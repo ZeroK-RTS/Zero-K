@@ -199,6 +199,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
 	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
 	['Settings/Interface/Missile Warnings']         = imgPath..'nuke_button_48.png',
+	['Settings/Interface/Player Name Tags']         = imgPath..'hellomynameis.png',
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
@@ -446,6 +447,8 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 
 local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
 	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
+
+ShButton('Settings/Interface/Player Name Tags', 'Toggle Player Name Tags', function() spSendCommands{"luaui togglewidget Unit Team Names"} end, "Draws player names near visible units.")
 
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
