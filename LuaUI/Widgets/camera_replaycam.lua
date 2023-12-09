@@ -1097,7 +1097,8 @@ local function updateDisplay(event)
 	elseif event.type == hotspotEventType then
 		commentary = "Something's going down here"
 	elseif event.type == overviewEventType then
-		camAngle = - pi / 2
+		-- Don't quite go to straight down, as Spring gets janky
+		camAngle = 0.01 - pi / 2
 		camType = camTypeOverview
 		commentary = "Let's get an overview of the battlefield"
 	elseif event.type == unitBuiltEventType then
