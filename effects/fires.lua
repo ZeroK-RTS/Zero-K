@@ -24,7 +24,7 @@ return {
         directional        = true,
 		--emitmul            = [[0, 2, 0]],
         emitrot            = 0,
-        emitrotspread      = 0.035,
+        emitrotspread      = 0.05,
         emitvector         = [[dir]],
         gravity            = [[0.1 r-0.2, 0.05, 0.1 r-0.2]],
         numparticles       = 1,
