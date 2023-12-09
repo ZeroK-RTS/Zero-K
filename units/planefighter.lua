@@ -65,7 +65,7 @@ return { planefighter = {
       [[custom:MUZZLE_ORANGE]],
       [[custom:FF_PUFF]],
       [[custom:BEAMWEAPON_MUZZLE_RED]],
-      [[custom:FLAMER]],
+      [[custom:flamer_cartoon]],
     },
 
   },

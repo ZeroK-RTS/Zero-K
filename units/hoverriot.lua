@@ -50,7 +50,7 @@ return { hoverriot = {
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
       [[custom:RAIDMUZZLE]],
-      [[custom:FLAMER]],
+      [[custom:flamer_cartoon]],
     },
 
   },

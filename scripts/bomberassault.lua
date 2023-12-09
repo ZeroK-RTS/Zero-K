@@ -39,7 +39,7 @@ local function AirManualFireThread()
 		local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 		if cmdID == CMD_AIR_MANUALFIRE then
 			if cp_3 then
-				Spring.SetUnitTarget(unitID, cp_1, cp_2, cp_3, false, false, 4)
+				Spring.SetUnitTarget(unitID, cp_1, cp_2, cp_3, false, false, manualfireWeapon)
 				manualTarget_p1 = cp_1
 				manualTarget_p2 = cp_2
 				manualTarget_p3 = cp_3
@@ -54,7 +54,7 @@ local function AirManualFireThread()
 							end
 						end)
 					if tx then
-						Spring.SetUnitTarget(unitID, tx, ty, tz, false, false, 4)
+						Spring.SetUnitTarget(unitID, tx, ty, tz, false, false, manualfireWeapon)
 						manualTarget_p1 = tx
 						manualTarget_p2 = ty
 						manualTarget_p3 = tz
@@ -75,7 +75,7 @@ local function AirManualFireThread()
 end
 
 local function IsManualFireTargetValid()
-	local targetType, isUser, targetParams = Spring.GetUnitWeaponTarget(unitID, 4)
+	local targetType, isUser, targetParams = Spring.GetUnitWeaponTarget(unitID, manualfireWeapon)
 	if targetType == 2 then
 		if targetParams and targetParams[1] == manualTarget_p1 and
 				targetParams[2] == manualTarget_p2 and targetParams[3] == manualTarget_p3 then
