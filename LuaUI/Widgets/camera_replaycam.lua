@@ -1,8 +1,8 @@
 function widget:GetInfo()
 	return {
-		name    = "ReplayCam",
-		desc    = "Pan to and comment on interesting events",
-		author  = "moreginger",
+		name    = "Action Tracking Camera",
+		desc    = "Automated camera for spectator mode",
+		author  = "fiendicus_prime",
 		date    = "2023-11-24",
 		license = "GNU GPL v2",
 		layer   = 0,
@@ -10,6 +10,7 @@ function widget:GetInfo()
 	}
 end
 
+local abs = math.abs
 local atan2 = math.atan2
 local cos = math.cos
 local deg = math.deg
@@ -33,13 +34,14 @@ local glPolygonMode = gl.PolygonMode
 local glRect = gl.Rect
 
 local spEcho = Spring.Echo
+local spGetAIInfo = Spring.GetAIInfo
 local spGetAllyTeamList = Spring.GetAllyTeamList
 local spGetCameraPosition = Spring.GetCameraPosition
 local spGetCameraState = Spring.GetCameraState
+local spGetGaiaTeamID = Spring.GetGaiaTeamID
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetHumanName = Spring.Utilities.GetHumanName
-local spGetMapDrawMode = Spring.GetMapDrawMode
 local spGetMouseState = Spring.GetMouseState
 local spGetMovetype = Spring.Utilities.getMovetype
 local spGetPlayerInfo = Spring.GetPlayerInfo
@@ -47,6 +49,7 @@ local spGetSpectatingState = Spring.GetSpectatingState
 local spGetTeamColor = Spring.GetTeamColor
 local spGetTeamInfo = Spring.GetTeamInfo
 local spGetTeamList = Spring.GetTeamList
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitNoDraw = Spring.GetUnitNoDraw
@@ -57,8 +60,8 @@ local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetViewGeometry = Spring.GetViewGeometry
 local spIsReplay = Spring.IsReplay
-local spSendCommands = Spring.SendCommands
 local spSetCameraState = Spring.SetCameraState
+local spSetMouseCursor = Spring.SetMouseCursor
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 
 local Chili
@@ -66,15 +69,13 @@ local Window
 local ScrollPanel
 local screen0
 
-local customCmds                = VFS.Include("LuaRules/Configs/customcmds.lua")
 local CMD_ATTACK = CMD.ATTACK
 local CMD_ATTACK_MOVE = CMD.FIGHT
 local CMD_MOVE = CMD.MOVE
-local CMD_RAW_MOVE = customCmds.RAW_MOVE
+local CMD_RAW_MOVE = VFS.Include("LuaRules/Configs/customcmds.lua").RAW_MOVE
 
 local framesPerSecond = 30
 local gameFrame = 0
-local doToggleLos = true
 
 -- CONFIGURATION
 
@@ -82,26 +83,83 @@ local LOG_ERROR, LOG_DEBUG = 1, 2
 local logging = LOG_ERROR
 local updateIntervalFrames = framesPerSecond
 local defaultFov, defaultRx, defaultRy = 45, -1.0, pi
+-- Time until we think the user is watching, not playing
+local userInactiveSecondsThreshold = 2
+
+-- GUI COMPONENTS
+
+local window_cpl, panel_cpl, commentary_cpl
+
+local function setupPanels()
+	window_cpl = Window:New {
+		parent = screen0,
+		dockable = true,
+		name = "Action Tracking",
+		color = { 0, 0, 0, 0 },
+		x = 100,
+		y = 200,
+		width = 500,
+		height = 50,
+		padding = { 0, 0, 0, 0 };
+		draggable = true,
+		resizable = true,
+		tweakDraggable = true,
+		tweakResizable = true,
+		minimizable = false,
+	}
+	panel_cpl = ScrollPanel:New {
+		parent = window_cpl,
+		width = "100%",
+		height = "100%",
+		padding = { 4, 4, 4, 4 },
+		scrollbarSize = 6,
+		horizontalScrollbar = false,
+	}
+	commentary_cpl = Chili.TextBox:New {
+		parent = panel_cpl,
+		width = "100%",
+		x = 0,
+		y = 0,
+		padding = { 4, 4, 4, 4 },
+		fontSize = 16,
+		text = "The quiet before the storm.",
+	}
+end
 
 options_path = 'Settings/Spectating/Action Tracking Camera'
+options_order = {"user_interrupts_tracking", "camera_rotation", "show_commentary", "tracking_reticle"}
 options = {
-	tracking_reticle = {
-		name = 'Show tracking reticle',
-		desc = 'Draw a reticle around the units being tracked',
-		type = 'bool',
-		value = false,
-	},
-	disable_tracking = {
-		name = 'Disable tracking',
-		desc = 'Disable camera tracking',
-		type = 'bool',
-		value = false,
-	},
 	user_interrupts_tracking = {
 		name = 'Pause tracking on user input',
 		desc = 'Pause camera tracking when the user moves the mouse etc',
 		type = 'bool',
 		value = true,
+	},
+	camera_rotation = {
+		name = 'Camera rotation',
+		desc = 'Can rotate the camera to keep up with the action',
+		type = 'bool',
+		value = true,
+	},
+	show_commentary = {
+		name = 'Show commentary',
+		desc = 'Show a commentary panel with information about the action',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			if self.value and not window_cpl then
+				setupPanels()
+			elseif not self.value and window_cpl then
+				window_cpl:Dispose()
+				window_cpl, panel_cpl, commentary_cpl = nil, nil, nil
+			end
+		end,
+	},
+	tracking_reticle = {
+		name = 'Show tracking reticle',
+		desc = 'Draw a reticle around the units being tracked',
+		type = 'bool',
+		value = false,
 	}
 }
 
@@ -500,15 +558,20 @@ function UnitInfoCache:_unitStats(unitDefID)
 	local cacheObject = self._unitStatsCache[unitDefID]
 	if not cacheObject then
 		local unitDef = UnitDefs[unitDefID]
+		local isStatic = not spGetMovetype(unitDef)
 		local importance = unitDef.metalCost
-		if unitDef.customParams.ismex then
-			-- Give mexes a little buff since they are cheap but important
-			importance = importance * 2
-		elseif unitDef.name == 'terraunit' then
-			-- terraunit has fixed cost of 100000, actual estimated cost is a unit rules param
+		if isStatic then
+			-- This helps us pick static builds to show. Mobile units are going to show up anyway
+			importance = importance * 1.5
+		end
+	    if unitDef.customParams.ismex then
+			-- Give mexes a little extra buff since they are cheap but important
+			importance = importance * 1.5
+		end
+		if unitDef.name == 'terraunit' then
+			-- terraunit has fixed cost of 100000, actual estimated cost is a unit rules param that we try to read later
 			importance = 500
 		end
-		local isStatic = not spGetMovetype(unitDef)
 		local wImportance, wRange = self:_weaponStats(unitDef)
 		cacheObject = { importance, isStatic, wImportance, wRange }
 		self._unitStatsCache[unitDefID] = cacheObject
@@ -726,10 +789,6 @@ local worldGridSize = 512
 local mapGridX, mapGridZ = mapSizeX / worldGridSize, mapSizeZ / worldGridSize
 local teamInfo, interestGrid, unitInfo
 
--- GUI COMPONENTS
-
-local window_cpl, panel_cpl, commentary_cpl
-
 -- EVENT TRACKING
 
 local attackEventType = "attack"
@@ -779,11 +838,11 @@ local eventStatistics = EventStatistics:new({
 	-- < 1: make each event seem less likely (more interesting)
 	eventMeanAdj = {
 		attack = 1.0,
-		building = 3.2,
+		building = 3.4,
 		hotspot = 0.7,
 		move = 5.0,
 		overview = 1.7,
-		unitBuilt = 1.6,
+		unitBuilt = 1.7,
 		unitDamaged = 0.8,
 		unitDestroyed = 0.5,
 		unitDestroyer = 0.7,
@@ -984,7 +1043,7 @@ local mapEdgeBorder = worldGridSize * 0.5
 local keepTrackingRange = worldGridSize * 2
 
 local display, initialCameraState, camera
-local userCameraOverrideFrame, lastMouseLocation = -1000, { -1, 0, -1 }
+local userInactiveSeconds, lastMouseLocation = 0, { -1, 0, -1 }
 
 local function initCamera(cx, cy, cz, rx, ry, type)
 	return { x = cx, y = cy, z = cz, xv = 0, yv = 0, zv = 0, rx = rx, rxv = 0, ry = ry, ryv = 0, fov = defaultFov, type = type }
@@ -1038,7 +1097,8 @@ local function updateDisplay(event)
 	elseif event.type == hotspotEventType then
 		commentary = "Something's going down here"
 	elseif event.type == overviewEventType then
-		camAngle = - pi / 2
+		-- Don't quite go to straight down, as Spring gets janky
+		camAngle = 0.01 - pi / 2
 		camType = camTypeOverview
 		commentary = "Let's get an overview of the battlefield"
 	elseif event.type == unitBuiltEventType then
@@ -1087,44 +1147,11 @@ local function updateDisplay(event)
 		end
 	end
 
-	commentary_cpl:SetText(commentary)
+	if options.show_commentary.value then
+		commentary_cpl:SetText(commentary)
+	end
 
 	return true
-end
-
-local function setupPanels()
-	window_cpl = Window:New {
-		parent = screen0,
-		dockable = true,
-		name = "replaycam",
-		color = { 0, 0, 0, 0 },
-		x = 100,
-		y = 200,
-		width = 500,
-		height = 100,
-		padding = { 0, 0, 0, 0 };
-		draggable = false,
-		resizable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		minimizable = false,
-	}
-	panel_cpl = ScrollPanel:New {
-		parent = window_cpl,
-		width = "100%",
-		height = "100%",
-		padding = { 4, 4, 4, 4 },
-		scrollbarSize = 6,
-		horizontalScrollbar = false,
-	}
-	commentary_cpl = Chili.TextBox:New {
-		parent = panel_cpl,
-		width = "100%",
-		x = 0,
-		y = 0,
-		fontSize = 16,
-		text = "The quiet before the storm.",
-	}
 end
 
 function widget:Shutdown()
@@ -1144,6 +1171,7 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 
 	-- Init teams.
+    local gaiaTeamID = spGetGaiaTeamID()
 	teamInfo = {}
 	local teamCount = 0
 	local allyTeams = spGetAllyTeamList()
@@ -1156,17 +1184,26 @@ function widget:Initialize()
 		end
 
 		for _, teamID in pairs(teamList) do
-			local teamLeader = nil
-			_, teamLeader = spGetTeamInfo(teamID)
-			local teamName = "unknown"
-			if teamLeader then
-				teamName = spGetPlayerInfo(teamLeader)
+			local teamName
+            if teamID == gaiaTeamID then
+                teamName = "Gaia"
+            else
+                local _, teamLeader, _, isAI = spGetTeamInfo(teamID)
+				if teamLeader < 0 then
+					teamLeader = spGetTeamRulesParam(teamID, "initLeaderID") or teamLeader
+				end
+                if isAI then
+                    local _, name = spGetAIInfo(teamID)
+                    teamName = name
+                else
+				    teamName = spGetPlayerInfo(teamLeader)
+                end
 			end
 			teamInfo[teamID] = {
 				allyTeam = allyTeam,
 				allyTeamName = allyTeamName,
 				color = { spGetTeamColor(teamID) } or { 1, 1, 1, 1 },
-				name = teamName
+				name = teamName or ("Team " .. teamID)
 			}
 			teamCount = teamCount + 1
 		end
@@ -1179,7 +1216,9 @@ function widget:Initialize()
 		interestGrid:add(location[1], location[3], allyTeam, interest)
 	end})
 
-	setupPanels()
+	if options.show_commentary then
+		setupPanels()
+	end
 
 	initialCameraState = spGetCameraState()
 
@@ -1197,11 +1236,6 @@ function widget:Initialize()
 end
 
 function widget:GameFrame(frame)
-	if doToggleLos and spGetMapDrawMode() == "los" then
-		spSendCommands("togglelos")
-		doToggleLos = false
-	end
-
 	gameFrame = frame
 	unitInfo:update(frame)
 
@@ -1258,8 +1292,7 @@ end
 
 local function userAction()
 	if options.user_interrupts_tracking.value then
-		-- Override camera movements for a short time.
-		userCameraOverrideFrame = gameFrame + framesPerSecond
+		userInactiveSeconds = 0
 	end
 end
 
@@ -1315,7 +1348,11 @@ local moveCommands = {
 	[CMD_RAW_MOVE] = true,
 }
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, _, _)
+    if not unitID or not unitDefID or not unitTeam or not cmdID or not cmdParams then
+		return
+	end
+
 	if not moveCommands[cmdID] and cmdID ~= CMD_ATTACK then
 		return
 	end
@@ -1391,14 +1428,23 @@ local function _updateBuildingEvent(event)
 	end
 end
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function widget:UnitCreated(unitID, unitDefID, unitTeam, _)
+	if not unitID or not unitDefID or not unitTeam then
+		return
+	end
+	
 	local allyTeam = teamInfo[unitTeam].allyTeam
 	local sbjLocation, _, importance, sbjName = unitInfo:watch(unitID, allyTeam, unitDefID)
 	local meta = { sbjUnitID = unitID }
 	addEvent(unitTeam, importance, sbjLocation, meta, sbjName, buildingEventType, unitID, _updateBuildingEvent)
 end
 
-function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
+function widget:UnitDamaged(unitID, unitDefID, _, damage, paralyzer, _, _, attackerID, _, attackerTeam)
+	-- attackerID and attackerTeam may be nil and are tolerated
+	if not unitID or not unitDefID or not damage then
+		return
+	end
+
 	if paralyzer then
 		-- Paralyzer weapons deal very high "damage", but it's not as important as real damage
 		damage = damage / 2
@@ -1419,18 +1465,18 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	end
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, _, attackerTeam)
+	-- First do some cleanup, if we can
+	if not unitID then
+		return
+	end
+
 	local destroyedLocation, _, importance, destroyedName = unitInfo:get(unitID)
 	unitInfo:forget(unitID)
 	purgeEvents(__purgeSubject, { unitID = unitID })
 
-	if not destroyedLocation or not importance or not destroyedName then
-		-- Might happen if an uncached unit is destroyed and fails to retrieve current location
-		return
-	end
-
-	if not attackerTeam then
-		-- Attempt to ignore cancelled builds and other similar things like comm upgrade
+	if not unitDefID or not unitTeam or not attackerID or not attackerTeam or not destroyedLocation or not importance or not destroyedName then
+		-- Ignore cancelled builds and other similar things like comm upgrade and other calls we don't understand
 		return
 	end
 
@@ -1451,12 +1497,20 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
+if not unitID or not unitDefID or not unitTeam then
+		return
+	end
+
 	local allyTeam = teamInfo[unitTeam].allyTeam
 	local sbjLocation, _, importance, sbjName = unitInfo:watch(unitID, allyTeam, unitDefID)
 	addEvent(unitTeam, importance, sbjLocation, nil, sbjName, unitBuiltEventType, unitID)
 end
 
-function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+function widget:UnitTaken(unitID, _, _, newTeam)
+if not unitID or not newTeam then
+		return
+	end
+
 	-- Note that UnitTaken (and UnitGiven) are both called for both capture and release.
 	local captureController = spGetUnitRulesParam(unitID, "capture_controller");
 	if not captureController or captureController == -1 then
@@ -1538,6 +1592,7 @@ local function updateCamera(dt, userCameraOverride)
 	end
 
 	local isOverview = display.camType == camTypeOverview;
+	local noRotation = isOverview or deferRotationRenderFrames == 0 or not options.camera_rotation.value
 	-- Smoothly move to the location of the event.
 	-- Camera position and vector
 	local cx, cy, cz, cxv, cyv, czv = camera.x, camera.y, camera.z, camera.xv, camera.yv, camera.zv
@@ -1549,10 +1604,10 @@ local function updateCamera(dt, userCameraOverride)
 	ex, ez = bound(ex, mapEdgeBorder, mapSizeX - mapEdgeBorder), bound(ez, mapEdgeBorder, mapSizeZ - mapEdgeBorder)
 	-- Where do we *want* the camera to be ie: (t)arget
 	local tcDist = calcCamRange(display.diag, defaultFov)
-	local try = isOverview and defaultRy or atan2(cx - ex, cz - ez) + pi
+	local try = noRotation and defaultRy or atan2(cx - ex, cz - ez) + pi
 	local pry = cry + cryv / cameraRAccel / 2
-	cryv = (deferRotationRenderFrames == 0 and 0) or cryv + signum(try - pry) * cameraRAccel * dt
-	cry = (deferRotationRenderFrames == 0 and try) or cry + cryv * dt
+	cryv = noRotation and 0 or cryv + signum(try - pry) * cameraRAccel * dt
+	cry = noRotation and try or cry + cryv * dt
 	-- Calculate target position
 	local tcDist2d = tcDist * cos(-display.camAngle)
 	local tcx, tcy, tcz = ex + tcDist2d * sin(cry - pi), ey + tcDist * sin(-display.camAngle), ez + tcDist2d * cos(cry - pi)
@@ -1597,17 +1652,17 @@ local function updateCamera(dt, userCameraOverride)
 		cz = cz + dt * czv
 
 		-- Rotate and zoom camera
-		local trx = isOverview and display.camAngle or -atan2(cy - ey, length(cx - ex, cz - ez))
+		local trx = noRotation and display.camAngle or -atan2(cy - ey, length(cx - ex, cz - ez))
 		local prx = crx + crxv / cameraRAccel / 2
-		crxv = (deferRotationRenderFrames == 0 and 0) or crxv + signum(trx - prx) * cameraRAccel * dt
-		crx = (deferRotationRenderFrames == 0 and display.camAngle) or crx + crxv * dt
+		crxv = noRotation and 0 or crxv + signum(trx - prx) * cameraRAccel * dt
+		crx = noRotation and display.camAngle or crx + crxv * dt
 		cfov = applyDamping(cfov, deg(2 * atan2(display.diag / 2, length(ex - cx, ey - cy, ez - cz))), 0.5, dt)
 	end
 
 	local showReticle = display.camType == camTypeTracking
 	camera = { x = cx, y = cy, z = cz, xv = cxv, yv = cyv, zv = czv, rx = crx, rxv = crxv, ry = cry, ryv = cryv, fov = cfov, deferRotationRenderFrames = deferRotationRenderFrames, reticle = showReticle and { xMin, zMin, xMax, zMax } }
-
-	if options.disable_tracking.value or userCameraOverride then
+	
+	if userCameraOverride then
 		return
 	end
 
@@ -1626,11 +1681,15 @@ end
 function widget:Update(dt)
 	local mx, my = spGetMouseState()
 	local newMouseLocation = { mx, 0, my }
-  if distance(newMouseLocation, lastMouseLocation) ~= 0 then
+    if distance(newMouseLocation, lastMouseLocation) ~= 0 then
 		lastMouseLocation = newMouseLocation
 		userAction()
 	end
-	updateCamera(dt, userCameraOverrideFrame >= gameFrame)
+	userInactiveSeconds = userInactiveSeconds + dt
+	if userInactiveSeconds > userInactiveSecondsThreshold then
+		spSetMouseCursor('none')
+	end
+	updateCamera(dt, userInactiveSeconds < userInactiveSecondsThreshold)
 end
 
 function widget:DrawScreen()
