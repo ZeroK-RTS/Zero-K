@@ -16,6 +16,7 @@ local SIG_BURROW = 1
 local burrowed = false
 
 local bombDefID = WeaponDefNames["gunshipbomb_gunshipbomb_bomb"].id
+local bombGravity = -WeaponDefs[bombDefID].customParams.mygravity
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
@@ -52,19 +53,55 @@ local function Burrow()
 	end
 end
 
+local function GetWeaponTargetPos(num)
+	local cmdID, cmdOpts, cmdTag, cps_1, cps_2, cps_3 = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID ~= CMD.ATTACK then
+		return false
+	end
+	if cps_3 then
+		return cps_1, cps_2, cps_3
+	end
+	local _,_,_, _,_,_, tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
+		function () return Spring.GetUnitPosition(cps_1, true, true) end)
+	return tx, ty, tz
+	-- The following would be superior, but GetUnitWeaponTarget returns 0 in script.Killed
+	--local targetType, _, target = Spring.GetUnitWeaponTarget(unitID, num)
+	--if targetType == 2 and target then
+	--	return target[1], target[2], target[3]
+	--end
+	--if targetType == 1 and target then
+	--	local _,_,_, _,_,_, tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
+	--		function () return Spring.GetUnitPosition(target, true, true) end)
+	--	return tx, ty, tz
+	--end
+	--return false
+end
+
 local function ThrowBomb()
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	if not vz then
 		return
 	end
 	local px, py, pz = Spring.GetUnitPosition(unitID)
+	local tx, ty, tz = GetWeaponTargetPos(1)
+	vy = vy + 0.2
+	if tx then
+		local horDist = math.sqrt((px - tx)*(px - tx) + (pz - tz)*(pz - tz))
+		local horSpeed = math.max(0.1, math.sqrt(vx*vx + vz*vz))
+		local horFrames = horDist/horSpeed
+		local vertPrediction = py + horFrames*vy + 0.5 * bombGravity*horFrames*horFrames
+		--Spring.Echo("bombGravity", horDist, horSpeed, horFrames)
+		--Spring.Echo("prediction", py - vertPrediction, py - ty)
+		local extraVelocityRequired = (ty - vertPrediction) / horFrames
+		vy = vy + math.max(-0.5, math.min(0.5, extraVelocityRequired))
+	end
 	local params = {
 		pos = {px, py, pz},
-		speed = {vx, vy + 0.3, vz},
+		speed = {vx, vy, vz},
 		team = Spring.GetUnitTeam(unitID),
 		owner = unitID,
 		ttl = 300,
-		gravity = -0.12,
+		gravity = bombGravity,
 	}
 	Spring.SpawnProjectile(bombDefID, params)
 end
@@ -109,6 +146,30 @@ end
 
 function script.StopMoving()
 	StartThread(Burrow)
+end
+
+function script.QueryWeapon(num)
+	return missile
+end
+
+function script.AimFromWeapon(num)
+	local _,_,_,speed = Spring.GetUnitVelocity(unitID)
+	if speed then
+		local range = (math.max(10, math.min(200, speed * 30 - 30)) / 200)*160
+		Spring.SetUnitWeaponState(unitID, 1, "range", range)
+		Spring.SetUnitMaxRange(unitID, range)
+	end
+	return missile
+end
+
+function script.AimWeapon(num, heading, pitch)
+	return true
+end
+
+function script.BlockShot(num, targetID)
+	Detonate()
+	--Spring.Utilities.UnitEcho(unitID, "D")
+	return true
 end
 
 function script.Killed(recentDamage, maxHealth)

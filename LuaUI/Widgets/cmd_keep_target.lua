@@ -35,7 +35,7 @@ options = {
 		name = "Prioritise overridden attack for bombers",
 		type = "bool",
 		value = false,
-		desc = "Also enables the behaviour of 'Prioritise overridden attack target' for bombers.",
+		desc = "Also enables the behaviour of 'Prioritise overridden attack target' for bombers and Blastwing.",
 		noHotkey = true,
 	},
 	removeTarget = {
@@ -54,7 +54,7 @@ local keepTargetDefs = {}
 local isFactory = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	keepTargetDefs[i] = not (ud.isBomberAirUnit or ud.isFactory or ud.customParams.reallyabomber)
+	keepTargetDefs[i] = not (ud.isBomberAirUnit or ud.isFactory or ud.customParams.reallyabomber or ud.customParams.avoid_sticky_keep_target)
 	isFactory[i] = ud.isFactory
 end
 

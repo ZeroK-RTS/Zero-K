@@ -56,7 +56,7 @@ for udid, ud in pairs(UnitDefs) do
 	end
 
 	if not burstDef then
-		burstDef = processWeapon(WeaponDefNames[ud.deathExplosion:lower()])
+		burstDef = processWeapon(WeaponDefNames[ud.customParams.stats_detonate_weapon or ud.deathExplosion:lower()])
 	end
 
 	if burstDef then

@@ -2,7 +2,8 @@ return { gunshipbomb = {
   name                   = [[Blastwing]],
   description            = [[Flying Bomb/Scout (Burrows)]],
   acceleration           = 0.25,
-  brakeRate              = 0.4,
+  airStrafe              = 0,
+  brakeRate              = 0.32,
   builder                = false,
   buildPic               = [[gunshipbomb.png]],
   canFly                 = true,
@@ -25,6 +26,7 @@ return { gunshipbomb = {
     landflystate   = [[1]],
     idle_cloak = 1,
     stats_detonate_weapon = [[gunshipbomb_gunshipbomb_bomb]],
+    avoid_sticky_keep_target = 1,
   },
 
   explodeAs              = [[TINY_BUILDINGEX]],
@@ -41,6 +43,7 @@ return { gunshipbomb = {
   maneuverleashlength    = [[1240]],
   maxSlope               = 36,
   metalCost              = 55,
+  moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[f-1.s3o]],
@@ -53,6 +56,17 @@ return { gunshipbomb = {
   upright                = false,
   workerTime             = 0,
   
+  weapons             = {
+
+    {
+      def                = [[fake_weapon]],
+      mainDir            = [[0 -0.15 1]],
+      maxAngleDif        = 25,
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+    },
+
+  },
+
   featureDefs            = {
 
     DEAD      = {
@@ -73,9 +87,10 @@ return { gunshipbomb = {
   },
 
   weaponDefs = {
-    gunshipbomb_bomb = {
-      name               = [[Blastwing Bomb]],
+    fake_weapon = {
+      name               = [[fake bogus weapon]],
       areaOfEffect       = 256,
+      avoidFeature       = false,
       cegTag             = [[blastwingtrail]],
       craterBoost        = 1,
       craterMult         = 3.5,
@@ -84,6 +99,8 @@ return { gunshipbomb = {
         setunitsonfire = "1",
         burnchance     = "1",
         burntime = 720,
+        burst = Shared.BURST_UNRELIABLE,
+        stats_burst_damage  = 300,
 
         --lups_heat_fx = [[firewalker]],
         light_color = [[1.6 0.8 0.32]],
@@ -102,7 +119,47 @@ return { gunshipbomb = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       model                   = [[f-1_bomb.s3o]],
-      myGravity               = 0.34,
+      myGravity               = 0.12,
+      noSelfDamage            = true,
+      range                   = 10,
+      reloadtime              = 5.6,
+      soundHit                = [[explosion/burn_explode]],
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 250,
+    },
+    gunshipbomb_bomb = {
+      name               = [[Blastwing Bomb]],
+      areaOfEffect       = 256,
+      cegTag             = [[blastwingtrail]],
+      craterBoost        = 1,
+      craterMult         = 3.5,
+
+      customParams          = {
+        setunitsonfire = "1",
+        burnchance     = "1",
+        burntime = 720,
+        burst = Shared.BURST_UNRELIABLE,
+        stats_burst_damage  = 300,
+
+        --lups_heat_fx = [[firewalker]],
+        light_color = [[1.6 0.8 0.32]],
+        light_radius = 500,
+      },
+
+      damage                  = {
+        default = 300,
+      },
+
+      explosionGenerator      = [[custom:blastwing]],
+      edgeeffectiveness       = 0.7,
+      explosionSpeed          = 10000,
+      firestarter             = 180,
+      impulseBoost            = 0.1,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      model                   = [[f-1_bomb.s3o]],
+      myGravity               = 0.12,
       noSelfDamage            = true,
       range                   = 750,
       reloadtime              = 5.6,
