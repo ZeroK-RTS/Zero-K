@@ -40,8 +40,9 @@ local unitAoeDefs = {}
 local unitDgunDefs = {}
 local unitHasBeenSetup = {}
 
-local aoeUnitInfos = {}
-local dgunUnitInfos = {}
+local aoeUnitInfo
+local aoeUnitID
+local dgunUnitInfo
 
 local selUnitID
 
@@ -361,8 +362,9 @@ end
 
 local function UpdateSelection(sel)
 	local maxCost = 0
-	dgunUnitInfos = {}
-	aoeUnitInfos = {}
+	dgunUnitInfo = false
+	aoeUnitInfo = false
+	aoeUnitID = false
 	sumoSelected = false
 	detrimentSelected = false
 	detrimentUnitID = nil
@@ -391,14 +393,16 @@ local function UpdateSelection(sel)
 			end
 			
 			if (dgunInfo[unitDefID]) then
-				dgunUnitInfos[unitID] = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+				dgunUnitInfo = dgunUnitInfo or {}
+				dgunUnitInfo[unitID] = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
 			end
 
 			if (aoeDefInfo[unitDefID]) then
 				local currCost = Spring.Utilities.GetUnitCost(unitID, unitDefID) * seenCount[unitDefID]
 				if (currCost > maxCost) then
 					maxCost = currCost
-					aoeUnitInfos[unitID] = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
+					aoeUnitID = unitID
+					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
 				end
 			end
 
@@ -763,7 +767,7 @@ end
 --Main draw
 --------------------------------------------------------------------------------
 
-local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
+local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeRingOnly)
 	if info.drawLeashedToRange then
 		tx, ty, tz = LeashDrawRange(unitID, info.range, tx, ty, tz)
 	end
@@ -773,6 +777,17 @@ local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
 	if (not fx) then
 		return
 	end
+	
+	if ((cmd == CMD_MANUALFIRE) or (cmd == CMD_AIR_MANUALFIRE)) and info.range then
+		glColor(1, 0.3, 0.3, 0.6)
+		glLineWidth(2)
+		glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)
+		glColor(1,1,1,1)
+	end
+	if rangeRingOnly then
+		return
+	end
+	
 	if (not info.mobile) then
 		fy = fy + GetUnitRadius(unitID)
 	end
@@ -812,13 +827,6 @@ local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
 		DrawOrbitalScatter(info.scatter, tx, ty, tz)
 	elseif (weaponType ~= "dontdraw") then
 		DrawAoE(tx, ty, tz, info.aoe, info.ee, false, false, info.circleMode)
-	end
-
-	if ((cmd == CMD_MANUALFIRE) or (cmd == CMD_AIR_MANUALFIRE)) and info.range then
-		glColor(1, 0, 0, 0.75)
-		glLineWidth(1)
-		glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)
-		glColor(1,1,1,1)
 	end
 end
 
@@ -865,14 +873,14 @@ function widget:DrawWorld()
 		return
 	end
 
-	if cmd == CMD_ATTACK then
-		for unitID, info in pairs(aoeUnitInfos) do
-			drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
-		end
+	if cmd == CMD_ATTACK and aoeUnitID then
+		drawForUnit(aoeUnitID, tx, ty, tz, targetIsGround, cmd, aoeUnitInfo)
 	end
-	if (cmd == CMD_MANUALFIRE or cmd == CMD_AIR_MANUALFIRE) then
-		for unitID, info in pairs(dgunUnitInfos) do
-			drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
+	if (cmd == CMD_MANUALFIRE or cmd == CMD_AIR_MANUALFIRE) and dgunUnitInfo then
+		local rangeRingOnly = false
+		for unitID, info in pairs(dgunUnitInfo) do
+			drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeRingOnly)
+			rangeRingOnly = true
 		end
 	end
 
