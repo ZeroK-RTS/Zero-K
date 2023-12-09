@@ -87,19 +87,27 @@ local defaultFov, defaultRx, defaultRy = 45, -1.0, pi
 local userInactiveSecondsThreshold = 2
 
 options_path = 'Settings/Spectating/Action Tracking Camera'
+options_order = {"user_interrupts_tracking", "camera_rotation", "tracking_reticle"}
 options = {
-	tracking_reticle = {
-		name = 'Show tracking reticle',
-		desc = 'Draw a reticle around the units being tracked',
-		type = 'bool',
-		value = false,
-		noHotkey = true,
-	},
 	user_interrupts_tracking = {
 		name = 'Pause tracking on user input',
 		desc = 'Pause camera tracking when the user moves the mouse etc',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+	},
+	camera_rotation = {
+		name = 'Camera rotation',
+		desc = 'Can rotate the camera to keep up with the action',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	tracking_reticle = {
+		name = 'Show tracking reticle',
+		desc = 'Draw a reticle around the units being tracked',
+		type = 'bool',
+		value = false,
 		noHotkey = true,
 	}
 }
@@ -1562,6 +1570,7 @@ local function updateCamera(dt, userCameraOverride)
 	end
 
 	local isOverview = display.camType == camTypeOverview;
+	local noRotation = isOverview or deferRotationRenderFrames == 0 or not options.camera_rotation.value
 	-- Smoothly move to the location of the event.
 	-- Camera position and vector
 	local cx, cy, cz, cxv, cyv, czv = camera.x, camera.y, camera.z, camera.xv, camera.yv, camera.zv
@@ -1573,10 +1582,10 @@ local function updateCamera(dt, userCameraOverride)
 	ex, ez = bound(ex, mapEdgeBorder, mapSizeX - mapEdgeBorder), bound(ez, mapEdgeBorder, mapSizeZ - mapEdgeBorder)
 	-- Where do we *want* the camera to be ie: (t)arget
 	local tcDist = calcCamRange(display.diag, defaultFov)
-	local try = isOverview and defaultRy or atan2(cx - ex, cz - ez) + pi
+	local try = noRotation and defaultRy or atan2(cx - ex, cz - ez) + pi
 	local pry = cry + cryv / cameraRAccel / 2
-	cryv = (deferRotationRenderFrames == 0 and 0) or cryv + signum(try - pry) * cameraRAccel * dt
-	cry = (deferRotationRenderFrames == 0 and try) or cry + cryv * dt
+	cryv = noRotation and 0 or cryv + signum(try - pry) * cameraRAccel * dt
+	cry = noRotation and try or cry + cryv * dt
 	-- Calculate target position
 	local tcDist2d = tcDist * cos(-display.camAngle)
 	local tcx, tcy, tcz = ex + tcDist2d * sin(cry - pi), ey + tcDist * sin(-display.camAngle), ez + tcDist2d * cos(cry - pi)
@@ -1621,16 +1630,16 @@ local function updateCamera(dt, userCameraOverride)
 		cz = cz + dt * czv
 
 		-- Rotate and zoom camera
-		local trx = isOverview and display.camAngle or -atan2(cy - ey, length(cx - ex, cz - ez))
+		local trx = noRotation and display.camAngle or -atan2(cy - ey, length(cx - ex, cz - ez))
 		local prx = crx + crxv / cameraRAccel / 2
-		crxv = (deferRotationRenderFrames == 0 and 0) or crxv + signum(trx - prx) * cameraRAccel * dt
-		crx = (deferRotationRenderFrames == 0 and display.camAngle) or crx + crxv * dt
+		crxv = noRotation and 0 or crxv + signum(trx - prx) * cameraRAccel * dt
+		crx = noRotation and display.camAngle or crx + crxv * dt
 		cfov = applyDamping(cfov, deg(2 * atan2(display.diag / 2, length(ex - cx, ey - cy, ez - cz))), 0.5, dt)
 	end
 
 	local showReticle = display.camType == camTypeTracking
 	camera = { x = cx, y = cy, z = cz, xv = cxv, yv = cyv, zv = czv, rx = crx, rxv = crxv, ry = cry, ryv = cryv, fov = cfov, deferRotationRenderFrames = deferRotationRenderFrames, reticle = showReticle and { xMin, zMin, xMax, zMax } }
-
+	
 	if userCameraOverride then
 		return
 	end
