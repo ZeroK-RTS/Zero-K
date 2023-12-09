@@ -558,15 +558,20 @@ function UnitInfoCache:_unitStats(unitDefID)
 	local cacheObject = self._unitStatsCache[unitDefID]
 	if not cacheObject then
 		local unitDef = UnitDefs[unitDefID]
+		local isStatic = not spGetMovetype(unitDef)
 		local importance = unitDef.metalCost
-		if unitDef.customParams.ismex then
-			-- Give mexes a little buff since they are cheap but important
-			importance = importance * 2
-		elseif unitDef.name == 'terraunit' then
-			-- terraunit has fixed cost of 100000, actual estimated cost is a unit rules param
+		if isStatic then
+			-- This helps us pick static builds to show. Mobile units are going to show up anyway
+			importance = importance * 1.5
+		end
+	    if unitDef.customParams.ismex then
+			-- Give mexes a little extra buff since they are cheap but important
+			importance = importance * 1.5
+		end
+		if unitDef.name == 'terraunit' then
+			-- terraunit has fixed cost of 100000, actual estimated cost is a unit rules param that we try to read later
 			importance = 500
 		end
-		local isStatic = not spGetMovetype(unitDef)
 		local wImportance, wRange = self:_weaponStats(unitDef)
 		cacheObject = { importance, isStatic, wImportance, wRange }
 		self._unitStatsCache[unitDefID] = cacheObject
@@ -833,11 +838,11 @@ local eventStatistics = EventStatistics:new({
 	-- < 1: make each event seem less likely (more interesting)
 	eventMeanAdj = {
 		attack = 1.0,
-		building = 3.2,
+		building = 3.4,
 		hotspot = 0.7,
 		move = 5.0,
 		overview = 1.7,
-		unitBuilt = 1.6,
+		unitBuilt = 1.7,
 		unitDamaged = 0.8,
 		unitDestroyed = 0.5,
 		unitDestroyer = 0.7,
