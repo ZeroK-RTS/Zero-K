@@ -61,7 +61,7 @@ return { gunshipbomb = {
     {
       def                = [[fake_weapon]],
       mainDir            = [[0 -0.15 1]],
-      maxAngleDif        = 25,
+      maxAngleDif        = 20,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -90,7 +90,6 @@ return { gunshipbomb = {
     fake_weapon = {
       name               = [[fake bogus weapon]],
       areaOfEffect       = 256,
-      avoidFeature       = false,
       cegTag             = [[blastwingtrail]],
       craterBoost        = 1,
       craterMult         = 3.5,
@@ -100,7 +99,7 @@ return { gunshipbomb = {
         burnchance     = "1",
         burntime = 720,
         burst = Shared.BURST_UNRELIABLE,
-        stats_burst_damage  = 300,
+        stats_burst_damage  = 320,
 
         --lups_heat_fx = [[firewalker]],
         light_color = [[1.6 0.8 0.32]],
@@ -108,11 +107,11 @@ return { gunshipbomb = {
       },
 
       damage                  = {
-        default = 300,
+        default = 320,
       },
 
       explosionGenerator      = [[custom:blastwing]],
-      edgeeffectiveness       = 0.7,
+      edgeeffectiveness       = 0.4,
       explosionSpeed          = 10000,
       firestarter             = 180,
       impulseBoost            = 0.1,
@@ -140,7 +139,7 @@ return { gunshipbomb = {
         burnchance     = "1",
         burntime = 720,
         burst = Shared.BURST_UNRELIABLE,
-        stats_burst_damage  = 300,
+        stats_burst_damage  = 320,
 
         --lups_heat_fx = [[firewalker]],
         light_color = [[1.6 0.8 0.32]],
@@ -148,11 +147,11 @@ return { gunshipbomb = {
       },
 
       damage                  = {
-        default = 300,
+        default = 320,
       },
 
       explosionGenerator      = [[custom:blastwing]],
-      edgeeffectiveness       = 0.7,
+      edgeeffectiveness       = 0.4,
       explosionSpeed          = 10000,
       firestarter             = 180,
       impulseBoost            = 0.1,

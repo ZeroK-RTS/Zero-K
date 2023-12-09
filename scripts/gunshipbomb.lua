@@ -78,22 +78,31 @@ local function GetWeaponTargetPos(num)
 end
 
 local function ThrowBomb()
+	if not Spring.ValidUnitID(unitID) then
+		return
+	end
+	local _, stunned, inbuild = Spring.GetUnitIsStunned(unitID)
+	if inbuild then
+		return
+	end
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	if not vz then
 		return
 	end
 	local px, py, pz = Spring.GetUnitPosition(unitID)
-	local tx, ty, tz = GetWeaponTargetPos(1)
-	vy = vy + 0.2
-	if tx then
-		local horDist = math.sqrt((px - tx)*(px - tx) + (pz - tz)*(pz - tz))
-		local horSpeed = math.max(0.1, math.sqrt(vx*vx + vz*vz))
-		local horFrames = horDist/horSpeed
-		local vertPrediction = py + horFrames*vy + 0.5 * bombGravity*horFrames*horFrames
-		--Spring.Echo("bombGravity", horDist, horSpeed, horFrames)
-		--Spring.Echo("prediction", py - vertPrediction, py - ty)
-		local extraVelocityRequired = (ty - vertPrediction) / horFrames
-		vy = vy + math.max(-0.5, math.min(0.5, extraVelocityRequired))
+	if not stunned then -- Vertical launch adjustment is an ability, so not availible while stunned.
+		local tx, ty, tz = GetWeaponTargetPos(1)
+		vy = vy + 0.2
+		if tx then
+			local horDist = math.sqrt((px - tx)*(px - tx) + (pz - tz)*(pz - tz))
+			local horSpeed = math.max(0.1, math.sqrt(vx*vx + vz*vz))
+			local horFrames = horDist/horSpeed
+			local vertPrediction = py + horFrames*vy + 0.5 * bombGravity*horFrames*horFrames
+			--Spring.Echo("bombGravity", horDist, horSpeed, horFrames)
+			--Spring.Echo("prediction", py - vertPrediction, py - ty)
+			local extraVelocityRequired = (ty - vertPrediction) / horFrames
+			vy = vy + math.max(-0.5, math.min(0.5, extraVelocityRequired))
+		end
 	end
 	local params = {
 		pos = {px, py, pz},
