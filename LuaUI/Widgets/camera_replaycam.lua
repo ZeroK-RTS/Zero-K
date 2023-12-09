@@ -49,6 +49,7 @@ local spGetSpectatingState = Spring.GetSpectatingState
 local spGetTeamColor = Spring.GetTeamColor
 local spGetTeamInfo = Spring.GetTeamInfo
 local spGetTeamList = Spring.GetTeamList
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitNoDraw = Spring.GetUnitNoDraw
@@ -1160,18 +1161,21 @@ function widget:Initialize()
                 teamName = "Gaia"
             else
                 local _, teamLeader, _, isAI = spGetTeamInfo(teamID)
+				if teamLeader < 0 then
+					teamLeader = spGetTeamRulesParam(teamID, "initLeaderID") or teamLeader
+				end
                 if isAI then
                     local _, name = spGetAIInfo(teamID)
                     teamName = name
                 else
-				teamName = spGetPlayerInfo(teamLeader)
+				    teamName = spGetPlayerInfo(teamLeader)
                 end
 			end
 			teamInfo[teamID] = {
 				allyTeam = allyTeam,
 				allyTeamName = allyTeamName,
 				color = { spGetTeamColor(teamID) } or { 1, 1, 1, 1 },
-				name = teamName
+				name = teamName or ("Team " .. teamID)
 			}
 			teamCount = teamCount + 1
 		end
