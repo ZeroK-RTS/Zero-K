@@ -207,7 +207,10 @@ local function GetAllyAverageStartpoint(allyTeamID)
 	return boxX, boxZ
 end
 
-local function CheckStartbox (boxID, x, z)
+local function CheckStartbox (boxID, x, z, ignoreDisable)
+	if (shuffleMode == "disable") and not ignoreDisable then
+		return true
+	end
 	if not boxID then
 		return true
 	end
