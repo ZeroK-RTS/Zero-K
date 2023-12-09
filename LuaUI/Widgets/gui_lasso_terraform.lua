@@ -84,7 +84,7 @@ local Grid = 16 -- grid size, do not change without other changes.
 local HOTKEY_PATH = 'Hotkeys/Construction'
 
 options_path = 'Settings/Interface/Building Placement'
-options_order = {'catlabel', 'structure_holdMouse', 'structure_altSelect', 'staticMouseTime', 'label_preset', 'text_hotkey_level', 'text_hotkey_raise'}
+options_order = {'catlabel', 'structure_holdMouse', 'structure_altSelect', 'staticMouseTime', 'staticMouseThreshold', 'label_preset', 'text_hotkey_level', 'text_hotkey_raise'}
 options = {
 	catlabel = {
 		name = 'Build Height',
@@ -109,6 +109,12 @@ options = {
 		name = "Structure Terraform Press Time",
 		type = "number",
 		value = 1, min = 0, max = 10, step = 0.05,
+	},
+	staticMouseThreshold = {
+		name = "Mouse drag threshold",
+		type = "number",
+		value = 20, min = 0, max = 400, step = 1,
+		desc = "Dragging the mouse more than this many pixels to start registering as a mouse movement.",
 	},
 	label_preset = {
 		type = 'label',
@@ -218,6 +224,7 @@ local commandMap = {
 local terraTag=-1
 
 local volumeSelection = 0
+local totalMouseMove = 0
 
 local currentlyActiveCommand = false
 local presetTerraHeight = false
@@ -1240,9 +1247,12 @@ function widget:MouseMove(mx, my, dx, dy, button)
 	--local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 	--local normal = select(2, Spring.GetGroundNormal(pos[1], pos[3]))
 	--Spring.Echo("normal", normal)
+	totalMouseMove = totalMouseMove + math.abs(dx or 0) + math.abs(dy or 0)
+	if totalMouseMove < options.staticMouseThreshold.value then
+		return
+	end
 
 	if drawingLasso then
-
 		if button == 1 then
 			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 			local a,c,m,s = spGetModKeyState()
