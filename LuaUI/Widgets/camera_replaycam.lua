@@ -94,21 +94,18 @@ options = {
 		desc = 'Pause camera tracking when the user moves the mouse etc',
 		type = 'bool',
 		value = true,
-		noHotkey = true,
 	},
 	camera_rotation = {
 		name = 'Camera rotation',
 		desc = 'Can rotate the camera to keep up with the action',
 		type = 'bool',
 		value = true,
-		noHotkey = true,
 	},
 	tracking_reticle = {
 		name = 'Show tracking reticle',
 		desc = 'Draw a reticle around the units being tracked',
 		type = 'bool',
 		value = false,
-		noHotkey = true,
 	}
 }
 
