@@ -380,7 +380,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
-		x, y, z = GetClosestValidSpawnSpot(startUnit, facing, x, z) -- adjust for new location.
+		x, y, z = GetClosestValidSpawnSpot(teamID, startUnit, facing, x, z) -- adjust for new location.
 
 		if CAMPAIGN_SPAWN_DEBUG then
 			local _, aiName = Spring.GetAIInfo(teamID)
