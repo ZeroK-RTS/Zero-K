@@ -134,7 +134,7 @@ void main() {
 	float opac = dot(normalize(v_normal), normalize(v_toeye));
 	opac = 1.0 - abs(opac);
 	opac = pow(opac, v_parameters.z) * v_parameters.y;
-	fragColor.a +=   mix(opac, opac * worldposfactor, v_parameters.w) ; // edge highlighing mixed according to animation
+	fragColor.a += mix(opac, opac * worldposfactor, v_parameters.w) ; // edge highlighing mixed according to animation
 	fragColor.rgb += opac * 1.3; // brighten all, a bit more
 	// debug all 3 components:
 	//fragColor.rgba = vec4(v_hcolor.a, opac * v_parameters.y, worldposfactor * v_parameters.w , 1.0);

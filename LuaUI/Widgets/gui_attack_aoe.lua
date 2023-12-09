@@ -873,7 +873,7 @@ function widget:DrawWorld()
 		return
 	end
 
-	if cmd == CMD_ATTACK and aoeUnitID then
+	if cmd == CMD_ATTACK and aoeUnitID and aoeUnitInfo then
 		drawForUnit(aoeUnitID, tx, ty, tz, targetIsGround, cmd, aoeUnitInfo)
 	end
 	if (cmd == CMD_MANUALFIRE or cmd == CMD_AIR_MANUALFIRE) and dgunUnitInfo then
