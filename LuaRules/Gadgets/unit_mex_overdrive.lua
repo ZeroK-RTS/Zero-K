@@ -52,7 +52,7 @@ local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.6
 local MEX_REFUND_SHARE = 0.8 -- refund starts at 80% of base income and linearly goes to 20% as full payback approaches
 local MEX_REFUND_MIN = 0.2
-local MISC_PAYBACK_OD_PROP = 0.1 -- Maximum proportion of overdrive metal that can go towards misc payback
+local MISC_PAYBACK_OD_PROP = 0.15 -- Maximum proportion of overdrive metal that can go towards misc payback
 
 --[[ Uses the regular 50% payback. This is because at 100% people would leave
      empty nanoframes for their allies to finish (actual experience from past).
@@ -1423,7 +1423,7 @@ function gadget:GameFrame(n)
 				local poolForEnergyPayback = summedOverdrive
 				local miscPaybackFactor = 1
 				if totalMiscPaybackRate > 0 then
-					miscPaybackFactor = math.min(1, (summedOverdrive * MISC_PAYBACK_OD_PROP) / (totalMiscPaybackRate * paybackFactorFunction(0)))
+					miscPaybackFactor = math.min(1, (summedOverdrive * MISC_PAYBACK_OD_PROP) / (totalMiscPaybackRate))
 					poolForEnergyPayback = summedOverdrive - totalMiscPaybackRate * miscPaybackFactor
 				end
 				
