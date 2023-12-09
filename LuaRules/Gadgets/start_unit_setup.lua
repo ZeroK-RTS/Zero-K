@@ -282,6 +282,63 @@ local function GetStartPos(teamID, teamInfo, isAI)
 	return x, y, z
 end
 
+local function CanUnitDropHere(startBoxID, unitDefID, x, y, z, facing, checkForFeature, checkForStartBox)
+	if checkForStartBox then
+		local inBox = GG.CheckStartbox(startBoxID, x, z)
+		if not inBox then return false end
+	end
+	local blocking, feature = Spring.TestBuildOrder(unitDefID, x, y, z, facing)
+	if checkForFeature then
+		return blocking == 3 -- Recoil engine now has 3 for "free", 2 for "blocked by feature"
+	else
+		return blocking > 1
+	end
+end
+
+local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
+	local startBoxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	local radius = 16
+	local canDropHere = false
+	local mag = 1
+	local spiralChangeNumber = 1
+	local movesLeft = 1
+	local dir = 1 -- 1: right, 2: up, 3: left, 4 down
+	local nx, ny, nz
+	local offsetX, offsetZ = 0, 0
+	local aborted = false
+	repeat -- 1 right, 1 up, 2 left, 2 down, 3 right, 3 up
+		nx = x + offsetX
+		nz = z + offsetZ
+		ny = Spring.GetGroundHeight(nx, nz)
+		canDropHere = CanUnitDropHere(startBoxID, unitDefID, nx, ny, nz, facing, false, true)
+		if canDropHere then
+			return nx, ny, nz
+		end
+		if movesLeft == 0 and not (mag == 8 and movesLeft == 0 and dir == 4) then 
+			spiralChangeNumber = spiralChangeNumber + 1
+			if spiralChangeNumber%3 == 0 then 
+				mag = mag + 1
+			end
+			movesLeft = mag
+			dir = dir%4 + 1
+		elseif mag == 8 and movesLeft == 0 and dir == 4 then -- abort
+			aborted = true 
+		else -- move to the next offset
+			if dir == 1 then
+				offsetX = offsetX + radius
+			elseif dir == 2 then
+				offsetZ = offsetZ + radius
+			elseif dir == 3 then
+				offsetX = offsetX - radius
+			elseif dir == 4 then
+				offsetZ = offsetZ - radius
+			end
+			movesLeft = movesLeft - 1
+		end
+	until canDropHere or aborted
+	return x, Spring.GetGroundHeight(x, z), z -- aborted, return original position.
+end
+	
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
 	if not teamID then
 		return
@@ -323,6 +380,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
+		x, y, z = GetClosestValidSpawnSpot(teamID, startUnit, facing, x, z) -- adjust for new location.
 
 		if CAMPAIGN_SPAWN_DEBUG then
 			local _, aiName = Spring.GetAIInfo(teamID)
