@@ -86,8 +86,48 @@ local defaultFov, defaultRx, defaultRy = 45, -1.0, pi
 -- Time until we think the user is watching, not playing
 local userInactiveSecondsThreshold = 2
 
+-- GUI COMPONENTS
+
+local window_cpl, panel_cpl, commentary_cpl
+
+local function setupPanels()
+	window_cpl = Window:New {
+		parent = screen0,
+		dockable = true,
+		name = "Action Tracking",
+		color = { 0, 0, 0, 0 },
+		x = 100,
+		y = 200,
+		width = 500,
+		height = 50,
+		padding = { 0, 0, 0, 0 };
+		draggable = true,
+		resizable = true,
+		tweakDraggable = true,
+		tweakResizable = true,
+		minimizable = false,
+	}
+	panel_cpl = ScrollPanel:New {
+		parent = window_cpl,
+		width = "100%",
+		height = "100%",
+		padding = { 4, 4, 4, 4 },
+		scrollbarSize = 6,
+		horizontalScrollbar = false,
+	}
+	commentary_cpl = Chili.TextBox:New {
+		parent = panel_cpl,
+		width = "100%",
+		x = 0,
+		y = 0,
+		padding = { 4, 4, 4, 4 },
+		fontSize = 16,
+		text = "The quiet before the storm.",
+	}
+end
+
 options_path = 'Settings/Spectating/Action Tracking Camera'
-options_order = {"user_interrupts_tracking", "camera_rotation", "tracking_reticle"}
+options_order = {"user_interrupts_tracking", "camera_rotation", "show_commentary", "tracking_reticle"}
 options = {
 	user_interrupts_tracking = {
 		name = 'Pause tracking on user input',
@@ -100,6 +140,20 @@ options = {
 		desc = 'Can rotate the camera to keep up with the action',
 		type = 'bool',
 		value = true,
+	},
+	show_commentary = {
+		name = 'Show commentary',
+		desc = 'Show a commentary panel with information about the action',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			if self.value and not window_cpl then
+				setupPanels()
+			elseif not self.value and window_cpl then
+				window_cpl:Dispose()
+				window_cpl, panel_cpl, commentary_cpl = nil, nil, nil
+			end
+		end,
 	},
 	tracking_reticle = {
 		name = 'Show tracking reticle',
@@ -730,10 +784,6 @@ local worldGridSize = 512
 local mapGridX, mapGridZ = mapSizeX / worldGridSize, mapSizeZ / worldGridSize
 local teamInfo, interestGrid, unitInfo
 
--- GUI COMPONENTS
-
-local window_cpl, panel_cpl, commentary_cpl
-
 -- EVENT TRACKING
 
 local attackEventType = "attack"
@@ -1091,45 +1141,11 @@ local function updateDisplay(event)
 		end
 	end
 
-	commentary_cpl:SetText(commentary)
+	if options.show_commentary.value then
+		commentary_cpl:SetText(commentary)
+	end
 
 	return true
-end
-
-local function setupPanels()
-	window_cpl = Window:New {
-		parent = screen0,
-		dockable = true,
-		name = "Action Tracking",
-		color = { 0, 0, 0, 0 },
-		x = 100,
-		y = 200,
-		width = 500,
-		height = 50,
-		padding = { 0, 0, 0, 0 };
-		draggable = true,
-		resizable = true,
-		tweakDraggable = true,
-		tweakResizable = true,
-		minimizable = false,
-	}
-	panel_cpl = ScrollPanel:New {
-		parent = window_cpl,
-		width = "100%",
-		height = "100%",
-		padding = { 4, 4, 4, 4 },
-		scrollbarSize = 6,
-		horizontalScrollbar = false,
-	}
-	commentary_cpl = Chili.TextBox:New {
-		parent = panel_cpl,
-		width = "100%",
-		x = 0,
-		y = 0,
-		padding = { 4, 4, 4, 4 },
-		fontSize = 16,
-		text = "The quiet before the storm.",
-	}
 end
 
 function widget:Shutdown()
@@ -1194,7 +1210,9 @@ function widget:Initialize()
 		interestGrid:add(location[1], location[3], allyTeam, interest)
 	end})
 
-	setupPanels()
+	if options.show_commentary then
+		setupPanels()
+	end
 
 	initialCameraState = spGetCameraState()
 
