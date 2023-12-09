@@ -1103,15 +1103,15 @@ local function setupPanels()
 	window_cpl = Window:New {
 		parent = screen0,
 		dockable = true,
-		name = "replaycam",
+		name = "Action Tracking",
 		color = { 0, 0, 0, 0 },
 		x = 100,
 		y = 200,
 		width = 500,
-		height = 100,
+		height = 50,
 		padding = { 0, 0, 0, 0 };
-		draggable = false,
-		resizable = false,
+		draggable = true,
+		resizable = true,
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = false,
@@ -1129,6 +1129,7 @@ local function setupPanels()
 		width = "100%",
 		x = 0,
 		y = 0,
+		padding = { 4, 4, 4, 4 },
 		fontSize = 16,
 		text = "The quiet before the storm.",
 	}
