@@ -1,6 +1,6 @@
 function widget:GetInfo()
 	return {
-		name    = "Unit Team Names",
+		name    = "Player Name Tags",
 		desc    = "Tag one onscreen unit with the team name",
 		author  = "fiendicus_prime",
 		date    = "2023-11-29",

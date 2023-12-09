@@ -448,7 +448,7 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
 	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
 
-ShButton('Settings/Interface/Player Name Tags', 'Toggle Player Name Tags', function() spSendCommands{"luaui togglewidget Unit Team Names"} end, "Draws player names near visible units.")
+ShButton('Settings/Interface/Player Name Tags', 'Toggle Player Name Tags', function() spSendCommands{"luaui togglewidget Player Name Tags"} end, "Draws player names near visible units.")
 
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
