@@ -59,8 +59,8 @@ function UnitCloaker:BeginDraw()
 	local x,y,z = Spring.GetCameraPosition()
 	gl.Uniform(cameraUniform,x,y,z)
 
-	x,y,z = gl.GetSun( "pos" )
-	gl.Light(0,GL.POSITION,x,y,z)
+	--x,y,z = gl.GetSun( "pos" )
+	--gl.Light(0,GL.POSITION,x,y,z)
 
 	gl.Uniform(lightUniform,x,y,z)
 
