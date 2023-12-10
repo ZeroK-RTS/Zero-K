@@ -111,7 +111,6 @@ return { bomberassault = {
       areaOfEffect            = 40,
       avoidFeature            = false,
       avoidFriendly           = false,
-      avoidGround             = false,
       avoidNeutral            = false,
       cegTag                  = [[custom:none]],
       craterBoost             = 0,
