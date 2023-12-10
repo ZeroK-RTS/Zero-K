@@ -30,7 +30,7 @@ local YELLOW = {1, 1, 0.35, 0.4}
 local LOB_WEAPON_NUM = 1
 
 options_path = "Settings/Interface/Falling Units/Lobster"
-options_order = {"drawEffectCircle", "checkReloadTime", "checkRange", "drawFor", "edgeRange", "useHightlight"}
+options_order = {"drawEffectCircle", "checkReloadTime", "checkRange", "drawFor", "edgeRange", "useHightlight", "highlightStrength"}
 options = {
 	drawEffectCircle = {
 		name = "Show effect circle",
@@ -74,6 +74,14 @@ options = {
 		type = "bool",
 		value = true,
 		desc = "Highlight units which will be lobbed. When disabled, circles are drawn below units that show more information.",
+	},
+	highlightStrength = {
+		name = "Highlight strength",
+		type = "number",
+		value = 0.6,
+		min = 0,
+		max = 1,
+		step = 0.01,
 	},
 }
 
@@ -307,7 +315,11 @@ local function UpdateHighlight()
 			if unitsInActiveLobsterRange[unitID] then
 				found[unitID] = true
 				if not highlightedUnits[unitID] then
-					highlightedUnits[unitID] = WG.HighlightUnitGL4(unitID, 'unitID', 0.3, 0.3, 0, 0.75, 0.2, 0.15, 0.2, 0, 0, 0)
+					highlightedUnits[unitID] = WG.HighlightUnitGL4(
+						unitID, 'unitID',
+						0.3, 0.3, 0, options.highlightStrength.value,
+						0.2, 0.15, 0.2, 0, 0, 0
+					)
 				end
 			end
 		end
