@@ -18,24 +18,25 @@ local log                 = math.log
 local min                 = math.min
 local sqrt                = math.sqrt
 
-local GetAIInfo           = Spring.GetAIInfo
-local GetAllUnits         = Spring.GetAllUnits
-local GetAllyTeamList     = Spring.GetAllyTeamList
-local GetCameraPosition   = Spring.GetCameraPosition
-local GetGaiaTeamID       = Spring.GetGaiaTeamID
-local GetMoveType         = Spring.Utilities.getMovetype
-local GetPlayerInfo       = Spring.GetPlayerInfo
-local GetTeamColor        = Spring.GetTeamColor
-local GetTeamInfo         = Spring.GetTeamInfo
-local GetTeamList         = Spring.GetTeamList
-local GetTeamRulesParam   = Spring.GetTeamRulesParam
-local GetUnitDefID        = Spring.GetUnitDefID
-local GetUnitHeight       = Spring.Utilities.GetUnitHeight
-local GetUnitPosition     = Spring.GetUnitPosition
-local GetUnitTeam         = Spring.GetUnitTeam
-local GetViewSizes        = Spring.GetViewSizes
-local IsUnitInView        = Spring.IsUnitInView
-local WorldToScreenCoords = Spring.WorldToScreenCoords
+local spGetAIInfo           = Spring.GetAIInfo
+local spGetAllUnits         = Spring.GetAllUnits
+local spGetAllyTeamList     = Spring.GetAllyTeamList
+local spGetCameraPosition   = Spring.GetCameraPosition
+local spGetGaiaTeamID       = Spring.GetGaiaTeamID
+local spGetMoveType         = Spring.Utilities.getMovetype
+local spGetPlayerInfo       = Spring.GetPlayerInfo
+local spGetTeamColor        = Spring.GetTeamColor
+local spGetTeamInfo         = Spring.GetTeamInfo
+local spGetTeamList         = Spring.GetTeamList
+local spGetTeamRulesParam   = Spring.GetTeamRulesParam
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitHeight       = Spring.Utilities.GetUnitHeight
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetViewSizes        = Spring.GetViewSizes
+local spIsGUIHidden         = Spring.IsGUIHidden
+local spIsUnitInView        = Spring.IsUnitInView
+local spWorldToScreenCoords = Spring.WorldToScreenCoords
 
 local glBillboard         = gl.Billboard
 local glCallList          = gl.CallList
@@ -96,25 +97,25 @@ local function _initTeam(teamID, name, color)
 end
 
 local function _initTeams()
-	local gaiaTeamID = GetGaiaTeamID()
-	for _, allyTeam in pairs(GetAllyTeamList()) do
-		for _, teamID in pairs(GetTeamList(allyTeam)) do
+	local gaiaTeamID = spGetGaiaTeamID()
+	for _, allyTeam in pairs(spGetAllyTeamList()) do
+		for _, teamID in pairs(spGetTeamList(allyTeam)) do
 			local teamName
 			if teamID == gaiaTeamID then
 				teamName = "Gaia"
 			else
-				local _, teamLeader, _, isAI = GetTeamInfo(teamID)
+				local _, teamLeader, _, isAI = spGetTeamInfo(teamID)
 				if teamLeader < 0 then
-                    teamLeader = GetTeamRulesParam(teamID, "initLeaderID") or teamLeader
+                    teamLeader = spGetTeamRulesParam(teamID, "initLeaderID") or teamLeader
 				end
 				if isAI then
-					local _, name = GetAIInfo(teamID)
+					local _, name = spGetAIInfo(teamID)
 					teamName = name
 				else
-					teamName = GetPlayerInfo(teamLeader)
+					teamName = spGetPlayerInfo(teamLeader)
 				end
 			end
-			local r, g, b = GetTeamColor(teamID)
+			local r, g, b = spGetTeamColor(teamID)
 
 			unitsByTeam[teamID] = {}
 			teamCheckDelays[teamID] = 0
@@ -127,15 +128,15 @@ local function _initTeams()
 end
 
 local function _addUnit(unitTeam, unitID, unitDefID)
-	unitDefID = unitDefID or GetUnitDefID(unitID)
+	unitDefID = unitDefID or spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
 	if not unitDef then
 		-- Why?
 		return
 	end
-	local isStatic = not GetMoveType(unitDef)
+	local isStatic = not spGetMoveType(unitDef)
 	local isComm = unitDef.customParams.level
-	local height = GetUnitHeight(unitDef) + heightOffset
+	local height = spGetUnitHeight(unitDef) + heightOffset
 	unitsByTeam[unitTeam][unitID] = { isStatic, isComm, height }
 end
 
@@ -154,8 +155,8 @@ end
 function widget:Initialize()
 	_initTeams()
 
-	for _, unitID in pairs(GetAllUnits()) do
-		_addUnit(GetUnitTeam(unitID), unitID, GetUnitDefID(unitID))
+	for _, unitID in pairs(spGetAllUnits()) do
+		_addUnit(spGetUnitTeam(unitID), unitID, spGetUnitDefID(unitID))
 	end
 end
 
@@ -166,11 +167,11 @@ function widget:Update(dt)
 end
 
 local function _GetScreenCoords(unitID)
-	local ux, uy, uz = GetUnitPosition(unitID)
+	local ux, uy, uz = spGetUnitPosition(unitID)
 	if not ux or not uy or not uz then
 		return
 	end
-	return WorldToScreenCoords(ux, uy, uz)
+	return spWorldToScreenCoords(ux, uy, uz)
 end
 
 local function _DrawTeamName(unitID, attributes)
@@ -182,7 +183,7 @@ local function _DrawTeamName(unitID, attributes)
 end
 
 local function _DrawTeamNames()
-	local sx, sy = GetViewSizes()
+	local sx, sy = spGetViewSizes()
 	local scale = WG.uiScale or 1
 	sx, sy = sx * scale, sy * scale
 	local scx, scy = sx / 2, sy / 2
@@ -201,13 +202,13 @@ local function _DrawTeamNames()
 		end
 
 		-- Find avatar
-        if (not teamAvatar and teamCheckDelays[teamID] <= 0) or (teamAvatar and not IsUnitInView(teamAvatar[2])) then
+        if (not teamAvatar and teamCheckDelays[teamID] <= 0) or (teamAvatar and not spIsUnitInView(teamAvatar[2])) then
 			teamAvatars[teamID] = nil
 			teamCheckDelays[teamID] = teamCheckDelay
 
             local bestUnitID, bestDistance, bestIsStatic, bestHeight = nil, 999999999, true, nil
 			for unitID, unitInfo in pairs(unitsByTeam[teamID]) do
-				if IsUnitInView(unitID) and (not onlyComms or unitInfo[2]) then
+				if spIsUnitInView(unitID) and (not onlyComms or unitInfo[2]) then
 					local isStatic = unitInfo[1]
 					local usx, usy = _GetScreenCoords(unitID)
 					local distance = _length(scx - usx, scy - usy)
@@ -225,11 +226,11 @@ local function _DrawTeamNames()
 		end
 	end
 
-	local cx, cy, cz = GetCameraPosition()
+	local cx, cy, cz = spGetCameraPosition()
 	for _, attributes in pairs(teamAvatars) do
 		-- Log scale the text so that it's readable over a wider range whilst still being world rendered
         local unitID = attributes[2]
-        local ux, uy, uz = GetUnitPosition(unitID)
+        local ux, uy, uz = spGetUnitPosition(unitID)
 		local cDistance = _length(cx - ux, cy - uy, cz - uz)
         attributes[4] = log(cDistance / 32, 2)
         glDrawFuncAtUnit(unitID, false, _DrawTeamName, unitID, attributes)
@@ -240,7 +241,7 @@ end
 
 function widget:DrawWorld()
 	-- Disable for maximum performance. Could be a (shared?) setting like the outline shader.
-	if Spring.IsGUIHidden() then return end
+	if spIsGUIHidden() then return end
 
 	_DrawTeamNames()
 end
