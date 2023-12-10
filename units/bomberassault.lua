@@ -128,6 +128,7 @@ return { bomberassault = {
         thermite_frames       = 900,
         thermite_dps_start    = 0,
         thermite_dps_end      = 1000,
+        thermite_ceg_initial  = [[beamerray_angry_thermite_initial]],
         thermite_ceg          = [[beamerray_angry_thermite]],
         thermite_sound        = [[weapon/burning_fixed]],
         thermite_sound_hit    = [[explosion/ex_med6]],

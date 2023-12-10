@@ -238,16 +238,28 @@ local cegs = {
         pos                = GeneratePositionInCircle(200, 2, 30),
       },
     },
+    redploom_long_large = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 45,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[i1]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_1400_LARGE]],
+        pos                = GeneratePositionInSphere(180, 8),
+      },
+    },
     redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 120,
+      count              = 50,
       ground             = true,
       water              = true,
       properties = {
         delay              = [[i1]],
         explosiongenerator = [[custom:NAPALMFIREBALL_1400]],
-        pos                = GeneratePositionInSphere(200, 4),
+        pos                = GeneratePositionInSphere(200, 8),
       },
     },
   },
@@ -462,7 +474,7 @@ local cegs = {
       water              = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:NAPALMFIREBALL_1400]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_1400_HELLFIRE]],
         pos                = GeneratePositionInSphere(100, 3),
       },
     },
@@ -742,7 +754,7 @@ local altforms = {
       },
     },
   },
-  napalmfireball_1400 = {
+  napalmfireball_1400_hellfire = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
@@ -754,6 +766,38 @@ local altforms = {
 		  particlespeed      = 0.6,
 		  particlesize       = 40,
 		  particlesizespread = 25,
+		  particlespeedspread = 2,},
+      }
+    }
+  },
+  napalmfireball_1400 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		properties = {
+		 colormap           = [[0 0 0 0.005   .42 .42 .42 0.19       .4 .4 .4 0.19       .4 .4 .4 0.19     .38 .38 .38 0.22    .35 .35 .35 0.22    .32 .32 .32 0.22    .28 .28 .28 0.3    .26 .26 .26 0.3    .24 .24 .24 0.3   0 0 0 0]],
+		  airdrag            = 0.95,
+		  particlelife       = 1200, --minimum particle lifetime in frames
+		  particlelifespread = 200, --max value of random lifetime added to each particle's lifetime
+		  particlespeed      = 0.6,
+		  particlesize       = 30,
+		  particlesizespread = 70,
+		  particlespeedspread = 2,},
+      }
+    }
+  },
+  napalmfireball_1400_large = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		properties = {
+		 colormap           = [[0 0 0 0.005  .24 .24 .24 0.3   .24 .24 .24 0.3   .24 .24 .24 0.3   .24 .24 .24 0.3   .24 .24 .24 0.3   .24 .24 .24 0.2      0 0 0 0]],
+		  airdrag            = 0.95,
+		  particlelife       = 900, --minimum particle lifetime in frames
+		  particlelifespread = 500, --max value of random lifetime added to each particle's lifetime
+		  particlespeed      = 0.6,
+		  particlesize       = 60,
+		  particlesizespread = 50,
 		  particlespeedspread = 2,},
       }
     }

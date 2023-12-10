@@ -37,6 +37,7 @@ for i = 1,#WeaponDefs do
 			maxSpeed = wcp.noexplode_speed_damage and WeaponDefs[i].projectilespeed,
 			thermiteFrames = wcp.thermite_frames,
 			ceg = wcp.thermite_ceg,
+			initialCeg = wcp.thermite_ceg_initial,
 			sound = wcp.thermite_sound,
 			hitSound = wcp.thermite_sound_hit,
 		}
@@ -246,9 +247,11 @@ local function UpdateProjectile(proID, proData, index, frame)
 		local height = Spring.GetGroundHeight(px, pz) or py
 		local vx, vy, vz, speed = Spring.GetProjectileVelocity(proID)
 		if proData.resetNextFrame then
-			if def.hitSound and not proData.playedHitAlready then
-				Spring.PlaySoundFile(def.hitSound, 14, px, py, pz, 'sfx')
-				proData.playedHitAlready = true
+			if not proData.hasHitSomething then
+				if def.hitSound then
+					Spring.PlaySoundFile(def.hitSound, 14, px, py, pz, 'sfx')
+				end
+				proData.hasHitSomething = true
 			end
 			px, py, pz = proData.px, proData.py, proData.pz
 			if proData.resetNextFrameShield then
@@ -281,7 +284,9 @@ local function UpdateProjectile(proID, proData, index, frame)
 		end
 		if def.ceg then
 			local height = Spring.GetGroundHeight(px, pz) or py
-			Spring.SpawnCEG(def.ceg, px, math.max(height, py), pz, vx, vy, vz, 10, proData.damageMod) 
+			local ceg = (not proData.hasHitSomething and def.initialCeg) or def.ceg
+			vx, vy, vz = vx/speed, vy/speed, vz/speed
+			Spring.SpawnCEG(ceg, px, math.max(height, py), pz, vx, vy, vz, 10, proData.damageMod) 
 		end
 	end
 	if proData.killFrame and frame >= proData.killFrame then
