@@ -418,7 +418,7 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 
 --- Spectating --- anything that's an interface but not a HUD Panel
 local pathSpectating = 'Settings/Spectating'
-	ShButton(pathSpectating .. "/Action Tracking Camera", 'Toggle Action Camera', function() spSendCommands{"luaui togglewidget ReplayCam"} end, "Toggles an automatic action tracking camera. Only activates for non-players.")
+	ShButton(pathSpectating .. "/Action Tracking Camera", 'Toggle Action Camera', function() spSendCommands{"luaui togglewidget Action Tracking Camera"} end, "Toggles an automatic action tracking camera. Only activates for non-players.")
 
 --- Interface --- anything that's an interface but not a HUD Panel
 local pathInterface = 'Settings/Interface'
