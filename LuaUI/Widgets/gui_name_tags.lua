@@ -14,9 +14,9 @@ end
 -- speed-ups
 --------------------------------------------------------------------------------
 
-local log                 = math.log
-local min                 = math.min
-local sqrt                = math.sqrt
+local log                   = math.log
+local min                   = math.min
+local sqrt                  = math.sqrt
 
 local spGetAIInfo           = Spring.GetAIInfo
 local spGetAllUnits         = Spring.GetAllUnits
@@ -38,32 +38,32 @@ local spIsGUIHidden         = Spring.IsGUIHidden
 local spIsUnitInView        = Spring.IsUnitInView
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 
-local glBillboard         = gl.Billboard
-local glCallList          = gl.CallList
-local glColor             = gl.Color
-local glCreateList        = gl.CreateList
-local glDrawFuncAtUnit    = gl.DrawFuncAtUnit
-local glScale             = gl.Scale
-local glTranslate         = gl.Translate
-local font                = gl.LoadFont('FreeSansBold.otf', 64, 8, 6)
+local glBillboard           = gl.Billboard
+local glCallList            = gl.CallList
+local glColor               = gl.Color
+local glCreateList          = gl.CreateList
+local glDrawFuncAtUnit      = gl.DrawFuncAtUnit
+local glScale               = gl.Scale
+local glTranslate           = gl.Translate
+local font                  = gl.LoadFont('FreeSansBold.otf', 64, 8, 6)
 
 --------------------------------------------------------------------------------
 -- config
 --------------------------------------------------------------------------------
 
-local heightOffset        = 32
-local teamCheckDelay      = 0.25
+local heightOffset          = 32
+local teamCheckDelay        = 0.25
 -- labels are sticky unless units stray into screen borders defined by this fraction
-local borderFraction      = 0.15
+local borderFraction        = 0.15
 
-local teams               = {}
-local unitsByTeam         = {}
-local teamAvatars         = {}
-local teamCheckDelays     = {}
+local teams                 = {}
+local unitsByTeam           = {}
+local teamAvatars           = {}
+local teamCheckDelays       = {}
 
-options_path              = "Settings/Interface/Player Name Tags"
-options_order             = { "onlyComms" }
-options                   = {
+options_path                = "Settings/Interface/Player Name Tags"
+options_order               = { "onlyComms" }
+options                     = {
 	onlyComms = {
 		name = "Only tag Commanders",
 		type = "bool",
@@ -76,7 +76,7 @@ options                   = {
 	},
 }
 
-onlyComms                 = options.onlyComms.value
+onlyComms                   = options.onlyComms.value
 
 local function _length(x, y, z)
 	return sqrt(x * x + y * y + (z and z * z or 0))
@@ -86,14 +86,14 @@ end
 local nameTagsList = {}
 
 local function _initTeam(teamID, name, color)
-    teams[teamID] = true
-    nameTagsList[teamID] = glCreateList(function()
-        font:Begin()
-        font:SetTextColor(color)
-        font:SetOutlineColor(0, 0, 0, 1)
-        font:Print(name, 0, 0, 5, "con")
-        font:End()
-    end)
+	teams[teamID] = true
+	nameTagsList[teamID] = glCreateList(function()
+		font:Begin()
+		font:SetTextColor(color)
+		font:SetOutlineColor(0, 0, 0, 1)
+		font:Print(name, 0, 0, 5, "con")
+		font:End()
+	end)
 end
 
 local function _initTeams()
@@ -106,7 +106,7 @@ local function _initTeams()
 			else
 				local _, teamLeader, _, isAI = spGetTeamInfo(teamID)
 				if teamLeader < 0 then
-                    teamLeader = spGetTeamRulesParam(teamID, "initLeaderID") or teamLeader
+					teamLeader = spGetTeamRulesParam(teamID, "initLeaderID") or teamLeader
 				end
 				if isAI then
 					local _, name = spGetAIInfo(teamID)
@@ -120,9 +120,9 @@ local function _initTeams()
 			unitsByTeam[teamID] = {}
 			teamCheckDelays[teamID] = 0
 
-            local name = teamName or ("Team " .. teamID)
-            local color = r and g and b and { r, g, b, 1 } or { 1, 1, 1, 1 }
-            _initTeam(teamID, name, color)
+			local name = teamName or ("Team " .. teamID)
+			local color = r and g and b and { r, g, b, 1 } or { 1, 1, 1, 1 }
+			_initTeam(teamID, name, color)
 		end
 	end
 end
@@ -175,11 +175,11 @@ local function _GetScreenCoords(unitID)
 end
 
 local function _DrawTeamName(unitID, attributes)
-    local teamID, _, height, scale = unpack(attributes)
-    glTranslate(0, height, 0)
-    glScale(scale, scale, scale)
+	local teamID, _, height, scale = unpack(attributes)
+	glTranslate(0, height, 0)
+	glScale(scale, scale, scale)
 	glBillboard()
-    glCallList(nameTagsList[teamID])
+	glCallList(nameTagsList[teamID])
 end
 
 local function _DrawTeamNames()
@@ -187,14 +187,15 @@ local function _DrawTeamNames()
 	local scale = WG.uiScale or 1
 	sx, sy = sx * scale, sy * scale
 	local scx, scy = sx / 2, sy / 2
-	local sxmin, sxmax, symin, symax = sx * borderFraction, sx * (1 - borderFraction), sy * borderFraction, sy * (1 - borderFraction)
+	local sxmin, sxmax, symin, symax = sx * borderFraction, sx * (1 - borderFraction), sy * borderFraction,
+		sy * (1 - borderFraction)
 
-    for teamID, _ in pairs(teams) do
+	for teamID, _ in pairs(teams) do
 		local teamAvatar = teamAvatars[teamID]
 
 		-- Periodically check if avatar is near center of screen
 		if teamAvatar and teamCheckDelays[teamID] <= 0 then
-            local usx, usy = _GetScreenCoords(teamAvatar[2])
+			local usx, usy = _GetScreenCoords(teamAvatar[2])
 			if not usx or not usy or usx < sxmin or usx > sxmax or usy < symin or usy > symax then
 				teamAvatar = nil
 				teamAvatars[teamID] = nil
@@ -202,11 +203,11 @@ local function _DrawTeamNames()
 		end
 
 		-- Find avatar
-        if (not teamAvatar and teamCheckDelays[teamID] <= 0) or (teamAvatar and not spIsUnitInView(teamAvatar[2])) then
+		if (not teamAvatar and teamCheckDelays[teamID] <= 0) or (teamAvatar and not spIsUnitInView(teamAvatar[2])) then
 			teamAvatars[teamID] = nil
 			teamCheckDelays[teamID] = teamCheckDelay
 
-            local bestUnitID, bestDistance, bestIsStatic, bestHeight = nil, 999999999, true, nil
+			local bestUnitID, bestDistance, bestIsStatic, bestHeight = nil, 999999999, true, nil
 			for unitID, unitInfo in pairs(unitsByTeam[teamID]) do
 				if spIsUnitInView(unitID) and (not onlyComms or unitInfo[2]) then
 					local isStatic = unitInfo[1]
@@ -215,13 +216,13 @@ local function _DrawTeamNames()
 					if (bestIsStatic and not isStatic) or ((bestIsStatic or not isStatic) and bestDistance > distance) then
 						bestDistance = distance
 						bestUnitID = unitID
-                        bestHeight = unitInfo[3]
+						bestHeight = unitInfo[3]
 						bestIsStatic = isStatic
 					end
 				end
 			end
-            if bestUnitID ~= nil and bestHeight ~= nil then
-                teamAvatars[teamID] = { teamID, bestUnitID, bestHeight }
+			if bestUnitID ~= nil and bestHeight ~= nil then
+				teamAvatars[teamID] = { teamID, bestUnitID, bestHeight }
 			end
 		end
 	end
@@ -229,11 +230,11 @@ local function _DrawTeamNames()
 	local cx, cy, cz = spGetCameraPosition()
 	for _, attributes in pairs(teamAvatars) do
 		-- Log scale the text so that it's readable over a wider range whilst still being world rendered
-        local unitID = attributes[2]
-        local ux, uy, uz = spGetUnitPosition(unitID)
+		local unitID = attributes[2]
+		local ux, uy, uz = spGetUnitPosition(unitID)
 		local cDistance = _length(cx - ux, cy - uy, cz - uz)
-        attributes[4] = log(cDistance / 32, 2)
-        glDrawFuncAtUnit(unitID, false, _DrawTeamName, unitID, attributes)
+		attributes[4] = log(cDistance / 32, 2)
+		glDrawFuncAtUnit(unitID, false, _DrawTeamName, unitID, attributes)
 	end
 
 	glColor(1, 1, 1, 1)
