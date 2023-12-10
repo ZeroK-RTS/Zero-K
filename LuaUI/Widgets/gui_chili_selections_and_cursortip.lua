@@ -999,13 +999,18 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	local newSelectedUnits
 	
 	if (button == 3) then
-		if shift then
-			--// deselect a whole unitdef block
+		if alt or shift then
+			--// deselect whole block, or half if alt is held
+			local toDeselect = #unitList
+			if alt then
+				toDeselect = math.floor(toDeselect / 2)
+			end
 			newSelectedUnits = {}
 			local j = 1
 			for i = 1, #selectedUnitsList do
-				if unitList[j] and selectedUnitsList[i] == unitList[j] then
+				if toDeselect > 0 and unitList[j] and selectedUnitsList[i] == unitList[j] then
 					j = j + 1
+					toDeselect = toDeselect - 1
 				else
 					newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
 				end
@@ -1025,15 +1030,26 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	elseif button == 1 then
 		if ctrl then
 			ctrlFilterUnits = ctrlFilterUnits or {}
-			if shift then
-				for i = 1, #unitList do
+			if shift or alt then
+				local toSelect = #unitList
+				if alt then
+					toSelect = math.ceil(toSelect / 2)
+				end
+				for i = 1, toSelect do
 					ctrlFilterUnits[#ctrlFilterUnits + 1] = unitList[i]
 				end
 			else
 				ctrlFilterUnits[#ctrlFilterUnits + 1] = unitID
 			end
 		else
-			if shift then
+			if alt then
+				local toSelect = math.ceil(#unitList / 2)
+				newSelectedUnits = {}
+				for i = 1, toSelect do
+					newSelectedUnits[#newSelectedUnits + 1] = unitList[i]
+				end
+				spSelectUnitArray(newSelectedUnits)
+			elseif shift then
 				spSelectUnitArray(unitList) -- select all
 			else
 				spSelectUnitArray({unitID})  -- only 1
@@ -2821,12 +2837,24 @@ function widget:Initialize()
 		singleSelectionTooltip = "\n" ..
 			green .. WG.Translate("interface", "lmb") .. ": " .. "Center view" .. "\n" ..
 			green .. WG.Translate("interface", "space_click_show_stats")
+		--selectionTooltip = "\n" ..
+		--	green .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" ..
+		--	green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
+		--	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
+		--	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" ..
+		--	green .. WG.Translate("interface", "alt") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type_half") .. "\n" ..
+		--	green .. WG.Translate("interface", "alt") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type_half") .. "\n" ..
+		--	green .. WG.Translate("interface", "ctrl") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
+		--	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
+		--	green .. WG.Translate("interface", "space_click_show_stats")
+
 		selectionTooltip = "\n" ..
-			green .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" ..
-			green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
-			green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
-			green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" ..
-			green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
+			green .. WG.Translate("interface", "lmb")   .. ": " .. WG.Translate("interface", "select") .. "\n" ..
+			green .. WG.Translate("interface", "rmb")   .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "alt")   .. ": " .. WG.Translate("interface", "select_type_half") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "ctrl")  .. ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
+			green .. WG.Translate("interface", "mmb")   .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
 			green .. WG.Translate("interface", "space_click_show_stats")
 
 		unitSelectionTooltipCache = {}
