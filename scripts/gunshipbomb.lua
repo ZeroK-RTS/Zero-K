@@ -15,6 +15,10 @@ local smokePiece = { base, l_wing, r_wing }
 local SIG_BURROW = 1
 local burrowed = false
 
+local PREDICT_FRAMES = 25
+local PREDICT_SPEED_CAP = 2.8
+local WEAPON_NUM = 1
+
 local bombDefID = WeaponDefNames["gunshipbomb_gunshipbomb_bomb"].id
 local bombGravity = -WeaponDefs[bombDefID].customParams.mygravity
 
@@ -53,17 +57,20 @@ local function Burrow()
 	end
 end
 
-local function GetWeaponTargetPos(num)
+local function GetWeaponTargetPos(num, distanceLimit)
 	local cmdID, cmdOpts, cmdTag, cps_1, cps_2, cps_3 = Spring.GetUnitCurrentCommand(unitID)
 	if cmdID ~= CMD.ATTACK then
 		return false
 	end
 	if cps_3 then
-		return cps_1, cps_2, cps_3
+		return cps_1, cps_2, cps_3, false
+	end
+	if (not Spring.ValidUnitID(cps_1)) or (distanceLimit and Spring.GetUnitSeparation(unitID, cps_1, true) > distanceLimit) then
+		return
 	end
 	local _,_,_, _,_,_, tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
 		function () return Spring.GetUnitPosition(cps_1, true, true) end)
-	return tx, ty, tz
+	return tx, ty, tz, cps_1
 	-- The following would be superior, but GetUnitWeaponTarget returns 0 in script.Killed
 	--local targetType, _, target = Spring.GetUnitWeaponTarget(unitID, num)
 	--if targetType == 2 and target then
@@ -91,7 +98,7 @@ local function ThrowBomb()
 	end
 	local px, py, pz = Spring.GetUnitPosition(unitID)
 	if not stunned then -- Vertical launch adjustment is an ability, so not availible while stunned.
-		local tx, ty, tz = GetWeaponTargetPos(1)
+		local tx, ty, tz = GetWeaponTargetPos(WEAPON_NUM)
 		vy = vy + 0.2
 		if tx then
 			local horDist = math.sqrt((px - tx)*(px - tx) + (pz - tz)*(pz - tz))
@@ -165,8 +172,23 @@ function script.AimFromWeapon(num)
 	local _,_,_,speed = Spring.GetUnitVelocity(unitID)
 	if speed then
 		local range = (math.max(10, math.min(200, speed * 30 - 30)) / 200)*160
-		Spring.SetUnitWeaponState(unitID, 1, "range", range)
+		Spring.SetUnitWeaponState(unitID, WEAPON_NUM, "range", range)
 		Spring.SetUnitMaxRange(unitID, range)
+	end
+	
+	-- Gunship move goals towards their target update infrequently (about 1Hz?),
+	-- enough for Blastwing to aim sideways and miss consistently.
+	local tx, ty, tz, targetID = GetWeaponTargetPos(WEAPON_NUM, 600)
+	if tx and targetID then
+		local vx, vy, vz, tSpeed = Spring.GetUnitVelocity(targetID, true)
+		if vx and tSpeed then
+			if tSpeed > PREDICT_SPEED_CAP then
+				local mult = PREDICT_SPEED_CAP / tSpeed
+				vx, vy, vz = vx*mult, vy*mult, vz*mult
+			end
+			tx, ty, tz = tx + vx*PREDICT_FRAMES, ty + vy*PREDICT_FRAMES, tz + vz*PREDICT_FRAMES
+		end
+		Spring.SetUnitMoveGoal(unitID, tx, ty, tz)
 	end
 	return missile
 end
