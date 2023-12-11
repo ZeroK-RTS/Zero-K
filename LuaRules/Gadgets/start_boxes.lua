@@ -14,6 +14,7 @@ local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), fals
 local shuffleMode = Spring.GetModOptions().shuffle or "auto"
 local startboxConfig
 
+local isCampaignBattle = Spring.GetModOptions().singleplayercampaignbattleid and true
 local ParseBoxes = VFS.Include ("LuaRules/Gadgets/Include/startbox_utilities.lua")
 
 local function GetAverageStartpoint(boxID)
@@ -208,6 +209,9 @@ local function GetAllyAverageStartpoint(allyTeamID)
 end
 
 local function CheckStartbox (boxID, x, z, ignoreDisable)
+	if isCampaignBattle then
+		return true
+	end
 	if (shuffleMode == "disable") and not ignoreDisable then
 		return true
 	end
