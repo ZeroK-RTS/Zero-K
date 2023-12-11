@@ -42,6 +42,7 @@ local glBillboard           = gl.Billboard
 local glCallList            = gl.CallList
 local glColor               = gl.Color
 local glCreateList          = gl.CreateList
+local glDeleteList          = gl.DeleteList
 local glDrawFuncAtUnit      = gl.DrawFuncAtUnit
 local glScale               = gl.Scale
 local glTranslate           = gl.Translate
@@ -157,6 +158,12 @@ function widget:Initialize()
 
 	for _, unitID in pairs(spGetAllUnits()) do
 		_addUnit(spGetUnitTeam(unitID), unitID, spGetUnitDefID(unitID))
+	end
+end
+
+function widget:Shutdown()
+	for _, list in pairs(nameTagsList) do
+		glDeleteList(list)
 	end
 end
 
