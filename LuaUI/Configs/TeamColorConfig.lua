@@ -7,14 +7,13 @@ end
 
 local colors = {
 	myColor		= Range({ 050, 250, 050 }),	-- can only be 1 color
---	myColor		= Range({ 008, 192, 016 }),
 	gaiaColor	= Range({ 200, 200, 200 }),	-- can only be 1 color
 	
 	allyColors = {
 	  -- the first three ally colours are shades of blue
 	  -- this is so that in a MM game (4v4 or less) you are the only one green
 	  -- this is effectively soft simplecolors without the main disadvantage
-	  Range({ 010, 080, 255 }),
+	  Range({ 050, 110, 255 }),
 	  Range({ 010, 250, 250 }),
 	  Range({ 150, 150, 255 }),
 
@@ -50,7 +49,6 @@ local colors = {
 
 local colorsTeal = {
 	myColor		= Range({ 013, 245, 243 }),	-- can only be 1 color
---	myColor		= Range({ 008, 192, 016 }),
 	gaiaColor	= Range({ 200, 200, 200 }),	-- can only be 1 color
 	
 	allyColors = {
@@ -130,13 +128,6 @@ local simpleColors = {
 	allyColors = {colors.allyColors[1]},
 	enemyColors = {colors.enemyColors[1]},
 	enemyByTeamColors = colors.enemyColors,
-}
-
-local simpleColorsTeams = {
-	myColor = colors.myColor,
-	gaiaColor = colors.gaiaColor,
-	allyColors = {colors.allyColors[1]},
-	enemyColors = colors.enemyColors,
 }
 
 local simpleColorblind = {
