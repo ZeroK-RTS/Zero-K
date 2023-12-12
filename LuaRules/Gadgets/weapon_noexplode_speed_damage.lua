@@ -277,7 +277,7 @@ local function UpdateProjectile(proID, proData, index, frame)
 			proData.resetNextFrame = false
 			if def.sound then
 				if (not proData.nextSoundFrame) or proData.nextSoundFrame < frame then
-					Spring.PlaySoundFile(def.sound, 4.5*(math.random()*0.5 + 0.5) + 0.3*proData.damageMod, px, py, pz, 'sfx')
+					Spring.PlaySoundFile(def.sound, 3.5*(math.random()*0.5 + 0.5) + 0.3*proData.damageMod + (proData.hasDamaged and 4 or 0), px, py, pz, 'sfx')
 					proData.nextSoundFrame = frame + 28 + math.random()*5 - 0.2*proData.damageMod
 				end
 			end
