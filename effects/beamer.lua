@@ -203,7 +203,7 @@ return {
         colormap           = [[0.8 0.8 0.8 0.01   1 1 1 0.01  1 0.4 0 0.01  1 0.2 0.2 0.01  0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
-        emitrotspread      = [[30 d0.5]],
+        emitrotspread      = [[30 d0.6]],
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, -1.5 r0.25, 0]],
         numparticles       = [[d0.15 2.8 k1]],
