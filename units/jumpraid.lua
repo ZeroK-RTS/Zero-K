@@ -90,7 +90,7 @@ return { jumpraid = {
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
-      cegTag                  = [[flamer]],
+      cegTag                  = [[flamer_240_range]],
 
       customParams            = {
         flamethrower = [[1]],

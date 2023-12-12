@@ -8,13 +8,12 @@
 -- fire1_burn1_flame2
 -- fire1
 
-return {
-
+local defs = {
   ["flamer"] = {
     fire = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
-      count              = 4,
+      count              = 1,
       ground             = true,
       water              = true,
       properties = {
@@ -27,7 +26,7 @@ return {
         emitrotspread      = 0.05,
         emitvector         = [[dir]],
         gravity            = [[0.1 r-0.2, 0.05, 0.1 r-0.2]],
-        numparticles       = 1,
+        numparticles       = 4,
         particlelife       = 7,
         particlelifespread = 4,
         particlesize       = 12,
@@ -391,6 +390,31 @@ return {
       },
     },
   },
-
 }
 
+defs["flamer_240_range"] = Spring.Utilities.MergeTable({
+		fire = {
+			properties = {
+				particlesize       = [[d10.5 y0 -1 x0 100 p0.75]],
+				particlesizespread = 2,
+				numparticles       = [[d0.65 p1.15 r0.7 1 k1]],
+				emitrotspread      = [[-0.12 d0.015]],
+				particlelifespread = 3,
+			}
+		}
+	}, defs["flamer"], true)
+
+
+defs["flamer_320_range"] = Spring.Utilities.MergeTable({
+		fire = {
+			properties = {
+				particlesize       = [[d9 y0 -1 x0 105 p0.8]],
+				particlesizespread = 2,
+				numparticles       = [[d0.3 p1.5 r0.8 2.1 k]],
+				emitrotspread      = [[-0.12 d0.01]],
+				particlelifespread = 3,
+			}
+		}
+	}, defs["flamer"], true)
+
+return defs
