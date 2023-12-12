@@ -38,6 +38,7 @@ for i = 1,#WeaponDefs do
 			thermiteFrames = wcp.thermite_frames,
 			ceg = wcp.thermite_ceg,
 			initialCeg = wcp.thermite_ceg_initial,
+			damageCeg = wcp.thermite_ceg_damage,
 			sound = wcp.thermite_sound,
 			hitSound = wcp.thermite_sound_hit,
 		}
@@ -201,6 +202,7 @@ function gadget:ShieldPreDamaged(projectileID, proOwnerID, shieldEmitterWeaponNu
 	end
 	Spring.SetUnitShieldState(shieldCarrierUnitID, -1, true, charge - fullDamage)
 	proData.resetNextFrame = true
+	proData.hasDamaged = true
 	if proData.resetNextFrameShield then
 		proData.resetNextFrameShield = {proData.resetNextFrameShield}
 		proData.resetNextFrameShield[#proData.resetNextFrameShield + 1] = shieldCarrierUnitID
@@ -229,6 +231,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if alreadyTakenDamage[unitID][projectileID] then
 		return 0
 	end
+	proData.hasDamaged = true
 	alreadyTakenDamage[unitID][projectileID] = true
 	return damage * (proData.damageMod or 1)
 end
@@ -285,9 +288,13 @@ local function UpdateProjectile(proID, proData, index, frame)
 		if def.ceg then
 			local height = Spring.GetGroundHeight(px, pz) or py
 			local ceg = (not proData.hasHitSomething and def.initialCeg) or def.ceg
+			if proData.hasDamaged and def.damageCeg then
+				ceg = def.damageCeg
+			end
 			vx, vy, vz = vx/speed, vy/speed, vz/speed
 			Spring.SpawnCEG(ceg, px, math.max(height, py), pz, vx, vy, vz, 10, proData.damageMod) 
 		end
+		proData.hasDamaged = false
 	end
 	if proData.killFrame and frame >= proData.killFrame then
 		Spring.DeleteProjectile(proID)

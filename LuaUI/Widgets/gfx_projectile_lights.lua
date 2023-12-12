@@ -280,6 +280,10 @@ function GetLightsFromUnitDefs()
 			weaponData.beamOffset = tonumber(customParams.light_beam_offset)
 		end
 		
+		if customParams.light_elevation then
+			weaponData.elevation = tonumber(customParams.light_elevation)
+		end
+		
 		if customParams.light_color then
 			local colorList = Split(customParams.light_color, " ")
 			weaponData.r = colorList[1]
@@ -402,7 +406,9 @@ end
 local function GetProjectileLight(lightParams, pID, x, y, z)
 	local light = {
 		pID = pID,
-		px = x, py = y, pz = z,
+		px = x,
+		py = y + (lightParams.elevation or 0),
+		pz = z,
 		param = (doOverride and overrideParam) or lightParams
 	}
 	-- Use the following to check heatray fadeout parameters.
