@@ -134,7 +134,6 @@ local ConvexHull = VFS.Include("LuaRules/Gadgets/Include/ConvexHull.lua")
 
 local gaiaTeamId = spGetGaiaTeamID()
 
-local myAllyTeamID
 local benchmark = Benchmark and Benchmark.new()
 
 local scanInterval = 1 * Game.gameSpeed
@@ -175,10 +174,6 @@ local font = gl.LoadFont("FreeSansBold.otf", BASE_FONT_SIZE, 0, 0)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- State update
-
-local function UpdateTeamAndAllyTeamID()
-	myAllyTeamID = spGetMyAllyTeamID()
-end
 
 local function UpdateDrawEnabled()
 	if (options.showhighlight.value == 'always')
@@ -242,6 +237,7 @@ local function UpdateFeatures(gf)
 	if benchmark then
 		benchmark:Enter("UpdateFeatures")
 	end
+	local myAllyTeamID = spGetMyAllyTeamID()
 	featuresUpdated = false
 	clusterMetalUpdated = false
 	if benchmark then
@@ -555,8 +551,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-Spring.Echo("Initialize")
-	UpdateTeamAndAllyTeamID()
+	Spring.Echo("Initialize")
 	screenx, screeny = widgetHandler:GetViewSizes()
 end
 
