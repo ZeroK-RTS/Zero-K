@@ -397,7 +397,6 @@ local function UpdateSelection(sel)
 				if dgunInfo then
 					dgunUnitInfo = dgunUnitInfo or {}
 					dgunUnitInfo[unitID] = dgunInfo
-					Spring.Utilities.UnitEcho(unitID, "")
 				end
 			end
 
