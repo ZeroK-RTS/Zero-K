@@ -768,6 +768,9 @@ end
 --------------------------------------------------------------------------------
 
 local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeRingOnly)
+	if not (unitID and info) then
+		return
+	end
 	if info.drawLeashedToRange then
 		tx, ty, tz = LeashDrawRange(unitID, info.range, tx, ty, tz)
 	end
