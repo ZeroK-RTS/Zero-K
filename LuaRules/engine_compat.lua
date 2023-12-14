@@ -495,6 +495,6 @@ if true then -- No engine has this yet
 	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
 		gadgetHandler.GG._AddUnitDamage_teamID = teamID
 		origAddUnitDamage(unitID, damage, paralyze, attackerID, weaponID)
-		gadgetHandler.GG._AddUnitDamage_teamID = nil
+		gadgetHandler.GG._AddUnitDamage_teamID = nil -- TODO: deal with recursion by saving old value. But this needs testing.
 	end
 end

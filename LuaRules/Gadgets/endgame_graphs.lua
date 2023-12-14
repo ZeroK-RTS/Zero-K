@@ -51,6 +51,8 @@ local unitValueKilledByTeamNonhax = {}
 
 local ALLIED_VISIBLE = {allied = true}
 
+local destructionTallied = {}
+
 local spGetUnitPosition = Spring.GetUnitPosition
 local spIsPosInLos = Spring.IsPosInLos
 local function canTeamSeeUnit(teamID, unitID)
@@ -111,6 +113,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 	if not attackerTeam and projectileID then
 		attackerTeam = Spring.GetProjectileTeamID(projectileID)
+		if not paralyzer then
+			local health = Spring.GetUnitHealth(unitID)
+			if health - damage <= 0 then
+				-- Without attackerTeam in UnitDamaged, destruction will not be tracked normally.
+				gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+			end
+		end
 	end
 
 	local costdamage = DamageToCostDamage(unitID, damage, unitDefID, unitTeam)
@@ -125,6 +134,7 @@ local nanoframeCosts = {} -- [index] = fullCost
 local nanoframesByID = {} -- [unitID] = index
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
+	destructionTallied[unitID] = nil
 	if dontCountUnits[unitDefID] then
 		return
 	end
@@ -190,9 +200,13 @@ function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeam)
+	if destructionTallied[unitID] then
+		return
+	end
 	if dontCountUnits[unitDefID] then
 		return
 	end
+	destructionTallied[unitID] = true
 
 	local index = nanoframesByID[unitID]
 	local cost
