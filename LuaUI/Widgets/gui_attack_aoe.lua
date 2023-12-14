@@ -393,8 +393,12 @@ local function UpdateSelection(sel)
 			end
 			
 			if (dgunInfo[unitDefID]) then
-				dgunUnitInfo = dgunUnitInfo or {}
-				dgunUnitInfo[unitID] = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+				local dgunInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+				if dgunInfo then
+					dgunUnitInfo = dgunUnitInfo or {}
+					dgunUnitInfo[unitID] = dgunInfo
+					Spring.Utilities.UnitEcho(unitID, "")
+				end
 			end
 
 			if (aoeDefInfo[unitDefID]) then
