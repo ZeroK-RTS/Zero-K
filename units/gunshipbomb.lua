@@ -99,7 +99,7 @@ return { gunshipbomb = {
         burnchance     = "1",
         burntime = 720,
         burst = Shared.BURST_UNRELIABLE,
-        stats_burst_damage  = 320,
+        stats_burst_damage  = 280,
 
         --lups_heat_fx = [[firewalker]],
         light_color = [[1.6 0.8 0.32]],
@@ -107,7 +107,7 @@ return { gunshipbomb = {
       },
 
       damage                  = {
-        default = 320,
+        default = 280,
       },
 
       explosionGenerator      = [[custom:blastwing]],
