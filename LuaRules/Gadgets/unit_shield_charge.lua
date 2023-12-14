@@ -155,6 +155,7 @@ function gadget:GameFrame(n)
 				local overProportion = 1 - (charge + chargeAdd - def.maxCharge)/chargeAdd
 				if data.resTable then
 					data.resTable.e = data.resTable.e*overProportion
+					data.oldChargeRate = false -- Reset resTable on next full charge
 				end
 				chargeAdd = chargeAdd*overProportion
 			end
