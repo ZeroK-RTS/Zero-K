@@ -102,7 +102,6 @@ local GetUnitPosition        = Spring.GetUnitPosition
 local spGetUnitsInCylinder   = Spring.GetUnitsInCylinder
 local GetMouseState          = Spring.GetMouseState
 local TraceScreenRay         = Spring.TraceScreenRay
-
 local spGetUnitDefID         = Spring.GetUnitDefID
 
 local CMD_MANUALFIRE         = CMD.MANUALFIRE
@@ -111,6 +110,13 @@ local glColor                = gl.Color
 local glLineWidth            = gl.LineWidth
 local glDrawGroundCircle     = gl.DrawGroundCircle
 
+local canBeThrown = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.isGroundUnit then -- includes sea units
+		canBeThrown[i] = true
+	end
+end
 
 -- TODO: don't hard code lobster and first weapon
 local lobsterDefID           = UnitDefNames.amphlaunch.id
@@ -212,9 +218,12 @@ local function GetUnitLobsterStatus(onlyCircle, drawCircles)
 			for i = 1, #unitsAffectedByThis do
 				local unitAffectedID = unitsAffectedByThis[i]
 				if unitID ~= unitAffectedID then
-					unitsInLobsterRange[unitAffectedID] = true
-					if activeLobster then
-						unitsInActiveLobsterRange[unitAffectedID] = true
+					local affectedDefID = spGetUnitDefID(unitAffectedID)
+					if affectedDefID and canBeThrown[affectedDefID] then
+						unitsInLobsterRange[unitAffectedID] = true
+						if activeLobster then
+							unitsInActiveLobsterRange[unitAffectedID] = true
+						end
 					end
 					if not foundUnitMap[unitAffectedID] then
 						foundUnitList[#foundUnitList + 1] = unitAffectedID

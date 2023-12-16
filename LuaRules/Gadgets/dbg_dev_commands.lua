@@ -486,6 +486,8 @@ local function give(cmd,line,words,player)
 					local x2, z2 = (j+offset)*INCREMENT, zOffset*INCREMENT
 					local y2 = Spring.GetGroundHeight(x2,z2)
 					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
+					--local ud = UnitDefs[subUdid]
+					--Spring.Echo(ud.humanName .. "\t" .. ud.speed .. "\t" .. ud.maxWeaponRange  .. "\t" .. (ud.health / ud.buildTime))
 					if build then
 						SetupNanoUnit(subUnitID, nanoAmount)
 					end

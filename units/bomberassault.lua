@@ -122,7 +122,7 @@ return { bomberassault = {
         stats_burst_damage  = 14000,
         stats_typical_damage  = 14000,
         stats_hide_damage     = 1,
-        damage_vs_feature     = 20, -- Compromise that ideally won't look too silly
+        damage_vs_feature     = 20, -- Doesn't ramp for technical reasons, so this is here to deal some reasonable damage.
         truerange             = 180,
 
         thermite_frames       = 900,
