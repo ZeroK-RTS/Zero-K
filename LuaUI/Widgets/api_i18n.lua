@@ -72,7 +72,7 @@ end
 local function loadLocale(i18n,database,locale)
 	local path="Luaui/Configs/lang/"..database.."."..locale..".json"
 	if VFS.FileExists(path, VFS.ZIP) then
-		local lang=Spring.Utilities.json.decode(VFS.LoadFile(path, VFS.ZIP))
+		local lang=Spring.Utilities.json.decode(VFS.LoadFile(path))
 		local t={}
 		t[locale]=lang
 		i18n.load(t)
