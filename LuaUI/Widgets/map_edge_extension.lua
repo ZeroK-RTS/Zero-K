@@ -345,25 +345,25 @@ local function DrawMapVertices(useMirrorShader, tile)
 			if useMirrorShader then
 				TexCoord(0.5, 0.5)
 				
-				local z = Game.mapSizeZ
+				local z = Game.mapSizeZ - 0.05
 				for x = Game.mapSizeX, 0, -Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
 					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
-				local x = 0
+				local x = 0.05
 				for z = Game.mapSizeZ, 0, -Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
 					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
-				z = 0
+				z = 0.05
 				for x = 0, Game.mapSizeX, Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
 					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
-				x = Game.mapSizeX
+				x = Game.mapSizeX - 0.05
 				for z = 0, Game.mapSizeZ, Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
