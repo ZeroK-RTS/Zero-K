@@ -42,6 +42,8 @@ local island = nil -- Later it will be checked and set to true of false
 local drawingEnabled = true
 
 local SPACE_CLICK_OUTSIDE = false
+local HEIGHT_UP = 2
+local HEIGHT_LEEWAY = 1000
 
 local forceTextureToGrid = false
 function WG.game_SetCustomExtensionGridTexture(newGridTex, newForceTextureToGrid)
@@ -322,6 +324,7 @@ local function DrawMapVertices(useMirrorShader, tile)
 		end
 		
 		if tile then
+			local bla = 1
 			for x = 0,Game.mapSizeX - Scale, Scale do
 				xv0, xv1 = xv1, abs(dx+x+Scale)+sx
 				xm0, xm1 = xm1, xm1+Scale
@@ -330,12 +333,41 @@ local function DrawMapVertices(useMirrorShader, tile)
 					zv = abs(dz+z)+sz
 					TexCoord(ReverseTile(xm0 / GridSize), ReverseTile(z / GridSize))
 					-- Normal(GetGroundNormal(xm0,z))
-					h = sggh(xm0,z)
+					h = sggh(xm0,z) + HEIGHT_UP
 					Vertex(xv0,h,zv)
 					TexCoord(ReverseTile(xm1 / GridSize), ReverseTile(z / GridSize))
 					--Normal(GetGroundNormal(xm1,z))
-					h = sggh(xm1,z)
+					h = sggh(xm1,z) + HEIGHT_UP
 					Vertex(xv1,h,zv)
+				end
+			end
+			
+			if useMirrorShader then
+				TexCoord(0.5, 0.5)
+				
+				local z = Game.mapSizeZ
+				for x = Game.mapSizeX, 0, -Scale do
+					local height = sggh(x, z)
+					Vertex(x, height + HEIGHT_UP, z)
+					Vertex(x, height - HEIGHT_LEEWAY, z)
+				end
+				local x = 0
+				for z = Game.mapSizeZ, 0, -Scale do
+					local height = sggh(x, z)
+					Vertex(x, height + HEIGHT_UP, z)
+					Vertex(x, height - HEIGHT_LEEWAY, z)
+				end
+				z = 0
+				for x = 0, Game.mapSizeX, Scale do
+					local height = sggh(x, z)
+					Vertex(x, height + HEIGHT_UP, z)
+					Vertex(x, height - HEIGHT_LEEWAY, z)
+				end
+				x = Game.mapSizeX
+				for z = 0, Game.mapSizeZ, Scale do
+					local height = sggh(x, z)
+					Vertex(x, height + HEIGHT_UP, z)
+					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
 			end
 		else
@@ -412,7 +444,10 @@ local function Initialize()
 	local enableMapBorder = false
 	if island and not options.drawForIslands.value then
 		enableMapBorder = false
-	elseif options and (options.mapBorderStyle.value == 'cutaway' or (options.mapBorderStyle.value == 'texture' and (not forceTextureToGrid))) then
+	elseif options and (
+			options.mapBorderStyle.value == 'cutaway' or
+			options.mapBorderStyle.value == 'grid' or
+			(options.mapBorderStyle.value == 'texture' and (not forceTextureToGrid))) then
 		enableMapBorder = true
 	end
 	
