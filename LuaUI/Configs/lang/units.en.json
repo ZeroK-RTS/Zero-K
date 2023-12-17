@@ -885,9 +885,9 @@
 		"helptext" : "The Hermit can take an incredible beating, and is useful as a shield for the weaker, more-damaging Recluses."
 	},
 	"turretantiheavy" : {
-		"name" : "Lucifer",
+		"name" : "Rename",
 		"description" : "Tachyon Projector - Power by connecting to a 50 energy grid",
-		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a third."
+		"helptext" : "Inside the heavily armored shell of the Rename lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Rename is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a third."
 	},
 	"jumparty" : {
 		"name" : "Firewalker",

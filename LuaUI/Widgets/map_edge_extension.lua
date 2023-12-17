@@ -23,8 +23,7 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local spTraceScreenRay = Spring.TraceScreenRay
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local gridTex = "LuaUI/Images/vr_grid_large.dds"
---local gridTex = "bitmaps/PD/shield3hex.png"
+local gridTex = "LuaUI/Images/vr_grid_cell.dds"
 local realTex = '$grass'
 
 local dList
@@ -66,7 +65,7 @@ local function ResetWidget()
 end
 
 options_path = 'Settings/Graphics/Map Exterior'
-options_order = {'mapBorderStyle', 'drawForIslands', 'gridSize',  'fogEffect', 'curvature', 'textureBrightness', 'useShader'}
+options_order = {'mapBorderStyle', 'drawForIslands', 'gridSizeExp', 'gridTextureSizeExp', 'fogEffect', 'curvature', 'textureBrightness2', 'useShader'}
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
     --when not, the map is drawn mirrored 8 times into a display list
@@ -103,24 +102,34 @@ options = {
 		OnChange = ResetWidget,
 		noHotkey = true,
 	},
-	gridSize = {
-		name = "Heightmap tile size",
+	gridSizeExp = {
+		name = "Heightmap resolution (2^n)",
 		type = 'number',
-		min = 32,
-		max = 512,
-		step = 32,
-		value = 32,
+		min = 5,
+		max = 8,
+		step = 1,
+		value = 5,
 		desc = '',
 		OnChange = ResetWidget,
 	},
-	textureBrightness = {
+	gridTextureSizeExp = {
+		name = "Grid tile size (2^n)",
+		desc = "Cannot be less than heightmap resolution",
+		type = 'number',
+		min = 5,
+		max = 8,
+		step = 1,
+		value = 5,
+		desc = '',
+		OnChange = ResetWidget,
+	},
+	textureBrightness2 = {
 		name = "Texture Brightness",
-		advanced = true,
 		type = 'number',
 		min = 0,
 		max = 1,
 		step = 0.01,
-		value = 0.27,
+		value = 0.29,
 		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
 		OnChange = ResetWidget,
 	},
@@ -274,8 +283,15 @@ local function IsIsland()
 	return true
 end
 
-local function DrawMapVertices(useMirrorShader)
+local function ReverseTile(value)
+	value = value%2
+	if value % 2 > 1 then
+		return 1 - (value%1)
+	end
+	return value
+end
 
+local function DrawMapVertices(useMirrorShader, tile)
 	local floor = math.floor
 	local ceil = math.ceil
 	local abs = math.abs
@@ -283,7 +299,8 @@ local function DrawMapVertices(useMirrorShader)
 	gl.Color(1,1,1,1)
 
 	local function doMap(dx,dz,sx,sz)
-		local Scale = options.gridSize.value
+		local Scale = math.pow(2, options.gridSizeExp.value)
+		local GridSize = math.max(Scale, math.pow(2, options.gridTextureSizeExp.value))
 		local sggh = Spring.GetGroundHeight
 		local Vertex = gl.Vertex
 		local glColor = gl.Color
@@ -294,30 +311,49 @@ local function DrawMapVertices(useMirrorShader)
 	
 		local sten = {0, floor(Game.mapSizeZ/Scale)*Scale, 0}--do every other strip reverse
 		local xm0, xm1 = 0, 0
-		local xv0, xv1 = 0,math.abs(dx)+sx
+		local xv0, xv1 = 0, math.abs(dx)+sx
 		local ind = 0
 		local zv
 		local h
 
 		if not useMirrorShader then
-		gl.TexCoord(0, sten[2]/Game.mapSizeZ)
-		Vertex(xv1, sggh(0,sten[2]),abs(dz+sten[2])+sz)--start and end with a double vertex
+			gl.TexCoord(0, sten[2]/Game.mapSizeZ)
+			Vertex(xv1, sggh(0,sten[2]),abs(dz+sten[2])+sz)--start and end with a double vertex
 		end
-	
-		for x=0,Game.mapSizeX-Scale,Scale do
-			xv0, xv1 = xv1, abs(dx+x+Scale)+sx
-			xm0, xm1 = xm1, xm1+Scale
-			ind = (ind+1)%2
-			for z=sten[ind+1], sten[ind+2], (1+(-ind*2))*Scale do
-				zv = abs(dz+z)+sz
-				TexCoord(xm0/mapSizeX, z/mapSizeZ)
-       -- Normal(GetGroundNormal(xm0,z))
-        h = sggh(xm0,z)
-				Vertex(xv0,h,zv)
-				TexCoord(xm1/mapSizeX, z/mapSizeZ)
-        --Normal(GetGroundNormal(xm1,z))
-				h = sggh(xm1,z)
-				Vertex(xv1,h,zv)
+		
+		if tile then
+			for x = 0,Game.mapSizeX - Scale, Scale do
+				xv0, xv1 = xv1, abs(dx+x+Scale)+sx
+				xm0, xm1 = xm1, xm1+Scale
+				ind = (ind+1)%2
+				for z = sten[ind+1], sten[ind+2], (1+(-ind*2))*Scale do
+					zv = abs(dz+z)+sz
+					TexCoord(ReverseTile(xm0 / GridSize), ReverseTile(z / GridSize))
+					-- Normal(GetGroundNormal(xm0,z))
+					h = sggh(xm0,z)
+					Vertex(xv0,h,zv)
+					TexCoord(ReverseTile(xm1 / GridSize), ReverseTile(z / GridSize))
+					--Normal(GetGroundNormal(xm1,z))
+					h = sggh(xm1,z)
+					Vertex(xv1,h,zv)
+				end
+			end
+		else
+			for x=0,Game.mapSizeX-Scale,Scale do
+				xv0, xv1 = xv1, abs(dx+x+Scale)+sx
+				xm0, xm1 = xm1, xm1+Scale
+				ind = (ind+1)%2
+				for z=sten[ind+1], sten[ind+2], (1+(-ind*2))*Scale do
+					zv = abs(dz+z)+sz
+					TexCoord(xm0/mapSizeX, z/mapSizeZ)
+					-- Normal(GetGroundNormal(xm0,z))
+					h = sggh(xm0,z)
+					Vertex(xv0,h,zv)
+					TexCoord(xm1/mapSizeX, z/mapSizeZ)
+					--Normal(GetGroundNormal(xm1,z))
+					h = sggh(xm1,z)
+					Vertex(xv1,h,zv)
+				end
 			end
 		end
 		if not useMirrorShader then
@@ -349,7 +385,7 @@ local function DrawOMap(useMirrorShader)
 		else
 			gl.Texture(gridTex)
 		end
-	gl.BeginEnd(GL.TRIANGLE_STRIP,DrawMapVertices, useMirrorShader)
+	gl.BeginEnd(GL.TRIANGLE_STRIP,DrawMapVertices, useMirrorShader, options.mapBorderStyle.value == "grid")
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
@@ -453,11 +489,11 @@ local function DrawWorldFunc() --is overwritten when not using the shader
         gl.DepthMask(true)
         if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then
 			gl.Texture(realTex)
-			glUniform(ubrightness, options.textureBrightness.value)
+			glUniform(ubrightness, options.textureBrightness2.value)
 			glUniform(ugrid, 0)
 		else
 			gl.Texture(gridTex)
-			glUniform(ubrightness, 1.0)
+			glUniform(ubrightness, options.textureBrightness2.value)
 			glUniform(ugrid, 1)
 		end
         if wiremap then
