@@ -13,8 +13,9 @@ end
 -- Configurable Parts:
 local texture = "luaui/images/solid.png"
 
+-- TODO: Note these are placed in a WG setting on init and re-read from there.
 local opacity = 0.19
-local teamcolorOpacity = 0.6
+local teamcolorOpacity = 1.0
 
 ---- GL4 Backend Stuff----
 local selectionVBO = nil
@@ -86,10 +87,9 @@ local function AddPrimitiveAtUnit(unitID)
 		width = radius
 		length = radius
 	elseif unitBuilding[unitDefID] then
+		numVertices = 4
 		width = unitBuilding[unitDefID][1]
 		length = unitBuilding[unitDefID][2]
-		cornersize = (width + length) * 0.075
-		numVertices = 2
 	else
 		width = radius
 		length = radius
@@ -121,7 +121,7 @@ function widget:DrawWorldPreUnit()
 			gl.Culling(false)
 		end
 		
-		glTexture(0, texture)
+		-- glTexture(0, texture)
 		selectShader:Activate()
 		selectShader:SetUniform("iconDistance", 99999) -- pass
 		glStencilTest(true) --https://learnopengl.com/Advanced-OpenGL/Stencil-testing
@@ -139,7 +139,7 @@ function widget:DrawWorldPreUnit()
 		glStencilMask(0)
 		glDepthTest(true)
 
-		selectShader:SetUniform("addRadius", 1.3)
+		selectShader:SetUniform("addRadius", 3.0)
 		selectionVBO.VAO:DrawArrays(GL_POINTS, selectionVBO.usedElements)
 
 		glStencilMask(1)
@@ -147,7 +147,7 @@ function widget:DrawWorldPreUnit()
 		glDepthTest(true)
 
 		selectShader:Deactivate()
-		glTexture(0, false)
+		-- glTexture(0, false)
 		
 				
 		-- This is the correct way to exit out of the stencil mode, to not break drawing of area commands:
@@ -215,11 +215,11 @@ local function init()
 	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
 	shaderConfig.BILLBOARD = 0
 	shaderConfig.TRANSPARENCY = opacity
-	shaderConfig.INITIALSIZE = 0.75
-	shaderConfig.GROWTHRATE = 3.5
+	shaderConfig.ANIMATION = 0
 	shaderConfig.TEAMCOLORIZATION = teamcolorOpacity	-- not implemented, doing it via POST_SHADING below instead
-	shaderConfig.HEIGHTOFFSET = 4
-	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(mix(g_color.rgb * texcolor.rgb + addRadius, vec3(1.0), "..(1-teamcolorOpacity)..") , texcolor.a * TRANSPARENCY + addRadius);"
+	shaderConfig.HEIGHTOFFSET = 0
+	shaderConfig.USETEXTURE = 0
+	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * TRANSPARENCY + addRadius);"
 	selectionVBO, selectShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
 	if selectionVBO == nil then 
 		widgetHandler:RemoveWidget()
@@ -267,6 +267,7 @@ function widget:GetConfigData(data)
 end
 
 function widget:SetConfigData(data)
-	opacity = data.opacity or opacity
-	teamcolorOpacity = data.teamcolorOpacity or teamcolorOpacity
+	-- FIXME: Restore this setting code?
+	-- opacity = data.opacity or opacity
+	-- teamcolorOpacity = data.teamcolorOpacity or teamcolorOpacity
 end
