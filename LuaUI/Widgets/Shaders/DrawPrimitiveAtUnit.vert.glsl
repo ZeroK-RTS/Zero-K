@@ -80,7 +80,8 @@ void main()
 	v_centerpos = vec4( modelMatrix[3].xyz, 1.0); // We are going to pass the centerpoint to the GS
 	v_lengthwidthcornerheight = lengthwidthcornerheight;
 	#if (ANIMATION == 1)
-		float animation = clamp(((timeInfo.x + timeInfo.w) - parameters.x)/GROWTHRATE + INITIALSIZE, INITIALSIZE, 1.0) + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE;
+	    // parameters.y is 0 for normal selections and 1 for preselections
+		float animation = clamp(((timeInfo.x + timeInfo.w) - parameters.x)/GROWTHRATE + INITIALSIZE, max(INITIALSIZE, float(1 - parameters.y)), 1.0) + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE*parameters.y;
 		v_lengthwidthcornerheight.xy *= animation; // modulate it with animation factor
 	#endif
 	POST_ANIM
