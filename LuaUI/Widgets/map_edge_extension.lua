@@ -199,7 +199,7 @@ local function SetupShaderTable()
 		  alpha = 0.0;
 			if(mirrorX != 0.0) alpha -= pow(abs(mirrorVertex.x-left*mirrorX)/lengthX, 2.0);
 			if(mirrorZ != 0.0) alpha -= pow(abs(mirrorVertex.z-up*mirrorZ)/lengthZ, 2.0);
-			alpha = 1.0 + (6.0 * (alpha + 0.18));
+			alpha = 1.0 + (3.0 * (alpha + 0.5));
 		#endif
   
 		float ff = 20000.0;
