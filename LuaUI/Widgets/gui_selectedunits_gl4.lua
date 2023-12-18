@@ -13,11 +13,8 @@ function widget:GetInfo()
 end
 
 -- Configurable Parts:
-local texture = "luaui/images/solid.png"
 
--- TODO: Note these are placed in a WG setting on init and re-read from there.
-local opacity = 0.19
-local teamcolorOpacity = 1.0
+local lineWidth, showOtherSelections, platterOpacity
 
 ---- GL4 Backend Stuff----
 local selectionVBO = nil
@@ -36,7 +33,6 @@ local glStencilOp           = gl.StencilOp
 local glStencilTest         = gl.StencilTest
 local glStencilMask         = gl.StencilMask
 local glDepthTest           = gl.DepthTest
-local glTexture             = gl.Texture
 local glClear               = gl.Clear
 local GL_ALWAYS             = GL.ALWAYS
 local GL_NOTEQUAL           = GL.NOTEQUAL
@@ -109,7 +105,7 @@ local function AddSelected(unitID, unitTeam, preselection)
 end
 
 local function RemoveSelected(unitID)
-	if selectionVBO.instanceIDtoIndex[unitID] then
+	if selectionVBO and selectionVBO.instanceIDtoIndex[unitID] then
 		popElementInstance(selectionVBO, unitID)
 	end
 end
@@ -126,74 +122,134 @@ local function FindPreselUnits()
 	return preselection
 end
 
+-- Hide/show the default Spring selection boxes
+local function UpdateCmdColorsConfig(isOn)
+	WG.widgets_handling_selection = WG.widgets_handling_selection or 0
+	WG.widgets_handling_selection = WG.widgets_handling_selection + (isOn and 1 or -1)
+	if not isOn and WG.widgets_handling_selection > 0 then
+		return
+	end
+	Spring.LoadCmdColorsConfig('unitBox  0 1 0 ' .. (isOn and 0 or 1))
+end
+
 local function init()
+	lineWidth = tonumber(options.linewidth.value) or 3.0
+	showOtherSelections = options.showallselections.value
+	platterOpacity = tonumber(options.platteropacity.value) or 0.2
+
+	for unitID, _ in pairs(selUnits) do
+		RemoveSelected(unitID)
+	end
 	selUnits = {}
+	isLocalSelection = {}
+
 	local DPatUnit = VFS.Include(luaShaderDir.."DrawPrimitiveAtUnit.lua")
 	local InitDrawPrimitiveAtUnit = DPatUnit.InitDrawPrimitiveAtUnit
 	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
 	shaderConfig.BILLBOARD = 0
-	shaderConfig.TRANSPARENCY = opacity
+	shaderConfig.TRANSPARENCY = platterOpacity
 	shaderConfig.ANIMATION = 1
-	shaderConfig.INITIALSIZE = 0.5
+	shaderConfig.INITIALSIZE = 0.6
 	shaderConfig.GROWTHRATE = 15.0
 	shaderConfig.BREATHERATE = 15.0
 	shaderConfig.BREATHESIZE = 0.05
-	shaderConfig.TEAMCOLORIZATION = teamcolorOpacity	-- not implemented, doing it 	a POST_SHADING below instead
 	shaderConfig.HEIGHTOFFSET = 0
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * TRANSPARENCY + addRadius);"
 	selectionVBO, selectShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
-	if selectionVBO == nil then 
-		widgetHandler:RemoveWidget()
-		return false
-	end
-	return true
+
+	return selectionVBO ~= nil
 end
 
-local drawFrame = 0
+options_path = 'Settings/Interface/Selection/SelectedUnits'
+options_order = {'showallselections', 'linewidth', 'platteropacity'}
+options = {
+	showallselections = {
+		name = 'Show Other Selections',
+		desc = 'Show selections of other players',
+		type = 'bool',
+		value = 'true',
+		OnChange = function(self)
+			showOtherSelections = nil
+			init()
+			-- showOtherSelections = self.value
+		end,
+	},
+	linewidth = {
+		name = 'Line Width',
+		desc = '',
+		type = 'radioButton',
+		items = {
+			{name = 'Thin', key='1.5'},
+			{name = 'Standard', key='3'},
+		},
+		value = '3',
+		noHotkey = true,
+		OnChange = function(self)
+			lineWidth = nil
+			init()
+			-- lineWidth = tonumber(self.value) or lineWidth
+		end,
+	},
+	platteropacity = {
+		name = 'Platter Opacity',
+		desc = '',
+		type = 'number',
+		min = 0.0,
+		max = 0.3,
+		step = 0.1,
+		def = 0.2,
+		OnChange = function(self)
+			platterOpacity = nil
+			init()
+			-- opacity = self.value
+		end,
+	}
+}
+
+-- Callins
+
 function widget:DrawWorldPreUnit()
-	drawFrame = drawFrame + 1
-	if selectionVBO.usedElements > 0 then
-		if hasBadCulling then 
-			gl.Culling(false)
-		end
-		
-		-- glTexture(0, texture)
-		selectShader:Activate()
-		selectShader:SetUniform("iconDistance", 99999) -- pass
-		glStencilTest(true) --https://learnopengl.com/Advanced-OpenGL/Stencil-testing
-		glDepthTest(true)
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE) -- Set The Stencil Buffer To 1 Where Draw Any Polygon		this to the shader
-		glClear(GL_STENCIL_BUFFER_BIT ) -- set stencil buffer to 0
-
-		glStencilFunc(GL_NOTEQUAL, 1, 1) -- use NOTEQUAL instead of ALWAYS to ensure that overlapping transparent fragments dont get written multiple times
-		glStencilMask(1)
-
-		selectShader:SetUniform("addRadius", 0)
-		selectionVBO.VAO:DrawArrays(GL_POINTS, selectionVBO.usedElements)
-
-		glStencilFunc(GL_NOTEQUAL, 1, 1)
-		glStencilMask(0)
-		glDepthTest(true)
-
-		selectShader:SetUniform("addRadius", 3.0)
-		selectionVBO.VAO:DrawArrays(GL_POINTS, selectionVBO.usedElements)
-
-		glStencilMask(1)
-		glStencilFunc(GL_ALWAYS, 1, 1)
-		glDepthTest(true)
-
-		selectShader:Deactivate()
-		-- glTexture(0, false)
-		
-				
-		-- This is the correct way to exit out of the stencil mode, to not break drawing of area commands:
-		glStencilTest(false)
-		glStencilMask(255)
-		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
-		glClear(GL_STENCIL_BUFFER_BIT)
-		-- All the above are needed :(
+	if selectionVBO.usedElements == 0 then
+		return
 	end
+
+	if hasBadCulling then 
+		gl.Culling(false)
+	end
+	
+	selectShader:Activate()
+	selectShader:SetUniform("iconDistance", 99999) -- pass
+	glStencilTest(true) --https://learnopengl.com/Advanced-OpenGL/Stencil-testing
+	glDepthTest(true)
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE) -- Set The Stencil Buffer To 1 Where Draw Any Polygon		this to the shader
+	glClear(GL_STENCIL_BUFFER_BIT ) -- set stencil buffer to 0
+
+	glStencilFunc(GL_NOTEQUAL, 1, 1) -- use NOTEQUAL instead of ALWAYS to ensure that overlapping transparent fragments dont get written multiple times
+	glStencilMask(1)
+
+	selectShader:SetUniform("addRadius", 0)
+	selectionVBO.VAO:DrawArrays(GL_POINTS, selectionVBO.usedElements)
+
+	glStencilFunc(GL_NOTEQUAL, 1, 1)
+	glStencilMask(0)
+	glDepthTest(true)
+
+	selectShader:SetUniform("addRadius", lineWidth)
+	selectionVBO.VAO:DrawArrays(GL_POINTS, selectionVBO.usedElements)
+
+	glStencilMask(1)
+	glStencilFunc(GL_ALWAYS, 1, 1)
+	glDepthTest(true)
+
+	selectShader:Deactivate()
+
+	-- This is the correct way to exit out of the stencil mode, to not break drawing of area commands:
+	glStencilTest(false)
+	glStencilMask(255)
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+	glClear(GL_STENCIL_BUFFER_BIT)
+	-- All the above are needed :(
 end
 
 function widget:Update(dt)
@@ -216,15 +272,16 @@ function widget:Update(dt)
 		end
 		newSelUnits[unitID] = true
 	end
-	-- FIXME: This should be under a preference.
-	-- Ally selections
-	for unitID, _ in pairs(WG.allySelUnits or {}) do
-		if not selUnits[unitID] or (isLocalSelection[unitID] and not newSelUnits[unitID]) then
-			AddSelected(unitID, Spring.GetUnitTeam(unitID))
-			selUnits[unitID] = true
-			isLocalSelection[unitID] = nil
+	-- Ally/other selections
+	if showOtherSelections then
+		for unitID, _ in pairs(WG.allySelUnits or {}) do
+			if not selUnits[unitID] or (isLocalSelection[unitID] and not newSelUnits[unitID]) then
+				AddSelected(unitID, Spring.GetUnitTeam(unitID))
+				selUnits[unitID] = true
+				isLocalSelection[unitID] = nil
+			end
+			newSelUnits[unitID] = true
 		end
-		newSelUnits[unitID] = true
 	end
 	-- Clean up deselected units
 	for unitID, _ in pairs(selUnits) do
@@ -237,7 +294,10 @@ function widget:Update(dt)
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
-	-- FIXME: Remove selection?
+	-- Let update restore it if it's an "ally" selection
+	selUnits[unitID] = nil
+	isLocalSelection[unitID] = nil
+	RemoveSelected(unitID)
 end
 
 function widget:UnitDestroyed(unitID)
@@ -247,45 +307,13 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:Initialize()
-	if not gl.CreateShader then -- no shader support, so just remove the widget itself, especially for headless
+	if not gl.CreateShader or not init() then
 		widgetHandler:RemoveWidget()
 		return
 	end
-	if not init() then return end
-	WG.selectedunits = {}
-	WG.selectedunits.getOpacity = function()
-		return opacity
-	end
-	WG.selectedunits.setOpacity = function(value)
-		opacity = value
-		init()
-	end
-	WG.selectedunits.getTeamcolorOpacity = function()
-		return teamcolorOpacity
-	end
-	WG.selectedunits.setTeamcolorOpacity = function(value)
-		teamcolorOpacity = value
-		init()
-	end
-	Spring.LoadCmdColorsConfig('unitBox  0 1 0 0')
+	UpdateCmdColorsConfig(true)
 end
 
 function widget:Shutdown()
-	if not (WG.teamplatter or WG.highlightselunits) then
-		Spring.LoadCmdColorsConfig('unitBox  0 1 0 1')
-	end
-	WG.selectedunits = nil
-end
-
-function widget:GetConfigData(data)
-	return {
-		opacity = opacity,
-		teamcolorOpacity = teamcolorOpacity
-	}
-end
-
-function widget:SetConfigData(data)
-	-- FIXME: Restore this setting code?
-	-- opacity = data.opacity or opacity
-	-- teamcolorOpacity = data.teamcolorOpacity or teamcolorOpacity
+	UpdateCmdColorsConfig(false)
 end
