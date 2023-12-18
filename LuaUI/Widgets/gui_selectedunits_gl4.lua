@@ -29,7 +29,6 @@ local hasBadCulling = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Li
 -- Localize for speedups:
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
 local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
-local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
 
 local glStencilFunc         = gl.StencilFunc
@@ -46,13 +45,7 @@ local GL_STENCIL_BUFFER_BIT = GL.STENCIL_BUFFER_BIT
 local GL_REPLACE            = GL.REPLACE
 local GL_POINTS				= GL.POINTS
 
-local selUnits = {}
-local preselUnits = {}
-local updateSelection = true
-local selectedUnits = Spring.GetSelectedUnits()
-
-local unitTeam = {}
-local unitUnitDefID = {}
+local selUnits, isLocalSelection = {}, {}
 
 local unitScale = {}
 local unitCanFly = {}
@@ -70,24 +63,17 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	end
 end
 
-local function AddSelected(unitID, preselection)
+local function AddSelected(unitID, unitTeam, preselection)
 	if Spring.ValidUnitID(unitID) ~= true or Spring.GetUnitIsDead(unitID) == true then return end
 	local gf = Spring.GetGameFrame()
 
-	if not unitUnitDefID[unitID] then
-		unitUnitDefID[unitID] = Spring.GetUnitDefID(unitID)
-	end
-	local unitDefID = unitUnitDefID[unitID]
+	local unitDefID =  Spring.GetUnitDefID(unitID)
 	if unitDefID == nil then return end -- these cant be selected
 
 	local numVertices = 64 -- default to cornered rectangle
 	local cornersize = 0
 
 	local radius = unitScale[unitDefID]
-
-	if not unitTeam[unitID] then
-		unitTeam[unitID] = Spring.GetUnitTeam(unitID)
-	end
 
 	local additionalheight = 0
 	local width, length
@@ -109,7 +95,7 @@ local function AddSelected(unitID, preselection)
 		selectionVBO, -- push into this Instance VBO Table
 		{
 			length, width, cornersize, additionalheight,  -- lengthwidthcornerheight
-			unitTeam[unitID], -- teamID
+			unitTeam, -- teamID
 			numVertices, -- how many trianges should we make
 			gf, preselection and 1 or 0, 0, 0, -- the gameFrame (for animations), whether to animate (for preselection) and unused parameters
 			0, 1, 0, 1, -- These are our default UV atlas tranformations
@@ -131,15 +117,37 @@ end
 local function FindPreselUnits()
 	local preselection = {}
 	local hoverUnitID = GetUnitUnderCursor(false)
-	if hoverUnitID and not selUnits[hoverUnitID] then
+	if hoverUnitID then
 		preselection[hoverUnitID] = true
 	end
 	for _, unitID in pairs(GetUnitsInSelectionBox() or {}) do
-		if not selUnits[unitID] then
-			preselection[unitID] = true
-		end
+		preselection[unitID] = true
 	end
 	return preselection
+end
+
+local function init()
+	selUnits = {}
+	local DPatUnit = VFS.Include(luaShaderDir.."DrawPrimitiveAtUnit.lua")
+	local InitDrawPrimitiveAtUnit = DPatUnit.InitDrawPrimitiveAtUnit
+	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
+	shaderConfig.BILLBOARD = 0
+	shaderConfig.TRANSPARENCY = opacity
+	shaderConfig.ANIMATION = 1
+	shaderConfig.INITIALSIZE = 0.5
+	shaderConfig.GROWTHRATE = 15.0
+	shaderConfig.BREATHERATE = 15.0
+	shaderConfig.BREATHESIZE = 0.05
+	shaderConfig.TEAMCOLORIZATION = teamcolorOpacity	-- not implemented, doing it 	a POST_SHADING below instead
+	shaderConfig.HEIGHTOFFSET = 0
+	shaderConfig.USETEXTURE = 0
+	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * TRANSPARENCY + addRadius);"
+	selectionVBO, selectShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
+	if selectionVBO == nil then 
+		widgetHandler:RemoveWidget()
+		return false
+	end
+	return true
 end
 
 local drawFrame = 0
@@ -188,86 +196,54 @@ function widget:DrawWorldPreUnit()
 	end
 end
 
-function widget:SelectionChanged(sel)
-	updateSelection = true
-end
-
-function widget:Update(dt)	
-	if updateSelection then
-		selectedUnits = Spring.GetSelectedUnits()
-		updateSelection = false
-
-		-- Update selected units
-		local newSelUnits = {}
-		for _, unitID in ipairs(selectedUnits) do
-			newSelUnits[unitID] = true
-			if not selUnits[unitID] then
-				preselUnits[unitID] = nil
-				RemoveSelected(unitID)
-				AddSelected(unitID)
-			end
+function widget:Update(dt)
+	local newSelUnits = {}
+	-- Local selections
+	for _, unitID in pairs(Spring.GetSelectedUnits()) do
+		if not selUnits[unitID] or not isLocalSelection[unitID] then
+			AddSelected(unitID, 255)
+			selUnits[unitID] = true
+			isLocalSelection[unitID] = true
 		end
-		for unitID, _ in pairs(selUnits) do
-			if not newSelUnits[unitID] then
-				RemoveSelected(unitID)
-			end
-		end
-		selUnits = newSelUnits
+		newSelUnits[unitID] = true
 	end
-
-	-- Update preselected units
-	local newPreselUnits = FindPreselUnits()
-	for unitID, _ in pairs(preselUnits) do
-		if not newPreselUnits[unitID] then
+	-- Preselections
+	for unitID, _ in pairs(FindPreselUnits()) do
+		if not selUnits[unitID] or not isLocalSelection[unitID] then
+			AddSelected(unitID, 255, true)
+			selUnits[unitID] = true
+			isLocalSelection[unitID] = true
+		end
+		newSelUnits[unitID] = true
+	end
+	-- FIXME: This should be under a preference.
+	-- Ally selections
+	for unitID, _ in pairs(WG.allySelUnits or {}) do
+		if not selUnits[unitID] or (isLocalSelection[unitID] and not newSelUnits[unitID]) then
+			AddSelected(unitID, Spring.GetUnitTeam(unitID))
+			selUnits[unitID] = true
+			isLocalSelection[unitID] = nil
+		end
+		newSelUnits[unitID] = true
+	end
+	-- Clean up deselected units
+	for unitID, _ in pairs(selUnits) do
+		if not newSelUnits[unitID] then
 			RemoveSelected(unitID)
+			isLocalSelection[unitID] = nil
+			selUnits[unitID] = nil
 		end
 	end
-	for unitID, _ in pairs(newPreselUnits) do
-		if not preselUnits[unitID] then
-			AddSelected(unitID, true)
-		end
-	end
-	preselUnits = newPreselUnits
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
-	if unitTeam[unitID] then
-		unitTeam[unitID] = newTeamID
-	end
+	-- FIXME: Remove selection?
 end
 
 function widget:UnitDestroyed(unitID)
-	--Spring.Echo("UnitDestroyed(unitID)",unitID, selectedUnits[unitID])
-	if selectedUnits[unitID] then
-		RemoveSelected(unitID)
-	end
-	unitTeam[unitID] = nil
-	unitUnitDefID[unitID] = nil
-end
-
-local function init()
-	updateSelection = true
-	selUnits = {}	
-	local DPatUnit = VFS.Include(luaShaderDir.."DrawPrimitiveAtUnit.lua")
-	local InitDrawPrimitiveAtUnit = DPatUnit.InitDrawPrimitiveAtUnit
-	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
-	shaderConfig.BILLBOARD = 0
-	shaderConfig.TRANSPARENCY = opacity
-	shaderConfig.ANIMATION = 1
-	shaderConfig.INITIALSIZE = 0.5
-	shaderConfig.GROWTHRATE = 15.0
-	shaderConfig.BREATHERATE = 15.0
-	shaderConfig.BREATHESIZE = 0.05
-	shaderConfig.TEAMCOLORIZATION = teamcolorOpacity	-- not implemented, doing it via POST_SHADING below instead
-	shaderConfig.HEIGHTOFFSET = 0
-	shaderConfig.USETEXTURE = 0
-	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * TRANSPARENCY + addRadius);"
-	selectionVBO, selectShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
-	if selectionVBO == nil then 
-		widgetHandler:RemoveWidget()
-		return false
-	end
-	return true
+	selUnits[unitID] = nil
+	isLocalSelection[unitID] = nil
+	RemoveSelected(unitID)
 end
 
 function widget:Initialize()

@@ -9,7 +9,7 @@
 layout (location = 0) in vec4 lengthwidthcornerheight;
 layout (location = 1) in uint teamID;
 layout (location = 2) in uint numvertices;
-layout (location = 3) in vec4 parameters; // lifestart, ismine
+layout (location = 3) in vec4 parameters; // time start, animate, unused, unused
 layout (location = 4) in vec4 uvoffsets; // this is optional, for using an Atlas
 layout (location = 5) in uvec4 instData;
 
@@ -76,11 +76,12 @@ void main()
 	v_rotationY = atan(modelMatrix[0][2], modelMatrix[0][0]); // we can get the euler Y rot of the model from the model matrix
 	v_uvoffsets = uvoffsets;
 	v_parameters = parameters;
-	v_color = teamColor[teamID];  // We can lookup the teamcolor right here
+	// teamID 255 is used for local selection color
+	v_color = teamID == 255 ? vec4(0.1, 1.0, 0.2, 1.0) : teamColor[teamID];
 	v_centerpos = vec4( modelMatrix[3].xyz, 1.0); // We are going to pass the centerpoint to the GS
 	v_lengthwidthcornerheight = lengthwidthcornerheight;
 	#if (ANIMATION == 1)
-	    // parameters.y is 0 for normal selections and 1 for preselections
+	    // No animation when parameters.y is 0
 		float animation = clamp(((timeInfo.x + timeInfo.w) - parameters.x)/GROWTHRATE + INITIALSIZE, max(INITIALSIZE, float(1 - parameters.y)), 1.0) + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE*parameters.y;
 		v_lengthwidthcornerheight.xy *= animation; // modulate it with animation factor
 	#endif
