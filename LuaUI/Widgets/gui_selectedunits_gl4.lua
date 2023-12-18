@@ -63,15 +63,13 @@ local function AddSelected(unitID, unitTeam, preselection)
 	if Spring.ValidUnitID(unitID) ~= true or Spring.GetUnitIsDead(unitID) == true then return end
 	local gf = Spring.GetGameFrame()
 
-	local unitDefID =  Spring.GetUnitDefID(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
 	if unitDefID == nil then return end -- these cant be selected
 
-	local numVertices = 64 -- default to cornered rectangle
-	local cornersize = 0
+	local numVertices = 64
 
 	local radius = unitScale[unitDefID]
 
-	local additionalheight = 0
 	local width, length
 	if unitCanFly[unitDefID] then
 		numVertices = 3 -- triangles for planes
@@ -90,7 +88,7 @@ local function AddSelected(unitID, unitTeam, preselection)
 	pushElementInstance(
 		selectionVBO, -- push into this Instance VBO Table
 		{
-			length, width, cornersize, additionalheight,  -- lengthwidthcornerheight
+			length, width, 0, 0,  -- lengthwidthcornerheight
 			unitTeam, -- teamID
 			numVertices, -- how many trianges should we make
 			gf, preselection and 1 or 0, 0, 0, -- the gameFrame (for animations), whether to animate (for preselection) and unused parameters
