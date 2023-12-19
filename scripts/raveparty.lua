@@ -16,7 +16,7 @@ end
 
 local hpi = math.pi*0.5
 
-local headingSpeed = math.rad(3)
+local headingSpeed = math.rad(2.4)
 local pitchSpeed = math.rad(61) -- Float maths makes this exactly one revolution every 6 seconds.
 
 guns[5].y = 11
@@ -65,66 +65,57 @@ local minSpinMult = 0.2
 local spinScriptAccel = 0.05
 local maxSpin = math.pi/3
 
-local maxGainStoreTotal = 0.062
-local maxLoseSpinStoreTotal = -0.15
-local maxStoreFrames = 150
-local defaultTimeFrames = 30
-local lastGainStoreTime = 0
-local lastLoseStoreTime = 0
-
-local isAiming = false
 local spinMult = 0
+local targetSpin = 1
 local gunNum = 1
+local aimSpeedMult = 1
 local reloadChange = 0
+local lastAimFrame = false
 
 local function UpdateSpin(gainSpin, loseSpin)
 	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 	reloadChange = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
 	if gainSpin then
-		local gameFrame = Spring.GetGameFrame()
-		local timeDiff = gameFrame - lastGainStoreTime
-		lastGainStoreTime = gameFrame
-		lastLoseStoreTime = 0
-		if timeDiff > maxStoreFrames then
-			timeDiff = defaultTimeFrames
-		end
-		spinMult = spinMult + math.sqrt(spinMult) * reloadChange * maxGainStoreTotal * timeDiff / maxStoreFrames
-		if spinMult > 1 then
-			spinMult = 1
-		end
+		spinMult = spinMult + (0.022*spinMult - 0.042)*spinMult + 0.033
 	end
+	if spinMult > 1 then
+		spinMult = 1
+	end
+	
+	--local xpos = select(1, Spring.GetUnitPosition(unitID))
+	--targetSpin = math.max(targetSpin, 0.5 + 0.5*(xpos - 1735)/1200)
+	
 	if loseSpin then
-		local gameFrame = Spring.GetGameFrame()
-		local timeDiff = gameFrame - lastLoseStoreTime
-		lastLoseStoreTime = gameFrame
-		lastGainStoreTime = 0
-		if timeDiff > maxStoreFrames then
-			timeDiff = defaultTimeFrames
-		end
-		spinMult = spinMult + spinMult * maxLoseSpinStoreTotal * timeDiff / maxStoreFrames
-		if spinMult < 0 then
-			spinMult = 0
-		end
-	end
-	if spinMult > reloadChange then
-		spinMult = spinMult*0.97 - 0.0015
-		if spinMult < 0 then
-			spinMult = 0
+		if spinMult > reloadChange then
+			spinMult = spinMult*0.97 - 0.002
+			if spinMult < 0 then
+				spinMult = 0
+			end
+		elseif spinMult > targetSpin then
+			spinMult = spinMult*0.95 - 0.004
+			if spinMult < targetSpin then
+				spinMult = targetSpin
+			end
 		end
 	end
+	
 	if reloadChange > 0 and spinMult < minSpinMult then
 		spinMult = spinMult + 0.03
 		if spinMult > minSpinMult then
 			spinMult = minSpinMult
 		end
 	end
+	aimSpeedMult = 1 - math.pow(math.min(1, (math.max(0.5, spinMult) - 0.4)*1.8), 4/3)*0.7
 	Spin(spindle, x_axis, spinMult*maxSpin, spinScriptAccel)
 	Spring.SetUnitRulesParam(unitID, "speed_bar", spinMult, LOS_ACCESS)
 end
 
 local function SpinThread()
 	while true do
-		UpdateSpin(false, isAiming)
+		UpdateSpin(false, true)
+		if lastAimFrame and lastAimFrame + 15 < Spring.GetGameFrame() then
+			GG.PieceControl.StopTurn(turret, y_axis)
+		end
 		Sleep(1000)
 	end
 end
@@ -136,19 +127,18 @@ function script.Create()
 	end
 	
 	Spin(spindle, x_axis, spinMult*maxSpin, spinScriptAccel)
-	StartThread(SpinThread, unitID, smokePiece)
+	StartThread(SpinThread)
 end
 
 function script.HitByWeapon()
 	if Spring.GetUnitRulesParam(unitID,"disarmed") == 1 then
-		GG.PieceControl.StopTurn (turret, y_axis)
-		GG.PieceControl.StopTurn (spindle, x_axis)
+		GG.PieceControl.StopTurn(turret, y_axis)
 	end
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal (SIG_AIM)
-	SetSignalMask (SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 
 	while reloadChange <= 0 do
 		Sleep(10)
@@ -156,27 +146,33 @@ function script.AimWeapon(num, heading, pitch)
 
 	local curHead = select (2, Spring.UnitScript.GetPieceRotation(turret))
 	local headDiff = heading - curHead
+	
+	-- note, DRP can actually fire backwards
 	if math.abs(headDiff) > math.pi then
 		headDiff = headDiff - math.abs(headDiff) / headDiff * math.tau
 	end
-	--Spring.Echo(headDiff*180/math.pi)
+	headDiff = math.abs(headDiff)
 
-	if math.abs(headDiff) > hpi then
+	if headDiff > hpi then
 		heading = (heading + math.pi) % math.tau
 		pitch = -pitch+math.pi
+		headDiff = math.pi - headDiff
 	end
+	--Spring.Echo(headDiff*180/math.pi)
 
-	-- note, DRP can actually fire backwards
-	if math.abs(headDiff) > 0.01 and math.abs(headDiff) < math.pi - 0.01 then
-		UpdateSpin(false, true)
-		isAiming = true
+	if headDiff > 0.85 then
+		targetSpin = 0.5
+	elseif headDiff > 0.05 then
+		targetSpin = 1 - headDiff*0.5/0.85
+	else
+		targetSpin = 1
 	end
 	
 	local spindlePitch = -pitch + (num - 1)* math.pi/3
 
-	Turn(turret, y_axis, heading, headingSpeed*reloadChange)
+	lastAimFrame = Spring.GetGameFrame()
+	Turn(turret, y_axis, heading, headingSpeed*reloadChange*aimSpeedMult)
 	WaitForTurn(turret, y_axis)
-	isAiming = false
 	
 	local currentSpindle = select(1, Spring.UnitScript.GetPieceRotation(spindle))
 	local diff = math.abs(((currentSpindle - spindlePitch - math.pi) % math.tau) - math.pi)
@@ -211,7 +207,6 @@ end
 
 function script.FireWeapon(num)
 	Sleep(33)
-	
 	if spinMult < 1 then
 		UpdateSpin(true)
 	end
