@@ -53,6 +53,8 @@ local GL_POINTS				= GL.POINTS
 local selUnits, isLocalSelection = {}, {}
 local doUpdate
 
+local paused, currentFrame, timeSinceLastFrame = false, -1, 0
+
 local unitScale = {}
 local unitCanFly = {}
 local unitBuilding = {}
@@ -71,7 +73,9 @@ end
 
 local function AddSelected(unitID, unitTeam, preselection)
 	if spValidUnitID(unitID) ~= true or spGetUnitIsDead(unitID) == true then return end
-	local gf = spGetGameFrame()
+	-- When paused we don't want to animate from initial size because that may not be visible for some units
+	local gf = paused and -30 or spGetGameFrame()
+	local animate = preselection and 1 or 0
 
 	local unitDefID = spGetUnitDefID(unitID)
 	if unitDefID == nil then return end -- these cant be selected
@@ -100,7 +104,7 @@ local function AddSelected(unitID, unitTeam, preselection)
 			length, width, 0, 0,  -- lengthwidthcornerheight
 			unitTeam, -- teamID
 			numVertices, -- how many trianges should we make
-			gf, preselection and 1 or 0, 0, 0, -- the gameFrame (for animations), whether to animate (for preselection) and unused parameters
+			gf, animate, 0, 0, -- the gameFrame (for animations), whether to animate (for preselection) and unused parameters
 			0, 1, 0, 1, -- These are our default UV atlas tranformations
 			0, 0, 0, 0 -- these are just padding zeros, that will get filled in
 		},
@@ -158,7 +162,7 @@ local function init()
 	shaderConfig.BILLBOARD = 0
 	shaderConfig.TRANSPARENCY = platterOpacity
 	shaderConfig.ANIMATION = 1
-	shaderConfig.INITIALSIZE = 0.6
+	shaderConfig.INITIALSIZE = 0.5
 	shaderConfig.GROWTHRATE = 15.0
 	shaderConfig.BREATHERATE = 15.0
 	shaderConfig.BREATHESIZE = 0.05
@@ -170,7 +174,18 @@ local function init()
 	return selectionVBO ~= nil
 end
 
-options_path = 'Settings/Interface/Selection/SelectedUnits'
+local function SetPausedHack(gameFrame)
+	-- GamePaused callin and Spring.GetGameSpeed() don't work in replays.
+	if gameFrame == currentFrame and timeSinceLastFrame > 1 then
+		paused = true
+    elseif gameFrame ~= currentFrame then
+		paused = false
+		currentFrame = gameFrame
+		timeSinceLastFrame = 0
+	end
+end
+
+options_path = 'Settings/Interface/Selection/Selected Units'
 options_order = {'showallselections', 'linewidth', 'platteropacity'}
 options = {
 	showallselections = {
@@ -266,6 +281,9 @@ function widget:SelectionChanged()
 end
 
 function widget:Update(dt)
+	timeSinceLastFrame = timeSinceLastFrame + dt
+	SetPausedHack(currentFrame)
+
 	if not doUpdate and not IsSelectionBoxActive() then
 		return
 	end
@@ -332,6 +350,10 @@ end
 function widget:VisibleUnitsChanged()
 	-- Only called on start/stop of api_unit_tracker
     init()
+end
+
+function widget:GameFrame(gameFrame)
+	SetPausedHack(gameFrame)
 end
 
 function widget:Initialize()
