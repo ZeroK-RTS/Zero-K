@@ -43,7 +43,7 @@ local drawingEnabled = true
 
 local SPACE_CLICK_OUTSIDE = false
 local HEIGHT_UP = 2
-local HEIGHT_LEEWAY = math.min(Game.mapSizeZ * 0.1, 1000)
+local HEIGHT_LEEWAY = 800
 
 local forceTextureToGrid = false
 function WG.game_SetCustomExtensionGridTexture(newGridTex, newForceTextureToGrid)
@@ -177,7 +177,7 @@ local function SetupShaderTable()
 		uniform float mirrorX;
 		uniform float mirrorZ;
 		uniform float lengthX;
-	  uniform float lengthZ;
+		uniform float lengthZ;
 		uniform float left;
 		uniform float up;
 		uniform float brightness;
@@ -194,12 +194,18 @@ local function SetupShaderTable()
 		
 		float alpha = 1.0;
 		#ifdef curvature
-		  if(mirrorX != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0);
-		  if(mirrorZ != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0);
-		  alpha = 0.0;
+			if(mirrorX != 0.0) mirrorVertex.x += ((1.0 - left)*pow(mirrorVertex.x, 5.0) - left*pow(mirrorX - mirrorVertex.x, 5.0)) / pow(mirrorX, 4.0);
+			if(mirrorZ != 0.0) mirrorVertex.z += ((1.0 - up)*pow(mirrorVertex.z, 5.0) - up*pow(mirrorZ - mirrorVertex.z, 5.0)) / pow(mirrorZ, 4.0);
+			
+			float offset = pow(abs(mirrorVertex.z-up*mirrorZ) * mirrorZ / lengthZ * 0.006, 2.0) +
+				pow(abs(mirrorVertex.x-left*mirrorX) * mirrorX / lengthX * 0.006, 2.0);
+			if (offset > 1.0 && mirrorVertex.y < -400) mirrorVertex.y += ]] .. HEIGHT_LEEWAY .. [[;
+			mirrorVertex.y -= offset;
+			
+			alpha = 0.0;
 			if(mirrorX != 0.0) alpha -= pow(abs(mirrorVertex.x-left*mirrorX)/lengthX, 2.0);
 			if(mirrorZ != 0.0) alpha -= pow(abs(mirrorVertex.z-up*mirrorZ)/lengthZ, 2.0);
-			alpha = 1.0 + (3.0 * (alpha + 0.5));
+			alpha = 1.5 + alpha*0.5 + mirrorVertex.y*0.0001;
 		#endif
   
 		float ff = 20000.0;
