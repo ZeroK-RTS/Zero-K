@@ -24,10 +24,6 @@ function GG.PieceControl.StopMove(piece, axis)
 	return false
 end
 
-function GG.PieceControl.IsDisarmed ()
-	if ((Spring.SpringGetUnitRulesParam (unitID, "disarmed") == 1) or Spring.SpringGetUnitIsStunned (unitID)) then
-		return true
-	else
-		return false
-	end
+function GG.PieceControl.IsDisarmed (unitID)
+	return Spring.GetUnitRulesParam (unitID, "disarmed") == 1 or Spring.GetUnitIsStunned (unitID)
 end
