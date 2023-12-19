@@ -1,9 +1,9 @@
 function widget:GetInfo()
 	return {
 		name = "Selected Units GL4",
-		desc = "Draw geometric pritives at any unit",
-		author = "Beherith, Floris",
-		date = "2021.05.16",
+		desc = "Draw selection markers under units",
+		author = "Fiendicus Prime, Beherith, Floris",
+		date = "2023-12-19",
 		license = "GNU GPL, v2 or later",
 		-- Somewhere between layer -40 and -30 GetUnitUnderCursor starts
 		-- returning nil before GetUnitsInSelectionBox includes that unit.
@@ -24,6 +24,14 @@ local luaShaderDir = "LuaUI/Widgets/Include/"
 local hasBadCulling = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Linux") == true)
 
 -- Localize for speedups:
+local spGetGameFrame = Spring.GetGameFrame
+local spGetSelectedUnits = Spring.GetSelectedUnits
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGetUnitIsDead = Spring.GetUnitIsDead
+local spGetUnitTeam = Spring.GetUnitTeam
+local spLoadCmdColorsConfig = Spring.LoadCmdColorsConfig
+local spValidUnitID = Spring.ValidUnitID
+
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
 local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
@@ -62,10 +70,10 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 end
 
 local function AddSelected(unitID, unitTeam, preselection)
-	if Spring.ValidUnitID(unitID) ~= true or Spring.GetUnitIsDead(unitID) == true then return end
-	local gf = Spring.GetGameFrame()
+	if spValidUnitID(unitID) ~= true or spGetUnitIsDead(unitID) == true then return end
+	local gf = spGetGameFrame()
 
-	local unitDefID = Spring.GetUnitDefID(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
 	if unitDefID == nil then return end -- these cant be selected
 
 	local numVertices = 64
@@ -86,7 +94,6 @@ local function AddSelected(unitID, unitTeam, preselection)
 		length = radius
 	end
 
-	--Spring.Echo(unitID,radius,radius, Spring.GetUnitTeam(unitID), numvertices, 1, gf)
 	pushElementInstance(
 		selectionVBO, -- push into this Instance VBO Table
 		{
@@ -132,7 +139,7 @@ local function UpdateCmdColorsConfig(isOn)
 	if not isOn and WG.widgets_handling_selection > 0 then
 		return
 	end
-	Spring.LoadCmdColorsConfig('unitBox  0 1 0 ' .. (isOn and 0 or 1))
+	spLoadCmdColorsConfig('unitBox  0 1 0 ' .. (isOn and 0 or 1))
 end
 
 local function init()
@@ -216,7 +223,7 @@ function widget:DrawWorldPreUnit()
 		return
 	end
 
-	if hasBadCulling then 
+	if hasBadCulling then
 		gl.Culling(false)
 	end
 	
@@ -266,7 +273,7 @@ function widget:Update(dt)
 
 	local newSelUnits = {}
 	-- Local selections
-	for _, unitID in pairs(Spring.GetSelectedUnits()) do
+	for _, unitID in pairs(spGetSelectedUnits()) do
 		if not selUnits[unitID] or not isLocalSelection[unitID] then
 			AddSelected(unitID, 255)
 			selUnits[unitID] = true
@@ -287,7 +294,7 @@ function widget:Update(dt)
 	if showOtherSelections then
 		for unitID, _ in pairs(WG.allySelUnits or {}) do
 			if not selUnits[unitID] or (isLocalSelection[unitID] and not newSelUnits[unitID]) then
-				AddSelected(unitID, Spring.GetUnitTeam(unitID))
+				AddSelected(unitID, spGetUnitTeam(unitID))
 				selUnits[unitID] = true
 				isLocalSelection[unitID] = nil
 			end
