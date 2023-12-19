@@ -43,7 +43,7 @@ local drawingEnabled = true
 
 local SPACE_CLICK_OUTSIDE = false
 local HEIGHT_UP = 2
-local HEIGHT_LEEWAY = 800
+local HEIGHT_LEEWAY = 1400
 
 local forceTextureToGrid = false
 function WG.game_SetCustomExtensionGridTexture(newGridTex, newForceTextureToGrid)
