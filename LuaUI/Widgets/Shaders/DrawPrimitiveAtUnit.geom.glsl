@@ -103,7 +103,6 @@ void main(){
 	#ifdef USE_CIRCLES
 		if (numVertices > 5u){ // A circle with even subdivisions
 			numVertices = min(numVertices,62u); // to make sure that we dont emit more than 64 vertices
-			// FIXME: Test whether this has any effect on performance. Could just use one and/or hardcode some more cases.
 			float internalAngle = float(numVertices) * radians(180.0) / float(numVertices);
 			float addRadiusCorr = 1 / sin(internalAngle / 2.0);
 			//left most vertex
