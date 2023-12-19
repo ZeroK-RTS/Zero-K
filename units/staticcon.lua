@@ -40,7 +40,6 @@ return { staticcon = {
   levelGround                   = false,
   maxSlope                      = 15,
   metalCost                     = 180,
-  movementClass                 = [[KBOT2]],
   objectName                    = [[armsenan.s3o]],
   script                        = [[staticcon.lua]],
   selfDestructAs                = [[NANOBOOM2]],

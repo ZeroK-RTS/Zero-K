@@ -59,7 +59,6 @@ return { striderhub = {
   maneuverleashlength           = [[380]],
   maxSlope                      = 15,
   metalCost                     = Shared.FACTORY_COST,
-  movementClass                 = [[KBOT4]],
   noAutoFire                    = false,
   objectName                    = [[striderhub.s3o]],
   script                        = [[striderhub.lua]],
