@@ -27,6 +27,7 @@ local hasBadCulling = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Li
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
 local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
+local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
 
 local glStencilFunc         = gl.StencilFunc
 local glStencilOp           = gl.StencilOp
@@ -42,6 +43,7 @@ local GL_REPLACE            = GL.REPLACE
 local GL_POINTS				= GL.POINTS
 
 local selUnits, isLocalSelection = {}, {}
+local doUpdate
 
 local unitScale = {}
 local unitCanFly = {}
@@ -103,6 +105,9 @@ local function AddSelected(unitID, unitTeam, preselection)
 end
 
 local function RemoveSelected(unitID)
+	doUpdate = true
+	isLocalSelection[unitID] = nil
+	selUnits[unitID] = nil
 	if selectionVBO and selectionVBO.instanceIDtoIndex[unitID] then
 		popElementInstance(selectionVBO, unitID)
 	end
@@ -134,12 +139,11 @@ local function init()
 	lineWidth = tonumber(options.linewidth.value) or 3.0
 	showOtherSelections = options.showallselections.value
 	platterOpacity = tonumber(options.platteropacity.value) or 0.2
+	doUpdate = true
 
 	for unitID, _ in pairs(selUnits) do
 		RemoveSelected(unitID)
 	end
-	selUnits = {}
-	isLocalSelection = {}
 
 	local DPatUnit = VFS.Include(luaShaderDir.."DrawPrimitiveAtUnit.lua")
 	local InitDrawPrimitiveAtUnit = DPatUnit.InitDrawPrimitiveAtUnit
@@ -250,7 +254,16 @@ function widget:DrawWorldPreUnit()
 	-- All the above are needed :(
 end
 
+function widget:SelectionChanged()
+	doUpdate = true
+end
+
 function widget:Update(dt)
+	if not doUpdate and not IsSelectionBoxActive() then
+		return
+	end
+	doUpdate = false
+
 	local newSelUnits = {}
 	-- Local selections
 	for _, unitID in pairs(Spring.GetSelectedUnits()) do
@@ -285,23 +298,33 @@ function widget:Update(dt)
 	for unitID, _ in pairs(selUnits) do
 		if not newSelUnits[unitID] then
 			RemoveSelected(unitID)
-			isLocalSelection[unitID] = nil
-			selUnits[unitID] = nil
 		end
 	end
 end
 
-function widget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
-	-- Let update restore it if it's an "ally" selection
-	selUnits[unitID] = nil
-	isLocalSelection[unitID] = nil
+function widget:UnitDestroyed(unitID)
 	RemoveSelected(unitID)
 end
 
-function widget:UnitDestroyed(unitID)
-	selUnits[unitID] = nil
-	isLocalSelection[unitID] = nil
+function widget:UnitGiven()
+	doUpdate = true
+end
+
+function widget:UnitTaken(unitID)
 	RemoveSelected(unitID)
+end
+
+function widget:VisibleUnitAdded()
+	doUpdate = true
+end
+
+function widget:VisibleUnitRemoved(unitID)
+	RemoveSelected(unitID)
+end
+
+function widget:VisibleUnitsChanged()
+	-- Only called on start/stop of api_unit_tracker
+    init()
 end
 
 function widget:Initialize()
