@@ -202,7 +202,9 @@ local firstClickTimer
 local firstClickUnitDefID
 local function GetDoubleClickUnitDefID(units)
 	if firstClickTimer and (spDiffTimers(spGetTimer(), firstClickTimer) <= doubleClickToleranceTime) then
-		return firstClickUnitDefID
+		local unitDefID = firstClickUnitDefID
+		firstClickUnitDefID = nil
+		return unitDefID
 	end
 	
 	if units and units[1] and #units == 1 then
