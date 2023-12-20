@@ -24,7 +24,6 @@ local bombGravity = -WeaponDefs[bombDefID].customParams.mygravity
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
-	burrowed = false
 	Turn(base, x_axis, 0, 5)
 	Turn(l_wing, x_axis, 0, 5)
 	Turn(r_wing, x_axis, 0, 5)
@@ -38,22 +37,25 @@ local function Burrow()
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local height = math.max(Spring.GetGroundHeight(x,z) or 0, 0)
 	
+	Move(base, y_axis, 3, 12)
 	while height + 35 < y do
 		Sleep(500)
 		x,y,z = Spring.GetUnitPosition(unitID)
 		height = math.max(Spring.GetGroundHeight(x,z) or 0, 0)
 	end
-	burrowed = true
 
 	Turn(base, x_axis, math.rad(-90), 5)
 	Turn(l_wing, x_axis, math.rad(90), 5)
 	Turn(r_wing, x_axis, math.rad(90), 5)
-	Move(base, y_axis, 8, 16)
+	Move(base, y_axis, 8, 10)
 	Sleep(600)
 	
 	local x,y,z, speed = Spring.GetUnitVelocity(unitID)
 	if speed > 0.01 then
-		UnBurrow()
+		local ux, uy, uz = Spring.GetUnitPosition(unitID)
+		if uy > 0.01 + Spring.GetGroundHeight(ux, uz) then
+			UnBurrow()
+		end
 	end
 end
 
@@ -133,8 +135,26 @@ local function BurrowThread()
 
 	     Note that the animation is still tied to events because
 	     they produce better looks (transitions happen in flight). ]]
+	local attempts = 0
 	while true do
-		if burrowed and (select(4, Spring.GetUnitVelocity(unitID)) or 0.02) < 0.02 then
+		local x,y,z, speed = Spring.GetUnitVelocity(unitID)
+		burrowed = false
+		if speed < 3.5 then
+			local ux, uy, uz = Spring.GetUnitPosition(unitID)
+			local height = uy - math.max(0, Spring.GetGroundHeight(ux, uz))
+			if height < 12 then
+				burrowed = true
+			elseif height < 40 then
+				local wantLand = select(4, Spring.GetUnitStates(unitID, false, false, true))
+				if wantLand then
+					local isIdle = Spring.GetCommandQueue(unitID, 0) == 0
+					if isIdle then
+						Spring.AddUnitImpulse(unitID, 0, -2, 0)
+					end
+				end
+			end
+		end
+		if burrowed then -- and (select(4, Spring.GetUnitVelocity(unitID)) or 0.1) < 0.1 then
 			GG.SetWantedCloaked(unitID, 1)
 		else
 			GG.SetWantedCloaked(unitID, 0)
