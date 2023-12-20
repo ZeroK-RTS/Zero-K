@@ -10,6 +10,9 @@ return { staticarty = {
   buildPic                      = [[staticarty.png]],
   category                      = [[SINK]],
   corpse                        = [[DEAD]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[80 80 80]],
+  collisionVolumeType           = [[ellipsoid]],
 
   customParams                  = {
     keeptooltip = [[any string I want]],

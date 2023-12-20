@@ -1,8 +1,9 @@
 include "constants.lua"
 
-local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local base = piece 'base'
+local vent = piece 'vent'
 local turret = piece 'turret'
 local sleeve = piece 'sleeve'
 local barrel1 = piece 'barrel1'
@@ -13,6 +14,7 @@ local barrel3 = piece 'barrel3'
 local flare3 = piece 'flare3'
 
 local gun_1 = 1
+local aiming = true
 
 local gunPieces = {
 	{ barrel = barrel2, flare = flare2 },
@@ -22,14 +24,24 @@ local gunPieces = {
 
 -- Signal definitions
 local SIG_AIM = 2
+local SIG_IDLE = 4
 
 local RECOIL_DISTANCE = -3
 local RECOIL_RESTORE_SPEED = 1
 
 local smokePiece = {base, turret}
 
+local function Idle()
+	aiming = true
+	Signal(SIG_IDLE)
+	SetSignalMask(SIG_IDLE)
+	Sleep(500)
+	aiming = false
+end
+
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(Idle)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -43,7 +55,8 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(sleeve, x_axis, -pitch, math.rad(30))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
-	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
+	StartThread(Idle)
+	return (spGetUnitRulesParam(unitID, "lowpower") == 0) --checks for sufficient energy in grid
 end
 
 function script.Shot(num)
@@ -58,12 +71,15 @@ function script.Shot(num)
 end
 
 function script.QueryWeapon(num)
+	if not aiming then
+		return turret
+	end
 	-- Seet mantis 5056 for further improvement.
 	return gunPieces[gun_1].flare
 end
 
 function script.AimFromWeapon(num)
-	return sleeve
+	return turret
 end
 
 function script.Killed(recentDamage, maxHealth)
