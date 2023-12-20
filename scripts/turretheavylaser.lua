@@ -1,6 +1,5 @@
 include "constants.lua"
 include "pieceControl.lua"
-include "aimPosTerraform.lua"
 ----------------------------------------------------------------------------------------------
 -- Model Pieces
 

@@ -621,6 +621,9 @@ function gadget:Initialize()
 	Spring.Log(section, LOG.INFO, string.format("Loading gadget: %-18s  <%s>", ghInfo.name, ghInfo.basename))
 	gadgetHandler:AddChatAction("scriptdebug", ToggleScriptDebug, "Toggles script debug output.")
 
+	-- Useful script libraries
+	LoadChunk("scripts/aimPosTerraform.lua")()
+
 	-- This initialization code has following properties:
 	--  * all used scripts are loaded => early syntax error detection
 	--  * unused scripts aren't loaded

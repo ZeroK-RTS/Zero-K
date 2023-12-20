@@ -7,7 +7,6 @@ local flare = piece 'flare'
 
 include "constants.lua"
 include "pieceControl.lua"
-include "aimPosTerraform.lua"
 
 -- Signal definitions
 local SIG_AIM = 2

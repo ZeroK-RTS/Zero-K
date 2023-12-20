@@ -18,7 +18,6 @@ local p3 = piece 'p3'
 local p4 = piece 'p4'
 
 include "constants.lua"
-include "aimPosTerraform.lua"
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 

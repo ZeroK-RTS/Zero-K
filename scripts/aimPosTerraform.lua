@@ -1,4 +1,5 @@
 if GG.Script_SetupAimPosTerraform then
+	Spring.Echo('Warning, redundant `include "aimPosTerraform.lua"` in unit script', UnitDefs[unitDefID].name)
 	return
 end
 
