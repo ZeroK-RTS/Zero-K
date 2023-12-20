@@ -131,7 +131,7 @@ options = {
 		min = 0,
 		max = 1,
 		step = 0.01,
-		value = 0.29,
+		value = 0.18,
 		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
 		OnChange = ResetWidget,
 	},
