@@ -360,9 +360,14 @@
 		"helptext" : "針狀體是個快速且多功能戰鬥無人機，其粒子光束能有效對付地面和空中的目標。"
 	},
 	"bomberassault" : {
-		"name" : "日蝕",
-		"description" : "突擊轟炸機（反建築）",
-		"helptext" : "日蝕雄偉的船體經得起承載並發射熾熱毀滅性的炸彈，但無導引的炸彈難以擊中機動的目標，且龐大身軀容易成為攻擊目標。"
+		"name" : "奧丁",
+		"description" : "重型突擊／多功能轟炸機（反建築）",
+		"helptext" : "The Odin's imposing hull weathers significant punishment as it drifts towards its target. Its main weapon fires a thermite bomb that lingers for half a minute, ramping up its damage output over time. The bomb slides off units that move, so it is most effective against static targets. Odin can also support ground forces by deploying a cluster of tempoary shields with its special weapon."
+	},
+	"statictempshield" : {
+		"name" : "帕維塞",
+		"description" : "臨時護盾",
+		"helptext" : "奧丁可以部署數個帕維塞來支援地面部隊。這些臨時護盾會隨著時間的推移而失去電量，並在電量歸零後自毀。"
 	},
 	"cloakassault" : {
 		"name" : "騎士",
@@ -537,7 +542,7 @@
 	"hoverarty" : {
 		"name" : "長槍",
 		"description" : "反重型砲兵懸浮器",
-		"helptext" : "長槍的武器，別名「藍色死亡雷射」，其威力和準度能一發殲滅大多數單位。用來對付高裝甲單位，將它放在前線後－因為輕裝甲且遇難時無法逃離。"
+		"helptext" : "長槍的武器，別名「藍色死亡雷射」，其威力和準度能一發殲滅大多數單位。用來對付高裝甲單位，將它放在前線後－只有輕裝甲且遇難時無法逃離。"
 	},
 	"shieldbomb" : {
 		"name" : "告密者",
@@ -967,7 +972,7 @@
 	"shipaa" : {
 		"name" : "和風",
 		"description" : "防空巡防艦",
-		"helptext" : "憑藉其強大的雙防空雷射砲台，這艘防空巡防艦可以保護您的艦隊免受空軍攻擊。一如既往，它對非空中目標毫無用處。"
+		"helptext" : "憑藉其雷射砲台，這艘防空巡防艦可保護您的艦隊免受攻擊。一如既往，它對非空中目標毫無用處。"
 	},
 	"shipheavyarty" : {
 		"name" : "將軍",
@@ -1175,9 +1180,9 @@
 		"helptext" : "作為終極突擊雞，提阿瑪特是個會噴火、鐵顎、噴孢子的怪物，無所畏懼，無情無義。它甚至還有一個黏液護盾來保護自己和周圍其它雞不受傷害。"
 	},
 	"bomberstrike" : {
-		"name" : "紅隼",
+		"name" : "鵲",
 		"description" : "戰術突擊轟炸機",
-		"helptext" : "紅隼發射短程表面攻擊導彈，也能攻擊潛艇。它是攻擊單個機動目標的最佳轟炸機。"
+		"helptext" : "鵲可向地面和空中目標發射短射程的導彈。它的射程和機動性能足以擊中危險目標並返回基地，從而彌補了其傷害低和重新裝填時間長的缺陷。"
 	},
 	"staticrearm" : {
 		"name" : "維修機場",
@@ -1207,7 +1212,7 @@
 	"gunshipheavytrans" : {
 		"name" : "大力士",
 		"description" : "武裝重型空中運輸機",
-		"helptext" : "大力士可以在遊戲中運輸任何非飛行可移動單位，包含船艦。配備雙雷射槍和自動貨物彈射系統使它能運輸到前線的理想選擇。"
+		"helptext" : "大力士可以在遊戲中運輸任何非飛行可移動單位，包含船艦。配備雙雷射槍和自動貨物彈射系統使它成為運輸部隊到前線的理想選擇。"
 	},
 	"planescout" : {
 		"name" : "貓頭鷹",
@@ -1217,7 +1222,7 @@
 	"planelightscout" : {
 		"name" : "麻雀",
 		"description" : "輕型偵察機",
-		"helptext" : "麻雀是一種從雷達塔生產的輕型偵察機，使其成為唯一不是從飛機場生產的飛機。這種易於使用的偵察選項對於那些無法建造飛機的人來說是無價的，但通常會被更快速的雨燕和更大的貓頭鷹替換掉。"
+		"helptext" : "麻雀是一種輕型偵察機，引爆後能顯示視野 12 秒。能從雷達塔變形而來，因此不需要飛機場也能使用，但比不上更快的雨燕和更大的貓頭鷹。"
 	},
 	"amphfloater" : {
 		"name" : "浮標",
