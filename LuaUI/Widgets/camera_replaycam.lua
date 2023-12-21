@@ -858,6 +858,10 @@ local showingEvent
 -- returns event {}
 -- - units Contains unit IDs and their current locations. May contain negative unit IDs e.g. for dead units.
 local function addEvent(actor, importance, location, meta, sbjName, type, unitID, updateFunc, opts)
+	if not importance or not location or not sbjName or not type then
+		spEcho("ERROR! addEvent failed", importance, location, sbjName, type)
+		return
+	end
 	opts = opts or {}
 
 	local decay = eventDecayFactors[type]
@@ -1497,7 +1501,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, _, attack
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-if not unitID or not unitDefID or not unitTeam then
+	if not unitID or not unitDefID or not unitTeam then
 		return
 	end
 
@@ -1507,7 +1511,7 @@ if not unitID or not unitDefID or not unitTeam then
 end
 
 function widget:UnitTaken(unitID, _, _, newTeam)
-if not unitID or not newTeam then
+	if not unitID or not newTeam then
 		return
 	end
 
