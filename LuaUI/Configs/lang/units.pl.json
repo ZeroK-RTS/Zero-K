@@ -346,7 +346,7 @@
 	},
 	"tacnuke" : {
 		"name" : "Eos",
-		"description" : "Rakieta taktyczna",
+		"description" : "Rakieta taktyczna - wysokie obrażenia na małym obszarze. Blokowane przez w pełni naładowane tarcze obszarowe",
 		"helptext" : "Jednorazowa rakieta dalekiego zasięgu, której wybuch obejmuje mały obszar, lecz jest bardzo silny."
 	},
 	"chickenwurm" : {
@@ -361,8 +361,13 @@
 	},
 	"bomberassault" : {
 		"name" : "Odin",
-		"description" : "Bombowiec szturmowy (na budynki)",
-		"helptext" : "Mimo że przez swój rozmiar łatwo go trafić, Odin jest w stanie wytrzymać ciężki ostrzał, by spuścić na swój cel potężną bombę, która jednak spada na tyle wolno, że nie można liczyć na trafienie w ruchome jednostki."
+		"description" : "Ciężki bombowiec szturmowy (na budynki)",
+		"helptext" : "Ciężki kadłub Odina jest w stanie przetrwać ciężkie obrażenia, by zrzucić jeden z dwóch ładunków. Podstawowa broń to bomba termitowa, która utrzymuje się przez 30s w miejscu zrzutu i płonie z coraz większą intensywnością, jednak nie utrzymuje się na ruchomych jednostkach - najlepiej spisuje się przeciwko budynkom. Alternatywnie można zrzucić tymczasowe tarcze obszarowe."
+	},
+	"statictempshield" : {
+		"name" : "Pavise",
+		"description" : "Tymczasowa tarcza obszarowa",
+		"helptext" : "Garść Pavise'ów może być zrzucona przez bombowiec Odin do wspierania oddziałów na ziemi. Te tymczasowe tarcze samoistnie tracą ładunek i znikają po wyczerpaniu się."
 	},
 	"cloakassault" : {
 		"name" : "Knight",
@@ -581,7 +586,7 @@
 	},
 	"napalmmissile" : {
 		"name" : "Inferno",
-		"description" : "Rakieta zapalająca",
+		"description" : "Rakieta zapalająca - podpala obszar na 45s. Blokowana przez tarcze obszarowe, niskie obrażenia bezpośrednie.",
 		"helptext" : "Inferno to rakieta zapalająca trafiony obszar na długi czas. Świetna przeciwko dużym grupom lekkich jednostek."
 	},
 	"factoryamph" : {
@@ -856,7 +861,7 @@
 	},
 	"empmissile" : {
 		"name" : "Shockley",
-		"description" : "Rakieta EMP",
+		"description" : "Rakieta EMP - paraliżuje prawie wszystko na 45s. Przechodzi przez tarcze obszarowe oprócz Funnelweba",
 		"helptext" : "Shockley paraliżuje cele w małym obszarze do 45 sekund."
 	},
 	"striderhub" : {
@@ -1001,7 +1006,7 @@
 	},
 	"seismic" : {
 		"name" : "Quake",
-		"description" : "Rakieta sejsmiczna",
+		"description" : "Rakieta sejsmiczna - wypłaszcza teren, nie zadaje obrażeń, blokowana przez tarcze obszarowe",
 		"helptext" : "Jednorazowa rakieta sejsmiczna dalekiego zasięgu. Nie zadaje obrażeń, lecz wyrównuje trafiony teren."
 	},
 	"missileslow" : {
@@ -1177,7 +1182,7 @@
 	"bomberstrike" : {
 		"name" : "Magpie",
 		"description" : "Bombowiec taktyczny",
-		"helptext" : "Magpie wystrzeliwuje rakiety krótkiego zasięgu, które mogą trafić cele w powietrzu, na powierzchni lub pod wodą. Spośród bombowców najlepiej nadaje się do niszczenia pojedynczych jednostek."
+		"helptext" : "Magpie wystrzeliwuje lekkie rakiety, które mogą trafić cele w powietrzu lub na ziemi. Chociaż ma niskie obrażenia i długo przeładowuje, jego zasięg i zwinność pozwala mu skutecznie przeżyć spotkanie z wrogiem i wrócić do bazy."
 	},
 	"staticrearm" : {
 		"name" : "Lądowisko",
@@ -1217,7 +1222,7 @@
 	"planelightscout" : {
 		"name" : "Sparrow",
 		"description" : "Lekki samolot zwiadowczy",
-		"helptext" : "Sparrow to lekki zwiadowca, którego można stworzyć poprzez przeobrażenie podstawowej wieżyczki radarowej, co czyni go dostępnym we wczesnej fazie gry przed zbudowaniem lotniska. Słabo wypada w porównaniu z szybszym Swiftem i większym Owlem."
+		"helptext" : "Sparrow to lekki zwiadowca, którego można zużyć do odkrycia obszaru na 12s. Można go zbudować bez lotniska poprzez przeobrażenie z podstawowej wieżyczki radarowe, ale słabo wypada w porównaniu z szybszym Swiftem i większym Owlem."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",
