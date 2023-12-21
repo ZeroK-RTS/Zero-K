@@ -301,6 +301,16 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Set radius for nanolathing (incl. placing the nanoframe) purposes
+--
+
+local USE_RADIUS_FROM_MODEL_FILE = -1
+for name, ud in pairs(UnitDefs) do
+	ud.buildeebuildradius = tonumber(ud.customparams.modelradius) or USE_RADIUS_FROM_MODEL_FILE
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Tell UnitDefs about script_reload and script_burst
 --
 
