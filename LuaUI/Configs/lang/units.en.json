@@ -362,7 +362,7 @@
 	"bomberassault" : {
 		"name" : "Odin",
 		"description" : "Heavy Assault/Utility Bomber (Anti-Static)",
-		"helptext" : "The Odin's imposing hull weathers significant punishment as it drifts towards its target. Its main weapon fires a thermite bomb that lingers for half a minute, ramping up its damage output over time. The bomb slides off units that move, so it is most effective against static targets. Odin can also support ground forces by deploying a cluster of tempoary shields with its special weapon."
+		"helptext" : "The Odin's imposing hull weathers significant punishment as it drifts towards its target. Its main weapon fires a thermite bomb that lingers for half a minute, ramping up its damage output over time. The bomb slides off units that move, so it is most effective against static targets. Odin can also support ground forces by deploying a cluster of temporary shields with its special weapon."
 	},
 	"statictempshield" : {
 		"name" : "Pavise",
