@@ -147,7 +147,7 @@
 	"factoryveh" : {
 		"name" : "Fabbrica dei Rover",
 		"description" : "Produce veicoli leggeri con ruote",
-		"helptext" : "La Fabbrica di Rover è l'ideale per produrre unità veloci, aggressive e ideali per i blitzkrieg. Le unità più lente del lotto sono comunque dotate con un'abbondante potenza di foco. Unità chiave: Dart, Scorcher, Ravager, Ripper, Slasher"
+		"helptext" : "La Fabbrica di Rover è l'ideale per produrre unità veloci, aggressive e ideali per i blitzkrieg. Le unità più lente del lotto sono comunque dotate con un'abbondante potenza di foco. Unità chiave: Dart, Scorcher, Ravager, Ripper, Fencer"
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
@@ -361,8 +361,13 @@
 	},
 	"bomberassault" : {
 		"name" : "Odin",
-		"description" : "Bombardiere d'assalto (Anti-strutture)",
-		"helptext" : "Le bombe dell'Odin può provocare danni significativi mentre è costantemente in fiamme, ma. non essendo guidata, ha problemi nel colpire bersagli mobili. Le unità Odin, a causa delle grandi dimensioni, sono un bersaglio facile!"
+		"description" : "Heavy Assault/Utility Bomber (Anti-Static)",
+		"helptext" : "The Odin's imposing hull weathers significant punishment as it drifts towards its target. Its main weapon fires a thermite bomb that lingers for half a minute, ramping up its damage output over time. The bomb slides off units that move, so it is most effective against static targets. Odin can also support ground forces by deploying a cluster of temporary shields with its special weapon."
+	},
+	"statictempshield" : {
+		"name" : "Pavise",
+		"description" : "Temporary Shield",
+		"helptext" : "Clusters of Pavise can be deployed by Odin to support ground forces. These temporary shields lose charge over time and self-destruct when their charge hits zero."
 	},
 	"cloakassault" : {
 		"name" : "Knight",
@@ -1004,6 +1009,11 @@
 		"description" : "Missile sismico",
 		"helptext" : "Il Quake crea una potente onda d'urto sismica che leviga un'ampia area di terreno, causando al contempo danni minimi alle unità."
 	},
+	"missileslow" : {
+		"name" : "Zeno",
+		"description" : "Slow Homing Missile - High single-target slow damage with lingering damage over time",
+		"helptext" : "The Zeno slows down a single target and leaves a slowing area behind it. It has far more range than other combat missiles and homes onto its target."
+	},
 	"striderscorpion" : {
 		"name" : "Scorpion",
 		"description" : "Strider di penetrazione con capacità di occultamento",
@@ -1067,7 +1077,7 @@
 	"tankheavyraid" : {
 		"name" : "Blitz",
 		"description" : "Carro leggero d'assalto",
-		"helptext" : "The Blitz is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Blitz can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base."
+		"helptext" : "Il Blitz è un raider ad alta tecnologia. La sua arma, una pistola a fulmini, infligge principalmente danni da paralisi. In questo modo il Blitz può disabilitare le torrette, attraversare la linea difensiva e procedere a danneggiare il cuore economico della base avversaria."
 	},
 	"staticheavyradar" : {
 		"name" : "Radar Avanzato",
@@ -1172,7 +1182,7 @@
 	"bomberstrike" : {
 		"name" : "Magpie",
 		"description" : "Bombardiere d'attacco tattico",
-		"helptext" : "Il Magpie lancia missili d'attacco di superficie a corto raggio che possono colpire anche i sottomarini. È il miglior bombardiere per abbattere bersagli singoli."
+		"helptext" : "The Magpie launches short-range homing missiles at ground and air targets. It makes up for its low damage and long rearm time by boasting the range and manoeuvrability to hit dangerous targets and make it back to base."
 	},
 	"staticrearm" : {
 		"name" : "Airpad",
@@ -1202,7 +1212,7 @@
 	"gunshipheavytrans" : {
 		"name" : "Hercules",
 		"description" : "Gunship pesante e armato da trasporto",
-		"helptext" : "L'Hercules può trasportare qualsiasi unità mobile non volante all'interno della mappa, comprese le navi (tranne le unità Reef e Shogun). I suoi doppi cannoni laser e il sistema di espulsione automatizzata del carico lo rendono ideale per i trasporti nelle zone calde."
+		"helptext" : "L'Hercules può trasportare qualsiasi unità mobile non volante all'interno della mappa, comprese le navi. I suoi doppi cannoni laser e il sistema di espulsione automatizzata del carico lo rendono ideale per i trasporti nelle zone calde."
 	},
 	"planescout" : {
 		"name" : "Owl",
