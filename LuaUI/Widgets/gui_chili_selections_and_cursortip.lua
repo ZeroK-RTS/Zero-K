@@ -148,7 +148,7 @@ local terraCmdTip = {
 		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
 		'\n'..
 		yellow..'[After Terraform Draw]\n'..
-		green.. 'Alt'..white..': Snap to steps of 6 height.\n(6 blocks vehicles, 18 blocks bots)\n'..
+		green.. 'Alt'..white..': Snap height (walls 12 high block vehicles, 24 blocks bots)\n'..
 		green.. 'Ctrl'..white..': Reset to 0 height.',
 	[CMD_SMOOTH] = terraformGeneralTip ..
 		yellow..'[During Terraform Draw]\n'..
