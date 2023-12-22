@@ -13,6 +13,7 @@ local r_fan = piece "r_fan"
 local smokePiece = { base, l_wing, r_wing }
 
 local SIG_BURROW = 1
+local SIG_HAXY_HAX = 2
 local burrowed = false
 
 local PREDICT_FRAMES = 25
@@ -65,14 +66,18 @@ local function GetWeaponTargetPos(num, distanceLimit)
 		return false
 	end
 	if cps_3 then
-		return cps_1, cps_2, cps_3, false
+		return cps_1, cps_2, cps_3, false, false
 	end
-	if (not Spring.ValidUnitID(cps_1)) or (distanceLimit and Spring.GetUnitSeparation(unitID, cps_1, true) > distanceLimit) then
+	if (not Spring.ValidUnitID(cps_1)) then
 		return
+	end
+	local distance = (distanceLimit and Spring.GetUnitSeparation(unitID, cps_1, true))
+	if distanceLimit and distance > distanceLimit then
+		return false
 	end
 	local _,_,_, _,_,_, tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
 		function () return Spring.GetUnitPosition(cps_1, true, true) end)
-	return tx, ty, tz, cps_1
+	return tx, ty, tz, cps_1, distance
 	-- The following would be superior, but GetUnitWeaponTarget returns 0 in script.Killed
 	--local targetType, _, target = Spring.GetUnitWeaponTarget(unitID, num)
 	--if targetType == 2 and target then
@@ -188,6 +193,27 @@ function script.QueryWeapon(num)
 	return missile
 end
 
+local function HaxyHaxThread()
+	-- The engine seems to force gunships upwards when their velocity predicts that they are going
+	-- to hit a cliff. Unfortunately the engine doesn't seem to care about where the move goal is,
+	-- so gunships told to move to the base of a cliff get forced up before coming back down. This
+	-- affects Locust, giving it a delay of 1-2s as it flies out of weapon range and then back
+	-- down. But it is worse for Blastwing as it makes anything with a cliff to its back
+	-- effectively invulnerable, as there is no command that can be given to stop Blastwing flying
+	-- up and overshooting in the cliff.
+	-- Hence the haxy hax thread. Blastwings that are detected doing this are forced back down with
+	-- impulse. It most likely breaks some edge case.
+	Signal(SIG_HAXY_HAX)
+	SetSignalMask(SIG_HAXY_HAX)
+	for i = 1, 15 do
+		local vx, vy, vz, tSpeed = Spring.GetUnitVelocity(unitID, true)
+		if vy > 0.2 then
+			Spring.AddUnitImpulse(unitID, 0, -0.5, 0)
+		end
+		Sleep(33)
+	end
+end
+
 function script.AimFromWeapon(num)
 	local _,_,_,speed = Spring.GetUnitVelocity(unitID)
 	if speed then
@@ -198,15 +224,27 @@ function script.AimFromWeapon(num)
 	
 	-- Gunship move goals towards their target update infrequently (about 1Hz?),
 	-- enough for Blastwing to aim sideways and miss consistently.
-	local tx, ty, tz, targetID = GetWeaponTargetPos(WEAPON_NUM, 600)
-	if tx and targetID then
-		local vx, vy, vz, tSpeed = Spring.GetUnitVelocity(targetID, true)
-		if vx and tSpeed then
-			if tSpeed > PREDICT_SPEED_CAP then
-				local mult = PREDICT_SPEED_CAP / tSpeed
-				vx, vy, vz = vx*mult, vy*mult, vz*mult
+	local tx, ty, tz, targetID, distance = GetWeaponTargetPos(WEAPON_NUM, 600)
+	if tx then
+		if targetID then
+			local vx, vy, vz, tSpeed = Spring.GetUnitVelocity(targetID, true)
+			if vx and tSpeed then
+				if tSpeed > PREDICT_SPEED_CAP then
+					local mult = PREDICT_SPEED_CAP / tSpeed
+					vx, vy, vz = vx*mult, vy*mult, vz*mult
+				end
+				tx, ty, tz = tx + vx*PREDICT_FRAMES, ty + vy*PREDICT_FRAMES, tz + vz*PREDICT_FRAMES
 			end
-			tx, ty, tz = tx + vx*PREDICT_FRAMES, ty + vy*PREDICT_FRAMES, tz + vz*PREDICT_FRAMES
+		end
+		local ux, uy, uz = Spring.GetUnitPosition(unitID)
+		if ty < uy + 5 then
+			if not distance then
+				local dx, dy, dz = tx - ux, ty - uy, tz - uz
+				distance = math.sqrt(dx*dx + dy*dy + dz*dz)
+			end
+			if distance < 500 then
+				StartThread(HaxyHaxThread)
+			end
 		end
 		Spring.SetUnitMoveGoal(unitID, tx, ty, tz)
 	end
