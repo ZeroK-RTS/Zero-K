@@ -13,12 +13,10 @@ function widget:GetInfo()
 end
 
 -- Configurable Parts:
-
 local lineWidth, showOtherSelections, platterOpacity
 
 ---- GL4 Backend Stuff----
-local selectionVBO = nil
-local selectShader = nil
+local localSelectionVBO, selectionShader, otherSelectionVBO = nil, nil, nil
 local luaShaderDir = "LuaUI/Widgets/Include/"
 
 local hasBadCulling = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Linux") == true)
@@ -51,9 +49,9 @@ local GL_REPLACE            = GL.REPLACE
 local GL_POINTS				= GL.POINTS
 
 local selUnits, isLocalSelection = {}, {}
-local doUpdate
+local doUpdate, allySelUnits
 
-local paused, currentFrame, timeSinceLastFrame = false, -1, 0
+local paused, currentFrame, timeSinceLastFrame = true, -1, 0
 
 local unitScale = {}
 local unitCanFly = {}
@@ -71,11 +69,11 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	end
 end
 
-local function AddSelected(unitID, unitTeam, preselection)
+local function AddSelected(unitID, unitTeam, isLocal)
 	if spValidUnitID(unitID) ~= true or spGetUnitIsDead(unitID) == true then return end
 	-- When paused we don't want to animate from initial size because that may not be visible for some units
 	local gf = paused and -30 or spGetGameFrame()
-	local animate = preselection and 1 or 0
+	local animate = isLocal and 1 or 0
 
 	local unitDefID = spGetUnitDefID(unitID)
 	if unitDefID == nil then return end -- these cant be selected
@@ -86,7 +84,7 @@ local function AddSelected(unitID, unitTeam, preselection)
 
 	local width, length
 	if unitCanFly[unitDefID] then
-		numVertices = 3 -- triangles for planes
+		numVertices = 3
 		width = radius
 		length = radius
 	elseif unitBuilding[unitDefID] then
@@ -98,8 +96,15 @@ local function AddSelected(unitID, unitTeam, preselection)
 		length = radius
 	end
 
+	-- Make sure we move local selections back to other when deselecting
+	local oppositeSelectionVBO = isLocal and otherSelectionVBO or localSelectionVBO
+	if oppositeSelectionVBO.instanceIDtoIndex[unitID] then
+		popElementInstance(oppositeSelectionVBO, unitID)
+	end
+
+	-- Add the new selection
 	pushElementInstance(
-		selectionVBO, -- push into this Instance VBO Table
+		isLocal and localSelectionVBO or otherSelectionVBO, -- push into this Instance VBO Table
 		{
 			length, width, 0, 0,  -- lengthwidthcornerheight
 			unitTeam, -- teamID
@@ -119,8 +124,11 @@ local function RemoveSelected(unitID)
 	doUpdate = true
 	isLocalSelection[unitID] = nil
 	selUnits[unitID] = nil
-	if selectionVBO and selectionVBO.instanceIDtoIndex[unitID] then
-		popElementInstance(selectionVBO, unitID)
+	if localSelectionVBO.instanceIDtoIndex[unitID] then
+		popElementInstance(localSelectionVBO, unitID)
+	end
+	if otherSelectionVBO.instanceIDtoIndex[unitID] then
+		popElementInstance(otherSelectionVBO, unitID)
 	end
 end
 
@@ -158,6 +166,7 @@ local function init()
 
 	local DPatUnit = VFS.Include(luaShaderDir.."DrawPrimitiveAtUnit.lua")
 	local InitDrawPrimitiveAtUnit = DPatUnit.InitDrawPrimitiveAtUnit
+	local InitDrawPrimitiveAtUnitVBO = DPatUnit.InitDrawPrimitiveAtUnitVBO
 	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
 	shaderConfig.BILLBOARD = 0
 	shaderConfig.TRANSPARENCY = platterOpacity
@@ -169,13 +178,15 @@ local function init()
 	shaderConfig.HEIGHTOFFSET = 0
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * TRANSPARENCY + addRadius);"
-	selectionVBO, selectShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
+	localSelectionVBO, selectionShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
+	otherSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_Other")
 
-	return selectionVBO ~= nil
+	return localSelectionVBO ~= nil and selectionShader ~= nil and otherSelectionVBO ~= nil
 end
 
 local function SetPausedHack(gameFrame)
 	-- GamePaused callin and Spring.GetGameSpeed() don't work in replays.
+	-- TODO: Get this fixed?
 	if gameFrame == currentFrame and timeSinceLastFrame > 1 then
 		paused = true
     elseif gameFrame ~= currentFrame then
@@ -196,7 +207,6 @@ options = {
 		OnChange = function(self)
 			showOtherSelections = nil
 			init()
-			-- showOtherSelections = self.value
 		end,
 	},
 	linewidth = {
@@ -212,7 +222,6 @@ options = {
 		OnChange = function(self)
 			lineWidth = nil
 			init()
-			-- lineWidth = tonumber(self.value) or lineWidth
 		end,
 	},
 	platteropacity = {
@@ -234,7 +243,7 @@ options = {
 -- Callins
 
 function widget:DrawWorldPreUnit()
-	if selectionVBO.usedElements == 0 then
+	if localSelectionVBO.usedElements == 0 and otherSelectionVBO.usedElements == 0 then
 		return
 	end
 
@@ -242,8 +251,8 @@ function widget:DrawWorldPreUnit()
 		gl.Culling(false)
 	end
 	
-	selectShader:Activate()
-	selectShader:SetUniform("iconDistance", 99999) -- pass
+	selectionShader:Activate()
+	selectionShader:SetUniform("iconDistance", 99999) -- pass
 	glStencilTest(true) --https://learnopengl.com/Advanced-OpenGL/Stencil-testing
 	glDepthTest(true)
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE) -- Set The Stencil Buffer To 1 Where Draw Any Polygon		this to the shader
@@ -252,21 +261,22 @@ function widget:DrawWorldPreUnit()
 	glStencilFunc(GL_NOTEQUAL, 1, 1) -- use NOTEQUAL instead of ALWAYS to ensure that overlapping transparent fragments dont get written multiple times
 	glStencilMask(1)
 
-	selectShader:SetUniform("addRadius", 0)
-	selectionVBO.VAO:DrawArrays(GL_POINTS, selectionVBO.usedElements)
+	selectionShader:SetUniform("addRadius", 0)
+	localSelectionVBO.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
 
-	glStencilFunc(GL_NOTEQUAL, 1, 1)
-	glStencilMask(0)
-	glDepthTest(true)
+	selectionShader:SetUniform("addRadius", lineWidth)
+	localSelectionVBO.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
 
-	selectShader:SetUniform("addRadius", lineWidth)
-	selectionVBO.VAO:DrawArrays(GL_POINTS, selectionVBO.usedElements)
+	selectionShader:SetUniform("addRadius", 0)
+	otherSelectionVBO.VAO:DrawArrays(GL_POINTS, otherSelectionVBO.usedElements)
 
-	glStencilMask(1)
+	selectionShader:SetUniform("addRadius", lineWidth)
+	otherSelectionVBO.VAO:DrawArrays(GL_POINTS, otherSelectionVBO.usedElements)
+
+	-- Cleanup?
 	glStencilFunc(GL_ALWAYS, 1, 1)
-	glDepthTest(true)
 
-	selectShader:Deactivate()
+	selectionShader:Deactivate()
 
 	-- This is the correct way to exit out of the stencil mode, to not break drawing of area commands:
 	glStencilTest(false)
@@ -284,16 +294,21 @@ function widget:Update(dt)
 	timeSinceLastFrame = timeSinceLastFrame + dt
 	SetPausedHack(currentFrame)
 
-	if not doUpdate and not IsSelectionBoxActive() then
+	-- TODO: Add a callin for when ally selections change?
+	local allySelUpdated = WG.allySelUnits ~= allySelUnits
+	allySelUnits = WG.allySelUnits
+
+	if not doUpdate and not allySelUpdated and not IsSelectionBoxActive() then
 		return
 	end
+
 	doUpdate = false
 
 	local newSelUnits = {}
 	-- Local selections
 	for _, unitID in pairs(spGetSelectedUnits()) do
 		if not selUnits[unitID] or not isLocalSelection[unitID] then
-			AddSelected(unitID, 255)
+			AddSelected(unitID, 255, true)
 			selUnits[unitID] = true
 			isLocalSelection[unitID] = true
 		end
@@ -310,9 +325,9 @@ function widget:Update(dt)
 	end
 	-- Ally/other selections
 	if showOtherSelections then
-		for unitID, _ in pairs(WG.allySelUnits or {}) do
+		for unitID, _ in pairs(allySelUnits or {}) do
 			if not selUnits[unitID] or (isLocalSelection[unitID] and not newSelUnits[unitID]) then
-				AddSelected(unitID, spGetUnitTeam(unitID))
+				AddSelected(unitID, spGetUnitTeam(unitID), false)
 				selUnits[unitID] = true
 				isLocalSelection[unitID] = nil
 			end
