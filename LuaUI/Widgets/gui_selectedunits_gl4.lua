@@ -17,51 +17,55 @@ local lineWidth, showOtherSelections, platterOpacity
 
 ---- GL4 Backend Stuff----
 local localSelectionVBO, selectionShader, otherSelectionVBO = nil, nil, nil
-local luaShaderDir = "LuaUI/Widgets/Include/"
+local luaShaderDir                                          = "LuaUI/Widgets/Include/"
 
-local hasBadCulling = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Linux") == true)
+local hasBadCulling                                         = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Linux") == true)
 
 -- Localize for speedups:
-local spGetGameFrame = Spring.GetGameFrame
-local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitIsDead = Spring.GetUnitIsDead
-local spGetUnitTeam = Spring.GetUnitTeam
-local spLoadCmdColorsConfig = Spring.LoadCmdColorsConfig
-local spValidUnitID = Spring.ValidUnitID
+local spGetGameFrame                                        = Spring.GetGameFrame
+local spGetSelectedUnits                                    = Spring.GetSelectedUnits
+local spGetUnitDefID                                        = Spring.GetUnitDefID
+local spGetUnitIsDead                                       = Spring.GetUnitIsDead
+local spGetUnitTeam                                         = Spring.GetUnitTeam
+local spLoadCmdColorsConfig                                 = Spring.LoadCmdColorsConfig
+local spValidUnitID                                         = Spring.ValidUnitID
 
-local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
-local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
-local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
-local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
+local SafeWGCall                                            = function(fnName, param1) if fnName then return fnName(
+		param1) else return nil end end
+local GetUnitUnderCursor                                    = function(onlySelectable) return SafeWGCall(
+	WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
+local GetUnitsInSelectionBox                                = function() return SafeWGCall(WG
+	.PreSelection_GetUnitsInSelectionBox) end
+local IsSelectionBoxActive                                  = function() return SafeWGCall(WG
+	.PreSelection_IsSelectionBoxActive) end
 
-local glStencilFunc         = gl.StencilFunc
-local glStencilOp           = gl.StencilOp
-local glStencilTest         = gl.StencilTest
-local glStencilMask         = gl.StencilMask
-local glDepthTest           = gl.DepthTest
-local glClear               = gl.Clear
-local GL_ALWAYS             = GL.ALWAYS
-local GL_NOTEQUAL           = GL.NOTEQUAL
-local GL_KEEP               = 0x1E00 --GL.KEEP
-local GL_STENCIL_BUFFER_BIT = GL.STENCIL_BUFFER_BIT
-local GL_REPLACE            = GL.REPLACE
-local GL_POINTS				= GL.POINTS
+local glStencilFunc                                         = gl.StencilFunc
+local glStencilOp                                           = gl.StencilOp
+local glStencilTest                                         = gl.StencilTest
+local glStencilMask                                         = gl.StencilMask
+local glDepthTest                                           = gl.DepthTest
+local glClear                                               = gl.Clear
+local GL_ALWAYS                                             = GL.ALWAYS
+local GL_NOTEQUAL                                           = GL.NOTEQUAL
+local GL_KEEP                                               = 0x1E00 --GL.KEEP
+local GL_STENCIL_BUFFER_BIT                                 = GL.STENCIL_BUFFER_BIT
+local GL_REPLACE                                            = GL.REPLACE
+local GL_POINTS                                             = GL.POINTS
 
-local selUnits, isLocalSelection = {}, {}
+local selUnits, isLocalSelection                            = {}, {}
 local doUpdate, allySelUnits
 
-local paused, currentFrame, timeSinceLastFrame = true, -1, 0
+local paused, currentFrame, timeSinceLastFrame              = true, -1, 0
 
-local unitScale = {}
-local unitCanFly = {}
-local unitBuilding = {}
+local unitScale                                             = {}
+local unitCanFly                                            = {}
+local unitBuilding                                          = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-	unitScale[unitDefID] = (8 * ( unitDef.xsize^2 + unitDef.zsize^2 ) ^ 0.5) + 4
+	unitScale[unitDefID] = (8 * (unitDef.xsize ^ 2 + unitDef.zsize ^ 2) ^ 0.5) + 4
 	if unitDef.canFly then
 		unitCanFly[unitDefID] = true
 		unitScale[unitDefID] = unitScale[unitDefID] * 0.7
-	elseif unitDef.isBuilding or unitDef.isFactory or unitDef.speed==0 then
+	elseif unitDef.isBuilding or unitDef.isFactory or unitDef.speed == 0 then
 		unitBuilding[unitDefID] = {
 			unitDef.xsize * 8 + 0.5,
 			unitDef.zsize * 8 + 0.5
@@ -106,17 +110,17 @@ local function AddSelected(unitID, unitTeam, isLocal)
 	pushElementInstance(
 		isLocal and localSelectionVBO or otherSelectionVBO, -- push into this Instance VBO Table
 		{
-			length, width, 0, 0,  -- lengthwidthcornerheight
-			unitTeam, -- teamID
-			numVertices, -- how many trianges should we make
-			gf, animate, 0, 0, -- the gameFrame (for animations), whether to animate (for preselection) and unused parameters
-			0, 1, 0, 1, -- These are our default UV atlas tranformations
-			0, 0, 0, 0 -- these are just padding zeros, that will get filled in
+			length, width, 0, 0,                      -- lengthwidthcornerheight
+			unitTeam,                                 -- teamID
+			numVertices,                              -- how many trianges should we make
+			gf, animate, 0, 0,                        -- the gameFrame (for animations), whether to animate (for preselection) and unused parameters
+			0, 1, 0, 1,                               -- These are our default UV atlas tranformations
+			0, 0, 0, 0                                -- these are just padding zeros, that will get filled in
 		},
-		unitID, -- this is the key inside the VBO TAble,
-		true, -- update existing element
-		nil, -- noupload, dont use unless you
-		unitID -- last one should be UNITID?
+		unitID,                                       -- this is the key inside the VBO TAble,
+		true,                                         -- update existing element
+		nil,                                          -- noupload, dont use unless you
+		unitID                                        -- last one should be UNITID?
 	)
 end
 
@@ -164,7 +168,7 @@ local function init()
 		RemoveSelected(unitID)
 	end
 
-	local DPatUnit = VFS.Include(luaShaderDir.."DrawPrimitiveAtUnit.lua")
+	local DPatUnit = VFS.Include(luaShaderDir .. "DrawPrimitiveAtUnit.lua")
 	local InitDrawPrimitiveAtUnit = DPatUnit.InitDrawPrimitiveAtUnit
 	local InitDrawPrimitiveAtUnitVBO = DPatUnit.InitDrawPrimitiveAtUnitVBO
 	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
@@ -189,7 +193,7 @@ local function SetPausedHack(gameFrame)
 	-- TODO: Get this fixed?
 	if gameFrame == currentFrame and timeSinceLastFrame > 1 then
 		paused = true
-    elseif gameFrame ~= currentFrame then
+	elseif gameFrame ~= currentFrame then
 		paused = false
 		currentFrame = gameFrame
 		timeSinceLastFrame = 0
@@ -197,7 +201,7 @@ local function SetPausedHack(gameFrame)
 end
 
 options_path = 'Settings/Interface/Selection/Selected Units'
-options_order = {'showallselections', 'linewidth', 'platteropacity'}
+options_order = { 'showallselections', 'linewidth', 'platteropacity' }
 options = {
 	showallselections = {
 		name = 'Show Other Selections',
@@ -214,8 +218,8 @@ options = {
 		desc = '',
 		type = 'radioButton',
 		items = {
-			{name = 'Thin', key='1.5'},
-			{name = 'Standard', key='3'},
+			{ name = 'Thin',     key = '1.5' },
+			{ name = 'Standard', key = '3' },
 		},
 		value = '3',
 		noHotkey = true,
@@ -250,15 +254,15 @@ function widget:DrawWorldPreUnit()
 	if hasBadCulling then
 		gl.Culling(false)
 	end
-	
+
 	selectionShader:Activate()
 	selectionShader:SetUniform("iconDistance", 99999) -- pass
-	glStencilTest(true) --https://learnopengl.com/Advanced-OpenGL/Stencil-testing
+	glStencilTest(true)                            --https://learnopengl.com/Advanced-OpenGL/Stencil-testing
 	glDepthTest(true)
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE) -- Set The Stencil Buffer To 1 Where Draw Any Polygon		this to the shader
-	glClear(GL_STENCIL_BUFFER_BIT ) -- set stencil buffer to 0
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)      -- Set The Stencil Buffer To 1 Where Draw Any Polygon		this to the shader
+	glClear(GL_STENCIL_BUFFER_BIT)                 -- set stencil buffer to 0
 
-	glStencilFunc(GL_NOTEQUAL, 1, 1) -- use NOTEQUAL instead of ALWAYS to ensure that overlapping transparent fragments dont get written multiple times
+	glStencilFunc(GL_NOTEQUAL, 1, 1)               -- use NOTEQUAL instead of ALWAYS to ensure that overlapping transparent fragments dont get written multiple times
 	glStencilMask(1)
 
 	selectionShader:SetUniform("addRadius", 0)
@@ -364,7 +368,7 @@ end
 
 function widget:VisibleUnitsChanged()
 	-- Only called on start/stop of api_unit_tracker
-    init()
+	init()
 end
 
 function widget:GameFrame(gameFrame)
