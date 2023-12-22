@@ -32,13 +32,9 @@ local shaderConfig = {
 	PRE_OFFSET = "",
 }
 
----- GL4 Backend Stuff----
-local DrawPrimitiveAtUnitVBO = nil
-local DrawPrimitiveAtUnitShader = nil
-
 local luaShaderDir = "LuaUI/Widgets/Include/"
-local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
-VFS.Include(luaShaderDir.."instancevbotable.lua")
+local LuaShader = VFS.Include(luaShaderDir .. "LuaShader.lua")
+VFS.Include(luaShaderDir .. "instancevbotable.lua")
 
 local vsSrcPath = "LuaUI/Widgets/Shaders/DrawPrimitiveAtUnit.vert.glsl"
 local gsSrcPath = "LuaUI/Widgets/Shaders/DrawPrimitiveAtUnit.geom.glsl"
@@ -57,42 +53,54 @@ local shaderSourceCache = {
 		shaderConfig = shaderConfig,
 	}
 
+
+local function InitDrawPrimitiveAtUnitVBO(DPATname)
+	local drawPrimitiveAtUnitVBO = makeInstanceVBOTable(
+		{
+			{ id = 0, name = 'lengthwidthcorner', size = 4 },
+			{ id = 1, name = 'teamID',            size = 1, type = GL.UNSIGNED_INT },
+			{ id = 2, name = 'numvertices',       size = 1, type = GL.UNSIGNED_INT },
+			{ id = 3, name = 'parameters',        size = 4 },
+			{ id = 4, name = 'uvoffsets',         size = 4 },
+			{ id = 5, name = 'instData',          size = 4, type = GL.UNSIGNED_INT },
+		},
+		64,          -- maxelements
+		DPATname .. "VBO", -- name
+		5            -- unitIDattribID (instData)
+	)
+	if drawPrimitiveAtUnitVBO == nil then
+		Spring.Echo("Failed to create drawPrimitiveAtUnitVBO for ", DPATname)
+		return nil
+	end
+
+	local drawPrimitiveAtUnitVAO = gl.GetVAO()
+	drawPrimitiveAtUnitVAO:AttachVertexBuffer(drawPrimitiveAtUnitVBO.instanceVBO)
+	drawPrimitiveAtUnitVBO.VAO = drawPrimitiveAtUnitVAO
+
+	return drawPrimitiveAtUnitVBO
+end
+
 local function InitDrawPrimitiveAtUnit(shaderConfig, DPATname)
 	if shaderConfig.USETEXTURE then 
-		shaderSourceCache.uniformInt = {DrawPrimitiveAtUnitTexture = 0,}
+		shaderSourceCache.uniformInt = { DrawPrimitiveAtUnitTexture = 0, }
 	end
 	
 	shaderSourceCache.shaderName = DPATname .. "Shader GL4"
 	
-	DrawPrimitiveAtUnitShader =  LuaShader.CheckShaderUpdates(shaderSourceCache)
+	local drawPrimitiveAtUnitShader = LuaShader.CheckShaderUpdates(shaderSourceCache)
 
-	if not DrawPrimitiveAtUnitShader then 
+	if not drawPrimitiveAtUnitShader then
 		Spring.Echo("Failed to compile shader for ", DPATname)
 		return nil
 	end
 
-	DrawPrimitiveAtUnitVBO = makeInstanceVBOTable(
-		{
-			{id = 0, name = 'lengthwidthcorner', size = 4},
-			{id = 1, name = 'teamID', size = 1, type = GL.UNSIGNED_INT},
-			{id = 2, name = 'numvertices', size = 1, type = GL.UNSIGNED_INT},
-			{id = 3, name = 'parameters', size = 4},
-			{id = 4, name = 'uvoffsets', size = 4},
-			{id = 5, name = 'instData', size = 4, type = GL.UNSIGNED_INT},
-		},
-		64, -- maxelements
-		DPATname .. "VBO", -- name
-		5  -- unitIDattribID (instData)
-	)
-	if DrawPrimitiveAtUnitVBO == nil then 
-		Spring.Echo("Failed to create DrawPrimitiveAtUnitVBO for ", DPATname) 
-		return nil
-	end
-
-	local DrawPrimitiveAtUnitVAO = gl.GetVAO()
-	DrawPrimitiveAtUnitVAO:AttachVertexBuffer(DrawPrimitiveAtUnitVBO.instanceVBO)
-	DrawPrimitiveAtUnitVBO.VAO = DrawPrimitiveAtUnitVAO
-	return  DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
+	local drawPrimitiveAtUnitVBO = InitDrawPrimitiveAtUnitVBO(DPATname)
+	return drawPrimitiveAtUnitVBO, drawPrimitiveAtUnitShader
 end
 
-return {InitDrawPrimitiveAtUnit = InitDrawPrimitiveAtUnit, shaderConfig = shaderConfig}
+
+return {
+	InitDrawPrimitiveAtUnit = InitDrawPrimitiveAtUnit,
+	InitDrawPrimitiveAtUnitVBO = InitDrawPrimitiveAtUnitVBO,
+	shaderConfig = shaderConfig
+}
