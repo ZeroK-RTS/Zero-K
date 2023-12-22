@@ -53,7 +53,7 @@ local GL_REPLACE                                            = GL.REPLACE
 local GL_POINTS                                             = GL.POINTS
 
 local selUnits, isLocalSelection                            = {}, {}
-local doUpdate, allySelUnits
+local doUpdate, allySelUnits, hoverUnitID
 
 local paused, currentFrame, timeSinceLastFrame              = true, -1, 0
 
@@ -138,7 +138,6 @@ end
 
 local function FindPreselUnits()
 	local preselection = {}
-	local hoverUnitID = GetUnitUnderCursor(false)
 	if hoverUnitID then
 		preselection[hoverUnitID] = true
 	end
@@ -297,12 +296,19 @@ end
 function widget:Update(dt)
 	timeSinceLastFrame = timeSinceLastFrame + dt
 	SetPausedHack(currentFrame)
+	
+	local newHoverUnitID = GetUnitUnderCursor(false)
+	doUpdate = doUpdate or newHoverUnitID ~= hoverUnitID
+	hoverUnitID = newHoverUnitID
 
 	-- TODO: Add a callin for when ally selections change?
-	local allySelUpdated = WG.allySelUnits ~= allySelUnits
-	allySelUnits = WG.allySelUnits
+	local newAllySelUnits = WG.allySelUnits
+	doUpdate = doUpdate or newAllySelUnits ~= allySelUnits
+	allySelUnits = newAllySelUnits
 
-	if not doUpdate and not allySelUpdated and not IsSelectionBoxActive() then
+	doUpdate = doUpdate or IsSelectionBoxActive()
+
+	if not doUpdate then
 		return
 	end
 
