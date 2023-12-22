@@ -106,7 +106,6 @@ local function ThrowBomb()
 	local px, py, pz = Spring.GetUnitPosition(unitID)
 	if not stunned then -- Vertical launch adjustment is an ability, so not availible while stunned.
 		local tx, ty, tz = GetWeaponTargetPos(WEAPON_NUM)
-		vy = vy + 0.2
 		if tx then
 			local horDist = math.sqrt((px - tx)*(px - tx) + (pz - tz)*(pz - tz))
 			local horSpeed = math.max(0.1, math.sqrt(vx*vx + vz*vz))

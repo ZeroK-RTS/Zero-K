@@ -34,7 +34,7 @@ return { gunshipbomb = {
   floater                = true,
   footprintX             = 2,
   footprintZ             = 2,
-  health                 = 100,
+  health                 = 80,
   hoverAttack            = true,
   iconType               = [[gunshipspecial]],
   kamikaze               = true,
@@ -51,7 +51,7 @@ return { gunshipbomb = {
   selfDestructAs         = [[TINY_BUILDINGEX]],
   selfDestructCountdown  = 0,
   sightDistance          = 500,
-  speed                  = 246,
+  speed                  = 234,
   turnRate               = 1144,
   upright                = false,
   workerTime             = 0,
@@ -99,7 +99,7 @@ return { gunshipbomb = {
         burnchance     = "1",
         burntime = 720,
         burst = Shared.BURST_UNRELIABLE,
-        stats_burst_damage  = 280,
+        stats_burst_damage  = 250,
 
         --lups_heat_fx = [[firewalker]],
         light_color = [[1.6 0.8 0.32]],
@@ -107,7 +107,7 @@ return { gunshipbomb = {
       },
 
       damage                  = {
-        default = 280,
+        default = 250,
       },
 
       explosionGenerator      = [[custom:blastwing]],
@@ -137,9 +137,9 @@ return { gunshipbomb = {
       customParams          = {
         setunitsonfire = "1",
         burnchance     = "1",
-        burntime = 420,
+        burntime = 360,
         burst = Shared.BURST_UNRELIABLE,
-        stats_burst_damage  = 280,
+        stats_burst_damage  = 250,
 
         --lups_heat_fx = [[firewalker]],
         light_color = [[1.6 0.8 0.32]],
@@ -147,7 +147,7 @@ return { gunshipbomb = {
       },
 
       damage                  = {
-        default = 280,
+        default = 250,
       },
 
       explosionGenerator      = [[custom:blastwing]],
