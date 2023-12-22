@@ -57,14 +57,14 @@ local unitScale = {}
 local unitCanFly = {}
 local unitBuilding = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-	unitScale[unitDefID] = (7.5 * ( unitDef.xsize^2 + unitDef.zsize^2 ) ^ 0.5) + 8
+	unitScale[unitDefID] = (8 * ( unitDef.xsize^2 + unitDef.zsize^2 ) ^ 0.5) + 4
 	if unitDef.canFly then
 		unitCanFly[unitDefID] = true
 		unitScale[unitDefID] = unitScale[unitDefID] * 0.7
 	elseif unitDef.isBuilding or unitDef.isFactory or unitDef.speed==0 then
 		unitBuilding[unitDefID] = {
-			unitDef.xsize * 8.2 + 12,
-			unitDef.zsize * 8.2 + 12
+			unitDef.xsize * 8 + 0.5,
+			unitDef.zsize * 8 + 0.5
 		}
 	end
 end
