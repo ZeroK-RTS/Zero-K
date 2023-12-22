@@ -13,6 +13,7 @@ function widget:GetInfo()
 end
 
 -- Configurable Parts:
+local breatheSize = 4
 local lineWidth, showOtherSelections, platterOpacity
 
 ---- GL4 Backend Stuff----
@@ -61,7 +62,7 @@ local unitScale                                             = {}
 local unitCanFly                                            = {}
 local unitBuilding                                          = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-	unitScale[unitDefID] = (8 * (unitDef.xsize ^ 2 + unitDef.zsize ^ 2) ^ 0.5) + 4
+	unitScale[unitDefID] = (8 * (unitDef.xsize ^ 2 + unitDef.zsize ^ 2) ^ 0.5) - 2.0
 	if unitDef.canFly then
 		unitCanFly[unitDefID] = true
 		unitScale[unitDefID] = unitScale[unitDefID] * 0.7
@@ -177,7 +178,7 @@ local function init()
 	shaderConfig.INITIALSIZE = 0.5
 	shaderConfig.GROWTHRATE = 15.0
 	shaderConfig.BREATHERATE = 15.0
-	shaderConfig.BREATHESIZE = 0.05
+	shaderConfig.BREATHESIZE = breatheSize
 	shaderConfig.HEIGHTOFFSET = 0
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * TRANSPARENCY + addRadius);"

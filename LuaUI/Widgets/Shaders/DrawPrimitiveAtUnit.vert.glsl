@@ -83,7 +83,7 @@ void main()
 	#if (ANIMATION == 1)
 	    // No animation when parameters.y is 0
 		float initial = clamp(((timeInfo.x + timeInfo.w) - parameters.x)/GROWTHRATE + INITIALSIZE, max(INITIALSIZE, float(1 - parameters.y)), 1.0);
-		float breathe = 64.0 * (BREATHESIZE + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE*parameters.y);
+		float breathe = (BREATHESIZE + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE) * parameters.y;
 		v_lengthwidthcornerheight.xy *= initial;
 		v_lengthwidthcornerheight.xy += breathe;
 	#endif
