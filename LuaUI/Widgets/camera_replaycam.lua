@@ -10,7 +10,6 @@ function widget:GetInfo()
 	}
 end
 
-local abs = math.abs
 local atan2 = math.atan2
 local cos = math.cos
 local deg = math.deg
@@ -1169,6 +1168,8 @@ function widget:Initialize()
 		return
 	end
 
+	Spring.AssignMouseCursor('action_camera', 'popcorn', true, true)
+
 	Chili = WG.Chili
 	Window = Chili.Window
 	ScrollPanel = Chili.ScrollPanel
@@ -1295,9 +1296,7 @@ function widget:GameFrame(frame)
 end
 
 local function userAction()
-	if options.user_interrupts_tracking.value then
-		userInactiveSeconds = 0
-	end
+	userInactiveSeconds = 0
 end
 
 function widget:MousePress(x, y, button)
@@ -1690,10 +1689,8 @@ function widget:Update(dt)
 		userAction()
 	end
 	userInactiveSeconds = userInactiveSeconds + dt
-	if userInactiveSeconds > userInactiveSecondsThreshold then
-		spSetMouseCursor('none')
-	end
-	updateCamera(dt, userInactiveSeconds < userInactiveSecondsThreshold)
+	spSetMouseCursor(userInactiveSeconds > userInactiveSecondsThreshold and 'none' or 'action_camera')
+	updateCamera(dt, not options.user_interrupts_tracking.value or userInactiveSeconds < userInactiveSecondsThreshold)
 end
 
 function widget:DrawScreen()
