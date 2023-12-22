@@ -82,8 +82,10 @@ void main()
 	v_lengthwidthcornerheight = lengthwidthcornerheight;
 	#if (ANIMATION == 1)
 	    // No animation when parameters.y is 0
-		float animation = clamp(((timeInfo.x + timeInfo.w) - parameters.x)/GROWTHRATE + INITIALSIZE, max(INITIALSIZE, float(1 - parameters.y)), 1.0) + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE*parameters.y;
-		v_lengthwidthcornerheight.xy *= animation; // modulate it with animation factor
+		float initial = clamp(((timeInfo.x + timeInfo.w) - parameters.x)/GROWTHRATE + INITIALSIZE, max(INITIALSIZE, float(1 - parameters.y)), 1.0);
+		float breathe = 64.0 * (BREATHESIZE + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE*parameters.y);
+		v_lengthwidthcornerheight.xy *= initial;
+		v_lengthwidthcornerheight.xy += breathe;
 	#endif
 	POST_ANIM
 	v_numvertices = numvertices;
