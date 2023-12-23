@@ -80,7 +80,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	return not RearmBlockShot()
 end
 
 function script.Shot(num)

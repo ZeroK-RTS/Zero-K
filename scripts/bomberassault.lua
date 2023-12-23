@@ -113,7 +113,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+	if RearmBlockShot() then
 		return false
 	end
 	if num == manualfireWeapon then
@@ -132,7 +132,7 @@ function script.BlockShot(num, targetID)
 	if num == 1 or (num == manualfireWeapon and not IsManualFireTargetValid()) then
 		return true
 	end
-	return ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
+	return (GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot()
 end
 
 function script.Killed(recentDamage, maxHealth)
