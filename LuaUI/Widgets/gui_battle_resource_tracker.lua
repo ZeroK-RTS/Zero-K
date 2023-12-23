@@ -357,7 +357,7 @@ local function toEngineeringNotation(number)
 	return str .. prefix
 end
 
-local function toRoundedNotation(number)
+local function toRoundedNotation(number, alwaysSign)
 	number = tonumber(number)
 	if number == 0 or not number then
 		return "0"
@@ -369,17 +369,23 @@ local function toRoundedNotation(number)
 	end
 	local digits = math.floor(math.log(number) / math.log(10))
 	number = math.pow(10, digits - 1) * math.round(number / (math.pow(10, digits - 1)))
+	if alwaysSign and sign == 1 then
+		return "+" .. number
+	end
 	return number * sign
 end
 
 local function deltaText(killed, lost)
 	if killed == 0 then
-		return toRoundedNotation(mathRound(lost)), GetColor(hpcolormap, 0)
+		if lost == 0 then
+			return false
+		end
+		return toRoundedNotation(lost, true), GetColor(hpcolormap, 0)
 	end
 	if lost == 0 then
-		return toRoundedNotation(mathRound(killed)), GetColor(hpcolormap, 1)
+		return toRoundedNotation(killed), GetColor(hpcolormap, 1)
 	end
-	local str = toRoundedNotation(mathRound(killed)) .. "" .. toRoundedNotation(mathRound(lost))
+	local str = toRoundedNotation(killed) .. "" .. toRoundedNotation(lost, true)
 	return str, GetColor(hpcolormap, killed / (killed - lost))
 end
 
@@ -434,45 +440,38 @@ local function DrawBattleText()
 
 			local metalDeltaText, deltaColor = deltaText(metalKilled, metalLost)
 
-			-- draw the text
-			glPushMatrix()
+			if metalDeltaText then
+				-- draw the text
+				glPushMatrix()
 
-			if drawLocation == "ScreenEffects" then
-				glTranslate(SpringWorldToScreenCoords(ex, ey, ez))
-			else
-				glTranslate(ex, ey, ez)
+				if drawLocation == "ScreenEffects" then
+					glTranslate(SpringWorldToScreenCoords(ex, ey, ez))
+				else
+					glTranslate(ex, ey, ez)
 
-				glRotate(-90, 1, 0, 0)
-				if cameraState.flipped == 1 then
-					-- only applicable in ta camera
-					glRotate(180, 0, 0, 1)
-				elseif cameraState.mode == 2 then
-					-- spring camera
-					local rx, ry, rz = SpringGetCameraRotation()
-					glRotate(-180 * ry / mathPi, 0, 0, 1)
+					glRotate(-90, 1, 0, 0)
+					if cameraState.flipped == 1 then
+						-- only applicable in ta camera
+						glRotate(180, 0, 0, 1)
+					elseif cameraState.mode == 2 then
+						-- spring camera
+						local rx, ry, rz = SpringGetCameraRotation()
+						glRotate(-180 * ry / mathPi, 0, 0, 1)
+					end
 				end
-			end
 
-			drawText(metalDeltaText, currentFontSize, deltaColor, alpha)
-			glPopMatrix()
+				drawText(metalDeltaText, currentFontSize, deltaColor, alpha)
+				glPopMatrix()
+			end
 		end
 	end
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-	if ignoreUnitDestroyed[unitID] then
-		ignoreUnitDestroyed[unitID] = nil
-		return
-	end
-
+local function AddDestroyEvent(unitID, unitDefID, unitTeam, costMult)
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.dontcount then
 		return
 	end
-	if Spring.GetUnitRulesParam(unitID, "wasMorphedTo") then
-		return
-	end
-
 	local _, _, _, _, buildProgress = SpringGetUnitHealth(unitID)
 	local allyTeamID = SpringGetTeamAllyTeamID(unitTeam)
 	local x, y, z = SpringGetUnitPosition(unitID)
@@ -483,6 +482,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 	if metal < 1 then
 		return
 	end
+	metal = metal * (costMult or 1)
 
 	local event = {
 		x = x, -- x coordinate of the event
@@ -505,8 +505,38 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 			spatialHash:removeEvent(nearbyEvent)
 		end
 	end
-
 	spatialHash:addEvent(combinedEvent)
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+	if ignoreUnitDestroyed[unitID] then
+		ignoreUnitDestroyed[unitID] = nil
+		return
+	end
+	if Spring.GetUnitRulesParam(unitID, "wasMorphedTo") then
+		return
+	end
+	AddDestroyEvent(unitID, unitDefID, unitTeam)
+end
+
+function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
+	if Spring.AreTeamsAllied(unitTeam, oldTeam) then
+		return
+	end
+	AddDestroyEvent(unitID, unitDefID, oldTeam)
+	AddDestroyEvent(unitID, unitDefID, unitTeam, -1)
+end
+
+function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
+	if Spring.AreTeamsAllied(unitTeam, newTeam) then
+		return
+	end
+	local currentspec, currentfullview = Spring.GetSpectatingState()
+	if currentfullview then
+		return -- Both UnitGiven and UnitTaken are called for fullview spectators
+	end
+	AddDestroyEvent(unitID, unitDefID, unitTeam)
+	AddDestroyEvent(unitID, unitDefID, newTeam, -1)
 end
 
 function widget:GameFrame(frame)
