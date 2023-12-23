@@ -115,11 +115,8 @@ end
 function CreateTheUI()
 	--create main Chili elements
 	local screenWidth,screenHeight = Spring.GetViewGeometry()
-	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
 	local windowY = math.floor(screenWidth*2/11 + 32)
-	
-	local labelHeight = 24
-	local fontSize = 16
+
 	
 	local currSpeed = 2 --default button setting
 	if window then
@@ -358,39 +355,15 @@ function setReplaySpeed (speed, i)
 	if (speed > s) then	--speedup
 		Spring.SendCommands ("setminspeed " .. speed)
 		Spring.SendCommands ("setminspeed " ..0.1)
-	else	--slowdown
-		-- wantedSpeed = speed
-		--[[
-		--does not work:
-		Spring.SendCommands ("slowdown")
-		Spring.SendCommands ("slowdown")
-		Spring.SendCommands ("slowdown")
-		Spring.SendCommands ("slowdown")
-		Spring.SendCommands ("slowdown")
-		]]--
-		--does not work:
-		-- local i = 0
-		-- while (Spring.GetGameSpeed() > speed and i < 50) do
-			-- Spring.SendCommands ("setminspeed " ..0.1)
-			Spring.SendCommands ("setmaxspeed " .. speed)
-			Spring.SendCommands ("setmaxspeed " .. 10.0)
-			-- Spring.SendCommands ("slowdown")
-			-- i=i+1
-		-- end
+	else
+		Spring.SendCommands ("setmaxspeed " .. speed)
+		Spring.SendCommands ("setmaxspeed " .. 10.0)
 	end
-	--Spring.SendCommands ("setmaxpeed " .. speed)
 	window.currSpeed = i
 end
 
 local lastSkippedTime = 0
 function widget:Update(dt)
-	-- if (wantedSpeed) then
-	-- 	if (Spring.GetGameSpeed() > wantedSpeed) then
-	-- 		Spring.SendCommands ("slowdown")
-	-- 	else
-	-- 		wantedSpeed = nil
-	-- 	end
-	-- end
 	if skipped and demoStarted then --do not do "skip 1" at or before demoStart because,it Hung Spring/broke the command respectively.
 		if lastSkippedTime > 1.5 then
 			Spring.SendCommands("skip 1")
@@ -454,5 +427,4 @@ function skipPreGameChatter ()
 		Spring.SendCommands("skip 0")
 	end
 	skipped = true
-	-- window:RemoveChild(button_skipPreGame)
 end
