@@ -200,6 +200,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
 	['Settings/Interface/Missile Warnings']         = imgPath..'nuke_button_48.png',
 	['Settings/Interface/Player Name Tags']         = imgPath..'hellomynameis.png',
+	['Settings/Interface/Battle Value Tracker']     = imgPath..'costIcon.png',
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
@@ -449,6 +450,8 @@ local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
 	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
 
 ShButton('Settings/Interface/Player Name Tags', 'Toggle Player Name Tags', function() spSendCommands{"luaui togglewidget Player Name Tags"} end, "Draws player names near visible units.")
+ShButton('Settings/Interface/Battle Value Tracker', 'Toggle Battle Value Tracker', function() spSendCommands{"luaui togglewidget Battle Resource Tracker"} end, "Draws value killed and lost during a shortly after each battle. This toggle enables tracking, so battles that happen prior to the toggle are not shown.")
+
 
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")

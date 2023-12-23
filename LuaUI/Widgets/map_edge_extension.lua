@@ -67,7 +67,7 @@ local function ResetWidget()
 end
 
 options_path = 'Settings/Graphics/Map Exterior'
-options_order = {'mapBorderStyle', 'drawForIslands', 'gridSizeExp', 'gridTextureSizeExp', 'fogEffect', 'curvature', 'textureBrightness2', 'useShader'}
+options_order = {'mapBorderStyle', 'drawForIslands', 'gridSizeExp', 'gridTextureSizeExp', 'fogEffect', 'curvature', 'textureBrightness3', 'useShader'}
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
     --when not, the map is drawn mirrored 8 times into a display list
@@ -125,13 +125,13 @@ options = {
 		desc = '',
 		OnChange = ResetWidget,
 	},
-	textureBrightness2 = {
+	textureBrightness3 = {
 		name = "Texture Brightness",
 		type = 'number',
 		min = 0,
 		max = 1,
 		step = 0.01,
-		value = 0.18,
+		value = 0.29,
 		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
 		OnChange = ResetWidget,
 	},
@@ -530,11 +530,11 @@ local function DrawWorldFunc() --is overwritten when not using the shader
         gl.DepthMask(true)
         if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then
 			gl.Texture(realTex)
-			glUniform(ubrightness, options.textureBrightness2.value)
+			glUniform(ubrightness, options.textureBrightness3.value)
 			glUniform(ugrid, 0)
 		else
 			gl.Texture(gridTex)
-			glUniform(ubrightness, options.textureBrightness2.value)
+			glUniform(ubrightness, options.textureBrightness3.value)
 			glUniform(ugrid, 1)
 		end
         if wiremap then
