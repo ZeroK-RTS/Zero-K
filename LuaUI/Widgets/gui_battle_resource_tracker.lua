@@ -368,11 +368,14 @@ local function toRoundedNotation(number, alwaysSign)
 		sign = -1
 	end
 	local digits = math.floor(math.log(number) / math.log(10))
-	number = math.pow(10, digits - 1) * math.round(number / (math.pow(10, digits - 1)))
+	number = sign * math.pow(10, digits - 1) * math.round(number / (math.pow(10, digits - 1)))
+	if math.abs(number) >= 10000 then
+		number = math.round(number / 1000) .. "k"
+	end
 	if alwaysSign and sign == 1 then
 		return "+" .. number
 	end
-	return number * sign
+	return number
 end
 
 local function deltaText(killed, lost)
