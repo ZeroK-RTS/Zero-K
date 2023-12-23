@@ -67,7 +67,7 @@ local function ResetWidget()
 end
 
 options_path = 'Settings/Graphics/Map Exterior'
-options_order = {'mapBorderStyle', 'drawForIslands', 'gridSizeExp', 'gridTextureSizeExp', 'fogEffect', 'curvature', 'textureBrightness3', 'useShader'}
+options_order = {'mapBorderStyle', 'drawForIslands', 'gridSizeExp', 'gridTextureSizeExp', 'fogEffect', 'curvature2', 'textureBrightness3', 'useShader'}
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
     --when not, the map is drawn mirrored 8 times into a display list
@@ -143,10 +143,10 @@ options = {
 		OnChange = ResetWidget,
 		noHotkey = true,
 	},
-	curvature = {
+	curvature2 = {
 		name = "Curvature Effect",
 		type = 'bool',
-		value = false,
+		value = true,
 		desc = 'Add a curvature to the extension.',
 		OnChange = ResetWidget,
 		noHotkey = true,
@@ -170,7 +170,7 @@ local function SetupShaderTable()
 		grid = 0,
 		brightness = 1.0,
 	  },
-	  vertex = (options.curvature.value and "#define curvature \n" or '')
+	  vertex = (options.curvature2.value and "#define curvature \n" or '')
 		.. (options.fogEffect.value and "#define edgeFog \n" or '')
 		.. [[
 		// Application to vertex shader

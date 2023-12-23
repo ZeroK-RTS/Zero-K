@@ -11,104 +11,6 @@ function widget:GetInfo()
 	}
 end
 
-local BASE_FONT_SIZE = 64
-local font = gl.LoadFont('FreeSansBold.otf', BASE_FONT_SIZE, 8, 6)
-
-local hpcolormap = { {0.9, 0.1, 0.1, 1},  {0.8, 0.6, 0.0, 1}, {0.1, 0.90, 0.1, 1} }
-function GetColor(colormap, slider)
-	local coln = #colormap
-	if (slider >= 1) then
-		local col = colormap[coln]
-		return {col[1], col[2], col[3], col[4]}
-	end
-	if (slider < 0) then slider = 0 elseif(slider > 1) then
-		slider = 1
-	end
-	local posn  = 1+(coln-1) * slider
-	local iposn = math.floor(posn)
-	local aa    = posn - iposn
-	local ia    = 1-aa
-
-	local col1, col2 = colormap[iposn], colormap[iposn+1]
-
-	return {col1[1]*ia + col2[1]*aa, col1[2]*ia + col2[2]*aa,
-	       col1[3]*ia + col2[3]*aa, col1[4]*ia + col2[4]*aa}
-end
-
-
-options_path = 'Settings/Interface/Battle Value Tracker'
-options_order = { 'showText', 'searchRadius', 'eventTimeout', 'fontSize', 'textAlpha' }
-options = {
-	showText = {
-		name = 'Show text',
-		desc = 'Whether to show text. Use this to toggle the text while keeping tracking active.',
-		type = 'bool',
-		value = true,
-	},
-	searchRadius = {
-		name = 'Battle radius (elmos)',
-		desc = 'The size of an individual battle. Lower radius detects more distinct battles.',
-		type = 'number',
-		value = 600,
-		min = 200,
-		max = 1600,
-		step = 50,
-	},
-	eventTimeout = {
-		name = 'Battle time (seconds)',
-		desc = 'How long a battle persists until it fades. New kills refresh battle time.',
-		type = 'number',
-		value = 20,
-		min = 4,
-		max = 60,
-		step = 1,
-	},
-	fontSize = {
-		name = 'Font size',
-		type = 'number',
-		value = 30,
-		min = 10,
-		max = 80,
-		step = 1,
-	},
-	textAlpha = {
-		name = 'Font opacity',
-		type = 'number',
-		value = 0.7,
-		min = 0.01,
-		max = 1,
-		step = 0.01,
-	}
-}
-
-local config = {
-	-- user configuration
-	-- =============
-
-	-- distance to swap between drawing text under units, and above units/icons
-	cameraThreshold = 0,
-
-	-- what drawing mode to use depending on camera distance
-	-- "PreDecals", "WorldPreUnit", "World", "ScreenEffects", or nil
-	nearCameraMode = "WorldPreUnit",
-	farCameraMode = "ScreenEffects",
-
-	-- advanced configuration
-	-- ======================
-
-	-- the size of the cells that the map is divided into (for performance optimization)
-	spatialHashCellSize = 500,
-
-	-- how often to check and remove old events (for performance optimization)
-	eventTimeoutCheckPeriod = 30 * 1,
-
-	-- how distance affects font size when drawing using DrawScreenEffects
-	distanceScaleFactor = 1800,
-
-	-- how much to increase the size of the text as you zoom out
-	farCameraTextBoost = 0.8,
-}
-
 -- engine call optimizations
 -- =========================
 
@@ -189,6 +91,43 @@ function SpatialHash:allEvents(filterFunc)
 	return events
 end
 
+local config = {
+	-- user configuration
+	-- =============
+
+	-- distance to swap between drawing text under units, and above units/icons
+	cameraThreshold = 0,
+
+	-- what drawing mode to use depending on camera distance
+	-- "PreDecals", "WorldPreUnit", "World", "ScreenEffects", or nil
+	nearCameraMode = "WorldPreUnit",
+	farCameraMode = "ScreenEffects",
+
+	-- advanced configuration
+	-- ======================
+
+	-- the size of the cells that the map is divided into (for performance optimization)
+	spatialHashCellSize = 500,
+
+	-- how often to check and remove old events (for performance optimization)
+	eventTimeoutCheckPeriod = 30 * 1,
+
+	-- how distance affects font size when drawing using DrawScreenEffects
+	distanceScaleFactor = 1800,
+
+	-- how much to increase the size of the text as you zoom out
+	farCameraTextBoost = 0.8,
+}
+
+local BASE_FONT_SIZE = 64
+local font = gl.LoadFont('FreeSansBold.otf', BASE_FONT_SIZE, 8, 6)
+
+local spatialHash = SpatialHash.new(config.spatialHashCellSize)
+local drawLocation = nil
+local isGameStarted = false
+local ignoreUnitDestroyed = {}
+
+
 function SpatialHash:getNearbyEvents(x, z, radius)
 	local nearbyEvents = {}
 	local startX = mathFloor((x - radius) / self.cellSize)
@@ -214,13 +153,84 @@ function SpatialHash:getNearbyEvents(x, z, radius)
 	return nearbyEvents
 end
 
+
+local hpcolormap = { {0.9, 0.1, 0.1, 1},  {0.8, 0.6, 0.0, 1}, {0.1, 0.90, 0.1, 1} }
+function GetColor(colormap, slider)
+	local coln = #colormap
+	if (slider >= 1) then
+		local col = colormap[coln]
+		return {col[1], col[2], col[3], col[4]}
+	end
+	if (slider < 0) then slider = 0 elseif(slider > 1) then
+		slider = 1
+	end
+	local posn  = 1+(coln-1) * slider
+	local iposn = math.floor(posn)
+	local aa    = posn - iposn
+	local ia    = 1-aa
+
+	local col1, col2 = colormap[iposn], colormap[iposn+1]
+
+	return {col1[1]*ia + col2[1]*aa, col1[2]*ia + col2[2]*aa,
+	       col1[3]*ia + col2[3]*aa, col1[4]*ia + col2[4]*aa}
+end
+
+
+options_path = 'Settings/Interface/Battle Value Tracker'
+options_order = { 'showText', 'clearEvents', 'searchRadius', 'eventTimeout', 'fontSize', 'textAlpha' }
+options = {
+	showText = {
+		name = 'Show text',
+		desc = 'Whether to show text. Use this to toggle the text while keeping tracking active.',
+		type = 'bool',
+		value = true,
+	},
+	clearEvents = {
+		name = "Clear data",
+		desc = "Forget previous events. Hotkey this button.",
+		type = 'button',
+		OnChange = function(self)
+			spatialHash = SpatialHash.new(config.spatialHashCellSize)
+		end,
+	},
+	searchRadius = {
+		name = 'Battle radius (elmos)',
+		desc = 'The size of an individual battle. Lower radius detects more distinct battles.',
+		type = 'number',
+		value = 600,
+		min = 200,
+		max = 1600,
+		step = 50,
+	},
+	eventTimeout = {
+		name = 'Battle time (seconds)',
+		desc = 'How long a battle persists until it fades. New kills refresh battle time.',
+		type = 'number',
+		value = 16,
+		min = 2,
+		max = 60,
+		step = 1,
+	},
+	fontSize = {
+		name = 'Font size',
+		type = 'number',
+		value = 30,
+		min = 10,
+		max = 80,
+		step = 1,
+	},
+	textAlpha = {
+		name = 'Font opacity',
+		type = 'number',
+		value = 0.7,
+		min = 0.01,
+		max = 1,
+		step = 0.01,
+	}
+}
+
 -- widget code
 -- ===========
-
-local spatialHash = SpatialHash.new(config.spatialHashCellSize)
-local drawLocation = nil
-local isGameStarted = false
-local ignoreUnitDestroyed = {}
 
 local function combineEvents(events)
 	-- Calculate the average position (weighted by number of events)
