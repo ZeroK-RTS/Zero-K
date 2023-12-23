@@ -24,7 +24,7 @@ return { shipriot = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
-  health                 = 1350,
+  health                 = 1500,
   iconType               = [[shipriot]],
   metalCost              = 240,
   minWaterDepth          = 10,
@@ -46,7 +46,7 @@ return { shipriot = {
   },
   
   sonarDistance          = 500,
-  speed                  = 81,
+  speed                  = 90,
   turninplace            = 0,
   turnRate               = 800,
   waterline              = 0,
@@ -90,7 +90,7 @@ return { shipriot = {
       },
       
       damage                  = {
-          default = 26,
+          default = 23,
       },
 
       explosionGenerator      = [[custom:ARCHPLOSION]],
@@ -100,8 +100,8 @@ return { shipriot = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      projectiles             = 3,
-      range                   = 293,
+      projectiles             = 4,
+      range                   = 300,
       reloadtime              = 2.0,
       rgbColor                = [[1 1 0]],
       separation              = 1.2,
@@ -111,7 +111,7 @@ return { shipriot = {
       soundStart              = [[weapon/cannon/cannon_fire4]],
       soundStartVolume        = 0.05,
       soundTrigger            = true,
-      sprayangle              = 1500,
+      sprayangle              = 2500,
       stages                  = 20,
       tolerance               = 10000,
       turret                  = true,
