@@ -58,6 +58,16 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {glow})
 	StartThread(initialize)
+	Spring.SetUnitNanoPieces(unitID, {glow})
+end
+
+function script.StartBuilding()
+	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 1)
+end
+
+
+function script.StopBuilding()
+	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 0)
 end
 
 function script.Activate()

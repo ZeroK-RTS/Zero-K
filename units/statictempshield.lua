@@ -2,11 +2,13 @@ return { statictempshield = {
   name                   = [[Pavise]],
   description            = [[Temporary Shield]],
   activateWhenBuilt      = true,
-  builder                = false,
+  buildDistance          = 200,
+  builder                = true,
   buildPic               = [[statictempshield.png]],
-  canGuard               = false,
+  canGuard               = true,
   canMove                = false,
-  canPatrol              = false,
+  canPatrol              = true,
+  cantBeTransported      = true,
   category               = [[FLOAT MINE STUPIDTARGET]],
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
@@ -19,6 +21,7 @@ return { statictempshield = {
     dontcount = [[1]],
     mobilebuilding = [[1]],
     has_parent_unit = 1,
+    like_structure   = 1,
     very_low_priority_target = 1,
 
     shield_draw_style = [[noisy]],
@@ -45,10 +48,10 @@ return { statictempshield = {
   script                 = [[statictempshield.lua]],
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
+  showNanoSpray          = false,
   sightDistance          = 240,
   waterline              = 1,
-  workerTime             = 0,
-  yardMap                = [[y]],
+  workerTime             = 10,
 
   weapons                = {
 
