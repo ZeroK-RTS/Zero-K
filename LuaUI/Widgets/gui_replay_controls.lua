@@ -22,12 +22,7 @@ local Chili
 local Button
 local Label
 local Window
-local Panel
-local TextBox
-local Image
 local Progressbar
-local Control
-local Font
 
 -- elements
 local window
@@ -41,7 +36,8 @@ local label_hoverTime
 ---------------------------------
 -- Globals
 ---------------------------------
-local speeds = {0.5, 1, 2, 3, 4, 5,10}
+local speeds = {0.5, 1, 2, 3, 5, 20}
+local speedLabels = {"0.5x", "1x", "2x", "3x", "5x", "MAX"}
 local isPaused = false
 -- local wantedSpeed = nil
 local skipped = false
@@ -142,7 +138,7 @@ function CreateTheUI()
 	window = Window:New{
 		--parent = screen0,
 		name   = 'replaycontroller3';
-		width = 310;
+		width = 270;
 		height = 86;
 		right = 10;
 		y = windowY;
@@ -199,19 +195,19 @@ function CreateTheUI()
 				return
 			end},
 	}
-	
+
 	for i = 1, #speeds do
 		local button = Button:New {
 			width = 40,
 			height = 20,
 			y = 28,
-			x = 5+(i-1)*40,
+			x = 5 + (i-1)*40,
 			classname = "button_tiny",
-			parent=window;
-			padding = {0, 0, 0,0},
+			parent = window;
+			padding = {0, 0, 0, 0},
 			margin = {0, 0, 0, 0},
-			caption=speeds[i] .."x",
-			tooltip = "play at " .. speeds[i] .. "x speed";
+			caption = speedLabels[i],
+			tooltip = "play at " .. speedLabels[i] .. " speed";
 			OnClick = {
 				function()
 					snapButton(i)
@@ -236,45 +232,16 @@ function CreateTheUI()
 		end
 		button_setspeed[i] = button
 	end
-	
-	if (frame == 0) then
-		button_skipPreGame = Button:New {
-			width = 180,
-			height = 20,
-			y = 50,
-			x = 95,
-			classname = "button_tiny",
-			parent=window;
-			padding = {0, 0, 0,0},
-			margin = {0, 0, 0, 0},
-			caption="skip pregame chatter",
-			tooltip = "Skip the pregame chat and startposition choosing, go directly to the action!";
-			OnClick = {function()
-				skipPreGameChatter ()
-				end}
-		}
-	else
-		--in case reloading luaui mid demo
-		widgetHandler:RemoveCallIn("AddConsoleMessage")
-	end
-	
-	label_hoverTime = Label:New {
-		width = 20,
-		height = 15,
-		y = 54,
-		x = 125,
-		parent=window;
-		caption=" ",
-	}
-	
+
+	local startStopWidth = 110
 	button_startStop = Button:New {
-		width = 80,
+		width = startStopWidth,
 		height = 20,
 		y = 50,
 		x = 5,
-			classname = "button_tiny",
-		parent=window;
-		padding = {0, 0, 0,0},
+		classname = "button_tiny",
+		parent = window;
+		padding = {0, 0, 0, 0},
 		margin = {0, 0, 0, 0},
 		caption="pause", --pause/continue
 		tooltip = "pause or continue playback";
@@ -287,16 +254,47 @@ function CreateTheUI()
 			end
 		end}
 	}
+
+	local skipPreGameWidth = 130
+	if frame == 0 then
+		button_skipPreGame = Button:New {
+			width = skipPreGameWidth,
+			height = 20,
+			y = 50,
+			x = 5 + startStopWidth,
+			classname = "button_tiny",
+			parent = window;
+			padding = {0, 0, 0, 0},
+			margin = {0, 0, 0, 0},
+			caption="skip pregame",
+			tooltip = "Skip the pregame and go directly to the action!";
+			OnClick = {function()
+				skipPreGameChatter ()
+				end}
+		}
+	else
+		--in case reloading luaui mid demo
+		widgetHandler:RemoveWidgetCallIn("AddConsoleMessage")
+	end
+
+	label_hoverTime = Label:New {
+		width = 20,
+		height = 15,
+		y = 54,
+		x = 125,
+		parent = window;
+		caption = " ",
+	}
 	
 	progress_target = Progressbar:New{
 			parent = window,
 			y =  5,
-			x		= 5,
+			x = 5,
 			right = 5,
 			height	= 20,
 			max     = 1;
-			color   = {0.75,0.75,0.75,0.5} ;
-			backgroundColor = {0,0,0,0} ,
+			color   = {0.75,0.75,0.75,0.5};
+			backgroundColor = {0, 0, 0, 0},
 			value = 0,
 		}
 
