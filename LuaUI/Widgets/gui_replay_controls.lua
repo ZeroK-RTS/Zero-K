@@ -1,8 +1,7 @@
 function widget:GetInfo()
 	return {
 		name    = "Replay control buttons",
-		desc    = "Graphical buttons for controlling replay speed, " ..
-			"pausing and skipping pregame chatter",
+		desc    = "Graphical buttons for controlling replay speed, pausing and skipping pregame chatter",
 		author  = "knorke",
 		date    = "August 2012", --updated on 20 May 2015
 		license = "stackable",
@@ -13,6 +12,8 @@ function widget:GetInfo()
 end
 
 -- 5 May 2015 added progress bar, by xponen
+
+local i18nPrefix = "replay_controls_"
 
 --Speedup
 local widgetName = widget:GetInfo().name
@@ -39,7 +40,7 @@ local label_hoverTime
 -- Globals
 ---------------------------------
 local speeds = { 0.5, 1, 2, 3, 5, 20 }
-local speedLabels = { "0.5x", "1x", "2x", "3x", "5x", "MAX" }
+local speedLabels = { "0.5x", "1x", "2x", "3x", "5x", WG.Translate("interface", i18nPrefix .. "speed_max" ) }
 local isPaused = false
 -- local wantedSpeed = nil
 local skipped = false
@@ -56,41 +57,6 @@ local SELECT_BUTTON_FOCUS_COLOR = { 0.98, 0.48, 0.26, 0.85 }
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 local BUTTON_BORDER_COLOR
-
----------------------------------
--- Epic Menu
----------------------------------
-options_path = 'Settings/HUD Panels/Replay Controls'
-options_order = { 'visibleprogress' }
-options = {
-	visibleprogress = {
-		name = 'Progress Bar',
-		desc = 'Enables a clickable progress bar for the replay.',
-		type = 'bool',
-		value = true,
-		noHotkey = true,
-		OnChange = function(self)
-			if (not Spring.IsReplay()) then
-				return
-			end
-			local replayLen = Spring.GetReplayLength and Spring.GetReplayLength()
-			if replayLen == 0 then --replay info broken
-				replayLen = false
-				self.value = false
-			end
-			local frame = Spring.GetGameFrame()
-
-			if self.value then
-				progress_speed:SetValue(frame)
-				progress_speed:SetCaption(math.modf(frame / progress_speed.max * 100) .. "%")
-			else
-				progress_speed:SetValue(0)
-				progress_speed:SetCaption("")
-			end
-			showProgress = self.value
-		end,
-	},
-}
 
 local function getWidgetActive(name)
 	local widgetData = widgetHandler.knownWidgets[name]
@@ -122,7 +88,7 @@ end
 
 function CreateTheUI()
 	--create main Chili elements
-	local screenWidth, screenHeight = Spring.GetViewGeometry()
+	local screenWidth, _ = Spring.GetViewGeometry()
 	local windowY = math.floor(screenWidth * 2 / 11 + 32)
 
 
@@ -190,7 +156,7 @@ function CreateTheUI()
 				local target = (x - progress_speed.x) / (progress_speed.width)
 				local hoverOver = modf(target * progress_speed.max / 30)
 				local minute, second = modf(hoverOver / 60) --second divide by 60sec-per-minute, then saperate result from its remainder
-				second = 60 * second           --multiply remainder with 60sec-per-minute to get second back.
+				second = 60 * second            --multiply remainder with 60sec-per-minute to get second back.
 				label_hoverTime:SetCaption(format("%d:%02d", minute, second))
 			else
 				if label_hoverTime.caption ~= " " then
@@ -212,7 +178,7 @@ function CreateTheUI()
 			padding = { 0, 0, 0, 0 },
 			margin = { 0, 0, 0, 0 },
 			caption = speedLabels[i],
-			tooltip = "play at " .. speedLabels[i] .. " speed",
+			tooltip = WG.Translate("interface", i18nPrefix .. "speed_tooltip", {speed = speedLabels[i]}),
 			OnClick = {
 				function()
 					snapButton(i)
@@ -248,8 +214,8 @@ function CreateTheUI()
 		parent = window,
 		padding = { 0, 0, 0, 0 },
 		margin = { 0, 0, 0, 0 },
-		caption = "pause", --pause/continue
-		tooltip = "pause or continue playback",
+		caption = WG.Translate("interface", i18nPrefix .. "playback_pause"), --pause/continue
+		tooltip = WG.Translate("interface", i18nPrefix .. "playback_tooltip"),
 		OnClick = { function()
 			currentFrameTime = -3
 			if (isPaused) then
@@ -271,8 +237,8 @@ function CreateTheUI()
 			parent = window,
 			padding = { 0, 0, 0, 0 },
 			margin = { 0, 0, 0, 0 },
-			caption = "skip pregame",
-			tooltip = "Skip the pregame and go directly to the action!",
+			caption = WG.Translate("interface", i18nPrefix .. "skip_pregame"),
+			tooltip = WG.Translate("interface", i18nPrefix .. "skip_pregame_tooltip"),
 			OnClick = { function()
 				skipPreGameChatter()
 			end }
@@ -295,7 +261,7 @@ function CreateTheUI()
 		margin = { 0, 0, 0, 0 },
 		backgroundColor = actionCameraActive and SELECT_BUTTON_COLOR or BUTTON_COLOR,
 		focusColor = actionCameraActive and SELECT_BUTTON_FOCUS_COLOR or BUTTON_FOCUS_COLOR,
-		tooltip = "Toggle Action Camera",
+		tooltip = WG.Translate("interface", i18nPrefix .. "toggle_action_camera_tooltip"),
 		children = {
 			Chili.Image:New {
 				file = 'LuaUI/images/epicmenu/video_camera.png',
@@ -448,7 +414,7 @@ function widget:GameFrame(f)
 		window:RemoveChild(button_skipPreGame)
 		skipped = nil
 		lastSkippedTime = nil
-		widgetHandler:RemoveCallIn("AddConsoleMessage")
+		widgetHandler:RemoveWidgetCallIn("AddConsoleMessage")
 	elseif showProgress and (f % 2 == 0) then
 		progress_speed:SetValue(f)
 		progress_speed:SetCaption(math.modf(f / progress_speed.max * 100) .. "%")
@@ -458,7 +424,7 @@ end
 function widget:AddConsoleMessage(msg)
 	if msg.text == "Beginning demo playback" then
 		demoStarted = true
-		widgetHandler:RemoveCallIn("AddConsoleMessage")
+		widgetHandler:RemoveWidgetCallIn("AddConsoleMessage")
 	end
 end
 
