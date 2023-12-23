@@ -103,6 +103,8 @@
 	"cheatsheet_cat_wacky" : "Wacky",
 	"cheatsheet_cat_planetwars" : "Planet Wars",
 	"cheatsheet_cat_rejects" : "Technical junk",
+	"replay_controls_options_progressbar": "Progress Bar",
+	"replay_controls_options_progressbar_desc": "Show progress bar for the replay",
 	"replay_controls_speed_max": "MAX",
 	"replay_controls_playback_pause": "pause",
 	"replay_controls_playback_start": "start",

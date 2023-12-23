@@ -64,10 +64,9 @@ local BUTTON_BORDER_COLOR
 options_path = 'Settings/HUD Panels/Replay Controls'
 options_order = { 'visibleprogress'}
 options = {
+	-- Useful if you want to keep the battle length a secret
 	visibleprogress = {
-		-- Useful if you want to keep the battle length a secret
-		name = 'Progress Bar',
-		desc = 'Show progress bar for the replay',
+		i18nKey = i18nPrefix .. 'options_progressbar',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
