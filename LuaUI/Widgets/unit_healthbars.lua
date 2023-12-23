@@ -844,7 +844,7 @@ do
 		end
 		
 		--// RELOAD
-		if (not ci.scriptReload) and (ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value)) then
+		if (not ci.scriptReload) and (ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value)) and (not ci.canReammo) then
 			local primaryWeapon = (ci.dyanmicComm and GetUnitRulesParam(unitID, "primary_weapon_override")) or ci.primaryWeapon
 			_, reloaded, reloadFrame = GetUnitWeaponState(unitID, primaryWeapon)
 			if (reloaded == false) then
