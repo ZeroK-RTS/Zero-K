@@ -58,6 +58,42 @@ local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 local BUTTON_BORDER_COLOR
 
+---------------------------------
+-- Epic Menu
+---------------------------------
+options_path = 'Settings/HUD Panels/Replay Controls'
+options_order = { 'visibleprogress'}
+options = {
+	visibleprogress = {
+		-- Useful if you want to keep the battle length a secret
+		name = 'Progress Bar',
+		desc = 'Show progress bar for the replay',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function(self)
+			if (not Spring.IsReplay()) then
+				return
+			end
+			local replayLen = Spring.GetReplayLength and Spring.GetReplayLength()
+			if replayLen == 0 then --replay info broken
+				replayLen = false
+				self.value = false
+			end
+			local frame = Spring.GetGameFrame()
+			
+			if self.value then
+				progress_speed:SetValue(frame)
+				progress_speed:SetCaption(math.modf(frame/progress_speed.max*100) .. "%")
+			else
+				progress_speed:SetValue(0)
+				progress_speed:SetCaption("")
+			end
+			showProgress = self.value
+		end,
+	},
+}
+
 local function getWidgetActive(name)
 	local widgetData = widgetHandler.knownWidgets[name]
 	return widgetData and widgetData.active
