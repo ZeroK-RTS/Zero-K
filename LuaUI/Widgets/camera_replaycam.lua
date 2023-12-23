@@ -132,7 +132,7 @@ options = {
 		name = 'Pause tracking on user input',
 		desc = 'Pause camera tracking when the user moves the mouse etc',
 		type = 'bool',
-		value = true,
+		value = false,
 	},
 	camera_rotation = {
 		name = 'Camera rotation',
@@ -1168,7 +1168,7 @@ function widget:Initialize()
 		return
 	end
 
-	Spring.AssignMouseCursor('action_camera', 'popcorn', true, true)
+	Spring.AssignMouseCursor('action_camera', 'video_camera', true, true)
 
 	Chili = WG.Chili
 	Window = Chili.Window
@@ -1690,7 +1690,7 @@ function widget:Update(dt)
 	end
 	userInactiveSeconds = userInactiveSeconds + dt
 	spSetMouseCursor(userInactiveSeconds > userInactiveSecondsThreshold and 'none' or 'action_camera')
-	updateCamera(dt, not options.user_interrupts_tracking.value or userInactiveSeconds < userInactiveSecondsThreshold)
+	updateCamera(dt, options.user_interrupts_tracking.value and userInactiveSeconds < userInactiveSecondsThreshold)
 end
 
 function widget:DrawScreen()
