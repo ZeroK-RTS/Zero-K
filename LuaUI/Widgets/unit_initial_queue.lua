@@ -291,7 +291,7 @@ local function DrawWorldFunc()
 
 		-- Draw start units build radius
 		gl.Color(buildDistanceColor)
-		gl.DrawGroundCircle(sx, sy, sz, buildDistance, 40)
+		gl.DrawGroundCircle(sx, sy, sz, buildDistance, 64)
 	end
 
 	-- Draw all the buildings

@@ -325,7 +325,7 @@ function widget:DrawWorld()
 					empty = false
 				end
 			end
-			if empty then gl.DrawGroundCircle(x, 0, z, recommendedStartposRadius, 19) end
+			if empty then gl.DrawGroundCircle(x, 0, z, recommendedStartposRadius, 64) end
 		end
 		gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 	end
