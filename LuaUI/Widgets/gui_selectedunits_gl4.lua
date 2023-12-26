@@ -13,7 +13,7 @@ function widget:GetInfo()
 end
 
 -- Configurable Parts:
-local breatheSize = 4
+local breatheSize                                           = 4
 local lineWidth, showOtherSelections, platterOpacity
 
 ---- GL4 Backend Stuff----
@@ -24,6 +24,7 @@ local hasBadCulling                                         = ((Platform.gpuVend
 
 -- Localize for speedups:
 local spGetGameFrame                                        = Spring.GetGameFrame
+local spGetGameState                                        = Spring.GetGameState
 local spGetSelectedUnits                                    = Spring.GetSelectedUnits
 local spGetUnitDefID                                        = Spring.GetUnitDefID
 local spGetUnitIsDead                                       = Spring.GetUnitIsDead
@@ -31,14 +32,18 @@ local spGetUnitTeam                                         = Spring.GetUnitTeam
 local spLoadCmdColorsConfig                                 = Spring.LoadCmdColorsConfig
 local spValidUnitID                                         = Spring.ValidUnitID
 
-local SafeWGCall                                            = function(fnName, param1) if fnName then return fnName(
-		param1) else return nil end end
-local GetUnitUnderCursor                                    = function(onlySelectable) return SafeWGCall(
-	WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
-local GetUnitsInSelectionBox                                = function() return SafeWGCall(WG
-	.PreSelection_GetUnitsInSelectionBox) end
-local IsSelectionBoxActive                                  = function() return SafeWGCall(WG
-	.PreSelection_IsSelectionBoxActive) end
+local SafeWGCall                                            = function(fnName, param1)
+	if fnName then return fnName(param1) else return nil end
+end
+local GetUnitUnderCursor                                    = function(onlySelectable)
+	return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable)
+end
+local GetUnitsInSelectionBox                                = function()
+	return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox)
+end
+local IsSelectionBoxActive                                  = function()
+	return SafeWGCall(WG.PreSelection_IsSelectionBoxActive)
+end
 
 local glStencilFunc                                         = gl.StencilFunc
 local glStencilOp                                           = gl.StencilOp
@@ -55,8 +60,6 @@ local GL_POINTS                                             = GL.POINTS
 
 local selUnits, isLocalSelection                            = {}, {}
 local doUpdate, allySelUnits, hoverUnitID
-
-local paused, currentFrame, timeSinceLastFrame              = true, -1, 0
 
 local unitScale                                             = {}
 local unitCanFly                                            = {}
@@ -77,6 +80,7 @@ end
 local function AddSelected(unitID, unitTeam, isLocal)
 	if spValidUnitID(unitID) ~= true or spGetUnitIsDead(unitID) == true then return end
 	-- When paused we don't want to animate from initial size because that may not be visible for some units
+	local _, _, paused = spGetGameState()
 	local gf = paused and -30 or spGetGameFrame()
 	local animate = isLocal and 1 or 0
 
@@ -188,18 +192,6 @@ local function init()
 	return localSelectionVBO ~= nil and selectionShader ~= nil and otherSelectionVBO ~= nil
 end
 
-local function SetPausedHack(gameFrame)
-	-- GamePaused callin and Spring.GetGameSpeed() don't work in replays.
-	-- TODO: Get this fixed?
-	if gameFrame == currentFrame and timeSinceLastFrame > 1 then
-		paused = true
-	elseif gameFrame ~= currentFrame then
-		paused = false
-		currentFrame = gameFrame
-		timeSinceLastFrame = 0
-	end
-end
-
 options_path = 'Settings/Interface/Selection/Selected Units'
 options_order = { 'showallselections', 'linewidth', 'platteropacity' }
 options = {
@@ -295,9 +287,6 @@ function widget:SelectionChanged()
 end
 
 function widget:Update(dt)
-	timeSinceLastFrame = timeSinceLastFrame + dt
-	SetPausedHack(currentFrame)
-	
 	local newHoverUnitID = GetUnitUnderCursor(false)
 	doUpdate = doUpdate or newHoverUnitID ~= hoverUnitID
 	hoverUnitID = newHoverUnitID
@@ -376,10 +365,6 @@ end
 function widget:VisibleUnitsChanged()
 	-- Only called on start/stop of api_unit_tracker
 	init()
-end
-
-function widget:GameFrame(gameFrame)
-	SetPausedHack(gameFrame)
 end
 
 function widget:Initialize()
