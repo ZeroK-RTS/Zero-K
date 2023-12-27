@@ -140,11 +140,14 @@ local function ParseBoxes ()
 
 	-- Fix rendering z-fighting with the `/mapborder` option,
 	-- also hides that the box is only skin-deep
+	-- Value tested to be the minimum for CCR Remake, max zoom,
+	-- scrolling in/out, 1920x1080 resolution.
+	local MAX_EDGE = Game.mapSizeZ - 0.5
 	for boxid, box in pairs(startBoxConfig) do
 		for i = 1, #box.boxes do
 			for j = 1, #box.boxes[i] do
-				if box.boxes[i][j][2] > Game.mapSizeZ - 1 then
-					box.boxes[i][j][2] = Game.mapSizeZ - 1
+				if box.boxes[i][j][2] > MAX_EDGE then
+					box.boxes[i][j][2] = MAX_EDGE
 				end
 			end
 		end
