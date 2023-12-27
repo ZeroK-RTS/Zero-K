@@ -124,8 +124,8 @@ local function ParseBoxes ()
 				startBoxConfig[1] = {
 					boxes = {{
 						{Game.mapSizeX * 0.8, 0},
-						{Game.mapSizeX * 0.8, Game.mapSizeZ - 1},
-						{Game.mapSizeX, Game.mapSizeZ - 1},
+						{Game.mapSizeX * 0.8, Game.mapSizeZ},
+						{Game.mapSizeX, Game.mapSizeZ},
 						{Game.mapSizeX, 0},
 					}},
 					startpoints = {
