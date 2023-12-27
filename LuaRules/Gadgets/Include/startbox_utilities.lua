@@ -138,7 +138,8 @@ local function ParseBoxes ()
 		end
 	end
 
-	-- fix rendering z-fighting
+	-- Fix rendering z-fighting with the `/mapborder` option,
+	-- also hides that the box is only skin-deep
 	for boxid, box in pairs(startBoxConfig) do
 		for i = 1, #box.boxes do
 			for j = 1, #box.boxes[i] do
