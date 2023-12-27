@@ -550,10 +550,15 @@ do
 		--// GET UNIT INFORMATION
 		health, maxHealth, paralyzeDamage = GetUnitHealth(unitID)
 		paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage
+		if not maxHealth then
+			return
+		end
+		paralyzeDamage = (paralyzeDamage or 0)
+		health = (health or 0)
 
 		local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
-		emp = (paralyzeDamage or 0)/empHP
-		hp  = (health or 0)/maxHealth
+		emp = paralyzeDamage/empHP
+		hp  = health/maxHealth
 		morph = UnitMorphs[unitID]
 
 		if (drawUnitsOnFire)and(GetUnitRulesParam(unitID, "on_fire") == 1) then
