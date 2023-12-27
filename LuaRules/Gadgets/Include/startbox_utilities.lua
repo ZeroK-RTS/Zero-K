@@ -145,9 +145,11 @@ local function ParseBoxes ()
 	local MAX_EDGE = Game.mapSizeZ - 0.5
 	for boxid, box in pairs(startBoxConfig) do
 		for i = 1, #box.boxes do
-			for j = 1, #box.boxes[i] do
-				if box.boxes[i][j][2] > MAX_EDGE then
-					box.boxes[i][j][2] = MAX_EDGE
+			local polygon = box.boxes[i]
+			for j = 1, #polygon do
+				local vertex = polygon[j]
+				if vertex[2] > MAX_EDGE then
+					vertex[2] = MAX_EDGE
 				end
 			end
 		end
