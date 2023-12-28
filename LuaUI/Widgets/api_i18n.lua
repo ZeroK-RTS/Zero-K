@@ -42,8 +42,6 @@ function widget:GetInfo()
 	}
 end
 
-VFS.Include("LuaUI/Utilities/json.lua");
-
 local langValue="en"
 local langListeners={}
 

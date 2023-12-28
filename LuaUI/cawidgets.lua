@@ -32,6 +32,8 @@ local vfsGame = vfs.GAME
 WG = {}
 Spring.Utilities = {}
 
+Spring.Utilities.json = vfsInclude("LuaRules/Utilities/json.lua"          , nil, vfsGame)
+
 vfsInclude("LuaRules/Utilities/globals.lua"          , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/debugFunctions.lua"   , nil, vfsGame)

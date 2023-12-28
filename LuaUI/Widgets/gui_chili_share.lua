@@ -12,7 +12,6 @@ end
 
 local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
-VFS.Include("LuaUI/Utilities/json.lua");
 
 local MIN_STORAGE = 0.5
 
