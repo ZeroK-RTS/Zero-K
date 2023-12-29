@@ -52,23 +52,27 @@ local function Walk()
 	while true do
 		local speedmod = GetSpeedMod()
 		local truespeed = runspeed * speedmod
+		local turnMult = 1
+		if truespeed > 25 then
+			turnMult = 1 + (truespeed - 25) * 0.1
+		end
 
-		Turn (shin[side], x_axis, math.rad(85), truespeed*0.28)
+		Turn (shin[side], x_axis, math.rad(85)*turnMult, truespeed*0.28)
 		Turn (heel[side], x_axis, 0, truespeed*0.25)
 		Turn (foot[side], x_axis, 0, truespeed*0.25)
-		Turn (thigh[side], x_axis, math.rad(-36), truespeed*0.16)
-		Turn (thigh[3-side], x_axis, math.rad(36), truespeed*0.16)
+		Turn (thigh[side], x_axis, math.rad(-36)*turnMult, truespeed*0.16)
+		Turn (thigh[3-side], x_axis, math.rad(36)*turnMult, truespeed*0.16)
 
-		Move (hips, y_axis, 0, truespeed*0.8)
+		Move (hips, y_axis, 0, truespeed*0.8 / turnMult)
 		WaitForMove (hips, y_axis)
 
-		Turn (shin[side], x_axis, math.rad(10), truespeed*0.32)
-		Turn (heel[side], x_axis, math.rad(20), truespeed*0.35)
-		Turn (foot[side], x_axis, math.rad(-20), truespeed*0.25)
+		Turn (shin[side], x_axis, math.rad(10)*turnMult, truespeed*0.32)
+		Turn (heel[side], x_axis, math.rad(20)*turnMult, truespeed*0.35)
+		Turn (foot[side], x_axis, math.rad(-20)*turnMult, truespeed*0.25)
 		Move (hips, y_axis, -1, truespeed*0.35)
 		WaitForMove (hips, y_axis)
 
-		Move (hips, y_axis, -2, truespeed*0.8)
+		Move (hips, y_axis, -2, truespeed*0.8 / turnMult)
 
 		WaitForTurn (thigh[side], x_axis)
 
@@ -118,21 +122,32 @@ local function ReloadPenaltyAndAnimation()
 	SetSelfSpeedMod(RELOAD_PENALTY)
 
 	Sleep(200)
-	Turn (gun, x_axis, 1, math.rad(120))
 	Turn (turner, y_axis, 0, math.rad(200))
-
-	Sleep(2300) -- 3.5 second reload so no point checking earlier.
-	local checkRate = 400
+	Turn (gun, x_axis, 1, math.rad(120))
+	Sleep(1000)
+	for i = 2, 4 do -- 3.5 second reload so no point checking earlier.
+		Turn (gun, x_axis, 0.8 + (i%3)*0.2, math.rad(60))
+		Sleep(600)
+	end
+	local checkRate = 500
 	while true do
 		local state = Spring.GetUnitWeaponState(unitID, 1, "reloadState")
 		local gameFrame = Spring.GetGameFrame()
-		if state - 40 < gameFrame then
-			checkRate = 100
+		if state - 30 < gameFrame then
+			checkRate = 66
 		end
-		if state - 10 < gameFrame then
+		if state - 13 < gameFrame then
 			aimBlocked = false
-			Sleep(250)
 			Turn (gun, x_axis, 0, math.rad(100))
+			Sleep(300)
+			if aimBlocked then
+				return
+			end
+			SetSelfSpeedMod(RELOAD_PENALTY*0.5 + 0.5)
+			Sleep(200)
+			if aimBlocked then
+				return
+			end
 			SetSelfSpeedMod(1)
 			RestoreAfterDelay()
 			return

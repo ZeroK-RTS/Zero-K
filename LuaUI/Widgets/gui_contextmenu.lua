@@ -554,7 +554,6 @@ local function weapons2Table(cells, ws, unitID)
 		local dpss = math.floor(dams/reloadtime + 0.5)
 		local dpsd = math.floor(damd/reloadtime + 0.5)
 		local dpsc = math.floor(damc/reloadtime + 0.5)
-		Spring.Echo("comm_mult", comm_mult)
 		if cp.stats_typical_damage then
 			dps  = math.floor(tonumber(cp.stats_typical_damage) * comm_mult /reloadtime + 0.5)
 		end
