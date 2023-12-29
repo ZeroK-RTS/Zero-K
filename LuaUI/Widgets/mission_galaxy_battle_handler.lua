@@ -8,7 +8,7 @@ function widget:GetInfo()
 		author    = "GoogleFrog",
 		date      = "7 February 2016",
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
+		layer     = 1500, -- Put the end screen below chili
 		enabled   = true,
 		alwaysStart = true,
 	}
@@ -858,6 +858,10 @@ function IsOverWindow(x, y)
 	if not missionEndTime then
 		return false
 	end
+	if WG.Chili and WG.Chili.Screen0 and WG.Chili.Screen0.hoveredControl then
+		return
+	end
+	
 	if ((x > screenCenterX - boxWidth) and (y < screenCenterY + boxHeight) and
 		(x < screenCenterX + boxWidth) and (y > screenCenterY - boxHeight)) then
 		return true
