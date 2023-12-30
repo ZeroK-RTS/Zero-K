@@ -86,6 +86,7 @@ return {
 		{	"buildfacing dec",	{"Any+delete", "]","Shift+]",}, },
 		{	"attack",	"f",},
 		{	"movestate",	"h",},
+		{	"firestate",	"n",},
 		{	"areaattack",	"Alt+a",},
 		{	"debug",	"Ctrl+Alt+n",},
 		{	"debugcolvol",	"Ctrl+Alt+b",},
