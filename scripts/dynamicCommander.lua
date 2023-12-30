@@ -356,7 +356,7 @@ local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, 
 	local dx = vx + math.cos(dir)*horScale
 	local dz = vz + math.sin(dir)*horScale
 
-	--local featureID = Spring.CreateFeature(featureDefID, x + dx, y, z + dz, heading, teamID)
+	local featureID = Spring.CreateFeature(featureDefID, x + dx, y, z + dz, heading, teamID)
 end
 
 local function SpawnModuleWrecks(wreckLevel)
@@ -381,12 +381,12 @@ local function SpawnWreck(wreckLevel)
 	if (wreckDef) then
 		local heading   = Spring.GetUnitHeading(unitID)
 		local teamID	= Spring.GetUnitTeam(unitID)
-		--local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
-		--Spring.SetFeatureVelocity(featureID, vx, vy, vz)
-		--if makeRezzable then
-		--	local baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID") or unitDefID
-		--	Spring.SetFeatureResurrect(featureID, UnitDefs[baseUnitDefID].name)
-		--end
+		local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
+		Spring.SetFeatureVelocity(featureID, vx, vy, vz)
+		if makeRezzable then
+			local baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID") or unitDefID
+			Spring.SetFeatureResurrect(featureID, UnitDefs[baseUnitDefID].name)
+		end
 	end
 end
 
