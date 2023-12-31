@@ -189,7 +189,9 @@ options = {
 		value = true,
 		noHotkey = true,
 		OnChange = function (self)
-			 WG.GlobalBuildCommand.IsSelectionOverrideSet = self.value
+			if WG.GlobalBuildCommand then
+				WG.GlobalBuildCommand.IsSelectionOverrideSet = self.value
+			end
 		end
 	},
 
@@ -202,7 +204,9 @@ options = {
 		tooltip_format = "%.0f",
 		noHotkey = true,
 		OnChange = function (self)
-			 WG.GlobalBuildCommand.SelectionOverrideRank = self.value
+			if WG.GlobalBuildCommand then
+				WG.GlobalBuildCommand.SelectionOverrideRank = self.value
+			end
 		end
 	},
 
