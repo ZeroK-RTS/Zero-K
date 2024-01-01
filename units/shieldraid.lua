@@ -12,6 +12,7 @@ return { shieldraid = {
   collisionVolumeScales  = [[24 29 24]],
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
+  decoyFor                 = [[cloakraid]],
 
   customParams           = {
     modelradius        = [[12]],
