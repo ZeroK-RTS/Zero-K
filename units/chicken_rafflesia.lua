@@ -11,6 +11,7 @@ return { chicken_rafflesia = {
   },
 
   explodeAs                     = [[NOWEAPON]],
+  floater                       = true,
   footprintX                    = 3,
   footprintZ                    = 3,
   health                        = 500,

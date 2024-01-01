@@ -33,7 +33,7 @@ return { chicken_shield = {
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 1200,
-  movementClass       = [[AKBOT4]],
+  movementClass       = [[BHOVER5]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[chicken_shield.s3o]],
@@ -60,6 +60,7 @@ return { chicken_shield = {
   trackWidth          = 34,
   turnRate            = 967,
   upright             = false,
+  waterline           = 26,
   workerTime          = 0,
 
   weapons             = {
