@@ -381,14 +381,25 @@ function widget:RecvLuaMsg(msg, playerID)
 		--Header|unitdefID|x|y|z|facing
 		msg = msg:sub(4)
 		local msgArray = explode('|',msg)
-		local typeArg, unitDefID = tonumber(msgArray[1]), tonumber(msgArray[2])
+		local typeArg, unitDefIDorIndex = tonumber(msgArray[1]), tonumber(msgArray[2])
 		if typeArg == 5 then -- Cancel queue
 			local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
 			othersBuildQueue[teamID] = {}
 			return
 		end
-		if not UnitDefs[unitDefID] or typeArg > 5 or typeArg < 1 then
-			return --invalid unitDefID and message type
+		if not unitDefIDorIndex then
+			return
+		end
+		if typeArg == 2 then -- Remove queue index
+			local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
+			local playerXBuildQueue = othersBuildQueue[teamID]
+			if playerXBuildQueue and playerXBuildQueue[unitDefIDorIndex] then
+				table.remove(playerXBuildQueue, unitDefIDorIndex)
+			end
+			return
+		end
+		if not UnitDefs[unitDefIDorIndex] or typeArg > 5 or typeArg < 1 then
+			return --invalid unitDefID or message type
 		end
 		local x,y,z,face = tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])
 		if not (x and y and z and face) then
@@ -398,15 +409,14 @@ function widget:RecvLuaMsg(msg, playerID)
 		othersBuildQueue[teamID] = othersBuildQueue[teamID] or {}
 		local playerXBuildQueue = othersBuildQueue[teamID]
 		if typeArg == 1 then
-			table.insert(playerXBuildQueue, 1, {unitDefID,x,y,z,face})
-		elseif typeArg == 2 then
-			table.remove(playerXBuildQueue, unitDefID)
+			table.insert(playerXBuildQueue, 1, {unitDefIDorIndex,x,y,z,face})
 		elseif typeArg == 3 then
-			playerXBuildQueue[#playerXBuildQueue+1] = {unitDefID,x,y,z,face}
+			playerXBuildQueue[#playerXBuildQueue+1] = {unitDefIDorIndex,x,y,z,face}
 		elseif typeArg == 4 then
-			othersBuildQueue[teamID] = {{unitDefID,x,y,z,face}}
+			othersBuildQueue[teamID] = {{unitDefIDorIndex,x,y,z,face}}
 		end
 	end
+end
 end
 
 ------------------------------------------------------------
@@ -600,7 +610,6 @@ end
 local function CancelQueue()
 	buildQueue = {}
 	Spring.SendLuaUIMsg("IQ|5",'a')
-	Spring.SendLuaUIMsg("IQ|5",'s')
 	mCost, eCost, bCost = GetQueueCosts()
 	buildTime = bCost / sDef.buildSpeed
 end
@@ -667,11 +676,9 @@ local function InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 		end
 		if msg then
 			Spring.SendLuaUIMsg(msg,'a')
-			Spring.SendLuaUIMsg(msg,'s') --need 2 msg because since Spring 97 LuaUIMsg without parameter is send info to EVERYONE (including enemy)
 		end
 		if msg2 then
 			Spring.SendLuaUIMsg(msg2,'a')
-			Spring.SendLuaUIMsg(msg2,'s')
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
