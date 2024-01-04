@@ -134,7 +134,7 @@ local function GetFirstCmdAndFirstParam(unitID, unitDefID)
 		return cmdID, cmdParam1
 	end
 	local cQueue = spGetFactoryCommands(unitID, 1)
-	if cQueue[1] and cQueue[1].params then
+	if cQueue and cQueue[1] and cQueue[1].params then -- nil check needed or it can crash when spectator in not fullview switch ally team view
 		return cQueue[1].id, cQueue[1].params[1]
 	end
 end
