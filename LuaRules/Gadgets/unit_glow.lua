@@ -113,6 +113,15 @@ function gadget:Initialize()
 	end
 
 	GG.GlowUnit = GlowUnit
+
+	if UnitCreated then
+		local allUnits = Spring.GetAllUnits()
+		local spGetUnitDefID = Spring.GetUnitDefID
+		for i = 1, #allUnits do
+			local unitID = allUnits[i]
+			UnitCreated(nil, unitID, spGetUnitDefID(unitID))
+		end
+	end
 end
 
 local function DrawWorldFunc()
