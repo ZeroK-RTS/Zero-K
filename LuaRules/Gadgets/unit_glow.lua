@@ -143,7 +143,7 @@ local function DrawWorldFunc()
 end
 
 local function DrawWorldFuncTeamWrapper()
-	local isSpec, specFullView = Spring.GetSpectatingState
+	local isSpec, specFullView = Spring.GetSpectatingState()
 	if isSpec and specFullView then
 		CallAsTeam(scALL_ACCESS_TEAM, DrawWorldFunc)
 	else
