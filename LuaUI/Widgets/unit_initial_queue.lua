@@ -417,7 +417,6 @@ function widget:RecvLuaMsg(msg, playerID)
 		end
 	end
 end
-end
 
 ------------------------------------------------------------
 -- Game start
