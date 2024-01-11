@@ -86,9 +86,6 @@ local function IsManualFireTargetValid()
 end
 
 function script.Deactivate()
-	StopSpin(turbineTop, y_axis, 0.5);
-	StopSpin(turbineLeft, y_axis, 0.5);
-	StopSpin(turbineRight, y_axis, 0.5);
 end
 
 function script.Activate()
