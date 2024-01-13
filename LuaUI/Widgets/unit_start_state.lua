@@ -2,16 +2,16 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Unit Start State",
-    desc      = "Configurable starting unit states for units",
-    author    = "GoogleFrog",
-    date      = "13 April 2011", --last update: 29 January 2014
-    license   = "GNU GPL, v2 or later",
-	handler   = false,
-    layer     = 1,
-    enabled   = true,  --  loaded by default?
-  }
+	return {
+		name      = "Unit Start State",
+		desc      = "Configurable starting unit states for units",
+		author    = "GoogleFrog",
+		date      = "13 April 2011", --last update: 29 January 2014
+		license   = "GNU GPL, v2 or later",
+		handler   = false,
+		layer     = 1,
+		enabled   = true,  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -145,6 +145,10 @@ for i = 1, #UnitDefs do
 		end
 	end
 end
+
+local notAFactory = {
+	[UnitDefNames["athena"]] = true, -- use stupid hax to avoid not treating striderhubs like a factory.
+}
 
 options_path = 'Settings/Unit Behaviour/Default States'
 options_order = {
@@ -1265,21 +1269,20 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 	local name = ud.name
 	if unitAlreadyAdded[name] then
+		local builderDefID = builderID and Spring.GetUnitDefID(builderID) -- DO. NOT. CALL. THIS. FOR. EVERY. STATE! CPU cycles do not grow on trees!
+		local isAFactory = false 
+		if builderDefID then
+			isAFactory = not notAFactory[builderDefID] -- this simplifies the check a bit, probably. note this hits athena only!
+		end
 		local value = GetStateValue(name, "firestate0")
 		if value ~= nil then
 			if value == -1 then
-				local trueBuilder = false
-				if builderID then
-					local bdid = Spring.GetUnitDefID(builderID)
-					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-						local firestate = Spring.Utilities.GetUnitFireState(builderID)
-						if firestate then
-							orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
-							trueBuilder = true
-						end
+				if isAFactory then
+					local firestate = Spring.Utilities.GetUnitFireState(builderID)
+					if firestate then
+						orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
 					end
-				end
-				if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
+				else	-- inherit from factory def's start state, not the current state of any specific factory unit
 					local firestate = GetFactoryDefState(name, "firestate0")
 					if firestate ~= nil then
 						orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, CMD.OPT_SHIFT}
@@ -1293,18 +1296,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		value = GetStateValue(name, "movestate1")
 		if value ~= nil then
 			if value == -1 then
-				local trueBuilder = false
-				if builderID then
-					local bdid = Spring.GetUnitDefID(builderID)
-					if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-						local movestate = Spring.Utilities.GetUnitMoveState(builderID)
-						if movestate then
-							orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
-							trueBuilder = true
-						end
+				if isAFactory then
+					local movestate = Spring.Utilities.GetUnitMoveState(builderID)
+					if movestate then
+						orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
 					end
-				end
-				if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
+				else
 					local movestate = GetFactoryDefState(name, "movestate1")
 					if movestate ~= nil then
 						orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, CMD.OPT_SHIFT}
@@ -1316,16 +1313,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		value = GetStateValue(name, "flylandstate_1")
-		if value == -1 then
-			local trueBuilder = false
-			if builderID then
-				local bdid = Spring.GetUnitDefID(builderID)
-				if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-					trueBuilder = true
-					-- inheritance handled in unit_air_plants gadget
-				end
-			end
-			if not trueBuilder then	-- inherit from factory def's start state, not the current state of any specific factory unit
+		if value == -1 then -- inheritance handled in unit_air_plants gadget
+			if not isAFactory then	-- inherit from factory def's start state, not the current state of any specific factory unit
 				value = GetFactoryDefState(name, "flylandstate_1_factory")
 				if value ~= nil then
 					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
