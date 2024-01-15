@@ -15,6 +15,9 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+Explosion = function() Spring.Echo("boom") end
+Script.UpdateCallIn("Explosion")
+
 LUAUI_VERSION = "LuaUI v0.3"
 
 LUAUI_DIRNAME = 'LuaUI/'
