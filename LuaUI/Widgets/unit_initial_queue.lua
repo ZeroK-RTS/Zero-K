@@ -381,30 +381,43 @@ function widget:RecvLuaMsg(msg, playerID)
 		--Header|unitdefID|x|y|z|facing
 		msg = msg:sub(4)
 		local msgArray = explode('|',msg)
-		local typeArg, unitDefID = tonumber(msgArray[1]), tonumber(msgArray[2])
+		local typeArg = tonumber(msgArray[1])
+		if not typeArg or typeArg < 1 or typeArg > 5 then
+			return
+		end
+		local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
 		if typeArg == 5 then -- Cancel queue
-			local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
 			othersBuildQueue[teamID] = {}
 			return
 		end
-		if not UnitDefs[unitDefID] or typeArg > 5 or typeArg < 1 then
-			return --invalid unitDefID and message type
-		end
-		local x,y,z,face = tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])
-		if not (x and y and z and face) then
-			return --invalid coordinate and facing
-		end
-		local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
-		othersBuildQueue[teamID] = othersBuildQueue[teamID] or {}
 		local playerXBuildQueue = othersBuildQueue[teamID]
-		if typeArg == 1 then
-			table.insert(playerXBuildQueue, 1, {unitDefID,x,y,z,face})
-		elseif typeArg == 2 then
-			table.remove(playerXBuildQueue, unitDefID)
-		elseif typeArg == 3 then
-			playerXBuildQueue[#playerXBuildQueue+1] = {unitDefID,x,y,z,face}
-		elseif typeArg == 4 then
+		if typeArg == 2 then  -- Remove queue index
+			local index = tonumber(msgArray[2])
+			if playerXBuildQueue and playerXBuildQueue[index] then
+				table.remove(playerXBuildQueue, index)
+			end
+			return
+		end
+		local unitDefID = tonumber(msgArray[2])
+		if not UnitDefs[unitDefID] then
+			return -- Invalid defID
+		end
+		local x,y,z,face = tonumber(msgArray[3]), tonumber(msgArray[4]), tonumber(msgArray[5]), tonumber(msgArray[6])
+		if not (x and y and z and face) then
+			return --Invalid coordinate and facing
+		end
+		if typeArg == 4 then -- Remake queue with a new order
 			othersBuildQueue[teamID] = {{unitDefID,x,y,z,face}}
+			return
+		end
+		if not playerXBuildQueue then
+			playerXBuildQueue = {}
+			othersBuildQueue[teamID] = playerXBuildQueue
+		end
+		if typeArg == 1 then -- Insert at start of queue
+			table.insert(playerXBuildQueue, 1, {unitDefID,x,y,z,face})
+		elseif typeArg == 3 then -- Append to end of queue
+			playerXBuildQueue[#playerXBuildQueue+1] = {unitDefID,x,y,z,face}
 		end
 	end
 end
@@ -600,7 +613,6 @@ end
 local function CancelQueue()
 	buildQueue = {}
 	Spring.SendLuaUIMsg("IQ|5",'a')
-	Spring.SendLuaUIMsg("IQ|5",'s')
 	mCost, eCost, bCost = GetQueueCosts()
 	buildTime = bCost / sDef.buildSpeed
 end
@@ -667,11 +679,9 @@ local function InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 		end
 		if msg then
 			Spring.SendLuaUIMsg(msg,'a')
-			Spring.SendLuaUIMsg(msg,'s') --need 2 msg because since Spring 97 LuaUIMsg without parameter is send info to EVERYONE (including enemy)
 		end
 		if msg2 then
 			Spring.SendLuaUIMsg(msg2,'a')
-			Spring.SendLuaUIMsg(msg2,'s')
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
