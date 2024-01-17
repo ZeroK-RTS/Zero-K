@@ -64,7 +64,7 @@
 	"x%_done" : "%{x}%% done",
 	"append_to_current_selection" : "Append to current selection",
 	"unit_under_attack" : "is under attack",
-	"roster_factorycloak" : "クロークボット",
+	"roster_factorycloak" : "ステルスボット",
 	"roster_factoryshield" : "シールドボット",
 	"roster_factoryveh" : "ロバーボット",
 	"roster_factorytank" : "タンクボット",
