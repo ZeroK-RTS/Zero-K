@@ -1,0 +1,117 @@
+{
+	"pw_artefact" : {
+		"name" : "Ancient Artefact",
+		"description" : "Mysterious Relic",
+		"helptext" : "This mysterious alien device houses unimaginable powers. Although it remains poorly understood by our scientists, it could potentially be harnessed as a galaxy-dominating superweapon."
+	},
+	"pw_bomberfac" : {
+		"name" : "Bomber Factory",
+		"description" : "Produces bombers",
+		"helptext" : "Produces space bombers for assaulting hostile planets. During planetary invasions, produces regular bomber aircraft."
+	},
+	"pw_dropfac" : {
+		"name" : "Dropship Factory",
+		"description" : "Produces dropships",
+		"helptext" : "Produces space dropships for invading hostile planets. During planetary invasions, produces regular transport aircraft."
+	},
+	"pw_estorage" : {
+		"name" : "Energy Storage",
+		"description" : "Stores energy",
+		"helptext" : "A large capacitor bank."
+	},
+	"pw_estorage2" : {
+		"name" : "Double Energy Storage",
+		"description" : "Stores energy",
+		"helptext" : "A large double capacitor bank."
+	},
+	"pw_garrison" : {
+		"name" : "Field Garrison",
+		"description" : "Reduces Influence gain",
+		"helptext" : "This structure maintains an army which reduces enemy Influence gained from battles."
+	},
+	"pw_gaspowerstation" : {
+		"name" : "Gas Power Station",
+		"description" : "Produces Energy",
+		"helptext" : "A gas-fired power generator."
+	},
+	"pw_grid" : {
+		"name" : "Planetary Defence Grid",
+		"description" : "Defends against everything",
+		"helptext" : "This structure reduces Influence gains as well as intercepting incoming bombers."
+	},
+	"pw_guerilla" : {
+		"name" : "Guerilla Jumpgate",
+		"description" : "Spreads Influence remotely",
+		"helptext" : "A jumpgate capable of sending Influence to any planet."
+	},
+	"pw_hq_attacker" : {
+		"name" : "Attacker Command",
+		"description" : "PlanetWars Field HQ (changes influence gain)",
+		"helptext" : "This building is integral to strategic control of the planet. If the Attackers win with a destroyed Command Center they only gain 50%% of the influence they would have otherwise gained."
+	},
+	"pw_hq_defender" : {
+		"name" : "Defender Command",
+		"description" : "PlanetWars Field HQ (changes influence gain)",
+		"helptext" : "This building is integral to strategic control of the planet. If the Attackers lose but destroy this Command Center they gain a small amount of influence, 20%% of what they would have gained if they won."
+	},
+	"pw_inhibitor" : {
+		"name" : "Wormhole Inhibitor",
+		"description" : "Blocks Influence Spread",
+		"helptext" : "Inhibits Influence spread from enemy planets."
+	},
+	"pw_interception" : {
+		"name" : "Interception Network",
+		"description" : "Intercepts planetary bombers",
+		"helptext" : "This structure intercepts incoming bombers."
+	},
+	"pw_mine" : {
+		"name" : "Power Generator Unit",
+		"description" : "Produces 50 energy/turn",
+		"helptext" : "A small, efficient power generator."
+	},
+	"pw_mine2" : {
+		"name" : "Orbital Solar Array",
+		"description" : "Produces 100 energy/turn",
+		"helptext" : "A larger power generator with increased output."
+	},
+	"pw_mine3" : {
+		"name" : "Planetary Geothermal Tap",
+		"description" : "Produces 250 energy/turn",
+		"helptext" : "This massive complex draws energy directly from the planet's mantle. It goes up in a nuclear explosion if destroyed."
+	},
+	"pw_mstorage2" : {
+		"name" : "Metal Storage",
+		"description" : "Stores metal",
+		"helptext" : "Stores a large quantity of metal for planetary use."
+	},
+	"pw_warpgate" : {
+		"name" : "Warp Gate",
+		"description" : "Produces warp cores",
+		"helptext" : "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."
+	},
+	"pw_warpjammer" : {
+		"name" : "Warp Jammer",
+		"description" : "Prevents warp attacks",
+		"helptext" : "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
+	},
+	"pw_wormhole" : {
+		"name" : "Wormhole Generator",
+		"description" : "Links this planet to nearby planets",
+		"helptext" : "Allows ships to leave this planet for its connected neighbours, and projects influence spread to connected planets."
+	},
+	"pw_wormhole2" : {
+		"name" : "Improved Wormhole",
+		"description" : "Links this planet to nearby planets",
+		"helptext" : "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
+	},
+	"generic_tech" : {
+		"name" : "Tech Lab",
+		"description" : "Unlocks tech",
+		"helptext" : "This structure unlocks a specific tech for its owning faction."
+	},
+	"pw_techlab" : {
+		"name" : "Tech Lab",
+		"description" : "Contains powerful ancient technology" ,
+		"helptext" : "This structure contains some powerful technology."
+	}
+}
