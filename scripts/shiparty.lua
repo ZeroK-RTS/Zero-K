@@ -227,7 +227,11 @@ end
 
 function script.FireWeapon(num)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gun_1_yaw, ROCK_FORCE)
+	Sleep(33)
+	gun_1 = 1 - gun_1
+end
 
+function script.Shot()
 	if  gun_1 == 0 then
 		Show( fire1)
 		Hide( fire1)
@@ -239,10 +243,6 @@ function script.FireWeapon(num)
 		Move( barrel2 , z_axis, -8  )
 		Move( barrel2 , z_axis, 0 , 8.000000 )
 	end
-end
-
-function script.EndBurst()
-	gun_1 = 1 - gun_1
 end
 
 function script.AimFromWeapon(num)

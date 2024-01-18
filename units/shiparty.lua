@@ -28,9 +28,9 @@ return { shiparty = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
-  health                 = 2000,
+  health                 = 2600,
   iconType               = [[shiparty]],
-  metalCost              = 850,
+  metalCost              = 1200,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
   moveState              = 0,
@@ -63,6 +63,8 @@ return { shiparty = {
       areaOfEffect            = 96,
       avoidFeature            = false,
       avoidGround             = true,
+      burst                   = 2,
+      burstRate               = 0.4,
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -71,8 +73,8 @@ return { shiparty = {
             },
 
       damage                  = {
-        default = 601.1,
-        planes  = 601.1,
+        default = 600.01,
+        planes  = 600.01,
       },
 
       explosionGenerator      = [[custom:PLASMA_HIT_96]],
@@ -82,7 +84,7 @@ return { shiparty = {
       myGravity               = 0.1,
       projectiles             = 1,
       range                   = 1200,
-      reloadtime              = 5,
+      reloadtime              = 7.2,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/heavy_cannon]],
       turret                  = true,

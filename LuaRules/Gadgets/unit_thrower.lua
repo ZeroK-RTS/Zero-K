@@ -634,7 +634,7 @@ local function DrawWire(emitUnitID, recUnitID, spec, myAllyTeam, x, y, z)
 			local topX, topY, topZ = GetUnitTop(emitUnitID, x, y, z)
 			point[1] = {x, y, z}
 			point[2] = {topX, topY, topZ}
-			local _,_,_, rX, rY, rZ = spGetUnitPosition(recUnitID, true)
+			local rX, rY, rZ = Spring.GetUnitViewPosition(recUnitID, true)
 			topX, topY, topZ = GetUnitTop(recUnitID, rX, rY, rZ)
 			point[3] = {topX,topY,topZ}
 			point[4] = {rX, rY, rZ}
@@ -656,7 +656,7 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 	end
 	local los = spGetUnitLosState(unitID, myAllyTeam, true)
 	if spec or (los and (los and los%2 == 1)) then
-		local _,_,_, x, y, z = spGetUnitPosition(unitID, true)
+		local x, y, z = Spring.GetUnitViewPosition(unitID, true)
 		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 		if nearUnits then
 			for i = 1, #nearUnits do
