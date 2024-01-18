@@ -151,6 +151,9 @@ local function InvokePower(teamID, powerDefName, arg1, arg2, arg3, arg4)
 end
 
 local function handleMessage (teamID, msg)
+	if not msg or type(msg) == "number" then
+		return
+	end
 	--[[ NB: Lua patterns are not proper regexes, so the matching is
 	     not ideal. In particular, you can't apply ? to capture groups,
 	     only piece-meal, so strings can satisfy some of the optional
