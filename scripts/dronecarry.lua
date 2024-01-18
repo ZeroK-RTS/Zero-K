@@ -98,10 +98,10 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.Shot()
-	EmitSfx (gunpod, 1025)
-	EmitSfx (flare, 1024)
-end
+--function script.Shot()
+--	EmitSfx (gunpod, 1025)
+--	EmitSfx (flare, 1024)
+--end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = (recentDamage/maxHealth) * 100

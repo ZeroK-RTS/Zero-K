@@ -57,7 +57,6 @@ local TELEPORT_CHARGE_NEEDED = Spring.GetGameRulesParam("pw_teleport_time") or g
 local stockpileH = 24
 local stockpileW = 12
 
-local captureReloadTime = tonumber(UnitDefNames["vehcapture"].customParams.post_capture_reload) -- Hackity hax
 local DISARM_DECAY_FRAMES = 1200
 
 local destructableFeature = {}
@@ -607,6 +606,9 @@ do
 				heat          = ud.customParams.heat_per_shot,
 				speed         = ud.customParams.speed_bar,
 			}
+			if customInfo[unitDefID].canCapture then
+				customInfo[unitDefID].captureReload = tonumber(ud.customParams.post_capture_reload)
+			end
 		end
 		ci = customInfo[unitDefID]
 
@@ -762,7 +764,7 @@ do
 		if ci.canCapture then
 			local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame")
 			if (captureReloadState and captureReloadState > 0) then
-				local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
+				local capture = 1-(captureReloadState-gameFrame)/ci.captureReload
 				barDrawer.AddBar(addTitle and messages.capture_reload, capture, "reload", (addPercent and floor(capture*100) .. '%'))
 			end
 		end

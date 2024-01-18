@@ -7,14 +7,17 @@ for i=1, #WeaponDefs do
 			captureDamage = WeaponDefs[i].damages[0],
 			scaleDamage = (WeaponDefs[i].customParams.capture_scaling == '1'), -- falloff, armor, etc
 			baseDamage = WeaponDefs[i].customParams.shield_damage,
+			captureToDroneController = WeaponDefs[i].customParams.capture_to_drone_controller and true or false,
 		}
 	end
 end
 
 for i=1, #UnitDefs do
-	if UnitDefs[i].customParams.post_capture_reload then
+	local cp = UnitDefs[i].customParams
+	if cp.post_capture_reload or cp.capture_via_drones then
 		unitArray[i] = {
-			postCaptureReload = tonumber(UnitDefs[i].customParams.post_capture_reload), -- in frames
+			postCaptureReload = cp.post_capture_reload and tonumber(cp.post_capture_reload), -- in frames
+			captureFromDrones = cp.capture_via_drones and true or false,
 		}
 	end
 end

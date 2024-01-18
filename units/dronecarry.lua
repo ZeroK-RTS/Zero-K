@@ -2,8 +2,8 @@ return { dronecarry = {
   name                = [[Gull]],
   description         = [[Carrier Drone]],
   acceleration        = 0.3,
-  airHoverFactor      = 4,
-  brakeRate           = 0.24,
+  airHoverFactor      = 3,
+  brakeRate           = 0.6,
   builder             = false,
   buildPic            = [[dronecarry.png]],
   canBeAssisted       = false,
@@ -17,12 +17,12 @@ return { dronecarry = {
   collisionVolumeScales    = [[26 26 26]],
   collisionVolumeType      = [[ellipsoid]],
   collide             = false,
-  cruiseAltitude      = 100,
+  cruiseAltitude      = 80,
   explodeAs           = [[TINY_BUILDINGEX]],
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
-  health              = 180,
+  health              = 260,
   hoverAttack         = true,
   iconType            = [[smallgunship]],
   maneuverleashlength = [[900]],
@@ -60,10 +60,10 @@ return { dronecarry = {
   weapons             = {
 
     {
-      def                = [[ARM_DRONE_WEAPON]],
+      def                = [[CAPTURERAY]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 30,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -72,41 +72,59 @@ return { dronecarry = {
 
   weaponDefs          = {
 
-    ARM_DRONE_WEAPON = {
-      name                    = [[Drone EMG]],
-      areaOfEffect            = 8,
-      burst                   = 3,
-      burstrate               = 0.1,
+    CAPTURERAY = {
+      name                    = [[Capture Ray]],
+      beamdecay               = 0.9,
+      beamTime                = 1/30,
+      beamttl                 = 1,
+      coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
-  
-      customParams            = {
-        light_camera_height = 2000,
-        light_color = [[0.95 0.91 0.48]],
-        light_radius = 150,
+
+      customparams = {
+        capture_scaling = 1,
+        is_capture = 1,
+        capture_to_drone_controller = 1,
+        post_capture_reload = 150,
+
+        stats_hide_damage = 1, -- continuous laser
+        stats_hide_reload = 1,
+        
+        light_radius = 120,
+        light_color = [[0 0.6 0.15]],
+        combatrange = 230,
       },
 
       damage                  = {
-        default = 8,
+        default = 12,
       },
 
-      explosionGenerator      = [[custom:EMG_HIT]],
+      explosionGenerator      = [[custom:NONE]],
       fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      intensity               = 0.7,
-      interceptedByShieldType = 1,
-      range                   = 360,
-      reloadtime              = 0.3,
-      rgbColor                = [[1 0.95 0.4]],
-      size                    = 1.75,
-      soundStart              = [[weapon/emg]],
-      soundStartVolume        = 2,
-      sprayAngle              = 512,
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 1000,
+      interceptedByShieldType = 0,
+      largeBeamLaser          = true,
+      laserFlareSize          = 0,
+      minIntensity            = 1,
+      range                   = 250,
+      reloadtime              = 1/30,
+      rgbColor                = [[0 0.8 0.2]],
+      scrollSpeed             = 2.5,
+      soundStart              = [[weapon/laser/pulse_laser2]],
+      soundStartVolume        = 0.28,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[dosray]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 2.6,
+      tolerance               = 12000,
+      turret                  = false,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 150,
     },
 
   },

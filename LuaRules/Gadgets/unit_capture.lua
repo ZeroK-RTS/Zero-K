@@ -233,7 +233,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,attackerID, attackerDefID, attackerTeam)
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if (not weaponID) or (not captureWeaponDefs[weaponID]) then
 		return damage
 	end
@@ -291,8 +291,16 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	allyTeamData.totalDamage = allyTeamData.totalDamage + newCaptureDamage
 	-- capture the unit if total damage is greater than max hp of unit
 	if allyTeamData.totalDamage >= damageData.captureHealth then
+		local controllerID = attackerID
+		if def.captureToDroneController then
+			local parentID = Spring.GetUnitRulesParam(attackerID, "parent_unit_id")
+			if Spring.ValidUnitID(parentID) then
+				controllerID = parentID
+			end
+		end
+		
 		-- give the unit
-		recusivelyTransfer(unitID, attackerTeam, attackerAllyTeam, attackerID)
+		recusivelyTransfer(unitID, attackerTeam, attackerAllyTeam, controllerID)
 		
 		-- reload handling
 		if controllers[attackerID].postCaptureReload then
@@ -310,7 +318,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 		
 		-- destroy the unit if the controller is set to destroy units
-		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= (capturedUnits[unitID] or {}).originAllyTeam then
+		if controllers[controllerID].killSubordinates and attackerAllyTeam ~= (capturedUnits[unitID] or {}).originAllyTeam then
 			spGiveOrderToUnit(unitID, CMD_SELFD, 0, 0)
 		end
 		return 0
@@ -557,16 +565,16 @@ else --UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spGetUnitPosition 	= Spring.GetUnitPosition
-local spGetUnitLosState 	= Spring.GetUnitLosState
-local spValidUnitID 		= Spring.ValidUnitID
-local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitLosState     = Spring.GetUnitLosState
+local spValidUnitID         = Spring.ValidUnitID
+local spGetMyAllyTeamID     = Spring.GetMyAllyTeamID
 local spGetGameFrame        = Spring.GetGameFrame
 local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spGetUnitVectors      = Spring.GetUnitVectors
 
-local glVertex 		= gl.Vertex
+local glVertex      = gl.Vertex
 local glPushAttrib  = gl.PushAttrib
 local glLineStipple = gl.LineStipple
 local glDepthTest   = gl.DepthTest
@@ -626,11 +634,11 @@ local function DrawWire(units, spec)
 			if teamID and (spec or (los1 and los1.los) or (los2 and los2.los)) then
 				local teamR, teamG, teamB = Spring.GetTeamColor(teamID)
 				
-				local _,_,_,xxx,yyy,zzz = spGetUnitPosition(controller, true)
+				local xxx,yyy,zzz = Spring.GetUnitViewPosition(controller, true)
 				local topX, topY, topZ = GetUnitTop(controller, xxx, yyy, zzz, 50)
 				point[1] = {xxx, yyy, zzz}
 				point[2] = {topX, topY, topZ}
-				_,_,_,xxx,yyy,zzz = spGetUnitPosition(controliee, true)
+				xxx,yyy,zzz = Spring.GetUnitViewPosition(controliee, true)
 				topX, topY, topZ = GetUnitTop(controliee, xxx, yyy, zzz)
 				point[3] = {topX,topY,topZ}
 				point[4] = {xxx,yyy,zzz}
