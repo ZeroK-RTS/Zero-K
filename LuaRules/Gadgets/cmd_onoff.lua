@@ -54,7 +54,7 @@ local spGiveOrderToUnit   = Spring.GiveOrderToUnit
 local function IsImpulseUnit(ud)
 	for _, w in pairs(ud.weapons) do
 		local wd = WeaponDefs[w.weaponDef]
-		if wd and wd.customParams and wd.customParams.impulse then
+		if wd and wd.customParams and wd.customParams.impulse and not wd.customParams.notoggleimpulse then
 			return true
 		end
 	end
