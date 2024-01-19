@@ -25,7 +25,7 @@ else
 		if not fullView and not spIsPosInLos(x, y, z, myAllyTeam) then
 			return
 		end
-		spPlaySoundFile(sound, volume, x, y, z)
+		spPlaySoundFile(sound, volume, x, y, z, "battle")
 	end
 
 	local myPlayerID = Spring.GetLocalPlayerID()
