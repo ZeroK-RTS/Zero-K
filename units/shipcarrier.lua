@@ -10,9 +10,9 @@ return { shipcarrier = {
   canManualFire          = true,
   category               = [[SHIP]],
   CollisionSphereScale   = 0.6,
-  collisionVolumeOffsets = [[10 -10 0]],
-  collisionVolumeScales  = [[80 80 240]],
-  collisionVolumeType    = [[CylZ]],
+  collisionVolumeOffsets = [[14 -10 0]],
+  collisionVolumeScales  = [[105 90 278]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -25,6 +25,7 @@ return { shipcarrier = {
     ispad         = 1,
     pad_count     = 2,
     capture_via_drones = 1,
+    selection_scale   = 1.2,
 
     outline_x = 300,
     outline_y = 300,

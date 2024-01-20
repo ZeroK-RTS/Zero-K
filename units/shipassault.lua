@@ -10,8 +10,8 @@ return { shipassault = {
   canMove                = true,
   canPatrol              = true,
   category               = [[SHIP]],
-  collisionVolumeOffsets = [[0 6 0]],
-  collisionVolumeScales  = [[55 55 110]],
+  collisionVolumeOffsets = [[0 2 -2]],
+  collisionVolumeScales  = [[65 70 130]],
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
   --Core_color.dds Core_other.dds
@@ -24,6 +24,8 @@ return { shipassault = {
     outline_x = 160,
     outline_y = 160,
     outline_yoff = 25,
+    model_rescale = 1.2,
+    selection_scale   = 1.1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

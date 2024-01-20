@@ -10,15 +10,17 @@ return { shipskirm = {
   canMove                = true,
   canPatrol              = true,
   category               = [[SHIP]],
-  collisionVolumeOffsets = [[0 2 0]],
-  collisionVolumeScales  = [[24 24 60]],
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[34 34 70]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     bait_level_default = 1,
     turnatfullspeed = [[1]],
     modelradius     = [[24]],
+    model_rescale = 1.15,
+    selection_scale   = 1.1,
   },
 
 

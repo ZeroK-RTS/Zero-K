@@ -22,6 +22,7 @@ return { shipheavyarty = {
     outline_x = 340,
     outline_y = 340,
     outline_yoff = 30,
+    selection_scale   = 1.2,
   },
 
   explodeAs              = [[BIG_UNITEX]],

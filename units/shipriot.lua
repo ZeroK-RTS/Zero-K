@@ -10,14 +10,15 @@ return { shipriot = {
   canMove                = true,
   canPatrol              = true,
   category               = [[SHIP]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[32 32 102]],
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeOffsets = [[0 0 -4]],
+  collisionVolumeScales  = [[32 32 100]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     turnatfullspeed = [[1]],
     --extradrawrange = 420,
+    selection_scale   = 1.05,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

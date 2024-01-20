@@ -9,8 +9,8 @@ return { shiparty = {
   canMove                = true,
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 1 3]],
-  collisionVolumeScales  = [[32 32 132]],
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeScales  = [[35 35 160]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -22,6 +22,8 @@ return { shiparty = {
     outline_x = 160,
     outline_y = 160,
     outline_yoff = 25,
+    model_rescale = 1.2,
+    selection_scale   = 1.1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -43,7 +45,7 @@ return { shiparty = {
   sonarDistance          = 660,
   speed                  = 51,
   turninplace            = 0,
-  turnRate               = 560,
+  turnRate               = 520,
   waterline              = 0,
 
   weapons                = {

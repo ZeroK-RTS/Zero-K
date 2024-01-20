@@ -10,9 +10,9 @@ return { shiptorpraider = {
   canMove             = true,
   canPatrol           = true,
   category               = [[SHIP SMALL TOOFAST]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[28 28 55]],
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeOffsets = [[0 0 -2]],
+  collisionVolumeScales  = [[30 30 60]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -21,6 +21,7 @@ return { shiptorpraider = {
     aim_lookahead      = 80,
     bait_level_default = 0,
     okp_damage = 180,
+    model_rescale = 0.9,
   },
 
 

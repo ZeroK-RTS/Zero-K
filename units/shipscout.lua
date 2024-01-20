@@ -10,7 +10,7 @@ return { shipscout = {
   category               = [[SHIP SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[25 25 60]],
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
