@@ -16,6 +16,7 @@ return { shipassault = {
   corpse                 = [[DEAD]],
   --Core_color.dds Core_other.dds
   customParams           = {
+    aim_lookahead      = 80,
     bait_level_default = 0,
     modelradius    = [[55]],
     turnatfullspeed = [[1]],
