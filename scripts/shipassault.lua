@@ -1,7 +1,7 @@
 include "constants.lua"
 
 local base, turret, sleeves = piece("base", "turret", "sleeves")
-local wake1, wake2 = piece("wake1", "wake2")
+local wake1, wake2, wake3, wake4 = piece("wake1", "wake2", "wake3", "wake4")
 local barrel1, barrel2, flare1, flare2 = piece("barrel1", "barrel2", "flare1", "flare2")
 
 local gunPieces = {
@@ -30,6 +30,8 @@ local function Wake()
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(wake1, 2)
 			EmitSfx(wake2, 2)
+			EmitSfx(wake3, 2)
+			EmitSfx(wake4, 2)
 		end
 		Sleep(200)
 	end

@@ -258,10 +258,10 @@
           </node>
         </node>
         <node id="Wake1" name="Wake1" type="NODE">
-          <matrix sid="transform">1 0 0 -3.204971 0 -4.37114e-8 1 0.005155211 0 -1 -4.37114e-8 35.58051 0 0 0 1</matrix>
+          <matrix sid="transform">1 0 0 0 0 -4.37114e-8 1 0.005155211 0 -1 -4.37114e-8 0 0 0 0 1</matrix>
         </node>
         <node id="Wake2" name="Wake2" type="NODE">
-          <matrix sid="transform">1 0 0 3.232616 0 -4.37114e-8 1 0.005155211 0 -1 -4.37114e-8 35.58051 0 0 0 1</matrix>
+          <matrix sid="transform">1 0 0 0 0 -4.37114e-8 1 0.005155211 0 -1 -4.37114e-8 0 0 0 0 1</matrix>
         </node>
       </node>
     </visual_scene>

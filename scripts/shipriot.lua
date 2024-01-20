@@ -48,7 +48,7 @@ local RESTORE_DELAY = 3000
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-
+	Move(wake1, z_axis, 10)
 	Turn(gunb, y_axis, math.rad(-180))
 end
 
@@ -60,7 +60,7 @@ local function MoveThread()
 			EmitSfx(wake1, 2)
 			EmitSfx(wake2, 2)
 		end
-		Sleep(300)
+		Sleep(133)
 	end
 end
 

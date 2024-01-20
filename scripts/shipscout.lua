@@ -31,7 +31,7 @@ local function Motion()
 			EmitSfx(wake1, 2)
 			EmitSfx(wake2, 2)
 		end
-		Sleep(150)
+		Sleep(100)
 	end
 end
 

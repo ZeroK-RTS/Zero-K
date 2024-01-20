@@ -92,12 +92,13 @@ local function Wake()
 	SetSignalMask(SIG_Move)
 	while true do
 		if not Spring.GetUnitIsCloaked(unitID) then
-			for i = 1, 6 do
-				Move(wake[i], z_axis, math.random()*50 - 25)
+			for i = 1, 6, 5 do
+				Move(wake[i], z_axis, math.random()*20 - 10)
+				Move(wake[i], x_axis, math.random()*40 - 20)
 				EmitSfx(wake[i], 2)
 			end
 		end
-		Sleep(200)
+		Sleep(66)
 	end
 end
 

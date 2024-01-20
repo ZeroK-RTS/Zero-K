@@ -7,10 +7,8 @@ local arm2 = piece 'arm2'
 local armpiece = piece 'armpiece'
 local claw1 = piece 'claw1'
 local claw2 = piece 'claw2'
-local wakes =
-	{ piece 'wake1'
-	, piece 'wake2'
-}
+local wake1 = piece 'wake1'
+local wake2 = piece 'wake2'
 local beam = piece 'beam'
 
 local smokePiece = {body, claw1, turret}
@@ -20,6 +18,8 @@ local SIG_Build = 1
 local SIG_Move = 2
 
 function script.Create()
+	Move(wake1, z_axis, 75)
+	Move(wake2, z_axis, -10)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
@@ -34,10 +34,10 @@ local function MoveThread()
 	SetSignalMask(SIG_Move)
 	while true do
 		if not Spring.GetUnitIsCloaked(unitID) and (sfxNum == 1 or sfxNum == 2) then
-			EmitSfx(wakes[1], 2)
-			EmitSfx(wakes[2], 2)
+			EmitSfx(wake1, 2)
+			EmitSfx(wake2, 2)
 		end
-		Sleep(200)
+		Sleep(166)
 	end
 end
 
@@ -75,13 +75,11 @@ end
 local explodables = {turret, arm1, arm2, armpiece, claw1, claw2}
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-
 	for i = 1, #explodables do
 		if (math.random() < severity) then
 			Explode (explodables[i], SFX.FALL + SFX.FIRE + SFX.SMOKE)
 		end
 	end
-
 	if severity < 0.5 then
 		return 1
 	else

@@ -69,6 +69,8 @@ function script.Create()
 	Hide(WakeForeRight)
 	Hide(WakeAftLeft)
 	Hide(WakeAftRight)
+	Move(WakeForeLeft, x_axis, -18)
+	Move(WakeForeRight, x_axis, 18)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	
 	for bay,_ in pairs(droneBays) do

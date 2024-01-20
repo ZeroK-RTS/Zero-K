@@ -26,9 +26,8 @@ local function MoveScript()
 	while true do
 		if moving and not Spring.GetUnitIsCloaked(unitID) and (sfxNum == 1 or sfxNum == 2) then
 			EmitSfx(wake1, 3)
-			EmitSfx(wake2, 3)
 		end
-		Sleep(150)
+		Sleep(66)
 	end
 end
 
@@ -72,6 +71,7 @@ function Unstunned (stun_type)
 end
 
 function script.Create()
+	Move(wake1, z_axis, -22)
 	StartThread(MoveScript)
 	StartThread(GG.Script.SmokeUnit, unitID, {hull, sonar, turret})
 end

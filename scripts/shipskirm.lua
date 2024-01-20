@@ -69,6 +69,8 @@ local restore_delay = 3000
 local gun_1_yaw = 0
 local dead = false
 function script.Create()
+	Move(wakel, x_axis, -3)
+	Move(waker, x_axis, 3)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 end
@@ -87,9 +89,9 @@ local function Wake()
 	while true do
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx( wakel,  2 )
-			EmitSfx( waker,  4 )
+			EmitSfx( waker,  2 )
 		end
-		Sleep(300)
+		Sleep(233)
 	end
 end
 
