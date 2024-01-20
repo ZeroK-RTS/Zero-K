@@ -110,6 +110,18 @@ local Sounds = {
 			maxconcurrent = 30,
 			maxdist = nil,
 		},
+		SonicLow = {
+			file = "sounds/weapon/sonicgun2.wav",
+			pitchmod = 0,
+			gainmod = 0,
+			pitch = 0.95,
+		},
+		SonicHitLow = {
+			file = "sounds/weapon/sonicgun_hit.wav",
+			pitchmod = 0,
+			gainmod = 0,
+			pitch = 0.9,
+		},
 	},
 }
 

@@ -11,9 +11,9 @@ return { shipaa = {
   canMove                = true,
   canPatrol              = true,
   category               = [[SHIP]],
-  collisionVolumeOffsets = [[0 4 4]],
-  collisionVolumeScales  = [[32 32 128]],
-  collisionVolumeType    = [[CylZ]],
+  collisionVolumeOffsets = [[0 -6 2]],
+  collisionVolumeScales  = [[32 42 128]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

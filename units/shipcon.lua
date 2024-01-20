@@ -15,10 +15,10 @@ return { shipcon = {
   canMove                = true,
   canPatrol              = true,
   category               = [[SHIP UNARMED]],
-  collisionVolumeOffsets = [[0 8 0]],
-  collisionVolumeScales  = [[25 25 96]],
+  collisionVolumeOffsets = [[0 5 2]],
+  collisionVolumeScales  = [[25 32 98]],
 
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

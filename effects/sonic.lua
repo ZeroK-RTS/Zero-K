@@ -57,6 +57,64 @@ local fx = {
     },
 },
 
+['sonic_80'] = {
+    groundflash = {
+      air                = true,
+      underwater         = true,
+      circlealpha        = 0.65,
+      circlegrowth       = 4.7,
+      flashalpha         = 0.92,
+      flashsize          = 20,
+      ground             = true,
+      ttl                = 18,
+      unit               = true,
+      water              = true,
+      color = {
+        [1]  = 0,
+        [2]  = 0.55,
+        [3]  = 0.96,
+      },
+    },
+    expand = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      unit               = true,
+      underwater         = true,
+      properties = {
+        heat               = 90,
+        heatfalloff        = 8,
+        maxheat            = 90,
+        pos                = [[0,4,0]],
+        size               = 12,
+        sizegrowth         = 12,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+    contract = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      unit               = true,
+      underwater         = true,
+      properties = {
+        heat               = 90,
+        heatfalloff        = 7,
+        maxheat            = 90,
+        pos                = [[0,4,0]],
+        size               = 160,
+        sizegrowth         = -15,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+},
+
 ['sonicfire'] = {
     expand = {
       air                = true,
@@ -140,20 +198,6 @@ local fx = {
 }
 
 local altforms = {
-  sonic_80 = {
-    source = "sonic",
-    modifications = {
-      groundflash = {
-       ttl = 18,
-      },
-      expand = {
-        properties = {size = 16, sizegrowth = 16, heat = 45, maxheat = 45},
-      },
-      contract = {
-        properties = {size = 90, sizegrowth = -16, heat = 45, maxheat = 45},
-      },
-    },
-  },
   sonicfire_80 = {
     source = "sonicfire",
     modifications = {
