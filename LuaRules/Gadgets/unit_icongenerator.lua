@@ -79,7 +79,10 @@ if (gadgetHandler:IsSyncedCode()) then
 			Spring.GiveOrderToUnit(uid, CMD.STOP, 0, 0)
 
 			local env = Spring.UnitScript.GetScriptEnv(uid)
-			if env then lus = true end
+			if env then
+				lus = true
+				env = env.script
+			end
 			
 			if lus then
 				if env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate) end
