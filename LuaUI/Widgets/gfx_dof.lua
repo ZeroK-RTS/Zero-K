@@ -91,6 +91,7 @@ options = {
 	},
 }
 
+local glDeleteTexture = gl.DeleteTexture
 local function onChangeFunc()
 	if options.useDoF.value then
 		widget:Initialize()
@@ -113,7 +114,6 @@ local glCopyToTexture        = gl.CopyToTexture
 local glCreateShader         = gl.CreateShader
 local glCreateTexture        = gl.CreateTexture
 local glDeleteShader         = gl.DeleteShader
-local glDeleteTexture        = gl.DeleteTexture
 local glGetShaderLog         = gl.GetShaderLog
 local glTexture              = gl.Texture
 local glTexRect              = gl.TexRect
@@ -134,31 +134,6 @@ local GL_COLOR_ATTACHMENT1_EXT = 0x8CE1
 local GL_COLOR_ATTACHMENT2_EXT = 0x8CE2
 local GL_COLOR_ATTACHMENT3_EXT = 0x8CE3
 
------------------------------------------------------------------
-
-
-local function CleanupTextures()
-	glDeleteTexture(baseBlurTex or "")
-	glDeleteTexture(baseNearBlurTex or "")
-	glDeleteTexture(intermediateBlurTex0 or "")
-	glDeleteTexture(intermediateBlurTex1 or "")
-	glDeleteTexture(intermediateBlurTex2 or "")
-	glDeleteTexture(intermediateBlurTex3 or "")
-	glDeleteTexture(finalBlurTex or "")
-	glDeleteTexture(finalNearBlurTex or "")
-	glDeleteTexture(screenTex or "")
-	glDeleteTexture(depthTex or "")
-	gl.DeleteFBO(intermediateBlurFBO)
-	gl.DeleteFBO(baseBlurFBO)
-	baseBlurTex, baseNearBlurTex, intermediateBlurTex0, intermediateBlurTex1,
-	intermediateBlurTex2, intermediateBlurTex3, finalBlurTex, finalNearBlurTex,
-	screenTex, depthTex =
-		nil, nil, nil, nil,
-		nil, nil, nil, nil,
-		nil, nil
-	intermediateBlurFBO = nil
-	baseBlurFBO = nil
-end
 -----------------------------------------------------------------
 -- Global Vars
 -----------------------------------------------------------------
@@ -207,6 +182,57 @@ local shaderPasses =
 	finalNearBlur = 4,
 	composition = 5,
 }
+
+function CleanupTextures()
+	if baseBlurTex then
+		glDeleteTexture(baseBlurTex)
+		baseBlurTex = nil
+	end
+	if baseNearBlurTex then
+		glDeleteTexture(baseNearBlurTex)
+		baseNearBlurTex = nil
+	end
+	if intermediateBlurTex0 then
+		glDeleteTexture(intermediateBlurTex0)
+		intermediateBlurTex0 = nil
+	end
+	if intermediateBlurTex1 then
+		glDeleteTexture(intermediateBlurTex1)
+		intermediateBlurTex1 = nil
+	end
+	if intermediateBlurTex2 then
+		glDeleteTexture(intermediateBlurTex2)
+		intermediateBlurTex2 = nil
+	end
+	if intermediateBlurTex3 then
+		glDeleteTexture(intermediateBlurTex3)
+		intermediateBlurTex3 = nil
+	end
+	if finalBlurTex then
+		glDeleteTexture(finalBlurTex)
+		finalBlurTex = nil
+	end
+	if finalNearBlurTex then
+		glDeleteTexture(finalNearBlurTex)
+		finalNearBlurTex = nil
+	end
+	if screenTex then
+		glDeleteTexture(screenTex)
+		screenTex = nil
+	end
+	if depthTex then
+		glDeleteTexture(depthTex)
+		depthTex = nil
+	end
+	if intermediateBlurFBO then
+		gl.DeleteFBO(intermediateBlurFBO)
+		intermediateBlurFBO = nil
+	end
+	if baseBlurFBO then
+		gl.DeleteFBO(baseBlurFBO)
+		baseBlurFBO = nil
+	end
+end
 
 -----------------------------------------------------------------
 
