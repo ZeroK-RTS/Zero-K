@@ -58,6 +58,7 @@ return { shipcarrier = {
   speed                  = 82.5,
   turninplace            = 0,
   turnRate               = 372,
+  upright                = true,
   waterline              = 20,
 
   weapons                = {
