@@ -295,7 +295,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		if def.captureToDroneController then
 			local parentID = Spring.GetUnitRulesParam(attackerID, "parent_unit_id")
 			if Spring.ValidUnitID(parentID) then
-				controllerID = parentID
+				local parentAllyTeamID = Spring.GetUnitAllyTeam(parentID)
+				if parentAllyTeamID and parentAllyTeamID == attackerAllyTeam then
+					controllerID = parentID
+				end
 			end
 		end
 		
