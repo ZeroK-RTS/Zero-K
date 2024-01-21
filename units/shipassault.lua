@@ -102,7 +102,7 @@ return { shipassault = {
         },
 
         damage                  = {
-            default = 280.01,
+            default = 170.01,
         },
         
         cegTag                  = [[sonictrail]],
@@ -116,13 +116,13 @@ return { shipassault = {
         myGravity               = 0.01,
         noSelfDamage            = true,
         range                   = 300,
-        reloadtime              = 1.6,
-        size                    = 64,
+        reloadtime              = 1.1,
+        size                    = 55,
         sizeDecay               = 0.2,
         soundStart              = [[SonicLow]],
         soundHit                = [[SonicHitLow]],
-        soundStartVolume        = 6,
-        soundHitVolume          = 10,
+        soundStartVolume        = 5,
+        soundHitVolume          = 9,
         stages                  = 1,
         texture1                = [[sonic_glow2]],
         texture2                = [[null]],
