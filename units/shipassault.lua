@@ -27,6 +27,9 @@ return { shipassault = {
     outline_yoff = 25,
     model_rescale = 1.2,
     selection_scale   = 1.1,
+    selectionscalemult = 1.18,
+    selectionwidthscalemult = 1.25,
+    selectioninherit = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

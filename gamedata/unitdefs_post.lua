@@ -797,12 +797,19 @@ local SEL_SCALE = 1.5
 local STATIC_SEL_SCALE = 1.35
 
 for name, ud in pairs(UnitDefs) do
-	local scale = STATIC_SEL_SCALE
+	local scale, widthScale = STATIC_SEL_SCALE, STATIC_SEL_SCALE
 	if ud.acceleration and ud.acceleration > 0 and ud.canmove then
 		scale = SEL_SCALE
 	end
 	if ud.customparams.selectionscalemult then
 		scale = ud.customparams.selectionscalemult
+	end
+	if ud.customparams.selectionscalemult then
+		scale = ud.customparams.selectionscalemult
+	end
+	widthScale = scale
+	if ud.customparams.selectionwidthscalemult then
+		widthScale = ud.customparams.selectionwidthscalemult
 	end
 	
 	if ud.collisionvolumescales or ud.selectionvolumescales then
@@ -812,7 +819,13 @@ for name, ud in pairs(UnitDefs) do
 			if size > 0 then
 				local dimensions, largest = GetDimensions(ud.collisionvolumescales)
 				local x, y, z = size, size, size
-				if size > largest then
+				if ud.customparams.selectioninherit then
+					ud.selectionvolumeoffsets = ud.selectionvolumeoffsets or ud.collisionvolumeoffsets or "0 0 0"
+					x = dimensions[1]
+					y = dimensions[2]
+					z = dimensions[3]
+					ud.selectionvolumetype    = ud.selectionvolumetype or ud.collisionvolumetype
+				elseif size > largest then
 					ud.selectionvolumeoffsets = ud.selectionvolumeoffsets or "0 0 0"
 					ud.selectionvolumetype    = ud.selectionvolumetype or "ellipsoid"
 				elseif string.lower(ud.collisionvolumetype) == "cylx" then
@@ -840,7 +853,7 @@ for name, ud in pairs(UnitDefs) do
 					z = dimensions[3]
 					ud.selectionvolumetype    = ud.selectionvolumetype or ud.collisionvolumetype
 				end
-				ud.selectionvolumescales  = math.ceil(x*scale) .. " " .. math.ceil(y*scale) .. " " .. math.ceil(z*scale)
+				ud.selectionvolumescales  = math.ceil(x*widthScale) .. " " .. math.ceil(y*scale) .. " " .. math.ceil(z*scale)
 			end
 		end
 	else

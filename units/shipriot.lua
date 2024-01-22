@@ -20,6 +20,9 @@ return { shipriot = {
     turnatfullspeed = [[1]],
     --extradrawrange = 420,
     selection_scale   = 1.05,
+    selectionscalemult = 1.2,
+    selectionwidthscalemult = 1.8,
+    selectioninherit = 1,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

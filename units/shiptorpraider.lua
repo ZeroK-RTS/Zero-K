@@ -22,6 +22,9 @@ return { shiptorpraider = {
     bait_level_default = 0,
     okp_damage = 180,
     model_rescale = 0.9,
+    selectionscalemult = 1.3,
+    selectionwidthscalemult = 1.75,
+    selectioninherit = 1,
   },
 
 

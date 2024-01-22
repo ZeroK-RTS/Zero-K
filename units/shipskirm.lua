@@ -21,6 +21,9 @@ return { shipskirm = {
     modelradius     = [[24]],
     model_rescale = 1.15,
     selection_scale   = 1.1,
+    selectionscalemult = 1.25,
+    selectionwidthscalemult = 1.65,
+    selectioninherit = 1,
   },
 
 
@@ -34,7 +37,7 @@ return { shipskirm = {
   minWaterDepth          = 10,
   movementClass          = [[BOAT3]],
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB FIXEDWING]],
   objectName             = [[shipskirm.s3o]],
   script                 = [[shipskirm.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
@@ -59,8 +62,8 @@ return { shipskirm = {
 
     {
       def                = [[ROCKET]],
-      badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     
   },

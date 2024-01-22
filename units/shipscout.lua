@@ -17,6 +17,9 @@ return { shipscout = {
     modelradius    = [[12]],
     turnatfullspeed = [[1]],
     bait_level_default = 0,
+    selectionscalemult = 1.3,
+    selectionwidthscalemult = 2.2,
+    selectioninherit = 1,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

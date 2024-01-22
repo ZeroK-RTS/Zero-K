@@ -24,6 +24,10 @@ return { shipaa = {
     outline_x = 160,
     outline_y = 160,
     outline_yoff = 25,
+    selectionscalemult = 1.22,
+    selectionwidthscalemult = 1.3,
+    selectionwidthscalemult = 1.7,
+    selectioninherit = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

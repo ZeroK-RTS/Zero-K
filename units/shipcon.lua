@@ -29,6 +29,9 @@ return { shipcon = {
     outline_x = 128,
     outline_y = 128,
     outline_yoff = 16,
+    selectionscalemult = 1.22,
+    selectionwidthscalemult = 2.1,
+    selectioninherit = 1,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

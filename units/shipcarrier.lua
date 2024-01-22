@@ -30,6 +30,9 @@ return { shipcarrier = {
     outline_x = 300,
     outline_y = 300,
     outline_yoff = 55,
+    selectionscalemult = 1.1,
+    selectionwidthscalemult = 1.2,
+    selectioninherit = 1,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],

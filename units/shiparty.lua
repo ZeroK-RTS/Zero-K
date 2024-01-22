@@ -24,6 +24,9 @@ return { shiparty = {
     outline_yoff = 25,
     model_rescale = 1.2,
     selection_scale   = 1.1,
+    selectionscalemult = 1.15,
+    selectionwidthscalemult = 1.9,
+    selectioninherit = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
