@@ -266,7 +266,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 95, false, false, true) then
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 1200.1, 95, false, false, true) then
 		return true
 	end
 	return false
