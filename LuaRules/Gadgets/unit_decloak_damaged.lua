@@ -102,6 +102,13 @@ local function RemoveWaterUnit(unitID)
 	if not waterUnitMap[unitID] then
 		return
 	end
+	if waterUnitCloakBlocked[unitID] then
+		spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)
+		spSetUnitRulesParam(unitID, "shield_disabled", 0, alliedTrueTable)
+		GG.UpdateUnitAttributes(unitID)
+		waterUnitCloakBlocked[unitID] = false
+	end
+	
 	waterUnits[waterUnitMap[unitID]] = waterUnits[waterUnitCount]
 	waterUnitMap[waterUnits[waterUnitCount]] = waterUnitMap[unitID]
 	waterUnits[waterUnitCount] = nil
