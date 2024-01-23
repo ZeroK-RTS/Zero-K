@@ -1265,9 +1265,9 @@ function MatchUnitsToNodes(nodes, units, shifted)
 	if (#units == 1) then
 		return {{units[1], nodes[1]}}
 	elseif (#units <= maxHungarianUnits) then
-		return GetOrdersHungarian(nodes, units, #units, shift and not meta)
+		return GetOrdersHungarian(nodes, units, #units, shifted)
 	else
-		return GetOrdersNoX(nodes, units, #units, shift and not meta)
+		return GetOrdersNoX(nodes, units, #units, shifted)
 	end
 end
 
