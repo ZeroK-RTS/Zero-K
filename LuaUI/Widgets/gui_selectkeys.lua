@@ -210,12 +210,13 @@ options = {
 	lowhealth_100 = { type = 'button',
 		name = 'Deselect Full Health',
 		desc = 'Filters full health units out of your selection',
-		action = 'select PrevSelection+_RelativeHealth_100+_ClearSelection_SelectAll+',
+		-- engine check is (hp > threshold) so it has to be epsilon less than 100
+		action = 'select PrevSelection+_Not_RelativeHealth_99+_ClearSelection_SelectAll+',
 	},
 	highhealth_100 = { type = 'button',
 		name = 'Deselect Damaged Units',
 		desc = 'Filters damaged units out of your selection',
-		action = 'select PrevSelection+_Not_RelativeHealth_100+_ClearSelection_SelectAll+',
+		action = 'select PrevSelection+_RelativeHealth_99+_ClearSelection_SelectAll+',
 	},
 	
 	----
