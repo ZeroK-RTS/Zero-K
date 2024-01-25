@@ -104,6 +104,7 @@ local TargetCancelingCommand = {
 
 local orderParamTable = {0}
 local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
+local CMD_OPT_CTRL     = CMD.OPT_CTRL
 local CMD_UNIT_SET_TARGET    = SUC.UNIT_SET_TARGET
 local CMD_UNIT_CANCEL_TARGET = SUC.UNIT_CANCEL_TARGET
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
@@ -113,13 +114,13 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			local unitID = units[i]
 			if isValidUnit(unitID) then
 				local currCmdID, cmdOpts, _, cmdParam1, cmdParam2 = Spring.GetUnitCurrentCommand(unitID)
-				if currCmdID == CMD.ATTACK and not cmdParam2 and (cmdOpts % (2*CMD_OPT_INTERNAL) < CMD_OPT_INTERNAL) then
+				if currCmdID == CMD.ATTACK and not cmdParam2 and (cmdOpts % (2*CMD_OPT_INTERNAL) < CMD_OPT_INTERNAL) and (cmdOpts % (2*CMD_OPT_CTRL) < CMD_OPT_CTRL) then
 					orderParamTable[1] = cmdParam1
 					Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
 				end
 			end
 		end
-	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not cmdOptions.shift) and cmdParams and #cmdParams == 1 then
+	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not cmdOptions.shift and not cmdOptions.ctrl) and cmdParams and #cmdParams == 1 then
 		local units = Spring.GetSelectedUnits()
 		orderParamTable[1] = cmdParams[1]
 		for i = 1, #units do
