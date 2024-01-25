@@ -46,7 +46,7 @@ return { factoryplane = {
     shared_energy_gen = 1,
     ispad         = 1,
     parent_of_plate   = [[plateplane]],
-    buggeroff_radius    = 40,
+    buggeroff_radius    = 20,
     buggeroff_offset    = 45,
     buggeroff_angle     = math.rad(-65),
 
