@@ -135,7 +135,9 @@ function script.BlockShot(num, targetID)
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
-	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 40, false, false, false) then
+
+	local TIMEOUT = 50 -- enough not to double-bomb a mex on flat land, empirically
+	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, TIMEOUT, false, false, false) then
 		-- Remove attack command on blocked target, if it is followed by another attack command. This is commands queued in an area.
 		local cmdID, _, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
 		if cmdID == CMD.ATTACK and (not cp_2) and cp_1 == targetID then
@@ -187,7 +189,7 @@ function script.BlockShot(num, targetID)
 		--return true
 	--end
 	
-	if targetID and (not isTooFast) and GG.Script.OverkillPreventionCheck(unitID, targetID, damage, 270, 35, 0.025) then
+	if targetID and (not isTooFast) and GG.Script.OverkillPreventionCheck(unitID, targetID, damage, 270, TIMEOUT, 0.025) then
 		return true
 	end
 	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
