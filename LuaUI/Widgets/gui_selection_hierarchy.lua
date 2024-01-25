@@ -56,16 +56,8 @@ local selectionFilteringOnlyAlt = false
 local retreatDeselects = false
 
 local function StartRetreat(unitID)
-	local selection = Spring.GetSelectedUnits()
-	local count = #selection
-	for i = 1, count do
-		local selUnitID = selection[i]
-		if selUnitID == unitID then
-			selection[i] = selection[count]
-			selection[count] = nil
-			Spring.SelectUnitArray(selection)
-			return
-		end
+	if not Spring.GetSpectatingState() then -- FIXME: ideally would be `Spring.IsUnitControllable(unitID)`, see engine #1242
+		Spring.DeselectUnit(unitID)
 	end
 end
 
