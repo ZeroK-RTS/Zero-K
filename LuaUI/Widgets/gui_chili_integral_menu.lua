@@ -1040,10 +1040,8 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, 
 	if alt and factoryUnitID and options.altInsertBehind.value and (not fakeFactory) then
 		-- Repeat alt has to be handled by engine so that the command is removed after completion.
 		if not spGetUnitRepeat(factoryUnitID) then
-			local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
-			for i = 1, inputMult do
-				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
-			end
+			local countOpts = (shift and CMD.OPT_SHIFT or 0) + (ctrl and CMD.OPT_CTRL or 0)
+			spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, countOpts}, CMD.OPT_ALT + CMD.OPT_CTRL)
 			if WG.noises then
 				WG.noises.PlayResponse(factoryUnitID, cmdID)
 			end
