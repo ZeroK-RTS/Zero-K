@@ -490,6 +490,17 @@ if GL then -- BAR 105-1988
 	GL.MAX                   = GL.MAX                   or 32776
 end
 
+if not Script.IsEngineMinVersion(105, 0, 2182) then
+	Spring.SetUnitBuildeeRadius = Script.GetSynced() and RET_NONE
+	Spring.GetUnitBuildeeRadius = Spring.GetUnitRadius
+
+	if UnitDefs then
+		for _, unitDef in pairs (UnitDefs) do
+			unitDef.buildeeBuildRadius = 64 -- arbitrary
+		end
+	end
+end
+
 if true then -- No engine has this yet
 	local origAddUnitDamage = Spring.AddUnitDamage
 	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
