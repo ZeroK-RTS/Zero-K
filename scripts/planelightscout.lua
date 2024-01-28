@@ -58,6 +58,12 @@ end
 function script.Create()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+
+	-- Work around a LUPS ribbon bug. See #5178
+	local tipL, tipR = piece('wingtipl', 'wingtipr')
+	local speedPerFrame = UnitDef.speed / Game.gameSpeed
+	Move(tipL, z_axis, -speedPerFrame)
+	Move(tipR, z_axis, -speedPerFrame)
 end
 
 function script.Killed(recentDamage, maxHealth)
