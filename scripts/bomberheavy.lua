@@ -81,6 +81,12 @@ function script.Create()
 	Hide(flare1)
 	Hide(flare2)
 	Hide(drop)
+
+	-- Work around a LUPS ribbon bug. See #5178
+	local tip1, tip2 = piece('wingtip1', 'wingtip2')
+	local speedPerFrame = UnitDef.speed / Game.gameSpeed
+	Move(tip1, z_axis, -speedPerFrame)
+	Move(tip2, z_axis, -speedPerFrame)
 end
 
 function script.FireWeapon(num)

@@ -198,6 +198,8 @@ effectUnitDefs = {
 	bomberheavy = {
 		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true, noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=6, piece="wingtip1", noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=6, piece="wingtip2", noIconDraw = true}},
 	 },
 	gunshipheavyskirm = {
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="lfjet", onActive=true, noIconDraw = true}},
