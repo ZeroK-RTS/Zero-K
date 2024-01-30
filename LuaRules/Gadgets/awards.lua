@@ -50,11 +50,6 @@ local cappedComs = {}
 
 local awardData = {}
 
-local basicEasyFactor = 0.5
-local veryEasyFactor = 0.3
-
-local empFactor     = veryEasyFactor*4
-local reclaimFactor = veryEasyFactor*0.2 -- wrecks aren't guaranteed to leave more than 0.2 of value
 
 local minReclaimRatio = 0.15
 
@@ -72,6 +67,8 @@ local awardAbsolutes = {
 	vet         = 3,
 }
 
+local basicEasyFactor = 0.5
+local veryEasyFactor = 0.3
 local awardEasyFactors = {
 	shell     = basicEasyFactor,
 	fire      = basicEasyFactor,
@@ -80,8 +77,10 @@ local awardEasyFactors = {
 	kam       = veryEasyFactor,
 	comm      = veryEasyFactor,
 
-	reclaim   = reclaimFactor,
-	emp       = empFactor,
+	reclaim   = 0.2,
+	slow      = 2,
+	disarm    = 4,
+	emp       = 1.2,
 }
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
