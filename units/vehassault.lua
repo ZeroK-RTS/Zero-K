@@ -40,6 +40,11 @@ return { vehassault = {
   objectName             = [[corraid.s3o]],
   script                 = [[vehassault.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
+		loadingradius = 250,
+		transportcapacity = 40,
+		transportsize = 4,
+		transportunloadmethod = 2,
+		unloadspread = 2,
 
   sfxtypes               = {
 
@@ -61,13 +66,6 @@ return { vehassault = {
   workerTime             = 0,
 
   weapons                = {
-
-    {
-      def                = [[PLASMA]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
   },
 
 

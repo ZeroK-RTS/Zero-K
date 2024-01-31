@@ -1187,6 +1187,7 @@ function gadgetHandler:AllowUnitTransportLoad(
   transporteeID, transporteeUnitDefID, transporteeTeam,
   loadPosX, loadPosY, loadPosZ
 )
+	Spring.Echo("AllowUnitTransportLoad",transporteeID, math.random())
   for _,g in r_ipairs(self.AllowUnitTransportLoadList) do
     if (not g:AllowUnitTransportLoad(
       transporterID, transporterUnitDefID, transporterTeam,
@@ -1204,6 +1205,7 @@ function gadgetHandler:AllowUnitTransportUnload(
   transporteeID, transporteeUnitDefID, transporteeTeam,
   unloadPosX, unloadPosY, unloadPosZ
 )
+	Spring.Echo("AllowUnitTransportUNLoad",transporteeID, math.random())
   for _,g in r_ipairs(self.AllowUnitTransportUnloadList) do
     if (not g:AllowUnitTransportUnload(
       transporterID, transporterUnitDefID, transporterTeam,

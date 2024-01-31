@@ -127,6 +127,43 @@ function script.BlockShot(num, targetID)
 	return false
 end
 
+
+
+
+function script.TransportPickup(passengerID)
+	Spring.Echo("TransportPickup", passengerID, math.random())
+	Spring.UnitAttach(unitID, passengerID, -1)
+end
+function script.TransportDrop(passengerID, x, y, z)
+	Spring.Echo("TransportDrop", passengerID, math.random())
+	Spring.UnitDetach(passengerID)
+	Spring.SetUnitPosition(passengerID, x, y, z)
+end
+function script.EndTransport(unitID)
+	Spring.Echo("EndTransport", unitID, math.random())
+end
+
+
+
+-- afaict these are for air transport and won't get called
+function script.BeginTransport(unitID)
+	Spring.Echo("BeginTransport", unitID)
+end
+function script.QueryTransport(unitID)
+	Spring.Echo("QueryTransport", unitID)
+	return turret
+end
+function script.StartUnload(unitID)
+	Spring.Echo("StartUnload", unitID)
+end
+
+
+
+
+
+
+
+
 function script.AimFromWeapon(num)
 	return turret
 end
