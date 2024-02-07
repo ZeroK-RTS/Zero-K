@@ -15,7 +15,7 @@ local SigAim = 1
 local function SetupHeat()
 	local ud = UnitDefs[unitDefID]
 	local cp = ud.customParams
-	return tonumber(cp.heat_per_shot), (tonumber(cp.heat_decay) or 0)/30, tonumber(cp.heat_max_slow), tonumber(cp.heat_initial) or 0
+	return tonumber(cp.heat_per_shot), (tonumber(cp.heat_decay) or 0)/Game.gameSpeed, tonumber(cp.heat_max_slow), tonumber(cp.heat_initial) or 0
 end
 local heatPerShot, heatDecay, heatMaxSlow, currentHeat = SetupHeat()
 
