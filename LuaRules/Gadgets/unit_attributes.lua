@@ -52,7 +52,7 @@ local spSetUnitCOBValue = Spring.SetUnitCOBValue
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
 local CMD_WAIT = CMD.WAIT
 
-local HALF_FRAME = 1/60
+local HALF_FRAME = 1/(2 * Game.gameSpeed)
 
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
@@ -195,7 +195,7 @@ local function UpdateReloadSpeed(unitID, unitDefID, weaponMods, speedFactor, gam
 			state.weapon[i] = {
 				reload = reload,
 				burstRate = wd.salvoDelay,
-				oldReloadFrames = floor(reload*30),
+				oldReloadFrames = floor(reload*Game.gameSpeed),
 			}
 			if wd.type == "BeamLaser" then
 				state.weapon[i].burstRate = false -- beamlasers go screwy if you mess with their burst length
@@ -231,7 +231,7 @@ local function UpdateReloadSpeed(unitID, unitDefID, weaponMods, speedFactor, gam
 			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
 			local newReload = w.reload/moddedSpeed
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-			-- Add HALF_FRAME to round reloadTime to the closest multiple of 1/30, since the the engine rounds down to a multiple of 1/30.
+			-- Add HALF_FRAME to round reloadTime to the closest discrete frame (multiple of 1/30), since the the engine rounds DOWN
 			if w.burstRate then
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload + HALF_FRAME, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed + HALF_FRAME})
 			else

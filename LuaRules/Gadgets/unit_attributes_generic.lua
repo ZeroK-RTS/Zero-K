@@ -175,7 +175,7 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 			state.weapon[i] = {
 				reload = reload,
 				burstRate = wd.salvoDelay,
-				oldReloadFrames = floor(reload*30),
+				oldReloadFrames = floor(reload*Game.gameSpeed),
 				range = wd.range,
 			}
 			if wd.type == "BeamLaser" then
