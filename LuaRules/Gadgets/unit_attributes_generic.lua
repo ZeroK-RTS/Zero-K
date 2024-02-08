@@ -50,6 +50,7 @@ local getMovetype = Spring.Utilities.getMovetype
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
 local DO_CHANGES_EXTERNALLY = true
+local HALF_FRAME = 1 / (2 * Game.gameSpeed)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -215,9 +216,9 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				local newReload = w.reload/moddedSpeed
 				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 				if w.burstRate then
-					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload + HALF_FRAME, reloadState = nextReload + 0.5, burstRate = w.burstRate/moddedSpeed + HALF_FRAME})
 				else
-					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload + HALF_FRAME, reloadState = nextReload + 0.5})
 				end
 			end
 		end
