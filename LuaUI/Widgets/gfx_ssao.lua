@@ -101,6 +101,48 @@ local presets = {
 	},
 }
 
+options_path = 'Settings/Graphics/Ambient Occlusion'
+options_order = {'quality_preset', 'strength', 'radius'}
+options = {
+	quality_preset = {
+		name = 'Quality',
+		type = 'radioButton',
+		value = 2,
+		items = {
+			{key = 3, name='High (slowest)'},
+			{key = 2,  name='Medium'},
+			{key = 1,  name='Low (fastest)'},
+		},
+		OnChange = function (self)
+			preset = self.value
+			widget:Shutdown()
+			widget:Initialize()
+		end,
+	},
+	strength = {
+		name = 'Strength',
+		type = 'number',
+		value = SSAO_ALPHA_POW,
+		min = 0.5, max = 32, step = 0.5,
+		OnChange = function (self)
+			SSAO_ALPHA_POW = self.value
+			widget:Shutdown()
+			widget:Initialize()
+		end,
+	},
+	radius = {
+		name = 'Radius',
+		type = 'number',
+		value = SSAO_RADIUS,
+		min = 1, max = 32, step = 1,
+		OnChange = function (self)
+			SSAO_RADIUS = self.value
+			widget:Shutdown()
+			widget:Initialize()
+		end,
+	},
+}
+
 -----------------------------------------------------------------
 -- File path Constants
 -----------------------------------------------------------------
@@ -225,31 +267,6 @@ function widget:Initialize()
 	if not gl.CreateShader then -- no shader support, so just remove the widget itself, especially for headless
 		widgetHandler:RemoveWidget()
 		return
-	end
-	WG['ssao'] = {}
-	WG['ssao'].getPreset = function()
-		return preset
-	end
-	WG['ssao'].setPreset = function(value)
-		preset = value
-		widget:Shutdown()
-		widget:Initialize()
-	end
-	WG['ssao'].getStrength = function()
-		return SSAO_ALPHA_POW
-	end
-	WG['ssao'].setStrength = function(value)
-		SSAO_ALPHA_POW = value
-		widget:Shutdown()
-		widget:Initialize()
-	end
-	WG['ssao'].getRadius = function()
-		return SSAO_RADIUS
-	end
-	WG['ssao'].setRadius = function(value)
-		SSAO_RADIUS = value
-		widget:Shutdown()
-		widget:Initialize()
 	end
 	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 	if not canContinue then
@@ -620,28 +637,5 @@ function widget:DrawWorld()
 	if delayedUpdateSun and os.clock() > delayedUpdateSun then
 		Spring.SendCommands("luarules updatesun")
 		delayedUpdateSun = nil
-	end
-end
-
-function widget:GetConfigData(data)
-	return {
-		strength = SSAO_ALPHA_POW,
-		radius = SSAO_RADIUS,
-		preset = preset
-	}
-end
-
-function widget:SetConfigData(data)
-	if data.strength ~= nil then
-		SSAO_ALPHA_POW = data.strength
-	end
-	if data.radius ~= nil then
-		SSAO_RADIUS = data.radius
-	end
-	if data.preset ~= nil then
-		preset = data.preset
-		if preset > 3 then
-			preset = 3
-		end
 	end
 end
