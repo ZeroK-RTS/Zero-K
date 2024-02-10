@@ -43,7 +43,7 @@ local drawingEnabled = true
 
 local SPACE_CLICK_OUTSIDE = false
 local HEIGHT_UP = 2
-local HEIGHT_LEEWAY = 1400
+local HEIGHT_LEEWAY = 1400.5 -- Casts to float
 
 local forceTextureToGrid = false
 function WG.game_SetCustomExtensionGridTexture(newGridTex, newForceTextureToGrid)
@@ -199,7 +199,7 @@ local function SetupShaderTable()
 			
 			float offset = pow(abs(mirrorVertex.z-up*mirrorZ) * mirrorZ / lengthZ * 0.006, 2.0) +
 				pow(abs(mirrorVertex.x-left*mirrorX) * mirrorX / lengthX * 0.006, 2.0);
-			if (offset > 1.0 && mirrorVertex.y < -400) mirrorVertex.y += ]] .. HEIGHT_LEEWAY .. [[;
+			if ((offset > 1.0) && (mirrorVertex.y < -400.0)) mirrorVertex.y += ]] .. HEIGHT_LEEWAY .. [[;
 			mirrorVertex.y -= offset;
 			
 			alpha = 0.0;
