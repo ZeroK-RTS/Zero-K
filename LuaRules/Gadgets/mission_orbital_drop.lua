@@ -177,7 +177,7 @@ function gadget:GameFrame(frame)
 		Spring.MoveCtrl.SetVelocity(unitID,0,speedProfile[index],0)
 	  end
       
-      if y < groundH+10  or dy >= 0.1 then --if unit touch the ground or missed its landing point (ie: landing height is set above ground)
+      if y < groundH+10  or dy >= 0 then --if unit touch the ground or missed its landing point (ie: landing height is set above ground)
 		-- unit has landed
 		if useSetUnitVelocity then
 			Spring.SetUnitVelocity(unitID,0,0,0) --nullify unit's remaining speed
