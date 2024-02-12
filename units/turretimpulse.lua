@@ -12,6 +12,9 @@ return { turretimpulse = {
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[50 50 50]],
   collisionVolumeType           = [[ellipsoid]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[60 60 60]],
+  selectionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
