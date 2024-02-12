@@ -90,8 +90,6 @@ local structureConfig = {
 		unitDef.customparams.landflystate = [[0]]
 		unitDef.customparams.factory_land_state = 0
 
-		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
-
 		unitDef.featuredefs.dead.object = "pw_dropfac_dead.dae"
 		unitDef.featuredefs.heap.object = "debris8x8b.s3o"
 	end,
@@ -123,8 +121,6 @@ local structureConfig = {
 		unitDef.buildoptions = { [[bomberprec]], [[bomberriot]], [[bomberdisarm]], [[bomberheavy]] }
 		unitDef.customparams.landflystate = [[0]]
 		unitDef.customparams.factory_land_state = 0
-
-		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
 
 		unitDef.buildpic = "pw_dropdepot.png"
 		unitDef.featuredefs.dead.object = "pw_dropdepot_dead.dae"

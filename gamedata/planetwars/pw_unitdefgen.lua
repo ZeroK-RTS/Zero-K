@@ -71,6 +71,12 @@ local function commonDefs(def)
 	fd.collisionvolumetype = fd.collisionvolumetype or def.collisionvolumetype
 	fd.collisionvolumescales = fd.collisionvolumescales or def.collisionvolumescales
 	def.customparams.planetwars = 1
+
+	if not def.speed or def.speed == 0 then
+		if not def.yardmap then
+			def.yardmap = string.rep('o', def.footprintx * def.footprintz)
+		end
+	end
 end
 
 --for name in pairs(unitData) do
