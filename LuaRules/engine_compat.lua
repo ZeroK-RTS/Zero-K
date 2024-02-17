@@ -501,6 +501,15 @@ if not Script.IsEngineMinVersion(105, 0, 2182) then
 	end
 end
 
+if not Script.IsEngineMinVersion(105, 0, 2346) and not Script.GetSynced() then
+	local spGetGameFrame = Spring.GetGameFrame
+	local spGetFrameTimeOffset = Spring.GetFrameTimeOffset
+	local gameSpeed = Game.gameSpeed
+	Spring.GetGameSecondsInterpolated = function()
+		return (spGetFrameTimeOffset() + spGetGameFrame()) / gameSpeed
+	end
+end
+
 if true then -- No engine has this yet
 	local origAddUnitDamage = Spring.AddUnitDamage
 	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
