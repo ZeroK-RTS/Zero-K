@@ -63,7 +63,7 @@ local glMultiTexCoord = gl.MultiTexCoord
 
 function UnitJitter:BeginDrawDistortion()
 	gl.UseShader(warpShader)
-	gl.Uniform(timerUniform,  Spring.GetGameSeconds()*0.1 - 0.5 )
+	gl.Uniform(timerUniform,  Spring.GetGameSecondsInterpolated()*0.1 - 0.5 )
 	--gl.PolygonOffset(0,-1)
 	lastCullFace = GL_FRONT
 	gl.Culling(GL_FRONT)

@@ -68,7 +68,7 @@ function ShockWave:DrawDistortion()
 	local cx,cy = spWorldToScreenCoords(x,y,z)
 
 	glMultiTexCoord(0,x,y,z,1)
-	glMultiTexCoord(1,cx,cy,self.radius,self.life2)
+	glMultiTexCoord(1,cx,cy,self.radius + (self.growth * Spring.GetFrameTimeOffset()),self.life2)
 
 	glCallList(dlist)
 end

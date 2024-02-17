@@ -131,7 +131,7 @@ end
 
 function JitterParticles:BeginDrawDistortion()
 	glUseShader(billShader)
-	glUniform(timeUniform, Spring.GetGameFrame()*0.01)
+	glUniform(timeUniform, Spring.GetGameSecondsInterpolated()*0.3)
 end
 
 function JitterParticles:EndDrawDistortion()

@@ -48,7 +48,7 @@ Jet.Default = {
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
-local spGetGameSeconds = Spring.GetGameSeconds
+local spGetGameSecondsInterpolated = Spring.GetGameSecondsInterpolated
 local glUseShader = gl.UseShader
 local glUniform   = gl.Uniform
 local glTexture   = gl.Texture
@@ -56,7 +56,7 @@ local glCallList  = gl.CallList
 
 function Jet:BeginDrawDistortion()
 	glUseShader(jitShader)
-		glUniform(timerUniform, spGetGameSeconds())
+		glUniform(timerUniform, spGetGameSecondsInterpolated())
 end
 
 function Jet:EndDrawDistortion()

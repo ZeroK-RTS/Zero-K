@@ -46,13 +46,14 @@ UnitSmoke.Default = {
 
 local glUniform   = gl.Uniform
 local glUseShader = gl.UseShader
+local spGetGameSecondsInterpolated = Spring.GetGameSecondsInterpolated
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
 function UnitSmoke:BeginDraw()
 	glUseShader(UnitSmokeShader)
-	glUniform(timeLoc, thisGameFrame * 0.01 )
+	glUniform(timeLoc, spGetGameSecondsInterpolated() * 0.3)
 	gl.Texture(1,"bitmaps/GPL/Lups/mynoise.png")
 	gl.Texture(0,":c:bitmaps/GPL/Lups/smoketrail.png")
 	--gl.Texture(0,":c:bitmaps/GPL/Lups/flametrail.png")

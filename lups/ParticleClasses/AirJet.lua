@@ -69,7 +69,7 @@ local IsPosInLos    = Spring.IsPosInLos
 local IsPosInAirLos = Spring.IsPosInAirLos
 local IsPosInRadar  = Spring.IsPosInRadar
 
-local spGetGameSeconds = Spring.GetGameSeconds
+local spGetGameSecondsInterpolated = Spring.GetGameSecondsInterpolated
 local glUseShader = gl.UseShader
 local glUniform   = gl.Uniform
 local glBlending  = gl.Blending
@@ -81,7 +81,7 @@ local GL_ONE                 = GL.ONE
 
 function AirJet:BeginDraw()
 	glUseShader(jetShader)
-		glUniform(timerUniform, spGetGameSeconds())
+		glUniform(timerUniform, spGetGameSecondsInterpolated())
 	glBlending(GL_ONE,GL_ONE)
 end
 
@@ -110,7 +110,7 @@ end
 
 function AirJet:BeginDrawDistortion()
 	glUseShader(jitShader)
-		glUniform(timer2Uniform, spGetGameSeconds())
+		glUniform(timer2Uniform, spGetGameSecondsInterpolated())
 end
 
 function AirJet:EndDrawDistortion()

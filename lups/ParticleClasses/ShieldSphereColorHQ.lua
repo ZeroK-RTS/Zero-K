@@ -77,7 +77,7 @@ function ShieldSphereColorHQParticle:Visible()
 	return self.visibleToMyAllyTeam
 end
 
-local PACE = 400
+local PACE = 13.33
 
 local lastTexture = ""
 
@@ -86,8 +86,7 @@ function ShieldSphereColorHQParticle:BeginDraw()
 	gl.DepthMask(false)
 	gl.UseShader(shieldShader)
 
-	local gf = Spring.GetGameFrame()
-	gl.Uniform(timerUniform,	gf / PACE)
+	gl.Uniform(timerUniform, Spring.GetGameSecondsInterpolated() / PACE)
 	gl.UniformMatrix(viewInvUniform, "viewinverse")
 end
 
@@ -109,7 +108,7 @@ function ShieldSphereColorHQParticle:Draw()
 	if self.rechargeDelay > 0 or self.shieldNoise then
 		gl.UniformInt(methodUniform, 2)
 		local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
-		local currTime = Spring.GetGameFrame()
+		local currTime = Spring.GetGameFrame() + Spring.GetFrameTimeOffset()
 		local cooldown = hitTime + (self.rechargeDelay or 0) * 30 - currTime
 		if cooldown > 0 and self.rechargeSpinupTime then
 			local rampDown = 1.0

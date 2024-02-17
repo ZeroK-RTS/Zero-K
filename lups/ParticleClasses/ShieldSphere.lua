@@ -78,7 +78,7 @@ function ShieldSphereParticle:Draw()
 	local alignment = self.pos[2]
 	if self.shieldRechargeDelay and self.rechargingColor1 and self.shieldRechargeDelay > 0 then
 		local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
-		local currTime = Spring.GetGameFrame()
+		local currTime = Spring.GetGameFrame() + Spring.GetFrameTimeOffset()
 		local cooldown = hitTime + self.shieldRechargeDelay - currTime
 		if cooldown > 0 then
 			local timeSinceRegenDisabled = currTime - self.startOfRechargeDelay

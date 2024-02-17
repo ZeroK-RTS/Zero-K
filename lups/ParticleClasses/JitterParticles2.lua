@@ -166,10 +166,12 @@ end
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 local time
+local timeOffset
 
 function JitterParticles2.BeginDrawDistortion()
 	glUseShader(billShader)
-	time = Spring.GetGameFrame()*0.01
+	time = Spring.GetGameSecondsInterpolated()*0.3
+	timeOffset = Spring.GetFrameTimeOffset()
 end
 
 function JitterParticles2.EndDrawDistortion()
@@ -185,7 +187,7 @@ function JitterParticles2:DrawDistortion()
 		lastTexture=self.texture
 	end
 
-	glMultiTexCoord(5, self.frame/200, time*self.animSpeed)
+	glMultiTexCoord(5, (self.frame + timeOffset)/200, time*self.animSpeed)
 	glCallList(self.dlist)
 end
 

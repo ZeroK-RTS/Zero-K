@@ -179,7 +179,7 @@ function SimpleParticles2:Draw()
 		lastTexture=self.texture
 	end
 
-	glMultiTexCoord(5, self.frame/200)
+	glMultiTexCoord(5, (self.frame + Spring.GetFrameTimeOffset())/200)
 	glCallList(self.dlist)
 end
 
