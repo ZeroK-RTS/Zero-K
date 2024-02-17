@@ -49,6 +49,7 @@ local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/sel
 local ctrlFlattenRank = 1
 local altFilterHighRank = 2
 local doubleClickFlattenRank = 1
+local applyToControlGroups = false
 local retreatOverride = true
 local retreatingRank = 0
 local useSelectionFiltering = true
@@ -70,6 +71,7 @@ options_order = {
 	'selectionFilteringOnlyAltOption',
 	'altBlocksHighRankSelection',
 	'doubleClickFlattenRankOption',
+	'applyToControlGroups',
 	'retreatOverrideOption',
 	'retreatingRankOption',
 	'retreatDeselects'
@@ -142,6 +144,16 @@ options = {
 		tooltip_format = "%.0f",
 		OnChange = function (self)
 			doubleClickFlattenRank = self.value
+		end
+	},
+	applyToControlGroups = {
+		name = "Ranks apply to control groups",
+		desc = "Control groups normally ignore ranks. Toggle to make groups obey ranks. Useful for the 'retreat override' option.",
+		type = "bool",
+		value = applyToControlGroups,
+		noHotkey = true,
+		OnChange = function (self)
+			applyToControlGroups = self.value
 		end
 	},
 	retreatOverrideOption = {
@@ -267,8 +279,8 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	if #units <= 1 and not alt then
 		return
 	end
-	
-	if CheckControlGroupHotkeys() then
+
+	if not applyToControlGroups and CheckControlGroupHotkeys() then
 		return -- assume the user is selecting a control group
 	end
 	
