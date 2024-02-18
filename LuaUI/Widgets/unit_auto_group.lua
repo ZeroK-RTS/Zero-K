@@ -126,7 +126,6 @@ local finiGroup = {}
 local myTeam
 local selUnitDefs = {}
 local loadGroups = true
-local createdFrame = {}
 local textColor = {0.7, 1.0, 0.7, 1.0} -- r g b alpha
 local textSize = 13.0
 
@@ -241,8 +240,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 
-	if createdFrame[unitID] == GetGameFrame() -- probably to handle /give
-	or options.immediate.value
+	if options.immediate.value
 	or isBuilding[unitDefID] then
 		SetGroupFromAuto(unitID, unitDefID)
 	else
@@ -252,14 +250,14 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if (unitTeam == myTeam) then
-		createdFrame[unitID] = GetGameFrame()
+	if unitTeam == myTeam and not Spring.GetUnitIsBeingBuilt(unitID) then
+		-- handle spawned units (morph, wolverine etc)
+		SetGroupFromAuto(unitID, unitDefID)
 	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	finiGroup[unitID] = nil
-	createdFrame[unitID] = nil
 	IterableMap.Remove(screwyWaypointUnits, unitID)
 	--printDebug("<AUTOGROUP> : Unit destroyed "..  unitID)
 end
@@ -268,7 +266,6 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	if (newTeamID == myTeam) then
 		SetGroupFromAuto(unitID, unitDefID)
 	end
-	createdFrame[unitID] = nil
 	finiGroup[unitID] = nil
 end
 
@@ -277,7 +274,6 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		SetGroupFromAuto(unitID, unitDefID)
 		IterableMap.Remove(screwyWaypointUnits, unitID)
 	end
-	createdFrame[unitID] = nil
 	finiGroup[unitID] = nil
 end
 
