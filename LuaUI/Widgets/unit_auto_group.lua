@@ -222,6 +222,20 @@ function widget:DrawWorld()
 	end
 end
 
+local function SetGroupFromAuto(unitID, unitDefID)
+	local autoGroup = unit2group[unitDefID]
+	if not autoGroup then
+		return
+	end
+
+	local currentGroup = Spring.GetUnitGroup(unitID)
+	if currentGroup then
+		return
+	end
+
+	SetUnitGroup(unitID, autoGroup)
+end
+
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if unitTeam ~= myTeam then
 		return
@@ -230,10 +244,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if createdFrame[unitID] == GetGameFrame() -- probably to handle /give
 	or options.immediate.value
 	or isBuilding[unitDefID] then
-		local gr = unit2group[unitDefID]
-		if gr then
-			SetUnitGroup(unitID, gr)
-		end
+		SetGroupFromAuto(unitID, unitDefID)
 	else
 		IterableMap.Add(screwyWaypointUnits, unitID, {})
 		finiGroup[unitID] = true
@@ -255,11 +266,7 @@ end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	if (newTeamID == myTeam) then
-		local gr = unit2group[unitDefID]
-		--printDebug("<AUTOGROUP> : Unit given "..  unit2group[unitDefID])
-		if gr ~= nil then
-			SetUnitGroup(unitID, gr)
-		end
+		SetGroupFromAuto(unitID, unitDefID)
 	end
 	createdFrame[unitID] = nil
 	finiGroup[unitID] = nil
@@ -267,11 +274,7 @@ end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if (teamID == myTeam) then
-		local gr = unit2group[unitDefID]
-		--printDebug("<AUTOGROUP> : Unit taken "..  unit2group[unitDefID])
-		if gr ~= nil then
-			SetUnitGroup(unitID, gr)
-		end
+		SetGroupFromAuto(unitID, unitDefID)
 		IterableMap.Remove(screwyWaypointUnits, unitID)
 	end
 	createdFrame[unitID] = nil
@@ -280,11 +283,7 @@ end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (unitTeam == myTeam and finiGroup[unitID]~=nil) then
-		local gr = unit2group[unitDefID]
-		if gr ~= nil then
-			SetUnitGroup(unitID, gr)
-			--printDebug("<AUTOGROUP> : Unit idle " ..  gr)
-		end
+		SetGroupFromAuto(unitID, unitDefID)
 		IterableMap.Remove(screwyWaypointUnits, unitID)
 		finiGroup[unitID] = nil
 	end
