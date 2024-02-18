@@ -15,7 +15,6 @@ end
 include("keysym.lua")
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
-local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
 local isBuilding = {}
@@ -30,12 +29,6 @@ local function HotkeyChangeNotification()
 	local key = WG.crude.GetHotkeyRaw("epic_auto_group_removefromgroup")
 	removeAutogroupKey = ToKeysyms(key and key[1])
 end
-
-local helpText =
-	'Alt + Group Hotkey sets autogroup number for selected unit type(s).\nNewly built units get added to the group equal to their autogroup.'..
-	'\n (~) deletes autogrouping for selected unit type(s).'
-	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
-	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
 local hotkeyPath = 'Hotkeys/Selection/Control Groups'
 
@@ -75,7 +68,7 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
-	groupnumbers = {
+	groupnumbers = { -- FIXME why is this handled by autogroups? it's standalone functionality
 		name = 'Display Group Numbers',
 		type = 'bool',
 		value = true,
@@ -110,22 +103,20 @@ options = {
 }
 
 -- Hidden until working
-for i = 0, 9 do
+--for i = 0, 9 do
 	--options["autogroup_" .. i] = {
 	--	name = 'Autogroup ' .. i,
 	--	type = 'button',
 	--	OnChange = function()
-	--		DoAutogroupAction(i)
+	--		-- The issue is that if you press '1' then the 'Any+1' hotkey for 'select group 1' is done before the more specific hotkey 'Alt+1'
 	--	end,
 	--	path = hotkeyPath,
 	--}
 	--options_order[#options_order + 1] = "autogroup_" .. i
-end
+--end
 
 local finiGroup = {}
 local myTeam
-local selUnitDefs = {}
-local loadGroups = true
 local textColor = {0.7, 1.0, 0.7, 1.0} -- r g b alpha
 local textSize = 13.0
 
@@ -138,18 +129,14 @@ local screwyWaypointUnits = IterableMap.New()
 local SetUnitGroup     = Spring.SetUnitGroup
 local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitDefID     = Spring.GetUnitDefID
-local GetAllUnits      = Spring.GetAllUnits
 local GetUnitHealth    = Spring.GetUnitHealth
 local GetMouseState    = Spring.GetMouseState
 local SelectUnitArray  = Spring.SelectUnitArray
 local TraceScreenRay   = Spring.TraceScreenRay
 local GetUnitPosition  = Spring.GetUnitPosition
-local UDefTab          = UnitDefs
 local GetGroupList     = Spring.GetGroupList
 local GetGroupUnits    = Spring.GetGroupUnits
-local GetGameFrame     = Spring.GetGameFrame
 local IsGuiHidden      = Spring.IsGUIHidden
-local Echo             = Spring.Echo
 
 local groupNumber = {
 	[KEYSYMS.N_1] = 1,
@@ -166,12 +153,6 @@ local groupNumber = {
 
 function WG.AutoGroup_UpdateGroupNumbers(newNumber)
 	groupNumber = newNumber
-end
-
-function printDebug( value )
-	if ( debug ) then
-		Echo( value )
-	end
 end
 
 function widget:PlayerChanged(playerID)
@@ -204,7 +185,7 @@ function widget:DrawWorld()
 		local existingGroups = GetGroupList()
 		if options.groupnumbers.value then
 			for inGroup, _ in pairs(existingGroups) do
-				units = GetGroupUnits(inGroup)
+				local units = GetGroupUnits(inGroup)
 				for _, unit in ipairs(units) do
 					if Spring.IsUnitInView(unit) then
 						local ux, uy, uz = Spring.GetUnitViewPosition(unit)
@@ -259,7 +240,6 @@ end
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	finiGroup[unitID] = nil
 	IterableMap.Remove(screwyWaypointUnits, unitID)
-	--printDebug("<AUTOGROUP> : Unit destroyed "..  unitID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
@@ -285,12 +265,6 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	end
 end
 
-function DoAutogroupAction(gr)
-	Spring.Echo("Todo")
-	-- Do stuff
-	-- The issue is that if you press '1' then the 'Any+1' hotkey for 'select group 1' is done before the more specific hotkey 'Alt+1'
-end
-
 function widget:KeyPress(key, modifier, isRepeat)
 	if (modifier.alt and not modifier.meta ) then
 		local gr = groupNumber[key]
@@ -299,21 +273,18 @@ function widget:KeyPress(key, modifier, isRepeat)
 			if (gr == -1) then
 				gr = nil
 			end
-			selUnitDefIDs = {}
+			local selUnitDefIDs = {}
 			local exec = false --set to true when there is at least one unit to process
 			for _, unitID in ipairs(GetSelectedUnits()) do
 				local udid = GetUnitDefID(unitID)
-					selUnitDefIDs[udid] = true
-					unit2group[udid] = gr
-					--local x, y, z = Spring.GetUnitPosition(unitID)
-					--Spring.MarkerAddPoint( x, y, z )
-					exec = true
-					--Echo('<AUTOGROUP> : Add unit ' .. unitID .. 'to group ' .. gr)
-					if (gr==nil) then
-						SetUnitGroup(unitID, -1)
-					else
-						SetUnitGroup(unitID, gr)
-					end
+				selUnitDefIDs[udid] = true
+				unit2group[udid] = gr
+				exec = true
+				if (gr==nil) then
+					SetUnitGroup(unitID, -1)
+				else
+					SetUnitGroup(unitID, gr)
+				end
 			end
 			if exec == false then
 				return false -- nothing to do
@@ -321,9 +292,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 			for udid, _ in pairs(selUnitDefIDs) do
 				if options.verbose.value then
 					if gr then
-						Echo('game_message: Added '..  Spring.Utilities.GetHumanName(UnitDefs[udid]) ..' to autogroup #'.. gr ..'.')
+						Spring.Echo('game_message: Added '..  Spring.Utilities.GetHumanName(UnitDefs[udid]) ..' to autogroup #'.. gr ..'.')
 					else
-						Echo('game_message: Removed '..  Spring.Utilities.GetHumanName(UnitDefs[udid]) ..' from autogroups.')
+						Spring.Echo('game_message: Removed '..  Spring.Utilities.GetHumanName(UnitDefs[udid]) ..' from autogroups.')
 					end
 				end
 			end
@@ -357,7 +328,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			end
 			for _, uid in ipairs(GetSelectedUnits()) do
 				local x,_,z = GetUnitPosition(uid)
-				dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
+				local dist = (pos[1]-x)^2 + (pos[3]-z)^2
 				if (dist < mindist) then
 					mindist = dist
 					muid = uid
@@ -411,7 +382,7 @@ local function UnstickUpdate(unitID, unitData)
 	if not Spring.ValidUnitID(unitID) then
 		return true
 	end
-	local cmdID, cmdOpts, cmdTag = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID = Spring.GetUnitCurrentCommand(unitID)
 	if not cmdID then
 		widget:UnitIdle(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		return true
@@ -427,7 +398,7 @@ local function UnstickUpdate(unitID, unitData)
 			return
 		end
 		if math.abs(x - unitData.x) < 32 and math.abs(z - unitData.z) < 32 then
-			Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+			Spring.GiveOrderToUnit(unitID, CMD.STOP, 0, 0)
 			return true
 		end
 		unitData.x, unitData.y, unitData.z = x, y, z
