@@ -18,12 +18,10 @@ local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
-local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic', 'missileslow' }
-
-local groupableBuildings = {}
-for _, v in ipairs( groupableBuildingTypes ) do
-	if UnitDefNames[v] then
-		groupableBuildings[ UnitDefNames[v].id ] = true
+local isBuilding = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	if unitDef.isImmobile then
+		isBuilding[unitDefID] = true
 	end
 end
 
@@ -231,7 +229,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 
 	if createdFrame[unitID] == GetGameFrame() -- probably to handle /give
 	or options.immediate.value
-	or groupableBuildings[unitDefID] then
+	or isBuilding[unitDefID] then
 		local gr = unit2group[unitDefID]
 		if gr then
 			SetUnitGroup(unitID, gr)
@@ -310,7 +308,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 			local exec = false --set to true when there is at least one unit to process
 			for _, unitID in ipairs(GetSelectedUnits()) do
 				local udid = GetUnitDefID(unitID)
-				if (not UDefTab[udid]["isFactory"] and (groupableBuildings[udid] or not UDefTab[udid]["isBuilding"] )) then
 					selUnitDefIDs[udid] = true
 					unit2group[udid] = gr
 					--local x, y, z = Spring.GetUnitPosition(unitID)
@@ -322,7 +319,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 					else
 						SetUnitGroup(unitID, gr)
 					end
-				end
 			end
 			if exec == false then
 				return false -- nothing to do
