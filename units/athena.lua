@@ -48,6 +48,9 @@ return { athena = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 20 60]],
   collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[45 20 75]],
+  selectionVolumeType    = [[ellipsoid]],
   cruiseAltitude      = 80,
 
   customParams        = {
