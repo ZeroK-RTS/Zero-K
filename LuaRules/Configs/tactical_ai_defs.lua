@@ -1323,7 +1323,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 50,
 		minSwarmLeeway = 120,
 		jinkPeriod = 2,
-		skirmLeeway = 40,
+		skirmLeeway = 10,
 		
 		wardFireTargets = personalShieldUnits,
 		wardFireShield = 160,
