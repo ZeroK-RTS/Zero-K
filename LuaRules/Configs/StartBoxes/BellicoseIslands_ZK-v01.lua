@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		nameLong = "West",
 		nameShort = "W",
 		startpoints = {
@@ -14,17 +14,17 @@ return {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "East",
 		nameShort = "E",
 		startpoints = {
-			{7332,2048},
+			{7373,2048},
 		},
 		boxes = {
 			{
 				{6554,0},
-				{8110,0},
-				{8110,4096},
+				{8192,0},
+				{8192,4096},
 				{6554,4096},
 			},
 		},
