@@ -44,7 +44,7 @@ local mainWindow
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-options_path = 'Settings/Misc/Autosave'
+options_path = 'Settings/Autosave'
 options =
 {
 	enableautosave = {
