@@ -178,6 +178,7 @@ confdata.subMenuIcons = {
 	['Settings/Tips']               = imgPath..'epicmenu/questionmark.png',
 	['Settings/Spectating']         = imgPath..'epicmenu/popcorn.png',
 	['Settings/Toolbox']            = imgPath..'commands/states/autoassist_on.png',
+	['Settings/Autosave']            = imgPath..'epicmenu/save_small.png',
 	
 	['Settings/Interface/Mouse Cursor']             = imgPath..'epicmenu/input_mouse.png',
 	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
@@ -235,7 +236,6 @@ confdata.simpleModeDirectory = {
 	['Camera'] = true,
 	['Unit Behaviour'] = true,
 	['Accessibility'] = true,
-	['Misc'] = true,
 	['Autosave'] = true,
 }
 confdata.simpleModeFullDirectory = {
