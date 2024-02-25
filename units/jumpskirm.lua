@@ -20,6 +20,7 @@ return { jumpskirm = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    canjump            = 1,
     bait_level_default = 1,
     dontfireatradarcommand = '1',
     selection_scale   = 0.85,
@@ -48,7 +49,10 @@ return { jumpskirm = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:NONE]],
+      [[custom:PILOT]],
+      [[custom:PILOT2]],
+      [[custom:RAIDMUZZLE]],
+      [[custom:VINDIBACK]],
     },
 
   },

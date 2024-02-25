@@ -19,6 +19,28 @@ local aiming = false
 
 local RESTORE_DELAY = 2000
 
+
+function jumping(jumpPercent)
+	if jumpPercent < 65 then
+		GG.PokeDecloakUnit(unitID, unitDefID)
+		EmitSfx(foot1, 1026)
+		EmitSfx(foot2, 1026)
+	end
+	
+	if jumpPercent > 95 and not landing then
+		landing = true
+		--StartThread(PrepareJumpLand)
+	end
+end
+
+function beginJump()
+end
+
+function endJump()
+	landing = false
+end
+
+
 -- Signal definitions
 local SIG_MOVE = 1
 local SIG_AIM = 2

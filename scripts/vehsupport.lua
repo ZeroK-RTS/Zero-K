@@ -290,6 +290,15 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(KeepStatic)
 	
+	Move(turret, z_axis, -2)
+	Move(turret, x_axis, 0)
+	Move(turret, y_axis, 6.4)
+	Hide(turret)
+	Hide(gun)
+	Hide(arms)
+	local rider = Spring.CreateUnit("cloakassault", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
+	Spring.UnitAttach(unitID, rider, turret)
+	
 	Move(aim, y_axis, 10)
 	
 	Turn(exhaust1, x_axis, math.rad(180))
