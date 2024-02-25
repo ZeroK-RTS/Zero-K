@@ -68,8 +68,7 @@ local emptyTable = {}
 
 local coroutines = {}
 local lastJumpPosition = {}
-local landBoxSize = 50
-local OFF_MAP_LEEWAY = 1
+local landBoxSize = 0
 local jumps = {}
 local jumping = {}
 local goalSet = {}

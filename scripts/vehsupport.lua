@@ -296,19 +296,8 @@ function script.Create()
 	Hide(turret)
 	Hide(gun)
 	Hide(arms)
-	if math.random() < 0 then
-		local rider = Spring.CreateUnit("cloakassault", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
-		Spring.UnitAttach(unitID, rider, turret)
-	elseif math.random() < 0 then
-		local rider = Spring.CreateUnit("energysingu", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
-		Spring.UnitAttach(unitID, rider, turret)
-		GG.UnitModelRescale(rider, 0.2)
-		Move(turret, z_axis, 1)
-	elseif math.random() < 0 then
-		local rider = Spring.CreateUnit("staticstorage", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
-		Spring.UnitAttach(unitID, rider, turret)
-		GG.UnitModelRescale(rider, 0.6)
-	end
+	local rider = Spring.CreateUnit("cloakassault", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
+	Spring.UnitAttach(unitID, rider, turret)
 	
 	Move(aim, y_axis, 10)
 	
