@@ -49,7 +49,7 @@ local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/sel
 local ctrlFlattenRank = 1
 local altFilterHighRank = 2
 local doubleClickFlattenRank = 1
-local applyToControlGroups = false
+local controlGroupFlattenRank = 1
 local retreatOverride = true
 local retreatingRank = 0
 local useSelectionFiltering = true
@@ -71,7 +71,7 @@ options_order = {
 	'selectionFilteringOnlyAltOption',
 	'altBlocksHighRankSelection',
 	'doubleClickFlattenRankOption',
-	'applyToControlGroups',
+	'controlGroupFlattenRank',
 	'retreatOverrideOption',
 	'retreatingRankOption',
 	'retreatDeselects'
@@ -146,14 +146,15 @@ options = {
 			doubleClickFlattenRank = self.value
 		end
 	},
-	applyToControlGroups = {
-		name = "Ranks apply to control groups",
-		desc = "Control groups normally ignore ranks. Toggle to make groups obey ranks. Useful for the 'retreat override' option.",
-		type = "bool",
-		value = applyToControlGroups,
+	controlGroupFlattenRank = {
+		name = "Control groups ignore rank difference above:",
+		desc = "Allows selecting entire control groups of differing selection rank.",
+		type = "number",
+		value = controlGroupFlattenRank,
+		min = 0, max = 3, step = 1,
 		noHotkey = true,
 		OnChange = function (self)
-			applyToControlGroups = self.value
+			controlGroupFlattenRank = self.value
 		end
 	},
 	retreatOverrideOption = {
@@ -280,10 +281,8 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		return
 	end
 
-	if not applyToControlGroups and CheckControlGroupHotkeys() then
-		return -- assume the user is selecting a control group
-	end
-	
+	local isControlGroupSelection = CheckControlGroupHotkeys()
+
 	if doubleClickUnitDefID then
 		for i = 1, #units do
 			local unitID = units[i]
@@ -320,6 +319,9 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 			end
 			if doubleClickUnitDefID and rank > doubleClickFlattenRank then
 				rank = doubleClickFlattenRank
+			end
+			if isControlGroupSelection and rank > controlGroupFlattenRank then
+				rank = controlGroupFlattenRank
 			end
 			if (not bestRank) or (bestRank < rank) then
 				if bestRank then
