@@ -42,7 +42,6 @@ local random                = math.random
 local max                   = math.max
 local min                   = math.min
 
-local spAdjustHeightMap     = Spring.AdjustHeightMap
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local spGetGroundNormal     = Spring.GetGroundNormal
@@ -2151,7 +2150,8 @@ function GG.Terraform_RaiseWater(raiseAmount)
 		end
 	end
 	--]]
-	spAdjustHeightMap(0, 0, mapWidth, mapHeight, -raiseAmount)
+	Spring.AdjustHeightMap(0, 0, mapWidth, mapHeight, -raiseAmount)
+	Spring.AdjustOriginalHeightMap(0, 0, mapWidth, mapHeight, -raiseAmount)
 	
 	Spring.SetGameRulesParam("waterLevelModifier", raiseAmount)
 	
