@@ -436,7 +436,7 @@ end
 
 local function GetGroundOrigHeightOverride(x, z, xOff, zOff)
 	if GG.mapgen_origHeight and GG.mapgen_origHeight[x] and GG.mapgen_origHeight[x][z] then
-		return GG.mapgen_origHeight[x][z]
+		return GG.mapgen_origHeight[x][z] - (Spring.GetGameRulesParam("waterlevel") or 0)
 	end
 	return spGetGroundOrigHeight(x +  (xOff or 0), z + (zOff or 0))
 end
