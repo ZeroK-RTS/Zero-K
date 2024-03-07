@@ -88,7 +88,7 @@ return { cloakriot = {
       craterMult              = 0.3,
 
       customParams        = {
-        reaim_time = 3, -- Moderate sideways gun prevention.
+        reaim_time = 1, -- noticeable twitching otherwise due to huge turnrates
         light_camera_height = 1600,
         light_color = [[0.8 0.76 0.38]],
         light_radius = 150,
