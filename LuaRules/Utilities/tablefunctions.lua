@@ -5,6 +5,21 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+function Spring.Utilities.ConcatArrays(...) -- concat({1, 2}, {3, 4}, {5, 6}) -> {1, 2, 3, 4, 5, 6}
+	local ret = {}
+	local count = 0
+	local arrays = {...}
+	for i = 1, #arrays do
+		local array = arrays[i]
+		for j = 1, #array do
+			count = count + 1
+			ret[count] = array[j]
+		end
+	end
+	return ret, count
+end
+
 --deep not safe with circular tables! defaults To false
 function Spring.Utilities.CopyTable(tableToCopy, deep, appendTo)
   local copy = appendTo or {}
