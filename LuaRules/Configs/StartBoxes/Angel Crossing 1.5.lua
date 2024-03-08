@@ -1,4 +1,4 @@
-local box_1_main = {
+local box_S_main = {
 	{5880, 7076},
 	{5797, 8189},
 	{8187, 8189},
@@ -19,7 +19,7 @@ local box_1_main = {
 	{5945, 7137},
 }
 
-local box_1_sea1 = {
+local box_S_sea1 = {
 	{7551, 6578},
 	{8185, 6551},
 	{8181, 4692},
@@ -44,7 +44,7 @@ local box_1_sea1 = {
 	{7495, 6564},
 }
 
-local box_1_sea2 = {
+local box_S_sea2 = {
 	{5880, 7076},
 	{5493, 7254},
 	{5459, 7301},
@@ -80,7 +80,7 @@ local box_1_sea2 = {
 	{5877, 7109},
 }
 
-local box_1_center = {
+local box_S_center = {
 	{7342, 6553},
 	{7151, 6176},
 	{7080, 6227},
@@ -206,59 +206,59 @@ local box_1_center = {
 	{7336, 6587},
 }
 
-local box_1_seastarts = {
+local box_S_seastarts = {
 	{7904, 5071},
 	{3274, 7530},
 }
 
-local box_1_middlestarts = {
+local box_S_centerstarts = {
 	{6679, 6746},
 	{6731, 5550},
 	{3932, 6825},
 	{5777, 6304},
 }
 
-local box_1_mainstarts = {
+local box_S_mainstarts = {
 	{6272, 7988},
 	{7692, 7690},
 }
 
-local box_2_main = {
-	{2362, 4},
-	{2356, 999},
-	{2226, 980},
-	{2134, 904},
-	{1874, 794},
-	{1517, 795},
-	{1208, 919},
-	{926, 1121},
-	{751, 1357},
-	{657, 1550},
-	{20, 1545},
-	{13, 17},
-	{2279, 10},
-	{2322, 10},
+local box_N_main = {
+	{2362,    4},
+	{2356,  999},
+	{2226,  980},
+	{2134,  904},
+	{1874,  794},
+	{1517,  795},
+	{1208,  919},
+	{ 926, 1121},
+	{ 751, 1357},
+	{ 657, 1550},
+	{  20, 1545},
+	{  13,   17},
+	{2279,   10},
+	{2322,   10},
 }
 
-local box_2_sea1 = {
-	{657, 1551},
-	{21, 1545},
-	{16, 3537},
+local box_N_sea1 = {
+	{ 657, 1551},
+	{  21, 1545},
+	{  16, 3537},
 	{1101, 3534},
 	{1008, 3294},
-	{781, 3181},
-	{676, 3092},
-	{660, 2879},
-	{651, 2620},
-	{784, 2373},
-	{984, 2008},
-	{861, 1634},
-	{758, 1636},
-	{695, 1593},
-	{670, 1573},
+	{ 781, 3181},
+	{ 676, 3092},
+	{ 660, 2879},
+	{ 651, 2620},
+	{ 784, 2373},
+	{ 984, 2008},
+	{ 861, 1634},
+	{ 758, 1636},
+	{ 695, 1593},
+	{ 670, 1573},
 }
 
-local box_2_sea2 = {
+local box_N_sea2 = {
 	{2356, 999},
 	{2683, 958},
 	{2680, 921},
@@ -290,17 +290,17 @@ local box_2_sea2 = {
 	{5093, 369},
 	{5058, 293},
 	{5014, 165},
-	{5003, 54},
-	{5003, 6},
-	{2362, 4},
+	{5003,  54},
+	{5003,   6},
+	{2362,   4},
 	{2356, 994},
 }
 
-local box_2_center = {
-	{984, 2008},
-	{861, 1634},
-	{905, 1532},
-	{985, 1446},
+local box_N_center = {
+	{ 984, 2008},
+	{ 861, 1634},
+	{ 905, 1532},
+	{ 985, 1446},
 	{1081, 1378},
 	{1150, 1293},
 	{1188, 1200},
@@ -314,21 +314,21 @@ local box_2_center = {
 	{2248, 1193},
 	{2259, 1093},
 	{2234, 1004},
-	{2226, 981},
-	{2356, 999},
-	{2683, 958},
+	{2226,  981},
+	{2356,  999},
+	{2683,  958},
 	{2742, 1026},
 	{2789, 1071},
 	{2984, 1032},
-	{3143, 986},
-	{3284, 972},
-	{3483, 933},
-	{3563, 847},
-	{3660, 845},
-	{3843, 849},
-	{3940, 857},
-	{4070, 924},
-	{4239, 984},
+	{3143,  986},
+	{3284,  972},
+	{3483,  933},
+	{3563,  847},
+	{3660,  845},
+	{3843,  849},
+	{3940,  857},
+	{4070,  924},
+	{4239,  984},
 	{4323, 1011},
 	{4458, 1044},
 	{4611, 1039},
@@ -382,9 +382,9 @@ local box_2_center = {
 	{1327, 3052},
 	{1208, 3025},
 	{1094, 3038},
-	{890, 2948},
-	{864, 2681},
-	{983, 2494},
+	{ 890, 2948},
+	{ 864, 2681},
+	{ 983, 2494},
 	{1044, 2371},
 	{1076, 2215},
 	{1170, 2125},
@@ -400,76 +400,63 @@ local box_2_center = {
 	{1007, 1995},
 }
 
-local box_2_mainstarts = {
+local box_N_mainstarts = {
 	{1744, 309},
-	{471, 565},
+	{ 471, 565},
 }
 
-local box_2_seastarts = {
-	{309, 3161},
-	{4960, 628},
+local box_N_seastarts = {
+	{ 309, 3161},
+	{4960,  628},
 }
 
-local box_2_centerstarts = {
+local box_N_centerstarts = {
 	{4277, 1358},
 	{1453, 2647},
 	{1511, 1455},
 	{2403, 1904},
 }
 
-local boxes1, boxes2, start1, start2
+local boxesN, boxesS, startN, startS
 
-do
-	local function CombineTables(table1, table2, table3)
-		for i = 1, #table2 do
-			table1[#table1 + 1] = table2[i]
-		end
-		if table3 then
-			for i = 1, #table3 do
-				table1[#table1 + 1] = table3[i]
-			end
-		end
-		return table1
+if Spring.Utilities.Gametype.isCoop() or Spring.Utilities.Gametype.isBigTeams() then
+	boxesN = {box_N_main, box_N_sea1, box_N_sea2, box_N_center}
+	boxesS = {box_S_main, box_S_sea1, box_S_sea2, box_S_center}
+	startN = Spring.Utilities.ConcatArrays(box_N_mainstarts, box_N_centerstarts, box_N_seastarts)
+	startS = Spring.Utilities.ConcatArrays(box_S_mainstarts, box_S_centerstarts, box_S_seastarts)
+elseif Spring.Utilities.Gametype.is1v1() then
+	if math.random() < 0.5 then
+		-- very corner
+		boxesN = {box_N_main}
+		boxesS = {box_S_main}
+		startN = box_N_mainstarts
+		startS = box_S_mainstarts
+	else
+		-- snowy hill
+		boxesN = {box_N_center}
+		boxesS = {box_S_center}
+		startN = box_N_centerstarts
+		startS = box_S_centerstarts
 	end
-
-	if Spring.Utilities.Gametype.isCoop() or Spring.Utilities.Gametype.isBigTeams() then
-		boxes1 = {[1] = box_1_main, [2] = box_1_sea1, [3] = box_1_sea2, [4] = box_1_center}
-		boxes2 = {[1] = box_2_main, [2] = box_2_sea1, [3] = box_2_sea2, [4] = box_2_center}
-		start1 = CombineTables(box_1_mainstarts, box_1_middlestarts, box_1_seastarts)
-		start2 = CombineTables(box_2_mainstarts, box_2_centerstarts, box_2_seastarts)
-	elseif Spring.Utilities.Gametype.is1v1() then
-		if math.random(1, 4) <= 2 then -- start on corner
-			boxes1 = {[1] = box_1_main}
-			boxes2 = {[1] = box_2_main}
-			start1 = box_1_mainstarts
-			start2 = box_2_mainstarts
-		else -- more aggressive start? can be removed.
-			boxes1 = {[1] = box_1_center}
-			boxes2 = {[1] = box_2_center}
-			start1 = box_1_middlestarts
-			start2 = box_2_centerstarts
-		end
-	else -- team games have the sea added
-		boxes1 = {[1] = box_1_main, [2] = box_1_sea1, [3] = box_1_sea2}
-		boxes2 = {[1] = box_2_main, [2] = box_2_sea1, [3] = box_2_sea2}
-		start1 = CombineTables(box_1_mainstarts, box_1_seastarts)
-		start2 = CombineTables(box_2_mainstarts, box_2_seastarts)
-	end
+else -- small teams
+	-- corner up to water, under the snowy hill
+	boxesN = {box_N_main, box_N_sea1, box_N_sea2}
+	boxesS = {box_S_main, box_S_sea1, box_S_sea2}
+	startN = Spring.Utilities.ConcatArrays(box_N_mainstarts, box_N_seastarts)
+	startS = Spring.Utilities.ConcatArrays(box_S_mainstarts, box_S_seastarts)
 end
 
-local boxes = {
-	[0] = {
-		nameLong = "South",
-		nameShort = "S",
-		startpoints = start1,
-		boxes = boxes1,
-	},
-	[1] = {
+return {
+	{
 		nameLong = "North",
 		nameShort = "N",
-		startpoints = start2,
-		boxes = boxes2,
+		startpoints = startN,
+		boxes = boxesN,
+	},
+	{
+		nameLong = "South",
+		nameShort = "S",
+		startpoints = startS,
+		boxes = boxesS,
 	},
 }
-
-return boxes
