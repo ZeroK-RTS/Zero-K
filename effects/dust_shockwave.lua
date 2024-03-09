@@ -1,10 +1,10 @@
--- george
--- george_1_1_1
--- george_1
--- george_1_1
+-- dust_shockwave
+-- dust_shockwave_1_1_1
+-- dust_shockwave_1
+-- dust_shockwave_1_1
 
 return {
-  ["george"] = {
+  ["dust_shockwave"] = {
     e = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -13,7 +13,7 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0, 0, i10]],
       },
     },
@@ -25,7 +25,7 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0 i10, 0, 0]],
       },
     },
@@ -37,7 +37,7 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0 i10, 0, 0i10]],
       },
     },
@@ -49,7 +49,7 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0 i10, 0, 0i-10]],
       },
     },
@@ -61,7 +61,7 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0 i-10, 0, 0i-10]],
       },
     },
@@ -73,7 +73,7 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0 i-10, 0, 0i10]],
       },
     },
@@ -85,7 +85,7 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0, 0, 0 i-10]],
       },
     },
@@ -97,13 +97,13 @@ return {
       water              = true,
       properties = {
         delay              = [[0  i0.20]],
-        explosiongenerator = [[custom:GEORGE_1]],
+        explosiongenerator = [[custom:dust_shockwave_1]],
         pos                = [[0 i-10, 0, 0]],
       },
     },
   },
 
-  ["george_1_1_1"] = {
+  ["dust_shockwave_1_1_1"] = {
     wezels = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -133,7 +133,7 @@ return {
     },
   },
 
-  ["george_1"] = {
+  ["dust_shockwave_1"] = {
     dust = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -142,13 +142,13 @@ return {
       water              = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:GEORGE_1_1]],
+        explosiongenerator = [[custom:dust_shockwave_1_1]],
         pos                = [[-100 r200, 0, -100 r200]],
       },
     },
   },
 
-  ["george_1_1"] = {
+  ["dust_shockwave_1_1"] = {
     wezels = {
       air                = true,
       class              = [[CSimpleParticleSystem]],

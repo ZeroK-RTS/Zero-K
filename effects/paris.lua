@@ -55,7 +55,7 @@ return {
       water              = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:GEORGE]],
+        explosiongenerator = [[custom:dust_shockwave]],
         pos                = [[0, 0, 0]],
       },
     },
