@@ -1,8 +1,8 @@
--- solange
--- solange_pillar
+-- nuke_rising_fireball_spawner
+-- nuke_rising_fireball_sub
 
 return {
-  ["solange"] = {
+  ["nuke_rising_fireball_spawner"] = {
     nw = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -12,13 +12,13 @@ return {
       underwater         = true,
       properties = {
         delay              = [[0  i4]],
-        explosiongenerator = [[custom:SOLANGE_PILLAR]],
+        explosiongenerator = [[custom:nuke_rising_fireball_sub]],
         pos                = [[20 r40, i20, -20 r40]],
       },
     },
   },
 
-  ["solange_pillar"] = {
+  ["nuke_rising_fireball_sub"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],

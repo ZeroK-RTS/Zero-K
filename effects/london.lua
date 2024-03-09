@@ -126,7 +126,7 @@ local effects = {
       underwater         = true,
       properties = {
         delay              = 100,
-        explosiongenerator = [[custom:ZOE]],
+        explosiongenerator = [[custom:nuke_mushroom]],
         pos                = [[0, 0, 0]],
       },
     },
@@ -234,18 +234,18 @@ local effects = {
 --    - Ground glow and flash.
 --  - LONDON_SPHERE: delay, pos
 --    - Expanding sphere. Also has a ground flash for some reason.
---  - ZOE: delay
---    - ZOE_CAP: Count 50, iterated delay and position.
---    - ZOE_CAP2: Count 50, iterated delay and position.
---    - ZOE_CAP3: Count 50, iterated delay and position.
---    - ZOE_CAP4: Count 50, iterated delay and position.
---    - ZOE_RING: Count 50, iterated delay and position.
---    - SOLANGE: Count 1 with pointless iterated delay. Rising fireball into the air.
---      - SOLANGE_PILLAR: Count 150, iterated delay.
---    - THEORA: Count 2 with iterated delay. Rising smoke cloud into the air.
---      - THEORA: Count 150, iterated delay.
---    - TRANSTHEORA: Count 1. Orange smoke.
---      - TRANSTHEORA_PILLAR: Count 150, iterated delay.
+--  - NUKE_MUSHROOM: delay
+--    - NUKE_MUSHROOM_CAP: Count 50, iterated delay and position.
+--    - NUKE_MUSHROOM_CAP2: Count 50, iterated delay and position.
+--    - NUKE_MUSHROOM_CAP3: Count 50, iterated delay and position.
+--    - NUKE_MUSHROOM_CAP4: Count 50, iterated delay and position.
+--    - NUKE_MUSHROOM_RING: Count 50, iterated delay and position.
+--    - NUKE_RISING_FIREBALL_SPAWNER: Count 1 with pointless iterated delay. Rising fireball into the air.
+--      - NUKE_RISING_FIREBALL_SUB: Count 150, iterated delay.
+--    - NUKE_RISING_GREY_SMOKE_SPAWNER: Count 2 with iterated delay. Rising smoke cloud into the air.
+--      - NUKE_RISING_GREY_SMOKE_SUB: Count 150, iterated delay.
+--    - NUKE_RISING_ORANGE_SMOKE_SPAWNER: Count 1. Orange smoke.
+--      - NUKE_RISING_ORANGE_SMOKE_SUB: Count 150, iterated delay.
 
 effects.london_flat = {
 	dustring = {
@@ -299,7 +299,7 @@ effects.london_flat = {
 			pos                = [[0, 5, 0]],
 		},
 	},
-	-- BEGIN ZOE: Delay 100
+
 	cap = {
 		air                = true,
 		class              = [[CExpGenSpawner]],
@@ -309,7 +309,7 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[100 i4]],
-			explosiongenerator = [[custom:ZOE_CAP]],
+			explosiongenerator = [[custom:nuke_mushroom_cap]],
 			pos                = [[-10 r20, 0 i20, -10 r20]],
 		},
 	},
@@ -322,7 +322,7 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[300 i4]],
-			explosiongenerator = [[custom:ZOE_CAP2]],
+			explosiongenerator = [[custom:nuke_mushroom_cap2]],
 			pos                = [[-10 r20, 1000 i20, -10 r20]],
 		},
 	},
@@ -335,7 +335,7 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[500 i4]],
-			explosiongenerator = [[custom:ZOE_CAP3]],
+			explosiongenerator = [[custom:nuke_mushroom_cap3]],
 			pos                = [[-10 r20, 2000 i20, -10 r20]],
 		},
 	},
@@ -348,7 +348,7 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[700 i4]],
-			explosiongenerator = [[custom:ZOE_CAP4]],
+			explosiongenerator = [[custom:nuke_mushroom_cap4]],
 			pos                = [[-10 r20, 3100 i5, -10 r20]],
 		},
 	},
@@ -361,12 +361,12 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[430 i4]],
-			explosiongenerator = [[custom:ZOE_RING]],
+			explosiongenerator = [[custom:nuke_mushroom_ring]],
 			pos                = [[-10 r20, 1500 i3, -10 r20]],
 		},
 	},
-	-- BEGIN SOLANG: Delay 100
-	zoe_solange_nw = {
+
+	nuke_rising_fireball_spawner = {
 		air                = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
@@ -375,13 +375,12 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[100  i4]],
-			explosiongenerator = [[custom:SOLANGE_PILLAR]],
+			explosiongenerator = [[custom:nuke_rising_fireball_sub]],
 			pos                = [[20 r40, i20, -20 r40]],
 		},
 	},
-	-- END SOLANG: Delay 100
-	-- BEGIN THEORA 1: Delay 500
-	zoe_theora_nw_1 = {
+
+	nuke_rising_grey_smoke_spawner_1 = {
 		air                = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
@@ -390,12 +389,11 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[500  i4]],
-			explosiongenerator = [[custom:THEORA_PILLAR]],
+			explosiongenerator = [[custom:nuke_rising_grey_smoke_sub]],
 			pos                = [[20 r40, i20, -20 r40]],
 		},
 	},
-	-- BEGIN THEORA 2: Delay 700
-	zoe_theora_nw_2 = {
+	nuke_rising_grey_smoke_spawner_2 = {
 		air                = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
@@ -404,13 +402,12 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[700  i4]],
-			explosiongenerator = [[custom:THEORA_PILLAR]],
+			explosiongenerator = [[custom:nuke_rising_grey_smoke_sub]],
 			pos                = [[20 r40, i20, -20 r40]],
 		},
 	},
-	-- END THEORA: Delay 100
-	-- BEGIN TRANSTHEORA: Delay 300
-	zoe_transtheora_nw = {
+
+	nuke_rising_orange_smoke_spawner = {
 		air                = true,
 		class              = [[CExpGenSpawner]],
 		count              = 150,
@@ -419,11 +416,10 @@ effects.london_flat = {
 		underwater         = true,
 		properties = {
 			delay              = [[300  i4]],
-			explosiongenerator = [[custom:TRANSTHEORA_PILLAR]],
+			explosiongenerator = [[custom:nuke_rising_orange_smoke_sub]],
 			pos                = [[20 r40, i20, -20 r40]],
 		},
 	},
-	-- END ZOE: Delay 0
 }
 
 return effects

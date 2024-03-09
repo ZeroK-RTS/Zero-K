@@ -1,12 +1,12 @@
--- zoe_cap
--- zoe_cap3
--- zoe_cap4
--- zoe_cap2
--- zoe
--- zoe_ring
+-- nuke_mushroom
+-- nuke_mushroom_cap
+-- nuke_mushroom_cap2
+-- nuke_mushroom_cap3
+-- nuke_mushroom_cap4
+-- nuke_mushroom_ring
 
 return {
-  ["zoe_cap"] = {
+  ["nuke_mushroom_cap"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -50,7 +50,7 @@ return {
     },
   },
 
-  ["zoe_cap3"] = {
+  ["nuke_mushroom_cap3"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -131,7 +131,7 @@ return {
     },
   },
 
-  ["zoe_cap4"] = {
+  ["nuke_mushroom_cap4"] = {
     smoke = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -172,7 +172,7 @@ return {
     },
   },
 
-  ["zoe_cap2"] = {
+  ["nuke_mushroom_cap2"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -260,7 +260,7 @@ return {
     },
   },
 
-  ["zoe"] = {
+  ["nuke_mushroom"] = {
     cap = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -270,7 +270,7 @@ return {
       underwater         = true,
       properties = {
         delay              = [[0 i4]],
-        explosiongenerator = [[custom:ZOE_CAP]],
+        explosiongenerator = [[custom:nuke_mushroom_cap]],
         pos                = [[-10 r20, 0 i20, -10 r20]],
       },
     },
@@ -283,7 +283,7 @@ return {
       underwater         = true,
       properties = {
         delay              = [[200 i4]],
-        explosiongenerator = [[custom:ZOE_CAP2]],
+        explosiongenerator = [[custom:nuke_mushroom_cap2]],
         pos                = [[-10 r20, 1000 i20, -10 r20]],
       },
     },
@@ -296,7 +296,7 @@ return {
       underwater         = true,
       properties = {
         delay              = [[400 i4]],
-        explosiongenerator = [[custom:ZOE_CAP3]],
+        explosiongenerator = [[custom:nuke_mushroom_cap3]],
         pos                = [[-10 r20, 2000 i20, -10 r20]],
       },
     },
@@ -309,7 +309,7 @@ return {
       underwater         = true,
       properties = {
         delay              = [[600 i4]],
-        explosiongenerator = [[custom:ZOE_CAP4]],
+        explosiongenerator = [[custom:nuke_mushroom_cap4]],
         pos                = [[-10 r20, 3100 i5, -10 r20]],
       },
     },
@@ -322,11 +322,11 @@ return {
       underwater         = true,
       properties = {
         delay              = [[330 i4]],
-        explosiongenerator = [[custom:ZOE_RING]],
+        explosiongenerator = [[custom:nuke_mushroom_ring]],
         pos                = [[-10 r20, 1500 i3, -10 r20]],
       },
     },
-    solange = {
+    nuke_rising_fireball_spawner = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
@@ -335,11 +335,11 @@ return {
       underwater         = true,
       properties = {
         delay              = [[0 i200]],
-        explosiongenerator = [[custom:SOLANGE]],
+        explosiongenerator = [[custom:nuke_rising_fireball_spawner]],
         pos                = [[0, 0, 0]],
       },
     },
-    theora = {
+    nuke_rising_grey_smoke_spawner = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 2,
@@ -348,11 +348,11 @@ return {
       underwater         = true,
       properties = {
         delay              = [[400 i200]],
-        explosiongenerator = [[custom:THEORA]],
+        explosiongenerator = [[custom:nuke_rising_grey_smoke_spawner]],
         pos                = [[0, 0, 0]],
       },
     },
-    transtheora = {
+    nuke_rising_orange_smoke_spawner = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
@@ -361,13 +361,13 @@ return {
       underwater         = true,
       properties = {
         delay              = [[200 i200]],
-        explosiongenerator = [[custom:TRANSTHEORA]],
+        explosiongenerator = [[custom:nuke_rising_orange_smoke_spawner]],
         pos                = [[0, 0, 0]],
       },
     },
   },
 
-  ["zoe_ring"] = {
+  ["nuke_mushroom_ring"] = {
     smoke = {
       air                = true,
       class              = [[CSimpleParticleSystem]],

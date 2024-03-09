@@ -1,10 +1,10 @@
--- theora_pillar
--- transtheora_pillar
--- transtheora
--- theora
+-- nuke_rising_grey_smoke_spawner
+-- nuke_rising_grey_smoke_sub
+-- nuke_rising_orange_smoke_spawner
+-- nuke_rising_orange_smoke_sub
 
 return {
-  ["theora_pillar"] = {
+  ["nuke_rising_grey_smoke_sub"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -42,7 +42,7 @@ return {
     },
   },
 
-  ["transtheora_pillar"] = {
+  ["nuke_rising_orange_smoke_sub"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -79,7 +79,7 @@ return {
     },
   },
 
-  ["transtheora"] = {
+  ["nuke_rising_orange_smoke_spawner"] = {
     nw = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -89,13 +89,13 @@ return {
       underwater         = true,
       properties = {
         delay              = [[0  i4]],
-        explosiongenerator = [[custom:TRANSTHEORA_PILLAR]],
+        explosiongenerator = [[custom:nuke_rising_orange_smoke_sub]],
         pos                = [[20 r40, i20, -20 r40]],
       },
     },
   },
 
-  ["theora"] = {
+  ["nuke_rising_grey_smoke_spawner"] = {
     nw = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -105,7 +105,7 @@ return {
       underwater         = true,
       properties = {
         delay              = [[0  i4]],
-        explosiongenerator = [[custom:THEORA_PILLAR]],
+        explosiongenerator = [[custom:nuke_rising_grey_smoke_sub]],
         pos                = [[20 r40, i20, -20 r40]],
       },
     },
