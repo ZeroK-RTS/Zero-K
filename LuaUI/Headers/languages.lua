@@ -3,6 +3,7 @@ local langs = {
 	{ lang = 'ru', flag = 'ru', name = 'Русский' },
 	{ lang = 'pl', flag = 'pl', name = 'Polski' },
 	{ lang = 'it', flag = 'it', name = 'Italiano' },
+	{ lang = 'fr', flag = 'fr', name = 'Français' },
 	{ lang = 'de', flag = 'de', name = 'Deutsch' },
 	{ lang = 'tr', flag = 'tr', name = 'Türkçe' },
 	{ lang = 'zh', flag = 'cn', name = '簡體中文' },
