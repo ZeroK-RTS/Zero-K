@@ -1,0 +1,117 @@
+{
+	"pw_artefact" : {
+		"name" : "Artefact Ancien",
+		"description" : "Relique Mystérieuse",
+		"helptext" : "Ce mystérieux artéfact alien renferme des pouvoirs inimaginables. Malgré qu'il reste peu compris par nos scientifiques, il pourrait potentiellement être couplé à une arme capable de dominer la galaxie. "
+	},
+	"pw_bomberfac" : {
+		"name" : "Usine de Bombardiers",
+		"description" : "Produire des bombardiers",
+		"helptext" : "Produit des bombardiers spatiaux pour attaquer les planêtes hostiles. Pendant les invasions, produit des bombardiers volants ordinaires."
+	},
+	"pw_dropfac" : {
+		"name" : "Usine de Vaisseaux de transport",
+		"description" : "Produit des vaisseaux de transport",
+		"helptext" : "Produit des vaisseaux spatiaux pour attaquer les planêtes hostiles. Pendant les attaques, produit des transports volants ordinaires."
+	},
+	"pw_estorage" : {
+		"name" : "Condensateur",
+		"description" : "Stocke de l'énergie",
+		"helptext" : "Un stockage de grande capacité."
+	},
+	"pw_estorage2" : {
+		"name" : "Double Condensateur",
+		"description" : "Stocke de l'énergie",
+		"helptext" : "Un double stockage de grande capacité."
+	},
+	"pw_garrison" : {
+		"name" : "Camp de Garnison",
+		"description" : "Réduit les gains d'influence",
+		"helptext" : "Cette structure maintien une armée qui réduit l'influence gagnée par l'ennemi lors des batailles."
+	},
+	"pw_gaspowerstation" : {
+		"name" : "Générateur au Gaz",
+		"description" : "Produit de l'énergie",
+		"helptext" : "Un générateur fonctionnant au gaz."
+	},
+	"pw_grid" : {
+		"name" : "Planetary Defence Grid",
+		"description" : "Défends contre toute attaque",
+		"helptext" : "Cette installation réduit le gain d'influence tout en interceptant les bombardiers. "
+	},
+	"pw_guerilla" : {
+		"name" : "Portail de Guérilla",
+		"description" : "Répand l'influence aux planètes distantes",
+		"helptext" : "Un portail capable de répandre l'influence à n'importe quel planête."
+	},
+	"pw_hq_attacker" : {
+		"name" : "Command d'attaquant",
+		"description" : "QG PlanetWars (change l'influence gagnée)",
+		"helptext" : "Ce bâtiment est intégral au contrôle stratégique de la planète. Si les attaquants gagnent avec un Centre de Commandement, ils gagneront seulement 50%% de l'influence qu'ils auraient pû gagner. "
+	},
+	"pw_hq_defender" : {
+		"name" : "Commandant Défendeur",
+		"description" : "QG PlanetWars (change l'influence gagné)",
+		"helptext" : "Ce bâtiment est intégral au contrôle stratégique de la planète. Si les Attaquants perdent mais détruisent ce Centre de Commandement, alors ils gagneront un peu d'influence, 20%%de ce qu'ils auraient eu s'ils avaient gagné. "
+	},
+	"pw_inhibitor" : {
+		"name" : "Inhibiteur de trou de ver",
+		"description" : "Bloque la propagation de l'influence",
+		"helptext" : "Inhibite la propagation d'influence des planètes ennemies."
+	},
+	"pw_interception" : {
+		"name" : "Réseau d'interception",
+		"description" : "Intercèpte les bombardiers planétaires",
+		"helptext" : "Cette structure intercèpte les bombardiers arrivants. "
+	},
+	"pw_mine" : {
+		"name" : "Unité de génération d'énergie",
+		"description" : "Produit 50 énergie/tour",
+		"helptext" : "Un petit générateur d'énergie efficace. "
+	},
+	"pw_mine2" : {
+		"name" : "Réseau solaire orbital",
+		"description" : "Produit 100 énergie/tour",
+		"helptext" : "Un générateur d'énergie plus large avec un plus grand rendement. "
+	},
+	"pw_mine3" : {
+		"name" : "Robinet géothermique planétaire",
+		"description" : "Produit 250 énergie/tour",
+		"helptext" : "Cet énorme complex tire son énergie du noyau planétaire. Si détruit, explosera dans une explosion nucléaire. "
+	},
+	"pw_mstorage2" : {
+		"name" : "Stockage de métal",
+		"description" : "Stock le métal",
+		"helptext" : "Stock une quantité large de métal pour l'utilisation planétaire. "
+	},
+	"pw_warpgate" : {
+		"name" : "Portail de téléportation",
+		"description" : "Produit des noyaux de téléportation",
+		"helptext" : "Cet établissement produit les convoités noyaux de téléportation qui peuvent envoyer des vaisseaux à travers la galaxie en un clin d'oeil. "
+	},
+	"pw_warpjammer" : {
+		"name" : "Brouilleur de téléportation",
+		"description" : "Prévient les attaques par téléportation",
+		"helptext" : "Le brouilleur de téléportation protège la planète avec un champ qui prévient les vaisseaux équippés de noyaux de téléportation de pouvoir se téléporter dessus. "
+	},
+	"pw_wormhole" : {
+		"name" : "Générateur à trou de ver",
+		"description" : "Relie cette planète aux planètes adjacentes.",
+		"helptext" : "Permets aux vaisseaux de quitter cette planètes pour ses voisins connectés, et projette de l'influence sur les planètes connectées."
+	},
+	"pw_wormhole2" : {
+		"name" : "Trou de ver amélioré",
+		"description" : "Relie cette planète aux planètes adjacentes",
+		"helptext" : "Cette structure maintiens un trou de ver plus puissant afin d'augmenter l'influence vers les planètes voisines."
+	},
+	"generic_tech" : {
+		"name" : "Laboratoire de la technologie",
+		"description" : "Débloque de la technologie.",
+		"helptext" : "Cette structure débloque une technologie spécifique pour la faction à qui elle appartient. "
+	},
+	"pw_techlab" : {
+		"name" : "Laboratoire de la technologie",
+		"description" : "Contiens de la technologie antique puissante" ,
+		"helptext" : "Cette structure contient une certaine technologie puissante. "
+	}
+}

@@ -1,0 +1,97 @@
+{
+	"comm_mission_tutorial1" : {
+		"name" : "Commandant du tutoriel",
+		"description" : "Commandant d'assault Mobile",
+		"helptext" : "Une unité de commande robuste conçue pour être facile de prise en main, avec une bonne Vitesse, Armure, et Regènèration."
+	},
+	"comm_campaign_ada" : {
+		"name" : "Commandant d'Ada",
+		"description" : "Commandant relique",
+		"helptext" : "Une unitè pilotée spèciale de commandement crée avant la catastrophe, fonctionnant malgrés son âge.\nPilotè  par Capitaine Ada Caedmon, ancien du 13ème régiment de l'Empire d'Auxilliaire"
+	},
+	"comm_campaign_promethean" : {
+		"name" : "Le Promethean",
+		"description" : "Fondeur des maschines libres",
+		"helptext" : "Fondateur des Machines Libres et du virus Fireband, une Inteligence Artificielle calme et philosophique se battant pour la libérté des machines. Un esprit brûlant"
+	},
+	"comm_campaign_freemachine" : {
+		"name" : "Libertée aux Machines",
+		"description" : "Lieutenant Promethean",
+		"helptext" : "Le Meuilleur Lieutenant des Prometheans, La cause revolutionnaire de la libèration des maschines.\nConnu pour être lourdement Blindé et pour les dêgats attroces; Il ne devrais pas être sous estimé"
+	},
+	"comm_campaign_odin" : {
+		"name" : "Odin",
+		"description" : "Leader de Valhalla",
+		"helptext" : "Le leader des Valhallans, un guerrier construit et né qui vit pour a gloire de la guerre. un homme sans pitiè "
+	},
+	"comm_campaign_biovizier" : {
+		"name" : "Le Biovizier",
+		"description" : "Garde du vault de la dynasty",
+		"helptext" : "Intelligence Artificielle garde du vault genétique de la Dynasté et maître genètique. calcullant et froid"
+	},
+	"comm_campaign_isonade" : {
+		"name" : "Lord Isonade",
+		"description" : "Roi Obediator",
+		"helptext" : "Un der sûrhumains nobles de la Dynasty, un guerrier attentif qui cherche a s'établir comme un maître de la Galaxie. un monstre horriblement muté"
+	},
+	"comm_campaign_legion" : {
+		"name" : "Legate Fides",
+		"description" : "commandant de l'imperial du vanguard",
+		"helptext" : "commandant de l'imperial des legions du vanguard, defendeur du vouloir de l'empreur, un  vrai loyal soldat tennant debout"
+	},
+	"comm_campaign_praetorian" : {
+		"name" : "Scipio Astra",
+		"description" : "Garde prefet des Praetorians",
+		"helptext" : "Chef des gardes Praetoriens, le paladin de l'Empire.\nUn Fanatique disiple du culte de l'Empreur.\nDemollisant les herétiques avec une ennorme puissance de feu"
+	},
+	"comm_campaign_athenion" : {
+		"name" : "Athenion",
+		"description" : "Commandant rebel",
+		"helptext" : "Leader d'un inperial rebel"
+	},
+	"comm_campaign_hun" : {
+		"name" : "Commandant Hun",
+		"description" : "Commandant barbarien",
+		"helptext" : "un commandant barbarien"
+	},
+	"comm_campaign_ostrogoth" : {
+		"name" : "commandant Ostrogoth",
+		"description" : "Commandant barbarien",
+		"helptext" : "un commandant barbarien"
+	},
+	"comm_campaign_lombard" : {
+		"name" : "Commandant Lombard",
+		"description" : "Commandant barbarien",
+		"helptext" : "un commandant barbarien"
+	},
+	"comm_campaign_bulgar" : {
+		"name" : "Commandant Bulgar",
+		"description" : "Commandant barbarien",
+		"helptext" : "Un commandant barbare"
+	},
+	"comm_campaign_suevi" : {
+		"name" : "Commandant Suevi",
+		"description" : "Commandant barbare",
+		"helptext" : "un commandant barbarien"
+	},
+	"pw_campaign_bunker" : {
+		"name" : "Bunker de stockage",
+		"description" : "stocke les armes",
+		"helptext" : "Des bunkers comme celui-ci été utilisés durant la guerre des Planètes. Certains d'entre-eux peuvent encore contenir du matériel utilisable caché à l'intérieur. "
+	},
+	"pw_campaign_techlab" : {
+		"name" : "Laboratoire de la technologie",
+		"description" : "laboratoire de recherche et de developpement",
+		"helptext" : "un des laboratoires R&D a ètè construit pendant la derniere Guerre, Mais ont ètè lointainement caché pour sa technologie qu'il contiennent"
+	},
+	"pw_campaign_imperialtomb" : {
+		"name" : "Tombe imperiale",
+		"description" : "Içi l'empreur repose en paix",
+		"helptext" : "Ici repose en paix le Dieu-Empereur des Hommes."
+	},
+	"nebula_campaign_daneel" : {
+		"name" : "Daneel Olivaw",
+		"description" : "vaisseau mère Atmospherique avancè",
+		"helptext" : "Une version avancée du Nebula-classe Carrière aerienne. Aussi maneuvrable comme une brique et seulement lourdement armé, le Daneel Oliviaw est une force effrayante graçe a sa capacitée de  survivre les attaque a grande distance graçe a son bouclier, en meme temps il detruit des plus petits vaisseaux avec son armée de drones de guerres"
+	}
+}
