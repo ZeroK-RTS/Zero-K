@@ -112,12 +112,6 @@ local function DrawBallHealthbar()
 				{x = shieldBall.x - healthBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarRoundiness)},
 				{x = shieldBall.x - healthBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarHeight - healthBarRoundiness)},
 			}
-			glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-			glColor(0.5, 0.5, 0.5, 0.5)
-			for i = 1, 8 do
-				local j = (i % 8) + 1
-				glBeginEnd(GL.LINE_STRIP, DrawHullVertices, {healthBarRoundedCorners[i], healthBarRoundedCorners[j]})
-			end
 			if isAllied then
 				glColor(0.5, 0.8, 0.5, 0.5)
 			else
@@ -129,6 +123,19 @@ local function DrawBallHealthbar()
 			local innerBarWidthWhenFull = healthBarWidth - healthBarMargin
 			local innerBarHeight = healthBarHeight - healthBarMargin
 			local proportionFull = shieldBall.currShield / shieldBall.totShield
+			local innerHealthBarBoundingBox = {
+				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + innerBarHeight)},
+				{ x = shieldBall.x + innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + innerBarHeight)},
+				{ x = shieldBall.x + innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
+				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
+			}
+			glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+			glColor(0.5, 0.5, 0.5, 0.5)
+			for i = 1, #innerHealthBarBoundingBox do
+				local j = (i % #innerHealthBarBoundingBox) + 1
+				glBeginEnd(GL.LINE_STRIP, DrawHullVertices, {innerHealthBarBoundingBox[i], innerHealthBarBoundingBox[j]})
+			end
+
 			local innerBarWidth = 2 * innerBarWidthWhenFull * proportionFull
 			local innerHealthBarCorners = {
 				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + innerBarHeight)},
@@ -136,6 +143,7 @@ local function DrawBallHealthbar()
 				{ x = shieldBall.x - innerBarWidthWhenFull + innerBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
 				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
 			}
+			glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 			if isAllied then
 				glColor(0.5, 0.3, 1.0, 0.5)
 			else
@@ -148,8 +156,8 @@ local function DrawBallHealthbar()
 			glTranslate(shieldBall.x, healthBarHeightAboveTheZero, shieldBall.z - healthBarOffsetZ - innerBarHeight/2 - healthBarMargin/2)
 			glRotate(-90, 1, 0, 0)
 
-			local regen = regenStr(shieldBall.regen)
-			local shieldHpText = tostring(math.floor(shieldBall.currShield)) .. " / " .. tostring(shieldBall.totShield) .. regen
+			local regen = regenStr(math.floor(shieldBall.regen))
+			local shieldHpText = tostring(math.floor(shieldBall.currShield)) .. " / " .. tostring(shieldBall.totShield) .. regen .. " max " .. tostring(math.floor(shieldBall.maxCurrentPower))
 			font:Begin()
 				font:SetTextColor(0.2, 0.2, 0.2, 0.6)
 				font:Print(shieldHpText, 0, 0, fontSize, "cv")
@@ -276,6 +284,7 @@ local function updateCurrentShieldBalls()
 			local totalCurrentShield = 0
 			local totalMaxShield = 0
 			local totalRegen = 0
+			local maxIndividualCurrentPower = 0
 			local x_avg, z_avg = 0, 0
 			local numUnits = 0
 			local highestTopOfShield = 0
@@ -296,6 +305,7 @@ local function updateCurrentShieldBalls()
 						if currPower < shieldProps.shieldMaxCharge then
 							totalRegen = totalRegen + getUnitShieldRegen(unitID, UnitDefs[spGetUnitDefID(unitID)])
 						end
+						maxIndividualCurrentPower = math.max(maxIndividualCurrentPower, currPower)
 					end
 				end
 				memberPositionsByUnitID[unitID] = {x = x, y = y, z = z}
@@ -330,6 +340,7 @@ local function updateCurrentShieldBalls()
 				zStdDev = zStdDev,
 				numUnits = numUnits,
 				regen = totalRegen,
+				maxCurrentPower = maxIndividualCurrentPower,
 			}
 			ballsInTeam[#ballsInTeam + 1] = ballData
 		end
