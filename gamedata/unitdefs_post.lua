@@ -665,6 +665,14 @@ for name, ud in pairs(UnitDefs) do
 	ud.airsightdistance = (ud.sightdistance or 0)
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Do the engine's job
+--
+for name, ud in pairs(UnitDefs) do
+	ud.customparams.los_height = ud.sightemitheight or ud.losemitheight or 20
+	ud.customparams.radar_height = ud.radaremitheight or ud.customparams.los_height
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
