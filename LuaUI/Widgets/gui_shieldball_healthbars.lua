@@ -18,7 +18,6 @@ local glTranslate = gl.Translate
 local glRotate = gl.Rotate
 local glScale = gl.Scale
 local glPopMatrix = gl.PopMatrix
-local glCallList = gl.CallList
 local glCreateList = gl.CreateList
 local glDeleteList = gl.DeleteList
 local glVertex = gl.Vertex
@@ -37,6 +36,9 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local strFormat = string.format
 
 local Optics = VFS.Include("LuaRules/Gadgets/Include/Optics.lua")
+local Benchmark = false and VFS.Include("LuaRules/Gadgets/Include/Benchmark.lua")
+local benchmark = nil -- Benchmark and Benchmark.new()
+
 ---------------------------------
 local function printThing(theTable, theKey, indent)
 	local indent = indent or ""
@@ -88,68 +90,64 @@ local drawBallHealthbarList
 
 local font = gl.LoadFont("FreeSansBold.otf", BASE_FONT_SIZE, 0, 0)
 
-local function DrawHullVertices(hull)
-	for j = 1, #hull do
-		glVertex(hull[j].x, hull[j].y, hull[j].z)
-	end
-end
-
 local function DrawBallHealthbar()
 	for allyTeamID, teamBalls in pairs(shieldBalls) do
-		--local isAllied = Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID())
 		local isAllied = (Spring.GetLocalAllyTeamID() == allyTeamID)
 		for _, shieldBall in pairs(teamBalls) do
 			local healthBarHeightAboveTheZero = shieldBall.highestTopOfShield + 40
-			local healthBarOffsetZ = shieldBall.zStdDev * 2 + 60
+			local healthBarOffsetZ = shieldBall.zStdDev + 60
+
 			-- The outer bar is actually an Octagon to give the impression of rounded corners
-			local healthBarRoundedCorners = {
-				{x = shieldBall.x - healthBarWidth + healthBarRoundiness, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarHeight)},
-				{x = shieldBall.x + healthBarWidth - healthBarRoundiness, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarHeight)},
-				{x = shieldBall.x + healthBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarHeight - healthBarRoundiness)},
-				{x = shieldBall.x + healthBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarRoundiness)},
-				{x = shieldBall.x + healthBarWidth - healthBarRoundiness, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ)},
-				{x = shieldBall.x - healthBarWidth + healthBarRoundiness, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ)},
-				{x = shieldBall.x - healthBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarRoundiness)},
-				{x = shieldBall.x - healthBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarHeight - healthBarRoundiness)},
-			}
 			if isAllied then
 				glColor(0.5, 0.8, 0.5, 0.5)
 			else
 				glColor(0.8, 0.5, 0.5, 0.5)
 			end
 			glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-			glBeginEnd(GL.TRIANGLE_FAN, DrawHullVertices, healthBarRoundedCorners)
+			glBeginEnd(GL.TRIANGLE_FAN, function()
+				glVertex(shieldBall.x - healthBarWidth + healthBarRoundiness, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarHeight))
+				glVertex(shieldBall.x + healthBarWidth - healthBarRoundiness, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarHeight))
+				glVertex(shieldBall.x + healthBarWidth, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarHeight - healthBarRoundiness))
+				glVertex(shieldBall.x + healthBarWidth, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarRoundiness))
+				glVertex(shieldBall.x + healthBarWidth - healthBarRoundiness, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ))
+				glVertex(shieldBall.x - healthBarWidth + healthBarRoundiness, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ))
+				glVertex(shieldBall.x - healthBarWidth, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarRoundiness))
+				glVertex(shieldBall.x - healthBarWidth, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarHeight - healthBarRoundiness))
+			end)
 
+
+			-- The healthbar container is four lines
 			local innerBarWidthWhenFull = healthBarWidth - healthBarMargin
 			local innerBarHeight = healthBarHeight - healthBarMargin
 			local proportionFull = shieldBall.currShield / shieldBall.totShield
-			local innerHealthBarBoundingBox = {
-				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + innerBarHeight)},
-				{ x = shieldBall.x + innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + innerBarHeight)},
-				{ x = shieldBall.x + innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
-				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
-			}
+
 			glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
 			glColor(0.5, 0.5, 0.5, 0.5)
-			for i = 1, #innerHealthBarBoundingBox do
-				local j = (i % #innerHealthBarBoundingBox) + 1
-				glBeginEnd(GL.LINE_STRIP, DrawHullVertices, {innerHealthBarBoundingBox[i], innerHealthBarBoundingBox[j]})
-			end
+			glBeginEnd(GL.QUADS, function()
+				glVertex(shieldBall.x - innerBarWidthWhenFull, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + innerBarHeight))
+				glVertex(shieldBall.x + innerBarWidthWhenFull, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + innerBarHeight))
+				glVertex(shieldBall.x + innerBarWidthWhenFull, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarMargin))
+				glVertex(shieldBall.x - innerBarWidthWhenFull, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarMargin))
+			end)
 
+
+			-- The healthbar itself is a rectangle
 			local innerBarWidth = 2 * innerBarWidthWhenFull * proportionFull
-			local innerHealthBarCorners = {
-				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + innerBarHeight)},
-				{ x = shieldBall.x - innerBarWidthWhenFull + innerBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + innerBarHeight)},
-				{ x = shieldBall.x - innerBarWidthWhenFull + innerBarWidth, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
-				{ x = shieldBall.x - innerBarWidthWhenFull, y = healthBarHeightAboveTheZero, z = shieldBall.z - (healthBarOffsetZ + healthBarMargin)},
-			}
 			glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 			if isAllied then
 				glColor(0.5, 0.3, 1.0, 0.5)
 			else
 				glColor(0.5, 0.3, 1.0, 0.5)
 			end
-			glBeginEnd(GL.TRIANGLE_FAN, DrawHullVertices, innerHealthBarCorners)
+			glBeginEnd(GL.TRIANGLE_FAN, function()
+				glVertex(shieldBall.x - innerBarWidthWhenFull, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + innerBarHeight))
+				glVertex(shieldBall.x - innerBarWidthWhenFull + innerBarWidth, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + innerBarHeight))
+				glVertex(shieldBall.x - innerBarWidthWhenFull + innerBarWidth, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarMargin))
+				glVertex(shieldBall.x - innerBarWidthWhenFull, healthBarHeightAboveTheZero, shieldBall.z - (healthBarOffsetZ + healthBarMargin))
+			end)
+
+
+			-- The healthbar text
 			local fontSize = BASE_FONT_SIZE / 10
 			--glScale(fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE)
 			glPushMatrix()
@@ -184,37 +182,49 @@ end
 
 local shieldBallsIdsByTeam = {}
 local allShieldUnitsByTeam = {}
+local allShieldUnitIDsByTeam = {}
 
-local function updateClustering()
-	for _, allyTeamID in pairs(Spring.GetAllyTeamList()) do
-		local allUnits = {}
-		for _, teamID in pairs(Spring.GetTeamList(allyTeamID)) do
-			local teamUnits = Spring.GetTeamUnits(teamID)
-			for _, unitID in pairs(teamUnits) do
-				allUnits[#allUnits + 1] = unitID
+local function validShieldUnit(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
+	if unitDefID and shieldUnitDefs[unitDefID] then
+		local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
+		if buildProgress == 1 then
+			local x,y,z = spGetUnitPosition(unitID)
+			if x then
+				return true
 			end
 		end
+	end
+end
+
+local function updateClustering()
+	if benchmark then
+		benchmark:Enter("ClusterizeShieldUnits")
+	end
+	for _, allyTeamID in pairs(Spring.GetAllyTeamList()) do
 		local allShieldUnits = {}
-		for _,unitID in pairs(allUnits) do
-			local unitDefID = spGetUnitDefID(unitID)
-			if unitDefID and shieldUnitDefs[unitDefID] then
-				local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
-				if buildProgress == 1 then
-					local shieldWep = WeaponDefs[UnitDefs[unitDefID].shieldWeaponDef]
-					local x,y,z = spGetUnitPosition(unitID)
-					if x then
-						allShieldUnits[unitID] = {
-							shieldMaxCharge  = shieldWep.shieldPower,
-							shieldRadius = shieldWep.shieldRadius,
-							x = x,
-							y = y,
-							z = z
-						}
+		for _, teamID in pairs(Spring.GetTeamList(allyTeamID)) do
+			for _,unitID in ipairs(allShieldUnitIDsByTeam[teamID]) do
+				local unitDefID = spGetUnitDefID(unitID)
+				if unitDefID and shieldUnitDefs[unitDefID] then
+					local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
+					if buildProgress == 1 then
+						local x,y,z = spGetUnitPosition(unitID)
+						if x then
+							local shieldWep = WeaponDefs[UnitDefs[unitDefID].shieldWeaponDef]
+							allShieldUnits[unitID] = {
+								shieldMaxCharge  = shieldWep.shieldPower,
+								shieldRadius = shieldWep.shieldRadius,
+								x = x,
+								y = y,
+								z = z
+							}
+						end
 					end
-					--printThing(allShieldUnits[unitID], "shieldDef", "")
 				end
 			end
 		end
+
 		local unitLocations = {}
 		local unitNeighborsMatrix = {}
 		for unitID, shieldProps in pairs(allShieldUnits) do
@@ -236,12 +246,14 @@ local function updateClustering()
 				end
 			end
 		end
-		--printThing(unitLocations, "unitLocations", "")
-		--printThing(unitNeighborsMatrix, "unitNeighborsMatrix", "")
-		local opticsObject = Optics.new(unitLocations, unitNeighborsMatrix, 2, false)
+		local opticsObject = Optics.new(unitLocations, unitNeighborsMatrix, 2, benchmark)
 		opticsObject:Run()
 		shieldBallsIdsByTeam[allyTeamID] = opticsObject:Clusterize(700)
+
 		allShieldUnitsByTeam[allyTeamID] = allShieldUnits
+	end
+	if benchmark then
+		benchmark:Leave("ClusterizeShieldUnits")
 	end
 end
 
@@ -347,19 +359,62 @@ local function updateCurrentShieldBalls()
 
 
 		shieldBalls[teamID] = ballsInTeam
-		drawBallHealthbarList = glCreateList(DrawBallHealthbar)
+	end
+	drawBallHealthbarList = glCreateList(DrawBallHealthbar)
+end
+---------------------------------
+-- Keeping track of shield units
+
+function widget:UnitCreated(unitID, unitDefID, teamID)
+	if unitDefID and shieldUnitDefs[unitDefID] then
+		allShieldUnitIDsByTeam[teamID][unitID] = true
 	end
 end
+
+function widget:UnitDestroyed(unitID, unitDefID, teamID)
+	if unitDefID and shieldUnitDefs[unitDefID] then
+		allShieldUnitIDsByTeam[teamID][unitID] = nil
+	end
+end
+
+function widget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID)
+	widget:UnitDestroyed(unitID, unitDefID, oldTeamID)
+	widget:UnitCreated(unitID, unitDefID, newTeamID)
+end
+
+function widget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
+	widget:UnitDestroyed(unitID, unitDefID, oldTeamID)
+	widget:UnitCreated(unitID, unitDefID, newTeamID)
+end
+
+function widget:UnitEnteredLos(unitID, unitTeam, allyTeam, unitDefID)
+	widget:UnitCreated(unitID, unitDefID, unitTeam)
+end
+
+function widget:UnitLeftLos(unitID, unitTeam, allyTeam, unitDefID)
+	widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+end
+
 ---------------------------------
 
 function widget:GameFrame(n)
-	if (n%UPDATE_FRAME==0) then
+	if (n%UPDATE_FRAME==1) then
 		updateClustering()
 	end
 	updateCurrentShieldBalls()
 end
 
 function widget:Initialize()
+	for _, teamID in pairs(Spring.GetTeamList()) do
+		local teamUnits = {}
+		local teamUnitsSpring = Spring.GetTeamUnits(teamID)
+		for _, unitID in pairs(teamUnitsSpring) do
+			if validShieldUnit(unitID) then
+				teamUnits[#teamUnits + 1] = unitID
+			end
+		end
+		allShieldUnitIDsByTeam[teamID] = teamUnits
+	end
 	updateClustering()
 	updateCurrentShieldBalls()
 end
