@@ -343,6 +343,15 @@ function script.Create()
 	-- workaround for ejectors pointing forwards in model
 	Turn(lejector, y_axis, math.rad(90), 100.0)
 	Turn(rejector, y_axis, math.rad(-90), 100.0)
+	
+	Turn(lforearm, y_axis, -0.4)
+	Turn(rforearm, y_axis, 0.4)
+	local rider = Spring.CreateUnit("staticstorage", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
+	Spring.UnitAttach(unitID, rider, lflare)
+	GG.UnitModelRescale(rider, 0.6)
+	Move(lflare, x_axis, -6.5)
+	Move(lflare, z_axis, 1.5)
+	Move(lflare, y_axis, -6.5)
 
 	StartThread(GG.Script.SmokeUnit, unitID, {chest})
 end

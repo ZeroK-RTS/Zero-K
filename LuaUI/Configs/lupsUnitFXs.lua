@@ -53,13 +53,13 @@ local presets = {
 
 effectUnitDefs = {
 	--// FUSIONS //--------------------------
-	energysingu = {
-		{class='Bursts', options=energysinguBursts},
-		{class='StaticParticles', options=energysinguCorona},
-		--{class='ShieldSphere', options=energysinguShieldSphere},
-		--{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
-		{class='GroundFlash', options=groundFlashOrange},
-	},
+	--energysingu = {
+	--	{class='Bursts', options=energysinguBursts},
+	--	{class='StaticParticles', options=energysinguCorona},
+	--	--{class='ShieldSphere', options=energysinguShieldSphere},
+	--	--{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
+	--	{class='GroundFlash', options=groundFlashOrange},
+	--},
 
 	--// SHIELDS //---------------------------
 	-- Don't raise strength of ShieldJitter recklessly, it can really distort things (including unit icons) under it!
