@@ -513,6 +513,29 @@ local function CancelAirpadReservation(unitID)
 	end
 end
 
+function gadget:UnitReverseBuilt(unitID, unitDefID)
+	local airpadData = airpadsData[unitID]
+	if not airpadData then
+		return
+	end
+
+	local bombers, count = {}, 0
+	for bomberID in pairs(airpadData.reservations.units) do
+		count = count + 1
+		bombers[count] = bomberID
+	end
+
+	for i = 1, count do
+		CancelAirpadReservation(bombers[i])
+	end
+	airpadsData[unitID] = nil
+	airpadsPerAllyteam[Spring.GetUnitAllyTeam(unitID)][unitID] = unitDefID
+
+	for i = 1, count do
+		RequestRearm(bombers[i], nil, false, true)
+	end
+end
+
 function ReserveAirpad(bomberID,airpadID)
 	spSetUnitRulesParam(bomberID, "airpadReservation",1)
 	local reservations = airpadsData[airpadID].reservations
@@ -588,21 +611,6 @@ function gadget:GameFrame(n)
 	for bomberID in pairs(rearmRequest) do
 		RequestRearm(bomberID, nil, true)
 		rearmRequest[bomberID] = nil
-	end
-	
-	if n%120 == 0 then
-		for airpadID, data in pairs(airpadsData) do
-			local _,_,inbuild = spGetUnitIsStunned(airpadID)
-			if inbuild then --if user reclaim airpad, send airplane elsewhere
-				local allyTeam = spGetUnitAllyTeam(airpadID)
-				airpadsPerAllyteam[allyTeam][airpadID] = nil
-				for bomberID in pairs(airpadsData[airpadID].reservations.units) do
-					CancelAirpadReservation(bomberID) -- send anyone who was going here elsewhere
-					RequestRearm(bomberID, nil, false, true) --argument: (bomberID, team, forceNow, replaceExisting)
-				end
-				airpadsData[airpadID] = nil
-			end
-		end
 	end
 	-- track bomber-airpad distance
 	if n%10 == 0 then
