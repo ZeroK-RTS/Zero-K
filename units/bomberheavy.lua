@@ -44,7 +44,7 @@ return { bomberheavy = {
   mygravity           = 1,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName          = [[armcybr.s3o]],
+  objectName          = [[bomberheavy.dae]],
   refuelTime          = 20,
   script              = [[bomberheavy.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
@@ -72,7 +72,7 @@ return { bomberheavy = {
       avoidFeature            = false,
       avoidFriendly           = false,
       burnblow                = true,
-      cegTag                  = [[raventrail]],
+      cegTag                  = [[likhotrail]],
       collideFriendly         = false,
    
       craterBoost             = 1,
@@ -99,7 +99,7 @@ return { bomberheavy = {
       impulseBoost            = 0,
       impulseFactor           = -0.8,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_deathblow.s3o]],
+      model                   = [[wep_bomberheavy.dae]],
       range                   = 500,
       reloadtime              = 1,
       smokeTrail              = false,
@@ -124,7 +124,7 @@ return { bomberheavy = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[licho_d.s3o]],
+      object           = [[bomberheavy_dead.dae]], -- not mangled, just retextured to wreck
     },
 
     HEAP  = {

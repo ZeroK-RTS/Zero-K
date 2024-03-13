@@ -116,6 +116,9 @@ unitConfigs = {
   },
 
 
+  [UnitDefNames.bomberheavy.id] = {
+    move = true,
+  },
   [UnitDefNames.jumpsumo.id] = {
     unfold = true,
   },
