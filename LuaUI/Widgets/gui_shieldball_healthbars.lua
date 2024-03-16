@@ -235,7 +235,9 @@ local function updateClustering()
 				fID = unitID,
 			}
 			local unitsInRange = spGetUnitsInCylinder(x, z, shieldProps.shieldRadius*2)
-			unitNeighborsMatrix[unitID] = {}
+			if not unitNeighborsMatrix[unitID] then
+				unitNeighborsMatrix[unitID] = {}
+			end
 			for _, unitInRange in ipairs(unitsInRange) do
 				if shieldsAreTouching(shieldProps, allShieldUnits[unitInRange]) then
 					unitNeighborsMatrix[unitID][unitInRange] = true
