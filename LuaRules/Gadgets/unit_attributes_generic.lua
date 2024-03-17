@@ -249,6 +249,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			origSpeed = ud.speed,
 			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed,
 			origTurnRate = ud.turnRate,
+			origTurnAccel = (ud.turnRate or 1) * (ud.customParams.turn_accel_factor or 1),
 			origMaxAcc = ud.maxAcc,
 			origMaxDec = ud.maxDec,
 			movetype = -1,
@@ -323,7 +324,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 				turnRate        = state.origTurnRate    *turnFactor,
 				accRate         = accRate,
 				decRate         = state.origMaxDec      *decFactor,
-				turnAccel       = state.origTurnRate    *turnAccelFactor*1.2,
+				turnAccel       = state.origTurnAccel    *turnAccelFactor,
 			}
 			spSetGroundMoveTypeData (unitID, attribute)
 		end

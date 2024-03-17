@@ -469,10 +469,12 @@ for name, ud in pairs(UnitDefs) do
 			ud.turnrate = ud.turnrate * TURNRATE_MULT_VEH
 			ud.acceleration = ud.acceleration * ACCEL_MULT_VEH
 			ud.brakerate = ud.brakerate * ACCEL_MULT_VEH
+			ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor or 1.2
 		else
 			ud.turnrate = ud.turnrate * TURNRATE_MULT_BOT
 			ud.acceleration = ud.acceleration * ACCEL_MULT_BOT
 			ud.brakerate = ud.brakerate * ACCEL_MULT_BOT
+			ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor or 1.2
 		end
 	end
 end

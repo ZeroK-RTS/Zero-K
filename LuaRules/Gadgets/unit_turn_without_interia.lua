@@ -24,7 +24,7 @@ local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 local turnAccels = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
 	if getMovetype(unitDef) == 2 then -- Ground/Sea
-		turnAccels[unitDefID] = unitDef.turnRate * 1.2
+		turnAccels[unitDefID] = unitDef.turnRate * unitDef.customParams.turn_accel_factor
 	end
 end
 
