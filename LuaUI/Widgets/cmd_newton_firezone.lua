@@ -195,6 +195,9 @@ local selectedNewtons = nil		--temprorary {newtons}
 local intensivity = 255
 local colorIndex = 0
 
+local NEWTON_HIT_MEMORY = 90 -- Predict trajectory after being hit by a weapon
+local NEWTON_HIT_LEEWAY = 5 -- Do not auto-jump while being hit by Newtons, as it may end up in jumps on the launch pad.
+
 local victim = {}
 local groupTarget = {}
 local victimStillBeingAttacked = {}
@@ -602,7 +605,7 @@ end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	if victim[unitID] then --is current victim of any Newton group?
-		victim[unitID] = currentFrame + 90 --delete 3 second later (if nobody attack it afterward)
+		victim[unitID] = currentFrame
 		
 		--notify group that target is still being attacked
 		for group=1, groups.count do
@@ -643,7 +646,7 @@ function widget:GameFrame(n)
 	
 	--empty whitelist to widget:UnitDamaged() monitoring
 	for unitID, frame in pairs(victim) do
-		if frame<=n then
+		if frame + NEWTON_HIT_MEMORY <= n then
 			victim[unitID] = nil
 		end
 	end
@@ -683,7 +686,7 @@ function widget:GameFrame(n)
 							--end
 							-- spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitID}, 0 )
 							-- groupTarget[g] = unitID
-							-- victim[unitID] = n + 90 --empty whitelist 3 second later
+							-- victim[unitID] = n
 							--cmdRate = cmdRate +1
 							--break
 							
@@ -698,7 +701,7 @@ function widget:GameFrame(n)
 						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, 0 ) --shoot unit
 						groupTarget[g] = unitToAttack --flag this group as having a target!
 						victimStillBeingAttacked[g] = nil --clear wait signal
-						victim[unitToAttack] = n + 90 --add UnitDamaged() whitelist, and expire after 3 second later
+						victim[unitToAttack] = n --add UnitDamaged() whitelist
 					end
 					if stop then --no unit in the box, and still have target?
 						if groupTarget[g] or groupData.needInit then
@@ -836,9 +839,12 @@ function EstimateCrashLocation(victimID, transportID)
 	end
 	
 	if options.jumpOnPrediction.value and jumpUnitDefIDs[defID] then
-		local groundHeight = spGetGroundHeight( x, z)
-		if y - groundHeight > 50 then
-			IssueJumpCommand(victimID, x,y,z, future_locationX, future_height, future_locationZ)
+		local frame = Spring.GetGameFrame()
+		if (not victim[victimID]) or victim[victimID] + NEWTON_HIT_LEEWAY > frame then
+			local groundHeight = spGetGroundHeight( x, z)
+			if y - groundHeight > 50 then
+				IssueJumpCommand(victimID, x,y,z, future_locationX, future_height, future_locationZ)
+			end
 		end
 	end
 end
