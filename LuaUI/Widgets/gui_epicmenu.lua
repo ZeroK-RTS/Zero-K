@@ -1045,6 +1045,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			return
 		end
 	end
+
 	if not pathoptions[path] then
 		AddOption( path )
 	end
@@ -1053,7 +1054,12 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		option.key = option.name
 	end
 	option.wname = wname
-	
+
+	if option.i18nKey then
+		option.name = WG.Translate('interface', option.i18nKey)
+		option.desc = WG.Translate('interface', option.i18nKey .. "_desc")
+	end
+
 	local curkey = path .. '_' .. option.key
 	--local fullkey = ('epic_'.. curkey)
 	local fullkey = GetFullKey(path, option)
