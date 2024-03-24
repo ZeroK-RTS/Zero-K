@@ -53,10 +53,10 @@ end
 function GG.MoveMobileUnit(unitID, tx, ty, tz)
 	if not CallScript(unitID, "unit_teleported", {tx, ty, tz}) then
 		Spring.SetUnitLeaveTracks(unitID, false)
-		Spring.Utilities.UnitEcho(unitID, 'r')
 		Spring.SetUnitPosition(unitID, tx, tz)
 		needTracks = needTracks or {}
 		needTracks[#needTracks + 1] = unitID
+		--Spring.Utilities.UnitEcho(unitID, 'r')
 	end
 end
 
@@ -78,7 +78,7 @@ function gadget:GameFrame(n)
 	for i = 1, #needTracks do
 		if Spring.ValidUnitID(needTracks[i]) then
 			Spring.SetUnitLeaveTracks(needTracks[i], true)
-			Spring.Utilities.UnitEcho(needTracks[i], 'a')
+			--Spring.Utilities.UnitEcho(needTracks[i], 'a')
 		end
 	end
 	needTracks = nil
