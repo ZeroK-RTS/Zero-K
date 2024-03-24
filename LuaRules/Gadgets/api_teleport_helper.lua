@@ -17,6 +17,8 @@ if gadgetHandler:IsSyncedCode() then -- SYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local needTracks
+
 local function CallScript(unitID, funcName, args)
 	local func = Spring.UnitScript.GetScriptEnv(unitID)
 	if func then
@@ -50,10 +52,11 @@ end
 
 function GG.MoveMobileUnit(unitID, tx, ty, tz)
 	if not CallScript(unitID, "unit_teleported", {tx, ty, tz}) then
+		Spring.SetUnitLeaveTracks(unitID, false)
+		Spring.Utilities.UnitEcho(unitID, 'r')
 		Spring.SetUnitPosition(unitID, tx, tz)
-		Spring.MoveCtrl.Enable(unitID)
-		Spring.MoveCtrl.SetPosition(unitID, tx, ty, tz)
-		Spring.MoveCtrl.Disable(unitID)
+		needTracks = needTracks or {}
+		needTracks[#needTracks + 1] = unitID
 	end
 end
 
@@ -66,6 +69,19 @@ function GG.MoveGeneralUnit(unitID, tx, ty, tz)
 	else
 		GG.MoveStructure(unitID, tx, tz)
 	end
+end
+
+function gadget:GameFrame(n)
+	if not needTracks then
+		return
+	end
+	for i = 1, #needTracks do
+		if Spring.ValidUnitID(needTracks[i]) then
+			Spring.SetUnitLeaveTracks(needTracks[i], true)
+			Spring.Utilities.UnitEcho(needTracks[i], 'a')
+		end
+	end
+	needTracks = nil
 end
 
 -------------------------------------------------------------------------------------
