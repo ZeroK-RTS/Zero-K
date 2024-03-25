@@ -76,8 +76,11 @@ void main()
 	v_rotationY = atan(modelMatrix[0][2], modelMatrix[0][0]); // we can get the euler Y rot of the model from the model matrix
 	v_uvoffsets = uvoffsets;
 	v_parameters = parameters;
-	// teamID 255 is used for local selection color
-	v_color = teamID == 255 ? vec4(0.1, 1.0, 0.2, 1.0) : teamColor[teamID];
+	// 255: local selection color
+	// 244: preselection color
+	if (teamID == 255) v_color = vec4(0.1, 1.0, 0.2, 1.0);
+	else if (teamID == 254) v_color = vec4(0.1 , 1.0, 1.0, 1.0);
+	else teamColor[teamID];
 	v_centerpos = vec4( modelMatrix[3].xyz, 1.0); // We are going to pass the centerpoint to the GS
 	v_lengthwidthcornerheight = lengthwidthcornerheight;
 	#if (ANIMATION == 1)

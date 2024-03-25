@@ -53,6 +53,22 @@ local shaderSourceCache = {
 		shaderConfig = shaderConfig,
 	}
 
+local function InitDrawPrimitiveAtUnitShader(shaderConfig, DPATname)
+	if shaderConfig.USETEXTURE then 
+		shaderSourceCache.uniformInt = { DrawPrimitiveAtUnitTexture = 0, }
+	end
+	
+	shaderSourceCache.shaderName = DPATname .. "Shader GL4"
+	
+	local drawPrimitiveAtUnitShader = LuaShader.CheckShaderUpdates(shaderSourceCache)
+
+	if not drawPrimitiveAtUnitShader then
+		Spring.Echo("Failed to compile shader for ", DPATname)
+		return nil
+	end
+
+	return drawPrimitiveAtUnitShader
+end
 
 local function InitDrawPrimitiveAtUnitVBO(DPATname)
 	local drawPrimitiveAtUnitVBO = makeInstanceVBOTable(
@@ -81,26 +97,13 @@ local function InitDrawPrimitiveAtUnitVBO(DPATname)
 end
 
 local function InitDrawPrimitiveAtUnit(shaderConfig, DPATname)
-	if shaderConfig.USETEXTURE then 
-		shaderSourceCache.uniformInt = { DrawPrimitiveAtUnitTexture = 0, }
-	end
-	
-	shaderSourceCache.shaderName = DPATname .. "Shader GL4"
-	
-	local drawPrimitiveAtUnitShader = LuaShader.CheckShaderUpdates(shaderSourceCache)
-
-	if not drawPrimitiveAtUnitShader then
-		Spring.Echo("Failed to compile shader for ", DPATname)
-		return nil
-	end
-
-	local drawPrimitiveAtUnitVBO = InitDrawPrimitiveAtUnitVBO(DPATname)
-	return drawPrimitiveAtUnitVBO, drawPrimitiveAtUnitShader
+	-- Convenience method for typical case
+	return InitDrawPrimitiveAtUnitVBO(DPATname), InitDrawPrimitiveAtUnitShader(shaderConfig, DPATname)
 end
-
 
 return {
 	InitDrawPrimitiveAtUnit = InitDrawPrimitiveAtUnit,
+	InitDrawPrimitiveAtUnitShader = InitDrawPrimitiveAtUnitShader,
 	InitDrawPrimitiveAtUnitVBO = InitDrawPrimitiveAtUnitVBO,
 	shaderConfig = shaderConfig
 }
