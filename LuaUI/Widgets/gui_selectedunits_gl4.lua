@@ -362,24 +362,16 @@ function widget:Update(dt)
 	end
 end
 
-function widget:UnitDestroyed(unitID)
-	RemoveSelected(unitID)
+function widget:UnitDestroyed()
+	doUpdate = true
 end
 
 function widget:UnitGiven()
 	doUpdate = true
 end
 
-function widget:UnitTaken(unitID)
-	RemoveSelected(unitID)
-end
-
-function widget:VisibleUnitAdded()
+function widget:UnitTaken()
 	doUpdate = true
-end
-
-function widget:VisibleUnitRemoved(unitID)
-	RemoveSelected(unitID)
 end
 
 function widget:VisibleUnitsChanged()
