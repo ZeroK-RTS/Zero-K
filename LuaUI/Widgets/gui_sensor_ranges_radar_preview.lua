@@ -26,7 +26,7 @@ for unitDefID, ud in pairs(UnitDefs) do
 	if ud.radarDistance > 100 and not ud.customParams.disable_radar_preview then
 		local range = ud.radarDistance
 		radarStructureRange[unitDefID] = range
-		radarEmitHeight[unitDefID] = ud.customParams.radar_height
+		radarEmitHeight[unitDefID] = ud.radarEmitHeight
 		radarTotalHeight[unitDefID] = radarEmitHeight[unitDefID] + ud.model.midy
 		if not radarRangeShaders[range] then
 			radarRangeShaders[range] = true
