@@ -81,7 +81,7 @@ void main()
 	v_centerpos = vec4( modelMatrix[3].xyz, 1.0); // We are going to pass the centerpoint to the GS
 	v_lengthwidthcornerheight = lengthwidthcornerheight;
 	#if (ANIMATION == 1)
-	    // No animation when parameters.y is 0
+		// No animation when parameters.y is 0
 		float initial = clamp(((timeInfo.x + timeInfo.w) - parameters.x)/GROWTHRATE + INITIALSIZE, max(INITIALSIZE, float(1 - parameters.y)), 1.0);
 		float breathe = (BREATHESIZE + sin((timeInfo.x)/BREATHERATE)*BREATHESIZE) * parameters.y;
 		v_lengthwidthcornerheight.xy *= initial;

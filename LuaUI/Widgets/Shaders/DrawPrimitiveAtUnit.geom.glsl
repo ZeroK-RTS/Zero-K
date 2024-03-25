@@ -83,7 +83,7 @@ void main(){
 	
 	#ifdef USE_TRIANGLES
 		if (numVertices == 3u){ // triangle pointing "forward"
-			offsetVertex4(0.0, 0.0, length, 0.5, 1.0, 2.000); // xyz uv
+			offsetVertex4(0.0, 0.0, length, 0.5, 1.0, 2.000);
 			offsetVertex4(-0.866 * width, 0.0, -0.5 * length, 0.0, 0.0, 2.000);
 			offsetVertex4(0.866* width, 0.0, -0.5 * length, 1.0, 0.0, 2.000);
 			EndPrimitive();
