@@ -16,7 +16,8 @@ end
 local lineWidth, showOtherSelections, platterOpacity, outlineOpacity
 
 ---- GL4 Backend Stuff----
-local localSelectionVBO, selectionShader, otherSelectionVBO = nil, nil, nil
+-- FIXME: Make VBOs into a table?
+local selectionShader, hoverSelectionVBO, localSelectionVBO, otherSelectionVBO
 local luaShaderDir                                          = "LuaUI/Widgets/Include/"
 
 local hasBadCulling                                         = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Linux") == true)
@@ -58,7 +59,7 @@ local GL_STENCIL_BUFFER_BIT                                 = GL.STENCIL_BUFFER_
 local GL_REPLACE                                            = GL.REPLACE
 local GL_POINTS                                             = GL.POINTS
 
-local selUnits, isLocalSelection                            = {}, {}
+local selUnits                                              = {}
 local doUpdate, allySelUnits, hoverUnitID
 
 local unitScale                                             = {}
@@ -77,12 +78,12 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	end
 end
 
-local function AddSelected(unitID, unitTeam, isLocal)
+local function AddSelected(unitID, unitTeam, vbo, animate)
 	if spValidUnitID(unitID) ~= true or spGetUnitIsDead(unitID) == true then return end
-	-- When paused we don't want to animate from initial size because that may not be visible for some units
+	-- When paused we don't want to animate from initial size because that may look misaligned / bad
 	local _, _, paused = spGetGameState()
 	local gf = paused and -30 or spGetGameFrame()
-	local animate = isLocal and 1 or 0
+	animate = animate and 1 or 0
 
 	local unitDefID = spGetUnitDefID(unitID)
 	if unitDefID == nil then return end -- these cant be selected
@@ -106,14 +107,19 @@ local function AddSelected(unitID, unitTeam, isLocal)
 	end
 
 	-- Make sure we move local selections back to other when deselecting
-	local oppositeSelectionVBO = isLocal and otherSelectionVBO or localSelectionVBO
-	if oppositeSelectionVBO.instanceIDtoIndex[unitID] then
-		popElementInstance(oppositeSelectionVBO, unitID)
+	if hoverSelectionVBO.instanceIDtoIndex[unitID] then
+		popElementInstance(hoverSelectionVBO, unitID)
+	end
+	if localSelectionVBO.instanceIDtoIndex[unitID] then
+		popElementInstance(localSelectionVBO, unitID)
+	end
+	if otherSelectionVBO.instanceIDtoIndex[unitID] then
+		popElementInstance(otherSelectionVBO, unitID)
 	end
 
 	-- Add the new selection
 	pushElementInstance(
-		isLocal and localSelectionVBO or otherSelectionVBO, -- push into this Instance VBO Table
+		vbo, -- push into this Instance VBO Table
 		{
 			length, width, 0, 0,                      -- lengthwidthcornerheight
 			unitTeam,                                 -- teamID
@@ -131,8 +137,10 @@ end
 
 local function RemoveSelected(unitID)
 	doUpdate = true
-	isLocalSelection[unitID] = nil
-	selUnits[unitID] = nil
+	selUnits[unitID] = nil	
+	if hoverSelectionVBO.instanceIDtoIndex[unitID] then
+		popElementInstance(hoverSelectionVBO, unitID)
+	end
 	if localSelectionVBO.instanceIDtoIndex[unitID] then
 		popElementInstance(localSelectionVBO, unitID)
 	end
@@ -174,21 +182,23 @@ local function init()
 	end
 
 	local DPatUnit = VFS.Include(luaShaderDir .. "DrawPrimitiveAtUnit.lua")
-	local InitDrawPrimitiveAtUnit = DPatUnit.InitDrawPrimitiveAtUnit
+	local InitDrawPrimitiveAtUnitShader = DPatUnit.InitDrawPrimitiveAtUnitShader
 	local InitDrawPrimitiveAtUnitVBO = DPatUnit.InitDrawPrimitiveAtUnitVBO
-	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
+	local shaderConfig = DPatUnit.shaderConfig
 	shaderConfig.BILLBOARD = 0
 	shaderConfig.ANIMATION = 1
-	shaderConfig.INITIALSIZE = 0.95
-	shaderConfig.GROWTHRATE = 4.0
+	shaderConfig.INITIALSIZE = 0.90
+	shaderConfig.GROWTHRATE = 10.0
 	shaderConfig.HEIGHTOFFSET = 0
 	shaderConfig.USETEXTURE = 0
-	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 64.0 / gl_Position.w;" -- Reduce pull-forward to 1/4 default otherwise the selection plane tends to clip through Krow.
+	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 64.0 / gl_Position.w;" -- Reduce pull-forward from default otherwise the selection plane tends to clip through base.
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. ");"
-	localSelectionVBO, selectionShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
-	otherSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_Other")
+	selectionShader = InitDrawPrimitiveAtUnitShader(shaderConfig, "selectedUnits")
+	hoverSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_hover")
+	localSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_local")
+	otherSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_other")
 
-	return localSelectionVBO ~= nil and selectionShader ~= nil and otherSelectionVBO ~= nil
+	return selectionShader ~= nil
 end
 
 options_path = 'Settings/Interface/Selection/Selected Units'
@@ -249,27 +259,31 @@ options = {
 }
 
 local function drawSelection(vbo)
+	if vbo.usedElements == 0 then
+		return
+	end
+
 	-- Draw platter
 	glDepthTest(true)
 	glColorMask(true)
 	selectionShader:SetUniform("addRadius", 0)
-	vbo.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
+	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
 
 	-- Stencil out platter area - this stops outlines being drawn over units that were above the platter
 	glDepthTest(false)
 	glColorMask(false)
-	vbo.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
+	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
 
 	-- Draw outlines
 	glDepthTest(true)
 	glColorMask(true)
 	selectionShader:SetUniform("addRadius", lineWidth)
-	vbo.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
+	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
 end
 
 -- Callins
 
-function widget:DrawWorld()
+function widget:DrawWorld()	
 	if localSelectionVBO.usedElements == 0 and otherSelectionVBO.usedElements == 0 then
 		return
 	end
@@ -288,6 +302,7 @@ function widget:DrawWorld()
 	glStencilMask(1)
 
 	-- Each selection priority is drawn in sequence.
+	drawSelection(hoverSelectionVBO)
 	drawSelection(localSelectionVBO)
 	drawSelection(otherSelectionVBO)
 
@@ -305,6 +320,8 @@ end
 function widget:SelectionChanged()
 	doUpdate = true
 end
+
+local HOVER_SEL, LOCAL_SEL, OTHER_SEL = 1, 2, 3
 
 function widget:Update(dt)
 	local newHoverUnitID = GetUnitUnderCursor(false)
@@ -325,31 +342,28 @@ function widget:Update(dt)
 	doUpdate = false
 
 	local newSelUnits = {}
-	-- Local selections
-	for _, unitID in pairs(spGetSelectedUnits()) do
-		if not selUnits[unitID] or not isLocalSelection[unitID] then
-			AddSelected(unitID, 255, true)
-			selUnits[unitID] = true
-			isLocalSelection[unitID] = true
+	-- Hover selections
+	for unitID, _ in pairs(FindPreselUnits()) do
+		if selUnits[unitID] ~= HOVER_SEL then
+			AddSelected(unitID, 254, hoverSelectionVBO, true)
+			selUnits[unitID] = HOVER_SEL
 		end
 		newSelUnits[unitID] = true
 	end
-	-- Preselections
-	for unitID, _ in pairs(FindPreselUnits()) do
-		if not selUnits[unitID] or not isLocalSelection[unitID] then
-			AddSelected(unitID, 255, true)
-			selUnits[unitID] = true
-			isLocalSelection[unitID] = true
+	-- Local selections
+	for _, unitID in pairs(spGetSelectedUnits()) do
+		if not newSelUnits[unitID] and not selUnits[unitID] ~= LOCAL_SEL then
+			AddSelected(unitID, 255, localSelectionVBO, false)
+			selUnits[unitID] = LOCAL_SEL
 		end
 		newSelUnits[unitID] = true
 	end
 	-- Ally/other selections
 	if showOtherSelections then
 		for unitID, _ in pairs(allySelUnits or {}) do
-			if not selUnits[unitID] or (isLocalSelection[unitID] and not newSelUnits[unitID]) then
-				AddSelected(unitID, spGetUnitTeam(unitID), false)
-				selUnits[unitID] = true
-				isLocalSelection[unitID] = nil
+			if not newSelUnits[unitID] and not selUnits[unitID] ~= OTHER_SEL  then
+				AddSelected(unitID, spGetUnitTeam(unitID), otherSelectionVBO, false)
+				selUnits[unitID] = OTHER_SEL
 			end
 			newSelUnits[unitID] = true
 		end
