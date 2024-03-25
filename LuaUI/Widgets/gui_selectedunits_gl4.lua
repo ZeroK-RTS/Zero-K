@@ -13,8 +13,7 @@ function widget:GetInfo()
 end
 
 -- Configurable Parts:
-local breatheSize                                           = 4
-local lineWidth, showOtherSelections, platterOpacity
+local lineWidth, showOtherSelections, platterOpacity, outlineOpacity
 
 ---- GL4 Backend Stuff----
 local localSelectionVBO, selectionShader, otherSelectionVBO = nil, nil, nil
@@ -49,6 +48,7 @@ local glStencilFunc                                         = gl.StencilFunc
 local glStencilOp                                           = gl.StencilOp
 local glStencilTest                                         = gl.StencilTest
 local glStencilMask                                         = gl.StencilMask
+local glColorMask                                           = gl.ColorMask
 local glDepthTest                                           = gl.DepthTest
 local glClear                                               = gl.Clear
 local GL_ALWAYS                                             = GL.ALWAYS
@@ -166,6 +166,7 @@ local function init()
 	lineWidth = tonumber(options.linewidth.value) or 3.0
 	showOtherSelections = options.showallselections.value
 	platterOpacity = tonumber(options.platteropacity.value) or 0.2
+	outlineOpacity = tonumber(options.outlineopacity.value) or 0.8
 	doUpdate = true
 
 	for unitID, _ in pairs(selUnits) do
@@ -177,15 +178,13 @@ local function init()
 	local InitDrawPrimitiveAtUnitVBO = DPatUnit.InitDrawPrimitiveAtUnitVBO
 	local shaderConfig = DPatUnit.shaderConfig -- MAKE SURE YOU READ THE SHADERCONFIG TABLE!
 	shaderConfig.BILLBOARD = 0
-	shaderConfig.TRANSPARENCY = platterOpacity
 	shaderConfig.ANIMATION = 1
-	shaderConfig.INITIALSIZE = 0.5
-	shaderConfig.GROWTHRATE = 15.0
-	shaderConfig.BREATHERATE = 15.0
-	shaderConfig.BREATHESIZE = breatheSize
+	shaderConfig.INITIALSIZE = 0.95
+	shaderConfig.GROWTHRATE = 4.0
 	shaderConfig.HEIGHTOFFSET = 0
 	shaderConfig.USETEXTURE = 0
-	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * TRANSPARENCY + addRadius);"
+	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 64.0 / gl_Position.w;" -- Reduce pull-forward to 1/4 default otherwise the selection plane tends to clip through Krow.
+	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. ");"
 	localSelectionVBO, selectionShader = InitDrawPrimitiveAtUnit(shaderConfig, "selectedUnits")
 	otherSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_Other")
 
@@ -193,7 +192,7 @@ local function init()
 end
 
 options_path = 'Settings/Interface/Selection/Selected Units'
-options_order = { 'showallselections', 'linewidth', 'platteropacity' }
+options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity' }
 options = {
 	showallselections = {
 		name = 'Show Other Selections',
@@ -210,10 +209,11 @@ options = {
 		desc = '',
 		type = 'radioButton',
 		items = {
-			{ name = 'Thin',     key = '1.5' },
-			{ name = 'Standard', key = '3' },
+			{ name = 'Thin',     key = '1' },
+			{ name = 'Standard', key = '2' },
+			{ name = 'Thick', key = '3' },
 		},
-		value = '3',
+		value = '2',
 		noHotkey = true,
 		OnChange = function(self)
 			lineWidth = nil
@@ -231,14 +231,45 @@ options = {
 		OnChange = function(self)
 			platterOpacity = nil
 			init()
-			-- opacity = self.value
+		end,
+	},
+	outlineopacity = {
+		name = 'Outline Opacity',
+		desc = '',
+		type = 'number',
+		min = 0.6,
+		max = 1.0,
+		step = 0.2,
+		def = 0.8,
+		OnChange = function(self)
+			outlineOpacity = nil
+			init()
 		end,
 	}
 }
 
+local function drawSelection(vbo)
+	-- Draw platter
+	glDepthTest(true)
+	glColorMask(true)
+	selectionShader:SetUniform("addRadius", 0)
+	vbo.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
+
+	-- Stencil out platter area - this stops outlines being drawn over units that were above the platter
+	glDepthTest(false)
+	glColorMask(false)
+	vbo.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
+
+	-- Draw outlines
+	glDepthTest(true)
+	glColorMask(true)
+	selectionShader:SetUniform("addRadius", lineWidth)
+	vbo.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
+end
+
 -- Callins
 
-function widget:DrawWorldPreUnit()
+function widget:DrawWorld()
 	if localSelectionVBO.usedElements == 0 and otherSelectionVBO.usedElements == 0 then
 		return
 	end
@@ -248,33 +279,22 @@ function widget:DrawWorldPreUnit()
 	end
 
 	selectionShader:Activate()
+
 	selectionShader:SetUniform("iconDistance", 99999) -- pass
 	glStencilTest(true)                            --https://learnopengl.com/Advanced-OpenGL/Stencil-testing
-	glDepthTest(true)
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)      -- Set The Stencil Buffer To 1 Where Draw Any Polygon		this to the shader
 	glClear(GL_STENCIL_BUFFER_BIT)                 -- set stencil buffer to 0
-
 	glStencilFunc(GL_NOTEQUAL, 1, 1)               -- use NOTEQUAL instead of ALWAYS to ensure that overlapping transparent fragments dont get written multiple times
 	glStencilMask(1)
 
-	selectionShader:SetUniform("addRadius", 0)
-	localSelectionVBO.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
-
-	selectionShader:SetUniform("addRadius", lineWidth)
-	localSelectionVBO.VAO:DrawArrays(GL_POINTS, localSelectionVBO.usedElements)
-
-	selectionShader:SetUniform("addRadius", 0)
-	otherSelectionVBO.VAO:DrawArrays(GL_POINTS, otherSelectionVBO.usedElements)
-
-	selectionShader:SetUniform("addRadius", lineWidth)
-	otherSelectionVBO.VAO:DrawArrays(GL_POINTS, otherSelectionVBO.usedElements)
-
-	-- Cleanup?
-	glStencilFunc(GL_ALWAYS, 1, 1)
+	-- Each selection priority is drawn in sequence.
+	drawSelection(localSelectionVBO)
+	drawSelection(otherSelectionVBO)
 
 	selectionShader:Deactivate()
 
 	-- This is the correct way to exit out of the stencil mode, to not break drawing of area commands:
+	glStencilFunc(GL_ALWAYS, 1, 1)
 	glStencilTest(false)
 	glStencilMask(255)
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
