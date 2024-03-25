@@ -408,6 +408,10 @@ if UnitDefs then -- BAR 105-1801
 				unitDef[newKey] = unitDef[oldKey]
 			end
 		end
+
+		if unitDef.radarEmitHeight == nil then
+			unitDef.radarEmitHeight = unitDef.sightEmitHeight or 20
+		end
 	end
 end
 

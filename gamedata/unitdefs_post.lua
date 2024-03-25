@@ -669,15 +669,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Do the engine's job
---
-for name, ud in pairs(UnitDefs) do
-	ud.customparams.los_height = ud.sightemitheight or ud.losemitheight or 20
-	ud.customparams.radar_height = ud.radaremitheight or ud.customparams.los_height
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Set mass
 --
 for name, ud in pairs(UnitDefs) do
