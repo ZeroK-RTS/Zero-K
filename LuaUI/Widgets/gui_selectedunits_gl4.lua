@@ -170,7 +170,7 @@ local function UpdateCmdColorsConfig(isOn)
 end
 
 local function init()
-	lineWidth = tonumber(options.linewidth.value) or 3.0
+	lineWidth = tonumber(options.linewidth.value) or 2.0
 	showOtherSelections = options.showallselections.value
 	drawDepthCheck = options.drawdepthcheck.value
 	platterOpacity = tonumber(options.platteropacity.value) or 0.2
@@ -248,10 +248,10 @@ options = {
 		name = 'Outline Opacity',
 		desc = 'Opacity of the selection outline - 1 is solid',
 		type = 'number',
-		min = 0.6,
+		min = 0.7,
 		max = 1.0,
-		step = 0.2,
-		def = 0.8,
+		step = 0.1,
+		def = 0.9,
 		OnChange = function(self)
 			init()
 		end,
