@@ -13,7 +13,7 @@ function widget:GetInfo()
 end
 
 -- Configurable Parts:
-local lineWidth, showOtherSelections, platterOpacity, outlineOpacity
+local lineWidth, showOtherSelections, drawDepthCheck, platterOpacity, outlineOpacity
 
 ---- GL4 Backend Stuff----
 -- FIXME: Make VBOs into a table?
@@ -174,8 +174,14 @@ end
 local function init()
 	lineWidth = tonumber(options.linewidth.value) or 3.0
 	showOtherSelections = options.showallselections.value
-	platterOpacity = 1 - math.sqrt(1 - (tonumber(options.platteropacity.value) or 0.2))
-	outlineOpacity = 1 - math.sqrt(1 - (tonumber(options.outlineopacity.value) or 0.8))
+	drawDepthCheck = options.drawdepthcheck.value
+	platterOpacity = tonumber(options.platteropacity.value) or 0.2
+	outlineOpacity = tonumber(options.outlineopacity.value) or 0.8
+	if drawDepthCheck then
+		-- We're going to draw things twice so tweak the opacity values accordingly
+		platterOpacity = 1 - math.sqrt(1 - platterOpacity)
+		outlineOpacity = 1 - math.sqrt(1 - outlineOpacity)
+	end
 	doUpdate = true
 
 	for unitID, _ in pairs(selUnits) do
@@ -204,7 +210,7 @@ local function init()
 end
 
 options_path = 'Settings/Interface/Selection/Selected Units'
-options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity' }
+options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity',  'drawdepthcheck' }
 options = {
 	showallselections = {
 		name = 'Show Other Selections',
@@ -212,12 +218,11 @@ options = {
 		type = 'bool',
 		value = 'true',
 		OnChange = function(self)
-			showOtherSelections = nil
 			init()
 		end,
 	},
 	linewidth = {
-		name = 'Line Width',
+		name = 'Outline Width',
 		desc = '',
 		type = 'radioButton',
 		items = {
@@ -228,33 +233,39 @@ options = {
 		value = '2',
 		noHotkey = true,
 		OnChange = function(self)
-			lineWidth = nil
 			init()
 		end,
 	},
 	platteropacity = {
-		name = 'Platter Opacity',
-		desc = '',
+		name = 'Fill Opacity',
+		desc = 'Opacity of the selection fill - 0 is invisble',
 		type = 'number',
 		min = 0.0,
 		max = 0.3,
 		step = 0.1,
 		def = 0.2,
 		OnChange = function(self)
-			platterOpacity = nil
 			init()
 		end,
 	},
 	outlineopacity = {
 		name = 'Outline Opacity',
-		desc = '',
+		desc = 'Opacity of the selection outline - 1 is solid',
 		type = 'number',
 		min = 0.6,
 		max = 1.0,
 		step = 0.2,
 		def = 0.8,
 		OnChange = function(self)
-			outlineOpacity = nil
+			init()
+		end,
+	},
+	drawdepthcheck = {
+		name = 'Draw Selections in Unit Plane',
+		desc = 'If disabled, selections are only drawn below units and never above - even for planes',
+		type = 'bool',
+		value = 'true',
+		OnChange = function(self)
 			init()
 		end,
 	}
@@ -319,7 +330,9 @@ function widget:DrawWorldPreUnit()
 end
 
 function widget:DrawWorld()
-	widget:drawSelections(false)
+	if drawDepthCheck then
+		widget:drawSelections(false)
+	end
 end
 
 function widget:SelectionChanged()
