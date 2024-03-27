@@ -71,9 +71,10 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 		unitCanFly[unitDefID] = true
 		unitScale[unitDefID] = unitScale[unitDefID] * 0.7
 	elseif unitDef.isBuilding or unitDef.isFactory or unitDef.speed == 0 then
+		local platterOverlap = 1.0 -- To make sure there aren't rendering gaps between adjacent buildings.
 		unitBuilding[unitDefID] = {
-			unitDef.xsize * 8 + 0.5,
-			unitDef.zsize * 8 + 0.5
+			unitDef.xsize * 8 + platterOverlap,
+			unitDef.zsize * 8 + platterOverlap
 		}
 	end
 end
@@ -191,7 +192,8 @@ local function init()
 	shaderConfig.GROWTHRATE = 10.0
 	shaderConfig.HEIGHTOFFSET = 0
 	shaderConfig.USETEXTURE = 0
-	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 64.0 / gl_Position.w;" -- Reduce pull-forward from default otherwise the selection plane tends to clip through base.
+	-- shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 64.0 / gl_Position.w;"
+	shaderConfig.POST_GEOMETRY = ""
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. ");"
 	selectionShader = InitDrawPrimitiveAtUnitShader(shaderConfig, "selectedUnits")
 	hoverSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_hover")
@@ -258,24 +260,19 @@ options = {
 	}
 }
 
-local function drawSelection(vbo)
+local function drawSelection(vbo, preUnit)
 	if vbo.usedElements == 0 then
 		return
 	end
+	selectionShader:SetUniform("addRadius", 0)
 
 	-- Draw platter
-	glDepthTest(true)
-	glColorMask(true)
-	selectionShader:SetUniform("addRadius", 0)
-	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
-
-	-- Stencil out platter area - this stops outlines being drawn over units that were above the platter
 	glDepthTest(false)
-	glColorMask(false)
+	glColorMask(preUnit) -- Only draw in preUnit, stencil later
 	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
 
 	-- Draw outlines
-	glDepthTest(true)
+	glDepthTest(not preUnit) -- No depth check for world
 	glColorMask(true)
 	selectionShader:SetUniform("addRadius", lineWidth)
 	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
@@ -283,7 +280,7 @@ end
 
 -- Callins
 
-function widget:DrawWorld()	
+function widget:drawSelections(preUnit)
 	if localSelectionVBO.usedElements == 0 and otherSelectionVBO.usedElements == 0 then
 		return
 	end
@@ -302,9 +299,9 @@ function widget:DrawWorld()
 	glStencilMask(1)
 
 	-- Each selection priority is drawn in sequence.
-	drawSelection(hoverSelectionVBO)
-	drawSelection(localSelectionVBO)
-	drawSelection(otherSelectionVBO)
+	drawSelection(hoverSelectionVBO, preUnit)
+	drawSelection(localSelectionVBO, preUnit)
+	drawSelection(otherSelectionVBO, preUnit)
 
 	selectionShader:Deactivate()
 
@@ -315,6 +312,14 @@ function widget:DrawWorld()
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
 	glClear(GL_STENCIL_BUFFER_BIT)
 	-- All the above are needed :(
+end
+
+function widget:DrawWorldPreUnit()
+	widget:drawSelections(true)
+end
+
+function widget:DrawWorld()
+	widget:drawSelections(false)
 end
 
 function widget:SelectionChanged()
