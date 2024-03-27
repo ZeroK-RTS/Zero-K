@@ -174,8 +174,8 @@ end
 local function init()
 	lineWidth = tonumber(options.linewidth.value) or 3.0
 	showOtherSelections = options.showallselections.value
-	platterOpacity = tonumber(options.platteropacity.value) or 0.2
-	outlineOpacity = tonumber(options.outlineopacity.value) or 0.8
+	platterOpacity = 1 - math.sqrt(1 - (tonumber(options.platteropacity.value) or 0.2))
+	outlineOpacity = 1 - math.sqrt(1 - (tonumber(options.outlineopacity.value) or 0.8))
 	doUpdate = true
 
 	for unitID, _ in pairs(selUnits) do
