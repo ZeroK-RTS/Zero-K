@@ -178,8 +178,7 @@ local function init()
 	platterOpacity = tonumber(options.platteropacity.value) or 0.2
 	outlineOpacity = tonumber(options.outlineopacity.value) or 0.8
 	if drawDepthCheck then
-		-- We're going to draw things twice so tweak the opacity values accordingly
-		platterOpacity = 1 - math.sqrt(1 - platterOpacity)
+		-- We're going to draw the outline twice so tweak the opacity value accordingly
 		outlineOpacity = 1 - math.sqrt(1 - outlineOpacity)
 	end
 	doUpdate = true
@@ -198,8 +197,7 @@ local function init()
 	shaderConfig.GROWTHRATE = 10.0
 	shaderConfig.HEIGHTOFFSET = 0
 	shaderConfig.USETEXTURE = 0
-	-- shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 64.0 / gl_Position.w;"
-	shaderConfig.POST_GEOMETRY = ""
+	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. ");"
 	selectionShader = InitDrawPrimitiveAtUnitShader(shaderConfig, "selectedUnits")
 	hoverSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_hover")
