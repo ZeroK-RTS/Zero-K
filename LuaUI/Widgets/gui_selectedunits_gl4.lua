@@ -62,52 +62,34 @@ local GL_POINTS                                             = GL.POINTS
 local selUnits                                              = {}
 local doUpdate, allySelUnits, hoverUnitID
 
-local unitScale                                             = {}
-local unitCanFly                                            = {}
-local unitBuilding                                          = {}
+-- { vertices, width, length }
+local unitDefToSel                                             = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-	unitScale[unitDefID] = (8 * (unitDef.xsize ^ 2 + unitDef.zsize ^ 2) ^ 0.5) - 2.0
-	if unitDef.canFly then
-		unitCanFly[unitDefID] = true
-		unitScale[unitDefID] = unitScale[unitDefID] * 0.7
-	elseif unitDef.isBuilding or unitDef.isFactory or unitDef.speed == 0 then
+	local scale = (8 * (unitDef.xsize ^ 2 + unitDef.zsize ^ 2) ^ 0.5) - 2.0
+	if unitDef.isBuilding or unitDef.isFactory or unitDef.speed == 0 then
 		local platterOverlap = 1.0 -- To make sure there aren't rendering gaps between adjacent buildings.
-		unitBuilding[unitDefID] = {
+		unitDefToSel[unitDefID] = {
+			4,
 			unitDef.xsize * 8 + platterOverlap,
 			unitDef.zsize * 8 + platterOverlap
+		}
+	elseif unitDef.canFly then
+		unitDefToSel[unitDefID] = {
+			3,
+			scale * 0.6,
+			scale * 0.7
+		}
+	else
+		unitDefToSel[unitDefID] = {
+			64,
+			scale,
+			scale
 		}
 	end
 end
 
 local function AddSelected(unitID, unitTeam, vbo, animate)
-	if spValidUnitID(unitID) ~= true or spGetUnitIsDead(unitID) == true then return end
-	-- When paused we don't want to animate from initial size because that may look misaligned / bad
-	local _, _, paused = spGetGameState()
-	local gf = paused and -30 or spGetGameFrame()
-	animate = animate and 1 or 0
-
-	local unitDefID = spGetUnitDefID(unitID)
-	if unitDefID == nil then return end -- these cant be selected
-
-	local numVertices = 64
-
-	local radius = unitScale[unitDefID]
-
-	local width, length
-	if unitCanFly[unitDefID] then
-		numVertices = 3
-		width = radius
-		length = radius
-	elseif unitBuilding[unitDefID] then
-		numVertices = 4
-		width = unitBuilding[unitDefID][1]
-		length = unitBuilding[unitDefID][2]
-	else
-		width = radius
-		length = radius
-	end
-
-	-- Make sure we move local selections back to other when deselecting
+	-- Clean up current selections
 	if hoverSelectionVBO.instanceIDtoIndex[unitID] then
 		popElementInstance(hoverSelectionVBO, unitID)
 	end
@@ -117,6 +99,22 @@ local function AddSelected(unitID, unitTeam, vbo, animate)
 	if otherSelectionVBO.instanceIDtoIndex[unitID] then
 		popElementInstance(otherSelectionVBO, unitID)
 	end
+	
+	if spValidUnitID(unitID) ~= true or spGetUnitIsDead(unitID) == true then
+		return
+	end
+
+	local unitDefID = spGetUnitDefID(unitID)
+	if unitDefID == nil then
+		return
+	end
+
+	local numVertices, width, length = unpack(unitDefToSel[unitDefID])
+
+	-- When paused we don't want to animate from initial size because that may look misaligned / bad
+	local _, _, paused = spGetGameState()
+	local gf = paused and -30 or spGetGameFrame()
+	animate = animate and 1 or 0
 
 	-- Add the new selection
 	pushElementInstance(
