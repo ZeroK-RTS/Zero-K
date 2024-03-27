@@ -288,10 +288,6 @@ end
 -- Callins
 
 function widget:drawSelections(preUnit)
-	if localSelectionVBO.usedElements == 0 and otherSelectionVBO.usedElements == 0 then
-		return
-	end
-
 	if hasBadCulling then
 		gl.Culling(false)
 	end
@@ -359,7 +355,8 @@ function widget:Update(dt)
 	-- Hover selections
 	for unitID, _ in pairs(FindPreselUnits()) do
 		if selUnits[unitID] ~= HOVER_SEL then
-			AddSelected(unitID, 254, hoverSelectionVBO, true)
+			local alreadySelected = selUnits[unitID]
+			AddSelected(unitID, 254, hoverSelectionVBO, not alreadySelected)
 			selUnits[unitID] = HOVER_SEL
 		end
 		newSelUnits[unitID] = true
