@@ -452,8 +452,12 @@ end
 function widget:Initialize()
 	if not gl.CreateShader or not Init() then
 		widgetHandler:RemoveWidget()
-		Spring.SendCommands({"luaui enablewidget UnitShapes"})
+		--Spring.SendCommands({"luaui enablewidget UnitShapes"})
 		return
 	end
 	UpdateCmdColorsConfig(true)
+end
+
+function widget:Shutdown()
+	UpdateCmdColorsConfig(false)
 end
