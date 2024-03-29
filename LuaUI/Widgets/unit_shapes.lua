@@ -1,6 +1,6 @@
 function widget:GetInfo()
 	return {
-		name      = "UnitShapes",
+		name      = "UnitShapes 2",
 		desc      = "0.5.8.zk.02 Draws blended shapes around units and buildings",
 		author    = "Lelousius and aegis, modded Licho, CarRepairer, jK, Shadowfury333",
 		date      = "30.07.2010",

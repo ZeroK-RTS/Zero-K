@@ -1,6 +1,6 @@
 function widget:GetInfo()
 	return {
-		name = "Selected Units GL4",
+		name = "Selected Units GL4 2",
 		desc = "Draw selection markers under units",
 		author = "Fiendicus Prime, Beherith, Floris",
 		date = "2023-12-19",
@@ -452,7 +452,6 @@ end
 function widget:Initialize()
 	if not gl.CreateShader or not Init() then
 		widgetHandler:RemoveWidget()
-		--Spring.SendCommands({"luaui enablewidget UnitShapes"})
 		return
 	end
 	UpdateCmdColorsConfig(true)
