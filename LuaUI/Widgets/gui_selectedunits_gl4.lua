@@ -12,6 +12,8 @@ function widget:GetInfo()
 	}
 end
 
+local HOVER_SEL, LOCAL_SEL, OTHER_SEL = 1, 2, 3
+
 -- Configurable Parts:
 local lineWidthDefault, platterOpactiyDefault, outlineOpacityDefault, selectionHeightDefault = 2, 0.15, 0.75, 2.0
 local lineWidth, showOtherSelections, drawDepthCheck, platterOpacity, outlineOpacity, selectionHeight
@@ -61,7 +63,8 @@ local GL_REPLACE                                            = GL.REPLACE
 local GL_POINTS                                             = GL.POINTS
 
 local selUnits                                              = {}
-local doUpdate, allySelUnits, hoverUnitID
+local checkSelectionType = {}
+local allySelUnits, hoverUnitID
 
 local Init
 options_path = 'Settings/Interface/Selection/Selected Units'
@@ -219,7 +222,6 @@ local function AddSelected(unitID, unitTeam, vbo, animate)
 end
 
 local function RemoveSelected(unitID)
-	doUpdate = true
 	selUnits[unitID] = nil
 	if hoverSelectionVBO.instanceIDtoIndex[unitID] then
 		popElementInstance(hoverSelectionVBO, unitID)
@@ -263,7 +265,9 @@ function Init()
 		-- We're going to draw the outline twice so tweak the opacity value accordingly
 		outlineOpacity = 1 - math.sqrt(1 - outlineOpacity)
 	end
-	doUpdate = true
+	checkSelectionType[HOVER_SEL] = true
+	checkSelectionType[LOCAL_SEL] = true
+	checkSelectionType[OTHER_SEL] = showOtherSelections
 
 	for unitID, _ in pairs(selUnits) do
 		RemoveSelected(unitID)
@@ -350,75 +354,97 @@ function widget:DrawWorld()
 end
 
 function widget:SelectionChanged()
-	doUpdate = true
+	checkSelectionType[LOCAL_SEL] = true
 end
 
-local HOVER_SEL, LOCAL_SEL, OTHER_SEL = 1, 2, 3
+function CleanSelections(typeToClear, newSelUnits)
+	local changed = false
+	for unitID, type in pairs(selUnits) do
+		if type == typeToClear and newSelUnits[unitID] ~= type then
+			changed = true
+			RemoveSelected(unitID)
+		end
+	end
+	return changed
+end
 
 function widget:Update(dt)
 	local newHoverUnitID = GetUnitUnderCursor(false)
-	doUpdate = doUpdate or newHoverUnitID ~= hoverUnitID
+	local isSelectionBoxActive = IsSelectionBoxActive()
+	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or newHoverUnitID ~= hoverUnitID or isSelectionBoxActive
 	hoverUnitID = newHoverUnitID
 
 	-- TODO: Add a callin for when ally selections change?
 	local newAllySelUnits = WG.allySelUnits
-	doUpdate = doUpdate or newAllySelUnits ~= allySelUnits
+	checkSelectionType[OTHER_SEL] = showOtherSelections and (checkSelectionType[HOVER_SEL] or newAllySelUnits ~= allySelUnits)
 	allySelUnits = newAllySelUnits
 
-	doUpdate = doUpdate or IsSelectionBoxActive()
-
-	if not doUpdate then
+	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
 		return
 	end
 
-	doUpdate = false
-
 	local newSelUnits = {}
 	-- Hover selections
-	for unitID, _ in pairs(FindPreselUnits()) do
-		if selUnits[unitID] ~= HOVER_SEL then
-			local alreadySelected = selUnits[unitID]
-			AddSelected(unitID, 254, hoverSelectionVBO, not alreadySelected)
-			selUnits[unitID] = HOVER_SEL
+	if checkSelectionType[HOVER_SEL] then
+		for unitID, _ in pairs(FindPreselUnits()) do
+			if selUnits[unitID] ~= HOVER_SEL then
+				local alreadySelected = selUnits[unitID]
+				AddSelected(unitID, 254, hoverSelectionVBO, not alreadySelected)
+				selUnits[unitID] = HOVER_SEL
+				checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
+			end
+			newSelUnits[unitID] = HOVER_SEL
 		end
-		newSelUnits[unitID] = true
+		if CleanSelections(HOVER_SEL, newSelUnits) then
+			checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
+		end
+	elseif wasSelectionBoxActive then
+		wasSelectionBoxActive = false
 	end
+
 	-- Local selections
-	for _, unitID in pairs(spGetSelectedUnits()) do
-		if not newSelUnits[unitID] and not selUnits[unitID] ~= LOCAL_SEL then
-			AddSelected(unitID, 255, localSelectionVBO, false)
-			selUnits[unitID] = LOCAL_SEL
+	if checkSelectionType[LOCAL_SEL] then
+		for _, unitID in pairs(spGetSelectedUnits()) do
+			if not newSelUnits[unitID] and not selUnits[unitID] ~= LOCAL_SEL then
+				AddSelected(unitID, 255, localSelectionVBO, false)
+				selUnits[unitID] = LOCAL_SEL
+				checkSelectionType[OTHER_SEL] = true
+			end
+			newSelUnits[unitID] = LOCAL_SEL
 		end
-		newSelUnits[unitID] = true
+		if CleanSelections(LOCAL_SEL, newSelUnits) then
+			checkSelectionType[OTHER_SEL] = true
+		end
 	end
+
 	-- Ally/other selections
-	if showOtherSelections then
+	if checkSelectionType[OTHER_SEL] then
 		for unitID, _ in pairs(allySelUnits or {}) do
 			if not newSelUnits[unitID] and not selUnits[unitID] ~= OTHER_SEL  then
 				AddSelected(unitID, spGetUnitTeam(unitID), otherSelectionVBO, false)
 				selUnits[unitID] = OTHER_SEL
 			end
-			newSelUnits[unitID] = true
+			newSelUnits[unitID] = OTHER_SEL
 		end
+		CleanSelections(OTHER_SEL, newSelUnits)
 	end
-	-- Clean up deselected units
-	for unitID, _ in pairs(selUnits) do
-		if not newSelUnits[unitID] then
-			RemoveSelected(unitID)
-		end
-	end
+
+    -- Prime it to check again next time around, as we may have stopped selecting without making a selection
+	checkSelectionType[HOVER_SEL] = isSelectionBoxActive
+	checkSelectionType[LOCAL_SEL] = false
+	checkSelectionType[OTHER_SEL] = false
 end
 
 function widget:UnitDestroyed()
-	doUpdate = true
+	checkSelectionType[LOCAL_SEL] = true
 end
 
 function widget:UnitGiven()
-	doUpdate = true
+	checkSelectionType[LOCAL_SEL] = true
 end
 
 function widget:UnitTaken()
-	doUpdate = true
+	checkSelectionType[LOCAL_SEL] = true
 end
 
 function widget:VisibleUnitsChanged()
