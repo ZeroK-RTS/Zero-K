@@ -592,6 +592,7 @@ end
 
 function widget:Shutdown()
 	gl.DeleteList(clearquad)
+	SetupCommandColors(true)
 	
 	for _, shape in pairs(shapes) do
 		DestroyShape(shape)
