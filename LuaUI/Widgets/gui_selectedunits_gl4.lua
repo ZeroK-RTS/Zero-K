@@ -13,7 +13,8 @@ function widget:GetInfo()
 end
 
 -- Configurable Parts:
-local lineWidth, showOtherSelections, drawDepthCheck, platterOpacity, outlineOpacity
+local lineWidthDefault, platterOpactiyDefault, outlineOpacityDefault, selectionHeightDefault = 2, 0.15, 0.75, 2.0
+local lineWidth, showOtherSelections, drawDepthCheck, platterOpacity, outlineOpacity, selectionHeight
 
 ---- GL4 Backend Stuff----
 -- FIXME: Make VBOs into a table?
@@ -64,7 +65,7 @@ local doUpdate, allySelUnits, hoverUnitID
 
 local Init
 options_path = 'Settings/Interface/Selection/Selected Units'
-options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity',  'drawdepthcheck' }
+options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity', 'selectionheight', 'drawdepthcheck' }
 options = {
 	showallselections = {
 		name = 'Show Other Selections',
@@ -81,10 +82,10 @@ options = {
 		type = 'radioButton',
 		items = {
 			{ name = 'Thin',     key = '1' },
-			{ name = 'Standard', key = '2' },
+			{ name = 'Standard', key = tostring(lineWidthDefault) },
 			{ name = 'Thick', key = '3' },
 		},
-		value = '2',
+		value = tostring(lineWidthDefault),
 		noHotkey = true,
 		OnChange = function(self)
 			Init()
@@ -97,7 +98,7 @@ options = {
 		min = 0.0,
 		max = 1,
 		step = 0.05,
-		def = 0.15,
+		def = tostring(platterOpactiyDefault),
 		OnChange = function(self)
 			Init()
 		end,
@@ -109,14 +110,26 @@ options = {
 		min = 0.0,
 		max = 1.0,
 		step = 0.05,
-		def = 0.75,
+		def = tostring(outlineOpacityDefault),
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	selectionheight = {
+		name = 'Selection Height',
+		desc = 'How much to float the selection above the unit baseline - a value of 0 is more likely to be clipped by units',
+		type = 'number',
+		min = 0.0,
+		max = 8.0,
+		step = 1.0,
+		def = tostring(selectionHeightDefault),
 		OnChange = function(self)
 			Init()
 		end,
 	},
 	drawdepthcheck = {
 		name = 'Draw Selections in Unit Plane',
-		desc = 'If disabled, selections are only drawn below units and never above - even for planes',
+		desc = 'If disabled, selections are only drawn below units and never above - even for planes. This can cause the selection to be invisible. On the other hand, disabling this can increase performance.',
 		type = 'bool',
 		value = 'true',
 		OnChange = function(self)
@@ -241,11 +254,11 @@ local function UpdateCmdColorsConfig(isOn)
 end
 
 function Init()
-	lineWidth = tonumber(options.linewidth.value) or 2.0
+	lineWidth = tonumber(options.linewidth.value) or lineWidthDefault
 	showOtherSelections = options.showallselections.value
 	drawDepthCheck = options.drawdepthcheck.value
-	platterOpacity = tonumber(options.platteropacity.value) or 0.2
-	outlineOpacity = tonumber(options.outlineopacity.value) or 0.8
+	platterOpacity = tonumber(options.platteropacity.value) or platterOpactiyDefault
+	outlineOpacity = tonumber(options.outlineopacity.value) or outlineOpacityDefault
 	if drawDepthCheck then
 		-- We're going to draw the outline twice so tweak the opacity value accordingly
 		outlineOpacity = 1 - math.sqrt(1 - outlineOpacity)
@@ -264,7 +277,7 @@ function Init()
 	shaderConfig.ANIMATION = 1
 	shaderConfig.INITIALSIZE = 0.90
 	shaderConfig.GROWTHRATE = 10.0
-	shaderConfig.HEIGHTOFFSET = 0
+	shaderConfig.HEIGHTOFFSET = tonumber(options.selectionheight.value) or selectionHeightDefault
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. ");"
