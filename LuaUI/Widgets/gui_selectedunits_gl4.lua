@@ -66,7 +66,7 @@ local checkSelectionType = {}
 local allySelUnits, hoverUnitID
 
 local Init
-options_path = 'Settings/Interface/Selection/Selected Units'
+options_path = 'Settings/Interface/Selection/Default Selections'
 options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity', 'selectionheight', 'drawdepthcheck' }
 options = {
 	showallselections = {
@@ -85,7 +85,7 @@ options = {
 		min = 0.1,
 		max = 4,
 		step = 0.1,
-		value = 1.6,
+		value = 1.7,
 		OnChange = function(self)
 			Init()
 		end,
@@ -452,11 +452,8 @@ end
 function widget:Initialize()
 	if not gl.CreateShader or not Init() then
 		widgetHandler:RemoveWidget()
+		Spring.SendCommands({"luaui enablewidget UnitShapes"})
 		return
 	end
 	UpdateCmdColorsConfig(true)
-end
-
-function widget:Shutdown()
-	UpdateCmdColorsConfig(false)
 end

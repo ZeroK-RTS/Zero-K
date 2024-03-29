@@ -591,8 +591,6 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	SetupCommandColors(true)
-	
 	gl.DeleteList(clearquad)
 	
 	for _, shape in pairs(shapes) do
