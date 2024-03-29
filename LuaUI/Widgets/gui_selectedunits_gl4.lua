@@ -15,8 +15,7 @@ end
 local HOVER_SEL, LOCAL_SEL, OTHER_SEL = 1, 2, 3
 
 -- Configurable Parts:
-local lineWidthDefault, platterOpactiyDefault, outlineOpacityDefault, selectionHeightDefault = 2, 0.15, 0.75, 2.0
-local lineWidth, showOtherSelections, drawDepthCheck, platterOpacity, outlineOpacity, selectionHeight
+local lineWidth, showOtherSelections, drawDepthCheck, platterOpacity, outlineOpacity
 
 ---- GL4 Backend Stuff----
 -- FIXME: Make VBOs into a table?
@@ -82,14 +81,11 @@ options = {
 	linewidth = {
 		name = 'Outline Width',
 		desc = '',
-		type = 'radioButton',
-		items = {
-			{ name = 'Thin',     key = '1' },
-			{ name = 'Standard', key = tostring(lineWidthDefault) },
-			{ name = 'Thick', key = '3' },
-		},
-		value = tostring(lineWidthDefault),
-		noHotkey = true,
+		type = 'number',
+		min = 0.1,
+		max = 4,
+		step = 0.1,
+		value = 1.6,
 		OnChange = function(self)
 			Init()
 		end,
@@ -101,7 +97,7 @@ options = {
 		min = 0.0,
 		max = 1,
 		step = 0.05,
-		def = tostring(platterOpactiyDefault),
+		value = 0.15,
 		OnChange = function(self)
 			Init()
 		end,
@@ -113,7 +109,7 @@ options = {
 		min = 0.0,
 		max = 1.0,
 		step = 0.05,
-		def = tostring(outlineOpacityDefault),
+		value = 0.75,
 		OnChange = function(self)
 			Init()
 		end,
@@ -125,7 +121,7 @@ options = {
 		min = 0.0,
 		max = 8.0,
 		step = 1.0,
-		def = tostring(selectionHeightDefault),
+		value = 2,
 		OnChange = function(self)
 			Init()
 		end,
@@ -256,11 +252,12 @@ local function UpdateCmdColorsConfig(isOn)
 end
 
 function Init()
-	lineWidth = tonumber(options.linewidth.value) or lineWidthDefault
+	lineWidth = options.linewidth.value
 	showOtherSelections = options.showallselections.value
 	drawDepthCheck = options.drawdepthcheck.value
-	platterOpacity = tonumber(options.platteropacity.value) or platterOpactiyDefault
-	outlineOpacity = tonumber(options.outlineopacity.value) or outlineOpacityDefault
+	platterOpacity = options.platteropacity.value
+	outlineOpacity = options.outlineopacity.value
+	
 	if drawDepthCheck then
 		-- We're going to draw the outline twice so tweak the opacity value accordingly
 		outlineOpacity = 1 - math.sqrt(1 - outlineOpacity)
@@ -281,7 +278,7 @@ function Init()
 	shaderConfig.ANIMATION = 1
 	shaderConfig.INITIALSIZE = 0.90
 	shaderConfig.GROWTHRATE = 10.0
-	shaderConfig.HEIGHTOFFSET = tonumber(options.selectionheight.value) or selectionHeightDefault
+	shaderConfig.HEIGHTOFFSET = options.selectionheight.value
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. ");"
