@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Selection BlurryHalo",
+    name      = "Selection BlurryHalo 2",
     desc      = "Shows a halo for selected, hovered ally-selected units.",
     author    = "CarRepairer, from jK's gfx_halo, modified by Shadowfury333 and aeonios",
     date      = "Jan, 2017",
