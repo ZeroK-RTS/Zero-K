@@ -95,9 +95,9 @@ options = {
 		desc = 'Opacity of the selection fill - 0 is invisble',
 		type = 'number',
 		min = 0.0,
-		max = 0.3,
-		step = 0.1,
-		def = 0.2,
+		max = 1,
+		step = 0.05,
+		def = 0.15,
 		OnChange = function(self)
 			Init()
 		end,
@@ -106,10 +106,10 @@ options = {
 		name = 'Outline Opacity',
 		desc = 'Opacity of the selection outline - 1 is solid',
 		type = 'number',
-		min = 0.7,
+		min = 0.0,
 		max = 1.0,
-		step = 0.1,
-		def = 0.9,
+		step = 0.05,
+		def = 0.75,
 		OnChange = function(self)
 			Init()
 		end,
