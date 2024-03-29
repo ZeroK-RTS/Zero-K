@@ -104,17 +104,20 @@ function makeInstanceVBOTable(layout, maxElements, myName, unitIDattribID)
 			if index then 
 				local instanceStep = self.instanceStep
 				local instanceData = self.instanceData
+				
+				local dstpos = newUsedElements * instanceStep
+				local srcpos = (i - 1) * instanceStep
 				for j=1, instanceStep do 
-					newInstanceData[newUsedElements * instanceStep + j] = instanceData[(i-1)*instanceStep +j]
+					newInstanceData[dstpos + j] = instanceData[srcpos +j]
 				end
 				newUsedElements = newUsedElements + 1
 				newInstanceIDtoIndex[instanceID] = newUsedElements
 				newIndexToInstanceID[newUsedElements] = instanceID
 			else
-			    Spring.Echo("compacting index",i, 'instanceID', instanceID) 
+			    --Spring.Echo("compacting index",i, 'instanceID', instanceID) 
 			end
 		end
-		Spring.Echo("Post compacting", self.usedElements, newUsedElements)
+		--Spring.Echo("Post compacting", self.usedElements, newUsedElements)
 		self.usedElements = newUsedElements
 		self.instanceIDtoIndex = newInstanceIDtoIndex
 		self.indextoInstanceID = newIndexToInstanceID
@@ -136,7 +139,34 @@ function makeInstanceVBOTable(layout, maxElements, myName, unitIDattribID)
 		end
 	end
 	
+	function instanceTable:getMemUsage()
+		-- arrays are 16 bytes per element
+		-- Hash tables are 40 bytes per element
+		local totalMem = 0
+		totalMem = totalMem + self.usedElements * self.instanceStep * 16 -- the actual instance data
+		totalMem = totalMem + self.usedElements * 16 -- indextoinstanceid
+		totalMem = totalMem + self.usedElements * 40 -- instanceIDtoIndex
+		if self.indextoUnitID then totalMem = totalMem + self.usedElements * 16 end
+		return totalMem
+	end
+	
 	newInstanceVBO:Upload(instanceData)
+	
+	--register self in WG if possible
+	if WG then 
+		if WG.VBOTableRegistry == nil then
+			--Spring.Echo("WG.VBORegistry == nil, creating registry on first load")
+			WG.VBOTableRegistry = {}
+		end
+		if WG.VBOTableRegistry[instanceTable.myName] then 
+			local newname = instanceTable.myName .. tostring(math.random())
+			--Spring.Echo(instanceTable.myName, 'already registered, renaming to', newname)
+			instanceTable.myName = newname
+		end
+		--Spring.Echo("Registered ", instanceTable.myName)
+		WG.VBOTableRegistry[instanceTable.myName] = instanceTable
+	end
+	
 	return instanceTable
 end
 
@@ -298,19 +328,23 @@ function resizeInstanceVBOTable(iT)
 		-- we need to walk through both tables at the same time, and virtually pop all invalid unit/featureIDs on a resize, or else face dire consequences (crashes) later on
 		-- the tables we need to keep updated are:
 		local new_instanceData = {}
+		local new_instanceData_count = 0
 		local new_usedElements = 0
 		local new_instanceIDtoIndex = {}
 		local new_indextoInstanceID = {}
 		local new_indextoUnitID = {}
 		local invalidcount = 0
+		local iTStep = iT.instanceStep
 
 		for i, objectID in ipairs(iT.indextoUnitID) do
 			local isValidID = false
 			if iT.featureIDs then isValidID = Spring.ValidFeatureID(objectID)
 			else isValidID = Spring.ValidUnitID(objectID) end
 			if isValidID then
-				for j = 1, iT.instanceStep do 
-					new_instanceData[#new_instanceData + 1 ] = iT.instanceData[j + new_usedElements * iT.instanceStep]
+				local offset = new_usedElements * iTStep
+				for j = 1, iTStep do 
+					new_instanceData_count = new_instanceData_count + 1
+					new_instanceData[new_instanceData_count] = iT.instanceData[j + offset]
 				end
 				new_usedElements = new_usedElements + 1 
 				local currentInstanceID = iT.indextoInstanceID[i]
@@ -414,6 +448,7 @@ function pushElementInstance(iT,thisInstance, instanceID, updateExisting, noUplo
 		if isvalidid == false then 
 			Spring.Echo("Error: Attempted to push an invalid unit/featureID",unitID, "into", iT.myName)
 			noUpload = true
+			Spring.Debug.TraceFullEcho(20,20,20,"invalid unit/featureID in " ..iT.myName)
 		end  
 		iT.indextoUnitID[thisInstanceIndex] = unitID
 	end
@@ -525,8 +560,8 @@ function popElementInstance(iT, instanceID, noUpload)
 						if iT.numZombies and iT.numZombies > 0 then -- WE HAVE ZOMBIES AAAAARGH
 							local s = "Warning: We have " .. tostring(iT.numZombies) .. " zombie units left over in " .. iT.myName
 							for zombie, gf in pairs(iT.zombies) do 
-								s = s .. " " .. tostring(zombie)
-								Spring.Echo("ZOMBIE AT", zombie, Spring.GetUnitPosition(zombie))
+								s = s .. " " .. tostring(zombie) ..'/'..tostring(gf)
+								Spring.Echo("ZOMBIE instanceID", zombie, 'gf',gf)
 								--Spring.SendCommands({"pause 1"})
 								Spring.Debug.TraceFullEcho(nil,nil,nil, iT.myName)
 							end 
@@ -565,8 +600,8 @@ function popElementInstance(iT, instanceID, noUpload)
 						iT.zombies = {}
 						iT.numZombies = 0
 					end 
-					if iT.zombies[popunitID] == nil then 
-						iT.zombies[popunitID] = gf
+					if iT.zombies[lastElementInstanceID] == nil then 
+						iT.zombies[lastElementInstanceID] = gf
 						iT.numZombies = iT.numZombies + 1 
 					end
 				end
@@ -583,7 +618,10 @@ function getElementInstanceData(iT, instanceID, cacheTable)
 	-- iT: instanceTable created with makeInstanceTable
 	-- instanceID: an optional key given to the item, so it can be easily removed by reference, defaults to the index of the instance in the buffer (1 based)
 	local instanceIndex = iT.instanceIDtoIndex[instanceID] 
-	if instanceIndex == nil then return nil end
+	if instanceIndex == nil then 
+		Spring.Echo("Tried to getElementInstanceData from",iT.myName,instanceID, "but it does not exist")
+		return nil 
+	end
 	local iData = cacheTable or {}
 	local iTStep = iT.instanceStep
 	instanceIndex = (instanceIndex-1) * iTStep
@@ -640,7 +678,6 @@ function compactInstanceVBO(iT, removelist, keeplist)
 	if usedElements == 0 then return 0 end
 	local instanceStep = iT.instanceStep
 	local instanceData = iT.instanceData
-	local instanceIDtoIndex = iT.instanceIDtoIndex
 	local indextoInstanceID = iT.indextoInstanceID
 	local newindextoInstanceID = {}
 	local newinstanceIDtoIndex = {}
@@ -662,11 +699,12 @@ function compactInstanceVBO(iT, removelist, keeplist)
 			numremoved = numremoved + 1
 		end
 	end
-	
-	iT.dirty = true -- we set the flag to notify that CPU and GPU contents dont match!
-	iT.usedElements = newUsedElements
-	iT.instanceIDtoIndex = newinstanceIDtoIndex
-	iT.indextoInstanceID = newindextoInstanceID
+	if numremoved > 0 then 
+		iT.dirty = true -- we set the flag to notify that CPU and GPU contents dont match!
+		iT.usedElements = newUsedElements
+		iT.instanceIDtoIndex = newinstanceIDtoIndex
+		iT.indextoInstanceID = newindextoInstanceID
+	end
 	return numremoved
 end
 
@@ -807,10 +845,11 @@ function makePlaneIndexVBO(xresolution, yresolution, cutcircle)
 	return planeIndexVBO, IndexVBOData
 end
 
-function makePointVBO(numPoints)
+function makePointVBO(numPoints, randomFactor)
 	-- makes points with xyzw
 	-- can be used in both GL.LINES and GL.TRIANGLE_FAN mode
-	if not numPoints then numPoints = 1 end
+	numPoints = numPoints or 1
+	randomFactor = randomFactor or 0
 	local pointVBO = gl.GetVBO(GL.ARRAY_BUFFER,true)
 	if pointVBO == nil then return nil end
 
@@ -821,10 +860,10 @@ function makePointVBO(numPoints)
 	local VBOData = {}
 
 	for i = 1, numPoints  do -- 
-		VBOData[#VBOData+1] = 0-- X
-		VBOData[#VBOData+1] = 0-- Y
-		VBOData[#VBOData+1] = 0---Z
-		VBOData[#VBOData+1] = numPoints -- index for lolz?
+		VBOData[#VBOData+1] = randomFactor * math.random()-- X
+		VBOData[#VBOData+1] = randomFactor * math.random()-- Y
+		VBOData[#VBOData+1] = randomFactor * math.random()---Z
+		VBOData[#VBOData+1] = i/numPoints -- index for lolz?
 	end	
 
 	pointVBO:Define(

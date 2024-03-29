@@ -62,7 +62,7 @@ local function StartRetreat(unitID)
 	end
 end
 
-options_path = 'Settings/Interface/Selection'
+options_path = 'Settings/Interface/Selection/Filtering'
 local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = {
 	'label_selection_rank',

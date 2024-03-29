@@ -436,15 +436,21 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 		springsetting = 'HardwareCursor',
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end,
 	})
-	
+
+ShLabel('Settings/Interface/Selection', 'Selection Graphics Options')
+
+local pathSelectionGL4 = 'Settings/Interface/Selection/Default Selections'
 local pathSelectionShapes = 'Settings/Interface/Selection/Selection Shapes'
 local pathSelectionXrayHalo = 'Settings/Interface/Selection/Selection XRay&Halo'
 local pathSelectionPlatters = 'Settings/Interface/Selection/Team Platters'
 local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selections'
+	ShButton(pathSelectionGL4, 'Toggle Default Selections', function() spSendCommands{"luaui togglewidget Selected Units GL4"} end, "Draws a configurable box and platter underneath units. This is the default, but required a graphics card capable of using shaders.")
 	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
 	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
+
+ShLabel('Settings/Interface/Selection', 'General Settings')
 
 local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
 	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
