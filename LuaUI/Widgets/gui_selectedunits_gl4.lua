@@ -62,10 +62,76 @@ local GL_POINTS                                             = GL.POINTS
 local selUnits                                              = {}
 local doUpdate, allySelUnits, hoverUnitID
 
+local Init
+options_path = 'Settings/Interface/Selection/Selected Units'
+options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity',  'drawdepthcheck' }
+options = {
+	showallselections = {
+		name = 'Show Other Selections',
+		desc = 'Show selections of other players',
+		type = 'bool',
+		value = 'true',
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	linewidth = {
+		name = 'Outline Width',
+		desc = '',
+		type = 'radioButton',
+		items = {
+			{ name = 'Thin',     key = '1' },
+			{ name = 'Standard', key = '2' },
+			{ name = 'Thick', key = '3' },
+		},
+		value = '2',
+		noHotkey = true,
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	platteropacity = {
+		name = 'Fill Opacity',
+		desc = 'Opacity of the selection fill - 0 is invisble',
+		type = 'number',
+		min = 0.0,
+		max = 0.3,
+		step = 0.1,
+		def = 0.2,
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	outlineopacity = {
+		name = 'Outline Opacity',
+		desc = 'Opacity of the selection outline - 1 is solid',
+		type = 'number',
+		min = 0.7,
+		max = 1.0,
+		step = 0.1,
+		def = 0.9,
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	drawdepthcheck = {
+		name = 'Draw Selections in Unit Plane',
+		desc = 'If disabled, selections are only drawn below units and never above - even for planes',
+		type = 'bool',
+		value = 'true',
+		OnChange = function(self)
+			Init()
+		end,
+	}
+}
+
 -- { vertices, width, length }
-local unitDefToSel                                             = {}
+local unitDefToSel = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
 	local scale = (8 * (unitDef.xsize ^ 2 + unitDef.zsize ^ 2) ^ 0.5) - 2.0
+	if unitDef.customParams.selection_scale then
+		scale = scale * tonumber(unitDef.customParams.selection_scale)
+	end
 	if unitDef.isBuilding or unitDef.isFactory or unitDef.speed == 0 then
 		local platterOverlap = 1.0 -- To make sure there aren't rendering gaps between adjacent buildings.
 		unitDefToSel[unitDefID] = {
@@ -136,7 +202,7 @@ end
 
 local function RemoveSelected(unitID)
 	doUpdate = true
-	selUnits[unitID] = nil	
+	selUnits[unitID] = nil
 	if hoverSelectionVBO.instanceIDtoIndex[unitID] then
 		popElementInstance(hoverSelectionVBO, unitID)
 	end
@@ -169,7 +235,7 @@ local function UpdateCmdColorsConfig(isOn)
 	spLoadCmdColorsConfig('unitBox  0 1 0 ' .. (isOn and 0 or 1))
 end
 
-local function init()
+function Init()
 	lineWidth = tonumber(options.linewidth.value) or 2.0
 	showOtherSelections = options.showallselections.value
 	drawDepthCheck = options.drawdepthcheck.value
@@ -205,69 +271,7 @@ local function init()
 	return selectionShader ~= nil
 end
 
-options_path = 'Settings/Interface/Selection/Selected Units'
-options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity',  'drawdepthcheck' }
-options = {
-	showallselections = {
-		name = 'Show Other Selections',
-		desc = 'Show selections of other players',
-		type = 'bool',
-		value = 'true',
-		OnChange = function(self)
-			init()
-		end,
-	},
-	linewidth = {
-		name = 'Outline Width',
-		desc = '',
-		type = 'radioButton',
-		items = {
-			{ name = 'Thin',     key = '1' },
-			{ name = 'Standard', key = '2' },
-			{ name = 'Thick', key = '3' },
-		},
-		value = '2',
-		noHotkey = true,
-		OnChange = function(self)
-			init()
-		end,
-	},
-	platteropacity = {
-		name = 'Fill Opacity',
-		desc = 'Opacity of the selection fill - 0 is invisble',
-		type = 'number',
-		min = 0.0,
-		max = 0.3,
-		step = 0.1,
-		def = 0.2,
-		OnChange = function(self)
-			init()
-		end,
-	},
-	outlineopacity = {
-		name = 'Outline Opacity',
-		desc = 'Opacity of the selection outline - 1 is solid',
-		type = 'number',
-		min = 0.7,
-		max = 1.0,
-		step = 0.1,
-		def = 0.9,
-		OnChange = function(self)
-			init()
-		end,
-	},
-	drawdepthcheck = {
-		name = 'Draw Selections in Unit Plane',
-		desc = 'If disabled, selections are only drawn below units and never above - even for planes',
-		type = 'bool',
-		value = 'true',
-		OnChange = function(self)
-			init()
-		end,
-	}
-}
-
-local function drawSelection(vbo, preUnit)
+local function DrawSelectionType(vbo, preUnit)
 	if vbo.usedElements == 0 then
 		return
 	end
@@ -287,7 +291,7 @@ end
 
 -- Callins
 
-function widget:drawSelections(preUnit)
+function DrawSelections(preUnit)
 	if hasBadCulling then
 		gl.Culling(false)
 	end
@@ -302,9 +306,9 @@ function widget:drawSelections(preUnit)
 	glStencilMask(1)
 
 	-- Each selection priority is drawn in sequence.
-	drawSelection(hoverSelectionVBO, preUnit)
-	drawSelection(localSelectionVBO, preUnit)
-	drawSelection(otherSelectionVBO, preUnit)
+	DrawSelectionType(hoverSelectionVBO, preUnit)
+	DrawSelectionType(localSelectionVBO, preUnit)
+	DrawSelectionType(otherSelectionVBO, preUnit)
 
 	selectionShader:Deactivate()
 
@@ -318,12 +322,12 @@ function widget:drawSelections(preUnit)
 end
 
 function widget:DrawWorldPreUnit()
-	widget:drawSelections(true)
+	DrawSelections(true)
 end
 
 function widget:DrawWorld()
 	if drawDepthCheck then
-		widget:drawSelections(false)
+		DrawSelections(false)
 	end
 end
 
@@ -401,11 +405,11 @@ end
 
 function widget:VisibleUnitsChanged()
 	-- Only called on start/stop of api_unit_tracker
-	init()
+	Init()
 end
 
 function widget:Initialize()
-	if not gl.CreateShader or not init() then
+	if not gl.CreateShader or not Init() then
 		widgetHandler:RemoveWidget()
 		return
 	end
