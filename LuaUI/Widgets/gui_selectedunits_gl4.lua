@@ -257,11 +257,7 @@ function Init()
 	drawDepthCheck = options.drawdepthcheck.value
 	platterOpacity = options.platteropacity.value
 	outlineOpacity = options.outlineopacity.value
-	
-	if drawDepthCheck then
-		-- We're going to draw the outline twice so tweak the opacity value accordingly
-		outlineOpacity = 1 - math.sqrt(1 - outlineOpacity)
-	end
+
 	checkSelectionType[HOVER_SEL] = true
 	checkSelectionType[LOCAL_SEL] = true
 	checkSelectionType[OTHER_SEL] = showOtherSelections
@@ -298,11 +294,19 @@ local function DrawSelectionType(vbo, preUnit)
 
 	-- Draw platter
 	glDepthTest(false)
-	glColorMask(preUnit) -- Only draw in preUnit, stencil later
+	glColorMask(preUnit) -- Only color in preUnit, stencil later
 	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
 
 	-- Draw outlines
-	glDepthTest(not preUnit) -- No depth check for world
+	-- Draw the below ground half of the outline in the preUnit pass, and the above ground half in the postUnit pass.
+	-- This allows us to cheat the depth check for the below ground pass. 
+	if not drawDepthCheck then
+		glDepthTest(false)
+	elseif preUnit then
+		glDepthTest(GL.GREATER)
+	else
+		glDepthTest(GL.LEQUAL)
+	end
 	glColorMask(true)
 	selectionShader:SetUniform("addRadius", lineWidth)
 	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
