@@ -128,16 +128,21 @@ options = {
 -- { vertices, width, length }
 local unitDefToSel = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-	local scale = (8 * (unitDef.xsize ^ 2 + unitDef.zsize ^ 2) ^ 0.5) - 2.0
-	if unitDef.customParams.selection_scale then
-		scale = scale * tonumber(unitDef.customParams.selection_scale)
+	local scaleFactor = 8.0
+	local xsize, zsize = unitDef.xsize, unitDef.zsize
+	local scale = (scaleFactor * (xsize ^ 2 + zsize ^ 2) ^ 0.5)
+	if unitDef.customParams and unitDef.customParams.selection_scale then
+		local factor = (tonumber(unitDef.customParams.selection_scale) or 1)
+		scale = scale * factor
+		xsize = xsize * factor
+		zsize = zsize * factor
 	end
-	if unitDef.isBuilding or unitDef.isFactory or unitDef.speed == 0 then
+	if unitDef.isImmobile then
 		local platterOverlap = 1.0 -- To make sure there aren't rendering gaps between adjacent buildings.
 		unitDefToSel[unitDefID] = {
 			4,
-			unitDef.xsize * 8 + platterOverlap,
-			unitDef.zsize * 8 + platterOverlap
+			xsize * scaleFactor + platterOverlap,
+			zsize * scaleFactor + platterOverlap
 		}
 	elseif unitDef.canFly then
 		unitDefToSel[unitDefID] = {
