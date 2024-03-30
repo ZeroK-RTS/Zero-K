@@ -22,6 +22,7 @@ return { vehraid = {
     aim_lookahead      = 80,
     set_target_range_buffer = 30,
     set_target_speed_buffer = 8,
+    selection_scale = 1.2,
   },
 
   explodeAs              = [[BIG_UNITEX]],

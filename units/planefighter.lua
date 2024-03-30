@@ -38,6 +38,7 @@ return { planefighter = {
     outline_x = 85,
     outline_y = 85,
     outline_yoff = 16,
+    selection_scale = 1.12,
   },
 
   explodeAs              = [[GUNSHIPEX]],

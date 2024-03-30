@@ -23,7 +23,7 @@ return { tankcon = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -4 0]],
     modelradius    = [[30]],
-    selection_scale = 1.2,
+    selection_scale = 1.5,
 
     outline_x = 80,
     outline_y = 80,

@@ -29,7 +29,7 @@ return { striderdetriment = {
     jump_rotate_midair    = 0,
     modelradius           = [[95]],
     draw_reload_num       = 3,
-    selection_scale       = 1.12,
+    selection_scale       = 1.4,
     decloak_footprint     = 6,
 
     stats_show_death_explosion = 1,

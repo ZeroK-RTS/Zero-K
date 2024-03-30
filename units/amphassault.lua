@@ -22,6 +22,7 @@ return { amphassault = {
     amph_regen = 40,
     amph_submerged_at = 40,
     sink_on_emp    = 0,
+    selection_scale = 1.22,
     floattoggle    = [[1]],
     aimposoffset   = [[0 30 0]],
     midposoffset   = [[0 6 0]],

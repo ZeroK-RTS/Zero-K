@@ -17,6 +17,7 @@ return { spiderassault = {
     bait_level_default = 0,
     modelradius    = [[12]],
     cus_noflashlight = 1,
+    selection_scale = 1.05,
   },
 
   explodeAs              = [[BIG_UNITEX]],

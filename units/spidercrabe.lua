@@ -23,6 +23,7 @@ return { spidercrabe = {
     outline_x = 110,
     outline_y = 110,
     outline_yoff = 5,
+    selection_scale = 0.98,
   },
 
   damageModifier         = 0.333,

@@ -32,6 +32,7 @@ return { striderfunnelweb = {
     shield_power_gfx_override = 10000,
     selection_rank = 3,
     disable_radar_preview = 1,
+    selection_scale = 1.36,
 
     outline_x = 160,
     outline_y = 160,

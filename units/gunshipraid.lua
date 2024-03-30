@@ -21,6 +21,7 @@ return { gunshipraid = {
   customParams           = {
     airstrafecontrol = [[1]],
     modelradius    = [[18]],
+    selection_scale = 1.2,
   },
 
   explodeAs              = [[GUNSHIPEX]],

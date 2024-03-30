@@ -21,6 +21,7 @@ return { hoverskirm = {
     modelradius    = [[25]],
     turnatfullspeed_hover = [[1]],
     okp_damage = 615,
+    selection_scale = 0.98,
   },
 
   explodeAs           = [[BIG_UNITEX]],
