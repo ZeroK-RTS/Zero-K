@@ -20,6 +20,7 @@ return { amphriot = {
     sink_on_emp    = 1,
     floattoggle    = [[1]],
     set_target_range_buffer = 35,
+    selection_scale = 1.17,
   },
 
   explodeAs              = [[BIG_UNITEX]],

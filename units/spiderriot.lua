@@ -19,6 +19,7 @@ return { spiderriot = {
   customParams           = {
     aimposoffset       = [[0 10 0]],
     aim_lookahead      = 80,
+    selection_scale = 1.2,
   },
 
   explodeAs              = [[BIG_UNITEX]],

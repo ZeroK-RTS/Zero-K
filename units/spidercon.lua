@@ -22,7 +22,7 @@ return { spidercon = {
 
   customParams           = {
     modelradius    = [[15]],
-    selection_scale = 1.2,
+    selection_scale = 1.5,
     disable_radar_preview = 1,
   },
 

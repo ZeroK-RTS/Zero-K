@@ -21,6 +21,7 @@ return { jumpassault = {
     outline_x = 125,
     outline_y = 125,
     outline_yoff = 21,
+    selection_scale = 1.1,
   },
 
   explodeAs           = [[BIG_UNITEX]],

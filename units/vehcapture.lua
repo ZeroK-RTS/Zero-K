@@ -22,6 +22,7 @@ return { vehcapture = {
     modelradius    = [[13]],
     turnatfullspeed = [[1]],
     cus_noflashlight = 1,
+    selection_scale = 1.05,
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -38,6 +38,7 @@ return { gunshipcon = {
     outline_x = 105,
     outline_y = 105,
     outline_yoff = 25,
+    selection_scale = 1.2,
   },
 
   explodeAs           = [[GUNSHIPEX]],
