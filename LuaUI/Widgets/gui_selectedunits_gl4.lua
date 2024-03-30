@@ -314,7 +314,7 @@ function Init()
 	shaderConfig.CLIPTOLERANCE = 2
 	shaderConfig.INITIALSIZE = 0.85
 	shaderConfig.GROWTHRATE = 18.0
-	shaderConfig.HEIGHTOFFSET = options.selectionheight.value
+	shaderConfig.HEIGHTOFFSET = options.selectionheight.value .. ' - min(0.0, max(-lengthwidthcornerheight.x / 4.0, v_centerpos.y))' -- When under water raise the selection height by up to 1/4 the unit height. This helps avoid ground clipping issues.
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, opacity * (texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. "));"

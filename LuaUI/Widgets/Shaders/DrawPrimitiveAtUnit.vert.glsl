@@ -104,7 +104,7 @@ void main()
 
 	if (dot(v_centerpos.xyz, v_centerpos.xyz) < 1.0) v_numvertices = 0; // if the center pos is at (0,0,0) then we probably dont have the matrix yet for this unit, because it entered LOS but has not been drawn yet.
 
-	v_centerpos.y += HEIGHTOFFSET - min(0.0, max(-lengthwidthcornerheight.x / 4.0, v_centerpos.y)) ; // Add some height to ensure above groundness
+	v_centerpos.y += HEIGHTOFFSET; // Add some height to ensure above groundness
 	v_centerpos.y += lengthwidthcornerheight.w; // Add per-instance height offset
 	#if (FULL_ROTATION == 1)
 		v_fullrotation = mat3(modelMatrix);
