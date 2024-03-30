@@ -272,8 +272,9 @@ function Init()
 	local shaderConfig = DPatUnit.shaderConfig
 	shaderConfig.BILLBOARD = 0
 	shaderConfig.ANIMATION = 1
-	shaderConfig.INITIALSIZE = 0.90
-	shaderConfig.GROWTHRATE = 10.0
+	shaderConfig.CLIPTOLERANCE = 2
+	shaderConfig.INITIALSIZE = 0.4
+	shaderConfig.GROWTHRATE = 2.5
 	shaderConfig.HEIGHTOFFSET = options.selectionheight.value
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
