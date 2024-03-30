@@ -25,11 +25,16 @@ local resources = {
 			'smoke/smoke11.tga',
 		},
 
-		scars = {
+		scars = Script.IsEngineMinVersion(105, 0, 2400) and {
 			'scars/scar1.png',
 			'scars/scar2.png',
 			'scars/scar3.png',
 			'scars/scar4.png',
+		} or {
+			'unknown/enlarge_old/scar1.png',
+			'unknown/enlarge_old/scar2.png',
+			'unknown/enlarge_old/scar3.png',
+			'unknown/enlarge_old/scar4.png',
 		},
 
 		trees = {
