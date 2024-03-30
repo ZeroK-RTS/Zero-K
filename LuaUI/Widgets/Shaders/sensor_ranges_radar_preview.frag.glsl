@@ -1,6 +1,6 @@
 #version 420
-// This shader is allegedly (c) Beherith (mysterme@gmail.com)
-// Better ask him before taking it beyond ZK
+// Beherith (mysterme@gmail.com) claims copyright on this file. He gives the Zero-K team permission to
+// use this for ZK but he would be unhappy if it were copied further without asking him, so best to ask.
 
 #line 20000
 
