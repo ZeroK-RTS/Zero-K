@@ -206,14 +206,14 @@ return {
     },
     smokeair = {
       air                = true,
-      class              = [[CSmokeProjectile2]],
+      class              = [[CSmokeProjectile]],
       count              = 2,
       ground             = false,
       water              = false,
       properties = {
-        agespeed           = 0.01,
-        color               = 1.0,
-        pos                = [[r-2 r2, r-100 -10, r-2 r2]],
+        agespeed           = 0.013,
+        color               = 0.9,
+        pos                = [[r-4 r4, r-100 -10, r-4 r4]],
         size               = 35,
         sizeexpansion      = 0.4,
         speed              = [[r-1.5 r1.5, -5 r-5.3, r-1.5 r1.5]],
