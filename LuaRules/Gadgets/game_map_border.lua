@@ -40,9 +40,9 @@ local OUT_OF_BOUNDS_UPDATE_FREQ = 3
 
 local UP_IMPULSE = 0.25
 local SIDE_IMPULSE = 1.5
-local RAMP_DIST = 180
-local NEAR_DIST = 500
-local DEFAULT_EDGE_BORDER = 800
+local RAMP_DIST = 800
+local NEAR_DIST = 200
+local DEFAULT_EDGE_BORDER = 400
 local DEFAULT_EDGE_NEAR = DEFAULT_EDGE_BORDER - NEAR_DIST
 
 local impulseMultipliers = {
@@ -210,6 +210,8 @@ local function HandleOutOFBoundsUnit(unitID, moveType)
 	end
 	
 	GG.AddGadgetImpulseRaw(unitID, vx*mag*SIDE_IMPULSE, UP_IMPULSE, vz*mag*SIDE_IMPULSE, true, true)
+	--local x, _, z = Spring.GetUnitPosition(unitID)
+	--Spring.Echo(x, z, "position")
 end
 
 -------------------------------------------------------------------------------------
