@@ -67,8 +67,7 @@ local GL_POINTS                                             = GL.POINTS
 
 local selUnits                                              = {}
 local checkSelectionType = {}
-local allySelUnits, hoverUnitID
-local lastAllySelStaleCheck = WG.allySelStaleCheck
+local lastHoverUnitID, lastAllySelStaleCheck
 local otherOpacityMult = 0.4
 
 local Init
@@ -271,8 +270,8 @@ end
 
 local function FindPreselUnits()
 	local preselection = {}
-	if hoverUnitID then
-		preselection[hoverUnitID] = true
+	if lastHoverUnitID then
+		preselection[lastHoverUnitID] = true
 	end
 	for _, unitID in pairs(GetUnitsInSelectionBox() or {}) do
 		preselection[unitID] = true
@@ -291,9 +290,6 @@ local function UpdateCmdColorsConfig(isOn)
 end
 
 function Init()
-	local spectating, fullSelect = Spring.GetSpectatingState()
-	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
-	
 	lineWidth = options.linewidth.value
 	drawDepthCheck = options.drawdepthcheck.value
 	platterOpacity = options.platteropacity.value
@@ -301,7 +297,7 @@ function Init()
 
 	checkSelectionType[HOVER_SEL] = true
 	checkSelectionType[LOCAL_SEL] = true
-	checkSelectionType[OTHER_SEL] = (otherOpacityMult > 0)
+	checkSelectionType[OTHER_SEL] = true
 
 	for unitID, _ in pairs(selUnits) do
 		RemoveSelected(unitID)
@@ -412,29 +408,22 @@ local function CleanSelections(typeToClear, newSelUnits)
 	return changed
 end
 
-local function CheckAllySelectionUpdate()
-	if lastAllySelStaleCheck == WG.allySelStaleCheck then
-		return false
-	end
-	lastAllySelStaleCheck = WG.allySelStaleCheck
-	return true
-end
-
 function widget:Update(dt)
-	local newHoverUnitID = GetUnitUnderCursor(false)
+	local hoverUnitID = GetUnitUnderCursor(false)
 	local isSelectionBoxActive = IsSelectionBoxActive()
 	local spectating, fullSelect = spGetSpectatingState()
 	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
-
-	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or newHoverUnitID ~= hoverUnitID or isSelectionBoxActive
-	hoverUnitID = newHoverUnitID
-
-	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (otherOpacityMult > 0)
-	local allySelUnits = WG.allySelUnits
+	
+	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or hoverUnitID ~= lastHoverUnitID or isSelectionBoxActive
+	checkSelectionType[OTHER_SEL] = otherOpacityMult > 0 and (checkSelectionType[OTHER_SEL] or WG.allySelStaleCheck ~= lastAllySelStaleCheck)
 
 	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
 		return
 	end
+
+	lastHoverUnitID = hoverUnitID
+	lastAllySelStaleCheck = WG.allySelStaleCheck
+
 	local useTeamcolor = (options.selectionColor.value == 'teamcolor')
 
 	local newSelUnits = {}
@@ -453,8 +442,6 @@ function widget:Update(dt)
 		if CleanSelections(HOVER_SEL, newSelUnits) then
 			checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
 		end
-	elseif wasSelectionBoxActive then
-		wasSelectionBoxActive = false
 	end
 
 	-- Local selections
@@ -475,7 +462,7 @@ function widget:Update(dt)
 
 	-- Ally/other selections
 	if checkSelectionType[OTHER_SEL] then
-		for unitID, _ in pairs(allySelUnits or {}) do
+		for unitID, _ in pairs(WG.allySelUnits or {}) do
 			local alreadySetType = newSelUnits[unitID]
 			if not alreadySetType and selUnits[unitID] ~= OTHER_SEL then
 				AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
@@ -486,7 +473,7 @@ function widget:Update(dt)
 		CleanSelections(OTHER_SEL, newSelUnits)
 	end
 
-    -- Prime it to check again next time around, as we may have stopped selecting without making a selection
+    -- Prime hover to check again next time around, as we may have stopped selecting without making a selection
 	checkSelectionType[HOVER_SEL] = isSelectionBoxActive
 	checkSelectionType[LOCAL_SEL] = false
 	checkSelectionType[OTHER_SEL] = false
