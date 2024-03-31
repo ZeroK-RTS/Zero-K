@@ -332,6 +332,7 @@ return { striderdetriment = {
     LANDING = {
       name                    = [[Jump Landing]],
       areaOfEffect            = 500,
+      scarDiameter            = 420,
       canattackground         = false,
       craterBoost             = 100,
       craterMult              = 15,
@@ -341,7 +342,7 @@ return { striderdetriment = {
       },
 
       edgeEffectiveness       = 0,
-      explosionGenerator      = [[custom:FLASH64]],
+      explosionGenerator      = [[custom:land_large]],
       explosionSpeed          = 500,
       impulseBoost            = 10,
       impulseFactor           = 2,

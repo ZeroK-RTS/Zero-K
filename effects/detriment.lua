@@ -222,36 +222,6 @@ return {
         glowfalloff        = 6.0,
       },
     },
-    smokeground = {
-      air                = false,
-      class              = [[CSmokeProjectile2]],
-      count              = 100,
-      ground             = true,
-      water              = false,
-      properties = {
-        agespeed           = 0.01,
-        color              = 1.0,
-        pos                = [[r-1 r1, 0, r-1 r1]],
-        size               = 10,
-        sizeexpansion      = 0.8,
-        speed              = [[r-5.5 r5.5, 0 r1, r-5.5 r5.5]],
-        startsize          = 5,
-        wantedpos          = [[r-100 r100, r50, r-100 r100]],
-        glowfalloff        = 6.0,
-      },
-    },
-    dirtypoof = {
-      class              = [[dirt]],
-      count              = 20,
-      ground             = true,
-      properties = {
-        alphafalloff       = 1,
-        color              = [[0.4, 0.2, 0.10]],
-        pos                = [[r-5 r10, 0, r-5 r10]],
-        size               = 10,
-        speed              = [[r-5 r5, r5, r-5 r5]],
-      },
-    },
   },
 
 }

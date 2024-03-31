@@ -230,9 +230,8 @@ end
 
 -- Jumping
 local function PreJumpThread(turn, lineDist, flightDist, duration)
-	Signal(SIG_Walk)
-	SetSignalMask(SIG_Walk)
-
+	script.StopMoving()
+	
 	DoRestore()
 	weaponBlocked = true
 	
@@ -316,6 +315,7 @@ function preJump(turn,lineDist,flightDist,duration)
 end
 
 function beginJump()
+	script.StopMoving()
 	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
 		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])

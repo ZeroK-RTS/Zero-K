@@ -231,6 +231,7 @@ end
 
 -- Jumping
 function preJump(turn,distance)
+	script.StopMoving()
 	local radians = turn*2*math.pi/2^16
 	local x = math.cos(radians)
 	local z = -math.sin(radians)
@@ -288,7 +289,8 @@ function preJump(turn,distance)
 end
 
 function beginJump()
-
+	script.StopMoving()
+	
 	Turn(b_dome, x_axis, 0, 0.2)
 	Turn(b_dome, z_axis, 0, 0.2)
 

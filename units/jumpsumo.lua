@@ -257,6 +257,7 @@ return { jumpsumo = {
     LANDING = {
       name                    = [[Jugglenaut Landing]],
       areaOfEffect            = 340,
+      scarDiameter            = 340,
       canattackground         = false,
       craterBoost             = 4,
       craterMult              = 6,
@@ -267,7 +268,7 @@ return { jumpsumo = {
       },
 
       edgeEffectiveness       = 0,
-      explosionGenerator      = [[custom:FLASH64]],
+      explosionGenerator      = [[custom:land_small]],
       impulseBoost            = 0.5,
       impulseFactor           = 1,
       interceptedByShieldType = 1,
