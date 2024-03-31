@@ -16,7 +16,7 @@ return { turretaaclose = {
   customParams                  = {
     bait_level_default = 1,
     aim_lookahead      = 120,
-    okp_damage = 500.1,
+    okp_damage = 700.1,
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -80,8 +80,8 @@ return { turretaaclose = {
       },
 
       damage                  = {
-        default = 50.1,
-        planes  = 500.1,
+        default = 70.1,
+        planes  = 700.1,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
