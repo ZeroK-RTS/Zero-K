@@ -432,20 +432,21 @@ end
 function widget:Update(dt)
 	local newHoverUnitID = GetUnitUnderCursor(false)
 	local isSelectionBoxActive = IsSelectionBoxActive()
+	local spectating, fullSelect = Spring.GetSpectatingState()
+	local otherSelOption = (spectating and options.spec_showSelect.value) or options.ally_showSelect.value
 
 	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or newHoverUnitID ~= hoverUnitID or isSelectionBoxActive
 	hoverUnitID = newHoverUnitID
 
 	-- TODO: Add a callin for when ally selections change?
-	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (options.ally_showSelect.value ~= 'disabled')
+	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (otherSelOption ~= 'disabled')
 	local allySelUnits = WG.allySelUnits
 
 	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
 		return
 	end
-	local spectating, fullSelect = Spring.GetSpectatingState()
-	local useTeamcolor = (spectating and options.spec_showSelect.value or options.ally_showSelect.value) == 'color'
-	otherOpacityMult = spectating and options.spec_strength.value or options.ally_strength.value
+	local useTeamcolor = (otherSelOption == 'color')
+	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
 
 	local newSelUnits = {}
 	-- Hover selections
