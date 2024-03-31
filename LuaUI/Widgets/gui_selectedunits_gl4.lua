@@ -459,14 +459,13 @@ function widget:Update(dt)
 	-- Local selections
 	if checkSelectionType[LOCAL_SEL] then
 		for _, unitID in pairs(spGetSelectedUnits()) do
-			if not newSelUnits[unitID] then
-				if selUnits[unitID] ~= LOCAL_SEL then
-					AddSelected(unitID, 255, localSelectionVBO, false)
-					selUnits[unitID] = LOCAL_SEL
-					checkSelectionType[OTHER_SEL] = true
-				end
-				newSelUnits[unitID] = LOCAL_SEL
+			local alreadySetType = newSelUnits[unitID]
+			if not alreadySetType and selUnits[unitID] ~= LOCAL_SEL then
+				AddSelected(unitID, 255, localSelectionVBO, false)
+				selUnits[unitID] = LOCAL_SEL
+				checkSelectionType[OTHER_SEL] = true
 			end
+			newSelUnits[unitID] = alreadySetType or LOCAL_SEL
 		end
 		if CleanSelections(LOCAL_SEL, newSelUnits) then
 			checkSelectionType[OTHER_SEL] = true
@@ -476,13 +475,12 @@ function widget:Update(dt)
 	-- Ally/other selections
 	if checkSelectionType[OTHER_SEL] then
 		for unitID, _ in pairs(allySelUnits or {}) do
-			if not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
-				if selUnits[unitID] ~= OTHER_SEL then
-					AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
-					selUnits[unitID] = OTHER_SEL
-				end
-				newSelUnits[unitID] = OTHER_SEL
+			local alreadySetType = newSelUnits[unitID]
+			if not alreadySetType and selUnits[unitID] ~= OTHER_SEL then
+				AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
+				selUnits[unitID] = OTHER_SEL
 			end
+			newSelUnits[unitID] = alreadySetType or OTHER_SEL
 		end
 		CleanSelections(OTHER_SEL, newSelUnits)
 	end
