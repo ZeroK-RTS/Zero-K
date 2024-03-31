@@ -73,7 +73,7 @@ local Init
 options_path = 'Settings/Interface/Selection/Default Selections'
 options_order = {
 	'linewidth', 'platteropacity', 'outlineopacity', 
-	'ally_showSelect', 'ally_strength', 'spec_showSelect', 'spec_strength',
+	'selectionColor', 'ally_strength', 'spec_strength',
 	'selectionheight', 'drawdepthcheck',
 }
 options = {
@@ -113,13 +113,12 @@ options = {
 			Init()
 		end,
 	},
-	ally_showSelect = {
-		name = 'Ally Selections',
+	selectionColor = {
+		name = 'Other Selections (allies and spectating)',
 		type = 'radioButton',
 		items = {
-			{name = 'Enabled',key='enabled', desc="Show selected ally units."},
-			{name = 'Enabled with colour',key='color', desc="Show selected ally units with their team colour."},
-			{name = 'Disabled',key='disabled', desc="Do not show any allied selection."},
+			{name = 'Shown with team colour',key='teamcolor', desc="Show selected ally units with their team colour."},
+			{name = 'Shown as yellow',key='yellow', desc="Show selected ally units."},
 		},
 		value = 'color',
 		OnChange = function(self)
@@ -134,19 +133,6 @@ options = {
 		max = 1,
 		step = 0.05,
 		value = 0.4,
-		OnChange = function(self)
-			Init()
-		end,
-	},
-	spec_showSelect = {
-		name = 'Player Selections (as spectator)',
-		type = 'radioButton',
-		items = {
-			{name = 'Enabled',key='enabled', desc="Show selected player units."},
-			{name = 'Enabled with colour',key='color', desc="Show selected player units with their team colour."},
-			{name = 'Disabled',key='disabled', desc="Do not show any player selection."},
-		},
-		value = 'color',
 		OnChange = function(self)
 			Init()
 		end,
@@ -303,6 +289,9 @@ local function UpdateCmdColorsConfig(isOn)
 end
 
 function Init()
+	local spectating, fullSelect = Spring.GetSpectatingState()
+	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
+	
 	lineWidth = options.linewidth.value
 	drawDepthCheck = options.drawdepthcheck.value
 	platterOpacity = options.platteropacity.value
@@ -310,7 +299,7 @@ function Init()
 
 	checkSelectionType[HOVER_SEL] = true
 	checkSelectionType[LOCAL_SEL] = true
-	checkSelectionType[OTHER_SEL] = (options.ally_showSelect.value ~= 'disabled')
+	checkSelectionType[OTHER_SEL] = (otherOpacityMult > 0)
 
 	for unitID, _ in pairs(selUnits) do
 		RemoveSelected(unitID)
@@ -342,6 +331,7 @@ local function DrawSelectionType(vbo, preUnit, allySel)
 		return
 	end
 	selectionShader:SetUniform("addRadius", 0)
+	selectionShader:SetUniform("opacity", allySel and otherOpacityMult or 1)
 
 	-- Draw platter
 	glDepthTest(false)
@@ -360,7 +350,6 @@ local function DrawSelectionType(vbo, preUnit, allySel)
 	end
 	glColorMask(true)
 	selectionShader:SetUniform("addRadius", lineWidth)
-	selectionShader:SetUniform("opacity", allySel and otherOpacityMult or 1)
 	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
 end
 
@@ -433,20 +422,19 @@ function widget:Update(dt)
 	local newHoverUnitID = GetUnitUnderCursor(false)
 	local isSelectionBoxActive = IsSelectionBoxActive()
 	local spectating, fullSelect = Spring.GetSpectatingState()
-	local otherSelOption = (spectating and options.spec_showSelect.value) or options.ally_showSelect.value
+	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
 
 	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or newHoverUnitID ~= hoverUnitID or isSelectionBoxActive
 	hoverUnitID = newHoverUnitID
 
 	-- TODO: Add a callin for when ally selections change?
-	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (otherSelOption ~= 'disabled')
+	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (otherOpacityMult > 0)
 	local allySelUnits = WG.allySelUnits
 
 	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
 		return
 	end
-	local useTeamcolor = (otherSelOption == 'color')
-	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
+	local useTeamcolor = (options.selectionColor.value == 'teamcolor')
 
 	local newSelUnits = {}
 	-- Hover selections
