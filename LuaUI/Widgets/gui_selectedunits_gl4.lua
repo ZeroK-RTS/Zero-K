@@ -121,7 +121,7 @@ options = {
 			{name = 'Enabled with colour',key='color', desc="Show selected ally units with their team colour."},
 			{name = 'Disabled',key='disabled', desc="Do not show any allied selection."},
 		},
-		value = 'enabled',
+		value = 'color',
 		OnChange = function(self)
 			Init()
 		end,
