@@ -12,10 +12,12 @@ function widget:GetInfo()
 	}
 end
 
+VFS.Include("LuaUI/Utilities/debug.lua")
+
 local HOVER_SEL, LOCAL_SEL, OTHER_SEL = 1, 2, 3
 
 -- Configurable Parts:
-local lineWidth, showOtherSelections, drawDepthCheck, platterOpacity, outlineOpacity
+local lineWidth, drawDepthCheck, platterOpacity, outlineOpacity
 
 ---- GL4 Backend Stuff----
 -- FIXME: Make VBOs into a table?
@@ -67,11 +69,11 @@ local allySelUnits, hoverUnitID
 
 local Init
 options_path = 'Settings/Interface/Selection/Default Selections'
-options_order = { 'showallselections', 'linewidth', 'platteropacity', 'outlineopacity', 'selectionheight', 'drawdepthcheck' }
+options_order = { 'allyselections', 'linewidth', 'platteropacity', 'outlineopacity', 'selectionheight', 'drawdepthcheck' }
 options = {
-	showallselections = {
-		name = 'Show Other Selections',
-		desc = 'Show selections of other players',
+	allyselections = {
+		name = 'Show Ally Selections',
+		desc = 'Show selections of allies when playing, or all players when spectating',
 		type = 'bool',
 		value = 'true',
 		OnChange = function(self)
@@ -134,6 +136,7 @@ options = {
 		OnChange = function(self)
 			Init()
 		end,
+		advanced = true,
 	}
 }
 
@@ -253,14 +256,13 @@ end
 
 function Init()
 	lineWidth = options.linewidth.value
-	showOtherSelections = options.showallselections.value
 	drawDepthCheck = options.drawdepthcheck.value
 	platterOpacity = options.platteropacity.value
 	outlineOpacity = options.outlineopacity.value
 
 	checkSelectionType[HOVER_SEL] = true
 	checkSelectionType[LOCAL_SEL] = true
-	checkSelectionType[OTHER_SEL] = showOtherSelections
+	checkSelectionType[OTHER_SEL] = options.allyselections.value
 
 	for unitID, _ in pairs(selUnits) do
 		RemoveSelected(unitID)
@@ -378,7 +380,7 @@ function widget:Update(dt)
 
 	-- TODO: Add a callin for when ally selections change?
 	local newAllySelUnits = WG.allySelUnits
-	checkSelectionType[OTHER_SEL] = showOtherSelections and (checkSelectionType[HOVER_SEL] or newAllySelUnits ~= allySelUnits)
+	checkSelectionType[OTHER_SEL] = options.allyselections.value and (checkSelectionType[HOVER_SEL] or newAllySelUnits ~= allySelUnits)
 	allySelUnits = newAllySelUnits
 
 	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
@@ -391,7 +393,8 @@ function widget:Update(dt)
 		for unitID, _ in pairs(FindPreselUnits()) do
 			if selUnits[unitID] ~= HOVER_SEL then
 				local alreadySelected = selUnits[unitID]
-				AddSelected(unitID, 254, hoverSelectionVBO, not alreadySelected)
+				local hoverColorID = Spring.IsUnitAllied(unitID) and 254 or 253
+				AddSelected(unitID, hoverColorID, hoverSelectionVBO, not alreadySelected)
 				selUnits[unitID] = HOVER_SEL
 				checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
 			end
@@ -407,12 +410,14 @@ function widget:Update(dt)
 	-- Local selections
 	if checkSelectionType[LOCAL_SEL] then
 		for _, unitID in pairs(spGetSelectedUnits()) do
-			if not newSelUnits[unitID] and not selUnits[unitID] ~= LOCAL_SEL then
-				AddSelected(unitID, 255, localSelectionVBO, false)
-				selUnits[unitID] = LOCAL_SEL
-				checkSelectionType[OTHER_SEL] = true
+			if not newSelUnits[unitID] then
+				if selUnits[unitID] ~= LOCAL_SEL then
+					AddSelected(unitID, 255, localSelectionVBO, false)
+					selUnits[unitID] = LOCAL_SEL
+					checkSelectionType[OTHER_SEL] = true
+				end
+				newSelUnits[unitID] = LOCAL_SEL
 			end
-			newSelUnits[unitID] = LOCAL_SEL
 		end
 		if CleanSelections(LOCAL_SEL, newSelUnits) then
 			checkSelectionType[OTHER_SEL] = true
@@ -422,11 +427,13 @@ function widget:Update(dt)
 	-- Ally/other selections
 	if checkSelectionType[OTHER_SEL] then
 		for unitID, _ in pairs(allySelUnits or {}) do
-			if not newSelUnits[unitID] and not selUnits[unitID] ~= OTHER_SEL  then
-				AddSelected(unitID, spGetUnitTeam(unitID), otherSelectionVBO, false)
-				selUnits[unitID] = OTHER_SEL
+			if not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
+				if selUnits[unitID] ~= OTHER_SEL then
+					AddSelected(unitID, spGetUnitTeam(unitID), otherSelectionVBO, false)
+					selUnits[unitID] = OTHER_SEL
+				end
+				newSelUnits[unitID] = OTHER_SEL
 			end
-			newSelUnits[unitID] = OTHER_SEL
 		end
 		CleanSelections(OTHER_SEL, newSelUnits)
 	end
