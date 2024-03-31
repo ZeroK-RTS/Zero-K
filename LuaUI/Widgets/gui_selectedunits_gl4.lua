@@ -27,9 +27,11 @@ local luaShaderDir                                          = "LuaUI/Widgets/Inc
 local hasBadCulling                                         = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Linux") == true)
 
 -- Localize for speedups:
+local spIsUnitAllied                                        = Spring.IsUnitAllied
 local spGetGameFrame                                        = Spring.GetGameFrame
 local spGetGameState                                        = Spring.GetGameState
 local spGetSelectedUnits                                    = Spring.GetSelectedUnits
+local spGetSpectatingState                                  = Spring.GetSpectatingState
 local spGetUnitDefID                                        = Spring.GetUnitDefID
 local spGetUnitIsDead                                       = Spring.GetUnitIsDead
 local spGetUnitTeam                                         = Spring.GetUnitTeam
@@ -65,8 +67,7 @@ local GL_POINTS                                             = GL.POINTS
 
 local selUnits                                              = {}
 local checkSelectionType = {}
-local allySelUnits, hoverUnitID
-local lastAllySelStaleCheck = WG.allySelStaleCheck
+local lastHoverUnitID, lastAllySelStaleCheck
 local otherOpacityMult = 0.4
 
 local Init
@@ -117,10 +118,10 @@ options = {
 		name = 'Other Selections (allies and spectating)',
 		type = 'radioButton',
 		items = {
-			{name = 'Shown with team colour',key='teamcolor', desc="Show selected ally units with their team colour."},
-			{name = 'Shown as yellow',key='yellow', desc="Show selected ally units."},
+			{name = 'Shown with team colour', key='teamcolor', desc="Show selected ally units with their team colour."},
+			{name = 'Shown as yellow', key='yellow', desc="Show selected ally units."},
 		},
-		value = 'color',
+		value = 'teamcolor',
 		OnChange = function(self)
 			Init()
 		end,
@@ -269,8 +270,8 @@ end
 
 local function FindPreselUnits()
 	local preselection = {}
-	if hoverUnitID then
-		preselection[hoverUnitID] = true
+	if lastHoverUnitID then
+		preselection[lastHoverUnitID] = true
 	end
 	for _, unitID in pairs(GetUnitsInSelectionBox() or {}) do
 		preselection[unitID] = true
@@ -289,9 +290,6 @@ local function UpdateCmdColorsConfig(isOn)
 end
 
 function Init()
-	local spectating, fullSelect = Spring.GetSpectatingState()
-	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
-	
 	lineWidth = options.linewidth.value
 	drawDepthCheck = options.drawdepthcheck.value
 	platterOpacity = options.platteropacity.value
@@ -299,7 +297,7 @@ function Init()
 
 	checkSelectionType[HOVER_SEL] = true
 	checkSelectionType[LOCAL_SEL] = true
-	checkSelectionType[OTHER_SEL] = (otherOpacityMult > 0)
+	checkSelectionType[OTHER_SEL] = true
 
 	for unitID, _ in pairs(selUnits) do
 		RemoveSelected(unitID)
@@ -314,7 +312,7 @@ function Init()
 	shaderConfig.CLIPTOLERANCE = 2
 	shaderConfig.INITIALSIZE = 0.85
 	shaderConfig.GROWTHRATE = 18.0
-	shaderConfig.HEIGHTOFFSET = options.selectionheight.value
+	shaderConfig.HEIGHTOFFSET = options.selectionheight.value .. ' - min(0.0, max(-lengthwidthcornerheight.x / 4.0, v_centerpos.y))' -- When under water raise the selection height by up to 1/4 the unit height. This helps avoid ground clipping issues.
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, opacity * (texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. "));"
@@ -410,30 +408,22 @@ local function CleanSelections(typeToClear, newSelUnits)
 	return changed
 end
 
-local function CheckAllySelectionUpdate()
-	if lastAllySelStaleCheck == WG.allySelStaleCheck then
-		return false
-	end
-	lastAllySelStaleCheck = WG.allySelStaleCheck
-	return true
-end
-
 function widget:Update(dt)
-	local newHoverUnitID = GetUnitUnderCursor(false)
+	local hoverUnitID = GetUnitUnderCursor(false)
 	local isSelectionBoxActive = IsSelectionBoxActive()
-	local spectating, fullSelect = Spring.GetSpectatingState()
+	local spectating, fullSelect = spGetSpectatingState()
 	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
-
-	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or newHoverUnitID ~= hoverUnitID or isSelectionBoxActive
-	hoverUnitID = newHoverUnitID
-
-	-- TODO: Add a callin for when ally selections change?
-	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (otherOpacityMult > 0)
-	local allySelUnits = WG.allySelUnits
+	
+	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or hoverUnitID ~= lastHoverUnitID or isSelectionBoxActive
+	checkSelectionType[OTHER_SEL] = otherOpacityMult > 0 and (checkSelectionType[OTHER_SEL] or WG.allySelStaleCheck ~= lastAllySelStaleCheck)
 
 	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
 		return
 	end
+
+	lastHoverUnitID = hoverUnitID
+	lastAllySelStaleCheck = WG.allySelStaleCheck
+
 	local useTeamcolor = (options.selectionColor.value == 'teamcolor')
 
 	local newSelUnits = {}
@@ -442,7 +432,7 @@ function widget:Update(dt)
 		for unitID, _ in pairs(FindPreselUnits()) do
 			if selUnits[unitID] ~= HOVER_SEL then
 				local alreadySelected = selUnits[unitID]
-				local hoverColorID = ((fullSelect or Spring.IsUnitAllied(unitID)) and 254) or 253
+				local hoverColorID = ((fullSelect or spIsUnitAllied(unitID)) and 254) or 253
 				AddSelected(unitID, hoverColorID, hoverSelectionVBO, not alreadySelected)
 				selUnits[unitID] = HOVER_SEL
 				checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
@@ -452,21 +442,18 @@ function widget:Update(dt)
 		if CleanSelections(HOVER_SEL, newSelUnits) then
 			checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
 		end
-	elseif wasSelectionBoxActive then
-		wasSelectionBoxActive = false
 	end
 
 	-- Local selections
 	if checkSelectionType[LOCAL_SEL] then
 		for _, unitID in pairs(spGetSelectedUnits()) do
-			if not newSelUnits[unitID] then
-				if selUnits[unitID] ~= LOCAL_SEL then
-					AddSelected(unitID, 255, localSelectionVBO, false)
-					selUnits[unitID] = LOCAL_SEL
-					checkSelectionType[OTHER_SEL] = true
-				end
-				newSelUnits[unitID] = LOCAL_SEL
+			local alreadySetType = newSelUnits[unitID]
+			if not alreadySetType and selUnits[unitID] ~= LOCAL_SEL then
+				AddSelected(unitID, 255, localSelectionVBO, false)
+				selUnits[unitID] = LOCAL_SEL
+				checkSelectionType[OTHER_SEL] = true
 			end
+			newSelUnits[unitID] = alreadySetType or LOCAL_SEL
 		end
 		if CleanSelections(LOCAL_SEL, newSelUnits) then
 			checkSelectionType[OTHER_SEL] = true
@@ -475,19 +462,18 @@ function widget:Update(dt)
 
 	-- Ally/other selections
 	if checkSelectionType[OTHER_SEL] then
-		for unitID, _ in pairs(allySelUnits or {}) do
-			if not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
-				if selUnits[unitID] ~= OTHER_SEL then
-					AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
-					selUnits[unitID] = OTHER_SEL
-				end
-				newSelUnits[unitID] = OTHER_SEL
+		for unitID, _ in pairs(WG.allySelUnits or {}) do
+			local alreadySetType = newSelUnits[unitID]
+			if not alreadySetType and selUnits[unitID] ~= OTHER_SEL then
+				AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
+				selUnits[unitID] = OTHER_SEL
 			end
+			newSelUnits[unitID] = alreadySetType or OTHER_SEL
 		end
 		CleanSelections(OTHER_SEL, newSelUnits)
 	end
 
-    -- Prime it to check again next time around, as we may have stopped selecting without making a selection
+    -- Prime hover to check again next time around, as we may have stopped selecting without making a selection
 	checkSelectionType[HOVER_SEL] = isSelectionBoxActive
 	checkSelectionType[LOCAL_SEL] = false
 	checkSelectionType[OTHER_SEL] = false
