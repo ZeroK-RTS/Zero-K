@@ -430,6 +430,7 @@ function widget:DrawWorldPreUnit()
 			unitTrackerShader:Activate()
 			unitTrackerShader:SetUniform("iconDistance", 99999) -- pass
 			unitTrackerShader:SetUniform("addRadius", 0)
+			unitTrackerShader:SetUniform("opacity", 1)
 			gl.DepthTest(true)
 			gl.DepthMask(false)
 			unitTrackerVBO.VAO:DrawArrays(GL.POINTS, unitTrackerVBO.usedElements)
