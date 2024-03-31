@@ -67,20 +67,16 @@ local selUnits                                              = {}
 local checkSelectionType = {}
 local allySelUnits, hoverUnitID
 local lastAllySelStaleCheck = WG.allySelStaleCheck
+local otherOpacityMult = 0.4
 
 local Init
 options_path = 'Settings/Interface/Selection/Default Selections'
-options_order = { 'allyselections', 'linewidth', 'platteropacity', 'outlineopacity', 'selectionheight', 'drawdepthcheck' }
+options_order = {
+	'linewidth', 'platteropacity', 'outlineopacity', 
+	'ally_showSelect', 'ally_strength', 'spec_showSelect', 'spec_strength',
+	'selectionheight', 'drawdepthcheck',
+}
 options = {
-	allyselections = {
-		name = 'Show Ally Selections',
-		desc = 'Show selections of allies when playing, or all players when spectating',
-		type = 'bool',
-		value = 'true',
-		OnChange = function(self)
-			Init()
-		end,
-	},
 	linewidth = {
 		name = 'Outline Width',
 		desc = '',
@@ -88,7 +84,7 @@ options = {
 		min = 0.1,
 		max = 4,
 		step = 0.1,
-		value = 1.7,
+		value = 1.8,
 		OnChange = function(self)
 			Init()
 		end,
@@ -117,6 +113,56 @@ options = {
 			Init()
 		end,
 	},
+	ally_showSelect = {
+		name = 'Ally Selections',
+		type = 'radioButton',
+		items = {
+			{name = 'Enabled',key='enabled', desc="Show selected ally units."},
+			{name = 'Enabled with colour',key='color', desc="Show selected ally units with their team colour."},
+			{name = 'Disabled',key='disabled', desc="Do not show any allied selection."},
+		},
+		value = 'enabled',
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	ally_strength = {
+		name = 'Ally Selection Strength',
+		desc = 'Opacity multiplier for ally selections when playing',
+		type = 'number',
+		min = 0.0,
+		max = 1,
+		step = 0.05,
+		value = 0.4,
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	spec_showSelect = {
+		name = 'Player Selections (as spectator)',
+		type = 'radioButton',
+		items = {
+			{name = 'Enabled',key='enabled', desc="Show selected player units."},
+			{name = 'Enabled with colour',key='color', desc="Show selected player units with their team colour."},
+			{name = 'Disabled',key='disabled', desc="Do not show any player selection."},
+		},
+		value = 'color',
+		OnChange = function(self)
+			Init()
+		end,
+	},
+	spec_strength = {
+		name = 'Player Selection Strength (as spectator)',
+		desc = 'Opacity multiplier for player selections while spectating',
+		type = 'number',
+		min = 0.0,
+		max = 1,
+		step = 0.05,
+		value = 0.75,
+		OnChange = function(self)
+			Init()
+		end,
+	},
 	selectionheight = {
 		name = 'Selection Height',
 		desc = 'How much to float the selection above the unit baseline - a value of 0 is more likely to be clipped by units',
@@ -128,6 +174,7 @@ options = {
 		OnChange = function(self)
 			Init()
 		end,
+		advanced = true,
 	},
 	drawdepthcheck = {
 		name = 'Draw Selections in Unit Plane',
@@ -263,7 +310,7 @@ function Init()
 
 	checkSelectionType[HOVER_SEL] = true
 	checkSelectionType[LOCAL_SEL] = true
-	checkSelectionType[OTHER_SEL] = options.allyselections.value
+	checkSelectionType[OTHER_SEL] = (options.ally_showSelect.value ~= 'disabled')
 
 	for unitID, _ in pairs(selUnits) do
 		RemoveSelected(unitID)
@@ -281,7 +328,7 @@ function Init()
 	shaderConfig.HEIGHTOFFSET = options.selectionheight.value
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
-	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. ");"
+	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, opacity * (texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. "));"
 	selectionShader = InitDrawPrimitiveAtUnitShader(shaderConfig, "selectedUnits")
 	hoverSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_hover")
 	localSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_local")
@@ -290,7 +337,7 @@ function Init()
 	return selectionShader ~= nil
 end
 
-local function DrawSelectionType(vbo, preUnit)
+local function DrawSelectionType(vbo, preUnit, allySel)
 	if vbo.usedElements == 0 then
 		return
 	end
@@ -313,6 +360,7 @@ local function DrawSelectionType(vbo, preUnit)
 	end
 	glColorMask(true)
 	selectionShader:SetUniform("addRadius", lineWidth)
+	selectionShader:SetUniform("opacity", allySel and otherOpacityMult or 1)
 	vbo.VAO:DrawArrays(GL_POINTS, vbo.usedElements)
 end
 
@@ -335,7 +383,7 @@ local function DrawSelections(preUnit)
 	-- Each selection priority is drawn in sequence.
 	DrawSelectionType(hoverSelectionVBO, preUnit)
 	DrawSelectionType(localSelectionVBO, preUnit)
-	DrawSelectionType(otherSelectionVBO, preUnit)
+	DrawSelectionType(otherSelectionVBO, preUnit, true)
 
 	selectionShader:Deactivate()
 
@@ -389,13 +437,15 @@ function widget:Update(dt)
 	hoverUnitID = newHoverUnitID
 
 	-- TODO: Add a callin for when ally selections change?
-	checkSelectionType[OTHER_SEL] = options.allyselections.value and CheckAllySelectionUpdate()
+	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (options.ally_showSelect.value ~= 'disabled')
 	local allySelUnits = WG.allySelUnits
 
 	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
 		return
 	end
-	local _, fullSelect = Spring.GetSpectatingState()
+	local spectating, fullSelect = Spring.GetSpectatingState()
+	local useTeamcolor = (spectating and options.spec_showSelect.value or options.ally_showSelect.value) == 'color'
+	otherOpacityMult = spectating and options.spec_strength.value or options.ally_strength.value
 
 	local newSelUnits = {}
 	-- Hover selections
@@ -439,7 +489,7 @@ function widget:Update(dt)
 		for unitID, _ in pairs(allySelUnits or {}) do
 			if not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
 				if selUnits[unitID] ~= OTHER_SEL then
-					AddSelected(unitID, spGetUnitTeam(unitID), otherSelectionVBO, false)
+					AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
 					selUnits[unitID] = OTHER_SEL
 				end
 				newSelUnits[unitID] = OTHER_SEL

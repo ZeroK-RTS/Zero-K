@@ -82,6 +82,7 @@ void main()
 	if (teamID == 255) v_color = vec4(0.1, 1.0, 0.2, 1.0);
 	else if (teamID == 254) v_color = vec4(0.1, 1.0, 1.0, 1.0);
 	else if (teamID == 253) v_color = vec4(1.0, 0.2, 0.1, 1.0);
+	else if (teamID == 252) v_color = vec4(1.0, 1.0, 0.1, 1.0);
 	else v_color = teamColor[teamID];
 	v_centerpos = vec4( modelMatrix[3].xyz, 1.0); // We are going to pass the centerpoint to the GS
 	v_lengthwidthcornerheight = lengthwidthcornerheight;
