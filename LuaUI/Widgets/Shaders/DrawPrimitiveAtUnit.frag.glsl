@@ -11,6 +11,7 @@
 #line 30000
 uniform float addRadius = 0.0;
 uniform float iconDistance = 20000.0;
+uniform float opacity = 1.0;
 in DataGS {
 	vec4 g_color;
 	vec4 g_uv;
