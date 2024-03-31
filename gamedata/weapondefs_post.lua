@@ -430,6 +430,20 @@ do
 	end
 end
 
+local scarSets = VFS.Include("gamedata/scars.lua", nil, VFS.GAME)
+for aa, weaponDef in pairs(WeaponDefs) do
+	if not weaponDef.scarindices then
+		local aoe = tonumber(weaponDef.areaofeffect) or 0
+		if aoe <= 128 then
+			weaponDef.scarindices = scarSets.SMALL_AOE
+		elseif aoe <= 384 then
+			weaponDef.scarindices = scarSets.MEDIUM_AOE
+		else
+			weaponDef.scarindices = scarSets.LARGE_AOE
+		end
+	end
+end
+
 
 --[[ Optimisation: if there are no firebases, we can set
      that flag to collide. For most weapons, normally it

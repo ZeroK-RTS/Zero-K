@@ -275,6 +275,7 @@ return { jumpsumo = {
       noSelfDamage            = true,
       range                   = 5,
       reloadtime              = 13,
+      scarIndices             = Shared.SCAR_SET.SUMO,
       soundHit                = [[krog_stomp]],
       soundStart              = [[krog_stomp]],
       soundStartVolume        = 3,

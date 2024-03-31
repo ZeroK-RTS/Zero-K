@@ -350,6 +350,7 @@ return { striderdetriment = {
       noSelfDamage            = true,
       range                   = 400,
       reloadtime              = 120,
+      scarIndices             = Shared.SCAR_SET.SUMO,
       soundHit                = [[explosion/mini_nuke]],
       soundStart              = [[krog_stomp]],
       soundStartVolume        = 10,
