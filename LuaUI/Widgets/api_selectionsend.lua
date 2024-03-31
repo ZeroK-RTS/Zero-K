@@ -26,6 +26,7 @@ local selchanged = false
 local allySelData = {}
 local allyActiveTx = {}
 WG.allySelUnits = {}
+WG.allySelStaleCheck = 0
 
 local echo = Spring.Echo
 --------------------------------------------------------------------------------
@@ -33,13 +34,14 @@ local echo = Spring.Echo
 
 function widget:Initialize()
 	WG.allySelUnits = {}
+	WG.allySelStaleCheck = (WG.allySelStaleCheck + 1)%1000
 end
 
 
 function widget:Shutdown()
 	WG.allySelUnits = {}
+	WG.allySelStaleCheck = (WG.allySelStaleCheck + 1)%1000
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -47,10 +49,10 @@ end
 --
 -- Speed-ups
 --
-local spGetMyPlayerID		= Spring.GetMyPlayerID
-local spGetPlayerInfo		= Spring.GetPlayerInfo
-local spGetSelectedUnits  	= Spring.GetSelectedUnits
-local SendLuaUIMsg       	= Spring.SendLuaUIMsg
+local spGetMyPlayerID    = Spring.GetMyPlayerID
+local spGetPlayerInfo    = Spring.GetPlayerInfo
+local spGetSelectedUnits = Spring.GetSelectedUnits
+local SendLuaUIMsg       = Spring.SendLuaUIMsg
 
 local function IsSpec()
 	local _, _, spec = spGetPlayerInfo(spGetMyPlayerID(), false)
@@ -88,16 +90,18 @@ local function UpdateAllySelUnits()
 	local num_units = allSelStr:len() / 2
 	for i = 1, num_units do
 		local code = allSelStr:sub(i*2-1,i*2)
-		--allySelUnits2[i] = VFS.UnpackU16(code)
-		allySelUnits2[VFS.UnpackU16(code)] = true
-		--Spring.Echo (i, "unpack to", code, VFS.UnpackU16(code))
+		local unitID = VFS.UnpackU16(code)
+		if Spring.ValidUnitID(unitID) then
+			allySelUnits2[unitID] = true
+		end
 	end
 	WG.allySelUnits = allySelUnits2
+	WG.allySelStaleCheck = (WG.allySelStaleCheck + 1)%1000
 end
 
 function widget:Update(dt)
 	timeSinceBroadcast = timeSinceBroadcast + dt
-		
+	
 	if timeSinceBroadcast > BROADCAST_PERIOD then
 		timeSinceBroadcast = 0
 		
@@ -115,14 +119,18 @@ function widget:Update(dt)
 		selchanged = false
 		SendSelUnits(spGetSelectedUnits())
 	end
-	
-	
+end
+
+function widget:UnitDestroyed(unitID)
+	if WG.allySelUnits and WG.allySelUnits[unitID] then
+		WG.allySelUnits[unitID] = nil
+		WG.allySelStaleCheck = (WG.allySelStaleCheck + 1)%1000
+	end
 end
 
 function widget:SelectionChanged(selectedUnits)
 	selchanged = true
 end
-
 
 function widget:RecvLuaMsg(msg, playerID)
 	if (msg:sub(1,1)=="@") then
@@ -139,13 +147,5 @@ function widget:RecvLuaMsg(msg, playerID)
 	end
 end
 
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-
-
-
-
-
