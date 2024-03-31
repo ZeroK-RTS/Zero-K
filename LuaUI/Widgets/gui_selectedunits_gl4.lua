@@ -118,10 +118,10 @@ options = {
 		name = 'Other Selections (allies and spectating)',
 		type = 'radioButton',
 		items = {
-			{name = 'Shown with team colour',key='teamcolor', desc="Show selected ally units with their team colour."},
-			{name = 'Shown as yellow',key='yellow', desc="Show selected ally units."},
+			{name = 'Shown with team colour', key='teamcolor', desc="Show selected ally units with their team colour."},
+			{name = 'Shown as yellow', key='yellow', desc="Show selected ally units."},
 		},
-		value = 'color',
+		value = 'teamcolor',
 		OnChange = function(self)
 			Init()
 		end,
