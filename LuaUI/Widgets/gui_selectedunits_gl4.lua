@@ -27,9 +27,11 @@ local luaShaderDir                                          = "LuaUI/Widgets/Inc
 local hasBadCulling                                         = ((Platform.gpuVendor == "AMD" and Platform.osFamily == "Linux") == true)
 
 -- Localize for speedups:
+local spIsUnitAllied                                        = Spring.IsUnitAllied
 local spGetGameFrame                                        = Spring.GetGameFrame
 local spGetGameState                                        = Spring.GetGameState
 local spGetSelectedUnits                                    = Spring.GetSelectedUnits
+local spGetSpectatingState                                  = Spring.GetSpectatingState
 local spGetUnitDefID                                        = Spring.GetUnitDefID
 local spGetUnitIsDead                                       = Spring.GetUnitIsDead
 local spGetUnitTeam                                         = Spring.GetUnitTeam
@@ -421,13 +423,12 @@ end
 function widget:Update(dt)
 	local newHoverUnitID = GetUnitUnderCursor(false)
 	local isSelectionBoxActive = IsSelectionBoxActive()
-	local spectating, fullSelect = Spring.GetSpectatingState()
+	local spectating, fullSelect = spGetSpectatingState()
 	otherOpacityMult = (spectating and options.spec_strength.value) or options.ally_strength.value
 
 	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or newHoverUnitID ~= hoverUnitID or isSelectionBoxActive
 	hoverUnitID = newHoverUnitID
 
-	-- TODO: Add a callin for when ally selections change?
 	checkSelectionType[OTHER_SEL] = CheckAllySelectionUpdate() and (otherOpacityMult > 0)
 	local allySelUnits = WG.allySelUnits
 
@@ -442,7 +443,7 @@ function widget:Update(dt)
 		for unitID, _ in pairs(FindPreselUnits()) do
 			if selUnits[unitID] ~= HOVER_SEL then
 				local alreadySelected = selUnits[unitID]
-				local hoverColorID = ((fullSelect or Spring.IsUnitAllied(unitID)) and 254) or 253
+				local hoverColorID = ((fullSelect or spIsUnitAllied(unitID)) and 254) or 253
 				AddSelected(unitID, hoverColorID, hoverSelectionVBO, not alreadySelected)
 				selUnits[unitID] = HOVER_SEL
 				checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
