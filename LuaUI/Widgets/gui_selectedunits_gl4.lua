@@ -66,6 +66,7 @@ local GL_POINTS                                             = GL.POINTS
 local selUnits                                              = {}
 local checkSelectionType = {}
 local allySelUnits, hoverUnitID
+local lastAllySelStaleCheck = WG.allySelStaleCheck
 
 local Init
 options_path = 'Settings/Interface/Selection/Default Selections'
@@ -317,7 +318,7 @@ end
 
 -- Callins
 
-function DrawSelections(preUnit)
+local function DrawSelections(preUnit)
 	if hasBadCulling then
 		gl.Culling(false)
 	end
@@ -361,7 +362,7 @@ function widget:SelectionChanged()
 	checkSelectionType[LOCAL_SEL] = true
 end
 
-function CleanSelections(typeToClear, newSelUnits)
+local function CleanSelections(typeToClear, newSelUnits)
 	local changed = false
 	for unitID, type in pairs(selUnits) do
 		if type == typeToClear and newSelUnits[unitID] ~= type then
@@ -372,20 +373,29 @@ function CleanSelections(typeToClear, newSelUnits)
 	return changed
 end
 
+local function CheckAllySelectionUpdate()
+	if lastAllySelStaleCheck == WG.allySelStaleCheck then
+		return false
+	end
+	lastAllySelStaleCheck = WG.allySelStaleCheck
+	return true
+end
+
 function widget:Update(dt)
 	local newHoverUnitID = GetUnitUnderCursor(false)
 	local isSelectionBoxActive = IsSelectionBoxActive()
+
 	checkSelectionType[HOVER_SEL] = checkSelectionType[HOVER_SEL] or newHoverUnitID ~= hoverUnitID or isSelectionBoxActive
 	hoverUnitID = newHoverUnitID
 
 	-- TODO: Add a callin for when ally selections change?
-	local newAllySelUnits = WG.allySelUnits
-	checkSelectionType[OTHER_SEL] = options.allyselections.value and (checkSelectionType[HOVER_SEL] or newAllySelUnits ~= allySelUnits)
-	allySelUnits = newAllySelUnits
+	checkSelectionType[OTHER_SEL] = options.allyselections.value and CheckAllySelectionUpdate()
+	local allySelUnits = WG.allySelUnits
 
 	if not checkSelectionType[HOVER_SEL] and not checkSelectionType[LOCAL_SEL] and not checkSelectionType[OTHER_SEL] then
 		return
 	end
+	local _, fullSelect = Spring.GetSpectatingState()
 
 	local newSelUnits = {}
 	-- Hover selections
@@ -393,7 +403,7 @@ function widget:Update(dt)
 		for unitID, _ in pairs(FindPreselUnits()) do
 			if selUnits[unitID] ~= HOVER_SEL then
 				local alreadySelected = selUnits[unitID]
-				local hoverColorID = Spring.IsUnitAllied(unitID) and 254 or 253
+				local hoverColorID = ((fullSelect or Spring.IsUnitAllied(unitID)) and 254) or 253
 				AddSelected(unitID, hoverColorID, hoverSelectionVBO, not alreadySelected)
 				selUnits[unitID] = HOVER_SEL
 				checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
