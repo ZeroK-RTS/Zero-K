@@ -84,6 +84,7 @@ return { shieldbomb = {
   },
   weaponDefs = {
     shieldbomb_DEATH = {
+      scarIndices        = {1},
       areaOfEffect       = 384,
       craterBoost        = 1,
       craterMult         = 3.5,
