@@ -174,8 +174,14 @@ local function PlaySound(filename, ...)
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
-  vsx = viewSizeX
-  vsy = viewSizeY
+	vsx = viewSizeX
+	vsy = viewSizeY
+	if mainWindow then
+		mainWindow:SetPos(
+			math.floor((vsx - WINDOW_WIDTH)/2),
+			math.floor((vsy - WINDOW_HEIGHT)/2)
+		)
+	end
 end
 
 local function GetStartZoomBounds()
@@ -271,8 +277,10 @@ local function CreateWindow()
 	local numRows = math.ceil(#optionData/numColumns)
 
 	mainWindow = Window:New{
+		name = "commanderSelectorWindow",
 		resizable = false,
 		draggable = false,
+		dockable = false,
 		clientWidth  = WINDOW_WIDTH,
 		clientHeight = WINDOW_HEIGHT,
 		x = math.floor((vsx - WINDOW_WIDTH)/2),
@@ -280,7 +288,7 @@ local function CreateWindow()
 		classname = "main_window",
 		parent = screen0,
 		caption = WG.Translate("interface", "startup_commenu_title"),
-		}
+	}
 	--scroll = ScrollPanel:New{
 	--	parent = mainWindow,
 	--	horizontalScrollbar = false,

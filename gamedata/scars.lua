@@ -12,10 +12,7 @@ local sets = {
 		'unknown/scars_newer/scar4.png',
 	},
 	LARGE_AOE = {
-		'unknown/scars_newer/scar1.png',
-		'unknown/scars_newer/scar2.png',
-		'unknown/scars_newer/scar3.png',
-		'unknown/scars_newer/scar4.png',
+		'unknown/scars_newer/scar5_big.png',
 	},
 	SUMO = {
 		'unknown/scars_newer/stomp.png',
