@@ -6,6 +6,7 @@ function widget:GetInfo()
     date      = "August 2012", --updated on 20 May 2015
     license   = "stackable",
     layer     = 1,
+	handler   = true,
     enabled   = true  --  loaded by my horse?
   }
 end
