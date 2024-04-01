@@ -68,6 +68,7 @@ return { tankriot = {
     TAWF_BANISHER = {
       name                    = [[Heavy Missile]],
       areaOfEffect            = 160,
+      scarDiameter            = 220,
       avoidFeature            = false,
       avoidGround             = false,
       cegTag                  = [[BANISHERTRAIL]],
