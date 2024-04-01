@@ -1,14 +1,14 @@
 function widget:GetInfo()
-  return {
-    name      = "Replay control buttons",
-    desc      = "Graphical buttons for controlling replay speed, pausing and skipping pregame chatter",
-    author    = "knorke",
-    date      = "August 2012", --updated on 20 May 2015
-    license   = "stackable",
-    layer     = 1,
-	handler   = true,
-    enabled   = true  --  loaded by my horse?
-  }
+	return {
+		name    = "Replay control buttons",
+		desc    = "Graphical buttons for controlling replay speed, pausing and skipping pregame chatter",
+		author  = "knorke",
+		date    = "August 2012", --updated on 20 May 2015
+		license = "stackable",
+		layer   = 1,
+		handler = true,
+		enabled = true --  loaded by my horse?
+	}
 end
 
 -- 5 May 2015 added progress bar, by xponen
