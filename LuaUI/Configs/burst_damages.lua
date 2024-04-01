@@ -8,7 +8,9 @@ local AA = 2
 local EMP_OR_DISARM = 3
 
 local burstDefs = {}
-VFS.Include("gamedata/unitdefs_pre.lua", { Shared = burstDefs })
+Shared = burstDefs -- unitdefs_pre expects it as a global
+VFS.Include("gamedata/unitdefs_pre.lua", nil, VFS.GAME)
+Shared = nil
 
 local function processWeapon(weaponDef, targetCats)
 	local cp = weaponDef.customParams
