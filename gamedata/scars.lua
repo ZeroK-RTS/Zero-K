@@ -1,18 +1,26 @@
 local sets = {
 	SMALL_AOE = {
-		'unknown/scars_new/scar1.png',
+		'unknown/scars_newer/scar1.png',
+		'unknown/scars_newer/scar2.png',
+		'unknown/scars_newer/scar3.png',
+		'unknown/scars_newer/scar4.png',
 	},
 	MEDIUM_AOE = {
-		'unknown/scars_new/scar1.png',
+		'unknown/scars_newer/scar1.png',
+		'unknown/scars_newer/scar2.png',
+		'unknown/scars_newer/scar3.png',
+		'unknown/scars_newer/scar4.png',
 	},
 	LARGE_AOE = {
-		'unknown/scars_new/scar1.png',
+		'unknown/scars_newer/scar1.png',
+		'unknown/scars_newer/scar2.png',
+		'unknown/scars_newer/scar3.png',
+		'unknown/scars_newer/scar4.png',
 	},
 	SUMO = {
-		'unknown/scars_new/scar2.png',
+		'unknown/scars_newer/stomp.png',
 	},
 }
-
 
 -- Decals are broken in various ways before 105-2400ish, so use
 -- old scars. They are all same-ish so no preset differentiation.
