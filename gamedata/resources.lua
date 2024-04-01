@@ -27,7 +27,7 @@ local resources = {
 
 		scars = Script.IsEngineMinVersion(105, 0, 2400) and {
 			'unknown/scars_new/scar1.png',
-			'unknown/scars_new/scar2.tga',
+			--'unknown/scars_new/scar2.tga',
 			--'scars/scar1.png',
 			--'scars/scar2.png',
 			--'scars/scar3.png',

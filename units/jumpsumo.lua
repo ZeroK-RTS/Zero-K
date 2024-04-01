@@ -256,7 +256,6 @@ return { jumpsumo = {
 
     LANDING = {
       name                    = [[Jugglenaut Landing]],
-      scarIndices        = {2},
       areaOfEffect            = 340,
       scarDiameter            = 340,
       canattackground         = false,
