@@ -1,8 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Replay control buttons",
-    desc      = "Graphical buttons for controlling replay speed, " ..
-    "pausing and skipping pregame chatter",
+    desc      = "Graphical buttons for controlling replay speed, pausing and skipping pregame chatter",
     author    = "knorke",
     date      = "August 2012", --updated on 20 May 2015
     license   = "stackable",
@@ -12,6 +11,8 @@ function widget:GetInfo()
 end
 
 -- 5 May 2015 added progress bar, by xponen
+
+local i18nPrefix = 'replay_controls_'
 
 --Speedup
 local widgetName = widget:GetInfo().name
@@ -36,8 +37,8 @@ local label_hoverTime
 ---------------------------------
 -- Globals
 ---------------------------------
-local speeds = {0.5, 1, 2, 3, 5, 20}
-local speedLabels = {"0.5x", "1x", "2x", "3x", "5x", "MAX"}
+local speeds = { 0.5, 1, 2, 3, 5, 20 }
+local speedLabels = { "0.5x", "1x", "2x", "3x", "5x", WG.Translate("interface", i18nPrefix .. "speed_max" ) }
 local isPaused = false
 -- local wantedSpeed = nil
 local skipped = false
@@ -114,10 +115,9 @@ end
 
 function CreateTheUI()
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetViewGeometry()
+	local screenWidth, _ = Spring.GetViewGeometry()
 	local windowY = math.floor(screenWidth*2/11 + 32)
 
-	
 	local currSpeed = 2 --default button setting
 	if window then
 		currSpeed = window.currSpeed
@@ -204,7 +204,7 @@ function CreateTheUI()
 			padding = {0, 0, 0, 0},
 			margin = {0, 0, 0, 0},
 			caption = speedLabels[i],
-			tooltip = "play at " .. speedLabels[i] .. " speed";
+			tooltip = WG.Translate("interface", i18nPrefix .. "speed_tooltip", {speed = speedLabels[i]}),
 			OnClick = {
 				function()
 					snapButton(i)
@@ -237,11 +237,11 @@ function CreateTheUI()
 		y = 50,
 		x = 5,
 		classname = "button_tiny",
-		parent = window;
+		parent = window,
 		padding = {0, 0, 0, 0},
 		margin = {0, 0, 0, 0},
-		caption="pause", --pause/continue
-		tooltip = "pause or continue playback";
+		caption = WG.Translate("interface", i18nPrefix .. "playback_pause"), --pause/continue
+		tooltip = WG.Translate("interface", i18nPrefix .. "playback_tooltip"),
 		OnClick = {function()
 			currentFrameTime = -3
 			if (isPaused) then
@@ -260,11 +260,11 @@ function CreateTheUI()
 			y = 50,
 			x = 5 + startStopWidth,
 			classname = "button_tiny",
-			parent = window;
+			parent = window,
 			padding = {0, 0, 0, 0},
 			margin = {0, 0, 0, 0},
-			caption="skip pregame",
-			tooltip = "Skip the pregame and go directly to the action!";
+			caption = WG.Translate("interface", i18nPrefix .. "skip_pregame"),
+			tooltip = WG.Translate("interface", i18nPrefix .. "skip_pregame_tooltip"),
 			OnClick = {function()
 				skipPreGameChatter ()
 				end}
@@ -404,7 +404,7 @@ function widget:GameFrame (f)
 		window:RemoveChild(button_skipPreGame)
 		skipped = nil
 		lastSkippedTime = nil
-		widgetHandler:RemoveCallIn("AddConsoleMessage")
+		widgetHandler:RemoveWidgetCallIn("AddConsoleMessage")
 	elseif showProgress and (f%2 ==0)  then
 		progress_speed:SetValue(f)
 		progress_speed:SetCaption(math.modf(f/progress_speed.max*100) .. "%")
@@ -414,7 +414,7 @@ end
 function widget:AddConsoleMessage(msg)
 	if msg.text == "Beginning demo playback" then
 		demoStarted = true
-		widgetHandler:RemoveCallIn("AddConsoleMessage")
+		widgetHandler:RemoveWidgetCallIn("AddConsoleMessage")
 	end
 end
 
