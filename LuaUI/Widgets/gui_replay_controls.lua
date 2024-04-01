@@ -38,7 +38,8 @@ local label_hoverTime
 ---------------------------------
 -- Globals
 ---------------------------------
-local speeds = { 0.5, 1, 2, 3, 5, 20 }
+local maxSpeed = 50
+local speeds = { 0.5, 1, 2, 3, 5, maxSpeed }
 local speedLabels = { "0.5x", "1x", "2x", "3x", "5x", WG.Translate("interface", i18nPrefix .. "speed_max" ) }
 local isPaused = false
 -- local wantedSpeed = nil
@@ -355,10 +356,10 @@ function setReplaySpeed (speed, i)
 	--Spring.Echo ("setting speed to: " .. speed .. " current is " .. s)
 	if (speed > s) then	--speedup
 		Spring.SendCommands ("setminspeed " .. speed)
-		Spring.SendCommands ("setminspeed " ..0.1)
+		Spring.SendCommands ("setminspeed " .. 0.1)
 	else
 		Spring.SendCommands ("setmaxspeed " .. speed)
-		Spring.SendCommands ("setmaxspeed " .. 10.0)
+		Spring.SendCommands ("setmaxspeed " .. maxSpeed)
 	end
 	window.currSpeed = i
 end
