@@ -10,7 +10,6 @@ function widget:GetInfo()
 	}
 end
 
-local abs = math.abs
 local atan2 = math.atan2
 local cos = math.cos
 local deg = math.deg
@@ -1295,9 +1294,7 @@ function widget:GameFrame(frame)
 end
 
 local function userAction()
-	if options.user_interrupts_tracking.value then
-		userInactiveSeconds = 0
-	end
+	userInactiveSeconds = 0
 end
 
 function widget:MousePress(x, y, button)
@@ -1693,7 +1690,7 @@ function widget:Update(dt)
 	if userInactiveSeconds > userInactiveSecondsThreshold then
 		spSetMouseCursor('none')
 	end
-	updateCamera(dt, userInactiveSeconds < userInactiveSecondsThreshold)
+	updateCamera(dt, options.user_interrupts_tracking.value and userInactiveSeconds < userInactiveSecondsThreshold)
 end
 
 function widget:DrawScreen()
