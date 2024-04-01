@@ -93,6 +93,7 @@ return { shieldbomb = {
       impulseBoost       = 0,
       impulseFactor      = 0.3,
       name               = "Explosion",
+      scarIndices        = Shared.SCAR_SET.MEDIUM_AOE,
       soundHit           = "explosion/mini_nuke",
       damage = {
         default          = 1200.8,
