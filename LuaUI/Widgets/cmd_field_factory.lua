@@ -19,7 +19,7 @@ local CMD_FIELD_FAC_UNIT_TYPE = Spring.Utilities.CMD.FIELD_FAC_UNIT_TYPE
 local screenWidth, screenHeight = Spring.GetViewGeometry()
 
 local OPT_WIDTH = 380
-local OPT_HEIGHT = 142
+local OPT_HEIGHT = 148
 
 local ROWS = 2
 local COLUMNS = 6
@@ -163,8 +163,8 @@ local function GenerateOptionsSelector(factoryID)
 		y = y,
 		width = OPT_WIDTH,
 		height = OPT_HEIGHT,
-		padding = {14, 20, 14, 8},
-		classname = "main_window_small_tall",
+		padding = {14, 22, 14, 10},
+		classname = "main_window_small",
 		textColor = {1,1,1,0.55},
 		parent = Chili.Screen0,
 		dockable  = false,
