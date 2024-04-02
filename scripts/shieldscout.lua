@@ -40,7 +40,7 @@ end
 --]]
 
 local walking = false -- prevent script.StartMoving from spamming threads if already walking
-local jumping = false
+local jumpActive = false
 local doingSomersault = false
 
 -----------------------------
@@ -94,7 +94,7 @@ local function jumpLegLand(leg)
 end
 
 function beginJump(turn,lineDist,flightDist,duration)
-	jumping = true
+	jumpActive = true
 	Turn(box, x_axis, math.rad(20))
 	jumpLegLaunch(leftLeg)
 	jumpLegLaunch(rightLeg)
@@ -114,7 +114,7 @@ function halfJump()
 end
 
 function endJump()
-	jumping = false
+	jumpActive = false
 	Spring.UnitScript.StopSpin(pelvis, x_axis)
 	Turn(pelvis, x_axis, 0)
 	Turn(box, x_axis, math.rad(40),math.rad(400))
@@ -336,7 +336,7 @@ local function StopWalking()
 end
 
 function script.StartMoving()
-	if not (walking or jumping) then
+	if not (walking or jumpActive) then
 		walking = true
 		if GG.lodLevelMedium then
 			StartThread(WalkLowDetail)

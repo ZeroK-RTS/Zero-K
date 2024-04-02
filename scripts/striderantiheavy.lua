@@ -75,7 +75,6 @@ local lastHeading, lastPitch = 0, 0
 --[[
 function beginJump()
 	EmitSfx(jump, 2048 + 3)
-	bJumping = 1
 	Turn(luparm, x_axis, math.rad(30), math.rad(400))
 	Turn(ruparm, x_axis, math.rad(30), math.rad(400))
 	Turn(lthigh, x_axis, math.rad(30), math.rad(400))
@@ -92,8 +91,6 @@ function beginJump()
 end
 
 function EndJump()
-
-	bJumping = 0
 	Turn(luparm, x_axis, 0, math.rad(400))
 	Turn(ruparm, x_axis, 0, math.rad(400))
 	Turn(rloarm, x_axis, 0, math.rad(400))

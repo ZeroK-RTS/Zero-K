@@ -21,7 +21,7 @@ local smokePieces = {turret}
 
 local gunHeading = 0
 local walking = false
-local jumping = false
+local jumpActive = false
 local hpi = math.pi*0.5
 
 local PACE = 1.9
@@ -117,12 +117,12 @@ function jumping(jumpPercent)
 end
 
 function beginJump()
-	jumping = true
+	jumpActive = true
 	StartThread(BeginJumpThread)
 end
 
 function endJump()
-	jumping = false
+	jumpActive = false
 	StartThread(EndJumpThread)
 end
 
@@ -223,7 +223,7 @@ end
 
 function script.StartMoving()
 	Signal(SIG_STOP)
-	if not (walking or jumping) then
+	if not (walking or jumpActive) then
 		StartThread(WalkThread)
 	end
 end

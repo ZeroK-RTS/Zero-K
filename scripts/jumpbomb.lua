@@ -15,7 +15,7 @@ include "constants.lua"
 local smokePiece = { Hump }
 
 local moving = false
-local jumping = false
+local jumpActive = false
 local SIG_MOVE = 1
 
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
@@ -49,7 +49,7 @@ local function WalkThread ()
 end
 
 function script.StartMoving()
-	if not (moving or jumping) then
+	if not (moving or jumpActive) then
 		moving = true
 		StartThread (WalkThread)
 	end
@@ -67,7 +67,7 @@ function script.StopMoving()
 end
 
 function beginJump()
-	jumping = true
+	jumpActive = true
 	script.StopMoving()
 	Turn (base, x_axis, math.rad(-40), pi3)
 	Turn (Left_Back_Leg, y_axis, -pi6, pi3)
@@ -90,7 +90,7 @@ function halfJump()
 end
 
 function endJump()
-	jumping = false
+	jumpActive = false
 	Turn (Left_Back_Leg, y_axis, 0, pi3)
 	Turn (Right_Back_Leg, y_axis, 0, pi3)
 	Turn (Left_Front_Leg, y_axis, 0, pi3)

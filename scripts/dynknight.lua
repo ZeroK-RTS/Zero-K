@@ -101,7 +101,7 @@ end
 -- vars
 --------------------------------------------------------------------------------
 local armsFree = true
-local jumping = false
+local jumpActive = false
 local restoreHeading = 0
 
 local starBLaunchers = {}
@@ -183,7 +183,7 @@ function script.Create()
 end
 
 function script.StartMoving()
-	if not jumping then
+	if not jumpActive then
 		StartThread(Walk)
 	end
 end
@@ -193,7 +193,7 @@ function script.StopMoving()
 end
 
 function beginJump()
-	jumping = true
+	jumpActive = true
 	script.StopMoving()
 	GG.PokeDecloakUnit(unitID, unitDefID)
 	GG.PokeDecloakUnit(unitID)
@@ -207,7 +207,7 @@ function jumping()
 end
 
 function endJump()
-	jumping = false
+	jumpActive = false
 	script.StopMoving()
 	EmitSfx(base, 1029)
 end
