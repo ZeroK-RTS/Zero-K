@@ -38,6 +38,8 @@ return {
 	SELECT_MISSILES = 14001,
 	BUILD_PLATE = 14002,
 
+	MISC_BUILD = 25612, -- This is used for integral menu
+
 	AREA_MEX = 30100,
 	AREA_TERRA_MEX = 30101,
 	STEALTH = 31100,
@@ -94,7 +96,6 @@ return {
 	WANTED_SPEED = 38825,
 	AIR_STRAFE = 39381,
 	AIR_MANUALFIRE = 38571,
-	MISC_BUILD = 25612, -- This is used for integral menu
 
 	-- terraform
 	RAMP = 39734,
