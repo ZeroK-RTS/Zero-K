@@ -86,6 +86,8 @@ local crater = 4101
 
 --variables
 
+local isJumping = false
+
 --signals
 local walk = 2
 local SIG_Aim = { [2] = 4, [3] = 8, [4] = 16, [5] = 32 }
@@ -231,6 +233,7 @@ end
 
 -- Jumping
 function preJump(turn,distance)
+	isJumping = true
 	script.StopMoving()
 	local radians = turn*2*math.pi/2^16
 	local x = math.cos(radians)
@@ -336,6 +339,7 @@ end
 
 
 function endJump()
+	isJumping = false
 	--Move(b_dome, x_axis, 22)
 	--Move(b_dome, y_axis, -30)
 	--Move(b_dome, z_axis, 12)
@@ -411,7 +415,9 @@ local function Stopping()
 end
 
 function script.StartMoving()
-	StartThread(Walk)
+	if not isJumping then
+		StartThread(Walk)
+	end
 end
 
 function script.StopMoving()

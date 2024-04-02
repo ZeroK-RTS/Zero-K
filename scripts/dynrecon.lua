@@ -41,7 +41,7 @@ local grenade = piece 'grenade'
 local smokePiece = {torso}
 local nanoPieces = {nanospray}
 
-local SPEED_MULT = 1
+local SPEED_MULT = 1.2
 local sizeSpeedMult = 1
 
 --------------------------------------------------------------------------------
@@ -131,162 +131,91 @@ local function RestoreAfterDelay()
 	end
 end
 
-local function Walk()
-	if not bAiming then
-		Turn(torso, x_axis, math.rad(12) * sizeSpeedMult) --tilt forward
-		Turn(torso, y_axis, math.rad(3.335165) * sizeSpeedMult)
-	end
-	Move(pelvis, y_axis, 0)
-	Turn(rupleg, x_axis, math.rad(5.670330) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(-26.467033) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(26.967033) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(26.967033) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-19.824176) * sizeSpeedMult)
-	Sleep(90/sizeSpeedMult) --had to + 20 to all sleeps in walk
+local walkCycle = {
+	{
+		pelvis = -0.2,
+		torso = math.rad(2),
+		pass = {
+			up = math.rad(-2),
+			mid = math.rad(65),
+			foot = math.rad(-40),
+		},
+		ground = {
+			up = math.rad(-15),
+			mid = math.rad(3),
+			foot = math.rad(8),
+		},
+	},
+	{
+		pelvis = 0,
+		torso = math.rad(0),
+		pass = {
+			up = math.rad(-18),
+			mid = math.rad(53),
+			foot = math.rad(-20),
+		},
+		ground = {
+			up = math.rad(-2),
+			mid = math.rad(10),
+			foot = math.rad(-8),
+		},
+	},
+	{
+		pelvis = 0.12,
+		torso = math.rad(-3),
+		pass = {
+			up = math.rad(-33),
+			mid = math.rad(35),
+			foot = math.rad(-15),
+		},
+		ground = {
+			up = math.rad(4),
+			mid = math.rad(27),
+			foot = math.rad(-20),
+		},
+	},
+	{
+		pelvis = 0.26,
+		torso = math.rad(-4),
+		pass = {
+			up = math.rad(-27),
+			mid = math.rad(8),
+			foot = math.rad(0),
+		},
+		ground = {
+			up = math.rad(18),
+			mid = math.rad(26),
+			foot = math.rad(-22),
+		},
+	},
+}
+
+local function Walk(groundUp, groundMid, groundFoot, passUp, passMid, passFoot, torsoParity)
+	local speed = 5 * sizeSpeedMult * math.max(0.5, GG.att_MoveChange[unitID] or 1)
 	
-	if not bMoving then
-		return
+	for i = 1, #walkCycle do
+		local cur = walkCycle[i]
+		local prev = walkCycle[(i > 1 and (i - 1)) or #walkCycle]
+		local prevPass = (i > 1 and prev.pass) or prev.ground
+		local prevGround = (i > 1 and prev.ground) or prev.pass
+		local prevTorso = (i > 1 and prev.torso) or (-1 * prev.torso)
+		
+		if not bAiming then
+			Turn(torso, y_axis, torsoParity * cur.torso, speed * math.abs(cur.torso - prevTorso))
+		end
+		
+		Move(pelvis, y_axis, cur.pelvis, speed * math.abs(cur.pelvis - prev.pelvis))
+		Turn(passUp, x_axis, cur.pass.up, speed * math.abs(cur.pass.up - prevPass.up))
+		Turn(passMid, x_axis, cur.pass.mid, speed * math.abs(cur.pass.mid - prevPass.mid))
+		Turn(passFoot, x_axis, cur.pass.foot, speed * math.abs(cur.pass.foot - prevPass.foot))
+		Turn(groundUp, x_axis, cur.ground.up, speed * math.abs(cur.ground.up - prevGround.up))
+		Turn(groundMid, x_axis, cur.ground.mid, speed * math.abs(cur.ground.mid - prevGround.mid))
+		Turn(groundFoot, x_axis, cur.ground.foot, speed * math.abs(cur.ground.foot - prevGround.foot))
+		Sleep(1000 / speed)
+		if not bMoving then
+			return
+		end
 	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(1.681319) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-5.269231) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(-20.989011) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(20.945055) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(41.368132) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-15.747253) * sizeSpeedMult)
-	Sleep(70/sizeSpeedMult)
-	
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, 0 * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-9.071429) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(-12.670330) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(12.670330) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(43.571429) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-12.016484) * sizeSpeedMult)
-	Sleep(50/sizeSpeedMult)
-	
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-1.77) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-21.357143) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(2.824176) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(3.560440) * sizeSpeedMult)
-	Turn(lfoot, x_axis, math.rad(-4.527473) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(52.505495) * sizeSpeedMult)
-	Turn(rfoot, x_axis, 0)
-	Sleep(40/sizeSpeedMult)
-	
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-3.15) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-35.923077) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(7.780220) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(8.203297) * sizeSpeedMult)
-	Turn(lfoot, x_axis, math.rad(-12.571429) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(54.390110) * sizeSpeedMult)
-	Sleep(50/sizeSpeedMult)
-
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-4.2) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-37.780220) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(10.137363) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(13.302198) * sizeSpeedMult)
-	Turn(lfoot, x_axis, math.rad(-16.714286) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(32.582418) * sizeSpeedMult)
-	Sleep(50/sizeSpeedMult)
-
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-3.15) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-28.758242) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(12.247253) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(19.659341) * sizeSpeedMult)
-	Turn(lfoot, x_axis, math.rad(-19.659341) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(28.758242) * sizeSpeedMult)
-	Sleep(90/sizeSpeedMult)
-
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(-1.88) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-22.824176) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(2.824176) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(34.060440) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-6.313187) * sizeSpeedMult)
-	Sleep(70/sizeSpeedMult)
-
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, 0 * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(-11.604396) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(-6.725275) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(39.401099) * sizeSpeedMult)
-	Turn(lfoot, x_axis, math.rad(-13.956044) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(19.005495) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-7.615385) * sizeSpeedMult)
-	Sleep(50/sizeSpeedMult)
-
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(1.88) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(1.857143) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(-24.357143) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(45.093407) * sizeSpeedMult)
-	Turn(lfoot, x_axis, math.rad(-7.703297) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(3.560440) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-4.934066) * sizeSpeedMult)
-	Sleep(40/sizeSpeedMult)
-
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(3.15) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(7.148352) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(-28.181319) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-9.813187) * sizeSpeedMult)
-	Sleep(50/sizeSpeedMult)
-
-	if not bMoving then
-		return
-	end
-	if not bAiming then
-		Turn(torso, y_axis, math.rad(4.2) * sizeSpeedMult)
-	end
-	Turn(rupleg, x_axis, math.rad(8.423077) * sizeSpeedMult)
-	Turn(lupleg, x_axis, math.rad(-32.060440) * sizeSpeedMult)
-	Turn(lloleg, x_axis, math.rad(27.527473) * sizeSpeedMult)
-	Turn(lfoot, x_axis, math.rad(-2.857143) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(24.670330) * sizeSpeedMult)
-	Turn(rfoot, x_axis, math.rad(-33.313187) * sizeSpeedMult)
-	Sleep(70/sizeSpeedMult)
 end
 
 local function MotionControl()
@@ -304,11 +233,18 @@ local function MotionControl()
 
 	local moving, aiming
 	local justmoved = true
+	local legParity = math.random() > 0.5
+	local moveFrac = 0
 	while true do
 		moving = bMoving
 		aiming = bAiming
 		if moving then
-			Walk()
+			if legParity then
+				Walk(lupleg, lloleg, lfoot, rupleg, rloleg, rfoot, -1)
+			else
+				Walk(rupleg, rloleg, rfoot, lupleg, lloleg, lfoot, 1)
+			end
+			legParity = not legParity
 			justmoved = true
 		else
 			if justmoved then
@@ -333,7 +269,7 @@ end
 
 function script.Create()
 	dyncomm.Create()
-	sizeSpeedMult = (1 - (1 - dyncomm.GetPace())/2.5) *SPEED_MULT
+	sizeSpeedMult = (1 - (1 - dyncomm.GetPace())/2.5) * SPEED_MULT
 	--alert to dirt
 	Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring at -45
 	Turn(ruparm, x_axis, 0, math.rad(250))
@@ -367,7 +303,9 @@ function script.Create()
 end
 
 function script.StartMoving()
-	bMoving = true
+	if not inJumpMode then
+		bMoving = true
+	end
 end
 
 function script.StopMoving()
@@ -498,8 +436,8 @@ function jumping()
 end
 
 function endJump()
-	script.StopMoving()
 	inJumpMode = false
+	script.StopMoving()
 	EmitSfx(base, 1029)
 end
 
