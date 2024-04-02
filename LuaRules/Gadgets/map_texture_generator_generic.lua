@@ -4,7 +4,7 @@ end
 
 function gadget:GetInfo()
 	return {
-		name      = "Map Texture Generator",
+		name      = "Map Texture Generator (generic)",
 		desc      = "Applies basic textures on maps based on slopemap",
 		author    = "Anarchid",
 		date      = "26 September 2021",
