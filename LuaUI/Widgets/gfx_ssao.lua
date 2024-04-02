@@ -9,7 +9,7 @@ if gpuMem and gpuMem > 0 and gpuMem < 1800 then
 end
 
 
-local widgetName = "SSAO"
+local widgetName = "SSAO 2"
 function widget:GetInfo()
     return {
         name      = widgetName,
@@ -19,7 +19,7 @@ function widget:GetInfo()
         date      = "2019",
         license   = "GPL",
         layer     = 999999,
-        enabled   = not isPotatoGpu,
+        enabled   = false, -- not isPotatoGpu, -- Sometimes causes a bug.
     }
 end
 
