@@ -227,7 +227,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local teamID           = spGetUnitTeam(unitID)
 	
 	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (start[2] < -UnitDefs[unitDefID].maxWaterDepth)) then
-		return false, true
+		return false, false
 	end
 	
 	local rotateMidAir = jumpDef.rotateMidAir
