@@ -832,9 +832,14 @@ local function UpdateBackgroundSkin()
 end
 
 local function GetCmdPosParameters(cmdID)
-	local def =  cmdPosDef[cmdID]
-	if (not def) and cmdID >= CMD_MORPH and cmdID < CMD_MORPH + 2000 then -- Includes CMD_MORPH and CMD_MORPH_STOP
-		def = cmdPosDef[CMD_MORPH]
+	local def = cmdPosDef[cmdID]
+	if (not def) then
+		if cmdID >= CMD_MORPH and cmdID < CMD_MORPH + 2000 then -- Includes CMD_MORPH and CMD_MORPH_STOP
+			def = cmdPosDef[CMD_MORPH]
+		end
+		if cmdID < 0 then
+			def = cmdPosDef[CMD_MISC_BUILD]
+		end
 	end
 	
 	if def then
@@ -1995,7 +2000,7 @@ local function HiddenCommand(command)
 	return hiddenCommands[command.id] or command.hidden or (commandCulling and commandCulling[command.id])
 end
 
-local function ProcessCommandPosition(command)
+local function ProcessCommandPosition(command, unitMobilePanelSize)
 	if HiddenCommand(command) then
 		return
 	end
@@ -2009,7 +2014,7 @@ local function ProcessCommandPosition(command)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		if not data.isBuild then
-			local found, position = data.inclusionFunction(command.id, factoryUnitDefID)
+			local found = data.inclusionFunction(command.id, factoryUnitDefID, false, unitMobilePanelSize)
 			if found then
 				data.buttons.AddCommandPosition(command.id)
 			end
@@ -2017,7 +2022,7 @@ local function ProcessCommandPosition(command)
 	end
 end
 
-local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
+local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex, forceOrdersCommand, unitMobilePanelSize)
 	if HiddenCommand(command) then
 		return
 	end
@@ -2038,7 +2043,7 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFact
 	
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		local found, position = data.inclusionFunction(command.id, factoryUnitDefID)
+		local found, position = data.inclusionFunction(command.id, factoryUnitDefID, forceOrdersCommand, unitMobilePanelSize)
 		if found then
 			data.commandCount = data.commandCount + 1
 			
@@ -2060,6 +2065,18 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFact
 	end
 end
 
+local function GetUnitMobilePanelSize(commands, factoryUnitDefID)
+	local unitsPanelSize = 0
+	local inclusionFunc = commandPanelMap["units_mobile"].inclusionFunction
+	for i = 1, #commands do
+		local command = commands[i]
+		if inclusionFunc(command.id, factoryUnitDefID) then
+			unitsPanelSize = unitsPanelSize + 1
+		end
+	end
+	return unitsPanelSize
+end
+
 local function SetIntegralVisibility(visible)
 	background:SetVisibility(visible)
 	UpdateBackgroundSkin()
@@ -2072,6 +2089,7 @@ end
 
 local function ProcessAllCommands(commands, customCommands)
 	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
+	local unitMobilePanelSize = GetUnitMobilePanelSize(commands, factoryUnitDefID)
 
 	selectionIndex = selectionIndex + 1
 	
@@ -2087,19 +2105,19 @@ local function ProcessAllCommands(commands, customCommands)
 	statePanel.buttons.ResetCommandPositions()
 	
 	for i = 1, #commands do
-		ProcessCommandPosition(commands[i])
+		ProcessCommandPosition(commands[i], unitMobilePanelSize)
 	end
 	
 	for i = 1, #customCommands do
-		ProcessCommandPosition(customCommands[i])
+		ProcessCommandPosition(customCommands[i], unitMobilePanelSize)
 	end
 	
 	for i = 1, #commands do
-		ProcessCommand(commands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
+		ProcessCommand(commands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex, false, unitMobilePanelSize)
 	end
 	
 	for i = 1, #customCommands do
-		ProcessCommand(customCommands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
+		ProcessCommand(customCommands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex, false, unitMobilePanelSize)
 	end
 	
 	-- Call factory queue update here because the update will globally

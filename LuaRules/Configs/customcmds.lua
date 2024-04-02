@@ -94,6 +94,7 @@ return {
 	WANTED_SPEED = 38825,
 	AIR_STRAFE = 39381,
 	AIR_MANUALFIRE = 38571,
+	MISC_BUILD = 25612, -- This is used for integral menu
 
 	-- terraform
 	RAMP = 39734,
