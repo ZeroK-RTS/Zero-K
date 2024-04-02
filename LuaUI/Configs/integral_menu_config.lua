@@ -321,6 +321,25 @@ local commandDisplayConfig = {
 --------------------------------------------------------------------------------
 -- Panel Configuration and Layout
 
+local factoryPlates = {
+	"platecloak",
+	"plateshield",
+	"plateveh",
+	"platehover",
+	"plategunship",
+	"plateplane",
+	"platespider",
+	"platejump",
+	"platetank",
+	"plateamph",
+	"plateship",
+}
+
+local plateCommandID = {}
+for i = 1, #factoryPlates do
+	plateCommandID[-UnitDefNames[factoryPlates[i]].id] = true
+end
+
 local function CommandClickFunction(isInstantCommand, isStateCommand)
 	local _,_, meta,_ = Spring.GetModKeyState()
 	if not meta then
@@ -379,6 +398,7 @@ local buttonLayoutConfig = {
 			keepAspect = true,
 		},
 		ClickFunction = CommandClickFunction,
+		tooltipPrefix = "BuildUnit",
 	},
 	build = {
 		image = {
@@ -456,8 +476,11 @@ local commandPanels = {
 	{
 		humanName = "Orders",
 		name = "orders",
-		inclusionFunction = function(cmdID)
-			return cmdID >= 0 and not buildCmdFactory[cmdID] and not buildCmdSpecial[cmdID]-- Terraform and Plate
+		inclusionFunction = function(cmdID, factoryUnitDefID, forceOrdersCommand, unitMobilePanelSize)
+			return ((cmdID >= 0 or unitMobilePanelSize == 1) and
+				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
+				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
+				not plateCommandID[cmdID])
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
@@ -526,7 +549,11 @@ local commandPanels = {
 		humanName = "Units",
 		name = "units_mobile",
 		inclusionFunction = function(cmdID, factoryUnitDefID)
-			return not factoryUnitDefID -- Only called if previous funcs don't
+			-- This has to be perfect to predict the size of the units tab in integral menu.
+			return (cmdID < 0 and not factoryUnitDefID and
+				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
+				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
+				not plateCommandID[cmdID])
 		end,
 		isBuild = true,
 		gridHotkeys = true,
@@ -596,20 +623,6 @@ local widgetSpaceHidden = {
 	[CMD_CHEAT_GIVE] = true,
 	[CMD_SET_FERRY] = true,
 	[CMD.MOVE] = true,
-}
-
-local factoryPlates = {
-	"platecloak",
-	"plateshield",
-	"plateveh",
-	"platehover",
-	"plategunship",
-	"plateplane",
-	"platespider",
-	"platejump",
-	"platetank",
-	"plateamph",
-	"plateship",
 }
 
 -- Hide factory plates

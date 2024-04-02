@@ -227,9 +227,16 @@ end
 
 -- Set build options
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+local fieldBuildOpts = VFS.Include("gamedata/field_buildoptions.lua")
 for name, ud in pairs(UnitDefs) do
 	if ud.buildoptions and (#ud.buildoptions == 0) then
 		ud.buildoptions = buildOpts
+	end
+	if ud.customparams.field_factory then
+		ud.buildoptions = Spring.Utilities.CopyTable(ud.buildoptions)
+		for i = 1, #fieldBuildOpts do
+			ud.buildoptions[#ud.buildoptions + 1] = fieldBuildOpts[i]
+		end
 	end
 end
 

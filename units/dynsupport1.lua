@@ -30,6 +30,7 @@ return { dynsupport1 = {
     soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[4]],
+    field_factory = [[1]],
     modelradius    = [[25]],
     aimposoffset   = [[0 15 0]],
     dynamic_comm   = 1,
