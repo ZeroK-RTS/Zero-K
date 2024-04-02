@@ -135,8 +135,8 @@ local function shutdownTranslation(widget_name)
 	langListeners[widget_name]=nil
 end
 
-local function Translate (db, text, data)
-	return translations[db].i18n(text, data)
+local function Translate (db, text, data, opts)
+	return translations[db].i18n(text, data, opts)
 end
 
 WG.lang = lang
