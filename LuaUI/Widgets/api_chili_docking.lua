@@ -267,6 +267,18 @@ local function GetButtonPos(win)
 	end
 end
 
+local function WindowWantsDocking(window)
+	if not window.dockable then
+		return false
+	end
+	if (not window.name) or string.match(window.name, 'window%d+') then
+		Spring.Echo("Anonymous window " .. (window.name or "unnamed") .. " tried to use docking", window.x, window.y)
+		window.dockable = false
+		return false
+	end
+	return true
+end
+
 function widget:Update()
 	frameCounter = frameCounter +1
 	if (not screen0) or (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then
@@ -285,7 +297,7 @@ function widget:Update()
 	local present = {}
 	local names = {}
 	for _, win in ipairs(screen0.children) do  -- NEEDED FOR MINIMIZE BUTTONS: table.shallowcopy(
-		if win.dockable then
+		if WindowWantsDocking(win) then
 			names[win.name] = win
 			present[win.name] = true
 			local lastWinPos = lastPos[win.name]
