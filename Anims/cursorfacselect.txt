@@ -1,0 +1,2 @@
+hotspot topleft
+frame  cursorfacselect_0.png  5

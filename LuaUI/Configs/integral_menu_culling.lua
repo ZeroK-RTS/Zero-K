@@ -5,6 +5,7 @@ local configList = {
 	{cmdID = CMD_AREA_MEX              , default = true, name = "Area Mex"},
 	{cmdID = CMD.FIGHT                 , default = true, name = "Attack Move"},
 	{cmdID = CMD_BUILD_PLATE           , default = true, name = "Build Plate"},
+	{cmdID = CMD_FIELD_FAC_SELECT      , default = true, name = "Copy Factory Blueprint"},
 	{cmdID = CMD_EMBARK                , default = true, name = "Embark"},
 	{cmdID = CMD.MANUALFIRE            , default = true, name = "Fire Special Weapon"},
 	{cmdID = CMD_AIR_MANUALFIRE        , default = true, name = "Fire Special Weapon (Aircraft)"},
