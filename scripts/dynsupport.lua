@@ -55,7 +55,7 @@ local bMoving = false
 local bAiming = false
 local inBuildAnim = false
 
-local SPEEDUP_FACTOR = 1.04
+local SPEEDUP_FACTOR = 1.02
 local REF_TURN_SPEED = math.rad(185)
 local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
