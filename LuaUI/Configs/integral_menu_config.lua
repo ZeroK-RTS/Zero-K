@@ -398,6 +398,7 @@ local buttonLayoutConfig = {
 			bottom = "7%",
 			keepAspect = true,
 		},
+		noUnitOutline = true,
 		ClickFunction = CommandClickFunction,
 		tooltipPrefix = "BuildUnit",
 	},
