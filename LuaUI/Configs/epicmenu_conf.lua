@@ -437,7 +437,7 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end,
 	})
 
-ShLabel('Settings/Interface/Selection', 'Selection Graphics Options')
+ShLabel('Settings/Interface/Selection', 'Selection Display Options')
 
 local pathSelectionGL4 = 'Settings/Interface/Selection/Default Selections'
 local pathSelectionShapes = 'Settings/Interface/Selection/Selection Shapes'
@@ -657,56 +657,58 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
 	ShLabel(pathUnitVisiblity, 'Unit Highlight Options')
-	AddOption(pathUnitVisiblity,
-	{
-		name = 'Teamcolour Halos',
-		desc = "Shows a thin halo of team colour around units.",
-		type = 'bool',
-		value = false,
-		OnChange = function(self)
-			SetWidgetEnableState("Halo", self.value)
-		end,
-	} )
-	AddOption(pathUnitVisiblity,
-	{
-		name = 'Teamcolour Baseplatter',
-		desc = "Highlight the base of units with a disk of their team colour.",
-		type = 'bool',
-		value = false,
-		OnChange = function(self)
-			SetWidgetEnableState("Fancy Teamplatter", self.value)
-		end,
-	} )
-	AddOption(pathUnitVisiblity,
-	{
-		name = 'Selection Halo',
-		desc = "Add a large halo around selected and hovered units.",
-		type = 'bool',
-		value = false,
-		OnChange = function(self)
-			SetWidgetEnableState("Selection BlurryHalo 2", self.value)
-		end,
-	} )
-	AddOption(pathUnitVisiblity,
-	{
-		name = 'Selection Shapes',
-		desc = "Show appropriate shapes around the base of selected and hovered units.",
-		type = 'bool',
-		value = false,
-		OnChange = function(self)
-			SetWidgetEnableState("UnitShapes 2", self.value)
-		end,
-	} )
-	AddOption(pathUnitVisiblity,
-	{
-		name = 'Selections GL4 (default)',
-		desc = "Shows shape and base platter around units. This is the default option.",
-		type = 'bool',
-		value = true,
-		OnChange = function(self)
-			SetWidgetEnableState("Selected Units GL4 2", self.value)
-		end,
-	} )
+	
+	-- Why are selections here? They are in Settings/Interface/Selection
+	--AddOption(pathUnitVisiblity,
+	--{
+	--	name = 'Selections GL4 (default)',
+	--	desc = "Shows shape and base platter around units. This is the default option.",
+	--	type = 'bool',
+	--	value = true,
+	--	OnChange = function(self)
+	--		SetWidgetEnableState("Selected Units GL4 2", self.value)
+	--	end,
+	--} )
+	--AddOption(pathUnitVisiblity,
+	--{
+	--	name = 'Selection Shapes (old)',
+	--	desc = "Show appropriate shapes around the base of selected and hovered units.",
+	--	type = 'bool',
+	--	value = false,
+	--	OnChange = function(self)
+	--		SetWidgetEnableState("UnitShapes 2", self.value)
+	--	end,
+	--} )
+	--AddOption(pathUnitVisiblity,
+	--{
+	--	name = 'Teamcolour Halos',
+	--	desc = "Shows a thin halo of team colour around units.",
+	--	type = 'bool',
+	--	value = false,
+	--	OnChange = function(self)
+	--		SetWidgetEnableState("Halo", self.value)
+	--	end,
+	--} )
+	--AddOption(pathUnitVisiblity,
+	--{
+	--	name = 'Teamcolour Baseplatter',
+	--	desc = "Highlight the base of units with a disk of their team colour.",
+	--	type = 'bool',
+	--	value = false,
+	--	OnChange = function(self)
+	--		SetWidgetEnableState("Fancy Teamplatter", self.value)
+	--	end,
+	--} )
+	--AddOption(pathUnitVisiblity,
+	--{
+	--	name = 'Selection Halo',
+	--	desc = "Add a large halo around selected and hovered units.",
+	--	type = 'bool',
+	--	value = false,
+	--	OnChange = function(self)
+	--		SetWidgetEnableState("Selection BlurryHalo 2", self.value)
+	--	end,
+	--} )
 	
 	--local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
 	--	ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
