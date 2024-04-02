@@ -86,7 +86,7 @@ local crater = 4101
 
 --variables
 
-local isJumping = false
+local jumpActive = false
 
 --signals
 local walk = 2
@@ -233,7 +233,7 @@ end
 
 -- Jumping
 function preJump(turn,distance)
-	isJumping = true
+	jumpActive = true
 	script.StopMoving()
 	local radians = turn*2*math.pi/2^16
 	local x = math.cos(radians)
@@ -339,7 +339,7 @@ end
 
 
 function endJump()
-	isJumping = false
+	jumpActive = false
 	--Move(b_dome, x_axis, 22)
 	--Move(b_dome, y_axis, -30)
 	--Move(b_dome, z_axis, 12)
@@ -415,7 +415,7 @@ local function Stopping()
 end
 
 function script.StartMoving()
-	if not isJumping then
+	if not jumpActive then
 		StartThread(Walk)
 	end
 end

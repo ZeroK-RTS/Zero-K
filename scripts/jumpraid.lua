@@ -25,7 +25,7 @@ local smokePiece = {base}
 
 local landing = false
 local firing = false
-local jumping = false
+local jumpActive = false
 
 local LINEAR_SPEED = 10
 local ANGULAR_SPEED = math.rad(160)
@@ -162,13 +162,13 @@ function jumping(jumpPercent)
 end
 
 function beginJump()
-	jumping = true
+	jumpActive = true
 	StartThread(BeginJumpThread)
 end
 
 function endJump()
 	landing = false
-	jumping = false
+	jumpActive = false
 	StartThread(EndJumpThread)
 end
 
@@ -259,7 +259,7 @@ local function walk()
 end
 
 function script.StartMoving()
-	if not jumping then
+	if not jumpActive then
 		StartThread(walk)
 	end
 end
