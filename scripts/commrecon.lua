@@ -424,6 +424,7 @@ local function JumpExhaust()
 end
 
 function beginJump()
+	script.StopMoving()
 	inJumpMode = true
 	--[[
 	StartThread(JumpExhaust)

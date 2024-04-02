@@ -99,6 +99,7 @@ local JUMP_TURN_SPEED = math.pi/80 -- matches jump_delay_turn_scale in unitdef
 
 local isFiring = false
 local resetRestore = false
+local jumping = false
 
 -- Effects
 local dirtfling = 1024
@@ -221,7 +222,9 @@ local function StopWalk()
 end
 
 function script.StartMoving()
-	StartThread(Walk)
+	if not jumping then
+		StartThread(Walk)
+	end
 end
 
 function script.StopMoving()
@@ -315,6 +318,7 @@ function preJump(turn,lineDist,flightDist,duration)
 end
 
 function beginJump()
+	jumping = true
 	script.StopMoving()
 	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
@@ -340,6 +344,7 @@ function jumping(jumpPercent)
 end
 
 function endJump()
+	jumping = false
 	StartThread(EndJumpThread)
 end
 

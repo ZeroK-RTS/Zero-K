@@ -28,6 +28,7 @@ local nanoPiece = flare
 
 local usingNano = false
 local usingGun = false
+local jumping = false
 
 --------------------------
 -- MOVEMENT
@@ -455,7 +456,9 @@ local function walk()
 end
 
 function script.StartMoving()
-	StartThread(walk)
+	if not jumping then
+		StartThread(walk)
+	end
 end
 
 
@@ -551,6 +554,7 @@ end
 -- JUMP
 
 function beginJump()
+	jumping = true
 	script.StopMoving()
 	EmitSfx(jump, GG.Script.UNIT_SFX2)
 end
@@ -561,6 +565,7 @@ function jumping()
 end
 
 function endJump()
+	jumping = false
 	script.StopMoving()
 	EmitSfx(jump, GG.Script.UNIT_SFX2)
 end
