@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		author  = "GoogleFrog",
 		date    = "2 April 2024",
 		license = "GNU GPL, v2 or later",
-		layer   = 0,
+		layer   = 10, -- Wants to be before mission handler for locking.
 		enabled = true,
 	}
 end
@@ -246,7 +246,6 @@ function gadget:UnitCreated(unitID, unitDefID)
 		return
 	end
 	isFieldFac[unitID] = true
-	Spring.InsertUnitCmdDesc(unitID, facSelectCmd)
 	local previousUnit = Spring.GetUnitRulesParam(unitID, "fieldFactoryUnit")
 	for i = 1, #fieldBuildOpts do
 		RemoveUnit(unitID, fieldBuildOpts[i])
@@ -254,6 +253,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if previousUnit then
 		AddUnit(unitID, previousUnit)
 	end
+	Spring.InsertUnitCmdDesc(unitID, facSelectCmd)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
@@ -265,6 +265,8 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_FIELD_FAC_SELECT)
+	Spring.SetCustomCommandDrawData(CMD_FIELD_FAC_SELECT, "FactorySelect", {0.2, 0.7, 1.0, 0.7})
+	Spring.AssignMouseCursor("FactorySelect", "cursorfacselect", true, true)
 	local allUnits = Spring.GetAllUnits()
 	for i=1,#allUnits do
 		local unitID = allUnits[i]
