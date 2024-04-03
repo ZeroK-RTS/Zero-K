@@ -13,7 +13,6 @@ end
 
 -- 5 May 2015 added progress bar, by xponen
 
-local i18nPrefix = 'replay_controls_'
 
 --Speedup
 local widgetName = widget:GetInfo().name
@@ -40,7 +39,7 @@ local label_hoverTime
 ---------------------------------
 local maxSpeed = 50
 local speeds = { 0.5, 1, 2, 3, 5, maxSpeed }
-local speedLabels = { "0.5x", "1x", "2x", "3x", "5x", WG.Translate("interface", i18nPrefix .. "speed_max" ) }
+local speedLabels = { "0.5x", "1x", "2x", "3x", "5x", WG.Translate("interface", "replay_controls_speed_max" ) }
 local isPaused = false
 -- local wantedSpeed = nil
 local skipped = false
@@ -63,6 +62,7 @@ local BUTTON_BORDER_COLOR
 options_path = 'Settings/HUD Panels/Replay Controls'
 options_order = { 'visibleprogress'}
 options = {
+	-- Useful if you want to keep the battle length a secret
 	visibleprogress = {
 		name = 'Progress Bar',
 		desc = 'Enables a clickable progress bar for the replay.',
@@ -206,7 +206,7 @@ function CreateTheUI()
 			padding = {0, 0, 0, 0},
 			margin = {0, 0, 0, 0},
 			caption = speedLabels[i],
-			tooltip = WG.Translate("interface", i18nPrefix .. "speed_tooltip", {speed = speedLabels[i]}),
+			tooltip = WG.Translate("interface", "replay_controls_speed_tooltip", {speed = speedLabels[i]}),
 			OnClick = {
 				function()
 					snapButton(i)
@@ -242,8 +242,8 @@ function CreateTheUI()
 		parent = window,
 		padding = {0, 0, 0, 0},
 		margin = {0, 0, 0, 0},
-		caption = WG.Translate("interface", i18nPrefix .. "playback_pause"), --pause/continue
-		tooltip = WG.Translate("interface", i18nPrefix .. "playback_tooltip"),
+		caption = WG.Translate("interface", "replay_controls_playback_pause"), --pause/continue
+		tooltip = WG.Translate("interface", "replay_controls_playback_tooltip"),
 		OnClick = {function()
 			currentFrameTime = -3
 			if (isPaused) then
@@ -265,8 +265,8 @@ function CreateTheUI()
 			parent = window,
 			padding = {0, 0, 0, 0},
 			margin = {0, 0, 0, 0},
-			caption = WG.Translate("interface", i18nPrefix .. "skip_pregame"),
-			tooltip = WG.Translate("interface", i18nPrefix .. "skip_pregame_tooltip"),
+			caption = WG.Translate("interface", "replay_controls_skip_pregame"),
+			tooltip = WG.Translate("interface", "replay_controls_skip_pregame_tooltip"),
 			OnClick = {function()
 				skipPreGameChatter ()
 				end}
