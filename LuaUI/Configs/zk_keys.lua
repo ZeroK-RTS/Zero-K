@@ -171,6 +171,8 @@ return {
 		{	"settargetcircle",	"t",},
 		{	"resurrect",	"t",},
 		{	"jump",	"j",},
+		{	"field_fac_select",	"i",},
+		{	"build_field_unit",	"u",},
 		{	"select AllMap++_ClearSelection_SelectAll+",	"ctrl+a",},
 		{	"selectidlecon_all",	"ctrl+b",},
 		{	"select PrevSelection+_Not_RelativeHealth_30+_ClearSelection_SelectAll+",	"ctrl+e",},
