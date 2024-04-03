@@ -296,7 +296,7 @@ local copy = {
 		dynrecon4 = {
 			level = 4,
 			mainstats = {health = 3800, objectname = "commrecon4.s3o", aimposoffset = [[0 16 0]]},
-			customparams = {shield_emit_height = 37.5, jump_reload = 16, jump_speed = 5.25},
+			customparams = {shield_emit_height = 37.5, jump_reload = 18, jump_speed = 5.25},
 			wreckmodel = "commrecon4_dead.s3o",
 		},
 		dynrecon5 = {
