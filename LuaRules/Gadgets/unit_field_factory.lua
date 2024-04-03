@@ -155,12 +155,15 @@ function gadget:AllowCommand_GetWantedCommand()
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	return fieldFacRange
+	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if not fieldFacRange[unitDefID] then
+	if not (cmdID == CMD_FIELD_FAC_UNIT_TYPE or cmdID == CMD_FIELD_FAC_SELECT) then
 		return true
+	end
+	if not fieldFacRange[unitDefID] then
+		return false
 	end
 	if cmdID == CMD_FIELD_FAC_UNIT_TYPE then
 		nextDesiredUnitType[unitID] = cmdParams and cmdParams[1]
