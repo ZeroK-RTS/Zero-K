@@ -133,20 +133,6 @@ end
 
 local walkCycle = {
 	{
-		pelvis = -0.2,
-		torso = math.rad(2),
-		pass = {
-			up = math.rad(-2),
-			mid = math.rad(65),
-			foot = math.rad(-40),
-		},
-		ground = {
-			up = math.rad(-15),
-			mid = math.rad(3),
-			foot = math.rad(8),
-		},
-	},
-	{
 		pelvis = 0,
 		torso = math.rad(0),
 		pass = {
@@ -186,6 +172,20 @@ local walkCycle = {
 			up = math.rad(18),
 			mid = math.rad(26),
 			foot = math.rad(-22),
+		},
+	},
+	{
+		pelvis = -0.2,
+		torso = math.rad(-2),
+		pass = {
+			up = math.rad(-15),
+			mid = math.rad(3),
+			foot = math.rad(8),
+		},
+		ground = {
+			up = math.rad(-2),
+			mid = math.rad(65),
+			foot = math.rad(-40),
 		},
 	},
 }
@@ -234,7 +234,6 @@ local function MotionControl()
 	local moving, aiming
 	local justmoved = true
 	local legParity = math.random() > 0.5
-	local moveFrac = 0
 	while true do
 		moving = bMoving
 		aiming = bAiming
