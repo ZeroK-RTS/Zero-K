@@ -1011,12 +1011,7 @@ local function ReApplyKeybinds()
 	end
 end
 
-local function AddOption(path, option, wname ) --Note: this is used when loading widgets and in Initialize()
-	--echo(path, wname, option)
-	if not wname then
-		wname = path
-	end
-	
+local function AddOption(path, option) --Note: this is used when loading widgets and in Initialize()
 	local path2 = path
 	if not option then
 		if not pathoptions[path] then
@@ -1045,6 +1040,10 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			return
 		end
 	end
+
+	option.wname = option.wname or path
+	local wname = option.wname
+
 	if not pathoptions[path] then
 		AddOption( path )
 	end
@@ -1052,8 +1051,6 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	if not option.key then
 		option.key = option.name
 	end
-	option.wname = wname
-	
 	local curkey = path .. '_' .. option.key
 	--local fullkey = ('epic_'.. curkey)
 	local fullkey = GetFullKey(path, option)
@@ -1219,7 +1216,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	end
 end
 
-local function RemOption(path, option, wname )
+local function RemOption(path, option)
 	if not pathoptions[path] then
 		--this occurs when a widget unloads itself inside :init
 		--echo ('<epic menu> error #333 ', wname, path)
@@ -1227,7 +1224,7 @@ local function RemOption(path, option, wname )
 		return
 	end
 	RemoveOptionAction(path, option)
-	otset( pathoptions[path], wname..option.key, nil )
+	otset( pathoptions[path], option.wname .. option.key, nil )
 end
 
 
@@ -1382,9 +1379,9 @@ local function IntegrateWidget(w, addoptions, index)
 		setmetatable( w.options[k], w.options[k] )
 		--]]
 		if addoptions then
-			AddOption(path, option, wname )
+			AddOption(path, option)
 		else
-			RemOption(path, option, wname )
+			RemOption(path, option)
 		end
 		
 	end
@@ -1612,7 +1609,7 @@ local function SearchElement(termToSearch, path)
 			elseif option.type == 'button' then
 				local hide = false
 				
-				if option.isDirectoryButton then --this type of button is defined in AddOption(path, option, wname) (a link into submenu)
+				if option.isDirectoryButton then --this type of button is defined in AddOption(path, option) (a link into submenu)
 					local menupath = currentPath .. ((currentPath == "") and "" or "/") .. option.name
 					if pathoptions[menupath] then
 						if #pathoptions[menupath] >= 1 and menupath ~= "" then
@@ -1807,7 +1804,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			end
 			
 			if not hide then
-				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option, wname )")
+				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option)")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
 				local button_height = 36
