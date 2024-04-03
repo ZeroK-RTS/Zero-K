@@ -464,7 +464,7 @@ function widget:Update(dt)
 	-- Ally/other selections
 	if checkSelectionType[OTHER_SEL] then
 		for unitID, _ in pairs(WG.allySelUnits or {}) do
-			if not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
+			if Spring.ValidUnitID(unitID) and not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
 				if not selUnits[unitID] then
 					AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
 					selUnits[unitID] = OTHER_SEL
