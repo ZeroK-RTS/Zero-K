@@ -1,2 +1,14 @@
 {
+	"actiontrackingcamera_option_camera_rotation" : "Camera rotation",
+	"actiontrackingcamera_option_camera_rotation_desc" : "Can rotate the camera to keep up with the action",
+	"actiontrackingcamera_option_user_interrupts_tracking" : "Pause tracking on user input",
+	"actiontrackingcamera_option_user_interrupts_tracking_desc" : "Pause camera tracking when the user moves the mouse etc",
+	"actiontrackingcamera_option_show_commentary" : "Show commentary",
+	"actiontrackingcamera_option_show_commentary_desc" : "Show a commentary panel with information about the action",
+	"actiontrackingcamera_option_tracking_reticle" : "Show tracking reticle",
+	"actiontrackingcamera_option_tracking_reticle_desc" : "Draw a reticle around the units being tracked",
+	"playernametags_option_onlycomms" : "Only tag Commanders",
+	"playernametags_option_onlycomms_desc" : "Name tags will only be shown on Commanders",
+	"replaycontrolbuttons_option_visibleprogress" : "Progress Bar",
+	"replaycontrolbuttons_option_visibleprogress_desc" : "Show progress bar for the replay"
 }

@@ -125,24 +125,19 @@ local function setupPanels()
 	}
 end
 
+i18nPrefix = 'actiontrackingcamera_'
 options_path = 'Settings/Spectating/Action Tracking Camera'
 options_order = {"user_interrupts_tracking", "camera_rotation", "show_commentary", "tracking_reticle"}
 options = {
 	user_interrupts_tracking = {
-		name = 'Pause tracking on user input',
-		desc = 'Pause camera tracking when the user moves the mouse etc',
 		type = 'bool',
 		value = true,
 	},
 	camera_rotation = {
-		name = 'Camera rotation',
-		desc = 'Can rotate the camera to keep up with the action',
 		type = 'bool',
 		value = true,
 	},
 	show_commentary = {
-		name = 'Show commentary',
-		desc = 'Show a commentary panel with information about the action',
 		type = 'bool',
 		value = true,
 		OnChange = function(self)
@@ -155,8 +150,6 @@ options = {
 		end,
 	},
 	tracking_reticle = {
-		name = 'Show tracking reticle',
-		desc = 'Draw a reticle around the units being tracked',
 		type = 'bool',
 		value = false,
 	}

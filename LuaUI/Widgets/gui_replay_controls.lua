@@ -59,13 +59,12 @@ local BUTTON_BORDER_COLOR
 ---------------------------------
 -- Epic Menu
 ---------------------------------
+i18nPrefix = 'replaycontrolbuttons_'
 options_path = 'Settings/HUD Panels/Replay Controls'
 options_order = { 'visibleprogress'}
 options = {
 	-- Useful if you want to keep the battle length a secret
 	visibleprogress = {
-		name = 'Progress Bar',
-		desc = 'Enables a clickable progress bar for the replay.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
