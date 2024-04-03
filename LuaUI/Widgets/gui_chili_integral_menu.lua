@@ -1473,6 +1473,8 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 		
 		local isBuild = (cmdID < 0)
+		local displayConfig = GetDisplayConfig(cmdID)
+		
 		if isBuild then
 			local ud = UnitDefs[-cmdID]
 			if buttonLayout.tooltipOverride then
@@ -1485,12 +1487,11 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			if buttonLayout.showCost then
 				SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
 			end
+		else
+			button.tooltip = GetButtonTooltip(displayConfig, command, state)
 		end
 		
-		local displayConfig = GetDisplayConfig(cmdID)
-		button.tooltip = GetButtonTooltip(displayConfig, command, state)
-		
-		if command.action then
+		if command and command.action then
 			local hotkey = GetHotkeyText(command.action)
 			if not (isStateCommand or usingGrid) then
 				hotkeyText = hotkey

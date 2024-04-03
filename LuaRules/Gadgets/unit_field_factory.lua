@@ -75,7 +75,7 @@ local factories = {
 
 local buildParams = {
 	type = 20,
-	action = "buildunit_etc",
+	action = "build_field_unit",
 	id = -1,
 	tooltip = "",
 	cursor = "etc",
@@ -130,7 +130,6 @@ local function AddUnit(unitID, lockDefID)
 		buildParams.id = -lockDefID
 		buildParams.cursor = name
 		buildParams.name = name
-		buildParams.action = "buildunit_name"
 		Spring.InsertUnitCmdDesc(unitID, buildParams)
 		canBuild[unitID] = lockDefID
 		Spring.SetUnitRulesParam(unitID, "fieldFactoryUnit", lockDefID, ALLY_TABLE)
