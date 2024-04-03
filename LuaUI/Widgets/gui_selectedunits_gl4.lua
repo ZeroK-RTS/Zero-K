@@ -399,8 +399,8 @@ end
 
 local function CleanSelections(typeToClear, newSelUnits)
 	local changed = false
-	for unitID, type in pairs(selUnits) do
-		if type == typeToClear and newSelUnits[unitID] ~= type then
+	for unitID, selType in pairs(selUnits) do
+		if selType == typeToClear and newSelUnits[unitID] ~= selType then
 			changed = true
 			RemoveSelected(unitID)
 		end
@@ -465,11 +465,11 @@ function widget:Update(dt)
 	if checkSelectionType[OTHER_SEL] then
 		for unitID, _ in pairs(WG.allySelUnits or {}) do
 			if not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
-				if selUnits[unitID] ~= OTHER_SEL then
+				if not selUnits[unitID] then
 					AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
 					selUnits[unitID] = OTHER_SEL
 				end
-				newSelUnits[unitID] = alreadySetType or OTHER_SEL
+				newSelUnits[unitID] = OTHER_SEL
 			end
 		end
 		CleanSelections(OTHER_SEL, newSelUnits)
