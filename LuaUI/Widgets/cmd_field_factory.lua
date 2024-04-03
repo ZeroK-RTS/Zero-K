@@ -29,6 +29,40 @@ local optionsWindow
 
 local _, factoryUnitPosDef = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
+local factoryDefs = {}
+do
+	local factories = {
+		[[factoryshield]],
+		[[factorycloak]],
+		[[factoryveh]],
+		[[factoryplane]],
+		[[factorygunship]],
+		[[factoryhover]],
+		[[factoryamph]],
+		[[factoryspider]],
+		[[factoryjump]],
+		[[factorytank]],
+		[[factoryship]],
+		[[striderhub]],
+		[[plateshield]],
+		[[platecloak]],
+		[[plateveh]],
+		[[plateplane]],
+		[[plategunship]],
+		[[platehover]],
+		[[plateamph]],
+		[[platespider]],
+		[[platejump]],
+		[[platetank]],
+		[[plateship]],
+	}
+
+	for i = 1, #factories do
+		local factoryName = factories[i]
+		factoryDefs[UnitDefNames[factoryName].id] = true
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -36,8 +70,8 @@ local _, factoryUnitPosDef = include("Configs/integral_menu_commands.lua", nil, 
 local function GetOptionsPosition(width, height)
 	local x, y = Spring.ScaledGetMouseState()
 	y = screenHeight - y
-	x = x - OPT_WIDTH / 2
-	y = y - OPT_HEIGHT - 20
+	x = x - width / 2
+	y = y - height - 20
 	
 	if x + width > screenWidth - 2 then
 		x = screenWidth - width - 2
@@ -145,6 +179,12 @@ local function GenerateOptionsSelector(factoryID)
 	if not unitDefID then
 		return
 	end
+	if not Spring.AreTeamsAllied(Spring.GetUnitTeam(factoryID), Spring.GetMyTeamID()) then
+		return
+	end
+	if not factoryDefs[unitDefID] then
+		return
+	end
 	local ud = UnitDefs[unitDefID]
 	if not ud then
 		return
@@ -156,13 +196,22 @@ local function GenerateOptionsSelector(factoryID)
 		return
 	end
 	
-	local x, y = GetOptionsPosition(OPT_WIDTH, OPT_HEIGHT)
+	local width, height, bottomGap = OPT_WIDTH, OPT_HEIGHT, 0
+	local bottom
+	local stunned, _, inbuild = Spring.GetUnitIsStunned(factoryID)
+	stunned = stunned or ((Spring.GetUnitRulesParam(factoryID, "totalEconomyChange") or 1) <= 0)
+	if stunned then
+		bottomGap = 36
+		height = height + bottomGap
+	end
+	
+	local x, y = GetOptionsPosition(width, height)
 	
 	optionsWindow = Chili.Window:New{
 		x = x,
 		y = y,
-		width = OPT_WIDTH,
-		height = OPT_HEIGHT,
+		width = width,
+		height = height,
 		padding = {14, 22, 14, 10},
 		classname = "main_window_small",
 		textColor = {1,1,1,0.55},
@@ -173,21 +222,50 @@ local function GenerateOptionsSelector(factoryID)
 	}
 	optionsWindow:BringToFront()
 	
+	local panel = Chili.Panel:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = bottomGap,
+		padding = {0, 0, 0, 0},
+		backgroundColor = {1, 1, 1, 0},
+		parent = optionsWindow,
+	}
+	
+	if stunned then
+		Chili.Label:New{
+			x      = 0,
+			right  = 0,
+			bottom = 0,
+			height = bottomGap,
+			caption = (inbuild and "Factory must be complete") or "Factory must be functional",
+			align  = "center",
+			autosize = false,
+			font   = {
+				size = 24,
+				outline = true,
+				outlineWidth = 2,
+				outlineWeight = 2,
+			},
+			parent = optionsWindow,
+		}
+	end
+	
 	for i = 1, #buildList do
 		local buildDefID = buildList[i]
 		local bud = UnitDefs[buildDefID]
 		local buildName = bud.name
 		local position = buildName and layoutData and layoutData[buildName]
 		if position then
-			GetButton(optionsWindow, position.col, position.row, buildDefID, bud, buildName)
+			GetButton(panel, position.col, position.row, buildDefID, bud, buildName)
 		else
 			local row = (i > 6) and 2 or 1
 			local col = (i - 1)%6 + row
-			GetButton(optionsWindow, col, row, buildDefID, bud, buildName)
+			GetButton(panel, col, row, buildDefID, bud, buildName)
 		end
 	end
 	
-	GetButton(optionsWindow, 1, 2)
+	GetButton(panel, 1, 2)
 end
 
 function widget:CommandNotify(cmdID, params, options)

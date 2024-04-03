@@ -25,7 +25,7 @@ local facSelectCmd = {
 	cursor  = 'facselect',
 	action  = 'field_fac_select',
 	name    = 'Factory Select',
-	params  = { },
+	params  = {},
 	hidden  = false,
 }
 
@@ -121,6 +121,9 @@ local function RemoveUnit(unitID, lockDefID)
 end
 
 local function AddUnit(unitID, lockDefID)
+	if canBuild[unitID] then
+		RemoveUnit(unitID, canBuild[unitID])
+	end
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, -lockDefID)
 	if (not cmdDescID) then
 		local name = UnitDefs[lockDefID].name
@@ -208,9 +211,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		local distance = Spring.GetUnitSeparation(unitID, targetID, true)
 		if distance <= fieldFacRange[unitDefID] and not temporaryProblem then
 			if canBuild[unitID] ~= nextDesiredUnitType[unitID] then
-				if canBuild[unitID] then
-					RemoveUnit(unitID, canBuild[unitID])
-				end
 				AddUnit(unitID, nextDesiredUnitType[unitID])
 			end
 			nextDesiredUnitType[unitID] = nil
@@ -242,6 +242,14 @@ function GG.FieldConstruction_NotifyPlop(unitID, factoryID, factoryDefID)
 		return
 	end
 	AddUnit(unitID, buildList[2])
+end
+
+function GG.FieldConstruction_SetProduction(unitID, productionDefID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not (unitDefID and fieldFacRange[unitDefID]) then
+		return
+	end
+	AddUnit(unitID, productionDefID)
 end
 
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)

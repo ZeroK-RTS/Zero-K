@@ -437,6 +437,11 @@ local function FinishMorph(unitID, morphData)
 
 	Spring.SetUnitRulesParam(newUnit, "jumpReload", Spring.GetUnitRulesParam(unitID, "jumpReload") or 1)
 	
+	local oldFieldFactoryUnit = Spring.GetUnitRulesParam(unitID, "fieldFactoryUnit")
+	if oldFieldFactoryUnit and GG.FieldConstruction_SetProduction then
+		GG.FieldConstruction_SetProduction(newUnit, oldFieldFactoryUnit)
+	end
+	
 	--// FIXME: - re-attach to current transport?
 	--// update selection
 	SendToUnsynced("unit_morph_finished", unitID, newUnit)
