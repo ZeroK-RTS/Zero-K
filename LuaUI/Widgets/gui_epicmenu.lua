@@ -1011,6 +1011,25 @@ local function ReApplyKeybinds()
 	end
 end
 
+local function UpdateI18n(option, checkRedundancy)
+	if not option.i18nKey then
+		return
+	end
+
+	local name = WG.Translate('epicmenu', option.i18nKey)
+	if checkRedundancy and option.name and name then
+		echo("Warning: overwriting name of option '" + option.key + "' from i18n" )
+	end
+	option.name = name or option.name
+
+	-- Suppress logging for description as it is optional
+	local desc = WG.Translate('epicmenu', option.i18nKey .. '_desc', nil, { suppressWarnings = true })
+	if checkRedundancy and option.desc and desc then
+		echo("Warning: overwriting desc of option '" + option.key + "' from i18n" )
+	end
+	option.desc = desc or option.desc
+end
+
 local function AddOption(path, option) --Note: this is used when loading widgets and in Initialize()
 	local path2 = path
 	if not option then
@@ -1051,6 +1070,9 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 	if not option.key then
 		option.key = option.name
 	end
+
+	UpdateI18n(option, true)
+
 	local curkey = path .. '_' .. option.key
 	--local fullkey = ('epic_'.. curkey)
 	local fullkey = GetFullKey(path, option)
@@ -1319,6 +1341,9 @@ local function IntegrateWidget(w, addoptions, index)
 		
 		option.key = k
 		option.wname = wname
+		if w.i18nPrefix then
+			option.i18nKey = w.i18nPrefix .. 'option_' .. string.lower(k)
+		end
 		
 		local origOnChange = w.options[k].OnChange
 		
@@ -2822,6 +2847,15 @@ end
 
 WG.RemakeEpicMenu = RemakeEpicMenu
 
+local function LanguageChanged ()
+	for path, subtable in pairs(pathoptions) do
+		for _, element in ipairs(subtable) do
+			UpdateI18n(element[2])
+		end
+	end
+	WG.RemakeEpicMenu()
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -3178,6 +3212,8 @@ function widget:Initialize()
 			option.OnChange({checked = value, value = value, color = value})
 		end
 	end
+
+	WG.InitializeTranslation (LanguageChanged, GetInfo().name)
 end
 
 function widget:Shutdown()
