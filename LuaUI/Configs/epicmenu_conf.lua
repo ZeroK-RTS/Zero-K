@@ -445,7 +445,7 @@ local pathSelectionXrayHalo = 'Settings/Interface/Selection/Selection XRay&Halo'
 local pathSelectionPlatters = 'Settings/Interface/Selection/Team Platters'
 local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selections'
 	ShButton(pathSelectionGL4, 'Toggle Default Selections', function() spSendCommands{"luaui togglewidget Selected Units GL4 2"} end, "Draws a configurable box and platter underneath units. This is the default, but required a graphics card capable of using shaders.")
-	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes 2"} end, "Draws coloured shapes under selected units")
+	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes 3"} end, "Draws coloured shapes under selected units")
 	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo 2"} end, "Places blurry halo around selected units")
@@ -676,7 +676,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	--	type = 'bool',
 	--	value = false,
 	--	OnChange = function(self)
-	--		SetWidgetEnableState("UnitShapes 2", self.value)
+	--		SetWidgetEnableState("UnitShapes 3", self.value)
 	--	end,
 	--} )
 	--AddOption(pathUnitVisiblity,
