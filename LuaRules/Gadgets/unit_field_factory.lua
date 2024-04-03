@@ -230,6 +230,10 @@ function GG.FieldConstruction_NotifyPlop(unitID, factoryID, factoryDefID)
 	if not factoryDefID then
 		return
 	end
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not (unitDefID and fieldFacRange[unitDefID]) then
+		return false
+	end
 	local buildList = UnitDefs[factoryDefID].buildOptions
 	if not buildList and buildList[2] then
 		return
