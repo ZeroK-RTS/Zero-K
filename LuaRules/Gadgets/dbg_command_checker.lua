@@ -29,6 +29,7 @@ local echoTime = 0
 local commandsfromPlayerID = {}
 local prevCommandsfromPlayerID = {}
 local playerName = {}
+local toTrack = {}
 
 local function EchoSummary()
 	commandsfromPlayerID = commandsfromPlayerID or {}
@@ -46,6 +47,7 @@ local function SendSummary(cmd, line, words, player)
 	end
 	EchoSummary()
 end
+
 local function VeryLightCheck(cmd, line, words, player)
 	if not spIsCheatingEnabled() then
 		return
@@ -94,6 +96,18 @@ local function PlayerDetailedCheck(cmd, line, words, player)
 	end
 end
 
+local function TrackUnit(cmd, line, words, player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local unitID = words[1] and tonumber(words[1])
+	local enabled = (words[2] and tonumber(words[2])) == 1
+	
+	local toTrack = toTrack or {}
+	toTrack[unitID] = enabled
+	Spring.Utilities.UnitEcho(unitID, "Track commands " .. (enabled and "enabled" or "disabled"))
+end
+
 local function ResetCheck(cmd, line, words, player)
 	if not spIsCheatingEnabled() then
 		return
@@ -104,6 +118,20 @@ end
 
 local SIZE_LIMIT = 10^8
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, playerID, fromSynced, fromLua)
+	if toTrack and toTrack[unitID] then
+		Spring.Utilities.UnitEcho(unitID, cmdID)
+		Spring.Echo("========= unitID", unitID, "cmdID", cmdID)
+		Spring.Utilities.TableEcho(cmdParams, "cmdParams")
+		Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
+		Spring.Echo(cmdTag, playerID, fromSynced, fromLua)
+		if #cmdParams >= 3 then
+			Spring.MarkerAddPoint(cmdParams[1], cmdParams[2], cmdParams[3], cmdID)
+			local ux, uy, uz = Spring.GetUnitPosition(unitID)
+			if ux then
+				Spring.MarkerAddLine(ux, uy, uz, cmdParams[1], cmdParams[2], cmdParams[3])
+			end
+		end
+	end
 	if heavyCheckEnabled and Spring.GetGameFrame() >= heavyCheckEnabled then
 		if not playerName[playerID] then
 			playerName[playerID] = Spring.GetPlayerInfo(playerID) or ("playerID_" .. playerID)
@@ -146,4 +174,5 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "cmdp", PlayerDetailedCheck, "LightCheck")
 	gadgetHandler.actionHandler.AddChatAction(self, "cmdr", ResetCheck, "LightCheck")
 	gadgetHandler.actionHandler.AddChatAction(self, "cmds", SendSummary, "Summary")
+	gadgetHandler.actionHandler.AddChatAction(self, "unitcmds", TrackUnit, "unitcmds")
 end
