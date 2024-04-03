@@ -201,7 +201,7 @@ local function GenerateOptionsSelector(factoryID)
 	local stunned, _, inbuild = Spring.GetUnitIsStunned(factoryID)
 	stunned = stunned or ((Spring.GetUnitRulesParam(factoryID, "totalEconomyChange") or 1) <= 0)
 	if stunned then
-		bottomGap = 36
+		bottomGap = 24
 		height = height + bottomGap
 	end
 	
@@ -238,14 +238,14 @@ local function GenerateOptionsSelector(factoryID)
 			right  = 0,
 			bottom = 0,
 			height = bottomGap,
-			caption = (inbuild and "Factory must be complete") or "Factory must be functional",
+			caption = (inbuild and "Warning: Factory must be complete") or "Warning: Factory must be functional",
 			align  = "center",
 			autosize = false,
 			font   = {
-				size = 24,
+				size = 16,
 				outline = true,
-				outlineWidth = 2,
-				outlineWeight = 2,
+				outlineWidth = 1,
+				outlineWeight = 1,
 			},
 			parent = optionsWindow,
 		}
