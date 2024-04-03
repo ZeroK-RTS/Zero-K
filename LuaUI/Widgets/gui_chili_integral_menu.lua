@@ -1471,7 +1471,9 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		if command then
 			SetDisabled(command.disabled)
 		end
-		if cmdID < 0 then
+		
+		local isBuild = (cmdID < 0)
+		if isBuild then
 			local ud = UnitDefs[-cmdID]
 			if buttonLayout.tooltipOverride then
 				button.tooltip = buttonLayout.tooltipOverride
@@ -1483,7 +1485,6 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			if buttonLayout.showCost then
 				SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
 			end
-			return
 		end
 		
 		local displayConfig = GetDisplayConfig(cmdID)
@@ -1510,9 +1511,10 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				spEcho("Error, missing command config", cmdID)
 			end
 		else
-			local texture = (displayConfig and displayConfig.texture) or command.texture
-			SetImage(texture)
-			
+			if not isBuild then
+				local texture = (displayConfig and displayConfig.texture) or command.texture
+				SetImage(texture)
+			end
 			-- Remove stockpile progress
 			if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
 				SetText(textConfig.bottomRightLarge.name, nil)

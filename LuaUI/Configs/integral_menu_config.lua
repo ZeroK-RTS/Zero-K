@@ -375,8 +375,10 @@ local textConfig = {
 	},
 	bottomRightLarge = {
 		name = "bottomRightLarge",
+		x = "15%",
 		right = "14%",
 		bottom = "16%",
+		height = 14,
 		fontsize = 14,
 	},
 	queue = {
