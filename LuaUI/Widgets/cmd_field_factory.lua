@@ -273,8 +273,17 @@ function widget:CommandNotify(cmdID, params, options)
 		GenerateOptionsSelector(params[1])
 		return false
 	end
-	if optionsWindow then
+	--if optionsWindow then
+	--	optionsWindow:Dispose()
+	--	Spring.GiveOrder(CMD_FIELD_FAC_UNIT_TYPE, {-1}, 0)
+	--	optionsWindow = false
+	--end
+end
+
+function widget:MousePress(x,y,button)
+	if optionsWindow and not Chili.Screen0:IsAbove(x,y) then
 		optionsWindow:Dispose()
+		Spring.GiveOrder(CMD_FIELD_FAC_UNIT_TYPE, {-1}, 0)
 		optionsWindow = false
 	end
 end
