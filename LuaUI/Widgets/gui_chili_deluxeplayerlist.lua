@@ -55,7 +55,7 @@ local incolor2color
 
 local window_cpl, scroll_cpl
 
-i18nPrefix = 'chilideluxeplayerlistalpha202_'
+i18nPrefix = 'chilideluxeplayerlistalpha_'
 options_path = 'Settings/HUD Panels/Player List'
 options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'show_cpu_ping', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
