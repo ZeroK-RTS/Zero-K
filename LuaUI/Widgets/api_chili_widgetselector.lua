@@ -144,16 +144,19 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
-
 -- returns whether widget is enabled
 local function WidgetEnabled(wname)
 	local order = widgetHandler.orderList[wname]
 	return order and (order > 0)
 end
-			
 
-
-
+function WG.WidgetEnabledAndActive(wname)
+	if not WidgetEnabled(wname) then
+		return false
+	end
+	local wdata = widgetHandler.knownWidgets[wname]
+	return wdata and wdata.active
+end
 
 -- Update colors for labels of widget checkboxes in widgetlist window
 local function checkWidget(widget)

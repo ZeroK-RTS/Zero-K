@@ -19,7 +19,7 @@ end
 
 local GL_RGB16F_ARB          = 0x881B
 local GL_RGB32F_ARB          = 0x8815
-local GL_RGB8				 = 0x8051
+local GL_RGB8                = 0x8051
 local GL_MODELVIEW           = GL.MODELVIEW
 local GL_NEAREST             = GL.NEAREST
 local GL_ONE                 = GL.ONE
@@ -32,7 +32,7 @@ local glBeginEnd             = gl.BeginEnd
 local glBillboard            = gl.Billboard
 local glBlending             = gl.Blending
 local glCallList             = gl.CallList
-local glClear				 = gl.Clear
+local glClear                = gl.Clear
 local glColor                = gl.Color
 local glColorMask            = gl.ColorMask
 local glCopyToTexture        = gl.CopyToTexture
@@ -49,7 +49,7 @@ local glLoadIdentity         = gl.LoadIdentity
 local glLoadMatrix           = gl.LoadMatrix
 local glMatrixMode           = gl.MatrixMode
 local glMultiTexCoord        = gl.MultiTexCoord
-local glOrtho            	 = gl.Ortho
+local glOrtho                = gl.Ortho
 local glPopMatrix            = gl.PopMatrix
 local glPushMatrix           = gl.PushMatrix
 local glResetMatrices        = gl.ResetMatrices
@@ -58,7 +58,7 @@ local glTexture              = gl.Texture
 local glTexRect              = gl.TexRect
 local glRect                 = gl.Rect
 local glRenderToTexture      = gl.RenderToTexture
-local glRotate				 = gl.Rotate
+local glRotate               = gl.Rotate
 local glUniform              = gl.Uniform
 local glUniformInt           = gl.UniformInt
 local glUniformMatrix        = gl.UniformMatrix
@@ -203,7 +203,6 @@ end
 --------------------------------------------------------------------------------
 
 function widget:ViewResize()
-
 	vsx, vsy = gl.GetViewSizes()
 	ivsx = 1.0 / vsx --we can do /n here!
 	ivsy = 1.0 / vsy
@@ -260,7 +259,6 @@ local function DeferredLighting_RegisterFunction(func)
 end
 
 function InitialiseShaders()
-
 	if ((not forceNonGLSL) and Spring.GetMiniMapDualScreen() ~= 'left') then --FIXME dualscreen
 		if (not glCreateShader) then
 			spEcho("gfx_deferred_rendering.lua: Shaders not found, removing self.")
@@ -436,6 +434,9 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	if WG.SSAO_DeferredRenderingDisabled then
+		WG.SSAO_DeferredRenderingDisabled()
+	end
 	if (GLSLRenderer) then
 		if (glDeleteShader) then
 			glDeleteShader(depthPointShader)
