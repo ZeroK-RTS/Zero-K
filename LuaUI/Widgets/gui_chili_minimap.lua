@@ -124,6 +124,7 @@ end
 local function MakeMinimapWindow()
 end
 
+i18nPrefix = 'chiliminimap_'
 options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 local hotkeysPath = 'Hotkeys/Misc'
@@ -188,22 +189,16 @@ options = {
 	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', path = hotkeysPath},
 	
 	drawinmap = {
-		name = 'Map Drawing Hotkey',
-		desc = 'Hold this hotkey to draw on the map and write messages. Left click to draw, right click to erase, middle click to place a marker. Double left click to type a marker message.',
 		type = 'button',
 		action = 'drawinmap',
 		path = hotkeysPath,
 	},
 	clearmapmarks = {
-		name = 'Erase Map Drawing',
-		desc = 'Erases all map drawing and markers (for you, not for others on your team).',
 		type = 'button',
 		action = 'clearmapmarks',
 		path = hotkeysPath,
 	},
 	lastmsgpos = {
-		name = 'Zoom To Last Message',
-		desc = 'Moves the camera to the most recently placed map marker or message.',
 		type = 'button',
 		action = 'lastmsgpos',
 		path = hotkeysPath,
@@ -212,38 +207,28 @@ options = {
 	lblViews = { type = 'label', name = 'Map Overlays', path = hotkeysPath},
 
 	viewstandard = {
-		name = 'Clear Overlays',
-		desc = 'Disables Heightmap, Pathing and Line of Sight overlays.',
 		type = 'button',
 		action = 'showstandard',
 		path = hotkeysPath,
 	},
 	viewheightmap = {
-		name = 'Toggle Height Map',
-		desc = 'Shows contours of terrain elevation.',
 		type = 'button',
 		action = 'showelevation',
 		path = hotkeysPath,
 	},
 	viewblockmap = {
-		name = 'Toggle Pathing Map',
-		desc = 'Select a unit to see where it can go. Select a building blueprint to see where it can be placed.',
 		type = 'button',
 		action = 'showpathtraversability',
 		path = hotkeysPath,
 	},
 	
 	viewfow = {
-		name = 'Toggle Line of Sight',
-		desc = 'Shows sight distance and radar coverage.',
 		type = 'button',
 		action = 'togglelos',
 		path = hotkeysPath,
 	},
 	
 	showeco = {
-		name = 'Toggle Economy Overlay',
-		desc = 'Show metal, geo spots and energy grid',
 		hotkey = {key='f4', mod=''},
 		type ='button',
 		action='showeco',
@@ -259,8 +244,6 @@ options = {
 	lable_initialView = { type = 'label', name = 'Initial Map Overlay', },
 	
 	initialSensorState = {
-		name = "Start with LOS enabled",
-		desc = "Game starts with Line of Sight Overlay enabled",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -275,7 +258,6 @@ options = {
 	},
 	
 	radar_fog_brightness1 = {
-		name = "Fog Brightness",
 		type = "number",
 		value = default_fog_brightness, min = 0, max = 1, step = 0.01,
 		OnChange =  function() updateRadarColors() end,
@@ -287,25 +269,23 @@ options = {
 --------------------------------------------------------------------------
 	
 	radar_view_colors_label2 = {
-		type = 'label', name = '* Note: These colors are additive.', path = radar_path_edit,
+		type = 'label',
+		path = radar_path_edit,
 	},
 
 	radar_radar_color = {
-		name = "Radar Edge Color",
 		type = "colors",
 		value = { 0, 0, 1, 0},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path_edit,
 	},
 	radar_radar2_color = {
-		name = "Radar Interior Color",
 		type = "colors",
 		value = { 0, 1, 0, 0},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path_edit,
 	},
 	radar_jammer_color = {
-		name = "Jammer Color",
 		type = "colors",
 		value = { 0.1, 0, 0, 0},
 		OnChange = function() updateRadarColors() end,
@@ -313,7 +293,6 @@ options = {
 	},
 	
 	echoLos = {
-		name = 'Print LOS config to console',
 		type = 'button',
 		OnChange = function()
 			local always, los, radar, jam, inRadar = Spring.GetLosViewColors()
@@ -332,11 +311,11 @@ options = {
 --------------------------------------------------------------------------
 	
 	radar_view_presets_label1 = {
-		type = 'label', name = 'Radar Presets', path = radar_path,
+		type = 'label',
+		path = radar_path,
 	},
 	
 	radar_preset_only_los = {
-		name = 'Only LOS',
 		type = 'button',
 		OnChange = function()
 			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
@@ -352,7 +331,6 @@ options = {
 	},
 	
 	radar_preset_double_outline = {
-		name = 'Double Outline (default)',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness1.value = default_fog_brightness
@@ -366,7 +344,6 @@ options = {
 		path = radar_path,
 	},
 	radar_preset_two_tone = {
-		name = 'LOS Brighter',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness1.value = 0.2
@@ -380,7 +357,6 @@ options = {
 	},
 
 	radar_preset_blue_line = {
-		name = 'Blue Outline',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness1.value = default_fog_brightness
@@ -394,7 +370,6 @@ options = {
 	},
 	
 	radar_preset_green = {
-		name = 'Green Area Fill',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness1.value = default_fog_brightness
@@ -408,7 +383,6 @@ options = {
 	},
 	
 	radar_preset_green_in_blue = {
-		name = 'Green in Blue Outline',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness1.value = default_fog_brightness
@@ -425,14 +399,12 @@ options = {
 -- Minimap path area 'Settings/HUD Panels/Minimap'
 --------------------------------------------------------------------------
 	disableMinimap = {
-		name = 'Disable Minimap',
 		type = 'bool',
 		value = false,
 		OnChange = function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
 	hideOnOverview = {
-		name = 'Hide on Overview',
 		type = 'bool',
 		value = false,
 		OnChange = function(self) MakeMinimapWindow() end,
@@ -440,7 +412,6 @@ options = {
 		noHotkey = true,
 	},
 	use_map_ratio = {
-		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
 		value = 'arwindow',
 		items = {
@@ -462,7 +433,6 @@ options = {
 		noHotkey = true,
 	},
 	opacity = {
-		name = "Opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -478,7 +448,6 @@ options = {
 		path = minimap_path,
 	},
 	alwaysResizable = {
-		name = 'Resizable',
 		type = 'bool',
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
@@ -486,7 +455,6 @@ options = {
 		noHotkey = true,
 	},
 	buttonsOnRight = {
-		name = 'Map buttons on the right',
 		type = 'bool',
 		value = false,
 		OnChange = function(self) MakeMinimapWindow() end,
@@ -494,7 +462,6 @@ options = {
 		noHotkey = true,
 	},
 	hidebuttons = {
-		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
 		OnChange= function(self)
@@ -506,7 +473,6 @@ options = {
 		noHotkey = true,
 	},
 	minimizable = {
-		name = 'Minimizable',
 		type = 'bool',
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
@@ -515,7 +481,6 @@ options = {
 	},
 	lblblank1 = {name=' ', type='label'},
 	leftClickOnMinimap = {
-		name = 'Left Click Behaviour',
 		type = 'radioButton',
 		value = 'camera',
 		items={
@@ -527,7 +492,6 @@ options = {
 		noHotkey = true,
 	},
 	fadeMinimapOnZoomOut = {
-		name = "Minimap fading when zoomed out",
 		type = 'radioButton',
 		value = 'none',
 		items={
@@ -542,7 +506,6 @@ options = {
 		noHotkey = true,
 	},
 	fancySkinning = {
-		name = 'Fancy Skinning',
 		type = 'radioButton',
 		value = 'panel',
 		path = minimap_path,
@@ -586,9 +549,7 @@ options = {
 	},
 	--[[
 	simpleMinimapColors = {
-		name = 'Simplified Minimap Colors',
 		type = 'bool',
-		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).',
 		springsetting = 'SimpleMiniMapColors',
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
 		path = minimap_path,

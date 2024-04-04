@@ -71,7 +71,7 @@ local lastHoverUnitID, lastAllySelStaleCheck
 local otherOpacityMult = 0.4
 
 local Init
-i18nPrefix = 'selectedunitsgl42_'
+i18nPrefix = 'selectedunitsgl4_'
 options_path = 'Settings/Interface/Selection/Default Selections'
 options_order = {
 	'linewidth', 'platteropacity', 'outlineopacity', 

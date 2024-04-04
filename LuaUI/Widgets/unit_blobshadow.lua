@@ -33,18 +33,6 @@ local function OnOptionsChange()
 	ResetWidget()
 end
 
-options_path = 'Settings/Graphics/Unit Visibility/BlobShadow'
-options = {
-  --onlyShowOnAir = {
-  --  name = 'Only on air',
-  --  desc = 'Only show blob shadows for flying units.  Land units will not display blob shadows',
-  --  type = 'bool',
-  --  value = true,
-  --  advanced = false,
-  --  OnChange = OnOptionsChange,
-  --},
-}
-
 local shadowUnitDefID = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]

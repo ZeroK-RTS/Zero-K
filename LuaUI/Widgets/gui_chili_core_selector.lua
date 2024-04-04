@@ -188,11 +188,11 @@ local defaultFacHotkeys = {
 	{key='T', mod='alt+'},
 }
 
+i18nPrefix = 'chilicoreselector_'
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
-		name = 'Selection Bar Visibility',
 		type = 'radioButton',
 		value = 'specHide',
 		items = {
@@ -205,21 +205,18 @@ options = {
 		noHotkey = true,
 	},
 	vertical = {
-		name = 'Vertical Bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 		OnChange = OptionsUpdateLayout,
 	},
 	buttonSizeLong = {
-		name = 'Button Size',
 		type = 'number',
 		value = 58,
 		min = 10, max = 200, step = 1,
 		OnChange = OptionsUpdateLayout,
 	},
 	background_opacity = {
-		name = "Opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -230,60 +227,54 @@ options = {
 		end
 	},
 	monitoridlecomms = {
-		name = 'Track idle commanders',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	monitoridlenano = {
-		name = 'Track idle nanotowers',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	monitorInbuiltCons = {
-		name = 'Track constructors being built',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	leftMouseCenter = {
-		name = 'Swap Camera Center Button',
-		desc = 'When enabled left click a commander or factory to center the camera on it. When disabled right click centers.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
-	lblSelectionIdle = { type='label', name='Idle Units', path='Hotkeys/Selection', },
+	lblSelectionIdle = {
+		type='label',
+		path='Hotkeys/Selection',
+	},
 	selectprecbomber = { type = 'button',
-		name = 'Select idle precision bomber',
-		desc = 'Selects an idle, armed precision bomber. Use multiple times to select more. Deselects any units which are not idle, armed precision bombers.',
 		action = 'selectprecbomber',
 		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
 	selectidlecon = { type = 'button',
-		name = 'Select idle constructor',
-		desc = 'Selects an idle constructor. Use multiple times to select more. Deselects any units which are not idle constructors.',
 		action = 'selectidlecon',
 		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
 	selectidlecon_all = { type = 'button',
-		name = 'Select all idle constructors',
 		action = 'selectidlecon_all',
 		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
-	lblSelection = { type='label', name='Quick Selection Bar', path='Hotkeys/Selection', },
+	lblSelection = {
+		type='label',
+		path='Hotkeys/Selection',
+	},
 	selectcomm = { type = 'button',
-		name = 'Select Commander',
 		action = 'selectcomm',
 		path = 'Hotkeys/Selection',
 		dontRegisterAction = true,
 	},
 	horPaddingLeft = {
-		name = 'Horizontal Padding Left',
 		type = 'number',
 		value = 0,
 		advanced = true,
@@ -291,7 +282,6 @@ options = {
 		OnChange = OptionsUpdateLayout,
 	},
 	horPaddingRight = {
-		name = 'Horizontal Padding Right',
 		type = 'number',
 		value = 0,
 		advanced = true,
@@ -299,7 +289,6 @@ options = {
 		OnChange = OptionsUpdateLayout,
 	},
 	vertPadding = {
-		name = 'Vertical Padding',
 		type = 'number',
 		value = 0,
 		advanced = true,
@@ -307,7 +296,6 @@ options = {
 		OnChange = OptionsUpdateLayout,
 	},
 	buttonSpacing = {
-		name = 'Button Spacing',
 		type = 'number',
 		value = 0,
 		advanced = true,
@@ -315,7 +303,6 @@ options = {
 		OnChange = OptionsUpdateLayout,
 	},
 	minButtonSpaces = {
-		name = 'Minimum Button Space',
 		type = 'number',
 		value = 0,
 		advanced = true,
@@ -323,7 +310,6 @@ options = {
 		OnChange = OptionsUpdateLayout,
 	},
 	specSpaceOverride = {
-		name = 'Spectating Space Override',
 		desc = 'Size of the spacer which is present while spectating with "Only keep space when spectating".',
 		type = 'number',
 		value = 50,
@@ -332,7 +318,6 @@ options = {
 		OnChange = OptionsUpdateLayout,
 	},
 	fancySkinning = {
-		name = 'Fancy Skinning',
 		type = 'radioButton',
 		value = 'panel',
 		items = {
@@ -349,7 +334,6 @@ options = {
 		noHotkey = true,
 	},
 	leftsideofscreen = {
-		name = 'Left side of screen',
 		type = 'bool',
 		value = true,
 		hidden = true,

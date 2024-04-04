@@ -127,6 +127,7 @@ ShowOptions = {ShowOptions}
 --------------------------------------------------------------------------------
 -- Options
 
+i18nPrefix = 'chilispectatorpanels_'
 options_path = 'Settings/Spectating/Team Information Panels'
 
 options_order = {
@@ -152,7 +153,6 @@ options_order = {
 local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 options = {
 	enableSpectator = {
-		name  = "Enable as Spectator",
 		type  = "bool",
 		value = false,
 		OnChange = function(self)
@@ -162,21 +162,20 @@ options = {
 		desc = "Automatically enables the spectator panels and disables the player resource bar when spectating."
 	},
 	clanNameLengthCutoff = {
-		name  = "Max Clan Name Length",
 		type  = "number",
 		value = 12, min = 0, max = 60, step = 1,
 		desc = "Clans with full names shorter than this are displayed in full. Otherwise the short name is used. Requires reload."
 	},
 	
-	lable_playerPanel = {type = 'label', name = 'Player Panel',},
+	lable_playerPanel = {
+		type = 'label',
+	},
 	enablePlayerPanel = {
-		name  = "Enable Player Panel",
 		type  = "bool",
 		value = true,
 		OnChange = function(self) option_CheckEnablePlayer(self) end,
 	},
 	playerOpacity = {
-		name  = "Opacity",
 		type  = "number",
 		value = 0.6, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -189,35 +188,31 @@ options = {
 			end,
 	},
 	playerMainFontSize = {
-		name  = "Main Font Size",
 		type  = "number",
 		value = 25, min = 8, max = 60, step = 1,
 		OnChange = option_UpdateFonts,
 	},
 	playerFontSize = {
-		name  = "Font Size",
 		type  = "number",
 		value = 16, min = 8, max = 40, step = 1,
 		OnChange = option_UpdateFonts,
 	},
 	
-	lable_economyPanels = {type = 'label', name = 'Economy Panels',},
+	lable_economyPanels = {
+		type = 'label',
+	},
 	enableEconomyPanels = {
-		name  = "Enable Economy Panels",
 		type  = "bool",
 		value = true,
 		OnChange = function(self) option_CheckEnableResource(self) end,
 	},
 	flowAsArrows = {
-		name  = "Flow as arrows",
-		desc = "Use arrows instead of a number for the flow. Each arrow is 5 resources per second.",
 		type  = "bool",
 		value = true,
 		noHotkey = true,
 		OnChange = option_UpdateFonts,
 	},
 	resourceOpacity = {
-		name  = "Opacity",
 		type  = "number",
 		value = 0.6, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -241,19 +236,16 @@ options = {
 			end,
 	},
 	resourceMainFontSize = {
-		name  = "Main Font Size",
 		type  = "number",
 		value = 25, min = 8, max = 60, step = 1,
 		OnChange = option_UpdateFonts,
 	},
 	resourceFontSize = {
-		name  = "Font Size",
 		type  = "number",
 		value = 16, min = 8, max = 40, step = 1,
 		OnChange = option_UpdateFonts,
 	},
 	colourBlind = {
-		name  = "Colourblind mode",
 		type  = "bool",
 		value = false,
 		noHotkey = true,
@@ -261,7 +253,6 @@ options = {
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},
 	fancySkinning = {
-		name = 'Fancy Skinning',
 		type = 'radioButton',
 		value = 'panel',
 		items = {

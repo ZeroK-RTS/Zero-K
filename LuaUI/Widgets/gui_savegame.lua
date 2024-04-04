@@ -44,18 +44,16 @@ local mainWindow
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+i18nPrefix = 'savegamemenu_'
 options_path = 'Settings/Autosave'
-options =
-{
+options = {
 	enableautosave = {
-		name = 'Enable Autosave',
 		type = 'bool',
 		value = false,
 		simpleMode = true,
 		everyMode = true,
 	},
 	autosaveFrequency = {
-		name = 'Autosave Frequency (minutes)',
 		type = 'number',
 		min = 1, max = 60, step = 1,
 		value = 10,

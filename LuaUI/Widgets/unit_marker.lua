@@ -48,14 +48,13 @@ else
 	unitList = VFS.Include("LuaUI/Configs/unit_marker.lua")
 end
 
+i18nPrefix = 'unitmarkerzerok_'
 options_path = 'Settings/Interface/Unit Marker'
 
 options_order = { 'enableAll', 'disableAll', 'unitslabel'}
 options = {
 	enableAll = {
 		type='button',
-		name= "Enable All",
-		desc = "Marks all listed units.",
 		path = options_path .. "/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
@@ -79,8 +78,6 @@ options = {
 	},
 	disableAll = {
 		type='button',
-		name= "Disable All",
-		desc = "Mark nothing.",
 		path = options_path .. "/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
@@ -102,7 +99,11 @@ options = {
 		end,
 		noHotkey = true,
 	},
-	unitslabel = {name = "unitslabel", type = 'label', value = "Individual Toggles", path = options_path},
+	unitslabel = {
+		type = 'label',
+		value = "Individual Toggles",
+		path = options_path,
+	},
 }
 
 for unitDefID in pairs(unitList) do
