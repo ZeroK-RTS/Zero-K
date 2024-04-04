@@ -925,6 +925,7 @@
 	"mapedgeextension_option_gridtexturesizeexp_desc" : "Cannot be less than heightmap resolution",
 	"mapedgeextension_option_mapborderstyle" : "Exterior Effect",
 	"mapedgeextension_option_texturebrightness3" : "Texture Brightness",
+	"mapedgeextension_option_texturebrightness3_desc" : "Sets the brightness of the realistic texture (doesn't affect the grid)",
 	"mapedgeextension_option_useshader" : "Use shader",
 	"mapedgeextension_option_useshader_desc" : "Use a shader when mirroring the map",
 	"metalfeaturesgl3old_option_minmetal" : "Minimum Reclaim To Highlight",

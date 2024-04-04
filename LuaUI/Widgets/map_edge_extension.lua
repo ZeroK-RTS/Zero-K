@@ -106,7 +106,6 @@ options = {
 		max = 8,
 		step = 1,
 		value = 5,
-		desc = '',
 		OnChange = ResetWidget,
 	},
 	gridTextureSizeExp = {
@@ -115,7 +114,6 @@ options = {
 		max = 8,
 		step = 1,
 		value = 5,
-		desc = '',
 		OnChange = ResetWidget,
 	},
 	textureBrightness3 = {
@@ -124,7 +122,6 @@ options = {
 		max = 1,
 		step = 0.01,
 		value = 0.29,
-		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
 		OnChange = ResetWidget,
 	},
 	fogEffect = {
