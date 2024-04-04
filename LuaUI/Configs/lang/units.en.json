@@ -1216,13 +1216,13 @@
 	},
 	"planescout" : {
 		"name" : "Owl",
-		"description" : "Area Jammer, Radar/Sonar Plane",
-		"helptext" : "The Owl provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath."
+		"description" : "Radar/Sonar Scout Plane",
+		"helptext" : "The Owl's massive sight range provides an unparalleled means for observing enemy positions. It is also equipped with radar and sonar, making it the only plane that can detect underwater units."
 	},
 	"planelightscout" : {
 		"name" : "Sparrow",
-		"description" : "Light Scout Plane",
-		"helptext" : "The Sparrow is a light scout plane that detonates to reveal an area for 12 seconds. It can be morphed from a Radar Tower, making it accessible without an Airplane Plant, but is generally outclassed by the faster Swift and larger Owl."
+		"description" : "Light Scout/Radar Jammer Plane",
+		"helptext" : "The Sparrow is a light scout plane that can be morphed from a Radar Tower. It has an area jammer for hiding your own position, and can be detonated to reveal an area for 12 seconds."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",
