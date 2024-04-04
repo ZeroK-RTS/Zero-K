@@ -1018,14 +1018,14 @@ local function UpdateI18n(option, checkRedundancy)
 
 	local name = WG.Translate('epicmenu', option.i18nKey)
 	if checkRedundancy and option.name and name then
-		echo("Warning: overwriting name of option '" + option.key + "' from i18n" )
+		echo("Warning: overwriting name of option '" .. option.key .. "' from i18n" )
 	end
 	option.name = name or option.name
 
 	-- Suppress logging for description as it is optional
 	local desc = WG.Translate('epicmenu', option.i18nKey .. '_desc', nil, { suppressWarnings = true })
 	if checkRedundancy and option.desc and desc then
-		echo("Warning: overwriting desc of option '" + option.key + "' from i18n" )
+		echo("Warning: overwriting desc of option '" .. option.key .. "' from i18n" )
 	end
 	option.desc = desc or option.desc
 end
