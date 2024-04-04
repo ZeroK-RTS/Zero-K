@@ -618,6 +618,11 @@ local function DoDrawSSAO(isScreenSpace)
 end
 
 function widget:DrawWorld()
+	gl.Texture(0, false)
+	gl.Texture(1, false)
+	gl.UseShader(0)
+	gl.Blending(false)
+
 	gl.MatrixMode(GL.MODELVIEW)
 	gl.PushMatrix()
 	gl.LoadIdentity()
