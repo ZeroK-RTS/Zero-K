@@ -623,7 +623,7 @@ local pathGraphicsExtras = 'Settings/Graphics/Effects'
 	ShButton(pathGraphicsExtras, 'Toggle Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen')
 	ShButton(pathGraphicsExtras, 'Toggle Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
 
-	
+
 local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	ShLabel(pathUnitVisiblity, 'Unit Visibility Options')
 	AddOption(pathUnitVisiblity,
@@ -724,6 +724,32 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 				spSendCommands{"luaui togglewidget Outline Shader GL4"}
 			end, "Highlights edges of units")
 
+
+
+local pathSSAO = 'Settings/Graphics/Ambient Occlusion'
+	WG.SSAO_RequireDeferredRendering = true
+	ShButton(
+		pathSSAO, 'Toggle SSAO',
+		function()
+			spSendCommands{"luaui togglewidget SSAO 2"}
+		end, "Toggle Screen Space Ambient Occlusion. It essentially adds a bit of shading to everything.")
+	AddOption(pathSSAO,
+		{
+			name = 'Require deferred rendering',
+			desc = 'SSAO can cause visual issues if enabled without deferred rendering. This option force-disables SSAO if deferred rendering is not found.',
+			type = 'bool',
+			value = true,
+			OnChange = function(self)
+				WG.SSAO_RequireDeferredRendering = self.value
+				if WG.WidgetEnabledAndActive then
+					if self.value and not WG.WidgetEnabledAndActive("Deferred rendering") then
+						spSendCommands{"luaui disablewidget SSAO 2"}
+					else
+						spSendCommands{"luaui enablewidget SSAO 2"}
+					end
+				end
+			end,
+		})
 
 local pathAudio = 'Settings/Audio'
 	AddOption(pathAudio,{

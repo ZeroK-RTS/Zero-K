@@ -258,13 +258,27 @@ end
 -- Widget Functions
 -----------------------------------------------------------------
 
+local function SSAO_DeferredRenderingDisabled()
+	if WG.SSAO_RequireDeferredRendering then
+		Spring.Echo("SSAO: Deferred rendering disabled, disabling.")
+		widgetHandler:RemoveWidget()
+	end
+end
+
 function widget:ViewResize()
 	widget:Shutdown()
 	widget:Initialize()
 end
 
 function widget:Initialize()
+	WG.SSAO_DeferredRenderingDisabled = SSAO_DeferredRenderingDisabled
 	if not gl.CreateShader then -- no shader support, so just remove the widget itself, especially for headless
+		Spring.Echo("SSAO: gl.CreateShader not found, disabling.")
+		widgetHandler:RemoveWidget()
+		return
+	end
+	if WG.SSAO_RequireDeferredRendering and WG.WidgetEnabledAndActive and not WG.WidgetEnabledAndActive("Deferred rendering") then
+		Spring.Echo("SSAO: Deferred rendering not found, disabling.")
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -419,7 +433,6 @@ function widget:Initialize()
 		end
 	end)
 
-
 	local gaussianBlurVert = VFS.LoadFile(shadersDir.."identity.vert.glsl")
 	local gaussianBlurFrag = VFS.LoadFile(shadersDir.."gaussianBlur.frag.glsl")
 
@@ -447,7 +460,6 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-
 	-- restore unit lighting settings
 	if presets[preset].tonemapA then
 		Spring.SetConfigFloat("tonemapA", initialTonemapA)
@@ -494,7 +506,6 @@ local function DoDrawSSAO(isScreenSpace)
 	gl.DepthTest(false)
 	gl.DepthMask(false) --"BK OpenGL state resets", default is already false, could remove
 	gl.Blending(false)
-
 
 	if firstTime then
 		screenQuadList = gl.CreateList(gl.TexRect, -1, -1, 1, 1)
