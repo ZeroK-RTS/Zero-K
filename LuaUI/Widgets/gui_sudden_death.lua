@@ -10,21 +10,19 @@ function widget:GetInfo()
 	}
 end
 
+i18nPrefix = 'suddendeath_'
 options_path = 'Settings/Interface/Map/Sudden Death'
 options_order = {"color", "mid_color", "thickness"}
 options = {
 	color = {
-		name = "Sudden death color",
 		type = "colors",
 		value = {1, 0.2, 0.2, 0.8},
 	},
 	mid_color = {
-		name = "Middle ring color",
 		type = "colors",
 		value = {0.2, 1, 0.2, 0.6},
 	},
 	thickness = {
-		name = "Line thickness",
 		type = "number",
 		value = 7,
 		min = 1,

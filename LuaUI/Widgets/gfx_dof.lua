@@ -11,81 +11,62 @@ function widget:GetInfo()
 	}
 end
 
+i18nPrefix = 'depthoffieldshader_'
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
 options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocusLabel', 'autofocusInFocusMultiplier', 'autofocusPower',
 'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop'}
 
 options = {
-	useDoF =
-	{
+	useDoF = {
 		type='bool',
-		name='Apply Depth of Field Effect',
 		value=false,
 		advanced = false,
 	},
-	highQuality =
-	{
+	highQuality = {
 		type='bool',
-		name='High Quality',
 		value=false,
 		advanced=false,
 		OnChange = function(self) InitTextures() end,
 	},
-	autofocus =
-	{
+	autofocus = {
 		type='bool',
-		name='Automatically Set Focus',
 		value=true,
 	},
-	mousefocus =
-	{
+	mousefocus = {
 		type='bool',
-		name='Focus on Mouse Position',
 		value=false,
 	},
-	autofocusLabel =
-	{
+	autofocusLabel = {
 		type='label',
 		name='Autofocus Parameters'
 	},
-	autofocusInFocusMultiplier =
-	{
+	autofocusInFocusMultiplier = {
 		type='number',
-		name='Autofocus Minimum In-Focus region size',
 		min = 0.05, max = 10.0, step = 0.05,
 		value = 0.4,
 	},
-	autofocusPower =
-	{
+	autofocusPower = {
 		type='number',
-		name='Autofocus Power (lower = blurrier at range)',
 		min = 0.05, max = 50.0, step = 0.05,
 		value = 6.0,
 	},
-	autofocusFocalLength =
-	{
+	autofocusFocalLength = {
 		type='number',
-		name='Autofocus Focal Length',
 		min = 0.005, max = 1.0, step = 0.005,
 		value = 0.03,
 	},
-	manualfocusLabel =
-	{
+	manualfocusLabel = {
 		type='label',
 		name='Manual Focus Parameters'
 	},
-	focusDepth =
-	{
+	focusDepth = {
 		type='number',
-		name='Focus Depth (Manual & Non-Mouse Focus)',
 		min = 0.0, max = 2000.0, step = 0.1,
 		value = 300.0,
 	},
-	fStop =
-	{
+	fStop = {
 		type='number',
-		name='F-Stop (Manual Focus Only)',
 		min = 1.0, max = 80.0, step = 0.1,
 		value = 16.0,
 	},

@@ -138,20 +138,17 @@ local TEXT_CORRECT_Y = 1.25
 local PRESS_DRAG_THRESHOLD_SQR = 25^2
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
+i18nPrefix = 'mexplacementhandler_'
 options_path = 'Settings/Interface/Map/Metal Spots'
 options_order = { 'drawicons', 'size', 'rounding', 'catlabel', 'area_point_command', 'catlabel_terra', 'wall_low', 'wall_high', 'burry_shallow', 'burry_deep'}
 options = {
 	drawicons = {
-		name = 'Show Income as Icon',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = "Enabled: income is shown pictorially.\nDisabled: income is shown as a number.",
 		OnChange = function() updateMexDrawList() end
 	},
 	size = {
-		name = "Income Display Size",
-		desc = "How large should the font or icon be?",
 		type = "number",
 		value = 40,
 		min = 10,
@@ -162,8 +159,6 @@ options = {
 		OnChange = function() updateMexDrawList() end
 	},
 	rounding = {
-		name = "Display decimal digits",
-		desc = "How precise should the number be?\nNo effect on icons.",
 		type = "number",
 		value = 1,
 		min = 1,
@@ -174,25 +169,19 @@ options = {
 		OnChange = function() updateMexDrawList() end
 	},
 	catlabel = {
-		name = 'Area Mex',
 		type = 'label',
 		path = 'Settings/Interface/Building Placement',
 	},
 	area_point_command = {
-		name = 'Point click queues mex',
 		type = 'bool',
 		value = true,
-		desc = "Clicking on the map with Area Mex or Area Terra Mex snaps to the nearest spot, like placing a mex.",
 		path = 'Settings/Interface/Building Placement',
 	},
 	catlabel_terra = {
-		name = 'Area Terra Mex (Alt+W by default)',
 		type = 'label',
 		path = 'Settings/Interface/Building Placement',
 	},
 	wall_low = {
-		name = "Low Wall height",
-		desc = "How high should a default terraformed wall be?",
 		type = "number",
 		value = 40,
 		min = 2,
@@ -201,8 +190,6 @@ options = {
 		path = 'Settings/Interface/Building Placement',
 	},
 	wall_high = {
-		name = "High Wall height",
-		desc = "How high should a tall terraformed wall (hold Ctrl) be?",
 		type = "number",
 		value = 75,
 		min = 2,
@@ -211,8 +198,6 @@ options = {
 		path = 'Settings/Interface/Building Placement',
 	},
 	burry_shallow = {
-		name = "Shallow burry depth",
-		desc = "How deep should a burried mex (hold Alt) be?",
 		type = "number",
 		value = 55,
 		min = 2,
@@ -221,8 +206,6 @@ options = {
 		path = 'Settings/Interface/Building Placement',
 	},
 	burry_deep = {
-		name = "Deep burry depth",
-		desc = "How deep should a deeper burried mex (hold Alt+Ctrl) be?",
 		type = "number",
 		value = 90,
 		min = 2,

@@ -22,35 +22,31 @@ local ALPHA = true
 local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+i18nPrefix = 'cegspawner_'
 options_order = { 'reload', 'xdir', 'ydir', 'zdir', 'radius', }
 options_path = 'Settings/Toolbox/CEG Spawner'
 options = {
 	reload = {
-		name = 'Reload CEGs',
 		type = 'button',
 		OnChange = function() Spring.SendCommands('reloadcegs') end,
 	},
 	
 	xdir = {
-		name = 'X (-1,1)',
 		type = 'number',
 		min = -1, max = 1, step = 0.1,
 		value = 0,
 	},
 	ydir = {
-		name = 'Y (-1,1)',
 		type = 'number',
 		min = -1, max = 1, step = 0.1,
 		value = 0,
 	},
 	zdir = {
-		name = 'Z (-1,1)',
 		type = 'number',
 		min = -1, max = 1, step = 0.1,
 		value = 0,
 	},
 	radius = {
-		name = 'Radius (0 - 100)',
 		type = 'number',
 		min = 0, max = 100, step = 1,
 		value = 20,

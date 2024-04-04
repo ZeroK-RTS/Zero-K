@@ -24,11 +24,11 @@ local fontSizeMax = 250
 
 local textParametersChanged = false
 
+i18nPrefix = 'reclaimfieldhighlight_'
 options_path = "Settings/Interface/Reclaim Highlight"
 options_order = { 'showhighlight', 'flashStrength', 'fontSizeMin', 'fontSizeMax', 'fontScaling' }
 options = {
 	showhighlight = {
-		name = 'Show Field Summary',
 		type = 'radioButton',
 		value = 'constructors',
 		items = {
@@ -42,43 +42,35 @@ options = {
 		noHotkey = true,
 	},
 	flashStrength = {
-		name = "Field flashing strength",
 		type = 'number',
 		value = flashStrength,
 		min = 0.0, max = 0.5, step = 0.05,
-		desc = "How intensely the reclaim fields should pulse over time",
 		OnChange = function()
 			flashStrength = options.flashStrength.value
 		end,
 	},
 	fontSizeMin = {
-		name = "Minimum font size",
 		type = 'number',
 		value = fontSizeMin,
 		min = 20, max = 150, step = 10,
-		desc = "The smallest font size to use for the smallest reclaim fields",
 		OnChange = function()
 			fontSizeMin = options.fontSizeMin.value
 			textParametersChanged = true
 		end,
 	},
 	fontSizeMax = {
-		name = "Maximum font size",
 		type = 'number',
 		value = fontSizeMax,
 		min = 20, max = 300, step = 10,
-		desc = "The largest font size to use for the largest reclaim fields",
 		OnChange = function()
 			fontSizeMax = options.fontSizeMax.value
 			textParametersChanged = true
 		end,
 	},
 	fontScaling = {
-		name = "Font scaling factor",
 		type = 'number',
 		value = fontScaling,
 		min = 0.2, max = 0.8, step = 0.025,
-		desc = "How quickly the font size of the metal value display should grow with the size of the field",
 		OnChange = function()
 			fontScaling = options.fontScaling.value
 			textParametersChanged = true

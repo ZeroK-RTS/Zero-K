@@ -62,6 +62,7 @@ local function StartRetreat(unitID)
 	end
 end
 
+i18nPrefix = 'selectionhierarchy_'
 options_path = 'Settings/Interface/Selection/Filtering'
 local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = {
@@ -80,7 +81,6 @@ options_order = {
 options = {
 	label_selection_rank = {
 		type = 'text',
-		name = 'Selection Rank Filtering',
 		value = [[Units have a toggleable selection rank on the right side of their command card (the circle with numbers 0-3).
  - Normal selection only selects the boxed units with the highest rank.
  - Shift ignores rank.
@@ -91,18 +91,14 @@ options = {
  - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.]],
 	},
 	useSelectionFilteringOption = {
-		name = "Enable selection filtering",
 		type = "bool",
 		value = true,
 		noHotkey = true,
-		desc = "Enables selection rank, which filters constructors from combat units by default.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
 		end
 	},
 	ctrlFlattenRankOption = {
-		name = 'Hold Ctrl to ignore rank difference above:',
-		desc = "Useful so that global selection hotkeys (such as Ctrl+Z) can expand upon a mixed selection.",
 		type = 'number',
 		value = 1,
 		min = 0, max = 3, step = 1,
@@ -113,18 +109,14 @@ options = {
 		end
 	},
 	selectionFilteringOnlyAltOption = {
-		name = "Only filter when Alt is held",
 		type = "bool",
 		value = false,
 		noHotkey = true,
-		desc = "Enable selection filtering when Alt is held. Requires the main selection filtering option to be enabled.",
 		OnChange = function (self)
 			selectionFilteringOnlyAlt = self.value
 		end
 	},
 	altBlocksHighRankSelection = {
-		name = 'Hold Alt to filter out ranks above:',
-		desc = "Useful for selecting low-rank units, such as constructors as they default to rank 2.",
 		type = 'number',
 		value = 2,
 		min = 0, max = 3, step = 1,
@@ -135,8 +127,6 @@ options = {
 		end
 	},
 	doubleClickFlattenRankOption = {
-		name = 'Double click ignores rank difference above:',
-		desc = "Allows for double click selection of many units of the same type and differing selection rank.",
 		type = 'number',
 		value = 1,
 		min = 0, max = 3, step = 1,
@@ -147,8 +137,6 @@ options = {
 		end
 	},
 	controlGroupFlattenRank = {
-		name = "Control groups ignore rank difference above:",
-		desc = "Allows selecting entire control groups of differing selection rank.",
 		type = "number",
 		value = controlGroupFlattenRank,
 		min = 0, max = 3, step = 1,
@@ -158,8 +146,6 @@ options = {
 		end
 	},
 	retreatOverrideOption = {
-		name = "Retreat overrides selection rank",
-		desc = "Retreating units will be treated as a different selection rank.",
 		type = "bool",
 		value = true,
 		noHotkey = true,
@@ -169,8 +155,6 @@ options = {
 		end
 	},
 	retreatingRankOption = {
-		name = 'Retreat selection override:',
-		desc = "Retreating units are treated as this selection rank, if override is enabled.",
 		type = 'number',
 		value = 0, -- This should be 0 because otherwise Ctrl selection keys work on the unit.
 		min = 0, max = 3, step = 1,
@@ -182,8 +166,6 @@ options = {
 		end
 	},
 	retreatDeselects = {
-		name = "Retreat deselects",
-		desc = "Whether a unit that starts retreating will be deselected, so as not to keep accidentally bringing units back into danger.",
 		type = "bool",
 		value = true,
 		noHotkey = true,

@@ -29,15 +29,14 @@ local savedCameraStates = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'camerasaveposition_'
 options_path = 'Hotkeys/Camera/Camera Position Hotkeys'
 options_order = {'lbl_alert', 'zoom_speed', 'zoomAlert', 'zoomDamage', 'zoomMessage', 'lbl_pos', 'savezoom', 'pos_zoom_speed', 'recallStartPos'}
 options = {
 	lbl_alert = {
 		type = 'label',
-		name = 'Alert Hotkeys',
 	},
 	zoom_speed = {
-		name = 'Alert transition time',
 		type = "number",
 		value = 0,
 		min = 0,
@@ -48,7 +47,6 @@ options = {
 		end
 	},
 	zoomAlert = {
-		name = "Zoom to last alert",
 		type = 'button',
 		OnChange = function()
 			if lastDamageX then
@@ -57,7 +55,6 @@ options = {
 		end
 	},
 	zoomDamage = {
-		name = "Zoom to last damaged unit",
 		type = 'button',
 		OnChange = function()
 			if lastDamageX then
@@ -66,7 +63,6 @@ options = {
 		end
 	},
 	zoomMessage = {
-		name = "Zoom to last message",
 		type = 'button',
 		OnChange = function()
 			if lastMarkX then
@@ -76,17 +72,13 @@ options = {
 	},
 	lbl_pos = {
 		type = 'label',
-		name = 'Position Save/Recall Hotkeys',
 	},
 	savezoom = {
-		name = 'Save zoom as well as position',
-		desc = 'Save more information about the camera state. This may break if you change camera type midgame.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	pos_zoom_speed = {
-		name = 'Position transition time',
 		type = "number",
 		value = 0,
 		min = 0,
@@ -97,7 +89,6 @@ options = {
 		end
 	},
 	recallStartPos = {
-		name = "Zoom to start position",
 		type = 'button',
 		OnChange = function()
 			local x, y, z = Spring.GetTeamStartPosition(myTeamID)

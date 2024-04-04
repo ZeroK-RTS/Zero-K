@@ -21,12 +21,11 @@ local function forceUpdate ()
 	needsUpdate = true
 end
 
+i18nPrefix = 'verticallineonradardots_'
 options_path = 'Settings/Graphics/Unit Visibility/Vertical Lines'
 options_order = { 'enable_vertical_lines_air', 'enable_vertical_lines_water', 'enable_vertical_lines_ally' }
 options = {
 	enable_vertical_lines_air = {
-		name = 'Show for enemy aircraft',
-		desc = 'Draw a line perpendicular to the ground for enemy airborne units',
 		type = 'radioButton',
 		value = 'radar',
 		items = {
@@ -38,8 +37,6 @@ options = {
 		OnChange = forceUpdate,
 	},
 	enable_vertical_lines_water = {
-		name = 'Show for enemy underwater',
-		desc = 'Draw a line perpendicular to the surface for enemy submerged units',
 		type = 'radioButton',
 		value = 'radar',
 		items = {
@@ -50,8 +47,6 @@ options = {
 		noHotkey = true,
 	},
 	enable_vertical_lines_ally = {
-		name = 'Show for allied units',
-		desc = 'Draw the lines for allied units',
 		type = 'radioButton',
 		value = 'never',
 		items = {

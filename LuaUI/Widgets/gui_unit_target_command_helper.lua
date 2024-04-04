@@ -22,12 +22,11 @@ local function SetCircleDragThreshold(value)
 	WG.CircleDragThreshold = value
 end
 
+i18nPrefix = 'unittargetcommandhelper_'
 options_path = 'Settings/Interface/Commands'
 options_order = { 'circleDragThreshold', 'unitTargetHelper' }
 options = {
 	circleDragThreshold = {
-		name = "Area command drag threshold",
-		desc = "Distance that the mouse must move to issue an area command.",
 		type = 'number',
 		value = 25,
 		min = 2, max = 300, step = 1,
@@ -37,8 +36,6 @@ options = {
 		end
 	},
 	unitTargetHelper = {
-		name = "Speedy unit click helper",
-		desc = "When enabled, clicking on a unit will target it even if it is no longer under the mouse when the click is released.",
 		type = "bool",
 		value = true,
 		noHotkey = true,

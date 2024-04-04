@@ -16,11 +16,10 @@ function MakeWidgetList() end
 function KillWidgetList() end
 local window_widgetlist
 
+i18nPrefix = 'chiliwidgetselector_'
 options_path = 'Settings/Misc'
-options =
-{
+options = {
 	widgetlist_2 = {
-		name = 'Widget List',
 		type = 'button',
 		--hotkey = {key='f11', mod='A'}, -- In zk_keys.lua
 		advanced = true,

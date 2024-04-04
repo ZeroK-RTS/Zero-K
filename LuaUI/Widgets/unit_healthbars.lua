@@ -119,6 +119,7 @@ local function OptionsChanged()
 	featureTitleSq     = options.featureTitleHeight.value*options.featureTitleHeight.value
 end
 
+i18nPrefix = 'healthbars_'
 options_path = 'Settings/Interface/Healthbars'
 options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump',
 	'barScale', 'debugMode', 'minReloadTime',
@@ -127,36 +128,28 @@ options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', '
 }
 options = {
 	showhealthbars = {
-		name = 'Show Healthbars',
 		type = 'bool',
 		value = true,
 		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
 	},
 	drawFeatureHealth = {
-		name = 'Draw health of features (corpses)',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'Shows healthbars on corpses',
 		OnChange = OptionsChanged,
 	},
 	drawBarPercentages = {
-		name = 'Draw percentages',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Shows percentages next to bars',
 		OnChange = OptionsChanged,
 	},
 	flashJump = {
-		name = 'Jump reload flash',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Set jump reload to flash when issuing the jump command',
 	},
 	barScale = {
-		name = 'Bar size scale',
 		type = 'number',
 		value = 1,
 		min = 0.5,
@@ -165,67 +158,51 @@ options = {
 		OnChange = OptionsChanged,
 	},
 	minReloadTime = {
-		name = 'Min reload time',
 		type = 'number',
 		value = 3,
 		min = 1,
 		max = 10,
 		step = 1,
-		desc = 'Min reload time (sec)',
 		OnChange = OptionsChanged,
 	},
 	debugMode = {
-		name = 'Debug Mode',
 		type = 'bool',
 		value = false,
 		advanced = true,
 		noHotkey = true,
-		desc = 'Pings units with debug information',
 		OnChange = OptionsChanged,
 	},
 	unitMaxHeight = {
-		name = 'Unit Bar Fade Height',
-		desc = 'If the camera is above this height, health bars will not be drawn.',
 		type = 'number',
 		min = 0, max = 8000, step = 50,
 		value = 3000,
 		OnChange = OptionsChanged,
 	},
 	unitPercentHeight = {
-		name = 'Unit Bar Percentage Height',
-		desc = 'If the camera is above this height, health bar percentages will not be drawn.',
 		type = 'number',
 		min = 0, max = 7000, step = 50,
 		value = 700,
 		OnChange = OptionsChanged,
 	},
 	unitTitleHeight = {
-		name = 'Unit Bar Title Heightt',
-		desc = 'If the camera is above this height, health bar titles will not be drawn.',
 		type = 'number',
 		min = 0, max = 7000, step = 50,
 		value = 500,
 		OnChange = OptionsChanged,
 	},
 	featureMaxHeight = {
-		name = 'Wreckage Bar Fade Height',
-		desc = 'If the camera is above this height, health bars will not be drawn.',
 		type = 'number',
 		min = 0, max = 7000, step = 50,
 		value = 2200,
 		OnChange = OptionsChanged,
 	},
 	featurePercentHeight = {
-		name = 'Wreckage Bar Percentage Height',
-		desc = 'If the camera is above this height, health bar percentages will not be drawn.',
 		type = 'number',
 		min = 0, max = 7000, step = 50,
 		value = 500,
 		OnChange = OptionsChanged,
 	},
 	featureTitleHeight = {
-		name = 'Wreckage Bar Title Heightt',
-		desc = 'If the camera is above this height, health bar titles will not be drawn.',
 		type = 'number',
 		min = 0, max = 7000, step = 50,
 		value = 500,

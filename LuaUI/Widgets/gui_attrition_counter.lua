@@ -16,11 +16,11 @@ VFS.Include("LuaRules/Configs/constants.lua")
 
 local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
 
+i18nPrefix = 'attritioncounter_'
 options_path = 'Settings/HUD Panels/Extras/Attrition Counter'
 options_order = {'updateFrequency'}
 options = {
 	updateFrequency = { -- fixme: this setting should die and the counters should update if and only if needed
-		name = "Update every N Frames",
 		type = 'number',
 		min = 1,
 		max = 150,

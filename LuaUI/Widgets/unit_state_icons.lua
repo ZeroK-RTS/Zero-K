@@ -34,19 +34,16 @@ local floor = math.floor
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
+i18nPrefix = 'stateicons_'
 options_path = 'Settings/Interface/Hovering Icons'
 options = {
 	
 	showstateonshift = {
-		name = "Show move/fire states on shift",
-		desc = "When holding shift, icons appear over units indicating move state and fire state.",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	showarmorstate = {
-		name = 'Armor state visibility',
-		desc = "When to show an icon for armored units.",
 		type = 'radioButton',
 		value = 'shift',
 		items = {
@@ -66,8 +63,6 @@ options = {
 	},
 
 	showpriority = {
-		name = "Priority state visibility",
-		desc = "When to show an icon for prioritized units.",
 		type = 'radioButton',
 		value = 'shift',
 		items = {
@@ -85,8 +80,6 @@ options = {
 		noHotkey = true,
 	},
 	showmiscpriorityonshift = {
-		name = "Show misc priorty on shift",
-		desc = "When holding shift, an icon appears over unit with low or high misc priority (morph or stockpile).",
 		type = 'bool',
 		value = true,
 		noHotkey = true,

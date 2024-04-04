@@ -17,10 +17,10 @@ local glColor            = gl.Color
 local glLineWidth        = gl.LineWidth
 local glDrawGroundCircle = gl.DrawGroundCircle
 
+i18nPrefix = 'showselectedunitrange_'
 options_path = 'Settings/Interface/Defence and Cloak Ranges'
 options = {
 	showselectedunitrange = {
-		name = 'Show selected unit(s) range(s)',
 		type = 'bool',
 		value = false,
 		OnChange = function (self)

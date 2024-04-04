@@ -97,6 +97,7 @@ renderAtPos = {
 -- Options
 --
 
+i18nPrefix = 'iconzoomtransition_'
 options_path = 'Settings/Graphics/Unit Visibility/Icon Zoom Transition'
 
 options_order = {
@@ -113,54 +114,40 @@ options_order = {
 options = {
 	lblIconTransition = {name = 'Icon Transition Parameters', type = 'label'},
 	icontransitiontop = {
-		name = 'Icon Transition Top',
-		desc = 'If the camera is above this height, units will be icons only.\n\nOnly applies when the icon display mode is set to Dynamic.\n\nThis setting overrides Icon Distance.',
 		type = 'number',
 		min = 0, max = 10000,
 		step = 50,
 		value = 4500,
 	},
 	icontransitionbottom = {
-		name = 'Icon Transition Bottom',
-		desc = 'If the camera is below this height, units will be models only.\n\nOnly applies when the icon display mode is set to Dynamic.\n\nThis setting overrides Icon Distance.',
 		type = 'number',
 		min = 0, max = 10000,
 		step = 50,
 		value = 350,
 	},
 	icontransitionmaxsize = {
-		name = 'Icon Transition Max Size',
-		desc = 'Size of the icons when the transition begins.',
 		type = 'number',
 		min = 1, max = 250,
 		step = 1,
 		value = 58,
 	},
 	icontransitionminsize = {
-		name = 'Icon Transition Min Size',
-		desc = 'Size of the icons when the transition ends.',
 		type = 'number',
 		min = 1, max = 250,
 		step = 1,
 		value = 6,
 	},
 	icontransitionmaxopacity = {
-		name = 'Icon Transition Max Opacity',
-		desc = 'Opacity of the icons when the transition begins.',
 		type = 'number',
 		min = 0, max = 100,
 		value = 100,
 	},
 	icontransitionminopacity = {
-		name = 'Icon Transition Min Opacity',
-		desc = 'Opacity of the icons when the transition ends.',
 		type = 'number',
 		min = 0, max = 100,
 		value = 100,
 	},
 	iconmodehotkey = {
-		name = "Icon Mode Hotkey",
-		desc = "Define a hotkey to switch between icon display modes (On/Off/Dynamic).\n\nSingle-press to switch between On/Off.\n\nDouble-press to switch to Dynamic.",
 		type = 'button',
 		hotkey = 'Alt+I',
 		OnChange = function(self) GotHotkeypress() end,

@@ -98,12 +98,11 @@ end
 local drawAlpha = 0.2
 WG.showeco_always_mexes = true -- No OnChange when not changed from the default.
 
+i18nPrefix = 'showecoandgriddrawer_'
 options_path = 'Settings/Interface/Economy Overlay'
 options_order = {'start_with_showeco', 'always_show_mexes', 'mergeCircles', 'drawQueued'}
 options = {
 	start_with_showeco = {
-		name = "Start with economy overlay",
-		desc = "Game starts with Economy Overlay enabled",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -114,8 +113,6 @@ options = {
 		end,
 	},
 	always_show_mexes = {
-		name = "Always show Mexes",
-		desc = "Show metal extractors even when the full economy overlay is not enabled.",
 		type = 'bool',
 		value = true,
 		OnChange = function(self)
@@ -123,15 +120,11 @@ options = {
 		end,
 	},
 	mergeCircles = {
-		name = "Draw merged grid circles",
-		desc = "Merge overlapping grid circle visualisation. Does not work on older hardware and should automatically disable.",
 		type = 'bool',
 		value = true,
 		OnChange = ForceRedraw,
 	},
 	drawQueued = {
-		name = "Draw grid in queue",
-		desc = "Shows the grid of not-yet constructed buildings in the queue of a selected constructor. Activates only when placing grid structures.",
 		type = 'bool',
 		value = true,
 		OnChange = ForceRedraw,

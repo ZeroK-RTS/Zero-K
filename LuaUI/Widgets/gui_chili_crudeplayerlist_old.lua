@@ -125,11 +125,11 @@ include("keysym.lua")
 
 function SetupPlayerNames() end
 
+i18nPrefix = 'chilicrudeplayerlistold_'
 options_path = 'Settings/HUD Panels/Player List'
 options_order = {'text_height', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','alignToTop','showSpecs','allyTeamPerTeam','debugMessages','mousewheel','win_show_condition'}
 options = {
 	text_height = {
-		name = 'Font Size (10-18)',
 		type = 'number',
 		value = 13,
 		min = 10, max = 18, step = 1,
@@ -137,7 +137,6 @@ options = {
 		advanced = true
 	},
 	backgroundOpacity = {
-		name = "Background opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -147,8 +146,6 @@ options = {
 		end,
 	},
 	reset_wins = {
-		name = "Reset Wins",
-		desc = "Reset the win counts of all players",
 		type = 'button',
 		OnChange = function()
 			if WG.WinCounter_Reset ~= nil then
@@ -158,7 +155,6 @@ options = {
 		end,
 	},
 	inc_wins_1 = {
-		name = "Increment Team 1 Wins",
 		desc = "",
 		type = 'button',
 		OnChange = function()
@@ -171,7 +167,6 @@ options = {
 		advanced = true
 	},
 	inc_wins_2 = {
-		name = "Increment Team 2 Wins",
 		desc = "",
 		type = 'button',
 		OnChange = function()
@@ -184,7 +179,6 @@ options = {
 		advanced = true
 	},
 	win_show_condition = {
-		name = 'Show Wins',
 		type = 'radioButton',
 		value = 'whenRelevant',
 		items = {
@@ -195,34 +189,27 @@ options = {
 		OnChange = function() SetupPlayerNames() end,
 	},
 	alignToTop = {
-		name = "Align to top",
 		type = 'bool',
 		value = false,
 		desc = "Align list entries to top (i.e. don't push to bottom)",
 		OnChange = function() SetupPlayerNames() end,
 	},
 	showSpecs = {
-		name = "Show spectators",
 		type = 'bool',
 		value = false,
-		desc = "Show spectators in main window (rather than confining them to tooltip. Note: tooltip might block mouse click in some cases)",
 		OnChange = function() SetupPlayerNames() end,
 	},
 	allyTeamPerTeam = {
-		name = "Display team for each player",
 		type = 'bool',
 		value = true,
 		desc = "Write the team number next to each player's name (rather than only for first player)",
 		OnChange = function() SetupPlayerNames() end,
 	},
 	debugMessages = {
-		name = "Enable debug messages",
 		type = 'bool',
 		value = false,
-		desc = "Enables some debug messages (disable if it starts flooding console)",
 	},
 	mousewheel = {
-		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = true,
 		OnChange = function(self)

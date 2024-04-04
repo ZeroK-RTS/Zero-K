@@ -344,73 +344,62 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+i18nPrefix = 'devcommands_'
 options_path = 'Settings/Toolbox/Dev Commands'
 options = {
 	cheat = {
-		name = "Cheat",
 		type = 'button',
 		action = 'cheat',
 	},
 	nocost = {
-		name = "No Cost",
 		type = 'button',
 		action = 'nocost',
 	},
 	
 	spectator = {
-		name = "Spectator",
 		type = 'button',
 		action = 'spectator',
 	},
 	
 	godmode = {
-		name = "Godmode",
 		type = 'button',
 		action = 'godmode',
 	},
 	
 	testunit = {
-		name = "Spawn Testunit",
 		type = 'button',
 		action = 'give testunit',
 	},
 	
 	luauireload = {
-		name = "Reload LuaUI",
 		type = 'button',
 		action = 'luaui reload',
 	},
 	
 	luarulesreload = {
-		name = "Reload LuaRules",
 		type = 'button',
 		action = 'luarules reload',
 	},
 	
 	debug = {
-		name = "Debug",
 		type = 'button',
 		action = 'debug',
 	},
 	debugcolvol = {
-		name = "Debug Colvol",
 		type = 'button',
 		action = 'debugcolvol',
 	},
 	debugpath = {
-		name = "Debug Path",
 		type = 'button',
 		action = 'debugpath',
 	},
 	singlestep = {
-		name = "Single Step",
 		type = 'button',
 		action = 'singlestep',
 	},
 	
 	
 	printunits = {
-		name = "Print Units",
 		type = 'button',
 		OnChange = function(self)
 			for i=1,#UnitDefs do
@@ -421,7 +410,6 @@ options = {
 		end,
 	},
 	printunitnames = {
-		name = "Print Unit Names",
 		type = 'button',
 		OnChange = function(self)
 			for i=1,#UnitDefs do
@@ -432,7 +420,6 @@ options = {
 		end,
 	},
 	echoCommand = {
-		name = 'Echo Given Commands',
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
@@ -440,69 +427,55 @@ options = {
 		end,
 	},
 	missionexport = {
-		name = "Mission Units Export",
 		type = 'button',
 		action = 'mission_units_export',
 		OnChange = ExportUnitsForMission,
 	},
 	missionexportcommands = {
-		name = "Mission Unit Export (Commands)",
 		type = 'button',
 		action = 'mission_unit_commands_export',
 		OnChange = ExportUnitsAndCommandsForMission,
 	},
 	missionexportselectedcommands = {
-		name = "Mission Unit Export (Selected and Commands)",
 		type = 'button',
 		action = 'mission_unit_commands_export',
 		OnChange = ExportSelectedUnitsAndCommandsForMission,
 	},
 	exportallyteamcommands = {
-		name = "AllyTeam Unit Export (Selected and Commands)",
 		type = 'button',
 		action = 'allyteam_unit_commands_export',
 		OnChange = ExportAllyTeamUnitsAndCommands,
 	},
 	missionexportfeatures = {
-		name = "Mission Feature Export",
 		type = 'button',
 		action = 'mission_features_export',
 		OnChange = ExportFeaturesForMission,
 	},
 	moveUnit = {
-		name = "Move Unit",
-		desc = "Move selected unit to the mouse cursor.",
 		type = 'button',
 		action = 'debug_move_unit',
 		OnChange = MoveUnit,
 	},
 	moveUnitSnap = {
-		name = "Move Unit Snap",
-		desc = "Move selected unit to the mouse cursor. Snaps to grid.",
 		type = 'button',
 		action = 'debug_move_unit_snap',
 		OnChange = MoveUnitSnap,
 	},
 	moveUnitDelay = {
-		name = "Move Unit Repeat Time",
 		type = "number",
 		value = 0.1, min = 0.01, max = 0.4, step = 0.01,
 	},
 	destroyUnit = {
-		name = "Destroy Units",
-		desc = "Destroy selected units (gentle).",
 		type = 'button',
 		action = 'debug_destroy_unit',
 		OnChange = DestroyUnit,
 	},
 	RotateUnitLeft = {
-		name = "Rotate Unit Anticlockwise",
 		type = 'button',
 		action = 'debug_rotate_unit_anticlockwise',
 		OnChange = RotateUnitLeft,
 	},
 	RotateUnitRight = {
-		name = "Rotate Unit Clockwise",
 		type = 'button',
 		action = 'debug_rotate_unit_clockwise',
 		OnChange = RotateUnitRight,

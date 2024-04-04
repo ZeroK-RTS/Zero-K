@@ -139,11 +139,11 @@ local cursorIsOn = "self"
 
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
+i18nPrefix = 'unitshapes3_'
 options_path = 'Settings/Interface/Selection/Selection Shapes'
 options_order = {'allyselectionlevel', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'}
 options = {
 	allyselectionlevel = {
-		name = 'Show Ally Selections',
 		type = 'radioButton',
 		items = {
 			{name = 'Enabled',key='enabled', desc="Show selected unit of allies."},
@@ -157,7 +157,6 @@ options = {
 		end,
 	},
 	showallyplayercolours = {
-		name = 'Use Player Colors when Spectating',
 		desc = 'Highlight allies\' selected units with their color.',
 		type = 'bool',
 		value = false,
@@ -167,8 +166,6 @@ options = {
 		noHotkey = true,
 	},
 	showhover = {
-		name = 'Highlight Hovered Unit',
-		desc = 'Highlight the unit under your cursor.',
 		type = 'bool',
 		value = true,
 		OnChange = function(self)
@@ -177,14 +174,11 @@ options = {
 		noHotkey = true,
 	},
 	showinselectionbox = {
-		name = 'Highlight Units in Selection Box',
-		desc = 'Highlight the units in the selection box.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	animatehover = {
-		name = 'Animate Hover Shape',
 		desc = '',
 		type = 'bool',
 		value = true,
@@ -192,7 +186,6 @@ options = {
 		noHotkey = true,
 	},
 	animateselectionbox = {
-		name = 'Animate Shapes in Selection Box',
 		desc = '',
 		type = 'bool',
 		value = true,

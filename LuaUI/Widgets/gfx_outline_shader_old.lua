@@ -1,7 +1,6 @@
-local wiName = "Outline Shader Old"
 function widget:GetInfo()
 	return {
-		name      = wiName,
+		name      = "Outline Shader Old",
 		desc      = "Displays small outline around units based on deferred g-buffer",
 		author    = "ivand",
 		date      = "2019",
@@ -10,6 +9,8 @@ function widget:GetInfo()
 		enabled   = false, --  loaded by default?
 	}
 end
+
+local wiName = widget:GetInfo().name
 
 -----------------------------------------------------------------
 -- Constants
@@ -88,11 +89,10 @@ local thickness = DEFAULT_THICKNESS
 local scaleWithHeight = true
 local functionScaleWithHeight = true
 
+i18nPrefix = 'outlineshaderold_'
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
 options = {
 	thickness = {
-		name = 'Outline Thickness',
-		desc = 'How thick the outline appears around objects',
 		type = 'number',
 		min = 0.2, max = 1, step = 0.01,
 		value = DEFAULT_THICKNESS,
@@ -101,8 +101,6 @@ options = {
 		end,
 	},
 	scaleWithHeight = {
-		name = 'Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -114,8 +112,6 @@ options = {
 		end,
 	},
 	functionScaleWithHeight = {
-		name = 'Subtle Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -127,8 +123,6 @@ options = {
 		end,
 	},
 	drawUnderCeg = {
-		name = 'Draw through effects',
-		desc = 'Reduces the screen space width of outlines when zoomed out.',
 		type = 'bool',
 		value = false,
 	},

@@ -145,29 +145,25 @@ local allyClusterInfo_gbl = {coords={},age=0}
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
+i18nPrefix = 'dynamicavoidancesystem_'
 options_path = 'Settings/Unit Behaviour/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
 options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'cloakyAlwaysFlee','enableReloadAvoidance','retreatAvoidance','dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
 options = {
 	enableCons = {
-		name = 'Enable for constructors',
 		type = 'bool',
 		value = true,
 		desc = 'Enable constructor\'s avoidance feature (WILL NOT include Commander).\n\nConstructors will avoid enemy while having move order. Constructor also return to base when encountering enemy during area-reclaim or area-ressurect command, and will try to avoid enemy while having build or repair or reclaim queue except when hold-position is issued.\n\nTips: order area-reclaim to the whole map, work best for cloaked constructor, but buggy for flying constructor. Default:On',
 	},
 	enableCloaky = {
-		name = 'Enable for cloakies',
 		type = 'bool',
 		value = true,
 		desc = 'Enable cloakies\' avoidance feature.\n\nCloakable bots will avoid enemy while having move order. Cloakable will also flee from enemy when idle except when hold-position state is used.\n\nTips: is optimized for Sycthe- your Sycthe will less likely to accidentally bump into enemy unit. Default:On',
 	},
 	enableGround = {
-		name = 'Enable for ground units',
 		type = 'bool',
 		value = true,
-		desc = 'Enable for ground units (INCLUDE Commander).\n\nAll ground unit will avoid enemy while being outside camera view and/or while reloading except when hold-position state is used.\n\nTips:\n1) is optimized for masses of Thug or Knight.\n2) You can use Guard to make your unit swarm the guarded unit in presence of enemy.\nDefault:On',
 	},
 	enableGunship = {
-		name = 'Enable for gunships',
 		type = 'bool',
 		value = false,
 		desc = 'Enable gunship\'s avoidance behaviour .\n\nGunship will avoid enemy while outside camera view and/or while reloading except when hold-position state is used.\n\nTips: to create a hit-&-run behaviour- set the fire-state options to hold-fire (can be buggy). Default:Off',
@@ -179,22 +175,16 @@ options = {
 		-- desc = 'Enable amphibious unit\'s avoidance feature (including Commander, and submarine). Unit avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded..',
 	-- },
 	enableReloadAvoidance = {
-		name = "Jink during attack",
 		type = 'bool',
 		value = true,
-		desc = "Unit with slow reload will randomly jink to random direction when attacking. NOTE: This have no benefit and bad versus fast attacker or fast weapon but have high chance of dodging versus slow ballistic weapon. Default:On",
 	},
 	enableReturnToBase = {
-		name = "Find base",
 		type = 'bool',
 		value = true,
-		desc = "Allow constructor to return to base when having area-reclaim or area-ressurect command, else it will return to center of the circle when retreating. \n\nTips: build 3 new buildings at new location to identify as base, unit will automatically select nearest base. Default:On",
 	},
 	consRetreatTimeoutOption = {
-		name = 'Constructor retreat auto-expire:',
 		type = 'number',
 		value = 3,
-		desc = "Amount in second before constructor retreat command auto-expire (is deleted), and then constructor will return to its previous area-reclaim command.\n\nTips: small value is better.",
 		min=3,max=15,step=1,
 		OnChange = function(self)
 					consRetreatTimeoutG = self.value
@@ -202,26 +192,19 @@ options = {
 				end,
 	},
 	cloakyAlwaysFlee = {
-		name = 'Cloakies always flee',
 		type = 'bool',
 		value = false,
-		desc = 'Force cloakies & constructor to always flee from enemy when idle except if they are under hold-position state. \n\nNote: Unit can wander around and could put themselves in danger. Default:Off',
 	},
 	retreatAvoidance = {
-		name = 'Retreating unit always flee',
 		type = 'bool',
 		value = true,
-		desc = 'Force retreating unit to always avoid the enemy (Note: this require the use of RETREAT functionality provided by cmd_retreat.lua widget a.k.a unit retreat widget). Default:On',
 	},
 	dbg_RemoveAvoidanceSplitSecond = {
-		name = 'Debug: Constructor instant retreat',
 		type = 'bool',
 		value = true,
-		desc = "Widget to issue a retreat order first before issuing an avoidance (to reduce chance of avoidance putting constructor into more danger).\n\nDefault:On.",
 		advanced = true,
 	},
 	dbg_IgnoreSelectedCons ={
-		name = 'Debug: Ignore current selection',
 		type = 'bool',
 		value = false,
 		desc = "Selected constructor(s) will be ignored by widget.\nNote: there's a second delay before unit is ignored/re-acquire after selection/de-selection.\n\nDefault:Off",

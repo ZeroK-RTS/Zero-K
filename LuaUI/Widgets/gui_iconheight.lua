@@ -98,6 +98,7 @@ local GotHotkeypress = function() end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'iconheight_'
 options_path = 'Settings/Graphics/Unit Visibility'
 
 options_order = {
@@ -110,15 +111,11 @@ options = {
 
 	lblIconHeight = {name='Icon Height Widget', type='label'},
 	iconheight = {
-		name = 'Icon Height',
-		desc = 'If the camera is above this height, all units will be icons; if below, no units will be icons.\n\nOnly applies when the icon display mode is set to Dynamic.\n\nThis setting overrides Icon Distance.',
 		type = 'number',
 		min = 0, max = 10000,
 		value = 2500,
 	},
 	iconmodehotkey = {
-		name = "Icon Mode Hotkey",
-		desc = "Define a hotkey to switch between icon display modes (On/Off/Dynamic).\n\nSingle-press to switch between On/Off.\n\nDouble-press to switch to Dynamic.",
 		type = 'button',
 		OnChange = function(self) GotHotkeypress() end,
 	},

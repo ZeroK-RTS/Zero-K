@@ -9,10 +9,9 @@ if gpuMem and gpuMem > 0 and gpuMem < 1800 then
 end
 
 
-local widgetName = "SSAO 2"
 function widget:GetInfo()
     return {
-        name      = widgetName,
+        name      = "SSAO 2",
         version	  = 2.0,
         desc      = "Screen-Space Ambient Occlusion",
         author    = "ivand",
@@ -22,6 +21,8 @@ function widget:GetInfo()
         enabled   = false, -- not isPotatoGpu, -- Sometimes causes a bug.
     }
 end
+
+local widgetName = widget:GetInfo().name
 
 -----------------------------------------------------------------
 -- Constants
@@ -101,11 +102,11 @@ local presets = {
 	},
 }
 
+i18nPrefix = 'ssao2_'
 options_path = 'Settings/Graphics/Ambient Occlusion'
 options_order = {'quality_preset', 'strength', 'radius'}
 options = {
 	quality_preset = {
-		name = 'Quality',
 		type = 'radioButton',
 		value = 2,
 		items = {
@@ -120,7 +121,6 @@ options = {
 		end,
 	},
 	strength = {
-		name = 'Strength',
 		type = 'number',
 		value = SSAO_ALPHA_POW,
 		min = 0.5, max = 32, step = 0.5,
@@ -131,7 +131,6 @@ options = {
 		end,
 	},
 	radius = {
-		name = 'Radius',
 		type = 'number',
 		value = SSAO_RADIUS,
 		min = 1, max = 32, step = 1,

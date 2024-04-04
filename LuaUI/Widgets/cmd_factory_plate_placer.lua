@@ -51,15 +51,14 @@ local glLineStipple         = gl.LineStipple
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'factoryplateplacer_'
 options_path = 'Settings/Interface/Building Placement'
 options_order = { 'ctrl_toggle'}
 options = {
 	ctrl_toggle = {
-		name = "Ctrl toggles Factory/Plate",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'When placing a factory or plate, press Ctrl to select whether a factory or construction plate is placed.',
 	},
 }
 

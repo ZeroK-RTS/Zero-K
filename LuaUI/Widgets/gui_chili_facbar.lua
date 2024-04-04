@@ -52,11 +52,11 @@ local echo = Spring.Echo
 
 local function RecreateFacbar() end
 
+i18nPrefix = 'chilifactorybar_'
 options_path = 'Settings/HUD Panels/FactoryBar'
 options = {
 	maxVisibleBuilds = {
 		type = 'number',
-		name = 'Visible Units in Que',
 		desc = "The maximum units to show in the factory's queue",
 		min = 2, max = 14,
 		value = 5,
@@ -64,7 +64,6 @@ options = {
 	
 	buttonsize = {
 		type = 'number',
-		name = 'Button Size',
 		min = 40, max = 100, step=5,
 		value = 50,
 		OnChange = function() RecreateFacbar() end,

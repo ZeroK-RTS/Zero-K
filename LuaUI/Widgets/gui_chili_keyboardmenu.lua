@@ -134,6 +134,7 @@ local function SetupKeybuttons() end
 -- options
 
 
+i18nPrefix = 'chilikeyboardmenu_'
 options_path = 'Settings/HUD Panels/KB Menu'
 options_order = {
 	'layout',
@@ -147,7 +148,6 @@ options_order = {
 options = {
 
 	layout = {
-		name = 'Keyboard Layout',
 		type = 'radioButton',
 		OnChange = function(self)
 			SetupKeybuttons()
@@ -163,9 +163,7 @@ options = {
 		},
 	},
 	sevenperrow = {
-		name = 'Rows of 7 keys',
 		type = 'bool',
-		desc = 'Each row has 7 keys instead of the 6 default.',
 		OnChange = function(self)
 			SetupKeybuttons()
 			UpdateButtons()
@@ -174,33 +172,28 @@ options = {
 	},
 	
 	showGlobalCommands = {
-		name = 'Show Global Commands',
 		type = 'bool',
 		value = false,
 		advanced = true,
 	},
 	goToCommands = {
-		name = 'Commands...',
 		type = 'button',
 		OnChange = function(self)
 			WG.crude.OpenPath('Hotkeys/Commands')
 		end
 	},
 	goToSelections = {
-		name = 'Selections...',
 		type = 'button',
 		OnChange = function(self)
 			WG.crude.OpenPath('Hotkeys/Selection')
 		end
 	},
 	opacity = {
-		name = "Opacity",
 		type = "number",
 		value = 0.4, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) window_main.color = {1,1,1,self.value}; window_main:Invalidate() end,
 	},
 	old_menu_at_shutdown = {
-		name = 'Reenable Spring Menu at Shutdown',
 		desc = "Upon widget shutdown (manual or upon crash) reenable Spring's original command menu.",
 		type = 'bool',
 		advanced = true,

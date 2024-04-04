@@ -86,10 +86,10 @@ local scrollSpeed = math.ceil(60*UPDATE_PERIOD)
 local function SetTickerVisiblity()
 end
 
+i18nPrefix = 'newsticker_'
 options_path = 'Settings/HUD Panels/News Ticker'
 options = {
 	backgroundOpacity = {
-		name = "Background opacity",
 		type = "number",
 		value = 0.8, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -98,25 +98,19 @@ options = {
 		end,
 	},
 	minCostMult = {
-		name = "Minimum cost mult (1-20)",
 		type = "number",
 		value = 10, min = 1, max = 20, step = 1,
-		desc = "Multiplies metal income for minimum cost of newsworthy units",
 	},
 	hideBar = {
-		name = "Hide Bar",
 		type = "bool",
 		value = false,
-		desc = "Hides the visible bar",
 		OnChange = function(self)
 			SetTickerVisiblity(not self.value)
 		end
 	},
 	useSounds = {
-		name = "Use Sounds",
 		type = "bool",
 		value = true,
-		desc = "Voice announcements for events.",
 	},
 	
 }

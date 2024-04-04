@@ -24,6 +24,7 @@ local keyData, mouseData
 --------------------------------------------------------------------------------
 -- Options
 
+i18nPrefix = 'displaykeys2_'
 options_path = 'Settings/HUD Panels/Extras/Display Keys'
 
 options_order = {
@@ -32,18 +33,14 @@ options_order = {
  
 options = {
 	enable = {
-		name = "Show input visualizer",
-		desc = "Shows pressed key combinations and mouse buttons. Useful for video tutorials.",
 		type = "bool",
 		value = false,
 	},
 	keyReleaseTimeout = {
-		name  = "Key Release Timeout",
 		type  = "number",
 		value = 0.6, min = 0, max = 2, step = 0.025,
 	},
 	mouseReleaseTimeout = {
-		name  = "Mouse Release Timeout",
 		type  = "number",
 		value = 0.3, min = 0, max = 2, step = 0.025,
 	},

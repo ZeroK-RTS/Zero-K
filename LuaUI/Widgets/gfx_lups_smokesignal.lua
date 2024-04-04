@@ -11,12 +11,11 @@ function widget:GetInfo() return {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'smokesignals_'
 options_path = 'Settings/Graphics/Effects'
 options_order = { 'enable' }
 options = {
 	enable = {
-		name = "Smoke signal markers",
-		desc = "Labels are additionally marked by a smoke signal flare.",
 		type = "bool",
 		value = false,
 		noHotkey = true,

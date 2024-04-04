@@ -22,15 +22,14 @@ local function CheckEnable()
 	end
 end
 
+i18nPrefix = 'cloakfirestate2_'
 options_path = 'Settings/Unit Behaviour'
 options_order = {'enable_cloak_holdfire'}
 options = {
 	enable_cloak_holdfire = {
-		name = "Hold fire when cloaked",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'Units which cloak will hold fire so as not to reveal themselves.',
 		OnChange = CheckEnable,
 	},
 }

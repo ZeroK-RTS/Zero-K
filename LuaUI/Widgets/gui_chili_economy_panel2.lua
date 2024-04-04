@@ -297,6 +297,7 @@ extraPanels = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'chilieconomypaneldefault_'
 options_path = 'Settings/HUD Panels/Economy Panel'
 
 local function UpdateExtraPanelHide(wantHide)
@@ -373,32 +374,27 @@ options_order = {
 options = {
 	lbl_metal = {name='Metal Warnings', type='label'},
 	metalFlash = {
-		name  = "Metal Excess Flash",
 		type  = "number",
 		value = 0.9, min = 0,max = 1, step = 0.02,
 		desc = "Metal storage will flash when metal storage exceeds this value."
 	},
 	metalWarning = {
-		name  = "Metal Excess Warning",
 		type  = "number",
 		value = 0.9, min = 0,max = 1, step = 0.02,
 		desc = "Recieve a warning when metal storage exceeds this value."
 	},
 	lbl_energy = {name='Energy Warnings', type='label'},
 	energyFlash = {
-		name  = "Energy Stall Flash",
 		type  = "number",
 		value = 0.1, min=0,max=1,step=0.02,
 		desc = "Energy storage will flash when it drops below this fraction of your total storage."
 	},
 	energyWarning = {
-		name  = "Energy Stall Warning",
 		type  = "number",
 		value = 0.1, min = 0,max = 1, step = 0.02,
 		desc = "Recieve a warning when energy storage drops below this value."
 	},
 	eExcessFlash = {
-		name  = 'Flash On Energy Excess',
 		type  = 'bool',
 		value = false,
 		noHotkey = true,
@@ -406,67 +402,52 @@ options = {
 	},
 	lbl_reserve = {name='Reserve', type='label'},
 	enableReserveBar = {
-		name  = 'Enable Reserve',
 		type  = 'bool',
 		value = true,
 		noHotkey = true,
 		desc = "Ctrl+Click on the resource bars will set reserve when enabled. Low and Normal priority constructors cannot use resources in reserve storage."
 	},
 	defaultEnergyReserve = {
-		name  = "Initial Energy Reserve",
 		type  = "number",
 		value = 0.05, min = 0, max = 1, step = 0.01,
 	},
 	defaultMetalReserve = {
-		name  = "Initial Metal Reserve",
 		type  = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 	},
 	lbl_extra = {name='Extras', type='label'},
 	panel_efficiency = {
-		name  = 'Show Efficiency',
 		type  = 'bool',
 		value = false,
-		desc = "Show the minimum of Metal Income/Metal Pull and Energy Income/Energy Pull as a percentage. Use Ctrl+F11 to reposition as Escape to cancel.",
 		OnChange = option_toggleExtra,
 		extraKey = 'efficiency',
 	},
 	panel_usage = {
-		name  = 'Show Usage',
 		type  = 'bool',
 		value = false,
-		desc = "Show the Metal Pull/Metal Income as a percentage. Use Ctrl+F11 to reposition and Escape to cancel.",
 		OnChange = option_toggleExtra,
 		extraKey = 'usage',
 	},
 	panel_overdrive = {
-		name  = 'Show Overdrive',
 		type  = 'bool',
 		value = false,
-		desc = "Show overdrive energy:metal ratio, metal income, and energy cost. Use Ctrl+F11 to reposition and Escape to cancel.",
 		OnChange = option_toggleExtra,
 		extraKey = 'overdrive',
 	},
 	panel_wind = {
-		name  = 'Show Wind',
 		type  = 'bool',
 		value = false,
-		desc = "Show wind strength as a percentage. Use Ctrl+F11 to reposition and Escape to cancel.",
 		OnChange = option_toggleExtra,
 		extraKey = 'wind',
 	},
 	lbl_visual = {name='Visuals', type='label'},
 	ecoPanelHideSpec = {
-		name  = 'Hide if spectating',
 		type  = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = "Should the panel hide when spectating?",
 		OnChange = option_recreateWindow
 	},
 	flowAsArrows = {
-		name  = "Flow as arrows",
-		desc = "Use arrows instead of a number for the flow. Each arrow is 5 resources per second.",
 		type  = "bool",
 		value = true,
 		noHotkey = true,
@@ -490,7 +471,6 @@ options = {
 		end,
 	},
 	opacity = {
-		name  = "Opacity",
 		type  = "number",
 		value = 0.6, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -498,7 +478,6 @@ options = {
 		end,
 	},
 	colourBlind = {
-		name  = "Colourblind mode",
 		type  = "bool",
 		value = false,
 		noHotkey = true,
@@ -506,19 +485,16 @@ options = {
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},
 	fontSize = {
-		name  = "Font Size",
 		type  = "number",
 		value = 20, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 	warningFontSize = {
-		name  = "Warning Font Size",
 		type  = "number",
 		value = 14, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 	fancySkinning = {
-		name = 'Fancy Skinning',
 		type = 'radioButton',
 		value = 'panel',
 		items = {

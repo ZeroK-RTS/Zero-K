@@ -94,6 +94,7 @@ end
 include("keysym.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+i18nPrefix = 'globalbuildcommand_'
 options_path = 'Settings/Unit Behaviour/Worker AI'
 
 options_order = {
@@ -113,78 +114,59 @@ options_order = {
 
 options = {
 	updateRate = {
-		name = 'Worker Update Rate (higher numbers are faster but more CPU intensive):',
 		type = 'number',
 		min = 1, max = 4, step = 1,
 		value = 1,
 	},
 
 	separateConstructors = {
-		name = 'Separate Constructors',
 		type = 'bool',
-		desc = 'Replace factory inherited orders for constructors so that they can be assigned jobs immediately.\n (default = true)',
 		value = true,
 	},
 	
 	splitArea = {
-		name = 'Split Area Commands',
 		type = 'bool',
-		desc = 'Automatically capture single targets from area commands so that more workers will be assigned to those jobs.\n (default = true)',
 		value = true,
 	},
 	
 	autoConvertRes = {
-		name = 'Convert Resurrect',
 		type = 'bool',
 		desc = 'Convert area resurrect into reclaim for targets that can\'t be resurrected.\n (Note: Only has any effect if Split Area Commands is enabled)\n (default = true)',
 		value = true,
 	},
 	
 	autoRepair = {
-		name = 'Auto-Repair',
 		type = 'bool',
-		desc = 'Automatically add repair jobs whenever units are damaged.\n (Note: If this is enabled, repair jobs will only be visible when \255\200\200\200shift\255\255\255\255 is held!) \n (default = false)',
 		value = false,
 	},
 	
 	cleanWrecks = {
-		name = 'Auto-Reclaim/Resurrect',
 		type = 'bool',
-		desc = 'Automatically add reclaim/res for wrecks near your base. This does not target map features and is not a replacement for area reclaim/res.\n (default = false)',
 		value = false,
 	},
 	
 	chicken = {
-		name = 'Auto-Chicken',
 		type = 'bool',
 		desc = 'Retreats auto-repairing/reclaiming units when they\'re attacked.\n (default = true)',
 		value = false,
 	},
 	
 	intelliCost = {
-		name = 'Intelligent Cost Model',
 		type = 'bool',
-		desc = 'Tries to optimize build order for better worker safety and faster overall construction, but makes it \nmore difficult to control what gets built first.\n (default = true)',
 		value = true,
 	},
 	
 	alwaysShow = {
-		name = 'Always Show',
 		type = 'bool',
-		desc = 'If this is enabled queued commands will always be displayed, otherwise they are only visible when \255\200\200\200shift\255\255\255\255 is held.\n (default = false)',
 		value = false,
 	},
 	
 	drawIcons = {
-		name = 'Draw Status Icons',
 		type = 'bool',
-		desc = 'Check to draw status icons over each unit, which shows its command state.\n (default = true)',
 		value = true,
 	},
 
 	isSelectionOverrideSetOption = {
-		name = "Global build overrides selection rank",
-		desc = "Units controlled by global build command will be treated as a different selection rank.",
 		type = "bool",
 		value = true,
 		noHotkey = true,
@@ -196,8 +178,6 @@ options = {
 	},
 
 	selectionOverrideRankOption = {
-		name = 'Global build selection override:',
-		desc = "Units controlled by global build command are treated as this selection rank, if override is enabled.",
 		type = 'number',
 		value = 0, -- This should be 0 because otherwise Ctrl selection keys work on the unit.
 		min = 0, max = 3, step = 1,

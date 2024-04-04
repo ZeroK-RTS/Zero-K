@@ -32,13 +32,12 @@ end
 
 local hotkeyPath = 'Hotkeys/Selection/Control Groups'
 
+i18nPrefix = 'autogroup_'
 options_order = { 'mainlabel', 'text_hotkey', 'cleargroups', 'removefromgroup', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
 options_path = 'Settings/Interface/Control Groups'
 options = {
 	mainlabel = {name='Auto Group', type='label'},
 	loadgroups = {
-		name = 'Preserve Auto Groups',
-		desc = 'Preserve auto groupings for next game. Unchecking this clears the groups!',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -49,41 +48,33 @@ options = {
 		end
 	},
 	addall = {
-		name = 'Add All',
-		desc = 'Existing units will be added to group# when setting autogroup#.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	verbose = {
-		name = 'Verbose Mode',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	immediate = {
-		name = 'Immediate Mode',
-		desc = 'Units built/resurrected/received are added to autogroups immediately instead of waiting them to be idle.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	groupnumbers = { -- FIXME why is this handled by autogroups? it's standalone functionality
-		name = 'Display Group Numbers',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 	
 	text_hotkey = {
-		name = 'Auto Groups',
 		type = 'text',
 		value = "Alt + <Group Number> sets all selected unit types to automatically be assigned to the group upon completion.\nAlt + <Remove From Autogroup> removes the selected unit types from their auto group. Auto groups persist across games by default.",
 		path = hotkeyPath,
 	},
 	
 	cleargroups = {
-		name = 'Clear All Auto Groups',
 		type = 'button',
 		OnChange = function()
 			unit2group = {}
@@ -92,7 +83,6 @@ options = {
 		path = hotkeyPath,
 	},
 	removefromgroup = {
-		name = 'Remove From Autogroup',
 		type = 'button',
 		hotkey = "`",
 		bindWithAny = true,
