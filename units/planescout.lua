@@ -1,6 +1,6 @@
 return { planescout = {
   name                = [[Owl]],
-  description         = [[Area Jammer, Radar/Sonar Plane]],
+  description         = [[Radar/Sonar Scout Plane]],
   brakerate           = 0.4,
   builder             = false,
   buildPic            = [[planescout.png]],
@@ -46,7 +46,6 @@ return { planescout = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[armpnix.s3o]],
   radarDistance       = 2400,
-  radarDistanceJam    = 700,
   script              = [[planescout.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 1400,

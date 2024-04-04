@@ -1,6 +1,6 @@
 return { planelightscout = {
   name                = [[Sparrow]],
-  description         = [[Light Scout Plane]],
+  description         = [[Light Scout/Radar Jammer Plane]],
   brakerate           = 0.4,
   builder             = false,
   buildPic            = [[planelightscout.png]],
@@ -44,13 +44,14 @@ return { planelightscout = {
   health              = 350,
   iconType            = [[scoutplane]],
   maxAcc              = 0.6,
-  maxAileron          = 0.016,
-  maxElevator         = 0.022,
+  maxAileron          = 0.017,
+  maxElevator         = 0.023,
   maxRudder           = 0.012,
   metalCost           = 230,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[planelightscout.s3o]],
+  radarDistanceJam    = 640,
   script              = [[planelightscout.lua]],
   selfDestructAs      = [[PLANELIGHTSCOUT_DEATH]],
   selfDestructCountdown  = 0,
@@ -64,7 +65,7 @@ return { planelightscout = {
   },
   sightDistance       = 950,
   speed               = 210,
-  turnRadius          = 50,
+  turnRadius          = 30,
   workerTime          = 0,
 
   featureDefs         = {
