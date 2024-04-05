@@ -66,7 +66,8 @@ local spinScriptAccel = 0.05
 local maxSpin = math.pi/3
 
 local spinMult = 0
-local targetSpin = 1
+local MAX_SPIN = 1.5
+local targetSpin = MAX_SPIN
 local gunNum = 1
 local aimSpeedMult = 1
 local reloadChange = 0
@@ -74,12 +75,13 @@ local lastAimFrame = false
 
 local function UpdateSpin(gainSpin, loseSpin)
 	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-	reloadChange = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
+	reloadChange = ((stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)) * MAX_SPIN
 	if gainSpin then
-		spinMult = spinMult + (0.022*spinMult - 0.042)*spinMult + 0.033
+		local gain = math.max(0.01, (0.022*math.min(1, spinMult) - 0.042)*spinMult + 0.033)
+		spinMult = spinMult + gain
 	end
-	if spinMult > 1 then
-		spinMult = 1
+	if spinMult > MAX_SPIN then
+		spinMult = MAX_SPIN
 	end
 	
 	--local xpos = select(1, Spring.GetUnitPosition(unitID))
@@ -105,9 +107,9 @@ local function UpdateSpin(gainSpin, loseSpin)
 			spinMult = minSpinMult
 		end
 	end
-	aimSpeedMult = 1 - math.pow(math.min(1, (math.max(0.5, spinMult) - 0.4)*1.8), 4/3)*0.7
+	aimSpeedMult = math.max(0.09, 1 - math.pow((math.max(0.5, spinMult) - 0.4)*1.8, 4/3)*0.7)
 	Spin(spindle, x_axis, spinMult*maxSpin, spinScriptAccel)
-	Spring.SetUnitRulesParam(unitID, "speed_bar", spinMult, LOS_ACCESS)
+	Spring.SetUnitRulesParam(unitID, "speed_bar", spinMult / MAX_SPIN, LOS_ACCESS)
 end
 
 local function SpinThread()
@@ -162,10 +164,10 @@ function script.AimWeapon(num, heading, pitch)
 
 	if headDiff > 0.85 then
 		targetSpin = 0.5
-	elseif headDiff > 0.05 then
-		targetSpin = 1 - headDiff*0.5/0.85
+	elseif headDiff > 0.02 then
+		targetSpin = 1 - headDiff*0.6
 	else
-		targetSpin = 1
+		targetSpin = MAX_SPIN
 	end
 	
 	local spindlePitch = -pitch + (num - 1)* math.pi/3
@@ -207,7 +209,7 @@ end
 
 function script.FireWeapon(num)
 	Sleep(33)
-	if spinMult < 1 then
+	if spinMult < MAX_SPIN then
 		UpdateSpin(true)
 	end
 end
