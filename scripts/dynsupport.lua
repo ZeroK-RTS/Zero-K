@@ -198,8 +198,11 @@ local walkCycle = {
 	},
 }
 
-local function Walk(groundUp, groundMid, groundFoot, passUp, passMid, passFoot, torsoParity)
+local function Walk(groundUp, groundMid, groundFoot, passUp, passMid, passFoot, torsoParity, alreadyMoving)
 	local speed = 5 * sizeSpeedMult * math.max(0.5, GG.att_MoveChange[unitID] or 1)
+	if not alreadyMoving then
+		speed = speed * 2
+	end
 	
 	for i = 1, #walkCycle do
 		local cur = walkCycle[i]
@@ -220,6 +223,9 @@ local function Walk(groundUp, groundMid, groundFoot, passUp, passMid, passFoot, 
 		Turn(groundMid, x_axis, cur.ground.mid, speed * math.abs(cur.ground.mid - prevGround.mid))
 		Turn(groundFoot, x_axis, cur.ground.foot, speed * math.abs(cur.ground.foot - prevGround.foot))
 		Sleep(1000 / speed)
+		if not alreadyMoving then
+			speed = speed * 0.8
+		end
 		if not bMoving then
 			return
 		end
@@ -235,12 +241,12 @@ local function MotionControl()
 		aiming = bAiming
 
 		if moving then
-			justmoved = true
 			if legParity then
-				Walk(lupleg, lloleg, lfoot, rupleg, rloleg, rfoot, -1)
+				Walk(lupleg, lloleg, lfoot, rupleg, rloleg, rfoot, -1, justmoved)
 			else
-				Walk(rupleg, rloleg, rfoot, lupleg, lloleg, lfoot, 1)
+				Walk(rupleg, rloleg, rfoot, lupleg, lloleg, lfoot, 1, justmoved)
 			end
+			justmoved = true
 			legParity = not legParity
 		else
 			if justmoved then
