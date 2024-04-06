@@ -1,9 +1,8 @@
 include "pieceControl.lua"
 
-local base, turret, spindle, fakespindle = piece('base', 'turret', 'spindle', 'fakespindle')
-
+local base_empty, base, turret, spindle, fakespindle = piece('base_empty', 'base', 'turret', 'spindle', 'fakespindle')
 local guns = {}
-for i=1,6 do
+for i = 1, 6 do
 	guns[i] = {
 		center = piece('center'..i),
 		sleeve = piece('sleeve'..i),
@@ -13,6 +12,12 @@ for i=1,6 do
 		z = 0,
 	}
 end
+
+local joins = {}
+for i = 1, 4 do
+	joins[i] = piece('join' .. i)
+end
+
 
 local hpi = math.pi*0.5
 
@@ -170,6 +175,14 @@ function script.AimWeapon(num, heading, pitch)
 		targetSpin = MAX_SPIN
 	end
 	
+	if headDiff > 0.000001 then
+		for i = 1, #joins do
+			if math.random() < math.min(0.3, headDiff * 9) then
+				EmitSfx(joins[i], 1027)
+			end
+		end
+	end
+	
 	local spindlePitch = -pitch + (num - 1)* math.pi/3
 
 	lastAimFrame = Spring.GetGameFrame()
@@ -201,7 +214,7 @@ local function gunFire(num)
 end
 
 function script.Shot(num)
-	--EmitSfx(base, 1024) BASE IS NOT CENTRAL
+	EmitSfx(base_empty, 1024)
 	EmitSfx(guns[gunNum].flare, 1025)
 	EmitSfx(guns[gunNum].flare, 1026)
 	StartThread(gunFire, gunNum)

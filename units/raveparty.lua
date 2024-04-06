@@ -45,9 +45,10 @@ return { raveparty = {
   sfxtypes                      = {
 
     explosiongenerators = {
-      [[custom:staticheavyarty_SHOCKWAVE]],
+      [[custom:staticheavyarty_SHOCKWAVE_DRP]],
       [[custom:staticheavyarty_SMOKE]],
       [[custom:staticheavyarty_FLARE]],
+      [[custom:drp_turn]],
     },
 
   },
