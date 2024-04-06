@@ -1,5 +1,14 @@
 if gadgetHandler:IsSyncedCode() then
-	return
+	return false
+end
+
+if not VFS.FileExists("mapconfig/texture_generator_config.lua", VFS.MAP) then
+	return false
+end
+
+if not gl.CreateShader then
+	Spring.Log("Map Texture Generator (generic)", LOG.WARNING, "gl.CreateShader unsupported")
+	return false
 end
 
 function gadget:GetInfo()
@@ -10,7 +19,7 @@ function gadget:GetInfo()
 		date      = "26 September 2021",
 		license   = "GNU GPL, v2 or later",
 		layer     = 10,
-		enabled   = gl.CreateShader and VFS.FileExists("mapconfig/texture_generator_config.lua", VFS.MAP),
+		enabled   = true,
 	}
 end
 
