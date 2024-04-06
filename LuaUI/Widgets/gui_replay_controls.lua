@@ -231,7 +231,7 @@ function CreateTheUI()
 		button_setspeed[i] = button
 	end
 
-	local startStopWidth = 110
+	local startStopWidth = 80
 	button_startStop = Button:New {
 		width = startStopWidth,
 		height = 20,
@@ -253,7 +253,7 @@ function CreateTheUI()
 		end}
 	}
 
-	local skipPreGameWidth = 130
+	local skipPreGameWidth = 160
 	if frame == 0 then
 		button_skipPreGame = Button:New {
 			width = skipPreGameWidth,
