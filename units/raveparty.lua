@@ -35,7 +35,7 @@ return { raveparty = {
   levelGround                   = false,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
-  metalCost                     = 42000,
+  metalCost                     = 45000,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[raveparty.s3o]],
   --onoffable                        = true,
@@ -90,7 +90,7 @@ return { raveparty = {
 
     RED_KILLER = {
       name                    = [[Red Killer]],
-      accuracy                = 750,
+      accuracy                = 600,
       avoidFeature            = false,
       avoidGround             = false,
       areaOfEffect            = 192,
@@ -102,7 +102,7 @@ return { raveparty = {
         reaim_time = 1,
       },
       damage                  = {
-        default = 3002.1,
+        default = 3500.1,
       },
 
       edgeeffectiveness       = 0.5,
@@ -126,8 +126,8 @@ return { raveparty = {
     
     ORANGE_ROASTER = {
       name                    = [[Orange Roaster]],
-      accuracy                = 750,
-      areaOfEffect            = 640,
+      accuracy                = 600,
+      areaOfEffect            = 800,
       craterAreaOfEffect      = 80,
       avoidFeature            = false,
       avoidGround             = false,
@@ -143,14 +143,13 @@ return { raveparty = {
         reaim_time = 1,
 
         area_damage = 1,
-        area_damage_radius = 320,
+        area_damage_radius = 400,
         area_damage_dps = 40,
-        area_damage_duration = 15,
+        area_damage_duration = 8,
       },
 
       damage                  = {
-        default = 300.9,
-        planes  = 300,
+        default = 250.1,
       },
 
       edgeeffectiveness       = 0.25,
@@ -174,7 +173,7 @@ return { raveparty = {
     
     YELLOW_SLAMMER = {
       name                    = [[Yellow Slammer]],
-      accuracy                = 750,
+      accuracy                = 600,
       areaOfEffect            = 384,
       craterAreaOfEffect      = 96,
       avoidFeature            = false,
@@ -188,8 +187,7 @@ return { raveparty = {
       },
 
       damage                  = {
-        default = 801.1,
-        planes  = 800,
+        default = 1001.1,
       },
 
       edgeeffectiveness       = 0.5,
@@ -214,7 +212,7 @@ return { raveparty = {
 
     GREEN_STAMPER = {
       name                    = [[Green Stamper]],
-      accuracy                = 750,
+      accuracy                = 600,
       areaOfEffect            = 384,
       avoidFeature            = false,
       avoidGround             = false,
@@ -222,10 +220,10 @@ return { raveparty = {
       craterMult              = 1,
 
       customParams            = {
-        gatherradius = [[400]],
-        smoothradius = [[240]],
-        smoothmult   = [[0.8]],
-        smoothexponent = [[0.45]],
+        gatherradius = [[540]],
+        smoothradius = [[300]],
+        smoothmult   = [[0.9]],
+        smoothexponent = [[0.8]],
         movestructures = [[1]],
 
         script_reload = [[4]],
@@ -233,8 +231,7 @@ return { raveparty = {
       },
       
       damage                  = {
-        default = 401.1,
-        planes  = 400,
+        default = 600.1,
       },
 
       explosionGenerator      = [[custom:blobber_goo]],
@@ -257,7 +254,7 @@ return { raveparty = {
 
     BLUE_SHOCKER = {
       name                    = [[Blue Shocker]],
-      accuracy                = 750,
+      accuracy                = 600,
       areaOfEffect            = 320,
       avoidFeature            = false,
       avoidGround             = false,
@@ -299,7 +296,7 @@ return { raveparty = {
 
     VIOLET_SLUGGER = {
       name                    = [[Violet Slugger]],
-      accuracy                = 750,
+      accuracy                = 600,
       areaOfEffect            = 720,
       craterAreaOfEffect      = 90,
       avoidFeature            = false,
@@ -316,7 +313,7 @@ return { raveparty = {
       },
       
       damage                  = {
-        default = 450.1,
+        default = 500.1,
       },
 
       edgeeffectiveness       = 0.8,
