@@ -523,6 +523,37 @@ return {
     },
   },
 
+  ["drp_turn"] = {
+    usedefaultexplosions = false,
+    sparks = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.97,
+        colormap           = [[1 1 1 0.01   1 0.7 0.2 0.01   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 30,
+        emitrotspread      = 55,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, -0.45, 0]],
+        numparticles       = 8,
+        particlelife       = 5,
+        particlelifespread = 4,
+        particlesize       = 0.8,
+        particlesizespread = 1.6,
+        particlespeed      = 1.8,
+        particlespeedspread = 1,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[plasma]],
+      },
+    },
+  },
+
   ["flash1bluedark"] = {
     usedefaultexplosions = false,
     groundflash = {
