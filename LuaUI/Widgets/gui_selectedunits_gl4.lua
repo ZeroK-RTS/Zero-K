@@ -69,6 +69,7 @@ local selUnits                                              = {}
 local checkSelectionType = {}
 local lastHoverUnitID, lastAllySelStaleCheck
 local otherOpacityMult = 0.4
+local oldUiHidden = Spring.IsGUIHidden()
 
 local Init
 options_path = 'Settings/Interface/Selection/Default Selections'
@@ -409,6 +410,24 @@ local function CleanSelections(typeToClear, newSelUnits)
 end
 
 function widget:Update(dt)
+	local uiHidden = Spring.IsGUIHidden()
+	if oldUiHidden and uiHidden then
+		return
+	end
+	if oldUiHidden ~= uiHidden then
+		checkSelectionType[HOVER_SEL] = true
+		checkSelectionType[LOCAL_SEL] = true
+		checkSelectionType[OTHER_SEL] = true
+		oldUiHidden = uiHidden
+		if uiHidden then
+			local newSelUnits = {}
+			CleanSelections(HOVER_SEL, newSelUnits)
+			CleanSelections(LOCAL_SEL, newSelUnits)
+			CleanSelections(OTHER_SEL, newSelUnits)
+			return
+		end
+	end
+
 	local hoverUnitID = GetUnitUnderCursor(false)
 	local isSelectionBoxActive = IsSelectionBoxActive()
 	local spectating, fullSelect = spGetSpectatingState()
