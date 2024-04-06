@@ -12,6 +12,7 @@ end
 
 local CMD_FIELD_FAC_SELECT    = Spring.Utilities.CMD.FIELD_FAC_SELECT
 local CMD_FIELD_FAC_UNIT_TYPE = Spring.Utilities.CMD.FIELD_FAC_UNIT_TYPE
+local CMD_FIELD_FAC_QUEUELESS = Spring.Utilities.CMD.FIELD_FAC_QUEUELESS
 
 if (gadgetHandler:IsSyncedCode()) then
 
@@ -152,8 +153,53 @@ end
 --------------------------------------------------------------------------------
 -- Command handling
 
+local function TryToCopyBlueprint(unitID, unitDefID, targetID, doMovement)
+	if not Spring.ValidUnitID(targetID) then
+		if doMovement then
+			Spring.ClearUnitGoal(unitID)
+		end
+		return true
+	end
+	local x, y, z = Spring.GetUnitPosition(targetID)
+	if not z then
+		if doMovement then
+			Spring.ClearUnitGoal(unitID)
+		end
+		return true
+	end
+	if nextDesiredUnitType[unitID] then
+		local temporaryProblem, permanentProblem = FactoryCanBuild(targetID, nextDesiredUnitType[unitID])
+		if permanentProblem then
+			if doMovement then
+				Spring.ClearUnitGoal(unitID)
+			end
+			return true
+		end
+		local distance = Spring.GetUnitSeparation(unitID, targetID, true)
+		if distance <= fieldFacRange[unitDefID] and not temporaryProblem then
+			if canBuild[unitID] ~= nextDesiredUnitType[unitID] then
+				AddUnit(unitID, nextDesiredUnitType[unitID])
+			end
+			nextDesiredUnitType[unitID] = nil
+			if doMovement then
+				Spring.ClearUnitGoal(unitID)
+			end
+			return true
+		end
+	end
+	if not doMovement then
+		return true
+	end
+	Spring.SetUnitMoveGoal(unitID, x, y, z, fieldFacRange[unitDefID] - 16)
+	return false
+end
+
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_FIELD_FAC_SELECT] = true, [CMD_FIELD_FAC_UNIT_TYPE] = true}
+	return {
+		[CMD_FIELD_FAC_SELECT] = true,
+		[CMD_FIELD_FAC_UNIT_TYPE] = true,
+		[CMD_FIELD_FAC_QUEUELESS] = true,
+	}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -161,10 +207,15 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if not (cmdID == CMD_FIELD_FAC_UNIT_TYPE or cmdID == CMD_FIELD_FAC_SELECT) then
+	if not (cmdID == CMD_FIELD_FAC_UNIT_TYPE or cmdID == CMD_FIELD_FAC_SELECT or cmdID == CMD_FIELD_FAC_QUEUELESS) then
 		return true
 	end
 	if not fieldFacRange[unitDefID] then
+		return false
+	end
+	if cmdID == CMD_FIELD_FAC_QUEUELESS and cmdParams and cmdParams[2] then
+		nextDesiredUnitType[unitID] = cmdParams[2]
+		TryToCopyBlueprint(unitID, unitDefID, cmdParams[1], false)
 		return false
 	end
 	if cmdID == CMD_FIELD_FAC_UNIT_TYPE then
@@ -192,33 +243,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	
 	local targetID = cmdParams and cmdParams[1]
-	if not Spring.ValidUnitID(targetID) then
-		Spring.ClearUnitGoal(unitID)
-		return true, true
-	end
-	local x, y, z = Spring.GetUnitPosition(targetID)
-	if not z then
-		Spring.ClearUnitGoal(unitID)
-		return true, true
-	end
-	if nextDesiredUnitType[unitID] then
-		local temporaryProblem, permanentProblem = FactoryCanBuild(targetID, nextDesiredUnitType[unitID])
-		if permanentProblem then
-			Spring.ClearUnitGoal(unitID)
-			return true, true
-		end
-		local distance = Spring.GetUnitSeparation(unitID, targetID, true)
-		if distance <= fieldFacRange[unitDefID] and not temporaryProblem then
-			if canBuild[unitID] ~= nextDesiredUnitType[unitID] then
-				AddUnit(unitID, nextDesiredUnitType[unitID])
-			end
-			nextDesiredUnitType[unitID] = nil
-			Spring.ClearUnitGoal(unitID)
-			return true, true
-		end
-	end
-	Spring.SetUnitMoveGoal(unitID, x, y, z, fieldFacRange[unitDefID] - 16)
-	return true, false
+	return true, TryToCopyBlueprint(unitID, unitDefID, targetID, true)
 end
 
 --------------------------------------------------------------------------------
