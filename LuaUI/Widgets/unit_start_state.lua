@@ -33,6 +33,19 @@ local unitsToFactory = {} -- [unitDefName] = factoryDefName
 local preventBaitTip = "\nAvoidance is disabled for units with Force Fire (only for the target), Attack Move or Patrol commands."
 local badTargetDescStr = "\n\nAvoid Bad Targets prevents auto-aim at low value targets. It is disabled for units with Force Fire (only for the target), Attack Move or Patrol commands. The lowest level avoids armoured targets (excluding Crab) while levels Light to Heavy ignore unidentified radar dots."
 
+local blueprintCopyDefaults = {
+	{[[factoryplane]],   2},
+	{[[factoryamph]],    2},
+	{[[factorycloak]],   2},
+	{[[factorygunship]], 4},
+	{[[factoryhover]],   2},
+	{[[factoryjump]],    3},
+	{[[factoryveh]],     3},
+	{[[factoryshield]],  3},
+	{[[factoryship]],    3},
+	{[[factoryspider]],  4},
+	{[[factorytank]],    2},
+}
 
 local tooltipFunc = {}
 local tooltips = {
@@ -167,6 +180,7 @@ options_order = {
 	'commander_auto_call_transport_2',
 	'commander_selection_rank',
 	'commander_formation_rank',
+	'commander_blueprint_copy_text',
 }
 
 options = {
@@ -625,7 +639,45 @@ options = {
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.formationrank,
 	},
+	
+	commander_blueprint_copy_text = {
+		name = 'Enginner Plop Blueprint Copy',
+		type = 'text',
+		value = "Engineer commanders automatically copy a build option from the factory they plop at the start of the game. The default can be changed below. Also, blueprints can be changed during the game with the Copy Factory Blueprint command.",
+		path = "Settings/Unit Behaviour/Default States/Misc/Blueprint",
+	},
 }
+
+do
+	for i = 1, #blueprintCopyDefaults do
+		local factoryName = blueprintCopyDefaults[i][1]
+		local defaultBuildIndex = blueprintCopyDefaults[i][2]
+		local ud = UnitDefNames[factoryName]
+		if ud then
+			local buildList = ud.buildOptions
+			local defName = "blueprint_copy_" .. factoryName
+			local items = {}
+			local default
+			for j = 1, #buildList do
+				local bud = UnitDefs[buildList[j]]
+				if bud then
+					items[#items + 1] = {key = bud.name, name = Spring.Utilities.GetHumanName(bud)}
+					if #items == defaultBuildIndex then
+						default = bud.name
+					end
+				end
+			end
+			options[defName] = {
+				name = Spring.Utilities.GetHumanName(ud),
+				type = 'radioButton',
+				items = items,
+				value = default,
+				path = "Settings/Unit Behaviour/Default States/Misc/Blueprint",
+			}
+			options_order[#options_order+1] = defName
+		end
+	end
+end
 
 local tacticalAIUnits = {}
 local wardFireUnits = {}
@@ -661,7 +713,6 @@ local function addLabel(text, path) -- doesn't work with order
 end
 
 local function addUnit(defName, path)
-
 	if unitAlreadyAdded[defName] then
 		return
 	end
@@ -1222,6 +1273,29 @@ local function StockpileUnit(unitID, wanted, orderArray)
 	end
 end
 
+local function CheckBlueprintDefault(unitID, unitDefID, ud, builderID)
+	local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
+	if inbuild then
+		return
+	end
+	local builderDefID = Spring.GetUnitDefID(builderID)
+	local bud = builderDefID and UnitDefs[builderDefID]
+	if not bud and bud.customParams.field_factory then
+		return
+	end
+	local confValue = options["blueprint_copy_" .. ud.name]
+	confValue = confValue and confValue.value
+	if not confValue then
+		return
+	end
+	local copyId = UnitDefNames[confValue]
+	copyId = copyId and copyId.id
+	if not copyId then
+		return
+	end
+	Spring.GiveOrderToUnit(builderID, CMD_FIELD_FAC_QUEUELESS, {unitID, copyId}, 0)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -1261,6 +1335,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if options.commander_formation_rank and WG.SetFormationRank then
 			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
+	end
+
+	if ud.isFactory and builderID then
+		CheckBlueprintDefault(unitID, unitDefID, ud, builderID)
 	end
 
 	local name = ud.name
