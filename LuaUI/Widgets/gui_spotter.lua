@@ -28,11 +28,10 @@ end
 
 local function UpdateDrawList() end
 
+i18nPrefix = 'spotter_'
 options_path = 'Settings/Graphics/Unit Visibility/Spotter'
 options = {
 	showEnemyCircle	= {
-		name = 'Show Circle Around Enemies',
-		desc = 'Show a hard circle rround enemy units',
 		type = 'bool',
 		value = true,
 		noHotkey = true,

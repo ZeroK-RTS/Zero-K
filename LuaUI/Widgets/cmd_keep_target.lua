@@ -21,28 +21,24 @@ end
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'keeptarget_'
 options_path = 'Settings/Unit Behaviour'
 options_order = {'keepTarget', 'keepTargetBombers', 'removeTarget'}
 options = {
 	keepTarget = {
-		name = "Prioritise overridden attack target",
 		type = "bool",
 		value = true,
-		desc = "Cancelling an attack command by issuing a movement command continues prioritising the target of the previous attack command.",
 		noHotkey = true,
 	},
 	keepTargetBombers = {
-		name = "Prioritise overridden attack for bombers",
 		type = "bool",
 		value = false,
 		desc = "Also enables the behaviour of 'Prioritise overridden attack target' for bombers and Blastwing.",
 		noHotkey = true,
 	},
 	removeTarget = {
-		name = "Stop clears target",
 		type = "bool",
 		value = true,
-		desc = "Target prioritisation is reset by Stop, Fight, Guard, Patrol and Attack commands.",
 		noHotkey = true,
 	},
 }

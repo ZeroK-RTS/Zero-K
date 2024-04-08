@@ -33,31 +33,26 @@ local CLICK_LEEWAY = 2
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'selectionmodkeys_'
 options_path = 'Settings/Interface/Selection'
 options_order = {'enable', 'leeway_time', 'leeway_distance'}
 options = {
 	leeway_time = {
-		name = "Selection leeway time (seconds)",
-		desc = "If the mouse is clicked and released within the leeway time, and moves less than the leeway distance, then the unit clicked on will be selected.",
 		type = 'number',
 		value = 0.15,
 		min = 0, max = 1, step = 0.01,
 		noHotkey = true
 	},
 	leeway_distance = {
-		name = "Selection leeway distance (pixels)",
-		desc = "If the mouse is clicked and released within the leeway time, and moves less than the leeway distance, then the unit clicked on will be selected.",
 		type = 'number',
 		value = 150,
 		min = 0, max = 1000, step = 1,
 		noHotkey = true
 	},
 	enable = {
-		name = "New left click selection modifiers",
 		type = "bool",
 		value = true,
 		noHotkey = true,
-		desc = "Implements new modifiers for left clicking on units. There is essentially no reason to disable this.",
 		advanced = true,
 	},
 }

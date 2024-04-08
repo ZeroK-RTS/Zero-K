@@ -203,6 +203,7 @@ local global_command_button
 
 -- EPIC options
 
+i18nPrefix = 'defenserangezerok_'
 options_path = 'Settings/Interface/Defence and Cloak Ranges'
 
 local function OnOptChange(self)
@@ -218,57 +219,46 @@ end
 options = {
 	label = { type = 'label', name = 'Defence Ranges' },
 	allyground = {
-		name = 'Show Ally Ground Defence',
 		type = 'bool',
 		value = false,
 	},
 	allyair = {
-		name = 'Show Ally Air Defence',
 		type = 'bool',
 		value = false,
 	},
 	allynuke = {
-		name = 'Show Ally Nuke Defence',
 		type = 'bool',
 		value = true,
 	},
 	enemyground = {
-		name = 'Show Enemy Ground Defence',
 		type = 'bool',
 		value = true,
 	},
 	enemyair = {
-		name = 'Show Enemy Air Defence',
 		type = 'bool',
 		value = true,
 	},
 	enemynuke = {
-		name = 'Show Enemy Nuke Defence',
 		type = 'bool',
 		value = true,
 	},
 	enemyshield = {
-		name = 'Show Enemy Shields',
 		type = 'bool',
 		value = true,
 	},
 	enemyradar = {
-		name = 'Show Enemy Radar Coverage',
 		type = 'bool',
 		value = false,
 	},
 	specground = {
-		name = 'Show Ground Defence as Spectator',
 		type = 'bool',
 		value = false,
 	},
 	specair = {
-		name = 'Show Air Defence as Spectator',
 		type = 'bool',
 		value = false,
 	},
 	specnuke = {
-		name = 'Show Nuke Defence as Spectator',
 		type = 'bool',
 		value = true,
 	},

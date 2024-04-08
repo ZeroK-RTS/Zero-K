@@ -85,11 +85,11 @@ local function LoadParams(param)
 	WG.RemakeEpicMenu()
 end
 
+i18nPrefix = 'projectilelights_'
 options_path = 'Settings/Graphics/Lighting'
 options_order = {'light_projectile_enable', 'light_strength_mult', 'useLOD', 'projectileFade', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
 options = {
 	light_projectile_enable = {
-		name = "Enable Projectile Lights",
 		type = 'bool',
 		value = true,
 		OnChange = function (self)
@@ -98,7 +98,6 @@ options = {
 		noHotkey = true,
 	},
 	light_strength_mult = {
-		name = 'Strength Multiplier',
 		type = 'number',
 		value = 1,
 		min = 0.01, max = 1.15, step = 0.01,
@@ -108,20 +107,14 @@ options = {
 		end,
 	},
 	useLOD = {
-		name = 'Use LOD',
 		type = 'bool',
-		desc = 'Reduces the number of lights drawn based on camera distance and current fps.',
 		value = true,
 	},
 	projectileFade = {
-		name = 'Fade Projectiles',
 		type = 'bool',
-		desc = 'Projectile lights smoothly fade out after the projectile disappears.',
 		value = true,
 	},
 	light_override = {
-		name = "Override Parameters",
-		desc = "Override lights with the following parameters.",
 		type = 'bool',
 		value = false,
 		OnChange = function (self)
@@ -131,7 +124,6 @@ options = {
 		advanced = true
 	},
 	light_radius = {
-		name = 'Light Radius',
 		type = 'number',
 		value = 3,
 		min = 20, max = 1000, step = 10,
@@ -142,7 +134,6 @@ options = {
 		advanced = true
 	},
 	light_brightness = {
-		name = 'Light Brightness',
 		type = 'number',
 		value = 3,
 		min = 0.05, max = 5, step = 0.05,
@@ -153,7 +144,6 @@ options = {
 		advanced = true
 	},
 	light_color = {
-		name = 'Light Color',
 		type = 'colors',
 		value = { 0.8, 0.8, 0.8, 1},
 		OnChange = function (self)
@@ -163,9 +153,7 @@ options = {
 		advanced = true
 	},
 	light_reload = {
-		name = 'Reload',
 		type = 'button',
-		desc = "Reload settings from the next projectile fired.",
 		OnChange = function (self)
 			wantLoadParams = true
 		end,

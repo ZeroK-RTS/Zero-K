@@ -166,6 +166,7 @@ local lastMsgChat, lastMsgBackChat, lastMsgConsole
 ------------------------------------------------------------
 -- options
 
+i18nPrefix = 'chiliproconsole_'
 options_path = "Settings/HUD Panels/Chat"
 
 local dedupe_path = options_path .. '/De-Duplication'
@@ -291,7 +292,6 @@ options = {
 	},
 	
 	enableConsole = {
-		name = "Enable the debug console",
 		type = 'bool',
 		value = false,
 		advanced = true,
@@ -307,14 +307,12 @@ options = {
 	},
 	
 	text_height_chat = {
-		name = 'Chat Text Size',
 		type = 'number',
 		value = 14,
 		min = 8, max = 30, step = 1,
 		OnChange = onOptionsChanged,
 	},
 	text_height_console = {
-		name = 'Log Text Size',
 		type = 'number',
 		value = 14,
 		min = 8, max = 30, step = 1,
@@ -322,14 +320,12 @@ options = {
 	},
 	
 	highlighted_text_height = {
-		name = 'Highlighted Text Size',
 		type = 'number',
 		value = 16,
 		min = 8, max = 30, step = 1,
 		OnChange = onOptionsChanged,
 	},
 	clickable_points = {
-		name = "Clickable points and labels",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -338,7 +334,6 @@ options = {
 	},
 	--[[
 	pointButtonOpacity = {
-		name = "Point button opacity",
 		type = 'number',
 		value = 0.25,
 		min = 0, max = 1, step = 0.05,
@@ -347,7 +342,6 @@ options = {
 	--]]
 	-- TODO work in progress
 	dedupe_messages = {
-		name = "Dedupe messages",
 		type = 'bool',
 		value = true,
 		OnChange = onOptionsChanged,
@@ -356,7 +350,6 @@ options = {
 		path = dedupe_path,
 	},
 	dedupe_points = {
-		name = "Dedupe points and labels",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -365,7 +358,6 @@ options = {
 		path = dedupe_path,
 	},
 	highlight_all_private = {
-		name = "Highlight all private messages",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -373,7 +365,6 @@ options = {
 		path = hilite_path,
 	},
 	highlight_filter_allies = {
-		name = "Check allies messages for highlight",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -381,7 +372,6 @@ options = {
 		path = hilite_path,
 	},
 	highlight_filter_enemies = {
-		name = "Check enemy messages for highlight",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -389,7 +379,6 @@ options = {
 		path = hilite_path,
 	},
 	highlight_filter_specs = {
-		name = "Check spec messages for highlight",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -397,7 +386,6 @@ options = {
 		path = hilite_path,
 	},
 	highlight_filter_other = {
-		name = "Check other messages for highlight",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -406,7 +394,6 @@ options = {
 	},
 --[[
 	highlight_filter = {
-		name = 'Highlight filter',
 		type = 'list',
 		OnChange = onOptionsChanged, -- NO NEED
 		value = 'allies',
@@ -420,7 +407,6 @@ options = {
 --]]
 	
 	highlight_surround = {
-		name = "Surround highlighted messages",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -429,7 +415,6 @@ options = {
 		path = hilite_path,
 	},
 	highlight_sound = {
-		name = "Sound for highlighted messages",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -438,7 +423,6 @@ options = {
 		path = hilite_path,
 	},
 	send_lobby_updates = {
-		name = "Display lobby chat and updates",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -446,7 +430,6 @@ options = {
 		path = hilite_path,
 	},
 	sound_for_lobby = {
-		name = "Play sound for lobby updates",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -454,7 +437,6 @@ options = {
 		path = hilite_path,
 	},
 	hideSpec = {
-		name = "Hide Spectator Chat",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
@@ -462,7 +444,6 @@ options = {
 		path = filter_path,
 	},
 	hideAlly = {
-		name = "Hide Ally Chat",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
@@ -470,7 +451,6 @@ options = {
 		path = filter_path,
 	},
 	hidePoint = {
-		name = "Hide Points",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
@@ -478,7 +458,6 @@ options = {
 		path = filter_path,
 	},
 	hideLabel = {
-		name = "Hide Labels",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
@@ -486,7 +465,6 @@ options = {
 		path = filter_path,
 	},
 	hideLog = {
-		name = "Hide Engine Logging Messages",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
@@ -494,7 +472,6 @@ options = {
 		path = filter_path,
 	},
 	max_lines = {
-		name = 'Maximum Lines (20-100)',
 		type = 'number',
 		value = 60,
 		min = 20, max = 100, step = 1,
@@ -502,35 +479,30 @@ options = {
 	},
 	
 	color_chat = {
-		name = 'Everyone chat text',
 		type = 'colors',
 		value = { 1, 1, 1, 1 },
 		OnChange = onOptionsChanged,
 		path = color_path,
 	},
 	color_ally = {
-		name = 'Ally text',
 		type = 'colors',
 		value = { 0.2, 1, 0.2, 1 },
 		OnChange = onOptionsChanged,
 		path = color_path,
 	},
 	color_other = {
-		name = 'Other text',
 		type = 'colors',
 		value = { 0.6, 0.6, 0.6, 1 },
 		OnChange = onOptionsChanged,
 		path = color_path,
 	},
 	color_spec = {
-		name = 'Spectator text',
 		type = 'colors',
 		value = { 0.8, 0.8, 0.8, 1 },
 		OnChange = onOptionsChanged,
 		path = color_path,
 	},
 	color_usernames = {
-		name = "Color usernames in messages",
 		type = 'bool',
 		value = true,
 		OnChange = onOptionsChanged,
@@ -538,28 +510,24 @@ options = {
 		path = color_path,
 	},
 	color_dup = {
-		name = 'Duplicate message mark',
 		type = 'colors',
 		value = { 1, 0.2, 0.2, 1 },
 		OnChange = onOptionsChanged,
 		path = dedupe_path,
 	},
 	color_highlight = {
-		name = 'Highlight mark',
 		type = 'colors',
 		value = { 1, 1, 0.2, 1 },
 		OnChange = onOptionsChanged,
 		path = hilite_path,
 	},
 	color_from_lobby = {
-		name = 'Lobby notification color',
 		type = 'colors',
 		value = { 1, 0.2, 1, 1 },
 		OnChange = onOptionsChanged,
 		path = hilite_path,
 	},
 	color_chat_background = {
-		name = "Chat Background color",
 		type = "colors",
 		value = { 0, 0, 0, 0},
 		OnChange = function(self)
@@ -570,7 +538,6 @@ options = {
 		path = color_path,
 	},
 	color_console_background = {
-		name = "Console Background color",
 		type = "colors",
 		value = { 0, 0, 0, 0},
 		OnChange = function(self)
@@ -587,16 +554,13 @@ options = {
 	},
 	--[[
 	mousewheel = {
-		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
 		OnChange = function(self) scrollpanel_console.ignoreMouseWheel = not self.value; end,
 	},
 	--]]
 	defaultAllyChat = {
-		name = "Default Chat Mode",
 		type = 'radioButton',
-		desc = "Sets default chat mode to allies at game start",
 		value = 'auto',
 		items = {
 			{key = 'on',   name = 'Ally/Spectator Chat', desc = "Always start the game with ally chat or spectator chat enabled."},
@@ -607,20 +571,14 @@ options = {
 		noHotkey = true,
 	},
 	defaultBacklogEnabled = {
-		name = "Enable backlog at start",
-		desc = "Starts with the backlog chat enabled.",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	toggleBacklog = {
-		name = "Toggle backlog",
-		desc = "The toggle backlog button is here to let you hotkey this action.",
 		type = 'button',
 	},
 	mousewheelBacklog = {
-		name = "Mousewheel Backlog",
-		desc = "Scroll the backlog chat with the mousewheel.",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -630,8 +588,6 @@ options = {
 		end,
 	},
 	enableSwap = {
-		name = "Show backlog arrow",
-		desc = "Enable the button to swap between chat and backlog chat.",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -677,8 +633,6 @@ options = {
 		end,
 	},
 	backlogHideNotChat = {
-		name = "Hide arrow when not chatting",
-		desc = "Enable to hide the backlog arrow when not entering chat.",
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
@@ -694,14 +648,10 @@ options = {
 		end
 	},
 	backlogShowWithChatEntry = {
-		name = "Auto-toggle backlog",
-		desc = "Enable to have the backlog enabled when entering text and disabled when not entering text.",
 		type = 'bool',
 		value = false,
 	},
 	backlogArrowOnRight = {
-		name = "Backlong Arrow On Right",
-		desc = "Puts the backlong arrow on the right. It appear on the left if disabled..",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -716,16 +666,12 @@ options = {
 		end,
 	},
 	changeFont = {
-		name = "Change message entering font.",
-		desc = "With this enabled the text-entering font will be changed to match the chat. May cause Spring to competely lock up intermittently on load. Requires reload to update.",
 		type = 'bool',
 		value = false,
 		advanced = true,
 		noHotkey = true,
 	},
 	enableChatBackground = {
-		name = "Enable chat background.",
-		desc = "Enables a background for the text-entering box.",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -740,8 +686,6 @@ options = {
 		end,
 	},
 	hideChat = {
-		name = "Hide when not chatting",
-		desc = "Hide the chat completely when not entering chat.",
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
@@ -749,7 +693,6 @@ options = {
 		end,
 	},
 	backchatOpacity = {
-		name = "Backlog Border Opacity",
 		type = 'number',
 		value = 0.5,
 		min = 0, max = 1, step = 0.05,
@@ -759,7 +702,6 @@ options = {
 		end,
 	},
 	autohide_text_time = {
-		name = "Text decay time",
 		type = 'number',
 		value = 20,
 		min = 10, max = 60, step = 5,

@@ -21,18 +21,16 @@ local team
 
 local SelectNextPlayer = function() end
 
+i18nPrefix = 'spectateselectedteam_'
 options_path = 'Settings/Spectating/Player View'
 options_order = {'followNextPlayer','specviewselection',}
 options={
 	followNextPlayer = {
-		name = "Select Next Player",
-		desc = "Quickly select next player. Hotkey this button.",
 		type = 'button',
 		OnChange = function(self) SelectNextPlayer() end,
 	},
 	specviewselection = {
 		type='radioButton',
-		name='View and Selection Restriction',
 		items = {
 			{name = 'Chosen player only',key='viewchosenplayer', desc="Point of view of current player, and you can only select the current player's units.", hotkey=nil},
 			{name = 'Full vision',key='viewall', desc="Unlimited line of sight, but you can only select current player's units.", hotkey=nil},

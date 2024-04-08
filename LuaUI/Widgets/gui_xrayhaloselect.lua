@@ -98,12 +98,11 @@ local glUnit = gl.Unit
 
 local showAlly = false
 
+i18nPrefix = 'xrayhaloselections_'
 options_path = 'Settings/Interface/Selection/Selection XRay&Halo'
 options = {
 	showally = {
-		name = 'Show Ally Selections',
 		type = 'bool',
-		desc = 'Highlight the units your allies currently have selected.',
 		value = false,
 		OnChange = function(self)
 			visibleAllySelUnits = {}
@@ -111,7 +110,6 @@ options = {
 		end,
 	},
 	useteamcolors = {
-		name = 'Use Team Colors',
 		type = 'bool',
 		desc = 'Highlight your allies\' selections with their team colors instead of the default yellow.',
 		value = false,

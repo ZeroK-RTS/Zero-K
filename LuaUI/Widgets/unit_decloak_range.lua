@@ -28,6 +28,7 @@ local decloakDist = {}
 local currentSelection = false
 local selectionCanCloak = false
 
+i18nPrefix = 'decloakrange_'
 options_path = 'Settings/Interface/Defence and Cloak Ranges'
 options_order = {
 	"label",
@@ -36,9 +37,10 @@ options_order = {
 }
 
 options = {
-	label = { type = 'label', name = 'Decloak Ranges' },
+	label = {
+		type = 'label',
+	},
 	drawranges = {
-		name = 'Draw decloak ranges',
 		type = 'bool',
 		value = true,
 		OnChange = function (self)
@@ -50,8 +52,6 @@ options = {
 		end
 	},
 	mergeCircles = {
-		name = "Draw merged cloak circles",
-		desc = "Merge overlapping grid circle visualisation. Does not work on older hardware and should automatically disable.",
 		type = 'bool',
 		value = true,
 	},

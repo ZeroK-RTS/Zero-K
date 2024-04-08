@@ -15,11 +15,11 @@ end
 
 --------------------------------------------------------------------------------
 ----------------------------Configuration---------------------------------------
+i18nPrefix = 'smoothcam_'
 options_path = 'Settings/Camera'
 options_order = { 'camSpeed', 'tiltZoom'}
 options = {
 	camSpeed = {
-		name = 'Camera Smoothness',
 		type = "number",
 		value = 0.30,
 		min = 0,
@@ -29,7 +29,6 @@ options = {
 		everyMode = true,
 	},
 	tiltZoom = {
-		name = 'Tilt Zoom',
 		type = "number",
 		value = 0,
 		min = 0,

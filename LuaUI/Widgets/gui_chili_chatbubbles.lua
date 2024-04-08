@@ -54,44 +54,35 @@ local window_width  = 400
 local window_timeout = 10
 --]]
 --options_section = 'Interface'
+i18nPrefix = 'chilichatbubbles_'
 options_path = 'Settings/HUD Panels/Chat/Bubbles'
 options_order = {'setavatar','filterGlobalChat', 'filterAutohostMsg', 'text_height', 'window_margin', 'window_width', 'window_height', 'window_timeout', 'firstbubble_y',}
 options = {
 	setavatar = {
-		name = 'Set An Avatar',
-		desc = 'Avatar to show next to your bubble. Requires the Avatar widget',
 		type = 'button',
 		OnChange = function() Spring.SendCommands{"luaui enablewidget Avatars", "setavatar"} end,
 		path = 'Settings/HUD Panels/Chat',
 	},
 	filterGlobalChat = {
-		name = 'Filter Global Chat',
-		desc = 'Filter out messages made in global chat',
 		type = 'bool',
 		value = true,
 	},
 	filterAutohostMsg = {
-		name = 'Filter Autohost Messages',
-		desc = 'Filter out messages from autohost',
 		type = 'bool',
 		value = true,
 	},
 	text_height = {
-		name = 'Font Size (10-18)',
 		type = 'number',
 		value = 12,
 		min=10,max=18,step=1,
 	},
 	window_margin = {
-		name = 'Margin (0 - 10)',
-		desc = 'Margin between bubbles',
 		type = 'number',
 		min = 0,
 		max = 10,
 		value = 0,
 	},
 	window_width  = {
-		name = 'Width (200 - 600)',
 		desc = '',
 		type = 'number',
 		min = 200,
@@ -99,7 +90,6 @@ options = {
 		value = 260,
 	},
 	window_height  = {
-		name = 'Height 60-120',
 		desc = '',
 		type = 'number',
 		min = 40,
@@ -108,7 +98,6 @@ options = {
 	},
 	
 	window_timeout = {
-		name = 'Timeout (5 - 50)',
 		desc = '',
 		type = 'number',
 		min = 5,
@@ -116,8 +105,6 @@ options = {
 		value = 20,
 	},
 	firstbubble_y = {
-		name = 'Screen Height of First Bubble',
-		desc = 'How high up the first bubble should start on the right of the screen.',
 		type = 'number',
 		min = 0,
 		max = 600,

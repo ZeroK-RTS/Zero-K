@@ -88,12 +88,11 @@ local teamApmStatsLabels = {}
 --------------------------------------------------------------------------------
 --options
 
+i18nPrefix = 'chiliendgamewindow_'
 options_path = 'Settings/HUD Panels/Stats Graph'
 options_order = {'togglestatsgraph'}
 options = {
 	togglestatsgraph = { type = 'button',
-		name = 'Toggle stats graph',
-		desc = 'Shows and hides the statistics graph.',
 		action = 'togglestatsgraph',
 		dontRegisterAction = true,
 	},

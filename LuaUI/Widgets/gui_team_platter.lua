@@ -117,23 +117,21 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'teamplatter_'
 options_path = 'Settings/Interface/Selection/Team Platters'
 options = {
   outlineOpacity = {
-      name = "Outline opacity (0 boosts performance)",
       type = 'number',
       value = 0, min = 0, max = 1, step = 0.05,
       --desc = "How much can be seen through the circle outline. The outline can removed completely by " ..
       --"setting this to 1, significantly enhancing performance",
   },
   fillOpacity = {
-      name = "Fill opacity",
       type = 'number',
       value = 0.4, min = 0, max = 1, step = 0.05,
       --desc = "How much can be seen through the circle fill",
   },
   extraRadius = {
-      name = "Platter size",
       type = 'number',
       value = 6, min = 0, max = 10, step = 0.5,
       --desc = "How much additional padding should be added to the circle radius in pixels",

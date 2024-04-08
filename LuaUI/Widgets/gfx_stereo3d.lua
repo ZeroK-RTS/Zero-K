@@ -261,20 +261,18 @@ local function UpdateConvSep()
 	conv = options.conv.value * swap
 end
 
+i18nPrefix = 'stereo3d_'
 options_path = 'Settings/Graphics/Effects/Stereo3D'
 options_order = { 'toggle3d', 'helpwindow', 'lblblank1', 'lblsettings', 'swapeyes', 'lasersight', 'hidecursor', 'sep', 'conv', 'lblblank2', 's3dmode', 'lblblank3',  }
 options = {
 	
 	toggle3d = {
-		name = 'Enable Stereo 3D',
 		type = 'bool',
 		value = false,
-		desc = 'Turn Stereo3D vision on or off.',
 		noHotkey = true,
 	},
 	
 	helpwindow = {
-		name = 'Stereo3D Help',
 		type = 'text',
 		value = [[
 			- Press alt+ctrl+shift to toggle the mouse cursor (doesn't work if gui is hidden).
@@ -287,51 +285,44 @@ options = {
 		]],
 	},
 	
-	lblsettings = {name='Settings', type='label'},
+	lblsettings = {
+		type='label',
+	},
 	
 	swapeyes = {
-		name = 'Swap Eyes',
 		type = 'bool',
 		value = false,
 		OnChange = UpdateConvSep,
 		noHotkey = true,
 	},
 	lasersight = {
-		name = 'Laser Sight',
 		type = 'bool',
 		value = true,
-		desc = 'Enable Laser sight for cursor.',
 		noHotkey = true,
 	},
 	
 	hidecursor = {
-		name = 'Hide Cursor',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	
 	sep = {
-		name = 'Separation',
 		type = 'number',
 		value = sep,
 		min=0,max=30,step=0.1,
-		desc = 'How far apart your eyes are.',
 		OnChange = UpdateConvSep,
 	},
 	
 	conv = {
-		name = 'Convergence',
 		type = 'number',
 		value = conv,
 		min=0,max=0.05,step=0.001,
-		desc = 'How crosseyed you are.',
 		OnChange = UpdateConvSep,
 	},
 	
 	
 	s3dmode = {
-		name   = '3D Modes',
 		type   = 'list',
 		items  = possibleRenderer,
 		OnChange = function()
@@ -349,7 +340,6 @@ options = {
 	
 	--[[
 	camera = {
-		name = 'Camera Type',
 		type = 'list',
 		items = {
 			{name = 'Default', 	            key = 'viewta'},

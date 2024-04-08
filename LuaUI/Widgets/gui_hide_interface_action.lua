@@ -68,12 +68,11 @@ function widget:Update()
 	widgetHandler:RemoveCallIn("Update")
 end
 
+i18nPrefix = 'hideinterfaceandmousecursor_'
 options_path = 'Settings/HUD Panels/Extras'
 
 options = {
 	hideinterfaceandcursor = {
-		name = 'Hide Interface',
-		desc = 'Toggle to show/hide the interface and mouse cursor.',
 		hotkey = {key = 'f5', mod = 'C'},
 		type = 'button',
 		action = 'hideinterfaceandcursor',
@@ -89,7 +88,6 @@ options = {
 		end,
 	},
 	cursor_animated = {
-		name = 'Large cursor',
 		desc = 'Double cursor size. WARNING: won\'t render cursors at all on some older graphics cards!',
 		type = 'bool',
 		value = false,

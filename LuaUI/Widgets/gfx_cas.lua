@@ -178,11 +178,11 @@ local function UpdateShader()
 	end
 end
 
+i18nPrefix = 'contrastadaptivesharpen_'
 options_path = 'Settings/Graphics/Effects/CAS'
 options_order = {'cas_sharpness6', 'cas_height_scale2', 'cas_height_scale2_start', 'cas_height_scale2_end'}
 options = {
 	cas_sharpness6 = {
-		name = 'Sharpening',
 		type = 'number',
 		value = defaultValue, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
 		min = 0.0,
@@ -198,7 +198,6 @@ options = {
 		update_on_the_fly = true,
 	},
 	cas_height_scale2 = {
-		name = 'Zoom sharpening range',
 		type = 'number',
 		value = 0.2,
 		min = 0,
@@ -214,7 +213,6 @@ options = {
 		update_on_the_fly = true,
 	},
 	cas_height_scale2_start = {
-		name = 'Zoom start',
 		type = 'number',
 		value = 800, 
 		min = 0.05,
@@ -230,7 +228,6 @@ options = {
 		update_on_the_fly = true,
 	},
 	cas_height_scale2_end = {
-		name = 'Zoom end',
 		type = 'number',
 		value = 6000, 
 		min = 0,

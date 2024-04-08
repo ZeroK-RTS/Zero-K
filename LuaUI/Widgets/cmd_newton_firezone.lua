@@ -106,13 +106,15 @@ local alwaysDrawFireZones = false
 local transportPredictLevel = 1
 local transportPredictionSpeedSq = 5^2
 
+i18nPrefix = 'newtonfirezone_'
 options_path = 'Settings/Interface/Falling Units'--/Formations'
 options_order = { 'lbl_newton', 'predictNewton', 'alwaysDrawZones', 'jumpOnPrediction', 'lbl_transports', 'predictDrop', 'transportSpeed'}
 options = {
-	lbl_newton = { name = 'Newton Launchers', type = 'label'},
+	lbl_newton = {
+		type = 'label',
+	},
 	predictNewton = {
 		type='radioButton',
-		name='Predict impact location for',
 		items = {
 			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge."},
 			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predited."},
@@ -134,8 +136,6 @@ options = {
 		end,
 	},
 	alwaysDrawZones = {
-		name = "Always draw firezones",
-		desc = "Enable to always draw Newton firezones. Otherwise they are only drawn on selection.",
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
@@ -143,15 +143,14 @@ options = {
 		end,
 	},
 	jumpOnPrediction = {
-		name = "Jump on prediction",
-		desc = "Enable to have jumpjet units jump to the predicted land location.",
 		type = 'bool',
 		value = true,
 	},
-	lbl_transports = { name = 'Transports', type = 'label'},
+	lbl_transports = {
+		type = 'label'
+	},
 	predictDrop = {
 		type='radioButton',
-		name='Predict transport drop location for',
 		items = {
 			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted."},
 			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop loction predicted."},
@@ -170,8 +169,6 @@ options = {
 		end,
 	},
 	transportSpeed = {
-		name = "Drop prediction speed threshold",
-		desc = "Draw prediction for transports above this speed.",
 		type = 'number',
 		min = 0, max = 8, step = 0.2,
 		value = 5,

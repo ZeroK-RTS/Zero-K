@@ -14,11 +14,21 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+i18nPrefix = 'replacecloakconorders_'
 options_path = 'Settings/Unit Behaviour/Replace Cloak Con Orders'
 options = {
-	reclaim = {name='Replace Reclaim', type='bool', value=true},
-	resurrect = {name='Replace Resurrect', type='bool', value=true},
-	repair = {name='Replace Repair', type='bool', value=true},
+	reclaim = {
+		type='bool',
+		value=true,
+	},
+	resurrect = {
+		type='bool',
+		value=true,
+	},
+	repair = {
+		type='bool',
+		value=true,,
+	},
 }
 
 function widget:CommandNotify(id, params, cmdOptions)

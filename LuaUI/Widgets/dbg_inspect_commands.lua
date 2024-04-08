@@ -33,12 +33,11 @@ local function ActivateOnSelectedUnits()
 	end
 end
 
+i18nPrefix = 'inspectcommands_'
 options_path = 'Settings/Toolbox/Inspect Commands'
 options_order = {'enableOnSelection'}
 options = {
 	enableOnSelection = {
-		name = "Set units",
-		desc = "Sets the selected units to command inspection mode",
 		type = "button",
 		OnChange = ActivateOnSelectedUnits,
 	},

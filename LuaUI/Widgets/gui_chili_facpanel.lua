@@ -56,19 +56,18 @@ local echo = Spring.Echo
 local function RecreateFacbar() end
 local function UpdateFactoryList () end
 
+i18nPrefix = 'chilifactorypanel_'
 options_path = 'Settings/HUD Panels/FactoryPanel'
 options = {
 	
 	buttonsize = {
 		type = 'number',
-		name = 'Button Size',
 		min = 40, max = 100, step=5,
 		value = 50,
 		OnChange = function() RecreateFacbar() end,
 	},
 	
 	backgroundOpacity = {
-		name = "Background opacity",
 		type = "number",
 		value = 1, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
@@ -78,17 +77,13 @@ options = {
 		end,
 	},
 	showAllPlayers = {
-		name = "Show All Players",
 		type = 'bool',
-		desc = 'When spectating, show the factory queues of all players. When disabled, only shows the factory queue of the currently spectated player.',
 		value = false,
 		OnChange = function() UpdateFactoryList() end,
 	},
 	
 	showETA = {
-		name = "Show ETA",
 		type = 'bool',
-		desc = 'Show ETA for the unit currently being built.',
 		value = true,
 		OnChange = function() RecreateFacbar() end,
 	},

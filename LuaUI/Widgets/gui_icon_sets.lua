@@ -7,12 +7,11 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
+i18nPrefix = 'iconsets_'
 options_path = 'Settings/Graphics/Unit Visibility/Radar Icons'
 options_order = { 'coniconchassis', 'ships' }
 options = {
 	coniconchassis = {
-		name = 'Show constructor chassis',
-		desc = 'Do constructor icons show chassis? Conveys more information but reduces visibility somewhat.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -45,8 +44,6 @@ options = {
 		end,
 	},
 	ships = {
-		name = 'Use standard ship icons',
-		desc = 'Do ships use the standarized chassis-role icons instead of hull shape pictograms?',
 		type = 'bool',
 		value = false,
 		noHotkey = true,

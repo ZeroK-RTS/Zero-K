@@ -13,10 +13,10 @@ end
 local END_FADE_TIME = 12
 local START_FADE_TIME = 8
 
+i18nPrefix = 'missileimpactpoints_'
 options_order = {"alpha", "thickness"}
 options = {
 	alpha = {
-		name = "Line opacity",
 		type = "number",
 		value = 0.6,
 		min = 0,
@@ -24,7 +24,6 @@ options = {
 		step = 0.01,
 	},
 	thickness = {
-		name = "Line thickness",
 		type = "number",
 		value = 3,
 		min = 1,

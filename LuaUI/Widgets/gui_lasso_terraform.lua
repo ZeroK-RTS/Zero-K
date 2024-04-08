@@ -83,52 +83,42 @@ local Grid = 16 -- grid size, do not change without other changes.
 ---------------------------------
 local HOTKEY_PATH = 'Hotkeys/Construction'
 
+i18nPrefix = 'lassoterraformgui_'
 options_path = 'Settings/Interface/Building Placement'
 options_order = {'catlabel', 'structure_holdMouse', 'structure_altSelect', 'staticMouseTime', 'staticMouseThreshold', 'label_preset', 'text_hotkey_level', 'text_hotkey_raise'}
 options = {
 	catlabel = {
-		name = 'Build Height',
 		type = 'label',
 	},
 	structure_holdMouse = {
-		name = "Terraform by holding mouse click",
 		type = "bool",
 		value = false, --[[ disabled by default because it is easy to accidentally enable this UI;
 		                    having your mouse anchored to a spot on your screen because you click
 		                    and hold for too long (likely to happen if you want to line build, or
 		                    are considering options) is really bad if you don't know what is coming ]]
-		desc = "When enabled, holding down the left mouse button while placing a structure will enter height selection mode.",
 	},
 	structure_altSelect = {
-		name = "Terraform by selecting with Alt",
 		type = "bool",
 		value = false,
-		desc = "When enabled, holding Alt while selecting a build option (either on the command card or with a hotkey) will cause height selection mode when the structure is placed.",
 	},
 	staticMouseTime = {
-		name = "Structure Terraform Press Time",
 		type = "number",
 		value = 1, min = 0, max = 10, step = 0.05,
 	},
 	staticMouseThreshold = {
-		name = "Mouse drag threshold",
 		type = "number",
 		value = 20, min = 0, max = 400, step = 1,
-		desc = "Dragging the mouse more than this many pixels to start registering as a mouse movement.",
 	},
 	label_preset = {
 		type = 'label',
-		name = 'Terraform Preset Hotkeys',
 		path = HOTKEY_PATH
 	},
 	text_hotkey_level = {
-		name = 'Level Presets',
 		type = 'text',
 		value = "These buttons can be bound to issue Level commands without the height selection step. Each preset is associated to a sliderbar which determines the height. The first four defaults (0, -8, -20, -24) block ships, let all units pass, block some units, and block land units.",
 		path = HOTKEY_PATH .. "/Level",
 	},
 	text_hotkey_raise = {
-		name = 'Raise Presets',
 		type = 'text',
 		value = "These buttons can be bound to issue Raise commands without the height adjustment step. Each preset is associated to a sliderbar which determines the amount raised or lowered. The first four values block vehicles (12, -12) and bots (24, -30).",
 		path = HOTKEY_PATH .. "/Raise",

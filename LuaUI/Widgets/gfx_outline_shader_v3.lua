@@ -1,7 +1,7 @@
-local wiName = "Outline Shader v3"
+
 function widget:GetInfo()
 	return {
-		name      = wiName,
+		name      = "Outline Shader v3",
 		desc      = "Displays small outline around units based on deferred g-buffer",
 		author    = "ivand",
 		date      = "2019",
@@ -10,6 +10,8 @@ function widget:GetInfo()
 		enabled   = false  --  loaded by default?
 	}
 end
+
+local wiName = widget:GetInfo().name
 
 -----------------------------------------------------------------
 -- Constants
@@ -42,11 +44,10 @@ local USE_MATERIAL_INDICES = true
 
 local functionScaleWithHeight = true
 
+i18nPrefix = 'outlineshaderv3_'
 options_path = 'Settings/Graphics/Unit Visibility/Outline v3'
 options = {
 	thickness = {
-		name = 'Outline Thickness',
-		desc = 'How thick the outline appears around objects (the thicker - the more expensive)',
 		type = 'number',
 		min = 1, max = 3, step = 1,
 		value = 1,
@@ -55,8 +56,6 @@ options = {
 		end,
 	},
 	functionScaleWithHeight = {
-		name = 'Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out',
 		type = 'bool',
 		value = true,
 		noHotkey = true,

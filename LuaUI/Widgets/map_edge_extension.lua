@@ -66,6 +66,7 @@ local function ResetWidget()
 	widget:Initialize()
 end
 
+i18nPrefix = 'mapedgeextension_'
 options_path = 'Settings/Graphics/Map Exterior'
 options_order = {'mapBorderStyle', 'drawForIslands', 'gridSizeExp', 'gridTextureSizeExp', 'fogEffect', 'curvature2', 'textureBrightness3', 'useShader'}
 options = {
@@ -73,7 +74,6 @@ options = {
     --when not, the map is drawn mirrored 8 times into a display list
 	mapBorderStyle = {
 		type='radioButton',
-		name='Exterior Effect',
 		items = {
 			{name = 'Texture',  key = 'texture', desc = "Mirror the heightmap and texture.",              hotkey = nil},
 			{name = 'Grid',     key = 'grid',    desc = "Mirror the heightmap with grid texture.",        hotkey = nil},
@@ -89,65 +89,50 @@ options = {
 		noHotkey = true,
 	},
 	drawForIslands = {
-		name = "Draw for islands",
 		type = 'bool',
 		value = false,
-		desc = "Draws mirror map when map is an island",
 		noHotkey = true,
 	},
 	useShader = {
-		name = "Use shader",
 		type = 'bool',
 		value = true,
 		advanced = true,
-		desc = 'Use a shader when mirroring the map',
 		OnChange = ResetWidget,
 		noHotkey = true,
 	},
 	gridSizeExp = {
-		name = "Heightmap resolution (2^n)",
 		type = 'number',
 		min = 5,
 		max = 8,
 		step = 1,
 		value = 5,
-		desc = '',
 		OnChange = ResetWidget,
 	},
 	gridTextureSizeExp = {
-		name = "Grid tile size (2^n)",
-		desc = "Cannot be less than heightmap resolution",
 		type = 'number',
 		min = 5,
 		max = 8,
 		step = 1,
 		value = 5,
-		desc = '',
 		OnChange = ResetWidget,
 	},
 	textureBrightness3 = {
-		name = "Texture Brightness",
 		type = 'number',
 		min = 0,
 		max = 1,
 		step = 0.01,
 		value = 0.29,
-		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
 		OnChange = ResetWidget,
 	},
 	fogEffect = {
-		name = "Edge Fog Effect",
 		type = 'bool',
 		value = false,
-		desc = 'Blurs the edges of the map slightly to distinguish it from the extension.',
 		OnChange = ResetWidget,
 		noHotkey = true,
 	},
 	curvature2 = {
-		name = "Curvature Effect",
 		type = 'bool',
 		value = true,
-		desc = 'Add a curvature to the extension.',
 		OnChange = ResetWidget,
 		noHotkey = true,
 	},

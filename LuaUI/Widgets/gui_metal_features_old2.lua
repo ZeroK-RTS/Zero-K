@@ -35,12 +35,11 @@ local spGetGameFrame = Spring.GetGameFrame
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'metalfeaturesveryold_'
 options_path = 'Settings/Interface/Reclaim Highlight/Old'
 options_order = { 'showhighlight','pregamehighlight','intensity','minmetal'}
 options = {
 	showhighlight = {
-		name = 'Show Reclaim',
-		desc = "When to highlight reclaimable features",
 		type = 'radioButton',
 		value = 'constructors',
 		items = {
@@ -55,8 +54,6 @@ options = {
 	},
 
 	intensity = {
-		name = 'Highlighted Reclaim Brightness',
-		desc = "Increase or decrease visibility of effect",
 		type = "number",
 		value = 100,
 		min = 20,
@@ -65,16 +62,12 @@ options = {
 	},
 
 	pregamehighlight = {
-		name = "Show Reclaim Before Round Start",
-		desc = "Enabled: Show reclaimable metal features before game begins \n Disabled: No highlights before game begins",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 	},
 
 	minmetal = {
-		name = 'Minimum Reclaim To Highlight',
-		desc = "Metal below this amount will not be highlighted",
 		type = "number",
 		value = 1,
 		min = 1,

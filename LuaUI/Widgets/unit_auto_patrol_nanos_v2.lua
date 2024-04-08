@@ -489,14 +489,13 @@ end
 --------------------------------------------------------------------------------
 -- Settings
 
+i18nPrefix = 'autopatrolnanosv2_'
 options_path = 'Settings/Unit Behaviour'
 options = {
 	patrol_idle_nanos = {
-		name = "Caretaker automation (v2)",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Caretakers will automatically find tasks when idle. They may assist, repair or reclaim. Also applies to Strider Hub.',
 		OnChange = function (self)
 			enableIdleNanos = self.value
 			if self.value then
@@ -505,11 +504,9 @@ options = {
 		end,
 	},
 	stop_disables = {
-		name = "Disable caretakers with stop (v2)",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Caretakers automation is put on hold with the Stop command. Automation resumes after any other command. Also applies to Strider Hub.',
 		OnChange = function (self)
 			stopHalts = self.value
 			if not self.value then

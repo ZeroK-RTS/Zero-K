@@ -16,12 +16,11 @@ local function ToggleCallins(self)
 	end
 end
 
+i18nPrefix = 'doubleclickattackmove_'
 options_path = 'Settings/Unit Behaviour'
 options = {
 	enabled = {
-		name = 'Double right-click to attack-move',
 		type = 'bool',
-		desc = 'Double right-click gives an Attack-Move order instead of Move.',
 		value = false,
 		noHotkey = true,
 		OnChange = ToggleCallins,

@@ -47,13 +47,13 @@ local toleranceTime = Spring.GetConfigInt('DoubleClickTime', 300) * 0.001 -- no 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'noises_'
 options_path = 'Settings/Audio'
 options_order = {
 'selectnoisevolume','ordernoisevolume','attacknoisevolume', 'commandSoundCooldown', 'selectSoundCooldown',
 }
 options = {
 	selectnoisevolume = {
-		name = 'Selection Volume',
 		type = "number",
 		value = 1,
 		min = 0,
@@ -63,7 +63,6 @@ options = {
 		everyMode = true,
 	},
 	ordernoisevolume = {
-		name = 'Command Volume',
 		type = "number",
 		value = 1,
 		min = 0,
@@ -73,7 +72,6 @@ options = {
 		everyMode = true,
 	},
 	attacknoisevolume = {
-		name = 'Commander Under Attack Volume',
 		type = "number",
 		value = 1,
 		min = 0,
@@ -83,7 +81,6 @@ options = {
 		everyMode = true,
 	},
 	commandSoundCooldown = {
-		name = 'Command Reply Cooldown',
 		type = "number",
 		value = 0.05,
 		min = 0,
@@ -91,7 +88,6 @@ options = {
 		step = 0.005,
 	},
 	selectSoundCooldown = {
-		name = 'Select Reply Cooldown',
 		type = "number",
 		value = toleranceTime,
 		min = 0,

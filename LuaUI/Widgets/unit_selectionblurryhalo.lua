@@ -22,6 +22,7 @@ local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'selectionblurryhalo2_'
 options_path = 'Settings/Interface/Selection/Blurry Halo Selections'
 
 options_order = {
@@ -32,23 +33,17 @@ options_order = {
 
 options = {
 	showAlly = {
-		name = 'Show Ally Selections',
 		type = 'bool',
-		desc = 'Highlight the units your allies currently have selected.',
 		value = true,
 	},
 	
 	thickness = {
-		name = 'Outline Thickness',
-		desc = 'How thick the outline appears around objects',
 		type = 'number',
 		min = 1, max = 16, step = 1,
 		value = 10,
     },
   
 	blur = {
-		name = 'Outline Blurriness',
-		desc = 'How smooth the outlines appear',
 		type = 'number',
 		min = 2, max = 16, step = 1,
 		value = 16,

@@ -10,11 +10,10 @@ function widget:GetInfo()
 	}
 end
 
+i18nPrefix = 'holdctrlduringplacementtomorph_'
 options_path = 'Settings/Unit Behaviour'
 options = {
 	enable_automorph = {
-		name = 'Morph buildings when placed with Ctrl',
-		desc = "If queued holding Ctrl, morphable buildings will start morphing when finished.",
 		type = 'bool',
 		value = false, -- not polished enough, see FIXMEs below
 		OnChange = function(self)

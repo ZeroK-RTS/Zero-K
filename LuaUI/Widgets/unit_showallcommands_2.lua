@@ -80,6 +80,7 @@ local function UpdateSelection(newSelectedUnits)
 end
 
 
+i18nPrefix = 'showallcommands_'
 options_path = 'Settings/Interface/Command Visibility'
 options_order = {
 'showallcommandselection','lbl_filters','includeallies', 'includealliesunits', 'includeneutral'
@@ -87,7 +88,6 @@ options_order = {
 options = {
 	showallcommandselection = {
 		type='radioButton',
-		name='Commands are drawn for',
 		items = {
 			{name = 'All units',key='showallcommand', desc="Command always drawn on all units.", hotkey=nil},
 			{name = 'Selected units, All with SHIFT',key='onlyselection', desc="Command always drawn on selected unit, pressing SHIFT will draw it for all units.", hotkey=nil},
@@ -121,16 +121,15 @@ options = {
 			end
 		end,
 	},
-	lbl_filters = {name='Filters', type='label'},
+	lbl_filters = {
+		type='label'
+	},
 	includeallies = {
-		name = 'Include ally selections',
 		desc = 'When showing commands for selected units, show them for both your own and your allies\' selections.',
 		type = 'bool',
 		value = false,
 	},
 	includealliesunits = {
-		name = 'Include ally units',
-		desc = 'When showing commands, show them for both your own and your allies units.',
 		type = 'bool',
 		value = true,
 		OnChange = function(self)
@@ -138,8 +137,6 @@ options = {
 		end,
 	},
 	includeneutral = {
-		name = 'Include Neutral Units',
-		desc = 'Toggle whether to show commands for neutral units (relevant while spectating).',
 		type = 'bool',
 		value = true,
 		OnChange = function(self)

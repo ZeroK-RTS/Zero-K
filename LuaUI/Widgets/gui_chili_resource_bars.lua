@@ -80,6 +80,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+i18nPrefix = 'chiliresourcebarsclassic_'
 options_path = 'Settings/HUD Panels/Resource Bars'
 
 local function option_workerUsageUpdate()
@@ -90,23 +91,40 @@ end
 options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve'}
  
 options = {
-	eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
-	onlyShowExpense = {name='Only Show Expense', type='bool', value=false},
-	enableReserveBar = {name='Enable Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
+	eexcessflashalways = {
+		type='bool',
+		value=false,
+	},
+	onlyShowExpense = {
+		type='bool',
+		value=false,
+	},
+	enableReserveBar = {
+		type='bool',
+		value=false,
+		tooltip = "Enables high priority reserve",
+	},
 	defaultEnergyReserve = {
-		name = "Initial Energy Reserve",
 		type = "number",
 		value = 0.05, min = 0, max = 1, step = 0.01,
 	},
 	defaultMetalReserve = {
-		name = "Initial Metal Reserve",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 	},
-	workerUsage = {name = "Show Worker Usage", type = "bool", value=false, OnChange = option_workerUsageUpdate},
-	energyFlash = {name = "Energy Stall Flash", type = "number", value=0.1, min=0,max=1,step=0.02},
+	workerUsage = {
+		type = "bool",
+		value=false,
+		OnChange = option_workerUsageUpdate,
+	},
+	energyFlash = {
+		type = "number",
+		value=0.1,
+		min=0,
+		max=1,
+		step=0.02,
+	},
 	opacity = {
-		name = "Opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,

@@ -99,12 +99,11 @@ local function PrintDrawBox()
 	end
 end
 
+i18nPrefix = 'outlineshadergl4_'
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
 options_order = {'thickness', 'scaleRange', 'scaleWithHeight', 'functionScaleWithHeight', 'disableWithUi', 'overrideDrawBox', 'overrideDrawBox_x', 'overrideDrawBox_y', 'overrideDrawBox_yoff'}
 options = {
 	thickness = {
-		name = 'Outline Thickness',
-		desc = 'How thick the outline appears around objects',
 		type = 'number',
 		min = 0.2, max = 5, step = 0.05,
 		value = DEFAULT_STRENGTH_MULT,
@@ -113,8 +112,6 @@ options = {
 		end,
 	},
 	scaleRange = {
-		name = 'Zoom Scale Minimum',
-		desc = 'Minimum outline thickness muliplier when zoomed out.',
 		type = 'number',
 		min = 0, max = 1, step = 0.01,
 		value = zoomScaleRange,
@@ -123,8 +120,6 @@ options = {
 		end,
 	},
 	scaleWithHeight = {
-		name = 'Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -133,8 +128,6 @@ options = {
 		end,
 	},
 	functionScaleWithHeight = {
-		name = 'Subtle Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -143,8 +136,6 @@ options = {
 		end,
 	},
 	disableWithUi = {
-		name = 'Disable with hidden UI',
-		desc = 'Toggles outlines with Ctrl+F5.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -155,8 +146,6 @@ options = {
 	
 	-- Debug
 	overrideDrawBox = {
-		name = 'Override draw box',
-		desc = 'Debug enabling below.',
 		type = 'bool',
 		value = false,
 		advanced = true,
@@ -174,7 +163,6 @@ options = {
 		end,
 	},
 	overrideDrawBox_x = {
-		name = 'Override X',
 		type = 'number',
 		min = 0, max = 300, step = 5,
 		value = 100,
@@ -184,7 +172,6 @@ options = {
 		end,
 	},
 	overrideDrawBox_y = {
-		name = 'Override Y',
 		type = 'number',
 		min = 0, max = 300, step = 5,
 		value = 100,
@@ -194,7 +181,6 @@ options = {
 		end,
 	},
 	overrideDrawBox_yoff = {
-		name = 'Override Y Offset',
 		type = 'number',
 		min = -200, max = 200, step = 5,
 		value = 0,

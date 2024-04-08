@@ -104,11 +104,10 @@ local scaleWithHeight = true
 local functionScaleWithHeight = true
 local zoomScaleRange = 0.5
 
+i18nPrefix = 'outlineshadergl3_'
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
 options = {
 	thickness = {
-		name = 'Outline Thickness',
-		desc = 'How thick the outline appears around objects',
 		type = 'number',
 		min = 0.2, max = 2, step = 0.01,
 		value = DEFAULT_STRENGTH_MULT,
@@ -118,8 +117,6 @@ options = {
 		end,
 	},
 	scaleRange = {
-		name = 'Zoom Scale Minimum',
-		desc = 'Minimum outline thickness muliplier when zoomed out.',
 		type = 'number',
 		min = 0, max = 1, step = 0.01,
 		value = zoomScaleRange,
@@ -129,8 +126,6 @@ options = {
 		end,
 	},
 	scaleWithHeight = {
-		name = 'Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -142,8 +137,6 @@ options = {
 		end,
 	},
 	functionScaleWithHeight = {
-		name = 'Subtle Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
