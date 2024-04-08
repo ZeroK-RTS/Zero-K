@@ -75,10 +75,6 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
 
-		if GG.FieldConstruction_NotifyPlop then
-			GG.FieldConstruction_NotifyPlop(builderID, unitID, unitDefID)
-		end
-
 		-- FIXME: temporary hack because I'm in a hurry
 		-- proper way: get rid of all the useless shit in modstats, reenable and collect plop stats that way (see above)
 		local str = "SPRINGIE:facplop," .. UnitDefs[unitDefID].name .. "," .. teamID .. "," .. select(6, Spring.GetTeamInfo(teamID, false)) .. ","

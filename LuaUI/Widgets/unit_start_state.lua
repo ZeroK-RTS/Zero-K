@@ -1293,6 +1293,9 @@ local function CheckBlueprintDefault(unitID, unitDefID, ud, builderID)
 	if not copyId then
 		return
 	end
+	if Spring.GetUnitRulesParam(builderID, "fieldFactoryUnit") then
+		return
+	end
 	Spring.GiveOrderToUnit(builderID, CMD_FIELD_FAC_QUEUELESS, {unitID, copyId}, 0)
 end
 

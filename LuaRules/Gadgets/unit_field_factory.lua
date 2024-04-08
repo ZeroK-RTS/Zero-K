@@ -42,7 +42,7 @@ local fieldFacRange = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.field_factory then
-		fieldFacRange[unitDefID] = ud.buildDistance
+		fieldFacRange[unitDefID] = ud.buildDistance + 128
 	end
 end
 
@@ -175,7 +175,7 @@ local function TryToCopyBlueprint(unitID, unitDefID, targetID, doMovement)
 			end
 			return true
 		end
-		local distance = Spring.GetUnitSeparation(unitID, targetID, true)
+		local distance = Spring.GetUnitSeparation(unitID, targetID)
 		if distance <= fieldFacRange[unitDefID] and not temporaryProblem then
 			if canBuild[unitID] ~= nextDesiredUnitType[unitID] then
 				AddUnit(unitID, nextDesiredUnitType[unitID])
@@ -190,7 +190,7 @@ local function TryToCopyBlueprint(unitID, unitDefID, targetID, doMovement)
 	if not doMovement then
 		return true
 	end
-	Spring.SetUnitMoveGoal(unitID, x, y, z, fieldFacRange[unitDefID] - 16)
+	Spring.SetUnitMoveGoal(unitID, x, y, z, fieldFacRange[unitDefID] - 32)
 	return false
 end
 
@@ -249,24 +249,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- API
-
-function GG.FieldConstruction_NotifyPlop(unitID, factoryID, factoryDefID)
-	if not factoryDefID then
-		return
-	end
-	if canBuild[unitID] then
-		return
-	end
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	if not (unitDefID and fieldFacRange[unitDefID]) then
-		return
-	end
-	local buildList = UnitDefs[factoryDefID].buildOptions
-	if not buildList and buildList[2] then
-		return
-	end
-	AddUnit(unitID, buildList[2])
-end
 
 function GG.FieldConstruction_SetProduction(unitID, productionDefID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
