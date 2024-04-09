@@ -281,10 +281,15 @@ function widget:CommandNotify(cmdID, params, options)
 end
 
 function widget:MousePress(x,y,button)
-	if optionsWindow and not Chili.Screen0:IsAbove(x,y) then
-		optionsWindow:Dispose()
-		Spring.GiveOrder(CMD_FIELD_FAC_UNIT_TYPE, {-1}, 0)
-		optionsWindow = false
+	if optionsWindow then
+		if WG.uiScale and WG.uiScale ~= 1 then
+			x, y = x/WG.uiScale, y/WG.uiScale
+		end
+		if not Chili.Screen0:IsAbove(x,y) then
+			optionsWindow:Dispose()
+			Spring.GiveOrder(CMD_FIELD_FAC_UNIT_TYPE, {-1}, 0)
+			optionsWindow = false
+		end
 	end
 end
 
