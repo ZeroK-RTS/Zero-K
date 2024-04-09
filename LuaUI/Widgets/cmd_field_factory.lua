@@ -96,6 +96,12 @@ local function GetOptionsPosition(width, height)
 			end
 		end
 		
+		if x < 2 then
+			x = 2
+		end
+		if y < 2 then
+			y = 2
+		end
 		if x + width > screenWidth - 2 then
 			x = screenWidth - width - 2
 		end
