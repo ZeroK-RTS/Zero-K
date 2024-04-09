@@ -175,7 +175,7 @@ local function TryToCopyBlueprint(unitID, unitDefID, targetID, doMovement)
 			end
 			return true
 		end
-		local distance = Spring.GetUnitSeparation(unitID, targetID)
+		local distance = Spring.GetUnitSeparation(unitID, targetID, true)
 		if distance <= fieldFacRange[unitDefID] and not temporaryProblem then
 			if canBuild[unitID] ~= nextDesiredUnitType[unitID] then
 				AddUnit(unitID, nextDesiredUnitType[unitID])
