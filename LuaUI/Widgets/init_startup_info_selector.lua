@@ -176,6 +176,9 @@ end
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
+	if WG.uiScale and WG.uiScale ~= 1 then
+		vsx, vsy = vsx/(WG.uiScale or 1), vsy/(WG.uiScale or 1)
+	end
 	if mainWindow then
 		mainWindow:SetPos(
 			math.floor((vsx - WINDOW_WIDTH)/2),
