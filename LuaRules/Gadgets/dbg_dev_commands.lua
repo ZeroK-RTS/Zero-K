@@ -835,6 +835,22 @@ local function PrintUnits(cmd, line, words, player)
 	end
 end
 
+local function GiveMexes(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+
+	local spots = GG.metalSpots
+	if not spots then
+		return
+	end
+
+	for i = 1, #spots do
+		local spot = spots[i]
+		Spring.CreateUnit("staticmex", spot.x, 0, spot.z, 0, 0)
+	end
+end
+
 local function PlaceBattle(cmd, line, words, player)
 	if not Spring.IsCheatingEnabled() then
 		return
@@ -907,6 +923,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "power", power, "Remove grid power limit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "printunits",  PrintUnits, "")
 	gadgetHandler.actionHandler.AddChatAction(self, "battle",  PlaceBattle, "")
+	gadgetHandler.actionHandler.AddChatAction(self, "mexes",  GiveMexes, "")
 
 	gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 end
