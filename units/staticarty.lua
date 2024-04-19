@@ -60,7 +60,7 @@ return { staticarty = {
       mainDir            = [[0 0 1]],
       maxAngleDif        = 180,
 	 -- stopBurstWhenOutOfArc = false,
-	  stopBurstWhenOutOfArc = true,
+	  stopBurstWhenOutOfArc = false,
     },
 
   },
@@ -90,6 +90,7 @@ return { staticarty = {
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:330rlexplode]],
       fireStarter             = 120,
+      firetolerance             = 5555,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
