@@ -16,7 +16,7 @@ return { staticarty = {
 
   customParams                  = {
     keeptooltip = [[any string I want]],
-    neededlink  = 50,
+    neededlink  = 0,
     pylonrange  = 50,
     aimposoffset   = [[0 26 0]],
     midposoffset   = [[0 10 0]],
@@ -57,6 +57,10 @@ return { staticarty = {
       def                = [[PLASMA]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 180,
+	 -- stopBurstWhenOutOfArc = false,
+	  stopBurstWhenOutOfArc = true,
     },
 
   },
@@ -69,8 +73,8 @@ return { staticarty = {
       areaOfEffect            = 192,
       avoidFeature            = false,
       avoidGround             = true,
-      burst                   = 3,
-      burstRate               = 0.133,
+      burst                   = 15,
+      burstRate               = 0.333,
       craterBoost             = 1,
       craterMult              = 2,
 
