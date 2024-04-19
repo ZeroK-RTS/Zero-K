@@ -196,6 +196,14 @@ local function SetMapTexture(texturePool, mapTexX, mapTexZ, topTexX, topTexZ, to
 			tex10 = 10,
 			tex11 = 11,
 		},
+		uniformFloat = {
+			phaseHeights = config.phaseHeights or
+				{ 60,  85, -- beach ends at 60, dirt starts at 85 (transition inbetween)
+				 110, 145, -- dirt ends at 110, lowland grass starts at 145
+				 180, 210, -- lowland, highland grass
+				 255, 380, -- highland g., mountains
+			},
+		},
 	})
 
 	Spring.Echo(gl.GetShaderLog())
