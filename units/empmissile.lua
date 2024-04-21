@@ -77,6 +77,7 @@ return { empmissile = {
 
       edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:EMPMISSILE_EXPLOSION]],
+      explosionSpeed          = 4.5,
       fireStarter             = 0,
       flightTime              = 20,
       impulseBoost            = 0,

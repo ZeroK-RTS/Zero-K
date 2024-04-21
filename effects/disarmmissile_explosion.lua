@@ -1,4 +1,4 @@
--- empmissile_explosion
+-- disarmmissile_explosion
 
 -- based on gundam_powerplant_explosion.lua
 
