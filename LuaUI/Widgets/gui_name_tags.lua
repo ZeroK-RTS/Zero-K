@@ -142,7 +142,7 @@ end
 
 local function _removeUnit(unitTeam, unitID)
 	unitsByTeam[unitTeam][unitID] = nil
-	if teamAvatars[unitTeam] and teamAvatars[unitTeam][1] == unitID then
+	if teamAvatars[unitTeam] and teamAvatars[unitTeam][2] == unitID then
 		teamAvatars[unitTeam] = nil
 		teamCheckDelays[unitTeam] = 0
 	end
@@ -261,13 +261,13 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	_removeUnit(unitTeam, unitID)
 end
 
-function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
+function widget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 	_removeUnit(oldTeam, unitID)
-	_addUnit(unitTeam, unitID, unitDefID)
+	_addUnit(newTeam, unitID, unitDefID)
 end
 
-function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-	_removeUnit(unitTeam, unitID)
+function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+	_removeUnit(oldTeam, unitID)
 	_addUnit(newTeam, unitID, unitDefID)
 end
 
