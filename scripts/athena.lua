@@ -2,6 +2,8 @@ local fuselage = piece 'fuselage'
 local head = piece 'head'
 local wingl = piece 'wingl'
 local wingr = piece 'wingr'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 local enginel = piece 'enginel'
 local enginer = piece 'enginer'
 local arm = piece 'arm'
@@ -32,6 +34,10 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
+	Move(wingtipl, x_axis, -0.6)
+	Move(wingtipl, z_axis, -6)
+	Move(wingtipr, x_axis, 0.6)
+	Move(wingtipr, z_axis, -6)
 end
 
 function script.Activate()
