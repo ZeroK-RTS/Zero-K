@@ -142,7 +142,7 @@ end
 
 local function _removeUnit(unitTeam, unitID)
 	unitsByTeam[unitTeam][unitID] = nil
-	if teamAvatars[unitTeam] and teamAvatars[unitTeam][2] == unitID then
+	if teamAvatars[unitTeam] and teamAvatars[unitTeam][1] == unitID then
 		teamAvatars[unitTeam] = nil
 		teamCheckDelays[unitTeam] = 0
 	end
@@ -180,8 +180,8 @@ local function _GetScreenCoords(unitID)
 	return spWorldToScreenCoords(ux, uy, uz)
 end
 
-local function _DrawTeamName(unitID, attributes)
-	local teamID, _, height, scale = unpack(attributes)
+local function _DrawTeamName(teamID, attributes, scale)
+	local unitID, height = unpack(attributes)
 	glTranslate(0, height, 0)
 	glScale(scale, scale, scale)
 	glBillboard()
@@ -228,19 +228,18 @@ local function _DrawTeamNames()
 				end
 			end
 			if bestUnitID ~= nil and bestHeight ~= nil then
-				teamAvatars[teamID] = { teamID, bestUnitID, bestHeight }
+				teamAvatars[teamID] = { bestUnitID, bestHeight }
 			end
 		end
 	end
 
 	local cx, cy, cz = spGetCameraPosition()
-	for _, attributes in pairs(teamAvatars) do
+	for teamID, attributes in pairs(teamAvatars) do
 		-- Log scale the text so that it's readable over a wider range whilst still being world rendered
-		local unitID = attributes[2]
+		local unitID = attributes[1]
 		local ux, uy, uz = spGetUnitPosition(unitID)
 		local cDistance = _length(cx - ux, cy - uy, cz - uz)
-		attributes[4] = log(cDistance / 32, 2)
-		glDrawFuncAtUnit(unitID, false, _DrawTeamName, unitID, attributes)
+		glDrawFuncAtUnit(unitID, false, _DrawTeamName, teamID, attributes, log(cDistance / 32, 2))
 	end
 
 	glColor(1, 1, 1, 1)
