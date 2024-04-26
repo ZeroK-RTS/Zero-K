@@ -892,9 +892,12 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 			alreadyRemovedTag[cmdTag] = true
 			spGiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, CMD.OPT_CTRL)
 			if reinsertPosition then
-				local opts = thisCmd.options
-				local coded = opts.coded
-				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
+				-- Should we preserve opts? All this would do is preserve whether an alt-inserted
+				-- command should be removed from a repeat queue. Is that even desirable for a 
+				-- block that has been moved though?
+				--local opts = thisCmd.options
+				--local coded = opts.coded
+				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, CMD.OPT_CTRL + CMD.OPT_ALT)
 			end
 			j = j + 1
 		end
