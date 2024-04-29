@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
-    layer     = -12,
+    layer     = -12, -- above gui_name_tags
     enabled   = true,  -- loaded by default?
   }
 end
