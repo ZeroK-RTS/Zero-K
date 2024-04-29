@@ -7,7 +7,7 @@ function widget:GetInfo()
 		license = "GNU GPL, v2 or later",
 		-- Somewhere between layer -40 and -30 GetUnitUnderCursor starts
 		-- returning nil before GetUnitsInSelectionBox includes that unit.
-		layer = -30,
+		layer = -8, -- Draw below health bars and selection.
 		enabled = true,
 	}
 end
