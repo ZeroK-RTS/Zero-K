@@ -88,11 +88,11 @@ end
 
 function script.Create()
 	Hide( radardish)
-	Hide( depthcharge1)
-	Hide( depthcharge2)
-	Hide( depthcharge3)
-	Hide( depthcharge4)
-	Hide( depthcharge5)
+	--Hide( depthcharge1)
+	--Hide( depthcharge2)
+	--Hide( depthcharge3)
+	--Hide( depthcharge4)
+	--Hide( depthcharge5)
 	
 	Move(wake1, z_axis, 1)
 	Move(wake2, z_axis, 1)
