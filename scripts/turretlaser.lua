@@ -43,6 +43,8 @@ end
 function script.Create()
 	local ud = UnitDefs[unitDefID]
 	local midTable = ud.model
+	Spin (body, y_axis, 1, 1)
+	Move(body, y_axis, 5)
 	
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 22, midTable.midz}
