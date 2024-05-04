@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author  = "fiendicus_prime",
 		date    = "2023-11-29",
 		license = "GNU GPL, v2 or later",
-		layer   = -9,
+		layer   = -11, -- above unit_healthbars, below unit_icons
 		enabled = false
 	}
 end
