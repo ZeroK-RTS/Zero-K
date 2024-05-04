@@ -1,18 +1,23 @@
 local RET_FALSE  = function() return false end
+local RET_TRUE   = function() return true end
 local RET_NONE   = function() end
 local RET_TABLE  = function() return {} end
 local RET_ZERO   = function() return 0 end
 local RET_ONE    = function() return 1 end
 local RET_STRING = function() return "" end
 
---[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
-     though this can only happen for random people's forks since regular BAR & Spring build
-     systems both hardcode the minor to 0. Assume we're on bleeding edge in that case. ]]
-if not Script.IsEngineMinVersion(1, 0, 0) then
-	Script.IsEngineMinVersion = function (major, minor, commit)
-		return true
-	end
+if not Script then
+	Script = { IsEngineMinVersion = RET_FALSE }
+elseif not Script.IsEngineMinVersion(1, 0, 0) then
+	-- For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
+	-- though this can only happen for random people's forks since regular BAR & Spring build
+	-- systems both hardcode the minor to 0. Assume we're on bleeding edge in that case.
+	Script.IsEngineMinVersion = RET_TRUE
 end
+
+-- Parser envs don't have it; some are actually "synced",
+-- such as modrules, but we cannot tell from here
+Script.GetSynced = Script.GetSynced or RET_FALSE
 
 if Script.IsEngineMinVersion(104, 0, 50) then
 	local origGetGroundInfo = Spring.GetGroundInfo
@@ -83,6 +88,8 @@ if Script.IsEngineMinVersion(104, 0, 536) then
 	end
 end
 
+Game = Game or {} -- 104-331 for defs; still missing from some like modrules
+Game.gameSpeed = Game.gameSpeed or 30 -- 104-331
 Game.speedModClasses = Game.speedModClasses or -- 104-756
 	{ Tank  = 0
 	, KBot  = 1
