@@ -1086,7 +1086,7 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 		if option.type == 'bool' then
 			newval = IntToBool(newval)
 		end
-	else
+	elseif not option.noSave then
 		--load option from widget settings (LuaUI/Config/ZK_data.lua).
 		--Read/write is handled by widgethandler; see widget:SetConfigData and widget:GetConfigData
 		if settings.config[fullkey] ~= nil then --nil check as it can be false
