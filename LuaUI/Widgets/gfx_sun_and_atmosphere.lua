@@ -165,7 +165,7 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		fixDefaultWater = options.override_water_with_default.value or nil,
+		fixDefaultWater = options.override_water_with_default.value,
 		sun             = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
 		direction       = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
 		fog             = fogSettingsChanged       and GetOptionsTable(fogPath),
@@ -277,8 +277,8 @@ local function LoadSunAndFogSettings()
 		ResetWater()
 	end
 	
-	if override.fixDefaultWater then
-		fixDefaultWater = true
+	if override.fixDefaultWater ~= nil then
+		fixDefaultWater = override.fixDefaultWater
 		ApplyDefaultWaterFix()
 	end
 end
@@ -353,6 +353,7 @@ local function GetOptions()
 				end
 			end,
 			developmentOnly = true,
+			noSave = true,
 			path = path
 		}
 		options_order[#options_order + 1] = name
@@ -373,6 +374,7 @@ local function GetOptions()
 				end
 			end,
 			developmentOnly = true,
+			noSave = true,
 			path = path
 		}
 		options_order[#options_order + 1] = name
@@ -416,6 +418,7 @@ local function GetOptions()
 			end
 		end,
 		developmentOnly = true,
+		noSave = true,
 		path = sunPath
 	}
 	options_order[#options_order + 1] = "sunDir"
@@ -432,6 +435,7 @@ local function GetOptions()
 			end
 		end,
 		developmentOnly = true,
+		noSave = true,
 		path = sunPath
 	}
 	options_order[#options_order + 1] = "sunPitch"
@@ -471,6 +475,7 @@ local function GetOptions()
 		type = 'bool',
 		desc = "Overrides all the water settings with a decent default.",
 		developmentOnly = true,
+		noSave = true,
 		OnChange = ToggleDefaultWater,
 	})
 	AddOption("save_map_settings", {
