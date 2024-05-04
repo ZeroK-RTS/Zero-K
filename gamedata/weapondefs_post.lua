@@ -453,7 +453,7 @@ end
 
      The version check is because the fast path used to
      be broken and instead ghosted through everything. ]]
-if Script and Script.IsEngineMinVersion(105, 0, 1578) then
+if Script.IsEngineMinVersion(105, 0, 1578) then
 	local anyFirePlatformExists = false
 	for name, ud in pairs(UnitDefs) do
 		if ud.isfireplatform then

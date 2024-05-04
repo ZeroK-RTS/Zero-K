@@ -1,3 +1,5 @@
+VFS.Include("LuaRules/engine_compat.lua", nil, VFS.GAME)
+
 local VFS = VFS
 local vfsInclude = VFS.Include
 local vfsDirList = VFS.DirList
