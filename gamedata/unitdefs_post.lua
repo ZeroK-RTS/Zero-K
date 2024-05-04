@@ -1093,3 +1093,11 @@ if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
 		end
 	end
 end
+
+if not Script or not Script.IsEngineMinVersion(105, 0, 2365) then
+	for name, ud in pairs(UnitDefs) do
+		if ud.trackstretch then
+			ud.trackstretch = 1 / ud.trackstretch
+		end
+	end
+end
