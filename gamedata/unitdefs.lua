@@ -4,7 +4,7 @@ local VFS = VFS
 local orig_VFS_Include = VFS.Include
 local VFS_GAME = VFS.GAME
 local VFS_MAP = VFS.MAP
-local VFS_DirList = orig_VFS_Include('gamedata/recursive_dir_list.lua', nil, VFS_GAME)
+local VFS_DirList = VFS.DirList
 
 local errors_during_loading = {}
 local function VFS_Include(filename, env, mode, recursive)

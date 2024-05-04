@@ -140,7 +140,6 @@ end
 
 -- needed here too, and gadget handler doesn't expose it
 VFS.Include('LuaGadgets/system.lua', nil, VFSMODE)
-VFS.Include('gamedata/VFSUtils.lua', nil, VFSMODE)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -634,7 +633,7 @@ function gadget:Initialize()
 
 	-- Recursively collect files below UNITSCRIPT_DIR.
 	local scriptFiles = {}
-	for _,filename in ipairs(RecursiveFileSearch(UNITSCRIPT_DIR, "*.lua", VFSMODE)) do
+	for _,filename in ipairs(VFS.DirList(UNITSCRIPT_DIR, "*.lua", VFSMODE, true)) do
 		local basename = Basename(filename)
 		scriptFiles[filename] = filename  -- for exact match
 		scriptFiles[basename] = filename  -- for basename match

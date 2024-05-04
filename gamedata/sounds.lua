@@ -130,7 +130,6 @@ local Sounds = {
 --------------------------------------------------------------------------------
 -- Automagical sound handling
 --------------------------------------------------------------------------------
-local VFSUtils = VFS.Include('gamedata/VFSUtils.lua')
 
 local optionOverrides = {
 	["weapon/missile/missile_launch_short"] = {
@@ -174,7 +173,7 @@ local ignoredExtensions = {
 local function AutoAdd(subDir, generalOpts)
 	generalOpts = generalOpts or {}
 
-	local dirList = RecursiveFileSearch("sounds/" .. subDir)
+	local dirList = VFS.DirList("sounds/" .. subDir, nil, nil, true)
 	for i = 1, #dirList do
 		local fullPath = dirList[i]
 		local pathPart, ext = fullPath:match("sounds/(.*)%.(.*)")
