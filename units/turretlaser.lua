@@ -20,7 +20,7 @@ return { turretlaser = {
     outline_x = 70,
     outline_y = 100,
     outline_yoff = 32.5,
-    model_rescale = 0.5,
+    model_rescale = 0.8,
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],
