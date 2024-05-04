@@ -34,7 +34,9 @@ local shaderConfig = {
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir .. "LuaShader.lua")
-VFS.Include(luaShaderDir .. "instancevbotable.lua")
+if not VFS.Include(luaShaderDir .. "instancevbotable.lua") then
+	return
+end
 
 local vsSrcPath = "LuaUI/Widgets/Shaders/DrawPrimitiveAtUnit.vert.glsl"
 local gsSrcPath = "LuaUI/Widgets/Shaders/DrawPrimitiveAtUnit.geom.glsl"
