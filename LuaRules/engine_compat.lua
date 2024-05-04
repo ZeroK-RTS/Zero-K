@@ -449,6 +449,33 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 	end
 end
 
+if not Script.IsEngineMinVersion(105, 0, 1873) then
+	local vfsDirList = VFS.DirList
+	local vfsSubDirs = VFS.SubDirs
+
+	local function recursiveSearch(results, dir, pattern, modes)
+		local files = vfsDirList(dir, pattern, modes)
+		for i = 1, #files do
+			results[#results + 1] = files[i]
+		end
+
+		local subfolders = vfsSubDirs(dir, "*", modes)
+		for i = 1, #subfolders do
+			recursiveSearch(results, subfolders[i], pattern, modes)
+		end
+	end
+
+	VFS.DirList = function(dir, pattern, modes, recursive)
+		if not recursive then
+			return vfsDirList(dir, pattern, modes)
+		else
+			local results = {}
+			recursiveSearch(results, dir, pattern, modes)
+			return results
+		end
+	end
+end
+
 if not Spring.GetUnitEffectiveBuildRange then -- BAR 105-1882
 	local spGetUnitBuildParams = Spring.GetUnitBuildParams
 	Spring.GetUnitEffectiveBuildRange = function(unitID, unitDefID)
