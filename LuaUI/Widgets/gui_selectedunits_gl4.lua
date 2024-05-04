@@ -305,6 +305,10 @@ function Init()
 	end
 
 	local DPatUnit = VFS.Include(luaShaderDir .. "DrawPrimitiveAtUnit.lua")
+	if not DPatUnit then
+		return false
+	end
+
 	local InitDrawPrimitiveAtUnitShader = DPatUnit.InitDrawPrimitiveAtUnitShader
 	local InitDrawPrimitiveAtUnitVBO = DPatUnit.InitDrawPrimitiveAtUnitVBO
 	local shaderConfig = DPatUnit.shaderConfig

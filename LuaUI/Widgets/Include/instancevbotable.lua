@@ -1,3 +1,7 @@
+if not gl.GetVBO then
+	return false
+end
+
 function makeInstanceVBOTable(layout, maxElements, myName, unitIDattribID)
 	-- layout: this must be an array of tables with at least the following specified: {{id = 1, name = 'optional', size = 4}}
 	-- maxElements: will be dynamic anyway, but defaults to 64
@@ -1238,3 +1242,7 @@ function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/
 
 	return sphereVBO, numVerts, sphereIndexVBO, #VBOData
 end
+
+-- FIXME it should return a table with all the API above
+-- instead of polluting the global namespace
+return true

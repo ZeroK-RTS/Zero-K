@@ -272,8 +272,8 @@ end
 
 function widget:Initialize()
 	WG.SSAO_DeferredRenderingDisabled = SSAO_DeferredRenderingDisabled
-	if not gl.CreateShader then -- no shader support, so just remove the widget itself, especially for headless
-		Spring.Echo("SSAO: gl.CreateShader not found, disabling.")
+	if not gl.CreateShader or not gl.RawBindFBO then -- no shader support, so just remove the widget itself, especially for headless
+		Spring.Echo("SSAO: gl.CreateShader or gl.RawBindFBO not found, disabling.")
 		widgetHandler:RemoveWidget()
 		return
 	end
