@@ -2,6 +2,7 @@ include "constants.lua"
 include "bombers.lua"
 include "fixedwingTakeOff.lua"
 
+
 local base = piece 'likho2024'
 local wing1 = piece 'wing_L'
 local wing2 = piece 'wing_R'
@@ -27,10 +28,13 @@ local cooling = false
 
 local function UpdateCooling()
 	if not armed and not cooling then
+		Show(coolerL)
+		Show(coolerR)
 		Turn(hatchL, y_axis, math.rad(-90), 2)
 		Turn(hatchR, y_axis, math.rad( 90), 2)
 		Move(coolerL, z_axis, 3, 1)
 		Move(coolerR, z_axis, 3, 1)
+		Spin(ball, y_axis, 0)
 		cooling = true
 	end
 
@@ -39,6 +43,11 @@ local function UpdateCooling()
 		Move(coolerR, z_axis, 0, 2)
 		Turn(hatchL, y_axis, math.rad(0), 1)
 		Turn(hatchR, y_axis, math.rad(0), 1)
+		Spin(ball, y_axis, math.rad(30))
+		WaitForTurn (hatchL, y_axis)
+		WaitForTurn (hatchR, y_axis)
+		Hide(coolerL)
+		Hide(coolerR)
 		cooling = false
 	end
 end
@@ -59,10 +68,7 @@ local function Reball()
 	end
 end
 
-local function Stopping()
-	Signal(SIG_move)
-	SetSignalMask(SIG_move)
-
+local function LandOld()
 	Turn(wingletL, z_axis, math.rad(-30), 3)
 	Turn(wingletR, z_axis, math.rad( 30), 3)
 
@@ -80,8 +86,106 @@ local function Stopping()
 
 	Turn(wing1, x_axis, math.rad(6), 2)
 	Turn(wing2, x_axis, math.rad(6), 2)
+end
 
+local function Land()
+	Turn(wingletL, z_axis, math.rad(-30), 3)
+	Turn(wingletR, z_axis, math.rad( 30), 3)
+
+	WaitForTurn (wingletL, z_axis)
+	WaitForTurn (wingletR, z_axis)
+
+	Turn(wingletL, z_axis, math.rad(-146.3), 2)
+	Turn(wingletR, z_axis, math.rad( 146.3), 2)
+
+	Move(wing1, x_axis, -7, 6)
+	Move(wing2, x_axis,  7, 6)
+
+	Move(wing1, y_axis, -9, 8)
+	Move(wing2, y_axis, -9, 8)
+
+	WaitForTurn (wingletL, z_axis)
+	WaitForTurn (wingletR, z_axis)
+
+	Move(wingletL, x_axis, -1, 3)
+	Move(wingletR, x_axis,  1, 3)
+end
+
+local function Stopping()
+	Signal(SIG_move)
+	SetSignalMask(SIG_move)
+
+	--LandOld()
+	Land()
 	Reball()
+end
+
+local function FlyOld()
+	Turn(wing1, y_axis, math.rad(0), 2)
+	Turn(wing2, y_axis, math.rad(0), 2)
+	Turn(wing1, z_axis, math.rad(0), 2)
+	Turn(wing2, z_axis, math.rad(0), 2)
+	Turn(wing1, x_axis, math.rad(0), 2)
+	Turn(wing2, x_axis, math.rad(0), 2)
+
+	Turn(wingletL, z_axis, math.rad(-30), 2)
+	Turn(wingletR, z_axis, math.rad( 30), 2)
+	WaitForTurn (wingletL, z_axis)
+	WaitForTurn (wingletR, z_axis)
+
+	Turn(wingletL, z_axis, math.rad(0), 1)
+	Turn(wingletR, z_axis, math.rad(0), 1)
+end
+
+local function Fly()
+	Move(wing1, x_axis, 0, 6)
+	Move(wing2, x_axis, 0, 6)
+	Move(wing1, y_axis, 0, 8)
+	Move(wing2, y_axis, 0, 8)
+
+	Move(wingletL, x_axis, 0, 3)
+	Move(wingletR, x_axis, 0, 3)
+	Turn(wingletL, z_axis, math.rad(-30), 2)
+	Turn(wingletR, z_axis, math.rad( 30), 2)
+	WaitForTurn (wingletL, z_axis)
+	WaitForTurn (wingletR, z_axis)
+
+	Turn(wingletL, z_axis, math.rad(0), 1)
+	Turn(wingletR, z_axis, math.rad(0), 1)
+end
+
+local function WingStart()
+	Move(wing1, x_axis, -7, 0)
+	Move(wing2, x_axis,  7, 0)
+	Move(wing1, y_axis, -9, 0)
+	Move(wing2, y_axis, -9, 0)
+
+	Turn(wingletL, z_axis, math.rad(-30), 0)
+	Turn(wingletR, z_axis, math.rad( 30), 0)
+	WaitForTurn (wingletL, z_axis)
+	WaitForTurn (wingletR, z_axis)
+
+	Turn(wingletL, z_axis, math.rad(-146.3), 0)
+	Turn(wingletR, z_axis, math.rad( 146.3), 0)
+	WaitForTurn (wingletL, z_axis)
+	WaitForTurn (wingletR, z_axis)
+
+	Move(wingletL, x_axis, -1, 0)
+	Move(wingletR, x_axis,  1, 0)
+end
+
+local function WingStartOld()
+	Turn(wingletL, z_axis, math.rad(-146.3), 0)
+	Turn(wingletR, z_axis, math.rad( 146.3), 0)
+
+	Turn(wing1, y_axis, math.rad(-90), 0)
+	Turn(wing2, y_axis, math.rad( 90), 0)
+
+	WaitForTurn (wing1, y_axis)
+	WaitForTurn (wing2, y_axis)
+
+	Turn(wing1, x_axis, math.rad(6), 0)
+	Turn(wing2, x_axis, math.rad(6), 0)
 end
 
 local function Moving()
@@ -89,19 +193,7 @@ local function Moving()
 	SetSignalMask(SIG_move)
 
 	Reball()
-
-	Turn(wing1, y_axis, math.rad(0), 2)
-	Turn(wing2, y_axis, math.rad(0), 2)
-	Turn(wing1, z_axis, math.rad(0), 2)
-	Turn(wing2, z_axis, math.rad(0), 2)
-	Turn(wing1, x_axis, math.rad(0), 2)
-	Turn(wing2, x_axis, math.rad(0), 2)
-	Turn(wingletL, z_axis, math.rad(-30), 2)
-	Turn(wingletR, z_axis, math.rad( 30), 2)
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
-	Turn(wingletL, z_axis, math.rad(0), 1)
-	Turn(wingletR, z_axis, math.rad(0), 1)
+	Fly()
 end
 
 function script.StartMoving()
@@ -124,12 +216,12 @@ function script.MoveRate(rate)
 end
 
 local function ShowBallWhenReady()
-	Hide(ball)
-	while Spring.GetUnitIsBeingBuilt(unitID) do
+	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
+	while stunned_or_inbuild do
 		Sleep(100)
+		stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 	end
 	Show(ball)
-	Spin(ball, y_axis, math.rad(30))
 end
 
 function script.Create()
@@ -142,24 +234,24 @@ function script.Create()
 	local exhaust_L, exhaust_R = piece('thrust_L', 'thrust_R')
 	Move(exhaust_L, y_axis, -5)
 	Move(exhaust_R, y_axis, -5)
+
 	Turn(exhaust_L, x_axis, math.rad(90))
 	Turn(exhaust_R, x_axis, math.rad(90))
+
 	Turn(coolerL, x_axis, math.rad(180))
 	Turn(coolerR, x_axis, math.rad(180))
 
-	-- Stopping() but without the waits
-	Turn(wingletL, z_axis, math.rad(-146.3))
-	Turn(wingletR, z_axis, math.rad( 146.3))
-	Turn(wing1, y_axis, math.rad(-90))
-	Turn(wing2, y_axis, math.rad( 90))
-	Turn(wing1, x_axis, math.rad(6))
-	Turn(wing2, x_axis, math.rad(6))
+	WingStart()
+	Hide(ball)
+	Hide(coolerL)
+	Hide(coolerR)
 
 	SetInitialBomberSettings()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 
 	StartThread(ShowBallWhenReady)
+	Spin(ball, y_axis, math.rad(30))
 end
 
 function script.FireWeapon(num)
