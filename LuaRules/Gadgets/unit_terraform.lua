@@ -3360,47 +3360,15 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 --------------------------------------------------------------------------------
--- Weapon Terraform
 --------------------------------------------------------------------------------
+-- Weapon smoothing that takes structures into account
 
-local wantedList = {}
-local SeismicWeapon = {}
-local DEFAULT_SMOOTH = 0.5
-local HEIGHT_FUDGE_FACTOR = 10
-local HEIGHT_RAD_MULT = 0.8
-
-for i=1,#WeaponDefs do
-	local wd = WeaponDefs[i]
-	if wd.customParams and wd.customParams.smoothradius or wd.customParams.smoothmult then
-		wantedList[#wantedList + 1] = wd.id
-		Script.SetWatchExplosion(wd.id, true)
-		SeismicWeapon[wd.id] = {
-			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
-			smoothradius = wd.customParams.smoothradius or wd.craterAreaOfEffect*0.5,
-			gatherradius = wd.customParams.gatherradius or wd.craterAreaOfEffect*0.75,
-			quickgather = wd.customParams.quickgather,
-			detachmentradius = wd.customParams.detachmentradius,
-			smoothheightoffset = wd.customParams.smoothheightoffset,
-			movestructures = wd.customParams.movestructures,
-			smoothexponent = wd.customParams.smoothexponent,
-		}
-	end
-end
-
-function gadget:Explosion_GetWantedWeaponDef()
-	return wantedList
-end
-
-local VALUE = 3
-local NUMERATOR = (2 + math.exp(VALUE) + math.exp(-1*VALUE))/(math.exp(VALUE) - math.exp(-1*VALUE))
-local OFFSET = NUMERATOR/(1 + math.exp(VALUE))
-local function FalloffFunc(disSQ, smoothradiusSQ, smoothExponent)
-	return NUMERATOR/(1 + math.exp(2*VALUE*(disSQ/smoothradiusSQ)^smoothExponent - VALUE)) - OFFSET
-end
-
-local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ, smoothExponent, movestructures)
+local function DoSmoothDirectly(
+		x, z, sx, sz, smoothradius, origHeight, groundHeight,
+		maxSmooth, smoothradiusSQ, FalloffFunc, smoothExponent, movestructures)
 	local structI = movestructures and {}
 	local structJ = movestructures and {}
+	local IsPositionTerraformable = GG.Terraform.IsPositionTerraformable
 	
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
@@ -3469,73 +3437,8 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 	end
 end
 
-local function DoSmooth(def, x, y, z)
-	local height = spGetGroundHeight(x,z)
-	
-	local smoothradius = def.smoothradius
-	local gatherradius = def.gatherradius
-	local detachmentradius = def.detachmentradius
-	local maxSmooth = def.smooth
-	local smoothheightoffset = def.smoothheightoffset
-	
-	if y > height + HEIGHT_FUDGE_FACTOR then
-		local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2
-		if factor > 0 then
-			smoothradius = smoothradius*factor
-			gatherradius = gatherradius*factor
-			maxSmooth = maxSmooth*factor
-		else
-			return
-		end
-	end
-	
-	local smoothradiusSQ = smoothradius^2
-	local gatherradiusSQ = gatherradius^2
-	
-	smoothradius = smoothradius + (8 - smoothradius%8)
-	gatherradius = gatherradius + (8 - gatherradius%8)
-	
-	local sx = floor((x+4)/8)*8
-	local sz = floor((z+4)/8)*8
-	
-	local groundPoints = 0
-	local groundHeight = 0
-	
-	local increment = (def.quickgather and 16) or 8
-	for i = sx - gatherradius, sx + gatherradius, increment do
-		for j = sz - gatherradius, sz + gatherradius, increment do
-			local disSQ = (i - x)^2 + (j - z)^2
-			if disSQ <= gatherradiusSQ then
-				groundPoints = groundPoints + 1
-				groundHeight = groundHeight + spGetGroundHeight(i,j)
-			end
-		end
-	end
-	
-	if groundPoints > 0 then
-		groundHeight = groundHeight/groundPoints - (smoothheightoffset or 0)
-		spSetHeightMapFunc(DoSmoothDirectly, x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ, def.smoothexponent, def.movestructures)
-	end
-	
-	if detachmentradius then
-		local GRAVITY = Game.gravity
-		local units = Spring.GetUnitsInCylinder(sx,sz,detachmentradius)
-		for i = 1, #units do
-			local hitUnitID = units[i]
-			GG.DetatchFromGround(hitUnitID, 1, 0.25, 0.002*GRAVITY)
-		end
-	end
-end
-
-function gadget:Explosion(weaponID, x, y, z, owner)
-	if SeismicWeapon[weaponID] then
-		local def = SeismicWeapon[weaponID]
-		DoSmooth(def, x, y, z)
-	end
-end
-
 --------------------------------------------------------------------------------
--- Death Explosion Terraform
+-- Structure Handling
 --------------------------------------------------------------------------------
 
 local function DeregisterStructure(unitID)
@@ -3788,8 +3691,8 @@ end
 -- Gadget API
 
 local TerraformFunctions = {}
-TerraformFunctions.DoSmooth = DoSmooth
 TerraformFunctions.IsPositionTerraformable = IsPositionTerraformable
+TerraformFunctions.DoSmoothDirectly = DoSmoothDirectly
 
 function TerraformFunctions.ForceTerraformCompletion(pregame, needSaveHax)
 	if pregame and needSaveHax then
