@@ -105,7 +105,7 @@ return { striderdozer = {
       impulseFactor           = 0.4,
       intensity               = 0.7,
       interceptedByShieldType = 1,
-      myGravity               = 0.25,
+      myGravity               = 0.3,
       noSelfDamage            = true,
       proximityPriority       = -4,
       range                   = 800,
@@ -119,7 +119,7 @@ return { striderdozer = {
       tolerance               = 2000,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 600,
+      weaponVelocity          = 580,
     },
 
   },
