@@ -4,8 +4,8 @@ local dynamicRockData
 include "trackControl.lua"
 include "pieceControl.lua"
 
-local base, body, turret1, sleeve1, barrel1, firepoint1, turret2, sleeve2, gun2, firepoint2
-	= piece("base", "body", "turret1", "sleeve1", "barrel1", "firepoint1", "turret2", "sleeve2", "gun2", "firepoint2")
+local base, front, body, turret1, sleeve1, barrel1, firepoint1, turret2, sleeve2, gun2, firepoint2
+	= piece("base", "front", "body", "turret1", "sleeve1", "barrel1", "firepoint1", "turret2", "sleeve2", "gun2", "firepoint2")
 	
 -- Signal definitions
 local SIG_AIM1 = 1
@@ -78,10 +78,12 @@ local HUGE_MUZZLE_FLASH_FX = 1025
 local ROCK_X_FIRE_1 = -24
 
 local aimPoints = {
+	base,
 	turret1,
 	turret2,
 }
 local firePoints = {
+	front,
 	firepoint1,
 	firepoint2,
 }
@@ -122,14 +124,7 @@ function script.StopMoving()
 end
 
 -- Weapons
-local spGetUnitSeparation = Spring.GetUnitSeparation
 function script.BlockShot(num, targetID)
-	if num == 1 and Spring.ValidUnitID(targetID) then
-		-- TTL at max range determined to be 50f empirically
-		-- at projectile speed 270 elmo/s and 450 range
-		local framesETA = 50 * (spGetUnitSeparation(unitID, targetID) or 0) / 450
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000.1, framesETA, false, false, true)
-	end
 	return false
 end
 
@@ -143,6 +138,8 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
+		return true
+	elseif num == 2 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
 		
@@ -168,7 +165,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num)
-	if num ~= 1 then
+	if num ~= 2 then
 		return
 	end
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
