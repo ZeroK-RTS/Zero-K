@@ -48,6 +48,12 @@ local HEIGHT_RAD_MULT = 0.8
 --------------------------------------------------------------------------------
 -- Weapon Terraform
 
+local projectileDefs = {
+	[WeaponDefNames["striderdozer_terra_spray"].id] = {
+		fallShort = 1,
+	},
+}
+
 for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.smoothradius or wd.customParams.smoothmult then
@@ -212,6 +218,25 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+
+local function DoFallShort(proID, def, proOwnerID)
+	local vx, vy, vz, speed = Spring.GetProjectileVelocity(proID)
+	local factor = math.sqrt(math.random())
+	Spring.SetProjectileVelocity(proID, factor*vx, factor*vy, factor*vz)
+end
+
+function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
+	if not projectileDefs[weaponID] then
+		return
+	end
+	if projectileDefs[weaponID].fallShort then
+		DoFallShort(proID, projectileDefs[weaponID], proOwnerID)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
@@ -232,4 +257,7 @@ end
 
 function gadget:Initialize()
 	GG.Terraform.DoSmooth = DoSmooth
+	for id, _ in pairs(projectileDefs) do
+		Script.SetWatchProjectile(id, true)
+	end
 end
