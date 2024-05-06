@@ -23,7 +23,7 @@ local sets = {
 -- old scars. They are all same-ish so no preset differentiation.
 -- Sets only do anything in engine releases past 105-2314, otherwise
 -- every weapon uses every referenced scar.
-if not Script.IsEngineMinVersion(105, 0, 2400) then
+if not (Script and Script.IsEngineMinVersion(105, 0, 2400)) then
 	local fallbackSet = {
 		'unknown/enlarge/scar1.png',
 		'unknown/enlarge/scar2.png',

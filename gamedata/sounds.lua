@@ -1,5 +1,3 @@
-VFS.Include("LuaRules/engine_compat.lua", nil, VFS.GAME)
-
 -- see http://springrts.com/wiki/Sounds.lua for help
 local Sounds = {
 	SoundItems = {
