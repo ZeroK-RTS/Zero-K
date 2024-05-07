@@ -11,8 +11,6 @@ uniform sampler2D tex9; // cloud grass
 uniform sampler2D tex10; // cloud grassdark
 uniform sampler2D tex11; // cloud sand
 
-uniform float[8] phaseHeights;
-
 uniform float minHeight;
 uniform float maxHeight;
 
@@ -61,19 +59,19 @@ void main()
 	gl_FragColor = mix(gl_FragColor,texture2D(tex4,coord*8.0),factor);
 
 	// admix cracks
-	factor = smoothstep(phaseHeights[0],phaseHeights[1],height) * (1.0-slope);
+	factor = smoothstep(60.0,85.0,height) * (1.0-slope);
 	gl_FragColor = mix(gl_FragColor,texture2D(tex2,coord*min(1.3, 1.15 + 0.005*slope)),factor);
 
 	// admix low grass
-	factor = smoothstep(phaseHeights[2],phaseHeights[3],height) * (1.0-slope);
+	factor = smoothstep(110.0,145.0,height) * (1.0-slope);
 	gl_FragColor = mix(mix(gl_FragColor,texture2D(tex10,coord*min(0.8, 0.785 + 2.5*slope)),factor),texture2D(tex5,coord*0.9),0.18*factor);
 
 	// admix high grass
-	factor = smoothstep(phaseHeights[4],phaseHeights[5],height) * (1.0-slope);
+	factor = smoothstep(180.0,210.0,height) * (1.0-slope);
 	gl_FragColor = mix(mix(gl_FragColor,texture2D(tex9,coord*min(0.8, 0.785 + 2.5*slope)),factor),texture2D(tex5,coord*0.65),0.1*factor);
 
 	// admix highlands
-	factor = smoothstep(phaseHeights[6],phaseHeights[7],height) * (1.0-slope);
+	factor = smoothstep(255.0,380.0,height) * (1.0-slope);
 	gl_FragColor = mix(gl_FragColor,texture2D(tex6,coord*min(1.02, 1.0 + 0.001*slope)),factor);
 
 	// ---- slope textures ----
@@ -114,8 +112,8 @@ void main()
 	}
 
 	// Show mountains over cliffs
-	if (height > phaseHeights[6]) {
-		factor = smoothstep(phaseHeights[6],phaseHeights[7],height)*max(0.0, 1.0 - slope*2.0 + 0.05);
+	if (height > 255.0) {
+		factor = smoothstep(255.0,380.0,height)*max(0.0, 1.0 - slope*2.0 + 0.05);
 		gl_FragColor = mix(gl_FragColor,texture2D(tex6,coord*min(0.82, 0.8 + 0.001*slope)),factor);
 	}
 }
