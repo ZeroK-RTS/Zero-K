@@ -14,7 +14,7 @@ function gadget:GetInfo()
 		author    = "GoogleFrog",
 		date      = "6 April 2024",
 		license   = "GNU GPL, v2 or later",
-		layer     = 1,
+		layer     = 1, -- After terraform for existence check.
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -256,6 +256,10 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:Initialize()
+	if not (GG.Terraform and GG.Terraform.IsPositionTerraformable) then
+		gadgetHandler:RemoveGadget()
+		return
+	end
 	GG.Terraform.DoSmooth = DoSmooth
 	for id, _ in pairs(projectileDefs) do
 		Script.SetWatchProjectile(id, true)
