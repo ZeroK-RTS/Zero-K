@@ -98,6 +98,21 @@ Game.speedModClasses = Game.speedModClasses or -- 104-756
 	, Ship  = 3
 }
 
+if not Spring.GetTidal then -- 104-804
+	Spring.GetTidal = function()
+		return Game.tidal or 0
+	end
+
+	if Script.GetSynced() then
+		Spring.SetTidal = RET_NONE
+		Spring.SetWind = RET_NONE
+	end
+end
+
+if not Spring.PreloadSoundItem then -- 104-994
+	Spring.PreloadSoundItem = RET_FALSE
+end
+
 if not Script.IsEngineMinVersion(104, 0, 1100) then
 	Script.SetWatchProjectile  = Script.SetWatchWeapon
 	Script.SetWatchExplosion   = Script.SetWatchWeapon
@@ -268,6 +283,19 @@ end
 if not Spring.SetWindowMinimized then -- BAR 105-1245
 	Spring.SetWindowMinimized = RET_FALSE
 	Spring.SetWindowMaximized = RET_FALSE
+end
+
+if not Spring.GetTeamAllyTeamID then -- BAR 105-1300
+	Spring.GetTeamAllyTeamID = function(teamID)
+		local _, _, _, allyTeamID = Spring.GetTeamInfo(teamID)
+		return allyTeamID
+	end
+end
+
+if not Spring.GetProjectileAllyTeamID then -- BAR 105-1300
+	Spring.GetProjectileAllyTeamID = function(proID)
+		return Spring.GetTeamAllyTeamID(Spring.GetProjectileTeamID(proID))
+	end
 end
 
 if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
@@ -514,6 +542,22 @@ if not Spring.GetModelRootPiece then -- BAR 105-1924
 	Spring.GetFeatureRootPiece = RET_ONE
 end
 
+if not Spring.DeselectUnitArray then -- BAR 105-1976
+	Spring.DeselectUnitArray = function(units)
+		for _, unitID in pairs(units) do
+			Spring.DeselectUnit(unitID)
+		end
+	end
+end
+
+if not Spring.DeselectUnitMap then -- BAR 105-1976
+	Spring.DeselectUnitMap = function(units)
+		for unitID in pairs(units) do
+			Spring.DeselectUnit(unitID)
+		end
+	end
+end
+
 Game.textColorCodes = Game.textColorCodes or -- BAR 105-1983
 	{ Color           = '\255'
 	, ColorAndOutline = '\254'
@@ -526,6 +570,14 @@ if GL then -- BAR 105-1988
 	GL.FUNC_REVERSE_SUBTRACT = GL.FUNC_REVERSE_SUBTRACT or 32779
 	GL.MIN                   = GL.MIN                   or 32775
 	GL.MAX                   = GL.MAX                   or 32776
+end
+
+if not Spring.IsPosInMap then -- BAR 105-1989
+	Spring.IsPosInMap = function (x, z)
+		local inMap = x >= 0 and z >= 0 and x <= Game.mapSizeX and z <= Game.mapSizeZ
+		local inPlayableArea = inMap
+		return inPlayableArea, inMap
+	end
 end
 
 if not Script.IsEngineMinVersion(105, 0, 2182) then
