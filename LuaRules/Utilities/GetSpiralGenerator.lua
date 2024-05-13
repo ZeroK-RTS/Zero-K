@@ -2,7 +2,7 @@ function Spring.Utilities.GetSpiralGenerator(x, z, {step, startingDirection, clo
     local radius = 16
     local mag = 1
     local spiralChangeNumber = 1
-    local nx,nz
+    local nx, ny, nz
     local offsetX, offsetZ = 0, 0
     local aborted = false
     repeat -- 1 right, 1 up, 2 left, 2 down, 3 right, 3 up
