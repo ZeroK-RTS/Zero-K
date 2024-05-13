@@ -27,6 +27,7 @@ function Spring.Utilities.GetSpiralGenerator(x, z, step, startingDirection, cloc
 				offsetX = offsetX - radius
 			elseif startingDirection == 4 then
 				offsetZ = offsetZ + radius
+			end
         else -- move to the next offset
 			if startingDirection == 1 then
 				offsetX = offsetX + radius
