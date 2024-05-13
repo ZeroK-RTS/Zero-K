@@ -18,7 +18,7 @@ function Spring.Utilities.GetSpiralGenerator(x, z, step, startingDirection, cloc
 			startingDirection = startingDirection%4 + 1
 		elseif mag == 8 and step == 0 and startingDirection == 4 then -- abort
 			aborted = true 
-        elseif clockwise == true then-- move to the next offset
+		elseif clockwise == true then-- move to the next offset
 			if startingDirection == 1 then
 				offsetX = offsetX + radius
 			elseif startingDirection == 2 then
@@ -28,7 +28,7 @@ function Spring.Utilities.GetSpiralGenerator(x, z, step, startingDirection, cloc
 			elseif startingDirection == 4 then
 				offsetZ = offsetZ + radius
 			end
-        else -- move to the next offset
+		else -- move to the next offset
 			if startingDirection == 1 then
 				offsetX = offsetX + radius
 			elseif startingDirection == 2 then
