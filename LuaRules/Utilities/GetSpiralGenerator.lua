@@ -1,4 +1,4 @@
-function Spring.Utilities.GetSpiralGenerator(x, z, {step, startingDirection, clockwise})
+function Spring.Utilities.GetSpiralGenerator(x, z, step, startingDirection, clockwise)
     local radius = 16
     local mag = 1
     local spiralChangeNumber = 1
