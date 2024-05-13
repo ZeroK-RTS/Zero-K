@@ -14,6 +14,8 @@ end
 include("LuaRules/Configs/start_setup.lua")
 include("LuaRules/Configs/constants.lua")
 
+include("LuaRules/Utilities/GetSpiralGenerator.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetTeamInfo         = Spring.GetTeamInfo
