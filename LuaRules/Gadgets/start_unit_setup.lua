@@ -303,7 +303,7 @@ local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
 	local y
 	local aborted = false
 	repeat -- 1 right, 1 up, 2 left, 2 down, 3 right, 3 up
-		y, aborted = Spring.Utilities.GetSpiralGeneral(x,z, movesLeft, dir, false)
+		y, aborted = Spring.Utilities.GetSpiralGenerator(x,z, movesLeft, dir, false)
 		canDropHere = CanUnitDropHere(startBoxID, unitDefID, x, y, z, facing, false, true)
 		if canDropHere then
 			return x, y, z
