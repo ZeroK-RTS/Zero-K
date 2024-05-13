@@ -40,4 +40,6 @@ function Spring.Utilities.GetSpiralGenerator(x, z, {step, startingDirection, clo
 			step = step - 1
 		end
 	until aborted
+
+	return aborted
 end
