@@ -297,43 +297,16 @@ end
 
 local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
 	local startBoxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-	local radius = 16
 	local canDropHere = false
-	local mag = 1
-	local spiralChangeNumber = 1
 	local movesLeft = 1
 	local dir = 1 -- 1: right, 2: up, 3: left, 4 down
-	local nx, ny, nz
-	local offsetX, offsetZ = 0, 0
+	local y
 	local aborted = false
 	repeat -- 1 right, 1 up, 2 left, 2 down, 3 right, 3 up
-		nx = x + offsetX
-		nz = z + offsetZ
-		ny = Spring.GetGroundHeight(nx, nz)
-		canDropHere = CanUnitDropHere(startBoxID, unitDefID, nx, ny, nz, facing, false, true)
+		y, aborted = Spring.Utilities.GetSpiralGeneral(x,z, movesLeft, dir, false)
+		canDropHere = CanUnitDropHere(startBoxID, unitDefID, x, y, z, facing, false, true)
 		if canDropHere then
-			return nx, ny, nz
-		end
-		if movesLeft == 0 and not (mag == 8 and movesLeft == 0 and dir == 4) then 
-			spiralChangeNumber = spiralChangeNumber + 1
-			if spiralChangeNumber%3 == 0 then 
-				mag = mag + 1
-			end
-			movesLeft = mag
-			dir = dir%4 + 1
-		elseif mag == 8 and movesLeft == 0 and dir == 4 then -- abort
-			aborted = true 
-		else -- move to the next offset
-			if dir == 1 then
-				offsetX = offsetX + radius
-			elseif dir == 2 then
-				offsetZ = offsetZ + radius
-			elseif dir == 3 then
-				offsetX = offsetX - radius
-			elseif dir == 4 then
-				offsetZ = offsetZ - radius
-			end
-			movesLeft = movesLeft - 1
+			return x, y, z
 		end
 	until canDropHere or aborted
 	return x, Spring.GetGroundHeight(x, z), z -- aborted, return original position.

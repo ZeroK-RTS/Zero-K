@@ -2,13 +2,13 @@ function Spring.Utilities.GetSpiralGenerator(x, z, step, startingDirection, cloc
     local radius = 16
     local mag = 1
     local spiralChangeNumber = 1
-    local nx, ny, nz
+    local y
     local offsetX, offsetZ = 0, 0
     local aborted = false
     repeat -- 1 right, 1 up, 2 left, 2 down, 3 right, 3 up
-		nx = x + offsetX
-		nz = z + offsetZ
-		ny = Spring.GetGroundHeight(nx, nz)
+		x = x + offsetX
+		z = z + offsetZ
+		y = Spring.GetGroundHeight(x, z)
 		if step == 0 and not (mag == 8 and step == 0 and startingDirection == 4) then 
 			spiralChangeNumber = spiralChangeNumber + 1
 			if spiralChangeNumber%3 == 0 then 
@@ -41,5 +41,5 @@ function Spring.Utilities.GetSpiralGenerator(x, z, step, startingDirection, cloc
 			step = step - 1
 		end
 	until aborted
-	return aborted
+	return y, aborted
 end
