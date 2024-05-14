@@ -1,7 +1,7 @@
 VFS.Include("LuaRules/Utilities/GetSpiralGenerator.lua")
 
 local defaultSpiral = Spring.Utilities.GetSpiralGenerator()
-local spiralWithDefaultsExplicitlySpecified = Spring.Utilities.GetSpiralGenerator(0, 0, step = 1, startingDirection = "n",  clockwise = false)
+local spiralWithDefaultsExplicitlySpecified = Spring.Utilities.GetSpiralGenerator(0, 0, 1, "n", false)
 
 for i = 1, 20 do
   local xD, zD = defaultSpiral.get()

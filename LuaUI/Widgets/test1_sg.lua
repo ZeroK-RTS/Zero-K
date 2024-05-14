@@ -1,6 +1,6 @@
 VFS.Include("LuaRules/Utilities/GetSpiralGenerator.lua")
 
-local spiralWithExtraParameters = Spring.Utilities.GetSpiralGenerator(12, 34, step = 3, startingDirection = "n",  clockwise = false)
+local spiralWithExtraParameters = Spring.Utilities.GetSpiralGenerator(12, 34, 3, "n", false)
 local x1, z1 = spiralWithExtraParameters.get()
 local x2, z2 = spiralWithExtraParameters.get()
 local x3, z3 = spiralWithExtraParameters.get()
