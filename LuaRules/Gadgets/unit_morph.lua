@@ -389,7 +389,7 @@ local function FinishMorph(unitID, morphData)
 			StopMorph(unitID, morphData)
 			return
 		end
-		Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768, 0)
+		Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768 + 0.00001, 0)
 		Spring.SetUnitPosition(newUnit, px, py, pz)
 	end
 
@@ -404,7 +404,7 @@ local function FinishMorph(unitID, morphData)
 		SendToUnsynced('PWCreate', unitTeam, newUnit)
 	elseif (not morphData.def.facing) then	-- set rotation only if unit is not planetwars and facing is not true
 		--Spring.Echo(morphData.def.facing)
-		Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768, 0)
+		Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768 + 0.00001, 0)
 	end
 
 	--// copy lineage
