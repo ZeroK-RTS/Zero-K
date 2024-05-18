@@ -23,7 +23,7 @@ local UNIT_EXPORT_MAP = {
 	--description = manual
 	image = "buildPicName",
 	icontype = "iconType",
-	cost = "metalCost",
+	cost = "buildTime",
 	hitpoints = "health",
 	mass = "mass",
 	movespeed = "speed",
@@ -56,6 +56,14 @@ local HITSCAN = {
 	BeamLaser = true,
 	LightningCannon = true,
 }
+
+local EXTRA_UNITS = {
+	"chickenbroodqueen", "chickenlandqueen", "chickenflyerqueen", "chickend", "chickenspire", "chicken_rafflesia", "roost",
+	"assaultcruiser", "dronecarry", "droneheavyslow", "dronefighter", "dronelight", "hoverskirm2", "hoversonic", "nebula", 
+	"pw_mine", "staticsonar", "subscout", "turretsunlance", "starlight_satellite", "tele_beacon", "wolverine_mine"
+}
+
+local COB_angle_to_degree = 360 / 65536
 
 local droneCarriers = include "LuaRules/Configs/drone_defs.lua"
 
@@ -198,6 +206,7 @@ end
 local function processWeapon(wsTemp, wd)
 	--if wd == nil then Spring.Echo("omg " .. wsTemp.defname) end
 	local cp = wd.customParams
+	local suicide = wd.name:match("death$")
 	
 	if wd.isShield then
 		return processShield(wsTemp, wd)
@@ -209,7 +218,7 @@ local function processWeapon(wsTemp, wd)
 	local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
 	if mult ~= 1 then wsTemp.projectiles = mult end
 	
-	-- damage and dps	
+	-- damage and dps
 	local dam, damPara, damSlow, damDisarm, damCapture, stunTime = getDamages(wd)
 	dam = damCapture > 0 and damCapture or dam
 	local reloadtime = tonumber(cp.script_reload) or wd.reload
@@ -222,7 +231,7 @@ local function processWeapon(wsTemp, wd)
 	wsTemp.shielddamage = cp.damage_vs_shield and tonumber(cp.damage_vs_shield)
 	wsTemp.stuntime = stunTime
 	
-	wsTemp.reloadtime = numformat(tonumber(cp.script_reload) or wd.reload)
+	wsTemp.reloadtime = numformat(reloadtime)
 		
 	wsTemp.dps = math.floor(dam /reloadtime + 0.5)*mult
 	wsTemp.empdps = math.floor(damPara/reloadtime + 0.5)*mult
@@ -232,16 +241,26 @@ local function processWeapon(wsTemp, wd)
 		wsTemp.dps = math.floor(tonumber(cp.stats_typical_damage)/reloadtime + 0.5)*mult
 	end
 	
+	local hide_dps = suicide or cp.stats_hide_dps or cp.reammoseconds or (dam + damPara + damSlow + damDisarm < 2)
+	if hide_dps then 
+		wsTemp.dps = nil 
+		wsTemp.empdps = nil
+		wsTemp.slowdps = nil
+		wsTemp.disarmdps = nil
+	end
+	
+	if suicide or cp.stats_hide_reload then wsTemp.reloadtime = nil end
+	
 	-- range
-	wsTemp.range = cp.truerange or wd.range
-	if cp.stats_hide_range then wsTemp.range = nil end
+	wsTemp.range = numformat(cp.truerange or wd.range)
+	if suicide or cp.stats_hide_range then wsTemp.range = nil end
 	local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
 	if (aoe > 15 and (not cp.stats_hide_aoe)) or cp.stats_aoe then
 		wsTemp.aoe = numformat(cp.stats_aoe or aoe)
-	end		
+	end
 	
 	-- projectile speed
-	if not cp.stats_hide_projectile_speed and not HITSCAN[wd.type] then
+	if not cp.stats_hide_projectile_speed and not suicide and not HITSCAN[wd.type] then
 		wsTemp.projectilespeed = numformat(wd.projectilespeed*30)
 	end
 	
@@ -313,16 +332,18 @@ local function processWeapon(wsTemp, wd)
 	end
 	
 	-- stockpile
-	if wsTemp.stockpile then
-		local stockpile = {type = "stockpile"}		
+	if wsTemp.stockpiletime then
+		local stockpile = {type = "stockpile"}
 		
 		local time = (((tonumber(wsTemp.stockpiletime) or 0) > 0) and tonumber(wsTemp.stockpiletime) or wd.stockpileTime)
 		stockpile.time = time
-		str = str .. str2
 		if ((not wsTemp.freestockpile) and ((tonumber(wsTemp.stockpilecost) or wd.metalcost or 0) > 0)) then
 			local cost = tonumber(wsTemp.stockpilecost) or wd.metalcost
 			stockpile.cost = cost
 		end
+		table.insert(extraData, stockpile)
+		wsTemp.stockpiletime = nil
+		wsTemp.stockpilecost = nil
 	end
 	
 	if HITSCAN[wd.type] then
@@ -411,6 +432,7 @@ local function condenseUnitDef(unitDefName)
 	if cud.altitude then
 		cud.altitude = cud.altitude * 1.5
 	end
+	cud.turnrate = numformat(cud.turnrate * Game.gameSpeed * COB_angle_to_degree)
 	
 	cud.gridlink = cp.pylonrange
 	if (ud.isImmobile) then
@@ -418,6 +440,7 @@ local function condenseUnitDef(unitDefName)
 	else
 		cud.mass = numformat(cud.mass, false)
 		cud.transportable = (cp.requireheavytrans and "Heavy") or (cp.requiremediumtrans and "Medium") or "Light"
+		if ud.canFly then cud.transportable = nil end
 	end
 	
 	
@@ -470,7 +493,7 @@ local function condenseUnitDef(unitDefName)
 		cud.jumpRange = tonumber(cp.jump_range)
 		cud.jumpReload = tonumber(cp.jump_reload)
 		cud.jumpSpeed = numformat(30*tonumber(cp.jump_speed))
-		cud.midairJump = tonumber(cp.jump_from_midair) == 0
+		cud.midairJump = tobool(cp.jump_from_midair) and true or nil
 	end
 	
 	if (ud.idleTime < 1800) or (cp.amph_regen) or (cp.armored_regen) then
@@ -606,11 +629,19 @@ function widget:Initialize()
 	Spring.Echo("Preparing stat dump")
 	
 	local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+	for i=1,#EXTRA_UNITS do
+		buildOpts[#buildOpts+1] = EXTRA_UNITS[i]
+	end
+	
 	local builtBySomething = {}
 	
 	for index, unitDefName in ipairs(buildOpts) do
 		local def = UnitDefNames[unitDefName]
 		builtBySomething[unitDefName] = def
+		
+		if def.customParams.morphto then
+			builtBySomething[def.customParams.morphto] = UnitDefNames[def.customParams.morphto]
+		end
 	
 		for index, buildeeId in pairs(def.buildOptions or {}) do
 			local buildeeDef = UnitDefs[buildeeId]
@@ -627,11 +658,22 @@ function widget:Initialize()
 	local folder = "temp/"
 	local unitFile = "unitStats.lua"
 	local weaponFile = "weaponStats.lua"
+	local unitListFile = "units.json"
 	
 	WG.SaveTable(condensed_unit_defs, folder, unitFile, nil, {prefixReturn = true})
 	Spring.Echo("Saved unit stats to " .. folder .. unitFile)
 	WG.SaveTable(condensed_weapon_defs, folder, weaponFile, nil, {prefixReturn = true})
 	Spring.Echo("Saved weapon stats to " .. folder .. weaponFile)
+	
+	--[[
+	local units = {}
+	for unitDefName, def in pairs(UnitDefNames) do
+		if not def.customParams.commtype then
+			units[def.humanName] = unitDefName
+		end
+	end
+	WG.SavePythonOrJSONDict(units, folder, unitListFile, nil, {json = true})
+	]]--
 	
 	Spring.Echo("Stat dump complete")
 	
