@@ -33,6 +33,9 @@ if Script.IsEngineMinVersion(104, 0, 50) then
 	end
 end
 
+Game = Game or {} -- 104-331 for defs; still missing from some like modrules
+Game.gameSpeed = Game.gameSpeed or 30 -- 104-331
+
 if not Script.IsEngineMinVersion(104, 0, 503) then
 	local tableCache = {123}
 	local function MakeWrappedSingleParamFunc(originalFunc)
@@ -88,8 +91,11 @@ if Script.IsEngineMinVersion(104, 0, 536) then
 	end
 end
 
-Game = Game or {} -- 104-331 for defs; still missing from some like modrules
-Game.gameSpeed = Game.gameSpeed or 30 -- 104-331
+if Game.paralyzeOnMaxHealth == nil then -- 104-585
+	Game.paralyzeOnMaxHealth = true
+	Game.paralyzeDeclineRate = 40
+end
+
 Game.speedModClasses = Game.speedModClasses or -- 104-756
 	{ Tank  = 0
 	, KBot  = 1

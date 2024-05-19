@@ -253,7 +253,8 @@ local function lowerkeys(t)
 	return tn
 end
 
-local paralyzeOnMaxHealth = ((lowerkeys(VFS.Include"gamedata/modrules.lua") or {}).paralyze or {}).paralyzeonmaxhealth
+local paralyzeOnMaxHealth = Game.paralyzeOnMaxHealth
+local empDecline = 1 / Game.paralyzeDeclineRate
 
 local spGetGroundHeight = Spring.GetGroundHeight
 local function IsCameraBelowMaxHeight()
@@ -317,8 +318,6 @@ local barColors = {
 local blink = false
 local blink_j = false
 local gameFrame = 0
-
-local empDecline = 1/40
 
 local cx, cy, cz = 0, 0, 0 --// camera pos
 
