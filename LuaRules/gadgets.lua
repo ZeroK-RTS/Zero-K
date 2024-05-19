@@ -128,6 +128,7 @@ local callInLists = {
 	-- "UnitUnitCollision",
 	-- "UnitFeatureCollision",
 	-- "UnitMoveFailed",
+	"UnitArrivedAtGoal",
 	"StockpileChanged",
 
 	-- Feature CallIns
@@ -1689,6 +1690,11 @@ function gadgetHandler:UnitFeatureCollision(colliderID, collideeID)
 	end
 end
 
+function gadgetHandler:UnitArrivedAtGoal(unitID, unitDefID, teamID)
+	for _,g in r_ipairs(self.UnitArrivedAtGoalList) do
+		g:UnitArrivedAtGoal(unitID, unitDefID, teamID)
+	end
+end
 
 function gadgetHandler:StockpileChanged(unitID, unitDefID, unitTeam,
                                         weaponNum, oldCount, newCount)

@@ -279,6 +279,7 @@ local function ResetUnitData(unitData)
 	unitData.doingRawMove = nil
 	unitData.possiblyTurning = nil
 	unitData.stuckCheckCount = nil
+	unitData.moveComplete = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -367,7 +368,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp, canFinish)
 		myStopDistSq = myStopDistSq + commonStopRadius[unitData.commandString]
 	end
 
-	if distSq < myStopDistSq then
+	if distSq < myStopDistSq or unitData.moveComplete then
 		if unitData.preventGoalClumping then
 			commonStopRadius[unitData.commandString] = (commonStopRadius[unitData.commandString] or 0) + stoppingRadiusIncrease[unitDefID]
 			if commonStopRadius[unitData.commandString] > MAX_COMM_STOP_RADIUS then
@@ -573,6 +574,10 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	end
 	
 	return true
+end
+
+function gadget:UnitArrivedAtGoal(unitID, unitDefID)
+	rawMoveUnit[unitID].moveComplete = true
 end
 
 ----------------------------------------------------------------------------------------------
