@@ -20,6 +20,13 @@ end
 local SUC = Spring.Utilities.CMD
 local CMD_SELECTION_RANK = SUC.SELECTION_RANK
 
+local isGuardCommand = {
+	[CMD.GUARD     ] = true,
+	[SUC.ORBIT     ] = true,
+	[SUC.ORBIT_DRAW] = true,
+	[SUC.AREA_GUARD] = true,
+}
+
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
 
@@ -72,6 +79,7 @@ options_order = {
 	'altBlocksHighRankSelection',
 	'doubleClickFlattenRankOption',
 	'controlGroupFlattenRank',
+	'guardRankOverrideOption',
 	'retreatOverrideOption',
 	'retreatingRankOption',
 	'retreatDeselects'
@@ -156,6 +164,15 @@ options = {
 		OnChange = function (self)
 			controlGroupFlattenRank = self.value
 		end
+	},
+	guardRankOverrideOption = {
+		name = 'Guard rank reduction:',
+		desc = "Units currently executing the guard command are reduced to this selection rank, if higher.",
+		type = 'number',
+		value = 3,
+		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
+		noHotkey = true,
 	},
 	retreatOverrideOption = {
 		name = "Retreat overrides selection rank",
@@ -308,6 +325,14 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 
 		if WG.GlobalBuildCommand and WG.GlobalBuildCommand.IsSelectionOverrideSet and WG.GlobalBuildCommand.IsControllingUnit(unitID) and (rank > WG.GlobalBuildCommand.SelectionOverrideRank) then
 			rank = WG.GlobalBuildCommand.SelectionOverrideRank
+		end
+
+		local guardRankOverrideRank = options.guardRankOverrideOption.value
+		if rank > guardRankOverrideRank then
+			local cmdID = Spring.GetUnitCurrentCommand(unitID)
+			if isGuardCommand[cmdID] then
+				rank = guardRankOverrideRank
+			end
 		end
 
 		if rank then
