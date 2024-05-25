@@ -167,7 +167,7 @@ if not Spring.GetUnitInBuildStance then -- BAR 105-665
 	Spring.GetUnitInBuildStance = RET_FALSE
 end
 
-if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-710
+if not Spring.ForceTesselationUpdate then -- BAR 105-710
 	--[[ This is just here so gadget code can avoid
 	     a nil check. The workaround was to apply
 	     ground detail changes to force an update,
@@ -210,7 +210,7 @@ if not Spring.AddUnitExperience and Script.GetSynced() then -- BAR 105-961
 	end
 end
 
-if not Spring.SetBoxSelectionByEngine and not Script.GetSynced() then -- BAR 105-980
+if not Spring.SetBoxSelectionByEngine then -- BAR 105-980
 	Spring.SetBoxSelectionByEngine = RET_NONE
 	Spring.GetBoxSelectionByEngine = RET_FALSE
 end
@@ -261,11 +261,11 @@ if not Spring.GetMiniMapRotation and not Script.GetSynced() then -- BAR 105-1242
 	Spring.GetMiniMapRotation = RET_ZERO
 end
 
-if not Spring.LoadModelTextures and not Script.GetSynced() then -- BAR 105-1244
+if not Spring.LoadModelTextures then -- BAR 105-1244
 	Spring.LoadModelTextures = RET_FALSE
 end
 
-if not Spring.SetWindowMinimized and not Script.GetSynced() then -- BAR 105-1245
+if not Spring.SetWindowMinimized then -- BAR 105-1245
 	Spring.SetWindowMinimized = RET_FALSE
 	Spring.SetWindowMaximized = RET_FALSE
 end
@@ -321,7 +321,7 @@ if Script.GetSynced() and not Script.IsEngineMinVersion(105, 0, 1706) then
 	end
 end
 
-if not Script.GetSynced() and not Script.IsEngineMinVersion(105, 0, 1719) then
+if not Script.IsEngineMinVersion(105, 0, 1719) then
 	local originalSetActiveCommand = Spring.SetActiveCommand
 	Spring.SetActiveCommand = function(...)
 		if not select(1, ...) then
@@ -350,14 +350,14 @@ if not Spring.GetUnitSeismicSignature then -- BAR 105-1777
 	Spring.GetUnitSeismicSignature = RET_ZERO
 end
 
-if not Spring.SelectUnit and not Script.GetSynced() then -- BAR 105-1790
+if not Spring.SelectUnit then -- BAR 105-1790
 	local spSelectUnitArray = Spring.SelectUnitArray
 	Spring.SelectUnit = function (unitID, append)
 		return spSelectUnitArray({unitID}, append)
 	end
 
 	local spGetSelectedUnits = Spring.GetSelectedUnits
-	Spring.DeselectUnit = function (unitID)
+	Spring.DeselectUnit = Script.GetSynced() and RET_NONE or function (unitID)
 		local selected = spGetSelectedUnits()
 		for i = 1, #selected do
 			if selected[i] == unitID then
