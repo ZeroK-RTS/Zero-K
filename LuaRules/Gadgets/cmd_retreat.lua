@@ -100,9 +100,6 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	end
 end
 
-_G.retreaterTagsMove = retreaterTagsMove
-_G.retreaterTagsWait = retreaterTagsWait
-
 ----------------------------
 ----- Haven Handling
 ----------------------------
@@ -603,23 +600,12 @@ local function WrapToLuaUI_Retreat (cmd, unitID)
 	Script.LuaUI[cmd](unitID, unitDefID, teamID)
 end
 
-local function GetRetreaterTagsMoveCopy()
-	return Spring.Utilities.MakeRealTable(SYNCED.retreaterTagsMove)
-end
-
-local function GetRetreaterTagsWaitCopy()
-	return Spring.Utilities.MakeRealTable(SYNCED.retreaterTagsWait)
-end
-
 function gadget:Initialize()
 	gadgetHandler:AddSyncAction('HavenUpdate',WrapToLuaUI_Haven)
 	gadgetHandler:AddSyncAction('StartRetreat',WrapToLuaUI_Retreat)
 	gadgetHandler:AddSyncAction('StopRetreat',WrapToLuaUI_Retreat)
 	
-	GG.Retreat = {
-		GetRetreaterTagsMoveCopy = GetRetreaterTagsMoveCopy,
-		GetRetreaterTagsWaitCopy = GetRetreaterTagsWaitCopy
-	}
+	GG.Retreat = { }
 end
 
 function gadget:Shutdown()

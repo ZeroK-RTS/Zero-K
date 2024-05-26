@@ -399,7 +399,6 @@ end
 
 function gadget:Initialize()
 
-	_G.bombers = bombers
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_BOMBER_DIVE_STATE)
 	
