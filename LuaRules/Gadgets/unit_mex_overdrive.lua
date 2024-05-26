@@ -1891,7 +1891,6 @@ end
 function gadget:Initialize()
 	GG.Overdrive = externalFunctions
 
-	_G.pylon = pylon
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		MaybeAddMex(unitID, unitDefID)

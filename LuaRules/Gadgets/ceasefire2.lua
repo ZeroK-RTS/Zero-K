@@ -275,8 +275,6 @@ function gadget:Initialize()
 	
 	checkAllianceSizes()
 	checkVotes()
-	_G.cfData = cfData
-
 end
 
 function gadget:AllowCommand_GetWantedCommand()

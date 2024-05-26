@@ -155,8 +155,6 @@ local rearmRemove = {}
 local cmdIgnoreSelf = false
 -- local totalReservedPad = 0
 
-_G.airpadsData = airpadsData
-
 function gadget:Initialize()
 	local allyteams = Spring.GetAllyTeamList()
 	local teams = Spring.GetTeamList()

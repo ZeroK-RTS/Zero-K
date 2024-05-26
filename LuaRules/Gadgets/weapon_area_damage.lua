@@ -23,8 +23,6 @@ local DAMAGE_PERIOD, weaponInfo = VFS.Include("LuaRules/Configs/area_damage_defs
 local explosionList = {}
 local explosionCount = 0
 
-_G.explosionList = explosionList
-
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}
 	for wdid = 1, #WeaponDefs do
