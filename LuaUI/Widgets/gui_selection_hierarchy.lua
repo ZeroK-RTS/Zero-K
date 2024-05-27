@@ -17,8 +17,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
-include("keysym.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_SELECTION_RANK = SUC.SELECTION_RANK
 
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
