@@ -49,7 +49,7 @@ local function CalcBallisticCircle( x, y, z, range, weaponDef )
 	local rangeFactor = 1.0 -- used by range2dCannon
 	if weaponDef.type == "Cannon" then
 		rangeFunc = GetRange2DCannon
-		rangeFactor = range / GetRange2DCannon(range, 0.0, weaponDef.projectilespeed, rangeFactor)
+		rangeFactor = range / GetRange2DCannon(range, 0.0, weaponDef.projectilespeed, rangeFactor, weaponDef.myGravity )
 		if rangeFactor > 1.0 or rangeFactor <= 0.0 then
 			rangeFactor = 1.0
 		end
@@ -70,7 +70,7 @@ local function CalcBallisticCircle( x, y, z, range, weaponDef )
 		local heightDiff = (posy - yGround) / 2.0 -- maybe y has to be getGroundHeight(x,z) cause y is unit center and not aligned to ground
 
 		rAdj = rAdj - heightDiff * slope
-		local adjRadius = rangeFunc( range, heightDiff * weaponDef.heightMod, weaponDef.projectilespeed, rangeFactor )
+		local adjRadius = rangeFunc( range, heightDiff * weaponDef.heightMod, weaponDef.projectilespeed, rangeFactor, weaponDef.myGravity )
 		local adjustment = rAdj / 2.0
 		local yDiff = 0.0
 
