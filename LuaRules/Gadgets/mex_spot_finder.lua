@@ -225,17 +225,27 @@ end
 ------------------------------------------------------------
 
 local function SanitiseSpots(spots, metalOverride, overrideDefinedMexes)
+	local metalOverrideFunc
+	if type(metalOverride) == "number" then
+		metalOverrideFunc = function() return metalOverride end
+	elseif type(metalOverride) == "function" then
+		metalOverrideFunc = metalOverride
+	end
+
 	local retSpots = {}
 	for i = 1, #spots do
 		local spot = spots[i]
 		if spot and spot.x and spot.z then
+			if metalOverrideFunc and (overrideDefinedMexes or not spot.metal) then
+				local m, x, z = metalOverrideFunc(spot.metal, spot.x, spot.z)
+				spot.metal = m or spot.metal
+				spot.x     = x or spot.x
+				spot.z     = z or spot.z
+			end
+
 			spot.x, spot.z = AdjustCoordinates(spot.x, spot.z)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
-			
-			if metalOverride and (overrideDefinedMexes or not spot.metal) then
-				spot.metal = metalOverride
-			end
-			
+
 			if not spot.metal then
 				local metal = IntegrateMetalFromAdjusted(spot.x, spot.z)
 				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
@@ -268,7 +278,7 @@ local function MakeString(group)
 	end
 end
 
-local function SearchForSpots(spotValueOverride)
+local function SearchForSpots()
 	local spots = {}
 	
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Detecting mex config from metalmap")
@@ -407,15 +417,7 @@ local function SearchForSpots(spotValueOverride)
 			spots[#spots + 1] = d
 		end
 	end
-	
-	-- Apply metal mult and override
-	if spotValueOverride then
-		for i = 1, #spots do
-			local spot = spots[i]
-			spot.metal = spotValueOverride
-		end
-	end
-	
+
 	return spots
 end
 
@@ -451,8 +453,8 @@ local function GetSpots(gameConfig, mapConfig)
 			spotValueOverride = mapConfig.metalValueOverride
 		end
 	end
-	
-	local spots = SanitiseSpots(SearchForSpots(spotValueOverride))
+
+	local spots = SanitiseSpots(SearchForSpots(), spotValueOverride, true)
 	return DoMetalMult(spots), true
 end
 
