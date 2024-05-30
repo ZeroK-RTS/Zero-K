@@ -1112,10 +1112,12 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 	
 	local controlfunc = function() end
 	if option.type == 'button' and (option.action) and (not option.noAutoControlFunc) then
-		controlfunc =
-			function(self)
-				spSendCommands{option.action}
-			end
+		if not option.dontRegisterAction then
+			controlfunc =
+				function(self)
+					spSendCommands{option.action}
+				end
+		end
 	elseif option.type == 'bool' then
 		
 		controlfunc =
