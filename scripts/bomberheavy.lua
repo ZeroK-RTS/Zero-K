@@ -257,7 +257,6 @@ function script.Create()
 	Turn(rad_R, x_axis, math.rad(180))
 	Move(rad_L, z_axis, -2)
 	Move(rad_R, z_axis, -2)
-	Move(base, y_axis, 30, 60)
 	
 	WingStart()
 	Hide(singu2024)
