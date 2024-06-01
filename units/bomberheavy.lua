@@ -1,8 +1,10 @@
 return { bomberheavy = {
+  unitname            = [[bomberheavy]],
   name                = [[Likho]],
   description         = [[Singularity Bomber]],
   --autoheal          = 25,
   brakerate           = 0.4,
+  buildCostMetal      = 2000,
   builder             = false,
   buildPic            = [[bomberheavy.png]],
   canFly              = true,
@@ -16,11 +18,11 @@ return { bomberheavy = {
   collisionVolumeScales  = [[32 12 40]],
   collisionVolumeType    = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[88 34 88]],
+  selectionVolumeScales  = [[65 25 65]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   crashDrag           = 0.02,
-  cruiseAltitude      = 250,
+  cruiseAlt           = 250,
 
   customParams        = {
     modelradius      = [[10]],
@@ -34,13 +36,13 @@ return { bomberheavy = {
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
-  health              = 2360,
   iconType            = [[bombernuke]],
   maneuverleashlength = [[1280]],
   maxAcc              = 0.75,
+  maxDamage           = 2360,
   maxFuel             = 1000000,
   maxRudder           = 0.0045,
-  metalCost           = 2000,
+  maxVelocity         = 9,
   mygravity           = 1,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
@@ -49,7 +51,6 @@ return { bomberheavy = {
   script              = [[bomberheavy.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 780,
-  speed               = 270,
   turnRadius          = 20,
   workerTime          = 0,
 
@@ -99,13 +100,15 @@ return { bomberheavy = {
       impulseBoost            = 0,
       impulseFactor           = -0.8,
       interceptedByShieldType = 2,
-      model                   = [[wep-likho2024.dae]],
+      model                   = [[wep-likho2024.dae]],--[[wep_m_deathblow.s3o]]
       range                   = 500,
       reloadtime              = 1,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/liche_hit]],
       soundStart              = [[weapon/missile/liche_fire]],
       startVelocity           = 300,
+	  --texture1                = [[flarescale01]],--useless
+	  --texture2                = [[AAsmoketrail]],
       tolerance               = 16000,
       tracks                  = true,
       turnRate                = 30000,
@@ -113,6 +116,7 @@ return { bomberheavy = {
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
     },
+	
 
   },
 

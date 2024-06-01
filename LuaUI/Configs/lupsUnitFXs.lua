@@ -196,35 +196,25 @@ effectUnitDefs = {
 	-- length tag does nothing
 	--// PLANES //----------------------------
 	bomberheavy = {
-		-- jets
+		--jets
 		{class='AirJet', options={color={0.4,0.1,0.8}, width=3, length=40, piece="thrust_L", onActive=true, noIconDraw = true, }},
 		{class='AirJet', options={color={0.4,0.1,0.8}, width=3, length=40, piece="thrust_R", onActive=true, noIconDraw = true, }},
-
-		-- ribbons
+		--ribbons
 		{class='Ribbon', options={width=0.5, size=10, piece="wingtip_L", noIconDraw = true}},
 		{class='Ribbon', options={width=0.5, size=10, piece="wingtip_R", noIconDraw = true}},
-
-		-- portable singularity
-		{class='Bursts', options=MergeTable(energysinguBursts,{piece="singu2024", noIconDraw = true, size=5, pos={0,0,0}})},
-		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="singu2024", noIconDraw = true, size=11, pos={0,0,0}})},
-
-		-- blinky lights
-		{class='StaticParticles', options=MergeTable(blinkyLightRed,   {piece="extra_L"}) },
+		--singu
+		{class='Bursts', options=MergeTable(energysinguBursts,{piece="singu2024", noIconDraw = true, size=8, pos={0,0,0}})},
+		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="singu2024", noIconDraw = true, size=17, pos={0,0,0}})},
+		--blinky lights
+		{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="extra_L"}) },
 		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="extra_R"}) },
-
-		-- radiator
-		{class='AirJet', options={color={1,0.8,0.4}, width=3, length=2, piece="radiator_L", noIconDraw = true, }},
-		{class='AirJet', options={color={1,0.8,0.4}, width=3, length=2, piece="radiator_R", noIconDraw = true,}},
-		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="radiator_L", noIconDraw = true, size=8, pos={0,0,0}})},
-		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="radiator_R", noIconDraw = true, size=8, pos={0,0,0}})},
-	},
-	bomberheavyold = {
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true, noIconDraw = true}},
-	 },
-	bomberheavyold = {
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true, noIconDraw = true}},
+		--radiator
+		{class='AirJet', options={color={1,0.8,0.4}, width=2.5, length=2.2, piece="rad_L", noIconDraw = true, }},
+		{class='AirJet', options={color={1,0.8,0.4}, width=2.5, length=2.2, piece="rad_R", noIconDraw = true,}},
+		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="rad_L", noIconDraw = true, size=8.8, pos={0,0,0}})},
+		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="rad_R", noIconDraw = true, size=8.8, pos={0,0,0}})},
+		
+		
 	 },
 	gunshipheavyskirm = {
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="lfjet", onActive=true, noIconDraw = true}},
