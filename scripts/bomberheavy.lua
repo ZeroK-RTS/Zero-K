@@ -3,23 +3,23 @@ include "bombers.lua"
 include "fixedwingTakeOff.lua"
 
 
-local flare1 = piece 'wingtip_L'
-local flare2 = piece 'wingtip_R'
-local base = piece 'likho2024'
-local wing1 = piece 'wing_L'
-local wing2 = piece 'wing_R'
-local thrust1 = piece 'thrust_L'
-local thrust2 = piece 'thrust_R'
+local wingtip_L = piece 'wingtip_L'
+local wingtip_R = piece 'wingtip_R'
+local base = piece 'base'
+local wing_L = piece 'wing_L'
+local wing_R = piece 'wing_R'
+local thrust_L = piece 'thrust_L'
+local thrust_R = piece 'thrust_R'
 local drop = piece 'drop'
-local wingletL = piece 'extra_L'
-local wingletR = piece 'extra_R'
-local coolerL = piece 'radiator_L'--model
-local coolerR = piece 'radiator_R'
-local heatL = piece 'rad_L'--empty for fx
-local heatR = piece 'rad_R'
-local hatchL = piece 'hatch_L'
-local hatchR = piece 'hatch_R'
-local ball = piece 'singu2024'
+local extra_L = piece 'extra_L'
+local extra_R = piece 'extra_R'
+local radiator_L = piece 'radiator_L'--model
+local radiator_R = piece 'radiator_R'
+local rad_L = piece 'rad_L'--empty for fx
+local rad_R = piece 'rad_R'
+local hatch_L = piece 'hatch_L'
+local hatch_R = piece 'hatch_R'
+local singu2024 = piece 'singu2024'
 
 local smokePiece = {base}
 
@@ -42,29 +42,29 @@ end
 
 local function cool()
 	if armed==0 and cooling==0 then
-		Show(coolerL)
-		Show(coolerR)
-		Turn(hatchL, y_axis, math.rad(-90), 2)
-		Turn(hatchR, y_axis, math.rad(90), 2)
-		Move(coolerL, z_axis, 3, 1)
-		Move(coolerR, z_axis, 3, 1)
-		Move(heatL, z_axis, 3, 1)
-		Move(heatR, z_axis, 3, 1)
-		Spin(ball, y_axis, 0)
+		Show(radiator_L)
+		Show(radiator_R)
+		Turn(hatch_L, y_axis, math.rad(-90), 2)
+		Turn(hatch_R, y_axis, math.rad(90), 2)
+		Move(radiator_L, z_axis, 3, 1)
+		Move(radiator_R, z_axis, 3, 1)
+		Move(rad_L, z_axis, 3, 1)
+		Move(rad_R, z_axis, 3, 1)
+		Spin(singu2024, y_axis, 0)
 		cooling = 1
 	end
 	if armed==1 and cooling ==1 then
-		Move(coolerL, z_axis, 0, 2)
-		Move(coolerR, z_axis, 0, 2)
-		Move(heatL, z_axis, -2, 2)
-		Move(heatR, z_axis, -2, 2)
-		Turn(hatchL, y_axis, math.rad(0), 1)
-		Turn(hatchR, y_axis, math.rad(0), 1)
-		Spin(ball, y_axis, math.rad(30))
-		WaitForTurn (hatchL, y_axis)
-		WaitForTurn (hatchR, y_axis)
-		Hide(coolerL)
-		Hide(coolerR)
+		Move(radiator_L, z_axis, 0, 2)
+		Move(radiator_R, z_axis, 0, 2)
+		Move(rad_L, z_axis, -2, 2)
+		Move(rad_R, z_axis, -2, 2)
+		Turn(hatch_L, y_axis, math.rad(0), 1)
+		Turn(hatch_R, y_axis, math.rad(0), 1)
+		Spin(singu2024, y_axis, math.rad(30))
+		WaitForTurn (hatch_L, y_axis)
+		WaitForTurn (hatch_R, y_axis)
+		Hide(radiator_L)
+		Hide(radiator_R)
 		cooling = 0
 	end
 	
@@ -72,62 +72,62 @@ end
 
 --add spin?
 
-local function Reball()	
+local function Resingu2024()	
 	local ammoState = Spring.GetUnitRulesParam(unitID, "noammo")
 	
 	if ammoState==0 then
 		armed=1
 		
-		Show(ball)
-		--SetPieceScale(ball, 1)
-		Move(ball, x_axis, 0, 0)
-		Move(ball, y_axis, 0, 0)
-		Move(ball, z_axis, 0, 0)
+		Show(singu2024)
+		--SetPieceScale(singu2024, 1)
+		Move(singu2024, x_axis, 0, 0)
+		Move(singu2024, y_axis, 0, 0)
+		Move(singu2024, z_axis, 0, 0)
 		cool()
 	end
 end
 
 local function LandOld()
-	Turn(wingletL, z_axis, math.rad(-30), 3)
-	Turn(wingletR, z_axis, math.rad(30), 3)
+	Turn(extra_L, z_axis, math.rad(-30), 3)
+	Turn(extra_R, z_axis, math.rad(30), 3)
 	
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
+	WaitForTurn (extra_L, z_axis)
+	WaitForTurn (extra_R, z_axis)
 	
-	Turn(wingletL, z_axis, math.rad(-146.3), 2)
-	Turn(wingletR, z_axis, math.rad(146.3), 2)
+	Turn(extra_L, z_axis, math.rad(-146.3), 2)
+	Turn(extra_R, z_axis, math.rad(146.3), 2)
 	
-	Turn(wing1, y_axis, math.rad(-90), 2)
-	Turn(wing2, y_axis, math.rad(90), 2)
+	Turn(wing_L, y_axis, math.rad(-90), 2)
+	Turn(wing_R, y_axis, math.rad(90), 2)
 	
-	WaitForTurn (wing1, y_axis)
-	WaitForTurn (wing2, y_axis)
+	WaitForTurn (wing_L, y_axis)
+	WaitForTurn (wing_R, y_axis)
 	
-	Turn(wing1, x_axis, math.rad(6), 2)
-	Turn(wing2, x_axis, math.rad(6), 2)
+	Turn(wing_L, x_axis, math.rad(6), 2)
+	Turn(wing_R, x_axis, math.rad(6), 2)
 end
 
 local function Land()
-	Turn(wingletL, z_axis, math.rad(-30), 3)
-	Turn(wingletR, z_axis, math.rad(30), 3)
+	Turn(extra_L, z_axis, math.rad(-30), 3)
+	Turn(extra_R, z_axis, math.rad(30), 3)
 	
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
+	WaitForTurn (extra_L, z_axis)
+	WaitForTurn (extra_R, z_axis)
 	
-	Turn(wingletL, z_axis, math.rad(-146.3), 2)
-	Turn(wingletR, z_axis, math.rad(146.3), 2)
+	Turn(extra_L, z_axis, math.rad(-146.3), 2)
+	Turn(extra_R, z_axis, math.rad(146.3), 2)
 	
-	Move(wing1, x_axis, -7, 6)
-	Move(wing2, x_axis, 7, 6)
+	Move(wing_L, x_axis, -7, 6)
+	Move(wing_R, x_axis, 7, 6)
 	
-	Move(wing1, y_axis, -9, 8)
-	Move(wing2, y_axis, -9, 8)
+	Move(wing_L, y_axis, -9, 8)
+	Move(wing_R, y_axis, -9, 8)
 	
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
+	WaitForTurn (extra_L, z_axis)
+	WaitForTurn (extra_R, z_axis)
 	
-	Move(wingletL, x_axis, -1, 3)
-	Move(wingletR, x_axis, 1, 3)
+	Move(extra_L, x_axis, -1, 3)
+	Move(extra_R, x_axis, 1, 3)
 	
 end
 
@@ -138,79 +138,79 @@ local function Stopping()
 	Land()
 	
 	
-	Reball()
+	Resingu2024()
 	
 end
 
 local function FlyOld()
-	Turn(wing1, y_axis, math.rad(0), 2)
-	Turn(wing2, y_axis, math.rad(0), 2)
-	Turn(wing1, z_axis, math.rad(0), 2)
-	Turn(wing2, z_axis, math.rad(0), 2)
-	Turn(wing1, x_axis, math.rad(0), 2)
-	Turn(wing2, x_axis, math.rad(0), 2)
-	Turn(wingletL, z_axis, math.rad(-30), 2)
-	Turn(wingletR, z_axis, math.rad(30), 2)
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
-	Turn(wingletL, z_axis, math.rad(0), 1)
-	Turn(wingletR, z_axis, math.rad(0), 1)
+	Turn(wing_L, y_axis, math.rad(0), 2)
+	Turn(wing_R, y_axis, math.rad(0), 2)
+	Turn(wing_L, z_axis, math.rad(0), 2)
+	Turn(wing_R, z_axis, math.rad(0), 2)
+	Turn(wing_L, x_axis, math.rad(0), 2)
+	Turn(wing_R, x_axis, math.rad(0), 2)
+	Turn(extra_L, z_axis, math.rad(-30), 2)
+	Turn(extra_R, z_axis, math.rad(30), 2)
+	WaitForTurn (extra_L, z_axis)
+	WaitForTurn (extra_R, z_axis)
+	Turn(extra_L, z_axis, math.rad(0), 1)
+	Turn(extra_R, z_axis, math.rad(0), 1)
 end
 
 local function Fly()
-	Move(wing1, x_axis, 0, 6)
-	Move(wing2, x_axis, 0, 6)
-	Move(wing1, y_axis, 0, 8)
-	Move(wing2, y_axis, 0, 8)
+	Move(wing_L, x_axis, 0, 6)
+	Move(wing_R, x_axis, 0, 6)
+	Move(wing_L, y_axis, 0, 8)
+	Move(wing_R, y_axis, 0, 8)
 	
-	Move(wingletL, x_axis, 0, 3)
-	Move(wingletR, x_axis, 0, 3)
+	Move(extra_L, x_axis, 0, 3)
+	Move(extra_R, x_axis, 0, 3)
 	
-	Turn(wingletL, z_axis, math.rad(-30), 2)
-	Turn(wingletR, z_axis, math.rad(30), 2)
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
-	Turn(wingletL, z_axis, math.rad(0), 1)
-	Turn(wingletR, z_axis, math.rad(0), 1)
+	Turn(extra_L, z_axis, math.rad(-30), 2)
+	Turn(extra_R, z_axis, math.rad(30), 2)
+	WaitForTurn (extra_L, z_axis)
+	WaitForTurn (extra_R, z_axis)
+	Turn(extra_L, z_axis, math.rad(0), 1)
+	Turn(extra_R, z_axis, math.rad(0), 1)
 end
 
 local function WingStart()
-	Move(wing1, x_axis, -7, 0)
-	Move(wing2, x_axis, 7, 0)
-	Move(wing1, y_axis, -9, 0)
-	Move(wing2, y_axis, -9, 0)
+	Move(wing_L, x_axis, -7, 0)
+	Move(wing_R, x_axis, 7, 0)
+	Move(wing_L, y_axis, -9, 0)
+	Move(wing_R, y_axis, -9, 0)
 	
-	Turn(wingletL, z_axis, math.rad(-30), 0)
-	Turn(wingletR, z_axis, math.rad(30), 0)
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
-	Turn(wingletL, z_axis, math.rad(-146.3), 0)
-	Turn(wingletR, z_axis, math.rad(146.3), 0)
-	WaitForTurn (wingletL, z_axis)
-	WaitForTurn (wingletR, z_axis)
-	Move(wingletL, x_axis, -1, 0)
-	Move(wingletR, x_axis, 1, 0)
+	Turn(extra_L, z_axis, math.rad(-30), 0)
+	Turn(extra_R, z_axis, math.rad(30), 0)
+	WaitForTurn (extra_L, z_axis)
+	WaitForTurn (extra_R, z_axis)
+	Turn(extra_L, z_axis, math.rad(-146.3), 0)
+	Turn(extra_R, z_axis, math.rad(146.3), 0)
+	WaitForTurn (extra_L, z_axis)
+	WaitForTurn (extra_R, z_axis)
+	Move(extra_L, x_axis, -1, 0)
+	Move(extra_R, x_axis, 1, 0)
 end
 
 local function WingStartOld()
-	Turn(wingletL, z_axis, math.rad(-146.3), 0)
-	Turn(wingletR, z_axis, math.rad(146.3), 0)
+	Turn(extra_L, z_axis, math.rad(-146.3), 0)
+	Turn(extra_R, z_axis, math.rad(146.3), 0)
 	
-	Turn(wing1, y_axis, math.rad(-90), 0)
-	Turn(wing2, y_axis, math.rad(90), 0)
+	Turn(wing_L, y_axis, math.rad(-90), 0)
+	Turn(wing_R, y_axis, math.rad(90), 0)
 	
-	WaitForTurn (wing1, y_axis)
-	WaitForTurn (wing2, y_axis)
+	WaitForTurn (wing_L, y_axis)
+	WaitForTurn (wing_R, y_axis)
 	
-	Turn(wing1, x_axis, math.rad(6), 0)
-	Turn(wing2, x_axis, math.rad(6), 0)
+	Turn(wing_L, x_axis, math.rad(6), 0)
+	Turn(wing_R, x_axis, math.rad(6), 0)
 end
 
 local function Moving()
 	Signal(SIG_move)
 	SetSignalMask(SIG_move)
 	
-	Reball()
+	Resingu2024()
 	Fly()
 	
 	
@@ -241,7 +241,7 @@ local function built()
 		Sleep(100)
 		stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 	end
-	Show(ball)
+	Show(singu2024)
 end
 
 function script.Create()
@@ -253,30 +253,30 @@ function script.Create()
 	Turn(exhaust_L, x_axis, math.rad(90))
 	Turn(exhaust_R, x_axis, math.rad(90))
 	
-	Turn(heatL, x_axis, math.rad(180))
-	Turn(heatR, x_axis, math.rad(180))
-	Move(heatL, z_axis, -2)
-	Move(heatR, z_axis, -2)
-			
+	Turn(rad_L, x_axis, math.rad(180))
+	Turn(rad_R, x_axis, math.rad(180))
+	Move(rad_L, z_axis, -2)
+	Move(rad_R, z_axis, -2)
+	Move(base, y_axis, 30, 60)
 	
 	WingStart()
-	Hide(ball)
-	Hide(coolerL)
-	Hide(coolerR)
+	Hide(singu2024)
+	Hide(radiator_L)
+	Hide(radiator_R)
 
 	SetInitialBomberSettings()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(built)
 	
-	Spin(ball, y_axis, math.rad(30))
+	Spin(singu2024, y_axis, math.rad(30))
 	
 end
 
 function script.FireWeapon(num)
-	Move(ball, y_axis, 27)
-	Move(ball, z_axis, 2)
-	Hide(ball)
+	Move(singu2024, y_axis, 27)
+	Move(singu2024, z_axis, 2)
+	Hide(singu2024)
 	armed=0
 	cool()
 	SetUnarmedAI()
@@ -302,20 +302,20 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
 		Explode(base, SFX.NONE)
-		Explode(wing1, SFX.NONE)
-		Explode(wing2, SFX.NONE)
+		Explode(wing_L, SFX.NONE)
+		Explode(wing_R, SFX.NONE)
 		return 1
 	elseif severity <= .50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(wing1, SFX.FALL + SFX.SMOKE + SFX.FIRE)
-		Explode(wing2, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wing_L, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wing_R, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	elseif severity <= .75 then
-		Explode(wing1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(wing2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wing_L, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wing_R, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	else
-		Explode(wing1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(wing2, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wing_L, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(wing_R, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		return 2
 	end
 end
