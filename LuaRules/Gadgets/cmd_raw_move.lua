@@ -577,7 +577,9 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 function gadget:UnitArrivedAtGoal(unitID, unitDefID)
-	rawMoveUnit[unitID].moveComplete = true
+	if rawMoveUnit[unitID] then
+		rawMoveUnit[unitID].moveComplete = true
+	end
 end
 
 ----------------------------------------------------------------------------------------------
