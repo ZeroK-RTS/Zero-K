@@ -486,6 +486,20 @@ local function InitPlayerData(playerID)
 	return {team = teamID, spectator = spectator}
 end
 
+local function RemoveDuplicateFilenames(files)
+	local commons = {}
+	local i = 1
+	while files[i] do
+		local filename = files[i]:gsub('\\','/')
+		if commons[filename] then
+			table.remove(files,i)
+		else
+			commons[filename] = true
+			i = i + 1
+		end
+	end
+end
+
 function widgetHandler:Initialize()
 	TimeLoad("==== widgetHandler Begin ====")
 	local gaia = Spring.GetGaiaTeamID()
@@ -531,6 +545,9 @@ function widgetHandler:Initialize()
 	TimeLoad("Start loading widget files")
 	-- stuff the widgets into unsortedWidgets
 	local widgetFiles = VFS.DirList(WIDGET_DIRNAME, "*.lua", VFSMODE)
+	if VFSMODE == VFS.ZIP_FIRST or VFSMODE == VFS.RAW_FIRST then
+		RemoveDuplicateFilenames(widgetFiles)
+	end
 	local wantYield = Spring.Yield and Spring.Yield()
 	for k, wf in ipairs(widgetFiles) do
 		local widget = self:LoadWidget(wf)
