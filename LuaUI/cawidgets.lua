@@ -486,6 +486,8 @@ local function InitPlayerData(playerID)
 	return {team = teamID, spectator = spectator}
 end
 
+-- https://github.com/beyond-all-reason/spring/issues/1526
+-- FIXME: poison VFS.DirList directly since the issue affects any call thereof
 local function RemoveDuplicateFilenames(files)
 	local commons = {}
 	local i = 1
