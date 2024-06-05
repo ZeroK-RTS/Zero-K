@@ -297,6 +297,10 @@ function widget:Initialize()
 
 	firstTime = true
 	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
+	if WG.uiScale then
+		vsx = vsx * WG.uiScale
+		vsy = vsy * WG.uiScale
+	end
 
 	local commonTexOpts = {
 		target = GL_TEXTURE_2D,
