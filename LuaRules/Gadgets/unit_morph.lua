@@ -942,14 +942,8 @@ local morphUnitsSynced = {}
 --//synced -> unsynced actions
 
 local function SelectSwap(cmd, oldID, newID)
-	local selUnits = Spring.GetSelectedUnits()
-	for i = 1, #selUnits do
-		local unitID = selUnits[i]
-		if (unitID == oldID) then
-			selUnits[i] = newID
-			Spring.SelectUnitArray(selUnits)
-			break
-		end
+	if Spring.IsUnitSelected(oldID) then
+		Spring.SelectUnit(newID, true)
 	end
 
 	if (Script.LuaUI('MorphFinished')) then
