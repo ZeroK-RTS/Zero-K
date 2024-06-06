@@ -94,18 +94,14 @@ end
 ----------------------------------------------------
 --code for "SelectNextPlayer" button----
 --pressing the button will cycle view thru available teams flawlessly--
---code compatibility note: Spring 91's PlayerRoster return "isSpec" as number 1 or 0, but in Spring 93.2 it return it as boolean.
 
 SelectNextPlayer = function ()
 	local currentTeam = Spring.GetLocalTeamID()
 	local playerTableSortTeamID = Spring.GetPlayerRoster(2)
-	local isSpring91 = type(playerTableSortTeamID[1][5])=='number'
 	local currentTeamIndex, firstPlayerIndex, teamIndexGoto = -1,nil,nil
 	for i=1, #playerTableSortTeamID do
 		local teamID = playerTableSortTeamID[i][3]
 		local isSpec = playerTableSortTeamID[i][5]
-		if ( isSpring91 ) then isSpec = ( isSpec==1 )
-		end
 		if (not isSpec ) then
 			if not firstPlayerIndex then --if spectator portion has finished: mark this index
 				firstPlayerIndex = i
@@ -126,8 +122,6 @@ SelectNextPlayer = function ()
 					teamIndexGoto = firstPlayerIndex
 				end
 				local isSpec = playerTableSortTeamID[teamIndexGoto][5]
-				if ( isSpring91 ) then isSpec = ( isSpec==1 )
-				end
 				if (not isSpec ) then --not spectator
 					break
 				end
