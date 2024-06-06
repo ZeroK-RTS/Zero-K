@@ -128,13 +128,8 @@ SelectNextPlayer = function ()
 				teamIndexGoto = teamIndexGoto + 1
 			end
 		end
+		Spring.SelectUnit(nil)
 		spSendCommands("specteam "..playerTableSortTeamID[teamIndexGoto][3])
 		Spring.Echo("game_message:Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
-		local teamsUnit = Spring.GetTeamUnits(playerTableSortTeamID[teamIndexGoto][3])
-		if teamsUnit and teamsUnit[1] then
-			Spring.SelectUnitArray({teamsUnit[math.random(1,#teamsUnit)],}) --select this player's unit
-		else
-			Spring.SelectUnitArray({nil,})
-		end
 	end
 end
