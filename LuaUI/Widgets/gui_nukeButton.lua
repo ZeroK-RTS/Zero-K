@@ -102,7 +102,6 @@ local spGetTeamUnits 		= Spring.GetTeamUnits
 local spGetMyTeamID			= Spring.GetMyTeamID
 local spGetMouseState       = Spring.GetMouseState
 local spGiveOrderToUnit 	= Spring.GiveOrderToUnit
-local spSelectUnitArray 	= Spring.SelectUnitArray
 local spGetGameSpeed		= Spring.GetGameSpeed
 local spSetActiveCommand	= Spring.SetActiveCommand
 --local DrawGhostFeatures
@@ -281,7 +280,7 @@ end
 function widget:MousePress(x, y, button)
 	if ( isMouseOver( x, y ) and readyNukeCount > 0 and button == 1 ) then
 		local timeNow = spGetGameSeconds()
-		spSelectUnitArray( { intConfig["nextNuke"] } , false )
+		Spring.SelectUnit(intConfig["nextNuke"])
 		
 		local _,speedfac, _ = spGetGameSpeed()
 		if ( timeNow < intConfig["leftClickTime"] + (0.5 * speedfac ) ) then

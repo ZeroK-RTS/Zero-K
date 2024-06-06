@@ -1052,7 +1052,7 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 			elseif shift then
 				spSelectUnitArray(unitList) -- select all
 			else
-				spSelectUnitArray({unitID})  -- only 1
+				Spring.SelectUnit(unitID)  -- only 1
 			end
 		end
 	else --button2 (middle)

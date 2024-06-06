@@ -121,7 +121,7 @@ local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitDefID     = Spring.GetUnitDefID
 local GetUnitHealth    = Spring.GetUnitHealth
 local GetMouseState    = Spring.GetMouseState
-local SelectUnitArray  = Spring.SelectUnitArray
+local spSelectUnit     = Spring.SelectUnit
 local TraceScreenRay   = Spring.TraceScreenRay
 local GetUnitPosition  = Spring.GetUnitPosition
 local GetGroupList     = Spring.GetGroupList
@@ -297,7 +297,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 							local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 							if buildProgress == 1 then
 								SetUnitGroup(unitID, gr)
-								SelectUnitArray({unitID}, true)
+								spSelectUnit(unitID, true)
 							end
 						else
 							SetUnitGroup(unitID, -1)
@@ -326,7 +326,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			end
 			if (muid ~= nil) then
 				SetUnitGroup(muid,-1)
-				SelectUnitArray({muid})
+				spSelectUnit(muid)
 			end
 		end
 		 --[[

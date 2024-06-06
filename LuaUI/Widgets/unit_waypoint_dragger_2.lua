@@ -9,7 +9,6 @@ local sprGetCommandQueue     = Spring.GetCommandQueue
 local sprGetMouseState       = Spring.GetMouseState
 local sprGetModKeyState      = Spring.GetModKeyState
 local sprGiveOrderToUnit     = Spring.GiveOrderToUnit
-local sprSelectUnitArray     = Spring.SelectUnitArray
 local sprIsAboveMiniMap      = Spring.IsAboveMiniMap
 local sprTestBuildOrder      = Spring.TestBuildOrder
 local sprGetBuildFacing      = Spring.GetBuildFacing

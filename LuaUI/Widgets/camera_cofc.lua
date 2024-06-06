@@ -1802,7 +1802,7 @@ OverviewAction = function()
 		if thirdperson_trackunit then
 			local selUnits = spGetSelectedUnits() --player's new unit to track
 			if not (selUnits and selUnits[1]) then --if player has no new unit to track
-				Spring.SelectUnitArray({thirdperson_trackunit}) --select the original unit
+				Spring.SelectUnit(thirdperson_trackunit) --select the original unit
 				selUnits = spGetSelectedUnits()
 			end
 			thirdperson_trackunit = false
@@ -2010,7 +2010,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 		local lowestStructureSeparation = 9999
 		for i=1, #sphUnits do
 			local unitID = sphUnits[i]
-			Spring.SelectUnitArray({unitID}) --test select unit (in case its not selectable)
+			Spring.SelectUnit(unitID) --test select unit (in case its not selectable)
 			local selUnits = spGetSelectedUnits()
 			if selUnits and selUnits[1] then --find unit in that area
 				local defID = spGetUnitDefID(unitID)
@@ -2038,7 +2038,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 		foundUnit = thirdperson_trackunit
 		Spring.Echo("COFC: no unit in that direction to jump to!")
 	end
-	Spring.SelectUnitArray({foundUnit}) --give selection order to player
+	Spring.SelectUnit(foundUnit) --give selection order to player
 	spSendCommands('viewfps')
 	spSendCommands('track')
 	thirdperson_trackunit = foundUnit --remember current unitID
@@ -2880,14 +2880,14 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			return
 		end
 		if Spring.ValidUnitID(attackerID) then --shift tracking toward attacker if it is alive (cinematic).
-			Spring.SelectUnitArray({attackerID})
+			Spring.SelectUnit(attackerID)
 		end
 		local selUnits = spGetSelectedUnits()--test select unit
 		if not (selUnits and selUnits[1]) then --if can't select, then, check any unit in vicinity
 			local x,_,z = spGetUnitPosition(unitID)
 			local units = Spring.GetUnitsInCylinder(x,z, 100)
 			if units and units[1] then
-				Spring.SelectUnitArray({units[1]})
+				Spring.SelectUnit(units[1])
 			end
 		end
 		selUnits = spGetSelectedUnits()--test select unit

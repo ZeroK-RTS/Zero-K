@@ -57,7 +57,7 @@ function widget:GameFrame(f)
 				-- Do not select commander at the start of campaign battles. The selection UI can clip into the mission
 				-- objectives popup and often there are many units to select at the start.
 				if not campaignBattleID then
-					Spring.SelectUnitArray{teamUnits[unitCount]}
+					Spring.SelectUnit(teamUnits[unitCount])
 				end
 			end
 			unitCount = unitCount + 1
