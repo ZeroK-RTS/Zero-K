@@ -266,7 +266,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 							waypointFac  = stackname
 						else
 							Spring.PlaySoundFile(sound_click, 1, 'ui')
-							Spring.SelectUnitArray({unitID})
+							Spring.SelectUnit(unitID)
 						end
 					end
 					or nil

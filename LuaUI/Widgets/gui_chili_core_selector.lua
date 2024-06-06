@@ -395,7 +395,7 @@ local function SelectComm()
 	end
 	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	Spring.SelectUnitArray({unitID}, shift)
+	Spring.SelectUnit(unitID, shift)
 	if not shift then
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		SetCameraTarget(x, y, z)
@@ -471,17 +471,17 @@ local function SelectIdleCon()
 			end
 		end
 
-		Spring.SelectUnitArray({muid}, true)
+		Spring.SelectUnit(muid, true)
 	else
 		if idleConCount == 0 then
-			Spring.SelectUnitArray({})
+			Spring.SelectUnit(nil)
 		else
 			conIndex = (conIndex % idleConCount) + 1
 			local i = 1
 			for uid, v in pairs(idleCons) do
 				if uid ~= "count" then
 					if i == conIndex then
-						Spring.SelectUnitArray({uid})
+						Spring.SelectUnit(uid)
 						local x, y, z = Spring.GetUnitPosition(uid)
 						SetCameraTarget(x, y, z)
 						return
@@ -960,7 +960,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 	
 	local function OnClick(mouse)
 		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		Spring.SelectUnitArray({unitID}, shift)
+		Spring.SelectUnit(unitID, shift)
 		if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 			local x, y, z = Spring.GetUnitPosition(unitID)
 			SetCameraTarget(x, y, z)
@@ -1111,7 +1111,7 @@ end
 local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 
 	local function OnClick(mouse)
-		Spring.SelectUnitArray({unitID}, shift)
+		Spring.SelectUnit(unitID, shift)
 		if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 			local x, y, z = Spring.GetUnitPosition(unitID)
 			SetCameraTarget(x, y, z)
