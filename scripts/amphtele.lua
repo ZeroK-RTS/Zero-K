@@ -3,6 +3,7 @@
 include "constants.lua"
 include "utility.lua"
 include 'letsNotFailAtTrig.lua'
+include 'reliableStartMoving.lua'
 
 -- unused piece: base
 local pelvis, body = piece('pelvis', 'body')
@@ -317,19 +318,23 @@ local function Stopping()
 	DeployTeleport()
 end
 
+local movingData = {}
 function script.StartMoving()
+	movingData.moving = true
 	deployed = false
 	GG.tele_undeployTeleport(unitID)
 	StartThread(Walk)
 end
 
 function script.StopMoving()
+	movingData.moving = false
 	Signal(SIG_WALK)
 	StartThread(Stopping)
 end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true, movingData)
 	--StartThread(Walk)
 	activity_mode(1)
 end
