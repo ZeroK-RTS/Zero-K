@@ -88,6 +88,13 @@ function Spring.Utilities.CheckBit(name, number, bit)
 	return number and (number%(2*bit) >= bit)
 end
 
+function Spring.Utilities.FilterOutBit(number, bit)
+	if Spring.Utilities.CheckBit(false, number, bit) then
+		number = number - bit
+	end
+	return number
+end
+
 function Spring.Utilities.IsBitSet(number, bit)
 	return number and (number%(2*bit) >= bit)
 end
