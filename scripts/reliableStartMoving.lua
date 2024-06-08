@@ -63,6 +63,10 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 		elseif fallTimeLeeway then
 			-- Falling does not count as moving and we have some time to not start moving after hitting the ground
 			externalDataAccess.fallTime = fallTimeLeeway
+			if moving and y > height + 0.5 then
+				moving = false
+				stopFunc()
+			end
 		end
 		Sleep(350)
 	end
