@@ -21,7 +21,7 @@ end
 
 local hpi = math.pi*0.5
 
-local headingSpeed = math.rad(2.4)
+local headingSpeed = math.rad(3)
 local pitchSpeed = math.rad(61) -- Float maths makes this exactly one revolution every 6 seconds.
 
 guns[5].y = 11
@@ -71,7 +71,7 @@ local spinScriptAccel = 0.05
 local maxSpin = math.pi/3
 
 local spinMult = 0
-local MAX_SPIN = 1.5
+local MAX_SPIN = 1.6
 local targetSpin = MAX_SPIN
 local gunNum = 1
 local aimSpeedMult = 1
@@ -82,7 +82,7 @@ local function UpdateSpin(gainSpin, loseSpin)
 	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 	reloadChange = ((stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)) * MAX_SPIN
 	if gainSpin then
-		local gain = math.max(0.01, (0.022*math.min(1, spinMult) - 0.042)*spinMult + 0.033)
+		local gain = math.max(0.01, (0.026*math.min(1, spinMult) - 0.042)*spinMult + 0.033)
 		spinMult = spinMult + gain
 	end
 	if spinMult > MAX_SPIN then
@@ -99,7 +99,7 @@ local function UpdateSpin(gainSpin, loseSpin)
 				spinMult = 0
 			end
 		elseif spinMult > targetSpin then
-			spinMult = spinMult*0.95 - 0.004
+			spinMult = spinMult*0.9 - 0.005
 			if spinMult < targetSpin then
 				spinMult = targetSpin
 			end
@@ -112,7 +112,10 @@ local function UpdateSpin(gainSpin, loseSpin)
 			spinMult = minSpinMult
 		end
 	end
-	aimSpeedMult = math.max(0.09, 1 - math.pow((math.max(0.5, spinMult) - 0.4)*1.8, 4/3)*0.7)
+	aimSpeedMult = math.max(0.12, 1 - math.pow((math.max(0.5, spinMult) - 0.55)*1.8, 4/3)*0.7)
+	--for i = 0, 1.6, 0.02 do
+	--	Spring.Echo(i, math.max(0.12, 1 - math.pow((math.max(0.5, i) - 0.55)*1.8, 4/3)*0.7))
+	--end
 	Spin(spindle, x_axis, spinMult*maxSpin, spinScriptAccel)
 	Spring.SetUnitRulesParam(unitID, "speed_bar", spinMult / MAX_SPIN, LOS_ACCESS)
 end
@@ -167,10 +170,10 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	--Spring.Echo(headDiff*180/math.pi)
 
-	if headDiff > 0.85 then
-		targetSpin = 0.5
-	elseif headDiff > 0.02 then
-		targetSpin = 1 - headDiff*0.6
+	if headDiff > 0.9 then
+		targetSpin = 0.74
+	elseif headDiff > 0.08 then
+		targetSpin = math.min(1.137, 1.17 - 0.45 * (headDiff / 0.9))
 	else
 		targetSpin = MAX_SPIN
 	end
