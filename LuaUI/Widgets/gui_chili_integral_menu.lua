@@ -892,12 +892,14 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 			alreadyRemovedTag[cmdTag] = true
 			spGiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, CMD.OPT_CTRL)
 			if reinsertPosition then
-				-- Should we preserve opts? All this would do is preserve whether an alt-inserted
-				-- command should be removed from a repeat queue. Is that even desirable for a 
-				-- block that has been moved though?
-				--local opts = thisCmd.options
-				--local coded = opts.coded
-				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, CMD.OPT_CTRL + CMD.OPT_ALT)
+				-- Copying Shift and Ctrl effectively multiplies the number of commands issued,
+				-- because each of the five shift commands is an individual command.
+				local opts = thisCmd.options
+				local coded = opts.coded
+				coded = Spring.Utilities.FilterOutBit(coded, CMD.OPT_SHIFT)
+				coded = Spring.Utilities.FilterOutBit(coded, CMD.OPT_CTRL)
+				Spring.Echo(coded, math.random())
+				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
 			end
 			j = j + 1
 		end
