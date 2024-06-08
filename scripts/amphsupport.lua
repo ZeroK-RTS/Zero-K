@@ -1,4 +1,5 @@
 include 'constants.lua'
+include 'reliableStartMoving.lua'
 
 local base = piece 'base'
 local aimfrom = piece 'aimfrom'
@@ -27,6 +28,8 @@ local lbarrel = piece 'lbarrel'
 local lflare = piece 'lflare'
 
 local smokePiece = {head}
+
+local weaponRange = WeaponDefNames["amphsupport_cannon"].range
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -345,7 +348,9 @@ local function SetDeploy(wantDeploy)
 	end
 end
 
+local movingData = {}
 function StartMoving()
+	movingData.moving = true
 	moving = true
 	StartThread(SetDeploy, false)
 	Signal(SIG_FLOAT)
@@ -354,6 +359,7 @@ function StartMoving()
 end
 
 function StopMoving()
+	movingData.moving = false
 	moving = false
 	StartThread(SetDeploy, true)
 	if floating then
@@ -363,45 +369,13 @@ function StopMoving()
 	Signal(SIG_WALK)
 end
 
+function script.StartMoving()
+	StartMoving()
+end
+
 function script.StopMoving()
 	GG.Floating_StopMoving(unitID)
-end
-
-local prevSpeed = false
-local function IsMoving()
-	local speed = select(4, spGetUnitVelocity(unitID))
-	floating = false
-	if speed <= 0.1 then
-		prevSpeed = false
-		return false
-	end
-	if not prevSpeed then
-		prevSpeed = true
-		return false
-	end
-	local x, y, z = spGetUnitPosition(unitID)
-	if (y > -2) then
-		return true
-	end
-	-- Deploy if floating somewhere in the water.
-	local height = spGetGroundHeight(x, z)
-	floating = (y > height + 1) and (height < -20)
-	return not floating
-end
-
-local function CheckMoving()
-	while true do
-		if moving then
-			if not IsMoving() then
-				StopMoving()
-			end
-		else
-			if IsMoving()  then
-				StartMoving()
-			end
-		end
-		Sleep(33)
-	end
+	StopMoving()
 end
 
 --------------------------------------------------------------------------------------
@@ -411,11 +385,11 @@ local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		if height < -20 then
-			Spring.SetUnitWeaponState(unitID, 2, {range = 550 - height})
-			Spring.SetUnitMaxRange(unitID, 550 - height)
+			Spring.SetUnitWeaponState(unitID, 2, {range = weaponRange - 50 - height})
+			Spring.SetUnitMaxRange(unitID, weaponRange -50 - height)
 		else
-			Spring.SetUnitWeaponState(unitID, 2, {range = 600})
-			Spring.SetUnitMaxRange(unitID, 600)
+			Spring.SetUnitWeaponState(unitID, 2, {range = weaponRange})
+			Spring.SetUnitMaxRange(unitID, weaponRange)
 		end
 		Sleep(500)
 	end
@@ -427,7 +401,7 @@ function script.Create()
 	Turn(laxel, x_axis, math.rad(-10))
 	moving = false
 	
-	StartThread(CheckMoving)
+	StartThread(GG.StartStopMovingControl, unitID, StartMoving, StopMoving, 0.3, false, movingData, 4, true)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 	

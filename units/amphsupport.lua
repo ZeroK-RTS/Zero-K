@@ -55,8 +55,8 @@ return { amphsupport = {
 
   },
 
-  sightDistance          = 660,
-  sonarDistance          = 660,
+  sightDistance          = 700,
+  sonarDistance          = 700,
   speed                  = 48,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -106,7 +106,7 @@ return { amphsupport = {
       interceptedByShieldType = 1,
       myGravity               = 0.12,
       noSelfDamage            = true,
-      range                   = 600,
+      range                   = 640,
       reloadtime              = 1.9,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],
@@ -139,7 +139,7 @@ return { amphsupport = {
       interceptedByShieldType = 1,
       myGravity               = 0.12,
       noSelfDamage            = true,
-      range                   = 600,
+      range                   = 640,
       reloadtime              = 1.8,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],
