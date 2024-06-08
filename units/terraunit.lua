@@ -18,6 +18,7 @@ return { terraunit = {
     mobilebuilding = [[1]],
     cannotcloak    = [[1]],
     instantselfd   = [[1]],
+    fireproof      = [[1]],
   },
 
   explodeAs              = [[NOWEAPON]],
