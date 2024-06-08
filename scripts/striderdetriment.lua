@@ -350,7 +350,7 @@ end
 local function RestoreAfterDelay()
 	local counter = 2
 	while true do
-		if counter > 0 then
+		if counter > 0 and not Spring.GetUnitIsStunned(unitID) then
 			counter = counter - 1
 		end
 		if resetRestore then
