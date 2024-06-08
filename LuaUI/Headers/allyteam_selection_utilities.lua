@@ -4,9 +4,9 @@ local function GetLeftRightAllyTeamIDs()
 		return {}
 	end
 
-	local myAllyTeamID = 0 -- FIXME Spring.GetLocalAllyTeamID()
-	local enemyAllyTeamID = 1 -- FIXME assumes teams are 0 and 1
-	local myTeamID = Spring.GetTeamList(myAllyTeamID)[1] -- FIXME Spring.GetLocalTeamID()
+	local myAllyTeamID = Spring.GetMyAllyTeamID()
+	local myTeamID = Spring.GetMyTeamID()
+	local enemyAllyTeamID = myAllyTeamID == 1 and 0 or 1
 
 	local myBoxID = Spring.GetTeamRulesParam(myTeamID, "start_box_id")
 	if not myBoxID then -- can start anywhere
