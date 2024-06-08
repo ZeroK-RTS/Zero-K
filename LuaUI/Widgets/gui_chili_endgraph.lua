@@ -32,8 +32,9 @@ local buttongroups = {
 		{"metal_base_mex"  , "Base Extraction", "Cumulative total of non-overdrive metal produced by extractors."},
 		{"metal_overdrive" , "Metal Overdrive", "Cumulative total of metal produced by overdrive."},
 		{"metal_reclaim"   , "Metal Reclaimed", "Cumulative total of metal reclaimed. Includes wreckage, unit reclaim and construction cancellation."},
-		{"metal_excess"    , "Metal Excess", "Cumulative total of metal lost to excess."},
+		{{{"metal_excess", "Metal Excess"}, {"metal_shared", "Metal Shared"}}, "Metal Excess", "Cumulative total of metal lost to excess."},
 		{"energy_income"   , "Energy Income", "Total energy income."},
+		{{{"energy_excess", "Energy Excess"}, {"energy_shared", "Energy Shared"}}, "Energy Excess", "Cumulative total of energy lost to excess."},
 		},
 	},
 
@@ -54,9 +55,12 @@ local buttongroups = {
 
 local rulesParamStats = {
 	metal_excess = true,
+	metal_shared = true,
 	metal_overdrive = true,
 	metal_base_mex = true,
 	metal_reclaim = true,
+	energy_excess = true,
+	energy_shared = true,
 	unit_value = true,
 	unit_value_army = true,
 	unit_value_def = true,
@@ -78,7 +82,8 @@ local hiddenStats = {
 local gameOver = false
 
 local graphLength = 0
-local usingAllyteams = false
+local usingAllyteams = Spring.Utilities.Gametype.isSoloTeams() -- Within team stats make no sense.
+Spring.Echo("usingAllyteams", usingAllyteams)
 local curGraph = {}
 
 -- Spring aliases
@@ -177,7 +182,7 @@ local function formatTime(seconds)
 	return hours .. ":" .. minutes .. ":" .. seconds
 end
 
-local function drawIntervals(graphMax)
+local function drawIntervals(graphMin, graphMax)
 	for i = 1, 4 do
 		local line = Chili.Line:New{
 			parent = graphPanel,
@@ -185,22 +190,31 @@ local function drawIntervals(graphMax)
 			bottom = (0.997*(i)/5*100 - 0.8) .. "%",
 			height = 0,
 			width = "100%",
-			color = {0.1,0.1,0.1,0.1}
 		}
-		if graphMax then
+		if graphMin and graphMax then
 			local label = Chili.Label:New{
 				parent = graphPanel,
 				x = 5,
-				bottom = ((i)/5*100 + 1) .. "%",
+				bottom = (i/5*100 + 1) .. "%",
 				width = "100%",
-				caption = numFormat(graphMax*i/5),
+				caption = numFormat(((graphMax - graphMin)*i)/5 + graphMin),
 				objectOverrideFont = WG.GetFont(),
 			}
 		end
 	end
+	if graphMin and graphMin < 0 then
+		local line = Chili.Line:New{
+			parent = graphPanel,
+			x = 0,
+			bottom = (0.997*(-graphMin/(graphMax - graphMin))*100 - 0.8) .. "%",
+			height = 0,
+			width = "100%",
+			borderColor = {1,1,1,0.4}
+		}
+	end
 end
 
-local getEngineArrays = function(name, caption) end
+local getEngineArrays = function(statNameData, caption) end
 
 local function SetHighlightedTeam(teamID)
 	if highlightedTeamId == teamID then
@@ -208,10 +222,10 @@ local function SetHighlightedTeam(teamID)
 	else
 		highlightedTeamId = teamID
 	end
-	if curGraph.name then
+	if curGraph.statNameData then
 		graphPanel:ClearChildren()
 		lineLabels:ClearChildren()
-		getEngineArrays(curGraph.name,curGraph.caption)
+		getEngineArrays(curGraph.statNameData,curGraph.caption)
 	end
 end
 
@@ -221,10 +235,10 @@ local function SetHighlightedAllyTeam(allyTeamID)
 	else
 		highlightedAllyTeamId = allyTeamID
 	end
-	if curGraph.name then
+	if curGraph.statNameData then
 		graphPanel:ClearChildren()
 		lineLabels:ClearChildren()
-		getEngineArrays(curGraph.name,curGraph.caption)
+		getEngineArrays(curGraph.statNameData,curGraph.caption)
 	end
 end
 
@@ -282,7 +296,7 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, graphMax, teamID, team_num, isHighlighted)
+local function drawGraph(graphArray, graphMin, graphMax, teamID, team_num, isHighlighted)
 	if #graphArray == 0 then
 		return
 	end
@@ -313,7 +327,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num, isHighlighted)
 	local drawLine = function()
 		for i = 1, #graphArray do
 			local ordinate = graphArray[i]
-			gl.Vertex((i - 1)/(#graphArray - 1), 0.9975 - ordinate/graphMax)
+			gl.Vertex((i - 1)/(#graphArray - 1), 0.9975 - (ordinate - graphMin)/(graphMax - graphMin))
 		end
 	end
 
@@ -388,7 +402,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num, isHighlighted)
 	return graph
 end
 
-getEngineArrays = function(statistic, labelCaption)
+getEngineArrays = function(statNameData, labelCaption)
 	local teamScores = {}
 	local teams = Spring.GetTeamList()
 	local spectating, specFullView = Spring.GetSpectatingState()
@@ -399,12 +413,17 @@ getEngineArrays = function(statistic, labelCaption)
 		or 0
 
 	--Applies label of the selected graph at bottom of window
+	local statistic = statNameData
+	curGraph.statNameData = statNameData
+	if type(statNameData) ~= "string" then
+		local statIndex = usingAllyteams and 1 or 2
+		statistic = statNameData[statIndex][1]
+		labelCaption = statNameData[statIndex][2]
+	end
+	
+		curGraph.caption = labelCaption
 	graphLabel:SetCaption(labelCaption)
-	
 	graphTime:SetCaption("Total Time: " .. formatTime(totalTime))
-	curGraph.caption = labelCaption
-	curGraph.name = statistic
-	
 	-- If there's not at least two data points then don't draw the graph, labels, intervals, or players
 	if graphLength < 2 then
 		Chili.Label:New{
@@ -424,6 +443,7 @@ getEngineArrays = function(statistic, labelCaption)
 	--finds highest stat out all the player stats, i.e. the highest point of the graph
 	local teamScores = {}
 	local graphMax = 0
+	local graphMin = 0
 	local gaia = usingAllyteams
 		and select(6, Spring.GetTeamInfo(gaiaTeamID, false))
 		or gaiaTeamID
@@ -456,12 +476,18 @@ getEngineArrays = function(statistic, labelCaption)
 				if graphMax < teamScores[effectiveTeam][b] then
 					graphMax = teamScores[effectiveTeam][b]
 				end
+				if graphMin > teamScores[effectiveTeam][b] then
+					graphMin = teamScores[effectiveTeam][b]
+				end
 			end
 		end
 	end
 
 	if graphMax < 5 then
 		graphMax = 5
+	end
+	if graphMin > 0 then
+		graphMin = 0
 	end
 	
 	local highlightID = (usingAllyteams and highlightedAllyTeamId)
@@ -472,11 +498,11 @@ getEngineArrays = function(statistic, labelCaption)
 	local team_i = 1
 	for teamID, v in pairs(teamScores) do
 		if teamID ~= gaia and teamID ~= highlightID then
-			drawGraph(v, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID)
+			drawGraph(v, graphMin, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID)
 		end
 	end
 	if highlightID then
-		local graph = drawGraph(teamScores[highlightID], graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
+		local graph = drawGraph(teamScores[highlightID], graphMin, graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
 		if graph then
 			graph:BringToFront()
 		end
@@ -487,7 +513,7 @@ getEngineArrays = function(statistic, labelCaption)
 
 	graphPanel:Invalidate()
 	graphPanel:UpdateClientArea()
-	drawIntervals(graphMax)
+	drawIntervals(graphMin, graphMax)
 end
 
 --------------------------------------------------------------------------------
@@ -562,9 +588,10 @@ function makePanel()
 	window0.graphButtons = {}
 	local gb_i = 1
 	for i = 1, #buttongroups do
+		local group = buttongroups[i][2]
 		local grouppanel = Chili.Panel:New {
 			parent = graphSelect,
-			weight = #buttongroups[i][2] + 0.7,
+			weight = #group + 0.7,
 			padding = {1,1,1,1},
 		}
 		local grouplabel = Chili.Label:New {
@@ -584,12 +611,12 @@ function makePanel()
 			itemMargin = {1,1,1,2},
 			resizeItems = true,
 		}
-		for j = 1, #buttongroups[i][2] do
+		for j = 1, #group do
 			local gb_il = gb_i -- even more local instance than gb_i
 			window0.graphButtons[gb_i] = Chili.Button:New {
-				name = buttongroups[i][2][j][1],
-				caption = buttongroups[i][2][j][2],
-				tooltip = buttongroups[i][2][j][3],
+				statNameData = group[j][1],
+				caption = group[j][2],
+				tooltip = group[j][3],
 				parent = groupstack,
 				objectOverrideFont = WG.GetFont(),
 				OnClick = {
@@ -601,7 +628,7 @@ function makePanel()
 						SetButtonSelected(obj, true)
 						graphPanel:ClearChildren()
 						lineLabels:ClearChildren()
-						getEngineArrays(obj.name,obj.caption)
+						getEngineArrays(obj.statNameData,obj.caption)
 					end
 				}
 			}
@@ -615,14 +642,14 @@ function makePanel()
 		parent = window0,
 		noFont = true,
 		right = 32, bottom = 2,
-		checked = false,
+		checked = usingAllyteams,
 		OnClick = {
 			function()
 				usingAllyteams = not usingAllyteams
-				if curGraph.name then
+				if curGraph.statNameData then
 					graphPanel:ClearChildren()
 					lineLabels:ClearChildren()
-					getEngineArrays(curGraph.name,curGraph.caption)
+					getEngineArrays(curGraph.statNameData, curGraph.caption)
 				end
 			end
 		}

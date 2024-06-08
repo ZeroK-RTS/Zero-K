@@ -375,9 +375,9 @@ local function SetupControls()
 		textColor = {0.5,0.5,0.5,1},
 		objectOverrideFont = WG.GetFont(50),
 		x = '20%',
-		y = '20%',
+		y = '16%',
 		width  = '60%',
-		height = '60%',
+		height = '62%',
 		--autosize   = true;
 		draggable = true,
 		resizable = true,

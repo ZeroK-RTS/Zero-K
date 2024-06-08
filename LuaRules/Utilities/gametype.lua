@@ -1,10 +1,12 @@
 local teamCount
-local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isFFA, isTeamFFA, isSandbox, isPlanetWars = false, false, false, false, false, false, false, false, false, false
+local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isFFA, isTeamFFA, isSandbox, isPlanetWars, isSoloTeams = false, false, false, false, false, false, false, false, false, false, false
 do
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local allyTeamList = Spring.GetAllyTeamList()
 	local actualAllyTeamList = {}
 	local allyTeamsWithHumans = {}
+	
+	isSoloTeams = true
 	for i = 1, #allyTeamList do
 		local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
 		if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
@@ -25,6 +27,9 @@ do
 			end
 			if humanExists then
 				allyTeamsWithHumans[#allyTeamsWithHumans + 1] = allyTeamList[i]
+			end
+			if #teamList > 1 then
+				isSoloTeams = false
 			end
 		end
 	end
@@ -81,4 +86,5 @@ Spring.Utilities.Gametype = {
 	isFFA        = function () return isFFA        end,
 	isSandbox    = function () return isSandbox    end,
 	isPlanetWars = function () return isPlanetWars end,
+	isSoloTeams  = function () return isSoloTeams  end,
 }
