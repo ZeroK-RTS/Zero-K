@@ -96,6 +96,9 @@ local function ValidThrowTarget(unitID, targetID, speed)
 	if Spring.GetUnitTransporter(targetID) then
 		return false
 	end
+	if Spring.MoveCtrl and Spring.MoveCtrl.GetTag(targetID) then
+		return false
+	end
 	local unitDefID = spGetUnitDefID(targetID)
 	return canBeThrown[unitDefID]
 end
