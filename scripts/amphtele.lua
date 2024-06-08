@@ -79,8 +79,8 @@ local function Create_Beacon_Thread(x,z)
 end
 
 function StopCreateBeacon(resetAnimation)
-	Signal(SIG_BEACON)
 	if beaconCreateX then
+		Signal(SIG_BEACON)
 		Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_x", nil, PRIVATE)
 		Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_z", nil, PRIVATE)
 		beaconCreateX, beaconCreateZ = nil, nil
