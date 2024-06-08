@@ -1522,6 +1522,12 @@ function gadget:GameFrame(n)
 					lastTeamOverdriveNetLoss[teamID] = 0
 				end
 				
+				if GG.EndgameGraphs then
+					GG.EndgameGraphs.AddTeamEnergyShared(teamID, -te.overdriveEnergyNet)
+					if energyWasted > 0 then
+						GG.EndgameGraphs.AddTeamEnergyExcess(teamID, energyWasted * te.inc / allyTeamEnergyIncome)
+					end
+				end
 				if debugMode then
 					Spring.Echo("Team energy income", teamID, "change", energyChange, "inc", te.inc, "net", te.overdriveEnergyNet)
 				end
@@ -1602,7 +1608,14 @@ function gadget:GameFrame(n)
 						for j = 1, allyTeamData.teams do
 							if freeSpace[j] then
 								local recieveID = allyTeamData.team[j]
-								Spring.ShareTeamResource(sendID, recieveID, "metal", shareToSend[i] * freeSpace[j] * shareFactorPerSpace)
+								local toShare = shareToSend[i] * freeSpace[j] * shareFactorPerSpace
+								Spring.ShareTeamResource(sendID, recieveID, "metal", toShare)
+								if GG.EndgameGraphs then
+									GG.EndgameGraphs.AddTeamMetalShared(sendID, toShare)
+								end
+								if GG.EndgameGraphs then
+									GG.EndgameGraphs.AddTeamMetalShared(recieveID, -toShare)
+								end
 							end
 						end
 						if excessFactor ~= 0 and GG.EndgameGraphs then
