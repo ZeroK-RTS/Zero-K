@@ -282,6 +282,15 @@ local function ResetUnitData(unitData)
 	unitData.moveComplete = nil
 end
 
+local function WaitWaitMoveUnit(unitID)
+	local unitData = unitID and rawMoveUnit[unitID]
+	if unitData then
+		ResetUnitData(unitData)
+	end
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
+end
+
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 -- Raw Move Handling
@@ -752,6 +761,7 @@ local function ReplaceMoveCommand(unitID)
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, 0, cmdParam_1, cmdParam_2, cmdParam_3}, CMD_OPT_ALT)
 		end
 		spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
+		WaitWaitMoveUnit(unitID)
 	end
 end
 
@@ -864,15 +874,6 @@ end
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 -- Gadget Interface
-
-local function WaitWaitMoveUnit(unitID)
-	local unitData = unitID and rawMoveUnit[unitID]
-	if unitData then
-		ResetUnitData(unitData)
-	end
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
-end
 
 local function AddRawMoveUnit(unitID)
 	rawMoveUnit[unitID] = true

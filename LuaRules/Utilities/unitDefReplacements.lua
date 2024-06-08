@@ -286,6 +286,9 @@ end
 -------------------------------------------------------------------------------------
 
 function Spring.Utilities.UnitEcho(unitID, st)
+	if type(st) == "boolean" then
+		st = st and "T" or "F"
+	end
 	st = st or unitID
 	if Spring.ValidUnitID(unitID) then
 		local x,y,z = Spring.GetUnitPosition(unitID)
