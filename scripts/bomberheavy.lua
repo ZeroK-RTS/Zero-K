@@ -16,7 +16,8 @@ local rad_R      = piece 'rad_R'
 local hatch_L    = piece 'hatch_L'
 local hatch_R    = piece 'hatch_R'
 local ball       = piece 'ball'
--- also: wingtip_L, wingtip_R, thrust_L, thrust_R
+local thrust_L, thrust_R = piece('thrust_L', 'thrust_R')
+-- also: wingtip_L, wingtip_R
 
 local smokePiece = {base, radiator_L, radiator_R}
 
@@ -231,13 +232,6 @@ local function ShowBallWhenReady()
 end
 
 function script.Create()
-	-- Work around a LUPS ribbon bug. See #5178
-	local tip1, tip2 = piece('wingtip_L', 'wingtip_R')
-	local speedPerFrame = UnitDef.speed / Game.gameSpeed
-	Move(tip1, y_axis, speedPerFrame)
-	Move(tip2, y_axis, speedPerFrame)
-
-	local thrust_L, thrust_R = piece('thrust_L', 'thrust_R')
 	Move(thrust_L, y_axis, -5)
 	Move(thrust_R, y_axis, -5)
 
