@@ -66,8 +66,14 @@ function gadget:AllowUnitTransportLoad(transporterID, transporterUnitDefID, tran
 	if Spring.GetUnitAllyTeam(transporterID) ~= Spring.GetUnitAllyTeam(transporteeID) then
 		local _,_,_,speed = Spring.GetUnitVelocity(transporteeID)
 		if speed > 0.5 then
-			-- Allow for floating, Crab uncurl, Placeholder, etc.
 			return false
+		elseif speed > 0.05 then
+			-- Allow floating units, Placeholder, etc... to be picked up
+			local ux, uy, uz = Spring.GetUnitPosition(transporteeID)
+			local ground = Spring.GetGroundHeight(ux, uz)
+			if uy < ground + 1 then
+				return false
+			end
 		end
 	end
 	Spring.SetUnitVelocity(transporterID, 0,0,0)
