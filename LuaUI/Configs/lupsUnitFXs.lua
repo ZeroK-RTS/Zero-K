@@ -197,8 +197,8 @@ effectUnitDefs = {
 	--// PLANES //----------------------------
 	bomberheavy = {
 		-- jets
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3, length=40, piece="thrust_L", onActive=true, noIconDraw = true, }},
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3, length=40, piece="thrust_R", onActive=true, noIconDraw = true, }},
+		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4, length=35, piece="thrust_L", onActive=true, noIconDraw = true, }},
+		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4, length=35, piece="thrust_R", onActive=true, noIconDraw = true, }},
 
 		-- ribbons
 		{class='Ribbon', options={width=0.5, size=10, piece="wingtip_L", noIconDraw = true}},
@@ -206,7 +206,7 @@ effectUnitDefs = {
 
 		-- portable singularity
 		{class='Bursts', options=MergeTable(energysinguBursts,{piece="ball", noIconDraw = true, size=5, pos={0,0,0}})},
-		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", noIconDraw = true, size=11, pos={0,0,0}})},
+		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", noIconDraw = true, size=18, pos={0,0,0}})},
 
 		-- blinky lights
 		{class='StaticParticles', options=MergeTable(blinkyLightRed,   {piece="extra_L"}) },
