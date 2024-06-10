@@ -138,3 +138,6 @@ scifi - ?
  
 KDR_11k (David Becker) - Public Domain
  * Chickens
+
+brunocb - ?
+ * bomberheavy.dae + bomberheavy_dead.dae + wep_bomberheavy.dae (Likho)
