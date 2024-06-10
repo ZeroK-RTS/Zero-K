@@ -1529,7 +1529,7 @@ local cegs = {
     spikes = {
       air                = true,
       class              = [[explspike]],
-      count              = 2,
+      count              = 3,
       ground             = true,
       water              = true,
       properties = {
@@ -1537,9 +1537,8 @@ local cegs = {
         alphadecay         = 0.25,
         color              = [[0.8 0.4 0.0]],
         dir                = [[-6 r12,-6 r12,-6 r12]],
-        length             = 20,
-        width              = 1,
-        --pos                = [[10, -5, 10]],
+        length             = [[5 r8]],
+        width              = 4,
       },
     },
   },
