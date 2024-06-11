@@ -1,8 +1,8 @@
 
 function gadget:GetInfo()
 	return {
-		name     = "Nano Frame Death Handeling",
-		desc     = "Makes nanoframes explode if above X% completion and makes dying nanoframes leave wrecks.",
+		name     = "Nano Frame Death and Factoryless Deployment",
+		desc     = "Makes nanoframes explode if above X% completion and makes dying nanoframes leave wrecks. Causes units built without a factory to deploy properly.",
 		author	 = "Google Frog",
 		date     = "Mar 29, 2009",
 		license	 = "GNU GPL, v2 or later",
@@ -35,6 +35,7 @@ local spCreateFeature = Spring.CreateFeature
 
 local unitFromFactory = {}
 local isAFactory = {}
+local needDeployUnit = {}
 
 function gadget:UnitCreated(unitID,unitDefID,_,builderID)
 	local ud = UnitDefs[unitDefID]
@@ -43,6 +44,8 @@ function gadget:UnitCreated(unitID,unitDefID,_,builderID)
 	end
 	if builderID and isAFactory[builderID] then
 		unitFromFactory[unitID] = true
+	elseif (not ud.isImmobile) or ud.customParams.mobilebuilding then
+		needDeployUnit[unitID] = true
 	end
 end
 
@@ -86,6 +89,17 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 	end
 end
 
+function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
+	if needDeployUnit[unitID] then
+		local env = Spring.UnitScript.GetScriptEnv(unitID)
+		if env and env.script.StopMoving then
+			Spring.UnitScript.CallAsUnit(unitID,env.script.StopMoving)
+		elseif env and env.StopMoving then
+			Spring.UnitScript.CallAsUnit(unitID,env.StopMoving)
+		end
+	end
+end
+
 local spawnProjPos = {1, 2, 3}
 local spawnProjTable = {ttl = 1, pos = spawnProjPos}
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -122,6 +136,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	
 	isAFactory[unitID] = nil
 	unitFromFactory[unitID] = nil
+	needDeployUnit[unitID] = nil
 end
 
 function gadget:Initialize()
