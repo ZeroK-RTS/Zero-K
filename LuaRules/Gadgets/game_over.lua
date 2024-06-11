@@ -786,7 +786,7 @@ function gadget:GameOver()
 		Spring.Echo("gadget:GameOver")
 	end
 	gameIsOver = true
-	if noElo then
+	if noElo or Spring.Utilities.Gametype.isFFA() then
 		Spring.SendCommands("wbynum 255 SPRINGIE:noElo")
 	end
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "GAME OVER!!")
