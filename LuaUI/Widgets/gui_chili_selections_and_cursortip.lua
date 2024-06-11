@@ -2258,6 +2258,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			selectedUnitID = unitID
 		else
 			selectedUnitID = nil
+			if unitpicBadgeUpdate then
+				unitpicBadgeUpdate(false)
+			end
 			if reloadBar then
 				reloadBar:SetVisibility(false)
 			end
