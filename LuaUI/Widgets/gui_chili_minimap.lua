@@ -149,6 +149,9 @@ options_order = {
 	-- Radar view configuration
 	'radar_view_colors_label1',
 	'radar_fog_brightness1',
+	'radar_los_mix',
+	'fog_stripe_strength',
+	'fog_stripe_speed',
 	
 	-- Radar view editing
 	'radar_view_colors_label2',
@@ -163,6 +166,7 @@ options_order = {
 	'radar_view_presets_label1',
 	'radar_preset_only_los',
 	'radar_preset_double_outline',
+	'radar_preset_outline_stripe',
 	'radar_preset_two_tone',
 	'radar_preset_blue_line',
 	'radar_preset_green',
@@ -276,8 +280,33 @@ options = {
 	
 	radar_fog_brightness1 = {
 		name = "Fog Brightness",
+		desc = "Brightness of the fog of war.",
 		type = "number",
 		value = default_fog_brightness, min = 0, max = 1, step = 0.01,
+		OnChange =  function() updateRadarColors() end,
+		path = radar_path,
+	},
+	radar_los_mix = {
+		name = "Mix Radar and LOS",
+		desc = "Strength of radar interior color inside LOS. Requires non-default settings so that there is any interior color to draw.",
+		type = "number",
+		value = 0, min = 0, max = 2, step = 0.01,
+		OnChange =  function() updateRadarColors() end,
+		path = radar_path,
+	},
+	fog_stripe_strength = {
+		name = "Unknown Region Stripe Strength",
+		desc = "Strength stripe effect that is drawn in areas outside radar and LOS.",
+		type = "number",
+		value = 0, min = 0, max = 2, step = 0.01,
+		OnChange =  function() updateRadarColors() end,
+		path = radar_path,
+	},
+	fog_stripe_speed = {
+		name = "Unknown Region Stripe Speed",
+		desc = "Drift speed of unknown region stripe effect.",
+		type = "number",
+		value = 0, min = 0, max = 4, step = 0.01,
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
@@ -345,6 +374,9 @@ options = {
 			options.radar_radar_color.value = { 0, 0, 0, 0}
 			options.radar_radar2_color.value = { 0, 0, 0, 0}
 			options.radar_jammer_color.value = { 0, 0, 0, 0}
+			options.radar_los_mix.value = 0
+			options.fog_stripe_strength.value = 0
+			options.fog_stripe_speed.value = 0
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
@@ -359,7 +391,25 @@ options = {
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
 			options.radar_radar_color.value = { 0, 0, 1, 0}
 			options.radar_radar2_color.value = { 0, 1, 0, 0}
-
+			options.radar_los_mix.value = 0
+			options.fog_stripe_strength.value = 0
+			options.fog_stripe_speed.value = 0
+			updateRadarColors()
+			WG.crude.OpenPath(radar_path, false)
+		end,
+		path = radar_path,
+	},
+	radar_preset_outline_stripe = {
+		name = 'Outline With Stripe',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_brightness1.value = default_fog_brightness
+			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
+			options.radar_radar_color.value = { 0, 0, 1, 0}
+			options.radar_radar2_color.value = { 0, 0.08, 0, 0}
+			options.radar_los_mix.value = 0
+			options.fog_stripe_strength.value = 0.7
+			options.fog_stripe_speed.value = 0.35
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
@@ -373,6 +423,9 @@ options = {
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
 			options.radar_radar_color.value = { 0, 0.5, 0, 0}
 			options.radar_radar2_color.value = { 0.2, 0.2, 0.2, 0}
+			options.radar_los_mix.value = 0
+			options.fog_stripe_strength.value = 0
+			options.fog_stripe_speed.value = 0
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
@@ -387,6 +440,9 @@ options = {
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
 			options.radar_radar_color.value = { 0, 0, 1, 0}
 			options.radar_radar2_color.value = { 0, 0, 1, 0}
+			options.radar_los_mix.value = 0
+			options.fog_stripe_strength.value = 0
+			options.fog_stripe_speed.value = 0
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
@@ -401,6 +457,9 @@ options = {
 			options.radar_radar_color.value = { 0, 0.17, 0, 0}
 			options.radar_radar2_color.value = { 0, 0.17, 0, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+			options.radar_los_mix.value = 0
+			options.fog_stripe_strength.value = 0
+			options.fog_stripe_speed.value = 0
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
@@ -415,6 +474,9 @@ options = {
 			options.radar_radar_color.value = { 0, 0, 0.4, 0}
 			options.radar_radar2_color.value = { 0, 0.04, 1, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+			options.radar_los_mix.value = 0
+			options.fog_stripe_strength.value = 0
+			options.fog_stripe_speed.value = 0
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
@@ -623,6 +685,9 @@ function updateRadarColors()
 	local radar = options.radar_radar_color.value
 	local jam = options.radar_jammer_color.value
 	local radar2 = options.radar_radar2_color.value
+	Spring.SetConfigFloat("LOS_radarLosMix", options.radar_los_mix.value)
+	Spring.SetConfigFloat("LOS_fogStripeStrength", options.fog_stripe_strength.value)
+	Spring.SetConfigFloat("LOS_fogStripeSpeed", options.fog_stripe_speed.value)
 	if usingNewEngine then
 		Spring.SetLosViewColors(fog, los, radar, jam, radar2)
 	else
