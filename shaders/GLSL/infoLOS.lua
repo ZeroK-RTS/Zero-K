@@ -1,6 +1,10 @@
 local Spring = Spring
 local alwaysColor, losColor, radarColor, jamColor, radarColor2 = Spring.GetLosViewColors()
 
+local mixRadarAndLos = math.max(0, math.min(5, Spring.GetConfigFloat("LOS_radarLosMix", 0) or 0))
+local fogStripeStrength = math.max(0, math.min(5, Spring.GetConfigFloat("LOS_fogStripeStrength", 0) or 0))
+local stripeMoveSpeed = math.max(0, math.min(5, Spring.GetConfigFloat("LOS_fogStripeSpeed", 0) or 0))
+
 return {
 	definitions = {
 		Spring.GetConfigInt("HighResInfoTexture") and "#define HIGH_QUALITY" or "",
@@ -29,6 +33,7 @@ return {
 	uniform sampler2D tex0;  // r = Ground LOS
 	uniform sampler2D tex1;  // r = Air LOS
 	uniform sampler2D tex2;  // r = Radar coverage, g = Jammer coverage
+	uniform sampler2D tex3;  // Heightmap?
 	varying vec2 texCoord;
 
 	#ifdef HIGH_QUALITY
@@ -64,10 +69,36 @@ return {
 		#define getTexel texture2D
 	#endif
 
+	const mat2 m = mat2(0.707107, -0.707107, 0.707107, 0.707107);
+
+	float diagLines1(vec2 uv) {
+		float col = 1.0;
+		uv = m * uv;
+		uv *= 2048.0;
+		uv += ]] .. stripeMoveSpeed .. [[ * 2.0 * vec2(-time, -time);
+		float c = sin(uv.x) * 0.15;
+		col -= c;
+		col = pow(col, 2.75);
+		return col;
+	}
+	
+	float diagLines2(vec2 uv) {
+		float col = 1.0;
+		uv = m * uv;
+		uv *= 2048.0;
+		uv += ]] .. stripeMoveSpeed .. [[ * 2.0 * vec2(-time, -time);
+		float c = sin(uv.x) * 0.20;
+		col -= c;
+		col = pow(col, 4.0);
+		return col;
+	}
+
 	void main() {
 		float los = getTexel(tex0, texCoord).r;
 		float airLos = getTexel(tex1, texCoord).r;
 		vec2 radarJammer = getTexel(tex2, texCoord).rg;
+		float height = texture2D(tex3, texCoord).x;
+		float heightStatus = smoothstep(-3.0, 0.0, height);
 		float losMix = los*0.9 + airLos*0.1;
 		float radar = radarJammer.r;
 		float jammer = radarJammer.g;
@@ -83,10 +114,18 @@ return {
 
 		gl_FragColor.rgb =  losColor.rgb * losMix;
 		gl_FragColor.rgb += jamColor.rgb * jammer;
-		gl_FragColor.rgb += fract(radarColor2.rgb) * step(1.0, radar) * (1.0 - los);  // Radar infill
+		gl_FragColor.rgb += fract(radarColor2.rgb) * step(1.0, radar) * (1.0 - los * (1.0 - ]] .. mixRadarAndLos .. [[));  // Radar infill
 		gl_FragColor.rgb += radarColor2.rgb * fract(step(0.8, radar) * radar);  // Radar inner edge/fringing
 		gl_FragColor.rgb += radarColor.rgb * step(0.2, fract(1.0-radar));  // Radar outer edge/fringing
+		
+		]] .. ((fogStripeStrength > 0) and [[
+		float terraIncognitaStatus = 1.0 - max(radar, los);
+		float terraIncognitaEffect = mix(diagLines2(texCoord), diagLines1(texCoord), heightStatus) * ]] .. fogStripeStrength .. [[ + (1.0 - ]] .. fogStripeStrength .. [[);
+		gl_FragColor.rgb += alwaysColor.rgb * mix(1.0, terraIncognitaEffect, terraIncognitaStatus);
+		]] or [[
 		gl_FragColor.rgb += alwaysColor.rgb;
+		]]) .. [[
+		
 		gl_FragColor.a = 0.05;
 	}]],
 	uniformFloat = {
