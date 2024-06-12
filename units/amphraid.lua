@@ -42,7 +42,7 @@ return { amphraid = {
 
   sightDistance          = 560,
   sonarDistance          = 560,
-  speed                  = 90,
+  speed                  = 93,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -93,7 +93,7 @@ return { amphraid = {
       model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
       projectiles             = 1,
-      range                   = 235,
+      range                   = 232,
       reloadtime              = 2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/cannon_hit2]],
