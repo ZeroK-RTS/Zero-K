@@ -20,6 +20,7 @@ local spGetUnitLosState    = Spring.GetUnitLosState
      so it is safe to cache them here even if the underlying func changes afterwards ]]
 local scriptUnitDestroyed       = Script.LuaUI.UnitDestroyed
 local scriptUnitDestroyedByTeam = Script.LuaUI.UnitDestroyedByTeam
+local scriptUnitLeftRadar	= Script.LuaUI.UnitLeftRadar
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
 	local myAllyTeamID = spGetMyAllyTeamID()
@@ -30,21 +31,36 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attUnitDef
 	if Script.LuaUI('UnitDestroyedByTeam') then
 		if spec then
 			scriptUnitDestroyedByTeam(unitID, unitDefID, unitTeam, attTeamID)
-			if not specFullView and not isAllyUnit and (spGetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1) then
-				scriptUnitDestroyed (unitID, unitDefID, unitTeam)
+			if not specFullView and not isAllyUnit then
+				local losState = spGetUnitLosState(unitID, myAllyTeamID, true)
+				if losState % 2 == 1 then
+					scriptUnitDestroyed (unitID, unitDefID, unitTeam)
+				elseif losState ~= 0 and Script.LuaUI('UnitLeftRadar') then
+					scriptUnitLeftRadar(unitID, unitTeam)
+				end
 			end
 		else
 			local attackerInLos = attUnitID and (spGetUnitLosState(attUnitID, myAllyTeamID, true) % 2 == 1)
 			if isAllyUnit then
 				scriptUnitDestroyedByTeam(unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
-			elseif spGetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
+			else
+				local losState = spGetUnitLosState(unitID, myAllyTeamID, true)
+				if losState % 2 == 1 then
 					scriptUnitDestroyed (unitID, unitDefID, unitTeam)
 					scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
+				elseif losState ~= 0 and Script.LuaUI('UnitLeftRadar') then
+					scriptUnitLeftRadar(unitID, unitTeam)
+				end
 			end
 		end
 	else
-		if not isAllyUnit and (not (spec and specFullView) and (spGetUnitLosState(unitID, spGetMyAllyTeamID(), true) % 2 == 1)) then
-			scriptUnitDestroyed(unitID, unitDefID, unitTeam)
+		if not isAllyUnit and not (spec and specFullView) then
+			local losState = spGetUnitLosState(unitID, myAllyTeamID, true)
+			if losState % 2 == 1 then
+				scriptUnitDestroyed(unitID, unitDefID, unitTeam)
+			elseif losState ~= 0 and Script.LuaUI('UnitLeftRadar') then
+				scriptUnitLeftRadar(unitID, unitTeam)
+			end
 		end
 	end
 end
