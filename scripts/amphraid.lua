@@ -11,7 +11,7 @@ local firepoints = {[0] = lflare, [1] = rflare}
 local smokePiece = {torso}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-local PACE = 2
+local PACE = 2.1
 
 local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
