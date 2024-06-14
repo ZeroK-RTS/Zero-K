@@ -7,6 +7,7 @@ local base       = piece 'base'
 local wing_L     = piece 'wing_L'
 local wing_R     = piece 'wing_R'
 local drop       = piece 'drop'
+local ball_emit  = piece 'ball_emit'
 local extra_L    = piece 'extra_L'
 local extra_R    = piece 'extra_R'
 local radiator_L = piece 'radiator_L'
@@ -26,73 +27,59 @@ local SIG_move = 1
 local SIG_TAKEOFF = 2
 local takeoffHeight = UnitDefNames["bomberheavy"].cruiseAltitude
 
-local armed = true
-local cooling = false
-
-local function UpdateCooling()
-	if not armed and not cooling then
-		Show(radiator_L)
-		Show(radiator_R)
-		Turn(hatch_L, y_axis, math.rad(-90), 2)
-		Turn(hatch_R, y_axis, math.rad( 90), 2)
-		Move(radiator_L, z_axis, 3, 1)
-		Move(radiator_R, z_axis, 3, 1)
-		Move(rad_L, z_axis, 3, 1)
-		Move(rad_R, z_axis, 3, 1)
-		Spin(ball, y_axis, 0)
-		cooling = true
+local function ShowBall()
+	Show(ball)
+	
+	Move(radiator_L, z_axis, 0, 2)
+	Move(radiator_R, z_axis, 0, 2)
+	Move(rad_L, z_axis, -2, 2)
+	Move(rad_R, z_axis, -2, 2)
+	Turn(hatch_L, y_axis, math.rad(0), 1)
+	Turn(hatch_R, y_axis, math.rad(0), 1)
+	Spin(ball_emit, y_axis, math.rad(30))
+	
+	local spSetUnitPieceMatrix = Spring.SetUnitPieceMatrix
+	local newTable = {1, 0, 0, 0,    0, 1, 0, 0,     0, 0, 1, 0,      0, 0, 0, 1}
+	for i = 1, 15 do
+		local scale = math.sin(i / 15 * 1.602)
+		newTable[1] = scale
+		newTable[6] = scale
+		newTable[11] = scale
+		spSetUnitPieceMatrix(unitID, ball, newTable)
+		Sleep(33)
 	end
+	spSetUnitPieceMatrix(unitID, ball, {0, 0, 0})
+	Move(ball, x_axis, 0)
+	Move(ball, y_axis, 0)
+	Move(ball, z_axis, 0)
+	
+	WaitForTurn (hatch_L, y_axis)
+	WaitForTurn (hatch_R, y_axis)
+	Hide(radiator_L)
+	Hide(radiator_R)
+end
 
-	if armed and cooling then
-		Move(radiator_L, z_axis, 0, 2)
-		Move(radiator_R, z_axis, 0, 2)
-		Move(rad_L, z_axis, -2, 2)
-		Move(rad_R, z_axis, -2, 2)
-		Turn(hatch_L, y_axis, math.rad(0), 1)
-		Turn(hatch_R, y_axis, math.rad(0), 1)
-		Spin(ball, y_axis, math.rad(30))
-		WaitForTurn (hatch_L, y_axis)
-		WaitForTurn (hatch_R, y_axis)
-		Hide(radiator_L)
-		Hide(radiator_R)
-		cooling = false
-	end
+local function HideBall()
+	Hide(ball)
+	Turn(ball_emit, y_axis, 0)
+	Spin(ball_emit, y_axis, 0)
+	Move(ball, y_axis, 27)
+	Move(ball, z_axis, 1)
+	
+	Show(radiator_L)
+	Show(radiator_R)
+	Turn(hatch_L, y_axis, math.rad(-90), 2)
+	Turn(hatch_R, y_axis, math.rad( 90), 2)
+	Move(radiator_L, z_axis, 3, 1)
+	Move(radiator_R, z_axis, 3, 1)
+	Move(rad_L, z_axis, 3, 1)
+	Move(rad_R, z_axis, 3, 1)
 end
 
 --add spin?
 
-local function Reball()
-	local ammoState = Spring.GetUnitRulesParam(unitID, "noammo")
-	if ammoState == 0 then
-		armed = true
-
-		Show(ball)
-		Move(ball, x_axis, 0)
-		Move(ball, y_axis, 0)
-		Move(ball, z_axis, 0)
-
-		UpdateCooling()
-	end
-end
-
-local function LandOld()
-	Turn(extra_L, z_axis, math.rad(-30), 3)
-	Turn(extra_R, z_axis, math.rad( 30), 3)
-
-	WaitForTurn (extra_L, z_axis)
-	WaitForTurn (extra_R, z_axis)
-
-	Turn(extra_L, z_axis, math.rad(-146.3), 2)
-	Turn(extra_R, z_axis, math.rad( 146.3), 2)
-
-	Turn(wing_L, y_axis, math.rad(-90), 2)
-	Turn(wing_R, y_axis, math.rad( 90), 2)
-
-	WaitForTurn (wing_L, y_axis)
-	WaitForTurn (wing_R, y_axis)
-
-	Turn(wing_L, x_axis, math.rad(6), 2)
-	Turn(wing_R, x_axis, math.rad(6), 2)
+function ReammoComplete()
+	StartThread(ShowBall)
 end
 
 local function Land()
@@ -121,27 +108,7 @@ end
 local function Stopping()
 	Signal(SIG_move)
 	SetSignalMask(SIG_move)
-
-	--LandOld()
 	Land()
-	Reball()
-end
-
-local function FlyOld()
-	Turn(wing_L, y_axis, math.rad(0), 2)
-	Turn(wing_R, y_axis, math.rad(0), 2)
-	Turn(wing_L, z_axis, math.rad(0), 2)
-	Turn(wing_R, z_axis, math.rad(0), 2)
-	Turn(wing_L, x_axis, math.rad(0), 2)
-	Turn(wing_R, x_axis, math.rad(0), 2)
-
-	Turn(extra_L, z_axis, math.rad(-30), 2)
-	Turn(extra_R, z_axis, math.rad( 30), 2)
-	WaitForTurn (extra_L, z_axis)
-	WaitForTurn (extra_R, z_axis)
-
-	Turn(extra_L, z_axis, math.rad(0), 1)
-	Turn(extra_R, z_axis, math.rad(0), 1)
 end
 
 local function Fly()
@@ -198,8 +165,6 @@ end
 local function Moving()
 	Signal(SIG_move)
 	SetSignalMask(SIG_move)
-
-	Reball()
 	Fly()
 end
 
@@ -222,13 +187,13 @@ function script.MoveRate(rate)
 	end
 end
 
-local function ShowBallWhenReady()
+local function ShowBallWhenConstructionFinished()
 	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 	while stunned_or_inbuild do
 		Sleep(100)
 		stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 	end
-	Show(ball)
+	ShowBall()
 end
 
 function script.Create()
@@ -252,18 +217,14 @@ function script.Create()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 
-	StartThread(ShowBallWhenReady)
+	StartThread(ShowBallWhenConstructionFinished)
 	Spin(ball, y_axis, math.rad(30))
 end
 
 function script.FireWeapon(num)
-	Move(ball, y_axis, 27)
-	Move(ball, z_axis, 2)
-	Hide(ball)
-	armed = false
-	UpdateCooling()
+	HideBall()
 	SetUnarmedAI()
-	Sleep(50)	-- delay before clearing attack order; else bomb loses target and fails to home
+	Sleep(50) -- delay before clearing attack order; else bomb loses target and fails to home
 	Reload()
 end
 
@@ -272,6 +233,10 @@ function script.AimWeapon(num)
 end
 
 function script.QueryWeapon(num)
+	return ball_emit
+end
+
+function script.AimFromWeapon(num)
 	return drop
 end
 
