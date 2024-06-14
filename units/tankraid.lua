@@ -118,7 +118,7 @@ return { tankraid = {
       interceptedByShieldType = 1,
       leadLimit               = 90,
       model                   = [[wep_b_fabby.s3o]],
-      myGravity               = 0.3,
+      myGravity               = 0.2,
       noSelfDamage            = true,
       range                   = 210,
       reloadtime              = 0.5,
@@ -128,7 +128,7 @@ return { tankraid = {
       soundStartVolume        = 5,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 480,
+      weaponVelocity          = 520,
     },
 
   },
