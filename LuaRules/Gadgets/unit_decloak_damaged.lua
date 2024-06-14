@@ -294,6 +294,15 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function WouldCloakIfIdle(unitID)
+	local wantCloakState = spGetUnitRulesParam(unitID, "wantcloak")
+	if wantCloakState == 1 then
+		return true
+	end
+	local areaCloaked = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1)
+	return areaCloaked
+end
+
 local function SetWantedCloaked(unitID, state)
 	if (not unitID) or spGetUnitIsDead(unitID) then
 		return
@@ -322,6 +331,7 @@ local function SetWantedCloaked(unitID, state)
 end
 
 GG.SetWantedCloaked = SetWantedCloaked
+GG.WouldCloakIfIdle = WouldCloakIfIdle
 
 function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_CLOAK] = true, [CMD_WANT_CLOAK] = true}
