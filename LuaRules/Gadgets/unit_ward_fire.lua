@@ -256,6 +256,9 @@ local function DoMexShootUnitUpdate(unitID, unitData)
 	if busy and not (busyUnitID and MEX_DEF_IDs[spGetUnitDefID(busyUnitID)]) then
 		return
 	end
+	if GG.WouldCloakIfIdle(unitID) then
+		return
+	end
 	local behaviour = unitData.def
 	
 	local enemyID = busyUnitID or spGetUnitNearestEnemy(unitID, behaviour.searchRange, true)
