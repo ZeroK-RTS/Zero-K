@@ -146,9 +146,13 @@ for i = 1, #UnitDefs do
 	end
 end
 
-local notAFactory = {
-	[UnitDefNames["athena"]] = true, -- use stupid hax to avoid not treating striderhubs like a factory.
-}
+local notAFactory = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.notreallyafactory then
+		notAFactory[ud.name] = true
+	end
+end
 
 options_path = 'Settings/Unit Behaviour/Default States'
 options_order = {
