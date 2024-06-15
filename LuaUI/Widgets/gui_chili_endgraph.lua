@@ -332,10 +332,10 @@ local function drawGraph(graphArray, graphMin, graphMax, teamID, team_num, isHig
 	end
 
 	--adds value to end of graph
-	local labelOffBottom = (graphArray[#graphArray]/graphMax > 0.025)
+	local labelOffBottom = ((graphArray[#graphArray] - graphMin)/(graphMax - graphMin) > 0.025)
 	local label1 = Chili.Label:New{
 		parent = lineLabels,
-		y = labelOffBottom and ((1 - graphArray[#graphArray]/graphMax) * 100 - 1 .. "%"),
+		y = labelOffBottom and ((1 - (graphArray[#graphArray] - graphMin)/(graphMax - graphMin)) * 100 - 1 .. "%"),
 		bottom = (not labelOffBottom) and 1,
 		width = "100%",
 		caption = lineLabel,
