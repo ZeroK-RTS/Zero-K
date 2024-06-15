@@ -157,11 +157,11 @@ local function numFormat(label)
 	end
 	local number = math.floor(label)
 	local string = ""
-	if number/1000000000 >= 1 then
+	if math.abs(number)/1000000000 >= 1 then
 		string = string.sub(number/1000000000 .. "", 0, 4) .. "B"
-	elseif number/1000000 >= 1 then
+	elseif math.abs(number)/1000000 >= 1 then
 		string = string.sub(number/1000000 .. "", 0, 4) .. "M"
-	elseif number/10000 >= 1 then
+	elseif math.abs(number)/10000 >= 1 then
 		string = string.sub(number/1000 .. "", 0, 4) .. "k"
 	else
 		string = math.floor(number) .. ""
