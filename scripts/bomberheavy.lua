@@ -48,10 +48,6 @@ local function ShowBall()
 		spSetUnitPieceMatrix(unitID, ball, newTable)
 		Sleep(33)
 	end
-	spSetUnitPieceMatrix(unitID, ball, {0, 0, 0})
-	Move(ball, x_axis, 0)
-	Move(ball, y_axis, 0)
-	Move(ball, z_axis, 0)
 	
 	WaitForTurn (hatch_L, y_axis)
 	WaitForTurn (hatch_R, y_axis)
@@ -61,6 +57,7 @@ end
 
 local function HideBall()
 	Hide(ball)
+	Spring.SetUnitPieceMatrix(unitID, ball, {0, 0, 0})
 	Turn(ball_emit, y_axis, 0)
 	Spin(ball_emit, y_axis, 0)
 	Move(ball, y_axis, 27)
