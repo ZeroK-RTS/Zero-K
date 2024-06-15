@@ -18,7 +18,7 @@ local hatch_L    = piece 'hatch_L'
 local hatch_R    = piece 'hatch_R'
 local ball       = piece 'ball'
 local thrust_L, thrust_R = piece('thrust_L', 'thrust_R')
--- also: wingtip_L, wingtip_R
+local wingtip_L, wingtip_R = piece('wingtip_L', 'wingtip_R')
 
 local smokePiece = {base, radiator_L, radiator_R}
 
@@ -196,6 +196,8 @@ end
 function script.Create()
 	Move(thrust_L, y_axis, -5)
 	Move(thrust_R, y_axis, -5)
+	Move(wingtip_L, y_axis, 5)
+	Move(wingtip_R, y_axis, 5)
 
 	Turn(thrust_L, x_axis, math.rad(90))
 	Turn(thrust_R, x_axis, math.rad(90))
