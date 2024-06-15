@@ -250,7 +250,7 @@ local function updateClustering()
 		end
 		local opticsObject = Optics.new(unitLocations, unitNeighborsMatrix, 2, benchmark)
 		opticsObject:Run()
-		shieldBallsIdsByTeam[allyTeamID] = opticsObject:Clusterize(700)
+		shieldBallsIdsByTeam[allyTeamID] = opticsObject:Clusterize(1400)
 
 		allShieldUnitsByTeam[allyTeamID] = allShieldUnits
 	end
@@ -285,6 +285,20 @@ local function getUnitShieldRegen(unitID, ud)
 		regen = mult * regen
 	end
 	return regen
+end
+---------------------------------
+
+local function hardShieldListUpdate()
+	for _, teamID in pairs(Spring.GetTeamList()) do
+		local teamUnits = {}
+		local teamUnitsSpring = Spring.GetTeamUnits(teamID)
+		for _, unitID in pairs(teamUnitsSpring) do
+			if validShieldUnit(unitID) then
+				teamUnits[#teamUnits + 1] = unitID
+			end
+		end
+		allShieldUnitIDsByTeam[teamID] = teamUnits
+	end
 end
 
 ---------------------------------
@@ -364,6 +378,7 @@ local function updateCurrentShieldBalls()
 	end
 	drawBallHealthbarList = glCreateList(DrawBallHealthbar)
 end
+
 ---------------------------------
 -- Keeping track of shield units
 
@@ -403,20 +418,14 @@ function widget:GameFrame(n)
 	if (n%UPDATE_FRAME==1) then
 		updateClustering()
 	end
+	if (n%77==2) then
+		hardShieldListUpdate()
+	end
 	updateCurrentShieldBalls()
 end
 
 function widget:Initialize()
-	for _, teamID in pairs(Spring.GetTeamList()) do
-		local teamUnits = {}
-		local teamUnitsSpring = Spring.GetTeamUnits(teamID)
-		for _, unitID in pairs(teamUnitsSpring) do
-			if validShieldUnit(unitID) then
-				teamUnits[#teamUnits + 1] = unitID
-			end
-		end
-		allShieldUnitIDsByTeam[teamID] = teamUnits
-	end
+	hardShieldListUpdate()
 	updateClustering()
 	updateCurrentShieldBalls()
 end
