@@ -206,6 +206,7 @@ options_order = {
 	
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
 	'error_opengl_source',
+	'filter_luaHandleCheckStack',
 	
 	--'pointButtonOpacity',
 	
@@ -289,6 +290,15 @@ options = {
 		path = filter_path ,
 		advanced = true,
 	},
+	filter_luaHandleCheckStack = {
+		name = "Filter out \'LuaHandle::CheckStack\' error",
+		type = 'bool',
+		value = true,
+		desc = "This filters out a message that appears usesless, and started being spammed in 105.1.1-2511.",
+		path = filter_path ,
+		advanced = true,
+	},
+	
 	
 	enableConsole = {
 		name = "Enable the debug console",
@@ -1484,6 +1494,9 @@ end
 function widget:AddConsoleMessage(msg)
 	if msg.msgtype == 'other' then
 		if options.error_opengl_source.value and (msg.argument):find('Error: OpenGL: source') then
+			return
+		end
+		if options.filter_luaHandleCheckStack.value and (msg.argument):find("Warning: [LuaHandle::CheckStack] LuaRules stack-top", 0, true) then
 			return
 		end
 		
