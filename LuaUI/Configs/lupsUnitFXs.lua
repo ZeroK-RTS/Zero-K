@@ -237,8 +237,8 @@ effectUnitDefs = {
 	bomberdisarm = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet1", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet2", onActive=true, noIconDraw = true}},
-		{class='Ribbon', options={width=1, size=6, piece="LWingTip", noIconDraw = true}},
-		{class='Ribbon', options={width=1, size=6, piece="RWingTip", noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=6, piece="LWingTipEnd", noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=6, piece="RWingTipEnd", noIconDraw = true}},
 	--{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="LWingTip"}) },
 	--{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="RWingTip"}) },
 	},
