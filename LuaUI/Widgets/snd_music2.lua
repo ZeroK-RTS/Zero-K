@@ -308,6 +308,17 @@ function widget:Update(dt)
 	end
 end
 
+function widget:GameID(gameID)
+    if options.albumSelection.value == 'random' then -- GameID is triggered at second round of Update, after options changes
+        local seed = tonumber('0x' .. gameID)
+        -- when number given is too big, the resulting sequence is the same / when difference between numbers is too small, the resulting number is the same
+        while seed > 1e8 do
+            seed = seed^0.8
+        end
+        math.randomseed(seed)
+        options.albumSelection:OnChange()
+    end
+end
 function widget:GameStart()
 	if not gameStarted then
 		gameStarted = true
