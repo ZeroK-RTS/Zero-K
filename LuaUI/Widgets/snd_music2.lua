@@ -36,7 +36,7 @@ local includedAlbums = {
 		humanName = "Superintendent",
 	}
 }
-local oldTrackListName = 'denny'
+local trackListName = 'denny'
 
 local trackList = {
 	warTracks       = {},
@@ -65,17 +65,29 @@ options = {
 	albumSelection = {
 		name = 'Track list',
 		type = 'radioButton',
-		value = oldTrackListName,
+		value = trackListName,
 		items = {
 			{key = 'denny', name = includedAlbums.denny.humanName},
 			{key = 'superintendent', name = includedAlbums.superintendent.humanName},
+			{key = 'random', name = 'Chosen at random'},
 		},
-		OnChange = function(self, value)
-			if self.value ~= oldTrackListName and includedAlbums[self.value] and includedAlbums[self.value].tracks then
-				oldTrackListName = self.value
-				trackList = includedAlbums[self.value].tracks
-				if WG.Music then
-					WG.Music.StopTrack()
+		OnChange = function(self)
+			local value = self.value
+			if value == 'random' then
+				local r = math.random(#self.items - 1)
+				local item = self.items[r]
+				if item.key == 'random' then -- in case the item 'random' is not at last position
+					item = self.items[r-1] or self.items[r+1]
+				end
+				value = item.key
+			end
+			if value ~= trackListName then
+				trackListName = value
+				if includedAlbums[value] and includedAlbums[value].tracks then
+					trackList = includedAlbums[value].tracks
+					if WG.Music then
+						WG.Music.StopTrack()
+					end
 				end
 			end
 		end,
@@ -224,7 +236,7 @@ function widget:Update(dt)
 			}
 		end
 		
-		trackList = includedAlbums[options.albumSelection.value].tracks
+		trackList = includedAlbums[trackListName].tracks
 	end
 	
 	timeframetimer_short = timeframetimer_short + dt
