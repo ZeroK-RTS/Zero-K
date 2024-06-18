@@ -246,8 +246,9 @@ local function GetRecommendedStartPosition(teamID, n) -- allyteams can have mult
 end
 
 local function GetStartPos(teamID, teamInfo, isAI)
+	Spring.Utilities.TableEcho(luaSetStartPositions, "luaSetStartPositions")
 	if luaSetStartPositions[teamID] then
-		return luaSetStartPositions[teamID].x, luaSetStartPositions[teamID].y, luaSetStartPositions[teamID].z
+		return luaSetStartPositions[teamID].x, luaSetStartPositions[teamID].y, luaSetStartPositions[teamID].z, true
 	end
 	
 	if fixedStartPos then
@@ -260,7 +261,7 @@ local function GetStartPos(teamID, teamInfo, isAI)
 		else
 			x, y, z = Spring.GetTeamStartPosition(teamID)
 		end
-		return x, y, z
+		return x, y, z, true
 	end
 	local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
 	if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
@@ -338,7 +339,7 @@ local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
 	until canDropHere or aborted
 	return x, Spring.GetGroundHeight(x, z), z -- aborted, return original position.
 end
-	
+
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
 	if not teamID then
 		return
@@ -376,11 +377,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 	if startUnit then
 		-- replace with shuffled position
-		local x,y,z = GetStartPos(teamID, teamInfo, isAI)
+		local x, y, z, fixedStartPos = GetStartPos(teamID, teamInfo, isAI)
 		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
-		x, y, z = GetClosestValidSpawnSpot(teamID, startUnit, facing, x, z) -- adjust for new location.
+		if not fixedStartPos then
+			x, y, z = GetClosestValidSpawnSpot(teamID, startUnit, facing, x, z) -- adjust for new location.
+		end
 
 		if CAMPAIGN_SPAWN_DEBUG then
 			local _, aiName = Spring.GetAIInfo(teamID)
