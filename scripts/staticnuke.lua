@@ -137,6 +137,7 @@ function script.FireWeapon()
 	
 	-- Intentionally non-positional
 	Spring.PlaySoundFile("sounds/weapon/missile/heavymissile_launch.wav", 15)
+	StartThread(CloseDoors)
 end
 
 function script.QueryWeapon()
