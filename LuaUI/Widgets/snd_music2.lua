@@ -23,8 +23,16 @@ function widget:GetInfo()
 	}
 end
 
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local seed = false
+local function SetRandomSeed()
+	if seed then
+		math.randomseed(seed)
+		seed = math.random(1e8)
+	end
+end
 
 local includedAlbums = {
 	denny = {
@@ -74,6 +82,7 @@ options = {
 		OnChange = function(self)
 			local value = self.value
 			if value == 'random' then
+				SetRandomSeed()
 				local r = math.random(#self.items - 1)
 				local item = self.items[r]
 				if item.key == 'random' then -- in case the item 'random' is not at last position
@@ -168,17 +177,20 @@ local function StartTrack(track)
 				if (#trackList.briefingTracks == 0) then
 					return
 				end
+				SetRandomSeed()
 				newTrack = trackList.briefingTracks[math.random(1, #trackList.briefingTracks)]
 				musicType = "briefing"
 			elseif musicType == 'peace' then
 				if (#trackList.peaceTracks == 0) then
 					return
 				end
+				SetRandomSeed()
 				newTrack = trackList.peaceTracks[math.random(1, #trackList.peaceTracks)]
 			elseif musicType == 'war' then
 				if (#trackList.warTracks == 0) then
 					return
 				end
+				SetRandomSeed()
 				newTrack = trackList.warTracks[math.random(1, #trackList.warTracks)]
 			end
 			tries = tries + 1
@@ -219,7 +231,11 @@ end
 
 function widget:Update(dt)
 	if not initialized then
-		math.randomseed(os.clock()* 100)
+		if seed then
+			SetRandomSeed()
+		else
+			math.randomseed(os.clock()* 100)
+		end
 		initialized = true
 		-- these are here to give epicmenu time to set the values properly
 		-- (else it's always default at startup)
@@ -309,15 +325,20 @@ function widget:Update(dt)
 end
 
 function widget:GameID(gameID)
-    if options.albumSelection.value == 'random' then -- GameID is triggered at second round of Update, after options changes
-        local seed = tonumber('0x' .. gameID)
-        -- when number given is too big, the resulting sequence is the same / when difference between numbers is too small, the resulting number is the same
-        while seed > 1e8 do
-            seed = seed^0.8
-        end
-        math.randomseed(seed)
-        options.albumSelection:OnChange()
-    end
+	-- Idempotence issue:
+	-- -when on replay we can't know the gameID until player connect, meanwhile the briefing track (if any) is playing and is not following the randomseed sequence
+	-- -when not on replay the GameID trigger at second round of Update
+	-- In any case option.OnChange got triggered before
+	seed = tonumber('0x' .. gameID)
+	-- when number given is too big, the resulting sequence is the same / when difference between numbers is too small, the resulting number is the same
+	while seed > 1e8 do
+		seed = seed^0.8
+	end
+	if options.albumSelection.value == 'random' then
+		if Spring.GetSoundStreamTime() < 0.5 then -- we don't change current album if a briefing track has started
+			options.albumSelection:OnChange()
+		end
+	end
 end
 function widget:GameStart()
 	if not gameStarted then
@@ -388,12 +409,14 @@ local function PlayGameOverMusic(gameWon)
 		if #trackList.victoryTracks <= 0 then
 			return
 		end
+		SetRandomSeed()
 		track = trackList.victoryTracks[math.random(1, #trackList.victoryTracks)]
 		musicType = "victory"
 	else
 		if #trackList.defeatTracks <= 0 then
 			return
 		end
+		SetRandomSeed()
 		track = trackList.defeatTracks[math.random(1, #trackList.defeatTracks)]
 		musicType = "defeat"
 	end
