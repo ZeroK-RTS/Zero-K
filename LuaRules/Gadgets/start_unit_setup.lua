@@ -246,7 +246,6 @@ local function GetRecommendedStartPosition(teamID, n) -- allyteams can have mult
 end
 
 local function GetStartPos(teamID, teamInfo, isAI)
-	Spring.Utilities.TableEcho(luaSetStartPositions, "luaSetStartPositions")
 	if luaSetStartPositions[teamID] then
 		return luaSetStartPositions[teamID].x, luaSetStartPositions[teamID].y, luaSetStartPositions[teamID].z, true
 	end
