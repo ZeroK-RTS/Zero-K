@@ -23,8 +23,16 @@ function widget:GetInfo()
 	}
 end
 
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local seed = false
+local function SetRandomSeed()
+	if seed then
+		math.randomseed(seed)
+		seed = math.random(1e8)
+	end
+end
 
 local includedAlbums = {
 	denny = {
@@ -36,7 +44,7 @@ local includedAlbums = {
 		humanName = "Superintendent",
 	}
 }
-local oldTrackListName = 'denny'
+local trackListName = 'denny'
 
 local trackList = {
 	warTracks       = {},
@@ -65,17 +73,30 @@ options = {
 	albumSelection = {
 		name = 'Track list',
 		type = 'radioButton',
-		value = oldTrackListName,
+		value = trackListName,
 		items = {
 			{key = 'denny', name = includedAlbums.denny.humanName},
 			{key = 'superintendent', name = includedAlbums.superintendent.humanName},
+			{key = 'random', name = 'Chosen at random'},
 		},
-		OnChange = function(self, value)
-			if self.value ~= oldTrackListName and includedAlbums[self.value] and includedAlbums[self.value].tracks then
-				oldTrackListName = self.value
-				trackList = includedAlbums[self.value].tracks
-				if WG.Music then
-					WG.Music.StopTrack()
+		OnChange = function(self)
+			local value = self.value
+			if value == 'random' then
+				SetRandomSeed()
+				local r = math.random(#self.items - 1)
+				local item = self.items[r]
+				if item.key == 'random' then -- in case the item 'random' is not at last position
+					item = self.items[r-1] or self.items[r+1]
+				end
+				value = item.key
+			end
+			if value ~= trackListName then
+				trackListName = value
+				if includedAlbums[value] and includedAlbums[value].tracks then
+					trackList = includedAlbums[value].tracks
+					if WG.Music then
+						WG.Music.StopTrack()
+					end
 				end
 			end
 		end,
@@ -156,17 +177,20 @@ local function StartTrack(track)
 				if (#trackList.briefingTracks == 0) then
 					return
 				end
+				SetRandomSeed()
 				newTrack = trackList.briefingTracks[math.random(1, #trackList.briefingTracks)]
 				musicType = "briefing"
 			elseif musicType == 'peace' then
 				if (#trackList.peaceTracks == 0) then
 					return
 				end
+				SetRandomSeed()
 				newTrack = trackList.peaceTracks[math.random(1, #trackList.peaceTracks)]
 			elseif musicType == 'war' then
 				if (#trackList.warTracks == 0) then
 					return
 				end
+				SetRandomSeed()
 				newTrack = trackList.warTracks[math.random(1, #trackList.warTracks)]
 			end
 			tries = tries + 1
@@ -207,7 +231,11 @@ end
 
 function widget:Update(dt)
 	if not initialized then
-		math.randomseed(os.clock()* 100)
+		if seed then
+			SetRandomSeed()
+		else
+			math.randomseed(os.clock()* 100)
+		end
 		initialized = true
 		-- these are here to give epicmenu time to set the values properly
 		-- (else it's always default at startup)
@@ -224,7 +252,7 @@ function widget:Update(dt)
 			}
 		end
 		
-		trackList = includedAlbums[options.albumSelection.value].tracks
+		trackList = includedAlbums[trackListName].tracks
 	end
 	
 	timeframetimer_short = timeframetimer_short + dt
@@ -296,6 +324,22 @@ function widget:Update(dt)
 	end
 end
 
+function widget:GameID(gameID)
+	-- Idempotence issue:
+	-- -when on replay we can't know the gameID until player connect, meanwhile the briefing track (if any) is playing and is not following the randomseed sequence
+	-- -when not on replay the GameID trigger at second round of Update
+	-- In any case option.OnChange got triggered before
+	seed = tonumber('0x' .. gameID)
+	-- when number given is too big, the resulting sequence is the same / when difference between numbers is too small, the resulting number is the same
+	while seed > 1e8 do
+		seed = seed^0.8
+	end
+	if options.albumSelection.value == 'random' then
+		if Spring.GetSoundStreamTime() < 0.5 then -- we don't change current album if a briefing track has started
+			options.albumSelection:OnChange()
+		end
+	end
+end
 function widget:GameStart()
 	if not gameStarted then
 		gameStarted = true
@@ -365,12 +409,14 @@ local function PlayGameOverMusic(gameWon)
 		if #trackList.victoryTracks <= 0 then
 			return
 		end
+		SetRandomSeed()
 		track = trackList.victoryTracks[math.random(1, #trackList.victoryTracks)]
 		musicType = "victory"
 	else
 		if #trackList.defeatTracks <= 0 then
 			return
 		end
+		SetRandomSeed()
 		track = trackList.defeatTracks[math.random(1, #trackList.defeatTracks)]
 		musicType = "defeat"
 	end
