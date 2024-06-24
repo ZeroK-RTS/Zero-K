@@ -26,6 +26,9 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+-- see `widget:GameID` below. Used just for rolling tracks,
+-- so that you get the same set of tracks in a replay.
 local seed = false
 local function SetRandomSeed()
 	if seed then
@@ -82,8 +85,12 @@ options = {
 		OnChange = function(self)
 			local value = self.value
 			if value == 'random' then
+
+				-- not idempotent, rerolls if you spam-click the radiobutton
+				-- or if OnChange is called externally. Not a big problem tho
 				SetRandomSeed()
 				local r = math.random(#self.items - 1)
+
 				local item = self.items[r]
 				if item.key == 'random' then -- in case the item 'random' is not at last position
 					item = self.items[r-1] or self.items[r+1]
