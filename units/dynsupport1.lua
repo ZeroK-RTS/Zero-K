@@ -83,7 +83,7 @@ return { dynsupport1 = {
   trackWidth          = 22,
   turnRate            = 1620,
   upright             = true,
-  workerTime          = 12,
+  workerTime          = 50,
 
   featureDefs         = {
 

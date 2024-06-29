@@ -768,6 +768,35 @@ end
 --------------------------------------------------------------------
 else
 
+local function circleLines(percentage, radius)
+	gl.BeginEnd(GL.LINE_STRIP, function()
+		local radstep = (2.0 * math.pi) / 50
+		for i = 0, 50 * percentage do
+			local a = (i * radstep)
+			gl.Vertex(math.sin(a)*radius, 0, math.cos(a)*radius)
+		end
+	end)
+end  
+
+function gadget:DrawWorldPreUnit()
+	teamID = Spring.GetLocalTeamID()
+	local spec, fullview = Spring.GetSpectatingState()
+	spec = spec or fullview
+	local mCurr, mStor = Spring.GetTeamResources(teamID, "metal")
+	local value = mCurr / 500
+	local radius = 30
+	for _, unitID in pairs(Spring.GetAllUnits()) do
+		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+		if (ud.customParams.dynamic_comm) then
+			gl.DepthTest(false)
+			gl.LineWidth(6.5)
+			gl.Color({255,0,0})
+			gl.DrawFuncAtUnit(unitID, false, circleLines, value, radius)
+			gl.DepthTest(true)
+		end
+	end
+end
+
 function gadget:Initialize()
   gadgetHandler:AddSyncAction('CommSelection',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
 
