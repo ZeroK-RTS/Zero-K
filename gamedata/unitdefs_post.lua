@@ -83,6 +83,8 @@ do
 		Spring.Echo("Loading tweakdefs modoption", append or 0)
 		if postfunc then
 			postfunc()
+		else
+			Spring.Log("defs.lua", LOG.ERROR, name, err)
 		end
 		append = (append or 0) + 1
 		name = "tweakdefs" .. append
