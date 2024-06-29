@@ -1,8 +1,8 @@
 include "constants.lua"
 
 --pieces
-local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body
-	= piece("base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
+local base, flare1, flare2, wingtip1, wingtip2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body
+	= piece("base", "flare1", "flare2", "wingtip1", "wingtip2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
 
 local smokePiece = {base, rwing, lwing}
 
@@ -41,6 +41,22 @@ end
 
 ----------------------------------------------------------
 
+local function SetSprintWingtips()
+	Move(wingtip1, x_axis, -35, 60)
+	Move(wingtip1, z_axis, -10, 10)
+	
+	Move(wingtip2, x_axis, 35, 60)
+	Move(wingtip2, z_axis, -10, 10)
+end
+
+local function ResetWingtips()
+	Move(wingtip1, x_axis, -3, 40)
+	Move(wingtip1, z_axis, -4, 6)
+	
+	Move(wingtip2, x_axis, 3, 40)
+	Move(wingtip2, z_axis, -4, 6)
+end
+
 function SprintThread()
 	GG.PokeDecloakUnit(unitID, unitDefID)
 	local _,_,_, sx, sy, sz = Spring.GetUnitPosition(unitID, true)
@@ -53,6 +69,7 @@ function SprintThread()
 		Sleep(33)
 	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	ResetWingtips()
 	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
 	GG.UpdateUnitAttributes(unitID)
 	
@@ -87,8 +104,13 @@ function Sprint()
 	Turn(rwing, y_axis, math.rad(65), math.rad(300))
 	Turn(lwing, y_axis, math.rad(-65), math.rad(300))
 
+	--Move(wingtip1, x_axis, -3, 3)
+	--Move(wingtip1, z_axis, -20, 3)
+
+	
 	StartThread(SprintThread)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)
+	SetSprintWingtips()
 	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 3)
 	GG.UpdateUnitAttributes(unitID)
 end
@@ -117,6 +139,8 @@ end
 function script.Create()
 	Move(rwing, x_axis, WING_DISTANCE)
 	Move(lwing, x_axis, -WING_DISTANCE)
+	ResetWingtips()
+	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
