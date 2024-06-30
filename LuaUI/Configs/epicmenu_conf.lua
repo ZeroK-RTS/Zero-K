@@ -525,47 +525,47 @@ local pathMisc = 'Settings/Misc'
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 	
-	ShRadio( pathGraphicsMap,
-		'Water rendering', {
-			{name = 'Basic',key='0', desc='A simple plane.', icon=imgPath..'epicmenu/water.png'},
-			{name = 'Reflective',key='1', desc='Reflects the world.', icon=imgPath..'epicmenu/water.png'},
-			-- crashy, see https://github.com/ZeroK-RTS/Zero-K/issues/3396
-			--{name = 'Dynamic',key='2', desc='Has waves and wakes when units move and projectiles explode.', icon=imgPath..'epicmenu/water.png'},
-			{name = 'Reflective / Refractive',key='3', desc='Reflects the world and has distortions.', icon=imgPath..'epicmenu/water.png'},
-			{name = 'Bumpmapped',key='4', desc='Fast and good-looking.', icon=imgPath..'epicmenu/water.png'},
-		},'4',
-		function(self)
-			spSendCommands{"water " .. self.value}
-		end,
-		true,
-		true
-	)
-
-	ShRadio( pathGraphicsMap,
-		'Shadows cast by', {
-			{name = 'Nothing',key='0', desc='Shadows disabled.'},
-			{name = 'Units',key='2', desc='Only units cast shadows.'},
-			{name = 'Units and terrain',key='1', desc='Terrain can cast shadows onto lower terrain. Units also cast shadows.'},
-		},'1',
-		function(self)
-			spSendCommands{"Shadows " .. self.value}
-		end,
-		true,
-		true
-	)
-	AddOption(pathGraphicsMap,
-	{
-		name = 'Shadow detail level',
-		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
-		advanced = true,
-		type = 'number',
-		valuelist = {512, 1024, 2048, 4096, 8192, 16384},
-		springsetting = 'ShadowMapSize',
-		OnChange=function(self)
-			local curShadow = Spring.GetConfigInt("Shadows") or 0
-			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
-		end,
-	})
+	--ShRadio( pathGraphicsMap,
+	--	'Water rendering', {
+	--		{name = 'Basic',key='0', desc='A simple plane.', icon=imgPath..'epicmenu/water.png'},
+	--		{name = 'Reflective',key='1', desc='Reflects the world.', icon=imgPath..'epicmenu/water.png'},
+	--		-- crashy, see https://github.com/ZeroK-RTS/Zero-K/issues/3396
+	--		--{name = 'Dynamic',key='2', desc='Has waves and wakes when units move and projectiles explode.', icon=imgPath..'epicmenu/water.png'},
+	--		{name = 'Reflective / Refractive',key='3', desc='Reflects the world and has distortions.', icon=imgPath..'epicmenu/water.png'},
+	--		{name = 'Bumpmapped',key='4', desc='Fast and good-looking.', icon=imgPath..'epicmenu/water.png'},
+	--	},'4',
+	--	function(self)
+	--		spSendCommands{"water " .. self.value}
+	--	end,
+	--	true,
+	--	true
+	--)
+	--
+	--ShRadio( pathGraphicsMap,
+	--	'Shadows cast by', {
+	--		{name = 'Nothing',key='0', desc='Shadows disabled.'},
+	--		{name = 'Units',key='2', desc='Only units cast shadows.'},
+	--		{name = 'Units and terrain',key='1', desc='Terrain can cast shadows onto lower terrain. Units also cast shadows.'},
+	--	},'1',
+	--	function(self)
+	--		spSendCommands{"Shadows " .. self.value}
+	--	end,
+	--	true,
+	--	true
+	--)
+	--AddOption(pathGraphicsMap,
+	--{
+	--	name = 'Shadow detail level',
+	--	desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+	--	advanced = true,
+	--	type = 'number',
+	--	valuelist = {512, 1024, 2048, 4096, 8192, 16384},
+	--	springsetting = 'ShadowMapSize',
+	--	OnChange=function(self)
+	--		local curShadow = Spring.GetConfigInt("Shadows") or 0
+	--		spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
+	--	end,
+	--})
 
 	ShLabel(pathGraphicsMap, 'Miscellaneous')
 	AddOption(pathGraphicsMap,
@@ -581,17 +581,17 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		OnChange = function(self) spSendCommands{"luaui enablewidget Darkening", "luaui darkening " .. 1-self.value} end,
 	} )
 
-	AddOption(pathGraphicsMap,
-	{
-		name = 'Terrain detail',
-		desc = 'Control the accuracy of the terrain.',
-		type = 'number',
-		min = 30,
-		max = 250,
-		step = 5,
-		value = 90,
-		OnChange = function(self) spSendCommands{"GroundDetail " .. self.value} end,
-	} )
+	--AddOption(pathGraphicsMap,
+	--{
+	--	name = 'Terrain detail',
+	--	desc = 'Control the accuracy of the terrain.',
+	--	type = 'number',
+	--	min = 30,
+	--	max = 250,
+	--	step = 5,
+	--	value = 90,
+	--	OnChange = function(self) spSendCommands{"GroundDetail " .. self.value} end,
+	--} )
 
 	AddOption(pathGraphicsMap,
 	{
