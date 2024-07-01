@@ -38,7 +38,7 @@ return { gunshipassault = {
   script              = [[gunshipassault.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 585,
-  speed               = 135,
+  speed               = 130,
   turnRate            = 1000,
 
   weapons             = {
@@ -79,7 +79,7 @@ return { gunshipassault = {
       },
 
       damage                  = {
-        default = 220.5,
+        default = 210.5,
       },
 
       dance                   = 28,
@@ -93,7 +93,7 @@ return { gunshipassault = {
       model                   = [[hobbes_nohax.s3o]],
       noSelfDamage            = true,
       range                   = 270,
-      reloadtime              = 9,
+      reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/rapid_rocket_hit]],
       soundStart              = [[weapon/missile/rapid_rocket_fire]],
