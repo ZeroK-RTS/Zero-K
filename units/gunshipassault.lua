@@ -38,7 +38,7 @@ return { gunshipassault = {
   script              = [[gunshipassault.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 585,
-  speed               = 130,
+  speed               = 130.5,
   turnRate            = 1000,
 
   weapons             = {
