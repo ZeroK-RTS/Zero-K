@@ -27,15 +27,25 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- see `widget:GameID` below. Used just for rolling tracks,
--- so that you get the same set of tracks in a replay.
-local seed = false
-local function SetRandomSeed()
-	if seed then
-		math.randomseed(seed)
-		seed = math.random(1e8)
+-- see `widget:GameID` below.
+-- getting same set of tracks during replay
+-- when using album chosen at random:
+-- 	- getting same initial album on same game
+-- 	- rolling same sequence of random album when spamming the option
+local seedAlbum, seedTrack = false, false
+local function SetRandomSeedAlbum()
+	if seedAlbum then
+		math.randomseed(seedAlbum)
+		seedAlbum = math.random(1e8)
 	end
 end
+local function SetRandomSeedTrack()
+	if seedTrack then
+		math.randomseed(seedTrack)
+		seedTrack = math.random(1e8)
+	end
+end
+
 
 local includedAlbums = {
 	denny = {
@@ -85,10 +95,7 @@ options = {
 		OnChange = function(self)
 			local value = self.value
 			if value == 'random' then
-
-				-- not idempotent, rerolls if you spam-click the radiobutton
-				-- or if OnChange is called externally. Not a big problem tho
-				SetRandomSeed()
+				SetRandomSeedAlbum()
 				local r = math.random(#self.items - 1)
 
 				local item = self.items[r]
@@ -184,20 +191,20 @@ local function StartTrack(track)
 				if (#trackList.briefingTracks == 0) then
 					return
 				end
-				SetRandomSeed()
+				SetRandomSeedTrack()
 				newTrack = trackList.briefingTracks[math.random(1, #trackList.briefingTracks)]
 				musicType = "briefing"
 			elseif musicType == 'peace' then
 				if (#trackList.peaceTracks == 0) then
 					return
 				end
-				SetRandomSeed()
+				SetRandomSeedTrack()
 				newTrack = trackList.peaceTracks[math.random(1, #trackList.peaceTracks)]
 			elseif musicType == 'war' then
 				if (#trackList.warTracks == 0) then
 					return
 				end
-				SetRandomSeed()
+				SetRandomSeedTrack()
 				newTrack = trackList.warTracks[math.random(1, #trackList.warTracks)]
 			end
 			tries = tries + 1
@@ -238,8 +245,8 @@ end
 
 function widget:Update(dt)
 	if not initialized then
-		if seed then
-			SetRandomSeed()
+		if seedTrack then
+			SetRandomSeedTrack()
 		else
 			math.randomseed(os.clock()* 100)
 		end
@@ -336,11 +343,12 @@ function widget:GameID(gameID)
 	-- -when on replay we can't know the gameID until player connect, meanwhile the briefing track (if any) is playing and is not following the randomseed sequence
 	-- -when not on replay the GameID trigger at second round of Update
 	-- In any case option.OnChange got triggered before
-	seed = tonumber('0x' .. gameID)
+	local seed = tonumber('0x' .. gameID)
 	-- when number given is too big, the resulting sequence is the same / when difference between numbers is too small, the resulting number is the same
 	while seed > 1e8 do
 		seed = seed^0.8
 	end
+	seedTrack, seedAlbum = seed, seed
 	if options.albumSelection.value == 'random' then
 		if Spring.GetSoundStreamTime() < 0.5 then -- we don't change current album if a briefing track has started
 			options.albumSelection:OnChange()
@@ -416,14 +424,14 @@ local function PlayGameOverMusic(gameWon)
 		if #trackList.victoryTracks <= 0 then
 			return
 		end
-		SetRandomSeed()
+		SetRandomSeedTrack()
 		track = trackList.victoryTracks[math.random(1, #trackList.victoryTracks)]
 		musicType = "victory"
 	else
 		if #trackList.defeatTracks <= 0 then
 			return
 		end
-		SetRandomSeed()
+		SetRandomSeedTrack()
 		track = trackList.defeatTracks[math.random(1, #trackList.defeatTracks)]
 		musicType = "defeat"
 	end
