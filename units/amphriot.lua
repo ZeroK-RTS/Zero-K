@@ -127,7 +127,7 @@ return { amphriot = {
     FLECHETTE = {
       name                    = [[Flechette]],
       alphaDecay              = 0.3,
-      areaOfEffect            = 32,
+      areaOfEffect            = 64,
       burnBlow                = true,
       burst                   = 3,
       burstRate               = 0.033,
@@ -142,10 +142,11 @@ return { amphriot = {
       },
 
       damage                  = {
-        default = 23,
+        default = 28,
       },
 
-      explosionGenerator      = [[custom:ARCHPLOSION]],
+      edgeEffectiveness       = 0.5,
+      explosionGenerator      = [[custom:archplosion_aoe]],
       fireStarter             = 50,
       heightMod               = 1,
       impulseBoost            = 0,
@@ -153,7 +154,7 @@ return { amphriot = {
       interceptedByShieldType = 1,
       projectiles             = 3,
       range                   = 264,
-      reloadtime              = 0.8,
+      reloadtime              = 0.966,
       separation              = 1.2,
       size                    = 2,
       sizeDecay               = 0,
@@ -162,7 +163,7 @@ return { amphriot = {
       soundStart              = [[weapon/shotgun_firev4]],
       soundStartVolume        = 0.5,
       soundTrigger            = true,
-      sprayangle              = 1500,
+      sprayangle              = 1800,
       stages                  = 20,
       tolerance               = 10000,
       turret                  = true,
