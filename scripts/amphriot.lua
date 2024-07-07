@@ -368,8 +368,8 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
 		
-		Turn(torso, y_axis, heading, math.rad(360))
-		Turn(mainturret, x_axis, -pitch, math.rad(180))
+		Turn(torso, y_axis, heading, math.rad(480))
+		Turn(mainturret, x_axis, -pitch, math.rad(240))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(mainturret, x_axis)
 		
@@ -385,7 +385,7 @@ function script.AimWeapon(num, heading, pitch)
 			pitch = math.rad(10)
 		end
 		
-		Turn(torso, y_axis, heading, math.rad(360))
+		Turn(torso, y_axis, heading, math.rad(480))
 		Turn(lturret1, x_axis, -pitch, math.rad(180))
 		Turn(rturret1, x_axis, -pitch, math.rad(180))
 		Turn(lturret2, x_axis, -pitch, math.rad(180))
@@ -423,7 +423,12 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 2 and targetID then -- torpedoes
+	if not targetID then
+		return false
+	end
+	if num == 1 then -- Shotgun
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 200, 8)
+	elseif num == 2 then -- torpedoes
 		-- Lower than real damage (104) to help against Duck regen case.
 		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 92, 40)
 	end
