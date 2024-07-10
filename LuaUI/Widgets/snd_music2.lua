@@ -254,7 +254,6 @@ end
 
 function widget:Update(dt)
 	if not initialized then
-		math.randomseed(os.clock()* 100)
 		initialized = true
 		-- these are here to give epicmenu time to set the values properly
 		-- (else it's always default at startup)
@@ -270,14 +269,15 @@ function widget:Update(dt)
 				defeatTracks    = VFS.DirList(dir .. 'defeat/', '*.ogg', vfsMode),
 			}
 		end
-		
+		if gameID then
+			-- update the tracklistName case: reload, random chosen at start
+			widget:GameID(gameID)
+		else
+			math.randomseed(os.clock()* 100)
+		end
 		trackList = includedAlbums[trackListName].tracks
 	elseif randomAlbumUseSeed == nil then
-		-- wait the second round for widget:GameID() to trigger (for the case: not in replay and not after a reload)
-		if gameID and not seed then
-			-- case: reload
-			widget:GameID(gameID)
-		end
+		-- case replay: widget:gameID() hasn't been triggered yet
 		randomAlbumUseSeed = false
 		continueAlbum = false
 	end
@@ -369,6 +369,7 @@ function widget:GameID(id)
 		end
 	end
 	randomAlbumUseSeed = false
+	continueAlbum = false
 end
 function widget:GameStart()
 	if not gameStarted then
