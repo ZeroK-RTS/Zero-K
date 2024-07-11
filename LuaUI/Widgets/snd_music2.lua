@@ -248,14 +248,15 @@ function widget:Update(dt)
 		-- (else it's always default at startup)
 		
 		local vfsMode = (options.useIncludedTracks.value and VFS.RAW_FIRST) or VFS.RAW
+		local supportedFileTypes = '*.{ogg,mp3}'
 		for name, data in pairs(includedAlbums) do
 			local dir = 'sounds/music/' .. data.dir
 			data.tracks = {
-				warTracks       = VFS.DirList(dir .. 'war/', '*.ogg', vfsMode),
-				peaceTracks     = VFS.DirList(dir .. 'peace/', '*.ogg', vfsMode),
-				briefingTracks  = VFS.DirList(dir .. 'briefing/', '*.ogg', vfsMode),
-				victoryTracks   = VFS.DirList(dir .. 'victory/', '*.ogg', vfsMode),
-				defeatTracks    = VFS.DirList(dir .. 'defeat/', '*.ogg', vfsMode),
+				warTracks       = VFS.DirList(dir .. 'war/'     , supportedFileTypes, vfsMode),
+				peaceTracks     = VFS.DirList(dir .. 'peace/'   , supportedFileTypes, vfsMode),
+				briefingTracks  = VFS.DirList(dir .. 'briefing/', supportedFileTypes, vfsMode),
+				victoryTracks   = VFS.DirList(dir .. 'victory/' , supportedFileTypes, vfsMode),
+				defeatTracks    = VFS.DirList(dir .. 'defeat/'  , supportedFileTypes, vfsMode),
 			}
 		end
 		
