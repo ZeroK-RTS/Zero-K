@@ -25,7 +25,7 @@ local setAiPosCommand = {
 }
 
 -- configurables
-local COMBOX_HEIGHT = 26
+local COMBOX_HEIGHT = 20
 local BUTTON_SIZE = 32
 local BUTTON_SPACING = 5
 
@@ -746,9 +746,6 @@ local function InitializeControls()
 		else
 			WG.cheat_global_button = WG.GlobalCommandBar.AddCommand("LuaRules/Images/awards/trophy_friend.png", "", ToggleWindow)
 		end
-	end
-	if WG.MakeMinizable then
-		WG.MakeMinizable(mainWindow)
 	end
 	languageChanged() -- update texts
 
