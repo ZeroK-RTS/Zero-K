@@ -52,6 +52,9 @@ local unitPickers
 local countSlider
 local teamPicker
 local controlTeamPicker
+local controlItemToTeam = {}
+local currentControlTeamItem = 1
+local myPlayerID
 
 -- misc derivative stuff
 local categories = {}
@@ -509,24 +512,51 @@ local function AddMiscControls(parent, offset)
 	AddAllowFpsToggle (parent, offset)
 	AddButtons        (parent, offset)
 end
+
+local function UpdateTeamControllerSelected()
+	local newSelect
+	if Spring.GetSpectatingState() then
+		newSelect = 1
+	else
+		local myTeamID = Spring.GetMyTeamID()
+		for i, item in ipairs(controlTeamPicker.items) do
+			if myTeamID == controlItemToTeam[i] then
+				newSelect = i
+			end
+		end
+	end
+	if newSelect then
+		currentControlTeamItem = newSelect
+		controlTeamPicker:Select(newSelect)
+	end
+end
+
 local function MakeTeamControllerComboBoxes(parent, offset)
-	local teams = Spring.GetTeamList()
 	controlTeamPicker = WG.Chili.ComboBox:New{
 		x = 5,
 		y = offset[1],
 		right = 5,
 		height = COMBOX_HEIGHT,
 		topHeight = 10,
-		items = {},
+		items = {'Spectator'},
+
 		parent = parent,
 		objectOverrideFont = WG.GetFont(),
 		OnSelect = {function(self, i)
 			if Spring.IsCheatingEnabled() then
-				Spring.SendCommands('team ' .. teams[i])
+				if currentControlTeamItem == i then
+					return
+				end
+				if i == 1 then
+					Spring.SendCommands('spectator')
+				elseif controlItemToTeam[i] then
+					Spring.SendCommands('team ' .. controlItemToTeam[i])
+				end
 			end
 		end},
 	}
 end
+
 local function MakeTeamControllerLabel(parent, offset)
 	WG.Chili.Label:New{
 		x = 0,
@@ -797,7 +827,6 @@ function languageChanged()
 	countSlider.tooltip_format = WG.Translate("interface", "cheatsheet_count_slider")
 	countSlider:SetValue(countSlider.value)
 
-	local myTeamID = Spring.GetMyTeamID()
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
 		local teamID = teams[i]
@@ -805,28 +834,37 @@ function languageChanged()
 
 		if Spring.GetGaiaTeamID() == teamID then
 			teamPicker.items[i] = WG.Translate("interface", "neutral")
-			-- controlTeamPicker.items[i] = teamPicker.items[i] -- Spring refuse to give control of the neutral team
+			-- Spring refuse to give control of the neutral team, saying it doesn't exist
+			-- controlTeamPicker.items[#controlTeamPicker.items + 1] = teamPicker.items[i]
+			-- controlItemToTeam[#controlTeamPicker.items] = teamID
 		elseif isAI then
 			local _,botID,_,shortName = Spring.GetAIInfo(teamID)
 			teamPicker.items[i] = (shortName or "Bot") .." - " .. (botID or "")
-			controlTeamPicker.items[i] = teamPicker.items[i]
+			controlTeamPicker.items[#controlTeamPicker.items + 1] = teamPicker.items[i]
+			controlItemToTeam[#controlTeamPicker.items] = teamID
 		else
 			teamPicker.items[i] = Spring.GetPlayerInfo(playerID, false) or "???"
-			controlTeamPicker.items[i] = teamPicker.items[i]
-		end
-		if teamID == myTeamID then
-			controlTeamPicker.selected = i
+			controlTeamPicker.items[#controlTeamPicker.items + 1] = teamPicker.items[i]
+			controlItemToTeam[#controlTeamPicker.items] = teamID
 		end
 	end
 	teamPicker.tooltip = WG.Translate("interface", "cheatsheet_teampick_desc")
-	controlTeamPicker.tooltip = 'Take control of that team.'
 	teamPicker:Select(teamPicker.selected)
-	controlTeamPicker:Select(controlTeamPicker.selected)
 	teamPicker:Invalidate()
-	controlTeamPicker:Invalidate()
+
+	controlTeamPicker.tooltip = 'Take control of that team.'
+	UpdateTeamControllerSelected()
 end
 
 -- WH interface
+
+function widget:PlayerChanged(playerID)
+	if playerID == myPlayerID then
+		if controlTeamPicker then
+			UpdateTeamControllerSelected()
+		end
+	end
+end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID ~= CMD_CHEAT_GIVE then
@@ -920,6 +958,7 @@ end
 
 function widget:Initialize()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	myPlayerID = Spring.GetMyPlayerID()
 
 	--[[ Don't display the controls (esp. the top bar button) before
 	     cheats are actually enabled for the first time. This way:
