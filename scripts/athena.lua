@@ -35,9 +35,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	Move(wingtipl, x_axis, -0.6)
-	Move(wingtipl, z_axis, -6)
 	Move(wingtipr, x_axis, 0.6)
-	Move(wingtipr, z_axis, -6)
 end
 
 function script.Activate()
