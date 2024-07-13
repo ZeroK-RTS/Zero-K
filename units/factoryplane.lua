@@ -30,6 +30,9 @@ return { factoryplane = {
   collisionVolumeOffsets        = [[0 -8 -25]],
   collisionVolumeScales         = [[110 46 0]],
   collisionVolumeType           = [[cylX]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[120 40 104]],
+  selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
