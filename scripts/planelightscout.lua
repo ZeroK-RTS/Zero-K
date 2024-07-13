@@ -5,7 +5,7 @@ include "fixedwingTakeOff.lua"
 -- constants/vars
 --------------------------------------------------------------------
 local fuselage, KRisaravinglunatic, wingl, wingr = piece("fuselage", "KRisaravinglunatic", "wingl", "wingr")
--- unused pieces: canardl, canardr, wingtipl, wingtipr, enginer, enginel, exhaustl, exhaustr
+-- unused pieces: canardl, canardr, enginer, enginel, exhaustl, exhaustr
 local smokePiece = {KRisaravinglunatic}
 
 local SIG_TAKEOFF = 2
@@ -58,12 +58,6 @@ end
 function script.Create()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-
-	-- Work around a LUPS ribbon bug. See #5178
-	local tipL, tipR = piece('wingtipl', 'wingtipr')
-	local speedPerFrame = UnitDef.speed / Game.gameSpeed
-	Move(tipL, z_axis, -speedPerFrame)
-	Move(tipR, z_axis, -speedPerFrame)
 end
 
 function script.Killed(recentDamage, maxHealth)
