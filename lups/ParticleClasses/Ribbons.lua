@@ -112,41 +112,57 @@ function Ribbon:Draw()
 	end
 	glUniform(widthLoc, self.width )
 	glUniformInt(quadsLoc, quads0 )
+	
+	-- Paused drawing involves a bunch of nonsense because Update() happens, causing the latest position
+	-- to be put in the table. However, it looks like units in paused games are drawn in the position
+	-- they were in at the start of the previous frame. So the latest position in the table has to be
+	-- discarded.
+	local _, _, paused = Spring.GetGameSpeed()
 
 	--// insert old pos
 	local j = ((self.posIdx==self.size) and 1) or (self.posIdx+1)
-	for i=1,quads0 do
+	for i = 1,quads0 - (paused and 1 or 0) do
 		local dir = self.oldPos[j]
 		j = ((j==self.size) and 1) or (j+1)
 		glUniform( oldPosUniform[i] , dir[1], dir[2], dir[3] )
 	end
-
-	--// insert interpolated current unit pos
-	if (self.isvalid) then
-		--local x,y,z = GetPiecePos(self.unit,self.piecenum)
-		local x,y,z
-		if self.unit then
-			x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
-			local ux, uy, uz = Spring.GetUnitViewPosition(self.unit, true)
-			local _, _, _, mx, my, mz = Spring.GetUnitPosition(self.unit, true)
-			if z and uz and mz then
-				x = x + (ux - mx) * 1.01
-				y = y + (uy - my) * 1.01
-				z = z + (uz - mz) * 1.01
+	
+	if paused then
+		local dir = self.oldPos[j]
+		local prev = self.oldPos[(j == 1 and self.size) or j - 1]
+		glUniform( oldPosUniform[quads0] , (prev[1] + dir[1])/2, (prev[2] + dir[2])/2, (prev[3] + dir[3])/2 )
+		glUniform( oldPosUniform[quads0 + 1] , dir[1], dir[2], dir[3] )
+	else
+		--// insert interpolated current unit pos
+		if (self.isvalid) then
+			--local x,y,z = GetPiecePos(self.unit,self.piecenum)
+			local x,y,z
+			if Spring.GetFrameTimeOffset() > 0 then
+				if self.unit then
+					x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
+					local ux, uy, uz = Spring.GetUnitViewPosition(self.unit, true)
+					local _, _, _, mx, my, mz = Spring.GetUnitPosition(self.unit, true)
+					if z and uz and mz then
+						x = x + (ux - mx)
+						y = y + (uy - my)
+						z = z + (uz - mz)
+					end
+				elseif self.projectile then
+					x,y,z = spGetProjectilePosition(self.projectile)
+				end
 			end
-		elseif self.projectile then
-			x,y,z = spGetProjectilePosition(self.projectile)
-		end
-		if x and y and z then
-			glUniform( oldPosUniform[quads0+1] , x,y,z )
+			if x and y and z then
+				glUniform( oldPosUniform[quads0+1] , x,y,z )
+			else
+				local dir = self.oldPos[j]
+				glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
+			end
 		else
 			local dir = self.oldPos[j]
 			glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
 		end
-	else
-		local dir = self.oldPos[j]
-		glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
 	end
+
 
 	--// define color and add speed blending (don't show ribbon for slow/landing units!)
 	if (self.blendfactor<1) then
