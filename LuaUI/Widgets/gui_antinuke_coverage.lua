@@ -488,8 +488,10 @@ end
 local function Draw()
 	if drawNuke then
 		local intercepted = DrawEnemyInterceptors()
+		if not (drawNuke.pos and drawNuke.mouse) then
+			return
+		end
 		local vertices = {drawNuke.pos, drawNuke.mouse}
-  
 		if intercepted == 2 then
 			glColor(1,0,0,1)
 		elseif intercepted == 1 then
