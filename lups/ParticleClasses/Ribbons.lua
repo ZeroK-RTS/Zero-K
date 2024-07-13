@@ -127,11 +127,21 @@ function Ribbon:Draw()
 		local x,y,z
 		if self.unit then
 			x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
+			local ux, uy, uz = Spring.GetUnitViewPosition(self.unit, true)
+			local _, _, _, mx, my, mz = Spring.GetUnitPosition(self.unit, true)
+			if z and uz and mz then
+				x = x + (ux - mx) * 1.01
+				y = y + (uy - my) * 1.01
+				z = z + (uz - mz) * 1.01
+			end
 		elseif self.projectile then
 			x,y,z = spGetProjectilePosition(self.projectile)
 		end
 		if x and y and z then
 			glUniform( oldPosUniform[quads0+1] , x,y,z )
+		else
+			local dir = self.oldPos[j]
+			glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
 		end
 	else
 		local dir = self.oldPos[j]
@@ -235,22 +245,22 @@ function Ribbon:Update(n)
 	if (self.isvalid) then
 		local x,y,z
 		if self.unit then
-			x, y, z = spGetUnitPiecePosDir(self.unit,self.piecenum)
+			x, y, z = spGetUnitPiecePosDir(self.unit, self.piecenum)
 		elseif self.projectile then
-			x,y,z = spGetProjectilePosition(self.projectile)
+			x, y, z = spGetProjectilePosition(self.projectile)
 		end
 		if x and y and z then
 			self.posIdx = (self.posIdx % self.size)+1
-			self.oldPos[self.posIdx] = {x,y,z}
+			self.oldPos[self.posIdx] = {x, y, z}
 
-			local vx,vy,vz
+			local vx, vy, vz
 			if self.unit then
-	vx, vy, vz = spGetUnitVelocity(self.unit)
+				vx, vy, vz = spGetUnitVelocity(self.unit)
 			elseif self.projectile then
-	vx, vy, vz = spGetProjectileVelocity(self.projectile)
+				vx, vy, vz = spGetProjectileVelocity(self.projectile)
 			end
 			if vx and vy and vz then
-	self.blendfactor = (vx*vx+vy*vy+vz*vz)/30
+				self.blendfactor = (vx*vx+vy*vy+vz*vz)/30
 			end
 		end
 	else
@@ -318,7 +328,7 @@ function Ribbon:CreateParticle()
 	if self.unit then
 		x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
 	elseif self.projectile then
-	x,y,z = spGetProjectilePosition(self.projectile)
+		x,y,z = spGetProjectilePosition(self.projectile)
 	end
 	local curpos = {x,y,z}
 
