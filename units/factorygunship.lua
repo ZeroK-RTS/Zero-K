@@ -30,7 +30,7 @@ return { factorygunship = {
   collisionVolumeScales         = [[86 86 86]],
   collisionVolumeType           = [[ellipsoid]],
   selectionVolumeOffsets        = [[0 10 0]],
-  selectionVolumeScales         = [[104 60 96]],
+  selectionVolumeScales         = [[104 60 104]],
   selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
