@@ -125,7 +125,7 @@ return { amphriot = {
     },
 
     FLECHETTE = {
-      name                    = [[Flechette]],
+      name                    = [[Heavy Shotgun]],
       alphaDecay              = 0.3,
       areaOfEffect            = 64,
       burnBlow                = true,
@@ -153,7 +153,7 @@ return { amphriot = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       projectiles             = 3,
-      range                   = 264,
+      range                   = 285,
       reloadtime              = 0.966,
       separation              = 1.2,
       size                    = 2,
