@@ -17,7 +17,6 @@ local spSendCommands = Spring.SendCommands
 
 local specOld = false
 local spec = false
-local team
 
 local SelectNextPlayer = function() end
 
@@ -73,19 +72,24 @@ function widget:PlayerChanged()
 end
 
 function widget:SelectionChanged(selection)
-  if selection and #selection > 0 then
-    -- I cannot read users mind, use first unit to have a team
-    local lastTeam = spGetMyTeamID()
-    for i, id in ipairs(selection) do
-        team = spGetUnitTeam(id)
-        if team then
-            if team ~= lastTeam then
-                spSendCommands("specteam "..team)
-            end
-            break
-        end
-    end
-  end
+	if selection and #selection > 0 then
+		-- I cannot read users mind, use first valid unit
+		local lastTeam = spGetMyTeamID()
+		for i, id in ipairs(selection) do
+			local team = spGetUnitTeam(id)
+
+			-- with specfullview 0, you can still unknowingly
+			-- select enemy units, but they won't look valid,
+			-- i.e. nil team. Skip those
+			if team then
+
+				if team ~= lastTeam then
+					spSendCommands("specteam "..team)
+				end
+				break
+			end
+		end
+	end
 end
 ----------------------------------------------------
 --code for "SelectNextPlayer" button----
