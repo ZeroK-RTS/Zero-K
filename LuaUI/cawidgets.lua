@@ -619,6 +619,8 @@ local restrictedFunctions = {
 	     Feel free to make a gadget instead though. See https://zero-k.info/Forum/Thread/34108 ]]
 	"GetVisibleProjectiles",
 	"GetProjectilesInRectangle",
+
+	"GetTeamDamageStats", -- LoS hax
 }
 local restrictedWhitelist = {
 	--[[ Other widgets have security holes and there is
