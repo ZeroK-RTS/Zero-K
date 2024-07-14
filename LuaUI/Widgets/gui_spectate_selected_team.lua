@@ -74,11 +74,16 @@ end
 
 function widget:SelectionChanged(selection)
   if selection and #selection > 0 then
-    -- I cannot read users mind, use first unit
-    team = spGetUnitTeam(selection[1])
+    -- I cannot read users mind, use first unit to have a team
     local lastTeam = spGetMyTeamID()
-    if team and team ~= lastTeam then
-      spSendCommands("specteam "..team)
+    for i, id in ipairs(selection) do
+        team = spGetUnitTeam(id)
+        if team then
+            if team ~= lastTeam then
+                spSendCommands("specteam "..team)
+            end
+            break
+        end
     end
   end
 end
