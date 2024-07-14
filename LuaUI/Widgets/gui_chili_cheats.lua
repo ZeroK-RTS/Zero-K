@@ -25,7 +25,7 @@ local setAiPosCommand = {
 }
 
 -- configurables
-local COMBOX_HEIGHT = 26
+local COMBOX_HEIGHT = 20
 local BUTTON_SIZE = 32
 local BUTTON_SPACING = 5
 
@@ -38,10 +38,10 @@ local spawnParams = {
 	count = 1,
 	team = 0,
 }
+
 local initialized = false
 
 -- chili handles (mostly for text localisation)
-local global_command_button
 
 local chbox = {}
 local label = {}
@@ -51,6 +51,10 @@ local categoryPickerCombox
 local unitPickers
 local countSlider
 local teamPicker
+local controlTeamPicker
+local controlItemToTeam = {}
+local currentControlTeamItem = 1
+local myPlayerID
 
 -- misc derivative stuff
 local categories = {}
@@ -489,7 +493,7 @@ local function AddCheatingToggle(parent, offset)
 end
 
 local function AddButtons(parent, y_offset)
-	y_offset[1] = y_offset[1] + 15
+	y_offset[1] = y_offset[1] + 10
 	local x_offset = {0}
 	AddAtmButton       (parent, x_offset, y_offset)
 	AddClearButton     (parent, x_offset, y_offset)
@@ -508,6 +512,73 @@ local function AddMiscControls(parent, offset)
 	AddAllowFpsToggle (parent, offset)
 	AddButtons        (parent, offset)
 end
+
+local function UpdateTeamControllerSelected()
+	local newSelect
+	if Spring.GetSpectatingState() then
+		newSelect = 1
+	else
+		local myTeamID = Spring.GetMyTeamID()
+		for i, item in ipairs(controlTeamPicker.items) do
+			if myTeamID == controlItemToTeam[i] then
+				newSelect = i
+			end
+		end
+	end
+	if newSelect then
+		currentControlTeamItem = newSelect
+		controlTeamPicker:Select(newSelect)
+	end
+end
+
+local function MakeTeamControllerComboBoxes(parent, offset)
+	controlTeamPicker = WG.Chili.ComboBox:New{
+		x = 5,
+		y = offset[1],
+		right = 5,
+		height = COMBOX_HEIGHT,
+		topHeight = 10,
+		items = {'Spectator'},
+
+		parent = parent,
+		objectOverrideFont = WG.GetFont(),
+		OnSelect = {function(self, i)
+			if Spring.IsCheatingEnabled() then
+				if currentControlTeamItem == i then
+					return
+				end
+				if i == 1 then
+					Spring.SendCommands('spectator')
+				elseif controlItemToTeam[i] then
+					Spring.SendCommands('team ' .. controlItemToTeam[i])
+				end
+			end
+		end},
+	}
+end
+
+local function MakeTeamControllerLabel(parent, offset)
+	label.ctrlteam = WG.Chili.Label:New{
+		x = 0,
+		right = 0,
+		y = offset[1],
+		height = 25,
+
+		objectOverrideFont = WG.GetFont(16),
+		align = "center",
+		autosize = false,
+		parent = parent,
+	}
+	offset[1] = offset[1] + 25
+end
+
+local function AddTeamController(parent, offset)
+	offset[1] = offset[1] + 15
+	MakeTeamControllerLabel     (parent, offset)
+	MakeTeamControllerComboBoxes(parent, offset)
+	offset[1] = offset[1] + 10
+end
+
 
 local function MakeUnitPickerComboxes(parent, offset)
 	unitPickers = {}
@@ -590,7 +661,7 @@ local function MakeCountPicker(parent, offset)
 
 		parent = parent,
 	}
-	offset[1] = offset[1] + COMBOX_HEIGHT + 2
+	offset[1] = offset[1] + COMBOX_HEIGHT
 end
 
 local function MakeSpawnButton(parent, offset)
@@ -620,7 +691,7 @@ local function MakeSpawnButton(parent, offset)
 		file = 'LuaUI/Images/gift2.png',
 	}
 
-	offset[1] = offset[1] + 50
+	offset[1] = offset[1] + 30
 end
 
 local function MakeSpawnLabel(parent, offset)
@@ -660,9 +731,9 @@ local function InitializeControls()
 		x         =  50,
 		y         = 150,
 		width     = 250,
-		height    = 380,
+		height    = 400,
 		minWidth  = 250,
-		minHeight = 380,
+		minHeight = 400,
 		padding = {16, 8, 16, 8},
 		dockable  = true,
 		dockableSavePositionOnly = true,
@@ -688,22 +759,31 @@ local function InitializeControls()
 
 	local offset = {40}
 	AddMiscControls  (mainWindow, offset)
+	AddTeamController(mainWindow, offset)
 	AddSpawnUnitStuff(mainWindow, offset)
-
 	if WG.GlobalCommandBar then
 		local function ToggleWindow()
 			if mainWindow.visible then
 				mainWindow:Hide()
 			else
 				mainWindow:Show()
+				mainWindow:BringToFront()
 			end
 		end
-		global_command_button = WG.GlobalCommandBar.AddCommand("LuaRules/Images/awards/trophy_friend.png", "", ToggleWindow)
+		if WG.cheat_global_button then -- work around since GlobalCommandBar doesn't have a remove function
+			WG.cheat_global_button.OnClick = {ToggleWindow}
+			WG.cheat_global_button:Show()
+		else
+			WG.cheat_global_button = WG.GlobalCommandBar.AddCommand("LuaRules/Images/awards/trophy_friend.png", "", ToggleWindow)
+		end
 	end
-
 	languageChanged() -- update texts
 
 	mainWindow:Hide()
+
+
+
+
 	return mainWindow
 end
 
@@ -714,9 +794,9 @@ function languageChanged()
 		return
 	end
 
-	if global_command_button then
-		global_command_button.tooltip = WG.Translate("interface", "toggle_cheatsheet_name") .. "\n\n" .. WG.Translate("interface", "toggle_cheatsheet_desc")
-		global_command_button:Invalidate()
+	if WG.cheat_global_button then
+		WG.cheat_global_button.tooltip = WG.Translate("interface", "toggle_cheatsheet_name") .. "\n\n" .. WG.Translate("interface", "toggle_cheatsheet_desc")
+		WG.cheat_global_button:Invalidate()
 	end
 
 	categoryPickerCombox.items[1] = WG.Translate("interface", "cheatsheet_no_category")
@@ -731,7 +811,6 @@ function languageChanged()
 	end
 	categoryPickerCombox.tooltip = WG.Translate("interface", "cheatsheet_pick_category")
 	categoryPickerCombox:Select(categoryPickerCombox.selected)
-
 	for name, btn in pairs (button) do
 		btn.tooltip = WG.Translate("interface", "cheatsheet_btn_" .. name)
 		btn:Invalidate()
@@ -748,25 +827,46 @@ function languageChanged()
 	countSlider.tooltip_format = WG.Translate("interface", "cheatsheet_count_slider")
 	countSlider:SetValue(countSlider.value)
 
+	controlTeamPicker.items[1] = WG.Translate("interface", "cheatsheet_ctrlteam_spec")
+
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
 		local teamID = teams[i]
 		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID, false)
+
 		if Spring.GetGaiaTeamID() == teamID then
 			teamPicker.items[i] = WG.Translate("interface", "neutral")
+			-- Spring refuse to give control of the neutral team, saying it doesn't exist
+			-- controlTeamPicker.items[#controlTeamPicker.items + 1] = teamPicker.items[i]
+			-- controlItemToTeam[#controlTeamPicker.items] = teamID
 		elseif isAI then
 			local _,botID,_,shortName = Spring.GetAIInfo(teamID)
 			teamPicker.items[i] = (shortName or "Bot") .." - " .. (botID or "")
+			controlTeamPicker.items[#controlTeamPicker.items + 1] = teamPicker.items[i]
+			controlItemToTeam[#controlTeamPicker.items] = teamID
 		else
 			teamPicker.items[i] = Spring.GetPlayerInfo(playerID, false) or "???"
+			controlTeamPicker.items[#controlTeamPicker.items + 1] = teamPicker.items[i]
+			controlItemToTeam[#controlTeamPicker.items] = teamID
 		end
 	end
 	teamPicker.tooltip = WG.Translate("interface", "cheatsheet_teampick_desc")
 	teamPicker:Select(teamPicker.selected)
 	teamPicker:Invalidate()
+
+	controlTeamPicker.tooltip = WG.Translate("interface", "cheatsheet_ctrlteampick_desc")
+	UpdateTeamControllerSelected()
 end
 
 -- WH interface
+
+function widget:PlayerChanged(playerID)
+	if playerID == myPlayerID then
+		if controlTeamPicker then
+			UpdateTeamControllerSelected()
+		end
+	end
+end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID ~= CMD_CHEAT_GIVE then
@@ -860,6 +960,7 @@ end
 
 function widget:Initialize()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	myPlayerID = Spring.GetMyPlayerID()
 
 	--[[ Don't display the controls (esp. the top bar button) before
 	     cheats are actually enabled for the first time. This way:
