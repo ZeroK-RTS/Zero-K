@@ -558,7 +558,7 @@ local function MakeTeamControllerComboBoxes(parent, offset)
 end
 
 local function MakeTeamControllerLabel(parent, offset)
-	WG.Chili.Label:New{
+	label.ctrlteam = WG.Chili.Label:New{
 		x = 0,
 		right = 0,
 		y = offset[1],
@@ -567,7 +567,6 @@ local function MakeTeamControllerLabel(parent, offset)
 		objectOverrideFont = WG.GetFont(16),
 		align = "center",
 		autosize = false,
-		caption = 'Control Team',
 		parent = parent,
 	}
 	offset[1] = offset[1] + 25
@@ -768,6 +767,7 @@ local function InitializeControls()
 				mainWindow:Hide()
 			else
 				mainWindow:Show()
+				mainWindow:BringToFront()
 			end
 		end
 		if WG.cheat_global_button then -- work around since GlobalCommandBar doesn't have a remove function
@@ -827,6 +827,8 @@ function languageChanged()
 	countSlider.tooltip_format = WG.Translate("interface", "cheatsheet_count_slider")
 	countSlider:SetValue(countSlider.value)
 
+	controlTeamPicker.items[1] = WG.Translate("interface", "cheatsheet_ctrlteam_spec")
+
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
 		local teamID = teams[i]
@@ -852,7 +854,7 @@ function languageChanged()
 	teamPicker:Select(teamPicker.selected)
 	teamPicker:Invalidate()
 
-	controlTeamPicker.tooltip = 'Take control of that team.'
+	controlTeamPicker.tooltip = WG.Translate("interface", "cheatsheet_ctrlteampick_desc")
 	UpdateTeamControllerSelected()
 end
 
