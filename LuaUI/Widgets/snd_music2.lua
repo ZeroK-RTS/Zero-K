@@ -36,6 +36,7 @@ local continueAlbum = false
 local function SetRandomSeed()
 	if seed then
 		math.randomseed(seed)
+		seed = math.random(1e8)
 	end
 end
 
