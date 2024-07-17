@@ -2387,30 +2387,30 @@ function widgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
 end
 
 
-function widgetHandler:UnitEnteredRadar(unitID, unitTeam)
+function widgetHandler:UnitEnteredRadar(unitID, unitTeam, forAllyTeamID, unitDefID)
 	for _, w in r_ipairs(self.UnitEnteredRadarList) do
-		w:UnitEnteredRadar(unitID, unitTeam)
+		w:UnitEnteredRadar(unitID, unitTeam, forAllyTeamID, unitDefID)
 	end
 end
 
 
-function widgetHandler:UnitEnteredLos(unitID, unitTeam)
+function widgetHandler:UnitEnteredLos(unitID, unitTeam, forAllyTeamID, unitDefID)
 	for _, w in r_ipairs(self.UnitEnteredLosList) do
-		w:UnitEnteredLos(unitID, unitTeam)
+		w:UnitEnteredLos(unitID, unitTeam, forAllyTeamID, unitDefID)
 	end
 end
 
 
-function widgetHandler:UnitLeftRadar(unitID, unitTeam)
+function widgetHandler:UnitLeftRadar(unitID, unitTeam, forAllyTeamID, unitDefID)
 	for _, w in r_ipairs(self.UnitLeftRadarList) do
-		w:UnitLeftRadar(unitID, unitTeam)
+		w:UnitLeftRadar(unitID, unitTeam, forAllyTeamID, unitDefID)
 	end
 end
 
 
-function widgetHandler:UnitLeftLos(unitID, unitDefID, unitTeam)
+function widgetHandler:UnitLeftLos(unitID, unitDefID, unitTeam, forAllyTeamID, unitDefID)
 	for _, w in r_ipairs(self.UnitLeftLosList) do
-		w:UnitLeftLos(unitID, unitDefID, unitTeam)
+		w:UnitLeftLos(unitID, unitDefID, unitTeam, forAllyTeamID, unitDefID)
 	end
 end
 
