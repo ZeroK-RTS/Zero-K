@@ -2443,9 +2443,9 @@ function widgetHandler:UnitLeftAir(unitID, unitDefID, unitTeam)
 end
 
 
-function widgetHandler:UnitSeismicPing(x, y, z, strength)
+function widgetHandler:UnitSeismicPing(x, y, z, strength, allyTeamID, unitID, unitDefID)
 	for _, w in r_ipairs(self.UnitSeismicPingList) do
-		w:UnitSeismicPing(x, y, z, strength)
+		w:UnitSeismicPing(x, y, z, strength, allyTeamID, unitID, unitDefID)
 	end
 end
 
