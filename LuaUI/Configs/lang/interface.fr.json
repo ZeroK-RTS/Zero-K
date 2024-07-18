@@ -80,7 +80,7 @@
 	"cheatsheet_lab_spawn" : "Apparition d'Unité",
 	"cheatsheet_lab_top" : "Triches",
 	"cheatsheet_chb_godmode" : "Contrôle global",
-	"cheatsheet_chb_godmode_desc" : "Autorise tout le monde (spectateurs compris) à contrôler toutes les équipes et faire apparaître/détruire des unités",
+	"cheatsheet_chb_godmode_desc" : "Autorise tout le monde (spectateurs compris) à contrôler toutes les équipes",
 	"cheatsheet_chb_allowfps" : "Autoriser les FPS sans triche",
 	"cheatsheet_chb_allowfps_desc" : "Permet le mode à la première personne même lorsque les triches sont désactivées. Sélectionnez une unité et appuyez sur Alt+P pour basculer en mode FPS.",
 	"cheatsheet_chb_nocost" : "Construction rapide",
