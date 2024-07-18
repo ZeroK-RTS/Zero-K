@@ -2408,9 +2408,9 @@ function widgetHandler:UnitLeftRadar(unitID, unitTeam, forAllyTeamID, unitDefID)
 end
 
 
-function widgetHandler:UnitLeftLos(unitID, unitDefID, unitTeam, forAllyTeamID, unitDefID)
+function widgetHandler:UnitLeftLos(unitID, unitTeam, forAllyTeamID, unitDefID)
 	for _, w in r_ipairs(self.UnitLeftLosList) do
-		w:UnitLeftLos(unitID, unitDefID, unitTeam, forAllyTeamID, unitDefID)
+		w:UnitLeftLos(unitID, unitTeam, forAllyTeamID, unitDefID)
 	end
 end
 
