@@ -23,13 +23,16 @@ function widget:GetInfo()
 	}
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
--- see `widget:GameID` below. Used just for rolling tracks,
--- so that you get the same set of tracks in a replay.
-local seed = false
+-- see `widget:GameID` below.
+-- getting initially same set of tracks during replay
+-- continue last album after a reload in case of random option
+local seed 
+local gameID = Spring.GetGameRulesParam('GameID')
+local randomChosen = false
+local randomAlbumUseSeed = nil 
+local continueAlbum = false
 local function SetRandomSeed()
 	if seed then
 		math.randomseed(seed)
@@ -85,27 +88,39 @@ options = {
 		OnChange = function(self)
 			local value = self.value
 			if value == 'random' then
-
-				-- not idempotent, rerolls if you spam-click the radiobutton
-				-- or if OnChange is called externally. Not a big problem tho
-				SetRandomSeed()
-				local r = math.random(#self.items - 1)
-
-				local item = self.items[r]
-				if item.key == 'random' then -- in case the item 'random' is not at last position
-					item = self.items[r-1] or self.items[r+1]
+				if randomChosen then
+					return
 				end
-				value = item.key
+				randomChosen = true
+				if continueAlbum then
+					value = continueAlbum
+				else
+					if randomAlbumUseSeed then 
+						math.randomseed(seed)
+					end
+
+					value = trackListName
+					local r = math.random(#self.items - 1)
+
+					local item = self.items[r]
+					if item.key == 'random' then -- in case the item 'random' is not at last position
+						item = self.items[r-1] or self.items[r+1]
+					end
+					value = item.key
+				end
+			else
+				randomChosen = false
 			end
 			if value ~= trackListName then
-				trackListName = value
 				if includedAlbums[value] and includedAlbums[value].tracks then
+					trackListName = value
 					trackList = includedAlbums[value].tracks
 					if WG.Music then
 						WG.Music.StopTrack()
 					end
 				end
 			end
+
 		end,
 	},
 }
@@ -133,6 +148,8 @@ local musicPaused = false
 
 local initialized = false
 local gameStarted = Spring.GetGameFrame() > 0
+local widgetReloaded = gameStarted
+
 local myTeam = Spring.GetMyTeamID()
 local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
 local defeat = false
@@ -238,11 +255,6 @@ end
 
 function widget:Update(dt)
 	if not initialized then
-		if seed then
-			SetRandomSeed()
-		else
-			math.randomseed(os.clock()* 100)
-		end
 		initialized = true
 		-- these are here to give epicmenu time to set the values properly
 		-- (else it's always default at startup)
@@ -259,8 +271,17 @@ function widget:Update(dt)
 				defeatTracks    = VFS.DirList(dir .. 'defeat/'  , supportedFileTypes, vfsMode),
 			}
 		end
-		
+		if gameID then
+			-- update the tracklistName case: reload, random chosen at start
+			widget:GameID(gameID)
+		else
+			math.randomseed(os.clock()* 100)
+		end
 		trackList = includedAlbums[trackListName].tracks
+	elseif randomAlbumUseSeed == nil then
+		-- case replay: widget:gameID() hasn't been triggered yet
+		randomAlbumUseSeed = false
+		continueAlbum = false
 	end
 	
 	timeframetimer_short = timeframetimer_short + dt
@@ -331,22 +352,26 @@ function widget:Update(dt)
 		end
 	end
 end
-
-function widget:GameID(gameID)
+function widget:GameID(id)
 	-- Idempotence issue:
-	-- -when on replay we can't know the gameID until player connect, meanwhile the briefing track (if any) is playing and is not following the randomseed sequence
-	-- -when not on replay the GameID trigger at second round of Update
+	-- -when on replay we can't know the id until player connect, meanwhile the briefing track (if any) is playing and is not following the randomseed sequence
+	-- -when not on replay the GameID trigger after first round of Update
 	-- In any case option.OnChange got triggered before
-	seed = tonumber('0x' .. gameID)
+	gameID = id
+	seed = tonumber('0x' .. id)
 	-- when number given is too big, the resulting sequence is the same / when difference between numbers is too small, the resulting number is the same
 	while seed > 1e8 do
 		seed = seed^0.8
 	end
 	if options.albumSelection.value == 'random' then
 		if Spring.GetSoundStreamTime() < 0.5 then -- we don't change current album if a briefing track has started
+			randomChosen = false
+			randomAlbumUseSeed = true
 			options.albumSelection:OnChange()
 		end
 	end
+	randomAlbumUseSeed = false
+	continueAlbum = false
 end
 function widget:GameStart()
 	if not gameStarted then
@@ -458,6 +483,18 @@ function widget:Shutdown()
 	Spring.StopSoundStream()
 	WG.Music = nil
 end
-
+-- save up current album to be continued in case of /luaui reload or simple widget reload
+function widget:GetConfigData()
+	return {currentGameAlbum = {gameID = gameID, trackListName =  trackListName}}
+end
+function widget:SetConfigData(data)
+	if not gameID then -- no reload occurred (or replay case before user connect), nothing to do
+		return
+	end
+	local current = data.currentGameAlbum
+	if current and current.gameID == gameID then
+		continueAlbum = current.trackListName
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
