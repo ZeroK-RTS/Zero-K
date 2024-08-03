@@ -174,10 +174,13 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 end
 
 function tele_ableToDeploy(unitID)
-	return tele[unitID] and tele[unitID].link and not tele[unitID].deployed
+	return unitID and tele[unitID] and tele[unitID].link and not tele[unitID].deployed
 end
 
 function tele_deployTeleport(unitID)
+	if not (unitID and tele[unitID]) then
+		return -- The unit probably died
+	end
 	tele[unitID].deployed = true
 	checkFrame[Spring.GetGameFrame() + 1] = true
 	
@@ -186,6 +189,9 @@ function tele_deployTeleport(unitID)
 end
 
 function tele_undeployTeleport(unitID)
+	if not (unitID and tele[unitID]) then
+		return -- The unit probably died
+	end
 	if tele[unitID].deployed then
 		interruptTeleport(unitID)
 	end
@@ -195,6 +201,9 @@ function tele_undeployTeleport(unitID)
 end
 
 function tele_createBeacon(unitID, unitDefID, x, z, beaconID)
+	if not (unitID and tele[unitID]) then
+		return -- The unit probably died
+	end
 	local beaconDef = beaconDefsByTeleporterDef[unitDefID]
 	local y = Spring.GetGroundHeight(x,z)
 	local place, feature = Spring.TestBuildOrder(beaconDef, x, y, z, 1)
@@ -220,7 +229,7 @@ function tele_createBeacon(unitID, unitDefID, x, z, beaconID)
 end
 
 local function undeployTeleport(unitID)
-	if tele[unitID].deployed then
+	if unitID and tele[unitID] and tele[unitID].deployed then
 		local func = Spring.UnitScript.GetScriptEnv(unitID).UndeployTeleport
 		Spring.UnitScript.CallAsUnit(unitID,func)
 		tele_undeployTeleport(unitID)
