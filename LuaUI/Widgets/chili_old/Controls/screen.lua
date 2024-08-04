@@ -156,7 +156,8 @@ function Screen:IsAbove(x,y,...)
     return true
   end
 
-  y = select(2,Spring.GetViewSizes()) - y
+  y = select(2,Spring.Orig.GetViewSizes()) - y
+  x, y = x/WG.uiScale, y/WG.uiScale
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
   --// tooltip
