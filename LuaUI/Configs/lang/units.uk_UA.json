@@ -25,9 +25,9 @@
 		"helptext" : "Lacking armaments of its own, the Lobsters response to threats is to throw other units at the problem. Though originally intended for rapid coastline deployment, the Lobster has a variety of uses and can even offensively throw enemies units."
 	},
 	"tankarty" : {
-		"name" : "Emissary",
-		"description" : "General-Purpose Artillery",
-		"helptext" : "The heavy, long-ranging gun of the Emissary makes it the unit of choice for standoff shelling of enemy mobiles or structures. As always, it should be wary of anything that gets close to it."
+		"name" : "Емісар",
+		"description" : "Артилерія загального призначення",
+		"helptext" : "Важкі, далекобійні знаряддя Емісара роблять його підходящим юнітом для обстрілу ворожих мобів або укріплень. Як завжди, він повинен остерігатися всього, що до нього наближається."
 	},
 	"staticmissilesilo" : {
 		"name" : "Ракетна шахта",
@@ -50,18 +50,18 @@
 		"helptext" : "Два слова: ШВИДШЕ ТІКАЙТЕ! Королева курчат це матка усієї колонії курчат. Вона плює пекучою кислотою, вистрілює масами спор, розтоптує менших одиниць, як черв'яків, і здатна розірвати на шматки навіть важких штурмових роботів. Тому, щоб її зупинити, потрібна сміливість, рішучість та велика кількість вогневої потужності"
 	},
 	"tankassault" : {
-		"name" : "Minotaur",
-		"description" : "Assault Tank",
+		"name" : "Мінотавр",
+		"description" : "Штурмовий танк",
 		"helptext" : "A heavy duty battle tank. The Minotaur excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of maneuverability."
 	},
 	"chicken_listener" : {
-		"name" : "Listener",
-		"description" : "Burrowing Mobile Seismic Detector",
+		"name" : "Слухач",
+		"description" : "Мобільний сейсмічний детектор, що закопується",
 		"helptext" : "The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces."
 	},
 	"cloakbomb" : {
-		"name" : "Imp",
-		"description" : "All Terrain EMP Bomb (Burrows)",
+		"name" : "Бісеня",
+		"description" : "Всюдихідна ЕМІ бомба (закопується)",
 		"helptext" : "The Imp relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Reavers or Glaives can then eliminate the helpless enemies without risk. Counter with defences or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
 	},
 	"shieldriot" : {
@@ -101,8 +101,8 @@
 	},
 	"turrettorp" : {
 		"name" : "Urchin",
-		"description" : "Torpedo Launcher (Anti-Sub)",
-		"helptext" : "This Torpedo Launcher provides defence against both surface and submerged vessels."
+		"description" : "Торпедна пускова установка (Проти підводних човнів)",
+		"helptext" : "Ця торпедна турель забеспечує захист від атак як надводних, так і підводних суден."
 	},
 	"tankheavyassault" : {
 		"name" : "Cyclops",
@@ -131,7 +131,7 @@
 	},
 	"chicken_drone" : {
 		"name" : "Drone",
-		"description" : "Morphs Into Chicken Structures",
+		"description" : "Перетворюється на структури курчат",
 		"helptext" : "A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures."
 	},
 	"staticjammer" : {
@@ -170,8 +170,8 @@
 		"helptext" : "The Sling has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defences up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
 	},
 	"chickend" : {
-		"name" : "Chicken Tube",
-		"description" : "Defence and energy source",
+		"name" : "Курячий наріст",
+		"description" : "Джерело енергії та оборони",
 		"helptext" : "The Tube is the chickens' only defence structure, firing deadly spores at air and ground targets alike."
 	},
 	"rocksink" : {
@@ -180,9 +180,9 @@
 		"helptext" : "I am rock and there ain't no breakin' me\nI am rooooock and there ain't no shakin' me"
 	},
 	"fakeunit_aatarget" : {
-		"name" : "Fake AA target",
+		"name" : "Фальшива ціль ППО",
 		"description" : "Used by the jumpjet script.",
-		"helptext" : "Fake unit for technical purposes."
+		"helptext" : "Підроблений агрегат для технічних задач."
 	},
 	"mahlazer" : {
 		"name" : "Starlight",
@@ -190,7 +190,7 @@
 		"helptext" : "This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases."
 	},
 	"spidercrabe" : {
-		"name" : "Crab",
+		"name" : "Краб",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
 		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defences. When it stops walking, Crab curls up into armored form reducing incoming damage to a third. The Crab's main weakness is its lack of mobility."
 	},
@@ -200,8 +200,8 @@
 		"helptext" : "The Lancelet is basically a large smart torpedo with scouting functionality. It can remain hidden in the depths to observe enemy movements, then detonate its explosive charge to sink unwary ships."
 	},
 	"staticstorage" : {
-		"name" : "Зберігання",
-		"description" : "Stores Metal and Energy (500)",
+		"name" : "Сховище",
+		"description" : "Зберігає метал та енергію (500)",
 		"helptext" : "Storages act as a buffer when one expects a big influx of metal, such as reclaiming a vast wreckage field. However, longer periods of increased metal income are better dealt with by acquiring more buildpower."
 	},
 	"shieldscout" : {
@@ -376,7 +376,7 @@
 	},
 	"energysolar" : {
 		"name" : "Solar Collector",
-		"description" : "Small Powerplant",
+		"description" : "Маленька електростанція",
 		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a third and offers excellent protection against raiders."
 	},
 	"gunshipheavyskirm" : {
@@ -465,24 +465,24 @@
 		"helptext" : "The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50%% in addition to dealing damage, making it effective against almost all targets."
 	},
 	"chicken" : {
-		"name" : "Chicken",
-		"description" : "Swarmer",
+		"name" : "Курка",
+		"description" : "Ройовий",
 		"helptext" : "The footsoldier of the Thunderbirds is an aggressive zergling-type unit. What it lacks in individual strength, it compensates for with its sheer numbers, overwhelming enemies with floods and floods of little chickens. A good riot unit is recommended for stopping them."
 	},
 	"chicken_sporeshooter" : {
-		"name" : "Sporeshooter",
-		"description" : "All-Terrain Spores (Anti-Air/Skirm)",
-		"helptext" : "The Sporeshooter shoots spores to drop aircraft and hit land targets from a distance. Can climb walls for surprise attacks."
+		"name" : "Спорострілець",
+		"description" : "Всюдихідний метальник спор (ППО/стрілець)",
+		"helptext" : "Спорострілець стріляє спорами для ураження авіації та має можливість атакувати наземні цілі на відстані. Також може залазити на стіни, аби несподівано атакувати."
 	},
 	"turretaafar" : {
-		"name" : "Chainsaw",
-		"description" : "Long-Range Anti-Air Missile Battery",
-		"helptext" : "The Chainsaw is a long range anti-air turret, dealing out massive damage, able to knock bombers out of the sky very quickly. It can't take very much damage in return, though, and does poorly when attacked directly."
+		"name" : "Бензопила",
+		"description" : "Далекобійна ЗРК",
+		"helptext" : "Безнопила це далекобійна ЗРК, яка завдає велику шкоду та здатна дуже швидко збивати бомбардувальники, але, у свою чергу, вона не може витримати цілеспрямований напад та буде швидко знищена у разі прямої атаки."
 	},
 	"staticnuke" : {
-		"name" : "Trinity",
-		"description" : "Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile",
-		"helptext" : "The Trinity launches devastating nuclear missiles that can obliterate entire bases. However, it is easily defeated by enemy anti-nuke systems, which must be removed from the desired target area beforehand."
+		"name" : "Трініті",
+		"description" : "Пускова установка стратегічних ядерних ракет, витрачає 18 м/с, 3 хвилини на підготовку ракети",
+		"helptext" : "Трініті запускає руйнівні ядерні ракети, які здатні знищити цілі бази. Проте, її боєголовки легко збиваються комплексами ПРО, які мають бути прибрані з обстрілюваної території заздалегідь."
 	},
 	"hovershotgun" : {
 		"name" : "Punisher",
@@ -495,13 +495,13 @@
 		"helptext" : "The Widow is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure."
 	},
 	"energywind" : {
-		"name" : "Wind/Tidal Generator",
-		"description" : "Small Powerplant",
-		"helptext" : "Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output."
+		"name" : "Вітровий/приливний генератор",
+		"description" : "Маленька електростанція",
+		"helptext" : "Вітрові генератори перетворюють енергію вітру в електроенергію, проте сильно залежать від його сили та направлення. Вони дуже крихкі та група інших вітряків, які знаходяться поруч, може здетонувати від підрива одного з них, тож заздалегідь обдумайте про їх розміщення. Будучи розміщеним на воді, він стає більш міцним приливним генератором з хорошою приливною потужністю."
 	},
 	"amphassault" : {
-		"name" : "Grizzly",
-		"description" : "Heavy Amphibious Assault Walker",
+		"name" : "Грізлі",
+		"description" : "Важкий штурмовик-амфібія",
 		"helptext" : "The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to the surface in order to shoot."
 	},
 	"shieldaa" : {
@@ -525,9 +525,9 @@
 		"helptext" : "The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defence against it is achieved by screening your heavyweights with lighter units."
 	},
 	"staticmex" : {
-		"name" : "Metal Extractor",
-		"description" : "Produces Metal",
-		"helptext" : "The metal extractor is the primary means of getting metal. If you have excess energy, metal extractors will automatically use it to extract more metal."
+		"name" : "Видобувна шахта",
+		"description" : "Видобуває метал",
+		"helptext" : "Видобувна шахта це основне джерело видобутку металу. При наявності надлишків енергії, шахта почне прискорювати свою роботу і видобувати більше металу."
 	},
 	"vehsupport" : {
 		"name" : "Fencer",
@@ -665,14 +665,14 @@
 		"helptext" : "The Detriment is the single heaviest strider in the field. It can defend itself against air attacks or use its rockets to hit distant targets, but the real meat lies in the massive gauss guns designed for one purpose - to kill other heavy units quickly and efficiently. Remember - the wise commander sends his Detriment out with adequate escorts against light unit swarms and air assaults."
 	},
 	"energygeo" : {
-		"name" : "Geothermal Generator",
+		"name" : "Геотермальна електростанція",
 		"description" : "Середня електростанція",
-		"helptext" : "Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent."
+		"helptext" : "Геотермальна електростанція це високоефективне джерело енергії, яке можна збудувати лише на термальних водах. Вони достатньо вибухонебезпечні, тож у разі знищення можуть нанести достатньої шкоди усьому, що стоїть поруч із ними."
 	},
 	"jumpcon" : {
-		"name" : "Constable",
-		"description" : "Jumpjet Constructor",
-		"helptext" : "Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support."
+		"name" : "Констебль",
+		"description" : "Стрибаючий конструктор",
+		"helptext" : "Швидкий, здатний стрибати на невеликі дистанції та уступи, Констебль - ідеальний конструктор для швидкої експансії. Озброєний уповільненим променем, він може забезпечити бойову підтримку."
 	},
 	"chicken_blimpy" : {
 		"name" : "Blimpy",
@@ -680,13 +680,13 @@
 		"helptext" : "Blimpy drops a Dodo on unsuspecting armies and bases."
 	},
 	"droneheavyslow" : {
-		"name" : "Viper",
-		"description" : "Advanced Battle Drone",
-		"helptext" : "The Viper is an advanced battle drone similar to the Firefly but equipped with a Disruptor Pulse Beam, slowing its targets more with each hit."
+		"name" : "Гадюка",
+		"description" : "Удосконалений бойовий дрон",
+		"helptext" : "Гадюка це удосконалений бойовий дрон, подібний Світляку, але оснащений спеціальною променевою установкою, що уповільнює з кожним пострілом. "
 	},
 	"athena" : {
-		"name" : "Athena",
-		"description" : "Airborne SpecOps Engineer",
+		"name" : "Афіна",
+		"description" : "Повітряний інженер спеціального призначення",
 		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army."
 	},
 	"staticsonar" : {
@@ -986,17 +986,17 @@
 	},
 	"turretheavy" : {
 		"name" : "Desolator",
-		"description" : "Medium Range Defence Fortress - Power by connecting to a 50 energy grid",
+		"description" : "Важка турель середньої дальності, котра використовує 50 одиниць енергії",
 		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defence point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a third, although it cannot fire its weapons while doing so."
 	},
 	"turretimpulse" : {
 		"name" : "Newton",
-		"description" : "Gravity Turret",
+		"description" : "Гравітаційна турель",
 		"helptext" : "The Newton is armed with an experimental graviton projector. This weapon does virtually no damage directly, but can push units toward or away from the Newton. You can use it on your own units as well, but beware of friendly fire."
 	},
 	"assaultcruiser" : {
 		"name" : "Vanquisher",
-		"description" : "Heavy Cruiser (Assault)",
+		"description" : "Важкий крейсер (штурмовий)",
 		"helptext" : "The Vanquisher cruiser boasts excellent armor and lethal close-in firepower. Its gauss cannons slice through surface targets like butter, while its missiles support it against enemies above and below the water surface. Its short range and lack of anti-air firepower leaves it vulnerable to standoff units and aircraft."
 	},
 	"shieldfelon" : {
@@ -1011,7 +1011,7 @@
 	},
 	"missileslow" : {
 		"name" : "Zeno",
-		"description" : "Slow Homing Missile - High single-target slow damage with lingering damage over time",
+		"description" : "Повільна ракета із самонаведенням - висока шкода по одній цілі з тривалим ушкодженням на деякий час",
 		"helptext" : "The Zeno slows down a single target and leaves a slowing area behind it. It has far more range than other combat missiles and homes onto its target."
 	},
 	"striderscorpion" : {
@@ -1025,8 +1025,8 @@
 		"helptext" : "The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed."
 	},
 	"factorytank" : {
-		"name" : "Tank Foundry",
-		"description" : "Produces Heavy Tracked Vehicles",
+		"name" : "Танковий завод",
+		"description" : "Виробляє важку гусеничну техніку",
 		"helptext" : "The Tank Foundry is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Emissary, Minotaur, Ogre, Cyclops"
 	},
 	"striderbantha" : {
@@ -1056,12 +1056,12 @@
 	},
 	"jumpscout" : {
 		"name" : "Puppy",
-		"description" : "Walking Missile",
+		"description" : "Крокуюча ракета",
 		"helptext" : "This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style."
 	},
 	"turretaalaser" : {
 		"name" : "Razor",
-		"description" : "Hardened Anti-Air Laser",
+		"description" : "Укріплена лазерна турель ППО",
 		"helptext" : "The Razor is a hardy anti-air turret. Its high hit points and 3x armour bonus when closed make it very hard for the enemy to dislodge."
 	},
 	"hovercon" : {
@@ -1071,7 +1071,7 @@
 	},
 	"jumpaa" : {
 		"name" : "Toad",
-		"description" : "Heavy Anti-Air Jumper",
+		"description" : "Важкий стрибаючий робот ППО",
 		"helptext" : "The Toad packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape."
 	},
 	"tankheavyraid" : {
@@ -1080,9 +1080,9 @@
 		"helptext" : "The Blitz is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Blitz can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base."
 	},
 	"staticheavyradar" : {
-		"name" : "Advanced Radar",
-		"description" : "Long-Range Radar",
-		"helptext" : "The advanced Radar Tower has a considerably greater range than the basic version."
+		"name" : "Удосконалений радар",
+		"description" : "Радар дальньої дії",
+		"helptext" : "Удосконалений радар має значно більший радіус дії ніж базова версія."
 	},
 	"amphimpulse" : {
 		"name" : "Archer",
@@ -1090,9 +1090,9 @@
 		"helptext" : "The Archer uses a powerful sonic cannon to hit units above or below the water. It does not work while wet, so Archers must float to fire."
 	},
 	"fakeunit" : {
-		"name" : "Fake radar signal",
-		"description" : "Created by scrambling devices.",
-		"helptext" : "Fake unit for technical purposes."
+		"name" : "Фальшивий сигнал радару",
+		"description" : "Створений генератором перешкод.",
+		"helptext" : "Підроблений агрегат для технічних задач."
 	},
 	"shieldshield" : {
 		"name" : "Aspis",
@@ -1136,17 +1136,17 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Construction Aircraft",
+		"description" : "Літак-будівельник",
 		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air player's territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetitive tasks."
 	},
 	"gunshipraid" : {
-		"name" : "Locust",
-		"description" : "Raider Gunship",
-		"helptext" : "The Locust is a light gunship. Its high speed and decent damage make it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Locust should avoid riots and static defence."
+		"name" : "Сарана",
+		"description" : "Екраноплан-рейдер",
+		"helptext" : "Саранча - це легкий гелікоптер, котрий має велику швидкість, достатнію шкоду та добре підходить для швидкого нанесення точкових ударів по економіці противника або техніці, котра погано захищена від атак з повітря. Проте, в той же час, невеликий радіус ураження робить його уразливим для атак швидкої, невеликої техніки противника. Також уникайте ворожу стаціонарну оборону."
 	},
 	"shieldraid" : {
-		"name" : "Bandit",
-		"description" : "Medium-Light Raider Bot",
+		"name" : "Бандит",
+		"description" : "Легкий/середній рейдер-бот",
 		"helptext" : "The Bandit outranges and is somewhat tougher than the Glaive, but still not something that you hurl against entrenched forces. Counter with riot units and LLTs."
 	},
 	"amphraid" : {
@@ -1165,9 +1165,9 @@
 		"helptext" : "The Gull is a small, aggressive drone armed with an energy MG."
 	},
 	"turretheavylaser" : {
-		"name" : "Stinger",
-		"description" : "High-Energy Laser Tower",
-		"helptext" : "The Stinger is a medium laser turret. Its three rotating laser guns can kill almost any small unit, but its low rate of fire makes it vulnerable to swarms when unassisted."
+		"name" : "Жало",
+		"description" : "Потужна лазерна турель",
+		"helptext" : "Жало - це середня лазерна турель. На ній встановлені три лазерні гармати, що обертаються, котрі можуть знищити майже будь-якого малого юніта, також вона має достатньо велику дальність атаки, але низька швидкість стрільби робить її вразливою проти великої кількості ворогів, коли вона не має підтримки."
 	},
 	"hoversonic" : {
 		"name" : "Morningstar",
@@ -1185,42 +1185,42 @@
 		"helptext" : "The Magpie launches short-range homing missiles at ground and air targets. It makes up for its low damage and long rearm time by boasting the range and manoeuvrability to hit dangerous targets and make it back to base."
 	},
 	"staticrearm" : {
-		"name" : "Airpad",
-		"description" : "Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad",
-		"helptext" : "The Airpad repairs up to four aircraft at a time. It also refuels/rearms bombers."
+		"name" : "ЗПС",
+		"description" : "Ремонтує та перезаряджає літаки, ремонтує за 2.5 е/с на площадку",
+		"helptext" : "Злітно-посадкова смуга (ЗПС) ремонтує до чотирьох літаків водночас. Також заправляє та перезаряджає бомбардувальники."
 	},
 	"dynrecon1" : {
-		"name" : "Recon Commander",
-		"description" : "High Mobility Commander",
+		"name" : "Командир-Розвідник",
+		"description" : "Високомобільний командир",
 		"helptext" : "The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules and comes pre-equipped with jumpjets."
 	},
 	"gunshipemp" : {
-		"name" : "Gnat",
+		"name" : "Комар",
 		"description" : "Anti-Heavy EMP Drone",
 		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with Locust or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to Pickets."
 	},
 	"bomberriot" : {
-		"name" : "Phoenix",
-		"description" : "Saturation Napalm Bomber",
-		"helptext" : "The Phoenix's napalm bombs decimate large clumps of units and light structures."
+		"name" : "Фенікс",
+		"description" : "Напалмовий бомбардувальник",
+		"helptext" : "Напалмові бомби \"Фенікса\" знищують великі скупчення військ і легкі споруди."
 	},
 	"striderarty" : {
-		"name" : "Merlin",
-		"description" : "Heavy Saturation Artillery Strider",
-		"helptext" : "The Merlin is an MLRS strider. It can launch a volley of rockets that guarantees the destruction of almost anything in the target area, then quickly retreat behind friendly forces."
+		"name" : "Мерлін",
+		"description" : "Важкий ракетний артилерійський страйдер",
+		"helptext" : "Мерлін - це РСЗО страйдер, здатний випускати залп ракет, який гарантує знищення практично всього в зоні ураження, а потім швидко відступити за дружніми силами."
 	},
 	"gunshipheavytrans" : {
-		"name" : "Hercules",
-		"description" : "Armed Heavy Air Transport",
+		"name" : "Геркулес",
+		"description" : "Озброєна важка авіація",
 		"helptext" : "The Hercules can haul any non-flying mobile unit in the game, including ships. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot landing zones."
 	},
 	"planescout" : {
-		"name" : "Owl",
+		"name" : "Сова",
 		"description" : "Radar/Sonar Scout Plane",
 		"helptext" : "The Owl's massive sight range provides an unparalleled means for observing enemy positions. It is also equipped with radar and sonar, making it the only plane that can detect underwater units."
 	},
 	"planelightscout" : {
-		"name" : "Sparrow",
+		"name" : "Горобець",
 		"description" : "Light Scout/Radar Jammer Plane",
 		"helptext" : "The Sparrow is a light scout plane that can be morphed from a Radar Tower. It has an area jammer for hiding your own position, and can be detonated to reveal an area for 12 seconds."
 	},
