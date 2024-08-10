@@ -1216,13 +1216,13 @@
 	},
 	"planescout" : {
 		"name" : "Owl",
-		"description" : "Samolot zwiadowczy z zakłócaczem",
-		"helptext" : "Owl oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."
+		"description" : "Samolot zwiadowczy radar/sonar",
+		"helptext" : "Owl oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar."
 	},
 	"planelightscout" : {
 		"name" : "Sparrow",
-		"description" : "Lekki samolot zwiadowczy",
-		"helptext" : "Sparrow to lekki zwiadowca, którego można zużyć do odkrycia obszaru na 12s. Można go zbudować bez lotniska poprzez przeobrażenie z podstawowej wieżyczki radarowe, ale słabo wypada w porównaniu z szybszym Swiftem i większym Owlem."
+		"description" : "Lekki samolot zwiadowczo-zakłócający",
+		"helptext" : "Sparrow to lekki zwiadowca, którego można zużyć do odkrycia obszaru na 12s. Można go zbudować bez lotniska poprzez przeobrażenie z podstawowej wieżyczki radarowej. Jest wyposażony w obszarowy zakłócacz radaru."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",
