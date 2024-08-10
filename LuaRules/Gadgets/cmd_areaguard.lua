@@ -91,6 +91,7 @@ local PREDICTION = 30
 local UPDATE_GAP_LEEWAY = 30*UPDATE_MULT
 
 local RADIUS_BAND_SIZE = 100
+local ALLOW_CIRCLE_ENEMY = true
 
 local cos = math.cos
 local sin = math.sin
@@ -196,7 +197,7 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	end
 
 	local targetTeamID = spGetUnitTeam(targetID)
-	if not spAreTeamsAllied(teamID, targetTeamID) then
+	if not spAreTeamsAllied(teamID, targetTeamID) and not ALLOW_CIRCLE_ENEMY then
 		if RAW_MOVE_MODE then
 			GG.RemoveRawMoveUnit(unitID)
 		end
