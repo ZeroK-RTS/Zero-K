@@ -450,8 +450,8 @@ local function GetOptions()
 	for _, thing in ipairs(fogThings) do
 		AddColorOption(thing .. "Color", thing .. " Color", fogPath, UpdateFogValue)
 	end
-	AddNumberOption("fogStart", "Fog Start", fogPath, UpdateFogValue, 0, -1, 1)
-	AddNumberOption("fogEnd", "Fog End", fogPath, UpdateFogValue, -1, -1, 1)
+	AddNumberOption("fogStart", "Fog Start", fogPath, UpdateFogValue, 0.99, -1, 0.99)
+	AddNumberOption("fogEnd", "Fog End", fogPath, UpdateFogValue, 1, -1, 1)
 
 ---------------------------------------
 -- Water
