@@ -30,9 +30,12 @@ To play the game, you need to **[Download]** the lobby.
 
 [*» Learn how to import content directly into the engine.*][Importing]
 
+Development guide: https://zero-k.info/mediawiki/Zero-K:Developing
+
 </div>
 
 <br>
+
 
 
 <!----------------------------------------------------------------------------->
