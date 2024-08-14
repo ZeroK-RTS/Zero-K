@@ -37,7 +37,6 @@ Development guide: https://zero-k.info/mediawiki/Zero-K:Developing
 <br>
 
 
-
 <!----------------------------------------------------------------------------->
 
 [Spring Engine]: https://springrts.com/
