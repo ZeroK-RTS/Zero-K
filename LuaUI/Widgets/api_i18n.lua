@@ -98,7 +98,7 @@ local function fireLangChange()
 	end
 
 	for w,f in pairs(langListeners) do
-		local okay,err=pcall(f)
+		local okay,err=pcall(f, langValue)
 		if not okay then
 			Spring.Echo("i18n API update failed: " .. w .. "\nCause: " .. err)
 			langListeners[w]=nil
