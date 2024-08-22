@@ -1906,7 +1906,6 @@ end
 
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local selectedUnitID
-	local selectedUnitDefID
 	
 	local leftPanel = Chili.Control:New{
 		name = "leftPanel",
