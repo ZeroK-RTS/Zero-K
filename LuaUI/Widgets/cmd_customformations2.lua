@@ -718,6 +718,9 @@ function widget:MousePress(mx, my, mButton)
 	-- Without this, the unloads issued will use the area of the last area unload
 	if usingCmd == CMD_UNLOADUNITS then
 		usingCmd = CMD_UNLOADUNIT
+	elseif usingCmd == CMD_MOVE then
+		-- work around to avoid the little halt caused by CMD_MOVE, (ie when moving through right click while pointing at a feature)
+		usingCmd = CMD_RAW_MOVE
 	end
 
 	-- Is this command eligible for a custom formation ?
