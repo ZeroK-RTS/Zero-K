@@ -37,6 +37,7 @@ local GetHumanName = Spring.Utilities.GetHumanName
 local GetUnitCost = Spring.Utilities.GetUnitCost
 local GetDescription = Spring.Utilities.GetDescription
 local GetHelptext = Spring.Utilities.GetHelptext
+local spGetSelectedUnitsSorted = Spring.GetSelectedUnitsSorted
 
 local strFormat = string.format
 
@@ -1026,7 +1027,6 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 			newSelectedUnits = selectedUnitsList
 		end
 		spSelectUnitArray(newSelectedUnits)
-		widget:SelectionChanged(newSelectedUnits)
 	elseif button == 1 then
 		if ctrl then
 			ctrlFilterUnits = ctrlFilterUnits or {}
@@ -1678,10 +1678,11 @@ local function GetSelectionStatsDisplay(parentControl)
 		unreliableBurst = false
 		burstClass = 0
 		
+		local defIDs = selectedUnits.defIDs or {}
 		local unitID, unitDefID
 		for i = 1, total_count do
 			unitID = selectedUnits[i]
-			unitDefID = spGetUnitDefID(unitID)
+			unitDefID = defIDs[unitID] or spGetUnitDefID(unitID)
 			if unitDefID and not filterUnitDefIDs[unitDefID] then
 				selectedUnitDefID[i] = unitDefID
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
@@ -1858,9 +1859,10 @@ local function GetMultiUnitInfoPanel(parentControl)
 		local unitDefAdded = {}
 		local displayUnitsByDefID = {}
 		local selectionSortOrder = {}
+		local defIDs = newDisplayUnits.defIDs or {}
 		for i = 1, #displayUnits do
 			local unitID = displayUnits[i]
-			local unitDefID = spGetUnitDefID(unitID) or 0
+			local unitDefID = defIDs[unitID] or spGetUnitDefID(unitID) or 0
 			local byDefID = displayUnitsByDefID[unitDefID] or {}
 			byDefID[#byDefID + 1] = unitID
 			displayUnitsByDefID[unitDefID] = byDefID
@@ -2678,9 +2680,9 @@ local function GetSelectionWindow()
 		multiUnitDisplay.LanguageChange()
 	end
 
-	function externalFunctions.ShowSingleUnit(unitID)
-		singleUnitID, singleUnitDefID = unitID, spGetUnitDefID(unitID)
-		singleUnitDisplay.SetDisplay(unitID, spGetUnitDefID(unitID))
+	function externalFunctions.ShowSingleUnit(unitID, unitDefID)
+		singleUnitID, singleUnitDefID = unitID, unitDefID or spGetUnitDefID(unitID)
+		singleUnitDisplay.SetDisplay(unitID, singleUnitDefID)
 		singleUnitDisplay.SetVisible(true)
 		multiUnitDisplay.SetUnitDisplay()
 		selectionStatsDisplay.ChangeSelection({unitID})
@@ -2768,7 +2770,7 @@ local function UpdateSelection(newSelection)
 	
 	selectionWindow.SetVisible(true)
 	if #newSelection == 1 then
-		selectionWindow.ShowSingleUnit(newSelection[1])
+		selectionWindow.ShowSingleUnit(newSelection[1], newSelection.defIDs[newSelection[1]])
 	else
 		selectionWindow.ShowMultiUnit(newSelection)
 	end
@@ -2806,7 +2808,18 @@ function widget:KeyRelease(key, modifier, isRepeat)
 	end
 end
 
-function widget:SelectionChanged(newSelection)
+function widget:CommandsChanged()
+	local selectionDefIDs = spGetSelectedUnitsSorted()
+	local defIDs = {}
+	local newSelection = {defIDs = defIDs}
+	local n = 0
+	for defID, units in pairs(selectionDefIDs) do
+		for i, unitID in ipairs(units) do
+			n = n + 1
+			newSelection[n] = unitID
+			defIDs[unitID] = defID
+		end
+	end
 	UpdateSelection(newSelection)
 end
 
