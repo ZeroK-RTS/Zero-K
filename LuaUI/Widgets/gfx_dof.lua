@@ -14,7 +14,7 @@ end
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
 options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocusLabel', 'autofocusInFocusMultiplier', 'autofocusPower',
-'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop'}
+'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop', 'fStop_up', 'fStop_down'}
 
 options = {
 	useDoF =
@@ -86,8 +86,26 @@ options = {
 	{
 		type='number',
 		name='F-Stop (Manual Focus Only)',
-		min = 1.0, max = 80.0, step = 0.1,
+		min = 0.5, max = 80.0, step = 0.05,
 		value = 16.0,
+	},
+	fStop_up =
+	{
+		type='button',
+		name= "Increment F-Stop",
+		OnChange = function ()
+			options.fStop.value = options.fStop.value + 0.05
+			Spring.Echo("F-Stop", options.fStop.value)
+		end,
+	},
+	fStop_down =
+	{
+		type='button',
+		name= "Decrement F-Stop",
+		OnChange = function ()
+			options.fStop.value = math.max(0.5, options.fStop.value - 0.05)
+			Spring.Echo("F-Stop", options.fStop.value)
+		end,
 	},
 }
 
