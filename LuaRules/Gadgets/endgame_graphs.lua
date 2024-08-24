@@ -217,8 +217,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 		cost = nanoframeCosts[index]
 
 		local lastUnitID = nanoframes[nanoframeCount]
-		nanoframesByID[unitID] = nil
 		nanoframesByID[lastUnitID] = index
+		nanoframesByID[unitID] = nil
 		nanoframeTeams[index] = nanoframeTeams[nanoframeCount]
 		nanoframeCosts[index] = nanoframeCosts[nanoframeCount]
 		nanoframes[index] = nanoframes[nanoframeCount]
