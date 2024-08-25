@@ -2,8 +2,9 @@
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 
-// Beherith (mysterme@gmail.com) claims copyright on this file. He gives the Zero-K team permission to
-// use this for ZK but he would be unhappy if it were copied further without asking him, so best to ask.
+// This file is going to be licensed under some sort of GPL-compatible license, but authors are dragging
+// their feet. Avoid copying for now (unless this header rots for years on end), and check back later.
+// See https://github.com/ZeroK-RTS/Zero-K/issues/5328
 
 //__ENGINEUNIFORMBUFFERDEFS__
 //__DEFINES__

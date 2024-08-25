@@ -624,6 +624,7 @@ local restrictedWhitelist = {
 	--[[ Other widgets have security holes and there is
 	     no reason for them to have access anyway. ]]
 	['LuaUI/Widgets/gfx_projectile_lights.lua'] = true,
+	['LuaUI/Widgets/gfx_deferred_rendering_gl4.lua'] = true,
 }
 
 for i = 1, #restrictedFunctions do

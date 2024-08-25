@@ -4,7 +4,7 @@ function widget:GetInfo()
 		desc      = "An interesting way of doing unit outlines",
 		author    = "Beherith",
 		date      = "2022.03.05",
-		license   = "Lua: GNU GPL, v2 or later, GLSL code: (c) Beherith, mysterme@gmail.com ",
+		license   = "Lua: GNU GPL, v2 or later, GLSL: See shader files",
 		layer     = -5,
 		enabled   = true
 	}
