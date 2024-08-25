@@ -38,6 +38,21 @@ local unitLights = {
 			}
 		),
 	},
+	energysingu = {
+		static = {
+			{
+				lightType = 'point',
+				pieceName = 'base',
+				lightConfig = {
+					posx = 0, posy = 60, posz = 0, radius = 380,
+					color2r = 1, color2g = 0.2, color2b = 0.2, colortime = 0,
+					r = 1, g = 0.82, b = 0, a = 0.18,
+					modelfactor = 0.45, specular = 0.8, scattering = 0.1, lensflare = 0,
+					lifetime = 0, sustain = 0, animtype = 0
+				},
+			},
+		}
+	},
 }
 
 return unitLights
