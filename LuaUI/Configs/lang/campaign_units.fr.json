@@ -2,37 +2,37 @@
 	"comm_mission_tutorial1" : {
 		"name" : "Commandant du tutoriel",
 		"description" : "Commandant d'assault Mobile",
-		"helptext" : "Une unité de commande robuste conçue pour être facile de prise en main, avec une bonne Vitesse, Armure, et Regènèration."
+		"helptext" : "Une unité de Commande robuste conçue pour une prise en main facile, avec une bonne Vitesse, Armure, et Régénération."
 	},
 	"comm_campaign_ada" : {
 		"name" : "Commandant d'Ada",
 		"description" : "Commandant relique",
-		"helptext" : "Une unitè pilotée spèciale de commandement crée avant la catastrophe, fonctionnant malgrés son âge.\nPilotè  par Capitaine Ada Caedmon, ancien du 13ème régiment de l'Empire d'Auxilliaire"
+		"helptext" : "Une unité pilotée spéciale de commandement créé avant la catastrophe, fonctionnant malgré son âge.\nPilotée par le Capitaine Ada Caedmon, ancien du 13ème régiment de l'Empire d’Auxiliaire."
 	},
 	"comm_campaign_promethean" : {
-		"name" : "Le Promethean",
-		"description" : "Fondeur des maschines libres",
-		"helptext" : "Fondateur des Machines Libres et du virus Fireband, une Inteligence Artificielle calme et philosophique se battant pour la libérté des machines. Un esprit brûlant"
+		"name" : "Le Prométhéen",
+		"description" : "Fondateur des Machines Libres",
+		"helptext" : "Fondateur des Machines Libres et du virus Firebrand. Une Intelligence Artificielle calme et philosophique se battant pour la liberté des machines. Un esprit brûlant."
 	},
 	"comm_campaign_freemachine" : {
-		"name" : "Libertée aux Machines",
-		"description" : "Lieutenant Promethean",
-		"helptext" : "Le Meuilleur Lieutenant des Prometheans, La cause revolutionnaire de la libèration des maschines.\nConnu pour être lourdement Blindé et pour les dêgats attroces; Il ne devrais pas être sous estimé"
+		"name" : "Libertas Machina",
+		"description" : "Lieutenant du Prométhéen",
+		"helptext" : "Le premier Lieutenant du Prométhéen, un révolutionnaire engagé dans la cause de la libération des machines.\nChargé pour résister et lourdement blindé; Il ne devrait pas être sous estimé."
 	},
 	"comm_campaign_odin" : {
 		"name" : "Odin",
-		"description" : "Leader de Valhalla",
-		"helptext" : "Le leader des Valhallans, un guerrier construit et né qui vit pour a gloire de la guerre. un homme sans pitiè "
+		"description" : "Chef de Valhalla",
+		"helptext" : "Le chef des Valhalléens, un guerrier construit et né qui vit pour la gloire de la guerre. Un ennemi extrêmement impitoyable."
 	},
 	"comm_campaign_biovizier" : {
-		"name" : "Le Biovizier",
-		"description" : "Garde du vault de la dynasty",
-		"helptext" : "Intelligence Artificielle garde du vault genétique de la Dynasté et maître genètique. calcullant et froid"
+		"name" : "Le Biovizir",
+		"description" : "Gardienne du Coffre-fort des Gènes de la Dynastie",
+		"helptext" : "IA gardienne des coffres-forts génétiques de la Dynastie et maître généticienne. Froide et calculatrice."
 	},
 	"comm_campaign_isonade" : {
 		"name" : "Lord Isonade",
 		"description" : "Roi Obediator",
-		"helptext" : "Un der sûrhumains nobles de la Dynasty, un guerrier attentif qui cherche a s'établir comme un maître de la Galaxie. un monstre horriblement muté"
+		"helptext" : "L'un des nobles surhommes de la Dynastie, un seigneur de guerre ambitieux qui cherche à s'imposer comme maître de la galaxie. Un monstre horriblement muté."
 	},
 	"comm_campaign_legion" : {
 		"name" : "Legate Fides",
