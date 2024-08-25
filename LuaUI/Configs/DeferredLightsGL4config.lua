@@ -26,22 +26,6 @@ local exampleLight = {
 	},
 }
 
--- multiple lights per unitdef/piece are possible, as the lights are keyed by lightname
-
-local unitLights = {
-	['energysolar'] = {
-		light = {
-			lightType = 'point',
-			pieceName = 'base',
-			lightConfig = { 
-			posx = 0, posy = 1000, posz = 0, radius = 1300,
-			r = 1, g = 1, b = 1, a = 0.75,
-			pos2x = 0, pos2y = -100, pos2z = 0,},
-		},
-	},
-}
-
-
 local gibLight = {
 	lightType = 'point', -- or cone or beam
 	pieceName = nil, -- optional
@@ -54,20 +38,29 @@ local gibLight = {
 	},
 }
 
--- convert unitname -> unitDefID
+local unitEventLights = {}
 local unitDefLights = {}
-for unitName, lights in pairs(unitLights) do
-	if UnitDefNames[unitName] then
-		unitDefLights[UnitDefNames[unitName].id] = lights
+local muzzleFlashLights = {}
+local lightFiles = VFS.DirList('LuaUI/Configs/UnitLights')
+for i = 1, #lightFiles do
+	local fileData = VFS.Include(lightFiles[i])
+	for unitName, unitLights in pairs(fileData) do
+		local ud = UnitDefNames[unitName]
+		if ud then
+			local unitDefID = ud.id
+			unitDefLights[unitDefID] = unitLights.static
+			unitEventLights[unitDefID] = unitLights.event
+			muzzleFlashLights[unitDefID] = unitLights.muzzle
+		end
 	end
+	fileData = nil -- This is just copypasta, I assume it does nearly nothing.
 end
-unitLights = nil
 
 local allLights = {
-	unitEventLights = {},
+	unitEventLights = unitEventLights,
 	unitDefLights = unitDefLights,
 	featureDefLights = {},
-	muzzleFlashLights = {},
+	muzzleFlashLights = muzzleFlashLights,
 	projectileDefLights = {},
 	explosionLights = {},
 	gibLight = gibLight,
