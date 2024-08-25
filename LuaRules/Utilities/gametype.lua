@@ -87,4 +87,5 @@ Spring.Utilities.Gametype = {
 	isSandbox    = function () return isSandbox    end,
 	isPlanetWars = function () return isPlanetWars end,
 	isSoloTeams  = function () return isSoloTeams  end,
+	IsSinglePlayer = function () return isSoloTeams or isSandbox end,
 }
