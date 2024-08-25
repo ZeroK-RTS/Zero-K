@@ -22,7 +22,7 @@ local exampleLight = {
 		-- beam lights only, specifies the endpoint of the beam:
 			pos2x = 100, pos2y = 100, pos2z = 100,
 		modelfactor = 1, specular = 1, scattering = 1, lensflare = 1,
-		lifetime = 0, sustain = 1, 	aninmtype = 0 -- unused
+		lifetime = 0, sustain = 1, aninmtype = 0 -- unused
 	},
 }
 
