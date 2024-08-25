@@ -337,6 +337,25 @@ local numAddLights = 0 -- how many times AddLight was called
 
 local spec = Spring.GetSpectatingState()
 
+---------------------- OPTIONS ----------------------------------
+
+options_path = 'Settings/Graphics/Lighting GL4'
+options_order = {'dynamic_reload'}
+options = {
+	dynamic_reload = {
+		name = "Constantly reload configuration",
+		desc = "Checks config files for changes and reloads them constantly.",
+		type = 'bool',
+		value = false,
+		OnChange = function (self)
+			autoupdate = self.value
+		end,
+		noHotkey = true,
+		advanced = true
+	},
+}
+
+
 ---------------------- INITIALIZATION FUNCTIONS ----------------------------------
 
 
@@ -928,7 +947,7 @@ function AddRandomLight(which)
 end
 
 
-local function LoadLightConfig()
+local function LoadLightConfig(isReload)
 	local success, result = pcall(VFS.Include, 'luaui/configs/DeferredLightsGL4config.lua')
 	--Spring.Echo("Loading GL4 light config", success, result)
 	if success then
@@ -1076,12 +1095,22 @@ function widget:Shutdown()
 
 	widgetHandler:DeregisterGlobal('UnitScriptLight')
 
-	deferredLightShader:Delete()
+	if deferredLightShader then
+		deferredLightShader:Delete()
+	end
 	local ram = 0
-	for lighttype, vbo in pairs(unitLightVBOMap) do ram = ram + vbo:Delete() end
-	for lighttype, vbo in pairs(projectileLightVBOMap) do ram = ram + vbo:Delete() end
-	for lighttype, vbo in pairs(lightVBOMap) do ram = ram + vbo:Delete() end
-	ram = ram + cursorPointLightVBO:Delete()
+	if unitLightVBOMap then
+		for lighttype, vbo in pairs(unitLightVBOMap) do ram = ram + vbo:Delete() end
+	end
+	if projectileLightVBOMap then
+		for lighttype, vbo in pairs(projectileLightVBOMap) do ram = ram + vbo:Delete() end
+	end
+	if lightVBOMap then
+		for lighttype, vbo in pairs(lightVBOMap) do ram = ram + vbo:Delete() end
+	end
+	if cursorPointLightVBO then
+		ram = ram + cursorPointLightVBO:Delete()
+	end
 
 	--Spring.Echo("DLGL4 ram usage MB = ", ram / 1000000)
 	--Spring.Echo("featureDefLights", table.countMem(featureDefLights))
@@ -1397,18 +1426,30 @@ local function updateProjectileLights(newgameframe)
 	--end
 end
 
-local configCache = {lastUpdate = Spring.GetTimer()}
+local configCache = {lastUpdate = Spring.GetTimer(), files = {}}
 local function checkConfigUpdates()
 	if Spring.DiffTimers(Spring.GetTimer(), configCache.lastUpdate) > 0.5 then
 		local newconf = VFS.LoadFile('luaui/configs/DeferredLightsGL4config.lua')
 		if newconf ~= configCache.conf then
-			LoadLightConfig()
+			needUpdate = true
+			configCache.conf = newconf
+		end
+		local lightFiles = VFS.DirList('LuaUI/Configs/UnitLights')
+		for i = 1, #lightFiles do
+			local newconf = VFS.LoadFile(lightFiles[i])
+			if newconf ~= configCache.files[i] then
+				needUpdate = true
+			end
+			configCache.files[i] = newconf
+		end
+		configCache.lastUpdate = Spring.GetTimer()
+		if needUpdate then
+			LoadLightConfig(true)
 			if WG['unittrackerapi'] and WG['unittrackerapi'].visibleUnits then
 				widget:VisibleUnitsChanged(WG['unittrackerapi'].visibleUnits, nil)
 			end
-			configCache.conf = newconf
 		end
-		configCache.lastUpdate = Spring.GetTimer()
+		needUpdate = false
 	end
 end
 
