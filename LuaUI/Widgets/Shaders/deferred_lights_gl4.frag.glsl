@@ -1,7 +1,10 @@
 #version 420
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
-// This shader is (c) Beherith (mysterme@gmail.com)
+
+// This file is going to be licensed under some sort of GPL-compatible license, but authors are dragging
+// their feet. Avoid copying for now (unless this header rots for years on end), and check back later.
+// See https://github.com/ZeroK-RTS/Zero-K/issues/5328
 
 //__ENGINEUNIFORMBUFFERDEFS__
 //__DEFINES__
