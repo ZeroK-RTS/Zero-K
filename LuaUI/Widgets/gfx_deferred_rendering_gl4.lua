@@ -438,9 +438,16 @@ local function InitializeLight(lightTable, unitID)
 				--Spring.Debug.TraceFullEcho(nil,nil,nil,"InitializeLight, pieceMap == nil")
 			end
 
-			if pieceMap[lightTable.pieceName] then -- if its not a real piece, it will default to the model worldpos!
+			if pieceMap[lightTable.pieceName] then
 				lightTable.pieceIndex = pieceMap[lightTable.pieceName]
 				lightTable.lightParamTable[pieceIndexPos] = lightTable.pieceIndex
+			else
+				-- if its not a real piece, it will crash
+				Spring.Echo("lightTable.pieceName", lightTable.pieceName, "not in piece table")
+				Spring.Utilities.TableEcho(pieceMap, "pieceMap")
+				Spring.Debug.TraceFullEcho(nil,nil,nil,"InitializeLight, pieceMap == nil")
+				Spring.Utilities.UnitEcho(unitID, "Light error for piece name " .. lightTable.pieceName)
+				return false
 			end
 				--Spring.Echo(lightname, lightParams.pieceName, pieceMap[lightParams.pieceName])
 		end
