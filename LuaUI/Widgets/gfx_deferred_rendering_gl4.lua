@@ -973,6 +973,9 @@ local function LoadLightConfig(isReload)
 		for weaponID, lightTable in pairs(projectileDefLights) do
 			InitializeLight(lightTable)
 		end
+		if isReload then
+			Spring.Echo("GL4 lights reloaded", math.random())
+		end
 	else
 		Spring.Echo("Failed to load GL4 light config", success, result)
 	end
@@ -1430,6 +1433,7 @@ local configCache = {lastUpdate = Spring.GetTimer(), files = {}}
 local function checkConfigUpdates()
 	if Spring.DiffTimers(Spring.GetTimer(), configCache.lastUpdate) > 0.5 then
 		local newconf = VFS.LoadFile('luaui/configs/DeferredLightsGL4config.lua')
+		local needUpdate = false
 		if newconf ~= configCache.conf then
 			needUpdate = true
 			configCache.conf = newconf
@@ -1449,7 +1453,6 @@ local function checkConfigUpdates()
 				widget:VisibleUnitsChanged(WG['unittrackerapi'].visibleUnits, nil)
 			end
 		end
-		needUpdate = false
 	end
 end
 
