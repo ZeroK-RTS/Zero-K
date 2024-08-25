@@ -2808,8 +2808,8 @@ function widget:KeyRelease(key, modifier, isRepeat)
 	end
 end
 
-function widget:CommandsChanged()
-	local selectionDefIDs = spGetSelectedUnitsSorted()
+function widget:CommandsChanged() -- like SelectionChanged, but only called once after all the filtering is done and the selection is finalized
+	local selectionDefIDs = spGetSelectedUnitsSorted() -- able to tell the defID of units selected in the fog (e.g. via godmode or specfullview 2)
 	local defIDs = {}
 	local newSelection = {defIDs = defIDs}
 	local n = 0
