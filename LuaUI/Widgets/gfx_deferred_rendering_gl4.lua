@@ -922,43 +922,36 @@ end
 
 
 local function LoadLightConfig()
-	local success, result =	pcall(VFS.Include, 'luaui/configs/DeferredLightsGL4config.lua')
+	local success, result = pcall(VFS.Include, 'luaui/configs/DeferredLightsGL4config.lua')
 	--Spring.Echo("Loading GL4 light config", success, result)
 	if success then
 		--Spring.Echo("Loaded GL4 light config")
 		unitDefLights = result.unitDefLights
 		unitEventLights = result.unitEventLights
 		featureDefLights = result.featureDefLights
-		--projectileDefLights = result.projectileDefLights
-
-	else
-		Spring.Echo("Failed to load GL4 Unit light config", success, result)
-	end
-
-	local success2, result2 =	pcall(VFS.Include, 'luaui/configs/DeferredLightsGL4WeaponsConfig.lua')
-	--Spring.Echo("Loading GL4 weapon light config", success2, result2)
-	if success2 then
-		gibLight = result2.gibLight
+		
+		gibLight = result.gibLight
 		InitializeLight(gibLight)
 
-		muzzleFlashLights = result2.muzzleFlashLights
+		muzzleFlashLights = result.muzzleFlashLights
 		for weaponID, lightTable in pairs(muzzleFlashLights) do
 			InitializeLight(lightTable)
 		end
 
-		explosionLights = result2.explosionLights
+		explosionLights = result.explosionLights
 		for weaponID, lightTable in pairs(explosionLights) do
 			InitializeLight(lightTable)
 		end
 
-		projectileDefLights = result2.projectileDefLights
+		projectileDefLights = result.projectileDefLights
 		for weaponID, lightTable in pairs(projectileDefLights) do
 			InitializeLight(lightTable)
 		end
 	else
-		Spring.Echo("Failed to load GL4 weapon light config", success2, result2)
+		Spring.Echo("Failed to load GL4 light config", success, result)
 	end
-	return success and success2
+
+	return success
 end
 
 local nightFactor = 1 --0.33
@@ -1400,15 +1393,13 @@ end
 local configCache = {lastUpdate = Spring.GetTimer()}
 local function checkConfigUpdates()
 	if Spring.DiffTimers(Spring.GetTimer(), configCache.lastUpdate) > 0.5 then
-		local newconfa = VFS.LoadFile('luaui/configs/DeferredLightsGL4config.lua')
-		local newconfb = VFS.LoadFile('luaui/configs/DeferredLightsGL4WeaponsConfig.lua')
-		if newconfa ~= configCache.confa or newconfb ~= configCache.confb then
+		local newconf = VFS.LoadFile('luaui/configs/DeferredLightsGL4config.lua')
+		if newconf ~= configCache.conf then
 			LoadLightConfig()
 			if WG['unittrackerapi'] and WG['unittrackerapi'].visibleUnits then
 				widget:VisibleUnitsChanged(WG['unittrackerapi'].visibleUnits, nil)
 			end
-			configCache.confa = newconfa
-			configCache.confb = newconfb
+			configCache.conf = newconf
 		end
 		configCache.lastUpdate = Spring.GetTimer()
 	end
