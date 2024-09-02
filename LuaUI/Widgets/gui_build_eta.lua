@@ -32,24 +32,21 @@ local fontSize = 8
 local displayETA = true
 local previousFullview = false
 
+i18nPrefix = 'buildeta_'
 options_path = 'Settings/Interface/Build ETA'
 options_order = { 'showonlyonshift', 'showforicons', 'fontsize', 'drawHeight'}
 options = {
 	showonlyonshift = {
-		name = 'Show only on shift',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	showforicons = {
-		name = 'Show for icons',
-		desc = 'Whether to show for radar icons during strategic zoom.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 	},
 	fontsize = {
-		name = 'Size',
 		type = 'number',
 		value = 9,
 		min = 2, max = 100, step = 1,
@@ -58,7 +55,6 @@ options = {
 		end,
 	},
 	drawHeight = {
-		name = 'Display Height',
 		type = 'number',
 		value = 1500,
 		min = 0, max = 5000, step = 1,
