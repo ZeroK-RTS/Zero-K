@@ -20,7 +20,6 @@ return { spiderantiheavy = {
     bait_level_default = 2,
     dontfireatradarcommand = '1',
     cus_noflashlight = 1,
-	model_rescale = 3.5
   },
 
   explodeAs             = [[BIG_UNITEX]],
