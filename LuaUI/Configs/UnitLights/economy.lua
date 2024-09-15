@@ -71,10 +71,10 @@ local unitLights = {
 				lightType = 'cone',
 				pieceName = 'base',
 				lightConfig = {
-					posx = 12, posy = 8, posz = 12, radius = 100,
-					dirx = 1, diry = -0.8, dirz = 1, theta = 0.72,
+					posx = 10, posy = 8, posz = 10, radius = 100,
+					dirx = 1, diry = -0.65, dirz = 1, theta = 0.8,
 					r = 0.9, g = 0.9, b = 0, a = 0.5,
-					modelfactor = 0.26, specular = 0, scattering = 0, lensflare = 0,
+					modelfactor = 0.1, specular = 0, scattering = 0, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
@@ -82,10 +82,10 @@ local unitLights = {
 				lightType = 'cone',
 				pieceName = 'base',
 				lightConfig = {
-					posx = 12, posy = 8, posz = -12, radius = 100,
-					dirx = 1, diry = -0.8, dirz = -1, theta = 0.72,
+					posx = 10, posy = 8, posz = -10, radius = 100,
+					dirx = 1, diry = -0.65, dirz = -1, theta = 0.8,
 					r = 0.9, g = 0.9, b = 0, a = 0.5,
-					modelfactor = 0.26, specular = 0, scattering = 0, lensflare = 0,
+					modelfactor = 0.1, specular = 0, scattering = 0, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
@@ -93,10 +93,10 @@ local unitLights = {
 				lightType = 'cone',
 				pieceName = 'base',
 				lightConfig = {
-					posx = -12, posy = 8, posz = 12, radius = 100,
-					dirx = -1, diry = -0.8, dirz = 1, theta = 0.72,
+					posx = -10, posy = 8, posz = 10, radius = 100,
+					dirx = -1, diry = -0.65, dirz = 1, theta = 0.8,
 					r = 0.9, g = 0.9, b = 0, a = 0.5,
-					modelfactor = 0.26, specular = 0, scattering = 00, lensflare = 0,
+					modelfactor = 0.1, specular = 0, scattering = 00, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
@@ -104,10 +104,10 @@ local unitLights = {
 				lightType = 'cone',
 				pieceName = 'base',
 				lightConfig = {
-					posx = -12, posy = 8, posz = -12, radius = 100,
-					dirx = -1, diry = -0.8, dirz = -1, theta = 0.72,
+					posx = -10, posy = 8, posz = -10, radius = 100,
+					dirx = -1, diry = -0.65, dirz = -1, theta = 0.8,
 					r = 0.9, g = 0.9, b = 0, a = 0.5,
-					modelfactor = 0.26, specular = 0, scattering = 0, lensflare = 0,
+					modelfactor = 0.1, specular = 0, scattering = 0, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
@@ -118,7 +118,7 @@ local unitLights = {
 					posx = 4, posy = 8, posz = 4, radius = 100,
 					dirx = 1, diry = 0.2, dirz = 1, theta = 0.9,
 					r = 0.9, g = 0.9, b = 0, a = 0.4,
-					modelfactor = 0.26, specular = 0, scattering = 0, lensflare = 0,
+					modelfactor = 0.35, specular = 0, scattering = 0, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
@@ -129,7 +129,7 @@ local unitLights = {
 					posx = 4, posy = 8, posz = -4, radius = 100,
 					dirx = 1, diry = 0.2, dirz = -1, theta = 0.9,
 					r = 0.9, g = 0.9, b = 0, a = 0.4,
-					modelfactor = 0.26, specular = 0, scattering = 0, lensflare = 0,
+					modelfactor = 0.35, specular = 0, scattering = 0, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
@@ -140,7 +140,7 @@ local unitLights = {
 					posx = -4, posy = 8, posz = 4, radius = 100,
 					dirx = -1, diry = 0.2, dirz = 1, theta = 0.9,
 					r = 0.9, g = 0.9, b = 0, a = 0.4,
-					modelfactor = 0.26, specular = 0, scattering = 0, lensflare = 0,
+					modelfactor = 0.35, specular = 0, scattering = 0, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
@@ -151,7 +151,7 @@ local unitLights = {
 					posx = -4, posy = 8, posz = -4, radius = 100,
 					dirx = -1, diry = 0.2, dirz = -1, theta = 0.9,
 					r = 0.9, g = 0.9, b = 0, a = 0.4,
-					modelfactor = 0.26, specular = 0, scattering = 0, lensflare = 0,
+					modelfactor = 0.35, specular = 0, scattering = 0, lensflare = 0,
 					lifetime = 0, sustain = 0, animtype = 0
 				},
 			},
