@@ -340,7 +340,7 @@ local spec = Spring.GetSpectatingState()
 ---------------------- OPTIONS ----------------------------------
 
 options_path = 'Settings/Graphics/Lighting GL4'
-options_order = {'dynamic_reload'}
+options_order = {'dynamic_reload', 'gib_lights'}
 options = {
 	dynamic_reload = {
 		name = "Constantly reload configuration",
@@ -352,6 +352,12 @@ options = {
 		end,
 		noHotkey = true,
 		advanced = true
+	},
+	gib_lights = {
+		name = "Gib lights",
+		desc = "Add lights to the bits of units that fly off when they explode.",
+		type = 'bool',
+		value = true,
 	},
 }
 
@@ -1341,12 +1347,14 @@ local function updateProjectileLights(newgameframe)
 				-- add projectile
 				local weapon, piece = spGetProjectileType(projectileID)
 				if piece then
-					local explosionflags = spGetPieceProjectileParams(projectileID)
-					local gib = gibLight.lightParamTable
-					gib[1] = px
-					gib[2] = py
-					gib[3] = pz
-					AddLight(projectileID, nil, nil, projectilePointLightVBO, gib, noUpload)
+					if options.gib_lights.value then
+						local explosionflags = spGetPieceProjectileParams(projectileID)
+						local gib = gibLight.lightParamTable
+						gib[1] = px
+						gib[2] = py
+						gib[3] = pz
+						AddLight(projectileID, nil, nil, projectilePointLightVBO, gib, noUpload)
+					end
 				else
 					local weaponDefID = spGetProjectileDefID ( projectileID )
 					if projectileDefLights[weaponDefID] and ( projectileID % (projectileDefLights[weaponDefID].fraction or 1) == 0 ) then
@@ -1638,7 +1646,6 @@ function widget:TextCommand(command)
 end
 
 function widget:Initialize()
-
 	Spring.Debug.TraceEcho("Initialize DLGL4")
 	if Spring.GetConfigString("AllowDeferredMapRendering") == '0' or Spring.GetConfigString("AllowDeferredModelRendering") == '0' then
 		Spring.Echo('Deferred Rendering (gfx_deferred_rendering.lua) requires  AllowDeferredMapRendering and AllowDeferredModelRendering to be enabled in springsettings.cfg!')
@@ -1650,7 +1657,10 @@ function widget:Initialize()
 		return
 	end
 
-	if initGL4() == false then return end
+	if initGL4() == false then
+		return
+	end
+	WG.widget_enabled_deferred_rendering_gl4 = true
 
 	local success, mapinfo = pcall(VFS.Include,"mapinfo.lua") -- load mapinfo.lua confs
 

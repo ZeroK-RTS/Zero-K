@@ -293,6 +293,10 @@ function AddParticles(Class,Options   ,__id)
 		return -1;
 	end
 
+	if Options.disable_with_gl4 and GG.widget_enabled_deferred_rendering_gl4 then
+		return -1
+	end
+
 	if (Options.delay and Options.delay~=0) then
 		partIDCount = partIDCount+1
 		newOptions = {}; CopyTable(newOptions,Options); newOptions.delay=nil
