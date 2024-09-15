@@ -671,7 +671,7 @@ function uploadElementRange(iT, startElementIndex, endElementIndex)
 	iT.instanceVBO:Upload(iT.instanceData, -- The lua mirrored VBO data
 		nil, -- the attribute index, nil for all attributes
 		startElementIndex, -- vboOffset optional, , what ELEMENT offset of the VBO to start uploading into, 0 based
-		startElementIndex * iT.instanceStep + 1, --  luaStartIndex, default 1, what element of the lua array to start uploading from. 1 is the 1st element of a lua table.
+		startElementIndex * iT.instanceStep + 1, --  luaStartIndex, default 1, what element of the lua array to start uploading from. 1 is the 1st element of a lua table. 
 		endElementIndex * iT.instanceStep --] luaEndIndex, default #{array}, what element of the lua array to upload up to, inclusively
 	)
 	if iT.indextoUnitID then
@@ -689,10 +689,10 @@ function uploadElementRange(iT, startElementIndex, endElementIndex)
 	end
 end
 
--- This function allows for order-preserving compacting of a list of instances based on these funcs.
+-- This function allows for order-preserving compacting of a list of instances based on these funcs. 
 -- It is designed for Decals GL4, where draw order matters a lot!
 -- remove takes priority over keep
-function compactInstanceVBO(iT, removelist, keeplist)
+function compactInstanceVBO(iT, removelist, keeplist)	
 	local usedElements = iT.usedElements
 	if usedElements == 0 then return 0 end
 	local instanceStep = iT.instanceStep
@@ -703,12 +703,12 @@ function compactInstanceVBO(iT, removelist, keeplist)
 	local newUsedElements = 0
 	local numremoved = 0
 	local removemode = (removelist ~= nil) and (keeplist == nil)
-	for index, instanceID in ipairs(indextoInstanceID) do
-		-- If its in keeplist,
-		if (removemode and (removelist[instanceID]== nil) ) or ((removemode == false) and keeplist[instanceID]) then
+	for index, instanceID in ipairs(indextoInstanceID) do 
+		-- If its in keeplist, 
+		if (removemode and (removelist[instanceID]== nil) ) or ((removemode == false) and keeplist[instanceID]) then 
 			local instanceOffset = (index-1) * instanceStep
 			local newInstanceOffset = newUsedElements * instanceStep
-			for i = 1, instanceStep do
+			for i = 1, instanceStep do 
 				instanceData[newInstanceOffset + i] = instanceData[instanceOffset + i]
 			end
 			newUsedElements = newUsedElements + 1
@@ -718,7 +718,7 @@ function compactInstanceVBO(iT, removelist, keeplist)
 			numremoved = numremoved + 1
 		end
 	end
-	if numremoved > 0 then
+	if numremoved > 0 then 
 		iT.dirty = true -- we set the flag to notify that CPU and GPU contents dont match!
 		iT.usedElements = newUsedElements
 		iT.instanceIDtoIndex = newinstanceIDtoIndex
@@ -728,8 +728,8 @@ function compactInstanceVBO(iT, removelist, keeplist)
 end
 
 function drawInstanceVBO(iT)
-	if iT.usedElements > 0 then
-		if iT.indexVBO then
+	if iT.usedElements > 0 then 
+		if iT.indexVBO then 
 			iT.VAO:DrawElements(iT.primitiveType, iT.numVertices, 0, iT.usedElements,0)
 		else
 			iT.VAO:DrawArrays(iT.primitiveType, iT.numVertices, 0, iT.usedElements,0)
@@ -744,12 +744,12 @@ function countInvalidUnitIDs(iT)
 		if iT.featureIDs then isValidID = Spring.ValidFeatureID(objectID)
 		else isValidID = Spring.ValidUnitID(objectID) end
 		if isValidID then
-
+		
 		else
 			invalids[#invalids + 1] = objectID
 		end
 	end
-	if #invalids > 0 then
+	if #invalids > 0 then 
 		Spring.Echo(#invalids, "invalid IDs found in ", iT.myName)
 	end
 	return invalids
@@ -777,7 +777,7 @@ function makeCircleVBO(circleSegments, radius)
 		VBOData[#VBOData+1] = math.cos(math.pi*2* i / circleSegments) * radius-- Y
 		VBOData[#VBOData+1] = i / circleSegments -- circumference [0-1]
 		VBOData[#VBOData+1] = radius
-	end
+	end	
 
 	circleVBO:Define(
 		circleSegments + 1,
@@ -808,7 +808,7 @@ function makePlaneVBO(xsize, ysize, xresolution, yresolution) -- makes a plane f
 			VBOData[#VBOData+1] = xsize * ((x / xresolution) -0.5 ) *2
 			VBOData[#VBOData+1] = ysize * ((y / yresolution) -0.5 ) * 2
 		end
-	end
+	end	
 
 	planeVBO:Define(
 		(xresolution + 1) * (yresolution + 1) ,
@@ -829,33 +829,33 @@ function makePlaneIndexVBO(xresolution, yresolution, cutcircle)
 	local function xyinrad(lx, ly)
 		local px = (lx / xresolution) * 2 - 1
 		local py = (ly / yresolution) * 2 - 1
-		return (px*px + py*py) <= 1
+		return (px*px + py*py) <= 1 
 	end
-
+	
 	local IndexVBOData = {}
 	local qindex = 0
 	local colsize = yresolution + 1
 	for x = 0, xresolution-1  do -- this is +1
 		for y = 0, yresolution-1 do
 			--this is only 20% optimization
-			if cutcircle == nil or (xyinrad(x,y) or xyinrad(x + 1,y) or xyinrad(x,y + 1 )) then
+			if cutcircle == nil or (xyinrad(x,y) or xyinrad(x + 1,y) or xyinrad(x,y + 1 )) then 
 				-- top left one
 				IndexVBOData[#IndexVBOData + 1] = qindex
 				IndexVBOData[#IndexVBOData + 1] = qindex +1
 				IndexVBOData[#IndexVBOData + 1] = qindex + colsize
 			end
-
-			if cutcircle == nil or (xyinrad(x+1,y+1) or xyinrad(x + 1,y) or xyinrad(x,y + 1 )) then
+			
+			if cutcircle == nil or (xyinrad(x+1,y+1) or xyinrad(x + 1,y) or xyinrad(x,y + 1 )) then 
 				-- bottom right one?
 				IndexVBOData[#IndexVBOData + 1] = qindex +1
 				IndexVBOData[#IndexVBOData + 1] = qindex + colsize + 1
 				IndexVBOData[#IndexVBOData + 1] = qindex + colsize
 			end
 			qindex = qindex + 1
-
+			
 		end
 		qindex = qindex + 1
-	end
+	end		
 	planeIndexVBO:Define(
 		#	IndexVBOData
 	)
@@ -878,12 +878,12 @@ function makePointVBO(numPoints, randomFactor)
 
 	local VBOData = {}
 
-	for i = 1, numPoints  do --
+	for i = 1, numPoints  do -- 
 		VBOData[#VBOData+1] = randomFactor * math.random()-- X
 		VBOData[#VBOData+1] = randomFactor * math.random()-- Y
 		VBOData[#VBOData+1] = randomFactor * math.random()---Z
 		VBOData[#VBOData+1] = i/numPoints -- index for lolz?
-	end
+	end	
 
 	pointVBO:Define(
 		numPoints,
@@ -937,20 +937,20 @@ end
 
 
 
-function makeConeVBO(numSegments, height, radius)
+function makeConeVBO(numSegments, height, radius) 
 	-- make a cone that points up, (y = height), with radius specified
 	-- returns the VBO object, and the number of elements in it (usually ==  numvertices)
 	-- needs GL.TRIANGLES
 	if not height then height = 1 end
-	if not radius then radius = 1 end
+	if not radius then radius = 1 end 
 	local coneVBO = gl.GetVBO(GL.ARRAY_BUFFER,true)
 	if coneVBO == nil then return nil end
 
 	local VBOData = {}
 
-	for i = 1, numSegments do
+	for i = 1, numSegments do 
 		-- center vertex
-		VBOData[#VBOData+1] = 0
+		VBOData[#VBOData+1] = 0 
 		VBOData[#VBOData+1] = 0
 		VBOData[#VBOData+1] = 0
 		VBOData[#VBOData+1] = (i - 1) / numSegments
@@ -968,7 +968,7 @@ function makeConeVBO(numSegments, height, radius)
 		VBOData[#VBOData+1] =(i - 0) / numSegments
 
 		-- top vertex
-		VBOData[#VBOData+1] = 0
+		VBOData[#VBOData+1] = 0 
 		VBOData[#VBOData+1] = height
 		VBOData[#VBOData+1] = 0
 		VBOData[#VBOData+1] = (i - 1) / numSegments
@@ -994,21 +994,21 @@ end
 
 
 
-function makeCylinderVBO(numSegments, height, radius, hastop, hasbottom)
+function makeCylinderVBO(numSegments, height, radius, hastop, hasbottom) 
 	-- make a cylinder that points up, (y = height), with radius specified
 	-- returns the VBO object, and the number of elements in it (usually ==  numvertices)
 	-- needs GL.TRIANGLES
 	if not height then height = 1 end
-	if not radius then radius = 1 end
+	if not radius then radius = 1 end 
 	local cylinderVBO = gl.GetVBO(GL.ARRAY_BUFFER,true)
 	if cylinderVBO == nil then return nil end
 
 	local VBOData = {}
 
-	for i = 1, numSegments do
+	for i = 1, numSegments do 
 		if hasbottom then
 			-- center vertex
-			VBOData[#VBOData+1] = 0
+			VBOData[#VBOData+1] = 0 
 			VBOData[#VBOData+1] = -1* height
 			VBOData[#VBOData+1] = 0
 			VBOData[#VBOData+1] = (i - 1) / numSegments
@@ -1071,7 +1071,7 @@ function makeCylinderVBO(numSegments, height, radius, hastop, hasbottom)
 
 		if hastop then
 			-- center vertex
-			VBOData[#VBOData+1] = 0
+			VBOData[#VBOData+1] = 0 
 			VBOData[#VBOData+1] = height
 			VBOData[#VBOData+1] = 0
 			VBOData[#VBOData+1] = (i - 1) / numSegments
@@ -1179,7 +1179,7 @@ function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/
 	local stackStep = math.pi / stackCount;
 	local sectorAngle, stackAngle;
 
-	for i = 0, stackCount do
+	for i = 0, stackCount do 
 
 		stackAngle = math.pi / 2 - i * stackStep;        -- starting from pi/2 to -pi/2
 		xy = radius * math.cos(stackAngle);             -- r * cos(u)
@@ -1212,7 +1212,7 @@ function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/
 			-- vertex tex coord (s, t) range between [0, 1]
 			s = j / sectorCount;
 			t = i / stackCount;
-
+			
 			VBOData[#VBOData + 1] = s;
 			VBOData[#VBOData + 1] = t;
 		end
@@ -1220,10 +1220,10 @@ function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/
 	sphereVBO:Define(#VBOData/9, vertVBOLayout)
 	sphereVBO:Upload(VBOData)
 	local numVerts = #VBOData/9
-
+	
 	local sphereIndexVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER,false)
 	VBOData = {}
-
+	
 	-- generate CCW index list of sphere triangles
 	-- k1--k1+1
 	-- |  / |
@@ -1231,7 +1231,7 @@ function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/
 	-- k2--k2+1
 	local k1, k2
 	for i = 0, stackCount-1 do -- for(int i = 0; i < stackCount; ++i)
-
+	
 		k1 = i * (sectorCount + 1)     -- beginning of current stack
 		k2 = k1 + sectorCount + 1      -- beginning of next stack
 
@@ -1239,8 +1239,8 @@ function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/
 			--	Spring.Echo('indices', k1, k2)
 			-- 2 triangles per sector excluding first and last stacks
 			-- k1 => k2 => k1+1
-			if i ~= 0 then
-
+			if i ~= 0 then 
+			
 				VBOData[#VBOData + 1] = k1
 				VBOData[#VBOData + 1] = k2
 				VBOData[#VBOData + 1] = k1 + 1
@@ -1248,19 +1248,19 @@ function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/
 
 			-- k1+1 => k2 => k2+1
 			if i ~= (stackCount-1)	 then
-
+			
 				VBOData[#VBOData + 1] = k1 + 1
 				VBOData[#VBOData + 1] = k2
 				VBOData[#VBOData + 1] = k2 + 1
 
 			end
-
+			
 			k1 = k1 + 1
 			k2 = k2 + 1
 		end
 	end
-
-
+	
+	
 	sphereIndexVBO:Define(#VBOData)
 	sphereIndexVBO:Upload(VBOData)
 
@@ -1305,3 +1305,5 @@ function MakeTexRectVAO(minX,minY, maxX, maxY, minU, minV, maxU, maxV)
 	myGL4TexRectVAO:AttachVertexBuffer(rectVBO)
 	return myGL4TexRectVAO
 end
+
+return true
