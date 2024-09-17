@@ -176,4 +176,7 @@ local function ParseBoxes ()
 	return startBoxConfig
 end
 
-return ParseBoxes
+return ParseBoxes, { -- I hate this but some mod gadget might depend on it
+	ParseBoxes = ParseBoxes,
+	GetStartboxName = GetStartboxName,
+}
