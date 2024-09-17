@@ -19,11 +19,15 @@ copy it from infolog to the config
 dont forget to change TEAM to an actual number
 ]]
 
+local _, GadgetStartboxUtilities = VFS.Include ("LuaRules/Gadgets/Include/startbox_utilities.lua")
+
+local MAP_FILE        = (Game.mapName or "") .. ".lua"
 local MAP_WIDTH, MAP_HEIGHT = Game.mapSizeX, Game.mapSizeZ
 local LEEWAY = 20
 
 local polygon = { }
 local final_polygons = { }
+local polygonPreview = false
 
 function widget:MousePress(mx, my, button)
 	if (button ~= 1 and button ~= 3) then
@@ -48,7 +52,7 @@ function widget:MousePress(mx, my, button)
 	if pos[3] > MAP_HEIGHT - LEEWAY then
 		pos[3] = MAP_HEIGHT
 	end
-	
+
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if ctrl and #polygon > 0 then
 		eastWest = math.abs(polygon[#polygon][1] - pos[1])
@@ -102,8 +106,96 @@ end
 
 include("keysym.lua")
 
+local function HorFlip(pos)
+	return {MAP_WIDTH - pos[1], pos[2]}
+end
+
+local function VertFlip(pos)
+	return {pos[1], MAP_HEIGHT - pos[2]}
+end
+
+local function QuarterRotate(pos)
+	return {
+		(1 - pos[2]/MAP_HEIGHT) * MAP_WIDTH,
+		pos[1] * MAP_HEIGHT / MAP_WIDTH,
+	}
+end
+
+local function HalfRotate(pos)
+	return {
+		MAP_WIDTH - pos[1],
+		MAP_HEIGHT - pos[2],
+	}
+end
+
+local function MakeTeamBoxes(startIndex, endIndex, Transform)
+	local boxes = {}
+	local startpoints = {}
+	for i = startIndex, endIndex do
+		local box = {}
+		local left, right, top, bot = false, false, false, false
+		for j = 1, #final_polygons[i] do
+			local pos = final_polygons[i][j]
+			local boxPos = {pos[1], pos[3]}
+			if Transform then
+				boxPos = Transform(boxPos)
+			end
+			box[#box + 1] = boxPos
+			if not left or left < boxPos[1] then
+				left = boxPos[1]
+			end
+			if not right or right > boxPos[1] then
+				right = boxPos[1]
+			end
+			if not top or top < boxPos[2] then
+				top = boxPos[2]
+			end
+			if not bot or bot > boxPos[2] then
+				bot = boxPos[2]
+			end
+		end
+		boxes[#boxes + 1] = box
+		startpoints[#startpoints + 1] = {(left + right) / 2, (top + bot) / 2}
+		Spring.Echo("Box " .. i)
+	end
+	if #startpoints == 0 then
+		Spring.Echo("Too few polygons")
+		return false
+	end
+	
+	local nameLong, nameShort = GadgetStartboxUtilities.GetStartboxName(startpoints[1][1]/MAP_WIDTH, startpoints[1][2]/MAP_HEIGHT)
+	Spring.Echo("Name: " .. nameLong .. ", " .. nameShort)
+	local writeTable = {
+		nameLong = nameLong,
+		nameShort = nameShort,
+		startpoints = startpoints,
+		boxes = boxes,
+	}
+	return writeTable
+end
+
+local function SaveStartboxes()
+	local writeTable = {
+		MakeTeamBoxes(1, math.floor(#final_polygons / 2)),
+		MakeTeamBoxes(math.floor(#final_polygons / 2) + 1, #final_polygons),
+	}
+	WG.SaveTable(writeTable, "MapTools/StartBoxes/", MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
+	Spring.Echo("Startboxes saved to MapTools/StartBoxes/" .. MAP_FILE)
+end
+
+local function SaveStartboxesTransform()
+	local writeTable = {
+		MakeTeamBoxes(1, #final_polygons),
+	}
+	for i = 1, #currentTransforms do
+		writeTable[#writeTable + 1] = MakeTeamBoxes(1, #final_polygons, currentTransforms[i])
+	end
+	WG.SaveTable(writeTable, "MapTools/StartBoxes/", MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
+	Spring.Echo("Startboxes saved to MapTools/StartBoxes/" .. MAP_FILE)
+end
+
 function widget:KeyPress(key)
-	if (key == KEYSYMS.S) then
+	if (key == KEYSYMS.B) then
 		local str = "\t\n\t\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
 		for j = 1, #final_polygons do
 			str = str .. "\t\t\t{\n"
@@ -116,6 +208,44 @@ function widget:KeyPress(key)
 		end
 		str = str .. "\t\t},\n"
 		Spring.Echo(str)
+		return true
+	end
+	if (key == KEYSYMS.A) then
+		Spring.Echo("Save startboxes, splitting boxes between teams")
+		SaveStartboxes()
+		return true
+	end
+	if (key == KEYSYMS.S) then
+		Spring.Echo("Save startboxes, with transform")
+		if currentTransforms then
+			SaveStartboxesTransform()
+		else
+			Spring.Echo("Set a transform with R, T, Y or G first")
+		end
+		return true
+	end
+	if (key == KEYSYMS.R) then
+		Spring.Echo("Set half rotation transform")
+		currentTransforms = {HalfRotate}
+		return true
+	end
+	if (key == KEYSYMS.T) then
+		Spring.Echo("Set horizontal mirror transform")
+		currentTransforms = {HorFlip}
+		return true
+	end
+	if (key == KEYSYMS.Y) then
+		Spring.Echo("Set vertical mirror transform")
+		currentTransforms = {VertFlip}
+		return true
+	end
+	if (key == KEYSYMS.F) then
+		Spring.Echo("Set 4-way rotational transform")
+		currentTransforms = {
+			QuarterRotate,
+			HalfRotate,
+			function (pos) return QuarterRotate(HalfRotate(pos)) end,
+		}
 		return true
 	end
 	if (key == KEYSYMS.D) and (#final_polygons > 0) then
@@ -133,35 +263,56 @@ function widget:KeyPress(key)
 	end
 end
 
-local function DrawLine()
+local function DrawLine(Transform)
 	for i = 1, #polygon do
 		local x = polygon[i][1]
 		local z = polygon[i][3]
 		local y = Spring.GetGroundHeight(x, z)
+		if Transform then
+			pos = Transform({x, z})
+			x, z = pos[1], pos[2]
+		end
 		gl.Vertex(x,y,z)
 	end
 
 	local mx,my = Spring.GetMouseState()
 	local pos = select(2, Spring.TraceScreenRay(mx, my, true))
 	if pos then
+		if Transform then
+			pos = Transform({pos[1], pos[3]})
+			pos[3] = pos[2]
+			pos[2] = Spring.GetGroundHeight(pos[1], pos[3])
+		end
 		gl.Vertex(pos[1],pos[2],pos[3])
 	end
 end
 
-local function DrawFinalLine(fpi)
+local function DrawFinalLine(fpi, Transform)
 	local poly = final_polygons[fpi]
 	for i = 1, #poly do
 		local x = poly[i][1]
 		local z = poly[i][3]
+		if Transform then
+			pos = Transform({x, z})
+			x, z = pos[1], pos[2]
+		end
 		local y = Spring.GetGroundHeight(x, z)
 		gl.Vertex(x,y,z)
 	end
-
-	gl.Vertex(poly[1][1], poly[1][2], poly[1][3])
+	
+	local pos = poly[1]
+	if Transform then
+		pos = Transform({pos[1], pos[3]})
+		pos[3] = pos[2]
+		pos[2] = Spring.GetGroundHeight(pos[1], pos[3])
+	end
+	gl.Vertex(pos[1], pos[2], pos[3])
 end
 
 function widget:DrawWorld()
-	if (#final_polygons == 0 and #polygon == 0) then return end
+	if (#final_polygons == 0 and #polygon == 0) then
+		return
+	end
 	gl.LineWidth(3.0)
 	gl.Color(0, 1, 0, 0.5)
 	for i = 1, #final_polygons do
@@ -171,6 +322,20 @@ function widget:DrawWorld()
 	gl.BeginEnd(GL.LINE_STRIP, DrawLine)
 	gl.LineWidth(1.0)
 	gl.Color(1, 1, 1, 1)
+	
+	if currentTransforms then
+		for p = 1, #currentTransforms do
+			gl.LineWidth(3.0)
+			gl.Color(0, 0.5, 0.5, 0.5)
+			for i = 1, #final_polygons do
+				gl.BeginEnd(GL.LINE_STRIP, DrawFinalLine, i, currentTransforms[p])
+			end
+			gl.Color(0, 0.5, 0.5, 1)
+			gl.BeginEnd(GL.LINE_STRIP, DrawLine, currentTransforms[p])
+			gl.LineWidth(1.0)
+			gl.Color(1, 1, 1, 1)
+		end
+	end
 end
 
 function widget:Initialize()

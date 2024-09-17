@@ -468,8 +468,16 @@ local pathToolbox = 'Settings/Toolbox'
   - Right click to place a vertex then finish the polygon (start zones can have multiple polygons).
   - Press N finish the current polygon.
   - Press U to undo the last placed vertex
-  - Press S to print the current boxes to infolog.txt.
   - Press D to delete the most recently placed box.
+  
+  - Press R to set a two-team rotational transform
+  - Press T to set a two-team horizontal mirror transform
+  - Press Y to set a two-team vertical mirror transform
+  - Press F to set a four-team rotational transform
+  
+  - Press A to save a startbox file. The first half of the boxes are for team 1, the second half are for team 2.
+  - Press S to save a startbox file using the current transform.
+  - Press B to print the current boxes to infolog.txt like a barbarian.
   - Hold Ctrl to snap to cardinal directions.]])
 
 	
