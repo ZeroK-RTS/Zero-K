@@ -106,7 +106,9 @@ for i = 1, #UnitDefs do
 		else
 			turnPeriods[i] = 8
 		end
-		if (ud.moveDef.maxSlope or 0) > 0.8 and ud.speed < 60 then
+		if ud.speed == 0 then -- Structures with move commands
+			startMovingTime[i] = 10000000 -- Never cancel orders due to no progress
+		elseif (ud.moveDef.maxSlope or 0) > 0.8 and ud.speed < 60 then
 			-- Slow spiders need a lot of leeway when climing cliffs.
 			stuckTravelOverride[i] = 5
 			startMovingTime[i] = 18 -- May take longer to start moving
