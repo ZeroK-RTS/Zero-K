@@ -85,17 +85,16 @@ local function IsManualFireTargetValid()
 	return false
 end
 
---function script.Deactivate()
---	StopSpin(turbineTop, z_axis, 0.5);
---	StopSpin(turbineLeft, z_axis, 0.5);
---	StopSpin(turbineRight, z_axis, 0.5);
---end
+function script.Deactivate()
+end
 
---function script.Activate()
---	Spin(turbineTop, z_axis, 8,2);
---	Spin(turbineLeft, z_axis, 8,2);
---	Spin(turbineRight, z_axis, -8,2);
---end
+function script.Activate()
+	local px, py, pz = Spring.GetUnitPosition(unitID)
+	GG.PlayFogHiddenSound("sounds/misc/blowtorch.wav", 10, px, py, pz)
+	--Spin(turbineTop, y_axis, 8,2);
+	--Spin(turbineLeft, y_axis, 8,2);
+	--Spin(turbineRight, y_axis, -8,2);
+end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
