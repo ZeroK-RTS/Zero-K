@@ -478,7 +478,7 @@ local pathToolbox = 'Settings/Toolbox'
   - Press A to save a startbox file. The first half of the boxes are for team 1, the second half are for team 2.
   - Press S to save a startbox file using the current transform.
   - Press B to print the current boxes to infolog.txt like a barbarian.
-  - Hold Ctrl to snap to cardinal directions.]])
+  - Hold Ctrl to snap to cardinal directions.]], true)
 
 	
 	ShButton(pathToolbox, 'Toggle Economy Announcer', function() spSendCommands{"luaui togglewidget Economic Victory Announcer v2"} end, "Toggles a widget that tracks team economies and announces 'victory' in chat, for certain manually run tournament games.")
