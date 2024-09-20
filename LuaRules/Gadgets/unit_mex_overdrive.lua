@@ -849,7 +849,7 @@ local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacit
 			if stunned_or_inbuld then
 				orgMetal = 0
 			end
-			local incomeFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
+			local incomeFactor = spGetUnitRulesParam(unitID, "metalGenerationFactor") or 1
 			if incomeFactor then
 				orgMetal = orgMetal * incomeFactor
 			end
@@ -1054,10 +1054,16 @@ function gadget:GameFrame(n)
 							local currentlyActive = not stunned_or_inbuld
 							local metal, energy = 0, 0
 							if currentlyActive then
-								local incomeFactor = spGetUnitRulesParam(unitID,"resourceGenerationFactor") or 1
-								metal  = data.metalIncome*incomeFactor
-								energy = data.energyIncome*incomeFactor
-
+								if data.metalIncome > 0 then
+									metal = data.metalIncome*(spGetUnitRulesParam(unitID,"metalGenerationFactor") or 1)
+								else
+									metal = 0
+								end
+								if data.energyIncome > 0 then
+									energy = data.energyIncome*(spGetUnitRulesParam(unitID,"energyGenerationFactor") or 1)
+								else
+									energy = 0
+								end
 								allyTeamMiscMetalIncome = allyTeamMiscMetalIncome + metal
 								if data.sharedEnergyGenerator then
 									allyTeamSharedEnergyIncome = allyTeamSharedEnergyIncome + energy

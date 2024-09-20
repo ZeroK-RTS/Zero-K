@@ -203,7 +203,7 @@ local function getValueStats(teamID)
 	for _, unitID in pairs(Spring.GetTeamUnits(teamID)) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if unitDefID then
-			local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+			local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID) * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
 			local isbuilt = not select(3, Spring.GetUnitIsStunned(unitID))
 			if metal and isbuilt then
 				local cat = unitDefID and unitCategoryDefs[unitDefID]

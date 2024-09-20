@@ -1617,7 +1617,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				mm, mu, em, eu = GetUnitResources(unitID)
 				
 				if hp then
-					total_cost = total_cost + GetUnitCost(unitID, unitDefID)*build
+					total_cost = total_cost + GetUnitCost(unitID, unitDefID)*build * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
 					total_hp = total_hp + hp
 				end
 				
@@ -1688,7 +1688,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
 				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
 				total_maxShield = total_maxShield + (maxShield[unitDefID] or 0)
-				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID)
+				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID) * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
 				local burstData = UNIT_BURST_DAMAGES[unitDefID]
 				if burstData and burstClass then
 					if burstClass == 0 then
@@ -2200,7 +2200,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
 
-			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0)
+			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0) * ((unitID and Spring.GetUnitRulesParam(unitID, "costMult")) or 1)
 			local smallCostDisplay = unitCost
 			if smallCostDisplay >= 10000 then
 				smallCostDisplay = math.floor(smallCostDisplay / 1000) .. "k"

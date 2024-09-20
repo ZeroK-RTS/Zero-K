@@ -249,17 +249,19 @@ end
 -------------------------------------------------------------------------------------
 
 local function DrawFuncAtUnitIcon2(unitID, xshift, yshift)
+	local heightMult = Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1
 	local x,y,z = spGetUnitViewPosition(unitID)
 	glPushMatrix()
 		glTranslate(x,y,z)
-		glTranslate(0,yshift,0)
+		glTranslate(0,yshift*heightMult,0)
 		glBillboard()
 		glTexRect(xshift -iconsize*0.5, -5, xshift + iconsize*0.5, iconsize-5)
 	glPopMatrix()
 end
 
 local function DrawUnitFunc(xshift, yshift)
-	glTranslate(0,yshift,0)
+	local heightMult = Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1
+	glTranslate(0,yshift*heightMult,0)
 	glBillboard()
 	glTexRect(xshift - iconsize*0.5, -9, xshift + iconsize*0.5, iconsize-9)
 end

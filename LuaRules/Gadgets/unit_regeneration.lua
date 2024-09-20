@@ -35,7 +35,7 @@ function gadget:GameFrame(frame)
 			local unitID = unitList[i]
 			local data = units[unitID]
 			if (data.idleFrame < frame) and (not spGetUnitIsStunned(unitID)) and (spGetUnitRulesParam(unitID, "disarmed") ~= 1) then
-				local regenRate = 1- (spGetUnitRulesParam(unitID, "slowState") or 0)
+				local regenRate = GG.att_RegenChange[unitID] or 1
 				local amount = data.rate * regenRate
 				local health = spGetUnitHealth(unitID)
 				if health then

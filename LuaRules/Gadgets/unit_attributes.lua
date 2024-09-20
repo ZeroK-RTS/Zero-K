@@ -62,6 +62,7 @@ GG.att_turnMult   = GG.att_turnMult   or {}
 GG.att_accelMult  = GG.att_accelMult  or {}
 GG.att_reloadMult = GG.att_reloadMult or {}
 GG.att_econMult   = GG.att_econMult   or {}
+GG.att_energyMult = GG.att_energyMult or {}
 GG.att_buildMult  = GG.att_buildMult  or {}
 GG.att_weaponMods = GG.att_weaponMods or {}
 
@@ -150,8 +151,9 @@ end
 --------------------------------------------------------------------------------
 -- Economy Handling
 
-local function UpdateEconomy(unitID, unitDefID, factor)
-	spSetUnitRulesParam(unitID,"resourceGenerationFactor", factor, INLOS_ACCESS)
+local function UpdateEconomy(unitID, unitDefID, factor, energyFactor)
+	spSetUnitRulesParam(unitID,"metalGenerationFactor", factor, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID,"energyGenerationFactor", factor*energyFactor, INLOS_ACCESS)
 end
 
 --------------------------------------------------------------------------------
@@ -365,6 +367,8 @@ end
 GG.att_EconomyChange = {}
 GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
+GG.att_RegenChange = {}
+GG.att_ShieldRegenChange = {}
 
 local currentEcon = {}
 local currentBuildpower = {}
@@ -428,6 +432,7 @@ function UpdateUnitAttributes(unitID, frame)
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
 	local selfTurnSpeedChange = spGetUnitRulesParam(unitID, "selfTurnSpeedChange")
 	local selfIncomeChange = (spGetUnitRulesParam(unitID, "selfIncomeChange") or 1) * (GG.unit_handicap[unitID] or 1)
+	local selfEnergyIncChange = 1
 	local selfMaxAccelerationChange = spGetUnitRulesParam(unitID, "selfMaxAccelerationChange") --only exist in airplane??
 	
 	-- SLOW --
@@ -450,71 +455,67 @@ function UpdateUnitAttributes(unitID, frame)
 		
 		selfReloadSpeedChange = (selfReloadSpeedChange or 1)*GG.att_reloadMult[unitID]
 		selfIncomeChange = (selfIncomeChange or 1)*GG.att_econMult[unitID]
+		selfEnergyIncChange = GG.att_energyMult[unitID]
 		buildpowerMult = (buildpowerMult or 1)*GG.att_buildMult[unitID]/GG.att_econMult[unitID]
 		
 		weaponMods = GG.att_weaponMods[unitID]
 	end
 	
-	if weaponMods or fullDisable or selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
-			selfTurnSpeedChange or selfIncomeChange or disarmed or completeDisable or selfMaxAccelerationChange or teleportSpeedMult then
-		
-		local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
-		
-		local econMult   = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)
-		local buildMult  = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
-		local moveMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(1 - completeDisable)*(upgradesSpeedMult or 1)*(teleportSpeedMult or 1)
-		local turnMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - completeDisable)*(teleportSpeedMult or 1)
-		local reloadMult = (baseSpeedMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - completeDisable)
-		local maxAccMult = (baseSpeedMult)*(selfMaxAccelerationChange or 1)*(upgradesSpeedMult or 1)*(teleportSpeedMult or 1)
+	local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
+	local econMult   = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)
+	local buildMult  = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
+	local moveMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(1 - completeDisable)*(upgradesSpeedMult or 1)*(teleportSpeedMult or 1)
+	local turnMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - completeDisable)*(teleportSpeedMult or 1)
+	local reloadMult = (baseSpeedMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - completeDisable)
+	local maxAccMult = (baseSpeedMult)*(selfMaxAccelerationChange or 1)*(upgradesSpeedMult or 1)*(teleportSpeedMult or 1)
 
-		if fullDisable then
-			buildMult = 0
-			moveMult = 0
-			turnMult = 0
-			reloadMult = 0
-			maxAccMult = 0
-		end
-		
-		-- Let other gadgets and widgets get the total effect without
-		-- duplicating the pevious calculations.
-		spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0
-		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
-		spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
-		spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
-		spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
-		
-		-- GG is faster (but gadget-only). The totals are for gadgets, so should be migrated to GG eventually.
-		GG.att_EconomyChange[unitID] = econMult
-		GG.att_ReloadChange[unitID] = reloadMult
-		GG.att_MoveChange[unitID] = moveMult
-		
-		unitSlowed[unitID] = moveMult < 1
-		if weaponMods or reloadMult ~= currentReload[unitID] then
-			UpdateReloadSpeed(unitID, unitDefID, weaponMods, reloadMult, frame)
-			currentReload[unitID] = reloadMult
-		end
-		
-		if currentMovement[unitID] ~= moveMult or currentTurn[unitID] ~= turnMult or currentAcc[unitID] ~= maxAccMult then
-			UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, maxAccMult*moveMult)
-			currentMovement[unitID] = moveMult
-			currentTurn[unitID] = turnMult
-			currentAcc[unitID] = maxAccMult
-		end
-		
-		if buildMult ~= currentBuildpower[unitID] then
-			UpdateBuildSpeed(unitID, unitDefID, buildMult)
-			currentBuildpower[unitID] = buildMult
-		end
-		
-		if econMult ~= currentEcon[unitID] then
-			UpdateEconomy(unitID, unitDefID, econMult)
-			currentEcon[unitID] = econMult
-		end
-		if econMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 or turnMult ~= 1 or maxAccMult ~= 1 then
-			changedAtt = true
-		end
-	else
-		unitSlowed[unitID] = nil
+	if fullDisable then
+		buildMult = 0
+		moveMult = 0
+		turnMult = 0
+		reloadMult = 0
+		maxAccMult = 0
+	end
+	
+	-- Let other gadgets and widgets get the total effect without
+	-- duplicating the pevious calculations.
+	spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0
+	spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
+	
+	-- GG is faster (but gadget-only). The totals are for gadgets, so should be migrated to GG eventually.
+	GG.att_EconomyChange[unitID] = econMult
+	GG.att_ReloadChange[unitID] = reloadMult
+	GG.att_MoveChange[unitID] = moveMult
+	GG.att_RegenChange[unitID] = (1 - (slowState or 0))
+	GG.att_ShieldRegenChange[unitID] = reloadMult
+	
+	unitSlowed[unitID] = moveMult < 1
+	if weaponMods or reloadMult ~= currentReload[unitID] then
+		UpdateReloadSpeed(unitID, unitDefID, weaponMods, reloadMult, frame)
+		currentReload[unitID] = reloadMult
+	end
+	
+	if currentMovement[unitID] ~= moveMult or currentTurn[unitID] ~= turnMult or currentAcc[unitID] ~= maxAccMult then
+		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, maxAccMult*moveMult)
+		currentMovement[unitID] = moveMult
+		currentTurn[unitID] = turnMult
+		currentAcc[unitID] = maxAccMult
+	end
+	
+	if buildMult ~= currentBuildpower[unitID] then
+		UpdateBuildSpeed(unitID, unitDefID, buildMult)
+		currentBuildpower[unitID] = buildMult
+	end
+	
+	if econMult ~= currentEcon[unitID] then
+		UpdateEconomy(unitID, unitDefID, econMult, selfEnergyIncChange)
+		currentEcon[unitID] = econMult
+	end
+	if econMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 or turnMult ~= 1 or maxAccMult ~= 1 then
+		changedAtt = true
 	end
 	
 	local forcedOff = spGetUnitRulesParam(unitID, "forcedOff")

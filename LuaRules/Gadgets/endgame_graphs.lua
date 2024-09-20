@@ -95,7 +95,7 @@ local function DamageToCostDamage(unitID, damage, unitDefID, unitTeam)
 	if (hp < 0) then
 		damage = damage + hp
 	end
-	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
+	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
 	return costdamage
 end
 
@@ -142,7 +142,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		return
 	end
 
-	local cost = GetUnitCost(unitID, unitDefID)
+	local cost = GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
 	nanoframeCount = nanoframeCount + 1
 	nanoframeTeams[nanoframeCount] = teamID
 	nanoframeCosts[nanoframeCount] = cost
@@ -185,7 +185,7 @@ function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
 		return
 	end
 
-	local cost = GetUnitCost(unitID, unitDefID)
+	local cost = GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
 
 	nanoframeCount = nanoframeCount + 1
 	nanoframeTeams[nanoframeCount] = teamID
@@ -266,7 +266,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		totalNanoValueByTeam[oldTeam] = totalNanoValueByTeam[oldTeam] - cost
 		totalNanoValueByTeam[newTeam] = totalNanoValueByTeam[newTeam] + cost
 	else
-		local cost = GetUnitCost(unitID, unitDefID)
+		local cost = GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
 		unitValueByTeam[oldTeam] = unitValueByTeam[oldTeam] - cost
 		unitValueByTeam[newTeam] = unitValueByTeam[newTeam] + cost
 		
