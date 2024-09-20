@@ -327,15 +327,14 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 			rank = WG.GlobalBuildCommand.SelectionOverrideRank
 		end
 
-		local guardRankOverrideRank = options.guardRankOverrideOption.value
-		if rank > guardRankOverrideRank then
-			local cmdID = Spring.GetUnitCurrentCommand(unitID)
-			if isGuardCommand[cmdID] then
-				rank = guardRankOverrideRank
-			end
-		end
-
 		if rank then
+			local guardRankOverrideRank = options.guardRankOverrideOption.value
+			if rank > guardRankOverrideRank then
+				local cmdID = Spring.GetUnitCurrentCommand(unitID)
+				if isGuardCommand[cmdID] then
+					rank = guardRankOverrideRank
+				end
+			end
 			if (alt and rank > altFilterHighRank) then
 				rank = -1
 			end
