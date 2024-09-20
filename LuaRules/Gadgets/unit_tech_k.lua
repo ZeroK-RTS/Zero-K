@@ -30,7 +30,7 @@ local INLOS_ACCESS = {inlos = true}
 
 local function SetUnitTechLevel(unitID, level)
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	Spring.Utilities.UnitEcho(unitID, level)
+	--Spring.Utilities.UnitEcho(unitID, level)
 	
 	local sizeScale = math.pow(1.6, math.pow(level, 0.4) - 1)
 	local projectiles = math.pow(2, level - 1)
@@ -39,7 +39,7 @@ local function SetUnitTechLevel(unitID, level)
 	
 	local redTint = math.pow(0.82, level - 1)
 	local otherTint = math.pow(0.7, level - 1)
-	local costAndEcon = math.pow(2, level - 1)
+	local simpleDoubling = math.pow(2, level - 1)
 	local energy = math.pow(1.5, level - 1) -- Multiplier for energy on top of the base econ multiplier
 	local healthMult = math.pow(2, level - 1)
 	
@@ -47,10 +47,12 @@ local function SetUnitTechLevel(unitID, level)
 		projectiles = projectiles,
 		speed = speed,
 		range = range,
-		cost = costAndEcon,
-		econ = costAndEcon,
+		cost = simpleDoubling,
+		econ = simpleDoubling,
 		energy = energy,
-		build = costAndEcon,
+		shieldRegen = simpleDoubling,
+		healthRegen = simpleDoubling,
+		build = simpleDoubling,
 		healthMult = healthMult,
 		projSpeed = math.sqrt(range), -- Maintains Cannon range.
 		minSprayAngle = (math.pow(level, 0.25) - 1) * 0.04
@@ -89,9 +91,17 @@ local function AddExplosions(unitID, unitDefID, teamID, level)
 end
 
 local function AddFeature(unitID, unitDefID, teamID, level)
+	local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
+	if inBuild then
+		return
+	end
 	local extraFeatures = math.pow(2, level - 1) - 1
 	if not deathCloneDefID[unitDefID] then
-		deathCloneDefID[unitDefID] = FeatureDefNames[UnitDefs[unitDefID].wreckName].id
+		local wreckName = UnitDefs[unitDefID].wreckName
+		deathCloneDefID[unitDefID] = (wreckName and FeatureDefNames[wreckName] and FeatureDefNames[wreckName].id) or -1
+	end
+	if deathCloneDefID[unitDefID] == -1 then
+		return
 	end
 	local _, _, _, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID, true)
@@ -112,6 +122,10 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	if GG.wasMorphedTo[unitID] then
+		-- TODO, set level of new unit
+		return
+	end
 	local level = Spring.GetUnitRulesParam(unitID, "tech_level") or 1
 	if level <= 1 then
 		return
