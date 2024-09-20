@@ -60,7 +60,11 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 	local hp, maxHP = spGetUnitHealth(unitID)
 
-	spSetUnitExperience(attackerID, spGetUnitExperience(attackerID) + ((((hp > 0) and damage or (damage + hp)) / maxHP) * getCost(unitID, unitDefID) / getCost(attackerID, attackerDefID)))
+	spSetUnitExperience(attackerID,
+		spGetUnitExperience(attackerID) + (
+			(((hp > 0) and damage or (damage + hp)) / maxHP) * getCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
+			/ (getCost(attackerID, attackerDefID)  * (GG.att_CostMult[attackerID] or 1))
+		))
 end
 
 function gadget:Initialize()

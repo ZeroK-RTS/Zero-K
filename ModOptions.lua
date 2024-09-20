@@ -226,6 +226,14 @@ local options = {
     def         = false,
   },
   {
+    key         = "techk",
+    name        = "Tech-K",
+    desc        = "Adds a tech level system",
+    type        = "bool",
+    section     = "experimental",
+    def         = false,
+  },
+  {
     key         = "disableresurrect",
     name        = "Disable resurrect",
     desc        = "Removes resurrect abilities from the game",

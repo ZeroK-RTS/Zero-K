@@ -52,6 +52,10 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local DO_CHANGES_EXTERNALLY = true
 local HALF_FRAME = 1 / (2 * Game.gameSpeed)
 
+local function GetMass(health, cost)
+	return (((cost/2) + (health/8))^0.6)*6.5
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Sensor Handling
@@ -135,6 +139,45 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Cost Handling
+
+local function UpdateCost(unitID, unitDefID, costMult)
+	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)*costMult
+	Spring.SetUnitCosts(unitID, {
+		metal = cost,
+		energy = cost,
+		buildTime = cost,
+	})
+	GG.att_CostMult[unitID] = costMult
+	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
+	
+	local _, maxHealth = Spring.GetUnitHealth(unitID)
+	Spring.SetUnitMass(unitID, GetMass(maxHealth, cost))
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Health Handling
+
+local origUnitHealth = {}
+
+local function UpdateHealth(unitID, unitDefID, healthAdd, healthMult)
+	if not origUnitHealth[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		origUnitHealth[unitDefID] = ud.health
+	end
+	local newMaxHealth = (origUnitHealth[unitDefID] + healthAdd) * healthMult
+	local oldHealth, oldMaxHealth = Spring.GetUnitHealth(unitID)
+	Spring.SetUnitMaxHealth(unitID, newMaxHealth)
+	Spring.SetUnitHealth(unitID, oldHealth * newMaxHealth / oldMaxHealth)
+	
+	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)*(GG.att_CostMult[unitID] or 1)
+	Spring.SetUnitMass(unitID, GetMass(newMaxHealth, cost))
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Reload Time Handling
 
 local origUnitWeapons = {}
@@ -159,7 +202,7 @@ local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, gameFrame)
+local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, projSpeedFactor, projectilesFactor, minSpray, gameFrame)
 	if not origUnitWeapons[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 	
@@ -176,8 +219,11 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 			state.weapon[i] = {
 				reload = reload,
 				burstRate = wd.salvoDelay,
+				projectiles = wd.projectiles,
 				oldReloadFrames = floor(reload*Game.gameSpeed),
 				range = wd.range,
+				sprayAngle = wd.sprayAngle,
+				projectileSpeed = wd.projectilespeed,
 			}
 			if wd.type == "BeamLaser" then
 				state.weapon[i].burstRate = false -- beamlasers go screwy if you mess with their burst length
@@ -223,7 +269,14 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 			end
 		end
 		local moddedRange = w.range*((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
+		local moddedSpeed = w.projectileSpeed*((weaponMods and weaponMods[i] and weaponMods[i].projSpeedMult) or 1)*projSpeedFactor
+		local moddedProjectiles = w.projectiles*((weaponMods and weaponMods[i] and weaponMods[i].projectilesMult) or 1)*projectilesFactor
 		
+		local sprayAngle = math.max(w.sprayAngle, minSpray)
+		spSetUnitWeaponState(unitID, i, "sprayAngle", sprayAngle)
+		
+		spSetUnitWeaponState(unitID, i, "projectiles", moddedProjectiles)
+		spSetUnitWeaponState(unitID, i, "projectileSpeed", moddedSpeed)
 		spSetUnitWeaponState(unitID, i, "range", moddedRange)
 		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
 		if maxRangeModified < moddedRange then
@@ -335,7 +388,7 @@ end
 --------------------------------------------------------------------------------
 -- Handle by a different gadget
 
-local function ApplyExternalChanges(unitID, weaponMods, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
+local function ApplyExternalChanges(unitID, weaponMods, moveMult, turnMult, accelMult, reloadMult, econMult, energyMult, buildMult)
 	GG.att_genericUsed = true
 
 	GG.att_moveMult[unitID]   = moveMult
@@ -343,6 +396,7 @@ local function ApplyExternalChanges(unitID, weaponMods, moveMult, turnMult, acce
 	GG.att_accelMult[unitID]  = accelMult
 	GG.att_reloadMult[unitID] = reloadMult
 	GG.att_econMult[unitID]   = econMult
+	GG.att_energyMult[unitID] = energyMult
 	GG.att_buildMult[unitID]  = buildMult
 
 	GG.att_weaponMods[unitID] = weaponMods
@@ -354,24 +408,42 @@ end
 --------------------------------------------------------------------------------
 -- Attribute Updating
 
+-- For other gadgets to read
+GG.att_CostMult = {}
+
+-- Internal tracking to avoid unnecessary updates
+local currentHealthAdd = {}
+local currentHealthMult = {}
 local currentMove = {}
 local currentTurn = {}
 local currentAccel = {}
 local currentReload = {}
 local currentRange = {}
+local currentProjSpeed = {}
 local currentEcon = {}
+local currentEnergy = {}
+local currentCost = {}
 local currentSense = {}
+local currentProjectiles = {}
+local currentMinSpray = {}
 
 local function RemoveUnit(unitID)
 	unitReloadPaused[unitID] = nil -- defined earlier
 	
+	currentHealthAdd[unitID] = nil
+	currentHealthMult[unitID] = nil
 	currentMove[unitID] = nil
 	currentTurn[unitID] = nil
 	currentAccel[unitID] = nil
 	currentReload[unitID] = nil
 	currentRange[unitID] = nil
+	currentProjSpeed[unitID] = nil
 	currentEcon[unitID] = nil
+	currentEnergy[unitID] = nil
+	currentCost[unitID] = nil
 	currentSense[unitID] = nil
+	currentProjectiles[unitID] = nil
+	currentMinSpray[unitID] = nil
 end
 
 local function UpdateUnitAttributes(unitID, attList)
@@ -386,37 +458,78 @@ local function UpdateUnitAttributes(unitID, attList)
 	
 	local frame = spGetGameFrame()
 	
+	local healthAdd = 0
+	local healthMult = 1
 	local moveMult = 1
 	local turnMult = 1
 	local accelMult = 1
 	local reloadMult = 1
 	local rangeMult = 1
+	local projSpeedMult = 1
 	local econMult = 1
+	local energyMult = 1
+	local costMult = 1
 	local buildMult = 1
 	local senseMult = 1
+	local projectilesMult = 1
+	local minSpray = 0
 	local weaponSpecificMods = false
 	
 	for _, data in IterableMap.Iterator(attList) do
+		healthAdd = healthAdd + (data.healthAdd or 0)
+		healthMult = healthMult*(data.healthMult or 1)
 		moveMult = moveMult*(data.move or 1)
 		turnMult = turnMult*(data.turn or 1)
 		accelMult = accelMult*(data.accel or 1)
 		econMult = econMult*(data.econ or 1)
+		energyMult = energyMult*(data.energy or 1)
+		costMult = costMult*(data.cost or 1)
 		buildMult = buildMult*(data.build or 1)
 		senseMult = senseMult*(data.sense or 1)
+		minSpray = math.max(minSpray, data.minSpray or 0)
 		
 		if data.weaponNum then
 			weaponSpecificMods = weaponSpecificMods or {}
 			weaponSpecificMods[data.weaponNum] = weaponSpecificMods[data.weaponNum] or {
 				reloadMult = 1,
 				rangeMult = 1,
+				projSpeedMult = 1,
+				projectilesMult = 1,
 			}
 			local wepData = weaponSpecificMods[data.weaponNum]
 			wepData.reloadMult = wepData.reloadMult*(data.reload or 1)
 			wepData.rangeMult = wepData.rangeMult*(data.range or 1)
+			wepData.projSpeedMult = wepData.projSpeedMult*(data.projSpeed or 1)
+			wepData.projectilesMult = wepData.projectilesMult*(data.projectiles or 1)
 		else
 			reloadMult = reloadMult*(data.reload or 1)
 			rangeMult = rangeMult*(data.range or 1)
+			projSpeedMult = projSpeedMult*(data.projSpeed or 1)
+			projectilesMult = projectilesMult*(data.projectiles or 1)
 		end
+	end
+	
+	local healthChanges = (currentHealthAdd[unitID] or 0) ~= healthAdd
+		or (currentHealthMult[unitID] or 1) ~= healthMult
+	
+	local weaponChanges = (currentReload[unitID] or 1) ~= reloadMult
+		or (currentRange[unitID] or 1) ~= rangeMult
+		or (currentProjectiles[unitID] or 1) ~= projectilesMult
+		or (currentMinSpray[unitID] or 0) ~= minSpray
+	
+	local moveChanges = (currentMove[unitID] or 1) ~= moveMult
+		or (currentTurn[unitID] or 1) ~= turnMult
+		or (currentAccel[unitID] or 1) ~= accelMult
+	
+	if healthChanges then
+		UpdateHealth(unitID, unitDefID, healthAdd, healthMult)
+		currentHealthAdd[unitID] = healthAdd
+		currentHealthMult[unitID] = healthMult
+	end
+	
+	if (currentCost[unitID] or 1) ~= costMult then
+		UpdateCost(unitID, unitDefID, costMult)
+		currentCost[unitID] = costMult
 	end
 	
 	if DO_CHANGES_EXTERNALLY then
@@ -424,31 +537,33 @@ local function UpdateUnitAttributes(unitID, attList)
 			UpdateSensorAndJamm(unitID, unitDefID, senseMult)
 			currentSense[unitID] = senseMult
 		end
-		if weaponSpecificMods or (currentRange[unitID] or 1) ~= rangeMult then
-			UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, frame)
+		if weaponSpecificMods or weaponChanges then
+			UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, projSpeedMult, projectilesMult, minSpray, frame)
+			currentReload[unitID] = reloadMult
 			currentRange[unitID] = rangeMult
+			currentProjSpeed[unitID] = projSpeedMult
+			currentProjectiles[unitID] = projectilesMult
+			currentMinSpray[unitID] = minSpray
 		end
 		
-		ApplyExternalChanges(unitID, weaponSpecificMods, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
+		ApplyExternalChanges(unitID, weaponSpecificMods, moveMult, turnMult, accelMult, reloadMult, econMult, energyMult, buildMult)
 		return
 	end
 	
-	if (currentMove[unitID] or 1) ~= moveMult or (currentTurn[unitID] or 1) ~= turnMult or (currentAccel[unitID] or 1) ~= accelMult then
+	if moveChanges then
 		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult)
 		currentMove[unitID] = moveMult
 		currentTurn[unitID] = turnMult
 		currentAccel[unitID] = accelMult
 	end
 	
-	if weaponSpecificMods or (currentReload[unitID] or 1) ~= reloadMult or (currentRange[unitID] or 1) ~= rangeMult then
-		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, frame)
+	if weaponSpecificMods or weaponChanges then
+		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, projSpeedMult, projectilesMult, minSpray, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
-	end
-	
-	if (currentEcon[unitID] or 1) ~= econMult then
-		UpdateEconRate(unitID, unitDefID, econMult)
-		currentEcon[unitID] = econMult
+		currentProjSpeed[unitID] = projSpeedMult
+		currentProjectiles[unitID] = projectilesMult
+		currentMinSpray[unitID] = minSpray
 	end
 	
 	if (currentSense[unitID] or 1) ~= senseMult then
@@ -475,15 +590,22 @@ function Attributes.AddEffect(unitID, key, effect)
 	end
 	local data = IterableMap.Get(attributeUnits[unitID], key) or {}
 	
+	data.healthAdd = effect.healthAdd
+	data.healthMult = effect.healthMult
 	data.move = effect.move
 	data.turn = effect.turn or effect.move
 	data.accel = effect.accel or effect.move
 	data.reload = effect.reload
 	data.range = effect.range
+	data.projSpeed = effect.projSpeed
 	data.econ = effect.econ
+	data.energy = effect.energy
+	data.cost = effect.cost
 	data.build = effect.build
 	data.sense = effect.sense
+	data.projectiles = effect.projectiles
 	data.weaponNum = effect.weaponNum
+	data.minSpray = effect.minSprayAngle
 	
 	IterableMap.Add(attributeUnits[unitID], key, data) -- Overwrites existing key if it exists
 	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then

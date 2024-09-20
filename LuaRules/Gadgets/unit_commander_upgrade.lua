@@ -159,9 +159,8 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
 		local newHealth = math.max(health + data.healthBonus, 1)
-		local newMaxHealth = math.max(maxHealth + data.healthBonus, 1)
-		Spring.SetUnitHealth(unitID, newHealth)
-		Spring.SetUnitMaxHealth(unitID, newMaxHealth)
+		GG.Attributes.AddEffect(unitID, "tidal_health", {healthAdd = data.healthBonus})
+		Spring.SetUnitHealth(unitID, newHealth) -- Override scaled health change from GG.Attributes
 	end
 	
 	if data.skinOverride then

@@ -70,7 +70,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	if damagedUnits[unitID] then
 		damagedUnits[unitID].frames = REPAIR_PENALTY_TIME
 	else
-		local bt = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+		local bt = Spring.Utilities.GetUnitCost(unitID, unitDefID)*(GG.att_CostMult[unitID] or 1)
 		damagedUnits[unitID] = {
 			bt = bt,
 			frames = REPAIR_PENALTY_TIME,

@@ -333,8 +333,9 @@ local function DrawEtaText(unitID, timeLeft,yoffset, negative)
 	local x, y, z = spGetUnitViewPosition(unitID)
 	
 	if x and y and z then
+		local heightMult = Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1
 		gl.PushMatrix()
-			gl.Translate(x, y + yoffset, z)
+			gl.Translate(x, y + yoffset*heightMult, z)
 			gl.Billboard()
 			gl.Translate(0, 5 ,0)
 			gl.Text(etaStr, 0, 0, fontSize, "co")

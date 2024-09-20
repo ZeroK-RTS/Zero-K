@@ -101,7 +101,7 @@ local function IsShieldEnabled(unitID)
 end
 
 local function GetChargeRate(unitID)
-	return (GG.att_ReloadChange[unitID] or 1)
+	return (GG.att_ShieldRegenChange[unitID] or 1)
 end
 
 function gadget:GameFrame(n)

@@ -425,7 +425,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		or (attackerTeam == gaiaTeamID)
 		then return end
 
-	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
+	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
 
 	if not spAreTeamsAllied(attackerTeam, unitTeam) then
 		if paralyzer then

@@ -39,6 +39,8 @@ local completeGrowUnit = {}
 local offsets = {}
 local modelRadii = {}
 local noGrowUnitDefs = {}
+local unitScales = {}
+local origColvolCache = {}
 
 local postCompleteGrowDefs = {}
 for i = 1, #UnitDefs do
@@ -123,44 +125,66 @@ local function UpdateUnitGrow(unitID, data, growScale)
 		data.aim[1], data.aim[2] - growScale*data.aimOff, data.aim[3], true)
 end
 
-function gadget:UnitCreated(unitID, unitDefID, teamID)
+local function UpdateUnitCollisionData(unitID, unitDefID, scales)
+	if unitScales[unitID] and not scales then
+		scales = unitScales[unitID]
+	end
 	local ud = UnitDefs[unitDefID]
 	local midTable = ud.model
 	local mid, aim
 	
 	if offsets[unitDefID] and ud then
-		mid = offsets[unitDefID].mid
-		aim = offsets[unitDefID].aim
+		mid = Spring.Utilities.CopyTable(offsets[unitDefID].mid)
+		aim = Spring.Utilities.CopyTable(offsets[unitDefID].aim)
 		mid[2] = Spring.GetUnitRulesParam(unitID, "midpos_override") or mid[2]
 		aim[2] = Spring.GetUnitRulesParam(unitID, "aimpos_override") or aim[2]
-		
-		spSetUnitMidAndAimPos(unitID,
-			mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz,
-			aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz, true)
 	else
 		mid = {0, Spring.GetUnitRulesParam(unitID, "midpos_override") or 0, 0}
 		aim = {0, Spring.GetUnitRulesParam(unitID, "aimpos_override") or 0, 0}
 	end
 	
+	mid[1], mid[2], mid[3] = mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz
+	aim[1], aim[2], aim[3] = aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz
+	if scales then
+		mid[1], mid[2], mid[3] = mid[1]*scales[1], mid[2]*scales[2], mid[3]*scales[3]
+		aim[1], aim[2], aim[3] = aim[1]*scales[1], aim[2]*scales[2], aim[3]*scales[3]
+	end
+	spSetUnitMidAndAimPos(unitID,
+		mid[1], mid[2], mid[3],
+		aim[1], aim[2], aim[3], true)
+		
 	if modelRadii[unitDefID] then
 		local mr = GetModelRadii(unitDefID)
 		spSetUnitRadiusAndHeight(unitID, mr.radius, mr.height)
 	end
 	
-	if noGrowUnitDefs[unitDefID] then
+	if noGrowUnitDefs[unitDefID] and not scales then
 		return
 	end
 	
 	local buildProgress = select(5, spGetUnitHealth(unitID))
-	if buildProgress > FULL_GROW and not postCompleteGrowDefs[unitDefID] then
+	if buildProgress > FULL_GROW and not postCompleteGrowDefs[unitDefID] and not scales then
 		return
 	end
 	
 	-- Sertup growth scale
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
+	if not origColvolCache[unitDefID] then
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
+			volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
+		origColvolCache[unitDefID] = {
+			scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
+			volumeType, testType, primaryAxis
+		}
+	end
+	local cache = origColvolCache[unitDefID]
 	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
-		volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
-
+			volumeType, testType, primaryAxis = cache[1], cache[2], cache[3], cache[4], cache[5], cache[6], cache[7], cache[8], cache[9]
+	
+	if scales then
+		scaleX, scaleY, scaleZ = scaleX*scales[1], scaleY*scales[2], scaleZ*scales[3]
+		offsetX, offsetY, offsetZ = offsetX*scales[1], offsetY*scales[2], offsetZ*scales[3]
+	end
 	-- Some units can be deeper than usual via waterline.
 	-- Poke above the surface instead of their "base" level
 	-- since it blocks lots of weaponry
@@ -184,10 +208,13 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local scaleOff = scaleY - volumeBelow - ((isSphere and 8) or 2)
 	
 	local growScale = min(1, buildProgress/FULL_GROW)
+	if noGrowUnitDefs[unitDefID] then
+		growScale = 1
+	end
 	
 	growUnit[unitID] = {
-		mid = {mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz},
-		aim = {aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz},
+		mid = mid,
+		aim = aim,
 		aimOff = aimOff,
 		scaleOff = scaleOff,
 		scale = {scaleX, scaleY, scaleZ},
@@ -211,6 +238,10 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	UpdateUnitGrow(unitID, growUnit[unitID], growScale)
 end
 
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	UpdateUnitCollisionData(unitID, unitDefID)
+end
+
 local function OverrideMidAndAimPos(unitID, mid, aim)
 	if not spValidUnitID(unitID) then
 		return
@@ -220,8 +251,8 @@ local function OverrideMidAndAimPos(unitID, mid, aim)
 	if growUnit[unitID] then
 		return
 	end
-	
-	spSetUnitMidAndAimPos(unitID, mid[1], mid[2], mid[3], aim[1], aim[2], aim[3], true)
+	local sx, sy, sz = GG.GetColvolScales(unitID)
+	spSetUnitMidAndAimPos(unitID, sx*mid[1], sy*mid[2], sz*mid[3], sx*aim[1], sy*aim[2], sz*aim[3], true)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
@@ -238,6 +269,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if completeGrowUnit[unitID] then
 		growUnit[unitID] = nil
 	end
+	unitScales[unitID] = nil
 end
 
 function gadget:GameFrame(f)
@@ -280,8 +312,23 @@ local function OffsetColVol(unitID, offset)
 	end
 end
 
+local function SetColvolScales(unitID, scales)
+	-- Wants a list of three values
+	unitScales[unitID] = scales
+	UpdateUnitCollisionData(unitID, Spring.GetUnitDefID(unitID), scales)
+end
+
+local function GetColvolScales(unitID)
+	if unitScales[unitID] then
+		return unitScales[unitID][1], unitScales[unitID][2], unitScales[unitID][3]
+	end
+	return 1, 1, 1
+end
+
 function gadget:Initialize()
 	GG.OverrideMidAndAimPos = OverrideMidAndAimPos
+	GG.SetColvolScales = SetColvolScales
+	GG.GetColvolScales = GetColvolScales
 	GG.OffsetColVol = OffsetColVol
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

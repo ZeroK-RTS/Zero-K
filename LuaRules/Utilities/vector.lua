@@ -247,7 +247,7 @@ local function RandomPointInCircle(radius, startAngle, endAngle)
 	
 	local r = math.random()
 	local angle = startAngle + math.random()*(endAngle - startAngle)
-	return PolarToCart(radius*math.sqrt(r), angle)
+	return PolarToCart(radius*math.sqrt(r), angle), r
 end
 
 local function DrawLine(p1, p2)
