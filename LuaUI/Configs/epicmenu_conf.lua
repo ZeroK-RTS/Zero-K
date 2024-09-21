@@ -474,6 +474,8 @@ local pathToolbox = 'Settings/Toolbox'
   - Press T to set a two-team horizontal mirror transform
   - Press Y to set a two-team vertical mirror transform
   - Press F to set a four-team rotational transform
+  - Press I to set a two-team main diagonal mirror transform
+  - Press O to set a four-team off diagonal mirror transform
   
   - Press A to save a startbox file. The first half of the boxes are for team 1, the second half are for team 2.
   - Press S to save a startbox file using the current transform.
