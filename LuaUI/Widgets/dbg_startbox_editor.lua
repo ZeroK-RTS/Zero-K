@@ -19,6 +19,9 @@ copy it from infolog to the config
 dont forget to change TEAM to an actual number
 ]]
 
+-- There is nothing stopping you replacing the below with "games/zk.sdd/LuaRules/Configs/StartBoxes/"
+local SAVE_DIR = "MapTools/StartBoxes/"
+
 local _, GadgetStartboxUtilities = VFS.Include ("LuaRules/Gadgets/Include/startbox_utilities.lua")
 
 local MAP_FILE        = (Game.mapName or "") .. ".lua"
@@ -114,6 +117,14 @@ local function VertFlip(pos)
 	return {pos[1], MAP_HEIGHT - pos[2]}
 end
 
+local function MainDiagFlip(pos)
+	return {pos[2], pos[1]}
+end
+
+local function OffDiagFlip(pos)
+	return {MAP_HEIGHT - pos[2], MAP_WIDTH - pos[1]}
+end
+
 local function QuarterRotate(pos)
 	return {
 		(1 - pos[2]/MAP_HEIGHT) * MAP_WIDTH,
@@ -179,8 +190,8 @@ local function SaveStartboxes()
 		MakeTeamBoxes(1, math.floor(#final_polygons / 2)),
 		MakeTeamBoxes(math.floor(#final_polygons / 2) + 1, #final_polygons),
 	}
-	WG.SaveTable(writeTable, "MapTools/StartBoxes/", MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
-	Spring.Echo("Startboxes saved to MapTools/StartBoxes/" .. MAP_FILE)
+	WG.SaveTable(writeTable, SAVE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
+	Spring.Echo("Startboxes saved to " .. SAVE_DIR .. MAP_FILE)
 end
 
 local function SaveStartboxesTransform()
@@ -190,8 +201,8 @@ local function SaveStartboxesTransform()
 	for i = 1, #currentTransforms do
 		writeTable[#writeTable + 1] = MakeTeamBoxes(1, #final_polygons, currentTransforms[i])
 	end
-	WG.SaveTable(writeTable, "MapTools/StartBoxes/", MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
-	Spring.Echo("Startboxes saved to MapTools/StartBoxes/" .. MAP_FILE)
+	WG.SaveTable(writeTable, SAVE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
+	Spring.Echo("Startboxes saved to " .. SAVE_DIR .. MAP_FILE)
 end
 
 function widget:KeyPress(key)
@@ -242,10 +253,20 @@ function widget:KeyPress(key)
 	if (key == KEYSYMS.F) then
 		Spring.Echo("Set 4-way rotational transform")
 		currentTransforms = {
-			QuarterRotate,
 			HalfRotate,
+			QuarterRotate,
 			function (pos) return QuarterRotate(HalfRotate(pos)) end,
 		}
+		return true
+	end
+	if (key == KEYSYMS.I) then
+		Spring.Echo("Set main diagonal mirror")
+		currentTransforms = {MainDiagFlip}
+		return true
+	end
+	if (key == KEYSYMS.O) then
+		Spring.Echo("Set off diagonal mirror")
+		currentTransforms = {OffDiagFlip}
 		return true
 	end
 	if (key == KEYSYMS.D) and (#final_polygons > 0) then
