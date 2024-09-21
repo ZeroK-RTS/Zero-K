@@ -13,7 +13,7 @@ return { spideraa = {
   customParams           = {
     bait_level_default = 0,
     cus_noflashlight = 1,
-    okp_damage = 250.1,
+    okp_damage = 265.1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
