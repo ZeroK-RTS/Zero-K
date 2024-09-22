@@ -417,11 +417,14 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 	end
 end
 
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Attribute Updating
 
+local attributesTypes = IterableMap.New()
 local unitSlowed = {}
+local unitHasAttributes = {}
 
 -- For other gadgets to read
 GG.att_CostMult = {}
@@ -450,7 +453,8 @@ local currentSetSonar = {}
 local currentSetJammer = {}
 local currentSetSight = {}
 
-local function RemoveUnit(unitID)
+local function CleanupAttributeDataForUnit(unitID)
+	unitHasAttributes[unitID] = nil
 	unitReloadPaused[unitID] = nil -- defined earlier
 	
 	currentHealthAdd[unitID] = nil
@@ -484,7 +488,7 @@ local function RemoveUnit(unitID)
 	GG.attRaw_BuildSpeed[unitID] = nil
 end
 
-local function UpdateUnitAttributes(unitID, attList)
+local function UpdateUnitAttributes(unitID, attTypeMap)
 	if not spValidUnitID(unitID) then
 		return true
 	end
@@ -521,46 +525,52 @@ local function UpdateUnitAttributes(unitID, attList)
 	local setJammer = false
 	local setSight = false
 	
-	for _, data in IterableMap.Iterator(attList) do
-		healthAdd = healthAdd + (data.healthAdd or 0)
-		healthMult = healthMult*(data.healthMult or 1)
-		moveMult = moveMult*(data.move or 1)
-		turnMult = turnMult*(data.turn or 1)
-		accelMult = accelMult*(data.accel or 1)
-		econMult = econMult*(data.econ or 1)
-		energyMult = energyMult*(data.energy or 1)
-		shieldRegen = shieldRegen*(data.shieldRegen or 1)
-		healthRegen = healthRegen*(data.healthRegen or 1)
-		energyMult = energyMult*(data.energy or 1)
-		costMult = costMult*(data.cost or 1)
-		buildMult = buildMult*(data.build or 1)
-		abilityDisabled = abilityDisabled or data.abilityDisabled
-		shieldDisabled = shieldDisabled or data.shieldDisabled
-		minSpray = math.max(minSpray, data.minSpray or 0)
-		senseMult = senseMult*(data.sense or 1)
-		setRadar = data.setRadar or setRadar
-		setJammer = data.setJammer or setJammer
-		setSonar = data.setSonar or setSonar
-		setSight = data.setSight or setSight
-		
-		if data.weaponNum then
-			weaponSpecificMods = weaponSpecificMods or {}
-			weaponSpecificMods[data.weaponNum] = weaponSpecificMods[data.weaponNum] or {
-				reloadMult = 1,
-				rangeMult = 1,
-				projSpeedMult = 1,
-				projectilesMult = 1,
-			}
-			local wepData = weaponSpecificMods[data.weaponNum]
-			wepData.reloadMult = wepData.reloadMult*(data.reload or 1)
-			wepData.rangeMult = wepData.rangeMult*(data.range or 1)
-			wepData.projSpeedMult = wepData.projSpeedMult*(data.projSpeed or 1)
-			wepData.projectilesMult = wepData.projectilesMult*(data.projectiles or 1)
-		else
-			reloadMult = reloadMult*(data.reload or 1)
-			rangeMult = rangeMult*(data.range or 1)
-			projSpeedMult = projSpeedMult*(data.projSpeed or 1)
-			projectilesMult = projectilesMult*(data.projectiles or 1)
+	local hasAttributes = false
+	for _, data in IterableMap.Iterator(attTypeMap) do
+		if data.includedUnits[unitID] then
+			hasAttributes = true
+			
+			healthAdd = healthAdd + (data.healthAdd and data.healthAdd[unitID] or 0)
+			healthMult = healthMult*(data.healthMult and data.healthMult[unitID] or 1)
+			moveMult = moveMult*(data.move and data.move[unitID] or 1)
+			turnMult = turnMult*(data.turn and data.turn[unitID] or (data.move and data.move[unitID]) or 1)
+			accelMult = accelMult*(data.accel and data.accel[unitID] or (data.move and data.move[unitID]) or 1)
+			econMult = econMult*(data.econ and data.econ[unitID] or 1)
+			energyMult = energyMult*(data.energy and data.energy[unitID] or 1)
+			shieldRegen = shieldRegen*(data.shieldRegen and data.shieldRegen[unitID] or 1)
+			healthRegen = healthRegen*(data.healthRegen and data.healthRegen[unitID] or 1)
+			energyMult = energyMult*(data.energy and data.energy[unitID] or 1)
+			costMult = costMult*(data.cost and data.cost[unitID] or 1)
+			buildMult = buildMult*(data.build and data.build[unitID] or 1)
+			abilityDisabled = abilityDisabled or data.abilityDisabled and data.abilityDisabled[unitID]
+			shieldDisabled = shieldDisabled or data.shieldDisabled and data.shieldDisabled[unitID]
+			minSpray = math.max(minSpray, data.minSpray and data.minSpray[unitID] or 0)
+			senseMult = senseMult*(data.sense and data.sense[unitID] or 1)
+			setRadar = data.setRadar and data.setRadar[unitID] or setRadar
+			setJammer = data.setJammer and data.setJammer[unitID] or setJammer
+			setSonar = data.setSonar and data.setSonar[unitID] or setSonar
+			setSight = data.setSight and data.setSight[unitID] or setSight
+			
+			if data.weaponNum and data.weaponNum[unitID] then
+				local weaponNum = data.weaponNum[unitID]
+				weaponSpecificMods = weaponSpecificMods or {}
+				weaponSpecificMods[weaponNum] = weaponSpecificMods[weaponNum] or {
+					reloadMult = 1,
+					rangeMult = 1,
+					projSpeedMult = 1,
+					projectilesMult = 1,
+				}
+				local wepData = weaponSpecificMods[weaponNum]
+				wepData.reloadMult = wepData.reloadMult*(data.reload and data.reload[unitID] or 1)
+				wepData.rangeMult = wepData.rangeMult*(data.range and data.range[unitID] or 1)
+				wepData.projSpeedMult = wepData.projSpeedMult*(data.projSpeed and data.projSpeed[unitID] or 1)
+				wepData.projectilesMult = wepData.projectilesMult*(data.projectiles and data.projectiles[unitID] or 1)
+			else
+				reloadMult = reloadMult*(data.reload and data.reload[unitID] or 1)
+				rangeMult = rangeMult*(data.range and data.range[unitID] or 1)
+				projSpeedMult = projSpeedMult*(data.projSpeed and data.projSpeed[unitID] or 1)
+				projectilesMult = projectilesMult*(data.projectiles and data.projectiles[unitID] or 1)
+			end
 		end
 	end
 	
@@ -662,6 +672,69 @@ local function UpdateUnitAttributes(unitID, attList)
 		currentSetJammer[unitID] = setJammer
 		currentSetSight[unitID] = setSeight
 	end
+	
+	if not hasAttributes then
+		CleanupAttributeDataForUnit(unitID)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local attributeNames = {
+	"healthAdd",
+	"healthMult",
+	"move",
+	"turn",
+	"accel",
+	"reload",
+	"range",
+	"projSpeed",
+	"econ",
+	"energy",
+	"shieldRegen",
+	"healthRegen",
+	"cost",
+	"build",
+	"sense",
+	"setRadar",
+	"setSonar",
+	"setJammer",
+	"setSight",
+	"projectiles",
+	"weaponNum",
+	"minSpray",
+	"abilityDisabled",
+	"shieldDisabled",
+}
+
+local function InitAttributeType()
+	local attType = {
+		includedUnits = {},
+	}
+	return attType
+end
+
+local function AddToAttributeType(attType, unitID, effectTable, attName)
+	if not effectTable[attName] and not attType[attName] then
+		return false
+	end
+	if not attType[attName] then
+		attType[attName] = {}
+	end
+	attType[attName][unitID] = effectTable[attName]
+end
+
+local function RemoveUnitFromAttributeType(attType, unitID)
+	if not attType.includedUnits[unitID] then
+		return
+	end
+	attType.includedUnits[unitID] = nil
+	for i = 1, #attributeNames do
+		if attType[attName] and attType[attName][unitID] ~= nil then
+			attType[attName][unitID] = nil
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -669,56 +742,43 @@ end
 -- External Interface
 
 local Attributes = {}
-local attributeUnits = {}
-
 function Attributes.RemoveUnit(unitID)
-	attributeUnits[unitID] = nil
-	RemoveUnit(unitID)
+	if not unitHasAttributes[unitID] then
+		return
+	end
+	CleanupAttributeDataForUnit(unitID)
+	for _, attType in IterableMap.Iterator(attributesTypes) do
+		RemoveUnitFromAttributeType(attType, unitID)
+	end
 end
 
 function Attributes.AddEffect(unitID, key, effect)
-	if not attributeUnits[unitID] then
-		attributeUnits[unitID] = IterableMap.New()
+	local attType = IterableMap.Get(attributesTypes, key)
+	if not attType then
+		attType = InitAttributeType()
 	end
-	local data = IterableMap.Get(attributeUnits[unitID], key) or {}
 	
-	data.healthAdd = effect.healthAdd
-	data.healthMult = effect.healthMult
-	data.move = effect.move
-	data.turn = effect.turn or effect.move
-	data.accel = effect.accel or effect.move
-	data.reload = effect.reload
-	data.range = effect.range
-	data.projSpeed = effect.projSpeed
-	data.econ = effect.econ
-	data.energy = effect.energy
-	data.shieldRegen = effect.shieldRegen
-	data.healthRegen = effect.healthRegen
-	data.cost = effect.cost
-	data.build = effect.build
-	data.sense = effect.sense
-	data.setRadar = effect.setRadar
-	data.setSonar = effect.setSonar
-	data.setJammer = effect.setJammer
-	data.setSight = effect.setSight
-	data.projectiles = effect.projectiles
-	data.weaponNum = effect.weaponNum
-	data.minSpray = effect.minSprayAngle
-	data.abilityDisabled = effect.abilityDisabled
-	data.shieldDisabled = effect.shieldDisabled
+	unitHasAttributes[unitID] = true
+	attType.includedUnits[unitID] = true
+	for i = 1, #attributeNames do
+		AddToAttributeType(attType, unitID, effect, attributeNames[i])
+	end
 	
-	IterableMap.Add(attributeUnits[unitID], key, data) -- Overwrites existing key if it exists
-	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then
+	IterableMap.Add(attributesTypes, key, attType) -- Overwrites existing key if it exists
+	if UpdateUnitAttributes(unitID, attributesTypes) then
 		Attributes.RemoveUnit(unitID)
 	end
 end
 
 function Attributes.RemoveEffect(unitID, key)
-	if not attributeUnits[unitID] then
+	if not unitHasAttributes[unitID] then
 		return
 	end
-	IterableMap.Remove(attributeUnits[unitID], key)
-	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then
+	local attType = IterableMap.Get(attributesTypes, key)
+	if attType then
+		RemoveUnitFromAttributeType(attType, unitID)
+	end
+	if UpdateUnitAttributes(unitID, attributesTypes) then
 		Attributes.RemoveUnit(unitID)
 	end
 end
