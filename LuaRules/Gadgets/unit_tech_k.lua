@@ -26,6 +26,12 @@ if not gadgetHandler:IsSyncedCode() then
 	return
 end
 
+local tintCycle = {
+	{1, 0.6, 0.9},
+	{1, 0.75, 0.6},
+	{0.72, 0.82, 1},
+}
+
 local INLOS_ACCESS = {inlos = true}
 
 local function SetUnitTechLevel(unitID, level)
@@ -37,29 +43,31 @@ local function SetUnitTechLevel(unitID, level)
 	local speed = math.pow(0.8, level - 1)
 	local range = math.pow(1.1, level - 1)
 	
-	local redTint = math.pow(0.82, level - 1)
-	local otherTint = math.pow(0.7, level - 1)
-	local simpleDoubling = math.pow(2, level - 1)
-	local energy = math.pow(1.5, level - 1) -- Multiplier for energy on top of the base econ multiplier
-	local healthMult = math.pow(2, level - 1)
+	if level > 1 then
+		local tintIndex = (level - 1)%(#tintCycle) + 1
+		local tintTier = math.floor((level - 2)/(#tintCycle))
+		local tint = tintCycle[tintIndex]
+		local tr, tg, tb = math.pow(tint[1], 1 + tintTier), math.pow(tint[2], 1 + tintTier),math.pow(tint[3], 1 + tintTier)
+		GG.TintUnit(unitID, tr, tg, tb)
+	end
 	
+	local simpleDoubling = math.pow(2, level - 1)
 	GG.Attributes.AddEffect(unitID, "tech", {
 		projectiles = projectiles,
 		speed = speed,
 		range = range,
 		cost = simpleDoubling,
-		econ = simpleDoubling,
-		energy = energy,
+		econ = math.pow(1.5, level - 1), -- 1.5x metal income
+		energy = simpleDoubling, -- Effective 3x
 		shieldRegen = simpleDoubling,
 		healthRegen = simpleDoubling,
 		build = simpleDoubling,
-		healthMult = healthMult,
+		healthMult = simpleDoubling,
 		projSpeed = math.sqrt(range), -- Maintains Cannon range.
 		minSprayAngle = (math.pow(level, 0.25) - 1) * 0.04
 	})
 	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.2, sizeScale, 1 + (sizeScale - 1)*0.2})
 	GG.UnitModelRescale(unitID, sizeScale)
-	GG.TintUnit(unitID, redTint, otherTint, otherTint)
 	Spring.SetUnitRulesParam(unitID, "tech_level", level, INLOS_ACCESS)
 end
 
@@ -111,14 +119,16 @@ local function AddFeature(unitID, unitDefID, teamID, level)
 		local rand, randMag = Vector.RandomPointInCircle(maxMag)
 		local featureID = Spring.CreateFeature(deathCloneDefID[unitDefID], ux + rand[1]*0.4, uy, uz + rand[2]*0.4, math.random()*2^16, allyTeamID)
 		if featureID then
-			local ySpeed = 1.2*maxMag - randMag
+			local ySpeed = (1.2*maxMag - randMag) * (0.7 + 0.3 * math.random())
 			Spring.SetFeatureVelocity(featureID, rand[1]*0.1 + vx, ySpeed*0.1 + vy, rand[2]*0.1 + vz)
 		end
 	end
 end
 
+local tech = 1
 function gadget:UnitCreated(unitID, unitDefID)
-	SetUnitTechLevel(unitID, math.floor(math.random()*8) + 1)
+	SetUnitTechLevel(unitID, tech)
+	tech = tech%10 + 1
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
@@ -128,6 +138,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 	local level = Spring.GetUnitRulesParam(unitID, "tech_level") or 1
 	if level <= 1 then
+		return
+	end
+	local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
+	if build and build < 0.8 then
 		return
 	end
 	AddExplosions(unitID, unitDefID, teamID, level)
