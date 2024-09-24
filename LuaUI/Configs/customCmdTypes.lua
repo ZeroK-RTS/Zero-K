@@ -248,4 +248,21 @@ for name, data in pairs(custom_cmd_actions) do
 	fullCustomCmdActions[name] = data
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+for i = 1, #modCommands do
+	local cmd = modCommands[i]
+	custom_cmd_actions[cmd.cmdID] = {
+		cmdType = (cmd.isState and 2) or (cmd.isInstant and 3) or 1,
+		cmdID = cmd.cmdID,
+		name = cmd.humanName,
+		states = cmd.stateNames,
+	}
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 return fullCustomCmdActions

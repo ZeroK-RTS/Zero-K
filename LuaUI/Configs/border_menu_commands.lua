@@ -275,7 +275,7 @@ local overrides = {
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, caption=''},
 	[CMD_SELECTION_RANK] = { texture = {imageDir .. 'states/selection_rank_0.png', imageDir .. 'states/selection_rank_1.png', imageDir .. 'states/selection_rank_2.png', imageDir .. 'states/selection_rank_3.png'}, text=''},
 	[CMD_FORMATION_RANK] = { texture = {imageDir .. 'states/formation_rank_0.png', imageDir .. 'states/formation_rank_1.png', imageDir .. 'states/formation_rank_2.png', imageDir .. 'states/formation_rank_3.png'}, text=''},
-	}
+}
 
 -- noone really knows what this table does but it's needed for epic menu to get the hotkey
 local custom_cmd_actions = {	-- states are 2, not states are 1
@@ -367,5 +367,11 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	formation_rank = 2,
 }
 
+local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+for i = 1, #modCommands do
+	local cmd = modCommands[i]
+	custom_cmd_actions[cmd.actionName] = cmd.isState and 2 or 1
+	overrides[cmd.cmdID] = {caption = '', tooltip = cmd.tooltip, texture = cmd.image}
+end
 
 return common_commands, states_commands, land_commands, sea_commands, advland_commands, advsea_commands, special_commands, globalCommands, overrides, custom_cmd_actions
