@@ -638,6 +638,15 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+for i = 1, #modCommands do
+	local cmd = modCommands[i]
+	commandDisplayConfig[cmd.cmdID] = {tooltip = cmd.tooltip, texture = cmd.image, stateTooltip = cmd.stateTooltip}
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 return commandPanels, commandPanelMap, commandDisplayConfig, widgetSpaceHidden, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef
 
 --------------------------------------------------------------------------------

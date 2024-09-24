@@ -14,6 +14,17 @@ function gadget:GetInfo()
 	}
 end
 
+if not ((modoption == "1") or (modoption == 1)) then
+	return
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local CMD_TECH_UP = Spring.Utilities.CMD.TECH_UP
+local modCommands, modCmdMap = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+local techCommandData = modCmdMap[CMD_TECH_UP]
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -23,6 +34,9 @@ local deathCloneDefID = {}
 local Vector = Spring.Utilities.Vector
 
 if not gadgetHandler:IsSyncedCode() then
+	function gadget:Initialize()
+		Spring.AssignMouseCursor(techCommandData.cursor, "cursortechup", true, true)
+	end
 	return
 end
 
@@ -129,6 +143,7 @@ local tech = 1
 function gadget:UnitCreated(unitID, unitDefID)
 	SetUnitTechLevel(unitID, tech)
 	tech = tech%10 + 1
+	Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)

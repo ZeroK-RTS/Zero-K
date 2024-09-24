@@ -1,0 +1,2 @@
+hotspot topleft
+frame  cursortechup_0.png  5
