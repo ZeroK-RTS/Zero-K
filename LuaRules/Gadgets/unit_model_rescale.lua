@@ -33,7 +33,6 @@ local suCopyTable = Spring.Utilities.CopyTable
 local function SetScale(unitID, base, scale)
 	local currentScale = (Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1)
 	Spring.SetUnitRulesParam(unitID, "currentModelScale", scale, INLOS_ACCESS)
-	scale = scale / currentScale
 	
 	local pieceTable = suCopyTable(origPieceTable[unitID])
 
