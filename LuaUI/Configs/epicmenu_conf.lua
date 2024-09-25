@@ -463,24 +463,7 @@ local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
 
 local pathToolbox = 'Settings/Toolbox'
-	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and writing their coordinates to infolog.txt.
-  - Left click to place a vertex.
-  - Right click to place a vertex then finish the polygon (start zones can have multiple polygons).
-  - Press N finish the current polygon.
-  - Press U to undo the last placed vertex
-  - Press D to delete the most recently placed box.
-  
-  - Press R to set a two-team rotational transform
-  - Press T to set a two-team horizontal mirror transform
-  - Press Y to set a two-team vertical mirror transform
-  - Press F to set a four-team rotational transform
-  - Press I to set a two-team main diagonal mirror transform
-  - Press O to set a four-team off diagonal mirror transform
-  
-  - Press A to save a startbox file. The first half of the boxes are for team 1, the second half are for team 2.
-  - Press S to save a startbox file using the current transform.
-  - Press B to print the current boxes to infolog.txt like a barbarian.
-  - Hold Ctrl to snap to cardinal directions.]], true)
+	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and saving their coordinates]], true)
 
 	
 	ShButton(pathToolbox, 'Toggle Economy Announcer', function() spSendCommands{"luaui togglewidget Economic Victory Announcer v2"} end, "Toggles a widget that tracks team economies and announces 'victory' in chat, for certain manually run tournament games.")
