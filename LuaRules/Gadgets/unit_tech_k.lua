@@ -21,24 +21,29 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local CMD_TECH_UP = Spring.Utilities.CMD.TECH_UP
-local modCommands, modCmdMap = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
-local techCommandData = modCmdMap[CMD_TECH_UP]
+if not gadgetHandler:IsSyncedCode() then
+	function gadget:Initialize()
+		Spring.AssignMouseCursor(techCommandData.cursor, "cursortechup", true, true)
+		Spring.SetCustomCommandDrawData(CMD_TECH_UP, techCommandData.cursor, {0.7, 0.7, 0.8, 0.8})
+	end
+	return
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local modCommands, modCmdMap = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+local CMD_TECH_UP = Spring.Utilities.CMD.TECH_UP
+local techCommandData = modCmdMap[CMD_TECH_UP]
+local INLOS_ACCESS = {inlos = true}
 
 local explosionDefID = {}
 local explosionRadius = {}
 local deathCloneDefID = {}
 local Vector = Spring.Utilities.Vector
 
-if not gadgetHandler:IsSyncedCode() then
-	function gadget:Initialize()
-		Spring.AssignMouseCursor(techCommandData.cursor, "cursortechup", true, true)
-	end
-	return
-end
+local goalSet = {}
+local unitLevel = {}
 
 local tintCycle = {
 	{1, 0.6, 0.9},
@@ -46,7 +51,20 @@ local tintCycle = {
 	{0.72, 0.82, 1},
 }
 
-local INLOS_ACCESS = {inlos = true}
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local factoryDefs = {}
+local function IsFactory(unitDefID)
+	if not factoryDefs[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		factoryDefs[unitDefID] = (ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions) and 1 or 0
+	end
+	return factoryDefs[unitDefID] == 1
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function SetUnitTechLevel(unitID, level)
 	local unitDefID = Spring.GetUnitDefID(unitID)
@@ -83,6 +101,7 @@ local function SetUnitTechLevel(unitID, level)
 	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.2, sizeScale, 1 + (sizeScale - 1)*0.2})
 	GG.UnitModelRescale(unitID, sizeScale)
 	Spring.SetUnitRulesParam(unitID, "tech_level", level, INLOS_ACCESS)
+	unitLevel[unitID] = level
 end
 
 local function AddExplosions(unitID, unitDefID, teamID, level)
@@ -139,6 +158,50 @@ local function AddFeature(unitID, unitDefID, teamID, level)
 	end
 end
 
+local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	local targetID = Spring.ValidUnitID(cmdParams[1]) and cmdParams[1]
+	if not targetID then
+		return true
+	end
+	local tx, ty, tz = Spring.GetUnitPosition(targetID)
+	if not tx then
+		return true
+	end
+
+	local buildRange = Spring.Utilities.GetUnitBuildRange(unitID, unitDefID)
+	if Spring.GetUnitSeparation(unitID, targetID) < buildRange then
+		SetUnitTechLevel(targetID, (unitLevel[targetID] or 0) + 1)
+		return true
+	end
+	if not goalSet[unitID] then
+		Spring.SetUnitMoveGoal(unitID, tx, ty, tz, buildRange - 5)
+		goalSet[unitID] = true
+	end
+	return false
+end
+
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if goalSet[unitID] then
+		goalSet[unitID] = nil
+	end
+	if cmdID == CMD_TECH_UP then
+		if cmdParams[2] then
+			return false -- LuaUI can handle area-tech
+		end
+	end
+	return true
+end
+
+function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_TECH_UP then
+		if cmdParams[2] then
+			return true, true
+		end
+		return true, HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	end
+	return false
+end
+
 local tech = 1
 function gadget:UnitCreated(unitID, unitDefID)
 	SetUnitTechLevel(unitID, tech)
@@ -161,4 +224,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 	AddExplosions(unitID, unitDefID, teamID, level)
 	AddFeature(unitID, unitDefID, teamID, level)
+end
+
+function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_TECH_UP)
 end
