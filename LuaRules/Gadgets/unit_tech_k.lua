@@ -324,6 +324,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if builderID and (unitLevel[builderID] or 1) > 1 then
 		SetUnitTechLevel(unitID, unitLevel[builderID])
 	end
+	--SetUnitTechLevel(unitID, 4)
 	if IsTechBuilder(unitID, unitDefID) then
 		hasTechCommand[unitID] = true
 		Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
@@ -343,8 +344,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if build and build < 0.8 then
 		return
 	end
-	AddExplosions(unitID, unitDefID, teamID, level)
-	AddFeature(unitID, unitDefID, teamID, level)
+	AddExplosions(unitID, unitDefID, teamID, unitLevel[unitID])
+	AddFeature(unitID, unitDefID, teamID, unitLevel[unitID])
 end
 
 function gadget:Initialize()
