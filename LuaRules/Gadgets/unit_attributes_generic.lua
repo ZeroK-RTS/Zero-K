@@ -61,6 +61,7 @@ local function GetMass(health, cost)
 	return (((cost/2) + (health/8))^0.6)*6.5
 end
 
+GG.att_CostMult = {}
 GG.att_EconomyChange = {}
 GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
@@ -426,8 +427,6 @@ local attributesTypes = IterableMap.New()
 local unitSlowed = {}
 local unitHasAttributes = {}
 
--- For other gadgets to read
-GG.att_CostMult = {}
 
 -- Internal tracking to avoid unnecessary updates
 local currentHealthAdd = {}

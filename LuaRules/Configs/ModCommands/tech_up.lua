@@ -3,7 +3,7 @@ local data = {
 	name = "TECH_UP",
 	cmdID = 38412,
 	
-	commandType = CMDTYPE.ICON_UNIT_OR_AREA,
+	commandType = CMDTYPE.ICON_UNIT, -- Suffer for now CMDTYPE.ICON_UNIT_OR_AREA,
 	isState = false, -- Hold fire etc
 	isInstant = false, -- Such as Stop, Self-D etc
 	humanName = "Tech Up",
