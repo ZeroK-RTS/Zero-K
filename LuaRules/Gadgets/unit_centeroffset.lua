@@ -325,6 +325,12 @@ local function GetColvolScales(unitID)
 	return 1, 1, 1
 end
 
+function gadget:Shutdown()
+	for unitID in pairs(unitScales) do
+		UpdateUnitCollisionData(unitID, Spring.GetUnitDefID(unitID), {1, 1, 1})
+	end
+end
+
 function gadget:Initialize()
 	GG.OverrideMidAndAimPos = OverrideMidAndAimPos
 	GG.SetColvolScales = SetColvolScales
