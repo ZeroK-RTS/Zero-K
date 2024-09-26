@@ -52,7 +52,7 @@ local modrules  = {
     featureEnergyCostFactor = 0;  -- defaults to 0
 
     allowEnemies  = false;  -- defaults to true
-    allowAllies   = (Spring.GetModOptions() and (Spring.GetModOptions().allyreclaim == "1")) or false;  -- defaults to true
+    allowAllies   = (Spring.GetModOptions() and (Spring.GetModOptions().allyreclaim == "1")) or (Spring.GetModOptions().techk == "1") false;  -- defaults to true
   },
 
 

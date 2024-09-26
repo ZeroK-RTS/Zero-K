@@ -9,17 +9,21 @@ function gadget:GetInfo()
 		author    = "GoogleFrog",
 		date      = "16 September 2024",
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
-		enabled   = (modoption == "1") or (modoption == 1),
+		layer     = 500,
+		enabled   = (modoption == "1"),
 	}
 end
 
-if not ((modoption == "1") or (modoption == 1)) then
+if not (modoption == "1") then
 	return
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local modCommands, modCmdMap = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+local CMD_TECH_UP = Spring.Utilities.CMD.TECH_UP
+local techCommandData = modCmdMap[CMD_TECH_UP]
 
 if not gadgetHandler:IsSyncedCode() then
 	function gadget:Initialize()
@@ -32,11 +36,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local modCommands, modCmdMap = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
-local CMD_TECH_UP = Spring.Utilities.CMD.TECH_UP
-local techCommandData = modCmdMap[CMD_TECH_UP]
 local INLOS_ACCESS = {inlos = true}
-
 local explosionDefID = {}
 local explosionRadius = {}
 local deathCloneDefID = {}
@@ -44,6 +44,8 @@ local Vector = Spring.Utilities.Vector
 
 local goalSet = {}
 local unitLevel = {}
+local hasTechCommand = {}
+local reclaimToRemoveUnit = {}
 
 local tintCycle = {
 	{1, 0.6, 0.9},
@@ -61,6 +63,51 @@ local function IsFactory(unitDefID)
 		factoryDefs[unitDefID] = (ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions) and 1 or 0
 	end
 	return factoryDefs[unitDefID] == 1
+end
+
+local buildingDefs = {}
+local function IsBuilding(unitDefID)
+	if not buildingDefs[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		buildingDefs[unitDefID] = (ud.speed == 0) and (not ud.customParams.mobilebuilding) and 1 or 0
+	end
+	return buildingDefs[unitDefID] == 1
+end
+
+local hasFactory = {}
+local function GetFactory(unitDefID)
+	if not hasFactory[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		local factory = ud.customParams.from_factory
+		if factory then
+			factory = UnitDefNames[factory].id
+		end
+		hasFactory[unitDefID] = factory or -1
+	end
+	return (hasFactory[unitDefID] >= 0) and hasFactory[unitDefID]
+end
+
+local isBuilder = {}
+local function IsTechBuilder(unitID, unitDefID)
+	if not isBuilder[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		isBuilder[unitDefID] = ud.canRepair and 1 or 0
+	end
+	if isBuilder[unitDefID] == 0 then
+		return false
+	end
+	if not hasFactory[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		local factory = ud.customParams.from_factory
+		if factory then
+			factory = UnitDefNames[factory].id
+		end
+		hasFactory[unitDefID] = factory or -1
+	end
+	if hasFactory[unitDefID] >= 0 then
+		return true
+	end
+	return (unitLevel[unitID] or 0) > 1
 end
 
 --------------------------------------------------------------------------------
@@ -102,6 +149,11 @@ local function SetUnitTechLevel(unitID, level)
 	GG.UnitModelRescale(unitID, sizeScale)
 	Spring.SetUnitRulesParam(unitID, "tech_level", level, INLOS_ACCESS)
 	unitLevel[unitID] = level
+	
+	if (not hasTechCommand[unitID]) and IsTechBuilder(unitID, unitDefID) then
+		hasTechCommand[unitID] = true
+		Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
+	end
 end
 
 local function AddExplosions(unitID, unitDefID, teamID, level)
@@ -158,23 +210,62 @@ local function AddFeature(unitID, unitDefID, teamID, level)
 	end
 end
 
+local function CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
+	local targetID = cmdParams[1]
+	if not Spring.ValidUnitID(targetID) then
+		return false
+	end
+	local isBuilder = IsTechBuilder(unitID, unitDefID)
+	if not isBuilder then
+		return false
+	end
+	local targetTeam = Spring.GetUnitTeam(targetID)
+	if not (targetTeam and Spring.AreTeamsAllied(targetTeam, unitTeam)) then
+		return false
+	end
+	local targetUnitDef = Spring.GetUnitDefID(targetID)
+	if not IsBuilding(targetUnitDef) then
+		return false
+	end
+	local builderLevel = (unitLevel[unitID] or 1)
+	local targetLevel = (unitLevel[targetID] or 1)
+	if GetFactory(unitDefID) == targetUnitDef then
+		-- Constructors can upgrade their factory to one beyond their own level
+		builderLevel = builderLevel + 1
+	end
+	return builderLevel > targetLevel
+end
+
 local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	local targetID = Spring.ValidUnitID(cmdParams[1]) and cmdParams[1]
-	if not targetID then
+	if not CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams) then
 		return true
 	end
+	local targetID = cmdParams[1]
 	local tx, ty, tz = Spring.GetUnitPosition(targetID)
 	if not tx then
 		return true
 	end
 
 	local buildRange = Spring.Utilities.GetUnitBuildRange(unitID, unitDefID)
-	if Spring.GetUnitSeparation(unitID, targetID) < buildRange then
-		SetUnitTechLevel(targetID, (unitLevel[targetID] or 0) + 1)
-		return true
+	if Spring.GetUnitSeparation(unitID, targetID, true, true) < buildRange - 10 then
+		local health, maxHealth, _, _, buildProgress = Spring.GetUnitHealth(targetID)
+		if buildProgress >= 1 then
+			-- https://github.com/beyond-all-reason/spring/issues/1698
+			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.RECLAIM, 0, targetID}, CMD.OPT_ALT)
+			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+			reclaimToRemoveUnit = reclaimToRemoveUnit or {}
+			reclaimToRemoveUnit[unitID] = Spring.GetGameFrame() + 20
+			return false
+		end
+		local cost = Spring.Utilities.GetUnitCost(targetID) * (GG.att_CostMult[targetID] or 1)
+		SetUnitTechLevel(targetID, (unitLevel[targetID] or 1) + 1)
+		local newCost = Spring.Utilities.GetUnitCost(targetID) * (GG.att_CostMult[targetID] or 1)
+		Spring.SetUnitHealth(targetID, {build = cost / newCost * buildProgress, health = health})
+		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.REPAIR, CMD.OPT_SHIFT, targetID}, CMD.OPT_ALT)
+		return false
 	end
 	if not goalSet[unitID] then
-		Spring.SetUnitMoveGoal(unitID, tx, ty, tz, buildRange - 5)
+		Spring.SetUnitMoveGoal(unitID, tx, ty, tz, buildRange - 30)
 		goalSet[unitID] = true
 	end
 	return false
@@ -188,6 +279,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if cmdParams[2] then
 			return false -- LuaUI can handle area-tech
 		end
+		return CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
 	end
 	return true
 end
@@ -202,20 +294,49 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	return false
 end
 
-local tech = 1
-function gadget:UnitCreated(unitID, unitDefID)
-	SetUnitTechLevel(unitID, tech)
-	tech = tech%10 + 1
-	Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
+function gadget:GameFrame(n)
+	if not reclaimToRemoveUnit then
+		return
+	end
+	local hasAny = false
+	for unitID, frame in pairs(reclaimToRemoveUnit) do
+		hasAny = true
+		if Spring.ValidUnitID(unitID) then
+			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+			if cmdID == CMD.RECLAIM and Spring.ValidUnitID(cp_1) then
+				local health, maxHealth, _, _, buildProgress = Spring.GetUnitHealth(cp_1)
+				if buildProgress < 1 then
+					Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0)
+					reclaimToRemoveUnit[unitID] = nil
+				end
+			end
+		end
+		if frame < n then
+			reclaimToRemoveUnit[unitID] = nil
+		end
+	end
+	if not hasAny then
+		reclaimToRemoveUnit = false
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	if builderID and (unitLevel[builderID] or 1) > 1 then
+		SetUnitTechLevel(unitID, unitLevel[builderID])
+	end
+	if IsTechBuilder(unitID, unitDefID) then
+		hasTechCommand[unitID] = true
+		Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	hasTechCommand[unitID] = nil
 	if GG.wasMorphedTo[unitID] then
 		-- TODO, set level of new unit
 		return
 	end
-	local level = Spring.GetUnitRulesParam(unitID, "tech_level") or 1
-	if level <= 1 then
+	if (unitLevel[unitID] or 1) <= 1 then
 		return
 	end
 	local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
@@ -228,4 +349,13 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TECH_UP)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local level = Spring.GetUnitRulesParam(unitID, "tech_level")
+		if level then
+			SetUnitTechLevel(unitID, level)
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local teamID = Spring.GetUnitTeam(unitID)
+			gadget:UnitCreated(unitID, unitDefID, teamID)
+		end
+	end
 end
