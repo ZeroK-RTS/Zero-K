@@ -73,6 +73,12 @@ function gadget:UnitDestroyed(unitID)
 	origPieceTable[unitID] = nil
 end
 
+function gadget:Shutdown()
+	for unitID in pairs(origPieceTable) do
+		UnitModelRescale(unitID, 1)
+	end
+end
+
 GG.UnitModelRescale = UnitModelRescale
 
 local rescaleUnitDefIDs = {}
