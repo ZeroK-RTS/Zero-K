@@ -65,6 +65,7 @@ GG.att_CostMult = {}
 GG.att_EconomyChange = {}
 GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
+GG.att_ProjSpeed = {}
 GG.att_RegenChange = {}
 GG.att_ShieldRegenChange = {}
 GG.attRaw_BuildSpeed = {} -- A build speed value rather than a multiplier
@@ -155,9 +156,6 @@ local function UpdateCost(unitID, unitDefID, costMult)
 		energy = cost,
 		buildTime = cost,
 	})
-	GG.att_CostMult[unitID] = costMult
-	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
-	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
 	Spring.SetUnitMass(unitID, GetMass(maxHealth, cost))
 end
@@ -238,10 +236,14 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				oldReloadFrames = floor(reload*Game.gameSpeed),
 				range = wd.range,
 				sprayAngle = wd.sprayAngle,
-				projectileSpeed = wd.projectilespeed,
 			}
+			if wd.type == "LaserCannon" or wd.type == "Cannon" then
+				-- Barely works for missiles, and might break their burnblow and prediction
+				state.weapon[i].projectileSpeed = wd.projectilespeed
+			end
 			if wd.type == "BeamLaser" then
-				state.weapon[i].burstRate = false -- beamlasers go screwy if you mess with their burst length
+				-- beamlasers go screwy if you mess with their burst length
+				state.weapon[i].burstRate = false
 			end
 		end
 		
@@ -283,14 +285,17 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 			end
 		end
 		local moddedRange = w.range*((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
-		local moddedSpeed = w.projectileSpeed*((weaponMods and weaponMods[i] and weaponMods[i].projSpeedMult) or 1)*projSpeedFactor
 		local moddedProjectiles = w.projectiles*((weaponMods and weaponMods[i] and weaponMods[i].projectilesMult) or 1)*projectilesFactor
 		
 		local sprayAngle = math.max(w.sprayAngle, minSpray)
 		spSetUnitWeaponState(unitID, i, "sprayAngle", sprayAngle)
 		
+		if w.projectileSpeed then
+			local moddedSpeed = w.projectileSpeed*((weaponMods and weaponMods[i] and weaponMods[i].projSpeedMult) or 1)*projSpeedFactor
+			spSetUnitWeaponState(unitID, i, "projectileSpeed", moddedSpeed)
+		end
+		
 		spSetUnitWeaponState(unitID, i, "projectiles", moddedProjectiles)
-		spSetUnitWeaponState(unitID, i, "projectileSpeed", moddedSpeed)
 		spSetUnitWeaponState(unitID, i, "range", moddedRange)
 		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
 		if maxRangeModified < moddedRange then
@@ -479,9 +484,11 @@ local function CleanupAttributeDataForUnit(unitID)
 	currentSetJammer[unitID] = nil
 	currentSetSight[unitID] = nil
 	
+	GG.att_CostMult[unitID] = nil
 	GG.att_EconomyChange[unitID] = nil
 	GG.att_ReloadChange[unitID] = nil
 	GG.att_MoveChange[unitID] = nil
+	GG.att_ProjSpeed[unitID] = nil
 	GG.att_RegenChange[unitID] = nil
 	GG.att_ShieldRegenChange[unitID] = nil
 	GG.attRaw_BuildSpeed[unitID] = nil
@@ -577,13 +584,17 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
+	
 	
 	-- GG is faster (but gadget-only). The totals are for gadgets, so should be migrated to GG eventually.
+	GG.att_CostMult[unitID] = costMult
 	GG.att_EconomyChange[unitID] = econMult
 	GG.att_ReloadChange[unitID] = reloadMult
 	GG.att_MoveChange[unitID] = moveMult
 	GG.att_RegenChange[unitID] = healthRegen
 	GG.att_ShieldRegenChange[unitID] = shieldRegen
+	GG.att_ProjSpeed[unitID] = projSpeedMult -- Ignores weapon mods
 	
 	unitSlowed[unitID] = moveMult < 1
 	
