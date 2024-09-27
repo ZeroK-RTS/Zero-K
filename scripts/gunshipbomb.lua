@@ -125,7 +125,10 @@ local function ThrowBomb()
 		ttl = 300,
 		gravity = bombGravity,
 	}
-	Spring.SpawnProjectile(bombDefID, params)
+	local projectileCount = (Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
+	for i = 1, projectileCount do
+		Spring.SpawnProjectile(bombDefID, params)
+	end
 end
 
 function Detonate() -- Giving an order causes recursion.

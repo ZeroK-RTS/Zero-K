@@ -66,6 +66,7 @@ GG.att_HealthMult = {}
 GG.att_EconomyChange = {}
 GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
+GG.att_RangeChange = {}
 GG.att_ProjSpeed = {}
 GG.att_RegenChange = {}
 GG.att_ShieldRegenChange = {}
@@ -500,6 +501,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	GG.att_EconomyChange[unitID] = nil
 	GG.att_ReloadChange[unitID] = nil
 	GG.att_MoveChange[unitID] = nil
+	GG.att_RangeChange[unitID] = nil
 	GG.att_ProjSpeed[unitID] = nil
 	GG.att_RegenChange[unitID] = nil
 	GG.att_ShieldRegenChange[unitID] = nil
@@ -635,6 +637,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	GG.att_EconomyChange[unitID] = econMult
 	GG.att_ReloadChange[unitID] = reloadMult
 	GG.att_MoveChange[unitID] = moveMult
+	GG.att_RangeChange[unitID] = rangeMult
 	GG.att_RegenChange[unitID] = healthRegen
 	GG.att_ShieldRegenChange[unitID] = shieldRegen
 	GG.att_ShieldMaxMult[unitID] = shieldMaxMult
