@@ -22,7 +22,7 @@ local isTechBuilder = {}
 local function IsTechBuilder(unitDefID)
 	if not isTechBuilder[unitDefID] then
 		local ud = UnitDefs[unitDefID]
-		isTechBuilder[unitDefID] = (ud.canRepair or ud.isFactory) and 1 or 0
+		isTechBuilder[unitDefID] = (ud.canRepair or ud.isFactory or ud.customParams.morphto) and 1 or 0
 	end
 	return isTechBuilder[unitDefID] == 1
 end
@@ -45,4 +45,7 @@ function widget:SelectionChanged(selection, subselection)
 		end
 	end
 	WG.SelectedTechLevel = maxLevel
+	WG.PlacementMetalMult = math.pow(1.5, maxLevel - 1)
+	WG.PlacementEnergyMult = math.pow(3, maxLevel - 1)
+	WG.PlacementCostMult = math.pow(2, maxLevel - 1)
 end

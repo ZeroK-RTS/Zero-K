@@ -95,7 +95,7 @@ local function DamageToCostDamage(unitID, damage, unitDefID, unitTeam)
 	if (hp < 0) then
 		damage = damage + hp
 	end
-	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
+	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 	return costdamage
 end
 
