@@ -332,7 +332,7 @@ function TargetingLaserUpdate()
 						end
 						
 						--// Shooting
-						local projectiles = (Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
+						local projectiles = (GG.att_ProjMult[unitID] or 1)
 						if shooting ~= 0 then
 							for i = 1, projectiles do
 								EmitSfx(EmitterMuzzle, GG.Script.FIRE_W2)
