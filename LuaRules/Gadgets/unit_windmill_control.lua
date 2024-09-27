@@ -191,7 +191,7 @@ local function SetupUnit(unitID)
 	
 	if Spring.GetGroundHeight(x, z) <= TIDAL_HEIGHT then
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
-		GG.Attributes.AddEffect(unitID, "self_upgrade", {healthAdd = TIDAL_HEALTH - WIND_HEALTH})
+		GG.Attributes.AddEffect(unitID, "self_upgrade", {healthAdd = TIDAL_HEALTH - WIND_HEALTH, static = true})
 		Spring.SetUnitCollisionVolumeData(unitID, 24, 20, 24, 0, -5, 0, 0, 1, 0)
 		Spring.SetUnitMidAndAimPos(unitID, 0, 0, 0, 0, 2, 0, true)
 		Spring.SetUnitRulesParam(unitID, "midpos_override", 5 - midy)

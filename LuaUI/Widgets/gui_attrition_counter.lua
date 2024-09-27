@@ -368,7 +368,7 @@ local function UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID)
 			-- unit was freed crom capture - refund score
 			capturedUnits[unitID] = nil;
 			local buildProgress = select(5, GetUnitHealth(unitID))
-			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 			local team = teams[newTeamID]
 			team.lostUnits = team.lostUnits - 1
 			team.lostMetal = team.lostMetal - worth
@@ -385,7 +385,7 @@ local function UnitTransfered(unitID, unitDefID, oldTeamID, newTeamID)
 			-- unit has now become mind-controlled for the first time; oldTeamID lost it
 			capturedUnits[unitID] = unitDefID; -- verify unitdef in case of ID recycling
 			local buildProgress = select(5, GetUnitHealth(unitID))
-			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+			local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 			local team = teams[oldTeamID]
 			team.lostUnits = team.lostUnits + 1
 			team.lostMetal = team.lostMetal + worth
@@ -445,7 +445,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	local captureController = Spring.GetUnitRulesParam(unitID,"capture_controller");
 	if captureController and captureController ~= -1 then return end
 		
-	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 	
 	-- if teamID and unitID and unitDefID and teamID ~= gaiaTeam then
 	local team = teams[teamID]

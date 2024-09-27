@@ -473,7 +473,7 @@ local function AddDestroyEvent(unitID, unitDefID, unitTeam, costMult)
 	local x, y, z = SpringGetUnitPosition(unitID)
 	local gameTime = SpringGetGameFrame()
 
-	local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+	local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 
 	if metal < 1 then
 		return

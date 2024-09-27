@@ -33,9 +33,11 @@ local spScaledGetMouseState = Spring.ScaledGetMouseState
 local spGetUnitShieldState = Spring.GetUnitShieldState
 
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
-local GetHumanName = Spring.Utilities.GetHumanName
 local GetUnitCost = Spring.Utilities.GetUnitCost
+local GetHumanName = Spring.Utilities.GetHumanName
 local GetDescription = Spring.Utilities.GetDescription
+local GetHumanNameForWreck = Spring.Utilities.GetHumanNameForWreck
+local GetDescriptionForWreck = Spring.Utilities.GetDescriptionForWreck
 local GetHelptext = Spring.Utilities.GetHelptext
 local spGetSelectedUnitsSorted = Spring.GetSelectedUnitsSorted
 
@@ -1617,7 +1619,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				mm, mu, em, eu = GetUnitResources(unitID)
 				
 				if hp then
-					total_cost = total_cost + GetUnitCost(unitID, unitDefID)*build * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+					total_cost = total_cost + GetUnitCost(unitID, unitDefID)*build
 					total_hp = total_hp + hp
 				end
 				
@@ -1688,7 +1690,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
 				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
 				total_maxShield = total_maxShield + (maxShield[unitDefID] or 0)
-				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID) * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID)
 				local burstData = UNIT_BURST_DAMAGES[unitDefID]
 				if burstData and burstClass then
 					if burstClass == 0 then
@@ -2027,7 +2029,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 
-	local function UpdateDynamicUnitAttributes(unitID, unitDefID, ud)
+	local function UpdateDynamicUnitAttributes(unitID, unitDefID, featureID, ud)
 		local mm, mu, em, eu = GetUnitResources(unitID)
 		local showMetalInfo = false
 		if mm then
@@ -2073,7 +2075,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		if dynamicTooltipDefs[unitDefID] then
-			unitDesc:SetText(GetDescription(ud, unitID))
+			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 		end
 		
 		unitpicBadgeUpdate(GetUnitNeedRearm(unitID, unitDefID), IMAGE.NO_AMMO)
@@ -2099,9 +2101,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
 		if extraTooltip then
-			unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
+			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
 		else
-			unitDesc:SetText(GetDescription(ud, unitID))
+			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 		end
 		unitDesc:Invalidate()
 		
@@ -2146,7 +2148,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			if not requiredOnly then
 				if unitID and unitDefID and visible then
-					UpdateDynamicUnitAttributes(unitID, unitDefID, UnitDefs[unitDefID])
+					UpdateDynamicUnitAttributes(unitID, unitDefID, featureID, UnitDefs[unitDefID])
 				end
 				if featureID then
 					UpdateDynamicFeatureAttributes(featureID, prevUnitDefID)
@@ -2200,9 +2202,13 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
 
-			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0) * ((unitID and Spring.GetUnitRulesParam(unitID, "costMult")) or 1)
+			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0)
 			local smallCostDisplay = unitCost
-			if smallCostDisplay >= 10000 then
+			if smallCostDisplay >= 10000000000 then
+				smallCostDisplay = math.floor(smallCostDisplay / 1000000000) .. "G"
+			elseif smallCostDisplay >= 10000000 then
+				smallCostDisplay = math.floor(smallCostDisplay / 1000000) .. "M"
+			elseif smallCostDisplay >= 10000 then
 				smallCostDisplay = math.floor(smallCostDisplay / 1000) .. "k"
 			end
 			costInfoUpdate(true, cyan .. smallCostDisplay, IMAGE.COST, PIC_HEIGHT + 4)
@@ -2212,13 +2218,13 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 			end
 			if extraTooltip then
-				unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
+				unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
 			else
-				unitDesc:SetText(GetDescription(ud, unitID))
+				unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 			end
 			unitDesc:Invalidate()
 			
-			local unitName = GetHumanName(ud, unitID)
+			local unitName = (featureID and GetHumanNameForWreck or GetHumanName)(ud, unitID)
 			unitNameUpdate(true, unitName, GetUnitIcon(unitDefID))
 			
 			if unitID then
@@ -2310,7 +2316,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitDesc:SetText(GetDescription(ud, prevUnitID))
 			unitDesc:Invalidate()
 
-			local unitName = GetHumanName(ud, prevUnitID)
+			local unitName = (prevFeatureID and GetHumanNameForWreck or GetHumanName)(ud, prevUnitID)
 			unitNameUpdate(true, unitName, GetUnitIcon(prevUnitDefID))
 
 			if not isTooltipVersion then

@@ -138,12 +138,14 @@ local function SetUnitTechLevel(unitID, level)
 		cost = simpleDoubling,
 		econ = math.pow(1.5, level - 1), -- 1.5x metal income
 		energy = simpleDoubling, -- Effective 3x
+		mass = simpleDoubling,
 		shieldRegen = simpleDoubling,
 		healthRegen = simpleDoubling,
 		build = simpleDoubling,
 		healthMult = simpleDoubling,
 		projSpeed = math.sqrt(range), -- Maintains Cannon range.
-		minSprayAngle = (math.pow(level, 0.25) - 1) * 0.04
+		minSprayAngle = (math.pow(level, 0.25) - 1) * 0.04,
+		static = true,
 	})
 	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.2, sizeScale, 1 + (sizeScale - 1)*0.2})
 	GG.UnitModelRescale(unitID, sizeScale)
