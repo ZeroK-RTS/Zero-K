@@ -91,7 +91,7 @@ local function EmitShot()
 		GG.Starlight_DamageFrame[parentUnitID] = nil
 	end
 	
-	local projectiles = (Spring.GetUnitRulesParam(parentUnitID, "projectilesMult") or 1)
+	local projectiles = (GG.att_ProjMult[parentUnitID] or 1)
 	if shooting ~= 0 then
 		for i = 1, projectiles do
 			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W1)

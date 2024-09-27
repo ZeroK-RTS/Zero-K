@@ -68,6 +68,7 @@ GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
 GG.att_RangeChange = {}
 GG.att_ProjSpeed = {}
+GG.att_ProjMult = {}
 GG.att_RegenChange = {}
 GG.att_ShieldRegenChange = {}
 GG.att_ShieldMaxMult = {}
@@ -503,6 +504,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	GG.att_MoveChange[unitID] = nil
 	GG.att_RangeChange[unitID] = nil
 	GG.att_ProjSpeed[unitID] = nil
+	GG.att_ProjMult[unitID] = nil
 	GG.att_RegenChange[unitID] = nil
 	GG.att_ShieldRegenChange[unitID] = nil
 	GG.att_StaticBuildRateMult[unitID] = nil
@@ -643,6 +645,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	GG.att_ShieldMaxMult[unitID] = shieldMaxMult
 	GG.att_StaticBuildRateMult[unitID] = staticBuildpowerMult
 	GG.att_ProjSpeed[unitID] = projSpeedMult -- Ignores weapon mods
+	GG.att_ProjMult[unitID] = projectilesMult
 	
 	unitSlowed[unitID] = moveMult < 1
 	
