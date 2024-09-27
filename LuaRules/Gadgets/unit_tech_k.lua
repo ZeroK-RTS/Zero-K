@@ -18,6 +18,16 @@ if not (modoption == "1") then
 	return
 end
 
+-- TODO
+-- Shield charge?
+-- Projectiles for Outlaw, Felon
+-- Integral updates
+-- Hack into energy income
+-- Morph desc
+-- Check Puppy
+-- Lamp creation
+-- Carrier drones
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -235,11 +245,14 @@ local function CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
 		-- Constructors can upgrade their factory to one beyond their own level
 		builderLevel = builderLevel + 1
 	end
-	return builderLevel > targetLevel
+	local _, _, _, _, buildProgress = Spring.GetUnitHealth(targetID)
+	local isNanoframe = buildProgress < 1
+	return isNanoframe or builderLevel > targetLevel, builderLevel
 end
 
 local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if not CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams) then
+	local validCommand, builderLevel = CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
+	if not validCommand then
 		return true
 	end
 	local targetID = cmdParams[1]
@@ -252,6 +265,9 @@ local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, 
 	if Spring.GetUnitSeparation(unitID, targetID, true, true) < buildRange - 10 then
 		local health, maxHealth, _, _, buildProgress = Spring.GetUnitHealth(targetID)
 		if buildProgress >= 1 then
+			if (unitLevel[targetID] or 1) >= builderLevel then
+				return true -- Nothing to do
+			end
 			-- https://github.com/beyond-all-reason/spring/issues/1698
 			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.RECLAIM, 0, targetID}, CMD.OPT_ALT)
 			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
@@ -259,10 +275,12 @@ local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, 
 			reclaimToRemoveUnit[unitID] = Spring.GetGameFrame() + 20
 			return false
 		end
-		local cost = Spring.Utilities.GetUnitCost(targetID) * (GG.att_CostMult[targetID] or 1)
-		SetUnitTechLevel(targetID, (unitLevel[targetID] or 1) + 1)
-		local newCost = Spring.Utilities.GetUnitCost(targetID) * (GG.att_CostMult[targetID] or 1)
-		Spring.SetUnitHealth(targetID, {build = cost / newCost * buildProgress, health = health})
+		if (unitLevel[targetID] or 1) < builderLevel then
+			local cost = Spring.Utilities.GetUnitCost(targetID)
+			SetUnitTechLevel(targetID, builderLevel)
+			local newCost = Spring.Utilities.GetUnitCost(targetID)
+			Spring.SetUnitHealth(targetID, {build = cost / newCost * buildProgress, health = health})
+		end
 		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.REPAIR, CMD.OPT_SHIFT, targetID}, CMD.OPT_ALT)
 		return false
 	end

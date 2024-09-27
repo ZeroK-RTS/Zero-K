@@ -607,7 +607,7 @@ local function GetUnitIcon(unitDefID)
 end
 
 local function GetCurrentBuildSpeed(unitID, buildSpeed)
-	return (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(spGetUnitRulesParam(unitID, "totalEconomyChange") or 1)*buildSpeed
+	return (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(spGetUnitRulesParam(unitID, "totalBuildPowerChange") or 1)*buildSpeed
 end
 
 local unitBorderCache = {}
@@ -841,13 +841,16 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	if econMultEnabled then
 		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetMyAllyTeamID() or "")) or 1)
 	end
+	local cost = Spring.Utilities.GetUnitCost(false, unitDefID)
+	local metalMult = WG.PlacementMetalMult or 1
+	local energyMult = WG.PlacementEnergyMult or 1
 	
 	if econDef.mex then
 		if mousePlaceX and WG.mouseoverMexIncome then
-			local finalBaseIncome = WG.mouseoverMexIncome * mult * econDef.mex
+			local finalBaseIncome = WG.mouseoverMexIncome * mult * econDef.mex * metalMult
 			local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. math.round(finalBaseIncome, 2)
 			if WG.mouseoverMexIncome > 0 then
-				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(econDef.cost / finalBaseIncome)
+				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(cost / finalBaseIncome)
 			else
 				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. WG.Translate("interface", "never")
 			end
@@ -855,8 +858,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		return
 	end
 	
-	local income = econDef.income * mult
-	local cost = econDef.cost
+	local income = econDef.income * mult * energyMult
 	local extraText = ""
 	local healthOverride = false
 	local minWind = 0
@@ -873,9 +875,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 						healthOverride = TIDAL_HEALTH
 						minWind = income
 					else
-						local minWindIncome = (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
-						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome * mult, 1) .. " - " .. math.round(windMax * mult, 1)
-						income = mult * (minWindIncome + windMax)/2
+						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
+						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome, 1) .. " - " .. math.round(windMax * mult * energyMult, 1)
+						income = (minWindIncome + mult * energyMult * windMax)/2
 						minWind = minWindIncome
 					end
 				end
@@ -883,6 +885,10 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		end
 	else
 		extraText = extraText .. " (+" .. math.round(income, ((mult == 1) and 0) or 1) .. ")"
+	end
+	
+	if Spring.Utilities.GetUnitHealth then
+		healthOverride = Spring.Utilities.GetUnitHealth(false, unitDefID, healthOverride)
 	end
 	
 	local teamID = Spring.GetLocalTeamID()
@@ -2527,7 +2533,12 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
 		local unitDefID, morphTime, morphCost = chiliTooltip:match('(%d+) (%d+) (%d+)')
 		if unitDefID and morphTime and morphCost then
-			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, tonumber(morphTime), tonumber(morphCost))
+			morphCost = tonumber(morphCost)
+			morphTime = tonumber(morphTime)
+			if WG.PlacementCostMult then
+				morphCost = morphCost * WG.PlacementCostMult
+			end
+			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, morphTime, morphCost)
 		end
 		return true
 	end

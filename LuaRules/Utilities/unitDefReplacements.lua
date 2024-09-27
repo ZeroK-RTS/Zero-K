@@ -63,7 +63,7 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		if variableCostUnit[unitDefID] then
 			cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 		else
-			cost = cost * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		end
 	end
 	return cost
@@ -94,6 +94,9 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 	local buildPower = GetCachedBaseBuildPower(unitDefID)
 	local mult = 1
 	if unitID then
+		mult = mult * Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1
+	end
+	if unitID then
 		if econMultEnabled then
 			mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (spGetUnitAllyTeam(unitID) or "")) or 1)
 		end
@@ -121,7 +124,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function GetGridTooltip(unitID)
+local function GetGridTooltip(unitID, windMult)
 	local gridCurrent = Spring.GetUnitRulesParam(unitID, "OD_gridCurrent")
 	if not gridCurrent then return end
 
@@ -137,8 +140,9 @@ local function GetGridTooltip(unitID)
 			minWind = minWind * mult
 			maxWind = maxWind * mult
 		end
-		minWind = math.round(minWind, 1)
-		maxWind = math.round(maxWind, 1)
+		windMult = windMult or 1
+		minWind = math.round(minWind * windMult, 1)
+		maxWind = math.round(maxWind * windMult, 1)
 		windStr = "\n" ..  WG.Translate("interface", "wind_range") .. " " .. minWind .. " - " .. maxWind
 	end
 
@@ -220,8 +224,8 @@ local function GetPlateTooltip(unitID, ud)
 	return desc .. " Disabled - Too far from operational factory"
 end
 
-local function GetCustomTooltip (unitID, ud)
-	return GetGridTooltip(unitID)
+local function GetCustomTooltip (unitID, ud, windMult)
+	return GetGridTooltip(unitID, windMult)
 	or GetMexTooltip(unitID, ud)
 	or GetTerraformTooltip(unitID)
 	or GetZenithTooltip(unitID)
@@ -300,6 +304,14 @@ if Spring.GetModOptions().techk == "1" and WG then
 		return (WG.SelectedTechLevel or 1)
 	end
 	
+	Spring.Utilities.GetUnitHealth = function(unitID, unitDefID, healthOverride)
+		if healthOverride then
+			return healthOverride * math.pow(2, GetTechLevel(unitID) - 1)
+		end
+		local ud = UnitDefs[unitDefID]
+		return ud.health * math.pow(2, GetTechLevel(unitID) - 1)
+	end
+	
 	Spring.Utilities.GetUnitCost = function(unitID, unitDefID)
 		unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 		if not (unitDefID and buildTimes[unitDefID]) then
@@ -310,7 +322,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 			if variableCostUnit[unitDefID] then
 				cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 			else
-				cost = cost * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+				cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 			end
 		else
 			cost = cost * math.pow(2, (WG.SelectedTechLevel or 1) - 1)
@@ -364,7 +376,8 @@ if Spring.GetModOptions().techk == "1" and WG then
 		local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
 		local isValidUnit = Spring.ValidUnitID(unitID)
 		if isValidUnit then
-			local customTooltip = GetCustomTooltip(unitID, ud)
+			local tech = GetTechLevel(unitID) or 1
+			local customTooltip = GetCustomTooltip(unitID, ud, math.pow(3, tech - 1))
 			if customTooltip then
 				return customTooltip
 			end

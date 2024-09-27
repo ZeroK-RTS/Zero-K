@@ -48,7 +48,7 @@ Spring.SetGameRulesParam("slowState",1)
 local function AddAwardSlow(unitID, attackerTeam, slowdown)
 	if GG.Awards and GG.Awards.AddAwardPoints then
 		local _, maxHp = spGetUnitHealth(unitID)
-		local cost_slowdown = (slowdown / maxHp) * GetUnitCost(unitID) * (GG.att_CostMult[unitID] or 1)
+		local cost_slowdown = (slowdown / maxHp) * GetUnitCost(unitID)
 		GG.Awards.AddAwardPoints ('slow', attackerTeam, cost_slowdown)
 	end
 end
