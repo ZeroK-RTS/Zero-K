@@ -62,12 +62,15 @@ local function GetMass(health, cost)
 end
 
 GG.att_CostMult = {}
+GG.att_HealthMult = {}
 GG.att_EconomyChange = {}
 GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
 GG.att_ProjSpeed = {}
 GG.att_RegenChange = {}
 GG.att_ShieldRegenChange = {}
+GG.att_ShieldMaxMult = {}
+GG.att_StaticBuildRateMult = {}
 GG.attRaw_BuildSpeed = {} -- A build speed value rather than a multiplier
 
 --------------------------------------------------------------------------------
@@ -185,10 +188,13 @@ local function UpdateHealthCostMass(unitID, unitDefID, healthAdd, healthMult, co
 	
 	if massMult == 1 then
 		-- Default to update mass based on new stats, if a multiplier is not set.
-		Spring.SetUnitMass(unitID, GetMass(newMaxHealth, cost))
+		local mass = GetMass(newMaxHealth, cost)
+		Spring.SetUnitMass(unitID, mass)
+		Spring.SetUnitRulesParam(unitID, "massOverride", mass, INLOS_ACCESS)
 	else
-		local mass = GetMass(origUnitHealth[unitDefID], origCost)
-		Spring.SetUnitMass(unitID, mass * massMult)
+		local mass = GetMass(origUnitHealth[unitDefID], origCost) * massMult
+		Spring.SetUnitMass(unitID, mass)
+		Spring.SetUnitRulesParam(unitID, "massOverride", mass, INLOS_ACCESS)
 	end
 end
 
@@ -490,12 +496,14 @@ local function CleanupAttributeDataForUnit(unitID)
 	currentSetSight[unitID] = nil
 	
 	GG.att_CostMult[unitID] = nil
+	GG.att_HealthMult[unitID] = nil
 	GG.att_EconomyChange[unitID] = nil
 	GG.att_ReloadChange[unitID] = nil
 	GG.att_MoveChange[unitID] = nil
 	GG.att_ProjSpeed[unitID] = nil
 	GG.att_RegenChange[unitID] = nil
 	GG.att_ShieldRegenChange[unitID] = nil
+	GG.att_StaticBuildRateMult[unitID] = nil
 	GG.attRaw_BuildSpeed[unitID] = nil
 end
 
@@ -523,6 +531,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local massMult = 1
 	local energyMult = 1
 	local shieldRegen = 1
+	local shieldMaxMult = 1
 	local healthRegen = 1
 	local costMult = 1
 	local buildMult = 1
@@ -540,6 +549,8 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local staticBuildpowerMult = 1
 	local staticMetalMult = 1
 	local staticEnergyMult = 1
+	local staticShieldRegen = 1
+	local staticHealthRegen = 1
 	
 	local hasAttributes = false
 	for _, data in IterableMap.Iterator(attTypeMap) do
@@ -548,16 +559,21 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 			
 			healthAdd = healthAdd + (data.healthAdd and data.healthAdd[unitID] or 0)
 			healthMult = healthMult*(data.healthMult and data.healthMult[unitID] or 1)
+			healthRegen = healthRegen*(data.healthRegen and data.healthRegen[unitID] or 1)
+			costMult = costMult*(data.cost and data.cost[unitID] or 1)
+			massMult = massMult*(data.mass and data.mass[unitID] or 1)
+			
 			moveMult = moveMult*(data.move and data.move[unitID] or 1)
 			turnMult = turnMult*(data.turn and data.turn[unitID] or (data.move and data.move[unitID]) or 1)
 			accelMult = accelMult*(data.accel and data.accel[unitID] or (data.move and data.move[unitID]) or 1)
-			econMult = econMult*(data.econ and data.econ[unitID] or 1)
-			massMult = massMult*(data.mass and data.mass[unitID] or 1)
-			energyMult = energyMult*(data.energy and data.energy[unitID] or 1)
+			
 			shieldRegen = shieldRegen*(data.shieldRegen and data.shieldRegen[unitID] or 1)
-			healthRegen = healthRegen*(data.healthRegen and data.healthRegen[unitID] or 1)
-			costMult = costMult*(data.cost and data.cost[unitID] or 1)
+			shieldMaxMult = shieldMaxMult*(data.shieldMax and data.shieldMax[unitID] or 1)
+			
+			energyMult = energyMult*(data.energy and data.energy[unitID] or 1)
+			econMult = econMult*(data.econ and data.econ[unitID] or 1)
 			buildMult = buildMult*(data.build and data.build[unitID] or 1)
+			
 			abilityDisabled = abilityDisabled or data.abilityDisabled and data.abilityDisabled[unitID]
 			shieldDisabled = shieldDisabled or data.shieldDisabled and data.shieldDisabled[unitID]
 			minSpray = math.max(minSpray, data.minSpray and data.minSpray[unitID] or 0)
@@ -571,6 +587,8 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 				staticBuildpowerMult = staticBuildpowerMult*(data.build and data.build[unitID] or 1)
 				staticMetalMult = staticMetalMult*(data.econ and data.econ[unitID] or 1)
 				staticEnergyMult = staticEnergyMult*(data.econ and data.econ[unitID] or 1)*(data.energy and data.energy[unitID] or 1)
+				staticShieldRegen = staticShieldRegen*(data.shieldRegen and data.shieldRegen[unitID] or 1)
+				staticHealthRegen = staticHealthRegen*(data.healthRegen and data.healthRegen[unitID] or 1)
 			end
 			
 			if data.weaponNum and data.weaponNum[unitID] then
@@ -601,18 +619,26 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "projectilesMult", projectilesMult, INLOS_ACCESS)
 	
 	spSetUnitRulesParam(unitID, "totalStaticBuildpowerMult", staticBuildpowerMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalStaticMetalMult", staticMetalMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalStaticEnergyMult", staticEnergyMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalShieldMaxMult", shieldMaxMult, INLOS_ACCESS)
+	
+	spSetUnitRulesParam(unitID, "totalStaticShieldRegen", staticShieldRegen, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalStaticHealthRegen", staticHealthRegen, INLOS_ACCESS)
 	
 	-- GG is faster (but gadget-only).
 	GG.att_CostMult[unitID] = costMult
+	GG.att_HealthMult[unitID] = healthMult
 	GG.att_EconomyChange[unitID] = econMult
 	GG.att_ReloadChange[unitID] = reloadMult
 	GG.att_MoveChange[unitID] = moveMult
 	GG.att_RegenChange[unitID] = healthRegen
 	GG.att_ShieldRegenChange[unitID] = shieldRegen
+	GG.att_ShieldMaxMult[unitID] = shieldMaxMult
+	GG.att_StaticBuildRateMult[unitID] = staticBuildpowerMult
 	GG.att_ProjSpeed[unitID] = projSpeedMult -- Ignores weapon mods
 	
 	unitSlowed[unitID] = moveMult < 1
@@ -643,6 +669,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 		currentCost[unitID] = costMult
 		currentMass[unitID] = massMult
 	end
+	spSetUnitRulesParam(unitID, "massMult", costMult, INLOS_ACCESS)
 	
 	if moveChanges then
 		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult)
@@ -707,9 +734,11 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- Gadgets can send these to Attributes.AddEffect
 local attributeNames = {
 	"healthAdd",
 	"healthMult",
+	"healthRegen",
 	"move",
 	"turn",
 	"accel",
@@ -718,8 +747,8 @@ local attributeNames = {
 	"projSpeed",
 	"econ",
 	"energy",
+	"shieldMax",
 	"shieldRegen",
-	"healthRegen",
 	"cost",
 	"mass",
 	"build",
@@ -784,6 +813,7 @@ function Attributes.RemoveUnit(unitID)
 end
 
 function Attributes.AddEffect(unitID, key, effect)
+	-- See attributeNames above for value effect keys
 	local attType = IterableMap.Get(attributesTypes, key)
 	if not attType then
 		attType = InitAttributeType()

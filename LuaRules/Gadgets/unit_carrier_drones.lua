@@ -199,6 +199,9 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 	--Note: create unit argument: (unitDefID|unitDefName, x, y, z, facing, teamID, build, flattenGround, targetID, builderID)
 	local droneID = CreateUnit(droneName, xS, yS, zS, 1, carrierList[unitID].teamID, droneBuiltExternally and true, false, nil, unitID)
 	if droneID then
+		if GG.SetUnitTechLevel then
+			GG.SetUnitTechLevel(droneID, GG.GetUnitTechLevel(unitID))
+		end
 		spSetUnitRulesParam(droneID, "parent_unit_id", unitID)
 		spSetUnitRulesParam(droneID, "drone_set_index", setNum)
 		local droneSet = carrierEntry.droneSets[setNum]
@@ -418,7 +421,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 		local droneType = droneList[unitID].set
 		local droneInfo = carrierList[carrierID].droneSets[droneType] --may persist even after "carrierList[carrierID]" is emptied
 		local build_step = droneInfo.config.buildStep
-		local build_step_health = droneInfo.config.buildStepHealth
+		local build_step_health = droneInfo.config.buildStepHealth * (GG.att_HealthMult[unitID] or 1)
 		
 		local buildStepCost = droneInfo.config.buildStepCost
 		local perSecondCost = droneInfo.config.perSecondCost

@@ -18,15 +18,7 @@ if not (modoption == "1") then
 	return
 end
 
--- TODO
--- Shield charge?
--- Projectiles for Outlaw, Felon
--- Integral updates
--- Hack into energy income
--- Morph desc
--- Check Puppy
--- Lamp creation
--- Carrier drones
+-- Factory plates
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -127,7 +119,7 @@ local function SetUnitTechLevel(unitID, level)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	--Spring.Utilities.UnitEcho(unitID, level)
 	
-	local sizeScale = math.pow(1.6, math.pow(level, 0.4) - 1)
+	local sizeScale = math.pow(1.6, math.pow(level, 0.45) - 1)
 	local projectiles = math.pow(2, level - 1)
 	local speed = math.pow(0.8, level - 1)
 	local range = math.pow(1.1, level - 1)
@@ -150,14 +142,15 @@ local function SetUnitTechLevel(unitID, level)
 		energy = simpleDoubling, -- Effective 3x
 		mass = simpleDoubling,
 		shieldRegen = simpleDoubling,
+		shieldMax = math.pow(1.75, level - 1),
 		healthRegen = simpleDoubling,
 		build = simpleDoubling,
 		healthMult = simpleDoubling,
 		projSpeed = math.sqrt(range), -- Maintains Cannon range.
-		minSprayAngle = (math.pow(level, 0.25) - 1) * 0.04,
+		minSpray = (math.pow(level, 0.25) - 1) * 0.04,
 		static = true,
 	})
-	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.2, sizeScale, 1 + (sizeScale - 1)*0.2})
+	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.1, sizeScale, 1 + (sizeScale - 1)*0.1})
 	GG.UnitModelRescale(unitID, sizeScale)
 	Spring.SetUnitRulesParam(unitID, "tech_level", level, INLOS_ACCESS)
 	unitLevel[unitID] = level
@@ -165,6 +158,10 @@ local function SetUnitTechLevel(unitID, level)
 	if (not hasTechCommand[unitID]) and IsTechBuilder(unitID, unitDefID) then
 		hasTechCommand[unitID] = true
 		Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
+	end
+	
+	if GG.FactoryPlate_RefreshUnit then
+		GG.FactoryPlate_RefreshUnit(unitID, unitDefID)
 	end
 end
 
@@ -291,6 +288,9 @@ local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, 
 	return false
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if goalSet[unitID] then
 		goalSet[unitID] = nil
@@ -340,11 +340,13 @@ function gadget:GameFrame(n)
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if builderID and (unitLevel[builderID] or 1) > 1 then
 		SetUnitTechLevel(unitID, unitLevel[builderID])
 	end
-	--SetUnitTechLevel(unitID, 4)
 	if IsTechBuilder(unitID, unitDefID) then
 		hasTechCommand[unitID] = true
 		Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
@@ -354,7 +356,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	hasTechCommand[unitID] = nil
 	if GG.wasMorphedTo[unitID] then
-		-- TODO, set level of new unit
+		SetUnitTechLevel(GG.wasMorphedTo[unitID], unitLevel[unitID] or 1)
 		return
 	end
 	if (unitLevel[unitID] or 1) <= 1 then
@@ -368,7 +370,12 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	AddFeature(unitID, unitDefID, teamID, unitLevel[unitID])
 end
 
+function GG.GetUnitTechLevel(unitID)
+	return unitLevel and unitID and unitLevel[unitID] or 1
+end
+
 function gadget:Initialize()
+	GG.SetUnitTechLevel = SetUnitTechLevel
 	gadgetHandler:RegisterCMDID(CMD_TECH_UP)
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local level = Spring.GetUnitRulesParam(unitID, "tech_level")

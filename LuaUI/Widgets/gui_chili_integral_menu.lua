@@ -35,6 +35,8 @@ local spGetViewGeometry = Spring.GetViewGeometry
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetActiveCommand = Spring.SetActiveCommand
 
+local GetUnitCost = Spring.Utilities.GetUnitCost
+
 -- Configuration
 include("colors.lua")
 include("keysym.lua")
@@ -1490,7 +1492,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			end
 			SetImage("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
 			if buttonLayout.showCost then
-				SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
+				local cost = GetUnitCost(false, -cmdID)
+				if cost >= 100000000 then
+					cost = string.format("%.0fM", cost/1000000)
+				elseif cost >= 100000 then
+					cost = string.format("%.0fk", cost/1000)
+				end
+				SetText(textConfig.bottomLeft.name, cost)
 			end
 		else
 			button.tooltip = GetButtonTooltip(displayConfig, command, state)

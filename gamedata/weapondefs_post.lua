@@ -257,6 +257,21 @@ for _, weaponDef in pairs(WeaponDefs) do
 		weaponDef.mygravity = defaultMyGravity
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- -- Missile compatibility for https://github.com/beyond-all-reason/spring/issues/1683
+-- 
+
+if Spring.GetModOptions().techk == "1" then
+	for _, weaponDef in pairs(WeaponDefs) do
+		if weaponDef.weapontype == "MissileLauncher" and weaponDef.flighttime
+				and weaponDef.name ~= "Napalm Rocket Salvo" then
+			weaponDef.flighttime = weaponDef.flighttime * 2
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

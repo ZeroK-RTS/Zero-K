@@ -292,7 +292,10 @@ function AutoAttack_Thread()
 				GG.PokeDecloakUnit(unitID, unitDefID)
 				
 				EmitSfx(emit, GG.Script.UNIT_SFX1)
-				EmitSfx(emit, GG.Script.DETO_W2)
+				local pulses = (Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
+				for i = 1, pulses do
+					EmitSfx(emit, GG.Script.DETO_W2)
+				end
 				FireAnim()
 			end
 		end

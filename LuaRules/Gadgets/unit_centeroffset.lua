@@ -130,6 +130,9 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales)
 		scales = unitScales[unitID]
 	end
 	local ud = UnitDefs[unitDefID]
+	if not (ud and unitDefID) then
+		return
+	end
 	local midTable = ud.model
 	local mid, aim
 	
@@ -203,6 +206,10 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales)
 	local isSphere = (volumeType == 3) -- Spheres are 3, seems to be no way for engine to tell me this.
 	local aimOff = aimAbove - 1
 	
+	if isSphere and scales then
+		volumeType = 0 -- Set to ellipsoid to allow for stretching.
+	end
+	
 	-- Spheres poke more above the ground to give them more vulnerabilty.
 	-- Otherwise only the tip would show. Other volumes show the entire surface area because they are prisms.
 	local scaleOff = scaleY - volumeBelow - ((isSphere and 8) or 2)
@@ -211,6 +218,7 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales)
 	if noGrowUnitDefs[unitDefID] then
 		growScale = 1
 	end
+	
 	
 	growUnit[unitID] = {
 		mid = mid,
