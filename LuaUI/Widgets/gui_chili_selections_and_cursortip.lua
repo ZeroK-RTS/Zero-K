@@ -2119,12 +2119,12 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if not (unitID or featureID) then
 			extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
-		if extraTooltip then
-			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
-		else
-			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
-		end
-		unitDesc:Invalidate()
+		--if extraTooltip then
+		--	unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
+		--else
+		--	unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
+		--end
+		--unitDesc:Invalidate()
 		
 		if econStructureDefs[unitDefID].isWind then
 			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
@@ -2279,7 +2279,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if unitID then
 			teamID = Spring.GetUnitTeam(unitID)
-			if UpdateDynamicUnitAttributes(unitID, unitDefID, ud) then
+			if UpdateDynamicUnitAttributes(unitID, unitDefID, featureID, ud) then
 				metalInfoShown = true
 			end
 			selectedUnitID = unitID
