@@ -142,7 +142,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		return
 	end
 
-	local cost = GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
+	local cost = GetUnitCost(unitID, unitDefID)
 	nanoframeCount = nanoframeCount + 1
 	nanoframeTeams[nanoframeCount] = teamID
 	nanoframeCosts[nanoframeCount] = cost
@@ -185,7 +185,7 @@ function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
 		return
 	end
 
-	local cost = GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
+	local cost = GetUnitCost(unitID, unitDefID)
 
 	nanoframeCount = nanoframeCount + 1
 	nanoframeTeams[nanoframeCount] = teamID
@@ -266,7 +266,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		totalNanoValueByTeam[oldTeam] = totalNanoValueByTeam[oldTeam] - cost
 		totalNanoValueByTeam[newTeam] = totalNanoValueByTeam[newTeam] + cost
 	else
-		local cost = GetUnitCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
+		local cost = GetUnitCost(unitID, unitDefID)
 		unitValueByTeam[oldTeam] = unitValueByTeam[oldTeam] - cost
 		unitValueByTeam[newTeam] = unitValueByTeam[newTeam] + cost
 		
