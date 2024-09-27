@@ -94,7 +94,7 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 	local buildPower = GetCachedBaseBuildPower(unitDefID)
 	local mult = 1
 	if unitID then
-		mult = mult * Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1
+		mult = mult * (Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1)
 	end
 	if unitID then
 		if econMultEnabled then
