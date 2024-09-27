@@ -147,21 +147,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Cost Handling
-
-local function UpdateCost(unitID, unitDefID, costMult)
-	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)*costMult
-	Spring.SetUnitCosts(unitID, {
-		metal = cost,
-		energy = cost,
-		buildTime = cost,
-	})
-	local _, maxHealth = Spring.GetUnitHealth(unitID)
-	Spring.SetUnitMass(unitID, GetMass(maxHealth, cost))
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Economy Handling
 
 local function UpdateEconomy(unitID, unitDefID, factor, energyFactor)
@@ -171,22 +156,40 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Health Handling
+-- Health Cost and Mass Handling
 
 local origUnitHealth = {}
+local origUnitCost = {}
 
-local function UpdateHealth(unitID, unitDefID, healthAdd, healthMult)
+local function UpdateHealthCostMass(unitID, unitDefID, healthAdd, healthMult, costMult, massMult)
 	if not origUnitHealth[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		origUnitHealth[unitDefID] = ud.health
+	end
+	if not origUnitCost[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		origUnitCost[unitDefID] = ud.buildTime
 	end
 	local newMaxHealth = (origUnitHealth[unitDefID] + healthAdd) * healthMult
 	local oldHealth, oldMaxHealth = Spring.GetUnitHealth(unitID)
 	Spring.SetUnitMaxHealth(unitID, newMaxHealth)
 	Spring.SetUnitHealth(unitID, oldHealth * newMaxHealth / oldMaxHealth)
 	
-	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)*(GG.att_CostMult[unitID] or 1)
-	Spring.SetUnitMass(unitID, GetMass(newMaxHealth, cost))
+	local origCost = origUnitCost[unitDefID]
+	local cost = origCost*costMult
+	Spring.SetUnitCosts(unitID, {
+		metalCost = cost,
+		energyCost = cost,
+		buildTime = cost,
+	})
+	
+	if massMult == 1 then
+		-- Default to update mass based on new stats, if a multiplier is not set.
+		Spring.SetUnitMass(unitID, GetMass(newMaxHealth, cost))
+	else
+		local mass = GetMass(origUnitHealth[unitDefID], origCost)
+		Spring.SetUnitMass(unitID, mass * massMult)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -443,6 +446,7 @@ local currentReload = {}
 local currentRange = {}
 local currentProjSpeed = {}
 local currentEcon = {}
+local currentMass = {}
 local currentEnergy = {}
 local currentBuildpower = {}
 local currentCost = {}
@@ -470,6 +474,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	currentRange[unitID] = nil
 	currentProjSpeed[unitID] = nil
 	currentEcon[unitID] = nil
+	currentMass[unitID] = nil
 	currentEnergy[unitID] = nil
 	currentBuildpower[unitID] = nil
 	currentCost[unitID] = nil
@@ -515,6 +520,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local rangeMult = 1
 	local projSpeedMult = 1
 	local econMult = 1
+	local massMult = 1
 	local energyMult = 1
 	local shieldRegen = 1
 	local healthRegen = 1
@@ -531,6 +537,10 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local setJammer = false
 	local setSight = false
 	
+	local staticBuildpowerMult = 1
+	local staticMetalMult = 1
+	local staticEnergyMult = 1
+	
 	local hasAttributes = false
 	for _, data in IterableMap.Iterator(attTypeMap) do
 		if data.includedUnits[unitID] then
@@ -542,10 +552,10 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 			turnMult = turnMult*(data.turn and data.turn[unitID] or (data.move and data.move[unitID]) or 1)
 			accelMult = accelMult*(data.accel and data.accel[unitID] or (data.move and data.move[unitID]) or 1)
 			econMult = econMult*(data.econ and data.econ[unitID] or 1)
+			massMult = massMult*(data.mass and data.mass[unitID] or 1)
 			energyMult = energyMult*(data.energy and data.energy[unitID] or 1)
 			shieldRegen = shieldRegen*(data.shieldRegen and data.shieldRegen[unitID] or 1)
 			healthRegen = healthRegen*(data.healthRegen and data.healthRegen[unitID] or 1)
-			energyMult = energyMult*(data.energy and data.energy[unitID] or 1)
 			costMult = costMult*(data.cost and data.cost[unitID] or 1)
 			buildMult = buildMult*(data.build and data.build[unitID] or 1)
 			abilityDisabled = abilityDisabled or data.abilityDisabled and data.abilityDisabled[unitID]
@@ -556,6 +566,12 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 			setJammer = data.setJammer and data.setJammer[unitID] or setJammer
 			setSonar = data.setSonar and data.setSonar[unitID] or setSonar
 			setSight = data.setSight and data.setSight[unitID] or setSight
+			
+			if data.static then
+				staticBuildpowerMult = staticBuildpowerMult*(data.build and data.build[unitID] or 1)
+				staticMetalMult = staticMetalMult*(data.econ and data.econ[unitID] or 1)
+				staticEnergyMult = staticEnergyMult*(data.econ and data.econ[unitID] or 1)*(data.energy and data.energy[unitID] or 1)
+			end
 			
 			if data.weaponNum and data.weaponNum[unitID] then
 				local weaponNum = data.weaponNum[unitID]
@@ -586,8 +602,11 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
 	
+	spSetUnitRulesParam(unitID, "totalStaticBuildpowerMult", staticBuildpowerMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalStaticMetalMult", staticMetalMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalStaticEnergyMult", staticEnergyMult, INLOS_ACCESS)
 	
-	-- GG is faster (but gadget-only). The totals are for gadgets, so should be migrated to GG eventually.
+	-- GG is faster (but gadget-only).
 	GG.att_CostMult[unitID] = costMult
 	GG.att_EconomyChange[unitID] = econMult
 	GG.att_ReloadChange[unitID] = reloadMult
@@ -617,15 +636,12 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 		or (setJammer ~= (currentSetJammer[unitID] or false))
 		or (setSight ~= (currentSetSight[unitID] or false))
 	
-	if healthChanges then
-		UpdateHealth(unitID, unitDefID, healthAdd, healthMult)
+	if healthChanges or (currentCost[unitID] or 1) ~= costMult or (currentMass[unitID] or 1) ~= massMult then
+		UpdateHealthCostMass(unitID, unitDefID, healthAdd, healthMult, costMult, massMult)
 		currentHealthAdd[unitID] = healthAdd
 		currentHealthMult[unitID] = healthMult
-	end
-	
-	if (currentCost[unitID] or 1) ~= costMult then
-		UpdateCost(unitID, unitDefID, costMult)
 		currentCost[unitID] = costMult
+		currentMass[unitID] = massMult
 	end
 	
 	if moveChanges then
@@ -705,6 +721,7 @@ local attributeNames = {
 	"shieldRegen",
 	"healthRegen",
 	"cost",
+	"mass",
 	"build",
 	"sense",
 	"setRadar",
@@ -716,6 +733,10 @@ local attributeNames = {
 	"minSpray",
 	"abilityDisabled",
 	"shieldDisabled",
+	
+	-- Whether the attribute change is intended to ba baked into the unit, or temporary.
+	-- This helps the UI display stats, and helps things like morph work correctly.
+	"static",
 }
 
 local function InitAttributeType()

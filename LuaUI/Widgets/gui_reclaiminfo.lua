@@ -156,7 +156,7 @@ function widget:DrawScreen()
 		if (isunit == "unit") and (Spring.GetUnitHealth(unitID)) then --Getunithealth just to make sure that it is in los
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local _,_,_,_,buildprogress = Spring.GetUnitHealth(unitID)
-			metal = math.floor(Spring.Utilities.GetUnitCost(unitID, unitDefID)*buildprogress) * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+			metal = math.floor(Spring.Utilities.GetUnitCost(unitID, unitDefID)*buildprogress)
 			local textwidth = 12*gl.GetTextWidth("    M:" .. metal)
 			if (textwidth+x>vsx) then
 				x = x - textwidth - 10

@@ -53,23 +53,24 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function GetUnitCost(unitID, unitDefID)
+function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
-	if unitID and variableCostUnit[unitDefID] then
-		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
-		if realCost then
-			return realCost
+	if not (unitDefID and buildTimes[unitDefID]) then
+		return 50
+	end
+	local cost = buildTimes[unitDefID]
+	if unitID then
+		if variableCostUnit[unitDefID] then
+			cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+		else
+			cost = cost * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
 		end
 	end
-	if unitDefID and buildTimes[unitDefID] then
-		return buildTimes[unitDefID]
-	end
-	return 50
+	return cost
 end
-Spring.Utilities.GetUnitCost = GetUnitCost
 
 function Spring.Utilities.GetUnitValue(unitID, unitDefID)
-	local cost = GetUnitCost(unitID, unitDefID)
+	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	local _, buildProgress = Spring.GetUnitIsBeingBuilt(unitID)
 	return cost * buildProgress
 end
@@ -156,7 +157,7 @@ local function GetMexTooltip(unitID, ud)
 
 	local currentIncome = Spring.GetUnitRulesParam(unitID, "current_metalIncome")
 	local mexIncome = (Spring.GetUnitRulesParam(unitID, "mexIncome") or 0) * (ud.customParams.metal_extractor_mult or 0)
-	local baseFactor = Spring.GetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
+	local baseFactor = Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1
 
 	if currentIncome == 0 then
 		return WG.Translate("interface", "disabled_base_metal") .. ": " .. math.round(mexIncome,2)
@@ -213,7 +214,7 @@ local function GetPlateTooltip(unitID, ud)
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
 	local buildSpeedRaw = spGetUnitBuildSpeed(unitID, unitDefID)
 	if buildSpeedRaw > 0 and not ud.customParams.nobuildpower then
-		local buildSpeed = buildSpeedRaw * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+		local buildSpeed = buildSpeedRaw * (Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1)
 		desc = WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc .. " Disabled - Too far from operational factory"
@@ -267,10 +268,16 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	
 	local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
 	if buildSpeed > 0 then
+		if unitID then
+			buildSpeed = buildSpeed * (Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1)
+		end
 		return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc
 end
+
+Spring.Utilities.GetHumanNameForWreck = Spring.Utilities.GetHumanName
+Spring.Utilities.GetDescriptionForWreck = Spring.Utilities.GetDescription
 
 function Spring.Utilities.GetHelptext(ud, unitID)
 	local name_override = ud.customParams.statsname or ud.name
@@ -280,6 +287,101 @@ end
 function Spring.Utilities.GetUnitHeight(ud)
 	local customHeight = ud.customParams.custom_height
 	return (customHeight and tonumber(customHeight)) or ud.height
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+if Spring.GetModOptions().techk == "1" and WG then
+	local function GetTechLevel(unitID)
+		if unitID then
+			return Spring.GetUnitRulesParam(unitID, "tech_level") or 1
+		end
+		return (WG.SelectedTechLevel or 1)
+	end
+	
+	Spring.Utilities.GetUnitCost = function(unitID, unitDefID)
+		unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+		if not (unitDefID and buildTimes[unitDefID]) then
+			return 50
+		end
+		local cost = buildTimes[unitDefID]
+		if unitID then
+			if variableCostUnit[unitDefID] then
+				cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+			else
+				cost = cost * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+			end
+		else
+			cost = cost * math.pow(2, (WG.SelectedTechLevel or 1) - 1)
+		end
+		return cost
+	end
+
+	Spring.Utilities.GetHumanName = function(ud, unitID)
+		if not ud then
+			return ""
+		end
+		
+		local prefix = ""
+		local level = GetTechLevel(unitID)
+		local preLevel = level
+		while preLevel > 7 do
+			prefix = prefix .. "Über "
+			preLevel = preLevel - 7
+		end
+		while preLevel > 3 do
+			prefix = prefix .. "Super "
+			preLevel = preLevel - 3
+		end
+		while preLevel > 1 do
+			prefix = prefix .. "Adv. "
+			preLevel = preLevel - 1
+		end
+
+		if unitID then
+			local name = Spring.GetUnitRulesParam(unitID, "comm_name")
+			if name then
+				local level = Spring.GetUnitRulesParam(unitID, "comm_level")
+				if level then
+					return prefix .. name .. " " .. WG.Translate("interface", "lvl") .. " " .. (level + 1)
+				else
+					return prefix .. name
+				end
+			end
+		end
+
+		local name_override = ud.customParams.statsname or ud.name
+		return prefix .. (WG.Translate ("units", name_override .. ".name") or ud.humanName)
+	end
+
+	Spring.Utilities.GetDescription = function(ud, unitID)
+		if not ud then
+			return ""
+		end
+
+		local name_override = ud.customParams.statsname or ud.name
+		local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+		local isValidUnit = Spring.ValidUnitID(unitID)
+		if isValidUnit then
+			local customTooltip = GetCustomTooltip(unitID, ud)
+			if customTooltip then
+				return customTooltip
+			end
+		end
+		
+		local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
+		if buildSpeed > 0 then
+			if unitID then
+				buildSpeed = buildSpeed * (Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1)
+			else
+				local mult = math.pow(2, (WG.SelectedTechLevel or 1) - 1)
+				buildSpeed = buildSpeed * mult
+			end
+			return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
+		end
+		return desc
+	end
 end
 
 -------------------------------------------------------------------------------------

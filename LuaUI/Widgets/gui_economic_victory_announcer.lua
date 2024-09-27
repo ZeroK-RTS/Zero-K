@@ -89,7 +89,7 @@ local function GetUnitValue(unitID)
 	if doesNotCountUnits[unitDefID] then
 		return 0
 	end
-	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID) * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	local progress = select(5, Spring.GetUnitHealth(unitID))
 	
 	return cost*progress

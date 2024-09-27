@@ -495,7 +495,7 @@ end
 local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	local stats = playerTeamStatsCache[unitTeam]
 	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
-		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID) * (Spring.GetUnitRulesParam(unitID, "costMult") or 1)
+		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
 		local isbuilt = not select(3, spGetUnitIsStunned(unitID))
 		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them

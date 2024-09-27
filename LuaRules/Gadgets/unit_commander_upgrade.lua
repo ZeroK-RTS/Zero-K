@@ -159,7 +159,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
 		local newHealth = math.max(health + data.healthBonus, 1)
-		GG.Attributes.AddEffect(unitID, "self_upgrade", {healthAdd = data.healthBonus})
+		GG.Attributes.AddEffect(unitID, "self_upgrade", {healthAdd = data.healthBonus, static = true})
 		Spring.SetUnitHealth(unitID, newHealth) -- Override scaled health change from GG.Attributes
 	end
 	
