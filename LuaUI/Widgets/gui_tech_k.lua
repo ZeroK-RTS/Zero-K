@@ -22,7 +22,7 @@ local isTechBuilder = {}
 local function IsTechBuilder(unitDefID)
 	if not isTechBuilder[unitDefID] then
 		local ud = UnitDefs[unitDefID]
-		isTechBuilder[unitDefID] = (ud.canRepair or ud.isFactory or ud.customParams.morphto) and 1 or 0
+		isTechBuilder[unitDefID] = (ud.canRepair or ud.isFactory or ud.customParams.morphto or ud.customParams.isfakefactory) and 1 or 0
 	end
 	return isTechBuilder[unitDefID] == 1
 end

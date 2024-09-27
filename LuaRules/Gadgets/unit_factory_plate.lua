@@ -62,8 +62,11 @@ local function DistSq(x1, z1, x2, z2)
 	return (x1 - x2)*(x1 - x2) + (z1 - z2)*(z1 - z2)
 end
 
-local function IsFactoryEligible(plate, factory)
+local function IsFactoryEligible(plateID, plate, factoryID, factory)
 	if (not factory.enabled) or plate.allyTeamID ~= factory.allyTeamID or plate.tech ~= factory.tech then
+		return false
+	end
+	if GG.GetUnitTechLevel and GG.GetUnitTechLevel(plateID) > GG.GetUnitTechLevel(factoryID) then
 		return false
 	end
 	return DistSq(plate.x, plate.z, factory.x, factory.z) <= FACTORY_RANGE_SQ
@@ -97,7 +100,7 @@ local function UpdateState(unitID, plateData, inFrame)
 end
 
 local function CheckPotentialParent(unitID, plateData, index, factoryID, factoryData)
-	if plateData.parent or not IsFactoryEligible(plateData, factoryData) then
+	if plateData.parent or not IsFactoryEligible(unitID, plateData, factoryID, factoryData) then
 		return
 	end
 	
@@ -107,7 +110,7 @@ end
 
 local function FindParent(unitID, plateData)
 	for factoryID, factoryData in IterableMap.Iterator(factories) do
-		if IsFactoryEligible(plateData, factoryData) then
+		if IsFactoryEligible(unitID, plateData, factoryID, factoryData) then
 			plateData.parent = factoryID
 			UpdateState(unitID, plateData)
 			return
@@ -238,9 +241,19 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	gadget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
+local function RefreshUnit(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if parentOfPlate[unitDefID] or childOfFactory[unitDefID] then
+		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitDestroyed(unitID, unitDefID, teamID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
+end
+
 function gadget:Initialize()
 	IterableMap.Clear(factories)
 	IterableMap.Clear(plates)
+	GG.FactoryPlate_RefreshUnit = RefreshUnit
 	
 	local units = Spring.GetAllUnits()
 	for i = 1, #units do

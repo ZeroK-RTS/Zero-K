@@ -304,7 +304,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 		return (WG.SelectedTechLevel or 1)
 	end
 	
-	Spring.Utilities.GetUnitHealth = function(unitID, unitDefID, healthOverride)
+	Spring.Utilities.GetUnitMaxHealth = function(unitID, unitDefID, healthOverride)
 		if healthOverride then
 			return healthOverride * math.pow(2, GetTechLevel(unitID) - 1)
 		end

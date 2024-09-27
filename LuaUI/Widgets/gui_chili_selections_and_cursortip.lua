@@ -503,7 +503,7 @@ function Round(num, idp)
 	end
 end
 
-local function Format(amount, displaySign)
+local function Format(amount, displaySign, longMult)
 	local formatted
 	if type(amount) == "number" then
 		local absAmount = math.abs(amount)
@@ -515,13 +515,13 @@ local function Format(amount, displaySign)
 			else
 				formatted = strFormat("%.1f", amount)
 			end
-		elseif absAmount < 1000 then
+		elseif absAmount < 1000 * (longMult or 1) then
 			if displaySign then
 				formatted = strFormat("%+d", amount)
 			else
 				formatted = strFormat("%d", amount)
 			end
-		elseif absAmount < 20000 then
+		elseif absAmount < 20000 * (longMult or 1) then
 			if displaySign then
 				formatted = strFormat("%+.1f", amount / 1000) .. "k"
 			else
@@ -722,6 +722,7 @@ local function GetUnitRegenString(unitID, ud)
 					regen = regen + ud.customParams.armored_regen
 				end
 				if (regen > 0) then
+					regen = regen * (Spring.GetUnitRulesParam(unitID, "totalStaticHealthRegen") or 1)
 					return "  (+" .. math.ceil(regenMult*regen) .. ")"
 				end
 			end
@@ -739,7 +740,7 @@ local function GetUnitShieldRegenString(unitID, ud)
 		return "  (" .. math.ceil(shieldRegen / 30) .. "s)"
 	end
 	
-	local mult = spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1 * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))
+	local mult = (spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1) * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))
 	if mult == 0 then
 		return ""
 	end
@@ -753,6 +754,7 @@ local function GetUnitShieldRegenString(unitID, ud)
 	if not wd.customParams.slow_immune then
 		regen = mult * regen
 	end
+	regen = regen * (Spring.GetUnitRulesParam(unitID, "totalStaticShieldRegen") or 1)
 	local sign = (regen >= 0) and "+" or ""
 	if math.abs(math.ceil(regen) - regen) < 0.05 then
 		return " (" .. sign .. math.ceil(regen - 0.2) .. ")"
@@ -900,8 +902,8 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		extraText = extraText .. " (+" .. math.round(income, ((mult == 1) and 0) or 1) .. ")"
 	end
 	
-	if Spring.Utilities.GetUnitHealth then
-		healthOverride = Spring.Utilities.GetUnitHealth(false, unitDefID, healthOverride)
+	if Spring.Utilities.GetUnitMaxHealth then
+		healthOverride = Spring.Utilities.GetUnitMaxHealth(false, unitDefID, healthOverride)
 	end
 	
 	local teamID = Spring.GetLocalTeamID()
@@ -1167,7 +1169,7 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 			bar:SetPos(nil, yPos, nil, nil, nil, true)
 		end
 		if not newCaption then
-			newCaption = Format(currentValue) .. ' / ' .. Format(maxValue)
+			newCaption = Format(currentValue, false, 1000) .. ' / ' .. Format(maxValue, false, 1000)
 			if extraCaption then
 				newCaption = newCaption .. extraCaption
 			end
@@ -1665,15 +1667,15 @@ local function GetSelectionStatsDisplay(parentControl)
 		end
 		
 		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count) .. "\n" ..
-			WG.Translate("interface", "value") .. ": " .. Format(total_cost) .. " / " ..  Format(total_finishedcost) .. "\n" ..
-			WG.Translate("interface", "health") .. ": " .. Format(total_hp) .. " / " ..  Format(total_maxhp) .. "\n"
+			WG.Translate("interface", "value") .. ": " .. Format(total_cost, false, 100) .. " / " ..  Format(total_finishedcost, false, 100) .. "\n" ..
+			WG.Translate("interface", "health") .. ": " .. Format(total_hp, false, 100) .. " / " ..  Format(total_maxhp, false, 100) .. "\n"
 		
 		if total_maxShield ~= 0 then
-			unitInfoString = unitInfoString .. WG.Translate("interface", "shields") .. ": " .. Format(total_shield) .. " / " ..  Format(total_maxShield) .. "\n"
+			unitInfoString = unitInfoString .. WG.Translate("interface", "shields") .. ": " .. Format(total_shield, false, 100) .. " / " ..  Format(total_maxShield, false, 100) .. "\n"
 		end
 		if total_totalbp ~= 0 then
 			unitInfoString = unitInfoString ..
-				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp) .. " / " .. Format(total_totalbp) .. "\n"
+				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp, false, 100) .. " / " .. Format(total_totalbp, false, 100) .. "\n"
 		end
 		if total_metalincome ~= 0 or total_metaldrain ~= 0 or total_energyincome ~= 0 or total_energydrain ~= 0 then
 			unitInfoString = unitInfoString ..
@@ -1682,7 +1684,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		end
 		if burstClass and total_totalburst ~= 0 then
 			unitInfoString = unitInfoString ..
-				WG.Translate("interface", "burst_damage") .. ": " .. ((unreliableBurst and "~") or "") .. Format(total_totalburst) .. "\n"
+				WG.Translate("interface", "burst_damage") .. ": " .. ((unreliableBurst and "~") or "") .. Format(total_totalburst, false, 100) .. "\n"
 		end
 		
 		statLabel:SetCaption(unitInfoString)
@@ -1708,7 +1710,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				selectedUnitDefID[i] = unitDefID
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
 				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
-				total_maxShield = total_maxShield + (maxShield[unitDefID] or 0)
+				total_maxShield = total_maxShield + (maxShield[unitDefID] or 0) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
 				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID)
 				local burstData = UNIT_BURST_DAMAGES[unitDefID]
 				if burstData and burstClass then
@@ -1716,7 +1718,7 @@ local function GetSelectionStatsDisplay(parentControl)
 						burstClass = burstData.class
 					end
 					if burstClass == burstData.class then
-						total_totalburst = total_totalburst + burstData.damage
+						total_totalburst = total_totalburst + burstData.damage * (Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
 						unreliableBurst = unreliableBurst or burstData.unreliable
 					else
 						burstClass = false
@@ -2064,7 +2066,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local healthPos
 		if shieldBarUpdate then
 			if ud and (ud.shieldPower > 0 or ud.level) then
-				local shieldPower = spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
+				local shieldPower = (spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
 				local _, shieldCurrentPower = spGetUnitShieldState(unitID, -1)
 				if shieldCurrentPower and shieldPower then
 					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
@@ -2125,9 +2127,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		--	unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 		--end
 		--unitDesc:Invalidate()
+		local health = getunithea
 		
 		if econStructureDefs[unitDefID].isWind then
-			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
+			local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
+			maxHealthLabel(true, health, IMAGE.HEALTH)
 			if mousePlaceX then
 				minWindLabel(true, FormatPlusMinus(minWind), IMAGE.WIND_SPEED)
 			else
@@ -2273,7 +2277,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34, nil, nil, nil, true)
 				end
 				maxHealthShown = true
-				maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH, maxHealthPos)
+				local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
+				maxHealthLabel(true, health, IMAGE.HEALTH, maxHealthPos)
 			end
 		end
 		
