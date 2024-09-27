@@ -506,19 +506,32 @@ end
 local function Format(amount, displaySign)
 	local formatted
 	if type(amount) == "number" then
-		if (amount ==0) then formatted = "0" else
-			if (amount < 20 and (amount * 10)%10 ~=0) then
-				if displaySign then
-					formatted = strFormat("%+.1f", amount)
-				else
-					formatted = strFormat("%.1f", amount)
-				end
+		local absAmount = math.abs(amount)
+		if (amount == 0) then
+			formatted = "0"
+		elseif (absAmount < 20 and (amount * 10)%10 ~=0) then
+			if displaySign then
+				formatted = strFormat("%+.1f", amount)
 			else
-				if displaySign then
-					formatted = strFormat("%+d", amount)
-				else
-					formatted = strFormat("%d", amount)
-				end
+				formatted = strFormat("%.1f", amount)
+			end
+		elseif absAmount < 1000 then
+			if displaySign then
+				formatted = strFormat("%+d", amount)
+			else
+				formatted = strFormat("%d", amount)
+			end
+		elseif absAmount < 20000 then
+			if displaySign then
+				formatted = strFormat("%+.1f", amount / 1000) .. "k"
+			else
+				formatted = strFormat("%.1f", amount / 1000) .. "k"
+			end
+		else
+			if displaySign then
+				formatted = strFormat("%+d", amount / 1000) .. "k"
+			else
+				formatted = strFormat("%d", amount / 1000) .. "k"
 			end
 		end
 	else
