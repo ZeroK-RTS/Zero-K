@@ -100,7 +100,6 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 		if econMultEnabled then
 			mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (spGetUnitAllyTeam(unitID) or "")) or 1)
 		end
-		buildPower = buildPower * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 	elseif econMultEnabled and Spring.GetMyAllyTeamID then
 		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetMyAllyTeamID() or "")) or 1)
 	end
@@ -217,8 +216,8 @@ local function GetPlateTooltip(unitID, ud)
 	end
 	local name_override = ud.customParams.statsname or ud.name
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
-	local buildSpeedRaw = spGetUnitBuildSpeed(unitID, unitDefID)
-	if buildSpeedRaw > 0 and not ud.customParams.nobuildpower then
+	local buildSpeed = spGetUnitBuildSpeed(unitID, unitDefID)
+	if buildSpeed > 0 and not ud.customParams.nobuildpower then
 		desc = WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc .. " Disabled - Too far from operational factory"
