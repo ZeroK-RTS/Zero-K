@@ -270,7 +270,7 @@ local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, 
 				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.RECLAIM, 0, targetID}, CMD.OPT_ALT)
 				local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 				reclaimToRemoveUnit = reclaimToRemoveUnit or {}
-				reclaimToRemoveUnit[unitID] = Spring.GetGameFrame() + 20
+				reclaimToRemoveUnit[unitID] = Spring.GetGameFrame() + 150
 			else
 				if not goalSet[unitID] then
 					Spring.SetUnitMoveGoal(unitID, tx, ty, tz, buildRange - 50)
