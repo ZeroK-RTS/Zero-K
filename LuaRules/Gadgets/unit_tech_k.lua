@@ -257,17 +257,26 @@ local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, 
 	end
 
 	local buildRange = Spring.Utilities.GetUnitBuildRange(unitID, unitDefID)
-	if Spring.GetUnitSeparation(unitID, targetID, true, true) < buildRange - 10 then
+	local distance = Spring.GetUnitSeparation(unitID, targetID, true, true)
+	if distance < buildRange then
 		local health, maxHealth, _, _, buildProgress = Spring.GetUnitHealth(targetID)
 		if buildProgress >= 1 then
 			if (unitLevel[targetID] or 1) >= builderLevel then
 				return true -- Nothing to do
 			end
-			-- https://github.com/beyond-all-reason/spring/issues/1698
-			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.RECLAIM, 0, targetID}, CMD.OPT_ALT)
-			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-			reclaimToRemoveUnit = reclaimToRemoveUnit or {}
-			reclaimToRemoveUnit[unitID] = Spring.GetGameFrame() + 20
+			local midDistance = Spring.GetUnitSeparation(unitID, targetID, true)
+			if midDistance < buildRange - 10 then
+				-- https://github.com/beyond-all-reason/spring/issues/1698
+				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.RECLAIM, 0, targetID}, CMD.OPT_ALT)
+				local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+				reclaimToRemoveUnit = reclaimToRemoveUnit or {}
+				reclaimToRemoveUnit[unitID] = Spring.GetGameFrame() + 20
+			else
+				if not goalSet[unitID] then
+					Spring.SetUnitMoveGoal(unitID, tx, ty, tz, buildRange - 50)
+					goalSet[unitID] = true
+				end
+			end
 			return false
 		end
 		if (unitLevel[targetID] or 1) < builderLevel then
@@ -280,7 +289,7 @@ local function HandleTechCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, 
 		return false
 	end
 	if not goalSet[unitID] then
-		Spring.SetUnitMoveGoal(unitID, tx, ty, tz, buildRange - 30)
+		Spring.SetUnitMoveGoal(unitID, tx, ty, tz, buildRange - 50)
 		goalSet[unitID] = true
 	end
 	return false
