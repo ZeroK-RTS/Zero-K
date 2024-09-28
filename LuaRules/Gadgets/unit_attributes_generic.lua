@@ -724,12 +724,12 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	if senseChanges then
-		UpdateSensorAndJamm(unitID, unitDefID, senseMult, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
+		UpdateSensorAndJamm(unitID, unitDefID, senseMult, not abilityDisabled, setRadar, setSonar, setJammer, setSight)
 		currentSense[unitID] = senseMult
 		currentSetRadar[unitID] = setRadar
 		currentSetSonar[unitID] = setSonar
 		currentSetJammer[unitID] = setJammer
-		currentSetSight[unitID] = setSeight
+		currentSetSight[unitID] = setSight
 	end
 	
 	if not hasAttributes then
