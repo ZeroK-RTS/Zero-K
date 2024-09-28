@@ -3,7 +3,7 @@ local data = {
 	name = "TECH_UP",
 	cmdID = 38412,
 	
-	commandType = CMDTYPE.ICON_UNIT, -- Suffer for now CMDTYPE.ICON_UNIT_OR_AREA,
+	commandType = CMDTYPE.ICON_UNIT_OR_AREA,
 	isState = false, -- Hold fire etc
 	isInstant = false, -- Such as Stop, Self-D etc
 	humanName = "Tech Up",
@@ -15,7 +15,9 @@ local data = {
 	position = {pos = 7, priority = 0.1},
 	stateNames = nil, -- A list of what the states are called.
 	stateTooltip = nil, -- A list of tooltips to use for each state.
-	tooltip = "Tech Up: Upgrade the constructor's factory to the next tech level, or any other structure to the current tech level.",
+	tooltip = [[Tech Up: Upgrade a matching factory to the next tech level, or any structure to the current tech level.
+Ctrl - Only upgrade metal extractors
+Alt - Only upgrade energy]],
 }
 
 return data
