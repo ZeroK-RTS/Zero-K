@@ -100,6 +100,9 @@ local callInLists = {
 	"GotChatMsg",
 	"RecvLuaMsg",
 
+	-- Custom from gadgets themselves
+	"UnitCreatedByMechanic",
+	
 	-- Unit CallIns
 	"UnitCreated",
 	"UnitFinished",
@@ -522,6 +525,12 @@ function gadgetHandler:NewGadget()
     end
     gh.RemoveSyncAction = function(_, cmd)
       return actionHandler.RemoveSyncAction(gadget, cmd)
+    end
+  end
+  
+  if IsSyncedCode() then
+    gh.NotifyUnitCreatedByMechanic = function(_, unitID, parentID, mechanicName, extraData)
+      self:UnitCreatedByMechanic(unitID, parentID, mechanicName, extraData)
     end
   end
 
@@ -1390,6 +1399,12 @@ end
 --
 --  Unit call-ins
 --
+
+function gadgetHandler:UnitCreatedByMechanic(unitID, parentID, mechanicName, extraData)
+  for _,g in r_ipairs(self.UnitCreatedByMechanicList) do
+    g:UnitCreatedByMechanic(unitID, parentID, mechanicName, extraData)
+  end
+end
 
 local inCreated = false
 local finishedDuringCreated = false -- assumes non-recursive create

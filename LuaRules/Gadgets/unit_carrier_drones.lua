@@ -199,9 +199,7 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 	--Note: create unit argument: (unitDefID|unitDefName, x, y, z, facing, teamID, build, flattenGround, targetID, builderID)
 	local droneID = CreateUnit(droneName, xS, yS, zS, 1, carrierList[unitID].teamID, droneBuiltExternally and true, false, nil, unitID)
 	if droneID then
-		if GG.SetUnitTechLevel then
-			GG.SetUnitTechLevel(droneID, GG.GetUnitTechLevel(unitID))
-		end
+		gadgetHandler:NotifyUnitCreatedByMechanic(droneID, unitID, "carrier_drones")
 		spSetUnitRulesParam(droneID, "parent_unit_id", unitID)
 		spSetUnitRulesParam(droneID, "drone_set_index", setNum)
 		local droneSet = carrierEntry.droneSets[setNum]

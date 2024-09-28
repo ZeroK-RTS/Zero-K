@@ -394,6 +394,10 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768 + 0.00001, 0)
 		Spring.SetUnitPosition(newUnit, px, py, pz)
 	end
+	
+	if newUnit then
+		gadgetHandler:NotifyUnitCreatedByMechanic(newUnit, unitID, "morph")
+	end
 
 	if (hostName ~= nil) and PWUnits[unitID] then
 		-- send planetwars deployment message

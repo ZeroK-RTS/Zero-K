@@ -341,6 +341,21 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local techInheritMechanics = {
+	teleport_beacon = true,
+	grey_goo = true,
+	carrier_drones = true,
+	morph = true,
+}
+
+function gadget:UnitCreatedByMechanic(unitID, parentID, mechanic, extraData)
+	if techInheritMechanics[mechanic] then
+		if unitLevel[parentID] then
+			SetUnitTechLevel(unitID, unitLevel[parentID])
+		end
+	end
+end
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if builderID and (unitLevel[builderID] or 1) > 1 then
 		SetUnitTechLevel(unitID, unitLevel[builderID])
@@ -353,10 +368,6 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	hasTechCommand[unitID] = nil
-	if GG.wasMorphedTo[unitID] then
-		SetUnitTechLevel(GG.wasMorphedTo[unitID], unitLevel[unitID] or 1)
-		return
-	end
 	if (unitLevel[unitID] or 1) <= 1 then
 		return
 	end
