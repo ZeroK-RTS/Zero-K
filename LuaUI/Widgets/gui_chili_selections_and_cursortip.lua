@@ -847,7 +847,7 @@ local function GetJumpReload(unitID, unitDefID)
 	return false
 end
 
-local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY, forceUpdate)
 	local econDef = econStructureDefs[unitDefID]
 	if not econDef then
 		return
@@ -861,6 +861,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	local energyMult = WG.PlacementEnergyMult or 1
 	
 	if econDef.mex then
+		if forceUpdate and not WG.mouseoverMexIncome and WG.mexplacement_ForceMouseoverUpdate then
+			WG.mexplacement_ForceMouseoverUpdate()
+		end
 		if mousePlaceX and WG.mouseoverMexIncome then
 			local finalBaseIncome = WG.mouseoverMexIncome * mult * econDef.mex * metalMult
 			local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. math.round(finalBaseIncome, 2)
@@ -2121,12 +2124,12 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if not (unitID or featureID) then
 			extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
-		--if extraTooltip then
-		--	unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
-		--else
-		--	unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
-		--end
-		--unitDesc:Invalidate()
+		if extraTooltip then
+			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
+		else
+			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
+		end
+		unitDesc:Invalidate()
 		local health = getunithea
 		
 		if econStructureDefs[unitDefID].isWind then
@@ -2238,7 +2241,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			local extraTooltip, healthOverride, minWind
 			if not (unitID or featureID) then
-				extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+				extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY, true)
 			end
 			if extraTooltip then
 				unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)

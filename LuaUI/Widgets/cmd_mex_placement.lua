@@ -1372,6 +1372,20 @@ function widget:DrawWorld()
 
 end
 
+function WG.mexplacement_ForceMouseoverUpdate()
+	local mx, my, leftPressed = spGetMouseState()
+	local _, pos = spTraceScreenRay(mx, my, true)
+	if not pos then
+		return
+	end
+	local bx, by, bz = Spring.Pos2BuildPos(primaryMexDefID, pos[1], pos[2], pos[3])
+	local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
+	if closestSpot and IsSpotBuildable(index) then
+		WG.mouseoverMexIncome = closestSpot.metal
+		WG.mouseoverMex = closestSpot
+	end
+end
+
 function widget:DefaultCommand(cmdType, id)
 	if mexSpotToDraw and not cmdType and (Spring.TestBuildOrder(primaryMexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
 		return -primaryMexDefID -- FIXME: if modded mexes exist then get selected units and pick an appropriate modded mex
