@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local base = piece 'base'
+local body = piece 'body'
 local turret = piece 'turret'
 local barrel1 = piece 'barrel1'
 local aim = piece 'aim'
@@ -11,7 +11,7 @@ local rrpontoon = piece 'rrpontoon'
 local rlpontoon = piece 'rlpontoon'
 local flare = piece 'firepoint1'
 
-local smokePiece = {base, turret}
+local smokePiece = {body, turret}
 
 local RESTORE_DELAY = 4000
 local WOBBLE_HEIGHT = 2
@@ -29,10 +29,10 @@ local function Tilt()
 	while true do
 		local angle1 = math.random()*math.rad(3) - math.rad(1.5)
 		local angle2 = math.random()*math.rad(3) - math.rad(1.5)
-		Turn(base, x_axis, angle1, math.rad(1))
-		Turn(base, z_axis, angle2, math.rad(1))
-		WaitForTurn(base, x_axis)
-		WaitForTurn(base, z_axis)
+		Turn(body, x_axis, angle1, math.rad(1))
+		Turn(body, z_axis, angle2, math.rad(1))
+		WaitForTurn(body, x_axis)
+		WaitForTurn(body, z_axis)
 	end
 end
 
@@ -42,9 +42,9 @@ local function WobbleUnit()
 	while true do
 		local rand = WOBBLE_SPEED + math.random()
 		if wobbleRising then
-			Move(base, y_axis, -WOBBLE_HEIGHT, rand)
+			Move(body, y_axis, -WOBBLE_HEIGHT, rand)
 		else
-			Move(base, y_axis, WOBBLE_HEIGHT, rand)
+			Move(body, y_axis, WOBBLE_HEIGHT, rand)
 		end
 		wobbleRising = not wobbleRising
 		Sleep(( 2000 * WOBBLE_HEIGHT / rand ) + ( 1000 / 6 ))
@@ -124,22 +124,22 @@ function script.FireWeapon()
 	firing = true
 	Signal(SIG_WOBBLE)
 	if not wobbleRising then
-		Move(base, y_axis, -WOBBLE_HEIGHT, WOBBLE_SPEED*0.25)
+		Move(body, y_axis, -WOBBLE_HEIGHT, WOBBLE_SPEED*0.25)
 		Sleep(100)
-		Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.35)
+		Move(body, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.35)
 		Sleep(100)
-		Move(base, y_axis, WOBBLE_HEIGHT + 1, WOBBLE_SPEED*0.66)
+		Move(body, y_axis, WOBBLE_HEIGHT + 1, WOBBLE_SPEED*0.66)
 		Sleep(100)
 		Sleep(beam_duration - 300)
-		Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.4)
+		Move(body, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.4)
 	else
-		Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.8)
+		Move(body, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.8)
 		Sleep(100)
-		Move(base, y_axis, WOBBLE_HEIGHT + 1, WOBBLE_SPEED*0.66)
+		Move(body, y_axis, WOBBLE_HEIGHT + 1, WOBBLE_SPEED*0.66)
 		Sleep(beam_duration - 100)
 	end
-	Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED)
-	WaitForMove(base, y_axis)
+	Move(body, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED)
+	WaitForMove(body, y_axis)
 	wobbleRising = true
 	StartThread(WobbleUnit)
 	firing = false
@@ -149,17 +149,17 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
 		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, SFX.NONE)
+		Explode(body, SFX.NONE)
 		Explode(turret, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
 		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, SFX.NONE)
+		Explode(body, SFX.NONE)
 		Explode(turret, SFX.FALL)
 		return 1
 	elseif severity <= .99 then
 		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, SFX.NONE)
+		Explode(body, SFX.NONE)
 		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(frpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
@@ -168,7 +168,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 2
 	else
 		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
-		Explode(base, SFX.NONE)
+		Explode(body, SFX.NONE)
 		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(frpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
