@@ -250,10 +250,16 @@ local function RefreshUnit(unitID, unitDefID)
 	end
 end
 
+local function GetPlateParent(unitID)
+	local plateData = IterableMap.Get(plates, unitID)
+	return plateData and plateData.parent
+end
+
 function gadget:Initialize()
 	IterableMap.Clear(factories)
 	IterableMap.Clear(plates)
 	GG.FactoryPlate_RefreshUnit = RefreshUnit
+	GG.FactoryPlate_GetPlateParent = GetPlateParent
 	
 	local units = Spring.GetAllUnits()
 	for i = 1, #units do

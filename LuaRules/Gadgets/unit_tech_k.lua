@@ -240,6 +240,10 @@ local function CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
 		-- Constructors can upgrade their factory to one beyond their own level
 		builderLevel = builderLevel + 1
 	end
+	local plateParent = GG.FactoryPlate_GetPlateParent(targetID)
+	if plateParent and (unitLevel[plateParent] or 1) > builderLevel then
+		builderLevel = (unitLevel[plateParent] or 1)
+	end
 	local _, _, _, _, buildProgress = Spring.GetUnitHealth(targetID)
 	local isNanoframe = buildProgress < 1
 	return isNanoframe or builderLevel > targetLevel, builderLevel
