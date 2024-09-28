@@ -151,7 +151,10 @@ local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
 local RELOAD = math.ceil(depthchargeWeaponDef.reload * Game.gameSpeed)
 
 function ShootDepthcharge()
-	EmitSfx(pads, GG.Script.FIRE_W3)
+	local projectileCount = (Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
+	for i = 1, projectileCount do
+		EmitSfx(pads, GG.Script.FIRE_W3)
+	end
 	StartThread(ShotThread)
 	Move(gun, y_axis, -2)
 	Move(gun, y_axis, 2, 2)
