@@ -669,14 +669,14 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 		or (setJammer ~= (currentSetJammer[unitID] or false))
 		or (setSight ~= (currentSetSight[unitID] or false))
 	
+	local actualMassMult = 1
 	if healthChanges or (currentCost[unitID] or 1) ~= costMult or (currentMass[unitID] or 1) ~= massMult then
-		UpdateHealthCostMass(unitID, unitDefID, healthAdd, healthMult, costMult, massMult)
+		actualMassMult = UpdateHealthCostMass(unitID, unitDefID, healthAdd, healthMult, costMult, massMult)
 		currentHealthAdd[unitID] = healthAdd
 		currentHealthMult[unitID] = healthMult
 		currentCost[unitID] = costMult
 		currentMass[unitID] = massMult
 	end
-	spSetUnitRulesParam(unitID, "massMult", costMult, INLOS_ACCESS)
 	
 	if moveChanges then
 		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult)

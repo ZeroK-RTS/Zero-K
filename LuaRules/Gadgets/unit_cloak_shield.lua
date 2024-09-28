@@ -259,9 +259,13 @@ local function CanBurrow(udid)
 	return (canBurrowCache[udid] == 1)
 end
 
-local function GetUnitDefCloakTimeMult(udid)
+local function GetUnitDefCloakTimeMult(unitID, udid)
 	if not decloakTimeMultCache[udid] then
 		decloakTimeMultCache[udid] = 1/UnitDefs[udid].mass -- or build time?
+	end
+	local massOverride = Spring.GetUnitRulesParam(unitID, "massOverride")
+	if massOverride then
+		return 1 / massOverride
 	end
 	return decloakTimeMultCache[udid]
 end
@@ -444,10 +448,10 @@ local function UpdateCloakees(data, frameNum)
 
 	if activeCloakee then
 		-- Spend energy on recloak
-		local recloakPower = data.recloakRate * (GG.att_ReloadChange[unitID] or 1)
+		local recloakPower = data.recloakRate * (GG.att_ReloadChange[unitID] or 1) * (GG.att_ProjMult[unitID] or 1)
 		while activeCloakee do
 			local udid = GetUnitDefID(activeCloakee)
-			local costMult = GetUnitDefCloakTimeMult(udid)
+			local costMult = GetUnitDefCloakTimeMult(activeCloakee, udid)
 			cloakProgress[activeCloakee] = (cloakProgress[activeCloakee] or 0) + recloakPower * costMult
 			if cloakProgress[activeCloakee] > 1 then
 				-- Spend overflow on next-closest unit
