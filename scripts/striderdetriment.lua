@@ -302,7 +302,10 @@ end
 
 local function EndJumpThread()
 	GG.PokeDecloakUnit(unitID, unitDefID)
-	EmitSfx(lfoot, landing_explosion)
+	local projectiles = (GG.att_ProjMult[unitID] or 1)
+	for i = 1, projectiles do
+		EmitSfx(lfoot, landing_explosion)
+	end
 	EmitSfx(lfoot, dirtfling)
 	Turn(torso, x_axis, math.rad(45))
 	Turn(larm, x_axis,  math.rad(-40))
