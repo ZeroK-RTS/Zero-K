@@ -219,7 +219,6 @@ local function GetPlateTooltip(unitID, ud)
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
 	local buildSpeedRaw = spGetUnitBuildSpeed(unitID, unitDefID)
 	if buildSpeedRaw > 0 and not ud.customParams.nobuildpower then
-		local buildSpeed = buildSpeedRaw * (Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1)
 		desc = WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc .. " Disabled - Too far from operational factory"
@@ -273,9 +272,6 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	
 	local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
 	if buildSpeed > 0 then
-		if unitID then
-			buildSpeed = buildSpeed * (Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1)
-		end
 		return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc
@@ -386,9 +382,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 		
 		local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
 		if buildSpeed > 0 then
-			if unitID then
-				buildSpeed = buildSpeed * (Spring.GetUnitRulesParam(unitID, "totalStaticBuildpowerMult") or 1)
-			else
+			if not unitID then
 				local mult = math.pow(2, (WG.SelectedTechLevel or 1) - 1)
 				buildSpeed = buildSpeed * mult
 			end
