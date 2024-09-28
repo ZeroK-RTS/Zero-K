@@ -785,9 +785,10 @@ local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeR
 	end
 	
 	if ((cmd == CMD_MANUALFIRE) or (cmd == CMD_AIR_MANUALFIRE)) and info.range then
+		local rangeMult = (Spring.GetUnitRulesParam(unitID, "rangeMult") or 1)
 		glColor(1, 0.3, 0.3, 0.6)
 		glLineWidth(2)
-		glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)
+		glDrawGroundCircle(fx, fy, fz, info.range * rangeMult, circleDivs)
 		glColor(1,1,1,1)
 	end
 	if rangeRingOnly then

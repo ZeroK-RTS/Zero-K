@@ -206,6 +206,7 @@ local function DoUnitUpdate(unitID, unitData)
 	
 	local effectiveRange = (GetEffectiveWeaponRange(unitData.unitDefID, -dy, behaviour.weaponNum) or 0)
 	if effectiveRange then
+		effectiveRange = effectiveRange * (GG.att_RangeChange[unitID] or 1)
 		local wardFireRange = (effectiveRange - behaviour.wardFireLeeway)
 
 		if doDebug then

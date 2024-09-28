@@ -159,7 +159,7 @@ local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()
 local UPDATE_PERIOD = 6
 
-local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, odz)
+local function SendUnitToTarget(unitID, launchMult, flyTimeMult, sideMult, upMult, odx, ty, odz)
 	if Spring.GetUnitTransporter(unitID) then
 		return false
 	end
@@ -168,7 +168,7 @@ local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, o
 		return false
 	end
 	local ndy = ty - ny
-	local flyTime = MIN_FLY_TIME -- math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
+	local flyTime = MIN_FLY_TIME * flyTimeMult -- math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
 	
 	local px, py, pz = odx/flyTime, flyTime*GRAVITY/2 + ndy/flyTime, odz/flyTime
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
@@ -259,6 +259,9 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	local fireDistance = math.sqrt(odx^2 + odz^2)
 	
 	local maxRange = GetEffectiveWeaponRange(data.unitDefID, -ody, data.weaponNum)
+	local rangeMult = (GG.att_RangeChange[proOwnerID] or 1)
+	local flyTimeMult = math.sqrt(rangeMult)
+	maxRange = maxRange * rangeMult
 	if maxRange and fireDistance > maxRange*1.05 then
 		maxRange = maxRange*1.05
 		odx = odx*maxRange/fireDistance
@@ -288,7 +291,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
 		local launchMult = speedMult
 		
-		local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
+		local flyTime = SendUnitToTarget(nearID, launchMult, flyTimeMult, 0, 1, odx, ty, odz)
 		if flyTime then
 			local nearDefID = Spring.GetUnitDefID(nearID)
 			flyTime = flyTime + 15 -- Sideways time.
@@ -306,8 +309,9 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 					odz = odz,
 					sidewaysCounter = 15,
 					launchMult = launchMult,
+					flyTimeMult = flyTimeMult,
 					drag = -1.5,
-					collisionResistence = -5*flyTime/MIN_FLY_TIME,
+					collisionResistence = -5*flyTime/(MIN_FLY_TIME * flyTimeMult),
 				}
 			)
 			SendToUnsynced("addFlying", nearID, nearDefID, flyTime)
@@ -517,7 +521,7 @@ local function UpdateTrajectory(unitID, data)
 	if data.sidewaysCounter then
 		data.sidewaysCounter = data.sidewaysCounter - 1
 		if data.sidewaysCounter < 10 then
-			if not SendUnitToTarget(unitID, data.launchMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
+			if not SendUnitToTarget(unitID, data.launchMult, data.flyTimeMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
 				return true -- remove unit
 			end
 		end
