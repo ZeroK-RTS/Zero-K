@@ -140,7 +140,7 @@ local function SetUnitTechLevel(unitID, level)
 		energy = simpleDoubling, -- Effective 3x
 		mass = simpleDoubling,
 		shieldRegen = simpleDoubling,
-		shieldMax = simpleDoubling,
+		shieldMax = math.pow(1.8, level - 1),
 		healthRegen = simpleDoubling,
 		build = simpleDoubling,
 		healthMult = simpleDoubling,
