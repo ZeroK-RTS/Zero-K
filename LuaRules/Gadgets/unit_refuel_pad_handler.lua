@@ -257,8 +257,8 @@ local function SitOnPad(unitID)
 			else
 				updateRate = 1
 			end
-			updateRate = updateRate*buildRate
-			resTable.e = updateCost*updateRate
+			updateRate = updateRate*buildRate/(GG.att_CostMult[unitID] or 1)
+			resTable.e = updateCost*updateRate*(GG.att_CostMult[unitID] or 1)
 			
 			if reammoProgress then
 				if (updateRate > 0) and ((updateCost == 0) or spUseUnitResource(landData.padID, resTable)) then
