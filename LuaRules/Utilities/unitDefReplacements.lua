@@ -160,7 +160,7 @@ local function GetMexTooltip(unitID, ud)
 	if not metalMult then return end
 
 	local currentIncome = Spring.GetUnitRulesParam(unitID, "current_metalIncome")
-	local mexIncome = (Spring.GetUnitRulesParam(unitID, "mexIncome") or 0) * (ud.customParams.metal_extractor_mult or 0)
+	local mexIncome = (Spring.GetUnitRulesParam(unitID, "mexIncome") or 0) * (ud.customParams.metal_extractor_mult or 0) * (Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1)
 	local baseFactor = Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1
 
 	if currentIncome == 0 then
