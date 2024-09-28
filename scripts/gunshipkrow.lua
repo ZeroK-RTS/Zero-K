@@ -258,11 +258,14 @@ end
 local function ClusterBombThread()
 	local sleepTime = 70
 	local index = 1
+	local projectileCount = (Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
 	while index <= SPECIAL_FIRE_COUNT do
 		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 		if not stunned_or_inbuild then
 			GG.PokeDecloakUnit(unitID, unitDefID)
-			EmitSfx(subemit[0], GG.Script.FIRE_W3)
+			for i = 1, projectileCount do
+				EmitSfx(subemit[0], GG.Script.FIRE_W3)
+			end
 			index = index + 1
 		end
 		local slowState = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
