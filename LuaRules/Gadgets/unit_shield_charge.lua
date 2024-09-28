@@ -101,7 +101,7 @@ local function IsShieldEnabled(unitID)
 end
 
 local function GetChargeRate(unitID)
-	return (GG.att_ReloadChange[unitID] or 1)
+	return (GG.att_ShieldRegenChange[unitID] or 1)
 end
 
 function gadget:GameFrame(n)
@@ -136,7 +136,8 @@ function gadget:GameFrame(n)
 			Spring.SetUnitRulesParam(unitID, "shield_rate_override", chargeRate, losTable)
 		end
 		
-		if enabled and (charge < def.maxCharge or chargeRate < 0) and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
+		local maxCharge = def.maxCharge * (GG.att_ShieldMaxMult[unitID] or 1)
+		if enabled and (charge < maxCharge or chargeRate < 0) and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
 			-- Get changed charge rate based on slow
 			local newChargeRate = (def.slowImmune and 1) or GetChargeRate(unitID)
 			
@@ -151,8 +152,8 @@ function gadget:GameFrame(n)
 			
 			-- Deal with overflow
 			local chargeAdd = newChargeRate*chargeRate
-			if charge + chargeAdd > def.maxCharge then
-				local overProportion = 1 - (charge + chargeAdd - def.maxCharge)/chargeAdd
+			if charge + chargeAdd > maxCharge then
+				local overProportion = 1 - (charge + chargeAdd - maxCharge)/chargeAdd
 				if data.resTable then
 					data.resTable.e = data.resTable.e*overProportion
 					data.oldChargeRate = false -- Reset resTable on next full charge

@@ -283,7 +283,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 		AddProjectile(proID, projectileDefs[weaponID], proOwnerID)
 	end
 	if projectileLead[weaponID] then
-		ApplyProjectileLead(proID, projectileLead[weaponID], weaponID)
+		ApplyProjectileLead(proID, projectileLead[weaponID] * (proOwnerID and GG.att_ProjSpeed[proOwnerID] or 1), weaponID)
 	end
 end
 

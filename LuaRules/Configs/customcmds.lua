@@ -7,7 +7,7 @@
      obvious where the extra commands are coming from). ]]
 
 -- if you add a command, please order it by ID!
-return {
+local commands = {
 	RETREAT_ZONE = 10001,
 	RESETFIRE = 10003,
 	RESETMOVE = 10004,
@@ -112,3 +112,11 @@ return {
 	--[[ WARNING!! Only BASE VANILLA ZK commands belong here!
 	     See the bigass chunk of text at the top of the file. ]]
 }
+
+local commandFiles = VFS.DirList('LuaRules/Configs/ModCommands')
+for i = 1, #commandFiles do
+	local fileData = VFS.Include(commandFiles[i])
+	commands[fileData.name] = fileData.cmdID
+end
+
+return commands

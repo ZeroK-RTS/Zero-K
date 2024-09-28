@@ -174,16 +174,6 @@ function script.StopMoving()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
-function script.MoveRate(rate)
-	if rate == 1 then
-		Turn(base, z_axis, math.rad(-240), math.rad(120))
-		WaitForTurn(base, z_axis)
-		Turn(base, z_axis, math.rad(-120), math.rad(180))
-		WaitForTurn(base, z_axis)
-		Turn(base, z_axis, 0, math.rad(120))
-	end
-end
-
 local function ShowBallWhenConstructionFinished()
 	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 	while stunned_or_inbuild do

@@ -28,7 +28,7 @@ local parentUnitID
 local function MonitorHost()
 	SetSignalMask(SIG_WATCH)
 	while true do
-		if(parentUnitID) then
+		if (parentUnitID) then
 			if not Spring.ValidUnitID(parentUnitID) then
 				on = false
 				Signal(SIG_DOCK+SIG_SHOOT)
@@ -91,14 +91,21 @@ local function EmitShot()
 		GG.Starlight_DamageFrame[parentUnitID] = nil
 	end
 	
+	local projectiles = (GG.att_ProjMult[parentUnitID] or 1)
 	if shooting ~= 0 then
-		EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W1)
+		for i = 1, projectiles do
+			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W1)
+		end
 		shooting = shooting - 1
 	else
 		if cutterCycle == 0 then
-			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
+			for i = 1, projectiles do
+				EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
+			end
 		else
-			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W3)
+			for i = 1, projectiles do
+				EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W3)
+			end
 		end
 		cutterCycle = (cutterCycle + 1)%5
 	end

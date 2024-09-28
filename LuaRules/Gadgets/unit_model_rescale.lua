@@ -22,6 +22,7 @@ end
 --------------------------------------------------------------------------------
 
 local origPieceTable = {}
+local INLOS_ACCESS = {inlos = true}
 
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 local suCopyTable = Spring.Utilities.CopyTable
@@ -31,8 +32,7 @@ local suCopyTable = Spring.Utilities.CopyTable
 
 local function SetScale(unitID, base, scale)
 	local currentScale = (Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1)
-	Spring.SetUnitRulesParam(unitID, "currentModelScale", scale)
-	scale = scale / currentScale
+	Spring.SetUnitRulesParam(unitID, "currentModelScale", scale, INLOS_ACCESS)
 	
 	local pieceTable = suCopyTable(origPieceTable[unitID])
 
@@ -71,6 +71,12 @@ end
 
 function gadget:UnitDestroyed(unitID)
 	origPieceTable[unitID] = nil
+end
+
+function gadget:Shutdown()
+	for unitID in pairs(origPieceTable) do
+		UnitModelRescale(unitID, 1)
+	end
 end
 
 GG.UnitModelRescale = UnitModelRescale

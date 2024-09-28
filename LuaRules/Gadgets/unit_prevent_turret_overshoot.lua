@@ -87,8 +87,11 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	if isSpherical[unitDefID] then
 		distSq = distSq + dy*dy
 	end
-
-	if distSq < allowedRangeSq[unitDefID] then
+	local rangeSq = allowedRangeSq[unitDefID]
+	if (GG.att_RangeChange[unitID] or 1) ~= 1 then
+		rangeSq = rangeSq * GG.att_RangeChange[unitID] * GG.att_RangeChange[unitID]
+	end
+	if distSq < rangeSq then
 		return true
 	end
 

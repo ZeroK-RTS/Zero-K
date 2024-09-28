@@ -143,7 +143,7 @@ function gadget:GameFrame(n)
 				local paralyzed = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 				if (not paralyzed) then
 					local tid = entry.teamID
-					local incomeFactor = spGetUnitRulesParam(unitID,"resourceGenerationFactor") or 1
+					local incomeFactor = spGetUnitRulesParam(unitID,"energyGenerationFactor") or 1
 					windEnergy = windEnergy*incomeFactor
 					teamEnergy[tid] = teamEnergy[tid] + windEnergy -- monitor team energy
 					spSetUnitRulesParam(unitID, "current_energyIncome", windEnergy, inlosTrueTable)
@@ -191,11 +191,7 @@ local function SetupUnit(unitID)
 	
 	if Spring.GetGroundHeight(x, z) <= TIDAL_HEIGHT then
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
-		Spring.SetUnitMaxHealth(unitID, TIDAL_HEALTH)
-		local health = Spring.GetUnitHealth(unitID)
-		if health == WIND_HEALTH then
-			Spring.SetUnitHealth(unitID, TIDAL_HEALTH)
-		end
+		GG.Attributes.AddEffect(unitID, "self_upgrade", {healthAdd = TIDAL_HEALTH - WIND_HEALTH, static = true})
 		Spring.SetUnitCollisionVolumeData(unitID, 24, 20, 24, 0, -5, 0, 0, 1, 0)
 		Spring.SetUnitMidAndAimPos(unitID, 0, 0, 0, 0, 2, 0, true)
 		Spring.SetUnitRulesParam(unitID, "midpos_override", 5 - midy)

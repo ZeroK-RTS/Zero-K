@@ -278,10 +278,9 @@ function script.Create()
 end
 
 local function RockSelf(anglex, anglez)
-	Turn(base, z_axis, -anglex, math.rad(50))
-	Turn(base, x_axis, anglez, math.rad(50))
-	WaitForTurn(base, z_axis)
-	WaitForTurn(base, x_axis)
+	Turn(base, z_axis, anglex, math.rad(50))
+	Turn(base, x_axis, -anglez, math.rad(50))
+	Sleep(66)
 	Turn(base, z_axis, 0, math.rad(20))
 	Turn(base, x_axis, 0, math.rad(20))
 end

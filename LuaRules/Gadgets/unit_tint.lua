@@ -11,15 +11,35 @@ function gadget:GetInfo()
 end
 
 local TINT_MAGIC = 'unit_tint'
+
 if gadgetHandler:IsSyncedCode() then
+	local preGameFrame = {}
+	
 	function GG.TintUnit(unitID, r_or_table, g, b)
 		if not r_or_table then
 			SendToUnsynced(TINT_MAGIC, unitID)
+			if preGameFrame then
+				preGameFrame[#preGameFrame + 1] = {unitID}
+			end
 		elseif type(r_or_table) == 'table' then
 			SendToUnsynced(TINT_MAGIC, unitID, r_or_table[1], r_or_table[2], r_or_table[3])
+			if preGameFrame then
+				preGameFrame[#preGameFrame + 1] = {unitID, r_or_table[1], r_or_table[2], r_or_table[3]}
+			end
 		else
 			SendToUnsynced(TINT_MAGIC, unitID, r_or_table, g, b)
+			if preGameFrame then
+				preGameFrame[#preGameFrame + 1] = {unitID, r_or_table, g, b}
+			end
 		end
+	end
+	
+	function gadget:GameFrame()
+		for i = 1, #preGameFrame do
+			SendToUnsynced(TINT_MAGIC, unpack(preGameFrame[i]))
+		end
+		preGameFrame = nil
+		gadgetHandler:RemoveCallIn("GameFrame")
 	end
 
 	return

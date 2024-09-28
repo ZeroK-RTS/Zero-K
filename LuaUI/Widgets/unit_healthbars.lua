@@ -919,8 +919,9 @@ do
 		end
 
 		if ((barDrawer.HasBars()) or (numStockpiled)) then
+			local heightMult = Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1
 			glPushMatrix()
-			glTranslate(ux, uy+ci.height, uz )
+			glTranslate(ux, uy+ci.height*heightMult, uz )
 			gl.Scale(barScale, barScale, barScale)
 			glBillboard()
 

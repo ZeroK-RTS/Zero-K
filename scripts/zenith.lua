@@ -164,7 +164,7 @@ local function SpawnMeteor()
 	Spring.SetProjectileTarget(proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
 	
 	-- Drop meteor if there are too many. It is more fun this way.
-	if projectileCount >= METEOR_CAPACITY then
+	if projectileCount >= METEOR_CAPACITY * (GG.att_ProjMult[unitID] or 1) then
 		DropSingleMeteor(oldestProjectile)
 		projectiles[oldestProjectile] = proID
 		oldestProjectile = oldestProjectile + 1
@@ -213,7 +213,7 @@ local function SpawnProjectileThread()
 			Sleep(100)
 		end
 		lastSpawnProjectileTime = Spring.GetGameFrame()
-		local reloadMult = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
+		local reloadMult = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1) * (GG.att_ProjMult[unitID] or 1)
 
 		EmitSfx(flare, 2049)
 		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
@@ -316,7 +316,7 @@ end
 function script.Create()
 	spSetUnitRulesParam(unitID, "meteorSpawnBlocked", 0)
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
-	spSetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY * (GG.att_ProjMult[unitID] or 1), INLOS_ACCESS)
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	ux, uy, uz = x, Spring.GetGroundHeight(x, z), z
 	

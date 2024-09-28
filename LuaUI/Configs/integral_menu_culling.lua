@@ -115,4 +115,17 @@ local defaultValues = {
 	--[CMD_FIRE_TOWARDS_ENEMY] = true,
 }
 
+
+local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+for i = 1, #modCommands do
+	local cmd = modCommands[i]
+	configList[#configList + 1] = {
+		cmdID = cmd.cmdID,
+		default = cmd.onCommandMenuByDefault,
+		name = cmd.humanName,
+		state = cmd.isState
+	}
+	defaultValues[cmd.cmdID] = not cmd.onCommandMenuByDefault
+end
+
 return configList, defaultValues

@@ -352,6 +352,15 @@ local special_commands = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
+for i = 1, #modCommands do
+	local cmd = modCommands[i]
+	cmdPosDef[cmd.cmdID] = cmd.position
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 return cmdPosDef, factoryUnitPosDef, factory_commands, econ_commands, defense_commands, special_commands
 
 --------------------------------------------------------------------------------

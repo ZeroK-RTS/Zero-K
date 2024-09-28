@@ -211,7 +211,7 @@ function script.BlockShot(num, targetID)
 	end
 
 	if aimTime <= 0 then
-		return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) or GG.DrainShieldAndCheckProjectilePenetrate(unitID, DRAIN, 0)
+		return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) or GG.DrainShieldAndCheckProjectilePenetrate(unitID, DRAIN * (GG.att_ProjMult[unitID] or 1), 0)
 	end
 	return true
 end

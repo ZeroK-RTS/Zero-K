@@ -118,6 +118,7 @@ return {
 		{	"stopproduction",	"ctrl+s",},
 		{	"globalbuildcancel",	"alt+s",},
 		{	"unloadunits",	"u",},
+		{	"techup",	"u",},
 		{	"pastetext",	"Ctrl+v",},
 		{	"wait",	"ctrl+w",},
 		{	"areamex",	"w",},

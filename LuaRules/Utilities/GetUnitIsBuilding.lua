@@ -22,6 +22,14 @@ local function IsGroundPosInRange(unitID, x, z, range)
 	return ((ux - x)^2 + (uz - z)^2) <= range^2
 end
 
+function Spring.Utilities.GetUnitBuildRange(unitID, unitDefID)
+	if not CachedBuildDistance[unitDefID] then
+		local unitDef = UnitDefs[unitDefID] or {}
+		CachedBuildDistance[unitDefID] = unitDef.buildDistance or 0
+	end
+	return CachedBuildDistance[unitDefID]
+end
+
 function Spring.Utilities.GetUnitNanoTarget(unitID)
 	local type = ""
 	local target
@@ -38,11 +46,7 @@ function Spring.Utilities.GetUnitNanoTarget(unitID)
 		if not unitDefID then
 			return
 		end
-		if not CachedBuildDistance[unitDefID] then
-			local unitDef = UnitDefs[unitDefID] or {}
-			CachedBuildDistance[unitDefID] = unitDef.buildDistance or 0
-		end
-		local buildRange = CachedBuildDistance[unitDefID]
+		local buildRange = Spring.Utilities.GetUnitBuildRange(unitID, unitDefID)
 		
 		local cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
 		

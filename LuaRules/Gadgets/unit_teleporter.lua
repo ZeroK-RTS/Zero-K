@@ -217,6 +217,9 @@ function tele_createBeacon(unitID, unitDefID, x, z, beaconID)
 		end
 		beaconID = beaconID or Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
 		if beaconID then
+			if GG.SetUnitTechLevel then
+				GG.SetUnitTechLevel(beaconID, GG.GetUnitTechLevel(unitID))
+			end
 			Spring.SetUnitPosition(beaconID, x, y, z)
 			Spring.SetUnitNeutral(beaconID,true)
 			tele[unitID].link = beaconID
@@ -588,8 +591,7 @@ function gadget:GameFrame(f)
 						if ud and not flying then
 
 							local mass = Spring.GetUnitRulesParam(teleportiee, "massOverride") or ud.mass
-
-							local cost = math.floor(mass/tele[tid].throughput)
+							local cost = math.floor(mass/(tele[tid].throughput * (GG.att_StaticBuildRateMult[tid] or 1)))
 							--Spring.Echo(cost/30)
 							tele[tid].teleportiee = teleportiee
 							tele[tid].teleportieeDefID = unitDefID

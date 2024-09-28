@@ -259,23 +259,28 @@ function gadget:GameFrame(f)
 		-- check for enough resources to spawn a new unit
 		-- this is done outside above loop as spawned units should not instantly eat goo
 		for i = 1, unitIndex.count do
-			local unit = units[unitIndex[i]]
-			if unit.progress >= unit.defs.cost then
-				unit.progress = unit.progress - unit.defs.cost
-				local x,y,z = spGetUnitPosition(unitIndex[i])
-				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(0,3),spGetUnitTeam(unitIndex[i]))
+			local unitID = unitIndex[i]
+			local unit = units[unitID]
+			local cost = unit.defs.cost * (GG.att_CostMult[unitID] or 1)
+			if unit.progress >= cost then
+				unit.progress = unit.progress - cost
+				local x,y,z = spGetUnitPosition(unitID)
+				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(0,3),spGetUnitTeam(unitID))
 				if newId then
+					if GG.SetUnitTechLevel then
+						GG.SetUnitTechLevel(newId, GG.GetUnitTechLevel(unitID))
+					end
 					local firestate, movestate
 					if REVERSE_COMPAT then
-						local states = spGetUnitStates(unitIndex[i])
+						local states = spGetUnitStates(unitID)
 						firestate, movestate = states.firestate, states.movestate
 					else
-						firestate, movestate = spGetUnitStates(unitIndex[i], false)
+						firestate, movestate = spGetUnitStates(unitID, false)
 					end
 					
 					spGiveOrderToUnit(newId, CMD_FIRE_STATE, firestate   , 0)
 					spGiveOrderToUnit(newId, CMD_MOVE_STATE, movestate   , 0)
-					spGiveOrderToUnit(newId, CMD_GUARD     , unitIndex[i], 0)
+					spGiveOrderToUnit(newId, CMD_GUARD     , unitID, 0)
 
 					spSpawnCEG(CEG_SPAWN,
 						x, y, z,
@@ -286,7 +291,7 @@ function gadget:GameFrame(f)
 			end
 			if unit.oldProgress ~= unit.progress then
 				unit.oldProgress = unit.progress
-				spSetUnitRulesParam(unitIndex[i],"gooState",unit.progress/unit.defs.cost, LOS_ACCESS)
+				spSetUnitRulesParam(unitID,"gooState",unit.progress/cost, LOS_ACCESS)
 			end
 		end
 	end

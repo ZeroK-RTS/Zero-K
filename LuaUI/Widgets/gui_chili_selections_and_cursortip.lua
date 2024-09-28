@@ -33,9 +33,11 @@ local spScaledGetMouseState = Spring.ScaledGetMouseState
 local spGetUnitShieldState = Spring.GetUnitShieldState
 
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
-local GetHumanName = Spring.Utilities.GetHumanName
 local GetUnitCost = Spring.Utilities.GetUnitCost
+local GetHumanName = Spring.Utilities.GetHumanName
 local GetDescription = Spring.Utilities.GetDescription
+local GetHumanNameForWreck = Spring.Utilities.GetHumanNameForWreck
+local GetDescriptionForWreck = Spring.Utilities.GetDescriptionForWreck
 local GetHelptext = Spring.Utilities.GetHelptext
 local spGetSelectedUnitsSorted = Spring.GetSelectedUnitsSorted
 
@@ -501,22 +503,35 @@ function Round(num, idp)
 	end
 end
 
-local function Format(amount, displaySign)
+local function Format(amount, displaySign, longMult)
 	local formatted
 	if type(amount) == "number" then
-		if (amount ==0) then formatted = "0" else
-			if (amount < 20 and (amount * 10)%10 ~=0) then
-				if displaySign then
-					formatted = strFormat("%+.1f", amount)
-				else
-					formatted = strFormat("%.1f", amount)
-				end
+		local absAmount = math.abs(amount)
+		if (amount == 0) then
+			formatted = "0"
+		elseif (absAmount < 20 and (amount * 10)%10 ~=0) then
+			if displaySign then
+				formatted = strFormat("%+.1f", amount)
 			else
-				if displaySign then
-					formatted = strFormat("%+d", amount)
-				else
-					formatted = strFormat("%d", amount)
-				end
+				formatted = strFormat("%.1f", amount)
+			end
+		elseif absAmount < 1000 * (longMult or 1) then
+			if displaySign then
+				formatted = strFormat("%+d", amount)
+			else
+				formatted = strFormat("%d", amount)
+			end
+		elseif absAmount < 20000 * (longMult or 1) then
+			if displaySign then
+				formatted = strFormat("%+.1f", amount / 1000) .. "k"
+			else
+				formatted = strFormat("%.1f", amount / 1000) .. "k"
+			end
+		else
+			if displaySign then
+				formatted = strFormat("%+d", amount / 1000) .. "k"
+			else
+				formatted = strFormat("%d", amount / 1000) .. "k"
 			end
 		end
 	else
@@ -605,7 +620,7 @@ local function GetUnitIcon(unitDefID)
 end
 
 local function GetCurrentBuildSpeed(unitID, buildSpeed)
-	return (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(spGetUnitRulesParam(unitID, "totalEconomyChange") or 1)*buildSpeed
+	return (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(spGetUnitRulesParam(unitID, "totalBuildPowerChange") or 1)*buildSpeed
 end
 
 local unitBorderCache = {}
@@ -707,6 +722,7 @@ local function GetUnitRegenString(unitID, ud)
 					regen = regen + ud.customParams.armored_regen
 				end
 				if (regen > 0) then
+					regen = regen * (Spring.GetUnitRulesParam(unitID, "totalStaticHealthRegen") or 1)
 					return "  (+" .. math.ceil(regenMult*regen) .. ")"
 				end
 			end
@@ -724,7 +740,7 @@ local function GetUnitShieldRegenString(unitID, ud)
 		return "  (" .. math.ceil(shieldRegen / 30) .. "s)"
 	end
 	
-	local mult = spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1 * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))
+	local mult = (spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1) * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))
 	if mult == 0 then
 		return ""
 	end
@@ -738,6 +754,7 @@ local function GetUnitShieldRegenString(unitID, ud)
 	if not wd.customParams.slow_immune then
 		regen = mult * regen
 	end
+	regen = regen * (Spring.GetUnitRulesParam(unitID, "totalStaticShieldRegen") or 1)
 	local sign = (regen >= 0) and "+" or ""
 	if math.abs(math.ceil(regen) - regen) < 0.05 then
 		return " (" .. sign .. math.ceil(regen - 0.2) .. ")"
@@ -839,13 +856,16 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	if econMultEnabled then
 		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetMyAllyTeamID() or "")) or 1)
 	end
+	local cost = Spring.Utilities.GetUnitCost(false, unitDefID)
+	local metalMult = WG.PlacementMetalMult or 1
+	local energyMult = WG.PlacementEnergyMult or 1
 	
 	if econDef.mex then
 		if mousePlaceX and WG.mouseoverMexIncome then
-			local finalBaseIncome = WG.mouseoverMexIncome * mult * econDef.mex
+			local finalBaseIncome = WG.mouseoverMexIncome * mult * econDef.mex * metalMult
 			local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. math.round(finalBaseIncome, 2)
 			if WG.mouseoverMexIncome > 0 then
-				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(econDef.cost / finalBaseIncome)
+				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(cost / finalBaseIncome)
 			else
 				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. WG.Translate("interface", "never")
 			end
@@ -853,8 +873,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		return
 	end
 	
-	local income = econDef.income * mult
-	local cost = econDef.cost
+	local income = econDef.income * mult * energyMult
 	local extraText = ""
 	local healthOverride = false
 	local minWind = 0
@@ -871,9 +890,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 						healthOverride = TIDAL_HEALTH
 						minWind = income
 					else
-						local minWindIncome = (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
-						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome * mult, 1) .. " - " .. math.round(windMax * mult, 1)
-						income = mult * (minWindIncome + windMax)/2
+						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
+						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome, 1) .. " - " .. math.round(windMax * mult * energyMult, 1)
+						income = (minWindIncome + mult * energyMult * windMax)/2
 						minWind = minWindIncome
 					end
 				end
@@ -881,6 +900,10 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		end
 	else
 		extraText = extraText .. " (+" .. math.round(income, ((mult == 1) and 0) or 1) .. ")"
+	end
+	
+	if Spring.Utilities.GetUnitMaxHealth then
+		healthOverride = Spring.Utilities.GetUnitMaxHealth(false, unitDefID, healthOverride)
 	end
 	
 	local teamID = Spring.GetLocalTeamID()
@@ -1146,7 +1169,7 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 			bar:SetPos(nil, yPos, nil, nil, nil, true)
 		end
 		if not newCaption then
-			newCaption = Format(currentValue) .. ' / ' .. Format(maxValue)
+			newCaption = Format(currentValue, false, 1000) .. ' / ' .. Format(maxValue, false, 1000)
 			if extraCaption then
 				newCaption = newCaption .. extraCaption
 			end
@@ -1644,15 +1667,15 @@ local function GetSelectionStatsDisplay(parentControl)
 		end
 		
 		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count) .. "\n" ..
-			WG.Translate("interface", "value") .. ": " .. Format(total_cost) .. " / " ..  Format(total_finishedcost) .. "\n" ..
-			WG.Translate("interface", "health") .. ": " .. Format(total_hp) .. " / " ..  Format(total_maxhp) .. "\n"
+			WG.Translate("interface", "value") .. ": " .. Format(total_cost, false, 100) .. " / " ..  Format(total_finishedcost, false, 100) .. "\n" ..
+			WG.Translate("interface", "health") .. ": " .. Format(total_hp, false, 100) .. " / " ..  Format(total_maxhp, false, 100) .. "\n"
 		
 		if total_maxShield ~= 0 then
-			unitInfoString = unitInfoString .. WG.Translate("interface", "shields") .. ": " .. Format(total_shield) .. " / " ..  Format(total_maxShield) .. "\n"
+			unitInfoString = unitInfoString .. WG.Translate("interface", "shields") .. ": " .. Format(total_shield, false, 100) .. " / " ..  Format(total_maxShield, false, 100) .. "\n"
 		end
 		if total_totalbp ~= 0 then
 			unitInfoString = unitInfoString ..
-				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp) .. " / " .. Format(total_totalbp) .. "\n"
+				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp, false, 100) .. " / " .. Format(total_totalbp, false, 100) .. "\n"
 		end
 		if total_metalincome ~= 0 or total_metaldrain ~= 0 or total_energyincome ~= 0 or total_energydrain ~= 0 then
 			unitInfoString = unitInfoString ..
@@ -1661,7 +1684,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		end
 		if burstClass and total_totalburst ~= 0 then
 			unitInfoString = unitInfoString ..
-				WG.Translate("interface", "burst_damage") .. ": " .. ((unreliableBurst and "~") or "") .. Format(total_totalburst) .. "\n"
+				WG.Translate("interface", "burst_damage") .. ": " .. ((unreliableBurst and "~") or "") .. Format(total_totalburst, false, 100) .. "\n"
 		end
 		
 		statLabel:SetCaption(unitInfoString)
@@ -1687,7 +1710,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				selectedUnitDefID[i] = unitDefID
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
 				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
-				total_maxShield = total_maxShield + (maxShield[unitDefID] or 0)
+				total_maxShield = total_maxShield + (maxShield[unitDefID] or 0) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
 				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID)
 				local burstData = UNIT_BURST_DAMAGES[unitDefID]
 				if burstData and burstClass then
@@ -1695,7 +1718,7 @@ local function GetSelectionStatsDisplay(parentControl)
 						burstClass = burstData.class
 					end
 					if burstClass == burstData.class then
-						total_totalburst = total_totalburst + burstData.damage
+						total_totalburst = total_totalburst + burstData.damage * (Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
 						unreliableBurst = unreliableBurst or burstData.unreliable
 					else
 						burstClass = false
@@ -2027,7 +2050,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 
-	local function UpdateDynamicUnitAttributes(unitID, unitDefID, ud)
+	local function UpdateDynamicUnitAttributes(unitID, unitDefID, featureID, ud)
 		local mm, mu, em, eu = GetUnitResources(unitID)
 		local showMetalInfo = false
 		if mm then
@@ -2043,7 +2066,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local healthPos
 		if shieldBarUpdate then
 			if ud and (ud.shieldPower > 0 or ud.level) then
-				local shieldPower = spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
+				local shieldPower = (spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
 				local _, shieldCurrentPower = spGetUnitShieldState(unitID, -1)
 				if shieldCurrentPower and shieldPower then
 					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
@@ -2073,7 +2096,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		if dynamicTooltipDefs[unitDefID] then
-			unitDesc:SetText(GetDescription(ud, unitID))
+			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 		end
 		
 		unitpicBadgeUpdate(GetUnitNeedRearm(unitID, unitDefID), IMAGE.NO_AMMO)
@@ -2098,15 +2121,17 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if not (unitID or featureID) then
 			extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
-		if extraTooltip then
-			unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
-		else
-			unitDesc:SetText(GetDescription(ud, unitID))
-		end
-		unitDesc:Invalidate()
+		--if extraTooltip then
+		--	unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
+		--else
+		--	unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
+		--end
+		--unitDesc:Invalidate()
+		local health = getunithea
 		
 		if econStructureDefs[unitDefID].isWind then
-			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
+			local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
+			maxHealthLabel(true, health, IMAGE.HEALTH)
 			if mousePlaceX then
 				minWindLabel(true, FormatPlusMinus(minWind), IMAGE.WIND_SPEED)
 			else
@@ -2146,7 +2171,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			if not requiredOnly then
 				if unitID and unitDefID and visible then
-					UpdateDynamicUnitAttributes(unitID, unitDefID, UnitDefs[unitDefID])
+					UpdateDynamicUnitAttributes(unitID, unitDefID, featureID, UnitDefs[unitDefID])
 				end
 				if featureID then
 					UpdateDynamicFeatureAttributes(featureID, prevUnitDefID)
@@ -2202,7 +2227,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 
 			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0)
 			local smallCostDisplay = unitCost
-			if smallCostDisplay >= 10000 then
+			if smallCostDisplay >= 10000000000 then
+				smallCostDisplay = math.floor(smallCostDisplay / 1000000000) .. "G"
+			elseif smallCostDisplay >= 10000000 then
+				smallCostDisplay = math.floor(smallCostDisplay / 1000000) .. "M"
+			elseif smallCostDisplay >= 10000 then
 				smallCostDisplay = math.floor(smallCostDisplay / 1000) .. "k"
 			end
 			costInfoUpdate(true, cyan .. smallCostDisplay, IMAGE.COST, PIC_HEIGHT + 4)
@@ -2212,13 +2241,13 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 			end
 			if extraTooltip then
-				unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
+				unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
 			else
-				unitDesc:SetText(GetDescription(ud, unitID))
+				unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 			end
 			unitDesc:Invalidate()
 			
-			local unitName = GetHumanName(ud, unitID)
+			local unitName = (featureID and GetHumanNameForWreck or GetHumanName)(ud, unitID)
 			unitNameUpdate(true, unitName, GetUnitIcon(unitDefID))
 			
 			if unitID then
@@ -2248,13 +2277,14 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34, nil, nil, nil, true)
 				end
 				maxHealthShown = true
-				maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH, maxHealthPos)
+				local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
+				maxHealthLabel(true, health, IMAGE.HEALTH, maxHealthPos)
 			end
 		end
 		
 		if unitID then
 			teamID = Spring.GetUnitTeam(unitID)
-			if UpdateDynamicUnitAttributes(unitID, unitDefID, ud) then
+			if UpdateDynamicUnitAttributes(unitID, unitDefID, featureID, ud) then
 				metalInfoShown = true
 			end
 			selectedUnitID = unitID
@@ -2310,7 +2340,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitDesc:SetText(GetDescription(ud, prevUnitID))
 			unitDesc:Invalidate()
 
-			local unitName = GetHumanName(ud, prevUnitID)
+			local unitName = (prevFeatureID and GetHumanNameForWreck or GetHumanName)(ud, prevUnitID)
 			unitNameUpdate(true, unitName, GetUnitIcon(prevUnitDefID))
 
 			if not isTooltipVersion then
@@ -2521,7 +2551,12 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
 		local unitDefID, morphTime, morphCost = chiliTooltip:match('(%d+) (%d+) (%d+)')
 		if unitDefID and morphTime and morphCost then
-			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, tonumber(morphTime), tonumber(morphCost))
+			morphCost = tonumber(morphCost)
+			morphTime = tonumber(morphTime)
+			if WG.PlacementCostMult then
+				morphCost = morphCost * WG.PlacementCostMult
+			end
+			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, morphTime, morphCost)
 		end
 		return true
 	end

@@ -332,11 +332,16 @@ function TargetingLaserUpdate()
 						end
 						
 						--// Shooting
+						local projectiles = (GG.att_ProjMult[unitID] or 1)
 						if shooting ~= 0 then
-							EmitSfx(EmitterMuzzle, GG.Script.FIRE_W2)
+							for i = 1, projectiles do
+								EmitSfx(EmitterMuzzle, GG.Script.FIRE_W2)
+							end
 							shooting = shooting - 1
 						else
-							EmitSfx(EmitterMuzzle, GG.Script.FIRE_W3)
+							for i = 1, projectiles do
+								EmitSfx(EmitterMuzzle, GG.Script.FIRE_W3)
+							end
 						end
 					end
 				end

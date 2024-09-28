@@ -35,6 +35,8 @@ local spGetViewGeometry = Spring.GetViewGeometry
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetActiveCommand = Spring.SetActiveCommand
 
+local GetUnitCost = Spring.Utilities.GetUnitCost
+
 -- Configuration
 include("colors.lua")
 include("keysym.lua")
@@ -98,6 +100,7 @@ EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 local modOptions = Spring.GetModOptions()
 local disabledTabs = {}
 
+local tech_k_enabled = modOptions.techk == "1"
 if modOptions.campaign_debug_units ~= "1" then
 	if modOptions.integral_disable_economy == "1" then
 		disabledTabs.economy = true
@@ -1437,6 +1440,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 		local state = isStateCommand and (((WG.GetOverriddenState and WG.GetOverriddenState(newCmdID)) or command.params[1]) + 1)
+		
 		if cmdID == newCmdID then
 			if isStateCommand then
 				local displayConfig = GetDisplayConfig(cmdID)
@@ -1464,9 +1468,22 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			if command then
 				SetDisabled(command.disabled)
 			end
+			if tech_k_enabled and cmdID then
+				if buttonLayout.showCost then
+					local cost = GetUnitCost(false, -cmdID)
+					if cost >= 100000000 then
+						cost = string.format("%.0fM", cost/1000000)
+					elseif cost >= 100000 then
+						cost = string.format("%.0fk", cost/1000)
+					end
+					SetText(textConfig.bottomLeft.name, cost)
+				end
+			end
 			return
 		end
+		
 		cmdID = newCmdID
+		local isBuild = (cmdID < 0)
 		if not notGlobal then
 			buttonsByCommand[cmdID] = externalFunctionsAndData
 		end
@@ -1477,7 +1494,6 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			SetDisabled(command.disabled)
 		end
 		
-		local isBuild = (cmdID < 0)
 		local displayConfig = GetDisplayConfig(cmdID)
 		
 		if isBuild then
@@ -1490,7 +1506,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			end
 			SetImage("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
 			if buttonLayout.showCost then
-				SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
+				local cost = GetUnitCost(false, -cmdID)
+				if cost >= 100000000 then
+					cost = string.format("%.0fM", cost/1000000)
+				elseif cost >= 100000 then
+					cost = string.format("%.0fk", cost/1000)
+				end
+				SetText(textConfig.bottomLeft.name, cost)
 			end
 		else
 			button.tooltip = GetButtonTooltip(displayConfig, command, state)
