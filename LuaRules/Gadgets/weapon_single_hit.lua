@@ -32,11 +32,11 @@ function gadget:Initialize()
 		local wd = WeaponDefs[wdid]
 		if wd.customParams then
 			if wd.customParams.single_hit then
-				singleHitWeapon[wd.id] = true;
+				singleHitWeapon[wd.id] = true
 				wantedWeaponList[#wantedWeaponList + 1] = wdid
 			end
 			if wd.customParams.single_hit_multi then
-				singleHitMultiWeapon[wd.id] = true;
+				singleHitMultiWeapon[wd.id] = true
 				wantedWeaponList[#wantedWeaponList + 1] = wdid
 				Script.SetWatchProjectile(wd.id, true)
 			end
@@ -46,13 +46,13 @@ end
 
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
-	if singleHitMultiWeapon[weaponID] then
+	if singleHitMultiWeapon[weaponID] or (proOwnerID and singleHitWeapon[weaponID] and GG.att_ProjMult[proOwnerID] and GG.att_ProjMult[proOwnerID] > 1) then
 		singleHitProjectile[proID] = {}
 	end
 end
 
 function gadget:ProjectileDestroyed(proID)
-	if singleHitMultiWeapon[proID] then
+	if singleHitMultiWeapon[proID] or singleHitWeapon[weaponDefID] then
 		singleHitProjectile[proID] = nil
 	end
 end
@@ -61,8 +61,9 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
-function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
-	if singleHitWeapon[weaponDefID] then
+function gadget:UnitPreDamaged(unitID, unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
+	local needMulti = singleHitMultiWeapon[weaponDefID] or (singleHitWeapon[weaponDefID] and GG.att_ProjMult[unitID] and GG.att_ProjMult[unitID] > 1))
+	if singleHitWeapon[weaponDefID] and not needMulti then
 		if attackerID then
 			local frame = spGetGameFrame()
 			if singleHitUnitId[attackerID] == nil then
@@ -80,7 +81,7 @@ function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attacke
 		end
 	end
 	
-	if singleHitMultiWeapon[weaponDefID] then
+	if needMulti then
 		if not singleHitProjectile[projectileID] then
 			singleHitProjectile[projectileID] = {}
 		end
