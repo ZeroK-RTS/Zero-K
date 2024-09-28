@@ -136,8 +136,8 @@ local function SetUnitTechLevel(unitID, level)
 		speed = speed,
 		range = range,
 		cost = simpleDoubling,
-		econ = math.pow(1.5, level - 1), -- 1.5x metal income
-		energy = simpleDoubling, -- Effective 3x
+		econ = math.pow(1.25, level - 1),
+		energy = math.pow(2.4, level - 1), -- Effective 3x
 		mass = simpleDoubling,
 		shieldRegen = simpleDoubling,
 		shieldMax = math.pow(1.8, level - 1),
