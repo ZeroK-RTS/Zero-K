@@ -217,9 +217,7 @@ function tele_createBeacon(unitID, unitDefID, x, z, beaconID)
 		end
 		beaconID = beaconID or Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
 		if beaconID then
-			if GG.SetUnitTechLevel then
-				GG.SetUnitTechLevel(beaconID, GG.GetUnitTechLevel(unitID))
-			end
+			gadgetHandler:NotifyUnitCreatedByMechanic(beaconID, unitID, "teleport_beacon")
 			Spring.SetUnitPosition(beaconID, x, y, z)
 			Spring.SetUnitNeutral(beaconID,true)
 			tele[unitID].link = beaconID

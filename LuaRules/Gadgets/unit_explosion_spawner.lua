@@ -90,6 +90,7 @@ local function SpawnUnit(spawnData)
 		if ownerID then
 			spSetUnitRulesParam(unitID, "parent_unit_id", ownerID, PRIVATE)
 		end
+		gadgetHandler:NotifyUnitCreatedByMechanic(unitID, ownerID, "explosion_spawner")
 
 		if spawnDef.expire then
 			expireCount = expireCount + 1

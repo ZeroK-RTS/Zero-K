@@ -291,6 +291,7 @@ function gadget:GameFrame(f)
 				spDestroyFeature(featureID)
 				local unitID = spCreateUnit(resName, x, y, z, face, GaiaTeamID)
 				if (unitID) then
+					gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
 					local size = UnitDefNames[resName].xsize
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)

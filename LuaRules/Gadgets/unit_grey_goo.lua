@@ -267,9 +267,7 @@ function gadget:GameFrame(f)
 				local x,y,z = spGetUnitPosition(unitID)
 				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(0,3),spGetUnitTeam(unitID))
 				if newId then
-					if GG.SetUnitTechLevel then
-						GG.SetUnitTechLevel(newId, GG.GetUnitTechLevel(unitID))
-					end
+					gadgetHandler:NotifyUnitCreatedByMechanic(newId, unitID, "grey_goo")
 					local firestate, movestate
 					if REVERSE_COMPAT then
 						local states = spGetUnitStates(unitID)
