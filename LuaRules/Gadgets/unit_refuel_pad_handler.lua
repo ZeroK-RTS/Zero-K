@@ -173,7 +173,7 @@ local function SitOnPad(unitID)
 	local unitDefID        = Spring.GetUnitDefID(unitID)
 	local ud               = UnitDefs[unitDefID]
 	local cost             = ud.metalCost
-	local maxHP            = ud.health
+	local _, maxHP         = spGetUnitHealth(unitID)
 	local healPerFrame     = landData.repairBp*maxHP/(REPAIR_COST_FACTOR*30*cost)
 	local repairFrameDrain = landData.repairBp/30
 	local reammoMaxTime     = reammoFrames[unitDefID]
@@ -272,7 +272,7 @@ local function SitOnPad(unitID)
 					end
 				end
 			else
-				health = spGetUnitHealth(unitID)
+				health, maxHP = spGetUnitHealth(unitID)
 				if health < maxHP and (updateRate > 0) and ((updateCost == 0) or spUseUnitResource(landData.padID, resTable)) then
 					spSetUnitHealth(unitID, min(maxHP, health + updateRate*healPerFrame))
 				else
