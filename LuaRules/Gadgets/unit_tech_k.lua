@@ -119,7 +119,7 @@ local function SetUnitTechLevel(unitID, level)
 	
 	local sizeScale = math.pow(1.6, math.pow(level, 0.45) - 1)
 	local projectiles = math.pow(2, level - 1)
-	local speed = math.pow(0.8, level - 1)
+	local moveSpeed = math.pow(0.9, level - 1)
 	local range = math.pow(1.1, level - 1)
 	
 	if level > 1 then
@@ -133,7 +133,7 @@ local function SetUnitTechLevel(unitID, level)
 	local simpleDoubling = math.pow(2, level - 1)
 	GG.Attributes.AddEffect(unitID, "tech", {
 		projectiles = projectiles,
-		speed = speed,
+		move = moveSpeed,
 		range = range,
 		jumpRange = range,
 		cost = simpleDoubling,
