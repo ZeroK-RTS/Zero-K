@@ -67,6 +67,7 @@ GG.att_EconomyChange = {}
 GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
 GG.att_RangeChange = {}
+GG.att_JumpRangeChange = {}
 GG.att_ProjSpeed = {}
 GG.att_ProjMult = {}
 GG.att_RegenChange = {}
@@ -503,6 +504,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	GG.att_ReloadChange[unitID] = nil
 	GG.att_MoveChange[unitID] = nil
 	GG.att_RangeChange[unitID] = nil
+	GG.att_JumpRangeChange[unitID] = nil
 	GG.att_ProjSpeed[unitID] = nil
 	GG.att_ProjMult[unitID] = nil
 	GG.att_RegenChange[unitID] = nil
@@ -530,6 +532,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local accelMult = 1
 	local reloadMult = 1
 	local rangeMult = 1
+	local jumpRangeMult = 1
 	local projSpeedMult = 1
 	local econMult = 1
 	local massMult = 1
@@ -570,6 +573,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 			moveMult = moveMult*(data.move and data.move[unitID] or 1)
 			turnMult = turnMult*(data.turn and data.turn[unitID] or (data.move and data.move[unitID]) or 1)
 			accelMult = accelMult*(data.accel and data.accel[unitID] or (data.move and data.move[unitID]) or 1)
+			jumpRangeMult = jumpRangeMult*(data.jumpRange and data.jumpRange[unitID] or 1)
 			
 			shieldRegen = shieldRegen*(data.shieldRegen and data.shieldRegen[unitID] or 1)
 			shieldMaxMult = shieldMaxMult*(data.shieldMax and data.shieldMax[unitID] or 1)
@@ -625,6 +629,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "projectilesMult", projectilesMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "rangeMult", rangeMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "jumpRangeMult", jumpRangeMult, INLOS_ACCESS)
 	
 	spSetUnitRulesParam(unitID, "totalStaticBuildpowerMult", staticBuildpowerMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalStaticMetalMult", staticMetalMult, INLOS_ACCESS)
@@ -641,6 +646,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	GG.att_ReloadChange[unitID] = reloadMult
 	GG.att_MoveChange[unitID] = moveMult
 	GG.att_RangeChange[unitID] = rangeMult
+	GG.att_JumpRangeChange[unitID] = jumpRangeMult
 	GG.att_RegenChange[unitID] = healthRegen
 	GG.att_ShieldRegenChange[unitID] = shieldRegen
 	GG.att_ShieldMaxMult[unitID] = shieldMaxMult
@@ -751,6 +757,7 @@ local attributeNames = {
 	"accel",
 	"reload",
 	"range",
+	"jumpRange",
 	"projSpeed",
 	"econ",
 	"energy",

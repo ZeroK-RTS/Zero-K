@@ -102,9 +102,10 @@ function UpdateUnitAttributes(unitID, frame)
 	-- duplicating the pevious calculations.
 	spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0 <- This is a pain to generalise
 	
-	if slowState ~= 0 or turnMult ~= 1 or maxAccMult ~= 1 then
+	if slowState ~= 0 then
 		attributesTable = attributesTable or {}
 		attributesTable.healthRegen = (1 - (slowState or 0))
+		attributesTable.shieldRegen = (1 - (slowState or 0))
 	end
 	
 	if reloadMult ~= 1 then

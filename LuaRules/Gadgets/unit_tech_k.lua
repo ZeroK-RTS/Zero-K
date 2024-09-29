@@ -135,6 +135,7 @@ local function SetUnitTechLevel(unitID, level)
 		projectiles = projectiles,
 		speed = speed,
 		range = range,
+		jumpRange = range,
 		cost = simpleDoubling,
 		econ = math.pow(1.25, level - 1),
 		energy = math.pow(2.4, level - 1), -- Effective 3x

@@ -219,9 +219,9 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local fakeUnitID
 	local unitDefID        = spGetUnitDefID(unitID)
 	local jumpDef          = jumpDefs[unitDefID]
-	local defSpeed         = jumpDef.speed
+	local defSpeed         = jumpDef.speed * (GG.att_JumpRangeChange[unitID] or 1)
 	local delay            = jumpDef.delay
-	local height           = jumpDef.height
+	local height           = jumpDef.height * (GG.att_JumpRangeChange[unitID] or 1)
 	local cannotJumpMidair = jumpDef.cannotJumpMidair
 	local reloadTime       = ((jumpDef.reload or 0) + (jumpReloadMod[unitID] or 0)) * 30
 	local teamID           = spGetUnitTeam(unitID)
@@ -591,7 +591,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local x, y, z = spGetUnitPosition(unitID)
 	local distSqr = GetDist2Sqr({x, y, z}, cmdParams)
 	local jumpDef = jumpDefs[unitDefID]
-	local range   = jumpDef.range
+	local range   = jumpDef.range * (GG.att_JumpRangeChange[unitID] or 1)
 
 	if (distSqr < (range*range)) then
 		if (Spring.GetUnitRulesParam(unitID, "jumpReload") >= 1) and Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1 then

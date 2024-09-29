@@ -236,7 +236,7 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 	local queueCount = spGetCommandQueue(unitID, 0)
 	local passIf = (not queueCount or queueCount == 0 or not shift)
 	
-	local range = jumpDefs[unitDefID].range
+	local range = jumpDefs[unitDefID].range * (Spring.GetUnitRulesParam(unitID, "jumpRangeMult") or 1)
 	if passIf then
 		local bx,by,bz,ux,uy,uz = spGetUnitPosition(unitID,true)
 		local unitPos = {ux,uy,uz}
