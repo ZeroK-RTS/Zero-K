@@ -173,7 +173,7 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 			controls.imCpu.tooltip = CpuUsageOut(cpuUsage)
 			controls.imPing.tooltip = PingTimeOut(pingTime)
 		end
-		
+		pingTime = pingTime * 1000 -- pingTime here is in SECONDS not ms! This means ping_timeout would require a user to be 33 minutes 33 seconds behind.
 		newIsLagging = ((pingTime > PING_TIMEOUT) and true) or false
 		if forceUpdateControls or newIsLagging ~= entryData.isLagging then
 			entryData.isLagging = newIsLagging
