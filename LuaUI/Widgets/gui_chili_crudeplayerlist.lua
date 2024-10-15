@@ -58,7 +58,7 @@ local pingCpuColors = {
 local ALLY_COLOR  = {0, 1, 1, 1}
 local ENEMY_COLOR = {1, 0, 0, 1}
 
-local PING_TIMEOUT = 2000 -- ms
+local PING_TIMEOUT = 2 -- seconds
 
 local MAX_NAME_LENGTH = 150
 
@@ -173,7 +173,7 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 			controls.imCpu.tooltip = CpuUsageOut(cpuUsage)
 			controls.imPing.tooltip = PingTimeOut(pingTime)
 		end
-		pingTime = pingTime * 1000 -- pingTime here is in SECONDS not ms! This means ping_timeout would require a user to be 33 minutes 33 seconds behind.
+		
 		newIsLagging = ((pingTime > PING_TIMEOUT) and true) or false
 		if forceUpdateControls or newIsLagging ~= entryData.isLagging then
 			entryData.isLagging = newIsLagging
