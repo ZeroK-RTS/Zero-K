@@ -37,6 +37,18 @@ local fallbackAllyTeamID    = Spring.GetMyAllyTeamID()
 
 local Chili
 
+local function GetAIName(teamID)
+	local _, name = Spring.GetAIInfo(teamID)
+	local fallbackName = Spring.GetTeamRulesParam(teamID, "initAIName") or "Unknown AI"
+	return name or "<Broken> " .. fallbackName
+end
+
+local function IsTeamAI(teamID) -- Creates a fallback. Probably should be a Utility function
+	local _, _, _, isAiTeam = Spring.GetTeamInfo(teamID, false)
+	return isAiTeam or Spring.GetTeamRulesParam(teamID, "initAI")
+end
+	
+
 local function GetColorChar(colorTable)
 	if colorTable == nil then return string.char(255,255,255,255) end
 	local col = {}
@@ -280,7 +292,7 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 	end
 	
 	if isAiTeam then
-		local _, name = Spring.GetAIInfo(teamID)
+		name = GetAIName(teamID)
 		entryData.name = name
 	end
 	
@@ -599,7 +611,8 @@ local function InitializePlayerlist()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		if teamID ~= gaiaTeamID then
-			local _, leaderID, isDead, isAiTeam, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
+			local _, leaderID, isDead, _, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
+			local isAiTeam = IsTeamAI(teamID)
 			if leaderID < 0 then
 				leaderID = Spring.GetTeamRulesParam(teamID, "initLeaderID") or leaderID
 			end
