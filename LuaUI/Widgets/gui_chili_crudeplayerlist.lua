@@ -58,7 +58,7 @@ local pingCpuColors = {
 local ALLY_COLOR  = {0, 1, 1, 1}
 local ENEMY_COLOR = {1, 0, 0, 1}
 
-local PING_TIMEOUT = 2000 -- ms
+local PING_TIMEOUT = 2 -- seconds
 
 local MAX_NAME_LENGTH = 150
 
