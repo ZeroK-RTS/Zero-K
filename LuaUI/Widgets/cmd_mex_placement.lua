@@ -1400,7 +1400,7 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 		glPushMatrix()
 
 		if GetMiniMapFlipped() then
-			glTranslate(minimapY, 0, 0)
+			glTranslate(minimapX, 0, 0)
 			glScale(-minimapX/mapX, minimapY/mapZ, 1)
 		else
 			glTranslate(0, minimapY, 0)
