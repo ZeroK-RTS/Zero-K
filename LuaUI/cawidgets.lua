@@ -252,6 +252,7 @@ local flexCallIns = {
 	"UnitStructureMoved",
 	'MissileFired',
 	'MissileDestroyed',
+	"PreGameTimekeeping",
 }
 local flexCallInMap = {}
 for _, ci in ipairs(flexCallIns) do
@@ -2654,6 +2655,13 @@ end
 function widgetHandler:Load(zip)
 	for _, w in r_ipairs(self.LoadList) do
 		w:Load(zip)
+	end
+end
+
+
+function widgetHandler:PreGameTimekeeping(secondsUntilStart)
+	for _,w in r_ipairs(self.PreGameTimekeepingList) do
+		w:PreGameTimekeeping(secondsUntilStart)
 	end
 end
 
