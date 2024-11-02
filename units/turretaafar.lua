@@ -14,7 +14,7 @@ return { turretaafar = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    bait_level_default = 1,
+    bait_level_default = 0,
     aimposoffset   = [[0 10 0]],
     modelradius    = [[19]],
     okp_damage = 200.1,
