@@ -3334,6 +3334,12 @@ function widget:GameFrame(n)
 	end
 end
 
+function widget:PreGameTimekeeping(secondsUntilStart)
+	if lbl_gtime then
+		lbl_gtime:SetCaption("-"..GetTimeString(secondsUntilStart))
+	end
+end
+
 function widget:KeyPress(key, modifier, isRepeat, label)
 	if not get_key_bind_mod then
 		if key == KEYSYMS.LCTRL
