@@ -32,9 +32,15 @@ function gadget:Initialize()
 		local teamList = Spring.GetTeamList()
 		for i = 1, #teamList do
 			local teamID = teamList[i]
-			local _, leaderID = Spring.GetTeamInfo(teamID, false)
+			local _, leaderID, _, isAI = Spring.GetTeamInfo(teamID, false)
 			if leaderID >= 0 then
 				Spring.SetTeamRulesParam(teamID, "initLeaderID", leaderID, PUBLIC_VISIBLE)
+				Spring.SetTeamRulesParam(teamID, "initAI", isAI, PUBLIC_VISIBLE) -- NB: NEEDED OR CRUDEPLAYERLIST WILL CRASH UPON RELOAD WHEN AN SKIRMISH AI HOST LEAVES!!!
+				if isAI then
+					local _, name, host = Spring.GetAIInfo(teamID)                       -- store these for later when https://github.com/beyond-all-reason/spring/issues/1727 is fixed. 
+					Spring.SetTeamRulesParam(teamID, "initAIHost", host, PUBLIC_VISIBLE) -- This will allow users to re-host AI and gives widgets a fallback.
+					Spring.SetTeamRulesParam(teamID, "initAIName", name, PUBLIC_VISIBLE) -- Note: ShortName and Version are not available to sync. This can be derived via initAIName.
+				end
 			end
 		end
 	end
