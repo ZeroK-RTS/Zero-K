@@ -62,7 +62,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
-	local needMulti = singleHitMultiWeapon[weaponDefID] or (singleHitWeapon[weaponDefID] and GG.att_ProjMult[unitID] and GG.att_ProjMult[unitID] > 1))
+	local needMulti = singleHitMultiWeapon[weaponDefID] or (singleHitWeapon[weaponDefID] and GG.att_ProjMult[unitID] and GG.att_ProjMult[unitID] > 1)
 	if singleHitWeapon[weaponDefID] and not needMulti then
 		if attackerID then
 			local frame = spGetGameFrame()
