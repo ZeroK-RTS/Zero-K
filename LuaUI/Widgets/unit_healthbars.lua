@@ -187,7 +187,7 @@ options = {
 		name = 'Unit Bar Fade Height',
 		desc = 'If the camera is above this height, health bars will not be drawn.',
 		type = 'number',
-		min = 0, max = 8000, step = 50,
+		min = 0, max = 10000, step = 50,
 		value = 3000,
 		OnChange = OptionsChanged,
 	},
