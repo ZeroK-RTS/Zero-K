@@ -107,9 +107,9 @@ function script.AimFromWeapon(num)
 end
 
 function script.Shot(num)
+	gun = (gun)%4 + 1
 	EmitSfx(emits[gun].flare, 1024)
 	EmitSfx(emits[gun].barrel, 1025)
-	gun = (gun)%4 + 1
 end
 
 function script.Killed(recentDamage, maxHealth)
