@@ -841,7 +841,7 @@ end
 
 -- This function detects when our workers have started a job
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if not unitTeam == myTeamID then
+	if unitTeam ~= myTeamID then
 		return -- if it's not our unit then ignore it!
 	end
 	
@@ -933,7 +933,7 @@ end
 
 -- This function cleans up when workers or building nanoframes are killed
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-	if not unitTeam == myTeamID then
+	if unitTeam ~= myTeamID then
 		return
 	end
 	

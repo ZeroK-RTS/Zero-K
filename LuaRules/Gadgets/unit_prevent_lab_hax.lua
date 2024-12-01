@@ -163,7 +163,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID,teamID)
 	local ud = UnitDefs[unitDefID]
-	if not ud.isFactory == true then
+	if not ud.isFactory then
 		return
 	end
 
