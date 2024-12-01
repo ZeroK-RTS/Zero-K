@@ -112,8 +112,8 @@ options = {
 				randomChosen = false
 			end
 			if value ~= trackListName then
+				trackListName = value -- trackListName has to be changed prior tracks has been filled in, because options.OnChange will be triggered before initialization in Update
 				if includedAlbums[value] and includedAlbums[value].tracks then
-					trackListName = value
 					trackList = includedAlbums[value].tracks
 					if WG.Music then
 						WG.Music.StopTrack()
