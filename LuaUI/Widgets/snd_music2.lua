@@ -1,12 +1,12 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---	file:   gui_music.lua
---	brief:  yay music
---	author: cake
+--  file:   gui_music.lua
+--  brief:  yay music
+--  author: cake
 --
---	Copyright (C) 2007.
---	Licensed under the terms of the GNU GPL, v2 or later.
+--  Copyright (C) 2007.
+--  Licensed under the terms of the GNU GPL, v2 or later.
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -40,35 +40,72 @@ local function SetRandomSeed()
 	end
 end
 
-local includedAlbums = {
-	denny = {
-		dir = "",
-		humanName = "Schneidemesser (default)",
-	},
-	superintendent = {
-		dir = "ost23_uf/",
-		humanName = "Superintendent",
-	}
-}
-local trackListName = 'denny'
+local function Deduplicate(files)
+	-- NOTE: local user file paths have backslashes "\" and may have upper case compared to the game version of it
+	-- since we list all files with RAW_FIRST mode, we may have duplicate with those differences
+	-- however Spring.PlaySoundStream will always play the local version of that file if it exists, no matter how the path is actually written
+	local i = 1
+	local file = files[i]
+	if not file then
+		return
+	end
+	local common = {}
+	while file do
+		local uni_file = file:lower():gsub('/', '\\')
+		if common[uni_file] then
+			table.remove(files, i)
+		else
+			common[uni_file] = true
+			i = i + 1
+		end
+		file = files[i]
+	end
+end
 
-local trackList = {
-	warTracks       = {},
-	peaceTracks     = {},
-	briefingTracks  = {},
-	victoryTracks   = {},
-	defeatTracks    = {},
-}
+local function FindAlbums(path)
+	local musicTypes = {'war', 'peace', 'briefing', 'victory', 'defeat'}
+	local vfsMode = VFS.RAW_FIRST
+	local supportedFileTypes = '*.{ogg,mp3}'
+	local albums = {}
+	for i, path in ipairs(VFS.SubDirs(path, 'peace', vfsMode, true)) do
+		path = path:gsub('peace[\\/]', '')
+		local tracks = {}
+		for _, musicType in ipairs(musicTypes) do
+			local files = VFS.DirList(path .. musicType .. '/' , supportedFileTypes, vfsMode)
+			Deduplicate(files)
+			tracks[musicType .. 'Tracks'] = files
+		end
+
+		local dir = path:gsub('sounds[\\/]music[\\/]', '')
+		local name = dir:gsub('[\\/]$', '')
+		local humanName
+		if name == '' then
+			name = 'denny'
+			humanName = 'Schneidemesser (default)'
+		elseif name == 'ost23_uf' then
+			name = 'superintendent'
+			humanName = 'Superintendent'
+		else
+			humanName = name
+		end
+		albums[name] = {
+			tracks = tracks,
+			dir = dir,
+			humanName = humanName,
+		}
+	end
+	return albums
+end
+
+local includedAlbums = FindAlbums('sounds/music/')
+
+local trackListName = includedAlbums.denny and 'denny' or next(includedAlbums)
+
+local trackList = includedAlbums[trackListName]
+
 
 options_path = 'Settings/Audio'
 options = {
-	useIncludedTracks = {
-		name = "Use Included Tracks",
-		type = 'bool',
-		value = true,
-		desc = 'Use the tracks included with Zero-K',
-		noHotkey = true,
-	},
 	pausemusic = {
 		name = 'Pause Music',
 		type = 'bool',
@@ -80,11 +117,14 @@ options = {
 		name = 'Track list',
 		type = 'radioButton',
 		value = trackListName,
-		items = {
-			{key = 'denny', name = includedAlbums.denny.humanName},
-			{key = 'superintendent', name = includedAlbums.superintendent.humanName},
-			{key = 'random', name = 'Chosen at random'},
-		},
+		items =	(function()
+			local t = {}
+			for k, v in pairs(includedAlbums) do
+				t[#t+1] = {key = k, name = v.humanName}
+			end
+			t[#t+1] = {key = 'random', name = 'Chosen at random'}
+			return t
+		end)(),
 		OnChange = function(self)
 			local value = self.value
 			if value == 'random' then
@@ -103,17 +143,14 @@ options = {
 					local r = math.random(#self.items - 1)
 
 					local item = self.items[r]
-					if item.key == 'random' then -- in case the item 'random' is not at last position
-						item = self.items[r-1] or self.items[r+1]
-					end
 					value = item.key
 				end
 			else
 				randomChosen = false
 			end
 			if value ~= trackListName then
-				trackListName = value -- trackListName has to be changed prior tracks has been filled in, because options.OnChange will be triggered before initialization in Update
 				if includedAlbums[value] and includedAlbums[value].tracks then
+					trackListName = value
 					trackList = includedAlbums[value].tracks
 					if WG.Music then
 						WG.Music.StopTrack()
@@ -256,21 +293,6 @@ end
 function widget:Update(dt)
 	if not initialized then
 		initialized = true
-		-- these are here to give epicmenu time to set the values properly
-		-- (else it's always default at startup)
-		
-		local vfsMode = (options.useIncludedTracks.value and VFS.RAW_FIRST) or VFS.RAW
-		local supportedFileTypes = '*.{ogg,mp3}'
-		for name, data in pairs(includedAlbums) do
-			local dir = 'sounds/music/' .. data.dir
-			data.tracks = {
-				warTracks       = VFS.DirList(dir .. 'war/'     , supportedFileTypes, vfsMode),
-				peaceTracks     = VFS.DirList(dir .. 'peace/'   , supportedFileTypes, vfsMode),
-				briefingTracks  = VFS.DirList(dir .. 'briefing/', supportedFileTypes, vfsMode),
-				victoryTracks   = VFS.DirList(dir .. 'victory/' , supportedFileTypes, vfsMode),
-				defeatTracks    = VFS.DirList(dir .. 'defeat/'  , supportedFileTypes, vfsMode),
-			}
-		end
 		if gameID then
 			-- update the tracklistName case: reload, random chosen at start
 			widget:GameID(gameID)
@@ -335,7 +357,7 @@ function widget:Update(dt)
 		totalTime = math.floor(totalTime)
 		local _, _, paused = Spring.GetGameSpeed()
 		if ( previousTrackType == "peace" and musicType == 'war' )
-		 or (playedTime >= totalTime)	-- both zero means track stopped
+		 or (playedTime >= totalTime)   -- both zero means track stopped
 		 and not(haltMusic or looping) then
 			previousTrackType = musicType
 			if not musicMuted and not (paused and options.pausemusic.value) then -- prevents music player from starting again until it is not muted and not "paused" (see: pausemusic option).
