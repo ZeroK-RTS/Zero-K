@@ -1337,12 +1337,18 @@ end
 
 
 function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)
+	local ignore = true
 	for _, g in r_ipairs(self.AllowWeaponTargetCheckList) do
-		if (not g:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)) then
-			return false
+		local allowCheck, ignoreCheck = g:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)
+		if not ignoreCheck then
+			ignore = false
+			if not allowCheck then
+				return 0
+			end
 		end
 	end
-	return true
+
+	return ((ignore and -1) or 1)
 end
 
 -- AllowWeaponTarget is also called when auto-generating CAI attack commands.
