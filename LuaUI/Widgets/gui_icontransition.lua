@@ -39,7 +39,7 @@ local renderAtPos = {}
 
 -- Forward function declarations
 local GotHotkeypress = function() end
-local UpdateDynamic = function() end
+local UpdateDynamic = function(shouldInit) end
 
 -- Localized Spring functions
 local echo = Spring.Echo
@@ -178,7 +178,7 @@ function GotHotkeypress()
 		target_mode = nil
 		kp_timer = nil
 		current_mode = "Dynamic"
-		UpdateDynamic()
+		UpdateDynamic(true)
 	else
 		waiting_on_double = true
 		kp_timer = spGetTimer()
@@ -194,7 +194,7 @@ function GotHotkeypress()
 	end
 end
 
-function UpdateDynamic()
+function UpdateDynamic(shouldInit)
 	local cs = spGetCameraState()
 	local gy = spGetGroundHeight(cs.px, cs.pz)
 	testHeight = cs.py - gy
@@ -208,12 +208,12 @@ function UpdateDynamic()
 	if showing_icons and drawIcons then
 		drawIcons = false
 	end
-	
-	if showing_icons and testHeight < options.icontransitiontop.value - tolerance then
+
+	if (shouldInit or showing_icons) and testHeight < options.icontransitiontop.value - tolerance then
 		spSendCommands("disticon " .. 100000)
 		showing_icons = false
 		drawIcons = true
-	elseif not showing_icons and testHeight > options.icontransitiontop.value + tolerance then
+	elseif (shouldInit or not showing_icons) and testHeight >= options.icontransitiontop.value + tolerance then
 		spSendCommands("disticon " .. 0)
 		showing_icons = true
 	end
@@ -369,7 +369,7 @@ function widget:Initialize()
 	target_mode = nil
 	kp_timer = nil
 	current_mode = "Dynamic"
-	UpdateDynamic()
+	UpdateDynamic(true)
 
 	local allUnits = spGetAllUnits()
 	for _,unitID in pairs (allUnits) do
