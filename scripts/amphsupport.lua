@@ -401,7 +401,7 @@ function script.Create()
 	Turn(laxel, x_axis, math.rad(-10))
 	moving = false
 	
-	StartThread(GG.StartStopMovingControl, unitID, StartMoving, StopMoving, 0.3, false, movingData, 4, true)
+	StartThread(GG.StartStopMovingControl, unitID, StartMoving, StopMoving, 48*0.25*1/30*0.5*0.9, false, movingData, 4, true)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 	
