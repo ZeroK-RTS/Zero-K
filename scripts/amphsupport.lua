@@ -327,13 +327,14 @@ local function SetSpeedMult(mult)
 	GG.UpdateUnitAttributes(unitID)
 end
 
+local DEPLOY_SPEED_MULT = 0.25
 local function SetDeploy(wantDeploy)
 	Signal(SIG_DEPLOY)
 	SetSignalMask(SIG_DEPLOY)
 	if wantDeploy then
 		AnimateDeployment(1, 1, true)
 		deployed = true
-		SetSpeedMult(0.25)
+		SetSpeedMult(DEPLOY_SPEED_MULT)
 	else
 		deployed = false
 		Turn(head, y_axis, 0, AIM_SPEED)
@@ -401,7 +402,8 @@ function script.Create()
 	Turn(laxel, x_axis, math.rad(-10))
 	moving = false
 	
-	StartThread(GG.StartStopMovingControl, unitID, StartMoving, StopMoving, 0.3, false, movingData, 4, true)
+	local lowest_normal_speed = UnitDef.speed / Game.gameSpeed * DEPLOY_SPEED_MULT * (Spring.GetGameRulesParam("MAX_SLOW_FACTOR") or 1)
+	StartThread(GG.StartStopMovingControl, unitID, StartMoving, StopMoving, lowest_normal_speed * 0.95, false, movingData, 4, true)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 	
