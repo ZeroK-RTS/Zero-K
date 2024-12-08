@@ -101,7 +101,7 @@ local includedAlbums = FindAlbums('sounds/music/')
 
 local trackListName = includedAlbums.denny and 'denny' or next(includedAlbums)
 
-local trackList = includedAlbums[trackListName]
+local trackList = includedAlbums[trackListName].tracks
 
 
 options_path = 'Settings/Audio'
