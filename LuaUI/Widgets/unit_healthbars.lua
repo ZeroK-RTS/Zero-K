@@ -80,7 +80,6 @@ local messages = {
 	disarm = "disarm",
 	capture = "capture",
 	capture_reload = "capture reload",
-	water_tank = "water tank",
 	teleport = "teleport",
 	teleport_pw = "teleport",
 	ability = "ability",
@@ -598,7 +597,6 @@ do
 				reloadTime    = ud.reloadTime,
 				primaryWeapon = ud.primaryWeapon,
 				dyanmicComm   = ud.customParams.dynamic_comm,
-				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
 				specialReload = ud.customParams.specialreloadtime,
 				specialRate   = ud.customParams.specialreload_userate,
@@ -765,17 +763,6 @@ do
 			if (captureReloadState and captureReloadState > 0) then
 				local capture = 1-(captureReloadState-gameFrame)/ci.captureReload
 				barDrawer.AddBar(addTitle and messages.capture_reload, capture, "reload", (addPercent and floor(capture*100) .. '%'))
-			end
-		end
-		
-		--// WATER TANK
-		if ci.maxWaterTank then
-			local waterTank = GetUnitRulesParam(unitID, "watertank")
-			if waterTank then
-				local prog = waterTank/ci.maxWaterTank
-				if prog < 1 then
-					barDrawer.AddBar(addTitle and messages.water_tank, prog, "tank", (addPercent and floor(prog*100) .. '%'))
-				end
 			end
 		end
 		
