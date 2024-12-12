@@ -1,6 +1,6 @@
 {
-	"shield_bar" : "tarcza",
-	"health_bar" : "życie",
+	"shield" : "tarcza",
+	"health" : "życie",
 	"building" : "budowa",
 	"morph" : "ulepszenie",
 	"stockpile" : "amunicja",
@@ -8,17 +8,16 @@
 	"disarm" : "rozbrojenie",
 	"capture" : "przejmowanie",
 	"capture_reload" : "przeładowanie",
-	"water_tank" : "cysterna",
 	"teleport" : "teleport",
+	"teleport_pw" : "ewakuacja",
 	"ability" : "umiejętność",
 	"heat" : "przegrzanie",
 	"speed" : "prędkość",
+	"reammo" : "ładowanie",
 	"reload" : "przeładowanie",
 	"slow" : "spowolnienie",
 	"goo" : "rozmnażanie",
-	"reclaim" : "zbieranie",
-	"reammo" : "ładowanie",
-	"teleport_pw" : "ewakuacja",
+	"jump" : "skok",
 	"resurrect" : "wskrzeszanie",
-	"jump" : "skok"
+	"reclaim" : "zbieranie"
 }

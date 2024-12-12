@@ -1,6 +1,6 @@
 {
-    "shield_bar": "Kalkan",
-    "health_bar": "Can",
+    "shield": "Kalkan",
+    "health": "Can",
     "building": "Bina",
     "morph": "Evrim",
     "stockpile": "Stoklama",
@@ -8,15 +8,16 @@
     "disarm": "Silahsız bırak",
     "capture": "Ele gerçir",
     "capture_reload": "Yeniden yakala",
-    "water_tank": "Su tankı",
     "teleport": "Işınlan",
+    "teleport_pw": "Tahliye",
     "ability": "Yetenek",
+    "heat": "",
+    "speed": "",
+    "reammo": "Yeniden Silahlanma",
     "reload": "Yenile",
     "slow": "Yavaş",
     "goo": "goo",
-    "reclaim": "Yeniden al",
-    "reammo": "Yeniden Silahlanma",
-    "teleport_pw": "Tahliye",
+    "jump": "Zıpla",
     "resurrect": "Yeniden canlan",
-    "jump": "Zıpla"
+    "reclaim": "Yeniden al"
 }
