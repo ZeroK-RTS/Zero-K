@@ -130,6 +130,11 @@ options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', '
 	'barScale', 'debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
+	'invert_shield', 'invert_health', 'invert_building', 'invert_morph',
+	'invert_stockpile', 'invert_paralyze', 'invert_disarm', 'invert_capture',
+	'invert_capture_reload', 'invert_teleport', 'invert_teleport_pw', 'invert_ability',
+	'invert_heat', 'invert_speed', 'invert_reload', 'invert_reammo',
+	'invert_slow', 'invert_goo', 'invert_jump', 'invert_reclaim', 'invert_resurrect',
 }
 options = {
 	showhealthbars = {
@@ -237,6 +242,176 @@ options = {
 		value = 500,
 		OnChange = OptionsChanged,
 	},
+	invert_shield = {
+		name = 'invert shield bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert shield bar',
+		OnChange = OptionsChanged,
+	},
+	invert_health = {
+		name = 'invert health bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert health bar',
+		OnChange = OptionsChanged,
+	},
+	invert_building = {
+		name = 'invert building bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert building bar',
+		OnChange = OptionsChanged,
+	},
+	invert_morph = {
+		name = 'invert morph bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert morph bar',
+		OnChange = OptionsChanged,
+	},
+	invert_stockpile = {
+		name = 'invert stockpile bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert stockpile bar',
+		OnChange = OptionsChanged,
+	},
+	invert_paralyze = {
+		name = 'invert paralyze bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert paralyze bar',
+		OnChange = OptionsChanged,
+	},
+	invert_disarm = {
+		name = 'invert disarm bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert disarm bar',
+		OnChange = OptionsChanged,
+	},
+	invert_capture = {
+		name = 'invert capture bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert capture bar',
+		OnChange = OptionsChanged,
+	},
+	invert_capture_reload = {
+		name = 'invert capture_reload bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert capture_reload bar',
+		OnChange = OptionsChanged,
+	},
+	invert_teleport = {
+		name = 'invert teleport bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert teleport bar',
+		OnChange = OptionsChanged,
+	},
+	invert_teleport_pw = {
+		name = 'invert teleport_pw bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert teleport_pw bar',
+		OnChange = OptionsChanged,
+	},
+	invert_ability = {
+		name = 'invert ability bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert ability bar',
+		OnChange = OptionsChanged,
+	},
+	invert_heat = {
+		name = 'invert heat bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert heat bar',
+		OnChange = OptionsChanged,
+	},
+	invert_speed = {
+		name = 'invert speed bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert speed bar',
+		OnChange = OptionsChanged,
+	},
+	invert_reload = {
+		name = 'invert reload bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert reload bar',
+		OnChange = OptionsChanged,
+	},
+	invert_reammo = {
+		name = 'invert reammo bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert reammo bar',
+		OnChange = OptionsChanged,
+	},
+	invert_slow = {
+		name = 'invert slow bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert slow bar',
+		OnChange = OptionsChanged,
+	},
+	invert_goo = {
+		name = 'invert goo bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert goo bar',
+		OnChange = OptionsChanged,
+	},
+	invert_jump = {
+		name = 'invert jump bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert jump bar',
+		OnChange = OptionsChanged,
+	},
+	invert_reclaim = {
+		name = 'invert reclaim bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert reclaim bar',
+		OnChange = OptionsChanged,
+	},
+	invert_resurrect = {
+		name = 'invert resurrect bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'invert resurrect bar',
+		OnChange = OptionsChanged,
+	},
+
+
 }
 OptionsChanged()
 
@@ -459,11 +634,15 @@ local function GetBarDrawer()
 	function externalFunc.AddPercentBar(status, percent, color)
 		barsN = barsN + 1
 		local barInfo = bars[barsN]
+		local progress = percent
+                if options["invert_" .. status].value then
+			progress = 1-progress
+		end
 		if barInfo then
 			barInfo.title    = addTitle and messages[status]
-			barInfo.progress = percent
+			barInfo.progress = progress
 			barInfo.color    = color or barColors[status]
-			barInfo.text     = addPercent and floor(percent*100) .. '%'
+			barInfo.text     = addPercent and floor(progress*100) .. '%'
 		end
 	end
 
