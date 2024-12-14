@@ -69,12 +69,12 @@ return { amphsupport = {
   weapons                = {
     {
       def                = [[CANNON]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     {
       def                = [[FAKE_CANNON]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
   },
