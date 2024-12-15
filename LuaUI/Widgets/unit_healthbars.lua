@@ -249,6 +249,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert shield bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_health = {
 		name = 'invert health bar',
@@ -257,6 +258,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert health bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_building = {
 		name = 'invert building bar',
@@ -265,6 +267,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert building bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_morph = {
 		name = 'invert morph bar',
@@ -273,6 +276,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert morph bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_stockpile = {
 		name = 'invert stockpile bar',
@@ -281,6 +285,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert stockpile bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_paralyze = {
 		name = 'invert paralyze bar',
@@ -289,6 +294,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert paralyze bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_disarm = {
 		name = 'invert disarm bar',
@@ -297,6 +303,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert disarm bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_capture = {
 		name = 'invert capture bar',
@@ -305,6 +312,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert capture bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_capture_reload = {
 		name = 'invert capture_reload bar',
@@ -313,6 +321,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert capture_reload bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_teleport = {
 		name = 'invert teleport bar',
@@ -321,6 +330,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert teleport bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_teleport_pw = {
 		name = 'invert teleport_pw bar',
@@ -329,6 +339,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert teleport_pw bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_ability = {
 		name = 'invert ability bar',
@@ -337,6 +348,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert ability bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_heat = {
 		name = 'invert heat bar',
@@ -345,6 +357,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert heat bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_speed = {
 		name = 'invert speed bar',
@@ -353,6 +366,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert speed bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_reload = {
 		name = 'invert reload bar',
@@ -361,6 +375,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert reload bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_reammo = {
 		name = 'invert reammo bar',
@@ -369,6 +384,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert reammo bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_slow = {
 		name = 'invert slow bar',
@@ -377,6 +393,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert slow bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_goo = {
 		name = 'invert goo bar',
@@ -385,6 +402,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert goo bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_jump = {
 		name = 'invert jump bar',
@@ -393,6 +411,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert jump bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_reclaim = {
 		name = 'invert reclaim bar',
@@ -401,6 +420,7 @@ options = {
 		noHotkey = true,
 		desc = 'invert reclaim bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_resurrect = {
 		name = 'invert resurrect bar',
@@ -409,9 +429,8 @@ options = {
 		noHotkey = true,
 		desc = 'invert resurrect bar',
 		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
 	},
-
-
 }
 OptionsChanged()
 
