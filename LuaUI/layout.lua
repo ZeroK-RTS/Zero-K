@@ -24,8 +24,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.lua")
-
 local showPanelLabel = false
 
 
@@ -81,9 +79,9 @@ local function DefaultHandler(xIcons, yIcons, cmdCount, commands)
 	
 	if (showPanelLabel) then
 		if (cmdsFirst) then
-			menuName =   RedStr .. 'Commands'
+			menuName = 'Commands'
 		else
-			menuName = GreenStr .. 'Build Orders'
+			menuName = 'Build Orders'
 		end
 	end
 
@@ -99,11 +97,9 @@ local function DefaultHandler(xIcons, yIcons, cmdCount, commands)
 	local pageNumCmd = -1
 	local pageNumPos = (prevPos + nextPos) / 2
 	if (xIcons > 2) then
-		local color
-		if (commands[1].id < 0) then color = GreenStr else color = RedStr end
 		local activePage = activePage or 0
 		local pageNum = '' .. (activePage + 1) .. ''
-		PageNumCmd.name = color .. '   ' .. pageNum .. '   '
+		PageNumCmd.name = '   ' .. pageNum .. '   '
 		table.insert(customCmds, PageNumCmd)
 		pageNumCmd = cmdCount + 1
 	end
