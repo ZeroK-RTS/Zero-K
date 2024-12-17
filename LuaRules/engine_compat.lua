@@ -6,6 +6,9 @@ local RET_ZERO   = function() return 0 end
 local RET_ONE    = function() return 1 end
 local RET_STRING = function() return "" end
 
+Engine = Engine or {}
+Engine.FeatureSupport = Engine.FeatureSupport or {}
+
 if not Script then
 	Script = { IsEngineMinVersion = RET_FALSE }
 elseif not Script.IsEngineMinVersion(1, 0, 0) then
