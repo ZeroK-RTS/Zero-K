@@ -116,8 +116,8 @@ end
 
 function CreateTheUI()
 	--create main Chili elements
-	local screenWidth, _ = Spring.GetViewGeometry()
-	local windowY = math.floor(screenWidth*2/11 + 32)
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
+	local windowY = math.floor(screenHeight/8)
 
 	local currSpeed = 2 --default button setting
 	if window then
