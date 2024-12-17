@@ -15,6 +15,8 @@ local function VFS_Include(filename, env, mode, recursive)
 	end
 end
 
+VFS_Include('LuaRules/engine_compat.lua', nil, VFS_GAME)
+
 --[[ unitdefs_post is massively simplified by being able to assume
      that all def keys are lowercase. However, being able to use
      uppercase in the defs is also good for readability (also we
