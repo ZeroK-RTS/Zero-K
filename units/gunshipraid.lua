@@ -48,7 +48,7 @@ return { gunshipraid = {
   },
 
   sightDistance          = 500,
-  speed                  = 212,
+  speed                  = 250,
   turnRate               = 693,
 
   weapons                = {
