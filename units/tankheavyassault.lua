@@ -54,7 +54,7 @@ return { tankheavyassault = {
   trackType           = [[StdTank]],
   trackWidth          = 50,
   turninplace         = 0,
-  turnRate            = 500,
+  turnRate            = 450,
   workerTime          = 0,
 
   weapons             = {
