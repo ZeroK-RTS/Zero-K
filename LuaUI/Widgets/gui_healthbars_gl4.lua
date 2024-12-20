@@ -208,6 +208,7 @@ local heatChannel = 7
 local speedChannel = 7
 local reammoChannel = 7
 local gooChannel = 7
+local jumpChannel = 7
 local captureReloadChannel = 7
 local abilityChannel = 7
 local stockpileChannel = 7
@@ -247,7 +248,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = morphChannel,
 		uvoffset = 1 / 16,
 	},
 	disarm = {
@@ -263,7 +264,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = slowChannel,
 		uvoffset = 1 / 16,
 	},
 	reload = {
@@ -271,7 +272,7 @@ local barTypeMap = {
 		maxcolor = {0.05, 0.6, 0.6, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitGetProgress,
 		hidethreshold = 0.99,
-		uniformindex = 2,
+		uniformindex = reloadChannel,
 		uvoffset = 11 / 16,
 	},
 	dgun = {
@@ -279,7 +280,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = dgunChannel,
 		uvoffset = 1 / 16,
 	},
 	teleport = {
@@ -287,7 +288,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = teleportChannel,
 		uvoffset = 1 / 16,
 	},
 	heat = {
@@ -295,7 +296,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = heatChannel,
 		uvoffset = 1 / 16,
 	},
 	speed = {
@@ -303,7 +304,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = speedChannel,
 		uvoffset = 1 / 16,
 	},
 	reammo = {
@@ -311,7 +312,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = reammoChannel,
 		uvoffset = 1 / 16,
 	},
 	goo = {
@@ -319,7 +320,15 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = gooChannel,
+		uvoffset = 1 / 16,
+	},
+	jump = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = jumpChannel,
 		uvoffset = 1 / 16,
 	},
 	captureReload = {
@@ -327,7 +336,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = captureReloadChannel,
 		uvoffset = 1 / 16,
 	},
 	ability = {
@@ -335,7 +344,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = abilityChannel,
 		uvoffset = 1 / 16,
 	},
 	stockpile = {
@@ -391,9 +400,9 @@ local barTypeMap = {
 	},
 }
 
-for barname, bt in pairs(barTypeMap) do 
+for barname, bt in pairs(barTypeMap) do
 	local cache = {}
-	for i=1,20 do cache[i] = 0 end 
+	for i=1,20 do cache[i] = 0 end
 	
 	--cache[1] = unitDefHeights[unitDefID] + additionalheightaboveunit * effectiveScale  -- height
 	--cache[2] = effectiveScale
@@ -433,6 +442,7 @@ local spec, fullview = Spring.GetSpectatingState()
 local myTeamID = Spring.GetMyTeamID()
 local myAllyTeamID = Spring.GetMyAllyTeamID()
 local myPlayerID = Spring.GetMyPlayerID()
+local gameSpeed = Game.gameSpeed
 
 local chobbyInterface
 
@@ -441,8 +451,13 @@ local unitDefHasShield = {} -- value is shield max power
 local unitDefCanStockpile = {} -- 0/1?
 local unitDefReload = {} -- value is max reload time
 local unitDefHeights = {} -- maps unitDefs to height
-local unitDefHideDamage = {}
 local unitDefPrimaryWeapon = {} -- the index for reloadable weapon on unitdef weapons
+local unitDefHasGoo = {}
+local unitDefHasJump = {}
+local unitDefHasHeat = {}
+local unitDefHasSpeed = {}
+local unitDefHasReammo = {}
+local unitDefHasCaptureReload = {}
 
 local unitBars = {} -- we need this additional table of {[unitID] = {barhealth, barrez, barreclaim}}
 
@@ -459,11 +474,12 @@ local unitHeatWatch = {}
 local unitSpeedWatch = {}
 local unitReammoWatch = {}
 local unitGooWatch = {}
+local unitJumpWatch = {}
 local unitCaptureReloadWatch = {}
 local unitAbilityWatch = {}
 local unitStockpilewatch = {}
 local unitShieldWatch = {} -- works
-local unitCaptureWatch = {} -- ??
+local unitCaptureWatch = {}
 
 local featureDefHeights = {} -- maps FeatureDefs to height
 local featureBars = {} -- we need this additional table of {[featureid] = {barhealth, barrez, barreclaim}}
@@ -552,7 +568,7 @@ local shaderSourceCache = {
 			skipGlyphsNumbers = 0.0,
 			globalSizeMult = 1.0,
 		  },
-		shaderConfig = shaderConfig,		  
+		shaderConfig = shaderConfig,
 	}
 
 -- Walk through unitdefs for the stuff we need:
@@ -561,6 +577,7 @@ for udefID, unitDef in pairs(UnitDefs) do
 		unitDefIgnore[udefID] = true
 	end --ignore debug units
 
+	-- SHIELDS
 	local shieldDefID = unitDef.shieldWeaponDef
 	local shieldPower = ((shieldDefID) and (WeaponDefs[shieldDefID].shieldPower)) or (-1)
 	if shieldPower > 1 then unitDefHasShield[udefID] = shieldPower
@@ -572,23 +589,53 @@ for udefID, unitDef in pairs(UnitDefs) do
 	local primaryWeapon = 1
 	for i = 1, #weapons do
 		local WeaponDef = WeaponDefs[weapons[i].weaponDef]
+		-- RELOAD
 		if WeaponDef and WeaponDef.reload and WeaponDef.reload > reloadTime then
 			reloadTime = WeaponDef.reload
 			primaryWeapon = i
 		end
+
+		-- CaptureReload
+		if WeaponDef.customParams and WeaponDef.customParams.post_capture_reload then
+			unitDefHasCaptureReload[udefID] = WeaponDef.customParams.post_capture_reload
+		end
 	end
-	unitDefHeights[udefID] = unitDef.height
-	unitDefSizeMultipliers[udefID] = math.min(1.45, math.max(0.85, (Spring.GetUnitDefDimensions(udefID).radius / 150) + math.min(0.6, unitDef.power / 4000))) + math.min(0.6, unitDef.health / 22000)
-	if unitDef.canStockpile then unitDefCanStockpile[udefID] = unitDef.canStockpile end
+
 	if reloadTime and reloadTime > minReloadTime then
 		if debugmode then Spring.Echo("Unit with watched reload time:", unitDef.name, reloadTime, minReloadTime) end
-
 		unitDefReload[udefID] = reloadTime
 		unitDefPrimaryWeapon[udefID] = primaryWeapon
 	end
-	if unitDef.hideDamage == true then
-		unitDefHideDamage[udefID] = true
+
+	-- GOO
+	if unitDef.customParams and unitDef.customParams.grey_goo then
+		unitDefHasGoo[udefID] = 1
 	end
+
+	-- JUMP
+	if unitDef.customParams and unitDef.customParams.canjump then
+		unitDefHasJump[udefID] = 1
+	end
+
+	-- HEAT
+	if unitDef.customParams and unitDef.customParams.heat_initial then
+		unitDefHasHeat[udefID] = 1
+	end
+
+	-- SPEED
+	if unitDef.customParams and unitDef.customParams.speed_bar then
+		unitDefHasSpeed[udefID] = 1
+	end
+
+	-- REAMMO
+	if unitDef.customParams and unitDef.customParams.reammoseconds then
+		unitDefHasReammo[udefID] = 1
+	end
+
+	-- BAR PLACEMENT
+	unitDefHeights[udefID] = unitDef.height
+	unitDefSizeMultipliers[udefID] = math.min(1.45, math.max(0.85, (Spring.GetUnitDefDimensions(udefID).radius / 150) + math.min(0.6, unitDef.power / 4000))) + math.min(0.6, unitDef.health / 22000)
+	if unitDef.canStockpile then unitDefCanStockpile[udefID] = unitDef.canStockpile end
 end
 
 for fdefID, featureDef in pairs(FeatureDefs) do
@@ -746,21 +793,6 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	addBarForUnit(unitID, unitDefID, "teleport", reason)
 	unitTeleportWatch[unitID] = -1
 
-	addBarForUnit(unitID, unitDefID, "heat", reason)
-	unitHeatWatch[unitID] = -1
-
-	addBarForUnit(unitID, unitDefID, "speed", reason)
-	unitSpeedWatch[unitID] = -1
-
-	addBarForUnit(unitID, unitDefID, "reammo", reason)
-	unitReammoWatch[unitID] = -1
-
-	addBarForUnit(unitID, unitDefID, "goo", reason)
-	unitGooWatch[unitID] = -1
-
-	addBarForUnit(unitID, unitDefID, "captureReload", reason)
-	unitCaptureReloadWatch[unitID] = -1
-
 	addBarForUnit(unitID, unitDefID, "ability", reason)
 	unitAbilityWatch[unitID] = -1
 
@@ -771,6 +803,36 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	if unitDefHasShield[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "shield", reason)
 		unitShieldWatch[unitID] = -1.0
+	end
+
+	if unitDefHasGoo[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "goo", reason)
+		unitGooWatch[unitID] = -1.0
+	end
+
+	if unitDefHasJump[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "jump", reason)
+		unitJumpWatch[unitID] = -1.0
+	end
+
+	if unitDefHasHeat[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "heat", reason)
+		unitHeatWatch[unitID] = -1.0
+	end
+
+	if unitDefHasSpeed[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "speed", reason)
+		unitSpeedWatch[unitID] = -1.0
+	end
+
+	if unitDefHasReammo[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "reammo", reason)
+		unitReammoWatch[unitID] = -1.0
+	end
+
+	if unitDefHasCaptureReload[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "captureReload", reason)
+		unitCaptureReloadWatch[unitID] = -1.0
 	end
 
 	addBarForUnit(unitID, unitDefID, "capture", reason)
@@ -794,6 +856,7 @@ local function removeBarsFromUnit(unitID, reason)
 	unitSpeedWatch[unitID] = nil
 	unitReammoWatch[unitID] = nil
 	unitGooWatch[unitID] = nil
+	unitJumpWatch[unitID] = nil
 	unitCaptureReloadWatch[unitID] = nil
 	unitAbilityWatch[unitID] = nil
 	unitStockpilewatch[unitID] = nil
@@ -802,7 +865,7 @@ local function removeBarsFromUnit(unitID, reason)
 	unitBars[unitID] = nil
 end
 
-local function addBarToFeature(featureID,  barname)
+local function addBarToFeature(featureID, barname)
 	if debugmode then Spring.Debug.TraceEcho() end
 	local featureDefID = Spring.GetFeatureDefID(featureID)
 
@@ -860,21 +923,22 @@ local function init()
 	unitHealthWatch = {}
 	unitBuildWatch = {}
 	unitMorphWatch = {}
-        unitParalyzeWatch = {}
-        unitDisarmWatch = {}
-        unitSlowWatch = {}
-        unitReloadWatch = {}
-        unitDgunWatch = {}
-        unitTeleportWatch = {}
-        unitHeatWatch = {}
-        unitSpeedWatch = {}
-        unitReammoWatch = {}
-        unitGooWatch = {}
-        unitCaptureReloadWatch = {}
-        unitAbilityWatch = {}
-        unitStockpilewatch = {}
-        unitShieldWatch = {}
-        unitCaptureWatch = {}
+	unitParalyzeWatch = {}
+	unitDisarmWatch = {}
+	unitSlowWatch = {}
+	unitReloadWatch = {}
+	unitDgunWatch = {}
+	unitTeleportWatch = {}
+	unitHeatWatch = {}
+	unitSpeedWatch = {}
+	unitReammoWatch = {}
+	unitGooWatch = {}
+	unitJumpWatch = {}
+	unitCaptureReloadWatch = {}
+	unitAbilityWatch = {}
+	unitStockpilewatch = {}
+	unitShieldWatch = {}
+	unitCaptureWatch = {}
 
 	unitBars = {}
 
@@ -920,7 +984,7 @@ local function initfeaturebars()
 end
 
 --12:32 PM] Beherith: widget:PlayerChanged generalizations
---[12:33 PM] Beherith: So, I would like to ask if we have a general guideline or if @Floris  knows anything about what circumstances should trigger UI GFX widget reinitialization
+--[12:33 PM] Beherith: So, I would like to ask if we have a general guideline or if @Floris knows anything about what circumstances should trigger UI GFX widget reinitialization
 --[12:36 PM] Beherith: Here, I assume we can live with a few assumptions:
 --1. UI GFX widgets are LOS dependent things, that either
 --    A. Should look the same for all players on an ALLYteam
@@ -1078,21 +1142,22 @@ function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
 	unitHealthWatch = {}
 	unitBuildWatch = {}
 	unitMorphWatch = {}
-        unitParalyzeWatch = {}
-        unitDisarmWatch = {}
-        unitSlowWatch = {}
-        unitReloadWatch = {}
-        unitDgunWatch = {}
-        unitTeleportWatch = {}
-        unitHeatWatch = {}
-        unitSpeedWatch = {}
-        unitReammoWatch = {}
-        unitGooWatch = {}
-        unitCaptureReloadWatch = {}
-        unitAbilityWatch = {}
-        unitStockpilewatch = {}
-        unitShieldWatch = {}
-        unitCaptureWatch = {}
+	unitParalyzeWatch = {}
+	unitDisarmWatch = {}
+	unitSlowWatch = {}
+	unitReloadWatch = {}
+	unitDgunWatch = {}
+	unitTeleportWatch = {}
+	unitHeatWatch = {}
+	unitSpeedWatch = {}
+	unitReammoWatch = {}
+	unitGooWatch = {}
+	unitJumpWatch = {}
+	unitCaptureReloadWatch = {}
+	unitAbilityWatch = {}
+	unitStockpilewatch = {}
+	unitShieldWatch = {}
+	unitCaptureWatch = {}
 
 	unitBars = {}
 
@@ -1141,7 +1206,7 @@ end
 
 local paralyzeOnMaxHealth = Game.paralyzeOnMaxHealth
 
-function widget:GameFrame(n)
+function widget:GameFrame(gameFrame)
 
 	if debugmode then
 		locateInvalidUnits(healthBarVBO)
@@ -1149,21 +1214,13 @@ function widget:GameFrame(n)
 	end
 	--[[ TODO:
         unitMorphWatch[unitID] = nil
-        unitDisarmWatch[unitID] = nil
-        unitSlowWatch[unitID] = nil
         unitReloadWatch[unitID] = nil
         unitDgunWatch[unitID] = nil
         unitTeleportWatch[unitID] = nil
-        unitHeatWatch[unitID] = nil
-        unitSpeedWatch[unitID] = nil
-        unitReammoWatch[unitID] = nil
-        unitGooWatch[unitID] = nil
-        unitCaptureReloadWatch[unitID] = nil
         unitAbilityWatch[unitID] = nil
         unitStockpilewatch[unitID] = nil
-        unitCaptureWatch[unitID] = nil
 	--]]
-	if n % 3 == 0 then
+	if gameFrame % 3 == 0 then
 		for unitID, oldHealthPower in pairs(unitHealthWatch) do
 			local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
 			paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage or 0
@@ -1191,7 +1248,7 @@ function widget:GameFrame(n)
 				gl.SetUnitBufferUniforms(unitID, uniformcache, buildChannel)
 			end
 
-                        --// PARALYZE
+			--// PARALYZE
 			local paraTime = false
 			local stunned = GetUnitIsStunned(unitID)
 			stunned = stunned and paralyzeDamage >= empHP
@@ -1205,13 +1262,54 @@ function widget:GameFrame(n)
 
 			if unitParalyzeWatch[unitID] ~= emp then
 				unitParalyzeWatch[unitID] = emp
-				uniformcache[1] = emp 
+				uniformcache[1] = emp
 				gl.SetUnitBufferUniforms(unitID, uniformcache, paralyzeChannel)
 			end
+
+			--// CAPTURE
+			capture = capture or 0
+			if unitCaptureWatch[unitID] ~= capture then
+				unitCaptureWatch[unitID] = capture
+				uniformcache[1] = capture
+				gl.SetUnitBufferUniforms(unitID, uniformcache, captureChannel)
+			end
+
+			--// DISARM
+			local disarmFrame = GetUnitRulesParam(unitID, "disarmframe")
+			if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
+				local disarm
+				local disarmProp = (disarmFrame - gameFrame)/1200
+				if disarmProp < 1 then
+					if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
+						disarm = disarmProp
+					end
+				else
+					local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
+					if (not paraTime) or disarmTime > paraTime + 0.5 then
+						disarm = disarmTime + 1
+					end
+				end
+				if unitDisarmWatch[unitID] ~= disarm then
+					unitDisarmWatch[unitID] = disarm
+					uniformcache[1] = disarm
+					gl.SetUnitBufferUniforms(unitID, uniformcache, disarmChannel)
+				end
+			end
+
+			--// SLOW
+		-- for unitID, oldSlow in pairs(unitSlowWatch) do
+			local slow = GetUnitRulesParam(unitID, "slowState") or 0
+			if unitSlowWatch[unitID] ~= slow then
+				unitSlowWatch[unitID] = slow
+				uniformcache[1] = slow * 2
+				gl.SetUnitBufferUniforms(unitID, uniformcache, slowChannel)
+			end
+		-- end
+
 		end
 	end
 
-	if n % 3 == 1 then
+	if gameFrame % 3 == 1 then
 		for unitID, oldshieldPower in pairs(unitShieldWatch) do
 			local shieldOn, shieldPower = GetUnitShieldState(unitID)
 			if shieldOn == false then shieldPower = 0.0 end
@@ -1223,6 +1321,72 @@ function widget:GameFrame(n)
 					gl.SetUnitBufferUniforms(unitID, uniformcache, shieldChannel)
 				end
 				unitShieldWatch[unitID] = shieldPower
+			end
+		end
+	end
+	if gameFrame % 3 == 2 then
+		--// GOO
+		for unitID, oldGoo in pairs(unitGooWatch) do
+			local goo = GetUnitRulesParam(unitID, "gooState") or 0
+			if oldGoo ~= goo then
+				unitGooWatch[unitID] = goo
+				uniformcache[1] = goo
+				gl.SetUnitBufferUniforms(unitID, uniformcache, gooChannel)
+			end
+		end
+
+		--// JUMP
+		for unitID, oldJump in pairs(unitJumpWatch) do
+			local jump = GetUnitRulesParam(unitID, "jumpReload") or 0
+			if oldJump ~= jump then
+				unitJumpWatch[unitID] = jump
+				uniformcache[1] = jump
+				gl.SetUnitBufferUniforms(unitID, uniformcache, jumpChannel)
+			end
+		 end
+
+		--// HEAT
+		for unitID, oldHeat in pairs(unitHeatWatch) do
+			local heat = GetUnitRulesParam(unitID, "heat_bar")
+			if oldHeat ~= heat then
+				unitHeatWatch[unitID] = heat
+				uniformcache[1] = heat
+				gl.SetUnitBufferUniforms(unitID, uniformcache, heatChannel)
+			end
+		end
+
+		--// SPEED
+		for unitID, oldSpeed in pairs(unitSpeedWatch) do
+			local speed = GetUnitRulesParam(unitID, "speed_bar") or 0
+			if oldSpeed ~= speed then
+				unitSpeedWatch[unitID] = speed
+				uniformcache[1] = speed
+				gl.SetUnitBufferUniforms(unitID, uniformcache, speedChannel)
+			end
+		end
+
+		--// REAMMO
+		for unitID, oldReammo in pairs(unitReammoWatch) do
+			local reammo = GetUnitRulesParam(unitID, "reammoProgress") or 0
+			if oldReammo ~= reammo then
+				unitReammoWatch[unitID] = reammo
+				uniformcache[1] = reammo
+				gl.SetUnitBufferUniforms(unitID, uniformcache, reammoChannel)
+			end
+		end
+
+		--// CAPTURE RELOAD
+		for unitID, oldCaptureReload in pairs(unitCaptureReloadWatch) do
+			local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame") or 0
+			local captureReload = 1 - (captureReloadState-gameFrame) / unitDefHasCaptureReload[Spring.GetUnitDefID(unitID)]
+			if captureReload > 1 then
+				captureReload = 1
+			end
+
+			if oldCaptureReload ~= captureReload then
+				unitCaptureReloadWatch[unitID] = captureReload
+				uniformcache[1] = captureReload
+				gl.SetUnitBufferUniforms(unitID, uniformcache, captureReloadChannel)
 			end
 		end
 	end
@@ -1276,7 +1440,7 @@ function widget:DrawWorld()
 	if chobbyInterface then return end
 	if not drawWhenGuiHidden and Spring.IsGUIHidden() then return end
 
-    local now = os.clock()
+	local now = os.clock()
 	if Spring.GetGameFrame() % 90 == 0 then
 		--Spring.Echo("healthBarVBO",healthBarVBO.usedElements, "featureHealthVBO",featureHealthVBO.usedElements)
 	end
