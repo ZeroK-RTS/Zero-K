@@ -46,7 +46,7 @@ return { hoverheavyraid = {
 
   sightDistance       = 560,
   sonarDistance       = 560,
-  speed               = 96,
+  speed               = 97.5,
   turninplace         = 0,
   turnRate            = 848,
 
