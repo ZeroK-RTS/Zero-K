@@ -16,7 +16,7 @@ return { energywind = {
 
   customParams                  = {
     bait_level_target = 1,
-    pylonrange     = 60,
+    pylonrange     = 63,
     windgen        = true,
     modelradius    = [[12]],
     removewait     = 1,
