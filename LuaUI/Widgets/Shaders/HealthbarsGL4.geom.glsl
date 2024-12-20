@@ -55,6 +55,8 @@ vec4 uvoffsets;
 float zoffset;
 float depthbuffermod;
 float sizemultiplier = dataIn[0].v_sizemodifiers.x;
+float duration = -1;
+
 #define HALFPIXEL 0.0019765625
 
 #define BARTYPE dataIn[0].v_bartype_index_ssboloc.x
@@ -79,6 +81,9 @@ void emitVertexBG(in vec2 pos){
 	gl_Position.z += depthbuffermod;
 	g_uv.z = 0.0; // this tells us to use color
 	float extracolor = 0.0;
+	if ((duration != -1) && (mod(timeInfo.x, 10.0) > 4.0)){
+		extracolor = 0.5;
+	}
 	if (((BARTYPE & BITFLASHBAR) > 0u) && (mod(timeInfo.x, 10.0) > 4.0)){
 		extracolor = 0.5;
 	}
@@ -128,12 +133,7 @@ void emitGlyph(vec2 bottomleft, vec2 uvbottomleft, vec2 uvsizes){
 
 #line 22000
 void main(){
-	// bail super early like scum if simple bar with >0.99 value
-	//if (v_bartype_index_ssboloc.y < 32u){ // for paralyze and emp bars, which should always go above regular health bar
-		zoffset =  1.15 * BARHEIGHT *  float(dataIn[0].v_bartype_index_ssboloc.y);
-	//}else{
-	//	zoffset =  1.15 * BARHEIGHT *  -1.0;
-	//}
+	zoffset =  1.15 * BARHEIGHT *  float(dataIn[0].v_bartype_index_ssboloc.y);
 
 	centerpos = dataIn[0].v_centerpos;
 
@@ -143,26 +143,12 @@ void main(){
 
 	uvoffsets = dataIn[0].v_uvoffsets; // if an atlas is used, then use this, otherwise dont
 
-	float health = dataIn[0].v_parameters.x;
+	float health = min(1, dataIn[0].v_parameters.x);
+        if (dataIn[0].v_parameters.x > 1.5) duration = floor(dataIn[0].v_parameters.x - 1);
 	if (BARALPHA < MINALPHA) return; // Dont draw below 50% transparency
 
 	// All the early bail conditions to not draw full/empty bars
-	#ifndef DEBUGSHOW
-		if (health < 0.00001) return;
-		if ((BARTYPE & BITPERCENTAGE) > 0u) { // for percentage bars
-			if (health > 0.999) return;
-		}else{
-			if ((BARTYPE & BITGETPROGRESS) > 0u) { // reload bar?
-				if (health > 0.999) return;
-			}
-			if ((BARTYPE & BITUSEOVERLAY) > 0u){ // for textured percentage bars bars
-			//	if (health > 0.995) return;
-			//	if (health < 0.005) return;
-			}
-		}
-	#endif
 	if (dataIn[0].v_numvertices == 0u) return; // for hiding the build bar when full health
-
 
 	// STOCKPILE BAR:  128*numStockpileQued + numStockpiled + stockpileBuild
 	uint numStockpiled = 0u;
@@ -270,15 +256,14 @@ void main(){
 		}
 	}
 
-
 	if ((BARTYPE & (BITTIMELEFT | BITPERCENTAGE))  > 0u){
 		float lsb ;
 		float msb ;
 		float glyphpctsecatlas;
-		if ((BARTYPE & BITTIMELEFT) > 0u){ //display time
-			health = (health - 1.0) / (1.0/40.0);
-			lsb = abs(floor(mod(health, 10.0)));
-			msb = abs( floor(mod(health*0.1, 10.0)));
+		if (duration != -1){ //display time
+		//if ((BARTYPE & BITTIMELEFT) > 0u){ //display time
+			lsb = abs(floor(mod(duration, 10.0)));
+			msb = abs( floor(mod(duration*0.1, 10.0)));
 			glyphpctsecatlas = 14.0; // seconds
 		}else{
 			lsb = floor(mod(health*100.0, 10.0));

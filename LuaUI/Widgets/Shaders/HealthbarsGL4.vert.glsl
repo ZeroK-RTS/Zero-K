@@ -137,35 +137,15 @@ void main()
 	v_bartype_index_ssboloc = bartype_index_ssboloc;
 	float relativehealth = UNITUNIFORMS.health / UNITUNIFORMS.maxHealth;
 	v_parameters.x = UNITUNIFORMS.health / UNITUNIFORMS.maxHealth;
-	if (UNIFORMLOC < 20u)
-	{
-		uint i = uint(mod(timeInfo.x, 20)*0.05);
-		//v_parameters.x =  UNITUNIFORMS.userDefined[uint(i / 5u)][uint(mod(i,4u))];
-		v_parameters.x =  UNITUNIFORMS.userDefined[0].y;
-
-	}else{ // this is a health bar, dont draw it if the unit is being built and its health doesnt really differ from the full health
+	if (UNIFORMLOC < 20u) {
+		v_parameters.x = UNITUNIFORMS.userDefined[0].y;
+	        v_parameters.x = UNITUNIFORMS.userDefined[0][bartype_index_ssboloc.z];
+	} else { // this is a health bar, dont draw it if the unit is being built and its health doesnt really differ from the full health
 		// TODO: this is kinda buggy, as buildprogess in the the unit uniforms is somehow lagging behind health.
 		float buildprogress = UNITUNIFORMS.userDefined[0].x; // this is -1.0 for fully built units
 		#ifndef DEBUGSHOW
 			if (abs(buildprogress - relativehealth )< 0.03) v_numvertices = 0u;
 		#endif
-	}
-	if (UNIFORMLOC < 4u) v_parameters.x = UNITUNIFORMS.userDefined[0][bartype_index_ssboloc.z ];
-	if (UNIFORMLOC == 0u) { //building
-		// dont draw if health = buildProgress
-		//v_parameters.x = UNITUNIFORMS.userDefined[0].x;
-		//if (abs(v_parameters.x - relativehealth )< 0.02) v_numvertices = 0u;
-	}
-	if (UNIFORMLOC == 1u) v_parameters.x = UNITUNIFORMS.userDefined[0].y; //hmm featureresurrect or timeleft?
-	if (UNIFORMLOC == 2u) v_parameters.x = UNITUNIFORMS.userDefined[0].z; // shield/reloadstart/stockpile / buildtimeleft?
-	if (UNIFORMLOC == 4u) v_parameters.x = UNITUNIFORMS.userDefined[1].x; //emp damage and paralyze
-	if (UNIFORMLOC == 5u) v_parameters.x = UNITUNIFORMS.userDefined[1].y; //capture
-
-	if ((BARTYPE & BITGETPROGRESS) > 0u) { // reload bar progress is calced from nowtime-shottime / (endtime - shottime)
-		v_parameters.x =
-			((timeInfo.x + timeInfo.w) - UNITUNIFORMS.userDefined[0].z ) /
-			(UNITUNIFORMS.userDefined[0].w - UNITUNIFORMS.userDefined[0].z);
-		v_parameters.x = clamp(v_parameters.x * 1.0, 0.0, 1.0);
 	}
 
 	v_mincolor = mincolor;

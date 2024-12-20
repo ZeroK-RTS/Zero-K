@@ -32,7 +32,6 @@ end
 			-- needs update on every fucking unitdamaged callin
 			-- handle cases where uni is empd outside of view?
 
-
 		-- reload
 			-- 2 floats, lastshot, nextshot
 		-- time left in construction
@@ -67,8 +66,6 @@ end
 --return: nil | number health, number maxHealth, number resurrectProgress
 --Spring.GetFeatureResources ( number featureID )
 --return: nil | number RemainingMetal, number maxMetal, number RemainingEnergy, number maxEnergy, number reclaimLeft, number reclaimTime
-
-
 
 -- the vertex shader:
 	-- Job of the VS:
@@ -111,7 +108,6 @@ end
 		-- bar type
 		-- bar alpha
 		-- corner size
-
 
 -- Geometry shader:
 	-- should only output anything if the bar actually needs to be drawn
@@ -199,91 +195,172 @@ local bitGetProgress = 32
 local bitFlashBar = 64
 local bitColorCorrect = 128
 
--- unit uniform index map:
--- 0: building
--- 1: NONE ,
--- 2: shield/reloadstart/stockpile
--- 3: reloadend?
--- 4: emp damage /paralyze
--- 5: capture
+local healthChannel = 32 -- if its >20, then its health/maxhealth
+local buildChannel = 1
+local morphChannel = 0
+local paralyzeChannel = 2
+local disarmChannel = 3
+local slowChannel = 4
+local reloadChannel = 5
+local dgunChannel = 6
+local teleportChannel = 7
+local heatChannel = 7
+local speedChannel = 7
+local reammoChannel = 7
+local gooChannel = 7
+local captureReloadChannel = 7
+local abilityChannel = 7
+local stockpileChannel = 7
+local shieldChannel = 8
+local captureChannel = 9
+local reclaimChannel = 0
+local resurrectChannel = 1
 
--- Feature uniform index map:
--- 0: NONE
--- 1: resurrect
--- 2: reclaim
-
-local barTypeMap = { -- WHERE SHOULD WE STORE THE FUCKING COLORS?
+local barTypeMap = {
 	health = {
 		mincolor = {1.0, 0.0, 0.0, 1.0},
 		maxcolor = {0.0, 1.0, 0.0, 1.0},
-		--bartype = 0,
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = 32, -- if its >20, then its health/maxhealth
-		uvoffset = 0.0625, -- the X offset of the icon for this bar
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
 	},
-	shield = {
-		mincolor = {0.15, 0.4, 0.4, 1.0},
-		maxcolor = {0.3, 0.8, 0.8, 1.0},
-		--bartype = 3,
+	paralyze = {
+		mincolor = {0.6, 0.6, 1.0, 1.0},
+		maxcolor = {0.6, 0.6, 1.0, 1.0},
+		--bartype = 1,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
-		hidethreshold = 0.99,
-		uniformindex = 2, -- if its >20, then its health/maxhealth
-		uvoffset = 0.3125, -- the X offset of the icon for this bar
-	},
-	capture = {
-		mincolor = {0.5, 0.25, 0.0, 1.0},
-		maxcolor = {1.0, 0.5, 0.0, 1.0},
-		--bartype = 3,
-		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
-		hidethreshold = 0.99,
-		uniformindex = 5, -- if its >20, then its health/maxhealth
-		uvoffset = 0.1875, -- the X offset of the icon for this bar
-	},
-	stockpile = {
-		mincolor = {0.1, 0.1, 0.1, 1.0},
-		maxcolor = {0.1, 0.1, 0.1, 1.0},
-		--bartype = 5,
-		bartype = bitShowGlyph + bitUseOverlay + bitIntegerNumber,
 		hidethreshold = 1.99,
-		uniformindex = 2, -- if its >20, then its health/maxhealth
-		uvoffset = 0.4375, -- the X offset of the icon for this bar
+		uniformindex = paralyzeChannel, -- if its >20, then its health/maxhealth
+		uvoffset = 13 / 16, -- the X offset of the icon for this bar
 	},
-	emp_damage = {
+	build = {
+		mincolor = {1.0, 1.0, 1.0, 1.0},
+		maxcolor = {1.0, 1.0, 1.0, 1.0},
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
+		hidethreshold = 0.999,
+		uniformindex = buildChannel, -- if its >20, then its health/maxhealth
+		uvoffset = 15 / 16, -- the X offset of the icon for this bar
+	},
+	morph = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	disarm = {
 		mincolor = {0.4, 0.4, 0.8, 1.0},
 		maxcolor = {0.6, 0.6, 1.0, 1.0},
-		--bartype = 3,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 4, -- if its >20, then its health/maxhealth
-		uvoffset = 0.5625, -- the X offset of the icon for this bar
+		uniformindex = disarmChannel,
+		uvoffset = 9 / 16,
+	},
+	slow = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
 	},
 	reload = {
 		mincolor = {0.03, 0.4, 0.4, 1.0},
 		maxcolor = {0.05, 0.6, 0.6, 1.0},
-		--bartype = 2,
 		bartype = bitShowGlyph + bitUseOverlay + bitGetProgress,
 		hidethreshold = 0.99,
-		uniformindex = 2, -- and 3!
-		uvoffset = 0.6875, -- the X offset of the icon for this bar
+		uniformindex = 2,
+		uvoffset = 11 / 16,
 	},
-	building = {
-		mincolor = {1.0, 1.0, 1.0, 1.0},
-		maxcolor = {1.0, 1.0, 1.0, 1.0},
-		--bartype = 3,
-		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
-		hidethreshold = 0.999,
-		uniformindex = 0, -- if its >20, then its health/maxhealth
-		uvoffset = 0.9375, -- the X offset of the icon for this bar
-	},
-	paralyzed = {
-		mincolor = {0.6, 0.6, 1.0, 1.0},
-		maxcolor = {0.6, 0.6, 1.0, 1.0},
-		--bartype = 1,
-		bartype = bitShowGlyph + bitUseOverlay + bitFlashBar + bitTimeLeft,
+	dgun = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = 4, -- if its >20, then its health/maxhealth
-		uvoffset = 0.8125, -- the X offset of the icon for this bar
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	teleport = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	heat = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	speed = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	reammo = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	goo = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	captureReload = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	ability = {
+		mincolor = {0.0, 0.0, 0.0, 0.0},
+		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		bartype = bitPercentage + bitColorCorrect,
+		hidethreshold = 0.99,
+		uniformindex = healthChannel,
+		uvoffset = 1 / 16,
+	},
+	stockpile = {
+		mincolor = {0.1, 0.1, 0.1, 1.0},
+		maxcolor = {0.1, 0.1, 0.1, 1.0},
+		bartype = bitShowGlyph + bitUseOverlay + bitIntegerNumber,
+		hidethreshold = 1.99,
+		uniformindex = stockpileChannel, -- if its >20, then its health/maxhealth
+		uvoffset = 7 / 16, -- the X offset of the icon for this bar
+	},
+	shield = {
+		mincolor = {0.15, 0.4, 0.4, 1.0},
+		maxcolor = {0.3, 0.8, 0.8, 1.0},
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
+		hidethreshold = 0.99,
+		uniformindex = shieldChannel, -- if its >20, then its health/maxhealth
+		uvoffset = 5 / 16, -- the X offset of the icon for this bar
+	},
+	capture = {
+		mincolor = {0.5, 0.25, 0.0, 1.0},
+		maxcolor = {1.0, 0.5, 0.0, 1.0},
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
+		hidethreshold = 0.99,
+		uniformindex = captureChannel, -- if its >20, then its health/maxhealth
+		uvoffset = 3 / 16, -- the X offset of the icon for this bar
 	},
 	featurehealth = {
 		mincolor = {0.25, 0.25, 0.25, 1.0},
@@ -292,7 +369,7 @@ local barTypeMap = { -- WHERE SHOULD WE STORE THE FUCKING COLORS?
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = 33, -- if its >20, then its health/maxhealth
-		uvoffset = 0.125, -- the X offset of the icon for this bar
+		uvoffset = 2 / 16, -- the X offset of the icon for this bar
 	},
 	featurereclaim = {
 		mincolor = {0.00, 1.00, 0.00, 1.0},
@@ -301,7 +378,7 @@ local barTypeMap = { -- WHERE SHOULD WE STORE THE FUCKING COLORS?
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = 2, -- if its >20, then its health/maxhealth
-		uvoffset = 0.5, -- the X offset of the icon for this bar
+		uvoffset = 8 / 16, -- the X offset of the icon for this bar
 	},
 	featureresurrect = {
 		mincolor = {0.75, 0.15, 0.75, 1.0},
@@ -310,7 +387,7 @@ local barTypeMap = { -- WHERE SHOULD WE STORE THE FUCKING COLORS?
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = 1, -- if its >20, then its health/maxhealth
-		uvoffset = 0.25, -- the X offset of the icon for this bar
+		uvoffset = 4 / 16, -- the X offset of the icon for this bar
 	},
 }
 
@@ -340,20 +417,27 @@ for barname, bt in pairs(barTypeMap) do
 	bt['cache'] = cache
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+local GetUnitIsStunned     = Spring.GetUnitIsStunned
+local GetUnitHealth        = Spring.GetUnitHealth
+local GetUnitWeaponState   = Spring.GetUnitWeaponState
+local GetUnitShieldState   = Spring.GetUnitShieldState
+--local GetUnitViewPosition  = Spring.GetUnitViewPosition
+local GetUnitStockpile     = Spring.GetUnitStockpile
+local GetUnitRulesParam    = Spring.GetUnitRulesParam
+
 
 local spec, fullview = Spring.GetSpectatingState()
 local myTeamID = Spring.GetMyTeamID()
 local myAllyTeamID = Spring.GetMyAllyTeamID()
 local myPlayerID = Spring.GetMyPlayerID()
-local GetUnitWeaponState = Spring.GetUnitWeaponState
 
 local chobbyInterface
 
 local unitDefIgnore = {} -- commanders!
-local unitDefhasShield = {} -- value is shield max power
+local unitDefHasShield = {} -- value is shield max power
 local unitDefCanStockpile = {} -- 0/1?
 local unitDefReload = {} -- value is max reload time
 local unitDefHeights = {} -- maps unitDefs to height
@@ -361,19 +445,30 @@ local unitDefHideDamage = {}
 local unitDefPrimaryWeapon = {} -- the index for reloadable weapon on unitdef weapons
 
 local unitBars = {} -- we need this additional table of {[unitID] = {barhealth, barrez, barreclaim}}
-local unitEmpWatch = {}
-local unitBeingBuiltWatch = {}
-local unitCaptureWatch = {}
-local unitShieldWatch = {} -- maps unitID to last shield value
-local unitEmpDamagedWatch = {}
-local unitParalyzedWatch = {}
-local unitStockPileWatch = {}
+
+local unitHealthWatch = {}
+local unitBuildWatch = {}
+local unitMorphWatch = {}
+local unitParalyzeWatch = {}
+local unitDisarmWatch = {}
+local unitSlowWatch = {}
 local unitReloadWatch = {}
+local unitDgunWatch = {}
+local unitTeleportWatch = {}
+local unitHeatWatch = {}
+local unitSpeedWatch = {}
+local unitReammoWatch = {}
+local unitGooWatch = {}
+local unitCaptureReloadWatch = {}
+local unitAbilityWatch = {}
+local unitStockpilewatch = {}
+local unitShieldWatch = {} -- works
+local unitCaptureWatch = {} -- ??
 
 local featureDefHeights = {} -- maps FeatureDefs to height
 local featureBars = {} -- we need this additional table of {[featureid] = {barhealth, barrez, barreclaim}}
 
---local empDecline = 1 / 40 --magic
+local empDecline = 1 / Game.paralyzeDeclineRate
 local minReloadTime = 4 -- weapons reloading slower than this willget bars
 
 local featureHealthVBO
@@ -404,7 +499,6 @@ local featureReclaimDistMult = 2 -- how many times closer features have to be fo
 local featureResurrectDistMult = 1 -- how many times closer features have to be for their bars to show
 local glphydistmult = 3.5 -- how much closer than BARFADEEND the bar has to be to start drawing numbers/icons. Numbers closer to 1 will make the glyphs be drawn earlier, high numbers will only shows glyphs when zoomed in hard.
 local glyphdistmultfeatures = 1.8 -- how much closer than BARFADEEND the bar has to be to start drawing numbers/icons
-
 
 local unitDefSizeMultipliers = {} -- table of unitdefID to a size mult (default 1.0) to override sizing of bars per unitdef
 local skipGlyphsNumbers = 0.0  -- 0.0 is draw glyph and number,  1.0 means only numbers, 2.0 means only bars,
@@ -461,7 +555,6 @@ local shaderSourceCache = {
 		shaderConfig = shaderConfig,		  
 	}
 
-
 -- Walk through unitdefs for the stuff we need:
 for udefID, unitDef in pairs(UnitDefs) do
 	if unitDef.customParams and unitDef.customParams.nohealthbars then
@@ -470,7 +563,7 @@ for udefID, unitDef in pairs(UnitDefs) do
 
 	local shieldDefID = unitDef.shieldWeaponDef
 	local shieldPower = ((shieldDefID) and (WeaponDefs[shieldDefID].shieldPower)) or (-1)
-	if shieldPower > 1 then unitDefhasShield[udefID] = shieldPower
+	if shieldPower > 1 then unitDefHasShield[udefID] = shieldPower
 		--Spring.Echo("HAS SHIELD")
 	end
 
@@ -503,13 +596,10 @@ for fdefID, featureDef in pairs(FeatureDefs) do
 	featureDefHeights[fdefID] = featureDef.height or 32
 end
 
-
 local function goodbye(reason)
   Spring.Echo("Healthbars GL4 widget exiting with reason: "..reason)
   widgetHandler:RemoveWidget()
 end
-
-
 
 local function initializeInstanceVBOTable(myName, usesFeatures)
 	local newVBOTable
@@ -534,7 +624,6 @@ local function initializeInstanceVBOTable(myName, usesFeatures)
 	return newVBOTable
 end
 
-
 local function initGL4()
 	healthBarShader =  LuaShader.CheckShaderUpdates(shaderSourceCache)
 
@@ -555,9 +644,8 @@ end
 --------------------------------------------------------------------------------
 
 local function addBarForUnit(unitID, unitDefID, barname, reason)
-	--Spring.Debug.TraceFullEcho()
 	if debugmode then Spring.Debug.TraceEcho(unitBars[unitID]) end
-	--Spring.Echo("Caller1:", tostring()".name), "caller2:", tostring(debug.getinfo(3).name))
+
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 
 	-- Why? Because adding additional bars can be triggered from outside of unit tracker api
@@ -567,10 +655,9 @@ local function addBarForUnit(unitID, unitDefID, barname, reason)
 
 	local gf = Spring.GetGameFrame()
 	local bt = barTypeMap[barname]
-	--if cnt == 1 then bt = barTypeMap.building end
-	--if cnt == 2 then bt = barTypeMap.reload end
+	if bt == nil then Spring.Echo(barname) end
 	local instanceID = unitID .. '_' .. barname
-	--Spring.Echo(instanceID, barname, unitBars[unitID])
+
 	if healthBarVBO.instanceIDtoIndex[instanceID] then
 		if debugmode then Spring.Echo("Trying to add duplicate bar", unitID, instanceID, barname, reason, unitBars[unitID]) end
 		return
@@ -583,23 +670,7 @@ local function addBarForUnit(unitID, unitDefID, barname, reason)
 		return nil
 	end
 
-	if unitBars[unitID] == nil then
-		if debugmode then
-			Spring.Echo("A unit has no bars yet", UnitDefs[unitDefID].name, Spring.GetUnitPosition(unitID))
-			Spring.Debug.TraceFullEcho()
-			Spring.SendCommands({"pause 1"})
-			Spring.Echo("No bars unit, last seen at", unitID)
-			Spring.MarkerAddPoint(Spring.GetUnitPosition(unitID) )
-		end
-		unitBars[unitID] = 1
-	end
-
-	--local barpos = unitBars[unitID]
-	--if bartype == 'emp_damage' or bartype == 'paralyze' then
-	--	barpos = 33
-	--else
-	unitBars[unitID] = unitBars[unitID] + 1
-	--end -- to keep these on top
+	unitBars[unitID] = (unitBars[unitID] or 0) + 1
 
 	local effectiveScale = ((variableBarSizes and unitDefSizeMultipliers[unitDefID]) or 1.0) * barScale
 	
@@ -607,7 +678,7 @@ local function addBarForUnit(unitID, unitDefID, barname, reason)
 
 	healthBarTableCache[1] = unitDefHeights[unitDefID] + additionalheightaboveunit * effectiveScale  -- height
 	healthBarTableCache[2] = effectiveScale
-	healthBarTableCache[6] = unitBars[unitID] - 1   -- bar index (how manyeth per unit)
+	healthBarTableCache[6] = unitBars[unitID]   -- bar index (how manyeth per unit)
 	
 	return pushElementInstance(
 		healthBarVBO, -- push into this Instance VBO Table
@@ -619,29 +690,7 @@ local function addBarForUnit(unitID, unitDefID, barname, reason)
 		-- we are returning here, to sign successful adds
 end
 
-
 local uniformcache = {0.0}
-
-local function updateReloadBar(unitID, unitDefID, reason)
-	if not unitDefPrimaryWeapon[unitDefID] then
-		return
-	end
-
-	local reloadFrame = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID], 'reloadFrame')
-	local reloadTime = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID], 'reloadTime')
-	local gf = Spring.GetGameFrame()
-
-	if (reloadFrame == nil or reloadFrame > gf) and unitReloadWatch[unitID] == nil then
-		addBarForUnit(unitID, unitDefID, "reload", reason)
-	end
-
-	if (reloadFrame and reloadTime and gl.SetUnitBufferUniforms) then
-		uniformcache[1] = reloadFrame - 30 * reloadTime
-		gl.SetUnitBufferUniforms(unitID, uniformcache, 2)
-		uniformcache[1] = reloadFrame
-		gl.SetUnitBufferUniforms(unitID, uniformcache, 3)
-	end
-end
 
 local function removeBarFromUnit(unitID, barname, reason) -- this will bite me in the ass later, im sure, yes it did, we need to just update them :P
 	local instanceKey = unitID .. "_" .. barname
@@ -656,7 +705,6 @@ local function removeBarFromUnit(unitID, barname, reason) -- this will bite me i
 	end
 end
 
-
 local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason) -- TODO, actually, we need to check for all of these for stuff entering LOS
 
 	if unitDefID == nil or Spring.ValidUnitID(unitID) == false or Spring.GetUnitIsDead(unitID) == true then
@@ -669,93 +717,90 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	-- This is optionally passed, and it only important in one edge case:
 	-- If a unit is captured and thus immediately become outside of LOS, then the getunitallyteam is still the old ally team according to getUnitAllyTEam, and not the new allyteam.
 	unitAllyTeam = unitAllyTeam or Spring.GetUnitAllyTeam(unitID)
-	local health, maxHealth, paralyzeDamage, capture, build = Spring.GetUnitHealth(unitID)
-	if (fullview or (unitAllyTeam == myAllyTeamID) or (unitDefHideDamage[unitDefID] == nil)) and (unitDefIgnore[unitDefID] == nil ) then
-		if debugmode and health == nil then
-			Spring.Echo("Trying to add a healthbar to nil health unit", unitID, unitDefID)
-			local ux, uy, uz = Spring.GetUnitPosition(unitID)
-			Spring.MarkerAddPoint(ux, uy, uz, "health")
-		end
-		addBarForUnit(unitID, unitDefID, "health", reason)
-	end
-	if unitDefhasShield[unitDefID] then
-		--Spring.Echo("hasshield")
+
+	addBarForUnit(unitID, unitDefID, "health", reason)
+	unitHealthWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "build", reason)
+	unitBuildWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "morph", reason)
+	unitMorphWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "paralyze", reason)
+	unitParalyzeWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "disarm", reason)
+	unitDisarmWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "slow", reason)
+	unitSlowWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "reload", reason)
+	unitReloadWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "dgun", reason)
+	unitDgunWatch[unitID] = -1
+
+	--[[
+	addBarForUnit(unitID, unitDefID, "teleport", reason)
+	unitTeleportWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "heat", reason)
+	unitHeatWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "speed", reason)
+	unitSpeedWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "reammo", reason)
+	unitReammoWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "goo", reason)
+	unitGooWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "captureReload", reason)
+	unitCaptureReloadWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "ability", reason)
+	unitAbilityWatch[unitID] = -1
+
+	addBarForUnit(unitID, unitDefID, "stockpile", reason)
+	unitStockpileWatch[unitID] = -1
+	]]--
+
+	if unitDefHasShield[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "shield", reason)
 		unitShieldWatch[unitID] = -1.0
 	end
 
-	updateReloadBar(unitID, unitDefID, reason)
-
-	if health ~= nil then
-		if build < 1 then
-			addBarForUnit(unitID, unitDefID, "building", reason)
-			-- moved to CUS gl4
-			--uniformcache[1] = build
-			--unitBeingBuiltWatch[unitID] = build
-			--gl.SetUnitBufferUniforms(unitID, uniformcache, 0) 
-			--uniformcache[1] = Spring.GetUnitHeight(unitID)
-			--gl.SetUnitBufferUniforms(unitID, uniformcache, 11)
-		else
-			-- Moved to CUS GL4:
-			--uniformcache[1] = -1.0 -- mean that the unit has been built, we init it to -1 always
-			--gl.SetUnitBufferUniforms(unitID, uniformcache, 0)
-		end
-		--Spring.Echo(unitID, unitDefID, unitDefCanStockpile[unitDefID])
-		if debugmode then
-			if unitDefCanStockpile[unitDefID] then
-				Spring.Echo("unitDefCanStockpile", unitAllyTeam, myAllyTeamID, fullview)
-			end
-
-		end
-
-		if unitDefCanStockpile[unitDefID] and ((unitAllyTeam == myAllyTeamID) or fullview) then
-			unitStockPileWatch[unitID] = 0.0
-			addBarForUnit(unitID, unitDefID, "stockpile", reason)
-		end
-		if  capture > 0 then
-			addBarForUnit(unitID, unitDefID, "capture", reason)
-			uniformcache[1] = capture
-			gl.SetUnitBufferUniforms(unitID, uniformcache, 5)
-			unitCaptureWatch[unitID] = capture
-		end
-
-		if paralyzeDamage > 0 then
-			--TODO
-
-			if Spring.GetUnitIsStunned(unitID) then
-				if unitParalyzedWatch[unitID] == nil then  -- already paralyzed
-					unitParalyzedWatch[unitID] = 0.0
-					-- if unit was already empd, remove that bar
-					if unitEmpDamagedWatch[unitID] then
-						unitEmpDamagedWatch[unitID] = nil
-						removeBarFromUnit(unitID, 'emp_damage', 'unitEmpDamagedWatch')
-					end
-					addBarForUnit(unitID, unitDefID, "paralyzed", reason)
-				end
-			else
-				if unitEmpDamagedWatch[unitID] == nil then
-					unitEmpDamagedWatch[unitID] = 0.0
-					addBarForUnit(unitID, unitDefID, "emp_damage", reason)
-				end
-			end
-		end
-	end
+	addBarForUnit(unitID, unitDefID, "capture", reason)
+	unitCaptureWatch[unitID] = -1
 end
 
 local function removeBarsFromUnit(unitID, reason)
 	for barname,v in pairs(barTypeMap) do
 		removeBarFromUnit(unitID, barname, reason)
 	end
+	unitHealthWatch[unitID] = nil
+	unitBuildWatch[unitID] = nil
+	unitMorphWatch[unitID] = nil
+	unitParalyzeWatch[unitID] = nil
+	unitDisarmWatch[unitID] = nil
+	unitSlowWatch[unitID] = nil
+	unitReloadWatch[unitID] = nil
+	unitDgunWatch[unitID] = nil
+	unitTeleportWatch[unitID] = nil
+	unitHeatWatch[unitID] = nil
+	unitSpeedWatch[unitID] = nil
+	unitReammoWatch[unitID] = nil
+	unitGooWatch[unitID] = nil
+	unitCaptureReloadWatch[unitID] = nil
+	unitAbilityWatch[unitID] = nil
+	unitStockpilewatch[unitID] = nil
 	unitShieldWatch[unitID] = nil
 	unitCaptureWatch[unitID] = nil
-	unitEmpDamagedWatch[unitID] = nil
-	unitParalyzedWatch[unitID] = nil
-	--unitBeingBuiltWatch[unitID] = nil
-	unitStockPileWatch[unitID] = nil
-	unitReloadWatch[unitID] = nil
 	unitBars[unitID] = nil
 end
-
 
 local function addBarToFeature(featureID,  barname)
 	if debugmode then Spring.Debug.TraceEcho() end
@@ -794,7 +839,6 @@ local function addBarToFeature(featureID,  barname)
 		featureID) -- last one should be featureID!
 end
 
-
 local function removeBarFromFeature(featureID, targetVBO)
 	--Spring.Echo("removeBarFromFeature", featureID, targetVBO.myName)
 	if targetVBO.instanceIDtoIndex[featureID] then
@@ -811,18 +855,29 @@ local function removeBarsFromFeature(featureID)
 	removeBarFromFeature(featureID, featureResurrectVBO)
 end
 
-
 local function init()
 	clearInstanceTable(healthBarVBO)
-	unitEmpWatch = {}
-	--unitBeingBuiltWatch = {}
-	unitCaptureWatch = {}
-	unitShieldWatch = {} -- maps unitID to last shield value
-	unitEmpDamagedWatch = {}
-	unitParalyzedWatch = {}
-	unitStockPileWatch = {}
-	unitReloadWatch = {}
+	unitHealthWatch = {}
+	unitBuildWatch = {}
+	unitMorphWatch = {}
+        unitParalyzeWatch = {}
+        unitDisarmWatch = {}
+        unitSlowWatch = {}
+        unitReloadWatch = {}
+        unitDgunWatch = {}
+        unitTeleportWatch = {}
+        unitHeatWatch = {}
+        unitSpeedWatch = {}
+        unitReammoWatch = {}
+        unitGooWatch = {}
+        unitCaptureReloadWatch = {}
+        unitAbilityWatch = {}
+        unitStockpilewatch = {}
+        unitShieldWatch = {}
+        unitCaptureWatch = {}
+
 	unitBars = {}
+
 	for i, unitID in ipairs(Spring.GetAllUnits()) do -- gets radar blips too!
 		-- probably shouldnt be adding non-visible units
 
@@ -887,7 +942,6 @@ end
 --[12:40 PM] Beherith: Transitions between any of the above 3 should trigger a full reinit
 --[12:41 PM] Beherith: But some internal transitions, for stuff that is draw differently for allies might require additional checks, for spectators who have fullview off?
 
-
 local function FeatureReclaimStartedHealthbars (featureID, step) -- step is negative for reclaim, positive for resurrect
 	--Spring.Echo("FeatureReclaimStartedHealthbars", featureID)
 
@@ -897,41 +951,19 @@ local function FeatureReclaimStartedHealthbars (featureID, step) -- step is nega
 end
 
 local function UnitCaptureStartedHealthbars(unitID, step) -- step is negative for reclaim, positive for resurrect
-	if debugmode then Spring.Echo("UnitCaptureStartedHealthbars", unitID) end
-    --gl.SetFeatureBufferUniforms(featureID, 0.5, 2) -- update GL
-	local capture = select(4, Spring.GetUnitHealth(unitID))
-	uniformcache[1] = capture
-	gl.SetUnitBufferUniforms(unitID, uniformcache, 5)
-	unitCaptureWatch[unitID] = capture
-	addBarForUnit(unitID, Spring.GetUnitDefID(unitID), 'capture', 'UnitCaptureStartedHealthbars')
-
+	--TODO
 end
 
 --function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 local function UnitParalyzeDamageHealthbars(unitID, unitDefID, damage)
-	--Spring.Echo()
-	if Spring.GetUnitIsStunned(unitID) then -- DO NOTE THAT: return: nil | bool stunned_or_inbuild, bool stunned, bool inbuild
-		if unitParalyzedWatch[unitID] == nil then  -- already paralyzed
-			unitParalyzedWatch[unitID] = 0.0
-			-- if unit was already empd, remove that bar
-			if unitEmpDamagedWatch[unitID] then
-				unitEmpDamagedWatch[unitID] = nil
-				removeBarFromUnit(unitID, 'emp_damage', 'unitEmpDamagedWatch')
-			end
-			addBarForUnit(unitID, unitDefID, "paralyzed", 'unitParalyzedWatch')
-		end
-	else
-		if unitEmpDamagedWatch[unitID] == nil then
-			unitEmpDamagedWatch[unitID] = 0.0
-			addBarForUnit(unitID, unitDefID, "emp_damage", 'unitEmpDamagedWatch')
-		end
-	end
+	-- TODO
 end
 
 local function ProjectileCreatedReloadHB(projectileID, unitID, weaponID, unitDefID)
-	local unitDefID = Spring.GetUnitDefID(unitID)
+	--TODO
+	--local unitDefID = Spring.GetUnitDefID(unitID)
 
-	updateReloadBar(unitID, unitDefID, 'ProjectileCreatedReloadHB')
+	--updateReloadBar(unitID, unitDefID, 'ProjectileCreatedReloadHB')
 end
 
 function widget:Initialize()
@@ -1013,7 +1045,6 @@ function widget:UnitLeftLos(unitID, unitTeam, allyTeam, unitDefID)
 	removeBarsFromUnit(unitID, 'UnitLeftLos')
 end
 
-
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
 	local newAllyTeamID = select( 6, Spring.GetTeamInfo(newTeamID))
 
@@ -1034,7 +1065,6 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID)
 end
 ]]--
 
-
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 	addBarsForUnit(unitID, unitDefID, unitTeam, nil, 'VisibleUnitAdded')
 end
@@ -1044,19 +1074,32 @@ function widget:VisibleUnitRemoved(unitID)
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
+	clearInstanceTable(healthBarVBO)
+	unitHealthWatch = {}
+	unitBuildWatch = {}
+	unitMorphWatch = {}
+        unitParalyzeWatch = {}
+        unitDisarmWatch = {}
+        unitSlowWatch = {}
+        unitReloadWatch = {}
+        unitDgunWatch = {}
+        unitTeleportWatch = {}
+        unitHeatWatch = {}
+        unitSpeedWatch = {}
+        unitReammoWatch = {}
+        unitGooWatch = {}
+        unitCaptureReloadWatch = {}
+        unitAbilityWatch = {}
+        unitStockpilewatch = {}
+        unitShieldWatch = {}
+        unitCaptureWatch = {}
+
 	unitBars = {}
-	unitShieldWatch = {}
-	unitCaptureWatch = {}
-	unitEmpDamagedWatch = {}
-	unitParalyzedWatch = {}
-	--unitBeingBuiltWatch = {}
-	unitStockPileWatch = {}
-	unitReloadWatch = {}
+
 	spec, fullview = Spring.GetSpectatingState()
 	myTeamID = Spring.GetMyTeamID()
 	myAllyTeamID = Spring.GetMyAllyTeamID()
 	myPlayerID = Spring.GetMyPlayerID()
-
 
 	clearInstanceTable(healthBarVBO) -- clear all instances
 	for unitID, unitDefID in pairs(extVisibleUnits) do
@@ -1096,6 +1139,7 @@ function widget:PlayerChanged(playerID)
 	--if reinit then init() end
 end
 
+local paralyzeOnMaxHealth = Game.paralyzeOnMaxHealth
 
 function widget:GameFrame(n)
 
@@ -1103,118 +1147,82 @@ function widget:GameFrame(n)
 		locateInvalidUnits(healthBarVBO)
 		locateInvalidUnits(featureHealthVBO)
 	end
-	-- Units:
-	-- check shields
+	--[[ TODO:
+        unitMorphWatch[unitID] = nil
+        unitDisarmWatch[unitID] = nil
+        unitSlowWatch[unitID] = nil
+        unitReloadWatch[unitID] = nil
+        unitDgunWatch[unitID] = nil
+        unitTeleportWatch[unitID] = nil
+        unitHeatWatch[unitID] = nil
+        unitSpeedWatch[unitID] = nil
+        unitReammoWatch[unitID] = nil
+        unitGooWatch[unitID] = nil
+        unitCaptureReloadWatch[unitID] = nil
+        unitAbilityWatch[unitID] = nil
+        unitStockpilewatch[unitID] = nil
+        unitCaptureWatch[unitID] = nil
+	--]]
 	if n % 3 == 0 then
+		for unitID, oldHealthPower in pairs(unitHealthWatch) do
+			local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
+			paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage or 0
+
+			if (not maxHealth)or(maxHealth < 1) then
+				maxHealth = 1
+			end
+
+			if (not build) then
+				build = 1
+			end
+
+			local empHP = (not paralyzeOnMaxHealth) and health or maxHealth
+			local emp = paralyzeDamage/empHP
+			local hp  = (health or 0)/maxHealth
+			
+			--// HEALTH
+			unitHealthWatch[unitID] = hp
+			-- Health is passed to shaders using health/maxHealth
+
+			--// BUILD
+			if unitBuildWatch[unitID] ~= build then
+				unitBuildWatch[unitID] = build
+				uniformcache[1] = build
+				gl.SetUnitBufferUniforms(unitID, uniformcache, buildChannel)
+			end
+
+                        --// PARALYZE
+			local paraTime = false
+			local stunned = GetUnitIsStunned(unitID)
+			stunned = stunned and paralyzeDamage >= empHP
+			if (stunned) then
+				emp = (paralyzeDamage-empHP)/(maxHealth*empDecline) + 1
+			else
+				if (emp > 1) then
+					emp = 1
+				end
+			end
+
+			if unitParalyzeWatch[unitID] ~= emp then
+				unitParalyzeWatch[unitID] = emp
+				uniformcache[1] = emp 
+				gl.SetUnitBufferUniforms(unitID, uniformcache, paralyzeChannel)
+			end
+		end
+	end
+
+	if n % 3 == 1 then
 		for unitID, oldshieldPower in pairs(unitShieldWatch) do
-			local shieldOn, shieldPower = Spring.GetUnitShieldState(unitID)
+			local shieldOn, shieldPower = GetUnitShieldState(unitID)
 			if shieldOn == false then shieldPower = 0.0 end
 			if oldshieldPower ~= shieldPower then
 				if shieldPower == nil then
 					removeBarFromUnit(unitID, "shield", "unitShieldWatch")
 				else
-					uniformcache[1] = shieldPower / (unitDefhasShield[Spring.GetUnitDefID(unitID)])
-					gl.SetUnitBufferUniforms(unitID, uniformcache, 2)
+					uniformcache[1] = shieldPower / (unitDefHasShield[Spring.GetUnitDefID(unitID)])
+					gl.SetUnitBufferUniforms(unitID, uniformcache, shieldChannel)
 				end
 				unitShieldWatch[unitID] = shieldPower
-			end
-		end
-	end
-
-	-- todo paralyzed and EMP doesnt work for enemy units :(
-	-- check EMP'd units
-	if (n + 1) % 3 == 0 then
-		for unitID, oldempvalue in pairs(unitEmpDamagedWatch) do
-			local health, maxHealth, newparalyzeDamage, capture, build = Spring.GetUnitHealth(unitID)
-			if newparalyzeDamage and oldempvalue ~= newparalyzeDamage then
-				if newparalyzeDamage == 0 then
-					unitEmpDamagedWatch[unitID] = nil
-					removeBarFromUnit(unitID, "emp_damage",'unitEmpDamagedWatch')
-				else
-					uniformcache[1] = newparalyzeDamage/ maxHealth
-					unitEmpDamagedWatch[unitID] = newparalyzeDamage
-					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
-				end
-			end
-		end
-	end
-
-	-- check Paralyzed units
-	if (n+2) % 3  == 0 then
-		for unitID, paralyzetime in pairs(unitParalyzedWatch) do
-			if Spring.GetUnitIsStunned(unitID) then
-				local health, maxHealth, paralyzeDamage, capture, build = Spring.GetUnitHealth(unitID)
-				--uniformcache[1] = math.floor((paralyzeDamage - maxHealth)) / (maxHealth * empDecline))
-				if paralyzeDamage then
-				
-					-- this returns something like 1.20 which somehow turns into seconds somewhere unsearchable, currently wrong display
-					-- this needs conditional fixing within an if Spring.GetModOptions().emprework
-					uniformcache[1] = paralyzeDamage / maxHealth
-					--Spring.Echo("Paralyze damages", paralyzeDamage, maxHealth)
-					--Spring.Echo("Paralyze damage cur", (paralyzeDamage / maxHealth))
-
-					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
-				end
-			else
-				unitParalyzedWatch[unitID] = nil
-				removeBarFromUnit(unitID, "paralyzed", 'unitEmpDamagedWatch')
-				addBarForUnit(unitID, unitDefID, "emp_damage",'unitEmpDamagedWatch')
-				unitEmpDamagedWatch[unitID] = 1.0
-			end
-		end
-	end
-
-	-- check build progress
-	--[[ -- DISABLED FOR CUS GL4 path
-	if (n % 1 == 0) then
-		for unitID, prevProgress in pairs(unitBeingBuiltWatch) do
-			local _, progress = Spring.GetUnitIsBeingBuilt(unitID)
-			if progress and progress ~= prevProgress then
-				uniformcache[1] = progress
-				--Spring.Echo("Health", health/maxHealth, build, math.abs(build - health/maxHealth))
-				--if math.abs(build - health/maxHealth) < 0.005 then uniformcache[1] = 1.0 end
-				gl.SetUnitBufferUniforms(unitID,uniformcache, 0)
-				unitBeingBuiltWatch[unitID] = progress
-				if progress == 1 then
-					removeBarFromUnit(unitID, "building", 'unitBeingBuiltWatch')
-					unitBeingBuiltWatch[unitID] = nil
-				else
-					unitBeingBuiltWatch[unitID] = 1.0
-				end
-			end
-		end
-	end
-	]]--
-
-	-- check capture progress?
-	if (n % 1) == 0 then
-		for unitID, captureprogress in pairs(unitCaptureWatch) do
-			local capture = select(4, Spring.GetUnitHealth(unitID))
-			if capture and capture ~= captureprogress then
-				uniformcache[1] = capture
-				gl.SetUnitBufferUniforms(unitID, uniformcache, 5)
-				unitCaptureWatch[unitID] = capture
-			end
-			if capture == 0 or capture == nil then
-				removeBarFromUnit(unitID, 'capture', 'unitCaptureWatch')
-				unitCaptureWatch[unitID] = nil
-			end
-		end
-	end
-
-	-- check stockpile progress
-	if (n % 5) == 2 then
-		for unitID, stockpilebuild in pairs(unitStockPileWatch) do
-			local numStockpiled, numStockpileQued, stockpileBuild = Spring.GetUnitStockpile(unitID)
-			if stockpileBuild and stockpileBuild ~= stockpilebuild then
-				-- we somehow need to forward 3 vars, all 3 of the above. packed into a float, this is nasty
-				--Spring.Echo("Stockpiling", numStockpiled, numStockpileQued, stockpileBuild)
-				if numStockpiled == nil then Spring.Debug.TraceFullEcho(nil,nil,nil, 'nostockpile', unitID, Spring.GetUnitPosition(unitID)) end
-
-				uniformcache[1] =  numStockpiled + stockpileBuild -- less hacky
-				--uniformcache[1] =  128*numStockpileQued + numStockpiled + stockpileBuild -- the worlds nastiest hack
-				unitStockPileWatch[unitID] = stockpileBuild
-				gl.SetUnitBufferUniforms(unitID, uniformcache, 2)
 			end
 		end
 	end
@@ -1237,7 +1245,6 @@ function widget:FeatureCreated(featureID)
 			if health ~= maxhealth then addBarToFeature(featureID, 'featurehealth') end
 		end
 
-
 		if rezProgress > 0 then
 			addBarToFeature(featureID, 'featureresurrect')
 		end
@@ -1248,7 +1255,7 @@ function widget:FeatureCreated(featureID)
 			addBarToFeature(featureID, 'featurereclaim')
 		end
 
-		if rezProgress > 0  or reclaimLeft < 1 then
+		if rezProgress > 0 or reclaimLeft < 1 then
 			-- We have to update the feature uniform buffers in this case, as features can be created with less than max health on the map with FP_featureplacer
 			rezreclaim[1] = rezProgress -- resurrect progress
 			rezreclaim[2] = reclaimLeft -- reclaim percent
