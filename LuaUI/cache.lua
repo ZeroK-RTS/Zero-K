@@ -17,6 +17,7 @@ local GetTeamColor = Spring.GetTeamColor
 local SetTeamColor = Spring.SetTeamColor
 local GetVisibleUnits = Spring.GetVisibleUnits
 local MarkerAddPoint = Spring.MarkerAddPoint
+local ShareResources = Spring.ShareResources
 
 -- Block line drawing widgets
 --local MarkerAddLine = Spring.MarkerAddLine
@@ -39,6 +40,18 @@ end
 
 function Spring.MarkerAddPoint(x, y, z, t, b)
 	MarkerAddPoint(x,y,z,t,true)
+end
+
+function Spring.ShareResources(teamID, resourceType, amount)
+	if resourceType:sub(1, 1) == "u" then
+		-- Cancel commands to prevent things like sharing an active con to drain resources
+		-- or to pass on griefing blame. The implementation matches legacy engine behaviour.
+		Spring.GiveOrder(CMD.STOP, 0, 0)
+
+		return ShareResources(teamID, resourceType) -- passing an explicit nil as amount breaks it on old engines
+	end
+
+	return ShareResources(teamID, resourceType, amount)
 end
 
 function Spring.SetTeamColor(teamid, r, g, b)
