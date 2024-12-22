@@ -26,7 +26,7 @@ end
 
 --------------------------------------------------------------------------------
 
-local GetCommandQueue = Spring.GetCommandQueue
+local GetUnitCommandCount = Spring.GetUnitCommandCount
 local GetPlayerInfo = Spring.GetPlayerInfo
 local GetUnitPosition = Spring.GetUnitPosition
 local GiveOrderToUnit = Spring.GiveOrderToUnit
@@ -60,7 +60,7 @@ function widget:Update(deltaTime)
 
  if (countDown > DELAY) then
    for unitID,_ in pairs(moveUnits) do
-     local cQueue = GetCommandQueue(unitID, 0)
+     local cQueue = GetUnitCommandCount(unitID)
      if (cQueue == 0) then
        local x, y, z = GetUnitPosition(unitID)
        if (math.random(1,2) == 1) then

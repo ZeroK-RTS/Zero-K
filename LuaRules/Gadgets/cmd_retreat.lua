@@ -239,7 +239,7 @@ end
 
 
 local function IsUnitIdle(unitID)
-	local queueSize = spGetCommandQueue(unitID, 0)
+	local queueSize = Spring.GetUnitCommandCount(unitID)
 	local moving = queueSize and queueSize > 0
 	return not moving
 end

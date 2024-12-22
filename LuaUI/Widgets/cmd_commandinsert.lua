@@ -277,7 +277,7 @@ function WG.CommandInsert(id, params, options, seq, nonInsertIfPossible)
 	local units = Spring.GetSelectedUnits()
 	for i = 1, #units do
 		local unitID = units[i]
-		local commands = Spring.GetCommandQueue(unitID, 0)
+		local commands = Spring.GetUnitCommandCount(unitID)
 		if commands then
 			if nonInsertIfPossible then
 				Spring.GiveOrderToUnit(unitID, id, params, options.coded)

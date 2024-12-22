@@ -31,7 +31,7 @@ local repairingUnits = {}
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
 local spGetUnitHealth = Spring.GetUnitHealth
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCommandCount = Spring.GetUnitCommandCount
 local spGetTeamUnits = Spring.GetTeamUnits
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -48,7 +48,7 @@ local function isIdleRepairer(unitID)
 		return false
 	end
 	
-	return spGetCommandQueue(unitID, 0) == 0
+	return spGetUnitCommandCount(unitID) == 0
 end
 
 local function findMyRepairUnits()

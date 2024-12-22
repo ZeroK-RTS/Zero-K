@@ -1505,7 +1505,7 @@ options.monitorInbuiltCons.OnChange = RefreshConsList
 -- Check current cmdID and the queue for a double-wait
 local function HasDoubleCommand(unitID, cmdID)
 	if cmdID == CMD.WAIT or cmdID == CMD.SELFD then
-		local cmdsLen = Spring.GetCommandQueue(unitID,0)
+		local cmdsLen = Spring.GetUnitCommandCount(unitID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
@@ -1518,7 +1518,7 @@ end
 
 -- Check the queue for an attack command
 local function isAttackQueued(unitID)
-	local cmdsLen = Spring.GetCommandQueue(unitID,0)
+	local cmdsLen = Spring.GetUnitCommandCount(unitID)
 	if cmdsLen and (cmdsLen > 0) then
 		local cmds = Spring.GetCommandQueue(unitID,-1)
 		for i = 1,cmdsLen do
@@ -1666,7 +1666,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
 			if not ud.isFactory then
-				local cQueue = Spring.GetCommandQueue(unitID, 0)
+				local cQueue = Spring.GetUnitCommandCount(unitID)
 				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
 				if cQueue == 0 then
 					--Spring.Echo("\tCon "..unitID.." must be idle")

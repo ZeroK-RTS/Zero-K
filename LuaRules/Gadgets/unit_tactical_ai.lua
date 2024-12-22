@@ -24,7 +24,7 @@ end
 
 local spGetGameFrame        = Spring.GetGameFrame
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spGetCommandQueue     = Spring.GetCommandQueue
+local spGetUnitCommandCount = Spring.GetUnitCommandCount
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetUnitVelocity     = Spring.GetUnitVelocity
@@ -186,7 +186,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 		return false -- no queue and on hold position.
 	end
 	if (holdPos and cmdID == CMD_ATTACK and Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
-		if spGetCommandQueue(unitID, 0) == 1 then
+		if spGetUnitCommandCount(unitID) == 1 then
 			return false -- set to hold position and is auto-acquiring target
 		end
 	end

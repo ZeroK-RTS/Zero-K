@@ -154,7 +154,7 @@ local function BurrowThread()
 			elseif height < 40 then
 				local wantLand = select(4, Spring.GetUnitStates(unitID, false, false, true))
 				if wantLand then
-					local isIdle = Spring.GetCommandQueue(unitID, 0) == 0
+					local isIdle = Spring.GetUnitCommandCount(unitID) == 0
 					if isIdle then
 						Spring.AddUnitImpulse(unitID, 0, -2, 0)
 					end

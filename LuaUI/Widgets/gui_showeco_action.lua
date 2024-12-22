@@ -349,7 +349,7 @@ function widget:DrawWorldPreUnit()
 						local unitID = currentSelection[i]
 						local unitDefID = spGetUnitDefID(unitID)
 						if unitDefID and isBuilder[unitDefID] then
-							commandsCount = Spring.GetCommandQueue(unitID, 0)
+							commandsCount = Spring.GetUnitCommandCount(unitID)
 							break
 						end
 					end
