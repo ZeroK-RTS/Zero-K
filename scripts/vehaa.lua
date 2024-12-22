@@ -196,7 +196,7 @@ function script.QueryWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 730, 30, 0.05, true)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 730, 24, 0.05, true)
 end
 
 function script.AimWeapon()
