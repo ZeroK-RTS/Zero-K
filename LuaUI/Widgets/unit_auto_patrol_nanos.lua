@@ -193,7 +193,7 @@ function widget:Update(dt)
 		return
 	end
 	for unitID, _ in pairs(idleCheckUnits) do
-		if Spring.ValidUnitID(unitID) and Spring.GetCommandQueue(unitID, 0) == 0 then
+		if Spring.ValidUnitID(unitID) and Spring.GetUnitCommandCount(unitID) == 0 then
 			SetupUnit(unitID)
 		end
 	end

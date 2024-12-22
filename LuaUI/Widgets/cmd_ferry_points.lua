@@ -358,7 +358,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 			Spring.GiveOrderToUnit(unitID, CMD.WAIT, EMPTY_TABLE, 0)
 
 			-- unsure why this is done but probably to make sure UnitIdle works correctly or somesuch
-			if Spring.GetCommandQueue(unitID, 0) == 1 then
+			if Spring.GetUnitCommandCount(unitID) == 1 then
 				Spring.GiveOrderToUnit(unitID, CMD.STOP, EMPTY_TABLE, 0)
 			end
 		end

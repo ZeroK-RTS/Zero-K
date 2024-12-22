@@ -27,7 +27,7 @@ local spFindUnitCmdDesc       = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc       = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc     = Spring.InsertUnitCmdDesc
 local spSetUnitTarget         = Spring.SetUnitTarget
-local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitCommandCount   = Spring.GetUnitCommandCount
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 
 local FEATURE = 102
@@ -151,7 +151,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 		IterableMap.Add(projectiles, -unitID, data)
 		return false
 	else
-		local queueSize = spGetCommandQueue(unitID, 0)
+		local queueSize = spGetUnitCommandCount(unitID)
 		if queueSize == 1 then
 			local cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
 			if cmdID == CMD.ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cp_1 and (not cp_2) and cp_1 == targetID then

@@ -149,7 +149,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			end
 			local targetDefID = spGetUnitDefID(cmdParams[1])
 			if floatDefs[targetDefID] then --targeted unit could utilize float gadget (unit_impulsefloat.lua)
-				local index = spGetCommandQueue(unitID, 0)
+				local index = Spring.GetUnitCommandCount(unitID)
 				 --LOAD command was not part of a queue, clear current queue (this create the normal behaviour when SHIFT modifier is not used)
 				if not cmdOptions.shift then
 					ClearUnitCommandQueue(unitID)
@@ -174,7 +174,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				haveWater = true
 			end
 			if haveWater then
-				local index = spGetCommandQueue(unitID, 0)
+				local index = Spring.GetUnitCommandCount(unitID)
 				--LOAD command was not part of a queue, clear current queue (this create the normal behaviour when SHIFT modifier is not used)
 				if not cmdOptions.shift then
 					ClearUnitCommandQueue(unitID)
@@ -187,7 +187,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		end
 	end
 	if (cmdID == CMD.UNLOAD_UNITS) then
-		local index = spGetCommandQueue(unitID, 0)
+		local index = Spring.GetUnitCommandCount(unitID)
 		if not cmdOptions.shift then
 			ClearUnitCommandQueue(unitID)
 			transportPhase[unitID] = nil

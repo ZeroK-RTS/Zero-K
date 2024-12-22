@@ -677,11 +677,11 @@ function GG.LandComplete(bomberID)
 	spGiveOrderToUnit(bomberID,CMD.WAIT, 0, 0)
 	
 	-- Check queue inheritence
-	local queueLength = spGetCommandQueue(bomberID, 0)
+	local queueLength = Spring.GetUnitCommandCount(bomberID)
 	local cmdID = Spring.GetUnitCurrentCommand(bomberID)
 	if (queueLength == 0 or (queueLength == 1 and (cmdID == CMD_REARM or cmdID == 0))) and
 			(padID and airpadsData[padID] and not airpadsData[padID].mobile) then
-		local padQueueLength = spGetCommandQueue(padID, 0)
+		local padQueueLength = Spring.GetUnitCommandCount(padID)
 		if padQueueLength > 0 then
 			local padQueue = spGetCommandQueue(padID, -1)
 			for i = 1, #padQueue do

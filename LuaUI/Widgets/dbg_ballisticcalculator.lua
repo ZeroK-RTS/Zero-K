@@ -30,7 +30,7 @@ local spGetMouseState = Spring.GetMouseState
 local spTraceScreenRay = Spring.TraceScreenRay
 local spGetModKeyState = Spring.GetModKeyState
 local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCommandCount = Spring.GetUnitCommandCount
 function widget:DrawWorld()
 	local _, activeCommand = spGetActiveCommand()
 	if (activeCommand == CMD.ATTACK) then
@@ -53,7 +53,7 @@ function DrawMouseArc(unitID, shift, groundPos)
 	if (not groundPos) then
 		return
 	end
-	local queue = spGetCommandQueue(unitID, 0)
+	local queue = spGetUnitCommandCount(unitID)
 	local deltaV = customWeaponVelocity
 	local customRange = customMaxRange
 	if (not queue or queue == 0 or not shift) then
