@@ -27,6 +27,8 @@ local isGuardCommand = {
 	[SUC.AREA_GUARD] = true,
 }
 
+local rearmUnitDef = {}
+
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
 
@@ -80,6 +82,7 @@ options_order = {
 	'doubleClickFlattenRankOption',
 	'controlGroupFlattenRank',
 	'guardRankOverrideOption',
+	'rearmingOverrideRank',
 	'retreatOverrideOption',
 	'retreatingRankOption',
 	'retreatDeselects'
@@ -168,6 +171,15 @@ options = {
 	guardRankOverrideOption = {
 		name = 'Guard rank reduction:',
 		desc = "Units currently executing the guard command are reduced to this selection rank, if higher.",
+		type = 'number',
+		value = 3,
+		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
+		noHotkey = true,
+	},
+	rearmingOverrideRank = {
+		name = 'Rearming rank reduction:',
+		desc = "Units currently rearming are reduced to this selection rank, if higher.",
 		type = 'number',
 		value = 3,
 		min = 0, max = 3, step = 1,
@@ -314,9 +326,9 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	local bestRank, bestUnits
 	for i = 1, #units do
 		local unitID = units[i]
+		local unitDefID = Spring.GetUnitDefID(unitID)
 		local rank = unitID and selectionRank[unitID]
 		if not rank then
-			local unitDefID = Spring.GetUnitDefID(unitID)
 			rank = unitDefID and defaultRank[unitDefID]
 		end
 		if retreatOverride and unitID and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and (rank > retreatingRank) then
@@ -335,6 +347,16 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 					rank = guardRankOverrideRank
 				end
 			end
+
+			if rearmUnitDef[unitDefID] then
+				local rearmingOverrideRank = options.rearmingOverrideRank.value
+				local reammoState = Spring.GetUnitRulesParam(unitID, "noammo") or 0
+				if (reammoState == 1 or reammoState == 2)
+					and rank > rearmingOverrideRank then
+					rank = rearmingOverrideRank
+				end
+			end
+
 			if (alt and rank > altFilterHighRank) then
 				rank = -1
 			end
@@ -411,6 +433,12 @@ function widget:Initialize()
 
 	WG.SetSelectionRank = SetSelectionRank
 	WG.SelectionRank_GetFilteredSelection = GetFilteredSelection
+	for unitDefID = 1, #UnitDefs do
+		local ud = UnitDefs[unitDefID]
+		if ud.customParams.reammoseconds then
+			rearmUnitDef[unitDefID] = true
+		end
+	end
 end
 
 function widget:MousePress(x, y, button)
