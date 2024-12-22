@@ -24,6 +24,7 @@ return { shipcarrier = {
     extradrawrange = 3000,
     ispad         = 1,
     pad_count     = 2,
+    pad_bp        = 10,
     capture_via_drones = 1,
     selection_scale   = 1.2,
 
