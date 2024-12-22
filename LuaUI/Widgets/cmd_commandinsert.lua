@@ -36,6 +36,7 @@ local positionCommand = {
 	[CMD.ATTACK] = true,
 	[CMD_JUMP] = true,
 	[CMD_LEVEL] = true,
+	[CMD_TECH_UP] = true,
 }
 
 local doNotHandleRaw = {}
