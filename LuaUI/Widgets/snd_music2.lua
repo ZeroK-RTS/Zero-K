@@ -67,7 +67,19 @@ local function FindAlbums(path)
 	local vfsMode = VFS.RAW_FIRST
 	local supportedFileTypes = '*.{ogg,mp3}'
 	local albums = {}
-	for i, path in ipairs(VFS.SubDirs(path, 'peace', vfsMode, true)) do
+
+	-- VFS.SubDirs returns paths with backslash on windows for local VFS.RAW,
+	-- but passing backslash to the regex seems to crash the engine. Thus we
+	-- must do a lenient filter and trim it manually
+	local subdirs = {}
+	for _, path in pairs(VFS.SubDirs(path, '*peace*', vfsMode, true)) do
+		if path:sub(-7) == "/peace/"
+		or path:sub(-7) == "\\peace\\" then
+			subdirs[#subdirs + 1] = path
+		end
+	end
+
+	for i, path in pairs(subdirs) do
 		path = path:gsub('peace[\\/]', '')
 		local tracks = {}
 		for _, musicType in ipairs(musicTypes) do
@@ -78,22 +90,37 @@ local function FindAlbums(path)
 
 		local dir = path:gsub('sounds[\\/]music[\\/]', '')
 		local name = dir:gsub('[\\/]$', '')
-		local humanName
-		if name == '' then
-			name = 'denny'
-			humanName = 'Schneidemesser (default)'
-		elseif name == 'ost23_uf' then
-			name = 'superintendent'
-			humanName = 'Superintendent'
-		else
-			humanName = name
-		end
 		albums[name] = {
 			tracks = tracks,
 			dir = dir,
-			humanName = humanName,
 		}
 	end
+
+	local function ParseMetadata(albumPath, albumData)
+		local metaFilePath = path .. albumPath .. "/metadata.lua"
+		if not VFS.FileExists(metaFilePath, vfsMode) then
+			return
+		end
+
+		local ok, data = pcall(VFS.Include, metaFilePath, nil, vfsMode)
+		if not ok then
+			Spring.Log("Music", LOG.ERROR, "Failed to load music album metadata file", metaFilePath, data)
+			return
+		end
+
+		if not data then
+			Spring.Log("Music", LOG.ERROR, "Failed to load music album metadata - invalid format", metaFilePath)
+			return
+		end
+
+		albumData.humanName = data.humanName
+	end
+
+	for albumPath, albumData in pairs(albums) do
+		ParseMetadata(albumPath, albumData)
+		albumData.humanName = albumData.humanName or albumPath
+	end
+
 	return albums
 end
 
