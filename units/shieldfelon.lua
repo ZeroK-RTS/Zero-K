@@ -101,7 +101,7 @@ return { shieldfelon = {
       cylinderTargeting       = 0,
 
       customParams            = {
-        shield_drain = 75,
+        shield_drain = 78,
         
         light_camera_height = 2500,
         light_color = [[0.66 0.32 0.90]],
