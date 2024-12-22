@@ -1,6 +1,6 @@
 {
-	"shield_bar" : "shield",
-	"health_bar" : "health",
+	"shield" : "shield",
+	"health" : "health",
 	"building" : "building",
 	"morph" : "morph",
 	"stockpile" : "stockpile",
@@ -8,17 +8,16 @@
 	"disarm" : "disarm",
 	"capture" : "capture",
 	"capture_reload" : "capture reload",
-	"water_tank" : "water tank",
 	"teleport" : "teleport",
+	"teleport_pw" : "evacuation",
 	"ability" : "ability",
 	"heat" : "heat",
 	"speed" : "speed",
+	"reammo" : "rearming",
 	"reload" : "reload",
 	"slow" : "slow",
 	"goo" : "goo",
-	"reclaim" : "reclaim",
-	"reammo" : "rearming",
-	"teleport_pw" : "evacuation",
+	"jump" : "jump",
 	"resurrect" : "resurrect",
-	"jump" : "jump"
+	"reclaim" : "reclaim"
 }
