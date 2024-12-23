@@ -1669,7 +1669,7 @@ local function GetSelectionStatsDisplay(parentControl)
 			end
 		end
 		
-		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count) .. "\n" ..
+		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count, false, 100) .. "\n" ..
 			WG.Translate("interface", "value") .. ": " .. Format(total_cost, false, 100) .. " / " ..  Format(total_finishedcost, false, 100) .. "\n" ..
 			WG.Translate("interface", "health") .. ": " .. Format(total_hp, false, 100) .. " / " ..  Format(total_maxhp, false, 100) .. "\n"
 		
