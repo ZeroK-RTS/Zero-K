@@ -237,7 +237,7 @@ local function MotionControl()
 	--	Spring.Echo("Weapon reload time", i, reloadTime)
 	--end
 
-	local moving, aimingm zeroSpeedCount
+	local moving, aiming, zeroSpeedCount
 	local justmoved = true
 	local legParity = math.random() > 0.5
 	while true do
