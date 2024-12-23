@@ -178,6 +178,7 @@ local function walk()
 
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
+	local zeroSpeedCount = 0
 	
 	Turn(l_leg, x_axis, math.rad(-65), ANGULAR_SPEED)
 	Turn(l_foot, x_axis, math.rad(65), ANGULAR_SPEED)
@@ -255,6 +256,15 @@ local function walk()
 		WaitForTurn(l_leg, x_axis)
 		Move(r_shin, y_axis, .5, LINEAR_SPEED*2)
 	
+		local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+		if speed == 0 then
+			zeroSpeedCount = zeroSpeedCount + 1
+			if zeroSpeedCount > 2 then
+				return
+			end
+		else
+			zeroSpeedCount = 0
+		end
 	end
 end
 
