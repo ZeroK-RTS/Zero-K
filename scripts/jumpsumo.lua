@@ -95,6 +95,7 @@ local SIG_Aim = { [2] = 4, [3] = 8, [4] = 16, [5] = 32 }
 local function Walk()
 	Signal(walk)
 	SetSignalMask(walk)
+	local zeroSpeedCount = 0
 	
 	Turn(lf_pump, x_axis, -p_angle, 1.4)
 	Turn(rf_pump, x_axis, -p_angle, 1.4)
@@ -220,6 +221,15 @@ local function Walk()
 		
 		Sleep(100)
 		
+		local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+		if speed == 0 then
+			zeroSpeedCount = zeroSpeedCount + 1
+			if zeroSpeedCount > 2 then
+				return
+			end
+		else
+			zeroSpeedCount = 0
+		end
 	end
 end
 

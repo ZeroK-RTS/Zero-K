@@ -179,6 +179,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	local speedMult, sleepTime = GG.Script.GetSpeedParams(unitID, ANIM_FRAMES)
+	local zeroSpeedCount = 0
 
 	-- Frame: 4 (first step)
 	Turn(box, z_axis, 0.021002, 0.630061 * speedMult) -- delta=1.20
@@ -304,6 +305,16 @@ local function Walk()
 		Turn(rfoot, x_axis, -0.904162, 9.744964 * speedMult) -- delta=18.61
 		Turn(rthigh, x_axis, 0.636317, 3.568894 * speedMult) -- delta=-6.82
 		Sleep(sleepTime)
+		
+		local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+		if speed == 0 then
+			zeroSpeedCount = zeroSpeedCount + 1
+			if zeroSpeedCount > 2 then
+				return
+			end
+		else
+			zeroSpeedCount = 0
+		end
 	end
 end
 

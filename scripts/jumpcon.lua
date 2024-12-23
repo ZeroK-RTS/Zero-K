@@ -36,6 +36,7 @@ local jumpActive = false
 local function walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	local zeroSpeedCount = 0
 	
 	while true do
 	
@@ -452,6 +453,16 @@ local function walk()
 			Turn(lhand, x_axis, math.rad(-50.098901))
 		end
 		Sleep(55)
+		
+		local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+		if speed == 0 then
+			zeroSpeedCount = zeroSpeedCount + 1
+			if zeroSpeedCount > 2 then
+				return
+			end
+		else
+			zeroSpeedCount = 0
+		end
 	end
 end
 
