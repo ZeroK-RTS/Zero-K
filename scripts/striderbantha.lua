@@ -151,19 +151,27 @@ local function IdleAnim()
 			shoulder, arm, lclaw, rclaw = rarm, rarmgun, rarm_lgunclaw, rarm_rgunclaw
 			Turn(head, y_axis, math.rad(-30), math.rad(60))
 		end
-		armGunIsR = not armGunIsR
-		Turn(arm, x_axis, math.rad(-20), math.rad(45))
-		Turn(shoulder, x_axis, math.rad(-20), math.rad(45))
+		if not Spring.GetUnitIsStunned(unitID) then
+			armGunIsR = not armGunIsR
+			Turn(arm, x_axis, math.rad(-20), math.rad(45))
+			Turn(shoulder, x_axis, math.rad(-20), math.rad(45))
+		end
 		Sleep(2000)
-		Turn(lclaw, y_axis, math.rad(30), math.rad(180))
-		Turn(rclaw, y_axis, math.rad(-30), math.rad(180))
+		if not Spring.GetUnitIsStunned(unitID) then
+			Turn(lclaw, y_axis, math.rad(30), math.rad(180))
+			Turn(rclaw, y_axis, math.rad(-30), math.rad(180))
+		end
 		Sleep(1500)
-		Turn(lclaw, y_axis, 0, math.rad(180))
-		Turn(rclaw, y_axis, 0, math.rad(180))
+		if not Spring.GetUnitIsStunned(unitID) then
+			Turn(lclaw, y_axis, 0, math.rad(180))
+			Turn(rclaw, y_axis, 0, math.rad(180))
+		end
 		Sleep(2000)
-		Turn(arm, x_axis, 0, math.rad(60))
-		Turn(shoulder, x_axis, 0, math.rad(60))
-		Turn(head, y_axis, 0, math.rad(60))
+		if not Spring.GetUnitIsStunned(unitID) then
+			Turn(arm, x_axis, 0, math.rad(60))
+			Turn(shoulder, x_axis, 0, math.rad(60))
+			Turn(head, y_axis, 0, math.rad(60))
+		end
 		Sleep(6500)
 	end
 end

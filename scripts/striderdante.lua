@@ -104,23 +104,29 @@ local function IdleAnim()
 	SetSignalMask(SIG_IDLE)
 	Sleep(12000)
 	while true do
-		Turn(torso, y_axis, math.rad(15), math.rad(60))
-		--Turn(larm, y_axis, math.rad(15), math.rad(60))
-		--Turn(rarm, y_axis, math.rad(-10), math.rad(60))
-		Turn(luparm, x_axis, math.rad(-40), math.rad(120))
-		Turn(ruparm, x_axis, 0, math.rad(120))
+		if not Spring.GetUnitIsStunned(unitID) then
+			Turn(torso, y_axis, math.rad(15), math.rad(60))
+			--Turn(larm, y_axis, math.rad(15), math.rad(60))
+			--Turn(rarm, y_axis, math.rad(-10), math.rad(60))
+			Turn(luparm, x_axis, math.rad(-40), math.rad(120))
+			Turn(ruparm, x_axis, 0, math.rad(120))
+		end
 		Sleep(1500)
-		Turn(torso, y_axis, math.rad(-15), math.rad(90))
-		--Turn(larm, y_axis, math.rad(10), math.rad(60))
-		--Turn(rarm, y_axis, math.rad(-15), math.rad(60))
-		Turn(luparm, x_axis, 0, math.rad(120))
-		Turn(ruparm, x_axis, math.rad(-40), math.rad(120))
+		if not Spring.GetUnitIsStunned(unitID) then
+			Turn(torso, y_axis, math.rad(-15), math.rad(90))
+			--Turn(larm, y_axis, math.rad(10), math.rad(60))
+			--Turn(rarm, y_axis, math.rad(-15), math.rad(60))
+			Turn(luparm, x_axis, 0, math.rad(120))
+			Turn(ruparm, x_axis, math.rad(-40), math.rad(120))
+		end
 		Sleep(1500)
-		Turn(torso, y_axis, 0, math.rad(60))
-		--Turn(larm, y_axis, 0, math.rad(60))
-		--Turn(rarm, y_axis, 0, math.rad(60))
-		Turn(luparm, x_axis, 0, math.rad(120))
-		Turn(ruparm, x_axis, 0, math.rad(120))
+		if not Spring.GetUnitIsStunned(unitID) then
+			Turn(torso, y_axis, 0, math.rad(60))
+			--Turn(larm, y_axis, 0, math.rad(60))
+			--Turn(rarm, y_axis, 0, math.rad(60))
+			Turn(luparm, x_axis, 0, math.rad(120))
+			Turn(ruparm, x_axis, 0, math.rad(120))
+		end
 		Sleep(7000)
 	end
 end
@@ -156,7 +162,6 @@ local function RestoreAfterDelay()
 				Turn(larm, z_axis, 0, math.rad(250))	 --up 22
 				RestorePose()
 			end
-			StartThread(IdleAnim)
 			armsFree = true
 		end
 		Sleep(1000)
