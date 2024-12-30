@@ -265,7 +265,7 @@ function gadget:Initialize()
 end
 
 function GG.MoveWindmill(unitID, unitDefID)
-	if not windDefs[unitDefID] and not IterableMap.Get(windmills, unitID) then
+	if not (windDefs[unitDefID] and IterableMap.Get(windmills, unitID)) then
 		return
 	end
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
