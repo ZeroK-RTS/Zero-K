@@ -224,7 +224,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = healthChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	paralyze = {
 		mincolor = {0.6, 0.6, 1.0, 1.0},
@@ -233,7 +233,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 1.99,
 		uniformindex = paralyzeChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 13 / 16, -- the X offset of the icon for this bar
+		uvoffset = 13 / 32, -- the X offset of the icon for this bar
 	},
 	build = {
 		mincolor = {1.0, 1.0, 1.0, 1.0},
@@ -241,7 +241,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.999,
 		uniformindex = buildChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 15 / 16, -- the X offset of the icon for this bar
+		uvoffset = 15 / 32, -- the X offset of the icon for this bar
 	},
 	morph = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -249,7 +249,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = morphChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	disarm = {
 		mincolor = {0.4, 0.4, 0.8, 1.0},
@@ -257,7 +257,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = disarmChannel,
-		uvoffset = 9 / 16,
+		uvoffset = 9 / 32,
 	},
 	slow = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -265,23 +265,23 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = slowChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	reload = {
 		mincolor = {0.03, 0.4, 0.4, 1.0},
 		maxcolor = {0.05, 0.6, 0.6, 1.0},
-		bartype = bitShowGlyph + bitUseOverlay + bitGetProgress,
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = reloadChannel,
-		uvoffset = 11 / 16,
+		uvoffset = 11 / 32,
 	},
 	dgun = {
-		mincolor = {0.0, 0.0, 0.0, 0.0},
-		maxcolor = {0.0, 0.0, 0.0, 0.0},
+		mincolor = {1.0, 1.0, 1.0, 1.0},
+		maxcolor = {1.0, 1.0, 1.0, 1.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = dgunChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	teleport = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -289,7 +289,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = teleportChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	heat = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -297,7 +297,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = heatChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	speed = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -305,7 +305,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = speedChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	reammo = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -313,7 +313,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = reammoChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	goo = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -321,7 +321,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = gooChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	jump = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -329,7 +329,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = jumpChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	captureReload = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -337,7 +337,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = captureReloadChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	ability = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -345,15 +345,15 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = abilityChannel,
-		uvoffset = 1 / 16,
+		uvoffset = 1 / 32,
 	},
 	stockpile = {
 		mincolor = {0.1, 0.1, 0.1, 1.0},
 		maxcolor = {0.1, 0.1, 0.1, 1.0},
-		bartype = bitShowGlyph + bitUseOverlay + bitIntegerNumber,
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage, --bitIntegerNumber,
 		hidethreshold = 1.99,
 		uniformindex = stockpileChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 7 / 16, -- the X offset of the icon for this bar
+		uvoffset = 7 / 32, -- the X offset of the icon for this bar
 	},
 	shield = {
 		mincolor = {0.15, 0.4, 0.4, 1.0},
@@ -361,7 +361,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = shieldChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 5 / 16, -- the X offset of the icon for this bar
+		uvoffset = 5 / 32, -- the X offset of the icon for this bar
 	},
 	capture = {
 		mincolor = {0.5, 0.25, 0.0, 1.0},
@@ -369,7 +369,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = captureChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 3 / 16, -- the X offset of the icon for this bar
+		uvoffset = 3 / 32, -- the X offset of the icon for this bar
 	},
 	featurehealth = {
 		mincolor = {0.25, 0.25, 0.25, 1.0},
@@ -378,7 +378,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = 33, -- if its >20, then its health/maxhealth
-		uvoffset = 2 / 16, -- the X offset of the icon for this bar
+		uvoffset = 2 / 32, -- the X offset of the icon for this bar
 	},
 	featurereclaim = {
 		mincolor = {0.00, 1.00, 0.00, 1.0},
@@ -387,7 +387,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = 2, -- if its >20, then its health/maxhealth
-		uvoffset = 8 / 16, -- the X offset of the icon for this bar
+		uvoffset = 8 / 32, -- the X offset of the icon for this bar
 	},
 	featureresurrect = {
 		mincolor = {0.75, 0.15, 0.75, 1.0},
@@ -396,7 +396,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = 1, -- if its >20, then its health/maxhealth
-		uvoffset = 4 / 16, -- the X offset of the icon for this bar
+		uvoffset = 4 / 32, -- the X offset of the icon for this bar
 	},
 }
 
@@ -449,15 +449,20 @@ local chobbyInterface
 local unitDefIgnore = {} -- commanders!
 local unitDefHasShield = {} -- value is shield max power
 local unitDefCanStockpile = {} -- 0/1?
-local unitDefReload = {} -- value is max reload time
+local unitDefPrimaryReload = {} -- value is max reload time
 local unitDefHeights = {} -- maps unitDefs to height
 local unitDefPrimaryWeapon = {} -- the index for reloadable weapon on unitdef weapons
+local unitDefHasAbility = {}
+local unitDefScriptReload = {}
+local unitDefDgun = {}
+local unitDefDgunReload = {}
 local unitDefHasGoo = {}
 local unitDefHasJump = {}
 local unitDefHasHeat = {}
 local unitDefHasSpeed = {}
 local unitDefHasReammo = {}
 local unitDefHasCaptureReload = {}
+local unitDefHasTeleport = {}
 
 local unitBars = {} -- we need this additional table of {[unitID] = {barhealth, barrez, barreclaim}}
 
@@ -473,11 +478,12 @@ local unitTeleportWatch = {}
 local unitHeatWatch = {}
 local unitSpeedWatch = {}
 local unitReammoWatch = {}
+local unitScriptReloadWatch = {}
 local unitGooWatch = {}
 local unitJumpWatch = {}
 local unitCaptureReloadWatch = {}
 local unitAbilityWatch = {}
-local unitStockpilewatch = {}
+local unitStockpileWatch = {}
 local unitShieldWatch = {} -- works
 local unitCaptureWatch = {}
 
@@ -538,7 +544,8 @@ local shaderConfig = { -- these are our shader defines
 	BOTTOMDARKENFACTOR = 0.5,
 	BARFADESTART = 3200,
 	BARFADEEND = 3800,
-	ATLASSTEP = 0.0625,
+	ATLASSTEPY = 0.03125,
+	ATLASSTEPX = 0.0625,
 	MINALPHA = 0.2,
 }
 shaderConfig.BARCORNER = 0.06 + (shaderConfig.BARHEIGHT / 9)
@@ -584,32 +591,77 @@ for udefID, unitDef in pairs(UnitDefs) do
 		--Spring.Echo("HAS SHIELD")
 	end
 
-	local weapons = unitDef.weapons
-	local reloadTime = unitDef.reloadTime or 0
-	local primaryWeapon = 1
-	for i = 1, #weapons do
-		local WeaponDef = WeaponDefs[weapons[i].weaponDef]
-		-- RELOAD
-		if WeaponDef and WeaponDef.reload and WeaponDef.reload > reloadTime then
-			reloadTime = WeaponDef.reload
-			primaryWeapon = i
-		end
+	local primaryReloadTime = minReloadTime
 
-		-- CaptureReload
-		if WeaponDef.customParams and WeaponDef.customParams.post_capture_reload then
-			unitDefHasCaptureReload[udefID] = WeaponDef.customParams.post_capture_reload
-		end
+	local isDynamic = false
+
+	if unitDef.customParams and unitDef.customParams.dynamic_comm then
+		isDynamic = true
 	end
 
-	if reloadTime and reloadTime > minReloadTime then
-		if debugmode then Spring.Echo("Unit with watched reload time:", unitDef.name, reloadTime, minReloadTime) end
-		unitDefReload[udefID] = reloadTime
-		unitDefPrimaryWeapon[udefID] = primaryWeapon
-	end
+	if not isDynamic then -- TODO if isDynamic then return end
+		local weapons = unitDef.weapons
 
-	-- GOO
-	if unitDef.customParams and unitDef.customParams.grey_goo then
-		unitDefHasGoo[udefID] = 1
+		for i = 1, #weapons do
+			local WeaponDef = WeaponDefs[weapons[i].weaponDef]
+
+			if not WeaponDef then
+
+			-- DGUN
+			elseif WeaponDef.manualFire then 
+				unitDefDgun[udefID] = i
+				unitDefDgunReload[udefID] = WeaponDef.reload
+
+			-- CAPTURE RELOAD
+			elseif WeaponDef.customParams and WeaponDef.customParams.post_capture_reload then
+				unitDefHasCaptureReload[udefID] = WeaponDef.customParams.post_capture_reload
+
+			-- RELOAD
+			elseif WeaponDef.reload and WeaponDef.reload >= primaryReloadTime then
+				unitDefPrimaryReload[udefID] = primaryReloadTime
+				unitDefPrimaryWeapon[udefID] = i
+			end
+		end
+
+                -- SPECIAL ABILITY
+		if unitDef.customParams and unitDef.customParams.specialreloadtime then
+			unitDefHasAbility[udefID] = unitDef.customParams.specialreloadtime
+		end
+
+		-- SCRIPT RELOAD
+		if unitDef.customParams and unitDef.customParams.script_reload then
+			unitDefScriptReload[udefID] = tonumber(unitDef.customParams.script_reload) * gameSpeed
+		end
+
+		-- GOO
+		if unitDef.customParams and unitDef.customParams.grey_goo then
+			unitDefHasGoo[udefID] = 1
+		end
+
+		-- HEAT
+		if unitDef.customParams and unitDef.customParams.heat_initial then
+			unitDefHasHeat[udefID] = 1
+		end
+
+		-- SPEED
+		if unitDef.customParams and unitDef.customParams.speed_bar then
+			unitDefHasSpeed[udefID] = 1
+		end
+
+		-- REAMMO
+		if unitDef.customParams and unitDef.customParams.reammoseconds then
+			unitDefHasReammo[udefID] = 1
+		end
+
+		-- STOCKPILE
+		if unitDef.canStockpile then
+			unitDefCanStockpile[udefID] = unitDef.canStockpile
+		end
+		
+		-- TELEPORT
+		if unitDef.customParams and (unitDef.customParams.teleporter_throughput or unitDef.customParams.teleporter_is_beacon) then
+			unitDefHasTeleport[udefID] = 1
+		end
 	end
 
 	-- JUMP
@@ -617,25 +669,9 @@ for udefID, unitDef in pairs(UnitDefs) do
 		unitDefHasJump[udefID] = 1
 	end
 
-	-- HEAT
-	if unitDef.customParams and unitDef.customParams.heat_initial then
-		unitDefHasHeat[udefID] = 1
-	end
-
-	-- SPEED
-	if unitDef.customParams and unitDef.customParams.speed_bar then
-		unitDefHasSpeed[udefID] = 1
-	end
-
-	-- REAMMO
-	if unitDef.customParams and unitDef.customParams.reammoseconds then
-		unitDefHasReammo[udefID] = 1
-	end
-
 	-- BAR PLACEMENT
 	unitDefHeights[udefID] = unitDef.height
 	unitDefSizeMultipliers[udefID] = math.min(1.45, math.max(0.85, (Spring.GetUnitDefDimensions(udefID).radius / 150) + math.min(0.6, unitDef.power / 4000))) + math.min(0.6, unitDef.health / 22000)
-	if unitDef.canStockpile then unitDefCanStockpile[udefID] = unitDef.canStockpile end
 end
 
 for fdefID, featureDef in pairs(FeatureDefs) do
@@ -771,9 +807,6 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	addBarForUnit(unitID, unitDefID, "build", reason)
 	unitBuildWatch[unitID] = -1
 
-	addBarForUnit(unitID, unitDefID, "morph", reason)
-	unitMorphWatch[unitID] = -1
-
 	addBarForUnit(unitID, unitDefID, "paralyze", reason)
 	unitParalyzeWatch[unitID] = -1
 
@@ -783,11 +816,10 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	addBarForUnit(unitID, unitDefID, "slow", reason)
 	unitSlowWatch[unitID] = -1
 
-	addBarForUnit(unitID, unitDefID, "reload", reason)
-	unitReloadWatch[unitID] = -1
-
-	addBarForUnit(unitID, unitDefID, "dgun", reason)
-	unitDgunWatch[unitID] = -1
+	if unitDefDgun[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "dgun", reason)
+		unitDgunWatch[unitID] = -1
+	end
 
 	--[[
 	addBarForUnit(unitID, unitDefID, "teleport", reason)
@@ -805,6 +837,28 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 		unitShieldWatch[unitID] = -1.0
 	end
 
+	if unitDefPrimaryWeapon[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "reload", reason)
+		unitReloadWatch[unitID] = -1.0
+	end
+--[[
+	local unitDef = UnitDefs[unitDefID]
+	if unitDef.customParams and unitDef.customParams.dynamic_comm then
+		addBarForUnit(unitID, unitDefID, "reload", reason)
+		unitReloadWatch[unitID] = -1.0
+	end
+	--]]
+
+	if unitDefHasAbility[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "ability", reason)
+		unitAbilityWatch[unitID] = -1.0
+	end
+	
+	if unitDefScriptReload[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "reload", reason)
+		unitScriptReloadWatch[unitID] = -1.0
+	end
+	
 	if unitDefHasGoo[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "goo", reason)
 		unitGooWatch[unitID] = -1.0
@@ -830,9 +884,19 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 		unitReammoWatch[unitID] = -1.0
 	end
 
+	if unitDefCanStockpile[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "stockpile", reason)
+		unitStockpileWatch[unitID] = -1.0
+	end
+
 	if unitDefHasCaptureReload[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "captureReload", reason)
 		unitCaptureReloadWatch[unitID] = -1.0
+	end
+
+	if unitDefHasTeleport[unitDefID] then
+		addBarForUnit(unitID, unitDefID, "teleport", reason)
+		unitTeleportWatch[unitID] = -1.0
 	end
 
 	addBarForUnit(unitID, unitDefID, "capture", reason)
@@ -855,11 +919,12 @@ local function removeBarsFromUnit(unitID, reason)
 	unitHeatWatch[unitID] = nil
 	unitSpeedWatch[unitID] = nil
 	unitReammoWatch[unitID] = nil
+	unitScriptReloadWatch[unitID] = nil
 	unitGooWatch[unitID] = nil
 	unitJumpWatch[unitID] = nil
 	unitCaptureReloadWatch[unitID] = nil
 	unitAbilityWatch[unitID] = nil
-	unitStockpilewatch[unitID] = nil
+	unitStockpileWatch[unitID] = nil
 	unitShieldWatch[unitID] = nil
 	unitCaptureWatch[unitID] = nil
 	unitBars[unitID] = nil
@@ -932,11 +997,12 @@ local function init()
 	unitHeatWatch = {}
 	unitSpeedWatch = {}
 	unitReammoWatch = {}
+	unitScriptReloadWatch = {}
 	unitGooWatch = {}
 	unitJumpWatch = {}
 	unitCaptureReloadWatch = {}
 	unitAbilityWatch = {}
-	unitStockpilewatch = {}
+	unitStockpileWatch = {}
 	unitShieldWatch = {}
 	unitCaptureWatch = {}
 
@@ -1030,6 +1096,31 @@ local function ProjectileCreatedReloadHB(projectileID, unitID, weaponID, unitDef
 	--updateReloadBar(unitID, unitDefID, 'ProjectileCreatedReloadHB')
 end
 
+function MorphUpdate(morphTable)
+	for unitID, morph in pairs(morphTable) do
+		local oldMorph = unitMorphWatch[unitID]
+		if not oldMorph then 
+			addBarForUnit(unitID, unitDefID, "morph", "MorphUpdate")
+			oldMorph = -1.0
+		end
+		if oldMorph and morph and morph.progress ~= UnitMorphs then
+			unitMorphWatch[unitID] = morph.progress
+			uniformcache[1] = morph.progress
+			gl.SetUnitBufferUniforms(unitID, uniformcache, morphChannel)
+		end
+	end
+end
+
+function MorphStart(unitID, morphDef)
+	addBarForUnit(unitID, unitDefID, "morph", "MorphStart")
+	unitMorphWatch[unitID] = -1.0
+end
+
+function MorphStopOrFinished(unitID)
+	removeBarFromUnit(unitID, "morph", "MorphStopOrFinished")
+	unitMorphWatch[unitID] = nil
+end
+
 function widget:Initialize()
 	if not gl.CreateShader then -- no shader support, so just remove the widget itself, especially for headless
 		widgetHandler:RemoveWidget()
@@ -1069,6 +1160,15 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal("UnitCaptureStartedHealthbars", UnitCaptureStartedHealthbars )
 	widgetHandler:RegisterGlobal("UnitParalyzeDamageHealthbars", UnitParalyzeDamageHealthbars )
 	widgetHandler:RegisterGlobal("ProjectileCreatedReloadHB", ProjectileCreatedReloadHB )
+
+	--// link morph callins
+	widgetHandler:RegisterGlobal('MorphUpdate', MorphUpdate)
+	widgetHandler:RegisterGlobal('MorphFinished', MorphStopOrFinished)
+	widgetHandler:RegisterGlobal('MorphStart', MorphStart)
+	widgetHandler:RegisterGlobal('MorphStop', MorphStopOrFinished)
+
+	--// deactivate cheesy progress text
+	widgetHandler:RegisterGlobal('MorphDrawProgress', function() return true end)
 end
 
 function widget:Shutdown()
@@ -1077,6 +1177,14 @@ function widget:Shutdown()
 	widgetHandler:DeregisterGlobal("UnitParalyzeDamageHealthbars" )
 	widgetHandler:DeregisterGlobal("ProjectileCreatedReloadHB" )
 	Spring.Echo("Healthbars GL4 unloaded hooks")
+
+        widgetHandler:DeregisterGlobal('MorphUpdate', MorphUpdate)
+        widgetHandler:DeregisterGlobal('MorphFinished', MorphFinished)
+        widgetHandler:DeregisterGlobal('MorphStart', MorphStart)
+        widgetHandler:DeregisterGlobal('MorphStop', MorphStop)
+
+        widgetHandler:DeregisterGlobal('MorphDrawProgress')
+
 end
 
 function widget:RecvLuaMsg(msg, playerID)
@@ -1151,11 +1259,12 @@ function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
 	unitHeatWatch = {}
 	unitSpeedWatch = {}
 	unitReammoWatch = {}
+	unitScriptReloadWatch = {}
 	unitGooWatch = {}
 	unitJumpWatch = {}
 	unitCaptureReloadWatch = {}
 	unitAbilityWatch = {}
-	unitStockpilewatch = {}
+	unitStockpileWatch = {}
 	unitShieldWatch = {}
 	unitCaptureWatch = {}
 
@@ -1218,7 +1327,7 @@ function widget:GameFrame(gameFrame)
         unitDgunWatch[unitID] = nil
         unitTeleportWatch[unitID] = nil
         unitAbilityWatch[unitID] = nil
-        unitStockpilewatch[unitID] = nil
+        unitStockpileWatch[unitID] = nil
 	--]]
 	if gameFrame % 3 == 0 then
 		for unitID, oldHealthPower in pairs(unitHealthWatch) do
@@ -1310,6 +1419,7 @@ function widget:GameFrame(gameFrame)
 	end
 
 	if gameFrame % 3 == 1 then
+		--// SHIELD
 		for unitID, oldshieldPower in pairs(unitShieldWatch) do
 			local shieldOn, shieldPower = GetUnitShieldState(unitID)
 			if shieldOn == false then shieldPower = 0.0 end
@@ -1323,7 +1433,95 @@ function widget:GameFrame(gameFrame)
 				unitShieldWatch[unitID] = shieldPower
 			end
 		end
+
+	-- RELOAD
+		for unitID, oldReload in pairs(unitReloadWatch) do
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local reloadFrame 
+                        _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID])
+
+			reloadTime = Spring.GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID], 'reloadTime')
+
+			local reload = 1 - (((reloadFrame or 0)-gameFrame) / gameSpeed) / reloadTime --unitDefPrimaryReload[unitDefID]
+
+			if reload > 1 then
+				reload = 1
+			end
+
+			if oldReload ~= reload then
+				unitReloadWatch[unitID] = reload
+				uniformcache[1] = reload 
+				gl.SetUnitBufferUniforms(unitID, uniformcache, reloadChannel)
+			end
+		end
+
+	-- DGUN
+		for unitID, oldReload in pairs(unitDgunWatch) do
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local reloadFrame 
+                        _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefDgun[unitDefID])
+
+			reloadTime = Spring.GetUnitWeaponState(unitID, unitDefDgun[unitDefID], 'reloadTime')
+
+			local reload = 1 - (((reloadFrame or 0)-gameFrame) / gameSpeed) / reloadTime --unitDefDgunReload[unitDefID]
+
+			if reload > 1 then
+				reload = 1
+			end
+
+			if oldReload ~= reload then
+				unitDgunWatch[unitID] = reload
+				uniformcache[1] = reload 
+				gl.SetUnitBufferUniforms(unitID, uniformcache, dgunChannel)
+			end
+		end
+
+		-- ABILITY
+		for unitID, oldAbility in pairs(unitAbilityWatch) do
+			local ability = 1 - GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+			if oldAbility ~= ability then
+				unitAbilityWatch[unitID] = ability
+				uniformcache[1] = ability 
+				gl.SetUnitBufferUniforms(unitID, uniformcache, abilityChannel)
+			end
+		end
+
+		-- SCRIPT RELOAD
+		for unitID, oldReload in pairs(unitScriptReloadWatch) do
+                        local reloadFrame = GetUnitRulesParam(unitID, "scriptReloadFrame") or 0
+			local reload = 1 - (reloadFrame-gameFrame) / unitDefScriptReload[Spring.GetUnitDefID(unitID)]
+
+			if reload > 1 then
+				reload = 1
+			end
+
+			if oldReload ~= reload then
+				unitScriptReloadWatch[unitID] = reload
+				uniformcache[1] = reload 
+				gl.SetUnitBufferUniforms(unitID, uniformcache, reloadChannel)
+			end
+                end
+		--[[
+		               local TeleportEnd = GetUnitRulesParam(unitID, "teleportend")
+                local TeleportCost = GetUnitRulesParam(unitID, "teleportcost")
+                if TeleportEnd and TeleportCost and TeleportEnd >= 0 then
+                        local prog
+                        if TeleportEnd > 1 then
+                                -- End frame given
+                                prog = 1 - (TeleportEnd - gameFrame)/TeleportCost
+                        else
+                                -- Same parameters used to display a static progress
+                                prog = 1 - TeleportEnd
+                        end
+                        if prog < 1 then
+                                barDrawer.AddBar(addTitle and messages.teleport, prog, "tele", (addPercent and floor(prog*100) .. '%'))
+                        end
+                end
+
+		--]]
+
 	end
+
 	if gameFrame % 3 == 2 then
 		--// GOO
 		for unitID, oldGoo in pairs(unitGooWatch) do
@@ -1375,6 +1573,26 @@ function widget:GameFrame(gameFrame)
 			end
 		end
 
+		--// STOCKPILE
+		for unitID, oldStockpile in pairs(unitStockpileWatch) do
+			local numStockpiled
+			local numStockpileQued
+			local stockpileBuild 
+			numStockpiled, numStockpileQued, stockpileBuild = GetUnitStockpile(unitID)
+
+	                local unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+                        local unitDef = UnitDefs[unitDefID]
+			if unitDef.customParams and unitDef.customParams.stockpiletime then
+                                stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
+                        end
+
+			if oldStockpile ~= stockpileBuild then
+				unitStockpileWatch[unitID] = stockpileBuild 
+				uniformcache[1] = stockpileBuild
+				gl.SetUnitBufferUniforms(unitID, uniformcache, stockpileChannel)
+			end
+		end
+
 		--// CAPTURE RELOAD
 		for unitID, oldCaptureReload in pairs(unitCaptureReloadWatch) do
 			local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame") or 0
@@ -1387,6 +1605,23 @@ function widget:GameFrame(gameFrame)
 				unitCaptureReloadWatch[unitID] = captureReload
 				uniformcache[1] = captureReload
 				gl.SetUnitBufferUniforms(unitID, uniformcache, captureReloadChannel)
+			end
+		end
+
+		--// TELEPORT
+		for unitID, oldTeleport in pairs(unitTeleportWatch) do
+			local TeleportEnd = GetUnitRulesParam(unitID, "teleportend") or 0
+			local TeleportCost = GetUnitRulesParam(unitID, "teleportcost") or 1
+			local teleport = 1 - (TeleportEnd - gameFrame)/TeleportCost
+
+			if teleport > 1 then
+				teleport = 1
+			end
+
+			if oldTeleport ~= teleport then
+				unitTeleportWatch[unitID] = teleport 
+				uniformcache[1] = teleport
+				gl.SetUnitBufferUniforms(unitID, uniformcache, teleportChannel)
 			end
 		end
 	end

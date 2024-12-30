@@ -79,7 +79,7 @@ void emitVertexBarBG(in vec2 pos, in vec4 botcolor, in float bartextureoffset){
 	g_uv.x = g_uv.x + 0.5; // map UVS to [0,1]x[0,1]
 	g_uv.y = (pos.y - BARCORNER) / (BARHEIGHT - 2 * BARCORNER);
 	vec2 uv01 = g_uv.xy*3.0;
-	g_uv.xy = g_uv.xy * vec2(ATLASSTEP * 9, ATLASSTEP) + vec2(3 * ATLASSTEP, bartextureoffset); // map uvs to the bar texture
+	g_uv.xy = g_uv.xy * vec2(ATLASSTEPX * 9, ATLASSTEPY) + vec2(3 * ATLASSTEPX, bartextureoffset); // map uvs to the bar texture
 	g_uv.y = -1.0 * g_uv.y;
 	//vec3 primitiveCoords = vec3( (pos.x - sign(pos.x) * BARCORNER),0.0, (pos.y - sign(pos.y - 0.5) * BARCORNER - zoffset)) * BARSCALE;
 	vec3 primitiveCoords = vec3( pos.x,0.0, pos.y - zoffset) * BARSCALE *sizemultiplier;
@@ -90,7 +90,7 @@ void emitVertexBarBG(in vec2 pos, in vec4 botcolor, in float bartextureoffset){
 	//g_color = vec4(g_uv.x, g_uv.y, 0.0, 1.0);
 	g_color.a *= dataIn[0].v_parameters.y; // blend with bar fade alpha
 	//g_color.a = 1.0;
-	//	g_uv.y -= ATLASSTEP * 8;
+	//	g_uv.y -= ATLASSTEPY * 8;
 	EmitVertex();
 }
 void emitVertexGlyph(in vec2 pos, in vec2 uv){
@@ -219,7 +219,7 @@ void main(){
 
 	if (skipGlyphsNumbers < 0.5 ){
 		if ((BARTYPE & BITSHOWGLYPH) > 0u){
-			emitGlyph(vec2(- BARWIDTH - currentglyphpos * BARHEIGHT , 0), vec2(ATLASSTEP, UVOFFSET), vec2(ATLASSTEP, ATLASSTEP));	//glyph icon
+			emitGlyph(vec2(- BARWIDTH - currentglyphpos * BARHEIGHT , 0), vec2(ATLASSTEPX, UVOFFSET), vec2(ATLASSTEPX, ATLASSTEPY));	//glyph icon
 		}
 	}else{
 		currentglyphpos = 0.0;
@@ -228,13 +228,13 @@ void main(){
 	if ((BARTYPE & BITINTEGERNUMBER) > 0u){ // STOCKPILE FONTS THEN EH? xx/yy
 		vec4 numbers = vec4(numStockpiled, numStockpiled, numStockpileQueued, numStockpileQueued);
 		numbers = numbers * vec4(1.0, 0.1, 1.0, 0.1);
-		numbers = floor(mod(numbers, 10.0)) * ATLASSTEP;
-		float glyphpctsecatlas = 11 * ATLASSTEP; // TODO: slash sign in texture
+		numbers = floor(mod(numbers, 10.0)) * ATLASSTEPY;
+		float glyphpctsecatlas = 11 * ATLASSTEPY; // TODO: slash sign in texture
 		// go right to left
 
-		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 1.0) * BARHEIGHT  , 0), vec2(0, numbers.x ), vec2(ATLASSTEP, ATLASSTEP)); // lsb of numqueued
+		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 1.0) * BARHEIGHT  , 0), vec2(0, numbers.x ), vec2(ATLASSTEPX, ATLASSTEPY)); // lsb of numqueued
 		if (numbers.y > 0 ){
-			emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 2.0) * BARHEIGHT + BARHEIGHT * 0.4 , 0), vec2(0, numbers.y ), vec2(ATLASSTEP, ATLASSTEP)); // msb of numqueued
+			emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 2.0) * BARHEIGHT + BARHEIGHT * 0.4 , 0), vec2(0, numbers.y ), vec2(ATLASSTEPX, ATLASSTEPY)); // msb of numqueued
 		}
 	}
 
@@ -252,10 +252,10 @@ void main(){
 			msb = floor(mod(health*10.0, 10.0));
 			glyphpctsecatlas = 11.0; // percent
 		}
-		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 1.0) * BARHEIGHT , 0), vec2(0, glyphpctsecatlas * ATLASSTEP), vec2(ATLASSTEP, ATLASSTEP)); // %
-		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 2.0) * BARHEIGHT + BARHEIGHT * 0.2 , 0), vec2(0,  lsb * ATLASSTEP ), vec2(ATLASSTEP, ATLASSTEP)); // lsb
+		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 1.0) * BARHEIGHT , 0), vec2(0, glyphpctsecatlas * ATLASSTEPY), vec2(ATLASSTEPX, ATLASSTEPY)); // %
+		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 2.0) * BARHEIGHT + BARHEIGHT * 0.2 , 0), vec2(0,  lsb * ATLASSTEPY ), vec2(ATLASSTEPX, ATLASSTEPY)); // lsb
 		if (msb > 0){
-			emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 3.0) * BARHEIGHT + BARHEIGHT * 0.5 , 0), vec2(0,  msb * ATLASSTEP), vec2(ATLASSTEP, ATLASSTEP)); //msb
+			emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 3.0) * BARHEIGHT + BARHEIGHT * 0.5 , 0), vec2(0,  msb * ATLASSTEPY), vec2(ATLASSTEPX, ATLASSTEPY)); //msb
 		}
 	}
 }
