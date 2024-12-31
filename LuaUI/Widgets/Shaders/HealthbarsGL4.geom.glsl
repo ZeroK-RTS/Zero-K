@@ -22,7 +22,7 @@ in DataVS { // I recall the sane limit for cache coherence is like 48 floats per
 	vec4 v_centerpos;
 	vec4 v_uvoffsets;
 	vec4 v_parameters;
-	vec2 v_sizemodifiers;
+	float v_sizeModifier;
 	uvec4 v_bartype_index_ssboloc;
 } dataIn[];
 
@@ -36,7 +36,7 @@ vec4 centerpos;
 vec4 uvoffsets;
 float zoffset;
 float depthbuffermod;
-float sizemultiplier = dataIn[0].v_sizemodifiers.x;
+float sizeMultiplier = dataIn[0].v_sizeModifier;
 float duration = -1;
 
 #define HALFPIXEL 0.0019765625
@@ -53,20 +53,17 @@ float duration = -1;
 #define BITTIMELEFT 8u
 #define BITINTEGERNUMBER 16u
 #define BITGETPROGRESS 32u
-#define BITFLASHBAR 64u
+#define BITFRAMETIME 64u
 #define BITCOLORCORRECT 128u
 
 void emitVertexBG(in vec2 pos){
 	g_uv.xy = vec2(0.0,0.0);
-	vec3 primitiveCoords = vec3(pos.x,0.0,pos.y - zoffset) * BARSCALE *sizemultiplier;
+	vec3 primitiveCoords = vec3(pos.x,0.0,pos.y - zoffset) * BARSCALE *sizeMultiplier;
 	gl_Position = cameraViewProj * vec4(centerpos.xyz + rotY * ( primitiveCoords ), 1.0);
 	gl_Position.z += depthbuffermod;
 	g_uv.z = 0.0; // this tells us to use color
 	float extracolor = 0.0;
 	if ((duration != -1) && (mod(timeInfo.x, 10.0) > 4.0)){
-		extracolor = 0.5;
-	}
-	if (((BARTYPE & BITFLASHBAR) > 0u) && (mod(timeInfo.x, 10.0) > 4.0)){
 		extracolor = 0.5;
 	}
 	g_color = mix(BGBOTTOMCOLOR + extracolor, BGTOPCOLOR + extracolor, pos.y);
@@ -82,7 +79,7 @@ void emitVertexBarBG(in vec2 pos, in vec4 botcolor, in float bartextureoffset){
 	g_uv.xy = g_uv.xy * vec2(ATLASSTEPX * 9, ATLASSTEPY) + vec2(3 * ATLASSTEPX, bartextureoffset); // map uvs to the bar texture
 	g_uv.y = -1.0 * g_uv.y;
 	//vec3 primitiveCoords = vec3( (pos.x - sign(pos.x) * BARCORNER),0.0, (pos.y - sign(pos.y - 0.5) * BARCORNER - zoffset)) * BARSCALE;
-	vec3 primitiveCoords = vec3( pos.x,0.0, pos.y - zoffset) * BARSCALE *sizemultiplier;
+	vec3 primitiveCoords = vec3( pos.x,0.0, pos.y - zoffset) * BARSCALE *sizeMultiplier;
 	gl_Position = cameraViewProj * vec4(centerpos.xyz + rotY * ( primitiveCoords ), 1.0);
 	gl_Position.z += depthbuffermod;
 	g_uv.z = clamp(10000 * bartextureoffset, 0, 1); // this tells us to use color if we are using bartextureoffset
@@ -95,7 +92,7 @@ void emitVertexBarBG(in vec2 pos, in vec4 botcolor, in float bartextureoffset){
 }
 void emitVertexGlyph(in vec2 pos, in vec2 uv){
 	g_uv.xy = vec2(uv.x, 1.0 - uv.y);
-	vec3 primitiveCoords = vec3(pos.x,0.0,pos.y - zoffset) * BARSCALE *sizemultiplier;
+	vec3 primitiveCoords = vec3(pos.x,0.0,pos.y - zoffset) * BARSCALE *sizeMultiplier;
 	gl_Position = cameraViewProj * vec4(centerpos.xyz + rotY * ( primitiveCoords ), 1.0);
 	g_uv.z = 1.0; // this tells us to use texture
 	g_color = vec4(1.0);

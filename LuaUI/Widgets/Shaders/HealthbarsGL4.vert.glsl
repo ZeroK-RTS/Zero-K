@@ -10,6 +10,10 @@
 #line 5000
 
 layout (location = 0) in vec4 height_timers;
+#define unitHeight height_timers.x
+#define sizeModifier height_timers.y
+#define range height_timers.z
+#define uvOffset height_timers.w
 layout (location = 1) in uvec4 bartype_index_ssboloc;
 layout (location = 2) in vec4 mincolor;
 layout (location = 3) in vec4 maxcolor;
@@ -52,7 +56,7 @@ out DataVS {
 	vec4 v_centerpos;
 	vec4 v_uvoffsets;
 	vec4 v_parameters;
-	vec2 v_sizemodifiers;
+	float v_sizeModifier;
 	uvec4 v_bartype_index_ssboloc;
 };
 
@@ -69,8 +73,8 @@ bool vertexClipped(vec4 clipspace, float tolerance) {
 #define BITPERCENTAGE 4u
 #define BITTIMELEFT 8u
 #define BITINTEGERNUMBER 16u
-#define BITGETPROGRESS 32u
-#define BITFLASHBAR 64u
+#define BITINVERSE 32u
+#define BITFRAMETIME 64u
 #define BITCOLORCORRECT 128u
 
 void main()
@@ -99,8 +103,8 @@ void main()
 		v_parameters.z = 1.0;
 	#endif
 
-	v_parameters.w = height_timers.w;
-	v_sizemodifiers = height_timers.yz;
+	v_parameters.w = uvOffset;
+	v_sizeModifier = sizeModifier;
 	
 	if (length((cameraViewInv[3]).xyz - v_centerpos.xyz) >  iconDistance){
 		//v_parameters.yz = vec2(0.0); // No longer needed
@@ -110,24 +114,29 @@ void main()
 	if (dot(v_centerpos.xyz, v_centerpos.xyz) < 1.0) v_numvertices = 0; // if the center pos is at (0,0,0) then we probably dont have the matrix yet for this unit, because it entered LOS but has not been drawn yet.
 
 	v_centerpos.y += HEIGHTOFFSET; // Add some height to ensure above groundness
-	v_centerpos.y += height_timers.x; // Add per-instance height offset
+	v_centerpos.y += unitHeight; // Add per-instance height offset
 
 	// This is not needed since the switch to .drawPos
 	//if ((UNITUNIFORMS.composite & 0x00000003u) < 1u ) v_numvertices = 0u; // this checks the drawFlag of wether the unit is actually being drawn (this is ==1 when then unit is both visible and drawn as a full model (not icon))
 
 
 	v_bartype_index_ssboloc = bartype_index_ssboloc;
-	float relativehealth = UNITUNIFORMS.health / UNITUNIFORMS.maxHealth;
-	v_parameters.x = UNITUNIFORMS.health / UNITUNIFORMS.maxHealth;
 	if (UNIFORMLOC < 20u) {
-		v_parameters.x = UNITUNIFORMS.userDefined[0].y;
 	        v_parameters.x = UNITUNIFORMS.userDefined[0][bartype_index_ssboloc.z];
-	} else { // this is a health bar, dont draw it if the unit is being built and its health doesnt really differ from the full health
-		// TODO: this is kinda buggy, as buildprogess in the the unit uniforms is somehow lagging behind health.
-		float buildprogress = UNITUNIFORMS.userDefined[0].x; // this is -1.0 for fully built units
-		#ifndef DEBUGSHOW
-			if (abs(buildprogress - relativehealth )< 0.03) v_numvertices = 0u;
-		#endif
+
+		if ((BARTYPE & BITFRAMETIME) != 0u) {
+			v_parameters.x = v_parameters.x - timeInfo.x;
+			v_parameters.x = max(0, v_parameters.x);
+		}
+
+	        v_parameters.x = v_parameters.x / range;
+
+	} else {
+		v_parameters.x = UNITUNIFORMS.health / UNITUNIFORMS.maxHealth;
+	}
+
+	if ((BARTYPE & BITINVERSE) != 0u) {
+		v_parameters.x = 1 - v_parameters.x;
 	}
 
 	v_mincolor = mincolor;

@@ -191,8 +191,8 @@ local bitShowGlyph = 2
 local bitPercentage = 4
 local bitTimeLeft = 8
 local bitIntegerNumber = 16
-local bitGetProgress = 32
-local bitFlashBar = 64
+local bitInverse = 32
+local bitFrameTime = 64
 local bitColorCorrect = 128
 
 local healthChannel = 32 -- if its >20, then its health/maxhealth
@@ -229,19 +229,18 @@ local barTypeMap = {
 	paralyze = {
 		mincolor = {0.6, 0.6, 1.0, 1.0},
 		maxcolor = {0.6, 0.6, 1.0, 1.0},
-		--bartype = 1,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 1.99,
-		uniformindex = paralyzeChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 13 / 32, -- the X offset of the icon for this bar
+		uniformindex = paralyzeChannel,
+		uvoffset = 13 / 32,
 	},
 	build = {
 		mincolor = {1.0, 1.0, 1.0, 1.0},
 		maxcolor = {1.0, 1.0, 1.0, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.999,
-		uniformindex = buildChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 15 / 32, -- the X offset of the icon for this bar
+		uniformindex = buildChannel,
+		uvoffset = 15 / 32,
 	},
 	morph = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -270,7 +269,7 @@ local barTypeMap = {
 	reload = {
 		mincolor = {0.03, 0.4, 0.4, 1.0},
 		maxcolor = {0.05, 0.6, 0.6, 1.0},
-		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = reloadChannel,
 		uvoffset = 11 / 32,
@@ -278,7 +277,7 @@ local barTypeMap = {
 	dgun = {
 		mincolor = {1.0, 1.0, 1.0, 1.0},
 		maxcolor = {1.0, 1.0, 1.0, 1.0},
-		bartype = bitPercentage + bitColorCorrect,
+		bartype = bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = dgunChannel,
 		uvoffset = 1 / 32,
@@ -334,7 +333,7 @@ local barTypeMap = {
 	captureReload = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
-		bartype = bitPercentage + bitColorCorrect,
+		bartype = bitPercentage + bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = captureReloadChannel,
 		uvoffset = 1 / 32,
@@ -342,7 +341,7 @@ local barTypeMap = {
 	ability = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
-		bartype = bitPercentage + bitColorCorrect,
+		bartype = bitPercentage + bitColorCorrect + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = abilityChannel,
 		uvoffset = 1 / 32,
@@ -405,13 +404,14 @@ for barname, bt in pairs(barTypeMap) do
 	for i=1,20 do cache[i] = 0 end
 	
 	--cache[1] = unitDefHeights[unitDefID] + additionalheightaboveunit * effectiveScale  -- height
-	--cache[2] = effectiveScale
-	--cache[3] = 0.0 -- unused
+	--cache[2] = sizeModifier
+	cache[3] = 1 -- range 
 	cache[4] = bt.uvoffset -- glyph uv offset
 
 	cache[5] = bt.bartype -- bartype int
 	--cache[6] = unitBars[unitID] - 1   -- bar index (how manyeth per unit)
 	cache[7] = bt.uniformindex -- ssbo location offset (> 20 for health)
+	--cache[8] = 0.0 -- unused
 
 	cache[9]  = bt.mincolor[1]
 	cache[10] = bt.mincolor[2]
@@ -614,10 +614,11 @@ for udefID, unitDef in pairs(UnitDefs) do
 
 			-- CAPTURE RELOAD
 			elseif WeaponDef.customParams and WeaponDef.customParams.post_capture_reload then
-				unitDefHasCaptureReload[udefID] = WeaponDef.customParams.post_capture_reload
+				unitDefHasCaptureReload[udefID] = tonumber(WeaponDef.customParams.post_capture_reload)
 
 			-- RELOAD
 			elseif WeaponDef.reload and WeaponDef.reload >= primaryReloadTime then
+				primaryReloadTime = WeaponDef.reload
 				unitDefPrimaryReload[udefID] = primaryReloadTime
 				unitDefPrimaryWeapon[udefID] = i
 			end
@@ -726,7 +727,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function addBarForUnit(unitID, unitDefID, barname, reason)
+local function addBarForUnit(unitID, unitDefID, barname, reason, range)
+	if barname == "captureReload" then Spring.Echo("XXX" .. range) end
 	if debugmode then Spring.Debug.TraceEcho(unitBars[unitID]) end
 
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
@@ -761,6 +763,7 @@ local function addBarForUnit(unitID, unitDefID, barname, reason)
 
 	healthBarTableCache[1] = unitDefHeights[unitDefID] + additionalheightaboveunit * effectiveScale  -- height
 	healthBarTableCache[2] = effectiveScale
+	healthBarTableCache[3] = range or 1
 	healthBarTableCache[6] = unitBars[unitID]   -- bar index (how manyeth per unit)
 	
 	return pushElementInstance(
@@ -817,7 +820,7 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	unitSlowWatch[unitID] = -1
 
 	if unitDefDgun[unitDefID] then
-		addBarForUnit(unitID, unitDefID, "dgun", reason)
+		addBarForUnit(unitID, unitDefID, "dgun", reason, unitDefDgunReload[unitDefID] * gameSpeed)
 		unitDgunWatch[unitID] = -1
 	end
 
@@ -838,7 +841,8 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	end
 
 	if unitDefPrimaryWeapon[unitDefID] then
-		addBarForUnit(unitID, unitDefID, "reload", reason)
+	        local reloadTime = unitDefPrimaryReload[unitDefID]
+		addBarForUnit(unitID, unitDefID, "reload", reason, reloadTime * gameSpeed)
 		unitReloadWatch[unitID] = -1.0
 	end
 --[[
@@ -855,7 +859,8 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	end
 	
 	if unitDefScriptReload[unitDefID] then
-		addBarForUnit(unitID, unitDefID, "reload", reason)
+		local reloadTime = unitDefScriptReload[unitDefID]
+		addBarForUnit(unitID, unitDefID, "reload", reason, reloadTime)
 		unitScriptReloadWatch[unitID] = -1.0
 	end
 	
@@ -890,7 +895,7 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	end
 
 	if unitDefHasCaptureReload[unitDefID] then
-		addBarForUnit(unitID, unitDefID, "captureReload", reason)
+		addBarForUnit(unitID, unitDefID, "captureReload", reason, unitDefHasCaptureReload[unitDefID])
 		unitCaptureReloadWatch[unitID] = -1.0
 	end
 
@@ -1437,16 +1442,9 @@ function widget:GameFrame(gameFrame)
 	-- RELOAD
 		for unitID, oldReload in pairs(unitReloadWatch) do
 			local unitDefID = Spring.GetUnitDefID(unitID)
-			local reloadFrame 
-                        _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID])
-
-			reloadTime = Spring.GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID], 'reloadTime')
-
-			local reload = 1 - (((reloadFrame or 0)-gameFrame) / gameSpeed) / reloadTime --unitDefPrimaryReload[unitDefID]
-
-			if reload > 1 then
-				reload = 1
-			end
+			local reload 
+                        _, _, reload = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID])
+			reload = reload or 0
 
 			if oldReload ~= reload then
 				unitReloadWatch[unitID] = reload
@@ -1458,16 +1456,10 @@ function widget:GameFrame(gameFrame)
 	-- DGUN
 		for unitID, oldReload in pairs(unitDgunWatch) do
 			local unitDefID = Spring.GetUnitDefID(unitID)
-			local reloadFrame 
-                        _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefDgun[unitDefID])
+			local reload 
+                        _, _, reload = GetUnitWeaponState(unitID, unitDefDgun[unitDefID])
 
-			reloadTime = Spring.GetUnitWeaponState(unitID, unitDefDgun[unitDefID], 'reloadTime')
-
-			local reload = 1 - (((reloadFrame or 0)-gameFrame) / gameSpeed) / reloadTime --unitDefDgunReload[unitDefID]
-
-			if reload > 1 then
-				reload = 1
-			end
+			reload = reload or 0
 
 			if oldReload ~= reload then
 				unitDgunWatch[unitID] = reload
@@ -1478,7 +1470,7 @@ function widget:GameFrame(gameFrame)
 
 		-- ABILITY
 		for unitID, oldAbility in pairs(unitAbilityWatch) do
-			local ability = 1 - GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+			local ability = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
 			if oldAbility ~= ability then
 				unitAbilityWatch[unitID] = ability
 				uniformcache[1] = ability 
@@ -1488,12 +1480,7 @@ function widget:GameFrame(gameFrame)
 
 		-- SCRIPT RELOAD
 		for unitID, oldReload in pairs(unitScriptReloadWatch) do
-                        local reloadFrame = GetUnitRulesParam(unitID, "scriptReloadFrame") or 0
-			local reload = 1 - (reloadFrame-gameFrame) / unitDefScriptReload[Spring.GetUnitDefID(unitID)]
-
-			if reload > 1 then
-				reload = 1
-			end
+                        local reload = GetUnitRulesParam(unitID, "scriptReloadFrame") or 0
 
 			if oldReload ~= reload then
 				unitScriptReloadWatch[unitID] = reload
@@ -1501,25 +1488,6 @@ function widget:GameFrame(gameFrame)
 				gl.SetUnitBufferUniforms(unitID, uniformcache, reloadChannel)
 			end
                 end
-		--[[
-		               local TeleportEnd = GetUnitRulesParam(unitID, "teleportend")
-                local TeleportCost = GetUnitRulesParam(unitID, "teleportcost")
-                if TeleportEnd and TeleportCost and TeleportEnd >= 0 then
-                        local prog
-                        if TeleportEnd > 1 then
-                                -- End frame given
-                                prog = 1 - (TeleportEnd - gameFrame)/TeleportCost
-                        else
-                                -- Same parameters used to display a static progress
-                                prog = 1 - TeleportEnd
-                        end
-                        if prog < 1 then
-                                barDrawer.AddBar(addTitle and messages.teleport, prog, "tele", (addPercent and floor(prog*100) .. '%'))
-                        end
-                end
-
-		--]]
-
 	end
 
 	if gameFrame % 3 == 2 then
@@ -1595,16 +1563,14 @@ function widget:GameFrame(gameFrame)
 
 		--// CAPTURE RELOAD
 		for unitID, oldCaptureReload in pairs(unitCaptureReloadWatch) do
-			local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame") or 0
-			local captureReload = 1 - (captureReloadState-gameFrame) / unitDefHasCaptureReload[Spring.GetUnitDefID(unitID)]
-			if captureReload > 1 then
-				captureReload = 1
-			end
+			if oldCaptureReload <= gameFrame then 
+				local captureReload = GetUnitRulesParam(unitID, "captureRechargeFrame") or 0
 
-			if oldCaptureReload ~= captureReload then
-				unitCaptureReloadWatch[unitID] = captureReload
-				uniformcache[1] = captureReload
-				gl.SetUnitBufferUniforms(unitID, uniformcache, captureReloadChannel)
+				if oldCaptureReload ~= captureReload then
+					unitCaptureReloadWatch[unitID] = captureReload
+					uniformcache[1] = captureReload
+					gl.SetUnitBufferUniforms(unitID, uniformcache, captureReloadChannel)
+				end
 			end
 		end
 
