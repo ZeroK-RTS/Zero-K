@@ -52,6 +52,10 @@ local CMD_FIRE_STATE = CMD.FIRE_STATE
 local TARGET_NONE   = 0
 local TARGET_GROUND = 1
 local TARGET_UNIT   = 2
+
+local CMD_ATTACK = CMD.ATTACK
+local DEBUG_NAME = "Target on the move"
+
 --------------------------------------------------------------------------------
 -- Config
 
@@ -613,6 +617,24 @@ function GG.GetUnitHasSetTarget(unitID)
 	if unitById[unitID] and unit.data[unitById[unitID]] then
 		local data = unit.data[unitById[unitID]]
 		return not (data.lingerOnly)
+	end
+	return false
+end
+
+function GG.GetAnyTypeOfUserUnitTarget(unitID)
+	if not unitID then
+		return false
+	end
+	if unitById[unitID] and unit.data[unitById[unitID]] then
+		local targetData = unit.data[unitById[unitID]]
+		if targetData.targetID then
+			return targetData.targetID
+		end
+		return targetData.x, targetData.y, targetData.z
+	end
+	local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL) then
+		return cp_1, cp_2, cp_3
 	end
 	return false
 end

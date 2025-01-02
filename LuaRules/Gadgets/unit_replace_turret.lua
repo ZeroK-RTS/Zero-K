@@ -21,18 +21,22 @@ if not gadgetHandler:IsSyncedCode() then
 	return
 end
 
+include("LuaRules/Configs/customcmds.h.lua")
+
+local CMD_ATTACK = CMD.ATTACK
+
 -- TODO.
 -- Make all damage to turret turn into damage onto mount
 -- Make mount immune to other sources of damage.
 -- Fill out and extract the mount defs
 -- Front back offset issues with vehicle turrets, for offsetting colvol and possibly target pos.
--- Make attack targets from mount turn into attack targets for the turret, when they are from users.
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local TURRET_OFFSET_FUDGE = 2
 
-local turrets = {}
-local mountData = IterableMap.New()
+local updateTargetNextFrame = {}
+local turrets = {} -- Indexed turretIDs (unitIDs of turrets), values are unitID of the mount holding the turret.
+local mountData = IterableMap.New() -- Indexed by unitID of mounts.
 
 local function HidePieceAndChildren(unitID, pieceName)
 	local pieceMap = Spring.GetUnitPieceMap(unitID)
@@ -132,18 +136,44 @@ local function ReplaceTurret(unitID, unitDefID, teamID, builderID, turretDefID)
 end
 
 local function UpdateWeaponTarget(unitID, data)
-	-- Doesn't work, needs to be replaced with reading the first order of the command queue and SetTarget API
-	local targetType, isUser, params = Spring.GetUnitWeaponTarget(unitID, 0)
-	Spring.Utilities.UnitEcho(unitID, targetType)
-	if targetType and targetType == 1 then
-		Spring.SetUnitTarget(data.turretID, params, false, isUser)
-	elseif targetType and targetType == 2 then
-		Spring.SetUnitTarget(data.turretID, params[1], params[2], params[3], false, isUser)
+	if data.forceUpdatingTarget then
+		return
+	end
+	local tx, ty, tz = GG.GetAnyTypeOfUserUnitTarget(unitID)
+	--Spring.Utilities.UnitEcho(unitID, tx)
+	if tz then
+		Spring.SetUnitTarget(data.turretID, tx, ty, tz, false, true)
+		data.hasUserTarget = true
+	elseif tx then
+		Spring.SetUnitTarget(data.turretID, tx, false, true)
+		data.hasUserTarget = true
+	elseif data.hasUserTarget then
+		Spring.SetUnitTarget(data.turretID, nil)
+		data.hasUserTarget = false
 	end
 end
 
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, playerID, fromSynced, fromLua)
+	local data = IterableMap.Get(mountData, unitID)
+	if data and not data.forceUpdatingTarget then
+		data.forceUpdatingTarget = true
+		updateTargetNextFrame = updateTargetNextFrame or {}
+		updateTargetNextFrame[#updateTargetNextFrame + 1] = unitID
+	end
+	return true
+end
+
 function gadget:GameFrame(n)
-	--IterableMap.ApplyFraction(mountData, 20, n%20, UpdateWeaponTarget)
+	IterableMap.ApplyFraction(mountData, 30, n%30, UpdateWeaponTarget)
+	if updateTargetNextFrame then
+		for i = 1, #updateTargetNextFrame do
+			local unitID = updateTargetNextFrame[i]
+			local data = IterableMap.Get(mountData, unitID)
+			data.forceUpdatingTarget = false
+			UpdateWeaponTarget(unitID, data)
+		end
+		updateTargetNextFrame = false
+	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
