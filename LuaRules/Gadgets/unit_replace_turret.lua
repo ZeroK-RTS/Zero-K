@@ -21,6 +21,13 @@ if not gadgetHandler:IsSyncedCode() then
 	return
 end
 
+-- TODO.
+-- Make all damage to turret turn into damage onto mount
+-- Make mount immune to other sources of damage.
+-- Fill out and extract the mount defs
+-- Front back offset issues with vehicle turrets, for offsetting colvol and possibly target pos.
+-- Make attack targets from mount turn into attack targets for the turret, when they are from users.
+
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local TURRET_OFFSET_FUDGE = 2
 
