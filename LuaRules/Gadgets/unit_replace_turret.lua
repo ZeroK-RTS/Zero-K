@@ -38,6 +38,19 @@ local updateTargetNextFrame = {}
 local turrets = {} -- Indexed turretIDs (unitIDs of turrets), values are unitID of the mount holding the turret.
 local mountData = IterableMap.New() -- Indexed by unitID of mounts.
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- To be moved to def files
+
+local mountDefs = {
+	[UnitDefNames["cloakraid"].id] = "chest",
+	[UnitDefNames["jumpraid"].id] = "low_head",
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Piece Utilities
+
 local function HidePieceAndChildren(unitID, pieceName)
 	local pieceMap = Spring.GetUnitPieceMap(unitID)
 	local pieceID = pieceMap[pieceName]
@@ -80,10 +93,9 @@ local function ShowOnlyPieceAndChildren(unitID, pieceName)
 	end)
 end
 
-local mountDefs = {
-	[UnitDefNames["cloakraid"].id] = "chest",
-	[UnitDefNames["jumpraid"].id] = "low_head",
-}
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Setup
 
 local function ReplaceTurret(unitID, unitDefID, teamID, builderID, turretDefID)
 	local mountPiece = mountDefs[unitDefID]
@@ -135,6 +147,10 @@ local function ReplaceTurret(unitID, unitDefID, teamID, builderID, turretDefID)
 	IterableMap.Add(mountData, unitID, {turretID = turretID})
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Weapon and Target Handling
+
 local function UpdateWeaponTarget(unitID, data)
 	if data.forceUpdatingTarget then
 		return
@@ -153,17 +169,16 @@ local function UpdateWeaponTarget(unitID, data)
 	end
 end
 
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, playerID, fromSynced, fromLua)
+local function QueueForWeaponCheck(unitID)
 	local data = IterableMap.Get(mountData, unitID)
 	if data and not data.forceUpdatingTarget then
 		data.forceUpdatingTarget = true
 		updateTargetNextFrame = updateTargetNextFrame or {}
 		updateTargetNextFrame[#updateTargetNextFrame + 1] = unitID
 	end
-	return true
 end
 
-function gadget:GameFrame(n)
+local function UpdateWeaponChecks(n)
 	IterableMap.ApplyFraction(mountData, 30, n%30, UpdateWeaponTarget)
 	if updateTargetNextFrame then
 		for i = 1, #updateTargetNextFrame do
@@ -174,6 +189,28 @@ function gadget:GameFrame(n)
 		end
 		updateTargetNextFrame = false
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Callins
+
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, playerID, fromSynced, fromLua)
+	QueueForWeaponCheck(unitID)
+	return true
+end
+
+function gadget:GameFrame(n)
+	UpdateWeaponChecks(n)
+end
+
+
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+	local data = IterableMap.Get(mountData, unitID)
+	if data then
+		return 0
+	end
+	return damage
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
