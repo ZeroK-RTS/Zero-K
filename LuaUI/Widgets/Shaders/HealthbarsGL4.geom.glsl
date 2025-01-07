@@ -29,6 +29,9 @@ in DataVS { // I recall the sane limit for cache coherence is like 48 floats per
 out DataGS {
 	vec4 g_color; // pure rgba
 	vec4 g_uv; // xy is trivially uv coords, z is texture blend factor, w means nothing yet
+        vec4 g_rect;
+        vec2 g_loc;
+        float g_corner_radius;
 };
 
 mat3 rotY;
@@ -56,6 +59,46 @@ float duration = -1;
 #define BITFRAMETIME 64u
 #define BITCOLORCORRECT 128u
 
+void emitRectangleVertex(vec2 pos, vec4 corners, float corner_radius, float useTexture, vec2 uv, vec4 color) {
+       g_uv.xy = vec2(uv.x, 1.0 - uv.y);
+       vec3 primitiveCoords = vec3(pos.x, 0.0, pos.y - zoffset) * BARSCALE * sizeMultiplier;
+       gl_Position = cameraViewProj * vec4(centerpos.xyz + rotY * ( primitiveCoords ), 1.0);
+	gl_Position.z += depthbuffermod;
+       g_uv.z = useTexture; // this tells us to use texture
+       g_color = color;
+       g_color.a *= dataIn[0].v_parameters.z; // blend with text/icon fade alpha
+       vec3 primitiveCorner = vec3(corners.x, 0.0, corners.y - zoffset) * BARSCALE * sizeMultiplier;
+       g_rect = corners;
+       g_loc = pos;
+       g_corner_radius = corner_radius;
+
+       EmitVertex();
+}
+
+void emitRectangle(vec4 destination, vec4 corners, float corner_radius, float useTexture, vec4 texture, vec4 topColor, vec4 bottomColor) {
+       // bottom = .x
+       // left = .y
+       // height = .z
+       // width = .w
+
+       float dl = destination.x;
+       float db = destination.y;
+       float dr = destination.x + destination.z;
+       float dt = destination.y + destination.w;
+
+       float tl = texture.x;
+       float tb = texture.y;
+       float tr = texture.x + texture.z;
+       float tt = texture.y + texture.w;
+
+       emitRectangleVertex(vec2(dl, db), corners, corner_radius, useTexture, vec2(tl, tb), bottomColor);
+       emitRectangleVertex(vec2(dl, dt), corners, corner_radius, useTexture, vec2(tl, tt), topColor);
+       emitRectangleVertex(vec2(dr, db), corners, corner_radius, useTexture, vec2(tr, tb), bottomColor);
+       emitRectangleVertex(vec2(dr, dt), corners, corner_radius, useTexture, vec2(tr, tt), topColor);
+
+       EndPrimitive();
+}
+
 void emitVertexBG(in vec2 pos){
 	g_uv.xy = vec2(0.0,0.0);
 	vec3 primitiveCoords = vec3(pos.x,0.0,pos.y - zoffset) * BARSCALE *sizeMultiplier;
@@ -68,6 +111,11 @@ void emitVertexBG(in vec2 pos){
 	}
 	g_color = mix(BGBOTTOMCOLOR + extracolor, BGTOPCOLOR + extracolor, pos.y);
 	g_color.a *= dataIn[0].v_parameters.y; // blend with bar fade alpha
+       g_rect = vec4(-1, -1, 2, 2);
+
+       g_loc = vec2(0,0);
+       g_corner_radius = 0;
+
 	EmitVertex();
 }
 
@@ -97,6 +145,9 @@ void emitVertexGlyph(in vec2 pos, in vec2 uv){
 	g_uv.z = 1.0; // this tells us to use texture
 	g_color = vec4(1.0);
 	g_color.a *= dataIn[0].v_parameters.z; // blend with text/icon fade alpha
+       g_rect = vec4(-1, -1, 2, 2);
+       g_corner_radius = 0;
+       g_loc = vec2(0,0);
 	EmitVertex();
 }
 
@@ -117,6 +168,8 @@ void main(){
 	centerpos = dataIn[0].v_centerpos;
 
 	rotY = mat3(cameraViewInv[0].xyz,cameraViewInv[2].xyz, cameraViewInv[1].xyz); // swizzle cause we use xz,
+        vec4 g_rect;
+        float g_corner_radius;
 
 	g_color = vec4(1.0, 0.0, 1.0, 1.0); // a very noticeable default color
 
@@ -148,63 +201,79 @@ void main(){
 	//     \-3----------5-/
 	//start in bottom leftmost of this shit.
 
-		depthbuffermod = 0.001;
-		emitVertexBG(vec2(-BARWIDTH            , BARCORNER            )); //1
-		emitVertexBG(vec2(-BARWIDTH            , BARHEIGHT - BARCORNER)); //2
-		emitVertexBG(vec2(-BARWIDTH + BARCORNER, 0                    )); //3
-		emitVertexBG(vec2(-BARWIDTH + BARCORNER, BARHEIGHT            )); //4
-		emitVertexBG(vec2( BARWIDTH - BARCORNER, 0                    )); //5
-		emitVertexBG(vec2( BARWIDTH - BARCORNER, BARHEIGHT            )); //6
-		emitVertexBG(vec2( BARWIDTH            , BARCORNER            )); //7
-		emitVertexBG(vec2( BARWIDTH            , BARHEIGHT - BARCORNER)); //8
-		EndPrimitive();
+	depthbuffermod = 0.001;
+	float extraColor = 0.0;
+	if ((duration != -1) && (mod(timeInfo.x, 10.0) > 4.0)){
+		extraColor = 0.5;
+	}
+
+	emitRectangle(
+		vec4(-BARWIDTH, 0, BARWIDTH * 2, BARHEIGHT),
+		vec4(-BARWIDTH, 0, BARWIDTH * 2, BARHEIGHT),
+		BARCORNER,
+		0.0,
+		vec4(1.0, 1.0, 1.0, 1.0),
+		BGTOPCOLOR + extraColor,
+		BGBOTTOMCOLOR + extraColor
+	);
 
 	// EMIT THE COLORED BACKGROUND
 	// for this to work, we need the true color of the bar?
 
-		vec4 topcolor = BGTOPCOLOR;
-		vec4 botcolor = BGBOTTOMCOLOR;
-		vec4 truecolor = mix(dataIn[0].v_mincolor, dataIn[0].v_maxcolor, health);
+	vec4 topcolor = BGTOPCOLOR;
+	vec4 botcolor = BGBOTTOMCOLOR;
+	vec4 truecolor = mix(dataIn[0].v_mincolor, dataIn[0].v_maxcolor, health);
 
-		truecolor.a = 0.2;
-		topcolor = truecolor;
+	truecolor.a = 0.2;
+	topcolor = truecolor;
 
-		topcolor.rgb *= BOTTOMDARKENFACTOR;
-		depthbuffermod = 0.000;
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER, SMALLERCORNER + BARCORNER), truecolor, 0.0); //1
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER, BARHEIGHT - SMALLERCORNER - BARCORNER), topcolor,  0.0); //2
-		emitVertexBarBG(vec2(-BARWIDTH + SMALLERCORNER + BARCORNER, BARCORNER            ), truecolor, 0.0); //3
-		emitVertexBarBG(vec2(-BARWIDTH + SMALLERCORNER + BARCORNER, BARHEIGHT -BARCORNER ), topcolor,  0.0); //4
-		emitVertexBarBG(vec2( BARWIDTH - SMALLERCORNER - BARCORNER, BARCORNER            ), truecolor, 0.0); //5
-		emitVertexBarBG(vec2( BARWIDTH - SMALLERCORNER - BARCORNER, BARHEIGHT - BARCORNER), topcolor,  0.0); //6
-		emitVertexBarBG(vec2( BARWIDTH - BARCORNER, SMALLERCORNER + BARCORNER            ), truecolor, 0.0); //7
-		emitVertexBarBG(vec2( BARWIDTH - BARCORNER, BARHEIGHT - SMALLERCORNER - BARCORNER), topcolor,  0.0); //8
-		EndPrimitive();
+	topcolor.rgb *= BOTTOMDARKENFACTOR;
+	depthbuffermod = 0.000;
 
+	emitRectangle(
+		vec4(-BARWIDTH + BARCORNER, BARCORNER, (BARWIDTH - BARCORNER) * 2, BARHEIGHT - 2 * BARCORNER),
+		vec4(-BARWIDTH + BARCORNER, BARCORNER, (BARWIDTH - BARCORNER) * 2, BARHEIGHT - 2 * BARCORNER),
+		SMALLERCORNER,
+		0.0,
+		vec4(1.0, 1.0, 1.0, 1.0),
+		truecolor,
+		topcolor
+	);
 
-	// EMIT BAR FOREGROUND, ok this is harder than i thought
+	// EMIT BAR FOREGROUND
 
-		float healthbasedpos = (2*(BARWIDTH -  BARCORNER) - 2 * SMALLERCORNER) * health  ;
-		if ((BARTYPE & BITTIMELEFT) > 0u) healthbasedpos =  (2*(BARWIDTH -  BARCORNER) - 2 * SMALLERCORNER); // full bar for timer based shit
-		if ((BARTYPE & BITCOLORCORRECT) > 0u) { truecolor.rgb = truecolor.rgb/max(truecolor.r, truecolor.g); } // color correction for health
-		truecolor.a = 1.0;
-		botcolor = truecolor;
-		botcolor.rgb *= BOTTOMDARKENFACTOR;
-		float bartextureoffset = 0;
-		if ((BARTYPE & BITUSEOVERLAY) > 0u) bartextureoffset = UVOFFSET; // if the bar type is a textured bar, we have a lot of work to do
+	depthbuffermod = -0.001;
+	emitRectangle(
+		vec4(-BARWIDTH + BARCORNER, BARCORNER, (BARWIDTH - BARCORNER) * 2 * health, BARHEIGHT - 2 * BARCORNER ),
+		vec4(-BARWIDTH + BARCORNER, BARCORNER, (BARWIDTH - BARCORNER) * 2, BARHEIGHT - 2 * BARCORNER),
+		SMALLERCORNER,
+		1.0,
+		vec4(
+			(672.0 * floor(mod(UVOFFSET, 3)) + 96) / 2048.0,
+			(96.0 + floor(UVOFFSET / 3) * 80) / 1024.0,
+			576.0 / 2048.0 * health,
+			64.0 / 1024.0),
+		vec4(1,1,1,1),
+		topcolor
+	);
 
-		depthbuffermod = -0.001;
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER,                                  SMALLERCORNER + BARCORNER            ), botcolor,  bartextureoffset); //1
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER,                                  BARHEIGHT - BARCORNER - SMALLERCORNER), truecolor, bartextureoffset); //2
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER + SMALLERCORNER,                  BARCORNER                            ), botcolor,  bartextureoffset); //3
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER + SMALLERCORNER,                  BARHEIGHT - BARCORNER               ), truecolor, bartextureoffset); //4
+	// EMIT GLYPH
+	depthbuffermod = -0.002;
+	emitRectangle(
+		vec4(-BARWIDTH - BARCORNER - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		vec4(-BARWIDTH - BARCORNER - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		0.0,
+		1.0,
+		vec4(
+			(672.0 * floor(mod(UVOFFSET, 3)) + 16) / 2048.0,
+			(96.0 + floor(UVOFFSET / 3) * 80) / 1024.0,
+			64.0 / 2048.0,
+			64.0 / 1024.0),
+		vec4(1,1,1,1),
+		vec4(1,1,1,1)
+	);
 
-
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER + SMALLERCORNER + healthbasedpos, BARCORNER                            ), botcolor,  bartextureoffset); //5
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER + SMALLERCORNER + healthbasedpos, BARHEIGHT - BARCORNER                ), truecolor, bartextureoffset); //6
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER + 2 *SMALLERCORNER + healthbasedpos,                 BARCORNER + SMALLERCORNER            ), botcolor,  bartextureoffset); //7
-		emitVertexBarBG(vec2(-BARWIDTH + BARCORNER + 2 *SMALLERCORNER + healthbasedpos,                 BARHEIGHT - BARCORNER - SMALLERCORNER), truecolor, bartextureoffset); //8
-		EndPrimitive();
+return;
 
 	// try to emit text?
 

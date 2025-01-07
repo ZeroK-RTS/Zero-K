@@ -169,7 +169,7 @@ end
 
 local drawWhenGuiHidden = false
 
-local healthbartexture = "LuaUI/Images/healtbars_exo4.tga"
+local healthbartexture = "LuaUI/Images/healthbars.png"
 
 -- a little explanation for 'bartype'
 -- 0: default percentage progress bar
@@ -224,7 +224,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = healthChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 18,
 	},
 	paralyze = {
 		mincolor = {0.6, 0.6, 1.0, 1.0},
@@ -232,7 +232,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 1.99,
 		uniformindex = paralyzeChannel,
-		uvoffset = 13 / 32,
+		uvoffset = 19,
 	},
 	build = {
 		mincolor = {1.0, 1.0, 1.0, 1.0},
@@ -240,7 +240,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.999,
 		uniformindex = buildChannel,
-		uvoffset = 15 / 32,
+		uvoffset = 2,
 	},
 	morph = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -248,7 +248,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = morphChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 20,
 	},
 	disarm = {
 		mincolor = {0.4, 0.4, 0.8, 1.0},
@@ -256,7 +256,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
 		uniformindex = disarmChannel,
-		uvoffset = 9 / 32,
+		uvoffset = 15,
 	},
 	slow = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -264,7 +264,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = slowChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 16,
 	},
 	reload = {
 		mincolor = {0.03, 0.4, 0.4, 1.0},
@@ -272,7 +272,7 @@ local barTypeMap = {
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = reloadChannel,
-		uvoffset = 11 / 32,
+		uvoffset = 21,
 	},
 	dgun = {
 		mincolor = {1.0, 1.0, 1.0, 1.0},
@@ -280,7 +280,7 @@ local barTypeMap = {
 		bartype = bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = dgunChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 17,
 	},
 	teleport = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -288,7 +288,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = teleportChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 12,
 	},
 	heat = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -296,7 +296,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = heatChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 13,
 	},
 	speed = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -304,7 +304,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = speedChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 14,
 	},
 	reammo = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -312,7 +312,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = reammoChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 9,
 	},
 	goo = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -320,7 +320,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = gooChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 10,
 	},
 	jump = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -328,7 +328,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
 		uniformindex = jumpChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 11,
 	},
 	captureReload = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -336,7 +336,7 @@ local barTypeMap = {
 		bartype = bitPercentage + bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = captureReloadChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 6,
 	},
 	ability = {
 		mincolor = {0.0, 0.0, 0.0, 0.0},
@@ -344,40 +344,39 @@ local barTypeMap = {
 		bartype = bitPercentage + bitColorCorrect + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = abilityChannel,
-		uvoffset = 1 / 32,
+		uvoffset = 7,
 	},
 	stockpile = {
 		mincolor = {0.1, 0.1, 0.1, 1.0},
 		maxcolor = {0.1, 0.1, 0.1, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage, --bitIntegerNumber,
 		hidethreshold = 1.99,
-		uniformindex = stockpileChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 7 / 32, -- the X offset of the icon for this bar
+		uniformindex = stockpileChannel,
+		uvoffset = 8,
 	},
 	shield = {
 		mincolor = {0.15, 0.4, 0.4, 1.0},
 		maxcolor = {0.3, 0.8, 0.8, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = shieldChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 5 / 32, -- the X offset of the icon for this bar
+		uniformindex = shieldChannel,
+		uvoffset = 1,
 	},
 	capture = {
 		mincolor = {0.5, 0.25, 0.0, 1.0},
 		maxcolor = {1.0, 0.5, 0.0, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = captureChannel, -- if its >20, then its health/maxhealth
-		uvoffset = 3 / 32, -- the X offset of the icon for this bar
+		uniformindex = captureChannel,
+		uvoffset = 0,
 	},
 	featurehealth = {
 		mincolor = {0.25, 0.25, 0.25, 1.0},
 		maxcolor = {0.65, 0.65, 0.65, 1.0},
-		--bartype = 0,
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 33, -- if its >20, then its health/maxhealth
-		uvoffset = 2 / 32, -- the X offset of the icon for this bar
+		uniformindex = 33,
+		uvoffset = 3,
 	},
 	featurereclaim = {
 		mincolor = {0.00, 1.00, 0.00, 1.0},
@@ -385,8 +384,8 @@ local barTypeMap = {
 		--bartype = 0,
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 2, -- if its >20, then its health/maxhealth
-		uvoffset = 8 / 32, -- the X offset of the icon for this bar
+		uniformindex = 2,
+		uvoffset = 4,
 	},
 	featureresurrect = {
 		mincolor = {0.75, 0.15, 0.75, 1.0},
@@ -394,8 +393,8 @@ local barTypeMap = {
 		--bartype = 0,
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 1, -- if its >20, then its health/maxhealth
-		uvoffset = 4 / 32, -- the X offset of the icon for this bar
+		uniformindex = 1,
+		uvoffset = 5,
 	},
 }
 
@@ -406,7 +405,7 @@ for barname, bt in pairs(barTypeMap) do
 	--cache[1] = unitDefHeights[unitDefID] + additionalheightaboveunit * effectiveScale  -- height
 	--cache[2] = sizeModifier
 	cache[3] = 1 -- range 
-	cache[4] = bt.uvoffset -- glyph uv offset
+	cache[4] = tonumber(bt.uvoffset) -- glyph uv offset
 
 	cache[5] = bt.bartype -- bartype int
 	--cache[6] = unitBars[unitID] - 1   -- bar index (how manyeth per unit)
