@@ -268,7 +268,8 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 		local w = state.weapon[i]
 		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
 		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
-		if speedFactor <= 0 then
+		local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
+		if moddedSpeed <= 0 then
 			if not unitReloadPaused[unitID] then
 				local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
 				unitReloadPaused[unitID] = unitDefID
@@ -286,7 +287,6 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				unitReloadPaused[unitID] = nil
 				spSetUnitRulesParam(unitID, "reloadPaused", 0, INLOS_ACCESS)
 			end
-			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
 			local newReload = w.reload/moddedSpeed
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 			-- Add HALF_FRAME to round reloadTime to the closest discrete frame (multiple of 1/30), since the the engine rounds DOWN
