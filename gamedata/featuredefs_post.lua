@@ -23,6 +23,16 @@ local function isstring(x) return (type(x) == 'string')  end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+--[[ This lets mutators add a bit of featuredefs_post processing without
+     losing access to future gameside updates to featuredefs_post. ]]
+local MODSIDE_POSTS_FILEPATH = 'gamedata/featuredefs_mod.lua'
+if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS.GAME) then
+	VFS.Include(MODSIDE_POSTS_FILEPATH, nil, VFS.GAME)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local mapMetalMult           = 1
 local EMPTY_TABLE            = {}
 

@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if VFS.FileExists("mission.lua") then
+if VFS.FileExists("mission.lua") or GG.MOD_MISSION then
   -- stats are meaningless in missions
   return
 end

@@ -45,7 +45,7 @@ local Button
 
 local vsx, vsy = Spring.GetViewGeometry()
 local modoptions = Spring.GetModOptions() --used in LuaUI\Configs\startup_info_selector.lua for planetwars
-local campaignBattleID = modoptions.singleplayercampaignbattleid
+local isMission = (modoptions.singleplayercampaignbattleid or Spring.GetGameRulesParam("is_mod_mission") == 1)
 local fixedStartPos = modoptions.fixedstartpos
 local selectorShown = false
 local mainWindow
@@ -483,7 +483,7 @@ function widget:Initialize()
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
 	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
-	if teamInfo and teamInfo.staticcomm then
+	if (teamInfo and teamInfo.staticcomm) or isMission then
 		wantClose = true
 		return
 	end
@@ -557,7 +557,7 @@ function widget:Update(dt)
 		end
 	end
 	
-	if startPosTimer and options.cameraZoom.value and (not campaignBattleID) then
+	if startPosTimer and options.cameraZoom.value and (not isMission) then
 		startPosTimer = startPosTimer + dt
 		if Spring.GetGameFrame() <= 0 then
 			if startPosTimer > 0.1 then
