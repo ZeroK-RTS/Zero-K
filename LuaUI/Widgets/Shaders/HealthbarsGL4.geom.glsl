@@ -259,9 +259,10 @@ void main(){
 
 	// EMIT GLYPH
 	depthbuffermod = -0.002;
+	float drawPos = -BARWIDTH - BARCORNER;
 	emitRectangle(
-		vec4(-BARWIDTH - BARCORNER - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
-		vec4(-BARWIDTH - BARCORNER - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
 		0.0,
 		1.0,
 		vec4(
@@ -272,56 +273,81 @@ void main(){
 		vec4(1,1,1,1),
 		vec4(1,1,1,1)
 	);
-
-return;
-
-	// try to emit text?
-
-	if (GLYPHALPHA < MINALPHA) return; // dont display glyphs below 50% transparency
-
-	if (skipGlyphsNumbers > 1.5) return;
-
-	float currentglyphpos = 1.0;
-
-	if (skipGlyphsNumbers < 0.5 ){
-		if ((BARTYPE & BITSHOWGLYPH) > 0u){
-			emitGlyph(vec2(- BARWIDTH - currentglyphpos * BARHEIGHT , 0), vec2(ATLASSTEPX, UVOFFSET), vec2(ATLASSTEPX, ATLASSTEPY));	//glyph icon
-		}
-	}else{
-		currentglyphpos = 0.0;
+	drawPos -= BARHEIGHT;
+	float ones;
+	float tens;
+	float hundrends;
+	float glyphpctsecatlas;
+	if (duration != -1){ //display time
+		ones = abs(floor(mod(duration, 10.0)));
+		tens = abs(floor(mod(duration*0.1, 10.0)));
+		hundrends = abs(floor(mod(duration*0.01, 10.0)));
+		glyphpctsecatlas = 0.0; // seconds
+	} else {
+		ones = floor(mod(health*100.0, 10.0));
+		tens = floor(mod(health*10.0, 10.0));
+		hundrends = floor(mod(health, 10.0));
+		glyphpctsecatlas = 1.0; // percent
 	}
 
-	if ((BARTYPE & BITINTEGERNUMBER) > 0u){ // STOCKPILE FONTS THEN EH? xx/yy
-		vec4 numbers = vec4(numStockpiled, numStockpiled, numStockpileQueued, numStockpileQueued);
-		numbers = numbers * vec4(1.0, 0.1, 1.0, 0.1);
-		numbers = floor(mod(numbers, 10.0)) * ATLASSTEPY;
-		float glyphpctsecatlas = 11 * ATLASSTEPY; // TODO: slash sign in texture
-		// go right to left
-
-		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 1.0) * BARHEIGHT  , 0), vec2(0, numbers.x ), vec2(ATLASSTEPX, ATLASSTEPY)); // lsb of numqueued
-		if (numbers.y > 0 ){
-			emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 2.0) * BARHEIGHT + BARHEIGHT * 0.4 , 0), vec2(0, numbers.y ), vec2(ATLASSTEPX, ATLASSTEPY)); // msb of numqueued
-		}
+	emitRectangle(
+		vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		0.0,
+		1.0,
+		vec4(
+			(64.0 * glyphpctsecatlas) / 2048.0,
+			16 / 1024.0,
+			64.0 / 2048.0,
+			64.0 / 1024.0),
+		vec4(1,1,1,1),
+		vec4(1,1,1,1)
+	);
+	drawPos -= BARHEIGHT * 0.8;
+	emitRectangle(
+		vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+		0.0,
+		1.0,
+		vec4(
+			(64.0 * (11 - ones)) / 2048.0,
+			16 / 1024.0,
+			64.0 / 2048.0,
+			64.0 / 1024.0),
+		vec4(1,1,1,1),
+		vec4(1,1,1,1)
+	);
+	drawPos -= BARHEIGHT * 0.8;
+	if (tens != 0 || hundrends != 0) {
+		emitRectangle(
+			vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+			vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+			0.0,
+			1.0,
+			vec4(
+				(64.0 * (11 - tens)) / 2048.0,
+				16 / 1024.0,
+				64.0 / 2048.0,
+				64.0 / 1024.0),
+			vec4(1,1,1,1),
+			vec4(1,1,1,1)
+		);
+	}
+	drawPos -= BARHEIGHT * 0.8;
+	if (hundrends != 0) {
+		emitRectangle(
+			vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+			vec4(drawPos - BARHEIGHT, 0, BARHEIGHT, BARHEIGHT),
+			0.0,
+			1.0,
+			vec4(
+				(64.0 * (11 - hundrends)) / 2048.0,
+				16 / 1024.0,
+				64.0 / 2048.0,
+				64.0 / 1024.0),
+			vec4(1,1,1,1),
+			vec4(1,1,1,1)
+		);
 	}
 
-	if ((BARTYPE & (BITTIMELEFT | BITPERCENTAGE))  > 0u){
-		float lsb ;
-		float msb ;
-		float glyphpctsecatlas;
-		if (duration != -1){ //display time
-		//if ((BARTYPE & BITTIMELEFT) > 0u){ //display time
-			lsb = abs(floor(mod(duration, 10.0)));
-			msb = abs( floor(mod(duration*0.1, 10.0)));
-			glyphpctsecatlas = 14.0; // seconds
-		}else{
-			lsb = floor(mod(health*100.0, 10.0));
-			msb = floor(mod(health*10.0, 10.0));
-			glyphpctsecatlas = 11.0; // percent
-		}
-		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 1.0) * BARHEIGHT , 0), vec2(0, glyphpctsecatlas * ATLASSTEPY), vec2(ATLASSTEPX, ATLASSTEPY)); // %
-		emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 2.0) * BARHEIGHT + BARHEIGHT * 0.2 , 0), vec2(0,  lsb * ATLASSTEPY ), vec2(ATLASSTEPX, ATLASSTEPY)); // lsb
-		if (msb > 0){
-			emitGlyph(vec2(-BARWIDTH - (currentglyphpos + 3.0) * BARHEIGHT + BARHEIGHT * 0.5 , 0), vec2(0,  msb * ATLASSTEPY), vec2(ATLASSTEPX, ATLASSTEPY)); //msb
-		}
-	}
 }
