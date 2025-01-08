@@ -95,7 +95,7 @@ end
 --------------------------------------------------------------------------------
 -- Mission Handling
 
-if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
+if VFS.FileExists("mission.lua") or GG.MOD_MISSION then -- this is a mission, we just want to set starting storage (and enable facplopping)
 	function gadget:Initialize()
 		for _, teamID in ipairs(Spring.GetTeamList()) do
 			Spring.SetTeamResource(teamID, "es", START_STORAGE + HIDDEN_STORAGE)
