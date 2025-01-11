@@ -214,7 +214,7 @@ local factoryUnitPosDef = {
 		jumpbomb          = unitTypes.SPECIAL,
 	},
 	factorytank = {
-		tankcon           = unitTypes. CONSTRUCTOR,
+		tankcon           = unitTypes.CONSTRUCTOR,
 		tankraid          = unitTypes.WEIRD_RAIDER,
 		tankheavyraid     = unitTypes.RAIDER,
 		tankriot          = unitTypes.RIOT,
@@ -260,6 +260,14 @@ local factoryUnitPosDef = {
 		gunshipheavytrans = unitTypes.UTILITY,
 	},
 }
+
+local modFactoryUnitPosDef = VFS.Include("LuaRules/Configs/modFactoryPosDefs.lua")
+Spring.Utilities.TableEcho(modFactoryUnitPosDef, "modFactoryUnitPosDef")
+if modFactoryUnitPosDef then
+	for k, v in pairs(modFactoryUnitPosDef) do
+		factoryUnitPosDef[k] = v
+	end
+end
 
 -- Factory plates copy their parents.
 factoryUnitPosDef.platecloak   = Spring.Utilities.CopyTable(factoryUnitPosDef.factorycloak)
@@ -353,9 +361,16 @@ local special_commands = {
 --------------------------------------------------------------------------------
 
 local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
-for i = 1, #modCommands do
-	local cmd = modCommands[i]
-	cmdPosDef[cmd.cmdID] = cmd.position
+if modCommands then
+	for i = 1, #modCommands do
+		local cmd = modCommands[i]
+		cmdPosDef[cmd.cmdID] = cmd.position
+	end
+end
+
+local modBuildList = VFS.Include("LuaRules/Configs/modBuildListFunc.lua")
+if modBuildList then
+	factory_commands, econ_commands, defense_commands, special_commands = modBuildList(factory_commands, econ_commands, defense_commands, special_commands)
 end
 
 --------------------------------------------------------------------------------
