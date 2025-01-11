@@ -99,71 +99,9 @@ void emitRectangle(vec4 destination, vec4 corners, float corner_radius, float us
        EndPrimitive();
 }
 
-void emitVertexBG(in vec2 pos){
-	g_uv.xy = vec2(0.0,0.0);
-	vec3 primitiveCoords = vec3(pos.x,0.0,pos.y - zoffset) * BARSCALE *sizeMultiplier;
-	gl_Position = cameraViewProj * vec4(centerpos.xyz + rotY * ( primitiveCoords ), 1.0);
-	gl_Position.z += depthbuffermod;
-	g_uv.z = 0.0; // this tells us to use color
-	float extracolor = 0.0;
-	if ((duration != -1) && (mod(timeInfo.x, 10.0) > 4.0)){
-		extracolor = 0.5;
-	}
-	g_color = mix(BGBOTTOMCOLOR + extracolor, BGTOPCOLOR + extracolor, pos.y);
-	g_color.a *= dataIn[0].v_parameters.y; // blend with bar fade alpha
-       g_rect = vec4(-1, -1, 2, 2);
-
-       g_loc = vec2(0,0);
-       g_corner_radius = 0;
-
-	EmitVertex();
-}
-
-void emitVertexBarBG(in vec2 pos, in vec4 botcolor, in float bartextureoffset){
-	g_uv.x =  pos.x * 1.0/ (2.0 * (BARWIDTH - BARCORNER)); // map U to [-1, 1] x [0,1]
-	g_uv.x = g_uv.x + 0.5; // map UVS to [0,1]x[0,1]
-	g_uv.y = (pos.y - BARCORNER) / (BARHEIGHT - 2 * BARCORNER);
-	vec2 uv01 = g_uv.xy*3.0;
-	g_uv.xy = g_uv.xy * vec2(ATLASSTEPX * 9, ATLASSTEPY) + vec2(3 * ATLASSTEPX, bartextureoffset); // map uvs to the bar texture
-	g_uv.y = -1.0 * g_uv.y;
-	//vec3 primitiveCoords = vec3( (pos.x - sign(pos.x) * BARCORNER),0.0, (pos.y - sign(pos.y - 0.5) * BARCORNER - zoffset)) * BARSCALE;
-	vec3 primitiveCoords = vec3( pos.x,0.0, pos.y - zoffset) * BARSCALE *sizeMultiplier;
-	gl_Position = cameraViewProj * vec4(centerpos.xyz + rotY * ( primitiveCoords ), 1.0);
-	gl_Position.z += depthbuffermod;
-	g_uv.z = clamp(10000 * bartextureoffset, 0, 1); // this tells us to use color if we are using bartextureoffset
-	g_color = botcolor;
-	//g_color = vec4(g_uv.x, g_uv.y, 0.0, 1.0);
-	g_color.a *= dataIn[0].v_parameters.y; // blend with bar fade alpha
-	//g_color.a = 1.0;
-	//	g_uv.y -= ATLASSTEPY * 8;
-	EmitVertex();
-}
-void emitVertexGlyph(in vec2 pos, in vec2 uv){
-	g_uv.xy = vec2(uv.x, 1.0 - uv.y);
-	vec3 primitiveCoords = vec3(pos.x,0.0,pos.y - zoffset) * BARSCALE *sizeMultiplier;
-	gl_Position = cameraViewProj * vec4(centerpos.xyz + rotY * ( primitiveCoords ), 1.0);
-	g_uv.z = 1.0; // this tells us to use texture
-	g_color = vec4(1.0);
-	g_color.a *= dataIn[0].v_parameters.z; // blend with text/icon fade alpha
-       g_rect = vec4(-1, -1, 2, 2);
-       g_corner_radius = 0;
-       g_loc = vec2(0,0);
-	EmitVertex();
-}
-
-void emitGlyph(vec2 bottomleft, vec2 uvbottomleft, vec2 uvsizes){
-	#define GROWSIZE 0.2
-	emitVertexGlyph(vec2(bottomleft.x, bottomleft.y), vec2(uvbottomleft.x + HALFPIXEL, uvbottomleft.y + HALFPIXEL));
-	emitVertexGlyph(vec2(bottomleft.x, bottomleft.y + BARHEIGHT), vec2(uvbottomleft.x + HALFPIXEL, uvbottomleft.y + uvsizes.y - HALFPIXEL));
-	emitVertexGlyph(vec2(bottomleft.x + BARHEIGHT, bottomleft.y), vec2(uvbottomleft.x + uvsizes.x - HALFPIXEL, uvbottomleft.y + HALFPIXEL));
-	emitVertexGlyph(vec2(bottomleft.x + BARHEIGHT, bottomleft.y + BARHEIGHT), vec2(uvbottomleft.x + uvsizes.x -HALFPIXEL, uvbottomleft.y + uvsizes.y-HALFPIXEL));
-	EndPrimitive();
-}
-
-
 #line 22000
 void main(){
-	zoffset =  1.15 * BARHEIGHT *  float(dataIn[0].v_bartype_index_ssboloc.y);
+	zoffset =  -1.15 * BARHEIGHT *  float(dataIn[0].v_bartype_index_ssboloc.y);
 
 	centerpos = dataIn[0].v_centerpos;
 
@@ -192,14 +130,6 @@ void main(){
 		numStockpiled = uint(floor( mod (oldhealth, 128)));
 		numStockpileQueued = uint(floor(oldhealth/128));
 	}
-
-	//EMIT BAR BACKGROUND!
-	//     /-4----------6-\
-	//   2 |              | 8
-	//     |              |
-	//   1 |              | 7
-	//     \-3----------5-/
-	//start in bottom leftmost of this shit.
 
 	depthbuffermod = 0.001;
 	float extraColor = 0.0;

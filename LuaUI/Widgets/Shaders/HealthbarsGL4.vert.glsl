@@ -77,6 +77,30 @@ bool vertexClipped(vec4 clipspace, float tolerance) {
 #define BITFRAMETIME 64u
 #define BITCOLORCORRECT 128u
 
+float valueForChannel(uint channel) {
+	float value;
+	if (channel == 20u) {
+		value = 1 - UNITUNIFORMS.health / UNITUNIFORMS.maxHealth;
+	} else if (channel > 15) {
+		return 0;
+	} else {
+	        value = UNITUNIFORMS.userDefined[channel / 4][channel % 4];
+	        if (value < 0) { // if value is < 0, it is in relationshiop to timeInfo or gameTime.
+			value = -value - timeInfo.x;
+			value = max(0, value);
+		}
+
+	        value = value.x / range;
+	}
+
+	return value;
+}
+
+bool isVarForChannelVisible(uint channel) {
+	float value = valueForChannel(channel);
+	return value > 0.01;
+}
+
 void main()
 {
 	vec4 drawPos = vec4(UNITUNIFORMS.drawPos.xyz, 1.0); // Models world pos and heading (.w) . Changed to use always available drawpos instead of model matrix.
@@ -85,7 +109,10 @@ void main()
 
 	v_centerpos = drawPos; // We are going to pass the centerpoint to the GS
 	v_numvertices = 4u;
-	if (vertexClipped(gl_Position, CLIPTOLERANCE)) v_numvertices = 0; // Make no primitives on stuff outside of screen
+	if (vertexClipped(gl_Position, CLIPTOLERANCE) || !isVarForChannelVisible(UNIFORMLOC)) {
+		v_numvertices = 0; // Make no primitives on stuff outside of screen
+		return;
+	}
 
 	// this sets the num prims to 0 for units further from cam than iconDistance
 	float cameraDistance = length((cameraViewInv[3]).xyz - v_centerpos.xyz);
@@ -121,20 +148,16 @@ void main()
 
 
 	v_bartype_index_ssboloc = bartype_index_ssboloc;
-	if (UNIFORMLOC < 20u) {
-	        v_parameters.x = UNITUNIFORMS.userDefined[0][bartype_index_ssboloc.z];
 
-		if ((BARTYPE & BITFRAMETIME) != 0u) {
-			v_parameters.x = v_parameters.x - timeInfo.x;
-			v_parameters.x = max(0, v_parameters.x);
+	v_bartype_index_ssboloc.y = 0;
+
+	for(uint channel = 0; channel < UNIFORMLOC -1; channel++) {
+		if (isVarForChannelVisible(channel)) {
+			v_bartype_index_ssboloc.y += 1;
 		}
-
-	        v_parameters.x = v_parameters.x / range;
-
-	} else {
-		v_parameters.x = UNITUNIFORMS.health / UNITUNIFORMS.maxHealth;
 	}
 
+	v_parameters.x = valueForChannel(UNIFORMLOC);
 	if ((BARTYPE & BITINVERSE) != 0u) {
 		v_parameters.x = 1 - v_parameters.x;
 	}

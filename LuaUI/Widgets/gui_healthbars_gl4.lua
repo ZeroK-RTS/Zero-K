@@ -195,7 +195,7 @@ local bitInverse = 32
 local bitFrameTime = 64
 local bitColorCorrect = 128
 
-local healthChannel = 32 -- if its >20, then its health/maxhealth
+local healthChannel = 20 -- if its =20, then its health/maxhealth
 local buildChannel = 1
 local morphChannel = 0
 local paralyzeChannel = 2
@@ -221,7 +221,7 @@ local barTypeMap = {
 	health = {
 		mincolor = {1.0, 0.0, 0.0, 1.0},
 		maxcolor = {0.0, 1.0, 0.0, 1.0},
-		bartype = bitPercentage + bitColorCorrect,
+		bartype = bitPercentage + bitColorCorrect + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = healthChannel,
 		uvoffset = 18,
@@ -237,7 +237,7 @@ local barTypeMap = {
 	build = {
 		mincolor = {1.0, 1.0, 1.0, 1.0},
 		maxcolor = {1.0, 1.0, 1.0, 1.0},
-		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitInverse,
 		hidethreshold = 0.999,
 		uniformindex = buildChannel,
 		uvoffset = 2,
@@ -726,6 +726,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local uniformcache = {0.0}
+
 local function addBarForUnit(unitID, unitDefID, barname, reason, range)
 	if barname == "captureReload" then Spring.Echo("XXX" .. range) end
 	if debugmode then Spring.Debug.TraceEcho(unitBars[unitID]) end
@@ -775,8 +777,6 @@ local function addBarForUnit(unitID, unitDefID, barname, reason, range)
 		-- we are returning here, to sign successful adds
 end
 
-local uniformcache = {0.0}
-
 local function removeBarFromUnit(unitID, barname, reason) -- this will bite me in the ass later, im sure, yes it did, we need to just update them :P
 	local instanceKey = unitID .. "_" .. barname
 	if healthBarVBO.instanceIDtoIndex[instanceKey] then
@@ -795,6 +795,11 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	if unitDefID == nil or Spring.ValidUnitID(unitID) == false or Spring.GetUnitIsDead(unitID) == true then
 		if debugmode then Spring.Echo("Tried to add a bar to a dead or invalid unit", unitID, "at", Spring.GetUnitPosition(unitID), reason) end
 		return
+	end
+
+	uniformcache[1] = 0
+	for channels = 0, 15, 1 do
+		gl.SetUnitBufferUniforms(unitID, uniformcache, channels)
 	end
 
 	unitBars[unitID] = unitBars[unitID] or 0
@@ -1357,7 +1362,7 @@ function widget:GameFrame(gameFrame)
 			--// BUILD
 			if unitBuildWatch[unitID] ~= build then
 				unitBuildWatch[unitID] = build
-				uniformcache[1] = build
+				uniformcache[1] = 1-build
 				gl.SetUnitBufferUniforms(unitID, uniformcache, buildChannel)
 			end
 
@@ -1447,7 +1452,7 @@ function widget:GameFrame(gameFrame)
 
 			if oldReload ~= reload then
 				unitReloadWatch[unitID] = reload
-				uniformcache[1] = reload 
+				uniformcache[1] = -reload 
 				gl.SetUnitBufferUniforms(unitID, uniformcache, reloadChannel)
 			end
 		end
@@ -1462,7 +1467,7 @@ function widget:GameFrame(gameFrame)
 
 			if oldReload ~= reload then
 				unitDgunWatch[unitID] = reload
-				uniformcache[1] = reload 
+				uniformcache[1] = -reload 
 				gl.SetUnitBufferUniforms(unitID, uniformcache, dgunChannel)
 			end
 		end
@@ -1483,7 +1488,7 @@ function widget:GameFrame(gameFrame)
 
 			if oldReload ~= reload then
 				unitScriptReloadWatch[unitID] = reload
-				uniformcache[1] = reload 
+				uniformcache[1] = -reload 
 				gl.SetUnitBufferUniforms(unitID, uniformcache, reloadChannel)
 			end
                 end
@@ -1567,7 +1572,7 @@ function widget:GameFrame(gameFrame)
 
 				if oldCaptureReload ~= captureReload then
 					unitCaptureReloadWatch[unitID] = captureReload
-					uniformcache[1] = captureReload
+					uniformcache[1] = -captureReload
 					gl.SetUnitBufferUniforms(unitID, uniformcache, captureReloadChannel)
 				end
 			end
