@@ -61,6 +61,7 @@ local function GetMass(health, cost)
 	return (((cost/2) + (health/8))^0.6)*6.5
 end
 
+GG.att_LastChangeFrame = {}
 GG.att_CostMult = {}
 GG.att_HealthMult = {}
 GG.att_EconomyChange = {}
@@ -498,6 +499,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	currentSetJammer[unitID] = nil
 	currentSetSight[unitID] = nil
 	
+	GG.att_LastChangeFrame[unitID] = nil
 	GG.att_CostMult[unitID] = nil
 	GG.att_HealthMult[unitID] = nil
 	GG.att_EconomyChange[unitID] = nil
@@ -524,6 +526,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	local frame = spGetGameFrame()
+	GG.att_LastChangeFrame[unitID] = frame
 	
 	local healthAdd = 0
 	local healthMult = 1
