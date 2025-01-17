@@ -418,7 +418,7 @@ local function DoPeriodicBonusObjectiveUpdate(gameSeconds)
 	--DebugPrintBonusObjective()
 end
 
-local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID, isCapture)
+local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID, isCapture, isPlayerAiAlly)
 	if gameIsOver then
 		return
 	end
@@ -427,6 +427,9 @@ local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID, isCap
 		return
 	end
 	if isCapture and not objectiveData.capturedUnitsSatisfy then
+		return
+	end
+	if isPlayerAiAlly and not objectiveData.alliedUnitsSatisfy then
 		return
 	end
 	objectiveData.units = objectiveData.units or {}
@@ -502,12 +505,12 @@ local function InitializeBonusObjectives()
 	end
 end
 
-local function AddUnitToBonusObjectiveList(unitID, objectiveList, isCapture)
+local function AddUnitToBonusObjectiveList(unitID, objectiveList, isCapture, isPlayerAiAlly)
 	if not objectiveList then
 		return
 	end
 	for i = 1, #objectiveList do
-		AddBonusObjectiveUnit(unitID, objectiveList[i], nil, isCapture)
+		AddBonusObjectiveUnit(unitID, objectiveList[i], nil, isCapture, isPlayerAiAlly)
 	end
 end
 
@@ -521,10 +524,12 @@ local function RemoveUnitFromBonusObjectiveList(unitID, objectiveList)
 end
 
 local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID, isCapture)
-	if teamID == PLAYER_TEAM_ID then
-		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID], isCapture)
-	elseif Spring.GetUnitAllyTeam(unitID) ~= PLAYER_ALLY_TEAM_ID then
-		AddUnitToBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID], isCapture)
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	if allyTeamID == PLAYER_ALLY_TEAM_ID then
+		local isPlayerAiAlly = teamID ~= PLAYER_TEAM_ID
+		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID], isCapture, isPlayerAiAlly)
+	else
+		AddUnitToBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID], isCapture, false)
 	end
 end
 
