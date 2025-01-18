@@ -71,6 +71,7 @@ GG.att_RangeChange = {}
 GG.att_JumpRangeChange = {}
 GG.att_ProjSpeed = {}
 GG.att_ProjMult = {}
+GG.att_DamageMult = {}
 GG.att_RegenChange = {}
 GG.att_ShieldRegenChange = {}
 GG.att_ShieldMaxMult = {}
@@ -228,7 +229,7 @@ local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, projSpeedFactor, projectilesFactor, minSpray, gameFrame)
+local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, projSpeedFactor, projectilesFactor, damageFactor, minSpray, gameFrame)
 	if not origUnitWeapons[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 	
@@ -249,7 +250,17 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				oldReloadFrames = floor(reload*Game.gameSpeed),
 				range = wd.range,
 				sprayAngle = wd.sprayAngle,
+				damages = GG.ATT_ENABLE_DAMAGE and {},
 			}
+			if GG.ATT_ENABLE_DAMAGE then
+				local did = 0
+				local data = state.weapon[i].damages
+				while wd.damages[did] do
+					data[did] = wd.damages[did]
+					did = did + 1
+				end
+			end
+			
 			if wd.type == "LaserCannon" or wd.type == "Cannon" then
 				-- Barely works for missiles, and might break their burnblow and prediction
 				state.weapon[i].projectileSpeed = wd.projectilespeed
@@ -259,7 +270,9 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				state.weapon[i].burstRate = false
 			end
 		end
-		
+	end
+	if damageFactor ~= 1 and not GG.ATT_ENABLE_DAMAGE then
+		Spring.Utilities.UnitEcho(unitID, "damage attribute requires GG.ATT_ENABLE_DAMAGE")
 	end
 	
 	local state = origUnitWeapons[unitDefID]
@@ -313,6 +326,16 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
 		if maxRangeModified < moddedRange then
 			maxRangeModified = moddedRange
+		end
+		if GG.ATT_ENABLE_DAMAGE then
+			local did = 0
+			local data = state.weapon[i].damages
+			local toSet = {}
+			while data[did] do
+				toSet[did] = data[did] * damageFactor
+				did = did + 1
+			end
+			spSetUnitWeaponDamages(unitID, i, toSet)
 		end
 	end
 	
@@ -461,6 +484,7 @@ local currentEnergy = {}
 local currentBuildpower = {}
 local currentCost = {}
 local currentProjectiles = {}
+local currentDamage = {}
 local currentMinSpray = {}
 local currentShieldDisabled = {}
 local currentAbilityDisabled = {}
@@ -489,6 +513,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	currentBuildpower[unitID] = nil
 	currentCost[unitID] = nil
 	currentProjectiles[unitID] = nil
+	currentDamage[unitID] = nil
 	currentMinSpray[unitID] = nil
 	currentShieldDisabled[unitID] = nil
 	currentAbilityDisabled[unitID] = nil
@@ -509,6 +534,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	GG.att_JumpRangeChange[unitID] = nil
 	GG.att_ProjSpeed[unitID] = nil
 	GG.att_ProjMult[unitID] = nil
+	GG.att_DamageMult[unitID] = nil
 	GG.att_RegenChange[unitID] = nil
 	GG.att_ShieldRegenChange[unitID] = nil
 	GG.att_StaticBuildRateMult[unitID] = nil
@@ -547,6 +573,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local buildMult = 1
 	local senseMult = 1
 	local projectilesMult = 1
+	local damageMult = 1
 	local minSpray = 0
 	local abilityDisabled = false
 	local shieldDisabled = false
@@ -610,17 +637,20 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 					rangeMult = 1,
 					projSpeedMult = 1,
 					projectilesMult = 1,
+					damageMult = 1,
 				}
 				local wepData = weaponSpecificMods[weaponNum]
 				wepData.reloadMult = wepData.reloadMult*(data.reload and data.reload[unitID] or 1)
 				wepData.rangeMult = wepData.rangeMult*(data.range and data.range[unitID] or 1)
 				wepData.projSpeedMult = wepData.projSpeedMult*(data.projSpeed and data.projSpeed[unitID] or 1)
 				wepData.projectilesMult = wepData.projectilesMult*(data.projectiles and data.projectiles[unitID] or 1)
+				wepData.damageMult = wepData.damageMult*(data.damage and data.damage[unitID] or 1)
 			else
 				reloadMult = reloadMult*(data.reload and data.reload[unitID] or 1)
 				rangeMult = rangeMult*(data.range and data.range[unitID] or 1)
 				projSpeedMult = projSpeedMult*(data.projSpeed and data.projSpeed[unitID] or 1)
 				projectilesMult = projectilesMult*(data.projectiles and data.projectiles[unitID] or 1)
+				damageMult = damageMult*(data.damage and data.damage[unitID] or 1)
 			end
 		end
 	end
@@ -631,6 +661,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "projectilesMult", projectilesMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "damageMult", damageMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "rangeMult", rangeMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "jumpRangeMult", jumpRangeMult, INLOS_ACCESS)
 	
@@ -656,6 +687,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	GG.att_StaticBuildRateMult[unitID] = staticBuildpowerMult
 	GG.att_ProjSpeed[unitID] = projSpeedMult -- Ignores weapon mods
 	GG.att_ProjMult[unitID] = projectilesMult
+	GG.att_DamageMult[unitID] = damageMult
 	
 	unitSlowed[unitID] = moveMult < 1
 	
@@ -665,6 +697,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local weaponChanges = (currentReload[unitID] or 1) ~= reloadMult
 		or (currentRange[unitID] or 1) ~= rangeMult
 		or (currentProjectiles[unitID] or 1) ~= projectilesMult
+		or (currentDamage[unitID] or 1) ~= damageMult
 		or (currentMinSpray[unitID] or 0) ~= minSpray
 	
 	local moveChanges = (currentMove[unitID] or 1) ~= moveMult
@@ -695,11 +728,12 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	if weaponSpecificMods or weaponChanges then
-		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, projSpeedMult, projectilesMult, minSpray, frame)
+		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, projSpeedMult, projectilesMult, damageMult, minSpray, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
 		currentProjSpeed[unitID] = projSpeedMult
 		currentProjectiles[unitID] = projectilesMult
+		currentDamage[unitID] = damageMult
 		currentMinSpray[unitID] = minSpray
 	end
 	
@@ -775,6 +809,7 @@ local attributeNames = {
 	"setJammer",
 	"setSight",
 	"projectiles",
+	"damage", -- Enabled by setting GG.ATT_ENABLE_DAMAGE = true
 	"weaponNum",
 	"minSpray",
 	"abilityDisabled",
