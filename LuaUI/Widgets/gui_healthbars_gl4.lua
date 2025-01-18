@@ -408,7 +408,7 @@ for barname, bt in pairs(barTypeMap) do
 	cache[4] = tonumber(bt.uvoffset) -- glyph uv offset
 
 	cache[5] = bt.bartype -- bartype int
-	--cache[6] = unitBars[unitID] - 1   -- bar index (how manyeth per unit)
+	--cache[6] = 0.0 -- unused
 	cache[7] = bt.uniformindex -- ssbo location offset (> 20 for health)
 	--cache[8] = 0.0 -- unused
 
@@ -462,8 +462,6 @@ local unitDefHasSpeed = {}
 local unitDefHasReammo = {}
 local unitDefHasCaptureReload = {}
 local unitDefHasTeleport = {}
-
-local unitBars = {} -- we need this additional table of {[unitID] = {barhealth, barrez, barreclaim}}
 
 local unitHealthWatch = {}
 local unitBuildWatch = {}
@@ -730,7 +728,6 @@ local uniformcache = {0.0}
 
 local function addBarForUnit(unitID, unitDefID, barname, reason, range)
 	if barname == "captureReload" then Spring.Echo("XXX" .. range) end
-	if debugmode then Spring.Debug.TraceEcho(unitBars[unitID]) end
 
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 
@@ -745,7 +742,7 @@ local function addBarForUnit(unitID, unitDefID, barname, reason, range)
 	local instanceID = unitID .. '_' .. barname
 
 	if healthBarVBO.instanceIDtoIndex[instanceID] then
-		if debugmode then Spring.Echo("Trying to add duplicate bar", unitID, instanceID, barname, reason, unitBars[unitID]) end
+		if debugmode then Spring.Echo("Trying to add duplicate bar", unitID, instanceID, barname, reason) end
 		return
 	end -- we already have this bar !
 
@@ -756,8 +753,6 @@ local function addBarForUnit(unitID, unitDefID, barname, reason, range)
 		return nil
 	end
 
-	unitBars[unitID] = (unitBars[unitID] or 0) + 1
-
 	local effectiveScale = ((variableBarSizes and unitDefSizeMultipliers[unitDefID]) or 1.0) * barScale
 	
 	local healthBarTableCache = bt.cache
@@ -765,7 +760,6 @@ local function addBarForUnit(unitID, unitDefID, barname, reason, range)
 	healthBarTableCache[1] = unitDefHeights[unitDefID] + additionalheightaboveunit * effectiveScale  -- height
 	healthBarTableCache[2] = effectiveScale
 	healthBarTableCache[3] = range or 1
-	healthBarTableCache[6] = unitBars[unitID]   -- bar index (how manyeth per unit)
 	
 	return pushElementInstance(
 		healthBarVBO, -- push into this Instance VBO Table
@@ -784,7 +778,6 @@ local function removeBarFromUnit(unitID, barname, reason) -- this will bite me i
 		--if barname == 'emp_damage' or barname == 'paralyze' then
 			-- dont decrease counter for these
 		--else
-			unitBars[unitID] = unitBars[unitID] - 1
 		--end
 		popElementInstance(healthBarVBO, instanceKey)
 	end
@@ -801,8 +794,6 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	for channels = 0, 15, 1 do
 		gl.SetUnitBufferUniforms(unitID, uniformcache, channels)
 	end
-
-	unitBars[unitID] = unitBars[unitID] or 0
 
 	-- This is optionally passed, and it only important in one edge case:
 	-- If a unit is captured and thus immediately become outside of LOS, then the getunitallyteam is still the old ally team according to getUnitAllyTEam, and not the new allyteam.
@@ -936,7 +927,6 @@ local function removeBarsFromUnit(unitID, reason)
 	unitStockpileWatch[unitID] = nil
 	unitShieldWatch[unitID] = nil
 	unitCaptureWatch[unitID] = nil
-	unitBars[unitID] = nil
 end
 
 local function addBarToFeature(featureID, barname)
@@ -1014,8 +1004,6 @@ local function init()
 	unitStockpileWatch = {}
 	unitShieldWatch = {}
 	unitCaptureWatch = {}
-
-	unitBars = {}
 
 	for i, unitID in ipairs(Spring.GetAllUnits()) do -- gets radar blips too!
 		-- probably shouldnt be adding non-visible units
@@ -1276,8 +1264,6 @@ function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
 	unitStockpileWatch = {}
 	unitShieldWatch = {}
 	unitCaptureWatch = {}
-
-	unitBars = {}
 
 	spec, fullview = Spring.GetSpectatingState()
 	myTeamID = Spring.GetMyTeamID()
