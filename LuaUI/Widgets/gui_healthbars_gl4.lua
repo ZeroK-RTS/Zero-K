@@ -949,7 +949,7 @@ local function addBarToFeature(featureID, barname)
 		targetVBO, -- push into this Instance VBO Table
 			{featureDefHeights[featureDefID] + additionalheightaboveunit,  -- height
 			1.0 * barScale, -- size mult
-			0, -- timer end
+			1.0, -- timer end
 			bt.uvoffset, -- unused float
 
 			bt.bartype, -- bartype int
