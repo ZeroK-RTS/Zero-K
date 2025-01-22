@@ -190,7 +190,7 @@ end
 local function RestoreTorsoAfterDelay(sleepTime)
 	local counter = (sleepTime or RESTORE_DELAY)
 	while true do
-		if counter > 0 then
+		if counter > 0  and not Spring.GetUnitIsStunned(unitID) then
 			counter = counter - 100
 		end
 		if resetRestoreTorso then
