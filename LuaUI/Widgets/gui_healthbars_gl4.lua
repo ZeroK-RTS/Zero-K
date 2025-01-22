@@ -197,7 +197,7 @@ local bitColorCorrect = 128
 
 local healthChannel = 20 -- if its =20, then its health/maxhealth
 local buildChannel = 1
-local morphChannel = 0
+local morphChannel = 10
 local paralyzeChannel = 2
 local disarmChannel = 3
 local slowChannel = 4
@@ -214,7 +214,7 @@ local abilityChannel = 7
 local stockpileChannel = 7
 local shieldChannel = 8
 local captureChannel = 9
-local reclaimChannel = 0
+local reclaimChannel = 2
 local resurrectChannel = 1
 
 local barTypeMap = {
@@ -375,25 +375,23 @@ local barTypeMap = {
 		maxcolor = {0.65, 0.65, 0.65, 1.0},
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 33,
-		uvoffset = 3,
+		uniformindex = healthChannel,
+		uvoffset = 18,
 	},
 	featurereclaim = {
 		mincolor = {0.00, 1.00, 0.00, 1.0},
 		maxcolor = {0.85, 1.00, 0.85, 1.0},
-		--bartype = 0,
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 2,
+		uniformindex = reclaimChannel,
 		uvoffset = 4,
 	},
 	featureresurrect = {
 		mincolor = {0.75, 0.15, 0.75, 1.0},
 		maxcolor = {1.0, 0.2, 1.0, 1.0},
-		--bartype = 0,
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 1,
+		uniformindex = resurrectChannel,
 		uvoffset = 5,
 	},
 }
@@ -490,9 +488,7 @@ local featureBars = {} -- we need this additional table of {[featureid] = {barhe
 local empDecline = 1 / Game.paralyzeDeclineRate
 local minReloadTime = 4 -- weapons reloading slower than this willget bars
 
-local featureHealthVBO
-local featureResurrectVBO
-local featureReclaimVBO
+local featureVBO
 
 local barScale = 1 -- Option 'healthbarsscale'
 local variableBarSizes = true -- Option 'healthbarsvariable'
@@ -711,10 +707,7 @@ local function initGL4()
 	if not healthBarShader then goodbye("Failed to compile health bars GL4 ") end
 
 	healthBarVBO = initializeInstanceVBOTable("healthBarVBO", false)
-
-	featureHealthVBO = initializeInstanceVBOTable("featureHealthVBO", true) -- we need separate ones for all feature health bars, as they seem to be
-	featureResurrectVBO = initializeInstanceVBOTable("featureResurrectVBO", true)
-	featureReclaimVBO = initializeInstanceVBOTable("featureReclaimVBO", true)
+	featureVBO = initializeInstanceVBOTable("featureVBO", true)
 
 	if debugmode then
 		healthBarVBO.debug = true
@@ -935,9 +928,7 @@ local function addBarToFeature(featureID, barname)
 
 	local bt = barTypeMap[barname]
 
-	local targetVBO = featureHealthVBO
-	if barname == 'featurereclaim' then targetVBO = featureReclaimVBO end
-	if barname == 'featureresurrect' then targetVBO = featureResurrectVBO end
+	targetVBO = featureVBO
 
 	if targetVBO.instanceIDtoIndex[featureID] then return end -- already exists, bail
 	if featureBars[featureID] == nil then
@@ -960,7 +951,7 @@ local function addBarToFeature(featureID, barname)
 			bt.mincolor[1], bt.mincolor[2], bt.mincolor[3], bt.mincolor[4],
 			bt.maxcolor[1], bt.maxcolor[2], bt.maxcolor[3], bt.maxcolor[4],
 			0, 0, 0, 0}, -- these are just padding zeros for instData, that will get filled in
-		featureID, -- this is the key inside the VBO Table, should be unique per unit
+		featureID .. "_" .. barname, -- this is the key inside the VBO Table, should be unique per unit
 		true, -- update existing element
 		nil, -- noupload, dont use unless you know what you want to batch push/pop
 		featureID) -- last one should be featureID!
@@ -977,9 +968,7 @@ local function removeBarFromFeature(featureID, targetVBO)
 end
 
 local function removeBarsFromFeature(featureID)
-	removeBarFromFeature(featureID, featureHealthVBO)
-	removeBarFromFeature(featureID, featureReclaimVBO)
-	removeBarFromFeature(featureID, featureResurrectVBO)
+	removeBarFromFeature(featureID, featureVBO)
 end
 
 local function init()
@@ -1024,9 +1013,7 @@ local function init()
 end
 
 local function initfeaturebars()
-	clearInstanceTable(featureHealthVBO)
-	clearInstanceTable(featureResurrectVBO)
-	clearInstanceTable(featureReclaimVBO)
+	clearInstanceTable(featureVBO)
 	local gameFrame = Spring.GetGameFrame()
 	for i, featureID in ipairs(Spring.GetAllFeatures()) do
 		local featureDefID = Spring.GetFeatureDefID(featureID)
@@ -1073,8 +1060,6 @@ local function FeatureReclaimStartedHealthbars (featureID, step) -- step is nega
 	--Spring.Echo("FeatureReclaimStartedHealthbars", featureID)
 
     --gl.SetFeatureBufferUniforms(featureID, 0.5, 2) -- update GL
-	if step > 0 then addBarToFeature(featureID, 'featureresurrect')
-	else addBarToFeature(featureID, 'featurereclaim') end
 end
 
 local function UnitCaptureStartedHealthbars(unitID, step) -- step is negative for reclaim, positive for resurrect
@@ -1314,7 +1299,6 @@ function widget:GameFrame(gameFrame)
 
 	if debugmode then
 		locateInvalidUnits(healthBarVBO)
-		locateInvalidUnits(featureHealthVBO)
 	end
 	--[[ TODO:
         unitMorphWatch[unitID] = nil
@@ -1583,40 +1567,13 @@ function widget:GameFrame(gameFrame)
 	end
 end
 
-local rezreclaim = {0.0, 1.0}
 function widget:FeatureCreated(featureID)
-	local featureDefID = Spring.GetFeatureDefID(featureID)
-	local gameFrame = Spring.GetGameFrame()
 	-- some map-supplied features dont have a model, in these cases modelpath == ""
+	local featureDefID = Spring.GetFeatureDefID(featureID)
 	if FeatureDefs[featureDefID].name ~= 'geovent' and FeatureDefs[featureDefID].modelpath ~= ''  then
-		--Spring.Echo(FeatureDefs[featureDefID].name)
-		--featureBars[featureID] = 0 -- this is already done in AddBarToFeature
-
-		local health,maxhealth,rezProgress = Spring.GetFeatureHealth(featureID)
-
-		if gameFrame > 0 then
-			addBarToFeature(featureID, 'featurehealth')
-		else
-			if health ~= maxhealth then addBarToFeature(featureID, 'featurehealth') end
-		end
-
-		if rezProgress > 0 then
-			addBarToFeature(featureID, 'featureresurrect')
-		end
-
-		local _, _, _, _, reclaimLeft = Spring.GetFeatureResources(featureID)
-
-		if reclaimLeft < 1.0 then
-			addBarToFeature(featureID, 'featurereclaim')
-		end
-
-		if rezProgress > 0 or reclaimLeft < 1 then
-			-- We have to update the feature uniform buffers in this case, as features can be created with less than max health on the map with FP_featureplacer
-			rezreclaim[1] = rezProgress -- resurrect progress
-			rezreclaim[2] = reclaimLeft -- reclaim percent
-			gl.SetFeatureBufferUniforms(featureID, rezreclaim, 1) -- update GL, at offset of 1
-		end
-
+		addBarToFeature(featureID, 'featureresurrect')
+		addBarToFeature(featureID, 'featurereclaim')
+		addBarToFeature(featureID, 'featurehealth')
 	end
 end
 
@@ -1631,43 +1588,29 @@ function widget:DrawWorld()
 	if chobbyInterface then return end
 	if not drawWhenGuiHidden and Spring.IsGUIHidden() then return end
 
-	local now = os.clock()
-	if Spring.GetGameFrame() % 90 == 0 then
-		--Spring.Echo("healthBarVBO",healthBarVBO.usedElements, "featureHealthVBO",featureHealthVBO.usedElements)
+	local disticon = Spring.GetConfigInt("UnitIconDistance", 200) * 27.5 -- iconLength = unitIconDist * unitIconDist * 750.0f;
+	gl.DepthTest(true)
+	gl.DepthMask(true)
+	gl.Texture(0,healthbartexture)
+	healthBarShader:Activate()
+	healthBarShader:SetUniform("iconDistance",disticon)
+	if not debugmode then healthBarShader:SetUniform("cameraDistanceMult",1.0)  end
+	healthBarShader:SetUniform("cameraDistanceMultGlyph", glphydistmult)
+	healthBarShader:SetUniform("skipGlyphsNumbers",skipGlyphsNumbers)  --0.0 is everything,  1.0 means only numbers, 2.0 means only bars,
+	if healthBarVBO.usedElements > 0 then
+		healthBarVBO.VAO:DrawArrays(GL.POINTS,healthBarVBO.usedElements)
 	end
-	if healthBarVBO.usedElements > 0 or featureHealthVBO.usedElements > 0 then -- which quite strictly, is impossible anyway
-		local disticon = Spring.GetConfigInt("UnitIconDistance", 200) * 27.5 -- iconLength = unitIconDist * unitIconDist * 750.0f;
-		gl.DepthTest(true)
-		gl.DepthMask(true)
-		gl.Texture(0,healthbartexture)
-		healthBarShader:Activate()
-		healthBarShader:SetUniform("iconDistance",disticon)
-		if not debugmode then healthBarShader:SetUniform("cameraDistanceMult",1.0)  end
-		healthBarShader:SetUniform("cameraDistanceMultGlyph", glphydistmult)
-		healthBarShader:SetUniform("skipGlyphsNumbers",skipGlyphsNumbers)  --0.0 is everything,  1.0 means only numbers, 2.0 means only bars,
-		if healthBarVBO.usedElements > 0 then
-			healthBarVBO.VAO:DrawArrays(GL.POINTS,healthBarVBO.usedElements)
-		end
-		-- below its the feature bars being drawn:
-			healthBarShader:SetUniform("cameraDistanceMultGlyph", glyphdistmultfeatures)
-			if featureHealthVBO.usedElements > 0 then
-				if not debugmode then healthBarShader:SetUniform("cameraDistanceMult",featureHealthDistMult)  end
-				featureHealthVBO.VAO:DrawArrays(GL.POINTS,featureHealthVBO.usedElements)
-			end
-			if featureResurrectVBO.usedElements > 0 then
-				if not debugmode then healthBarShader:SetUniform("cameraDistanceMult",featureResurrectDistMult)  end
-				featureResurrectVBO.VAO:DrawArrays(GL.POINTS,featureResurrectVBO.usedElements)
-			end
-			if featureReclaimVBO.usedElements > 0 then
-				if not debugmode then healthBarShader:SetUniform("cameraDistanceMult",featureReclaimDistMult)  end
-				featureReclaimVBO.VAO:DrawArrays(GL.POINTS,featureReclaimVBO.usedElements)
-			end
+	-- below its the feature bars being drawn:
+	healthBarShader:SetUniform("cameraDistanceMultGlyph", glyphdistmultfeatures)
+	if featureVBO.usedElements > 0 then
+		if not debugmode then healthBarShader:SetUniform("cameraDistanceMult",featureResurrectDistMult)  end
+		featureVBO.VAO:DrawArrays(GL.POINTS,featureVBO.usedElements)
+	end
 
-		healthBarShader:Deactivate()
-		gl.Texture(false)
-		gl.DepthTest(false)
+	healthBarShader:Deactivate()
+	gl.Texture(false)
+	gl.DepthTest(false)
     gl.DepthMask(false) --"BK OpenGL state resets", reset to default state
-	end
 end
 
 function widget:TextCommand(command)

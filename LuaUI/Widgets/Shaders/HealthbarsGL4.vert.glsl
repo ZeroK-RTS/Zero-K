@@ -151,7 +151,7 @@ void main()
 
 	v_bartype_index_ssboloc.y = 0;
 
-	for(uint channel = 0; channel < UNIFORMLOC -1; channel++) {
+	for(uint channel = 1; channel < UNIFORMLOC; channel++) {
 		if (isVarForChannelVisible(channel)) {
 			v_bartype_index_ssboloc.y += 1;
 		}
