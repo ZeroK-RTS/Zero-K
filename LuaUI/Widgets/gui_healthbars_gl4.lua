@@ -214,8 +214,8 @@ local abilityChannel = 7
 local stockpileChannel = 7
 local shieldChannel = 8
 local captureChannel = 9
-local reclaimChannel = 2
-local resurrectChannel = 1
+local reclaimChannel = 3
+local resurrectChannel = 2
 
 local barTypeMap = {
 	health = {
@@ -375,7 +375,7 @@ local barTypeMap = {
 		maxcolor = {0.65, 0.65, 0.65, 1.0},
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = 1,--healthChannel,
 		uvoffset = 18,
 	},
 	featurereclaim = {
@@ -483,7 +483,6 @@ local unitShieldWatch = {} -- works
 local unitCaptureWatch = {}
 
 local featureDefHeights = {} -- maps FeatureDefs to height
-local featureBars = {} -- we need this additional table of {[featureid] = {barhealth, barrez, barreclaim}}
 
 local empDecline = 1 / Game.paralyzeDeclineRate
 local minReloadTime = 4 -- weapons reloading slower than this willget bars
@@ -923,28 +922,23 @@ local function removeBarsFromUnit(unitID, reason)
 end
 
 local function addBarToFeature(featureID, barname)
+	Spring.Echo("add " .. barname .. " bar to " .. featureID)
 	if debugmode then Spring.Debug.TraceEcho() end
 	local featureDefID = Spring.GetFeatureDefID(featureID)
 
 	local bt = barTypeMap[barname]
 
-	targetVBO = featureVBO
-
-	if targetVBO.instanceIDtoIndex[featureID] then return end -- already exists, bail
-	if featureBars[featureID] == nil then
-		featureBars[featureID] = 0
-	end
-	featureBars[featureID] = featureBars[featureID] + 1
+	if featureVBO.instanceIDtoIndex[featureID] then return end -- already exists, bail
 
 	pushElementInstance(
-		targetVBO, -- push into this Instance VBO Table
+		featureVBO, -- push into this Instance VBO Table
 			{featureDefHeights[featureDefID] + additionalheightaboveunit,  -- height
 			1.0 * barScale, -- size mult
 			1.0, -- timer end
 			bt.uvoffset, -- unused float
 
 			bt.bartype, -- bartype int
-			featureBars[featureID] - 1, -- bar index (how manyeth per unit)
+			0, -- bar index (how manyeth per unit)
 			bt.uniformindex, -- ssbo location offset (> 20 for health)
 			0, -- unused int
 
@@ -957,18 +951,11 @@ local function addBarToFeature(featureID, barname)
 		featureID) -- last one should be featureID!
 end
 
-local function removeBarFromFeature(featureID, targetVBO)
-	--Spring.Echo("removeBarFromFeature", featureID, targetVBO.myName)
-	if targetVBO.instanceIDtoIndex[featureID] then
-		popElementInstance(targetVBO, featureID)
+local function removeBarFromFeature(featureID, barname)
+	local instanceKey = featureID .. "_" .. barname
+	if featureVBO.instanceIDtoIndex[instanceKey] then
+		popElementInstance(featureVBO, instanceKey)
 	end
-	if featureBars[featureID] then
-		featureBars[featureID] = featureBars[featureID] - 1 -- TODO ERROR
-	end
-end
-
-local function removeBarsFromFeature(featureID)
-	removeBarFromFeature(featureID, featureVBO)
 end
 
 local function init()
@@ -1012,24 +999,38 @@ local function init()
 
 end
 
+local function updateFeature(featureID) 
+	--Spring.Echo("updateFeature " .. featureID)
+end
+
+local function addFeature(featureID) 
+	Spring.Echo("addFeature " .. featureID .. " " .. Spring.GetGameFrame())
+	-- some map-supplied features dont have a model, in these cases modelpath == ""
+	local featureDefID = Spring.GetFeatureDefID(featureID)
+	if FeatureDefs[featureDefID].name ~= 'geovent' and FeatureDefs[featureDefID].modelpath ~= ''  then
+		addBarToFeature(featureID, 'featureresurrect')
+		addBarToFeature(featureID, 'featurereclaim')
+		addBarToFeature(featureID, 'featurehealth')
+	end
+end
+
+local function removeFeature(featureID) 
+	Spring.Echo("removeFeature " .. featureID)
+	removeBarFromFeature(featureID, 'featureresurrect')
+	removeBarFromFeature(featureID, 'featurereclaim')
+	removeBarFromFeature(featureID, 'featurehealth')
+end
+
 local function initfeaturebars()
 	clearInstanceTable(featureVBO)
-	local gameFrame = Spring.GetGameFrame()
-	for i, featureID in ipairs(Spring.GetAllFeatures()) do
-		local featureDefID = Spring.GetFeatureDefID(featureID)
-		--local resurrectname = Spring.GetFeatureResurrect(featureID)
-		--if resurrectname then
-		--	resurrectableFeatures[featureID] = true
-			-- if it has resurrect progress, then just straight up just store a bar here for it?
-			-- or shall we only instantiate bars when needed? probably number 2 is smarter...
-		--end -- maybe store resurrect progress here?
 
-		if featureDefID then -- dont add features that we cant get the ID of
-			-- add a health bar for it (dont add one for pre-existing stuff)
-			widget:FeatureCreated(featureID)
-		else
+	local currentWidget = widget:GetInfo().name
+	WG.FeatureStatusValueUpdateFeatureCallbacks[currentWidget] = updateFeature
+        WG.FeatureStatusValueAddFeatureCallbacks[currentWidget] = addFeature
+        WG.FeatureStatusValueRemoveFeatureCallbacks[currentWidget] = removeFeature
 
-		end
+	for featureID, featureDefID in pairs(WG.FeatureStatusValue.defID) do
+		addFeature(featureID) 
 	end
 end
 
@@ -1167,6 +1168,10 @@ function widget:Shutdown()
 
         widgetHandler:DeregisterGlobal('MorphDrawProgress')
 
+	local currentWidget = widget:GetInfo().name
+	WG.FeatureStatusValueUpdateFeatureCallbacks[currentWidget] = nil
+        WG.FeatureStatusValueAddFeatureCallbacks[currentWidget] = nil
+        WG.FeatureStatusValueRemoveFeatureCallbacks[currentWidget] = nil
 end
 
 function widget:RecvLuaMsg(msg, playerID)
@@ -1565,22 +1570,6 @@ function widget:GameFrame(gameFrame)
 			end
 		end
 	end
-end
-
-function widget:FeatureCreated(featureID)
-	-- some map-supplied features dont have a model, in these cases modelpath == ""
-	local featureDefID = Spring.GetFeatureDefID(featureID)
-	if FeatureDefs[featureDefID].name ~= 'geovent' and FeatureDefs[featureDefID].modelpath ~= ''  then
-		addBarToFeature(featureID, 'featureresurrect')
-		addBarToFeature(featureID, 'featurereclaim')
-		addBarToFeature(featureID, 'featurehealth')
-	end
-end
-
-function widget:FeatureDestroyed(featureID)
-	if debugmode then Spring.Echo("FeatureDestroyed",featureID, featureBars[featureID]) end
-	removeBarsFromFeature(featureID)
-	featureBars[featureID] = nil
 end
 
 function widget:DrawWorld()

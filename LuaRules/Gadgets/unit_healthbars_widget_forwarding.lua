@@ -122,7 +122,7 @@ else
 
 		--Spring.Echo('rezreclaim', rezreclaim[1], rezreclaim[2])
 
-		if not headless then glSetFeatureBufferUniforms(featureID, rezreclaim, 1) end -- update GL, at offset of 1
+		--if not headless then glSetFeatureBufferUniforms(featureID, rezreclaim, 1) end -- update GL, at offset of 1
 
 		if step > 0 and forwardedFeatureIDsResurrect[featureID] == nil and Script.LuaUI("FeatureReclaimStartedHealthbars") then
 				forwardedFeatureIDsResurrect[featureID] = true
