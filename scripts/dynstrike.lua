@@ -43,6 +43,7 @@ local smokePiece = {Breast, Head}
 local nanoPieces = {Nano}
 local nanoing = false
 local aiming = false
+local walking = false
 
 local FINGER_ANGLE_IN = math.rad(10)
 local FINGER_ANGLE_OUT = math.rad(-25)
@@ -61,7 +62,9 @@ local resetRestoreTorso = false
 
 local RESTORE_DELAY = 2500
 local RESTORE_DELAY_TORSO = 200
-local RESTORE_DELAY_RIGHT = 200
+local RESTORE_DELAY_DGUN = 2500
+local RESTORE_DELAY_NANO = 200
+local RESTORE_DELAY_RIGHT = RESTORE_DELAY_NANO
 
 ---------------------------------------------------------------------
 ---  blender-exported animation: data (move to include file?)     ---
@@ -350,6 +353,7 @@ local function Walk()
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
+		walking = true
 		-----------------------------------------------------------------------------------
 		
 		Turn(HipLeft, x_axis,  left[1].hip[1],  left[1].hip[2] * speedMult)
@@ -495,8 +499,10 @@ local function RestoreLeftAim(sleepTime)
 	if sleepTime ~= nil then 
 		Sleep(sleepTime)
 	end
-	Turn(ArmLeft, x_axis, math.rad(-5), ARM_SPEED_PITCH)
-	Turn(Gun, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+	if not walking then
+		Turn(ArmLeft, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+		Turn(Gun, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+	end
 end
 
 local function RestoreLeftAfterDelay(sleepTime)
@@ -529,7 +535,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
-	
+	walking = false
 	if weaponNum == 1 then
 		resetRestoreTorso = true
 		resetRestoreLeft = true
@@ -540,6 +546,11 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_RIGHT)
 		Signal(SIG_RESTORE_RIGHT)
 		resetRestoreTorso = true
+		if dyncomm.IsManualFire(num) then
+			RESTORE_DELAY_RIGHT = RESTORE_DELAY_DGUN
+		else 
+			RESTORE_DELAY_RIGHT = RESTORE_DELAY_NANO
+		end
 		AimArm(heading, pitch, ArmRight, HandRight, true)
 		StartThread(RestoreRightAim)
 		return true
@@ -599,6 +610,7 @@ function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	Signal(SIG_RESTORE_RIGHT)
 	SetSignalMask(SIG_RESTORE_RIGHT)
+	RESTORE_DELAY_RIGHT = RESTORE_DELAY_NANO
 	StartThread(RestoreRightAim)
 	StartThread(NanoRestore)
 	nanoing = false
