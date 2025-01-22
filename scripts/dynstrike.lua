@@ -56,6 +56,9 @@ local SIG_RESTORE_TORSO = 16
 local SIG_WALK = 32
 local SIG_NANO = 64
 
+local resetRestoreLeft = false
+local resetRestoreTorso = false
+
 local RESTORE_DELAY = 2500
 local RESTORE_DELAY_TORSO = 200
 local RESTORE_DELAY_RIGHT = 200
@@ -489,12 +492,28 @@ local function RestoreRightAim(sleepTime)
 end
 
 local function RestoreLeftAim(sleepTime)
-	resetRestoreTorso = true
-	Signal(SIG_RESTORE_LEFT)
-	SetSignalMask(SIG_RESTORE_LEFT)
-	Sleep(sleepTime or RESTORE_DELAY)
+	if sleepTime ~= nil then 
+		Sleep(sleepTime)
+	end
 	Turn(ArmLeft, x_axis, math.rad(-5), ARM_SPEED_PITCH)
 	Turn(Gun, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+end
+
+local function RestoreLeftAfterDelay(sleepTime)
+	local counter = (sleepTime or RESTORE_DELAY)
+	while true do
+		if counter > 0 then
+			counter = counter - 100
+		end
+		if resetRestoreLeft then
+			resetRestoreLeft = false
+			counter = RESTORE_DELAY
+		end
+		if counter <= 0 then
+			RestoreLeftAim()
+		end
+		Sleep(100)
+	end
 end
 
 local function AimArm(heading, pitch, arm, hand, wait)
@@ -512,12 +531,9 @@ function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
 	
 	if weaponNum == 1 then
-		Signal(SIG_LEFT)
-		SetSignalMask(SIG_LEFT)
-		Signal(SIG_RESTORE_LEFT)
 		resetRestoreTorso = true
+		resetRestoreLeft = true
 		AimArm(heading, pitch, ArmLeft, Gun, true)
-		StartThread(RestoreLeftAim)
 		return true
 	elseif weaponNum == 2 then
 		Signal(SIG_RIGHT)
@@ -624,6 +640,7 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreTorsoAfterDelay)
+	StartThread(RestoreLeftAfterDelay)
 end
 
 function script.Killed(recentDamage, maxHealth)
