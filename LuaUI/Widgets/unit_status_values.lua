@@ -12,6 +12,8 @@ end
 
 local ceil = math.ceil
 
+local updateCount = 0
+
 -----------------------------------------------------------------
 -- Units
 -----------------------------------------------------------------
@@ -84,7 +86,7 @@ function removeFeature(featureID)
 	end
 end
 
-function updateFeatures(gameFrame)
+function updateFeatures()
 	local visibleFeatures = GetVisibleFeatures(-1, nil, false, false)
 	local removedFeatures = {}
 
@@ -99,19 +101,23 @@ function updateFeatures(gameFrame)
 		featureDefID = GetFeatureDefID(featureID) or -1
 		if trackedFeatures[featureDefID] then
 			if removedFeatures[featureID] then
-				updateFeature(featureID)
-				for _, callback in pairs(WG.FeatureStatusValueUpdateFeatureCallbacks) do
-					callback(featureID)
+				if (updateCount + featureID) % updatePercent == 0 then
+					updateFeature(featureID)
+					for _, callback in pairs(WG.FeatureStatusValueUpdateFeatureCallbacks) do
+						callback(featureID)
+					end
 				end
 				removedFeatures[featureID] = nil
-			elseif (gameFrame + featureID) % updatePercent == 0 then
+			else
 				addFeature(featureID, featureDefID)
 			end
 		end
 	end
 
-	for featureID, _ in pairs(removedFeatures) do
-		removeFeature(featureID)
+	for featureID, val in pairs(removedFeatures) do
+		if val ~= nil then
+			removeFeature(featureID)
+		end
 	end
 end
 
@@ -119,9 +125,11 @@ end
 -- Widget
 -----------------------------------------------------------------
 
-function widget:GameFrame(gameFrame)
+function widget:Update()
+	updateCount = updateCount + 1
+	Spring.Echo("Update")
 	updateUnits()
-	updateFeatures(gameFrame)
+	updateFeatures()
 end
 
 function widget:Initialize()

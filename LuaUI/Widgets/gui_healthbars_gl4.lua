@@ -10,6 +10,21 @@ function widget:GetInfo()
    }
 end
 
+options_path = 'Settings/Interface/Healthbars'
+options_order = { 'drawFeatureHealth' }
+options = {
+	drawFeatureHealth = {
+                name = 'Draw health of features (corpses)',
+                type = 'bool',
+                value = false,
+                noHotkey = true,
+                desc = 'Shows healthbars on corpses',
+                OnChange = function()
+			initfeaturebars()
+		end
+        },
+}
+
 -- wellity wellity the time has come, and yes, this is design documentation
 -- what can we do with 64 verts per healthbars?
 	-- 9 verts bg
@@ -1010,7 +1025,10 @@ local function addFeature(featureID)
 	if FeatureDefs[featureDefID].name ~= 'geovent' and FeatureDefs[featureDefID].modelpath ~= ''  then
 		addBarToFeature(featureID, 'featureresurrect')
 		addBarToFeature(featureID, 'featurereclaim')
-		addBarToFeature(featureID, 'featurehealth')
+
+		if options.drawFeatureHealth.value then
+			addBarToFeature(featureID, 'featurehealth')
+		end
 	end
 end
 
@@ -1021,7 +1039,8 @@ local function removeFeature(featureID)
 	removeBarFromFeature(featureID, 'featurehealth')
 end
 
-local function initfeaturebars()
+function initfeaturebars()
+	Spring.Echo("initFeatureBars()");
 	clearInstanceTable(featureVBO)
 
 	local currentWidget = widget:GetInfo().name
