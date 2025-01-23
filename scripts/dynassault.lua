@@ -195,7 +195,7 @@ local function RestoreTorsoAfterDelay(sleepTime)
 		end
 		if resetRestoreTorso then
 			resetRestoreTorso = false
-			counter = RESTORE_DELAY
+			counter = (sleepTime or RESTORE_DELAY)
 		end
 		if counter <= 0 then
 			RestoreTorsoAim()
