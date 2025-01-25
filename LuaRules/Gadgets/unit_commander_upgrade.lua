@@ -101,6 +101,7 @@ end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	local newAttributesEffect = false
 	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
 	if data.speedMultPost or data.speedMod then
@@ -148,7 +149,12 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local buildPowerMult = ((data.bonusBuildPower or 0) + ud.buildSpeed)/ud.buildSpeed
 	data.metalIncome = (data.metalIncome or 0)
 	data.energyIncome = (data.energyIncome or 0)
-	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPowerMult, INLOS)
+	
+	if buildPowerMult ~= 1 then
+		-- Needs to use the new system so static can be set, to display properly on the UI.
+		newAttributesEffect = newAttributesEffect or {}
+		newAttributesEffect.build = buildPowerMult
+	end
 	
 	if data.metalIncome and GG.Overdrive then
 		Spring.SetUnitRulesParam(unitID, "comm_income_metal", data.metalIncome, INLOS)
@@ -156,11 +162,12 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome, true)
 	end
 	
+	local newHealth = false
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		local newHealth = math.max(health + data.healthBonus, 1)
-		GG.Attributes.AddEffect(unitID, "self_upgrade", {healthAdd = data.healthBonus, static = true})
-		Spring.SetUnitHealth(unitID, newHealth) -- Override scaled health change from GG.Attributes
+		newHealth = math.max(health + data.healthBonus, 1)
+		newAttributesEffect = newAttributesEffect or {}
+		newAttributesEffect.healthAdd = data.healthBonus
 	end
 	
 	if data.skinOverride then
@@ -196,6 +203,13 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
 	
+	if newAttributesEffect then
+		newAttributesEffect.static = true
+		GG.Attributes.AddEffect(unitID, "comm_upgrade", newAttributesEffect)
+		if newHealth then
+			Spring.SetUnitHealth(unitID, newHealth) -- Override scaled health change from GG.Attributes
+		end
+	end
 	-- Do this all the time as it will be needed almost always.
 	GG.UpdateUnitAttributes(unitID)
 end

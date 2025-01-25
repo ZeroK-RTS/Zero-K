@@ -19,7 +19,7 @@ return { bomberstrike = {
 
   customParams        = {
     reallyabomber    = [[1]],
-    reammoseconds    = [[13]],
+    reammoseconds    = [[12]],
     refuelturnradius = [[150]],
     modelradius      = [[10]],
     okp_damage       = 340, -- Not perfectly reliable

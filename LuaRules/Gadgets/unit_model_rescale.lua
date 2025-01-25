@@ -30,11 +30,19 @@ local suCopyTable = Spring.Utilities.CopyTable
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function SetScale(unitID, base, scale)
+local function SetScale(unitID, base, scale, offset)
+	scale = scale or 1
+	offset = offset or 0
+	
 	local currentScale = (Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1)
 	Spring.SetUnitRulesParam(unitID, "currentModelScale", scale, INLOS_ACCESS)
+	local currentOffset = (Spring.GetUnitRulesParam(unitID, "currentModelOffset") or 0)
+	Spring.SetUnitRulesParam(unitID, "currentOffset", offset, INLOS_ACCESS)
 	
 	local pieceTable = suCopyTable(origPieceTable[unitID])
+	--for i = 0, 3 do
+	--	Spring.Echo(pieceTable[i*4 + 1], pieceTable[i*4 + 2], pieceTable[i*4 + 3], pieceTable[i*4 + 4])
+	--end
 
 	pieceTable[1] = pieceTable[1] * scale
 	pieceTable[2] = pieceTable[2] * scale
@@ -49,7 +57,7 @@ local function SetScale(unitID, base, scale)
 	pieceTable[11] = pieceTable[11] * scale
 
 	pieceTable[13] = pieceTable[13] * scale
-	pieceTable[14] = pieceTable[14] * scale
+	pieceTable[14] = pieceTable[14] * scale + offset
 	pieceTable[15] = pieceTable[15] * scale
 
 	Spring.SetUnitPieceMatrix(unitID, base, pieceTable)
@@ -58,14 +66,14 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function UnitModelRescale(unitID, scale)
+local function UnitModelRescale(unitID, scale, offset)
 	local base = Spring.GetUnitRootPiece(unitID)
 	if base then
 		if not origPieceTable[unitID] then
 			origPieceTable[unitID] = {Spring.GetUnitPieceMatrix(unitID, base)}
 		end
 
-		SetScale(unitID, base, scale)
+		SetScale(unitID, base, scale, offset)
 	end
 end
 
@@ -75,7 +83,7 @@ end
 
 function gadget:Shutdown()
 	for unitID in pairs(origPieceTable) do
-		UnitModelRescale(unitID, 1)
+		UnitModelRescale(unitID, 1, 0)
 	end
 end
 

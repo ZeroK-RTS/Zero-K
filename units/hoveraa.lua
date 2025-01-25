@@ -85,8 +85,8 @@ return { hoveraa = {
       },
 
       damage                  = {
-        default = 37.5,
-        planes  = 375,
+        default = 47.5,
+        planes  = 475,
       },
 
       edgeEffectiveness       = 0.5,

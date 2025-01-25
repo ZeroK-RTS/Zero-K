@@ -261,8 +261,8 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	local maxRange = GetEffectiveWeaponRange(data.unitDefID, -ody, data.weaponNum)
 	local rangeMult = (GG.att_RangeChange[proOwnerID] or 1)
 	local flyTimeMult = math.sqrt(rangeMult)
-	maxRange = maxRange * rangeMult
 	if maxRange and fireDistance > maxRange*1.05 then
+		maxRange = maxRange * rangeMult
 		maxRange = maxRange*1.05
 		odx = odx*maxRange/fireDistance
 		odz = odz*maxRange/fireDistance

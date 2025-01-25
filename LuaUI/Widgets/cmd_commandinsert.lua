@@ -36,6 +36,7 @@ local positionCommand = {
 	[CMD.ATTACK] = true,
 	[CMD_JUMP] = true,
 	[CMD_LEVEL] = true,
+	[CMD_TECH_UP] = true,
 }
 
 local doNotHandleRaw = {}
@@ -276,7 +277,7 @@ function WG.CommandInsert(id, params, options, seq, nonInsertIfPossible)
 	local units = Spring.GetSelectedUnits()
 	for i = 1, #units do
 		local unitID = units[i]
-		local commands = Spring.GetCommandQueue(unitID, 0)
+		local commands = Spring.GetUnitCommandCount(unitID)
 		if commands then
 			if nonInsertIfPossible then
 				Spring.GiveOrderToUnit(unitID, id, params, options.coded)

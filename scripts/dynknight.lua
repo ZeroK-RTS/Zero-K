@@ -123,6 +123,8 @@ end
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	local zeroSpeedCount = 0
+	
 	while true do
 		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()
 		
@@ -157,6 +159,16 @@ local function Walk()
 		end
 		WaitForTurn(thighR, x_axis)
 		Sleep(0)
+		
+		local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+		if speed == 0 then
+			zeroSpeedCount = zeroSpeedCount + 1
+			if zeroSpeedCount > 2 then
+				return
+			end
+		else
+			zeroSpeedCount = 0
+		end
 	end
 end
 

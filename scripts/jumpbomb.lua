@@ -27,6 +27,8 @@ local pi12 = math.rad(15)
 
 local function WalkThread ()
 	SetSignalMask (SIG_MOVE)
+	local zeroSpeedCount = 0
+	
 	while true do
 
 		local slow_mult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
@@ -45,6 +47,16 @@ local function WalkThread ()
 		Turn (Right_Front_Leg, y_axis, pi6, anim_speed)
 		Turn (Tail, y_axis, pi18, anim_speed / 3)
 		Sleep (400 / slow_mult)
+		
+		local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+		if speed == 0 then
+			zeroSpeedCount = zeroSpeedCount + 1
+			if zeroSpeedCount > 2 then
+				return
+			end
+		else
+			zeroSpeedCount = 0
+		end
 	end
 end
 

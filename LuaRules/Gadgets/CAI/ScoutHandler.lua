@@ -7,7 +7,7 @@
 local UnitListHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitListHandler.lua")
 
 local spIsPosInLos = Spring.IsPosInLos
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCommandCount = Spring.GetUnitCommandCount
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local CMD_FIGHT = CMD.FIGHT
 
@@ -20,7 +20,7 @@ function scoutHandler.CreateScoutHandler(scoutHeatmap)
 	local function RunJobHandler()
 		if scoutHeatmap.IsScoutingRequired() then
 			for unitID,_ in scoutList.Iterator() do
-				local queueSize = spGetCommandQueue(unitID, 0)
+				local queueSize = spGetUnitCommandCount(unitID)
 				if queueSize then
 					if queueSize == 0 then
 						GiveClampedOrderToUnit(unitID, CMD_FIGHT, scoutHeatmap.GetPositionToScount(), {})

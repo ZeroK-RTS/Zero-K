@@ -46,7 +46,7 @@ local spGetAllUnits               = Spring.GetAllUnits
 local spGetGameFrame              = Spring.GetGameFrame
 local spGetAllFeatures            = Spring.GetAllFeatures
 local spGiveOrderToUnit           = Spring.GiveOrderToUnit
-local spGetCommandQueue           = Spring.GetCommandQueue
+local spGetUnitCommandCount       = Spring.GetUnitCommandCount
 local spDestroyFeature            = Spring.DestroyFeature
 local spGetFeatureResurrect       = Spring.GetFeatureResurrect
 local spGetUnitIsDead             = Spring.GetUnitIsDead
@@ -246,7 +246,7 @@ end
 
 local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
-		local queueSize = spGetCommandQueue(unitID, 0)
+		local queueSize = spGetUnitCommandCount(unitID)
 		if not (queueSize) or not (queueSize > 0) then -- oh
 			BringingDownTheHeavens(unitID)
 		end

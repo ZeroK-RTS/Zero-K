@@ -378,7 +378,7 @@ local function UnstickUpdate(unitID, unitData)
 		return true
 	end
 	if cmdID == CMD.FIGHT then
-		local queueSize = Spring.GetCommandQueue(unitID, 0)
+		local queueSize = Spring.GetUnitCommandCount(unitID)
 		if queueSize and queueSize > 1 then
 			return
 		end

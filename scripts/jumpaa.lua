@@ -25,6 +25,7 @@ local gun_1 = 0
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	local zeroSpeedCount = 0
 	while true do
 		--/RIGHT LEG
 		Turn(lshoulder, x_axis, math.rad(45), math.rad(22.5)*RUN_SPEED_FAST)
@@ -78,6 +79,16 @@ local function Walk()
 		Turn(rfoot, x_axis, math.rad(-5), math.rad(21)*RUN_SPEED_FAST)
 		
 		Sleep(1000 / RUN_SPEED_FAST)
+		
+		local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+		if speed == 0 then
+			zeroSpeedCount = zeroSpeedCount + 1
+			if zeroSpeedCount > 2 then
+				return
+			end
+		else
+			zeroSpeedCount = 0
+		end
 	end
 end
 

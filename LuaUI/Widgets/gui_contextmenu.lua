@@ -944,11 +944,15 @@ local function printAbilities(ud, unitID)
 
 	
 	if ud.buildSpeed > 0 and not cp.nobuildpower then
-		local buildSpeed = ud.buildSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+		local buildSpeed = (unitID and Spring.Utilities.GetUnitBuildSpeed(unitID)) or ud.buildSpeed
 		cells[#cells+1] = 'Construction'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Buildpower: '
-		cells[#cells+1] = numformat(buildSpeed)
+		cells[#cells+1] = numformat(buildSpeed) .. " cost/s"
+		if ud.buildDistance and not ud.isFactory then
+			cells[#cells+1] = ' - Build range:'
+			cells[#cells+1] = numformat(ud.buildDistance) .. " elmo"
+		end
 		if ud.canResurrect then
 			cells[#cells+1] = ' - Can resurrect wreckage'
 			cells[#cells+1] = ''
@@ -1141,7 +1145,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ' - Pads:'
 		cells[#cells+1] = cp.pad_count
 		cells[#cells+1] = ' - Pad buildpower:'
-		cells[#cells+1] = '2.5' -- maybe could use being a customparam too
+		cells[#cells+1] = (cp.pad_bp and numformat(cp.pad_bp) or '2.5') .. " cost/s"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end

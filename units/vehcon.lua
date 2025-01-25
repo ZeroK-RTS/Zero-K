@@ -3,7 +3,7 @@ return { vehcon = {
   description            = [[Construction Rover]],
   acceleration           = 0.4,
   brakeRate              = 18.0,
-  buildDistance          = 180,
+  buildDistance          = 210,
   builder                = true,
 
   buildoptions           = {

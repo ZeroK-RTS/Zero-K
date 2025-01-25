@@ -78,6 +78,9 @@ local function Undock()
 end
 
 local cutterCycle = 1
+local w1projectiles=WeaponDefs[UnitDef.weapons[1].weaponDef].projectiles
+local w2projectiles=WeaponDefs[UnitDef.weapons[2].weaponDef].projectiles
+local w3projectiles=WeaponDefs[UnitDef.weapons[3].weaponDef].projectiles
 local function EmitShot()
 	if not parentUnitID then
 		return
@@ -93,17 +96,17 @@ local function EmitShot()
 	
 	local projectiles = (GG.att_ProjMult[parentUnitID] or 1)
 	if shooting ~= 0 then
-		for i = 1, projectiles do
+		for i = 1, projectiles*w1projectiles do
 			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W1)
 		end
 		shooting = shooting - 1
 	else
 		if cutterCycle == 0 then
-			for i = 1, projectiles do
+			for i = 1, projectiles*w2projectiles do
 				EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
 			end
 		else
-			for i = 1, projectiles do
+			for i = 1, projectiles*w3projectiles do
 				EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W3)
 			end
 		end

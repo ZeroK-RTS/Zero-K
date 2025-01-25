@@ -23,7 +23,7 @@ end
 --	its active players have units left.
 --------------------------------------------------------------------------------
 
-local isScriptMission = VFS.FileExists("mission.lua")
+local isScriptMission = VFS.FileExists("mission.lua") or GG.MOD_MISSION
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

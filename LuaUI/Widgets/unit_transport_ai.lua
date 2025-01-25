@@ -272,7 +272,7 @@ function IsWaitCommand(unitID)
 end
 
 function IsIdle(unitID)
-	return spGetCommandQueue(unitID, 0) == 0
+	return Spring.GetUnitCommandCount(unitID) == 0
 end
 
 function GetToPickTransport(unitID)
@@ -400,7 +400,7 @@ end
 local function AddTransport(unitID, unitDefID)
 	if transportDef[unitDefID] then
 		activeTransports[unitID] = unitDefID
-		local queueCount = Spring.GetCommandQueue(unitID, 0)
+		local queueCount = Spring.GetUnitCommandCount(unitID)
 		if queueCount == 0 then
 			AddTransportToIdle(unitID, unitDefID)
 		end
@@ -551,7 +551,7 @@ end
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	if autoCallTransportUnits[unitID] then
 		local useful, halting = ProcessCommand(unitID, cmdID, params, false, true)
-		local queue = Spring.GetCommandQueue(unitID, 0)
+		local queue = Spring.GetUnitCommandCount(unitID)
 		if useful and halting and queue >= 1 then
 			spGiveOrderToUnit(unitID, CMD_EMBARK, EMPTY_TABLE, CMD.OPT_ALT)
 		else

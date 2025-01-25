@@ -45,7 +45,7 @@ return { shieldfelon = {
 
   sightEmitHeight     = 40,
   sightDistance       = 520,
-  speed               = 45,
+  speed               = 42,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -101,7 +101,7 @@ return { shieldfelon = {
       cylinderTargeting       = 0,
 
       customParams            = {
-        shield_drain = 75,
+        shield_drain = 78,
         
         light_camera_height = 2500,
         light_color = [[0.66 0.32 0.90]],
@@ -120,7 +120,7 @@ return { shieldfelon = {
       intensity               = 6,
       interceptedByShieldType = 1,
       range                   = 435,
-      reloadtime              = 0.133,
+      reloadtime              = 0.166,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,

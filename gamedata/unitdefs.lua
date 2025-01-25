@@ -15,6 +15,8 @@ local function VFS_Include(filename, env, mode, recursive)
 	end
 end
 
+VFS_Include('LuaRules/engine_compat.lua', nil, VFS_GAME)
+
 --[[ unitdefs_post is massively simplified by being able to assume
      that all def keys are lowercase. However, being able to use
      uppercase in the defs is also good for readability (also we
@@ -36,6 +38,18 @@ local zkUnits = VFS_DirList('units', '*.lua', VFS_GAME, true)
 for i = 1, #zkUnits do
 	suCopyTable(lowerKeys(VFS_Include(zkUnits[i], nil, VFS_GAME)), false, unitDefs)
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- ud.customparams IS NEVER EVER NIL
+
+for _, ud in pairs(UnitDefs) do
+	if not ud.customparams then
+		ud.customparams = {}
+	end
+ end
+ 
 -- TODO: put dynamic unit generation (comms, planet wars stuff) here
 
 --[[ The checks in this file don't apply to map-defined units,

@@ -225,7 +225,7 @@ local spIsSphereInView		= Spring.IsSphereInView
 local spGetTeamUnits		= Spring.GetTeamUnits
 local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spGetCommandQueue    	= Spring.GetCommandQueue
+local spGetUnitCommandCount = Spring.GetUnitCommandCount
 local spGetUnitPosition		= Spring.GetUnitPosition
 local spGetUnitDirection	= Spring.GetUnitDirection
 local spGetUnitHealth		= Spring.GetUnitHealth
@@ -393,7 +393,7 @@ function widget:Initialize()
 				allBuilders[uid] = {include=true} -- add it to the group of all workers
 				
 				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
-					if spGetCommandQueue(uid, 0) ~= 0 then -- if so we mark it as drec
+					if spGetUnitCommandCount(uid) ~= 0 then -- if so we mark it as drec
 						includedBuilders[uid] = {cmdtype=commandType.drec, unreachable={}}
 					else -- otherwise we mark it as idle
 						includedBuilders[uid] = {cmdtype=commandType.idle, unreachable={}}
@@ -921,7 +921,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	
 	-- add new workers to the active workers list if they're GBC-enabled.
 	if (allBuilders[unitID] and allBuilders[unitID].include) then
-		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
+		if spGetUnitCommandCount(unitID) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -1008,7 +1008,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		allBuilders[unitID] = {include=true}
-		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
+		if spGetUnitCommandCount(unitID) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -1377,7 +1377,7 @@ function SetGlobalBuildState(state)
 			if allBuilders[unitID].include then
 				local _,_,nanoframe = spGetUnitIsStunned(unitID)
 				if not includedBuilders[unitID] and not nanoframe then
-					if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
+					if spGetUnitCommandCount(unitID) ~= 0 then -- if so we mark it as drec
 						includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 					else -- otherwise we mark it as idle
 						includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
@@ -1916,7 +1916,7 @@ function CheckIdlers()
 		if includedBuilders[unitID] then -- we need to ensure that the unit hasn't died or left the group since it went idle, because this check is deferred
 			-- we need to check that the unit's command queue is empty, because other gadgets may invoke UnitIdle erroneously.
 			-- if there's a command on the queue, do nothing and let it be removed from the idle list.
-			if spGetCommandQueue(unitID, 0) == 0 then
+			if spGetUnitCommandCount(unitID) == 0 then
 				includedBuilders[unitID].cmdtype = commandType.idle -- then mark it as idle
 				if newBuilders[unitID] then -- for new units that have just been added and finished following their constructor separator orders.
 					newBuilders[unitID] = nil

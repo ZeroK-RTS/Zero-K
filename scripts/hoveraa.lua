@@ -76,7 +76,7 @@ local function ReloadMissileThread()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 374, 50)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 474, 45)
 end
 
 function script.FireWeapon()

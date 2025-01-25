@@ -319,7 +319,7 @@ end
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spIsUnitIcon = Spring.IsUnitIcon
 local function DrawEtaText(unitID, timeLeft,yoffset, negative)
-	if not options.showforicons.value and spIsUnitIcon(unitID) then
+	if not options.showforicons.value and spIsUnitIcon(unitID) or Spring.GetUnitRulesParam(unitID, "no_eta_display") then
 		return
 	end
 
