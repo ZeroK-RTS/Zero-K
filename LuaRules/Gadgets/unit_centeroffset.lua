@@ -126,6 +126,19 @@ local function UpdateUnitGrow(unitID, data, growScale)
 		data.aim[1], data.aim[2] - growScale*data.aimOff, data.aim[3], true)
 end
 
+local function GetOrigColvolData(unitID, unitDefID)
+	if not origColvolCache[unitDefID] then
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
+			volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
+		origColvolCache[unitDefID] = {
+			scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
+			volumeType, testType, primaryAxis
+		}
+	end
+	local cache = origColvolOverride[unitID] or origColvolCache[unitDefID]
+	return cache
+end
+
 local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	if unitScales[unitID] and not scales then
 		scales = unitScales[unitID]
@@ -178,15 +191,7 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	
 	-- Sertup growth scale
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
-	if not origColvolCache[unitDefID] then
-		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
-			volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
-		origColvolCache[unitDefID] = {
-			scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
-			volumeType, testType, primaryAxis
-		}
-	end
-	local cache = origColvolOverride[unitID] or origColvolCache[unitDefID]
+	local cache = GetOrigColvolData(unitID, unitDefID)
 	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
 			volumeType, testType, primaryAxis = cache[1], cache[2], cache[3], cache[4], cache[5], cache[6], cache[7], cache[8], cache[9]
 	
@@ -362,6 +367,7 @@ function gadget:Initialize()
 	GG.SetColvolScales = SetColvolScales
 	GG.GetColvolScales = GetColvolScales
 	GG.OffsetColVol = OffsetColVol
+	GG.GetOrigColvolData = GetOrigColvolData
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
