@@ -781,22 +781,22 @@ local function circleLines(percentage, radius)
 end  
 
 function gadget:DrawWorldPreUnit()
-	teamID = Spring.GetLocalTeamID()
-	local spec, fullview = Spring.GetSpectatingState()
-	spec = spec or fullview
-	local mCurr, mStor = Spring.GetTeamResources(teamID, "metal")
-	local value = mCurr / 500
-	local radius = 30
-	for _, unitID in pairs(Spring.GetAllUnits()) do
-		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if (ud.customParams.dynamic_comm) then
-			gl.DepthTest(false)
-			gl.LineWidth(6.5)
-			gl.Color({255,0,0})
-			gl.DrawFuncAtUnit(unitID, false, circleLines, value, radius)
-			gl.DepthTest(true)
-		end
-	end
+	--teamID = Spring.GetLocalTeamID()
+	--local spec, fullview = Spring.GetSpectatingState()
+	--spec = spec or fullview
+	--local mCurr, mStor = Spring.GetTeamResources(teamID, "metal")
+	--local value = mCurr / 500
+	--local radius = 30
+	--for _, unitID in pairs(Spring.GetAllUnits()) do
+	--	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	--	if (ud.customParams.dynamic_comm) then
+	--		gl.DepthTest(false)
+	--		gl.LineWidth(6.5)
+	--		gl.Color({255,0,0})
+	--		gl.DrawFuncAtUnit(unitID, false, circleLines, value, radius)
+	--		gl.DepthTest(true)
+	--	end
+	--end
 end
 
 function gadget:Initialize()
