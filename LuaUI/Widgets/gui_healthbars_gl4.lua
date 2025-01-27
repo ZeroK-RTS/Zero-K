@@ -734,8 +734,6 @@ end
 local uniformcache = {0.0}
 
 local function addBarForUnit(unitID, unitDefID, barname, reason, range)
-	if barname == "captureReload" then Spring.Echo("XXX" .. range) end
-
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 
 	-- Why? Because adding additional bars can be triggered from outside of unit tracker api
@@ -937,7 +935,6 @@ local function removeBarsFromUnit(unitID, reason)
 end
 
 local function addBarToFeature(featureID, barname)
-	Spring.Echo("add " .. barname .. " bar to " .. featureID)
 	if debugmode then Spring.Debug.TraceEcho() end
 	local featureDefID = Spring.GetFeatureDefID(featureID)
 
@@ -1019,7 +1016,6 @@ local function updateFeature(featureID)
 end
 
 local function addFeature(featureID) 
-	Spring.Echo("addFeature " .. featureID .. " " .. Spring.GetGameFrame())
 	-- some map-supplied features dont have a model, in these cases modelpath == ""
 	local featureDefID = Spring.GetFeatureDefID(featureID)
 	if FeatureDefs[featureDefID].name ~= 'geovent' and FeatureDefs[featureDefID].modelpath ~= ''  then
@@ -1033,14 +1029,12 @@ local function addFeature(featureID)
 end
 
 local function removeFeature(featureID) 
-	Spring.Echo("removeFeature " .. featureID)
 	removeBarFromFeature(featureID, 'featureresurrect')
 	removeBarFromFeature(featureID, 'featurereclaim')
 	removeBarFromFeature(featureID, 'featurehealth')
 end
 
 function initfeaturebars()
-	Spring.Echo("initFeatureBars()");
 	clearInstanceTable(featureVBO)
 
 	local currentWidget = widget:GetInfo().name

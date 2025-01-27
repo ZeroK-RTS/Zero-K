@@ -42,7 +42,7 @@ for i = 1, #FeatureDefs do
 	trackedFeatures[i] = FeatureDefs[i].destructable and FeatureDefs[i].drawTypeString == "model"
 end
 
-local featureUpdateRate = 200
+local featureUpdateRate = 200.0
 
 local featureUniform = {0, 0, 0}
 function updateFeature(featureID)
@@ -90,7 +90,7 @@ function updateFeatures()
 	local visibleFeatures = GetVisibleFeatures(-1, nil, false, false)
 	local removedFeatures = {}
 
-	local updatePercent = ceil(featureUpdateRate / #visibleFeatures)
+	local updatePercent = ceil(#visibleFeatures / featureUpdateRate)
 	for featureID, _ in pairs(WG.FeatureStatusValue.defID) do
 		removedFeatures[featureID] = true
 	end
@@ -127,7 +127,6 @@ end
 
 function widget:Update()
 	updateCount = updateCount + 1
-	Spring.Echo("Update")
 	updateUnits()
 	updateFeatures()
 end
