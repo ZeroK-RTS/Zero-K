@@ -1011,10 +1011,6 @@ local function init()
 
 end
 
-local function updateFeature(featureID) 
-	--Spring.Echo("updateFeature " .. featureID)
-end
-
 local function addFeature(featureID) 
 	-- some map-supplied features dont have a model, in these cases modelpath == ""
 	local featureDefID = Spring.GetFeatureDefID(featureID)
@@ -1034,16 +1030,29 @@ local function removeFeature(featureID)
 	removeBarFromFeature(featureID, 'featurehealth')
 end
 
+local GetVisibleFeatures   = Spring.GetVisibleFeatures
+local GetFeatureDefID      = Spring.GetFeatureDefID
+
 function initfeaturebars()
 	clearInstanceTable(featureVBO)
 
 	local currentWidget = widget:GetInfo().name
-	WG.FeatureStatusValueUpdateFeatureCallbacks[currentWidget] = updateFeature
-        WG.FeatureStatusValueAddFeatureCallbacks[currentWidget] = addFeature
-        WG.FeatureStatusValueRemoveFeatureCallbacks[currentWidget] = removeFeature
 
-	for featureID, featureDefID in pairs(WG.FeatureStatusValue.defID) do
-		addFeature(featureID) 
+	WG.GlUnionUpdaterAddFeatureCallbacks = WG.GlUnionUpdaterAddFeatureCallbacks or {}
+        WG.GlUnionUpdaterRemoveFeatureCallbacks = WG.GlUnionUpdaterRemoveFeatureCallbacks or {}
+
+        WG.GlUnionUpdaterAddFeatureCallbacks[currentWidget] = addFeature
+        WG.GlUnionUpdaterRemoveFeatureCallbacks[currentWidget] = removeFeature
+
+	local visibleFeatures = GetVisibleFeatures(-1, nil, false, false)
+
+        local cnt = #visibleFeatures
+        for i = cnt, 1, -1 do
+                featureID = visibleFeatures[i]
+                featureDefID = GetFeatureDefID(featureID) or -1
+		if FeatureDefs[featureDefID].destructable and FeatureDefs[featureDefID].drawTypeString == "model" then
+			addFeature(featureID) 
+		end
 	end
 end
 
@@ -1182,9 +1191,8 @@ function widget:Shutdown()
         widgetHandler:DeregisterGlobal('MorphDrawProgress')
 
 	local currentWidget = widget:GetInfo().name
-	WG.FeatureStatusValueUpdateFeatureCallbacks[currentWidget] = nil
-        WG.FeatureStatusValueAddFeatureCallbacks[currentWidget] = nil
-        WG.FeatureStatusValueRemoveFeatureCallbacks[currentWidget] = nil
+	WG.GlUnionUpdaterAddFeatureCallbacks[currentWidget] = nil
+        WG.GlUnionUpdaterRemoveFeatureCallbacks[currentWidget] = nil
 end
 
 function widget:RecvLuaMsg(msg, playerID)
