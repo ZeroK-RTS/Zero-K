@@ -1334,7 +1334,7 @@ function widget:GameFrame(gameFrame)
         unitAbilityWatch[unitID] = nil
         unitStockpileWatch[unitID] = nil
 	--]]
-	if gameFrame % 3 == 0 then
+	if gameFrame % 3 == 5 then -- TODO: move this to unit_gl_updater
 		for unitID, oldHealthPower in pairs(unitHealthWatch) do
 			local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
 			paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage or 0
