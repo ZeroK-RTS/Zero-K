@@ -20,6 +20,9 @@ local updateCount = 0
 
 local empDecline = 1 / Game.paralyzeDeclineRate
 
+local includeDir = "LuaUI/Widgets/Include/"
+VFS.Include(includeDir.."gl_uniform_channels.lua")
+--[[
 local unitBuildChannel = 1
 local unitParalyzeChannel = 2
 local unitDisarmChannel = 3
@@ -40,6 +43,7 @@ local unitShieldChannel = 8
 local unitCaptureChannel = 9
 local unitMorphChannel = 10
 local unitHealthChannel = 11 -- if its =20, then its health/maxhealth
+--]]
 
 local GetVisibleUnits = Spring.GetVisibleUnits
 local GetUnitDefID = Spring.GetUnitDefID
@@ -74,7 +78,7 @@ function updateUnit(unitID, unitDefID)
 	local hp  = (health or 0)/maxHealth
 
 	--// HEALTH
-	unitUniform[unitHealthChannel] = hp
+	unitUniform[unitHealthChannel] = 1 - hp
 
 	--// BUILD
 	unitUniform[unitBuildChannel] = 1 - build
@@ -91,6 +95,33 @@ function updateUnit(unitID, unitDefID)
 		end
 	end
 	unitUniform[unitParalyzeChannel] = emp
+
+	--// CAPTURE
+	capture = capture or 0
+	unitUniform[unitCaptureChannel] = capture
+
+	--// DISARM
+	local disarmFrame = GetUnitRulesParam(unitID, "disarmframe")
+	if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
+		local disarm
+		local disarmProp = (disarmFrame - gameFrame)/1200
+		if disarmProp < 1 then
+			if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
+				disarm = disarmProp
+			end
+		else
+			local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
+			if (not paraTime) or disarmTime > paraTime + 0.5 then
+				disarm = disarmTime + 1
+			end
+		end
+		unitUniform[unitDisarmChannel] = disarm
+	end
+
+	--// SLOW
+	-- for unitID, oldSlow in pairs(unitSlowWatch) do
+	local slow = GetUnitRulesParam(unitID, "slowState") or 0
+	unitUniform[unitSlowChannel] = slow
 
 	glSetUnitBufferUniforms(unitID, unitUniform , 1)
 end
@@ -144,11 +175,11 @@ function resetUnits()
 	local unitID, unitDefID
 	for i = 1, #allUnits do
 		unitID = allUnits[i]
-                if fullview or Spring.GetUnitLosState(unitID, myAllyTeamID).los then
+		if fullview or Spring.GetUnitLosState(unitID, myAllyTeamID).los then
 			addUnit(unitID, GetUnitDefID(unitID))
 		end
 
-        end
+	end
 end
 
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)

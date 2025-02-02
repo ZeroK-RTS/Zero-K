@@ -210,6 +210,11 @@ local bitInverse = 32
 local bitFrameTime = 64
 local bitColorCorrect = 128
 
+
+local includeDir = "LuaUI/Widgets/Include/"
+VFS.Include(includeDir.."gl_uniform_channels.lua")
+
+--[[
 local healthChannel = 20 -- if its =20, then its health/maxhealth
 local buildChannel = 1
 local morphChannel = 10
@@ -231,14 +236,14 @@ local shieldChannel = 8
 local captureChannel = 9
 local reclaimChannel = 3
 local resurrectChannel = 2
-
+--]]
 local barTypeMap = {
 	health = {
 		mincolor = {1.0, 0.0, 0.0, 1.0},
 		maxcolor = {0.0, 1.0, 0.0, 1.0},
 		bartype = bitPercentage + bitColorCorrect + bitInverse,
 		hidethreshold = 0.99,
-		uniformindex = healthChannel,
+		uniformindex = unitHealthChannel,
 		uvoffset = 18,
 	},
 	paralyze = {
@@ -246,7 +251,7 @@ local barTypeMap = {
 		maxcolor = {0.6, 0.6, 1.0, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 1.99,
-		uniformindex = paralyzeChannel,
+		uniformindex = unitParalyzeChannel,
 		uvoffset = 19,
 	},
 	build = {
@@ -254,7 +259,7 @@ local barTypeMap = {
 		maxcolor = {1.0, 1.0, 1.0, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitInverse,
 		hidethreshold = 0.999,
-		uniformindex = buildChannel,
+		uniformindex = unitBuildChannel,
 		uvoffset = 2,
 	},
 	morph = {
@@ -262,7 +267,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = morphChannel,
+		uniformindex = unitMorphChannel,
 		uvoffset = 20,
 	},
 	disarm = {
@@ -270,7 +275,7 @@ local barTypeMap = {
 		maxcolor = {0.6, 0.6, 1.0, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = disarmChannel,
+		uniformindex = unitDisarmChannel,
 		uvoffset = 15,
 	},
 	slow = {
@@ -278,7 +283,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = slowChannel,
+		uniformindex = unitSlowChannel,
 		uvoffset = 16,
 	},
 	reload = {
@@ -286,7 +291,7 @@ local barTypeMap = {
 		maxcolor = {0.05, 0.6, 0.6, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
-		uniformindex = reloadChannel,
+		uniformindex = unitReloadChannel,
 		uvoffset = 21,
 	},
 	dgun = {
@@ -294,7 +299,7 @@ local barTypeMap = {
 		maxcolor = {1.0, 1.0, 1.0, 1.0},
 		bartype = bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
-		uniformindex = dgunChannel,
+		uniformindex = unitDgunChannel,
 		uvoffset = 17,
 	},
 	teleport = {
@@ -302,7 +307,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = teleportChannel,
+		uniformindex = unitTeleportChannel,
 		uvoffset = 12,
 	},
 	heat = {
@@ -310,7 +315,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = heatChannel,
+		uniformindex = unitHeatChannel,
 		uvoffset = 13,
 	},
 	speed = {
@@ -318,7 +323,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = speedChannel,
+		uniformindex = unitSpeedChannel,
 		uvoffset = 14,
 	},
 	reammo = {
@@ -326,7 +331,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = reammoChannel,
+		uniformindex = unitReammoChannel,
 		uvoffset = 9,
 	},
 	goo = {
@@ -334,7 +339,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = gooChannel,
+		uniformindex = unitGooChannel,
 		uvoffset = 10,
 	},
 	jump = {
@@ -342,7 +347,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect,
 		hidethreshold = 0.99,
-		uniformindex = jumpChannel,
+		uniformindex = unitJumpChannel,
 		uvoffset = 11,
 	},
 	captureReload = {
@@ -350,7 +355,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitFrameTime + bitInverse,
 		hidethreshold = 0.99,
-		uniformindex = captureReloadChannel,
+		uniformindex = unitCaptureReloadChannel,
 		uvoffset = 6,
 	},
 	ability = {
@@ -358,7 +363,7 @@ local barTypeMap = {
 		maxcolor = {0.0, 0.0, 0.0, 0.0},
 		bartype = bitPercentage + bitColorCorrect + bitInverse,
 		hidethreshold = 0.99,
-		uniformindex = abilityChannel,
+		uniformindex = unitAbilityChannel,
 		uvoffset = 7,
 	},
 	stockpile = {
@@ -366,7 +371,7 @@ local barTypeMap = {
 		maxcolor = {0.1, 0.1, 0.1, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage, --bitIntegerNumber,
 		hidethreshold = 1.99,
-		uniformindex = stockpileChannel,
+		uniformindex = unitStockpileChannel,
 		uvoffset = 8,
 	},
 	shield = {
@@ -374,7 +379,7 @@ local barTypeMap = {
 		maxcolor = {0.3, 0.8, 0.8, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = shieldChannel,
+		uniformindex = unitShieldChannel,
 		uvoffset = 1,
 	},
 	capture = {
@@ -382,7 +387,7 @@ local barTypeMap = {
 		maxcolor = {1.0, 0.5, 0.0, 1.0},
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = captureChannel,
+		uniformindex = unitCaptureChannel,
 		uvoffset = 0,
 	},
 	featurehealth = {
@@ -390,7 +395,7 @@ local barTypeMap = {
 		maxcolor = {0.65, 0.65, 0.65, 1.0},
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = 1,--healthChannel,
+		uniformindex = unitHealthChannel,
 		uvoffset = 18,
 	},
 	featurereclaim = {
