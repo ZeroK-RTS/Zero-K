@@ -22,28 +22,6 @@ local empDecline = 1 / Game.paralyzeDeclineRate
 
 local includeDir = "LuaUI/Widgets/Include/"
 VFS.Include(includeDir.."gl_uniform_channels.lua")
---[[
-local unitBuildChannel = 1
-local unitParalyzeChannel = 2
-local unitDisarmChannel = 3
-local unitSlowChannel = 4
-local unitReloadChannel = 5
-local unitDgunChannel = 6
-local unitTeleportChannel = 7
-local unitHeatChannel = 7
-local unitSpeedChannel = 7
-local unitReammoChannel = 7
-local unitGooChannel = 7
-local unitJumpChannel = 7
-local unitCaptureReloadChannel = 7
-local unitAbilityChannel = 7
-local unitStockpileProgressChannel = 7
-local unitStockpileAmountChannel = 8
-local unitShieldChannel = 8
-local unitCaptureChannel = 9
-local unitMorphChannel = 10
-local unitHealthChannel = 11 -- if its =20, then its health/maxhealth
---]]
 
 local GetVisibleUnits = Spring.GetVisibleUnits
 local GetUnitDefID = Spring.GetUnitDefID
@@ -53,6 +31,9 @@ local GetUnitHealth        = Spring.GetUnitHealth
 local glSetUnitBufferUniforms = gl.SetUnitBufferUniforms
 local GetUnitRulesParam    = Spring.GetUnitRulesParam
 local GetVisibleUnits      = Spring.GetVisibleUnits
+local GetUnitShieldState   = Spring.GetUnitShieldState
+local GetUnitRulesParam    = Spring.GetUnitRulesParam
+local GetUnitStockpile     = Spring.GetUnitStockpile
 
 local unitUpdateRate = 10
 local units = {}
@@ -123,6 +104,14 @@ function updateUnit(unitID, unitDefID)
 	local slow = GetUnitRulesParam(unitID, "slowState") or 0
 	unitUniform[unitSlowChannel] = slow
 
+	--// SHIELD
+	if unitDefHasShield[unitDefID] then -- TODO: may need to look at unitID if commander
+		local shieldOn, shieldPower = GetUnitShieldState(unitID)
+		if shieldOn == false then shieldPower = 0.0 end
+		unitUniform[unitShieldChannel] = 1 - ((shieldPower or 0) / (unitDefHasShield[(unitDefID)]))
+	end
+
+
 	glSetUnitBufferUniforms(unitID, unitUniform , 1)
 end
 
@@ -143,7 +132,6 @@ end
 
 function addUnit(unitID, unitDefID)
 	if unitPosition[unitID] ~= nil then return end
-	Spring.Echo("addUnit(" .. unitID .. ")")
 	unitsCount = unitsCount + 1
 	units[unitsCount] = unitID
 	unitPosition[unitID] = unitsCount
@@ -153,7 +141,6 @@ end
 function removeUnit(unitID)
 	local position = unitPosition[unitID]
 	if position == nil then return end
-	Spring.Echo("removeUnit(" .. unitID .. ")")
 	local lastUnit = units[unitsCount]
 	units[position] = lastUnit
 	unitPosition[lastUnit] = postion
@@ -163,7 +150,6 @@ function removeUnit(unitID)
 end
 
 function resetUnits()
-	Spring.Echo("resetUnits()")
 	units = {}
 	unitsCount = 0
 	unitPosition = {}
