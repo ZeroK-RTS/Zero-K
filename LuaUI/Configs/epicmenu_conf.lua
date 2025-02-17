@@ -371,19 +371,19 @@ local camerHotkeys = 'Hotkeys/Camera'
 
 local camerTypeZoom = 'Hotkeys/Camera/Camera Position Hotkeys'
 	ShButton(camerTypeZoom, 'Cycle through alerts', 'lastmsgpos') -- Does not allow camtime override
-	
-local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
-	AddOption(camerTypeHotkeys,
-	{
-		type='text',
-		name='Camera Modes',
-		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
-	})
-	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta')
-	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
-	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
-	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot')
-	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
+
+--local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
+--	AddOption(camerTypeHotkeys,
+--	{
+--		type='text',
+--		name='Camera Modes',
+--		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
+--	})
+--	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta')
+--	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
+--	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
+--	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot')
+--	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
 
 -- Control menu order
 ShLabel('Hotkeys/Commands', 'Command Categories')
