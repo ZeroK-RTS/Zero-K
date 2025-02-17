@@ -850,14 +850,14 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		--local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
 		local actions = Spring.GetKeyBindings(hotkey)
 		if (actions and #actions > 0) then
-			echo( 'Warning: There are other actions bound to this hotkey combo (' .. GetReadableHotkey(hotkey) .. '):' )
+			echo( 'game_message:Warning: There are other actions bound to this hotkey combo (' .. GetReadableHotkey(hotkey) .. '):' )
 			for i = 1, #actions do
 				for actionCmd, actionExtra in pairs(actions[i]) do
 					echo ('  - ' .. actionCmd .. ' ' .. actionExtra)
 				end
 			end
 		end
-		echo( 'Hotkey (' .. GetReadableHotkey(hotkey) .. ') bound to action: ' .. actionName )
+		echo( 'game_message:Hotkey (' .. GetReadableHotkey(hotkey) .. ') bound to action: ' .. actionName )
 	end
 	
 	--actionName = actionName:lower()
@@ -1603,6 +1603,20 @@ local function ResetWinSettings(path)
 	end
 end
 
+local function HasSettingsToReset(path)
+	for _, elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+		if not (unresetableSettings[option.type]) then
+			if option.default ~= nil then --fixme : need default
+				return true
+			else
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Error #627', option.name, option.type)
+			end
+		end
+	end
+	return false
+end
+
 --[[ WIP
 WG.crude.MakeHotkey = function(path, optionkey)
 	local option = pathoptions[path][optionkey]
@@ -2100,7 +2114,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 		}
 	}
 	
-	if not searchedElement then --do not display reset setting button when search is a bunch of mixed options
+	if not searchedElement and HasSettingsToReset(path) then --do not display reset setting button when search is a bunch of mixed options
 		--reset button
 		Button:New{name = 'resetButton', noFont = true,
 			OnClick = {function() ResetWinSettings(path); RemakeEpicMenu(); end },
@@ -2113,6 +2127,18 @@ MakeSubWindow = function(path, pause, labelScroll)
 			children = {
 				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
 				Label:New{caption = 'Reset', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
+			}
+		}
+	else
+		Panel:New{name = 'resetButton', noFont = true,
+			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
+			--classname = "navigation_button",
+			tooltip = "Reset the settings within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
+			height = 5,
+			padding = {2, 2, 2, 2},
+			backgroundColor={0,1,0,0},
+			parent = buttonBar,
+			children = {
 			}
 		}
 	end
