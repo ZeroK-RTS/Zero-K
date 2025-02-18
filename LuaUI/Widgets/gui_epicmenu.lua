@@ -810,10 +810,10 @@ local function HotKeyBreakdown(hotkey) --convert hotkey string into a standardiz
 
 	for i = 1, #hotkey_table-1 do
 		local str2 = hotkey_table[i]:lower()
-		if str2 == 'a' or str2 == 'alt'         then     alt = true
-		elseif str2 == 'c' or str2 == 'ctrl'     then ctrl = true
-		elseif str2 == 's' or str2 == 'shift'     then shift = true
-		elseif str2 == 'm' or str2 == 'meta'     then meta = true
+		if str2 == 'a' or str2 == 'alt' or str2 == 'Alt'          then     alt = true
+		elseif str2 == 'c' or str2 == 'ctrl'  or str2 == 'Ctrl'    then ctrl = true
+		elseif str2 == 's' or str2 == 'shift' or str2 == 'Shift'     then shift = true
+		elseif str2 == 'm' or str2 == 'meta' or str2 == 'Meta'    then meta = true
 		end
 	end
 	
@@ -1579,6 +1579,47 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 	}
 end
 
+local function GetDefaultKeybind(path, option, defaultKeysMap)
+	local action = GetActionName(path, option)
+	if defaultKeysMap[action] then
+		local keybind = defaultKeysMap[action]
+		if type(v) == "table" then
+			keybind = keybind[1]
+		end
+		return keybind
+	end
+	return keybind
+end
+
+local function ResetWinHotkeys(path)
+	local defaultKeysMap = {}
+	for i = 1, #defaultkeybinds do
+		defaultKeysMap[defaultkeybinds[i][1]] = defaultkeybinds[i][2]
+	end
+	for _, elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+		local keybind = GetDefaultKeybind(path, option, defaultKeysMap)
+		local action = GetActionName(path, option)
+		
+		UnassignKeyBind(action)
+		option.hotkey = keybind and GetReadableHotkey(keybind) or "None"
+		Spring.Echo("keybind", option.name, keybind, option.hotkey)
+		if keybind and keybind ~= "None" then
+			AssignKeyBindAction(keybind, action)
+			otset( keybounditems, action, hotkey )
+		end
+		if get_key_bind_notify_function then
+			get_key_bind_notify_function()
+			get_key_bind_notify_function = false
+		end
+		
+		if WG.COFC_HotkeyChangeNotification then
+			WG.COFC_HotkeyChangeNotification()
+		end
+	end
+		ReApplyKeybinds()
+end
+
 local unresetableSettings = {button = true, label = true, menu = true}
 local function ResetWinSettings(path)
 	for _, elem in ipairs(pathoptions[path]) do
@@ -2117,10 +2158,14 @@ MakeSubWindow = function(path, pause, labelScroll)
 	if not searchedElement and HasSettingsToReset(path) then --do not display reset setting button when search is a bunch of mixed options
 		--reset button
 		Button:New{name = 'resetButton', noFont = true,
-			OnClick = {function() ResetWinSettings(path); RemakeEpicMenu(); end },
+			OnClick = {function()
+				ResetWinSettings(path)
+				ResetWinHotkeys(path)
+				RemakeEpicMenu()
+			end},
 			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 			--classname = "navigation_button",
-			tooltip = "Reset the settings within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
+			tooltip = "Reset the settings and hotkeys within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
 			height = B_HEIGHT,
 			padding = {2, 2, 2, 2},
 			parent = buttonBar,
@@ -2130,15 +2175,20 @@ MakeSubWindow = function(path, pause, labelScroll)
 			}
 		}
 	else
-		Panel:New{name = 'resetButton', noFont = true,
+		Button:New{name = 'resetButton', noFont = true,
+			OnClick = {function()
+				ResetWinHotkeys(path)
+				RemakeEpicMenu()
+			end},
 			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 			--classname = "navigation_button",
-			tooltip = "Reset the settings within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
-			height = 5,
+			tooltip = "Reset the hotkeys within this submenu.",
+			height = B_HEIGHT,
 			padding = {2, 2, 2, 2},
-			backgroundColor={0,1,0,0},
 			parent = buttonBar,
 			children = {
+				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
+				Label:New{caption = 'Reset', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 			}
 		}
 	end
