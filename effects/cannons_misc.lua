@@ -82,4 +82,27 @@ return {
       },
     },
   },
+	["medium_cannon_trail"]          = {
+		alwaysvisible        = false,
+		usedefaultexplosions = false,
+		shaft                = {
+			air        = true,
+			class      = [[CBitmapMuzzleFlame]],
+			count      = 1,
+			ground     = true,
+			underwater = 1,
+			water      = true,
+			properties = {
+				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				dir          = [[dir]],
+				frontoffset  = 0,
+				fronttexture = [[null]],
+				length       = -3,
+				sidetexture  = [[plasma3]],
+				size         = 1,
+				sizegrowth   = -0.1,
+				ttl          = 12,
+			},
+		},
+	},
 }

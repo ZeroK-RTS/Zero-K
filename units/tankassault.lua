@@ -78,6 +78,7 @@ return { tankassault = {
       areaOfEffect            = 32,
       burst                   = 2,
       burstRate               = 0.2,
+      cegTag                  = [[medium_cannon_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
