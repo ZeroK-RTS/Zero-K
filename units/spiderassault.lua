@@ -69,6 +69,7 @@ return { spiderassault = {
     THUD_WEAPON = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 36,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 

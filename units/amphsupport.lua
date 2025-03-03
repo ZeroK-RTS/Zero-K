@@ -85,6 +85,7 @@ return { amphsupport = {
       name                    = [[Plasma Cannon]],
       accuracy                = 480,
       areaOfEffect            = 40,
+      cegTag                  = [[light_arty_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
