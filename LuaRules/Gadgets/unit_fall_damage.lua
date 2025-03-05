@@ -45,6 +45,32 @@ local attributes                      = {}
 local unitWantedVelocity
 local unitAlreadyProcessed
 
+-- Table to store maximum landing damage for each unit type
+local maxLandingDamage                = {}
+
+-- Find landing weapons and their damage values for all units
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	if ud.weapons then
+		for i, weapon in pairs(ud.weapons) do
+			local weaponDefID = weapon.weaponDef
+			local weaponDef = WeaponDefs[weaponDefID]
+			if weaponDef and weaponDef.name and (weaponDef.name:find("Landing") or weaponDef.name:find("landing")) then
+				-- Found a landing weapon, store its damage
+				if weaponDef.damages and weaponDef.damages.default then
+					maxLandingDamage[unitDefID] = weaponDef.damages.default
+					Spring.Echo("Found landing weapon for " .. ud.name .. " with damage: " .. maxLandingDamage
+						[unitDefID])
+				elseif weaponDef.damage and weaponDef.damage.default then
+					maxLandingDamage[unitDefID] = weaponDef.damage.default
+					Spring.Echo("Found landing weapon for " .. ud.name .. " with damage: " .. maxLandingDamage
+						[unitDefID])
+				end
+			end
+		end
+	end
+end
+
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	attributes[unitDefID] = {
@@ -95,8 +121,8 @@ local function LocalSpeedToDamage(unitID, unitDefID, speed)
 end
 
 local function SpringSpeedToDamage(colliderMass, collideeeMass, relativeSpeed) --Inelastic collision. Reference: Spring/rts/Sim/MoveTypes/GroundMoveType.cpp#875
-	local COLLISION_DAMAGE_MULT = 0.02                                       --Reference: Spring/rts/Sim/MoveTypes/GroundMoveType.cpp#66
-	local MAX_UNIT_SPEED = 1000                                              --Reference: Spring/rts/Sim/Misc/GlobalConstants.h
+	local COLLISION_DAMAGE_MULT = 0.02                                         --Reference: Spring/rts/Sim/MoveTypes/GroundMoveType.cpp#66
+	local MAX_UNIT_SPEED = 1000                                                --Reference: Spring/rts/Sim/Misc/GlobalConstants.h
 	local impactSpeed = relativeSpeed * 0.5;
 	local colliderelMass = (colliderMass / (colliderMass + collideeeMass));
 	local colliderelImpactSpeed = impactSpeed * (1 - colliderelMass);
@@ -168,8 +194,26 @@ local function DoCollisionDamage(unitID, unitDefID, otherID)
 	if (mySpeed > UNIT_UNIT_SPEED or otherSpeed > UNIT_UNIT_SPEED) and not noSelfDamage then
 		local otherDamage = LocalSpeedToDamage(unitID, unitDefID, relativeSpeed)
 		local myDamage = LocalSpeedToDamage(otherID, otherUnitDefID, relativeSpeed)
+
+		-- Cap damage to landing weapon damage if available
+		if maxLandingDamage[unitDefID] then
+			otherDamage = math.min(otherDamage, maxLandingDamage[unitDefID])
+		else
+			-- Fallback cap for units without landing weapons
+			local unitHealth = UnitDefs[unitDefID].health
+			otherDamage = math.min(otherDamage, unitHealth * 0.2) -- Cap at 20% of max health
+		end
+
+		if maxLandingDamage[otherUnitDefID] then
+			myDamage = math.min(myDamage, maxLandingDamage[otherUnitDefID])
+		else
+			-- Fallback cap for units without landing weapons
+			local otherUnitHealth = UnitDefs[otherUnitDefID].health
+			myDamage = math.min(myDamage, otherUnitHealth * 0.2) -- Cap at 20% of max health
+		end
+
 		local damageToDeal = math.min(myDamage, otherDamage) *
-		UNIT_UNIT_DAMAGE_FACTOR                                                  -- deal the damage of the least massive unit
+			UNIT_UNIT_DAMAGE_FACTOR -- deal the damage of the least massive unit
 		local isUnitAllied = (spGetUnitAllyTeam(unitID) == spGetUnitAllyTeam(otherID))
 		local colliderImmune = false
 
@@ -310,8 +354,18 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 
 		local damgeSpeed = math.sqrt((nx + tx * TANGENT_DAMAGE) ^ 2 + (ny + ty * TANGENT_DAMAGE) ^ 2 +
-		(nz + tz * TANGENT_DAMAGE) ^ 2)
+			(nz + tz * TANGENT_DAMAGE) ^ 2)
 		local damageTotal = LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + outsideMapDamage(unitID, unitDefID)
+
+		-- Cap damage to landing weapon damage if available
+		if maxLandingDamage[unitDefID] then
+			damageTotal = math.min(damageTotal, maxLandingDamage[unitDefID])
+		else
+			-- Fallback cap for units without landing weapons
+			local unitHealth = UnitDefs[unitDefID].health
+			damageTotal = math.min(damageTotal, unitHealth * 0.2) -- Cap at 20% of max health
+		end
+
 		damageTotal = damageTotal * (collisionDamageMult[unitID] or 1)
 		return damageTotal
 	end
