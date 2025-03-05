@@ -770,8 +770,12 @@ local function weapons2Table(cells, ws, unitID)
 		if show_range then
 			local range = cp.truerange or wd.range
 			cells[#cells + 1] = ' - Range:'
-			cells[#cells + 1] = numformat(range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1)) ..
-				" elmo"
+			-- Apply Tech-K range multiplier
+			local rangeMult = ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1)
+			if techMultRange > 1 then
+				rangeMult = rangeMult * techMultRange
+			end
+			cells[#cells + 1] = numformat(range * rangeMult) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
@@ -782,7 +786,12 @@ local function weapons2Table(cells, ws, unitID)
 
 		if show_projectile_speed then
 			cells[#cells + 1] = ' - Projectile speed:'
-			cells[#cells + 1] = numformat(wd.projectilespeed * 30) .. " elmo/s"
+			-- Apply Tech-K projSpeed multiplier to projectile speed
+			local projSpeed = wd.projectilespeed * 30
+			if techMultRange > 1 and techLevel > 1 then
+				projSpeed = projSpeed * math.sqrt(techMultRange) -- Maintain cannon range
+			end
+			cells[#cells + 1] = numformat(projSpeed) .. " elmo/s"
 		elseif hitscan[wd.type] then
 			cells[#cells + 1] = ' - Instantly hits'
 			cells[#cells + 1] = ''
