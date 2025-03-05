@@ -1,13 +1,13 @@
 function widget:GetInfo()
-  return {
-    name      = "Context Menu",
-    desc      = "v0.088 Chili Context Menu\nPress [Space] while clicking for a context menu.",
-    author    = "CarRepairer",
-    date      = "2009-06-02",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true,
-  }
+	return {
+		name    = "Context Menu",
+		desc    = "v0.088 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+		author  = "CarRepairer",
+		date    = "2009-06-02",
+		license = "GNU GPL, v2 or later",
+		layer   = 0,
+		enabled = true,
+	}
 end
 
 --[[
@@ -39,31 +39,31 @@ include("keysym.lua")
 VFS.Include("LuaRules/Utilities/numberfunctions.lua")
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
 
-local spSendLuaRulesMsg			= Spring.SendLuaRulesMsg
-local spGetCurrentTooltip		= Spring.GetCurrentTooltip
-local spGetUnitDefID			= Spring.GetUnitDefID
-local spGetUnitAllyTeam			= Spring.GetUnitAllyTeam
-local spGetUnitTeam				= Spring.GetUnitTeam
-local spTraceScreenRay			= Spring.TraceScreenRay
-local spGetTeamInfo				= Spring.GetTeamInfo
-local spGetPlayerInfo			= Spring.GetPlayerInfo
-local spGetTeamColor			= Spring.GetTeamColor
-local spGetModKeyState			= Spring.GetModKeyState
+local spSendLuaRulesMsg                         = Spring.SendLuaRulesMsg
+local spGetCurrentTooltip                       = Spring.GetCurrentTooltip
+local spGetUnitDefID                            = Spring.GetUnitDefID
+local spGetUnitAllyTeam                         = Spring.GetUnitAllyTeam
+local spGetUnitTeam                             = Spring.GetUnitTeam
+local spTraceScreenRay                          = Spring.TraceScreenRay
+local spGetTeamInfo                             = Spring.GetTeamInfo
+local spGetPlayerInfo                           = Spring.GetPlayerInfo
+local spGetTeamColor                            = Spring.GetTeamColor
+local spGetModKeyState                          = Spring.GetModKeyState
 
-local abs						= math.abs
-local strFormat 				= string.format
+local abs                                       = math.abs
+local strFormat                                 = string.format
 
-local echo = Spring.Echo
+local echo                                      = Spring.Echo
 
-local VFSMODE      = VFS.RAW_FIRST
-local ignoreweapon, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
-local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
-local color = confdata.color
+local VFSMODE                                   = VFS.RAW_FIRST
+local ignoreweapon, iconFormat                  = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua", nil, VFSMODE)
+local confdata                                  = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
+local color                                     = confdata.color
 
-local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
-local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+local iconTypesPath                             = LUAUI_DIRNAME .. "Configs/icontypes.lua"
+local icontypes                                 = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
-local emptyTable = {}
+local emptyTable                                = {}
 
 local moduleDefs, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
@@ -85,36 +85,36 @@ local color2incolor
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local WINDOW_WIDTH  = 450
-local B_HEIGHT 		= 30
-local icon_size 	= 18
+local WINDOW_WIDTH                              = 450
+local B_HEIGHT                                  = 30
+local icon_size                                 = 18
 
-local scrH, scrW 		= 0,0
-local myAlliance 		= Spring.GetLocalAllyTeamID()
-local myTeamID 			= Spring.GetLocalTeamID()
+local scrH, scrW                                = 0, 0
+local myAlliance                                = Spring.GetLocalAllyTeamID()
+local myTeamID                                  = Spring.GetLocalTeamID()
 
-local ceasefires 		= (not Spring.FixedAllies())
-local marketandbounty 	= false
+local ceasefires                                = (not Spring.FixedAllies())
+local marketandbounty                           = false
 
 local window_unitcontext
-local statswindows = {}
+local statswindows                              = {}
 
-local colorCyan = {0.2, 0.7, 1, 1}
-local colorFire = {1, 0.3, 0, 1}
-local colorPurple = {0.9, 0.2, 1, 1}
-local colorDisarm = {0.5, 0.5, 0.5, 1}
-local colorCapture = {0.6, 1, 0.6, 1}
+local colorCyan                                 = { 0.2, 0.7, 1, 1 }
+local colorFire                                 = { 1, 0.3, 0, 1 }
+local colorPurple                               = { 0.9, 0.2, 1, 1 }
+local colorDisarm                               = { 0.5, 0.5, 0.5, 1 }
+local colorCapture                              = { 0.6, 1, 0.6, 1 }
 
-local valkMaxCost = tonumber(UnitDefNames.gunshiptrans.customParams.transportcost)
-local valkMaxSize = UnitDefNames.gunshiptrans.transportSize * 2
+local valkMaxCost                               = tonumber(UnitDefNames.gunshiptrans.customParams.transportcost)
+local valkMaxSize                               = UnitDefNames.gunshiptrans.transportSize * 2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Generate unit behaviour paths
-local BEHAVIOUR_PATH = "Settings/Unit Behaviour/Default States/"
+local BEHAVIOUR_PATH                            = "Settings/Unit Behaviour/Default States/"
 
-local behaviourPath = {}
-local unitAlreadyAdded = {}
+local behaviourPath                             = {}
+local unitAlreadyAdded                          = {}
 
 local function AddFactoryOfUnits(defName)
 	if unitAlreadyAdded[defName] then
@@ -147,7 +147,8 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
+local factory_commands, econ_commands, defense_commands, special_commands = include(
+	"Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -169,7 +170,7 @@ end
 local function MakeStatsWindow()
 end
 
-options_order = {'shortNotation', 'window_height', 'window_to_cursor', 'window_pos_x', 'window_pos_y', 'text_hotkey'}
+options_order = { 'shortNotation', 'window_height', 'window_to_cursor', 'window_pos_x', 'window_pos_y', 'text_hotkey' }
 options_path = 'Help/Unit List'
 options = {
 	shortNotation = {
@@ -212,18 +213,19 @@ options = {
 		max = 2000,
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
-	
+
 	text_hotkey = {
 		name = 'Global Construction Hotkeys',
 		type = 'text',
-		value = [[These hotkey are always active. To edit the in-tab hotkeys look in "Hotkeys/Command Panel". Each tab can even have their own layout.]],
+		value =
+		[[These hotkey are always active. To edit the in-tab hotkeys look in "Hotkeys/Command Panel". Each tab can even have their own layout.]],
 		path = 'Hotkeys/Construction',
 	},
 }
 
 local alreadyAdded = {}
 
-local function addUnit (unitDefID, path, buildable)
+local function addUnit(unitDefID, path, buildable)
 	if (alreadyAdded[unitDefID]) then
 		return
 	end
@@ -238,15 +240,15 @@ local function addUnit (unitDefID, path, buildable)
 		OnChange = function(self)
 			MakeStatsWindow(ud)
 		end,
-		path = options_path ..'/' .. path,
+		path = options_path .. '/' .. path,
 	}
 	options_order[#options_order + 1] = optionName
-	
+
 	if (buildable) then
 		optionName = unitName .. 'build'
 		options[unitName .. 'build'] = {
-			name=unitName,
-			type='button',
+			name = unitName,
+			type = 'button',
 			desc = "Build " .. unitName,
 			action = 'buildunit_' .. ud.name,
 			path = 'Hotkeys/Construction/' .. path,
@@ -257,11 +259,11 @@ end
 
 local function AddFactoryOfUnits(defName)
 	local ud = UnitDefNames[defName]
-    local name = "Units/" .. string.gsub(ud.humanName, "/", "-")
+	local name = "Units/" .. string.gsub(ud.humanName, "/", "-")
 	addUnit(ud.id, "Buildings/Factory", true)
 	for i = 1, #ud.buildOptions do
 		addUnit(ud.buildOptions[i], name, true)
-    end
+	end
 end
 
 AddFactoryOfUnits("factoryshield")
@@ -279,23 +281,24 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
+local factory_commands, econ_commands, defense_commands, special_commands = include(
+	"Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local udid = UnitDefNames[buildOpts[i]].id
 	if econ_commands[-udid] then
-		addUnit(udid,"Buildings/Economy", true)
+		addUnit(udid, "Buildings/Economy", true)
 	elseif defense_commands[-udid] then
-		addUnit(udid,"Buildings/Defence", true)
+		addUnit(udid, "Buildings/Defence", true)
 	elseif special_commands[-udid] then
-		addUnit(udid,"Buildings/Special", true)
+		addUnit(udid, "Buildings/Special", true)
 	end
 end
 
 -- Misc stuff without direct buildability
 addUnit(UnitDefNames["energyheavygeo"].id, "Buildings/Economy", true) -- moho geo
-addUnit(UnitDefNames["athena"].id, "Units/Misc", true) -- athena
-addUnit(UnitDefNames["wolverine_mine"].id, "Units/Misc", false) -- maybe should go under LV fac, like wolverine? to consider.
+addUnit(UnitDefNames["athena"].id, "Units/Misc", true)                -- athena
+addUnit(UnitDefNames["wolverine_mine"].id, "Units/Misc", false)       -- maybe should go under LV fac, like wolverine? to consider.
 addUnit(UnitDefNames["tele_beacon"].id, "Units/Misc", false)
 addUnit(UnitDefNames["asteroid"].id, "Units/Misc", false)
 
@@ -326,11 +329,11 @@ for i = 1, #UnitDefs do
 	if not alreadyAdded[i] then
 		local ud = UnitDefs[i]
 		if ud.name:lower():find('pw_') and (Spring.GetGameRulesParam("planetwars_structures") == 1) then
-			addUnit(i,"Misc/Planet Wars", false)
+			addUnit(i, "Misc/Planet Wars", false)
 		elseif ud.name:lower():find('chicken') and Spring.GetGameRulesParam("difficulty") then -- fixme: not all of these are actually used
-			addUnit(i,"Misc/Chickens", false)
+			addUnit(i, "Misc/Chickens", false)
 		elseif ud.customParams.is_drone then
-			addUnit(i,"Units/Misc", false)
+			addUnit(i, "Units/Misc", false)
 		end
 	end
 end
@@ -343,16 +346,27 @@ function comma_value(amount, displayPlusMinus, forceDecimal)
 
 	-- amount is a string when ToSI is used before calling this function
 	if amount and type(amount) == "number" then
-		if (amount == 0) then formatted = "0" else
-			if (amount < 2 and (amount * 100)%100 ~=0) then
-				if displayPlusMinus then formatted = strFormat("%+.2f", amount)
-				else formatted = strFormat("%.2f", amount) end
-			elseif (amount < 20 and (amount * 10)%10 ~=0) or forceDecimal then
-				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
-				else formatted = strFormat("%.1f", amount) end
+		if (amount == 0) then
+			formatted = "0"
+		else
+			if (amount < 2 and (amount * 100) % 100 ~= 0) then
+				if displayPlusMinus then
+					formatted = strFormat("%+.2f", amount)
+				else
+					formatted = strFormat("%.2f", amount)
+				end
+			elseif (amount < 20 and (amount * 10) % 10 ~= 0) or forceDecimal then
+				if displayPlusMinus then
+					formatted = strFormat("%+.1f", amount)
+				else
+					formatted = strFormat("%.1f", amount)
+				end
 			else
-				if displayPlusMinus then formatted = strFormat("%+d", amount)
-				else formatted = strFormat("%d", amount) end
+				if displayPlusMinus then
+					formatted = strFormat("%+d", amount)
+				else
+					formatted = strFormat("%d", amount)
+				end
 			end
 		end
 	elseif amount then
@@ -384,7 +398,7 @@ local function AdjustWindow(window)
 	end
 
 	if (nx or ny) then
-		window:SetPos(nx,ny)
+		window:SetPos(nx, ny)
 	end
 end
 --------------------------------------------------------------------------------
@@ -398,10 +412,10 @@ local function CloseButtonFunc2(self)
 end
 
 local function CloseButton(width)
-	return Button:New{
+	return Button:New {
 		caption = 'Close',
 		OnClick = { CloseButtonFunc },
-		width=width,
+		width = width,
 		height = B_HEIGHT,
 		--backgroundColor=color.sub_back_bg,
 		--textColor=color.sub_back_fg,
@@ -418,19 +432,19 @@ local function GetUnitDefByHumanName(humanName)
 	-- uncomment the altResult stuff to allow a non-exact match
 	--local altResult
 
-	for _,ud in pairs(UnitDefs) do
+	for _, ud in pairs(UnitDefs) do
 		if (ud.humanName == humanName) then
 			UnitDefByHumanName_cache[humanName] = ud
 			return ud
-		--elseif (ud.humanName:find(humanName)) then
-		--	altResult = altResult or ud
+			--elseif (ud.humanName:find(humanName)) then
+			--	altResult = altResult or ud
 		end
 	end
 	--if altResult then
 	--	UnitDefByHumanName_cache[humanName] = altResult
 	--	return altResult
 	--end
-	
+
 	UnitDefByHumanName_cache[humanName] = false
 	return false
 end
@@ -440,7 +454,7 @@ local function GetShieldRegenDrain(wd)
 	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
 		shieldRegen = wd.customParams.shield_rate
 	end
-	
+
 	local shieldDrain = wd.shieldPowerRegenEnergy
 	if shieldDrain == 0 and wd.customParams and wd.customParams.shield_drain then
 		shieldDrain = wd.customParams.shield_drain
@@ -450,13 +464,28 @@ end
 
 local function weapons2Table(cells, ws, unitID)
 	local cells = cells
-	
+
 	local wd = WeaponDefs[ws.weaponID]
 	local cp = wd.customParams or emptyTable
 
+	-- Get Tech-K level for weapon multipliers
+	local techLevel = unitID and Spring.GetUnitRulesParam(unitID, "tech_level") or 1
+	local techMultProjectiles = 1
+	local techMultRange = 1
+
+	-- Apply Tech-K multipliers
+	if techLevel and techLevel > 1 then
+		techMultProjectiles = math.pow(2, techLevel - 1)
+		techMultRange = math.pow(1.1, techLevel - 1)
+	end
+
 	local name = wd.description or "Weapon"
 	if ws.count > 1 then
-		name = name .. " x " .. ws.count
+		-- Apply Tech-K projectiles multiplier to weapon count
+		name = name .. " x " .. (ws.count * techMultProjectiles)
+	elseif techMultProjectiles > 1 then
+		-- If there's only one weapon but Tech-K multiplier is applied
+		name = name .. " x " .. techMultProjectiles
 	end
 
 	if wd.type == "TorpedoLauncher" then
@@ -466,51 +495,57 @@ local function weapons2Table(cells, ws, unitID)
 	if wd.manualFire or cp.ui_manual_fire then
 		name = name .. " (manual fire)"
 	end
-	
+
 	if ws.aa_only then
 		name = name .. " (anti-air only)"
 	end
 
-	cells[#cells+1] = name
-	cells[#cells+1] = ''
+	cells[#cells + 1] = name
+	cells[#cells + 1] = ''
 
 	if wd.isShield then
 		local regen, drain = GetShieldRegenDrain(wd)
-		cells[#cells+1] = ' - Strength:'
-		cells[#cells+1] = wd.shieldPower .. " HP"
-		cells[#cells+1] = ' - Regen:'
-		cells[#cells+1] = regen .. " HP/s"
-		if wd.customParams.shield_rate_charge then
-			cells[#cells+1] = ' - Regen change:'
-			cells[#cells+1] = tonumber(wd.customParams.shield_rate_charge) .. " HP/s²"
+		cells[#cells + 1] = ' - Strength:'
+		-- Apply Tech-K shield multiplier
+		local shieldPower = wd.shieldPower
+		if techLevel > 1 then
+			shieldPower = shieldPower * math.pow(1.8, techLevel - 1)
 		end
-		cells[#cells+1] = ' - Regen cost:'
-		cells[#cells+1] = drain .. " E/s"
+		cells[#cells + 1] = numformat(shieldPower) .. " HP"
+		cells[#cells + 1] = ' - Regen:'
+		-- Apply Tech-K regen multiplier
+		cells[#cells + 1] = numformat(regen * techMultProjectiles) .. " HP/s"
+		if wd.customParams.shield_rate_charge then
+			cells[#cells + 1] = ' - Regen change:'
+			cells[#cells + 1] = numformat(tonumber(wd.customParams.shield_rate_charge)) .. " HP/s²"
+		end
+		cells[#cells + 1] = ' - Regen cost:'
+		cells[#cells + 1] = drain .. " E/s"
 		local rechargeDelay = tonumber(wd.shieldrechargedelay or wd.customParams.shield_recharge_delay)
 		if rechargeDelay and rechargeDelay > 0 then
-			cells[#cells+1] = ' - Regen delay:'
-			cells[#cells+1] = rechargeDelay .. " s"
+			cells[#cells + 1] = ' - Regen delay:'
+			cells[#cells + 1] = rechargeDelay .. " s"
 		end
-		cells[#cells+1] = ' - Radius:'
-		cells[#cells+1] = wd.shieldRadius .. " elmo"
+		cells[#cells + 1] = ' - Radius:'
+		cells[#cells + 1] = wd.shieldRadius .. " elmo"
 		if wd.customParams.unlinked then
-			cells[#cells+1] = ' - Does not link with other shields'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Does not link with other shields'
+			cells[#cells + 1] = ''
 		end
 	else
 		-- calculate damages
 
-		local dam  = 0
-		local damw = 0
-		local dams = 0
-		local damd = 0
-		local damc = 0
+		local dam        = 0
+		local damw       = 0
+		local dams       = 0
+		local damd       = 0
+		local damc       = 0
 
-		local stun_time = 0
+		local stun_time  = 0
 
-		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
+		local comm_mult  = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
 		local baseDamage = tonumber(cp.stats_damage) or wd.customParams.shield_damage or 0
-		local val = baseDamage * comm_mult
+		local val        = baseDamage * comm_mult
 
 		if cp.disarmdamagemult then
 			damd = val * cp.disarmdamagemult
@@ -548,16 +583,16 @@ local function weapons2Table(cells, ws, unitID)
 
 		-- get reloadtime and calculate dps
 		local reloadtime = tonumber(cp.script_reload) or wd.reload
-		
-		local dps  = math.floor(dam /reloadtime + 0.5)
-		local dpsw = math.floor(damw/reloadtime + 0.5)
-		local dpss = math.floor(dams/reloadtime + 0.5)
-		local dpsd = math.floor(damd/reloadtime + 0.5)
-		local dpsc = math.floor(damc/reloadtime + 0.5)
+
+		local dps        = math.floor(dam / reloadtime + 0.5)
+		local dpsw       = math.floor(damw / reloadtime + 0.5)
+		local dpss       = math.floor(dams / reloadtime + 0.5)
+		local dpsd       = math.floor(damd / reloadtime + 0.5)
+		local dpsc       = math.floor(damc / reloadtime + 0.5)
 		if cp.stats_typical_damage then
-			dps  = math.floor(tonumber(cp.stats_typical_damage) * comm_mult /reloadtime + 0.5)
+			dps = math.floor(tonumber(cp.stats_typical_damage) * comm_mult / reloadtime + 0.5)
 		end
-		
+
 		local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
 
 		local dps_str, dam_str, shield_dam_str = '', '', ''
@@ -568,7 +603,7 @@ local function weapons2Table(cells, ws, unitID)
 			if cp.stats_damage_per_second then
 				dps_str = dps_str .. numformat(tonumber(cp.stats_damage_per_second))
 			else
-				dps_str = dps_str .. numformat(dps*mult)
+				dps_str = dps_str .. numformat(dps * mult)
 			end
 			damageTypes = damageTypes + 1
 		end
@@ -580,7 +615,7 @@ local function weapons2Table(cells, ws, unitID)
 			end
 			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(damw) .. " (P)\008"
 			shield_dam_str = shield_dam_str .. color2incolor(colorCyan) .. numformat(math.floor(damw / 3)) .. " (P)\008"
-			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(dpsw*mult) .. " (P)\008"
+			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(dpsw * mult) .. " (P)\008"
 			damageTypes = damageTypes + 1
 		end
 		if dpss > 0 then
@@ -590,8 +625,9 @@ local function weapons2Table(cells, ws, unitID)
 				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(dams) .. " (S)\008"
-			shield_dam_str = shield_dam_str .. color2incolor(colorPurple) .. numformat(math.floor(dams / 3)) .. " (S)\008"
-			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(dpss*mult) .. " (S)\008"
+			shield_dam_str = shield_dam_str ..
+				color2incolor(colorPurple) .. numformat(math.floor(dams / 3)) .. " (S)\008"
+			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(dpss * mult) .. " (S)\008"
 			damageTypes = damageTypes + 1
 		end
 
@@ -602,8 +638,9 @@ local function weapons2Table(cells, ws, unitID)
 				shield_dam_str = shield_dam_str .. ' + '
 			end
 			dam_str = dam_str .. color2incolor(colorDisarm) .. numformat(damd) .. " (D)\008"
-			shield_dam_str = shield_dam_str .. color2incolor(colorDisarm) .. numformat(math.floor(damd / 3)) .. " (D)\008"
-			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(dpsd*mult) .. " (D)\008"
+			shield_dam_str = shield_dam_str ..
+				color2incolor(colorDisarm) .. numformat(math.floor(damd / 3)) .. " (D)\008"
+			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(dpsd * mult) .. " (D)\008"
 			damageTypes = damageTypes + 1
 		end
 
@@ -615,7 +652,7 @@ local function weapons2Table(cells, ws, unitID)
 			end
 			dam_str = dam_str .. color2incolor(colorCapture) .. numformat(damc) .. " (C)\008"
 			shield_dam_str = shield_dam_str .. color2incolor(colorCapture) .. numformat(damc) .. " (C)\008"
-			dps_str = dps_str .. color2incolor(colorCapture) .. numformat(dpsc*mult) .. " (C)\008"
+			dps_str = dps_str .. color2incolor(colorCapture) .. numformat(dpsc * mult) .. " (C)\008"
 			damageTypes = damageTypes + 1
 		end
 
@@ -624,9 +661,9 @@ local function weapons2Table(cells, ws, unitID)
 			shield_dam_str = shield_dam_str .. " x " .. mult
 		end
 		if cp.shield_mult then
-			shield_dam_str = shield_dam_str .. " x " .. math.floor(100*cp.shield_mult) .. '%'
+			shield_dam_str = shield_dam_str .. " x " .. math.floor(100 * cp.shield_mult) .. '%'
 		end
-		
+
 		local show_damage = not cp.stats_hide_damage
 		local show_dps = not cp.stats_hide_dps
 		local show_reload = not cp.stats_hide_reload
@@ -643,31 +680,32 @@ local function weapons2Table(cells, ws, unitID)
 			show_damage = false
 			show_dps = false
 		end
-		
+
 		if cp.damage_vs_shield and cp.spawns_name then -- Badger
-			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
-			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
+			dam_str = tostring(cp.damage_vs_shield) ..
+				" (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield) - dam) .. " mine)"
+			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield) / reloadtime))
 		end
 
 		if cp.stats_typical_damage then
-			cells[#cells+1] = ' - Typical Damage:'
-			cells[#cells+1] = numformat(math.floor(tonumber(cp.stats_typical_damage) * comm_mult))
+			cells[#cells + 1] = ' - Typical Damage:'
+			cells[#cells + 1] = numformat(math.floor(tonumber(cp.stats_typical_damage) * comm_mult))
 			if cp.thermite_frames then
-				cells[#cells+1] = ' - Lingers when blocked by obstacles'
-				cells[#cells+1] = ''
-				cells[#cells+1] = ' - Projectile life:'
-				cells[#cells+1] = numformat(tonumber(cp.thermite_frames)/30) .. "s"
+				cells[#cells + 1] = ' - Lingers when blocked by obstacles'
+				cells[#cells + 1] = ''
+				cells[#cells + 1] = ' - Projectile life:'
+				cells[#cells + 1] = numformat(tonumber(cp.thermite_frames) / 30) .. "s"
 				if cp.thermite_dps_end then
-					cells[#cells+1] = ' - Damage increases over time'
-					cells[#cells+1] = ''
-					cells[#cells+1] = ' - Initial damage:'
-					cells[#cells+1] = numformat(tonumber(cp.thermite_dps_start)) .. " HP/s"
-					cells[#cells+1] = ' - Final damage:'
-					cells[#cells+1] = numformat(tonumber(cp.thermite_dps_end)) .. " HP/s"
+					cells[#cells + 1] = ' - Damage increases over time'
+					cells[#cells + 1] = ''
+					cells[#cells + 1] = ' - Initial damage:'
+					cells[#cells + 1] = numformat(tonumber(cp.thermite_dps_start)) .. " HP/s"
+					cells[#cells + 1] = ' - Final damage:'
+					cells[#cells + 1] = numformat(tonumber(cp.thermite_dps_end)) .. " HP/s"
 				end
 			elseif wd.noExplode or cp.pretend_no_explode then
-				cells[#cells+1] = ' - Continual damage while piercing'
-				cells[#cells+1] = ''
+				cells[#cells + 1] = ' - Continual damage while piercing'
+				cells[#cells + 1] = ''
 			end
 		end
 
@@ -675,77 +713,79 @@ local function weapons2Table(cells, ws, unitID)
 			dam_str = dam_str .. " per touch"
 		end
 		if show_damage then
-			cells[#cells+1] = ' - Damage:'
-			cells[#cells+1] = dam_str
+			cells[#cells + 1] = ' - Damage:'
+			cells[#cells + 1] = dam_str
 		end
 
 		-- shield damage
 		if (wd.interceptedByShieldType ~= 0) and show_damage and not cp.stats_hide_shield_damage then
 			if cp.damage_vs_shield then
-				cells[#cells+1] = ' - Shield damage:'
-				cells[#cells+1] = numformat(cp.stats_shield_damage)
+				cells[#cells + 1] = ' - Shield damage:'
+				cells[#cells + 1] = numformat(cp.stats_shield_damage)
 			elseif tonumber(cp.stats_shield_damage) ~= baseDamage then
-				cells[#cells+1] = ' - Shield damage:'
+				cells[#cells + 1] = ' - Shield damage:'
 				if damageTypes > 1 or mult > 1 then
-					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult * comm_mult)) .. " (" .. shield_dam_str .. ")"
+					cells[#cells + 1] = numformat(math.floor(cp.stats_shield_damage * mult * comm_mult)) ..
+						" (" .. shield_dam_str .. ")"
 				else
-					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult * comm_mult))
+					cells[#cells + 1] = numformat(math.floor(cp.stats_shield_damage * mult * comm_mult))
 				end
 			end
 		end
-		
+
 		if cp.post_capture_reload then
-			cells[#cells+1] = ' - Reloadtime:'
-			cells[#cells+1] = numformat (tonumber(cp.post_capture_reload)/30) .. 's'
+			cells[#cells + 1] = ' - Reloadtime:'
+			cells[#cells + 1] = numformat(tonumber(cp.post_capture_reload) / 30) .. 's'
 		elseif cp.reammoseconds then
-			cells[#cells+1] = ' - Must rearm after shot'
-			cells[#cells+1] = ''
-			cells[#cells+1] = ' - Rearm time:'
-			cells[#cells+1] = cp.reammoseconds .. 's'
+			cells[#cells + 1] = ' - Must rearm after shot'
+			cells[#cells + 1] = ''
+			cells[#cells + 1] = ' - Rearm time:'
+			cells[#cells + 1] = cp.reammoseconds .. 's'
 			show_dps = false
 		elseif show_reload then
-			cells[#cells+1] = ' - Reloadtime:'
-			cells[#cells+1] = numformat (reloadtime) .. 's'
+			cells[#cells + 1] = ' - Reloadtime:'
+			cells[#cells + 1] = numformat(reloadtime) .. 's'
 		end
 		if show_dps then
-			cells[#cells+1] = ' - DPS:'
-			cells[#cells+1] = dps_str
+			cells[#cells + 1] = ' - DPS:'
+			cells[#cells + 1] = dps_str
 		end
 
 		if (wd.interceptedByShieldType == 0) then
-			cells[#cells+1] = ' - Ignores shields'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Ignores shields'
+			cells[#cells + 1] = ''
 		end
 
 		if stun_time > 0 then
-			cells[#cells+1] = ' - Max stun time:'
-			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time) .. 's\008'
+			cells[#cells + 1] = ' - Max stun time:'
+			cells[#cells + 1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time) .. 's\008'
 		end
 
 		if cp.setunitsonfire then
-			cells[#cells+1] = ' - Afterburn:'
+			cells[#cells + 1] = ' - Afterburn:'
 			local afterburn_frames = (cp.burntime or (450 * (wd.fireStarter or 0)))
-			cells[#cells+1] = color2incolor(colorFire) .. numformat(afterburn_frames/30) .. 's (15 DPS)\008'
+			cells[#cells + 1] = color2incolor(colorFire) .. numformat(afterburn_frames / 30) .. 's (15 DPS)\008'
 		end
 
 		if show_range then
 			local range = cp.truerange or wd.range
-			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1)) .. " elmo"
+			cells[#cells + 1] = ' - Range:'
+			cells[#cells + 1] = numformat(range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1)) ..
+				" elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
 		if (aoe > 15 and show_aoe) or cp.stats_aoe then
-			cells[#cells+1] = ' - AoE radius:'
-			cells[#cells+1] = numformat(cp.stats_aoe or aoe) .. " elmo"
+			cells[#cells + 1] = ' - AoE radius:'
+			cells[#cells + 1] = numformat(cp.stats_aoe or aoe) .. " elmo"
 		end
 
 		if show_projectile_speed then
-			cells[#cells+1] = ' - Projectile speed:'
-			cells[#cells+1] = numformat(wd.projectilespeed*30) .. " elmo/s"
+			cells[#cells + 1] = ' - Projectile speed:'
+			cells[#cells + 1] = numformat(wd.projectilespeed * 30) .. " elmo/s"
 		elseif hitscan[wd.type] then
-			cells[#cells+1] = ' - Instantly hits'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Instantly hits'
+			cells[#cells + 1] = ''
 		end
 
 		--[[ Unimportant stuff, maybe make togglable with some option later
@@ -781,95 +821,96 @@ local function weapons2Table(cells, ws, unitID)
 		]]
 
 		if wd.tracks and wd.turnRate > 0 then
-			cells[#cells+1] = ' - Homing:'
+			cells[#cells + 1] = ' - Homing:'
 			local turnrate = wd.turnRate * 30 * 180 / math.pi
-			cells[#cells+1] = numformat(turnrate) .. " deg/s"
+			cells[#cells + 1] = numformat(turnrate) .. " deg/s"
 		end
 
 		if wd.wobble > 0 then
-			cells[#cells+1] = ' - Wobbly:'
+			cells[#cells + 1] = ' - Wobbly:'
 			local wobble = wd.wobble * 30 * 180 / math.pi
-			cells[#cells+1] = "up to " .. numformat(wobble) .. " deg/s"
+			cells[#cells + 1] = "up to " .. numformat(wobble) .. " deg/s"
 		end
 
 		if wd.sprayAngle > 0 then
-			cells[#cells+1] = ' - Inaccuracy:'
+			cells[#cells + 1] = ' - Inaccuracy:'
 			local accuracy = math.asin(wd.sprayAngle) * 90 / math.pi
-			cells[#cells+1] = numformat(accuracy) .. " deg"
+			cells[#cells + 1] = numformat(accuracy) .. " deg"
 		end
 
 		if wd.type == "BeamLaser" and wd.beamtime > 0.2 then
-			cells[#cells+1] = ' - Burst time:'
-			cells[#cells+1] = numformat(wd.beamtime) .. "s"
+			cells[#cells + 1] = ' - Burst time:'
+			cells[#cells + 1] = numformat(wd.beamtime) .. "s"
 		end
 
 		if cp.spawns_name then
-			cells[#cells+1] = ' - Spawns: '
-			cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.spawns_name])
+			cells[#cells + 1] = ' - Spawns: '
+			cells[#cells + 1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.spawns_name])
 			if cp.spawns_expire then
-				cells[#cells+1] = ' - Spawn life: '
-				cells[#cells+1] = cp.spawns_expire .. "s"
+				cells[#cells + 1] = ' - Spawn life: '
+				cells[#cells + 1] = cp.spawns_expire .. "s"
 			end
 		end
-		
+
 		if cp.reload_move_mod_time then
-			cells[#cells+1] = ' - Move mult time: '
-			cells[#cells+1] = cp.reload_move_mod_time .. "s"
+			cells[#cells + 1] = ' - Move mult time: '
+			cells[#cells + 1] = cp.reload_move_mod_time .. "s"
 		end
 
 		if cp.area_damage then
 			if (cp.area_damage_is_impulse == "1") then
-				cells[#cells+1] = ' - Creates a gravity well:'
-				cells[#cells+1] = ''
+				cells[#cells + 1] = ' - Creates a gravity well:'
+				cells[#cells + 1] = ''
 			elseif (cp.area_damage_is_slow == "1") then
-				cells[#cells+1] = ' - Lingering slow damage in an area:'
-				cells[#cells+1] = ''
-				cells[#cells+1] = '   * DPS:'
-				cells[#cells+1] = color2incolor(colorPurple) .. cp.area_damage_dps .. " (S)\008"
+				cells[#cells + 1] = ' - Lingering slow damage in an area:'
+				cells[#cells + 1] = ''
+				cells[#cells + 1] = '   * DPS:'
+				cells[#cells + 1] = color2incolor(colorPurple) .. cp.area_damage_dps .. " (S)\008"
 			else
-				cells[#cells+1] = ' - Sets the ground on fire:'
-				cells[#cells+1] = ''
-				cells[#cells+1] = '   * DPS:'
-				cells[#cells+1] = cp.area_damage_dps
+				cells[#cells + 1] = ' - Sets the ground on fire:'
+				cells[#cells + 1] = ''
+				cells[#cells + 1] = '   * DPS:'
+				cells[#cells + 1] = cp.area_damage_dps
 			end
-			cells[#cells+1] = '   * Radius:'
-			cells[#cells+1] = numformat(tonumber(cp.area_damage_radius)) .. " elmo"
-			cells[#cells+1] = '   * Duration:'
-			cells[#cells+1] = numformat(tonumber(cp.area_damage_duration)) .. " s"
+			cells[#cells + 1] = '   * Radius:'
+			cells[#cells + 1] = numformat(tonumber(cp.area_damage_radius)) .. " elmo"
+			cells[#cells + 1] = '   * Duration:'
+			cells[#cells + 1] = numformat(tonumber(cp.area_damage_duration)) .. " s"
 		end
 
 		if wd.trajectoryHeight > 0 then
-			cells[#cells+1] = ' - Arcing shot:'
-			cells[#cells+1] = numformat(math.atan(wd.trajectoryHeight) * 180 / math.pi) .. " deg"
+			cells[#cells + 1] = ' - Arcing shot:'
+			cells[#cells + 1] = numformat(math.atan(wd.trajectoryHeight) * 180 / math.pi) .. " deg"
 		end
 
 		if wd.stockpile then
-			cells[#cells+1] = ' - Stockpile time:'
-			cells[#cells+1] = (((tonumber(ws.stockpile_time) or 0) > 0) and tonumber(ws.stockpile_time) or wd.stockpileTime) .. 's'
+			cells[#cells + 1] = ' - Stockpile time:'
+			cells[#cells + 1] = (((tonumber(ws.stockpile_time) or 0) > 0) and tonumber(ws.stockpile_time) or wd.stockpileTime) ..
+				's'
 			if ((not ws.free_stockpile) and (ws.stockpile_cost or (wd.metalCost > 0))) then
-				cells[#cells+1] = ' - Stockpile cost:'
-				cells[#cells+1] = ws.stockpile_cost or wd.metalCost .. " M"
+				cells[#cells + 1] = ' - Stockpile cost:'
+				cells[#cells + 1] = ws.stockpile_cost or wd.metalCost .. " M"
 			end
 		end
 
 		if ws.firing_arc and (ws.firing_arc > -1) then
-			cells[#cells+1] = ' - Firing arc:'
-			cells[#cells+1] = numformat(360*math.acos(ws.firing_arc)/math.pi) .. ' deg'
+			cells[#cells + 1] = ' - Firing arc:'
+			cells[#cells + 1] = numformat(360 * math.acos(ws.firing_arc) / math.pi) .. ' deg'
 		end
 
 		if cp.needs_link then
-			cells[#cells+1] = ' - Grid needed:'
-			cells[#cells+1] = tonumber(cp.needs_link) .. " E"
+			cells[#cells + 1] = ' - Grid needed:'
+			cells[#cells + 1] = tonumber(cp.needs_link) .. " E"
 		end
 
 		if cp.smoothradius then
-			cells[#cells+1] = ' - Smooth ground'
-			cells[#cells+1] = numformat((tonumber(cp.smoothmult or 0) or 0)*100) .. '%'
+			cells[#cells + 1] = ' - Smooth ground'
+			cells[#cells + 1] = numformat((tonumber(cp.smoothmult or 0) or 0) * 100) .. '%'
 		end
 
 		if cp.movestructures then
-			cells[#cells+1] = ' - Smooth structures'
-			cells[#cells+1] = numformat((tonumber(cp.movestructures or 0) or 0)*100) .. '%'
+			cells[#cells + 1] = ' - Smooth structures'
+			cells[#cells + 1] = numformat((tonumber(cp.movestructures or 0) or 0) * 100) .. '%'
 		end
 
 		local highTraj = wd.highTrajectory
@@ -877,61 +918,61 @@ local function weapons2Table(cells, ws, unitID)
 			highTraj = ws.highTrajectory
 		end
 		if highTraj == 1 then
-			cells[#cells+1] = ' - High trajectory'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - High trajectory'
+			cells[#cells + 1] = ''
 		elseif highTraj == 2 then
-			cells[#cells+1] = ' - Trajectory toggle'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Trajectory toggle'
+			cells[#cells + 1] = ''
 		end
 
 		if wd.waterWeapon and (wd.type ~= "TorpedoLauncher") then
-			cells[#cells+1] = ' - Water capable'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Water capable'
+			cells[#cells + 1] = ''
 		end
 
 		if not wd.avoidFriendly and not wd.noFriendlyCollide and not cp.ui_no_friendly_fire then
-			cells[#cells+1] = ' - Potential friendly fire'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Potential friendly fire'
+			cells[#cells + 1] = ''
 		end
 
 		if wd.noGroundCollide then
-			cells[#cells+1] = ' - Passes through ground'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Passes through ground'
+			cells[#cells + 1] = ''
 		end
 
 		if (wd.noExplode or cp.pretend_no_explode) and not cp.thermite_frames then
-			cells[#cells+1] = ' - Piercing '
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Piercing '
+			cells[#cells + 1] = ''
 		end
 
 		if cp.dyndamageexp then
-			cells[#cells+1] = ' - Damage falls off with range'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Damage falls off with range'
+			cells[#cells + 1] = ''
 		end
 
 		if cp.nofriendlyfire then
-			cells[#cells+1] = ' - No friendly fire'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - No friendly fire'
+			cells[#cells + 1] = ''
 		end
 
 		if cp.shield_drain then
-			cells[#cells+1] = ' - Shield drain:'
-			cells[#cells+1] = cp.shield_drain .. " HP/shot"
+			cells[#cells + 1] = ' - Shield drain:'
+			cells[#cells + 1] = cp.shield_drain .. " HP/shot"
 		end
 
 		if cp.aim_delay then
-			cells[#cells+1] = ' - Aiming time:'
-			cells[#cells+1] = numformat(tonumber(cp.aim_delay)/1000) .. "s"
+			cells[#cells + 1] = ' - Aiming time:'
+			cells[#cells + 1] = numformat(tonumber(cp.aim_delay) / 1000) .. "s"
 		end
 
 		if wd.targetMoveError > 0 then
-			cells[#cells+1] = ' - Inaccuracy vs moving targets'
-			cells[#cells+1] = '' -- actual value doesn't say much as it's a multiplier for the target speed
+			cells[#cells + 1] = ' - Inaccuracy vs moving targets'
+			cells[#cells + 1] = '' -- actual value doesn't say much as it's a multiplier for the target speed
 		end
 
 		if wd.targetable and ((wd.targetable == 1) or (wd.targetable == true)) then
-			cells[#cells+1] = ' - Can be shot down by antinukes'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Can be shot down by antinukes'
+			cells[#cells + 1] = ''
 		end
 	end
 	return cells
@@ -942,390 +983,393 @@ local function printAbilities(ud, unitID)
 
 	local cp = ud.customParams
 
-	
+
 	if ud.buildSpeed > 0 and not cp.nobuildpower then
 		local buildSpeed = (unitID and Spring.Utilities.GetUnitBuildSpeed(unitID)) or ud.buildSpeed
-		cells[#cells+1] = 'Construction'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Buildpower: '
-		cells[#cells+1] = numformat(buildSpeed) .. " cost/s"
+		cells[#cells + 1] = 'Construction'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Buildpower: '
+		cells[#cells + 1] = numformat(buildSpeed) .. " cost/s"
 		if ud.buildDistance and not ud.isFactory then
-			cells[#cells+1] = ' - Build range:'
-			cells[#cells+1] = numformat(ud.buildDistance) .. " elmo"
+			cells[#cells + 1] = ' - Build range:'
+			cells[#cells + 1] = numformat(ud.buildDistance) .. " elmo"
 		end
 		if ud.canResurrect then
-			cells[#cells+1] = ' - Can resurrect wreckage'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Can resurrect wreckage'
+			cells[#cells + 1] = ''
 		end
 		if (#ud.buildOptions == 0) then
-			cells[#cells+1] = ' - Can only assist'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Can only assist'
+			cells[#cells + 1] = ''
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if ud.armoredMultiple < 1 then
-		cells[#cells+1] = 'Armored form'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Reduction: '
-		cells[#cells+1] = numformat((1-ud.armoredMultiple)*100) .. '%'
+		cells[#cells + 1] = 'Armored form'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Reduction: '
+		cells[#cells + 1] = numformat((1 - ud.armoredMultiple) * 100) .. '%'
 		if cp.force_close then
-			cells[#cells+1] = ' - Forced for: '
-			cells[#cells+1] = cp.force_close .. 's on damage'
+			cells[#cells + 1] = ' - Forced for: '
+			cells[#cells + 1] = cp.force_close .. 's on damage'
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.area_cloak or (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) then
 		local areaCloakUpkeep = (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_upkeep") or cp.area_cloak_upkeep)
 		local areaCloakRadius = ((unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_radius")) or cp.area_cloak_radius)
 		local areaCloakRecloak = ((unitID and Spring.GetUnitRulesParam(unitID, "comm_area_recloak_rate")) or cp.area_cloak_recloak_rate)
-		cells[#cells+1] = 'Area cloak'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Upkeep:'
-		cells[#cells+1] = areaCloakUpkeep .. " E/s"
-		cells[#cells+1] = ' - Radius:'
-		cells[#cells+1] = areaCloakRadius .. " elmo"
-		cells[#cells+1] = ' - Cloak rate:'
-		cells[#cells+1] = areaCloakRecloak .. " mass/s"
+		cells[#cells + 1] = 'Area cloak'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Upkeep:'
+		cells[#cells + 1] = areaCloakUpkeep .. " E/s"
+		cells[#cells + 1] = ' - Radius:'
+		cells[#cells + 1] = areaCloakRadius .. " elmo"
+		cells[#cells + 1] = ' - Cloak rate:'
+		cells[#cells + 1] = areaCloakRecloak .. " mass/s"
 		if cp.area_cloak_shift_range then
-			cells[#cells+1] = ' - Offset range:'
-			cells[#cells+1] = cp.area_cloak_shift_range
+			cells[#cells + 1] = ' - Offset range:'
+			cells[#cells + 1] = cp.area_cloak_shift_range
 		end
 		if cp.area_cloak_move_mult then
-			cells[#cells+1] = ' - Move speed:'
-			cells[#cells+1] = numformat(tonumber(cp.area_cloak_move_mult)*100) .. "%"
+			cells[#cells + 1] = ' - Move speed:'
+			cells[#cells + 1] = numformat(tonumber(cp.area_cloak_move_mult) * 100) .. "%"
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if ud.canCloak and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
-		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
-		cells[#cells+1] = 'Personal cloak'
-		cells[#cells+1] = ''
+		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or
+			ud.decloakDistance
+		cells[#cells + 1] = 'Personal cloak'
+		cells[#cells + 1] = ''
 		if not ud.isImmobile and ud.cloakCost ~= ud.cloakCostMoving then
-			cells[#cells+1] = ' - Upkeep mobile: '
-			cells[#cells+1] = numformat(ud.cloakCostMoving) .. " E/s"
-			cells[#cells+1] = ' - Upkeep idle: '
+			cells[#cells + 1] = ' - Upkeep mobile: '
+			cells[#cells + 1] = numformat(ud.cloakCostMoving) .. " E/s"
+			cells[#cells + 1] = ' - Upkeep idle: '
 		else
-			cells[#cells+1] = ' - Upkeep: '
+			cells[#cells + 1] = ' - Upkeep: '
 		end
-		cells[#cells+1] = numformat(ud.cloakCost) .. " E/s"
-		cells[#cells+1] = ' - Decloak radius: '
-		cells[#cells+1] = numformat(decloakDistance) .. " elmo"
+		cells[#cells + 1] = numformat(ud.cloakCost) .. " E/s"
+		cells[#cells + 1] = ' - Decloak radius: '
+		cells[#cells + 1] = numformat(decloakDistance) .. " elmo"
 		if not ud.decloakOnFire then
-			cells[#cells+1] = ' - No decloak while shooting'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - No decloak while shooting'
+			cells[#cells + 1] = ''
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.idle_cloak then
-		cells[#cells+1] = 'Personal cloak'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Only when idle'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Free and automated'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Decloak radius: '
-		cells[#cells+1] = numformat(ud.decloakDistance) .. " elmo"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Personal cloak'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Only when idle'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Free and automated'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Decloak radius: '
+		cells[#cells + 1] = numformat(ud.decloakDistance) .. " elmo"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	local radarRadius = unitID and Spring.GetUnitRulesParam(unitID, "radarRangeOverride") or ud.radarDistance
 	local jammerRadius = unitID and Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") or ud.radarDistanceJam
-	
+
 	if (radarRadius > 0) or (jammerRadius > 0) or ud.isTargetingUpgrade then
-		cells[#cells+1] = 'Provides intel'
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Provides intel'
+		cells[#cells + 1] = ''
 		if (radarRadius > 0) then
-			cells[#cells+1] = ' - Radar:'
-			cells[#cells+1] = numformat(radarRadius) .. " elmo"
+			cells[#cells + 1] = ' - Radar:'
+			cells[#cells + 1] = numformat(radarRadius) .. " elmo"
 		end
 		if (jammerRadius > 0) then
-			cells[#cells+1] = ' - Radar jamming:'
-			cells[#cells+1] = numformat(jammerRadius) .. " elmo"
+			cells[#cells + 1] = ' - Radar jamming:'
+			cells[#cells + 1] = numformat(jammerRadius) .. " elmo"
 		end
 		if ud.isTargetingUpgrade then
-			cells[#cells+1] = ' - Improves radar accuracy'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Improves radar accuracy'
+			cells[#cells + 1] = ''
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.canjump and (not cp.no_jump_handling) then
-		cells[#cells+1] = 'Jumping'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Range:'
-		cells[#cells+1] = cp.jump_range .. " elmo"
-		cells[#cells+1] = ' - Reload: '
-		cells[#cells+1] = (cp.jump_reload + ((unitID and Spring.GetUnitRulesParam(unitID, "upgradesJumpReloadMod")) or 0)) .. 's'
-		cells[#cells+1] = ' - Speed:'
-		cells[#cells+1] = numformat(30*tonumber(cp.jump_speed)) .. " elmo/s"
-		cells[#cells+1] = ' - Midair jump:'
-		cells[#cells+1] = (tonumber(cp.jump_from_midair) == 0) and "No" or "Yes"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Jumping'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Range:'
+		cells[#cells + 1] = cp.jump_range .. " elmo"
+		cells[#cells + 1] = ' - Reload: '
+		cells[#cells + 1] = (cp.jump_reload + ((unitID and Spring.GetUnitRulesParam(unitID, "upgradesJumpReloadMod")) or 0)) ..
+			's'
+		cells[#cells + 1] = ' - Speed:'
+		cells[#cells + 1] = numformat(30 * tonumber(cp.jump_speed)) .. " elmo/s"
+		cells[#cells + 1] = ' - Midair jump:'
+		cells[#cells + 1] = (tonumber(cp.jump_from_midair) == 0) and "No" or "Yes"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.morphto then
-		cells[#cells+1] = 'Morphing'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - To: '
-		cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.morphto])
-		cells[#cells+1] = ' - Cost: '
-		cells[#cells+1] = math.max(0, (UnitDefNames[cp.morphto].buildTime - ud.buildTime)) .. " M"
+		cells[#cells + 1] = 'Morphing'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - To: '
+		cells[#cells + 1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.morphto])
+		cells[#cells + 1] = ' - Cost: '
+		cells[#cells + 1] = math.max(0, (UnitDefNames[cp.morphto].buildTime - ud.buildTime)) .. " M"
 		if cp.morphrank and (tonumber(cp.morphrank) > 0) then
-			cells[#cells+1] = ' - Rank:'
-			cells[#cells+1] = cp.morphrank
+			cells[#cells + 1] = ' - Rank:'
+			cells[#cells + 1] = cp.morphrank
 		end
-		cells[#cells+1] = ' - Time: '
-		cells[#cells+1] = cp.morphtime .. "s"
+		cells[#cells + 1] = ' - Time: '
+		cells[#cells + 1] = cp.morphtime .. "s"
 		if cp.combatmorph == '1' then
-			cells[#cells+1] = ' - Not disabled during morph'
+			cells[#cells + 1] = ' - Not disabled during morph'
 		else
-			cells[#cells+1] = ' - Disabled during morph'
+			cells[#cells + 1] = ' - Disabled during morph'
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if (ud.idleTime < 1800) or (cp.amph_regen) or (cp.armored_regen) then
-		cells[#cells+1] = 'Improved regeneration'
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Improved regeneration'
+		cells[#cells + 1] = ''
 		if ud.idleTime < 1800 then
 			if ud.idleTime > 0 then
-				cells[#cells+1] = ' - Idle regen: '
-				cells[#cells+1] = numformat(cp.idle_regen) .. ' HP/s'
-				cells[#cells+1] = ' - Time to enable: '
-				cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
+				cells[#cells + 1] = ' - Idle regen: '
+				cells[#cells + 1] = numformat(cp.idle_regen) .. ' HP/s'
+				cells[#cells + 1] = ' - Time to enable: '
+				cells[#cells + 1] = numformat(ud.idleTime / 30) .. 's'
 			else
-				cells[#cells+1] = ' - Combat regen: '
-				local dynamic_regen = unitID and Spring.GetUnitRulesParam(unitID, "comm_autorepair_rate") or cp.idle_regen
-				cells[#cells+1] = numformat(dynamic_regen) .. ' HP/s'
+				cells[#cells + 1] = ' - Combat regen: '
+				local dynamic_regen = unitID and Spring.GetUnitRulesParam(unitID, "comm_autorepair_rate") or
+					cp.idle_regen
+				cells[#cells + 1] = numformat(dynamic_regen) .. ' HP/s'
 			end
 		end
 		if cp.amph_regen then
-			cells[#cells+1] = ' - Water regen: '
-			cells[#cells+1] = cp.amph_regen .. ' HP/s'
-			cells[#cells+1] = ' - At depth: '
-			cells[#cells+1] = cp.amph_submerged_at .. " elmo"
+			cells[#cells + 1] = ' - Water regen: '
+			cells[#cells + 1] = cp.amph_regen .. ' HP/s'
+			cells[#cells + 1] = ' - At depth: '
+			cells[#cells + 1] = cp.amph_submerged_at .. " elmo"
 		end
 		if cp.armored_regen then
-			cells[#cells+1] = ' - Closed regen: '
-			cells[#cells+1] = numformat(tonumber(cp.armored_regen)) .. ' HP/s'
+			cells[#cells + 1] = ' - Closed regen: '
+			cells[#cells + 1] = numformat(tonumber(cp.armored_regen)) .. ' HP/s'
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.teleporter then
-		cells[#cells+1] = 'Teleporter'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Spawns a beacon for one-way recall'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Spawn time:'
-		cells[#cells+1] = numformat(tonumber(cp.teleporter_beacon_spawn_time)) .. "s"
-		cells[#cells+1] = ' - Throughput: '
-		cells[#cells+1] = numformat(tonumber(cp.teleporter_throughput)) .. " mass / s"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Teleporter'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Spawns a beacon for one-way recall'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Spawn time:'
+		cells[#cells + 1] = numformat(tonumber(cp.teleporter_beacon_spawn_time)) .. "s"
+		cells[#cells + 1] = ' - Throughput: '
+		cells[#cells + 1] = numformat(tonumber(cp.teleporter_throughput)) .. " mass / s"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.pad_count then
-		cells[#cells+1] = 'Rearms and repairs aircraft'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Pads:'
-		cells[#cells+1] = cp.pad_count
-		cells[#cells+1] = ' - Pad buildpower:'
-		cells[#cells+1] = (cp.pad_bp and numformat(cp.pad_bp) or '2.5') .. " cost/s"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Rearms and repairs aircraft'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Pads:'
+		cells[#cells + 1] = cp.pad_count
+		cells[#cells + 1] = ' - Pad buildpower:'
+		cells[#cells + 1] = (cp.pad_bp and numformat(cp.pad_bp) or '2.5') .. " cost/s"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.is_drone then
-		cells[#cells+1] = 'Bound to owner'
-		cells[#cells+1] = ''
-		cells[#cells+1] = " - Uncontrollable, uses owner's orders"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Must stay near owner'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Will die if owner does'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Bound to owner'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = " - Uncontrollable, uses owner's orders"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Must stay near owner'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Will die if owner does'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.boost_speed_mult then
-		cells[#cells+1] = 'Speed boost'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Boost speed: '
-		cells[#cells+1] = math.floor((tonumber(cp.boost_speed_mult or "1")*100) + 0.5) .. "%"
-		cells[#cells+1] = ' - Boost accel: '
-		cells[#cells+1] = math.floor((tonumber(cp.boost_accel_mult or cp.boost_speed_mult or "1")*100) + 0.5) .. "%"
+		cells[#cells + 1] = 'Speed boost'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Boost speed: '
+		cells[#cells + 1] = math.floor((tonumber(cp.boost_speed_mult or "1") * 100) + 0.5) .. "%"
+		cells[#cells + 1] = ' - Boost accel: '
+		cells[#cells + 1] = math.floor((tonumber(cp.boost_accel_mult or cp.boost_speed_mult or "1") * 100) + 0.5) .. "%"
 		if cp.boost_reload_speed_mult then
-			cells[#cells+1] = ' - Recharge speed: '
-			cells[#cells+1] = math.floor((tonumber(cp.boost_reload_speed_mult or "1")*100) + 0.5) .. "%"
+			cells[#cells + 1] = ' - Recharge speed: '
+			cells[#cells + 1] = math.floor((tonumber(cp.boost_reload_speed_mult or "1") * 100) + 0.5) .. "%"
 		end
-		cells[#cells+1] = ' - Duration: '
-		cells[#cells+1] = numformat(tonumber(cp.boost_duration)/30) .. 's'
+		cells[#cells + 1] = ' - Duration: '
+		cells[#cells + 1] = numformat(tonumber(cp.boost_duration) / 30) .. 's'
 		if cp.specialreloadtime then
-			cells[#cells+1] = ' - Reload: '
-			cells[#cells+1] = numformat(tonumber(cp.specialreloadtime)/30) .. 's'
+			cells[#cells + 1] = ' - Reload: '
+			cells[#cells + 1] = numformat(tonumber(cp.specialreloadtime) / 30) .. 's'
 		end
 		if cp.boost_distance then
-			cells[#cells+1] = ' - Distance: '
-			cells[#cells+1] = numformat(tonumber(cp.boost_distance)) .. ' elmos (approx.)'
+			cells[#cells + 1] = ' - Distance: '
+			cells[#cells + 1] = numformat(tonumber(cp.boost_distance)) .. ' elmos (approx.)'
 		end
 		if cp.boost_detonate then
-			cells[#cells+1] = ' - Self detonates upon completion'
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ' - Self detonates upon completion'
+			cells[#cells + 1] = ''
 		end
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.scan_radius_base then
-		cells[#cells+1] = 'Reveals area on death'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Radius: '
-		cells[#cells+1] = math.floor(tonumber(cp.scan_radius_base or "1")) .. ' elmos'
+		cells[#cells + 1] = 'Reveals area on death'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Radius: '
+		cells[#cells + 1] = math.floor(tonumber(cp.scan_radius_base or "1")) .. ' elmos'
 		if cp.scan_radius_max then
-			cells[#cells+1] = ' - After full boost: '
-			cells[#cells+1] = math.floor(tonumber(cp.scan_radius_max or "1")) .. ' elmos'
+			cells[#cells + 1] = ' - After full boost: '
+			cells[#cells + 1] = math.floor(tonumber(cp.scan_radius_max or "1")) .. ' elmos'
 		end
-		cells[#cells+1] = ' - Duration: '
-		cells[#cells+1] = numformat(tonumber(cp.scan_frames)/30) .. 's'
-		cells[#cells+1] = ' - Reveals cloaked and underwater units'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ' - Duration: '
+		cells[#cells + 1] = numformat(tonumber(cp.scan_frames) / 30) .. 's'
+		cells[#cells + 1] = ' - Reveals cloaked and underwater units'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.windgen then
 		local wind_slope = Spring.GetGameRulesParam("WindSlope") or 0
 		local max_wind = Spring.GetGameRulesParam("WindMax") or 2.5
-		local bonus_100 = numformat(100*wind_slope*max_wind)
+		local bonus_100 = numformat(100 * wind_slope * max_wind)
 
-		cells[#cells+1] = 'Generates energy from wind'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Variable income'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Max wind:'
-		cells[#cells+1] = max_wind .. " E"
-		cells[#cells+1] = ' - Altitude bonus:'
-		cells[#cells+1] = bonus_100 .. " E / 100 height"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Generates energy from wind'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Variable income'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Max wind:'
+		cells[#cells + 1] = max_wind .. " E"
+		cells[#cells + 1] = ' - Altitude bonus:'
+		cells[#cells + 1] = bonus_100 .. " E / 100 height"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.grey_goo then
-		cells[#cells+1] = 'Gray Goo'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Eats nearby wreckage to spawn units'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Spawns:'
-		cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.grey_goo_spawn])
-		cells[#cells+1] = ' - BP:'
-		cells[#cells+1] = cp.grey_goo_drain
-		cells[#cells+1] = ' - Cost:'
-		cells[#cells+1] = cp.grey_goo_cost .. " M"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Gray Goo'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Eats nearby wreckage to spawn units'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Spawns:'
+		cells[#cells + 1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.grey_goo_spawn])
+		cells[#cells + 1] = ' - BP:'
+		cells[#cells + 1] = cp.grey_goo_drain
+		cells[#cells + 1] = ' - Cost:'
+		cells[#cells + 1] = cp.grey_goo_cost .. " M"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.floattoggle then
-		cells[#cells+1] = 'Floating'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Can move from seabed to surface'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Cannot move sideways while afloat'
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Floating'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Can move from seabed to surface'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Cannot move sideways while afloat'
+		cells[#cells + 1] = ''
 		if (cp.sink_on_emp ~= '0') then
-			cells[#cells+1] = ' - Sinks when stunned'
+			cells[#cells + 1] = ' - Sinks when stunned'
 		else
-			cells[#cells+1] = ' - Stays afloat when stunned'
+			cells[#cells + 1] = ' - Stays afloat when stunned'
 		end
-		cells[#cells+1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
-		cells[#cells+1] = 'Transport: '
-		cells[#cells+1] = (((ud.customParams.islightonlytransport) and "Light") or ((ud.customParams.islighttransport) and "Medium") or "Heavy")
-		cells[#cells+1] = 'Light Speed: '
-		cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_light or "1")*100) + 0.5) .. "%"
+		cells[#cells + 1] = 'Transport: '
+		cells[#cells + 1] = (((ud.customParams.islightonlytransport) and "Light") or ((ud.customParams.islighttransport) and "Medium") or "Heavy")
+		cells[#cells + 1] = 'Light Speed: '
+		cells[#cells + 1] = math.floor((tonumber(ud.customParams.transport_speed_light or "1") * 100) + 0.5) .. "%"
 		if not ud.customParams.islightonlytransport then
-			cells[#cells+1] = 'Medium Speed: '
-			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_medium or "1")*100) + 0.5) .. "%"
+			cells[#cells + 1] = 'Medium Speed: '
+			cells[#cells + 1] = math.floor((tonumber(ud.customParams.transport_speed_medium or "1") * 100) + 0.5) .. "%"
 		end
 		if not ud.customParams.islighttransport then
-			cells[#cells+1] = 'Heavy Speed: '
-			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_heavy or "1")*100) + 0.5) .. "%"
+			cells[#cells + 1] = 'Heavy Speed: '
+			cells[#cells + 1] = math.floor((tonumber(ud.customParams.transport_speed_heavy or "1") * 100) + 0.5) .. "%"
 		end
 	end
 
 	if ud.customParams.nuke_coverage then
-		cells[#cells+1] = 'Can intercept strategic nukes'
-		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Coverage:'
-		cells[#cells+1] = ud.customParams.nuke_coverage .. " elmo"
-		cells[#cells+1] = ''
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Can intercept strategic nukes'
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ' - Coverage:'
+		cells[#cells + 1] = ud.customParams.nuke_coverage .. " elmo"
+		cells[#cells + 1] = ''
+		cells[#cells + 1] = ''
 	end
 
 	if cp.combat_slowdown then
-		cells[#cells+1] = 'Combat slowdown: '
-		cells[#cells+1] = numformat(100*tonumber(cp.combat_slowdown)) .. "%"
+		cells[#cells + 1] = 'Combat slowdown: '
+		cells[#cells + 1] = numformat(100 * tonumber(cp.combat_slowdown)) .. "%"
 	end
 
 	if ud.stealth then
-		cells[#cells+1] = 'Invisible to radar'
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Invisible to radar'
+		cells[#cells + 1] = ''
 	end
 
 	if ud.selfDestructCountdown <= 1 then
-		cells[#cells+1] = 'Instant self-destruction'
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Instant self-destruction'
+		cells[#cells + 1] = ''
 	end
 
 	if ud.needGeo then
-		cells[#cells+1] = 'Requires thermal vent to build'
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Requires thermal vent to build'
+		cells[#cells + 1] = ''
 	end
 
 	local mexMult = tonumber(cp.metal_extractor_mult)
 	if mexMult then
-		cells[#cells+1] = 'Extracts metal'
+		cells[#cells + 1] = 'Extracts metal'
 		if differentMexTypeExists and mexMult > 0 then
-			cells[#cells+1] = numformat(100*mexMult) .. "% extraction"
+			cells[#cells + 1] = numformat(100 * mexMult) .. "% extraction"
 		else
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ''
 		end
 	end
 
 	if cp.fireproof then
-		cells[#cells+1] = 'Immunity to afterburn'
-		cells[#cells+1] = ''
+		cells[#cells + 1] = 'Immunity to afterburn'
+		cells[#cells + 1] = ''
 	end
 
 	if ud.metalStorage > 0 then
-		cells[#cells+1] = 'Stores metal: '
-		cells[#cells+1] = ud.metalStorage .. " M"
+		cells[#cells + 1] = 'Stores metal: '
+		cells[#cells + 1] = ud.metalStorage .. " M"
 	end
-	
+
 	if ud.energyStorage > 0 then
-		cells[#cells+1] = 'Stores energy: '
-		cells[#cells+1] = ud.energyStorage .. " E"
+		cells[#cells + 1] = 'Stores energy: '
+		cells[#cells + 1] = ud.energyStorage .. " E"
 	end
-	
-	if (#cells > 2 and cells[#cells-1] == '') then
+
+	if (#cells > 2 and cells[#cells - 1] == '') then
 		cells[#cells] = nil
 		cells[#cells] = nil
 	end
@@ -1338,14 +1382,25 @@ local function printWeapons(unitDef, unitID)
 
 	local wd = WeaponDefs
 	if not wd then return false end
-	
+
 	local ucp = unitDef.customParams
-	
-	for i=1, #unitDef.weapons do
+
+	-- Get Tech-K level for weapon multipliers
+	local techLevel = unitID and Spring.GetUnitRulesParam(unitID, "tech_level") or 1
+	local techMultProjectiles = 1
+	local techMultRange = 1
+
+	-- Apply Tech-K multipliers
+	if techLevel and techLevel > 1 then
+		techMultProjectiles = math.pow(2, techLevel - 1)
+		techMultRange = math.pow(1.1, techLevel - 1)
+	end
+
+	for i = 1, #unitDef.weapons do
 		if not unitID or -- filter out commander weapons not in current loadout
-		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
-		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
-		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_num")) then
+			(i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
+				or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
+				or i == Spring.GetUnitRulesParam(unitID, "comm_shield_num")) then
 			local weapon = unitDef.weapons[i]
 			local weaponID = weapon.weaponDef
 			local weaponDef = WeaponDefs[weaponID]
@@ -1360,19 +1415,19 @@ local function printWeapons(unitDef, unitID)
 
 			local isDuplicate = false
 
-			for i=1,#weaponStats do
+			for i = 1, #weaponStats do
 				if weaponStats[i].weaponID == weaponID then
 					weaponStats[i].count = weaponStats[i].count + 1
 					isDuplicate = true
 					break
 				end
 			end
-			
+
 			if (not isDuplicate) and not weaponDef.customParams.fake_weapon then
 				local wsTemp = {
 					weaponID = weaponID,
 					count = 1,
-					
+
 					-- stuff that the weapon gets from the owner unit
 					aa_only = aa_only,
 					highTrajectory = unitDef.highTrajectoryType,
@@ -1381,28 +1436,28 @@ local function printWeapons(unitDef, unitID)
 					stockpile_cost = ucp.stockpilecost,
 					firing_arc = weapon.maxAngleDif
 				}
-				
+
 				-- dual wielding comms
 				if (unitID and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2")) then
 					wsTemp.count = 2
 				end
-				weaponStats[#weaponStats+1] = wsTemp
+				weaponStats[#weaponStats + 1] = wsTemp
 			end
 		end
 	end
 
 	local cells = {}
 
-	for index,ws in pairs(weaponStats) do
+	for index, ws in pairs(weaponStats) do
 		--if not ignoreweapon[unitDef.name] or not ignoreweapon[unitDef.name][index] then
 		if (index ~= 1) then
-			cells[#cells+1] = ''
-			cells[#cells+1] = ''
+			cells[#cells + 1] = ''
+			cells[#cells + 1] = ''
 		end
 		cells = weapons2Table(cells, ws, unitID)
 		--end
 	end
-	
+
 	return cells
 end
 
@@ -1463,64 +1518,86 @@ end
 
 local function printunitinfo(ud, buttonWidth, unitID)
 	local icons = {
-		Image:New{
-			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
-			file = "#" .. ud.id,
-			keepAspect = false;
-			x = 32,
-			y = 0,
-			height  = 88*(4/5);
-			width   = 88;
+		Image:New {
+			file2      = (WG.GetBuildIconFrame) and (WG.GetBuildIconFrame(ud)),
+			file       = "#" .. ud.id,
+			keepAspect = false,
+			x          = 32,
+			y          = 0,
+			height     = 88 * (4 / 5),
+			width      = 88,
 		},
 	}
 	if ud.iconType ~= 'default' then
-		icons[#icons + 1] = Image:New{
-			file=icontypes and icontypes[(ud and ud.iconType or "default")].bitmap
-				or 'icons/'.. ud.iconType ..iconFormat,
+		icons[#icons + 1] = Image:New {
+			file = icontypes and icontypes[(ud and ud.iconType or "default")].bitmap
+				or 'icons/' .. ud.iconType .. iconFormat,
 			x = 0,
 			y = 2,
-			height=32,
-			width=32,
+			height = 32,
+			width = 32,
 		}
 	end
-	
+
 	if behaviourPath[ud.id] then
-		icons[#icons + 1] = Button:New{
+		icons[#icons + 1] = Button:New {
 			x = 2,
 			right = 2,
-			y = 88*(4/5),
+			y = 88 * (4 / 5),
 			height = 30,
 			caption = "Edit Behaviour",
 			tooltip = "Edit the default behaviour of " .. Spring.Utilities.GetHumanName(ud) .. ".",
-			OnClick = {function ()
-					WG.crude.OpenPathToLabel(behaviourPath[ud.id], true, Spring.Utilities.GetHumanName(ud))
-				end,
+			OnClick = { function()
+				WG.crude.OpenPathToLabel(behaviourPath[ud.id], true, Spring.Utilities.GetHumanName(ud))
+			end,
 			}
 		}
 	end
 
-	local helptextbox = TextBox:New{
+	local helptextbox = TextBox:New {
 		text = Spring.Utilities.GetHelptext(ud),
 		textColor = color.stats_fg,
 		width = '100%',
 		height = '100%',
 		padding = { 0, 0, 0, 0 },
-		}
-	
+	}
+
 	local statschildren = {}
 
 	local isCommander = (unitID and Spring.GetUnitRulesParam(unitID, "comm_level"))
 
-	local cost = numformat(ud.metalCost)
-	local health = numformat(ud.health)
+	-- Check for Tech-K level
+	local techLevel = unitID and Spring.GetUnitRulesParam(unitID, "tech_level") or 1
+	local techLevelStr = ""
+	local techMultHealth = 1
+	local techMultCost = 1
+	local techMultSpeed = 1
+	local techMultRange = 1
+	local techMultMetal = 1
+	local techMultEnergy = 1
+
+	-- Apply Tech-K multipliers
+	if techLevel and techLevel > 1 then
+		techLevelStr = " (Tech-K Level " .. techLevel .. ")"
+		techMultHealth = math.pow(2, techLevel - 1)
+		techMultCost = math.pow(2, techLevel - 1)
+		techMultSpeed = 1 -- Tech-K doesn't affect speed
+		techMultRange = math.pow(1.1, techLevel - 1)
+		techMultMetal = math.pow(1.25, techLevel - 1)
+		techMultEnergy = math.pow(2.4, techLevel - 1)
+	end
+
+	local cost = numformat(ud.metalCost * techMultCost)
+	local health = numformat(ud.health * techMultHealth)
 	local speed = numformat(ud.speed, true) -- Speeds often have 0.5s
 	local mass = numformat(ud.mass)
-	
+
 	-- stuff for modular commanders
 	local legacyModules, legacyCommCost
-	if ud.customParams.commtype and not isCommander then	-- old style pregenerated commander (still used in missions etc.)
+	if ud.customParams.commtype and not isCommander then -- old style pregenerated commander (still used in missions etc.)
 		legacyModules = WG.ModularCommAPI and WG.ModularCommAPI.GetLegacyModulesForComm(ud.id)
-		legacyCommCost = ud.customParams.cost -- or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
+		legacyCommCost = ud.customParams
+			.cost -- or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
 	end
 
 	-- dynamic comms get special treatment
@@ -1530,17 +1607,17 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		speed = numformat(ud.speed * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1), true) -- Show a decimal place for comms due to fractional speed modules
 		mass = numformat(Spring.GetUnitRulesParam(unitID, "massOverride") or ud.mass)
 
-		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
-		statschildren[#statschildren+1] = Label:New{ caption = 'Level: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level")+1, textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = 'Chassis: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].humanName, textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren + 1] = Label:New { caption = "COMMANDER", textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Level: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = Spring.GetUnitRulesParam(unitID, "comm_level") + 1, textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Chassis: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].humanName, textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
 
-		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'MODULES', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
 
 		local modules = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 
@@ -1553,41 +1630,41 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			for moduleID, moduleCount in pairs(module_instances) do
 				local moduleStr = moduleDefs[moduleID].humanName
 				if moduleCount > 1 then moduleStr = moduleStr .. "  x" .. moduleCount end
-				statschildren[#statschildren+1] = Label:New{ caption = moduleStr, textColor = color.stats_fg, }
-				statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+				statschildren[#statschildren + 1] = Label:New { caption = moduleStr, textColor = color.stats_fg, }
+				statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_fg, }
 			end
 		end
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
 	end
 
 	local costStr = cost .. " M"
 	if (legacyCommCost) then
 		costStr = costStr .. "(" .. legacyCommCost .. " M)"
 	end
-	
-	statschildren[#statschildren+1] = Label:New{ caption = 'STATS', textColor = color.stats_header, }
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 
-	statschildren[#statschildren+1] = Label:New{ caption = 'Cost: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = costStr, textColor = color.stats_fg, }
-	
-	statschildren[#statschildren+1] = Label:New{ caption = 'Health: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = health, textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = 'STATS' .. techLevelStr, textColor = color.stats_header, }
+	statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
 
-	statschildren[#statschildren+1] = Label:New{ caption = 'Mass: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = mass, textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = 'Cost: ', textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = costStr, textColor = color.stats_fg, }
+
+	statschildren[#statschildren + 1] = Label:New { caption = 'Health: ', textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = health, textColor = color.stats_fg, }
+
+	statschildren[#statschildren + 1] = Label:New { caption = 'Mass: ', textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = mass, textColor = color.stats_fg, }
 
 	if not ud.isImmobile then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = speed .. " elmo/s", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Speed: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = speed .. " elmo/s", textColor = color.stats_fg, }
 
 		local mt, slope = GetMoveType(ud)
-		statschildren[#statschildren+1] = Label:New{ caption = 'Movement: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = mt, textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Movement: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = mt, textColor = color.stats_fg, }
 		if slope then
-			statschildren[#statschildren+1] = Label:New{ caption = 'Climbs: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = slope .. " deg", textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = 'Climbs: ', textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = slope .. " deg", textColor = color.stats_fg, }
 		end
 	end
 
@@ -1605,115 +1682,113 @@ local function printunitinfo(ud, buttonWidth, unitID)
 
 	local COB_angle_to_degree = 360 / 65536
 	if ud.turnRate > 0 then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Turn rate: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Turn rate: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
 	local metal = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_metalIncome") or 0) or ((ud.metalMake or 0) + (ud.customParams.income_metal or 0)))
 
 	if metal ~= 0 then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Metal: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (metal > 0 and '+' or '') .. numformat(metal) .. " M/s", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Metal: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = (metal > 0 and '+' or '') .. numformat(metal * techMultMetal) .. " M/s", textColor = color.stats_fg, }
 	end
-	
+
 	local energy = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0) or ((ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0)))
 
 	if energy ~= 0 then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy) .. " E/s", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Energy: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = (energy > 0 and '+' or '') .. numformat(energy * techMultEnergy) .. " E/s", textColor = color.stats_fg, }
 	end
-	
+
 	if ud.sightDistance > 0 then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sightDistance) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Sight: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.sightDistance * techMultRange) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if (ud.sonarDistance > 0) then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Sonar: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarDistance) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Sonar: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.sonarDistance * techMultRange) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.cruiseAltitude > 0 then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Altitude: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.cruiseAltitude * 1.5) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Altitude: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.cruiseAltitude * 1.5) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.pylonrange then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Grid link range: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.pylonrange) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Grid link range: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.customParams.pylonrange) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.heat_per_shot then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Per Shot: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_per_shot*100) .. "%", textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Decay: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_decay*100) .. "%/s", textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Max Slow: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_max_slow*100) .. "%", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Heat Per Shot: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.customParams.heat_per_shot * 100) .. "%", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Heat Decay: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.customParams.heat_decay * 100) .. "%/s", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Heat Max Slow: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(ud.customParams.heat_max_slow * 100) .. "%", textColor = color.stats_fg, }
 	end
 
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or (ud.customParams.requiremediumtrans and "Medium") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Transportable: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = ((ud.customParams.requireheavytrans and "Heavy") or (ud.customParams.requiremediumtrans and "Medium") or "Light"), textColor = color.stats_fg, }
 	end
 
 	if isCommander then
 		local batDrones = Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow")
 		if batDrones and batDrones > 0 then
-			statschildren[#statschildren+1] = Label:New{ caption = 'Battle Drones: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = batDrones, textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = 'Battle Drones: ', textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = batDrones, textColor = color.stats_fg, }
 		end
 		local compDrones = Spring.GetUnitRulesParam(unitID, "carrier_count_drone")
 		if compDrones and compDrones > 0 then
-			statschildren[#statschildren+1] = Label:New{ caption = 'Companion Drones: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = compDrones, textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = 'Companion Drones: ', textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = compDrones, textColor = color.stats_fg, }
 		end
-	-- else
+		-- else
 		-- Do something for Reef and other carriers
 	end
 
 	if ud.customParams.reload_move_penalty then
-		statschildren[#statschildren+1] = Label:New{ caption = 'Reload move mult: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(100*tonumber(ud.customParams.reload_move_penalty)) .. "%", textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Reload move mult: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(100 * tonumber(ud.customParams.reload_move_penalty)) .. "%", textColor = color.stats_fg, }
 	end
-	
+
 	if legacyModules then
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i=1, #legacyModules do
-			statschildren[#statschildren+1] = Label:New{ caption = legacyModules[i], textColor = color.stats_fg,}
-			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'MODULES', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		for i = 1, #legacyModules do
+			statschildren[#statschildren + 1] = Label:New { caption = legacyModules[i], textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_fg, }
 		end
 	end
 
 	local cells = printAbilities(ud, isCommander and unitID)
-	
+
 	if cells and #cells > 0 then
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
 
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-
-		statschildren[#statschildren+1] = Label:New{ caption = 'ABILITIES', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i=1, #cells do
-			statschildren[#statschildren+1] = Label:New{ caption = cells[i], textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'ABILITIES', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		for i = 1, #cells do
+			statschildren[#statschildren + 1] = Label:New { caption = cells[i], textColor = color.stats_fg, }
 		end
 	end
 
 	cells = printWeapons(ud, isCommander and unitID)
-	
+
 	if cells and #cells > 0 then
-		
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		
-		statschildren[#statschildren+1] = Label:New{ caption = 'WEAPONS', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i=1, #cells do
-			statschildren[#statschildren+1] = Label:New{ caption = cells[i], textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+
+		statschildren[#statschildren + 1] = Label:New { caption = 'WEAPONS', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		for i = 1, #cells do
+			statschildren[#statschildren + 1] = Label:New { caption = cells[i], textColor = color.stats_fg, }
 		end
 	end
 
@@ -1721,109 +1796,109 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	local default_buildlist = UnitDefNames["shieldcon"].buildOptions
 	local this_buildlist = ud.buildOptions
 	if ((#this_buildlist ~= #default_buildlist) and (#this_buildlist > 0)) then
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
 
-		statschildren[#statschildren+1] = Label:New{ caption = 'BUILDS', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i=1, #this_buildlist do
-			statschildren[#statschildren+1] = Label:New{ caption = Spring.Utilities.GetHumanName(UnitDefs[this_buildlist[i]]), textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'BUILDS', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		for i = 1, #this_buildlist do
+			statschildren[#statschildren + 1] = Label:New { caption = Spring.Utilities.GetHumanName(UnitDefs[this_buildlist[i]]), textColor = color.stats_fg, }
 			-- desc. would be nice, but there is horizontal cutoff
 			-- and long names can overlap (eg. Adv Radar)
 			-- statschildren[#statschildren+1] = Label:New{ caption = UnitDefs[this_buildlist[i]].tooltip, textColor = colorDisarm,}
-			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorDisarm,}
+			statschildren[#statschildren + 1] = Label:New { caption = '', textColor = colorDisarm, }
 		end
 	end
 
 	-- death explosion
 	if ud.canKamikaze or ud.customParams.stats_show_death_explosion then
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = 'Death Explosion', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Death Explosion', textColor = color.stats_header, }
+		statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_fg, }
 
 		local weaponName = ud.customParams.stats_detonate_weapon or ud.deathExplosion:lower()
-		local weaponStats = GetWeapon( weaponName )
+		local weaponStats = GetWeapon(weaponName)
 		local wepCp = weaponStats.customParams
 		local damageValue = tonumber(weaponStats.customParams.stats_damage)
 
-		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = 'Damage: ', textColor = color.stats_fg, }
 		if (weaponStats.paralyzer) then
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue) .. " (P)", textColor = colorCyan, }
-			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages.paralyzeDamageTime) .. "s", textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = numformat(damageValue) .. " (P)", textColor = colorCyan, }
+			statschildren[#statschildren + 1] = Label:New { caption = 'Max EMP time: ', textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = numformat(weaponStats.damages.paralyzeDamageTime) .. "s", textColor = color.stats_fg, }
 		else
-			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
+			local damageSlow = (wepCp.timeslow_damagefactor or 0) * damageValue
 			local damageText
 			if damageSlow > 0 then
 				if wepCp.timeslow_onlyslow == "1" then
-					 damageText = color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
+					damageText = color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
 				else
-					damageText = numformat(damageValue) .. " + " .. color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
+					damageText = numformat(damageValue) ..
+						" + " .. color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
 				end
 			else
 				damageText = numformat(damageValue)
 			end
-			statschildren[#statschildren+1] = Label:New{ caption = damageText, textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = damageText, textColor = color.stats_fg, }
 		end
 
-		statschildren[#statschildren+1] = Label:New{ caption = 'AoE radius: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damageAreaOfEffect) .. " elmo", textColor = color.stats_fg, }
-		
+		statschildren[#statschildren + 1] = Label:New { caption = 'AoE radius: ', textColor = color.stats_fg, }
+		statschildren[#statschildren + 1] = Label:New { caption = numformat(weaponStats.damageAreaOfEffect) .. " elmo", textColor = color.stats_fg, }
+
 		if (weaponStats.customParams.setunitsonfire) then
-			statschildren[#statschildren+1] = Label:New{ caption = 'Afterburn: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat((weaponStats.customParams.burntime or 450)/30) .. "s (15 DPS)", textColor = colorFire, }
+			statschildren[#statschildren + 1] = Label:New { caption = 'Afterburn: ', textColor = color.stats_fg, }
+			statschildren[#statschildren + 1] = Label:New { caption = numformat((weaponStats.customParams.burntime or 450) / 30) .. "s (15 DPS)", textColor = colorFire, }
 		end
 
 		-- statschildren[#statschildren+1] = Label:New{ caption = 'Edge Damage: ', textColor = color.stats_fg, }
 		-- statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue * weaponStats.edgeEffectiveness), textColor = color.stats_fg, }
 		-- edge damage is always 0, see http://springrts.com/mediawiki/images/1/1c/EdgeEffectiveness.png
-
 	end
 
 	--adding this because of annoying  cutoff
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	
-	
-	local stack_icons = Chili.Control:New{
+	statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_fg, }
+	statschildren[#statschildren + 1] = Label:New { caption = '', textColor = color.stats_fg, }
+
+
+	local stack_icons = Chili.Control:New {
 		y = 3,
 		right = 1,
 		height = 200,
 		width = 120,
-		padding = {0,0,0,0},
-		itemMargin = {0,4,0,4},
+		padding = { 0, 0, 0, 0 },
+		itemMargin = { 0, 4, 0, 4 },
 		children = icons,
 	}
-	
-	local stack_stats = Grid:New{
-		columns=2,
-		autoArrangeV  = false,
+
+	local stack_stats = Grid:New {
+		columns      = 2,
+		autoArrangeV = false,
 		--height = (#statschildren/2)*statschildren[1].height,
-		height = (#statschildren/2)*15,
-		
-		width = '100%',
-		children = statschildren,
-		y = 1,
-		padding = {1,1,1,1},
-		itemPadding = {1,1,1,1},
-		itemMargin = {1,1,1,1},
+		height       = (#statschildren / 2) * 15,
+
+		width        = '100%',
+		children     = statschildren,
+		y            = 1,
+		padding      = { 1, 1, 1, 1 },
+		itemPadding  = { 1, 1, 1, 1 },
+		itemMargin   = { 1, 1, 1, 1 },
 	}
-	
-	local helptext_stack = StackPanel:New{
-		orientation = 'vertical',
-		autoArrangeV  = false,
-		autoArrangeH  = false,
+
+	local helptext_stack = StackPanel:New {
+		orientation  = 'vertical',
+		autoArrangeV = false,
+		autoArrangeH = false,
 		centerItems  = false,
-		right = 128,
-		x = 0,
+		right        = 128,
+		x            = 0,
 		--width = 200,
 		--height = '100%',
-		autosize=true,
-		resizeItems = false,
-		children = { helptextbox, stack_stats, },
+		autosize     = true,
+		resizeItems  = false,
+		children     = { helptextbox, stack_stats, },
 	}
 	return {
 		helptext_stack,
@@ -1843,14 +1918,14 @@ local function tooltipBreakdown(tooltip)
 		local udef = UnitDefs[tonumber(unitDefID)]
 		return udef or false
 	elseif tooltip:find('Selected', 1, true) == 1 then
-		local start,fin = tooltip:find([[ - ]], 1, true)
+		local start, fin = tooltip:find([[ - ]], 1, true)
 		if start and fin then
-			local unitHumanName = tooltip:sub(11,start-1)
+			local unitHumanName = tooltip:sub(11, start - 1)
 			local udef = GetUnitDefByHumanName(unitHumanName)
 			return udef or false
 		end
 	end
-	
+
 	return false
 end
 
@@ -1874,71 +1949,71 @@ local function KillStatsWindow(num)
 	statswindows[num] = nil
 end
 
-MakeStatsWindow = function(ud, x,y, unitID)
+MakeStatsWindow = function(ud, x, y, unitID)
 	hideWindow(window_unitcontext)
 	local x = x
 	local y = y
 	if x then
-		y = scrH-y
+		y = scrH - y
 	else
 		x = scrH / 3
 		y = scrH / 3
 	end
-	
-	
+
+
 	if not options.window_to_cursor.value then
 		x = options.window_pos_x.value
 		y = options.window_pos_y.value
 	end
 
-	local num = #statswindows+1
+	local num = #statswindows + 1
 	local children = {
-		ScrollPanel:New{
+		ScrollPanel:New {
 			--horizontalScrollbar = false,
-			x=5,y=15,
+			x = 5, y = 15,
 			right = 5,
 			bottom = B_HEIGHT + 10,
-			padding = {2,2,2,2},
-			children = printunitinfo(ud, window_width, unitID) ,
+			padding = { 2, 2, 2, 2 },
+			children = printunitinfo(ud, window_width, unitID),
 		},
-		Button:New{
+		Button:New {
 			caption = 'Close',
 			OnClick = { function(self) KillStatsWindow(num) end },
-			
-			x=5,
-			height=B_HEIGHT,
-			right=5,
-			bottom=5,
-			
+
+			x = 5,
+			height = B_HEIGHT,
+			right = 5,
+			bottom = 5,
+
 			--backgroundColor=color.sub_back_bg,
 			--textColor=color.sub_back_fg,
 			--classname = "back_button",
 		}
 	}
 
-	statswindows[num] = Window:New{
-		x = x,
-		y = y,
-		width  = WINDOW_WIDTH,
-		height = options.window_height.value,
-		resizable = true,
-		parent = screen0,
+	statswindows[num] = Window:New {
+		x               = x,
+		y               = y,
+		width           = WINDOW_WIDTH,
+		height          = options.window_height.value,
+		resizable       = true,
+		parent          = screen0,
 		backgroundColor = color.stats_bg,
-		classname = "main_window_small",
-		
-		minWidth = 250,
-		minHeight = 300,
-		
-		caption = Spring.Utilities.GetHumanName(ud, unitID) ..' - '.. Spring.Utilities.GetDescription(ud, unitID),
-		
-		children = children,
+		classname       = "main_window_small",
+
+		minWidth        = 250,
+		minHeight       = 300,
+
+		caption         = Spring.Utilities.GetHumanName(ud, unitID) .. ' - ' .. Spring.Utilities.GetDescription(ud, unitID),
+
+		children        = children,
 	}
 	AdjustWindow(statswindows[num])
 end
 
 local function PriceWindow(unitID, action)
 	local window_width = 250
-	
+
 	local header = 'Offer For Sale'
 	local command = '$sell'
 	local cancelText = 'Cancel Sale'
@@ -1950,31 +2025,31 @@ local function PriceWindow(unitID, action)
 		header = 'Place Bounty (5 Minutes - Cannot cancel!)'
 		command = '$bounty'
 	end
-	
+
 	local children = {}
-	children[#children+1] = Label:New{ caption = header, width=window_width, height=B_HEIGHT, textColor = color.context_header,}
-	
+	children[#children + 1] = Label:New { caption = header, width = window_width, height = B_HEIGHT, textColor = color.context_header, }
+
 	local grid_children = {}
-	
-	local dollar_amounts = {50,100,200,500,1000,2000,5000,10000, 0}
-	for i=1, #dollar_amounts do
+
+	local dollar_amounts = { 50, 100, 200, 500, 1000, 2000, 5000, 10000, 0 }
+	for i = 1, #dollar_amounts do
 		local dollar_amount = dollar_amounts[i]
 		local caption, func
 		if action == 'bounty' then
 			if dollar_amount ~= 0 then
 				caption = '$' .. dollar_amount
-				func = function() spSendLuaRulesMsg(  command .. '|' .. unitID .. '|' .. dollar_amount ) end
+				func = function() spSendLuaRulesMsg(command .. '|' .. unitID .. '|' .. dollar_amount) end
 			end
 		else
 			caption = dollar_amount == 0 and cancelText or '$' .. dollar_amount
-			func = function() spSendLuaRulesMsg(  command .. '|' .. unitID .. '|' .. dollar_amount) end
+			func = function() spSendLuaRulesMsg(command .. '|' .. unitID .. '|' .. dollar_amount) end
 		end
 		if caption then
-			grid_children[#grid_children+1] = Button:New{
+			grid_children[#grid_children + 1] = Button:New {
 				caption = caption,
 				OnClick = { func, CloseButtonFunc2 },
-				width=window_width,
-				height=B_HEIGHT,
+				width = window_width,
+				height = B_HEIGHT,
 				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
@@ -1982,106 +2057,105 @@ local function PriceWindow(unitID, action)
 		end
 	end
 	--local grid_height = (B_HEIGHT)* #grid_children /3
-	local grid_height = (B_HEIGHT)* 3
-	local price_grid = Grid:New{
+	local grid_height = (B_HEIGHT) * 3
+	local price_grid = Grid:New {
 		--rows = 3,
 		columns = 3,
-		resizeItems=true,
+		resizeItems = true,
 		width = window_width,
 		height = grid_height,
-		padding = {0,0,0,0},
-		itemPadding = {2,2,2,2},
-		itemMargin = {0,0,0,0},
-		
+		padding = { 0, 0, 0, 0 },
+		itemPadding = { 2, 2, 2, 2 },
+		itemMargin = { 0, 0, 0, 0 },
+
 		children = grid_children,
 	}
-	
-	children[#children+1] = price_grid
-	
-	children[#children+1] = Label:New{ caption = '', width=window_width, height=B_HEIGHT, autosize=false,}
 
-	children[#children+1] =  CloseButton(window_width)
-	
-	local window_height = (B_HEIGHT) * (#children-1) + grid_height
-		
-	local stack1 = StackPanel:New{
+	children[#children + 1] = price_grid
+
+	children[#children + 1] = Label:New { caption = '', width = window_width, height = B_HEIGHT, autosize = false, }
+
+	children[#children + 1] = CloseButton(window_width)
+
+	local window_height = (B_HEIGHT) * (#children - 1) + grid_height
+
+	local stack1 = StackPanel:New {
 		centerItems = false,
-		resizeItems=false,
+		resizeItems = false,
 		width = window_width,
 		height = window_height,
-		padding = {0,0,0,0},
-		itemPadding = {2,2,2,2},
-		itemMargin = {0,0,0,0},
+		padding = { 0, 0, 0, 0 },
+		itemPadding = { 2, 2, 2, 2 },
+		itemMargin = { 0, 0, 0, 0 },
 		children = children,
 	}
-	
-	local window = Window:New{
-		x = scrW/2,
-		y = scrH/2,
-		clientWidth  = window_width,
-		clientHeight = window_height,
-		resizable = false,
-		parent = screen0,
+
+	local window = Window:New {
+		x               = scrW / 2,
+		y               = scrH / 2,
+		clientWidth     = window_width,
+		clientHeight    = window_height,
+		resizable       = false,
+		parent          = screen0,
 		backgroundColor = color.context_bg,
-		children = {stack1},
+		children        = { stack1 },
 	}
 end
 
-local function MakeUnitContextMenu(unitID,x,y)
-	local udid 			= spGetUnitDefID(unitID)
-	local ud 			= UnitDefs[udid]
+local function MakeUnitContextMenu(unitID, x, y)
+	local udid = spGetUnitDefID(unitID)
+	local ud   = UnitDefs[udid]
 	if not ud then return end
-	local alliance 		= spGetUnitAllyTeam(unitID)
-	local team			= spGetUnitTeam(unitID)
-	local _, player 	= spGetTeamInfo(team, false)
-	local playerName 	= spGetPlayerInfo(player, false) or 'noname'
-	local teamColor 	= {spGetTeamColor(team)}
-		
+	local alliance     = spGetUnitAllyTeam(unitID)
+	local team         = spGetUnitTeam(unitID)
+	local _, player    = spGetTeamInfo(team, false)
+	local playerName   = spGetPlayerInfo(player, false) or 'noname'
+	local teamColor    = { spGetTeamColor(team) }
+
 	local window_width = 200
 	--local buttonWidth = window_width - 0
 
-	local children = {
-		Label:New{ caption = Spring.Utilities.GetHumanName(ud) ..' - '.. Spring.Utilities.GetDescription(ud), width=window_width, textColor = color.context_header,},
-		Label:New{ caption = 'Player: ' .. playerName, width=window_width, textColor=teamColor },
-		Label:New{ caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width=window_width ,textColor = color.context_fg,},
-		
-		Button:New{
+	local children     = {
+		Label:New { caption = Spring.Utilities.GetHumanName(ud) .. ' - ' .. Spring.Utilities.GetDescription(ud), width = window_width, textColor = color.context_header, },
+		Label:New { caption = 'Player: ' .. playerName, width = window_width, textColor = teamColor },
+		Label:New { caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width = window_width, textColor = color.context_fg, },
+		Button:New {
 			caption = 'Unit Info',
-			OnClick = { function() MakeStatsWindow(ud,x,y) end },
-			width=window_width,
+			OnClick = { function() MakeStatsWindow(ud, x, y) end },
+			width = window_width,
 			--backgroundColor=color.sub_back_bg,
 			--textColor=color.sub_back_fg,
 			--classname = "back_button",
 		},
 	}
-	local y = scrH-y
-	local x = x
-	
+	local y            = scrH - y
+	local x            = x
+
 	if marketandbounty then
 		if team == myTeamID then
-			children[#children+1] =  Button:New{
+			children[#children + 1] = Button:New {
 				caption = 'Set Sale Price',
 				OnClick = { function(self) PriceWindow(unitID, 'sell') end },
-				width=window_width,
+				width = window_width,
 				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
 			}
 		else
-			children[#children+1] =  Button:New{
+			children[#children + 1] = Button:New {
 				caption = 'Offer To Buy',
 				OnClick = { function(self) PriceWindow(unitID, 'buy') end },
-				width=window_width,
+				width = window_width,
 				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
 			}
 		end
 		if myAlliance ~= alliance then
-			children[#children+1] =  Button:New{
+			children[#children + 1] = Button:New {
 				caption = 'Place Bounty',
 				OnClick = { function(self) PriceWindow(unitID, 'bounty') end },
-				width=window_width,
+				width = window_width,
 				--backgroundColor=color.sub_back_bg,
 				--textColor=color.sub_back_fg,
 				--classname = "back_button",
@@ -2089,42 +2163,48 @@ local function MakeUnitContextMenu(unitID,x,y)
 		end
 	end
 
-	
+
 	if ceasefires and myAlliance ~= alliance then
 		--window_height = window_height + B_HEIGHT*2 --error no such window_height!
-		children[#children+1] = Button:New{ caption = 'Vote for ceasefire', OnClick = { function() spSendLuaRulesMsg('cf:y'..alliance) end }, width=window_width}
-		children[#children+1] = Button:New{ caption = 'Break ceasefire/unvote', OnClick = { function() spSendLuaRulesMsg('cf:n'..alliance) spSendLuaRulesMsg('cf:b'..alliance) end }, width=window_width}
+		children[#children + 1] = Button:New { caption = 'Vote for ceasefire', OnClick = { function()
+			spSendLuaRulesMsg(
+				'cf:y' .. alliance)
+		end }, width = window_width }
+		children[#children + 1] = Button:New { caption = 'Break ceasefire/unvote', OnClick = { function()
+			spSendLuaRulesMsg('cf:n' .. alliance)
+			spSendLuaRulesMsg('cf:b' .. alliance)
+		end }, width = window_width }
 	end
-	children[#children+1] = CloseButton()
-	
-	local window_height = (B_HEIGHT)* #children
-	
+	children[#children + 1] = CloseButton()
+
+	local window_height = (B_HEIGHT) * #children
+
 	if window_unitcontext then
 		window_unitcontext:Dispose()
 	end
-	local stack1 = StackPanel:New{
+	local stack1 = StackPanel:New {
 		centerItems = false,
 		--autoArrangeV = true,
 		--autoArrangeH = true,
-		resizeItems=true,
+		resizeItems = true,
 		width = window_width,
 		height = window_height,
-		padding = {0,0,0,0},
-		itemPadding = {2,2,2,2},
-		itemMargin = {0,0,0,0},
+		padding = { 0, 0, 0, 0 },
+		itemPadding = { 2, 2, 2, 2 },
+		itemMargin = { 0, 0, 0, 0 },
 		children = children,
 	}
-	
-	window_unitcontext = Window:New{
-		x = x,
-		y = y,
-		clientWidth  = window_width,
-		clientHeight = window_height,
-		classname = "main_window_small",
-		resizable = false,
-		parent = screen0,
+
+	window_unitcontext = Window:New {
+		x               = x,
+		y               = y,
+		clientWidth     = window_width,
+		clientHeight    = window_height,
+		classname       = "main_window_small",
+		resizable       = false,
+		parent          = screen0,
 		backgroundColor = color.context_bg,
-		children = {stack1},
+		children        = { stack1 },
 	}
 	AdjustWindow(window_unitcontext)
 end
@@ -2132,20 +2212,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:MousePress(x,y,button)
-	
+function widget:MousePress(x, y, button)
 	if button ~= 1 then return end
-	
+
 	local alt, ctrl, meta, shift = spGetModKeyState()
-	
+
 	if meta then
 		----------
 		local groundTooltip
-		if WG.customToolTip then --find any custom ground tooltip placed on the ground
-			local _, pos = spTraceScreenRay(x,y, true, false, false, true) --return coordinate of the ground
-			for _, data in pairs(WG.customToolTip) do --iterate over WG.customToolTip
-				if data.box and pos and (pos[1]>= data.box.x1 and pos[1]<= data.box.x2) and (pos[3]>= data.box.z1 and pos[3]<= data.box.z2) then --check if within box side x & check if within box side z
-					groundTooltip = data.tooltip --copy tooltip
+		if WG.customToolTip then                                                                                                         --find any custom ground tooltip placed on the ground
+			local _, pos = spTraceScreenRay(x, y, true, false, false, true)                                                              --return coordinate of the ground
+			for _, data in pairs(WG.customToolTip) do                                                                                    --iterate over WG.customToolTip
+				if data.box and pos and (pos[1] >= data.box.x1 and pos[1] <= data.box.x2) and (pos[3] >= data.box.z1 and pos[3] <= data.box.z2) then --check if within box side x & check if within box side z
+					groundTooltip = data
+						.tooltip                                                                                                         --copy tooltip
 					break
 				end
 			end
@@ -2153,31 +2233,31 @@ function widget:MousePress(x,y,button)
 		----------
 		local cur_ttstr = screen0.currentTooltip or groundTooltip or spGetCurrentTooltip()
 		local ud = tooltipBreakdown(cur_ttstr)
-		
-		local _,cmd_id = Spring.GetActiveCommand()
-		
+
+		local _, cmd_id = Spring.GetActiveCommand()
+
 		if cmd_id then
 			return false
 		end
 
 		if ud then
-			MakeStatsWindow(ud,x,y)
+			MakeStatsWindow(ud, x, y)
 			return true
 		end
-		
+
 		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
 			local unitID = data
-			
+
 			if marketandbounty then
-				MakeUnitContextMenu(unitID,x,y)
+				MakeUnitContextMenu(unitID, x, y)
 				return
 			end
-			
+
 			local udid = UnitDefs[Spring.GetUnitDefID(unitID)]
-			
+
 			if udid then
-				MakeStatsWindow(udid,x,y, unitID)
+				MakeStatsWindow(udid, x, y, unitID)
 			end
 			-- FIXME enable later when does not show useless info
 			return true
@@ -2186,17 +2266,16 @@ function widget:MousePress(x,y,button)
 			local fd = fdid and FeatureDefs[fdid]
 			local feature_name = fd and fd.name
 			if feature_name then
-				
 				local live_name
 				if fd and fd.customParams and fd.customParams.unit then
 					live_name = fd.customParams.unit
 				else
 					live_name = feature_name:gsub('([^_]*).*', '%1')
 				end
-				
+
 				local ud = UnitDefNames[live_name]
 				if ud then
-					MakeStatsWindow(ud,x,y)
+					MakeStatsWindow(ud, x, y)
 					return true
 				end
 			end
@@ -2216,29 +2295,27 @@ function widget:ViewResize(vsx, vsy)
 	scrH = vsy
 end
 
-
 function widget:Initialize()
-
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
-	
+
 	-- setup Chili
-	 Chili = WG.Chili
-	 Button = Chili.Button
-	 Label = Chili.Label
-	 Window = Chili.Window
-	 ScrollPanel = Chili.ScrollPanel
-	 StackPanel = Chili.StackPanel
-	 Grid = Chili.Grid
-	 TextBox = Chili.TextBox
-	 Image = Chili.Image
-	 screen0 = Chili.Screen0
-	 color2incolor = Chili.color2incolor
+	Chili = WG.Chili
+	Button = Chili.Button
+	Label = Chili.Label
+	Window = Chili.Window
+	ScrollPanel = Chili.ScrollPanel
+	StackPanel = Chili.StackPanel
+	Grid = Chili.Grid
+	TextBox = Chili.TextBox
+	Image = Chili.Image
+	screen0 = Chili.Screen0
+	color2incolor = Chili.color2incolor
 
 	widget:ViewResize(Spring.GetViewGeometry())
-	
+
 	WG.MakeStatsWindow = MakeStatsWindow
 end
 
