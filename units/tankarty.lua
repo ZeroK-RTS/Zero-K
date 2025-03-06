@@ -67,7 +67,7 @@ return { tankarty = {
       areaOfEffect            = 84,
       avoidFeature            = false,
       avoidGround             = true,
-      cegTag                  = [[medium_plasma_trail]],
+      cegTag                  = [[medium_arty_trail]],
       craterBoost             = 1,
       craterMult              = 2,
 
