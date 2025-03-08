@@ -126,7 +126,6 @@ local resources = {
       greennovaexplo= "cc/greennovaexplo.tga",
       gunshot= "cc/gunshot.tga",
       gunshotglow= "gpl/gunshotglow.tga",
-      hotsphere= "cc/hotsphere.tga",
       kburst= "other/burst.tga",
       kfoam= "other/foam.tga",
       kfoom= "other/foom.tga",
