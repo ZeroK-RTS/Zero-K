@@ -79,7 +79,7 @@ return { spidercrabe = {
     ARM_CRABE_GAUSS = {
       name                    = [[Heavy Plasma Cannon]],
       areaOfEffect            = 200,
-      cegTag                  = [[heavy_plasma_trail]],
+      cegTag                  = [[crab_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0.5,
 
