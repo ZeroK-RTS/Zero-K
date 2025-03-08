@@ -55,17 +55,17 @@ local GROUND = 103
 local UNIT = 117
 
 local MIN_FLY_TIME = 125
-local MAX_FLY_TIME = 125
+local MAX_FLY_TIME = 12500
 
-local SPEED_MAX = 20 --9
+local SPEED_MAX = 20000 --9
 local SPEED_INT_WIDTH = 3
 -- Dart speed is 5.1.
 -- Normal launch speed is 9.9
 
-local RECENT_MAX = -1.15 -- Ensure that units that are still being accelerated sideways cannot be rethrown
+local RECENT_MAX = -1.01 -- Ensure that units that are still being accelerated sideways cannot be rethrown
 local RECENT_INT_WIDTH = 1
 
-local MAX_ALTITUDE_AIM = 60
+local MAX_ALTITUDE_AIM = 600000
 
 local NO_BLOCK_TIME = 5
 local REMOVE_COMMAND_FRAME = 2
@@ -248,8 +248,8 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		tx, ty, tz = targetPos[1], targetPos[2], targetPos[3]
 	else
 		_, _, _, tx, ty, tz = spGetUnitPosition(targetPos, true)
-		local groundHeight = math.max(Spring.Utilities.GetGroundHeightMinusOffmap(tx, tz) or 0, 0)
-		ty = math.min(ty, groundHeight - MAX_ALTITUDE_AIM)
+		--local groundHeight = math.max(Spring.Utilities.GetGroundHeightMinusOffmap(tx, tz) or 0, 0)
+		--ty = math.min(ty, groundHeight - MAX_ALTITUDE_AIM)
 	end
 	ty = math.max(ty, 0)
 	

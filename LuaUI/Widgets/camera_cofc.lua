@@ -952,7 +952,8 @@ SetFOV = function(fov)
 
 	currentFOVhalf_rad = (fov/2) * RADperDEGREE
 	maxDistY, mapEdgeBuffer = GetDistForBounds(MWIDTH, MHEIGHT, groundMax) --adjust maximum TAB/Overview distance based on camera FOV
-
+	maxDistY = maxDistY *10
+	
 	cs.fov = fov
 	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
 

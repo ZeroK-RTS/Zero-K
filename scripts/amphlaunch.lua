@@ -118,27 +118,27 @@ function script.BlockShot(num, targetID)
 	if nextFireBlockCheckFrame > gameFrame then
 		return true
 	end
-	if num == 1 and GG.Thrower and GG.Thrower.BlockAttack(unitID) then
-		return true
-	end
-	local x, y, z = spGetUnitPosition(unitID)
-	if not x then
-		return true
-	end
-	local height = spGetGroundHeight(x, z)
-	if height < -5 then
-		height = -5
-	end
-	if y - height > 12 then
-		local _, vy = Spring.GetUnitVelocity(unitID)
-		if y - vy*4 - height > 12 then
-			return true
-		end
-	end
-	if GG.Thrower.CheckOverlobPrevention(unitID) then
-		nextFireBlockCheckFrame = gameFrame + 3
-		return true
-	end
+	--if num == 1 and GG.Thrower and GG.Thrower.BlockAttack(unitID) then
+	--	return true
+	--end
+	--local x, y, z = spGetUnitPosition(unitID)
+	--if not x then
+	--	return true
+	--end
+	--local height = spGetGroundHeight(x, z)
+	--if height < -5 then
+	--	height = -5
+	--end
+	--if y - height > 12 then
+	--	local _, vy = Spring.GetUnitVelocity(unitID)
+	--	if y - vy*4 - height > 12 then
+	--		return true
+	--	end
+	--end
+	--if GG.Thrower.CheckOverlobPrevention(unitID) then
+	--	nextFireBlockCheckFrame = gameFrame + 3
+	--	return true
+	--end
 	
 	local reloadTime = Spring.GetUnitWeaponState(unitID, 1, "reloadTime")*30 -- Takes slow into account
 	local otherNum = 3 - num
