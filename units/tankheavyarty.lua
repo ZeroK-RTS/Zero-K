@@ -108,7 +108,6 @@ return { tankheavyarty = {
       noSelfDamage            = false,
       range                   = 1160,
       reloadtime              = 0.333,
-      rgbColor                = "0.5, 1, 0", -- TODO why doesn't this work, it seems to work in modularcomms/weapons/heavymachinegun_disrupt.lua
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/tremor_fire]],
       turret                  = true,
