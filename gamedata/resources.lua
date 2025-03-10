@@ -78,6 +78,7 @@ local resources = {
 
       ["3explo"]= "cc/3explo.tga",
       AAsmoketrail= "AAsmoketrail.tga",
+      backtrail="GPL/backtrail.png",
       bigexplo= "cc/bigexplo.tga",
       bloodblast= "pd/bloodblast.png",
       bloodblastwhite= "pd/bloodblastwhite.tga",

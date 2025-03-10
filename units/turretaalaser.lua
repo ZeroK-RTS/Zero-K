@@ -65,6 +65,7 @@ return { turretaalaser = {
       name                    = [[Anti-Air Laser]],
       accuracy                = 50,
       areaOfEffect            = 8,
+      cegTag                  = [[laser_cannon_trail]],
       canattackground         = false,
       collideFriendly         = false,
       coreThickness           = 0.5,
@@ -84,7 +85,7 @@ return { turretaalaser = {
         planes  = 14.9,
       },
 
-      duration                = 0.02,
+      duration                = 0.03,
       edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:flash1orange]],
       fireStarter             = 10,

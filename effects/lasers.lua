@@ -1405,5 +1405,48 @@ return {
       },
     },
   },
+  
+	["laser_cannon_trail"] = {
+		alwaysvisible        = false,
+		usedefaultexplosions = false,
+		redtrail                = {
+			air        = true,
+			class      = [[CBitmapMuzzleFlame]],
+			count      = 1,
+			ground     = true,
+			underwater = 1,
+			water      = true,
+			properties = {
+				colormap     = [[1 0 0 0  1 0 0 0.01  1 0 0 0.01  0.5 0 0 0.01  0.1 0 0 0.01  0.1 0 0 0]],
+				dir          = [[dir]],
+				frontoffset  = 0,
+				fronttexture = [[null]],
+				length       = 3,
+				sidetexture  = [[backtrail]],
+				size         = 3,
+				sizegrowth   = 0,
+				ttl          = 3,
+			},
+		},
+		whitetrail                = {
+			air        = true,
+			class      = [[CBitmapMuzzleFlame]],
+			count      = 1,
+			ground     = true,
+			underwater = 1,
+			water      = true,
+			properties = {
+				colormap     = [[1 1 1 0  1 1 1 0.01  1 1 1 0.01  0.5 0.5 0.5 0.01  0.5 0.5 0.5 0.01  0.1 0.1 0.1 0]],
+				dir          = [[dir]],
+				frontoffset  = 0,
+				fronttexture = [[null]],
+				length       = 3,
+				sidetexture  = [[backtrail]],
+				size         = 2.8,
+				sizegrowth   = 0,
+				ttl          = 3,
+			},
+		},
+  },
 }
 
