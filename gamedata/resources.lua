@@ -168,6 +168,7 @@ local resources = {
       smokesmall= "pd/smokesmall.tga",
       smoketrailthinner= "pd/smoketrailthinner.tga",
 	  smoke1="pd/smoke1.tga",
+    smoothtrail= "gpl/smoothtrail.png",
 	  shockwave="pd/shockwave.tga",
 	  spark="pd/spark.tga",
       splashbase= "pd/splashbase.tga",
