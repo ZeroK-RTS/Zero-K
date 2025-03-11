@@ -94,7 +94,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -117,7 +117,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -140,7 +140,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -159,7 +159,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -182,7 +182,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -201,7 +201,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -224,7 +224,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -248,7 +248,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -271,7 +271,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -290,7 +290,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -313,7 +313,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -332,7 +332,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -355,7 +355,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
@@ -374,7 +374,7 @@ return {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.9 0.5 0 0.01  0.5 0.45 0 0.01  0 0 0 0.01]],
+				colormap     = [[0.09 0.05 0 0.01  0.05 0.045 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
