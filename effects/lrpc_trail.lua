@@ -24,7 +24,7 @@ return {
 				particlespeed       = 0,
 				sizegrowth          = 40,
 				sizemod             = 1,
-				texture             = [[glow2]],
+				texture             = [[glow]],
 			},
 		},
     
