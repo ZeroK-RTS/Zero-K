@@ -1,6 +1,6 @@
 {
-	"shield_bar" : "Schild",
-	"health_bar" : "Leben",
+	"shield" : "Schild",
+	"health" : "Leben",
 	"building" : "Bauen",
 	"morph" : "Morph",
 	"stockpile" : "Vorrat",
@@ -8,15 +8,16 @@
 	"disarm" : "Entwaffnung",
 	"capture" : "Einfang",
 	"capture_reload" : "Einfang nachladen",
-	"water_tank" : "Wassertank",
 	"teleport" : "Teleportation",
+	"teleport_pw" : "Evakuierung",
 	"ability" : "Fähigkeit",
+	"heat" : "hitze",
+	"speed" : "tempo",
+	"reammo" : "bewaffnen",
 	"reload" : "nachladen",
 	"slow" : "langsam",
 	"goo" : "goo",
-	"reclaim" : "reclaim",
-	"reammo" : "bewaffnen",
-	"teleport_pw" : "Evakuierung",
+	"jump" : "Sprung",
 	"resurrect" : "wiederbeleben",
-	"jump" : "Sprung"
+	"reclaim" : "reclaim"
 }

@@ -1,6 +1,6 @@
 {
-	"shield_bar" : "Scudo",
-	"health_bar" : "Vita",
+	"shield" : "Scudo",
+	"health" : "Vita",
 	"building" : "Edificio",
 	"morph" : "trasforma",
 	"stockpile" : "scorta",
@@ -8,17 +8,16 @@
 	"disarm" : "disarma",
 	"capture" : "cattura",
 	"capture_reload" : "ricarica cattura",
-	"water_tank" : "serbatoio d'acqua",
 	"teleport" : "Teletrasporto",
+	"teleport_pw" : "evacuazione",
 	"ability" : "abilità",
 	"heat" : "calore",
 	"speed" : "velocità",
+	"reammo" : "in riarmo",
 	"reload" : "Ricarica",
 	"slow" : "lento",
 	"goo" : "gelatina",
-	"reclaim" : "reclama",
-	"reammo" : "in riarmo",
-	"teleport_pw" : "evacuazione",
+	"jump" : "Salto",
 	"resurrect" : "Risorgi",
-	"jump" : "Salto"
+	"reclaim" : "reclama"
 }
