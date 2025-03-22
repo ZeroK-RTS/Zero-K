@@ -99,6 +99,7 @@ return { shipheavyarty = {
       avoidGround             = false,
       burst                   = 3,
       burstrate               = 0.2,
+      cegTag                  = [[heavy_arty_trail]],
       craterBoost             = 1,
       craterMult              = 2,
 
