@@ -95,6 +95,7 @@ return { raveparty = {
       avoidFeature            = false,
       avoidGround             = false,
       areaOfEffect            = 192,
+      cegTag                  = [[drp_trail_1]],
       craterBoost             = 4,
       craterMult              = 3,
 
@@ -132,6 +133,7 @@ return { raveparty = {
       craterAreaOfEffect      = 80,
       avoidFeature            = false,
       avoidGround             = false,
+      cegTag                  = [[drp_trail_2]],
       craterBoost             = 0.25,
       craterMult              = 0.5,
       
@@ -179,6 +181,7 @@ return { raveparty = {
       craterAreaOfEffect      = 96,
       avoidFeature            = false,
       avoidGround             = false,
+      cegTag                  = [[drp_trail_3]],
       craterBoost             = 0.5,
       craterMult              = 1,
 
@@ -217,6 +220,7 @@ return { raveparty = {
       areaOfEffect            = 384,
       avoidFeature            = false,
       avoidGround             = false,
+      cegTag                  = [[drp_trail_4]],
       craterBoost             = 32,
       craterMult              = 1,
 
@@ -259,6 +263,7 @@ return { raveparty = {
       areaOfEffect            = 320,
       avoidFeature            = false,
       avoidGround             = false,
+      cegTag                  = [[drp_trail_5]],
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
@@ -302,6 +307,7 @@ return { raveparty = {
       craterAreaOfEffect      = 90,
       avoidFeature            = false,
       avoidGround             = false,
+      cegTag                  = [[drp_trail_6]],
       craterBoost             = 0.25,
       craterMult              = 0.5,
 

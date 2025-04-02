@@ -137,6 +137,7 @@ return { turretheavy = {
       areaOfEffect            = 192,
       avoidFeature            = false,
       burnBlow                = true,
+      cegTag                  = [[heavy_plasma_trail]],
       craterBoost             = 0.7,
       craterMult              = 1.2,
 

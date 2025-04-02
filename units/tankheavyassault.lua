@@ -77,6 +77,7 @@ return { tankheavyassault = {
     COR_GOL             = {
       name                    = [[Tankbuster Cannon]],
       areaOfEffect            = 32,
+      cegTag                  = [[cyclops_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
