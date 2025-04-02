@@ -15,7 +15,7 @@ return {
 			properties = {
 				airdrag             = 0.3,
 				alwaysvisible       = false,
-				colormap            = [[0.9 0.5 0 0.01  0 0 0 0.01]],
+				colormap            = [[0.45 0.25 0 0.01  0 0 0 0.01]],
 				directional         = true,
 				emitvector          = [[dir]],
 				numparticles        = 1,
