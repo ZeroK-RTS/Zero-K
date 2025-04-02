@@ -1,4 +1,4 @@
-return {
+local trails = {
   ["heavy_cannon_muzzle"] = {
 	muzzle = {
       air                = true,
@@ -86,7 +86,7 @@ return {
 	["light_plasma_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-			glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -132,7 +132,7 @@ return {
 	["medium_plasma_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -178,7 +178,7 @@ return {
 	["heavy_plasma_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -279,7 +279,7 @@ return {
 	["crab_plasma_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -344,7 +344,7 @@ return {
 	["cyclops_plasma_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -437,7 +437,7 @@ return {
 	["medium_arty_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -502,7 +502,7 @@ return {
 	["heavy_arty_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -603,7 +603,7 @@ return {
 	["tremor_arty_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -665,4 +665,117 @@ return {
 			},
 		},
 	},
+	["drp_trail_base"]          = {
+		alwaysvisible        = false,
+		usedefaultexplosions = false,
+		glare               = {
+			class      = [[CSimpleParticleSystem]],
+			count      = 1,
+			ground     = true,
+			air        = true,
+			unit       = true,
+			water      = true,
+			underwater = true,
+			properties = {
+				airdrag             = 0.1,
+				alwaysvisible       = false,
+				colormap            = [[0.1 0.01 0.01 0.01  0.1 0.01 0.01 0.01]],
+				directional         = true,
+				emitvector          = [[dir]],
+				numparticles        = 1,
+				particlelife        = 3,
+				particlesize        = 70,
+				particlespeed       = 0.2,
+				sizegrowth          = 20,
+				sizemod             = 1,
+				texture             = [[glow]],
+			},
+		},
+		front                = {
+			air        = true,
+			class      = [[CBitmapMuzzleFlame]],
+			count      = 1,
+			ground     = true,
+			underwater = 1,
+			water      = true,
+			properties = {
+				colormap     = [[0.09 0.009 0.009 0.01  0.05 0.005 0.005 0.01  0 0 0 0.01]],
+				dir          = [[dir]],
+				frontoffset  = 0,
+				fronttexture = [[null]],
+				length       = -1.5,
+				sidetexture  = [[plasma]],
+				size         = 50,
+				ttl          = 1,
+			},
+		},
+		mid                = {
+			air        = true,
+			class      = [[CBitmapMuzzleFlame]],
+			count      = 1,
+			ground     = true,
+			underwater = 1,
+			water      = true,
+			properties = {
+				colormap     = [[0.09 0.009 0.009 0.01  0.05 0.005 0.005 0.01  0 0 0 0.01]],
+				dir          = [[dir]],
+				frontoffset  = 0,
+				fronttexture = [[null]],
+				length       = -5,
+				sidetexture  = [[smoothtrail]],
+				size         = 100,
+				ttl          = 1,
+			},
+		},
+		shaft                = {
+			air        = true,
+			class      = [[CBitmapMuzzleFlame]],
+			count      = 1,
+			ground     = true,
+			underwater = 1,
+			water      = true,
+			properties = {
+				colormap     = [[0.09 0.009 0.009 0.01  0.05 0.005 0.005 0.01  0 0 0 0.01]],
+				dir          = [[dir]],
+				frontoffset  = 0,
+				fronttexture = [[null]],
+				length       = -6,
+				sidetexture  = [[smoothtrail]],
+				size         = 100,
+				sizegrowth   = -0.18,
+				ttl          = 22,
+			},
+		},
+	},
 }
+
+local drpColors = {
+	{1, 0.1, 0.1},
+	{0.9, 0.3, 0},
+	{0.7, 0.7, 0},
+	{0.1, 1, 0.1},
+	{0.1, 0.1, 1},
+	{0.7, 0, 0.7},
+}
+
+local suMergeTable = Spring.Utilities.MergeTable
+for i = 1, #drpColors do
+	col = drpColors[i]
+	local colSpec = {
+		glare = {properties = {
+			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01", 0.1*col[1], 0.1*col[2], 0.1*col[3], 0.1*col[1], 0.1*col[2], 0.1*col[3])
+		}},
+		front = {properties = {
+			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.09*col[1], 0.09*col[2], 0.09*col[3], 0.05*col[1], 0.05*col[2], 0.05*col[3])
+		}},
+		mid = {properties = {
+			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.09*col[1], 0.09*col[2], 0.09*col[3], 0.05*col[1], 0.05*col[2], 0.05*col[3])
+		}},
+		shaft = {properties = {
+			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.09*col[1], 0.09*col[2], 0.09*col[3], 0.05*col[1], 0.05*col[2], 0.05*col[3])
+		}},
+	}
+	trails["drp_trail_" .. i] = suMergeTable(colSpec, trails["drp_trail_base"], true)
+end
+
+return trails
