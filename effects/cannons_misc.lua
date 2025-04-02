@@ -86,7 +86,7 @@ return {
 	["light_plasma_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+			glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -95,7 +95,7 @@ return {
 			water      = true,
 			underwater = true,
 			properties = {
-				airdrag             = 0.3,
+				airdrag             = 0.1,
 				alwaysvisible       = false,
 				colormap            = [[0.1 0.07 0 0.01  0.1 0.07 0 0.01]],
 				directional         = true,
@@ -103,8 +103,8 @@ return {
 				numparticles        = 1,
 				particlelife        = 3,
 				particlesize        = 10,
-				particlespeed       = 0.4,
-				sizegrowth          = 6,
+				particlespeed       = 0.1,
+				sizegrowth          = 10,
 				sizemod             = 1,
 				texture             = [[glow]],
 			},
@@ -121,11 +121,11 @@ return {
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
-				length       = -3,
+				length       = -3.5,
 				sidetexture  = [[smoothtrail]],
 				size         = 8,
-				sizegrowth   = -1,
-				ttl          = 3,
+				sizegrowth   = -0.7,
+				ttl          = 5,
 			},
 		},
 	},
@@ -391,7 +391,7 @@ return {
 	["light_arty_trail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
-    glare               = {
+		glare               = {
 			class      = [[CSimpleParticleSystem]],
 			count      = 1,
 			ground     = true,
@@ -400,7 +400,7 @@ return {
 			water      = true,
 			underwater = true,
 			properties = {
-				airdrag             = 0.3,
+				airdrag             = 0.1,
 				alwaysvisible       = false,
 				colormap            = [[0.1 0.07 0 0.01  0.1 0.07 0 0.01]],
 				directional         = true,
@@ -408,8 +408,8 @@ return {
 				numparticles        = 1,
 				particlelife        = 3,
 				particlesize        = 10,
-				particlespeed       = 0.4,
-				sizegrowth          = 6,
+				particlespeed       = 0.1,
+				sizegrowth          = 12,
 				sizemod             = 1,
 				texture             = [[glow]],
 			},
@@ -429,7 +429,7 @@ return {
 				length       = -3,
 				sidetexture  = [[smoothtrail]],
 				size         = 8,
-				sizegrowth   = -0.5,
+				sizegrowth   = -0.6,
 				ttl          = 5,
 			},
 		},
