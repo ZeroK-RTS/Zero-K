@@ -703,9 +703,9 @@ local trails = {
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
-				length       = -1.5,
+				length       = -4,
 				sidetexture  = [[plasma]],
-				size         = 50,
+				size         = 100,
 				ttl          = 1,
 			},
 		},
@@ -723,7 +723,7 @@ local trails = {
 				fronttexture = [[null]],
 				length       = -5,
 				sidetexture  = [[smoothtrail]],
-				size         = 100,
+				size         = 40,
 				ttl          = 1,
 			},
 		},
@@ -735,13 +735,14 @@ local trails = {
 			underwater = 1,
 			water      = true,
 			properties = {
+        airdrag = 0,
 				colormap     = [[0.09 0.009 0.009 0.01  0.05 0.005 0.005 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
-				length       = -6,
+				length       = -7,
 				sidetexture  = [[smoothtrail]],
-				size         = 100,
+				size         = 40,
 				sizegrowth   = -0.18,
 				ttl          = 22,
 			},
@@ -763,13 +764,13 @@ for i = 1, #drpColors do
 	col = drpColors[i]
 	local colSpec = {
 		glare = {properties = {
-			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01", 0.1*col[1], 0.1*col[2], 0.1*col[3], 0.1*col[1], 0.1*col[2], 0.1*col[3])
+			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01", 0.15*col[1], 0.15*col[2], 0.15*col[3], 0.15*col[1], 0.15*col[2], 0.15*col[3])
 		}},
 		front = {properties = {
-			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.09*col[1], 0.09*col[2], 0.09*col[3], 0.05*col[1], 0.05*col[2], 0.05*col[3])
+			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.3*col[1], 0.3*col[2], 0.3*col[3], 0.2*col[1], 0.2*col[2], 0.2*col[3])
 		}},
 		mid = {properties = {
-			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.09*col[1], 0.09*col[2], 0.09*col[3], 0.05*col[1], 0.05*col[2], 0.05*col[3])
+			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.2*col[1], 0.2*col[2], 0.2*col[3], 0.1*col[1], 0.1*col[2], 0.1*col[3])
 		}},
 		shaft = {properties = {
 			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.09*col[1], 0.09*col[2], 0.09*col[3], 0.05*col[1], 0.05*col[2], 0.05*col[3])
