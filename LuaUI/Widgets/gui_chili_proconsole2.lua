@@ -899,7 +899,7 @@ local function AddMessage(msg, target, remake)
 		--]]
 		font = {
 			-- [[
-			outlineWidth = 3,
+			outlineWidth = 2,
 			outlineWeight = 10,
 			outline = true,
 			--]]
@@ -936,7 +936,7 @@ local function AddMessage(msg, target, remake)
 		--autoObeyLineHeight=true,
 		
 		font = {
-			outlineWidth = 3,
+			outlineWidth = 2,
 			outlineWeight = 10,
 			outline = true,
 			color         = nameColor,

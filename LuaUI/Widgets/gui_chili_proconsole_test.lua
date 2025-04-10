@@ -1066,7 +1066,7 @@ local function AddMessage(msg, target, remake)
 		autoObeyLineHeight=true,
 		--]]
 		objectOverrideFont = WG.GetSpecialFont(size, "proconsole", {
-			outlineWidth = 3,
+			outlineWidth = 2,
 			outlineWeight = 10,
 			outline = true,
 		})
