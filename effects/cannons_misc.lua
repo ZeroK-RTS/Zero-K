@@ -860,7 +860,7 @@ local trails = {
 				texture             = [[glow]],
 			},
 		},
-		front                = {
+		vanguard              = {
 			air        = true,
 			class      = [[CBitmapMuzzleFlame]],
 			count      = 1,
@@ -868,32 +868,15 @@ local trails = {
 			underwater = 1,
 			water      = true,
 			properties = {
-				colormap     = [[0.09 0.009 0.009 0.01  0.05 0.005 0.005 0.01  0 0 0 0.01]],
+				colormap     = [[0 0 0 0.01  0 0 0 0.01  0 0 0 0.01  0 0 0 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
-				length       = -4,
-				sidetexture  = [[plasma]],
-				size         = 100,
-				ttl          = 1,
-			},
-		},
-		mid                = {
-			air        = true,
-			class      = [[CBitmapMuzzleFlame]],
-			count      = 1,
-			ground     = true,
-			underwater = 1,
-			water      = true,
-			properties = {
-				colormap     = [[0.09 0.009 0.009 0.01  0.05 0.005 0.005 0.01  0 0 0 0.01]],
-				dir          = [[dir]],
-				frontoffset  = 0,
-				fronttexture = [[null]],
-				length       = -5,
+				length       = 6,
 				sidetexture  = [[smoothtrail]],
-				size         = 40,
-				ttl          = 1,
+				size         = 50,
+				sizegrowth   = -0.4,
+				ttl          = 9,
 			},
 		},
 		shaft                = {
@@ -904,16 +887,16 @@ local trails = {
 			underwater = 1,
 			water      = true,
 			properties = {
-        airdrag = 0,
+			airdrag = 0,
 				colormap     = [[0.09 0.009 0.009 0.01  0.05 0.005 0.005 0.01  0 0 0 0.01]],
 				dir          = [[dir]],
 				frontoffset  = 0,
 				fronttexture = [[null]],
-				length       = -7,
+				length       = -6,
 				sidetexture  = [[smoothtrail]],
 				size         = 40,
 				sizegrowth   = -0.18,
-				ttl          = 22,
+				ttl          = 16,
 			},
 		},
 	},
@@ -935,11 +918,8 @@ for i = 1, #drpColors do
 		glare = {properties = {
 			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01", 0.15*col[1], 0.15*col[2], 0.15*col[3], 0.15*col[1], 0.15*col[2], 0.15*col[3])
 		}},
-		front = {properties = {
-			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.3*col[1], 0.3*col[2], 0.3*col[3], 0.2*col[1], 0.2*col[2], 0.2*col[3])
-		}},
-		mid = {properties = {
-			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.2*col[1], 0.2*col[2], 0.2*col[3], 0.1*col[1], 0.1*col[2], 0.1*col[3])
+		vanguard = {properties = {
+			colormap = string.format("0 0 0 0.01  0 0 0 0.01  %.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.3*col[1], 0.3*col[2], 0.3*col[3], 0.2*col[1], 0.2*col[2], 0.2*col[3], 0.1*col[1], 0.1*col[2], 0.1*col[3])
 		}},
 		shaft = {properties = {
 			colormap = string.format("%.2f %.2f %.2f 0.01  %.2f %.2f %.2f 0.01  0 0 0 0.01", 0.09*col[1], 0.09*col[2], 0.09*col[3], 0.05*col[1], 0.05*col[2], 0.05*col[3])
