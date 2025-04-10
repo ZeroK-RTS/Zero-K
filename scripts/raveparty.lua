@@ -21,7 +21,7 @@ end
 
 local hpi = math.pi*0.5
 
-local headingSpeed = math.rad(3)
+local headingSpeed = math.rad(4)
 local pitchSpeed = math.rad(61) -- Float maths makes this exactly one revolution every 6 seconds.
 
 guns[5].y = 11
