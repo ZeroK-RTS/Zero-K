@@ -68,11 +68,12 @@ return {
       water              = true,
       properties = {
         alpha              = 1,
-        alphadecay         = 0.15,
+        alphadecay         = 0.16,
         color              = [[1.0, 0.8, 0.5]],
         dir                = [[-10 r20,-10 r20,-10 r20]],
         length             = 1,
         width              = 22,
+        lengthGrowth       = 2,
       },
     },
 	
