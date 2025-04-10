@@ -74,6 +74,7 @@ return { cloakarty = {
       name                    = [[Light Plasma Cannon]],
       accuracy                = 220,
       areaOfEffect            = 16,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 

@@ -79,6 +79,7 @@ return { vehriot = {
       avoidFeature            = true,
       avoidFriendly           = true,
       burnblow                = true,
+      cegTag                  = [[riot_cannon_trail]],
       craterBoost             = 1,
       craterMult              = 0.5,
 
