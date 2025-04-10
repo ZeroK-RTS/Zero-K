@@ -1055,7 +1055,7 @@ function DrawProgressbar(obj)
 	local w = obj.width
 	local h = obj.height
 
-	local percent = (obj.value-obj.min)/(obj.max-obj.min)
+	local percent = (obj.max > obj.min and (obj.value-obj.min)/(obj.max-obj.min)) or 1
 
 	local skLeft, skTop, skRight, skBottom = unpack4(obj.tiles)
 
