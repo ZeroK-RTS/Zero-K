@@ -71,6 +71,7 @@ return { staticarty = {
       avoidGround             = true,
       burst                   = 3,
       burstRate               = 0.133,
+      cegTag                  = [[heavy_arty_trail]],
       craterBoost             = 1,
       craterMult              = 2,
 
