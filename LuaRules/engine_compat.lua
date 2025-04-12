@@ -803,6 +803,10 @@ if not Spring.GetUnitCommandCount then -- BAR 105-2720
 	end
 end
 
+if not Spring.SetMiniMapRotation then -- 2025.03
+	Spring.SetMiniMapRotation = RET_NONE
+end
+
 if true then -- No engine has this yet
 	local origAddUnitDamage = Spring.AddUnitDamage
 	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
