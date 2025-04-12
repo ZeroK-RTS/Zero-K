@@ -283,11 +283,7 @@ end
 
 function script.QueryWeapon(num)
 	if num == 1 then
-		if beamCount <= 2 or beamCount >= 48 then
-			return mflare
-		else
-			return gunPieces[gun_1].flare
-		end
+		return gunPieces[gun_1].flare
 	elseif num == 2 then
 		return turret
 	end
