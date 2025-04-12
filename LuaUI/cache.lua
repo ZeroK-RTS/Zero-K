@@ -127,3 +127,6 @@ function Spring.SetCameraTarget(x, y, z, transTime)
 		return SetCameraTarget(x, y, z, transTime) --return new results
 	end
 end
+
+-- not yet supported (can screw up the minimap)
+Spring.SetMiniMapRotation = function() end
