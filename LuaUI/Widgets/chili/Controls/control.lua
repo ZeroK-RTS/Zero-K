@@ -58,7 +58,7 @@ Control = Object:Inherit{
 		shadow        = false,
 		outline       = false,
 		outlineWidth  = 2,
-		outlineWeight = 2,
+		outlineWeight = 3,
 		color         = {1, 1, 1, 1},
 		outlineColor  = {0, 0, 0, 1},
 		autoOutlineColor = true,
@@ -413,7 +413,7 @@ end
 
 --// =============================================================================
 
-function Control:UpdateClientArea(dontRedraw)
+function Control:UpdateClientArea(dontRedraw, skipRealignParent)
 	local padding = self.padding
 
 	self.clientWidth  = self.width  - padding[1] - padding[3]
@@ -426,7 +426,7 @@ function Control:UpdateClientArea(dontRedraw)
 		self.clientHeight
 	}
 
-	if (self.parent) and (self.parent:InheritsFrom('control')) then
+	if (not skipRealignParent) and (self.parent) and (self.parent:InheritsFrom('control')) then
 		--FIXME sometimes this makes self:RequestRealign() redundant! try to reduce the Align() calls somehow
 		self.parent:RequestRealign()
 	end
@@ -539,7 +539,7 @@ end
 -- @int h height
 -- @param clientArea TODO
 -- @bool dontUpdateRelative TODO
-function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
+function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative, skipRealignParent)
 	local changed = false
 	local redraw  = false
 
@@ -616,7 +616,7 @@ function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
 	end
 
 	if (changed) or (not self.clientArea) then
-		self:UpdateClientArea(not redraw)
+		self:UpdateClientArea(not redraw, skipRealignParent)
 	end
 end
 
@@ -1023,18 +1023,14 @@ function Control:_UpdateChildrenDList()
 	if not self:IsInView() then
 		return
 	end
-
-	if self:InheritsFrom("scrollpanel") and not self._cantUseRTT then
-		local contentX, contentY, contentWidth, contentHeight = unpack4(self.contentArea)
-		if (contentWidth <= 0) or (contentHeight <= 0) then
-			return
-		end
-		self:CreateViewTexture("children", contentWidth, contentHeight, self.DrawChildrenForList, self, true)
-	end
-
-	--FIXME
-	--if self.useDLists then
-	--	self._children_dlist = gl.CreateList(self.DrawChildrenForList, self, true)
+	
+	-- Required if we ever want to pursue RTT
+	--if self:InheritsFrom("scrollpanel") and not self._cantUseRTT then
+	--	local contentX, contentY, contentWidth, contentHeight = unpack4(self.contentArea)
+	--	if (contentWidth <= 0) or (contentHeight <= 0) then
+	--		return
+	--	end
+	--	self:CreateViewTexture("children", contentWidth, contentHeight, self.DrawChildrenForList, self, true)
 	--end
 end
 
