@@ -232,16 +232,19 @@ for i = 1, #UnitDefs do
 end
 
 local manualFireTimeDefs = {}
+local manualFireWeaponNum = {}
 local specialReloadDefs = {}
 local jumpReloadDefs = {}
 local ammoRequiringDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	local unitWeapon = (ud and ud.weapons)
-	unitWeapon = unitWeapon and unitWeapon[3]
 	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	local weaponNum = tonumber(ud.customParams.manualfire_num or 3)
+	unitWeapon = unitWeapon and unitWeapon[weaponNum]
 	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
 		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
+		manualFireWeaponNum[unitDefID] = weaponNum
 	end
 	if ud.customParams.specialreloadtime then
 		specialReloadDefs[unitDefID] = tonumber(ud.customParams.specialreloadtime)
@@ -800,7 +803,7 @@ local function GetManualFireReload(unitID, unitDefID)
 	end
 	
 	if manualFireTimeDefs[unitDefID] then
-		return manualFireTimeDefs[unitDefID], 3
+		return manualFireTimeDefs[unitDefID], manualFireWeaponNum[unitDefID]
 	end
 	if specialReloadDefs[unitDefID] then
 		return specialReloadDefs[unitDefID], false, SPECIAL_WEAPON_RELOAD_PARAM
