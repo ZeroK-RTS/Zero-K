@@ -28,7 +28,7 @@ end
 --Init variables
 local bAiming = false
 local gun_1 = 1
-local gun_1_side = false
+local gun_1_side = 0
 
 -- Signal definitions
 local SIG_WALK = 1
@@ -184,15 +184,12 @@ end
 
 function script.FireWeapon(num)
 	gun_1 = 0
-	gun_1_side = true
+	gun_1_side = 1
 end
 
 function script.Shot(num)
 	if gun_1_side then
 		gun_1 = gun_1 + 1
-	end
-	if gun_1==21 then
-		gun_1=1
 	end
 	gun_1_side = not gun_1_side
 end
