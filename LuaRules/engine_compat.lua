@@ -807,6 +807,12 @@ if not Spring.SetMiniMapRotation then -- 2025.03
 	Spring.SetMiniMapRotation = RET_NONE
 end
 
+if gl and not gl.ObjectLabel then -- 2025.03, but can be nil anyway due to missing driver support
+	gl.ObjectLabel    = RET_NONE
+	gl.PushDebugGroup = RET_NONE
+	gl.PopDebugGroup  = RET_NONE
+end
+
 if true then -- No engine has this yet
 	local origAddUnitDamage = Spring.AddUnitDamage
 	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
