@@ -928,7 +928,7 @@ end]]
 --
 
 for name, ud in pairs(UnitDefs) do
-	if ud.customparams.ploppable or name == "striderhub" then
+	if (ud.customparams.ploppable or name == "striderhub") and ud.buildoptions then
 		for i = 1, #ud.buildoptions do
 			local unit = ud.buildoptions[i]
 			UnitDefs[unit].customparams.from_factory = name
