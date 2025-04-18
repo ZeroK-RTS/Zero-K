@@ -18,7 +18,7 @@ local luaShaderDir = "LuaUI/Widgets/Include/"
 --local texture = 'LuaUI/Images/halo.dds'
 local internalDisabled = false
 
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+local BAR_COMPAT = Script.IsEngineMinVersion(105, 0, 500)
 
 local unitConf = {}
 

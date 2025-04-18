@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date      = "May 2020",
 		license   = "GPL V2",
 		layer     = 0,
-		enabled   = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+		enabled   = Script.IsEngineMinVersion(105, 0, 500)
 	}
 end
 
@@ -443,7 +443,7 @@ end
 -- Callins
 
 local function GetModelFragShader()
-	if Spring.Utilities.IsCurrentVersionNewerThan(105, 1450) then
+	if Script.IsEngineMinVersion(105, 0, 1450) then
 		return VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS.glsl")
 	end
 	return VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS_old1450.glsl")
