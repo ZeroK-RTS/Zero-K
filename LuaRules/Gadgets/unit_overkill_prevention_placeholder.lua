@@ -44,7 +44,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Single target with Hold Fire", "Prevent Overkill"}
 }
 
 local shotRequirement = {}
@@ -63,7 +63,7 @@ for i = 1, #UnitDefs do
 	shotRequirement[i] = shots
 end
 
-local _, handledUnitDefIDs, handledWeaponDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local _, handledUnitDefIDs, handledWeaponDefIDs, _, OVERKILL_STATES = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 local canHandleUnit = {}
 local units = {}
@@ -260,7 +260,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		if cmdOptions and cmdOptions.right then
-			state = (state - 2)%4
+			state = (state - 2)%(OVERKILL_STATES + 1)
 		end
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 		

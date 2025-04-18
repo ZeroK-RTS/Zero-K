@@ -19,7 +19,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local overkillPrevention, overkillPreventionBlackHole, _, overkillPreventionLobster = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local overkillPrevention, overkillPreventionBlackHole, _, overkillPreventionLobster, OVERKILL_STATES = include("LuaRules/Configs/overkill_prevention_defs.lua")
 local baitPreventionDefault = include("LuaRules/Configs/bait_prevention_defs.lua")
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
@@ -1015,7 +1015,7 @@ local function addUnit(defName, path)
 			type = 'number',
 			value = overkillPrevention,
 			min = 0,
-			max = 3,
+			max = OVERKILL_STATES - 1,
 			step = 1,
 			path = path,
 			tooltipFunction = tooltipFunc.overkill_prevention,

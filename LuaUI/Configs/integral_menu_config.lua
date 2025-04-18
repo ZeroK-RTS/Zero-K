@@ -266,13 +266,15 @@ local commandDisplayConfig = {
 			imageDir .. 'states/overkill_off.png',
 			imageDir .. 'states/overkill_auto_target.png',
 			imageDir .. 'states/overkill_fire_at_will.png',
-			imageDir .. 'states/overkill_on.png'
+			imageDir .. 'states/overkill_on_except_single.png',
+			imageDir .. 'states/overkill_on.png',
 		},
 		stateTooltip = {
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Disabled"),
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled for automatic targeting"),
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled when set to Fire At Will"),
-			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Always")
+			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled except for single attack command"),
+			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Always"),
 		}
 	},
 	[CMD.TRAJECTORY] = {
