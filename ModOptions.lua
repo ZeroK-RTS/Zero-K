@@ -100,6 +100,18 @@ local options = {
 			{ key='none', name = "Off", desc = 'Turns commsharing off.' },
 		},
 	},
+	{
+		key    = 'mergeresourceshare',
+		name   = 'Commshare Resource Share',
+		desc   = 'Merged players recieve this much extra resource share per additional player.',
+		type   = 'number',
+		section= 'a_important',
+		def=0.5,
+		min=0,
+		max=1,
+		step=0.05,
+	},
+	
   {
     key    = 'zombies',
     name   = 'Enable zombies',
