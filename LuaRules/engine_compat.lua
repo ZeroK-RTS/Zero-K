@@ -447,6 +447,19 @@ end
 
 Game.metalMapSquareSize = Game.metalMapSquareSize or 16 -- BAR 105-1505
 
+if not tracy then -- BAR 105-1602
+	tracy = {
+		ZoneBegin   = RET_NONE,
+		ZoneBeginN  = RET_NONE,
+		ZoneBeginS  = RET_NONE,
+		ZoneBeginNS = RET_NONE,
+		ZoneEnd     = RET_NONE,
+		ZoneText    = RET_NONE,
+		ZoneName    = RET_NONE,
+		Message     = RET_NONE,
+	}
+end
+
 if not Spring.SetUnitHeadingAndUpDir and Script.GetSynced() then -- BAR 105-1611
 	Spring.SetUnitHeadingAndUpDir    = RET_NONE
 	Spring.SetFeatureHeadingAndUpDir = RET_NONE
@@ -613,6 +626,26 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 			return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
 		end
 	end
+end
+
+if not Script.IsEngineMinVersion(105, 0, 1856) then
+	local knownBoolsT = {}
+	local originalSTRP = Spring.SetTeamRulesParam
+	local originalGTRP = Spring.GetTeamRulesParam
+	Spring.SetTeamRulesParam = function(teamID, name, value, visibility)
+		if type(value) == "boolean" then
+			knownBoolsT[name] = true
+			return originalSTRP(teamID, name, value and "1" or "0", visibility)
+		end
+		return originalSTRP(teamID, name, value, visibility)
+	end
+	Spring.GetTeamRulesParam = function(teamID, name)
+		if knownBoolsT[name] then
+			return (originalGTRP(teamID, name) == "1")
+		end
+		return originalGTRP(teamID, name)
+	end
+	-- TODO: boolean game/unit/player rules params
 end
 
 if not Script.IsEngineMinVersion(105, 0, 1873) then
