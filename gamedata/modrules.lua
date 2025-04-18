@@ -15,6 +15,8 @@ if (modoptions and (modoptions.mtpath == 0 or modoptions.mtpath == "0")) then
 end
 Spring.Echo("forceSingleThreaded", forceSingleThreaded)
 
+local pathExperiment = Script.IsEngineMinVersion and Script.IsEngineMinVersion(2025, 3, 0)
+
 local modrules  = {
   
   movement = {
@@ -143,9 +145,9 @@ local modrules  = {
     allowTake = false,
     enableSmoothMesh = false,
     LuaAllocLimit = 2560,
-    pathFinderSystem = (Script.IsEngineMinVersion and Script.IsEngineMinVersion(2025, 3, 9) and 1) or 0, 
+    pathFinderSystem = (pathExperiment and 1) or 0, 
 	--(Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0, -- QTPFS causes desync https://springrts.com/mantis/view.php?id=5936
-    pathFinderUpdateRate = 0.0000001,
+    pathFinderUpdateRate = (pathExperiment and 1) or 0.0000001,
     pathFinderRawDistMult = 100000,
     pfForceSingleThreaded = forceSingleThreaded,
     pfForceUpdateSingleThreaded = forceSingleThreaded,
