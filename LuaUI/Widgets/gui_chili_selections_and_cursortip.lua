@@ -1181,11 +1181,12 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 			end
 		end
 		bar:SetCaption(newCaption)
+		prop = (maxValue > 0 and currentValue/maxValue) or 0
 		if colorFunc then
-			color = colorFunc(currentValue/maxValue)
+			color = colorFunc(prop)
 			bar.color = color
 		end
-		bar:SetValue(currentValue/maxValue)
+		bar:SetValue(prop)
 	end
 	
 	return UpdateBar
@@ -2090,10 +2091,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		if buildBarUpdate then
-			if ud and ud.buildSpeed > 0 then
+			local buildSpeed, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
+			if buildSpeed and buildSpeed > 0 then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
 				
-				local buildSpeed, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
 				local currentBuild = GetCurrentBuildSpeed(unitID, unhandicappedSpeed)
 				buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, currentBuild or 0, buildSpeed)
 			else
