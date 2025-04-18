@@ -184,7 +184,7 @@ local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 120^2 -- Commands shorter than this do
 local CONSTRUCTOR_UPDATE_RATE = 30
 local CONSTRUCTOR_TIMEOUT_RATE = 2
 
-local STOPPING_HAX = not Spring.Utilities.IsCurrentVersionNewerThan(104, 271)
+local STOPPING_HAX = not Script.IsEngineMinVersion(104, 0, 272)
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------

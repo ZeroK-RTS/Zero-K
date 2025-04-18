@@ -132,7 +132,6 @@ end]]
 
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
-local Utilities = VFS.Include('gamedata/utilities.lua')
 
 -- Handle obsolete keys in mods gracefully while they migrate
 for name, ud in pairs(UnitDefs) do
@@ -1015,7 +1014,7 @@ end
 -- Remove engine transport limits
 --
 
-if Utilities.IsCurrentVersionNewerThan(104, 600) then
+if not Script then -- 104-600, but Script.IsEngineMinVersion wasn't available back then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
 		local buildCost = ud.metalcost and tonumber(ud.metalcost)
