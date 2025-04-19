@@ -282,6 +282,10 @@ function gadget:GameFrame(frame)
 
 					strength = strength * allyTeamStrengthMult[allyID]
 
+					if Spring.Utilities.IsNanOrInf(strength)  then
+						Spring.Echo("div0 detected", "strength", strength, "allyTeamStrengthMult[allyID]", allyTeamStrengthMult[allyID])
+					end
+
 					for j = 1,#nanoPieces do
 						local nanoPieceID = nanoPieces[j]
 						--local nanoPieceIDAlt = Spring.GetUnitScriptPiece(unitID, nanoPieceID)
@@ -406,7 +410,9 @@ function gadget:Initialize()
 	local allyTeamList = Spring.GetAllyTeamList()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
-		allyTeamStrengthMult[allyTeamID] = 1 / (Spring.GetGameRulesParam("econ_mult_" .. allyTeamID) or 1)
+		local strength = (Spring.GetGameRulesParam("econ_mult_" .. allyTeamID) or 1)
+		strength = (strength > 0 and strength) or 1
+		allyTeamStrengthMult[allyTeamID] = 1 / strength
 	end
 	
 	for _,unitID in ipairs(Spring.GetAllUnits()) do

@@ -108,15 +108,23 @@ end
 
 local function DrawNanoLasersNoShader(dir,dir_upright,visibility,streamThickness,core_alpha,core_thickness)
 	local startF,endF = 0,1
-	if (visibility==0)
-		then startF=-visibility
-		else endF  = visibility end
+	if (visibility==0) then
+		startF=-visibility
+	else
+		endF  = visibility
+	end
 
 	local start_dir = Vmul(dir,startF)
 	local   end_dir = Vmul(dir,endF)
 
 	local dir_upright1 = Vmul(dir_upright,streamThickness)
 
+	if Spring.Utilities.IsNanOrInf(unpack(start_dir[1])) or Spring.Utilities.IsNanOrInf(unpack(dir_upright1[1])) then
+		Spring.Echo("div0 detected", "startF", startF, "endF", endF, "streamThickness", streamThickness)
+		Spring.Utilities.TableEcho(dir, "dir")
+		Spring.Utilities.TableEcho(dir_upright, "dir_upright")
+	end
+	
 	glTexCoord(0,0)
 	glVertex(start_dir[1]+dir_upright1[1],start_dir[2]+dir_upright1[2],start_dir[3]+dir_upright1[3])
 	glTexCoord(0,1)
