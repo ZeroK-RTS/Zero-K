@@ -420,7 +420,10 @@ WG.crude.SetMasterVolume = function (newVolume, viaTrackbar)
 end
 
 WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
-	if (WG.music_start_volume or 0 > 0) then
+	if Spring.Utilities.IsNanOrInf(newVolume) then
+		newVolume = 0
+	end
+	if ((WG.music_start_volume or 0) > 0) then
 		Spring.SetSoundStreamVolume(newVolume / WG.music_start_volume)
 	else
 		Spring.SetSoundStreamVolume(newVolume)
