@@ -52,6 +52,10 @@ function getTheActuallyCorrectHeadingAndPitch(heading, pitch, normal, radial, ri
 	
 	local orthagonal = add(mult(-dot(aim,normal), normal), aim)
 	local modOtho = modulus(orthagonal)
+	Spring.Echo("modOtho", modOtho)
+	if modOtho <= 0.0001 then
+		return 0, -math.pi/2 -- Fire straight up
+	end
 	local theta = (modOtho > 0 and acos(dot(radial,orthagonal)/modOtho)) or hpi
 	
 	if dot(right,aim) < 0 then
