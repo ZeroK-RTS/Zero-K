@@ -1531,7 +1531,11 @@ function gadget:GameFrame(n)
 				if GG.EndgameGraphs then
 					GG.EndgameGraphs.AddTeamEnergyShared(teamID, -te.overdriveEnergyNet)
 					if energyWasted > 0 then
-						GG.EndgameGraphs.AddTeamEnergyExcess(teamID, energyWasted * te.inc / allyTeamEnergyIncome)
+						if allyTeamEnergyIncome > 0 then
+							GG.EndgameGraphs.AddTeamEnergyExcess(teamID, energyWasted * te.inc / allyTeamEnergyIncome)
+						else
+							GG.EndgameGraphs.AddTeamEnergyExcess(teamID, energyWasted / allyTeamData.teams)
+						end
 					end
 				end
 				if debugMode then
