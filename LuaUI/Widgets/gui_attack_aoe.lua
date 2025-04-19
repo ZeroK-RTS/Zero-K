@@ -468,6 +468,9 @@ local function DrawNoExplode(aoe, fx, fy, fz, tx, ty, tz, range)
 	end
 
 	local br = sqrt(bx*bx + bz*bz)
+	if br <= 0.1 then
+		return
+	end
 
 	local wx = -aoe * bz / br
 	local wz = aoe * bx / br
@@ -583,6 +586,9 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 	end
 
 	local br = sqrt(bx*bx + bz*bz)
+	if br <= 0.1 then
+		return
+	end
 
 	--bars
 	local rx = dx / br
@@ -672,14 +678,18 @@ local function DrawDirectScatter(scatter, fx, fy, fz, tx, ty, tz, range, unitRad
 	if (not bx or d == 0 or d > range) then
 		return
 	end
+	local byInv = sqrt(1 - by*by)
+	if byInv == 0 then
+		return
+	end
 
-	local ux = bx * unitRadius / sqrt(1 - by*by)
-	local uz = bz * unitRadius / sqrt(1 - by*by)
+	local ux = bx * unitRadius / byInv
+	local uz = bz * unitRadius / byInv
 
 	local cx = -scatter * uz
 	local cz = scatter * ux
-	local wx = -scatter * dz / sqrt(1 - by*by)
-	local wz = scatter * dx / sqrt(1 - by*by)
+	local wx = -scatter * dz / byInv
+	local wz = scatter * dx / byInv
 
 	local vertices = {{fx + ux + cx, fy, fz + uz + cz}, {tx + wx, ty, tz + wz},
 					{fx + ux - cx, fy, fz + uz - cz}, {tx - wx, ty, tz - wz}}
