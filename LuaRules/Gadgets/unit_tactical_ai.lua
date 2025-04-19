@@ -428,6 +428,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx, cy, cz -- command position
 		
 		local pointDis = Dist(ex, ez, ux, uz)
+		if pointDis == 0 then
+			ex, ez = math.random()*2 - 1, math.random()*2 - 1
+			pointDis = Dist(ex, ez, ux, uz)
+		end
 		UpdateJink(behaviour, unitData)
 		
 		-- jink towards the enemy
