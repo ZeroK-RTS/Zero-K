@@ -86,7 +86,7 @@ return { staticheavyarty = {
         movestructures   = [[0.25]],
         force_ignore_ground = "1",
         
-        light_color = [[2.4 1.5 0.6]],
+        light_color = [[2.2 1.375 0.55]],
       },
       
       damage                  = {
