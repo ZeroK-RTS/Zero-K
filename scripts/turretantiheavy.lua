@@ -102,6 +102,8 @@ local function HeightUpdate(toOpen)
 	SetSignalMask(SIG_OPEN)
 	if toOpen then
 		Sleep(1200)
+	else
+		Sleep(200)
 	end
 	while true do
 		if toOpen then
