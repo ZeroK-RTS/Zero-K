@@ -78,7 +78,6 @@ local function Close()
 	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
 		Sleep(500)
 	end
-	GG.SetColvolScales(unitID, {1, 0.75, 1})
 	
 	Move(arm, y_axis, -50, 12)
 	WaitForMove(arm, y_axis)
