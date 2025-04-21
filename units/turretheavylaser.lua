@@ -8,14 +8,14 @@ return { turretheavylaser = {
   buildingGroundDecalType       = [[turretheavylaser_aoplane.dds]],
   buildPic                      = [[turretheavylaser.png]],
   category                      = [[FLOAT TURRET]],
-  collisionVolumeOffsets        = [[0 17 0]],
-  collisionVolumeScales         = [[36 110 36]],
+  collisionVolumeOffsets        = [[0 19 0]],
+  collisionVolumeScales         = [[36 114 36]],
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     bait_level_default = 0,
-    aimposoffset   = [[0 15 0]],
+    aimposoffset   = [[0 56 0]],
 
     outline_x = 115,
     outline_y = 150,
