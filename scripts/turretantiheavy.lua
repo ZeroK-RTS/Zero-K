@@ -20,6 +20,9 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local SIG_AIM = 2
 local SIG_OPEN = 1
 
+local currentHeight = 1
+local MIN_HEIGHT = 0.55
+
 local open = true
 local firing = false
 
@@ -35,14 +38,12 @@ local function Open()
 		Sleep(500)
 	end
 	
-	
 	Move(arm, y_axis, 0, 12)
 	Turn(antenna, x_axis, 0, math.rad(50))
 	Sleep(200)
 	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
 		Sleep(500)
 	end
-	
 	
 	Move(barrel, z_axis, 0, 7)
 	Move(ledgun, z_axis, 0, 7)
@@ -52,8 +53,10 @@ local function Open()
 		Sleep(500)
 	end
 	
-	
 	open = true
+	currentHeight = 1
+	GG.SetColvolScales(unitID, {1, currentHeight, 1})
+	Signal(SIG_OPEN)
 end
 
 local function Close()
@@ -75,7 +78,7 @@ local function Close()
 	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
 		Sleep(500)
 	end
-	
+	GG.SetColvolScales(unitID, {1, 0.75, 1})
 	
 	Move(arm, y_axis, -50, 12)
 	WaitForMove(arm, y_axis)
@@ -90,14 +93,35 @@ local function Close()
 	WaitForTurn(door2, z_axis)
 	
 	Spring.SetUnitArmored(unitID,true)
+	currentHeight = MIN_HEIGHT
+	GG.SetColvolScales(unitID, {1, currentHeight, 1})
+	Signal(SIG_OPEN)
+end
+
+local function HeightUpdate(toOpen)
+	SetSignalMask(SIG_OPEN)
+	if toOpen then
+		Sleep(1200)
+	end
+	while true do
+		if toOpen then
+			currentHeight = math.min(1, currentHeight + 0.06)
+		else
+			currentHeight = math.max(MIN_HEIGHT, currentHeight - 0.06)
+		end
+		GG.SetColvolScales(unitID, {1, currentHeight, 1})
+		Sleep(500)
+	end
 end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
+
 function script.Activate()
 	Spin(radar, y_axis, math.rad(100))
 	StartThread(Open)
+	StartThread(HeightUpdate, true)
 end
 
 function script.Deactivate()
@@ -105,6 +129,7 @@ function script.Deactivate()
 	Signal(SIG_AIM)
 	Turn(radar, y_axis, 0, math.rad(100))
 	StartThread(Close)
+	StartThread(HeightUpdate)
 end
 
 function script.AimWeapon(weaponNum, heading, pitch)
