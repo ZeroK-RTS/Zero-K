@@ -9,8 +9,8 @@ return { turretantiheavy = {
   buildingGroundDecalType       = [[turretantiheavy_aoplane.dds]],
   buildPic                      = [[turretantiheavy.png]],
   category                      = [[SINK TURRET]],
-  collisionVolumeOffsets        = [[0 -24 0]],
-  collisionVolumeScales         = [[64 128 64]],
+  collisionVolumeOffsets        = [[0 -10 0]],
+  collisionVolumeScales         = [[68 174 68]],
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
@@ -23,7 +23,7 @@ return { turretantiheavy = {
     neededlink     = 50,
     pylonrange     = 50,
 
-    aimposoffset   = [[0 32 0]],
+    aimposoffset   = [[0 60 0]],
     midposoffset   = [[0 0 0]],
     modelradius    = [[40]],
 
