@@ -1014,7 +1014,7 @@ end
 -- Remove engine transport limits
 --
 
-if not Script then -- 104-600, but Script.IsEngineMinVersion wasn't available back then
+if Script then -- 104-600, but Script.IsEngineMinVersion wasn't available back then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
 		local buildCost = ud.metalcost and tonumber(ud.metalcost)
