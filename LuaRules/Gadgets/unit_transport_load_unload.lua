@@ -41,6 +41,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:AllowUnitTransport(transporterID, transporterUnitDefID, transporterTeam, transporteeID, transporteeUnitDefID, transporteeTeam)
+	Spring.AddUnitDamage(transporteeID, 0.1)
 	if not lightTransport[transporterUnitDefID] then
 		return true
 	end
