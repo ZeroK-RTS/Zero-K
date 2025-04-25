@@ -182,14 +182,16 @@ for i = 1, #UnitDefs do
 	if energyIncome > 0 then
 		econStructureDefs[i] = {cost = ud.metalCost, income = energyIncome}
 	end
+	if cp.windgen then
+		econStructureDefs[i] = econStructureDefs[i] or {}
+		econStructureDefs[i].isWind = true
+	end
 
 	local mexMult = tonumber(cp.metal_extractor_mult) or 0
 	if mexMult > 0 then
 		econStructureDefs[i] = {cost = ud.metalCost, mex = mexMult}
 	end
 end
-
-econStructureDefs[UnitDefNames.energywind.id].isWind = true
 
 local TIDAL_HEALTH = UnitDefNames.energywind.customParams.tidal_health
 
@@ -879,7 +881,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		return
 	end
 	
-	local income = econDef.income * mult * energyMult
+	local income = (econDef.income or 0) * mult * energyMult
 	local extraText = ""
 	local healthOverride = false
 	local minWind = 0
