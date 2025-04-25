@@ -39,8 +39,8 @@ local fixedStartPos = (modOptions.fixedstartpos == "1")
 
 local modStartMetal = START_METAL
 local modStartEnergy = START_ENERGY
-local modInnateMetal = INNATE_INC_METAL
-local modInnateEnergy = INNATE_INC_ENERGY
+local modInnateMetal = INNATE_INC_METAL * (tonumber(Spring.GetModOptions().metalmult) or 1)
+local modInnateEnergy = INNATE_INC_ENERGY * (tonumber(Spring.GetModOptions().energymult) or 1)
 
 local storageUnits = {
 	{
