@@ -57,6 +57,7 @@
 	"select_type" : "Select/deselect by type",
 	"deselect_type" : "Deselect type",
 	"select_type_half" : "Select/deselect half of type",
+	"select_health" : "Select/deselect units with at least this health percent",
 	"deselect_type_half" : "Deselect half",
 	"defer_selection" : "Do selection on key release",
 	"select_all" : "Select all",
