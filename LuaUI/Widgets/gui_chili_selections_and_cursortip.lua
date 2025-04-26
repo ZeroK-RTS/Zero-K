@@ -292,7 +292,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter',
+	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'sortByHealth',
 	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar',
 	'fancySkinning', 'leftPadding',
 }
@@ -397,7 +397,7 @@ options = {
 			end
 		end,
 	},
-	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton',
+	groupbehaviour = {name='Unit grouping behaviour', type='radioButton',
 		value='overflow',
 		items = {
 			{key = 'overflow',	name = 'On window overflow'},
@@ -406,7 +406,7 @@ options = {
 		},
 		path = selPath,
 	},
-	showgroupinfo = {name='Show Group Info', type='bool', value=true,
+	showgroupinfo = {name='Show group info', type='bool', value=true,
 		path = selPath,
 		OnChange = function(self)
 			if selectionWindow then
@@ -414,10 +414,10 @@ options = {
 			end
 		end,
 	},
-	ctrlFilter = {
-		name = 'Ctrl Selection Filtering',
+	sortByHealth = {
+		name = 'Sort by health',
 		type = 'bool',
-		desc = "Hold Ctrl and click on some units. These units will be selected when Ctrl is released.",
+		desc = "Selected units of the same type are sorted by health remaining. Updates whenever selection changes.",
 		value = true,
 		path = selPath,
 	},
@@ -2860,6 +2860,17 @@ local function UpdateSelection(newSelection)
 	-- Check if selection is many, get unit list tooltip
 	-- Update group info.
 	
+	if options.sortByHealth.value then
+		local health = {}
+		for i = 1, #newSelection do
+			local unitID = newSelection[i]
+			health[unitID] = (unitID and Spring.GetUnitHealth(unitID)) or 0
+		end
+		local function HealthUnitSort(a, b)
+			return health[a] > health[b]
+		end
+		table.sort(newSelection, HealthUnitSort)
+	end
 	selectedUnitsList = newSelection
 	
 	if (not newSelection) or (#newSelection == 0) then
