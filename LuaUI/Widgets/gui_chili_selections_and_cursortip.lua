@@ -275,7 +275,8 @@ local sameObjectIDTime = 0
 local selectedUnitsList = {}
 local commanderManualFireReload = {}
 
-local ctrlFilterUnits = false
+local ctrlFilterUnitList = false
+local ctrlFilterUnitIncluded = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1012,7 +1013,7 @@ local function UpdateMouseCursor(holdingDrawKey)
 	end
 end
 
-local function SelectionsIconClick(button, unitID, unitList, unitDefID)
+local function SelectionsIconClick(button, unitID, unitList, unitDefID, groupedButton)
 	unitID = unitID or (unitList and unitList[1])
 	
 	if not unitID then
@@ -1060,17 +1061,30 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 		spSelectUnitArray(newSelectedUnits)
 	elseif button == 1 then
 		if ctrl then
-			ctrlFilterUnits = ctrlFilterUnits or {}
+			ctrlFilterUnitList = ctrlFilterUnitList or {}
+			ctrlFilterUnitIncluded = ctrlFilterUnitIncluded or {}
 			if shift or alt then
 				local toSelect = #unitList
 				if alt then
 					toSelect = math.ceil(toSelect / 2)
 				end
 				for i = 1, toSelect do
-					ctrlFilterUnits[#ctrlFilterUnits + 1] = unitList[i]
+					if not ctrlFilterUnitIncluded[unitList[i]] then
+						ctrlFilterUnitList[#ctrlFilterUnitList + 1] = unitList[i]
+						ctrlFilterUnitIncluded[unitList[i]] = true
+					end
 				end
 			else
-				ctrlFilterUnits[#ctrlFilterUnits + 1] = unitID
+				local toSelect = unitID
+				if groupedButton and ctrlFilterUnitIncluded[toSelect] then
+					local index = 1
+					while unitList[index] and ctrlFilterUnitIncluded[toSelect] do
+						toSelect = unitList[index]
+						index = index + 1
+					end
+				end
+				ctrlFilterUnitList[#ctrlFilterUnitList + 1] = toSelect
+				ctrlFilterUnitIncluded[toSelect] = true
 			end
 		else
 			if alt then
@@ -1093,11 +1107,12 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 end
 
 local function CheckCtrlFilterRelease()
-	if not ctrlFilterUnits then
+	if not ctrlFilterUnitList then
 		return
 	end
-	spSelectUnitArray(ctrlFilterUnits)
-	ctrlFilterUnits = false
+	spSelectUnitArray(ctrlFilterUnitList)
+	ctrlFilterUnitList = false
+	ctrlFilterUnitIncluded = false
 end
 
 local cacheFeatureTooltip = {}
@@ -1446,7 +1461,7 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = holder,
 		OnClick = {
 			function(_,_,_,button)
-				SelectionsIconClick(button, unitID, unitList, unitDefID)
+				SelectionsIconClick(button, unitID, unitList, unitDefID, not unitID)
 			end
 		}
 	}
