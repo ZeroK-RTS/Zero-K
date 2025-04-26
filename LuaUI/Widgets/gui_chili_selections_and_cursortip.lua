@@ -1061,13 +1061,12 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID, healthPr
 			end
 		else
 			--// deselect a single unit
+			newSelectedUnits = {}
 			for i = 1, #selectedUnitsList do
-				if selectedUnitsList[i] == unitID then
-					selectedUnitsList[i] = selectedUnitsList[#selectedUnitsList]
-					selectedUnitsList[#selectedUnitsList] = nil
+				if selectedUnitsList[i] ~= unitID then
+					newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
 				end
 			end
-			newSelectedUnits = selectedUnitsList
 		end
 		spSelectUnitArray(newSelectedUnits)
 	elseif button == 1 then
@@ -2861,18 +2860,35 @@ local function UpdateSelection(newSelection)
 	-- Update group info.
 	
 	if options.sortByHealth.value then
-		local health = {}
+		local prevOrder = {}
+		for i = 1, #selectedUnitsList do
+			prevOrder[selectedUnitsList[i]] = i
+		end
+		local subSelection = true
 		for i = 1, #newSelection do
-			local unitID = newSelection[i]
-			health[unitID] = (unitID and Spring.GetUnitHealth(unitID)) or 0
+			if not prevOrder[newSelection[i]] then
+				subSelection = false
+			end
 		end
-		local function HealthUnitSort(a, b)
-			return health[a] > health[b]
+		if subSelection then
+			local function KeepPreviousOrder(a, b)
+				return prevOrder[a] < prevOrder[b]
+			end
+			table.sort(newSelection, KeepPreviousOrder)
+		else
+			local health = {}
+			for i = 1, #newSelection do
+				local unitID = newSelection[i]
+				health[unitID] = (unitID and Spring.GetUnitHealth(unitID)) or 0
+			end
+			local function HealthUnitSort(a, b)
+				return health[a] > health[b]
+			end
+			table.sort(newSelection, HealthUnitSort)
 		end
-		table.sort(newSelection, HealthUnitSort)
 	end
 	selectedUnitsList = newSelection
-	
+
 	if (not newSelection) or (#newSelection == 0) then
 		selectionWindow.SetVisible(false)
 		return
