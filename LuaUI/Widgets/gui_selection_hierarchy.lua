@@ -55,6 +55,7 @@ local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/sel
 --------------------------------------------------------------------------------
 -- Epic Menu Options
 
+local shiftFlattenRank = 0
 local ctrlFlattenRank = 1
 local altFilterHighRank = 2
 local doubleClickFlattenRank = 1
@@ -76,6 +77,7 @@ local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = {
 	'label_selection_rank',
 	'useSelectionFilteringOption',
+	'shiftFlattenRankOption',
 	'ctrlFlattenRankOption',
 	'selectionFilteringOnlyAltOption',
 	'altBlocksHighRankSelection',
@@ -94,7 +96,7 @@ options = {
 		name = 'Selection Rank Filtering',
 		value = [[Units have a toggleable selection rank on the right side of their command card (the circle with numbers 0-3).
  - Normal selection only selects the boxed units with the highest rank.
- - Shift ignores rank.
+ - Shift ignores rank by default.
  - Combat units default to rank 3.
  - Constructors default to rank 2.
  - Structures default to rank 1.
@@ -111,11 +113,23 @@ options = {
 			useSelectionFiltering = self.value
 		end
 	},
+	shiftFlattenRankOption = {
+		name = 'Hold Shift to ignore rank difference above:',
+		desc = "Set to 0 to have shift ignore rank. Set to 3 to have shift have no effect on rank.",
+		type = 'number',
+		value = shiftFlattenRank,
+		min = 0, max = 3, step = 1,
+		noHotkey = true,
+		tooltip_format = "%.0f",
+		OnChange = function (self)
+			shiftFlattenRank = self.value
+		end
+	},
 	ctrlFlattenRankOption = {
 		name = 'Hold Ctrl to ignore rank difference above:',
 		desc = "Useful so that global selection hotkeys (such as Ctrl+Z) can expand upon a mixed selection.",
 		type = 'number',
-		value = 1,
+		value = ctrlFlattenRank,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
 		tooltip_format = "%.0f",
@@ -137,7 +151,7 @@ options = {
 		name = 'Hold Alt to filter out ranks above:',
 		desc = "Useful for selecting low-rank units, such as constructors as they default to rank 2.",
 		type = 'number',
-		value = 2,
+		value = altFilterHighRank,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
 		tooltip_format = "%.0f",
@@ -149,7 +163,7 @@ options = {
 		name = 'Double click ignores rank difference above:',
 		desc = "Allows for double click selection of many units of the same type and differing selection rank.",
 		type = 'number',
-		value = 1,
+		value = doubleClickFlattenRank,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
 		tooltip_format = "%.0f",
@@ -290,9 +304,6 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		return
 	end
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if shift then
-		return
-	end
 	
 	if selectionFilteringOnlyAlt and not alt then
 		return
@@ -362,6 +373,9 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 			end
 			if ctrl and rank > ctrlFlattenRank then
 				rank = ctrlFlattenRank
+			end
+			if shift and rank > shiftFlattenRank then
+				rank = shiftFlattenRank
 			end
 			if doubleClickUnitDefID and rank > doubleClickFlattenRank then
 				rank = doubleClickFlattenRank
