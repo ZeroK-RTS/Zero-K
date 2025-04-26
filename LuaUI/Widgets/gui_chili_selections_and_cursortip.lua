@@ -1013,7 +1013,7 @@ local function UpdateMouseCursor(holdingDrawKey)
 	end
 end
 
-local function SelectionsIconClick(button, unitID, unitList, unitDefID, groupedButton)
+local function SelectionsIconClick(button, unitID, unitList, unitDefID, healthProp, groupedButton)
 	unitID = unitID or (unitList and unitList[1])
 	
 	if not unitID then
@@ -1032,7 +1032,18 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID, groupedB
 	local newSelectedUnits
 	
 	if (button == 3) then
-		if alt or shift then
+		if shift and alt then
+			--// deselect units with health at least healthProp
+			newSelectedUnits = {}
+			for i = 1, #selectedUnitsList do
+				if selectedUnitsList[i] then
+					local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+					if maxhealth and maxhealth > 0 and health / maxhealth < healthProp then
+						newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
+					end
+				end
+			end
+		elseif alt or shift then
 			--// deselect whole block, or half if alt is held
 			local toDeselect = #unitList
 			if alt then
@@ -1063,7 +1074,21 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID, groupedB
 		if ctrl then
 			ctrlFilterUnitList = ctrlFilterUnitList or {}
 			ctrlFilterUnitIncluded = ctrlFilterUnitIncluded or {}
-			if shift or alt then
+			if shift and alt then
+				--// select units with health at least healthProp
+				newSelectedUnits = {}
+				for i = 1, #selectedUnitsList do
+					if selectedUnitsList[i] then
+						local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+						if maxhealth and maxhealth > 0 and health / maxhealth >= healthProp then
+							if not ctrlFilterUnitIncluded[selectedUnitsList[i]] then
+								ctrlFilterUnitList[#ctrlFilterUnitList + 1] = selectedUnitsList[i]
+								ctrlFilterUnitIncluded[selectedUnitsList[i]] = true
+							end
+						end
+					end
+				end
+			elseif shift or alt then
 				local toSelect = #unitList
 				if alt then
 					toSelect = math.ceil(toSelect / 2)
@@ -1087,7 +1112,19 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID, groupedB
 				ctrlFilterUnitIncluded[toSelect] = true
 			end
 		else
-			if alt then
+			if shift and alt then
+				--// select units with health at least healthProp
+				newSelectedUnits = {}
+				for i = 1, #selectedUnitsList do
+					if selectedUnitsList[i] then
+						local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+						if maxhealth and maxhealth > 0 and health / maxhealth >= healthProp then
+							newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
+						end
+					end
+				end
+				spSelectUnitArray(newSelectedUnits)
+			elseif alt then
 				local toSelect = math.ceil(#unitList / 2)
 				newSelectedUnits = {}
 				for i = 1, toSelect do
@@ -1426,6 +1463,7 @@ local function GetUnitGroupIconButton(parentControl)
 	local unitList
 	local unitCount
 	local unitpicBadgeUpdate
+	local healthProp
 	
 	local size = options.uniticon_size.value
 	
@@ -1461,7 +1499,7 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = holder,
 		OnClick = {
 			function(_,_,_,button)
-				SelectionsIconClick(button, unitID, unitList, unitDefID, not unitID)
+				SelectionsIconClick(button, unitID, unitList, unitDefID, healthProp, not unitID)
 			end
 		}
 	}
@@ -1481,8 +1519,9 @@ local function GetUnitGroupIconButton(parentControl)
 		if unitID then
 			local health, maxhealth = spGetUnitHealth(unitID)
 			if health then
-				healthBar.color = GetHealthColor(health/maxhealth)
-				healthBar:SetValue(health/maxhealth)
+				healthProp = health/maxhealth
+				healthBar.color = GetHealthColor(healthProp)
+				healthBar:SetValue(healthProp)
 			end
 			local reloadTime, weaponNum, rulesParam = GetManualFireReload(unitID, unitDefID)
 			if reloadTime then
@@ -1526,8 +1565,9 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 		
 		if totalMax > 0 then
-			healthBar.color = GetHealthColor(totalHealth/totalMax)
-			healthBar:SetValue(totalHealth/totalMax)
+			healthProp = totalHealth/totalMax
+			healthBar.color = GetHealthColor(healthProp)
+			healthBar:SetValue(healthProp)
 		end
 	end
 	
@@ -2928,8 +2968,9 @@ function widget:Initialize()
 			green .. WG.Translate("interface", "rmb")   .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
 			green .. "+ " .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
 			green .. "+ " .. WG.Translate("interface", "alt")   .. ": " .. WG.Translate("interface", "select_type_half") .. "\n" ..
-			green .. "+ " .. WG.Translate("interface", "ctrl")  .. ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
-			green .. WG.Translate("interface", "mmb")   .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "ctrl")  ..  ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "alt") .. ": " .. WG.Translate("interface", "select_health") .. "\n" ..
+			green .. WG.Translate("interface", "mmb")  ..": " .. WG.Translate("interface", "go_to") .. "\n" ..
 			green .. WG.Translate("interface", "space_click_show_stats")
 
 		unitSelectionTooltipCache = {}
