@@ -219,6 +219,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
 	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
 	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
+	['Settings/HUD Panels/Nuke Warning']            = imgPath..'nuke_button_48.png',
 	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
 	
 	['Settings/Spectating/Action Tracking Camera']  = imgPath..'epicmenu/video_camera.png',

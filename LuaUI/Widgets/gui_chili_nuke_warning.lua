@@ -31,6 +31,8 @@ local wantedShown = false
 local currentlyShown = false
 local flashState = 1
 local flashTime = 0
+local previewShow = false
+local postInit = false
 
 local FLASH_PERIOD = 0.4
 
@@ -52,7 +54,9 @@ local function UpdateFlashStateDefs()
 		}
 	}
 
-	if currentlyShown then UpdateFont(flashState) end
+	if currentlyShown then
+		UpdateFont(flashState)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -77,13 +81,8 @@ local function CreateWindow()
 	local data = {}
 	
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
-	local resourcePanelHeight = 100
-
-	local isHuge = options and options.nukeWarningIsHuge and options.nukeWarningIsHuge.value
-
+	local resourcePanelHeight = 105
 	local windowWidth = screenWidth - 10
-	local windowHeight = isHuge and (screenHeight - 2*resourcePanelHeight) or 50
-	local fontSize = isHuge and 200 or 32
 
 	data.window = Chili.Window:New{
 		parent = screen0,
@@ -92,9 +91,9 @@ local function CreateWindow()
 		name = "NukeLaunchWarningWindow",
 		padding = {0,0,0,0},
 		x = 5,
-		y = resourcePanelHeight,
+		y = (options.nukeWarningIsHuge.value and 0) or (options.yOffset.value + 109),
 		clientWidth  = windowWidth,
-		clientHeight = windowHeight,
+		bottom = 0,
 		dockable = false,
 		draggable = false,
 		resizable = false,
@@ -110,11 +109,11 @@ local function CreateWindow()
 		right  = 0,
 		bottom = 0,
 		caption = WG.Translate ("interface", "nuclear_launch_detected"),
-		valign = "center",
+		valign = options.nukeWarningIsHuge.value and "center" or "top",
 		align  = "center",
 		autosize = false,
 		font   = {
-			size = fontSize,
+			size = options.fontSize.value,
 			outline = true,
 			outlineWidth = 6,
 			outlineWeight = 6,
@@ -175,10 +174,17 @@ function widget:Initialize()
 		return
 	end
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
-	UpdateFlashStateDefs()
 end
 
 function widget:Update(dt)
+	if not postInit then
+		postInit = true
+	end
+	if previewShow then
+		wantedShown = true
+		ShowWindow()
+		previewShow = false
+	end
 	if not currentlyShown then
 		return
 	end
@@ -210,43 +216,58 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = "Settings/Accessibility"
-options_order = { "mainlabel", "nukeWarningIsHuge", "nukeWarningOpacity" }
+local function RecreateWindow()
+	if mainWindow and mainWindow.window then
+		mainWindow.window:Dispose()
+		mainWindow = nil
+		currentlyShown = false
+	end
+	UpdateFlashStateDefs()
+
+	if wantedShown then
+		ShowWindow()
+	end
+	if postInit then
+		previewShow = 1
+	end
+end
+
+options_path = "Settings/HUD Panels/Nuke Warning"
+options_order = { "mainlabel", "nukeWarningOpacity", "fontSize", "yOffset", "nukeWarningIsHuge"}
 
 options = {
 	mainlabel = {
 		name='Nuclear launch warning',
 		type='label',
-		simpleMode = true,
-		everyMode = true,
-	},
-	nukeWarningIsHuge = {
-		name = "Full-screen nuclear launch warning",
-		type = "bool",
-		value = false,
-		noHotkey = true,
-		OnChange = function (self)
-			if mainWindow and mainWindow.window then
-				mainWindow.window:Dispose()
-				mainWindow = nil
-				currentlyShown = false
-			end
-
-			if wantedShown then
-				ShowWindow()
-			end
-		end,
-		simpleMode = true,
-		everyMode = true,
 	},
 	nukeWarningOpacity = {
-		name = "Nuclear launch warning opacity",
+		name = "Warning opacity",
 		type = "number",
 		value = 100,
 		min = 1, max = 100, step = 1,
-		advanced = true,
-		OnChange = UpdateFlashStateDefs,
-		simpleMode = true,
-		everyMode = true,
+		OnChange = RecreateWindow,
+	},
+	yOffset = {
+		name = "Warning offset",
+		type = "number",
+		value = 0,
+		min = 0, max = 1000,
+		step = 5,
+		OnChange = RecreateWindow,
+	},
+	fontSize = {
+		name = "Warning size",
+		type = "number",
+		value = 32,
+		min = 32, max = 250,
+		step = 1,
+		OnChange = RecreateWindow,
+	},
+	nukeWarningIsHuge = {
+		name = "Warn in the middle of the screen",
+		type = "bool",
+		value = false,
+		noHotkey = true,
+		OnChange = RecreateWindow,
 	},
 }
