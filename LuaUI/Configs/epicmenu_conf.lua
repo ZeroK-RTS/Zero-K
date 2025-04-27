@@ -194,6 +194,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Line Formations']          = imgPath..'commands/bold/move.png',
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
+	['Settings/Interface/Selection Filtering']      = imgPath..'epicmenu/selection_rank.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
