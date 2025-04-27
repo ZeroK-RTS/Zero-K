@@ -174,6 +174,7 @@ function widget:Initialize()
 		return
 	end
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	UpdateFlashStateDefs()
 end
 
 function widget:Update(dt)

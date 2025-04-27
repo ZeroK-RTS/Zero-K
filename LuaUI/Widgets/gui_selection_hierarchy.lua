@@ -58,6 +58,7 @@ local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/sel
 local shiftFlattenRank = 0
 local ctrlFlattenRank = 1
 local altFilterHighRank = 2
+local metaFlattenRank = 3
 local doubleClickFlattenRank = 1
 local controlGroupFlattenRank = 1
 local retreatOverride = true
@@ -72,13 +73,13 @@ local function StartRetreat(unitID)
 	end
 end
 
-options_path = 'Settings/Interface/Selection/Filtering'
+options_path = 'Settings/Interface/Selection Filtering'
 local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = {
 	'label_selection_rank',
-	'useSelectionFilteringOption',
 	'shiftFlattenRankOption',
 	'ctrlFlattenRankOption',
+	'metaFlattenRankOption',
 	'selectionFilteringOnlyAltOption',
 	'altBlocksHighRankSelection',
 	'doubleClickFlattenRankOption',
@@ -87,27 +88,29 @@ options_order = {
 	'rearmingOverrideRank',
 	'retreatOverrideOption',
 	'retreatingRankOption',
-	'retreatDeselects'
+	'retreatDeselects',
+	'useSelectionFilteringOption',
 }
 
 options = {
 	label_selection_rank = {
 		type = 'text',
-		name = 'Selection Rank Filtering',
-		value = [[Units have a toggleable selection rank on the right side of their command card (the circle with numbers 0-3).
- - Normal selection only selects the boxed units with the highest rank.
- - Shift ignores rank by default.
+		name = 'Selection Filtering',
+		value = [[Default filtering is:
+ - Unmodified selection only selects the boxed units with the highest rank.
+ - Shift allows selection of mixed ranks.
  - Combat units default to rank 3.
  - Constructors default to rank 2.
  - Structures default to rank 1.
- - Rank 0 intended for manual use to make a unit hard to accidentally select.
- - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.]],
+ - Change rank mid game by toggling the state on the the command card (circle with the number top right).
+ - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.
+The modifiers can be configured below.
+ ]],
 	},
 	useSelectionFilteringOption = {
 		name = "Enable selection filtering",
 		type = "bool",
 		value = true,
-		noHotkey = true,
 		desc = "Enables selection rank, which filters constructors from combat units by default.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
@@ -135,6 +138,18 @@ options = {
 		tooltip_format = "%.0f",
 		OnChange = function (self)
 			ctrlFlattenRank = self.value
+		end
+	},
+	metaFlattenRankOption = {
+		name = 'Hold Space to ignore rank difference above:',
+		desc = "Set to 0 to have space ignore rank. Set to 3 to have space have no effect on rank.",
+		type = 'number',
+		value = metaFlattenRank,
+		min = 0, max = 3, step = 1,
+		noHotkey = true,
+		tooltip_format = "%.0f",
+		OnChange = function (self)
+			metaFlattenRank = self.value
 		end
 	},
 	selectionFilteringOnlyAltOption = {
@@ -376,6 +391,9 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 			end
 			if shift and rank > shiftFlattenRank then
 				rank = shiftFlattenRank
+			end
+			if meta and rank > metaFlattenRank then
+				rank = metaFlattenRank
 			end
 			if doubleClickUnitDefID and rank > doubleClickFlattenRank then
 				rank = doubleClickFlattenRank
