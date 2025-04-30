@@ -243,6 +243,7 @@ local flexCallIns = {
 	'DrawShadowFeaturesLua',
 	'RecvSkirmishAIMessage',
 	'SelectionChanged',
+	'TeamColorsChanged',
 	'AddConsoleMessage',
 	'Save',
 	'Load',
@@ -1681,6 +1682,16 @@ function widgetHandler:CommandsChanged()
 	self.inCommandsChanged = false
 end
 
+
+function widgetHandler:TeamColorsChanged()
+	tracy.ZoneBeginN("W:TeamColorsChanged")
+	for _, w in r_ipairs(self.TeamColorsChangedList) do
+		tracy.ZoneBeginN("W:TeamColorsChanged:" .. w.whInfo.name)
+		w:TeamColorsChanged();
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
 
 --------------------------------------------------------------------------------
 --

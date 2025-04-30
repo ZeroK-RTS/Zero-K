@@ -7,6 +7,7 @@ function widget:GetInfo()
 		license = "GNU GPL v2, or later",
 		layer = -10001,
 		enabled = true,
+		handler = true,
 	}
 end
 
@@ -184,6 +185,8 @@ local function SetNewTeamColors()
 	if not is_speccing then
 		Spring.SetTeamColor(myTeam, unpack(myColor)) -- overrides previously defined color
 	end
+
+	widgetHandler:TeamColorsChanged()
 end
 
 local function ResetOldTeamColors()
