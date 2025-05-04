@@ -1,4 +1,5 @@
 local support = piece 'support'
+local hips = piece 'cod'
 local flare = piece 'flare'
 local eye_flare = piece 'eye_flare'
 local thigh1 = piece 'thigh1'
@@ -13,160 +14,77 @@ local leg1 = piece 'leg1'
 local shoulder = piece 'shoulder'
 local shoulder_left = piece 'shoulder_left'
 
+
+-- groups
+local shoulders = {shoulder_left, shoulder}
+local thigh = {thigh2, thigh1}
+local shin = {leg2, leg1}
+local foot = {foot2, foot1}
+
+--constants
+local runspeed = 29 * (UnitDefs[unitDefID].speed / 115)  -- run animation rate, future-proofed
+local steptime = 40  -- how long legs stay extended during stride
+local hangtime = 20 -- how long it takes for "gravity" to accelerate stride descent
+local stride_top = 1.5  -- how high hips go during stride
+local stride_bottom = -1.0  -- how low hips go during stride
+
 include "constants.lua"
 
 local aiming = false
+local moving = false
 
 local RESTORE_DELAY = 2000
 
 -- Signal definitions
-local SIG_MOVE = 1
-local SIG_AIM = 2
-local SIG_RESTORE = 4
+local SIG_Idle = 1
+local SIG_Walk = 2
+local SIG_Aim = 4
+local SIG_RESTORE = 8
 
-local function walk()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
+local function GetSpeedMod()
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
+end
 
+local function Walk()
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
+
+	for i = 1, 2 do
+		Turn (thigh[i], y_axis, 0, runspeed*0.15)
+		Turn (thigh[i], z_axis, 0, runspeed*0.15)
+	end
+
+	local side = 1
 	while true do
-		if not aiming then
-			Move(torso, y_axis, -0.050000)
-			Turn(torso, x_axis, math.rad(1.758242))
-			Turn(torso, z_axis, math.rad(-0.703297))
+		local speedmod = GetSpeedMod()
+		local truespeed = runspeed * speedmod
+		local turnMult = 1
+		if truespeed > 25 then
+			turnMult = 1 + (truespeed - 25) * 0.1
 		end
-		
-		Turn(thigh1, x_axis, math.rad(16.879121))
-		Turn(thigh2, x_axis, math.rad(-45.714286))
-		Turn(leg2, x_axis, math.rad(50.983516))
-		Turn(foot1, x_axis, math.rad(-16.527473))
-		Sleep(100)
-	
-		if not aiming then
-			Move(torso, y_axis, 0.000000)
-			Turn(torso, x_axis, math.rad(0.351648))
-			Turn(torso, z_axis, math.rad(-0.351648))
-		end
-		
-		Turn(thigh1, x_axis, math.rad(24.263736))
-		Turn(thigh2, x_axis, math.rad(-41.137363))
-		Turn(leg2, x_axis, math.rad(43.247253))
-		Turn(foot1, x_axis, math.rad(-11.956044))
-		Sleep(102)
-	
-		if not aiming then
-			Turn(torso, x_axis, 0)
-			Turn(torso, z_axis, 0)
-		end
-		
-		Turn(thigh1, x_axis, math.rad(37.620879))
-		Turn(thigh2, x_axis, math.rad(-26.368132))
-		Turn(leg2, x_axis, math.rad(26.368132))
-		Turn(leg1, x_axis, math.rad(8.439560))
-		Sleep(104)
-	
-		if not aiming then
-			Move(torso, y_axis, -0.300000)
-			Turn(torso, x_axis, 0)
-		end
-		
-		Turn(thigh1, x_axis, math.rad(22.148352))
-		Turn(thigh2, x_axis, math.rad(-11.956044))
-		Turn(leg2, x_axis, math.rad(11.598901))
-		Turn(leg1, x_axis, math.rad(27.428571))
-		Sleep(102)
-	
-		if not aiming then
-			Move(torso, y_axis, -0.250000)
-			Turn(torso, x_axis, math.rad(1.758242))
-			Turn(torso, z_axis, math.rad(1.406593))
-		end
-		
-		Turn(thigh1, x_axis, math.rad(3.159341))
-		Turn(thigh2, x_axis, math.rad(7.032967))
-		Turn(leg2, x_axis, math.rad(-1.054945))
-		Turn(foot2, x_axis, math.rad(-6.329670))
-		Turn(leg1, x_axis, math.rad(53.450549))
-		Sleep(102)
-	
-		if not aiming then
-			Move(torso, y_axis, -0.100000)
-			Turn(torso, x_axis, math.rad(2.461538))
-			Turn(torso, z_axis, math.rad(0.703297))
-		end
-		
-		Turn(thigh1, x_axis, math.rad(-20.747253))
-		Turn(thigh2, x_axis, math.rad(20.747253))
-		Turn(foot2, x_axis, math.rad(-19.692308))
-		Turn(leg1, x_axis, math.rad(60.829670))
-		Sleep(103)
 
-		if not aiming then
-			Move(torso, y_axis, -0.050000)
-			Turn(torso, x_axis, math.rad(0.703297))
-		end
-		
-		Turn(thigh1, x_axis, math.rad(-39.384615))
-		Turn(thigh2, x_axis, math.rad(28.483516))
-		Turn(foot2, x_axis, math.rad(-27.076923))
-		Sleep(103)
-	
-		if not aiming then
-			Move(torso, y_axis, 0.000000)
-			Turn(torso, x_axis, math.rad(0.351648))
-			Turn(torso, z_axis, math.rad(0.351648))
-		end
-		
-		Turn(thigh1, x_axis, math.rad(-43.956044))
-		Turn(thigh2, x_axis, math.rad(34.813187))
-		Turn(foot2, x_axis, math.rad(-20.395604))
-		Turn(leg1, x_axis, math.rad(43.956044))
-		Turn(foot1, x_axis, 0)
-		Sleep(103)
-		
-		if not aiming then
-			Turn(torso, x_axis, 0)
-			Turn(torso, z_axis, 0)
-		end
-		
-		Turn(thigh1, x_axis, math.rad(-31.994505))
-		Turn(thigh2, x_axis, math.rad(35.868132))
-		Turn(leg2, x_axis, math.rad(16.175824))
-		Turn(foot2, x_axis, math.rad(-13.714286))
-		Turn(leg1, x_axis, math.rad(32.351648))
-		Sleep(103)
-	
-		if not aiming then
-			Move(torso, y_axis, -0.250000)
-		end
-		
-		Turn(thigh1, x_axis, math.rad(-23.554945))
-		Turn(thigh2, x_axis, math.rad(23.560440))
-		Turn(leg2, x_axis, math.rad(40.434066))
-		Turn(leg1, x_axis, math.rad(24.263736))
-		Sleep(103)
-	
-		if not aiming then
-			Move(torso, y_axis, -0.200000)
-			Turn(torso, x_axis, math.rad(2.109890))
-			Turn(torso, z_axis, math.rad(-2.109890))
-		end
-		
-		Turn(thigh1, x_axis, math.rad(-1.406593))
-		Turn(thigh2, x_axis, math.rad(-14.412088))
-		Turn(leg2, x_axis, math.rad(69.269231))
-		Turn(leg1, x_axis, math.rad(2.461538))
-		Sleep(103)
-	
-		if not aiming then
-			Move(torso, y_axis, -0.150000)
-			Turn(torso, z_axis, math.rad(-1.054945))
-		end
-		
-		Turn(thigh1, x_axis, math.rad(11.604396))
-		Turn(thigh2, x_axis, math.rad(-35.164835))
-		Turn(leg2, x_axis, math.rad(76.659341))
-		Turn(foot1, x_axis, math.rad(-14.065934))
-		Sleep(103)
+		Turn (shin[side], x_axis, math.rad(85)*turnMult, truespeed*0.28)
+		Turn (foot[side], x_axis, 0, truespeed*0.25)
+		Turn (thigh[side], x_axis, math.rad(-36)*turnMult, truespeed*0.16)
+		Turn (thigh[3-side], x_axis, math.rad(36)*turnMult, truespeed*0.16)
+
+		Move (hips, y_axis, 0, truespeed*0.4 / turnMult)
+		Move (torso, y_axis, 0, truespeed*0.4 / turnMult)
+		WaitForMove (hips, y_axis)
+
+		Turn (shin[side], x_axis, math.rad(10)*turnMult, truespeed*0.32)
+		Turn (foot[side], x_axis, math.rad(-20)*turnMult, truespeed*0.25)
+		Move (hips, y_axis, -1, truespeed*0.2)
+		Move (torso, y_axis, -1, truespeed*0.2)
+		WaitForMove (hips, y_axis)
+
+		Move (hips, y_axis, -2, truespeed*0.4 / turnMult)
+		Move (torso, y_axis, -2, truespeed*0.4 / turnMult)
+
+		WaitForTurn (thigh[side], x_axis)
+
+		side = 3 - side
 	end
 end
 
@@ -177,19 +95,28 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {torso})
 end
 
+local function StopWalk()
+	Signal(SIG_Walk)
+
+	Move (hips, y_axis, 0, runspeed*0.5)
+
+	for i = 1, 2 do
+		Turn (thigh[i], x_axis, 0, runspeed*0.2)
+		Turn (shin[i],  x_axis, 0, runspeed*0.2)
+		Turn (foot[i], x_axis, 0, runspeed*0.2)
+
+		Turn (thigh[i], y_axis, math.rad(0) - i*math.rad(0), runspeed*0.1)
+		Turn (thigh[i], z_axis, math.rad(0)*i - math.rad(0), runspeed*0.1)
+	end
+end
+
 function script.StartMoving()
-	StartThread(walk)
+	StartThread(Walk)
 end
 
 function script.StopMoving()
-	Signal(SIG_MOVE)
-	
-	Turn(thigh1, x_axis, 0)
-	Turn(thigh2, x_axis, 0)
-	Turn(leg2, x_axis, 0)
-	Turn(foot1, x_axis, 0)
+	StartThread(StopWalk)
 end
-
 
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
@@ -201,8 +128,8 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal(SIG_AIM)
-	SetSignalMask(SIG_AIM)
+	Signal(SIG_Aim)
+	SetSignalMask(SIG_Aim)
 	StartThread(RestoreAfterDelay)
 	aiming = true
 	
