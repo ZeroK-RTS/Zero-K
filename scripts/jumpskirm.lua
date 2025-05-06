@@ -22,7 +22,7 @@ local shin = {leg2, leg1}
 local foot = {foot2, foot1}
 
 --constants
-local runspeed = 29 * (UnitDefs[unitDefID].speed / 115)  -- run animation rate, future-proofed
+local runspeed = 35.5 * (UnitDefs[unitDefID].speed / 115)  -- run animation rate, future-proofed
 local steptime = 40  -- how long legs stay extended during stride
 local hangtime = 20 -- how long it takes for "gravity" to accelerate stride descent
 local stride_top = 1.5  -- how high hips go during stride
@@ -78,6 +78,7 @@ local function Walk()
 	end
 
 	local side = 1
+	local firstMult = 0.45
 	while true do
 		local speedmod = GetSpeedMod()
 		local truespeed = runspeed * speedmod
@@ -86,18 +87,21 @@ local function Walk()
 			turnMult = 1 + (truespeed - 25) * 0.1
 		end
 
-		Turn (shin[side], x_axis, math.rad(85)*turnMult, truespeed*0.28)
+		Turn (shin[side], x_axis, math.rad(45)*turnMult, truespeed*0.32)
 		Turn (foot[side], x_axis, 0, truespeed*0.25)
-		Turn (thigh[side], x_axis, math.rad(-36)*turnMult, truespeed*0.16)
-		Turn (thigh[3-side], x_axis, math.rad(36)*turnMult, truespeed*0.16)
-
-		Move (hips, y_axis, 0, truespeed*0.4 / turnMult)
+		Turn (thigh[side], x_axis, math.rad(-36)*turnMult, truespeed*0.165)
+		Turn (thigh[3-side], x_axis, math.rad(36)*turnMult, truespeed*0.165)
+		
+		Move (hips, y_axis, 0, truespeed*0.45 / turnMult)
 		Move (torso, y_axis, 0, truespeed*0.4 / turnMult)
+		WaitForTurn (shin[side], x_axis)
+		Turn (shin[side], x_axis, math.rad(85)*turnMult, truespeed*0.26)
+		
 		WaitForMove (hips, y_axis)
 
 		Turn (shin[side], x_axis, math.rad(10)*turnMult, truespeed*0.32)
 		Turn (foot[side], x_axis, math.rad(-20)*turnMult, truespeed*0.25)
-		Move (hips, y_axis, -1, truespeed*0.2)
+		Move (hips, y_axis, -1*firstMult, truespeed*0.22)
 		Move (torso, y_axis, -1, truespeed*0.2)
 		WaitForMove (hips, y_axis)
 
@@ -107,6 +111,7 @@ local function Walk()
 		WaitForTurn (thigh[side], x_axis)
 
 		side = 3 - side
+		firstMult = 1
 	end
 end
 
