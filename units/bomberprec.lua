@@ -76,10 +76,10 @@ return { bomberprec = {
       maxAngleDif        = 150,
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
-    --{
-    --  def                = [[SHIELD_CHECK]],
-    --  onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
-    --},
+    {
+      def                = [[SHIELD_CHECK]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+    },
 
   },
 
@@ -118,7 +118,7 @@ return { bomberprec = {
       areaOfEffect            = 32,
       avoidFeature            = false,
       avoidFriendly           = false,
-      cegTag                  = [[KBOTROCKETTRAIL]],
+      cegTag                  = [[precTrail]],
       collideFeature          = false,
       collideFriendly         = false,
       craterBoost             = 1,

@@ -1,6 +1,37 @@
 -- kbotrockettrail
 
 return {
+	precTrail = {
+    usedefaultexplosions = false,
+    exhale = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0,
+        colormap           = [[0.7 0.5 0.4 0.01 0.1 0.1 0.1 0.18 0.0 0.0 0.0 0.01]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = 20,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 6,
+        particlelife       = 120,
+        particlelifespread = 4.2,
+        particlesize       = 0.2,
+        particlesizespread = 1,
+        particlespeed      = 1,
+        particlespeedspread = 2,
+        pos                = [[0, 1, 0]],
+        sizegrowth         = 0.95,
+        sizemod            = 0.1,
+        texture            = [[smoke]],
+      },
+    },
+	
+	},
   ["kbotrockettrail"] = {
     usedefaultexplosions = false,
     exhale = {
