@@ -48,8 +48,8 @@ end
 
 function script.Create()
 	
-	local rider = Spring.CreateUnit("turretlaser", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
-	Spring.UnitAttach(unitID, rider, drill1)
+	--local rider = Spring.CreateUnit("turretlaser", 0, 0, 0, 0, Spring.GetUnitTeam(unitID))
+	--Spring.UnitAttach(unitID, rider, drill1)
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	if not Spring.GetUnitIsStunned(unitID) then
