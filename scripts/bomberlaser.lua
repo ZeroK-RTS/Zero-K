@@ -68,12 +68,53 @@ local function Lights()
 	end
 end
 
+local behaviour = {
+	wantedHeight = 100,
+	maxPitch = 0.8,
+	maxBank = 0.5,
+	turnRadius = 80,
+	maxAileron = 0.004,
+	maxElevator = 0.03,
+	maxRudder = 0.02,
+}
+
+local function ItsSineTime()
+	while true do
+		local ux, uy, uz = Spring.GetUnitPosition(unitID)
+		behaviour.wantedHeight = 200 + 150 * math.sin((ux/150)%(math.pi*2))
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
+		
+		if uz > 1500 then
+			local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
+			local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
+			local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
+			local xdx = xx - bx
+			local xdy = xy - by
+			local xdz = xz - bz
+			local zdx = zx - bx
+			local zdy = zy - by
+			local zdz = zz - bz
+			local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
+			local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
+
+			Turn(predrop, x_axis, angle_x)
+			Turn(predrop, z_axis, -angle_z)
+			if i == 1 then
+				Spring.PlaySoundFile("sounds/weapon/laser/heavy_laser3.wav", 4, px, py, pz)
+			end
+			EmitSfx(drop, GG.Script.FIRE_W2)
+		end
+		Sleep(35)
+	end
+end
+
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	Move (drop, y_axis, -9)
 	Move (drop, z_axis, 1.8)
+	ItsSineTime(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)
 end
 
