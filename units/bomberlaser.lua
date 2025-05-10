@@ -121,7 +121,7 @@ return { bomberlaser = {
         burst = Shared.BURST_UNRELIABLE,
         prevent_overshoot_fudge = 15,
 
-        light_color = [[1.25 1.25 3.75]],
+        light_color = [[0.25 1 0.25]],
         light_radius = 180,
       },
 

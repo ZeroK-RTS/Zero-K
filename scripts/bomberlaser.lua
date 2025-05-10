@@ -72,8 +72,8 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
-	Move (drop, y_axis, -8)
-	Move (drop, z_axis, 2)
+	Move (drop, y_axis, -9)
+	Move (drop, z_axis, 1.8)
 	--StartThread(Lights)
 end
 
