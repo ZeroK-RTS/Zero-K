@@ -119,7 +119,7 @@ local function DrawNanoLasersNoShader(dir,dir_upright,visibility,streamThickness
 
 	local dir_upright1 = Vmul(dir_upright,streamThickness)
 
-	if Spring.Utilities.IsNanOrInf(unpack(start_dir[1])) or Spring.Utilities.IsNanOrInf(unpack(dir_upright1[1])) then
+	if Spring.Utilities.IsNanOrInf(unpack(start_dir)) or Spring.Utilities.IsNanOrInf(unpack(end_dir)) or Spring.Utilities.IsNanOrInf(unpack(dir_upright1)) then
 		Spring.Echo("div0 detected", "startF", startF, "endF", endF, "streamThickness", streamThickness)
 		Spring.Utilities.TableEcho(dir, "dir")
 		Spring.Utilities.TableEcho(dir_upright, "dir_upright")
