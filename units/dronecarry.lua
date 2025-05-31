@@ -36,6 +36,7 @@ return { dronecarry = {
   repairable          = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script              = [[dronecarry.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
+  stealth                = true,
   
   customParams        = {
     bait_level_target      = 1,
