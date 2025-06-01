@@ -1,5 +1,5 @@
 #version 330
-// Shader licensed under GNU GPL v3. Relicensed from MIT, preserving the notice "(c) Beherith (mysterme@gmail.com)".
+// Shader licensed under GNU GPL, v2 or later. Relicensed from MIT, preserving the notice "(c) Beherith (mysterme@gmail.com)".
 
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require

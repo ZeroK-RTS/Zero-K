@@ -1,5 +1,5 @@
 #version 420
-// Shader licensed under GNU GPL v3. Relicensed from MIT, preserving the notice "(c) Beherith (mysterme@gmail.com)".
+// Shader licensed under GNU GPL, v2 or later. Relicensed from MIT, preserving the notice "(c) Beherith (mysterme@gmail.com)".
 
 #line 20000
 
