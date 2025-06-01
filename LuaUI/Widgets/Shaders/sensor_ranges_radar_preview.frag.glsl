@@ -1,7 +1,5 @@
 #version 420
-// This file is going to be licensed under some sort of GPL-compatible license, but authors are dragging
-// their feet. Avoid copying for now (unless this header rots for years on end), and check back later.
-// See https://github.com/ZeroK-RTS/Zero-K/issues/5328
+// Shader licensed under GNU GPL v3. Relicensed from MIT, preserving the notice "(c) Beherith (mysterme@gmail.com)".
 
 #line 20000
 
