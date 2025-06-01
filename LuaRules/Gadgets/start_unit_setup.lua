@@ -484,7 +484,7 @@ local function StartUnitPicked(playerID, name)
 			if startUnit then
 				local newCommID = Spring.CreateUnit(startUnit, pos.x, pos.y, pos.z , "s", 0)
 				if oldCommID then
-					local cmds = Spring.GetCommandQueue(oldCommID, -1)
+					local cmds = Spring.GetUnitCommands(oldCommID, -1)
 					--//transfer command queue
 					for i = 1, #cmds do
 						local cmd = cmds[i]

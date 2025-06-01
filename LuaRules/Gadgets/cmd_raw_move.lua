@@ -23,7 +23,7 @@ if gadgetHandler:IsSyncedCode() then
 local spGetUnitPosition   = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
-local spGetCommandQueue   = Spring.GetCommandQueue
+local spGetUnitCommands   = Spring.GetUnitCommands
 local spGiveOrderToUnit   = Spring.GiveOrderToUnit
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
@@ -784,7 +784,7 @@ local function UpdateMoveReplacement()
 end
 
 local function DoFactoryWaypointManually(unitID)
-	local cQueue = spGetCommandQueue(unitID, -1)
+	local cQueue = spGetUnitCommands(unitID, -1)
 	local foundRightOpts = false
 	for i = 1, #cQueue do
 		if cQueue[i].id ~= CMD_MOVE then
@@ -801,7 +801,7 @@ local function DoFactoryWaypointManually(unitID)
 	if not Spring.ValidUnitID(facID) then
 		return
 	end
-	local factoryQueue = spGetCommandQueue(facID, -1)
+	local factoryQueue = spGetUnitCommands(facID, -1)
 	local orderArray = {}
 	for i = 1, #factoryQueue do
 		orderArray[i] = {

@@ -104,7 +104,7 @@ local function KeepStatic()
 	while true do
 		local gameFrame = Spring.GetGameFrame()
 		if lastShotFrame and (lastShotFrame > gameFrame) then
-			local cmd = Spring.GetCommandQueue(unitID, 2)
+			local cmd = Spring.GetUnitCommands(unitID, 2)
 			SetAbleToMove(not (cmd and cmd[1] and (cmd[1].id == CMD_ATTACK) and (#cmd[1].params == 1) and cmd[2] and (cmd[2].id == CMD_FIGHT) and (#cmd[2].params == 6)))
 		else
 			SetAbleToMove(true)

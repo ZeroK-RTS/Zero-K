@@ -50,7 +50,7 @@ local spGetUnitPosition       = Spring.GetUnitPosition
 local spGetUnitDefID          = Spring.GetUnitDefID
 local spEcho                  = Spring.Echo
 local spGetPlayerInfo         = Spring.GetPlayerInfo
-local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitCommands       = Spring.GetUnitCommands
 local spGetUnitSeparation     = Spring.GetUnitSeparation
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 local spGetUnitDefDimensions  = Spring.GetUnitDefDimensions
@@ -677,7 +677,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 		return
 	end
 
-	local queue = spGetCommandQueue(unitID, -1);
+	local queue = spGetUnitCommands(unitID, -1);
 	if (queue == nil) then
 		return
 	end
@@ -941,7 +941,7 @@ function GetPathLength(unitID)
 	if (h > maxi) then maxi = h end
 
 	local d = 0
-	local queue = spGetCommandQueue(unitID, -1);
+	local queue = spGetUnitCommands(unitID, -1);
 	local udid = spGetUnitDefID(unitID)
 	local moveID = UnitDefs[udid].moveDef.id
 	if (queue == nil) then return 0 end
@@ -1053,7 +1053,7 @@ function taiEmbark(unitID, teamID, embark, shift, internal) -- called by gadget
 	end
 
 	if not internal then
-		local queue = spGetCommandQueue(unitID, -1)
+		local queue = spGetUnitCommands(unitID, -1)
 		if (not queue or #queue == 0) and (not shift) then --unit has no command at all and not queueing embark/disembark command
 			return false
 		else

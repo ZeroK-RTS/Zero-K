@@ -85,7 +85,7 @@ function gadget:GetInfo() return {
 	
 	function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		if (builderID) then
-			local command = Spring.GetCommandQueue(builderID, 1)[1]
+			local command = Spring.GetUnitCommands(builderID, 1)[1]
 			if (command and command.id == CMD_RESURRECT) then
 				local unitDef = unitDefID and UnitDefs[unitDefID]
 				-- add CEG and play sound
