@@ -153,12 +153,12 @@ if not Script.IsEngineMinVersion(104, 0, 1100) then
 end
 
 if not Script.IsEngineMinVersion(104, 0, 1143) then
-	local spGetCommandQueue = Spring.GetCommandQueue
+	local spGetUnitCommands = Spring.GetUnitCommands
 	local unpacc = unpack
 	Spring.GetUnitCurrentCommand = function (unitID, index)
 		index = index or 1
 
-		local queue = spGetCommandQueue(unitID, index)
+		local queue = spGetUnitCommands(unitID, index)
 		if not queue then
 			return
 		end

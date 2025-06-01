@@ -111,7 +111,7 @@ function script.BlockShot(num, targetID)
 		if cmdID == CMD.ATTACK and (not cp_2) and cp_1 == targetID then
 			local cmdID_2, _, _, cp_1_2, cp_2_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 			if cmdID_2 == CMD.ATTACK and (not cp_2_2) then
-				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				local cQueue = Spring.GetUnitCommands(unitID, 1)
 				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
 			end
 		end

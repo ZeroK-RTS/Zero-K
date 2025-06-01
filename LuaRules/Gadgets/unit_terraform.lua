@@ -47,7 +47,7 @@ local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local spGetGroundNormal     = Spring.GetGroundNormal
 local spLevelHeightMap      = Spring.LevelHeightMap
 local spGetUnitBuildFacing  = Spring.GetUnitBuildFacing
-local spGetCommandQueue     = Spring.GetCommandQueue
+local spGetUnitCommands     = Spring.GetUnitCommands
 local spValidUnitID         = Spring.ValidUnitID
 local spGetGameFrame        = Spring.GetGameFrame
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
@@ -2140,7 +2140,7 @@ function GG.Terraform_RaiseWater(raiseAmount)
 		if spValidUnitID(allUnits[i]) then
 			local x,y,z = spGetUnitPosition(allUnits[i])
 			spSetUnitPosition(x,y-raiseAmount,z)
-			local commands = spGetCommandQueue(allUnits[i], -1)
+			local commands = spGetUnitCommands(allUnits[i], -1)
 			local commandsCount = #commands
 			for j = 1, commandsCount do
 			
@@ -3226,7 +3226,7 @@ function gadget:GameFrame(n)
 			end
 			
 			local unitID = constructorTable[currentCon]
-			local cQueue = spGetCommandQueue(unitID, -1)
+			local cQueue = spGetUnitCommands(unitID, -1)
 			if cQueue then
 				local teamID = spGetUnitTeam(unitID)
 				local ncq = #cQueue

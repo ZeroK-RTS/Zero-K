@@ -78,8 +78,8 @@ end
 -- msafwan,			v1.2	(4sept2012)	: 	made it work with ZK "cmd_mex_placement.lua" mex queue,
 --											reduce the tendency to make a huge blob of constructor (where all constructor do same job),
 --											reduce chance of some constructor not given job when player have alot of constructor,
--- rafal,			v1.1	(2May2012)	:	Don't fetch full Spring.GetCommandQueue in cases when only the first command is needed - instead using
---											GetCommandQueue(unitID, 1)
+-- rafal,			v1.1	(2May2012)	:	Don't fetch full Spring.GetUnitCommands in cases when only the first command is needed - instead using
+--											GetUnitCommands(unitID, 1)
 -- KingRaptor,		v1.1	(24dec2011)	:	Removed the "remove in 85.0" stuff
 -- versus666,		v1.1	(16dec2011)	: 	mostly changed the layer order to get a logical priority among widgets.
 -- KingRaptor,		v1.1	(8dec2011)	:	Fixed the remaining unitdef tags for 85.0

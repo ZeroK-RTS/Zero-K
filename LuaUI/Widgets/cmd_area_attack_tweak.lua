@@ -115,7 +115,7 @@ if SPLIT_ATTACK_SINGLE then
 end
 
 function RevertAllButOneAttackQueue(unitID,attackList)
-	local queue = Spring.GetCommandQueue(unitID, -1)
+	local queue = Spring.GetUnitCommands(unitID, -1)
 	if queue then
 		local toRemoveCount = 0
 		local queueToRemove = {}
