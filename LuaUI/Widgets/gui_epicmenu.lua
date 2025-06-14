@@ -307,6 +307,13 @@ local function CopyTable(tableToCopy, deep)
 	return copy
 end
 
+local function Clone(value)
+	if type(value) == "table" then
+		return CopyTable(value, deep)
+	end
+	return value
+end
+
 --[[
 local function tableMerge(t1, t2, appendIndex)
 	for k, v in pairs(t2) do
@@ -1099,7 +1106,7 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 	
 	if option.type ~= 'button' and option.type ~= 'label' and option.default == nil then
 		if option.value ~= nil then
-			option.default = option.value
+			option.default = Clone(option.value)
 		else
 			option.default = newval
 		end
@@ -1341,8 +1348,7 @@ local function IntegrateWidget(w, addoptions, index)
 		end
 		
 		--store default
-		w.options[k].default = w.options[k].value
-		
+		w.options[k].default = Clone(w.options[k].value)
 		
 		option.key = k
 		option.wname = wname
@@ -1637,7 +1643,7 @@ local function ResetWinSettings(path)
 					option.value = option.default
 					option.OnChange(option)
 				elseif option.type == 'colors' then
-					option.color = option.default
+					option.color = Clone(option.default)
 					option.OnChange(option)
 				end
 			else
