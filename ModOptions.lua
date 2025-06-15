@@ -706,6 +706,14 @@ local options = {
 		step    = 0.1,
 	},
 	{
+		key     = 'autohandicap',
+		name    = 'Automatic Handicap',
+		desc    = 'Add automatically calculated economy multipliers for team 1 or 2 depending on rating.',
+		type    = 'bool',
+		section = 'multipliers',
+		def     = false,
+	},
+	{
 		key     = 'team_1_econ',
 		name    = 'Team 1 Income Multiplier',
 		desc    = 'Multiplies metal, energy and build speed. Set above 1 for an advantage and below 1 for a disadvantage.',
@@ -792,14 +800,6 @@ local options = {
 		min     = 0.1,
 		max     = 20.0,
 		step    = 0.05,
-	},
-	{
-		key     = 'autohandicap',
-		name    = 'Automatic Handicap',
-		desc    = 'Add automatically calculated economy multipliers for team 1 or 2 depending on rating.',
-		type    = 'bool',
-		section = 'multipliers',
-		def     = false,
 	},
 	{
 		key     = 'disablemapdamage',
