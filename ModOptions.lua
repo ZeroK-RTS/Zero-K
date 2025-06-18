@@ -871,32 +871,31 @@ local options = {
   --  def		= true,
   --  section	= "experimental",
   --},
---  { -- Causes desync https://springrts.com/mantis/view.php?id=5936
---    key		= "pathfinder",
---    name	= "Pathfinder type",
---    desc	= "Sets the pathfinding system used by units.",
---    type	= "list",
---    def		= "standard",
---    section	= "experimental",
---    items  = {
---      {
---	key  = 'standard',
---	name = 'Standard',
---	desc = 'Standard pathfinder',
---      },
---      {
---	key  = 'qtpfs',
---	name = 'QTPFS',
---	desc = 'New Quadtree Pathfinding System (experimental)',
---      },
---    --  {
---	--	key  = 'classic',
---	--	name = 'Classic',
---	--	desc = 'An older pathfinding system without turninplace or reverse',
---    --  }
---    },
---  },
-  
+  {
+	key     = "pathfinder",
+	name    = "Pathfinder type",
+	desc    = "Sets the pathfinding system used by units.",
+	type    = "list",
+	def     = "random",
+	section = "experimental",
+	items  = {
+		{
+			key  = 'standard',
+			name = 'Standard',
+			desc = 'Standard pathfinder',
+		},
+		{
+			key  = 'random',
+			name = 'Random',
+			desc = 'Randomly pick a pathfinder',
+		},
+		{
+			key  = 'qtpfs',
+			name = 'QTPFS',
+			desc = 'New Quadtree Pathfinding System (experimental)',
+		},
+	},
+  },
   {
     key    = 'chicken',
     name   = 'Chicken',
