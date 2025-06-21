@@ -66,6 +66,10 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		end
 	end
+	if not cost then
+		Spring.Echo("Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
+		error("Spring.Utilities.GetUnitCost nil cost")
+	end
 	return cost
 end
 
@@ -322,6 +326,10 @@ if Spring.GetModOptions().techk == "1" and WG then
 			end
 		else
 			cost = cost * math.pow(2, (WG.SelectedTechLevel or 1) - 1)
+		end
+		if not cost then
+			Spring.Echo("TECHK, Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
+			error("TECHK, Spring.Utilities.GetUnitCost nil cost")
 		end
 		return cost
 	end

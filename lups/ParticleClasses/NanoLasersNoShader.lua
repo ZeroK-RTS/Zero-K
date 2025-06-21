@@ -119,6 +119,22 @@ local function DrawNanoLasersNoShader(dir,dir_upright,visibility,streamThickness
 
 	local dir_upright1 = Vmul(dir_upright,streamThickness)
 
+	if type(   start_dir) ~= "table"
+	or type(     end_dir) ~= "table"
+	or type(dir_upright1) ~= "table"
+	then
+		Spring.Echo("NanoLasersNoShader type issue detected")
+		Spring.Echo("start_dir"      , start_dir      )
+		Spring.Echo("end_dir"        , end_dir        )
+		Spring.Echo("dir_upright1"   , dir_upright1   )
+		Spring.Echo("dir"            , dir            )
+		Spring.Echo("streamThickness", streamThickness)
+		Spring.Echo("startF"         , startF         )
+		Spring.Echo("endF"           , endF           )
+		Spring.Echo("visibility"     , visibility     )
+		-- continue knowing it will error below, for automated reporting
+	end
+
 	if Spring.Utilities.IsNanOrInf(unpack(start_dir)) or Spring.Utilities.IsNanOrInf(unpack(end_dir)) or Spring.Utilities.IsNanOrInf(unpack(dir_upright1)) then
 		Spring.Echo("div0 detected", "startF", startF, "endF", endF, "streamThickness", streamThickness)
 		Spring.Utilities.TableEcho(dir, "dir")
