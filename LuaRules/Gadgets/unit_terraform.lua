@@ -3694,6 +3694,11 @@ local TerraformFunctions = {}
 TerraformFunctions.IsPositionTerraformable = IsPositionTerraformable
 TerraformFunctions.DoSmoothDirectly = DoSmoothDirectly
 
+function TerraformFunctions.StructureAt(x, z)
+	x, z = math.floor(x/8)*8, math.floor(z/8)*8
+	return HasStructure(x, z)
+end
+
 function TerraformFunctions.ForceTerraformCompletion(pregame, needSaveHax)
 	if pregame and needSaveHax then
 		-- gadget:UnsyncedHeightMapUpdate seems to not be called pregame.

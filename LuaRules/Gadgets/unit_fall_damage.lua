@@ -39,6 +39,8 @@ local UNIT_UNIT_SPEED = 5.5
 local UNIT_UNIT_DAMAGE_FACTOR = 0.8
 local TANGENT_DAMAGE = 0.5
 local DEBRIS_SPRING_DAMAGE_MULTIPLIER = 10 --tweaked arbitrarily
+local OFF_MAP_POS_LEEWAY = 7
+local OFF_SEARCH_DIST = 24
 
 local gameframe = Spring.GetGameFrame()
 local attributes = {}
@@ -73,16 +75,45 @@ for wdid = 1, #WeaponDefs do
 	end
 end
 
-local function outsideMapDamage(unitID, unitDefID)
+local function OutsideMap(x, z)
+	return x < 0 or z < 0 or x > MAP_X or z > MAP_Z
+end
+
+local function OutsideMapDamage(unitDefID, x, z)
 	local att = attributes[unitDefID]
-	local x,y,z = Spring.GetUnitPosition(unitID)
-	if x < 0 or z < 0 or x > MAP_X or z > MAP_Z then
+	if OutsideMap(x, z) then
 		return math.max(-x,-z,x-MAP_X,z-MAP_Z)*att.outOfMapDamagePerElmo
 	else
 		return 0
 	end
 end
 
+local function SetUnitInsideMap(unitID, x, z)
+	nx = math.max(OFF_MAP_POS_LEEWAY, math.min(MAP_X - OFF_MAP_POS_LEEWAY, x))
+	nz = math.max(OFF_MAP_POS_LEEWAY, math.min(MAP_Z - OFF_MAP_POS_LEEWAY, z))
+	local searchPattern = (nx == x) and {{-OFF_SEARCH_DIST, 0}, {OFF_SEARCH_DIST, 0}} or {{0, -OFF_SEARCH_DIST}, {0, OFF_SEARCH_DIST}}
+	local searchPos = {{nx, nz}, {nx, nz}}
+	for i = 1, 100 do
+		local pat = searchPattern[1 + i%2]
+		local pos = searchPos[1 + i%2]
+		pos[1], pos[2] = pos[1] + pat[1], pos[2] + pat[2]
+		nx = math.max(OFF_MAP_POS_LEEWAY, math.min(MAP_X - OFF_MAP_POS_LEEWAY, pos[1]))
+		nz = math.max(OFF_MAP_POS_LEEWAY, math.min(MAP_Z - OFF_MAP_POS_LEEWAY, pos[2]))
+		if nx ~= pos[1] then
+			pat[1] = 0
+			pat[2] = (nz < MAP_Z/2) and OFF_SEARCH_DIST or -OFF_SEARCH_DIST
+		elseif nz ~= pos[2] then
+			pat[1] = (nx < MAP_X/2) and OFF_SEARCH_DIST or -OFF_SEARCH_DIST
+			pat[2] = 0
+		end
+		pos[1], pos[2] = nx, nz
+		--Spring.MarkerAddPoint(nx, 0, nz, GG.Terraform.StructureAt(nx, nz) and "S" or "_")
+		if not GG.Terraform.StructureAt(nx, nz) then
+			Spring.SetUnitPosition(unitID, nx, Spring.GetGroundHeight(nx, nz) or 0, nz)
+			return
+		end
+	end
+end
 
 local function LocalSpeedToDamage(unitID, unitDefID, speed)
 	local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
@@ -292,8 +323,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		-- unit takes damage based on velocity at normal to terrain + TANGENT_DAMAGE of velocity of tangent
 		local att = attributes[unitDefID]
 		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		local nx, ny, nz = Spring.GetGroundNormal(x,z)
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local nx, ny, nz = Spring.GetGroundNormal(x, z)
 		local nMag = math.sqrt(nx^2 + ny^2 + nz^2)
 		nx, ny, nz = nx/nMag, ny/nMag, nz/nMag -- normal to unit vector
 		local dot = nx*vx + ny*vy + nz*vz
@@ -302,6 +333,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local nf = att.elasticity
 		local tf = att.friction
 		vx, vy, vz = tx*tf + nx*nf - vx, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
+		
+		if OutsideMap(x, z) then
+			SetUnitInsideMap(unitID, x, z)
+		end
 		GG.AddGadgetImpulseRaw(unitID, vx, vy, vz, true, true)
 		
 		if env and env.script.StopMoving then
@@ -309,7 +344,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 		
 		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)
-		local damageTotal = LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + outsideMapDamage(unitID, unitDefID)
+		local damageTotal = LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + OutsideMapDamage(unitDefID, x, z)
 		damageTotal = damageTotal*(collisionDamageMult[unitID] or 1)
 		return damageTotal
 	end
