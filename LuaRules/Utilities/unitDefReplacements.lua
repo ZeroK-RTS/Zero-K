@@ -67,6 +67,9 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		end
 	end
 	if not cost then
+		if Spring.IsCheatingEnabled() then
+			return 10
+		end
 		Spring.Echo("Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
 		error("Spring.Utilities.GetUnitCost nil cost")
 	end
