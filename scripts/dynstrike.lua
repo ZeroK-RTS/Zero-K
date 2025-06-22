@@ -43,6 +43,7 @@ local smokePiece = {Breast, Head}
 local nanoPieces = {Nano}
 local nanoing = false
 local aiming = false
+local walking = false
 
 local FINGER_ANGLE_IN = math.rad(10)
 local FINGER_ANGLE_OUT = math.rad(-25)
@@ -56,7 +57,14 @@ local SIG_RESTORE_TORSO = 16
 local SIG_WALK = 32
 local SIG_NANO = 64
 
+local resetRestoreLeft = false
+local resetRestoreTorso = false
+
 local RESTORE_DELAY = 2500
+local RESTORE_DELAY_TORSO = 200
+local RESTORE_DELAY_DGUN = 2500
+local RESTORE_DELAY_NANO = 200
+local RESTORE_DELAY_RIGHT = RESTORE_DELAY_NANO
 
 ---------------------------------------------------------------------
 ---  blender-exported animation: data (move to include file?)     ---
@@ -345,6 +353,7 @@ local function Walk()
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
+		walking = true
 		-----------------------------------------------------------------------------------
 		
 		Turn(HipLeft, x_axis,  left[1].hip[1],  left[1].hip[2] * speedMult)
@@ -447,20 +456,39 @@ function script.QueryWeapon(num)
 end
 
 local function RestoreTorsoAim(sleepTime)
-	Signal(SIG_RESTORE_TORSO)
-	SetSignalMask(SIG_RESTORE_TORSO)
-	Sleep(sleepTime or RESTORE_DELAY)
+	if sleepTime ~= nil then 
+		Sleep(sleepTime)
+	end
 	if not nanoing then
 		Turn(Breast, z_axis, 0, TORSO_SPEED_YAW)
 		aiming = false
 	end
 end
 
+local function RestoreTorsoAfterDelay(sleepTime)
+	local counter = (sleepTime or RESTORE_DELAY_TORSO)
+	while true do
+		if counter > 0 and not Spring.GetUnitIsStunned(unitID) then
+			counter = counter - 100
+		end
+		if resetRestoreTorso then
+			resetRestoreTorso = false
+			counter = RESTORE_DELAY_TORSO
+		end
+		if counter <= 0 then
+			if not nanoing then
+				RestoreTorsoAim()
+			end
+		end
+		Sleep(100)
+	end
+end
+
 local function RestoreRightAim(sleepTime)
-	StartThread(RestoreTorsoAim, sleepTime)
+	resetRestoreTorso = true
 	Signal(SIG_RESTORE_RIGHT)
 	SetSignalMask(SIG_RESTORE_RIGHT)
-	Sleep(sleepTime or RESTORE_DELAY)
+	Sleep(sleepTime or RESTORE_DELAY_RIGHT)
 	if not nanoing then
 		Turn(ArmRight, x_axis, math.rad(-5), ARM_SPEED_PITCH)
 		Turn(HandRight, x_axis, math.rad(-5), ARM_SPEED_PITCH)
@@ -468,12 +496,30 @@ local function RestoreRightAim(sleepTime)
 end
 
 local function RestoreLeftAim(sleepTime)
-	StartThread(RestoreTorsoAim, sleepTime)
-	Signal(SIG_RESTORE_LEFT)
-	SetSignalMask(SIG_RESTORE_LEFT)
-	Sleep(sleepTime or RESTORE_DELAY)
-	Turn(ArmLeft, x_axis, math.rad(-5), ARM_SPEED_PITCH)
-	Turn(Gun, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+	if sleepTime ~= nil then 
+		Sleep(sleepTime)
+	end
+	if not walking then
+		Turn(ArmLeft, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+		Turn(Gun, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+	end
+end
+
+local function RestoreLeftAfterDelay(sleepTime)
+	local counter = (sleepTime or RESTORE_DELAY)
+	while true do
+		if counter > 0 and not Spring.GetUnitIsStunned(unitID) then
+			counter = counter - 100
+		end
+		if resetRestoreLeft then
+			resetRestoreLeft = false
+			counter = RESTORE_DELAY
+		end
+		if counter <= 0 then
+			RestoreLeftAim()
+		end
+		Sleep(100)
+	end
 end
 
 local function AimArm(heading, pitch, arm, hand, wait)
@@ -489,20 +535,22 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
-	
+	walking = false
 	if weaponNum == 1 then
-		Signal(SIG_LEFT)
-		SetSignalMask(SIG_LEFT)
-		Signal(SIG_RESTORE_LEFT)
-		Signal(SIG_RESTORE_TORSO)
+		resetRestoreTorso = true
+		resetRestoreLeft = true
 		AimArm(heading, pitch, ArmLeft, Gun, true)
-		StartThread(RestoreLeftAim)
 		return true
 	elseif weaponNum == 2 then
 		Signal(SIG_RIGHT)
 		SetSignalMask(SIG_RIGHT)
 		Signal(SIG_RESTORE_RIGHT)
-		Signal(SIG_RESTORE_TORSO)
+		resetRestoreTorso = true
+		if dyncomm.IsManualFire(num) then
+			RESTORE_DELAY_RIGHT = RESTORE_DELAY_DGUN
+		else 
+			RESTORE_DELAY_RIGHT = RESTORE_DELAY_NANO
+		end
 		AimArm(heading, pitch, ArmRight, HandRight, true)
 		StartThread(RestoreRightAim)
 		return true
@@ -560,7 +608,10 @@ end
 	
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-	StartThread(RestoreRightAim, 200)
+	Signal(SIG_RESTORE_RIGHT)
+	SetSignalMask(SIG_RESTORE_RIGHT)
+	RESTORE_DELAY_RIGHT = RESTORE_DELAY_NANO
+	StartThread(RestoreRightAim)
 	StartThread(NanoRestore)
 	nanoing = false
 end
@@ -600,6 +651,8 @@ function script.Create()
 	dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreTorsoAfterDelay)
+	StartThread(RestoreLeftAfterDelay)
 end
 
 function script.Killed(recentDamage, maxHealth)
