@@ -29,6 +29,9 @@ local pi2    = math.pi*2
 local random = math.random
 local abs    = math.abs
 
+local MAP_X = Game.mapX*512
+local MAP_Z = Game.mapY*512
+
 local CMD_STOP   = CMD.STOP
 local CMD_WAIT   = CMD.WAIT
 local CMD_MOVE   = CMD.MOVE
@@ -65,7 +68,8 @@ local emptyTable = {}
 
 local coroutines = {}
 local lastJumpPosition = {}
-local landBoxSize = 60
+local landBoxSize = 50
+local OFF_MAP_LEEWAY = 1
 local jumps = {}
 local jumping = {}
 local goalSet = {}
@@ -210,7 +214,9 @@ local function StartScript(fn)
 end
 
 local function Jump(unitID, goal, origCmdParams, mustJump)
-	goal[2]                = spGetGroundHeight(goal[1],goal[3])
+	goal[1] = math.max(OFF_MAP_LEEWAY, math.min(MAP_X - OFF_MAP_LEEWAY, goal[1]))
+	goal[3] = math.max(OFF_MAP_LEEWAY, math.min(MAP_Z - OFF_MAP_LEEWAY, goal[3]))
+	goal[2]                = spGetGroundHeight(goal[1], goal[3])
 	local start            = {spGetUnitPosition(unitID)}
 
 	local startHeight      = spGetGroundHeight(start[1],start[3])
