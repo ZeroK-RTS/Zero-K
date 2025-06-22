@@ -40,7 +40,7 @@ local UNIT_UNIT_DAMAGE_FACTOR = 0.8
 local TANGENT_DAMAGE = 0.5
 local DEBRIS_SPRING_DAMAGE_MULTIPLIER = 10 --tweaked arbitrarily
 local OFF_MAP_POS_LEEWAY = 7
-local OFF_SEARCH_DIST = 24
+local OFF_SEARCH_DIST = 16
 
 local gameframe = Spring.GetGameFrame()
 local attributes = {}
@@ -93,9 +93,20 @@ local function SetUnitInsideMap(unitID, x, z)
 	nz = math.max(OFF_MAP_POS_LEEWAY, math.min(MAP_Z - OFF_MAP_POS_LEEWAY, z))
 	local searchPattern = (nx == x) and {{-OFF_SEARCH_DIST, 0}, {OFF_SEARCH_DIST, 0}} or {{0, -OFF_SEARCH_DIST}, {0, OFF_SEARCH_DIST}}
 	local searchPos = {{nx, nz}, {nx, nz}}
+	local prevGood = {true, true}
 	for i = 1, 100 do
-		local pat = searchPattern[1 + i%2]
-		local pos = searchPos[1 + i%2]
+		local index = 1 + i%2
+		local pat = searchPattern[index]
+		local pos = searchPos[index]
+		if not GG.Terraform.StructureAt(pos[1], pos[2]) then
+			if prevGood[index] then
+				Spring.SetUnitPosition(unitID, pos[1], Spring.GetGroundHeight(pos[1], pos[2]) or 0, pos[2])
+				return
+			end
+			prevGood[index] = true
+		else
+			prevGood[index] = false
+		end
 		pos[1], pos[2] = pos[1] + pat[1], pos[2] + pat[2]
 		nx = math.max(OFF_MAP_POS_LEEWAY, math.min(MAP_X - OFF_MAP_POS_LEEWAY, pos[1]))
 		nz = math.max(OFF_MAP_POS_LEEWAY, math.min(MAP_Z - OFF_MAP_POS_LEEWAY, pos[2]))
@@ -108,10 +119,6 @@ local function SetUnitInsideMap(unitID, x, z)
 		end
 		pos[1], pos[2] = nx, nz
 		--Spring.MarkerAddPoint(nx, 0, nz, GG.Terraform.StructureAt(nx, nz) and "S" or "_")
-		if not GG.Terraform.StructureAt(nx, nz) then
-			Spring.SetUnitPosition(unitID, nx, Spring.GetGroundHeight(nx, nz) or 0, nz)
-			return
-		end
 	end
 end
 
