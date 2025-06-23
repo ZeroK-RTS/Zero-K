@@ -1,0 +1,17 @@
+Kanoba:
+ex_underwater.wav
+
+OpenGameArt:
+watersplash.wav
+watersplash2.wav
+
+Scorched 3D:
+splash.wav
+
+large_water_explode.wav - Open LieroX & Scorched 3D
+
+Sphiloth aka. Alcur of the Zero-K community (http://zero-k.info/):
+underwater_resounding_thump.wav
+underwater_resounding_thump_short.wav
+
+ex_underwater_pulse.wav, Kanoba and Nanoblobs
