@@ -53,6 +53,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local debugSent = false
+
 function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if not (unitDefID and buildTimes[unitDefID]) then
@@ -61,7 +63,13 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	local cost = buildTimes[unitDefID]
 	if unitID then
 		if variableCostUnit[unitDefID] then
-			cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate") or cost
+			local paramCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+			if not paramCost and not debugSent then
+				Spring.Utilities.UnitEcho(unitID, "variableCostUnit missing cost")
+				Spring.Echo("unitID, unitDefID, cost", unitID, unitDefID, cost)
+				debugSent = true
+			end
+			cost = paramCost or cost
 		else
 			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		end
