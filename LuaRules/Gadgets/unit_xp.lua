@@ -31,11 +31,10 @@ local function NoXpFromUnit(unitDefID)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-
 	if not attackerID or not spValidUnitID(attackerID)
 			or spAreTeamsAllied(unitTeam, attackerTeam)
 			or paralyzer -- requires a sensible formula
-			then
+			or not damage then
 		return
 	end
 
@@ -60,11 +59,10 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 	local hp, maxHP = spGetUnitHealth(unitID)
 
-	spSetUnitExperience(attackerID,
-		spGetUnitExperience(attackerID) + (
-			(((hp > 0) and damage or (damage + hp)) / maxHP) * getCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
-			/ (getCost(attackerID, attackerDefID)  * (GG.att_CostMult[attackerID] or 1))
-		))
+	local percentageDamage = ((hp > 0) and damage or (damage + hp)) / maxHP
+	local targetCost = getCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
+	local attackerCost = getCost(attackerID, attackerDefID)  * (GG.att_CostMult[attackerID] or 1)
+	spSetUnitExperience(attackerID, spGetUnitExperience(attackerID) + percentageDamage * targetCost / attackerCost)
 end
 
 function gadget:Initialize()
