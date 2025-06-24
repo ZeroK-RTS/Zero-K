@@ -103,6 +103,7 @@ return { cloakassault = {
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
+      soundStartVolume        = 7.0,
       sprayAngle              = 900,
       texture1                = [[lightning]],
       thickness               = 10,
