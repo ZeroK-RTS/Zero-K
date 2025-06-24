@@ -147,11 +147,15 @@ local optionOverrides = {
 }
 
 local defaultOpts = {
-	pitchmod = 0, --0.02,
+	pitchmod = 0.05, --0.02,
 	gainmod = 0,
 }
 local replyOpts = {
 	pitchmod = 0, --0.02,
+	gainmod = 0,
+}
+local explosionOpts = {
+	pitchmod = 0.08, --0.02,
 	gainmod = 0,
 }
 
@@ -196,8 +200,8 @@ end
 
 -- add sounds
 AutoAdd("weapon", defaultOpts)
-AutoAdd("explosion", defaultOpts)
 AutoAdd("reply", replyOpts)
+AutoAdd("explosion", explosionOpts)
 AutoAdd("music", noVariation)
 
 return Sounds
