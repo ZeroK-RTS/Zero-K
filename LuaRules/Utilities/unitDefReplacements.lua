@@ -61,7 +61,7 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	local cost = buildTimes[unitDefID]
 	if unitID then
 		if variableCostUnit[unitDefID] then
-			cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate") or 50
+			cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate") or cost
 		else
 			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		end
