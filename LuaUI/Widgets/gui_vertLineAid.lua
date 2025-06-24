@@ -137,7 +137,7 @@ function widget:UnitEnteredRadar(unitID, unitTeam)
 	if (Spring.GetUnitAllyTeam(unitID) ~= myAllyTeamID) then
 		local x, y, z = Spring.GetUnitPosition (unitID)
 		local losState = Spring.GetUnitLosState(unitID, myAllyTeamID)
-		local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
+		local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or unitTeam or Spring.GetGaiaTeamID())
 		enemyDots[unitID] = {x, y, z, math.max(Spring.GetGroundHeight(x,z), 0), losState.los, r, g, b} -- x, y, z, ground, inlos, r, g, b
 	end
 end
@@ -158,7 +158,7 @@ function widget:UnitCreated(unitID, unitDefID)
 		return
 	end
 	local x, y, z = Spring.GetUnitPosition(unitID)
-	local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
+	local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or Spring.GetGaiaTeamID())
 	if (Spring.GetUnitAllyTeam(unitID) == myAllyTeamID) then
 		allyDots[unitID] = {x, y, z, math.max(Spring.GetGroundHeight(x,z), 0), true, r, g, b} -- x, y, z, ground, inlos, r, g, b
 	else
@@ -260,7 +260,7 @@ function widget:DrawWorld()
 			else
 				local x, y, z = Spring.GetUnitPosition(unitID)
 				local losState = Spring.GetUnitLosState(unitID)
-				local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID))
+				local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or Spring.GetGaiaTeamID())
 				data[1] = x
 				data[2] = y
 				data[3] = z
@@ -313,7 +313,7 @@ function widget:DrawWorld()
 		for unitID, data in pairs (allyDots) do
 			if needs_update then
 				local x, y, z = Spring.GetUnitPosition(unitID)
-				local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID))
+				local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or Spring.GetGaiaTeamID())
 				data[1] = x
 				data[2] = y
 				data[3] = z
