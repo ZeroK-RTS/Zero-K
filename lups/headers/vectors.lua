@@ -111,6 +111,14 @@ function Vlength(a)
 	return sqrt(a[1]*a[1] + a[2]*a[2] + a[3]*a[3])
 end
 
+function Vnorm(a)
+	local length = Vlength(a)
+	if length <= 0 then
+		return a
+	end
+	return {a[1]/length, a[2]/length, a[3]/length}
+end
+
 function CopyVector(write,read,n)
 	for i=1,n do
 		write[i]=read[i]
