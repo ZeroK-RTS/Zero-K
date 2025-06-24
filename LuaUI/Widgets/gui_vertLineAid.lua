@@ -1,13 +1,15 @@
 
-function widget:GetInfo() return {
-	name    = "Vertical Line on Radar Dots v2",
-	desc    = "Helps you identify enemy air units by adding vertical line on radar dots",
-	author  = "msafwan",
-	date    = "Nov 11, 2012",
-	license = "GNU GPL, v2 or later",
-	layer   = 20,
-	enabled = true,
-} end
+function widget:GetInfo()
+	return {
+		name    = "Vertical Line on Radar Dots v2",
+		desc    = "Helps you identify enemy air units by adding vertical line on radar dots",
+		author  = "msafwan, GoogleFrog",
+		date    = "Nov 11, 2012",
+		license = "GNU GPL, v2 or later",
+		layer   = 20,
+		enabled = true,
+	}
+end
 
 
 local last_frame = 0
@@ -33,6 +35,29 @@ local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local iconCache = {}
+
+local function GetUnitIcon(unitDefID)
+	if not unitDefID then
+		return WARN_TEXTURE
+	end
+	if not iconCache[unitDefID] then
+		ud = UnitDefs[unitDefID]
+		iconCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/'.. ud.iconType ..iconFormat
+	end
+	return iconCache[unitDefID]
+end
+
+local wantDrawCache = {}
+local function WantDrawUnit(unitDefID)
+	if not unitDefID then
+		return true -- Fake enemy units are never detectable
+	end
+	if unitDefID and not wantDrawCache[unitDefID] then
+		ud = UnitDefs[unitDefID]
+		wantDrawCache[unitDefID] = ud.customParams.completely_hidden and 0 or 1
+	end
+	return (wantDrawCache[unitDefID] == 1)
+end
 
 local spectating, fullview = Spring.GetSpectatingState()
 
@@ -105,6 +130,10 @@ options = {
 }
 
 function widget:UnitEnteredRadar(unitID, unitTeam)
+	if spectating and not WantDrawUnit(Spring.GetUnitDefID(unitID)) then
+		-- Spectators can see fake enemy units, so check for them
+		return
+	end
 	if (Spring.GetUnitAllyTeam(unitID) ~= myAllyTeamID) then
 		local x, y, z = Spring.GetUnitPosition (unitID)
 		local losState = Spring.GetUnitLosState(unitID, myAllyTeamID)
@@ -124,8 +153,11 @@ function widget:UnitDestroyed(unitID, unitTeam)
 	allyDots[unitID] = nil
 end
 
-function widget:UnitCreated(unitID)
-	local x, y, z = Spring.GetUnitPosition (unitID)
+function widget:UnitCreated(unitID, unitDefID)
+	if not WantDrawUnit(unitDefID) then
+		return
+	end
+	local x, y, z = Spring.GetUnitPosition(unitID)
 	local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
 	if (Spring.GetUnitAllyTeam(unitID) == myAllyTeamID) then
 		allyDots[unitID] = {x, y, z, math.max(Spring.GetGroundHeight(x,z), 0), true, r, g, b} -- x, y, z, ground, inlos, r, g, b
@@ -144,7 +176,7 @@ local function DoFullUnitReload()
 		local unitID = units[i]
 		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
 		if unitAllyTeam == myAllyTeam then
-			widget:UnitCreated(unitID)
+			widget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 		else
 			widget:UnitEnteredRadar(unitID)
 		end
@@ -170,16 +202,6 @@ function widget:Initialize()
 	DoFullUnitReload()
 end
 
-local function GetUnitIcon(unitDefID)
-	if not unitDefID then
-		return WARN_TEXTURE
-	end
-	if not iconCache[unitDefID] then
-		ud = UnitDefs[unitDefID]
-		iconCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/'.. ud.iconType ..iconFormat
-	end
-	return iconCache[unitDefID]
-end
 local function DrawGroundquad(x, y, z, size)
 	gl.TexCoord(0, 0)
 	gl.Vertex(x - size, y, z - size)
