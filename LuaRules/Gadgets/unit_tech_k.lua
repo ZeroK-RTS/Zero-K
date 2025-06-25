@@ -146,6 +146,7 @@ local function SetUnitTechLevel(unitID, level)
 		healthMult = simpleDoubling,
 		projSpeed = math.sqrt(range), -- Maintains Cannon range.
 		minSpray = (math.pow(level, 0.25) - 1) * 0.04,
+		deathExplode = simpleDoubling,
 		static = true,
 	})
 	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.1, sizeScale, 1 + (sizeScale - 1)*0.1})
@@ -160,33 +161,6 @@ local function SetUnitTechLevel(unitID, level)
 	
 	if GG.FactoryPlate_RefreshUnit then
 		GG.FactoryPlate_RefreshUnit(unitID, unitDefID)
-	end
-end
-
-local function AddExplosions(unitID, unitDefID, teamID, level)
-	local extraExplosions = math.pow(2, level - 1) - 1
-	if not explosionDefID[unitDefID] then
-		local wd = WeaponDefNames[UnitDefs[unitDefID].deathExplosion]
-		explosionDefID[unitDefID] = wd.id
-		explosionRadius[unitDefID] = wd.damageAreaOfEffect or 0
-	end
-	local _, _, _, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
-	local projectileParams = {
-		pos = {ux, uy, uz},
-		["end"] = {ux, uy - 1, uz},
-		owner = unitID,
-		team = teamID,
-		ttl = 0,
-	}
-	local radius = (5 + 15*level)*(50 + math.pow(explosionRadius[unitDefID], 0.8))/100
-	for i = 1, extraExplosions do
-		local rand = Vector.RandomPointInCircle(radius)
-		projectileParams.pos[1] = ux + rand[1]
-		projectileParams.pos[3] = uz + rand[2]
-		local proID = Spring.SpawnProjectile(explosionDefID[unitDefID], projectileParams)
-		if proID then
-			Spring.SetProjectileCollision(proID)
-		end
 	end
 end
 
@@ -388,7 +362,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if build and build < 0.8 then
 		return
 	end
-	AddExplosions(unitID, unitDefID, teamID, unitLevel[unitID])
 	AddFeature(unitID, unitDefID, teamID, unitLevel[unitID])
 end
 
