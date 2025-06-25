@@ -182,7 +182,7 @@ return {
 		{	"select PrevSelection+_Idle+_ClearSelection_SelectAll+",	"ctrl+i",},
 		{	"select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Radar+_ClearSelection_SelectAll+",	"ctrl+s",},
 		{	"select AllMap+_Not_Builder_Not_Building_Transport_Aircraft+_ClearSelection_SelectAll+",	"ctrl+t",},
-		{	"selectidlecon",	"z",},
+		{	"selectidlecon",	"any+z",},
 		{	"select Visible+_InPrevSel+_ClearSelection_SelectAll+",	"ctrl+x",},
 		{	"select AllMap+_InPrevSel+_ClearSelection_SelectAll+",	"ctrl+z",},
 		{	"epic_chili_integral_menu_tab_economy",	"any+x",},
