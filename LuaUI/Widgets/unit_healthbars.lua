@@ -243,191 +243,191 @@ options = {
 		OnChange = OptionsChanged,
 	},
 	invert_shield = {
-		name = 'invert shield bar',
+		name = 'Invert shield bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert shield bar',
+		desc = 'Invert shield bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_health = {
-		name = 'invert health bar',
+		name = 'Invert health bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert health bar',
+		desc = 'Invert health bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_building = {
-		name = 'invert building bar',
+		name = 'Invert building bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert building bar',
+		desc = 'Invert building bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_morph = {
-		name = 'invert morph bar',
+		name = 'Invert morph bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert morph bar',
+		desc = 'Invert morph bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_stockpile = {
-		name = 'invert stockpile bar',
+		name = 'Invert stockpile bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert stockpile bar',
+		desc = 'Invert stockpile bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_paralyze = {
-		name = 'invert paralyze bar',
+		name = 'Invert paralyze bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert paralyze bar',
+		desc = 'Invert paralyze bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_disarm = {
-		name = 'invert disarm bar',
+		name = 'Invert disarm bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert disarm bar',
+		desc = 'Invert disarm bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_capture = {
-		name = 'invert capture bar',
+		name = 'Invert capture bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert capture bar',
+		desc = 'Invert capture bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_capture_reload = {
-		name = 'invert capture_reload bar',
+		name = 'Invert capture_reload bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert capture_reload bar',
+		desc = 'Invert capture_reload bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_teleport = {
-		name = 'invert teleport bar',
+		name = 'Invert teleport bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert teleport bar',
+		desc = 'Invert teleport bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_teleport_pw = {
-		name = 'invert teleport_pw bar',
+		name = 'Invert teleport_pw bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert teleport_pw bar',
+		desc = 'Invert teleport_pw bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_ability = {
-		name = 'invert ability bar',
+		name = 'Invert ability bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert ability bar',
+		desc = 'Invert ability bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_heat = {
-		name = 'invert heat bar',
+		name = 'Invert heat bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert heat bar',
+		desc = 'Invert heat bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_speed = {
-		name = 'invert speed bar',
+		name = 'Invert speed bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert speed bar',
+		desc = 'Invert speed bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_reload = {
-		name = 'invert reload bar',
+		name = 'Invert reload bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert reload bar',
+		desc = 'Invert reload bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_reammo = {
-		name = 'invert reammo bar',
+		name = 'Invert reammo bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert reammo bar',
+		desc = 'Invert reammo bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_slow = {
-		name = 'invert slow bar',
+		name = 'Invert slow bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert slow bar',
+		desc = 'Invert slow bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_goo = {
-		name = 'invert goo bar',
+		name = 'Invert goo bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert goo bar',
+		desc = 'Invert goo bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_jump = {
-		name = 'invert jump bar',
+		name = 'Invert jump bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert jump bar',
+		desc = 'Invert jump bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_reclaim = {
-		name = 'invert reclaim bar',
+		name = 'Invert reclaim bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert reclaim bar',
+		desc = 'Invert reclaim bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
 	invert_resurrect = {
-		name = 'invert resurrect bar',
+		name = 'Invert resurrect bar',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = 'invert resurrect bar',
+		desc = 'Invert resurrect bar',
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
@@ -650,18 +650,18 @@ local function GetBarDrawer()
 		end
 	end
 
-	function externalFunc.AddPercentBar(status, percent, color)
+	function externalFunc.AddPercentBar(status, percent, color, textOverride)
 		barsN = barsN + 1
 		local barInfo = bars[barsN]
 		local progress = percent
-                if options["invert_" .. status].value then
-			progress = 1-progress
+		if options["invert_" .. status].value then
+			progress = 1 - progress
 		end
 		if barInfo then
 			barInfo.title    = addTitle and messages[status]
 			barInfo.progress = progress
 			barInfo.color    = color or barColors[status]
-			barInfo.text     = addPercent and floor(progress*100) .. '%'
+			barInfo.text     = addPercent and (textOverride or floor(percent*100) .. '%')
 		end
 	end
 
@@ -1090,7 +1090,7 @@ do
 			if slowState > 0.5 then
 				barDrawer.AddDurationBar("slow", (slowState - 0.5)*25)
 			else
-				barDrawer.AddPercentBar("slow", slowState)
+				barDrawer.AddPercentBar("slow", slowState*2, false, floor(slowState*100) .. '%')
 			end
 		end
 		
