@@ -2,16 +2,16 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Unit Start State",
-    desc      = "Configurable starting unit states for units",
-    author    = "GoogleFrog",
-    date      = "13 April 2011", --last update: 29 January 2014
-    license   = "GNU GPL, v2 or later",
-	handler   = false,
-    layer     = 1,
-    enabled   = true,  --  loaded by default?
-  }
+	return {
+		name      = "Unit Start State",
+		desc      = "Configurable starting unit states for units",
+		author    = "GoogleFrog",
+		date      = "13 April 2011", --last update: 29 January 2014
+		license   = "GNU GPL, v2 or later",
+		handler   = false,
+		layer     = 1,
+		enabled   = true,  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
