@@ -22,7 +22,6 @@ local spGiveOrderToUnit         = Spring.GiveOrderToUnit
 local spGetTeamUnits            = Spring.GetTeamUnits
 local spGetUnitDefID            = Spring.GetUnitDefID
 local spEcho                    = Spring.Echo
-local spGetUnitCommands         = Spring.GetUnitCommands
 local spGetUnitVelocity         = Spring.GetUnitVelocity
 local spGetUnitHealth           = Spring.GetUnitHealth
 local spGetSpecState            = Spring.GetSpectatingState

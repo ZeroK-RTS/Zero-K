@@ -182,14 +182,16 @@ for i = 1, #UnitDefs do
 	if energyIncome > 0 then
 		econStructureDefs[i] = {cost = ud.metalCost, income = energyIncome}
 	end
+	if cp.windgen then
+		econStructureDefs[i] = econStructureDefs[i] or {}
+		econStructureDefs[i].isWind = true
+	end
 
 	local mexMult = tonumber(cp.metal_extractor_mult) or 0
 	if mexMult > 0 then
 		econStructureDefs[i] = {cost = ud.metalCost, mex = mexMult}
 	end
 end
-
-econStructureDefs[UnitDefNames.energywind.id].isWind = true
 
 local TIDAL_HEALTH = UnitDefNames.energywind.customParams.tidal_health
 
@@ -232,16 +234,19 @@ for i = 1, #UnitDefs do
 end
 
 local manualFireTimeDefs = {}
+local manualFireWeaponNum = {}
 local specialReloadDefs = {}
 local jumpReloadDefs = {}
 local ammoRequiringDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	local unitWeapon = (ud and ud.weapons)
-	unitWeapon = unitWeapon and unitWeapon[3]
 	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	local weaponNum = tonumber(ud.customParams.manualfire_num or 3)
+	unitWeapon = unitWeapon and unitWeapon[weaponNum]
 	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
 		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
+		manualFireWeaponNum[unitDefID] = weaponNum
 	end
 	if ud.customParams.specialreloadtime then
 		specialReloadDefs[unitDefID] = tonumber(ud.customParams.specialreloadtime)
@@ -270,7 +275,8 @@ local sameObjectIDTime = 0
 local selectedUnitsList = {}
 local commanderManualFireReload = {}
 
-local ctrlFilterUnits = false
+local ctrlFilterUnitList = false
+local ctrlFilterUnitIncluded = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -286,7 +292,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter',
+	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'sortByHealth',
 	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar',
 	'fancySkinning', 'leftPadding',
 }
@@ -391,7 +397,7 @@ options = {
 			end
 		end,
 	},
-	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton',
+	groupbehaviour = {name='Unit grouping behaviour', type='radioButton',
 		value='overflow',
 		items = {
 			{key = 'overflow',	name = 'On window overflow'},
@@ -400,7 +406,7 @@ options = {
 		},
 		path = selPath,
 	},
-	showgroupinfo = {name='Show Group Info', type='bool', value=true,
+	showgroupinfo = {name='Show group info', type='bool', value=true,
 		path = selPath,
 		OnChange = function(self)
 			if selectionWindow then
@@ -408,10 +414,10 @@ options = {
 			end
 		end,
 	},
-	ctrlFilter = {
-		name = 'Ctrl Selection Filtering',
+	sortByHealth = {
+		name = 'Sort by health',
 		type = 'bool',
-		desc = "Hold Ctrl and click on some units. These units will be selected when Ctrl is released.",
+		desc = "Selected units of the same type are sorted by health remaining. Updates whenever selection changes.",
 		value = true,
 		path = selPath,
 	},
@@ -800,7 +806,7 @@ local function GetManualFireReload(unitID, unitDefID)
 	end
 	
 	if manualFireTimeDefs[unitDefID] then
-		return manualFireTimeDefs[unitDefID], 3
+		return manualFireTimeDefs[unitDefID], manualFireWeaponNum[unitDefID]
 	end
 	if specialReloadDefs[unitDefID] then
 		return specialReloadDefs[unitDefID], false, SPECIAL_WEAPON_RELOAD_PARAM
@@ -876,7 +882,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		return
 	end
 	
-	local income = econDef.income * mult * energyMult
+	local income = (econDef.income or 0) * mult * energyMult
 	local extraText = ""
 	local healthOverride = false
 	local minWind = 0
@@ -1007,7 +1013,7 @@ local function UpdateMouseCursor(holdingDrawKey)
 	end
 end
 
-local function SelectionsIconClick(button, unitID, unitList, unitDefID)
+local function SelectionsIconClick(button, unitID, unitList, unitDefID, healthProp, groupedButton)
 	unitID = unitID or (unitList and unitList[1])
 	
 	if not unitID then
@@ -1026,7 +1032,18 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	local newSelectedUnits
 	
 	if (button == 3) then
-		if alt or shift then
+		if shift and alt then
+			--// deselect units with health at least healthProp
+			newSelectedUnits = {}
+			for i = 1, #selectedUnitsList do
+				if selectedUnitsList[i] then
+					local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+					if maxhealth and maxhealth > 0 and health / maxhealth < healthProp then
+						newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
+					end
+				end
+			end
+		elseif alt or shift then
 			--// deselect whole block, or half if alt is held
 			local toDeselect = #unitList
 			if alt then
@@ -1044,31 +1061,69 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 			end
 		else
 			--// deselect a single unit
+			newSelectedUnits = {}
 			for i = 1, #selectedUnitsList do
-				if selectedUnitsList[i] == unitID then
-					selectedUnitsList[i] = selectedUnitsList[#selectedUnitsList]
-					selectedUnitsList[#selectedUnitsList] = nil
+				if selectedUnitsList[i] ~= unitID then
+					newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
 				end
 			end
-			newSelectedUnits = selectedUnitsList
 		end
 		spSelectUnitArray(newSelectedUnits)
 	elseif button == 1 then
 		if ctrl then
-			ctrlFilterUnits = ctrlFilterUnits or {}
-			if shift or alt then
+			ctrlFilterUnitList = ctrlFilterUnitList or {}
+			ctrlFilterUnitIncluded = ctrlFilterUnitIncluded or {}
+			if shift and alt then
+				--// select units with health at least healthProp
+				newSelectedUnits = {}
+				for i = 1, #selectedUnitsList do
+					if selectedUnitsList[i] then
+						local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+						if maxhealth and maxhealth > 0 and health / maxhealth >= healthProp then
+							if not ctrlFilterUnitIncluded[selectedUnitsList[i]] then
+								ctrlFilterUnitList[#ctrlFilterUnitList + 1] = selectedUnitsList[i]
+								ctrlFilterUnitIncluded[selectedUnitsList[i]] = true
+							end
+						end
+					end
+				end
+			elseif shift or alt then
 				local toSelect = #unitList
 				if alt then
 					toSelect = math.ceil(toSelect / 2)
 				end
 				for i = 1, toSelect do
-					ctrlFilterUnits[#ctrlFilterUnits + 1] = unitList[i]
+					if not ctrlFilterUnitIncluded[unitList[i]] then
+						ctrlFilterUnitList[#ctrlFilterUnitList + 1] = unitList[i]
+						ctrlFilterUnitIncluded[unitList[i]] = true
+					end
 				end
 			else
-				ctrlFilterUnits[#ctrlFilterUnits + 1] = unitID
+				local toSelect = unitID
+				if groupedButton and ctrlFilterUnitIncluded[toSelect] then
+					local index = 1
+					while unitList[index] and ctrlFilterUnitIncluded[toSelect] do
+						toSelect = unitList[index]
+						index = index + 1
+					end
+				end
+				ctrlFilterUnitList[#ctrlFilterUnitList + 1] = toSelect
+				ctrlFilterUnitIncluded[toSelect] = true
 			end
 		else
-			if alt then
+			if shift and alt then
+				--// select units with health at least healthProp
+				newSelectedUnits = {}
+				for i = 1, #selectedUnitsList do
+					if selectedUnitsList[i] then
+						local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+						if maxhealth and maxhealth > 0 and health / maxhealth >= healthProp then
+							newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
+						end
+					end
+				end
+				spSelectUnitArray(newSelectedUnits)
+			elseif alt then
 				local toSelect = math.ceil(#unitList / 2)
 				newSelectedUnits = {}
 				for i = 1, toSelect do
@@ -1088,11 +1143,12 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 end
 
 local function CheckCtrlFilterRelease()
-	if not ctrlFilterUnits then
+	if not ctrlFilterUnitList then
 		return
 	end
-	spSelectUnitArray(ctrlFilterUnits)
-	ctrlFilterUnits = false
+	spSelectUnitArray(ctrlFilterUnitList)
+	ctrlFilterUnitList = false
+	ctrlFilterUnitIncluded = false
 end
 
 local cacheFeatureTooltip = {}
@@ -1178,11 +1234,12 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 			end
 		end
 		bar:SetCaption(newCaption)
+		prop = (maxValue > 0 and currentValue/maxValue) or 0
 		if colorFunc then
-			color = colorFunc(currentValue/maxValue)
+			color = colorFunc(prop)
 			bar.color = color
 		end
-		bar:SetValue(currentValue/maxValue)
+		bar:SetValue(prop)
 	end
 	
 	return UpdateBar
@@ -1405,6 +1462,7 @@ local function GetUnitGroupIconButton(parentControl)
 	local unitList
 	local unitCount
 	local unitpicBadgeUpdate
+	local healthProp
 	
 	local size = options.uniticon_size.value
 	
@@ -1440,7 +1498,7 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = holder,
 		OnClick = {
 			function(_,_,_,button)
-				SelectionsIconClick(button, unitID, unitList, unitDefID)
+				SelectionsIconClick(button, unitID, unitList, unitDefID, healthProp, not unitID)
 			end
 		}
 	}
@@ -1460,8 +1518,9 @@ local function GetUnitGroupIconButton(parentControl)
 		if unitID then
 			local health, maxhealth = spGetUnitHealth(unitID)
 			if health then
-				healthBar.color = GetHealthColor(health/maxhealth)
-				healthBar:SetValue(health/maxhealth)
+				healthProp = health/maxhealth
+				healthBar.color = GetHealthColor(healthProp)
+				healthBar:SetValue(healthProp)
 			end
 			local reloadTime, weaponNum, rulesParam = GetManualFireReload(unitID, unitDefID)
 			if reloadTime then
@@ -1505,8 +1564,9 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 		
 		if totalMax > 0 then
-			healthBar.color = GetHealthColor(totalHealth/totalMax)
-			healthBar:SetValue(totalHealth/totalMax)
+			healthProp = totalHealth/totalMax
+			healthBar.color = GetHealthColor(healthProp)
+			healthBar:SetValue(healthProp)
 		end
 	end
 	
@@ -1669,7 +1729,7 @@ local function GetSelectionStatsDisplay(parentControl)
 			end
 		end
 		
-		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count) .. "\n" ..
+		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count, false, 100) .. "\n" ..
 			WG.Translate("interface", "value") .. ": " .. Format(total_cost, false, 100) .. " / " ..  Format(total_finishedcost, false, 100) .. "\n" ..
 			WG.Translate("interface", "health") .. ": " .. Format(total_hp, false, 100) .. " / " ..  Format(total_maxhp, false, 100) .. "\n"
 		
@@ -2068,7 +2128,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		local healthPos
 		if shieldBarUpdate then
-			if ud and (ud.shieldPower > 0 or ud.level) then
+			if ud and ((ud.shieldPower or 0) > 0 or ud.level) then
 				local shieldPower = (spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
 				local _, shieldCurrentPower = spGetUnitShieldState(unitID, -1)
 				if shieldCurrentPower and shieldPower then
@@ -2087,10 +2147,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		if buildBarUpdate then
-			if ud and ud.buildSpeed > 0 then
+			local buildSpeed, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
+			if buildSpeed and buildSpeed > 0 then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
 				
-				local buildSpeed, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
 				local currentBuild = GetCurrentBuildSpeed(unitID, unhandicappedSpeed)
 				buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, currentBuild or 0, buildSpeed)
 			else
@@ -2799,8 +2859,36 @@ local function UpdateSelection(newSelection)
 	-- Check if selection is many, get unit list tooltip
 	-- Update group info.
 	
+	if options.sortByHealth.value then
+		local prevOrder = {}
+		for i = 1, #selectedUnitsList do
+			prevOrder[selectedUnitsList[i]] = i
+		end
+		local subSelection = true
+		for i = 1, #newSelection do
+			if not prevOrder[newSelection[i]] then
+				subSelection = false
+			end
+		end
+		if subSelection then
+			local function KeepPreviousOrder(a, b)
+				return prevOrder[a] < prevOrder[b]
+			end
+			table.sort(newSelection, KeepPreviousOrder)
+		else
+			local health = {}
+			for i = 1, #newSelection do
+				local unitID = newSelection[i]
+				health[unitID] = (unitID and Spring.GetUnitHealth(unitID)) or 0
+			end
+			local function HealthUnitSort(a, b)
+				return health[a] > health[b]
+			end
+			table.sort(newSelection, HealthUnitSort)
+		end
+	end
 	selectedUnitsList = newSelection
-	
+
 	if (not newSelection) or (#newSelection == 0) then
 		selectionWindow.SetVisible(false)
 		return
@@ -2907,8 +2995,9 @@ function widget:Initialize()
 			green .. WG.Translate("interface", "rmb")   .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
 			green .. "+ " .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
 			green .. "+ " .. WG.Translate("interface", "alt")   .. ": " .. WG.Translate("interface", "select_type_half") .. "\n" ..
-			green .. "+ " .. WG.Translate("interface", "ctrl")  .. ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
-			green .. WG.Translate("interface", "mmb")   .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "ctrl")  ..  ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "alt") .. ": " .. WG.Translate("interface", "select_health") .. "\n" ..
+			green .. WG.Translate("interface", "mmb")  ..": " .. WG.Translate("interface", "go_to") .. "\n" ..
 			green .. WG.Translate("interface", "space_click_show_stats")
 
 		unitSelectionTooltipCache = {}

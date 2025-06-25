@@ -264,11 +264,11 @@ function Object:AddChild(obj, dontUpdate, index)
     end
     table.insert(children, index, objDirect)
   else
-    local i = #children+1
-    children[i] = objDirect
-    children[hobj] = i
-    children[objDirect] = i
-  end
+		index = #children + 1
+		children[index] = objDirect
+	end
+	children[hobj] = index
+	children[objDirect] = index
     self:Invalidate()
 end
 

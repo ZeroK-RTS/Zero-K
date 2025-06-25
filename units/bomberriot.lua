@@ -23,7 +23,7 @@ return { bomberriot = {
   customParams        = {
     modelradius    = [[10]],
     refuelturnradius = [[120]],
-    reammoseconds = 13,
+    reammoseconds = 18,
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -38,7 +38,7 @@ return { bomberriot = {
   maxElevator         = 0.02,
   maxRudder           = 0.0075,
   maxFuel             = 1000000,
-  metalCost           = 460,
+  metalCost           = 520,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName          = [[firestorm.s3o]],

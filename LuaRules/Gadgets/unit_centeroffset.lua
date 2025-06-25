@@ -41,6 +41,7 @@ local modelRadii = {}
 local noGrowUnitDefs = {}
 local unitScales = {}
 local origColvolCache = {}
+local origColvolOverride = {}
 
 local postCompleteGrowDefs = {}
 for i = 1, #UnitDefs do
@@ -125,7 +126,20 @@ local function UpdateUnitGrow(unitID, data, growScale)
 		data.aim[1], data.aim[2] - growScale*data.aimOff, data.aim[3], true)
 end
 
-local function UpdateUnitCollisionData(unitID, unitDefID, scales)
+local function GetOrigColvolData(unitID, unitDefID)
+	if not origColvolCache[unitDefID] then
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
+			volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
+		origColvolCache[unitDefID] = {
+			scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
+			volumeType, testType, primaryAxis
+		}
+	end
+	local cache = origColvolOverride[unitID] or origColvolCache[unitDefID]
+	return cache
+end
+
+local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	if unitScales[unitID] and not scales then
 		scales = unitScales[unitID]
 	end
@@ -146,6 +160,11 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales)
 		aim = {0, Spring.GetUnitRulesParam(unitID, "aimpos_override") or 0, 0}
 	end
 	
+	local aimOffset = Spring.GetUnitRulesParam(unitID, "aimpos_offset")
+	if aimOffset then
+		aim[2] = aim[2] + aimOffset
+	end
+	
 	mid[1], mid[2], mid[3] = mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz
 	aim[1], aim[2], aim[3] = aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz
 	if scales then
@@ -161,26 +180,18 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales)
 		spSetUnitRadiusAndHeight(unitID, mr.radius, mr.height)
 	end
 	
-	if noGrowUnitDefs[unitDefID] and not scales then
+	if noGrowUnitDefs[unitDefID] and not scales and not force then
 		return
 	end
 	
 	local buildProgress = select(5, spGetUnitHealth(unitID))
-	if buildProgress > FULL_GROW and not postCompleteGrowDefs[unitDefID] and not scales then
+	if buildProgress > FULL_GROW and not postCompleteGrowDefs[unitDefID] and not scales and not force then
 		return
 	end
 	
 	-- Sertup growth scale
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
-	if not origColvolCache[unitDefID] then
-		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
-			volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
-		origColvolCache[unitDefID] = {
-			scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
-			volumeType, testType, primaryAxis
-		}
-	end
-	local cache = origColvolCache[unitDefID]
+	local cache = GetOrigColvolData(unitID, unitDefID)
 	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
 			volumeType, testType, primaryAxis = cache[1], cache[2], cache[3], cache[4], cache[5], cache[6], cache[7], cache[8], cache[9]
 	
@@ -263,6 +274,14 @@ local function OverrideMidAndAimPos(unitID, mid, aim)
 	spSetUnitMidAndAimPos(unitID, sx*mid[1], sy*mid[2], sz*mid[3], sx*aim[1], sy*aim[2], sz*aim[3], true)
 end
 
+local function OverrideBaseColvol(unitID, scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, volumeType, testType, primaryAxis)
+	origColvolOverride[unitID] = {
+		scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
+		volumeType, testType, primaryAxis
+	}
+	UpdateUnitCollisionData(unitID, Spring.GetUnitDefID(unitID), false, true)
+end
+
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if growUnit[unitID] then
 		UpdateUnitGrow(unitID, growUnit[unitID], 1)
@@ -278,6 +297,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		growUnit[unitID] = nil
 	end
 	unitScales[unitID] = nil
+	if origColvolOverride[unitID] then
+		origColvolOverride[unitID] = nil
+	end
 end
 
 function gadget:GameFrame(f)
@@ -341,9 +363,11 @@ end
 
 function gadget:Initialize()
 	GG.OverrideMidAndAimPos = OverrideMidAndAimPos
+	GG.OverrideBaseColvol = OverrideBaseColvol
 	GG.SetColvolScales = SetColvolScales
 	GG.GetColvolScales = GetColvolScales
 	GG.OffsetColVol = OffsetColVol
+	GG.GetOrigColvolData = GetOrigColvolData
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)

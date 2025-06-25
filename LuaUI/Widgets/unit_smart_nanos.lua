@@ -34,7 +34,7 @@ local GiveOrderToUnit     = Spring.GiveOrderToUnit
 local GetUnitHealth       = Spring.GetUnitHealth
 local GetUnitsInCylinder  = Spring.GetUnitsInCylinder
 local GetUnitPosition     = Spring.GetUnitPosition
-local GetCommandQueue     = Spring.GetCommandQueue
+local GetUnitCommandCount = Spring.GetUnitCommandCount
 local GetFeatureDefID     = Spring.GetFeatureDefID
 local GetFeatureResources = Spring.GetFeatureResources
 local AreTeamsAllied      = Spring.AreTeamsAllied
@@ -304,7 +304,7 @@ function widget:Update(deltaTime)
 				end
 				
 				local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
-				local cQueueCount = GetCommandQueue(unitID, 0)
+				local cQueueCount = GetUnitCommandCount(unitID)
 		 
 				local commandMe = false
 			

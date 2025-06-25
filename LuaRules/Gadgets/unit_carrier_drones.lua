@@ -25,7 +25,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local CreateUnit          = Spring.CreateUnit
-local GetCommandQueue     = Spring.GetCommandQueue
+local GetUnitCommands     = Spring.GetUnitCommands
 local spGetUnitDirection  = Spring.GetUnitDirection
 local GetUnitIsStunned    = Spring.GetUnitIsStunned
 local GetUnitPieceMap     = Spring.GetUnitPieceMap
@@ -636,7 +636,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 				end
 			else
 				-- return to carrier unless in combat
-				local cQueue = GetCommandQueue(droneID, -1)
+				local cQueue = GetUnitCommands(droneID, -1)
 				local engaged = false
 				for j = 1, (cQueue and #cQueue or 0) do
 					if cQueue[j].id == CMD.ATTACK and firestate > 0 then
@@ -725,9 +725,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if (carrierList[unitID]) then
+	local carrier = carrierList[unitID]
+	if carrier then
 		local newUnitID = GG.wasMorphedTo and GG.wasMorphedTo[unitID]
-		local carrier = carrierList[unitID]
 		if newUnitID and carrierList[newUnitID] then --MORPHED, and MORPHED to another carrier. Note: unit_morph.lua create unit first before destroying it, so "carrierList[]" is already initialized.
 			local newCarrier = carrierList[newUnitID]
 			ToggleDronesCommand(newUnitID, ((generateDrones[unitID] ~= false) and 1) or 0)
@@ -764,9 +764,12 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		generateDrones[unitID] = nil
 		carrierList[unitID] = nil
 		recall_frame_start[unitID] = nil
-	elseif (droneList[unitID]) then
-		local carrierID = droneList[unitID].carrier
-		local setID = droneList[unitID].set
+	end
+
+	local droneInfo = droneList[unitID]
+	if droneInfo then
+		local carrierID = droneInfo.carrier
+		local setID = droneInfo.set
 		if setID > -1 then --is -1 when carrier morphed and drone is incompatible with the carrier
 			local droneSet = carrierList[carrierID].droneSets[setID]
 			droneSet.droneCount = (droneSet.droneCount - 1)

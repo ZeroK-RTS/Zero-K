@@ -5,7 +5,7 @@ local UnitListHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitListHandler.lua")
 local HeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/HeatmapHandler.lua")
 
 local spIsPosInLos = Spring.IsPosInLos
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCommandCount = Spring.GetUnitCommandCount
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local CMD_FIGHT = CMD.FIGHT
 
@@ -59,7 +59,7 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 	local function RunJobHandler()
 		if unscoutedCount > 0 then
 			for unitID,_ in scoutList.Iterator() do
-				local queueSize = spGetCommandQueue(unitID, 0)
+				local queueSize = spGetUnitCommandCount(unitID)
 				if queueSize then
 					if queueSize == 0 then
 						local randIndex = math.floor(math.random(1,unscoutedCount))

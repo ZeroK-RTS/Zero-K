@@ -44,6 +44,7 @@ local attritionWeaponDefs, MAX_SLOW_FACTOR, DEGRADE_TIMER, DEGRADE_FACTOR, UPDAT
 local slowedUnits = {}
 
 Spring.SetGameRulesParam("slowState",1)
+Spring.SetGameRulesParam("MAX_SLOW_FACTOR", MAX_SLOW_FACTOR)
 
 local function AddAwardSlow(unitID, attackerTeam, slowdown)
 	if GG.Awards and GG.Awards.AddAwardPoints then

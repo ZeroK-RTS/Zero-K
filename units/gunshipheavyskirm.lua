@@ -52,7 +52,7 @@ return { gunshipheavyskirm = {
     },
 
   },
-  sightDistance       = 600,
+  sightDistance       = 660,
   speed               = 99,
   turnRate            = 600,
   workerTime          = 0,
@@ -78,6 +78,7 @@ return { gunshipheavyskirm = {
       burnBlow                = true,
       burst                   = 4,
       burstrate               = 0.1,
+      cegTag                  = [[hmg_trail]],
       collideFriendly         = false,
       craterBoost             = 0.15,
       craterMult              = 0.3,

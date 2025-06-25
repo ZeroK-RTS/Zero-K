@@ -76,6 +76,7 @@ return { vehassault = {
     PLASMA = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 32,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 

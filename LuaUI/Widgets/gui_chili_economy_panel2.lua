@@ -605,7 +605,7 @@ function UpdateCustomParamResourceData()
 		local teamID = Spring.GetLocalTeamID()
 		local mStor = select(2, spGetTeamResources(teamID, "metal")) - HIDDEN_STORAGE
 		cp.metalStorageReserve = Spring.GetTeamRulesParam(teamID, "metalReserve") or 0
-		if mStor <= 0 and bar_reserve_metal.bars[1].percent ~= 0 then
+		if mStor <= 0 then
 			bar_reserve_metal.bars[1].percent = 0
 			bar_reserve_metal:Invalidate()
 		elseif bar_reserve_metal.bars[1].percent*mStor ~= cp.metalStorageReserve then
@@ -615,7 +615,7 @@ function UpdateCustomParamResourceData()
 		
 		local eStor = select(2, spGetTeamResources(teamID, "energy")) - HIDDEN_STORAGE
 		cp.energyStorageReserve = Spring.GetTeamRulesParam(teamID, "energyReserve") or 0
-		if eStor <= 0 and bar_reserve_energy.bars[1].percent ~= 0 then
+		if eStor <= 0 then
 			bar_reserve_energy.bars[1].percent = 0
 			bar_reserve_energy:Invalidate()
 		elseif bar_reserve_energy.bars[1].percent*eStor ~= cp.energyStorageReserve then
@@ -1611,6 +1611,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	
 	bar_reserve_metal = Chili.Multiprogressbar:New{
 		parent = metalBarHolder,
+		name = "MetalReserveBar",
 		orientation = "horizontal",
 		x = 0,
 		y = 0,
@@ -1766,6 +1767,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	
 	bar_reserve_energy = Chili.Multiprogressbar:New{
 		parent = energyBarHolder,
+		name = "EnergyReserveBar",
 		orientation = "horizontal",
 		value  = 0,
 		x = 0,

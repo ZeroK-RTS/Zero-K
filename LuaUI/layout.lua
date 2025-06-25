@@ -24,16 +24,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.lua")
-
-local langSuffix = Spring.GetConfigString('Language', 'fr')
-local l10nName = 'L10N/commands_' .. langSuffix .. '.lua'
-local success, translations = pcall(VFS.Include, l10nName)
-if (not success) then
-	translations = nil
-end
-
-
 local showPanelLabel = false
 
 
@@ -89,9 +79,9 @@ local function DefaultHandler(xIcons, yIcons, cmdCount, commands)
 	
 	if (showPanelLabel) then
 		if (cmdsFirst) then
-			menuName =   RedStr .. 'Commands'
+			menuName = 'Commands'
 		else
-			menuName = GreenStr .. 'Build Orders'
+			menuName = 'Build Orders'
 		end
 	end
 
@@ -107,11 +97,9 @@ local function DefaultHandler(xIcons, yIcons, cmdCount, commands)
 	local pageNumCmd = -1
 	local pageNumPos = (prevPos + nextPos) / 2
 	if (xIcons > 2) then
-		local color
-		if (commands[1].id < 0) then color = GreenStr else color = RedStr end
 		local activePage = activePage or 0
 		local pageNum = '' .. (activePage + 1) .. ''
-		PageNumCmd.name = color .. '   ' .. pageNum .. '   '
+		PageNumCmd.name = '   ' .. pageNum .. '   '
 		table.insert(customCmds, PageNumCmd)
 		pageNumCmd = cmdCount + 1
 	end
@@ -167,24 +155,8 @@ local function DefaultHandler(xIcons, yIcons, cmdCount, commands)
 				end
 			end
 			
-			if (translations) then
-				local trans = translations[cmd.id]
-				if (trans) then
-					reTooltipCmds[cmdSlot] = trans.desc
-					if (not trans.params) then
-						if (cmd.id ~= CMD.STOCKPILE) then
-							reNamedCmds[cmdSlot] = trans.name
-						end
-					else
-						local num = tonumber(cmd.params[1])
-						if (num) then
-							num = (num + 1)
-							cmd.params[num] = trans.params[num]
-							reParamsCmds[cmdSlot] = cmd.params
-						end
-					end
-				end
-			end
+			-- FIXME: apparently this is the place to put translations
+			-- for native engine commands? Needs to be looked into.
 		end
 	end
 	

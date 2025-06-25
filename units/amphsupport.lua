@@ -34,7 +34,7 @@ return { amphsupport = {
   iconType               = [[amphsupport]],
   leaveTracks            = true,
   maxSlope               = 36,
-  metalCost              = 230,
+  metalCost              = 240,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
   noAutoFire             = false,
@@ -69,12 +69,12 @@ return { amphsupport = {
   weapons                = {
     {
       def                = [[CANNON]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     {
       def                = [[FAKE_CANNON]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
   },
@@ -85,6 +85,7 @@ return { amphsupport = {
       name                    = [[Plasma Cannon]],
       accuracy                = 480,
       areaOfEffect            = 40,
+      cegTag                  = [[light_arty_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -106,7 +107,7 @@ return { amphsupport = {
       interceptedByShieldType = 1,
       myGravity               = 0.12,
       noSelfDamage            = true,
-      range                   = 640,
+      range                   = 645,
       reloadtime              = 1.9,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],

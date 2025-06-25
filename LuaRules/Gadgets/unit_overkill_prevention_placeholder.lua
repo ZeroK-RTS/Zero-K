@@ -27,7 +27,7 @@ local spFindUnitCmdDesc       = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc       = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc     = Spring.InsertUnitCmdDesc
 local spSetUnitTarget         = Spring.SetUnitTarget
-local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitCommandCount   = Spring.GetUnitCommandCount
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 
 local FEATURE = 102
@@ -44,7 +44,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Single target with Hold Fire", "Prevent Overkill"}
 }
 
 local shotRequirement = {}
@@ -63,7 +63,7 @@ for i = 1, #UnitDefs do
 	shotRequirement[i] = shots
 end
 
-local _, handledUnitDefIDs, handledWeaponDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local _, handledUnitDefIDs, handledWeaponDefIDs, _, OVERKILL_STATES = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 local canHandleUnit = {}
 local units = {}
@@ -151,7 +151,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 		IterableMap.Add(projectiles, -unitID, data)
 		return false
 	else
-		local queueSize = spGetCommandQueue(unitID, 0)
+		local queueSize = spGetUnitCommandCount(unitID)
 		if queueSize == 1 then
 			local cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
 			if cmdID == CMD.ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cp_1 and (not cp_2) and cp_1 == targetID then
@@ -260,7 +260,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		if cmdOptions and cmdOptions.right then
-			state = (state - 2)%4
+			state = (state - 2)%(OVERKILL_STATES + 1)
 		end
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 		

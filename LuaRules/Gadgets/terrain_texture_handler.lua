@@ -27,7 +27,7 @@ local spGetMapSquareTexture = Spring.GetMapSquareTexture
 local floor = math.floor
 
 local SAVE_FILE = "Gadgets/terrain_texture_handler.lua"
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 1300)
+local BAR_COMPAT = Script.IsEngineMinVersion(105, 0, 1300)
 local USE_FORCE_UPDATE = true
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -400,6 +400,13 @@ end
 
 function gadget:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
 	--Spring.Echo("UHMU" .. " " .. Spring.GetGameFrame())
+	--Spring.MarkerAddPoint((x1 + x2)*4, 0, (z1 + z2)*4, "")
+	--Spring.MarkerAddLine(x1*8, 265, z1*8, x2*8, 265, z2*8)
+	--Spring.MarkerAddLine(x1*8, 265, z2*8, x2*8, 265, z1*8)
+	--Spring.MarkerAddLine(x1*8, 265, z1*8, x1*8, 265, z2*8)
+	--Spring.MarkerAddLine(x1*8, 265, z1*8, x2*8, 265, z1*8)
+	--Spring.MarkerAddLine(x1*8, 265, z2*8, x2*8, 265, z2*8)
+	--Spring.MarkerAddLine(x2*8, 265, z1*8, x2*8, 265, z2*8)
 	UMHU_updatequeue[#UMHU_updatequeue+1] ={x1, z1, x2, z2} --sent to gadget:DrawWorld()
 end
 

@@ -100,6 +100,18 @@ local options = {
 			{ key='none', name = "Off", desc = 'Turns commsharing off.' },
 		},
 	},
+	{
+		key    = 'mergeresourceshare',
+		name   = 'Commshare Resource Share',
+		desc   = 'Merged players recieve this much extra resource share per additional player.',
+		type   = 'number',
+		section= 'a_important',
+		def=0.5,
+		min=0,
+		max=1,
+		step=0.05,
+	},
+	
   {
     key    = 'zombies',
     name   = 'Enable zombies',
@@ -694,6 +706,14 @@ local options = {
 		step    = 0.1,
 	},
 	{
+		key     = 'autohandicap',
+		name    = 'Automatic Handicap',
+		desc    = 'Add automatically calculated economy multipliers for team 1 or 2 depending on rating.',
+		type    = 'bool',
+		section = 'multipliers',
+		def     = false,
+	},
+	{
 		key     = 'team_1_econ',
 		name    = 'Team 1 Income Multiplier',
 		desc    = 'Multiplies metal, energy and build speed. Set above 1 for an advantage and below 1 for a disadvantage.',
@@ -782,14 +802,6 @@ local options = {
 		step    = 0.05,
 	},
 	{
-		key     = 'autohandicap',
-		name    = 'Automatic Handicap',
-		desc    = 'Add automatically calculated economy multipliers for team 1 or 2 depending on rating.',
-		type    = 'bool',
-		section = 'multipliers',
-		def     = false,
-	},
-	{
 		key     = 'disablemapdamage',
 		name    = 'Disable map deformation',
 		desc    = 'Prevents the map shape from being changed by weapons and terraforming',
@@ -859,32 +871,31 @@ local options = {
   --  def		= true,
   --  section	= "experimental",
   --},
---  { -- Causes desync https://springrts.com/mantis/view.php?id=5936
---    key		= "pathfinder",
---    name	= "Pathfinder type",
---    desc	= "Sets the pathfinding system used by units.",
---    type	= "list",
---    def		= "standard",
---    section	= "experimental",
---    items  = {
---      {
---	key  = 'standard',
---	name = 'Standard',
---	desc = 'Standard pathfinder',
---      },
---      {
---	key  = 'qtpfs',
---	name = 'QTPFS',
---	desc = 'New Quadtree Pathfinding System (experimental)',
---      },
---    --  {
---	--	key  = 'classic',
---	--	name = 'Classic',
---	--	desc = 'An older pathfinding system without turninplace or reverse',
---    --  }
---    },
---  },
-  
+  {
+	key     = "pathfinder",
+	name    = "Pathfinder type",
+	desc    = "Sets the pathfinding system used by units.",
+	type    = "list",
+	def     = "random",
+	section = "experimental",
+	items  = {
+		{
+			key  = 'standard',
+			name = 'Standard',
+			desc = 'Standard pathfinder',
+		},
+		{
+			key  = 'random',
+			name = 'Random',
+			desc = 'Randomly pick a pathfinder',
+		},
+		{
+			key  = 'qtpfs',
+			name = 'QTPFS',
+			desc = 'New Quadtree Pathfinding System (experimental)',
+		},
+	},
+  },
   {
     key    = 'chicken',
     name   = 'Chicken',

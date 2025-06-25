@@ -92,7 +92,7 @@ return { shieldassault = {
       shieldPower             = 1200,
       shieldPowerRegen        = 13,
       shieldPowerRegenEnergy  = 0,
-      shieldRadius            = 80,
+      shieldRadius            = 90,
       shieldRepulser          = false,
       shieldStartingPower     = 1200,
       smartShield             = true,
@@ -104,6 +104,7 @@ return { shieldassault = {
     THUD_WEAPON = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 36,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 

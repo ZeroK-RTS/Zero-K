@@ -18,7 +18,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spValidUnitID = Spring.ValidUnitID
 local spValidFeatureID = Spring.ValidFeatureID
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCommands = Spring.GetUnitCommands
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
@@ -318,7 +318,7 @@ function widget:GameFrame(n)
 								local unitInfo = unitToEffect[unitID] --note: copy table reference (this mean changes to unitInfo saves into unitToEffect)
 								if not unitInfo["cmd"] then
 									local px,py,pz= spGetUnitPosition(unitID)
-									local cmd_queue = spGetCommandQueue(unitID,2); --note: unitToEffect[] (or unitInfo[]) is emptied every second, this mean new command is read every second
+									local cmd_queue = spGetUnitCommands(unitID,2); --note: unitToEffect[] (or unitInfo[]) is emptied every second, this mean new command is read every second
 									unitInfo["attckng"] = (cmd_queue and cmd_queue[1] and cmd_queue[1].id == CMD.ATTACK)
 									unitInfo["cmd"] = ConvertCMDToMOVE(cmd_queue[1])
 									unitInfo["pos"] = {px,py,pz}
@@ -357,7 +357,7 @@ function widget:GameFrame(n)
 										loopedUnits[unitID]=true
 										break; --a.k.a: Continue
 									else -- beacon removed
-										local cmd_queue = spGetCommandQueue(unitID,3);
+										local cmd_queue = spGetUnitCommands(unitID,3);
 										if cmd_queue[2] and cmd_queue[3] then --in case previous teleport AI teleport order make unit stuck to non-existent beacon
 											spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
 											unitInfo["attckng"] = (cmd_queue[3].id == CMD.ATTACK)

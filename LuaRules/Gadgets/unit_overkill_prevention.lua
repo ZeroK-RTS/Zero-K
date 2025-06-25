@@ -30,7 +30,7 @@ local spInsertUnitCmdDesc     = Spring.InsertUnitCmdDesc
 local spGetUnitTeam           = Spring.GetUnitTeam
 local spGetUnitDefID          = Spring.GetUnitDefID
 local spGetUnitRulesParam     = Spring.GetUnitRulesParam
-local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitCommandCount   = Spring.GetUnitCommandCount
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 local spGetUnitShieldState    = Spring.GetUnitShieldState
 local spUtilCheckBit          = Spring.Utilities.CheckBit
@@ -65,7 +65,7 @@ local lastGain = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local handledUnitDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local handledUnitDefIDs, _, _, _, OVERKILL_STATES = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 local shieldPowerDef = {}
 local shieldRegenDef = {}
@@ -87,7 +87,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Single target with Hold Fire", "Prevent Overkill"}
 }
 
 -------------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		-- Overkill prevention does not prevent firing at unidentified radar dots.
 		-- Although, it still remembers what has been fired at a radar dot.
 		if targetIdentified then
-			local queueSize = spGetCommandQueue(unitID, 0)
+			local queueSize = spGetUnitCommandCount(unitID)
 			if queueSize == 1 then
 				local cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
 				if cmdID == CMD.ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cp_1 and (not cp_2) and cp_1 == targetID then
@@ -317,9 +317,14 @@ function GG.OverkillPrevention_IsWanted(unitID, targetID, stateTable)
 		return false
 	end
 	if (stateTable[unitID] == 2 or stateTable[unitID] == 1) and spUtilGetUnitFireState(unitID) ~= 2 then
+		-- Only apply the lowest levels of OKP to units on Fire At Will
 		return false
 	end
 	if stateTable[unitID] == 1 then
+		-- Do OKP for targets aquired automatically.
+		-- Set target (GetUnitTarget) targets are always manual.
+		-- Check CMD.ATTACK options for manual target.
+		-- Manually given CMD.FIGHT create CMD.ATTACK that look manual, but should be treated as automatic
 		if targetID == GG.GetUnitTarget(unitID) then
 			return false
 		end
@@ -329,6 +334,19 @@ function GG.OverkillPrevention_IsWanted(unitID, targetID, stateTable)
 			if cmdID_2 ~= CMD_FIGHT then
 				return false
 			end
+		end
+	end
+	if stateTable[unitID] == 3 then
+		-- Do OKP when the unit has a single queued targets.
+		-- This means one attack command followed by something else, or no attack commands and a set target (GetUnitTarget).
+		local cmdID, cmdOpts, cmdTag, cmdParam1 = spGetUnitCurrentCommand(unitID)
+		if cmdID == CMD_ATTACK and cmdParam1 == targetID and not spUtilCheckBit(DEBUG_NAME, cmdOpts, CMD_OPT_INTERNAL) then
+			local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			if cmdID_2 ~= CMD_FIGHT and cmdID_2 ~= CMD_ATTACK then
+				return false
+			end
+		elseif targetID == GG.GetUnitTarget(unitID) then
+			return false
 		end
 	end
 	return true
@@ -378,7 +396,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		if cmdOptions and cmdOptions.right then
-			state = (state - 2)%4
+			state = (state - 2)%(OVERKILL_STATES + 1)
 		end
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 

@@ -307,6 +307,13 @@ local function CopyTable(tableToCopy, deep)
 	return copy
 end
 
+local function Clone(value)
+	if type(value) == "table" then
+		return CopyTable(value, deep)
+	end
+	return value
+end
+
 --[[
 local function tableMerge(t1, t2, appendIndex)
 	for k, v in pairs(t2) do
@@ -420,7 +427,10 @@ WG.crude.SetMasterVolume = function (newVolume, viaTrackbar)
 end
 
 WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
-	if (WG.music_start_volume or 0 > 0) then
+	if Spring.Utilities.IsNanOrInf(newVolume) then
+		newVolume = 0
+	end
+	if ((WG.music_start_volume or 0) > 0) then
 		Spring.SetSoundStreamVolume(newVolume / WG.music_start_volume)
 	else
 		Spring.SetSoundStreamVolume(newVolume)
@@ -810,10 +820,10 @@ local function HotKeyBreakdown(hotkey) --convert hotkey string into a standardiz
 
 	for i = 1, #hotkey_table-1 do
 		local str2 = hotkey_table[i]:lower()
-		if str2 == 'a' or str2 == 'alt'         then     alt = true
-		elseif str2 == 'c' or str2 == 'ctrl'     then ctrl = true
-		elseif str2 == 's' or str2 == 'shift'     then shift = true
-		elseif str2 == 'm' or str2 == 'meta'     then meta = true
+		if str2 == 'a' or str2 == 'alt' or str2 == 'Alt'          then     alt = true
+		elseif str2 == 'c' or str2 == 'ctrl'  or str2 == 'Ctrl'    then ctrl = true
+		elseif str2 == 's' or str2 == 'shift' or str2 == 'Shift'     then shift = true
+		elseif str2 == 'm' or str2 == 'meta' or str2 == 'Meta'    then meta = true
 		end
 	end
 	
@@ -850,14 +860,14 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		--local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
 		local actions = Spring.GetKeyBindings(hotkey)
 		if (actions and #actions > 0) then
-			echo( 'Warning: There are other actions bound to this hotkey combo (' .. GetReadableHotkey(hotkey) .. '):' )
+			echo( 'game_message:Warning: There are other actions bound to this hotkey combo (' .. GetReadableHotkey(hotkey) .. '):' )
 			for i = 1, #actions do
 				for actionCmd, actionExtra in pairs(actions[i]) do
 					echo ('  - ' .. actionCmd .. ' ' .. actionExtra)
 				end
 			end
 		end
-		echo( 'Hotkey (' .. GetReadableHotkey(hotkey) .. ') bound to action: ' .. actionName )
+		echo( 'game_message:Hotkey (' .. GetReadableHotkey(hotkey) .. ') bound to action: ' .. actionName )
 	end
 	
 	--actionName = actionName:lower()
@@ -1096,7 +1106,7 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 	
 	if option.type ~= 'button' and option.type ~= 'label' and option.default == nil then
 		if option.value ~= nil then
-			option.default = option.value
+			option.default = Clone(option.value)
 		else
 			option.default = newval
 		end
@@ -1338,8 +1348,7 @@ local function IntegrateWidget(w, addoptions, index)
 		end
 		
 		--store default
-		w.options[k].default = w.options[k].value
-		
+		w.options[k].default = Clone(w.options[k].value)
 		
 		option.key = k
 		option.wname = wname
@@ -1579,6 +1588,47 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 	}
 end
 
+local function GetDefaultKeybind(path, option, defaultKeysMap)
+	local action = GetActionName(path, option)
+	if defaultKeysMap[action] then
+		local keybind = defaultKeysMap[action]
+		if type(v) == "table" then
+			keybind = keybind[1]
+		end
+		return keybind
+	end
+	return keybind
+end
+
+local function ResetWinHotkeys(path)
+	local defaultKeysMap = {}
+	for i = 1, #defaultkeybinds do
+		defaultKeysMap[defaultkeybinds[i][1]] = defaultkeybinds[i][2]
+	end
+	for _, elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+		local keybind = GetDefaultKeybind(path, option, defaultKeysMap)
+		local action = GetActionName(path, option)
+		
+		UnassignKeyBind(action)
+		option.hotkey = keybind and GetReadableHotkey(keybind) or "None"
+		Spring.Echo("keybind", option.name, keybind, option.hotkey)
+		if keybind and keybind ~= "None" then
+			AssignKeyBindAction(keybind, action)
+			otset( keybounditems, action, hotkey )
+		end
+		if get_key_bind_notify_function then
+			get_key_bind_notify_function()
+			get_key_bind_notify_function = false
+		end
+		
+		if WG.COFC_HotkeyChangeNotification then
+			WG.COFC_HotkeyChangeNotification()
+		end
+	end
+		ReApplyKeybinds()
+end
+
 local unresetableSettings = {button = true, label = true, menu = true}
 local function ResetWinSettings(path)
 	for _, elem in ipairs(pathoptions[path]) do
@@ -1593,7 +1643,7 @@ local function ResetWinSettings(path)
 					option.value = option.default
 					option.OnChange(option)
 				elseif option.type == 'colors' then
-					option.color = option.default
+					option.color = Clone(option.default)
 					option.OnChange(option)
 				end
 			else
@@ -1601,6 +1651,20 @@ local function ResetWinSettings(path)
 			end
 		end
 	end
+end
+
+local function HasSettingsToReset(path)
+	for _, elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+		if not (unresetableSettings[option.type]) then
+			if option.default ~= nil then --fixme : need default
+				return true
+			else
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Error #627', option.name, option.type)
+			end
+		end
+	end
+	return false
 end
 
 --[[ WIP
@@ -2100,13 +2164,34 @@ MakeSubWindow = function(path, pause, labelScroll)
 		}
 	}
 	
-	if not searchedElement then --do not display reset setting button when search is a bunch of mixed options
+	if not searchedElement and HasSettingsToReset(path) then --do not display reset setting button when search is a bunch of mixed options
 		--reset button
 		Button:New{name = 'resetButton', noFont = true,
-			OnClick = {function() ResetWinSettings(path); RemakeEpicMenu(); end },
+			OnClick = {function()
+				ResetWinSettings(path)
+				ResetWinHotkeys(path)
+				RemakeEpicMenu()
+			end},
 			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 			--classname = "navigation_button",
-			tooltip = "Reset the settings within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
+			tooltip = "Reset the settings and hotkeys within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
+			height = B_HEIGHT,
+			padding = {2, 2, 2, 2},
+			parent = buttonBar,
+			children = {
+				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
+				Label:New{caption = 'Reset', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
+			}
+		}
+	else
+		Button:New{name = 'resetButton', noFont = true,
+			OnClick = {function()
+				ResetWinHotkeys(path)
+				RemakeEpicMenu()
+			end},
+			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
+			--classname = "navigation_button",
+			tooltip = "Reset the hotkeys within this submenu.",
 			height = B_HEIGHT,
 			padding = {2, 2, 2, 2},
 			parent = buttonBar,

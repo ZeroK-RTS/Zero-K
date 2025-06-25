@@ -84,6 +84,7 @@ return { cloakriot = {
       burnblow                = true,
       burst                   = 3,
       burstrate               = 0.1,
+      cegTag                  = [[hmg_trail_light]],
       craterBoost             = 0.15,
       craterMult              = 0.3,
 

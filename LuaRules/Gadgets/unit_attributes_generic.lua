@@ -50,6 +50,7 @@ local INLOS_ACCESS = {inlos = true}
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
 
 local getMovetype = Spring.Utilities.getMovetype
+local Vector = Spring.Utilities.Vector
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
@@ -61,6 +62,7 @@ local function GetMass(health, cost)
 	return (((cost/2) + (health/8))^0.6)*6.5
 end
 
+GG.att_LastChangeFrame = {}
 GG.att_CostMult = {}
 GG.att_HealthMult = {}
 GG.att_EconomyChange = {}
@@ -68,8 +70,10 @@ GG.att_ReloadChange = {}
 GG.att_MoveChange = {}
 GG.att_RangeChange = {}
 GG.att_JumpRangeChange = {}
+GG.att_DeathExplodeMult = {}
 GG.att_ProjSpeed = {}
 GG.att_ProjMult = {}
+GG.att_DamageMult = {}
 GG.att_RegenChange = {}
 GG.att_ShieldRegenChange = {}
 GG.att_ShieldMaxMult = {}
@@ -227,7 +231,7 @@ local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, projSpeedFactor, projectilesFactor, minSpray, gameFrame)
+local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, projSpeedFactor, projectilesFactor, damageFactor, minSpray, gameFrame)
 	if not origUnitWeapons[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 	
@@ -248,7 +252,17 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				oldReloadFrames = floor(reload*Game.gameSpeed),
 				range = wd.range,
 				sprayAngle = wd.sprayAngle,
+				damages = GG.ATT_ENABLE_DAMAGE and {},
 			}
+			if GG.ATT_ENABLE_DAMAGE then
+				local did = 0
+				local data = state.weapon[i].damages
+				while wd.damages[did] do
+					data[did] = wd.damages[did]
+					did = did + 1
+				end
+			end
+			
 			if wd.type == "LaserCannon" or wd.type == "Cannon" then
 				-- Barely works for missiles, and might break their burnblow and prediction
 				state.weapon[i].projectileSpeed = wd.projectilespeed
@@ -258,7 +272,9 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				state.weapon[i].burstRate = false
 			end
 		end
-		
+	end
+	if damageFactor ~= 1 and not GG.ATT_ENABLE_DAMAGE then
+		Spring.Utilities.UnitEcho(unitID, "damage attribute requires GG.ATT_ENABLE_DAMAGE")
 	end
 	
 	local state = origUnitWeapons[unitDefID]
@@ -268,7 +284,8 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 		local w = state.weapon[i]
 		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
 		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
-		if speedFactor <= 0 then
+		local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
+		if moddedSpeed <= 0 then
 			if not unitReloadPaused[unitID] then
 				local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
 				unitReloadPaused[unitID] = unitDefID
@@ -286,7 +303,6 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 				unitReloadPaused[unitID] = nil
 				spSetUnitRulesParam(unitID, "reloadPaused", 0, INLOS_ACCESS)
 			end
-			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
 			local newReload = w.reload/moddedSpeed
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 			-- Add HALF_FRAME to round reloadTime to the closest discrete frame (multiple of 1/30), since the the engine rounds DOWN
@@ -312,6 +328,16 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
 		if maxRangeModified < moddedRange then
 			maxRangeModified = moddedRange
+		end
+		if GG.ATT_ENABLE_DAMAGE then
+			local did = 0
+			local data = state.weapon[i].damages
+			local toSet = {}
+			while data[did] do
+				toSet[did] = data[did] * damageFactor
+				did = did + 1
+			end
+			spSetUnitWeaponDamages(unitID, i, toSet)
 		end
 	end
 	
@@ -435,6 +461,44 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Death Explosion Handling
+
+local explosionDefID = {}
+local explosionRadius = {}
+local function AddExplosions(unitID, unitDefID, teamID, expMult)
+	if expMult <= 1 then -- Unsupported
+		return
+	end
+	local extraExplosions = math.max(1, math.floor(expMult - 0.5))
+	local explosionDamageMult = extraExplosions / (expMult - 1)
+	if not explosionDefID[unitDefID] then
+		local wd = WeaponDefNames[UnitDefs[unitDefID].deathExplosion]
+		explosionDefID[unitDefID] = wd.id
+		explosionRadius[unitDefID] = wd.damageAreaOfEffect or 0
+	end
+	local _, _, _, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
+	local projectileParams = {
+		pos = {ux, uy, uz},
+		["end"] = {ux, uy - 1, uz},
+		owner = unitID,
+		team = teamID,
+		ttl = 0,
+	}
+	local expLevel = 1 + math.log(expMult) / math.log(2)
+	local radius = (5 + 15*expLevel)*(50 + math.pow(explosionRadius[unitDefID], 0.8))/100
+	for i = 1, extraExplosions do
+		local rand = Vector.RandomPointInCircle(radius)
+		projectileParams.pos[1] = ux + rand[1]
+		projectileParams.pos[3] = uz + rand[2]
+		local proID = Spring.SpawnProjectile(explosionDefID[unitDefID], projectileParams)
+		-- TODO: Handle explosionDamageMult ~= 1 with SetProjectileDamages
+		if proID then
+			Spring.SetProjectileCollision(proID)
+		end
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -460,6 +524,7 @@ local currentEnergy = {}
 local currentBuildpower = {}
 local currentCost = {}
 local currentProjectiles = {}
+local currentDamage = {}
 local currentMinSpray = {}
 local currentShieldDisabled = {}
 local currentAbilityDisabled = {}
@@ -488,6 +553,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	currentBuildpower[unitID] = nil
 	currentCost[unitID] = nil
 	currentProjectiles[unitID] = nil
+	currentDamage[unitID] = nil
 	currentMinSpray[unitID] = nil
 	currentShieldDisabled[unitID] = nil
 	currentAbilityDisabled[unitID] = nil
@@ -498,6 +564,7 @@ local function CleanupAttributeDataForUnit(unitID)
 	currentSetJammer[unitID] = nil
 	currentSetSight[unitID] = nil
 	
+	GG.att_LastChangeFrame[unitID] = nil
 	GG.att_CostMult[unitID] = nil
 	GG.att_HealthMult[unitID] = nil
 	GG.att_EconomyChange[unitID] = nil
@@ -505,8 +572,10 @@ local function CleanupAttributeDataForUnit(unitID)
 	GG.att_MoveChange[unitID] = nil
 	GG.att_RangeChange[unitID] = nil
 	GG.att_JumpRangeChange[unitID] = nil
+	GG.att_DeathExplodeMult[unitID] = nil
 	GG.att_ProjSpeed[unitID] = nil
 	GG.att_ProjMult[unitID] = nil
+	GG.att_DamageMult[unitID] = nil
 	GG.att_RegenChange[unitID] = nil
 	GG.att_ShieldRegenChange[unitID] = nil
 	GG.att_StaticBuildRateMult[unitID] = nil
@@ -524,6 +593,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	local frame = spGetGameFrame()
+	GG.att_LastChangeFrame[unitID] = frame
 	
 	local healthAdd = 0
 	local healthMult = 1
@@ -533,6 +603,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local reloadMult = 1
 	local rangeMult = 1
 	local jumpRangeMult = 1
+	local deathExplodeMult = 1
 	local projSpeedMult = 1
 	local econMult = 1
 	local massMult = 1
@@ -544,6 +615,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local buildMult = 1
 	local senseMult = 1
 	local projectilesMult = 1
+	local damageMult = 1
 	local minSpray = 0
 	local abilityDisabled = false
 	local shieldDisabled = false
@@ -558,6 +630,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local staticEnergyMult = 1
 	local staticShieldRegen = 1
 	local staticHealthRegen = 1
+	local staticMoveMult = 1
 	
 	local hasAttributes = false
 	for _, data in IterableMap.Iterator(attTypeMap) do
@@ -574,6 +647,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 			turnMult = turnMult*(data.turn and data.turn[unitID] or (data.move and data.move[unitID]) or 1)
 			accelMult = accelMult*(data.accel and data.accel[unitID] or (data.move and data.move[unitID]) or 1)
 			jumpRangeMult = jumpRangeMult*(data.jumpRange and data.jumpRange[unitID] or 1)
+			deathExplodeMult = deathExplodeMult*(data.deathExplode and data.deathExplode[unitID] or 1)
 			
 			shieldRegen = shieldRegen*(data.shieldRegen and data.shieldRegen[unitID] or 1)
 			shieldMaxMult = shieldMaxMult*(data.shieldMax and data.shieldMax[unitID] or 1)
@@ -597,6 +671,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 				staticEnergyMult = staticEnergyMult*(data.econ and data.econ[unitID] or 1)*(data.energy and data.energy[unitID] or 1)
 				staticShieldRegen = staticShieldRegen*(data.shieldRegen and data.shieldRegen[unitID] or 1)
 				staticHealthRegen = staticHealthRegen*(data.healthRegen and data.healthRegen[unitID] or 1)
+				staticMoveMult = staticMoveMult*(data.move and data.move[unitID] or 1)
 			end
 			
 			if data.weaponNum and data.weaponNum[unitID] then
@@ -607,17 +682,20 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 					rangeMult = 1,
 					projSpeedMult = 1,
 					projectilesMult = 1,
+					damageMult = 1,
 				}
 				local wepData = weaponSpecificMods[weaponNum]
 				wepData.reloadMult = wepData.reloadMult*(data.reload and data.reload[unitID] or 1)
 				wepData.rangeMult = wepData.rangeMult*(data.range and data.range[unitID] or 1)
 				wepData.projSpeedMult = wepData.projSpeedMult*(data.projSpeed and data.projSpeed[unitID] or 1)
 				wepData.projectilesMult = wepData.projectilesMult*(data.projectiles and data.projectiles[unitID] or 1)
+				wepData.damageMult = wepData.damageMult*(data.damage and data.damage[unitID] or 1)
 			else
 				reloadMult = reloadMult*(data.reload and data.reload[unitID] or 1)
 				rangeMult = rangeMult*(data.range and data.range[unitID] or 1)
 				projSpeedMult = projSpeedMult*(data.projSpeed and data.projSpeed[unitID] or 1)
 				projectilesMult = projectilesMult*(data.projectiles and data.projectiles[unitID] or 1)
+				damageMult = damageMult*(data.damage and data.damage[unitID] or 1)
 			end
 		end
 	end
@@ -628,8 +706,12 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "costMult", costMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "projectilesMult", projectilesMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "projectileSpeedMult", projSpeedMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "damageMult", damageMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "rangeMult", rangeMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "senseMult", senseMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "jumpRangeMult", jumpRangeMult, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "deathExplodeMult", deathExplodeMult, INLOS_ACCESS)
 	
 	spSetUnitRulesParam(unitID, "totalStaticBuildpowerMult", staticBuildpowerMult, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalStaticMetalMult", staticMetalMult, INLOS_ACCESS)
@@ -638,6 +720,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	
 	spSetUnitRulesParam(unitID, "totalStaticShieldRegen", staticShieldRegen, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "totalStaticHealthRegen", staticHealthRegen, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "totalStaticMoveSpeedChange", staticMoveMult, INLOS_ACCESS)
 	
 	-- GG is faster (but gadget-only).
 	GG.att_CostMult[unitID] = costMult
@@ -647,12 +730,14 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	GG.att_MoveChange[unitID] = moveMult
 	GG.att_RangeChange[unitID] = rangeMult
 	GG.att_JumpRangeChange[unitID] = jumpRangeMult
+	GG.att_DeathExplodeMult[unitID] = deathExplodeMult
 	GG.att_RegenChange[unitID] = healthRegen
 	GG.att_ShieldRegenChange[unitID] = shieldRegen
 	GG.att_ShieldMaxMult[unitID] = shieldMaxMult
 	GG.att_StaticBuildRateMult[unitID] = staticBuildpowerMult
 	GG.att_ProjSpeed[unitID] = projSpeedMult -- Ignores weapon mods
 	GG.att_ProjMult[unitID] = projectilesMult
+	GG.att_DamageMult[unitID] = damageMult
 	
 	unitSlowed[unitID] = moveMult < 1
 	
@@ -662,6 +747,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local weaponChanges = (currentReload[unitID] or 1) ~= reloadMult
 		or (currentRange[unitID] or 1) ~= rangeMult
 		or (currentProjectiles[unitID] or 1) ~= projectilesMult
+		or (currentDamage[unitID] or 1) ~= damageMult
 		or (currentMinSpray[unitID] or 0) ~= minSpray
 	
 	local moveChanges = (currentMove[unitID] or 1) ~= moveMult
@@ -692,11 +778,12 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	if weaponSpecificMods or weaponChanges then
-		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, projSpeedMult, projectilesMult, minSpray, frame)
+		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, projSpeedMult, projectilesMult, damageMult, minSpray, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
 		currentProjSpeed[unitID] = projSpeedMult
 		currentProjectiles[unitID] = projectilesMult
+		currentDamage[unitID] = damageMult
 		currentMinSpray[unitID] = minSpray
 	end
 	
@@ -758,6 +845,7 @@ local attributeNames = {
 	"reload",
 	"range",
 	"jumpRange",
+	"deathExplode",
 	"projSpeed",
 	"econ",
 	"energy",
@@ -772,6 +860,7 @@ local attributeNames = {
 	"setJammer",
 	"setSight",
 	"projectiles",
+	"damage", -- Enabled by setting GG.ATT_ENABLE_DAMAGE = true
 	"weaponNum",
 	"minSpray",
 	"abilityDisabled",
@@ -875,7 +964,10 @@ function gadget:GameFrame(f)
 	end
 end
 
-function gadget:UnitDestroyed(unitID)
+function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	if (GG.att_DeathExplodeMult[unitID] or 1) ~= 1 then
+		AddExplosions(unitID, unitDefID, teamID, GG.att_DeathExplodeMult[unitID])
+	end
 	Attributes.RemoveUnit(unitID)
 end
 

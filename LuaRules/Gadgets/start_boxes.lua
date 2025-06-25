@@ -353,6 +353,10 @@ local function GetTeamNames (allyTeamID)
 end
 
 function gadget:Initialize()
+	if GG.MOD_MISSION then
+		gadgetHandler:RemoveGadget()
+		return
+	end
 	if shuffleMode == "auto" then
 		if Spring.Utilities.GetTeamCount() > 2 then
 			shuffleMode = "shuffle"

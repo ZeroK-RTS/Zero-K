@@ -54,6 +54,7 @@ local final_opacity = 0
 local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
 local default_fog_brightness = 0.5
 
+local widgetsWantVisibleMinimap = true
 local tabbedMode = false
 
 local usingNewEngine = (#{Spring.GetLosViewColors()} == 5) -- newer engine has radar2
@@ -81,6 +82,7 @@ function WG.game_SetLosFogBrightnessMaximum(newMax)
 	fogBrightnessMin = 0
 	fogBrightnessMax = newMax
 end
+
 
 local function toggleTeamColors()
 	if WG.LocalColor and WG.LocalColor.localTeamColorToggle then
@@ -122,6 +124,14 @@ local function AdjustMapAspectRatioToWindow(x,y,w,h)
 end
 
 local function MakeMinimapWindow()
+end
+
+function WG.SetMinimapVisibility(newVisible)
+	if newVisible == widgetsWantVisibleMinimap then
+		return
+	end
+	widgetsWantVisibleMinimap = newVisible
+	MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Map'
@@ -818,7 +828,7 @@ MakeMinimapWindow = function()
 		window:Dispose()
 	end
 	
-	if options.disableMinimap.value then
+	if options.disableMinimap.value or not widgetsWantVisibleMinimap then
 		return
 	end
 	
@@ -1186,7 +1196,7 @@ local function DrawMiniMap()
 end
 
 function widget:DrawScreen()
-	if (options.disableMinimap.value or window.hidden or cs.name == "ov") then
+	if (options.disableMinimap.value or window.hidden or cs.name == "ov" or not widgetsWantVisibleMinimap) then
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0

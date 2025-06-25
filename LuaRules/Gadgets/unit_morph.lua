@@ -206,7 +206,7 @@ local function ReAssignAssists(newUnit,oldUnit)
 			GG.SetUnitTarget(unitID, newUnit)
 		end
 		
-		local cmds = Spring.GetCommandQueue(unitID, -1)
+		local cmds = Spring.GetUnitCommands(unitID, -1)
 		for j = 1, #cmds do
 			local cmd = cmds[j]
 			local params = cmd.params
@@ -422,7 +422,7 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitRulesParam(unitID, "facplop", 0, {inlos = true})
 	end
 	--//copy command queue
-	local cmds = Spring.GetCommandQueue(unitID, -1)
+	local cmds = Spring.GetUnitCommands(unitID, -1)
 
 	local states = Spring.GetUnitStates(unitID) -- This can be left in table-state mode until REVERSE_COMPAT is not an issue.
 	states.retreat = Spring.GetUnitRulesParam(unitID, "retreatState") or 0

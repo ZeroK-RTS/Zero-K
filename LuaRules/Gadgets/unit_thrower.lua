@@ -42,7 +42,7 @@ local unitIsNotBlocking = {}
 
 local cachedAttackCommandDesc = false
 
-local _, _, _, overkillPreventionDefault = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local _, _, _, overkillPreventionDefault, OVERKILL_STATES = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Single target with Hold Fire", "Prevent Overkill"}
 }
 
 local recentlyLobbedLobsters = {}
@@ -261,8 +261,8 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	local maxRange = GetEffectiveWeaponRange(data.unitDefID, -ody, data.weaponNum)
 	local rangeMult = (GG.att_RangeChange[proOwnerID] or 1)
 	local flyTimeMult = math.sqrt(rangeMult)
-	maxRange = maxRange * rangeMult
 	if maxRange and fireDistance > maxRange*1.05 then
+		maxRange = maxRange * rangeMult
 		maxRange = maxRange*1.05
 		odx = odx*maxRange/fireDistance
 		odz = odz*maxRange/fireDistance
@@ -394,7 +394,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	end
 	local state = cmdParams[1]
 	if cmdOptions and cmdOptions.right then
-		state = (state - 2)%4
+		state = (state - 2)%(OVERKILL_STATES + 1)
 	end
 	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 	

@@ -6,6 +6,11 @@ local RET_ZERO   = function() return 0 end
 local RET_ONE    = function() return 1 end
 local RET_STRING = function() return "" end
 
+Spring = Recoil or Spring
+
+Engine = Engine or {}
+Engine.FeatureSupport = Engine.FeatureSupport or {}
+
 if not Script then
 	Script = { IsEngineMinVersion = RET_FALSE }
 elseif not Script.IsEngineMinVersion(1, 0, 0) then
@@ -35,6 +40,12 @@ end
 
 Game = Game or {} -- 104-331 for defs; still missing from some like modrules
 Game.gameSpeed = Game.gameSpeed or 30 -- 104-331
+
+if not Spring.Ping then -- 104-381
+	Spring.Ping = function (tag)
+		Spring.SendCommands("/netping " .. (tag or 0))
+	end
+end
 
 if not Script.IsEngineMinVersion(104, 0, 503) then
 	local tableCache = {123}
@@ -115,8 +126,24 @@ if not Spring.GetTidal then -- 104-804
 	end
 end
 
+if not Spring.GetMapStartPositions then -- 104-823
+	Spring.GetMapStartPositions = RET_TABLE -- { [n] = {x, y, z} }
+end
+
+if not Spring.GarbageCollectCtrl then -- 104-909
+	Spring.GarbageCollectCtrl = RET_NONE
+end
+
 if not Spring.PreloadSoundItem then -- 104-994
 	Spring.PreloadSoundItem = RET_FALSE
+end
+
+if not Spring.GetCEGID then -- 104-1030
+	Spring.GetCEGID = RET_ONE -- 0 is SEG, 1+ are CEG
+end
+
+if SFX then -- 104-1031
+	SFX.GLOBAL = SFX.GLOBAL or 16384
 end
 
 if not Script.IsEngineMinVersion(104, 0, 1100) then
@@ -126,12 +153,12 @@ if not Script.IsEngineMinVersion(104, 0, 1100) then
 end
 
 if not Script.IsEngineMinVersion(104, 0, 1143) then
-	local spGetCommandQueue = Spring.GetCommandQueue
+	local spGetUnitCommands = Spring.GetUnitCommands
 	local unpacc = unpack
 	Spring.GetUnitCurrentCommand = function (unitID, index)
 		index = index or 1
 
-		local queue = spGetCommandQueue(unitID, index)
+		local queue = spGetUnitCommands(unitID, index)
 		if not queue then
 			return
 		end
@@ -153,8 +180,63 @@ if Script.IsEngineMinVersion(104, 0, 1166) then
 	end
 end
 
+if Script.GetSynced() and not Spring.SetUnitUseAirLos then -- 104-1194
+	Spring.SetUnitUseAirLos        = RET_NONE
+	Spring.SetFeatureUseAirLos     = RET_NONE
+	Spring.SetProjectileUseAirLos  = RET_NONE
+end
+
+if Script.GetSynced() and not Spring.SetUnitPieceVisible then -- 104-1196
+	Spring.SetUnitPieceVisible    = RET_NONE
+	Spring.SetFeaturePieceVisible = RET_NONE
+end
+
+if Script.GetSynced() and not Spring.UnitFinishCommand then -- 104-1254
+	Spring.UnitFinishCommand = function (unitID)
+		local cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
+		if not cmdTag then
+			return
+		end
+
+		if cmdID == CMD.ATTACK then
+			Spring.SetUnitTarget(unitID, nil)
+		end
+
+		Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
+	end
+end
+
+if not Script.GetSynced() and not Spring.GetGameState then -- 104-1345
+	Spring.GetGameState = function()
+		return true, false, false, false
+	end
+end
+
+if not Spring.ClosestBuildPos then -- 104-1401
+	Spring.ClosestBuildPos = function(_, _, x, y, z)
+		return x, y, z
+	end
+end
+
 if not math.tau then -- 104-1421 AFAICT
 	math.tau = 2 * math.pi
+end
+
+if Script.GetSynced() and not Spring.SetUnitUseWeapons then -- 104-1439
+	Spring.SetUnitUseWeapons = RET_NONE
+end
+
+if not Spring.SetNanoProjectileParams then -- 104-1978
+	Spring.SetNanoProjectileParams = RET_NONE
+
+	if not Script.GetSynced() then
+		Spring.GetNanoProjectileParams = function()
+			return 0, 0, 0
+		end
+	end
+
+	-- also added some entries in `WeaponDefs[x].visuals`:
+	-- castShadow, smokePeriod, smokeTime, smokeSize, smokeColor, smokeTrailCastShadow
 end
 
 if not Spring.SetUnitBuildParams and Script.GetSynced() then -- BAR 105-552
@@ -171,8 +253,22 @@ if not Spring.GetUnitBuildParams then -- BAR 105-552
 	end
 end
 
+if not Spring.SetUnitAlwaysUpdateMatrix then -- BAR 105-571
+	Spring.SetUnitAlwaysUpdateMatrix    = RET_FALSE
+	Spring.SetFeatureAlwaysUpdateMatrix = RET_FALSE
+	if not Script.GetSynced() then
+		Spring.GetUnitAlwaysUpdateMatrix    = RET_NONE
+		Spring.GetFeatureAlwaysUpdateMatrix = RET_NONE
+	end
+end
+
 if not Spring.GetUnitsInScreenRectangle and not Script.GetSynced() then -- BAR 105-637
 	Spring.GetUnitsInScreenRectangle = RET_TABLE
+end
+
+if not Script.GetSynced() and not Spring.GetRenderUnits then -- BAR 105-662
+	Spring.GetRenderUnits    = RET_TABLE
+	Spring.GetRenderFeatures = RET_TABLE
 end
 
 if not Spring.SetUnitNoEngineDraw then -- BAR 105-653
@@ -182,6 +278,20 @@ end
 if not Spring.GetUnitNoEngineDraw and not Script.GetSynced() then -- BAR 105-653
 	Spring.GetUnitNoEngineDraw    = RET_FALSE
 	Spring.GetFeatureNoEngineDraw = RET_FALSE
+end
+
+if not Spring.SetUnitEngineDrawMask then -- BAR 105-662
+	Spring.SetUnitEngineDrawMask    = RET_NONE
+	Spring.SetFeatureEngineDrawMask = RET_NONE
+	if not Script.GetSynced() then
+		local RET_FULL_8_BIT_MASK = function() return 255 end
+		Spring.GetUnitEngineDrawMask    = RET_FULL_8_BIT_MASK
+		Spring.GetFeatureEngineDrawMask = RET_FULL_8_BIT_MASK
+
+		local RET_OPAQUE_FLAGS = function() return 1 + 16 end -- opaque + casts shadows
+		Spring.GetUnitDrawFlag    = RET_OPAQUE_FLAGS
+		Spring.GetFeatureDrawFlag = RET_OPAQUE_FLAGS
+	end
 end
 
 if not Spring.GetUnitInBuildStance then -- BAR 105-665
@@ -207,6 +317,17 @@ if not Spring.UnitIconGetDraw and not Script.GetSynced() then -- BAR 105-800
 end
 if not Spring.UnitIconSetDraw then -- BAR 105-800
 	Spring.UnitIconSetDraw = RET_NONE
+end
+
+if not Script.GetSynced() and not Spring.GetRenderUnitsDrawFlagChanged then -- BAR 105-906
+	local RET_TWO_TABLES = function() return {}, {} end
+	Spring.GetRenderUnitsDrawFlagChanged = RET_TWO_TABLES
+	Spring.GetRenderFeaturesDrawFlagChanged = RET_TWO_TABLES
+end
+
+if not Spring.ClearUnitsPreviousDrawFlag then -- BAR 105-909 in UnsyncedRead
+	Spring.ClearUnitsPreviousDrawFlag = RET_NONE
+	Spring.ClearFeaturesPreviousDrawFlag = RET_NONE
 end
 
 if not Spring.GetTimerMicros and not Script.GetSynced() then -- BAR 105-916
@@ -304,6 +425,21 @@ if not Spring.GetProjectileAllyTeamID then -- BAR 105-1300
 	end
 end
 
+if not Spring.GetModelPieceList then -- BAR 105-1400
+	-- perhaps these should be { [1] = "base" } since that works for like 80% of models?
+	-- but then would break worse when it does
+	Spring.GetModelPieceList = RET_TABLE
+	Spring.GetModelPieceMap  = RET_TABLE
+end
+
+if not Script.GetSynced() and not Spring.Yield then -- BAR 105-1420
+	Spring.Yield = RET_FALSE
+end
+
+if not Script.GetSynced() and not Spring.GetDrawSeconds then -- BAR 105-1469
+	Spring.GetDrawSeconds = Spring.GetGameSeconds
+end
+
 if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
 	local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 	local staticTable = {123}
@@ -314,6 +450,19 @@ if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
 end
 
 Game.metalMapSquareSize = Game.metalMapSquareSize or 16 -- BAR 105-1505
+
+if not tracy then -- BAR 105-1602
+	tracy = {
+		ZoneBegin   = RET_NONE,
+		ZoneBeginN  = RET_NONE,
+		ZoneBeginS  = RET_NONE,
+		ZoneBeginNS = RET_NONE,
+		ZoneEnd     = RET_NONE,
+		ZoneText    = RET_NONE,
+		ZoneName    = RET_NONE,
+		Message     = RET_NONE,
+	}
+end
 
 if not Spring.SetUnitHeadingAndUpDir and Script.GetSynced() then -- BAR 105-1611
 	Spring.SetUnitHeadingAndUpDir    = RET_NONE
@@ -483,19 +632,39 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 	end
 end
 
+if not Script.IsEngineMinVersion(105, 0, 1856) then
+	local knownBoolsT = {}
+	local originalSTRP = Spring.SetTeamRulesParam
+	local originalGTRP = Spring.GetTeamRulesParam
+	Spring.SetTeamRulesParam = function(teamID, name, value, visibility)
+		if type(value) == "boolean" then
+			knownBoolsT[name] = true
+			return originalSTRP(teamID, name, value and "1" or "0", visibility)
+		end
+		return originalSTRP(teamID, name, value, visibility)
+	end
+	Spring.GetTeamRulesParam = function(teamID, name)
+		if knownBoolsT[name] then
+			return (originalGTRP(teamID, name) == "1")
+		end
+		return originalGTRP(teamID, name)
+	end
+	-- TODO: boolean game/unit/player rules params
+end
+
 if not Script.IsEngineMinVersion(105, 0, 1873) then
 	local vfsDirList = VFS.DirList
 	local vfsSubDirs = VFS.SubDirs
 
-	local function recursiveSearch(results, dir, pattern, modes)
-		local files = vfsDirList(dir, pattern, modes)
+	local function recursiveSearch(searchFunc, results, dir, pattern, modes)
+		local files = searchFunc(dir, pattern, modes)
 		for i = 1, #files do
 			results[#results + 1] = files[i]
 		end
 
 		local subfolders = vfsSubDirs(dir, "*", modes)
 		for i = 1, #subfolders do
-			recursiveSearch(results, subfolders[i], pattern, modes)
+			recursiveSearch(searchFunc, results, subfolders[i], pattern, modes)
 		end
 	end
 
@@ -504,7 +673,17 @@ if not Script.IsEngineMinVersion(105, 0, 1873) then
 			return vfsDirList(dir, pattern, modes)
 		else
 			local results = {}
-			recursiveSearch(results, dir, pattern, modes)
+			recursiveSearch(vfsDirList, results, dir, pattern, modes)
+			return results
+		end
+	end
+
+	VFS.SubDirs = function(dir, pattern, modes, recursive)
+		if not recursive then
+			return vfsSubDirs(dir, pattern, modes)
+		else
+			local results = {}
+			recursiveSearch(vfsSubDirs, results, dir, pattern, modes)
 			return results
 		end
 	end
@@ -604,6 +783,81 @@ if not Script.IsEngineMinVersion(105, 0, 2346) and not Script.GetSynced() then
 	Spring.GetGameSecondsInterpolated = function()
 		return (spGetFrameTimeOffset() + spGetGameFrame()) / gameSpeed
 	end
+end
+
+if not math.normalize then -- BAR 105-2611
+	math.normalize = function (...)
+		local args = {...}
+		local sum = 0
+		for i = 1, #args do
+			sum = sum + args[i]^2
+		end
+
+		local ret = {}
+		if sum < 0.000001 then
+			for i = 1, #args do
+				ret[i] = 0
+			end
+		else
+			local len = math.sqrt(sum)
+			for i = 1, #args do
+				ret[i] = args[i] / len
+			end
+		end
+
+		return ret
+	end
+end
+
+if not Spring.ForceUnitCollisionUpdate then -- BAR 105-2622
+	Spring.ForceUnitCollisionUpdate = function (unitID)
+		if not unitID or Spring.MoveCtrl.GetTag(unitID) then
+			return
+		end
+		local bx, by, bz = Spring.GetUnitPosition(unitID)
+		if bx then
+			local height = Spring.GetGroundHeight(bx, bz)
+			if math.abs(height - by) < 0.01 then
+				Spring.SetUnitPosition(unitID, bx, bz)
+			elseif by < 0.1 and by > -0.01 then
+				Spring.SetUnitPosition(unitID, bx, bz, true)
+			end
+		end
+	end
+end
+
+if not Spring.SetUnitIconDraw then -- BAR 105-2715
+	Spring.SetUnitIconDraw = function (unitID, enabled)
+		return Spring.UnitIconSetDraw(unitID, enabled)
+	end
+end
+
+if not Engine.FeatureSupport.NegativeGetUnitCurrentCommand then -- BAR 105-2716
+	local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+	Spring.GetUnitCurrentCommand = function (unitID, n)
+		if n and (n < 0) then
+			 local count = Spring.GetUnitCommandCount(unitID)
+			 n = count - n
+		end
+		return spGetUnitCurrentCommand(unitID, n)
+	end
+end
+
+if not Spring.GetUnitCommandCount then -- BAR 105-2720
+	local spGetUnitCommands = Spring.GetUnitCommands
+	Spring.GetUnitCommandCount = function (unitID)
+		return spGetUnitCommands(unitID, 0)
+	end
+end
+
+if not Spring.SetMiniMapRotation then -- 2025.03
+	Spring.SetMiniMapRotation = RET_NONE
+end
+
+if gl and not gl.ObjectLabel then -- 2025.03, but can be nil anyway due to missing driver support
+	gl.ObjectLabel    = RET_NONE
+	gl.PushDebugGroup = RET_NONE
+	gl.PopDebugGroup  = RET_NONE
 end
 
 if true then -- No engine has this yet

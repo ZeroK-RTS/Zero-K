@@ -237,7 +237,7 @@ local function MotionControl()
 	--	Spring.Echo("Weapon reload time", i, reloadTime)
 	--end
 
-	local moving, aiming
+	local moving, aiming, zeroSpeedCount
 	local justmoved = true
 	local legParity = math.random() > 0.5
 	while true do
@@ -251,6 +251,16 @@ local function MotionControl()
 			end
 			legParity = not legParity
 			justmoved = true
+			
+			local _,_,_, speed = Spring.GetUnitVelocity(unitID)
+			if speed == 0 then
+				zeroSpeedCount = zeroSpeedCount + 1
+				if zeroSpeedCount > 2 then
+					bMoving = false
+				end
+			else
+				zeroSpeedCount = 0
+			end
 		else
 			if justmoved then
 				Turn(rupleg, x_axis, 0, math.rad(200.071429) * sizeSpeedMult)
@@ -268,6 +278,7 @@ local function MotionControl()
 				justmoved = false
 			end
 			Sleep(100)
+			zeroSpeedCount = 0
 		end
 	end
 end

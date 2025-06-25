@@ -77,6 +77,7 @@ return { tankheavyarty = {
       areaOfEffect            = 140,
       avoidFeature            = false,
       avoidGround             = false,
+      cegTag                  = [[tremor_arty_trail]],
       craterAreaOfEffect      = 5,
       craterBoost             = 0,
       craterMult              = 0,

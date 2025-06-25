@@ -27,6 +27,8 @@ local isGuardCommand = {
 	[SUC.AREA_GUARD] = true,
 }
 
+local rearmUnitDef = {}
+
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
 
@@ -53,8 +55,10 @@ local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/sel
 --------------------------------------------------------------------------------
 -- Epic Menu Options
 
+local shiftFlattenRank = 0
 local ctrlFlattenRank = 1
 local altFilterHighRank = 2
+local metaFlattenRank = 3
 local doubleClickFlattenRank = 1
 local controlGroupFlattenRank = 1
 local retreatOverride = true
@@ -69,55 +73,83 @@ local function StartRetreat(unitID)
 	end
 end
 
-options_path = 'Settings/Interface/Selection/Filtering'
+options_path = 'Settings/Interface/Selection Filtering'
 local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = {
 	'label_selection_rank',
-	'useSelectionFilteringOption',
+	'shiftFlattenRankOption',
 	'ctrlFlattenRankOption',
+	'metaFlattenRankOption',
 	'selectionFilteringOnlyAltOption',
 	'altBlocksHighRankSelection',
 	'doubleClickFlattenRankOption',
 	'controlGroupFlattenRank',
 	'guardRankOverrideOption',
+	'rearmingOverrideRank',
 	'retreatOverrideOption',
 	'retreatingRankOption',
-	'retreatDeselects'
+	'retreatDeselects',
+	'useSelectionFilteringOption',
 }
 
 options = {
 	label_selection_rank = {
 		type = 'text',
-		name = 'Selection Rank Filtering',
-		value = [[Units have a toggleable selection rank on the right side of their command card (the circle with numbers 0-3).
- - Normal selection only selects the boxed units with the highest rank.
- - Shift ignores rank.
+		name = 'Selection Filtering',
+		value = [[Default filtering is:
+ - Unmodified selection only selects the boxed units with the highest rank.
+ - Shift allows selection of mixed ranks.
  - Combat units default to rank 3.
  - Constructors default to rank 2.
  - Structures default to rank 1.
- - Rank 0 intended for manual use to make a unit hard to accidentally select.
- - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.]],
+ - Change rank mid game by toggling the state on the the command card (circle with the number top right).
+ - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.
+The modifiers can be configured below.
+ ]],
 	},
 	useSelectionFilteringOption = {
 		name = "Enable selection filtering",
 		type = "bool",
 		value = true,
-		noHotkey = true,
 		desc = "Enables selection rank, which filters constructors from combat units by default.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
+		end
+	},
+	shiftFlattenRankOption = {
+		name = 'Hold Shift to ignore rank difference above:',
+		desc = "Set to 0 to have shift ignore rank. Set to 3 to have shift have no effect on rank.",
+		type = 'number',
+		value = shiftFlattenRank,
+		min = 0, max = 3, step = 1,
+		noHotkey = true,
+		tooltip_format = "%.0f",
+		OnChange = function (self)
+			shiftFlattenRank = self.value
 		end
 	},
 	ctrlFlattenRankOption = {
 		name = 'Hold Ctrl to ignore rank difference above:',
 		desc = "Useful so that global selection hotkeys (such as Ctrl+Z) can expand upon a mixed selection.",
 		type = 'number',
-		value = 1,
+		value = ctrlFlattenRank,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
 		tooltip_format = "%.0f",
 		OnChange = function (self)
 			ctrlFlattenRank = self.value
+		end
+	},
+	metaFlattenRankOption = {
+		name = 'Hold Space to ignore rank difference above:',
+		desc = "Set to 0 to have space ignore rank. Set to 3 to have space have no effect on rank.",
+		type = 'number',
+		value = metaFlattenRank,
+		min = 0, max = 3, step = 1,
+		noHotkey = true,
+		tooltip_format = "%.0f",
+		OnChange = function (self)
+			metaFlattenRank = self.value
 		end
 	},
 	selectionFilteringOnlyAltOption = {
@@ -134,7 +166,7 @@ options = {
 		name = 'Hold Alt to filter out ranks above:',
 		desc = "Useful for selecting low-rank units, such as constructors as they default to rank 2.",
 		type = 'number',
-		value = 2,
+		value = altFilterHighRank,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
 		tooltip_format = "%.0f",
@@ -146,7 +178,7 @@ options = {
 		name = 'Double click ignores rank difference above:',
 		desc = "Allows for double click selection of many units of the same type and differing selection rank.",
 		type = 'number',
-		value = 1,
+		value = doubleClickFlattenRank,
 		min = 0, max = 3, step = 1,
 		noHotkey = true,
 		tooltip_format = "%.0f",
@@ -168,6 +200,15 @@ options = {
 	guardRankOverrideOption = {
 		name = 'Guard rank reduction:',
 		desc = "Units currently executing the guard command are reduced to this selection rank, if higher.",
+		type = 'number',
+		value = 3,
+		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
+		noHotkey = true,
+	},
+	rearmingOverrideRank = {
+		name = 'Rearming rank reduction:',
+		desc = "Units currently rearming are reduced to this selection rank, if higher.",
 		type = 'number',
 		value = 3,
 		min = 0, max = 3, step = 1,
@@ -278,9 +319,6 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		return
 	end
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if shift then
-		return
-	end
 	
 	if selectionFilteringOnlyAlt and not alt then
 		return
@@ -314,9 +352,9 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 	local bestRank, bestUnits
 	for i = 1, #units do
 		local unitID = units[i]
+		local unitDefID = Spring.GetUnitDefID(unitID)
 		local rank = unitID and selectionRank[unitID]
 		if not rank then
-			local unitDefID = Spring.GetUnitDefID(unitID)
 			rank = unitDefID and defaultRank[unitDefID]
 		end
 		if retreatOverride and unitID and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and (rank > retreatingRank) then
@@ -335,11 +373,27 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 					rank = guardRankOverrideRank
 				end
 			end
+
+			if rearmUnitDef[unitDefID] then
+				local rearmingOverrideRank = options.rearmingOverrideRank.value
+				local reammoState = Spring.GetUnitRulesParam(unitID, "noammo") or 0
+				if (reammoState == 1 or reammoState == 2)
+					and rank > rearmingOverrideRank then
+					rank = rearmingOverrideRank
+				end
+			end
+
 			if (alt and rank > altFilterHighRank) then
 				rank = -1
 			end
 			if ctrl and rank > ctrlFlattenRank then
 				rank = ctrlFlattenRank
+			end
+			if shift and rank > shiftFlattenRank then
+				rank = shiftFlattenRank
+			end
+			if meta and rank > metaFlattenRank then
+				rank = metaFlattenRank
 			end
 			if doubleClickUnitDefID and rank > doubleClickFlattenRank then
 				rank = doubleClickFlattenRank
@@ -411,6 +465,12 @@ function widget:Initialize()
 
 	WG.SetSelectionRank = SetSelectionRank
 	WG.SelectionRank_GetFilteredSelection = GetFilteredSelection
+	for unitDefID = 1, #UnitDefs do
+		local ud = UnitDefs[unitDefID]
+		if ud.customParams.reammoseconds then
+			rearmUnitDef[unitDefID] = true
+		end
+	end
 end
 
 function widget:MousePress(x, y, button)

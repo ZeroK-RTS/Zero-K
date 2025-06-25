@@ -194,6 +194,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Line Formations']          = imgPath..'commands/bold/move.png',
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
+	['Settings/Interface/Selection Filtering']      = imgPath..'epicmenu/selection_rank.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
@@ -219,6 +220,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
 	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
 	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
+	['Settings/HUD Panels/Nuke Warning']            = imgPath..'nuke_button_48.png',
 	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
 	
 	['Settings/Spectating/Action Tracking Camera']  = imgPath..'epicmenu/video_camera.png',
@@ -371,19 +373,19 @@ local camerHotkeys = 'Hotkeys/Camera'
 
 local camerTypeZoom = 'Hotkeys/Camera/Camera Position Hotkeys'
 	ShButton(camerTypeZoom, 'Cycle through alerts', 'lastmsgpos') -- Does not allow camtime override
-	
-local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
-	AddOption(camerTypeHotkeys,
-	{
-		type='text',
-		name='Camera Modes',
-		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
-	})
-	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta')
-	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
-	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
-	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot')
-	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
+
+--local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
+--	AddOption(camerTypeHotkeys,
+--	{
+--		type='text',
+--		name='Camera Modes',
+--		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
+--	})
+--	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta')
+--	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
+--	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
+--	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot')
+--	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
 
 -- Control menu order
 ShLabel('Hotkeys/Commands', 'Command Categories')

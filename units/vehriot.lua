@@ -79,6 +79,7 @@ return { vehriot = {
       avoidFeature            = true,
       avoidFriendly           = true,
       burnblow                = true,
+      cegTag                  = [[riot_cannon_trail]],
       craterBoost             = 1,
       craterMult              = 0.5,
 
@@ -102,7 +103,7 @@ return { vehriot = {
       impulseFactor           = 0.6,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 280,
+      range                   = 290,
       reloadtime              = 1.7 + 2/30, -- don't forget to tweak the high-alpha threshold at the bottom of `LuaRules/Configs/target_priority_defs.lua`
       soundHit                = [[weapon/cannon/generic_cannon]],
       soundStart              = [[weapon/cannon/outlaw_gun]],
