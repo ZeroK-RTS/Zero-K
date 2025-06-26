@@ -21,6 +21,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local unitSpawnIndex = 0
 local spawnPos = {1300, 1700}
+local speedMode = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -324,6 +325,39 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Dev
+
+local function CheatAll()
+	if not Spring.IsCheatingEnabled() then
+		Spring.SendCommands{"cheat"}
+	end
+	Spring.SendCommands{"spectator"}
+	if not Spring.IsGodModeEnabled() then
+		Spring.SendCommands{"godmode"}
+	end
+end
+
+local function FullSpeed()
+	speedMode = not speedMode
+	if speedMode then
+		Spring.SendCommands{"setmaxspeed 100"}
+		Spring.SendCommands{"setminspeed 100"}
+	else
+		Spring.SendCommands{"setminspeed 1"}
+		Spring.SendCommands{"setmaxspeed 1"}
+		Spring.SendCommands{"setmaxspeed 100"}
+		Spring.SendCommands{"setminspeed 0.1"}
+	end
+end
+
+function widget:TextCommand(command)  
+	if command == "cheatall" then
+		CheatAll()
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function widget:Update(dt)
 	if recentlyExported then
@@ -352,6 +386,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Settings/Toolbox/Dev Commands'
+options_order = {'cheat', 'nocost', 'spectator', 'godmode', 'testunit', 'cheatall', 'fullspeed', 'luauireload', 'luarulesreload', 'debug', 'debugcolvol', 'debugpath', 'singlestep', 'spawn_next_unit', 'spawn_prev_unit', 'spawn_set_pos', 'printunits', 'printunitnames', 'echoCommand', 'missionexport', 'missionexportcommands', 'missionexportselectedcommands', 'exportallyteamcommands', 'missionexportfeatures', 'moveUnit', 'moveUnitSnap', 'moveUnitDelay', 'destroyUnit', 'RotateUnitLeft', 'RotateUnitRight'}
 options = {
 	cheat = {
 		name = "Cheat",
@@ -379,7 +414,17 @@ options = {
 	testunit = {
 		name = "Spawn Testunit",
 		type = 'button',
-		action = 'give testunit',
+		action = 'give empiricaldpser 1',
+	},
+	cheatall = {
+		name = "Full Cheat",
+		type = 'button',
+		OnChange = CheatAll,
+	},
+	fullspeed = {
+		name = "Full Speed",
+		type = 'button',
+		OnChange = FullSpeed,
 	},
 	
 	luauireload = {
