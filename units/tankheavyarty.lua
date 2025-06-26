@@ -110,6 +110,7 @@ return { tankheavyarty = {
       reloadtime              = 0.333,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/tremor_fire]],
+      soundStartVolume        = 7.5,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 420,

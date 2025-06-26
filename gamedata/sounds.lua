@@ -102,9 +102,17 @@ local Sounds = {
 			pitchmod = 0.1,
 			gainmod = 0.05,
 		},
-		SiloLaunch = {
+		SiloLaunchEmp = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
 			gain = 1.0,
+			pitch = 1.0,
+			priority = 1,
+			maxconcurrent = 30,
+			maxdist = nil,
+		},
+		SiloLaunch = {
+			file = "sounds/weapon/missile/tacnuke_launch.wav",
+			gain = 0.4,
 			pitch = 1.0,
 			priority = 1,
 			maxconcurrent = 30,
@@ -124,13 +132,26 @@ local Sounds = {
 		},
 		FirewalkerHit = {
 			file = "sounds/weapon/cannon/wolverine_hit.wav",
-			pitchmod = 0.03,
+			pitchmod = 0.008,
 		},
 		ex_med5_flat_pitch = {
 			file = "sounds/explosion/ex_med5.wav",
 			pitchmod = 0,
-		
-		}
+		},
+		heavy_laser3_flat_pitch = {
+			file = "sounds/weapon/laser/heavy_laser3.wav",
+			pitchmod = 0,
+		},
+		gravity_fire = {
+			file = "sounds/weapon/gravity_fire.wav",
+			gainmod = 0.8,
+			pitchmod = 0.01,
+		},
+		dgun_hit = {
+			file = "sounds/explosion/ex_med6.wav",
+			gainmod = 0.7,
+			pitchmod = 0,
+		},
 	},
 }
 
@@ -159,11 +180,16 @@ local lowPitchMod = {
 	"weapon/emg",
 	"explosion/burn_explode",
 	"weapon/bomb_drop_short",
-	"weapon/small_lightning",
+	"impacts/shotgun_impactv5",
+	"explosion/ex_large4",
+	"explosion/ex_large5",
+	"weapon/laser/mini_laser",
 }
 
 local lowestPitchMod = {
 	"weapon/laser/pulse_laser3",
+	"weapon/gauss_fire_short",
+	"weapon/missile/rapid_rocket_hit",
 }
 
 local noPitchMod = {
@@ -171,8 +197,11 @@ local noPitchMod = {
 	"weapon/missile/rapid_rocket_fire2",
 	"weapon/cannon/wolverine_fire",
 	"weapon/laser/pulse_laser2",
+	"weapon/shotgun_firev4",
+	"weapon/cannon/cannon_fire4",
+	"weapon/missile/rapid_rocket_fire",
+	"weapon/small_lightning",
 }
-
 
 for i = 1, #noPitchMod do 
 	optionOverrides[noPitchMod[i]] = {pitchmod = 0}

@@ -92,6 +92,7 @@ return { shiparty = {
       range                   = 1200,
       reloadtime              = 7.3,
       soundHit                = [[weapon/cannon/cannon_hit2]],
+      soundHitVolume          = 8.5,
       soundStart              = [[weapon/cannon/heavy_cannon]],
       turret                  = true,
       weaponType              = [[Cannon]],
