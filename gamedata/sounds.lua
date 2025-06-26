@@ -163,7 +163,7 @@ for i = 1, #lowPitchMod do
 end
 
 local defaultOpts = {
-	pitchmod = 0.05, --0.02,
+	pitchmod = 0.03, --0.02,
 	gainmod = 0,
 }
 local replyOpts = {
@@ -171,7 +171,7 @@ local replyOpts = {
 	gainmod = 0,
 }
 local explosionOpts = {
-	pitchmod = 0.08, --0.02,
+	pitchmod = 0.07, --0.02,
 	gainmod = 0,
 }
 
