@@ -113,6 +113,7 @@ return { cloaksnipe = {
       sizeDecay               = 0,
       soundHit                = [[weapon/laser/heavy_laser6]],
       soundStart              = [[weapon/gauss_fire]],
+      soundHitVolume          = 9,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 850,

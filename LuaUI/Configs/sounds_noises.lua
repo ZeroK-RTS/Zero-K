@@ -49,7 +49,7 @@ local volumeOverrides = {
 	
 	building_select1 = 0.8,
 	building_select2 = 0.58,
-	windmill = 0.48,
+	windmill = 0.52,
 	fusion_select = 0.37,
 	adv_fusion_select = 0.37,
 	geo_select = 0.43,

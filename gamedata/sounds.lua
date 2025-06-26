@@ -122,6 +122,10 @@ local Sounds = {
 			gainmod = 0,
 			pitch = 0.9,
 		},
+		FirewalkerHit = {
+			file = "sounds/weapon/cannon/wolverine_hit.wav",
+			pitchmod = 0.03,
+		},
 	},
 }
 
@@ -148,10 +152,13 @@ local optionOverrides = {
 
 local noPitchMod = {
 	"weapon/missile/missile_fire9_heavy",
+	"weapon/cannon/wolverine_fire",
 }
 
 local lowPitchMod = {
+	"weapon/heatray_fire",
 	"weapon/emg",
+	"explosion/burn_explode",
 }
 
 for i = 1, #noPitchMod do 
@@ -159,19 +166,19 @@ for i = 1, #noPitchMod do
 end
 
 for i = 1, #lowPitchMod do 
-	optionOverrides[lowPitchMod[i]] = {pitchmod = 0.02}
+	optionOverrides[lowPitchMod[i]] = {pitchmod = 0.015}
 end
 
 local defaultOpts = {
-	pitchmod = 0.03, --0.02,
+	pitchmod = 0.04,
 	gainmod = 0,
 }
 local replyOpts = {
-	pitchmod = 0, --0.02,
+	pitchmod = 0, 
 	gainmod = 0,
 }
 local explosionOpts = {
-	pitchmod = 0.07, --0.02,
+	pitchmod = 0.07,
 	gainmod = 0,
 }
 
