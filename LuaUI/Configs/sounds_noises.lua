@@ -3,7 +3,7 @@
 local VOLUME_MULT = 1.13
 
 local volumeOverrides = {
-	builder_start = 1.1,
+	builder_start = 1,
 	light_bot_select2 = 0.55,
 	light_bot_select = 0.58,
 	light_bot_move = 0.8,

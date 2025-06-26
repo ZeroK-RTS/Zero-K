@@ -143,7 +143,7 @@ local optionOverrides = {
 	},
 	["weapon/cannon/plasma_fire_extra2"] = {
 		gain = 20,
-	}
+	},
 }
 
 local noPitchMod = {
