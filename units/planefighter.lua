@@ -129,6 +129,7 @@ return { planefighter = {
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/small_laser_fire3]],
+      soundStartVolume        = 5,
       soundTrigger            = true,
       sweepfire               = false,
       thickness               = 2.85043856274785,

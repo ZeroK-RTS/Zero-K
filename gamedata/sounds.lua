@@ -126,6 +126,11 @@ local Sounds = {
 			file = "sounds/weapon/cannon/wolverine_hit.wav",
 			pitchmod = 0.03,
 		},
+		ex_med5_flat_pitch = {
+			file = "sounds/explosion/ex_med5.wav",
+			pitchmod = 0,
+		
+		}
 	},
 }
 
@@ -149,17 +154,25 @@ local optionOverrides = {
 		gain = 20,
 	},
 }
-
-local noPitchMod = {
-	"weapon/missile/missile_fire9_heavy",
-	"weapon/cannon/wolverine_fire",
-}
-
 local lowPitchMod = {
 	"weapon/heatray_fire",
 	"weapon/emg",
 	"explosion/burn_explode",
+	"weapon/bomb_drop_short",
+	"weapon/small_lightning",
 }
+
+local lowestPitchMod = {
+	"weapon/laser/pulse_laser3",
+}
+
+local noPitchMod = {
+	"weapon/missile/missile_fire9_heavy",
+	"weapon/missile/rapid_rocket_fire2",
+	"weapon/cannon/wolverine_fire",
+	"weapon/laser/pulse_laser2",
+}
+
 
 for i = 1, #noPitchMod do 
 	optionOverrides[noPitchMod[i]] = {pitchmod = 0}
@@ -167,6 +180,10 @@ end
 
 for i = 1, #lowPitchMod do 
 	optionOverrides[lowPitchMod[i]] = {pitchmod = 0.015}
+end
+
+for i = 1, #lowestPitchMod do 
+	optionOverrides[lowestPitchMod[i]] = {pitchmod = 0.006}
 end
 
 local defaultOpts = {
