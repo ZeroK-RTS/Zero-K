@@ -181,15 +181,12 @@ local lowPitchMod = {
 	"explosion/burn_explode",
 	"weapon/bomb_drop_short",
 	"impacts/shotgun_impactv5",
-	"explosion/ex_large4",
 	"explosion/ex_large5",
 	"weapon/laser/mini_laser",
 }
 
 local lowestPitchMod = {
 	"weapon/laser/pulse_laser3",
-	"weapon/gauss_fire_short",
-	"weapon/missile/rapid_rocket_hit",
 }
 
 local noPitchMod = {
@@ -201,6 +198,9 @@ local noPitchMod = {
 	"weapon/cannon/cannon_fire4",
 	"weapon/missile/rapid_rocket_fire",
 	"weapon/small_lightning",
+	"explosion/ex_large4",
+	"weapon/gauss_fire_short",
+	"weapon/missile/rapid_rocket_hit",
 }
 
 for i = 1, #noPitchMod do 
