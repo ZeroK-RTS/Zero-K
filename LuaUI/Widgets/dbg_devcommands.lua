@@ -17,6 +17,13 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Other
+
+local unitSpawnIndex = 0
+local spawnPos = {1300, 1700}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Mission Creation
 
 local recentlyExported = false
@@ -345,6 +352,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Settings/Toolbox/Dev Commands'
+options_order = {'cheat', 'nocost', 'spectator', 'godmode', 'testunit', 'luauireload', 'luarulesreload', 'debug', 'debugcolvol', 'debugpath', 'singlestep', 'spawn_next_unit', 'spawn_prev_unit', 'spawn_set_pos', 'printunits', 'printunitnames', 'echoCommand', 'missionexport', 'missionexportcommands', 'missionexportselectedcommands', 'exportallyteamcommands', 'missionexportfeatures', 'moveUnit', 'moveUnitSnap', 'moveUnitDelay', 'destroyUnit', 'RotateUnitLeft', 'RotateUnitRight'}
 options = {
 	cheat = {
 		name = "Cheat",
@@ -408,6 +416,35 @@ options = {
 		action = 'singlestep',
 	},
 	
+	
+	spawn_next_unit = {
+		name = "Spawn Next Unit",
+		type = 'button',
+		OnChange = function(self)
+			unitSpawnIndex = unitSpawnIndex + 1
+			Spring.SendCommands("luarules spawnnthunit " .. unitSpawnIndex .. " " .. spawnPos[1] .. " " .. spawnPos[2])
+		end,
+	},
+	spawn_prev_unit = {
+		name = "Spawn Prev Unit",
+		type = 'button',
+		OnChange = function(self)
+			unitSpawnIndex = unitSpawnIndex - 1
+			Spring.SendCommands("luarules spawnnthunit " .. unitSpawnIndex .. " " .. spawnPos[1] .. " " .. spawnPos[2])
+		end,
+	},
+	spawn_set_pos = {
+		name = "Set Spawn Position",
+		type = 'button',
+		OnChange = function(self)
+			local mx, my = Spring.GetMouseState()
+			local trace, pos = Spring.TraceScreenRay(mx, my, true, false, false, true)
+			if not (trace == "ground" and pos) then
+				return
+			end
+			spawnPos = pos
+		end,
+	},
 	
 	printunits = {
 		name = "Print Units",
