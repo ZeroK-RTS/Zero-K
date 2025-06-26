@@ -337,6 +337,7 @@ local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
 
 local creationUnitList, creationIndex
+local lastSpawnedUnitID
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -437,6 +438,56 @@ local function RotateUnit(cmd, line, words, player)
 	
 	Spring.DestroyUnit(unitID, false, true)
 	Spring.CreateUnit(unitDefID, x, y, z, facing, teamID)
+end
+
+local function SpawnNthUnit(cmd, line, words, player)
+	if not (spIsCheatingEnabled() and #words >= 3) then
+		return
+	end
+	local unitIndex = tonumber(words[1])
+	local x = tonumber(words[2])
+	local z = tonumber(words[3])
+	
+	if not (unitIndex and x and z) or unitIndex < 1 then
+		return
+	end
+	local y = Spring.GetGroundHeight(x, z)
+	if lastSpawnedUnitID then
+		Spring.DestroyUnit(lastSpawnedUnitID, false, true)
+		lastSpawnedUnitID = nil
+	end
+	
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
+		local ud = UnitDefs[udid]
+		if not ud.customParams.child_of_factory then
+			unitIndex = unitIndex - 1
+			if unitIndex <= 0 then
+				lastSpawnedUnitID = Spring.CreateUnit(udid, x, y, z, 1, 0)
+				return
+			end
+			if ud.buildOptions and #ud.buildOptions > 0 then
+				local sublist = ud.buildOptions
+				if ud.customParams.parent_of_plate then
+					unitIndex = unitIndex - 1
+					if unitIndex <= 0 then
+						local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
+						lastSpawnedUnitID = Spring.CreateUnit(subUdid, x, y, z, 1, 0)
+						return
+					end
+				end
+				for j = 1, #sublist do
+					unitIndex = unitIndex - 1
+					if unitIndex <= 0 then
+						local subUdid = sublist[j]
+						lastSpawnedUnitID = Spring.CreateUnit(subUdid,  x, y, z, 1, 0)
+						return
+					end
+				end
+			end
+		end
+	end
 end
 
 local function SetupNanoUnit(unitID, nanoAmount)
@@ -869,6 +920,15 @@ local function PlaceBattle(cmd, line, words, player)
 	end
 end
 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+function gadget:UnitDestroyed(unitID)
+	if lastSpawnedUnitID == unitID then
+		lastSpawnedUnitID = nil
+	end
+end
+
 function gadget:GameFrame(n)
 	if not spIsCheatingEnabled() then
 		return
@@ -907,6 +967,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "moveunit",  MoveUnit,  "Moves a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "destroyunit",  DestroyUnit,  "Destroys a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "rotateunit",  RotateUnit,  "Rotates a unit.")
+	gadgetHandler.actionHandler.AddChatAction(self, "spawnnthunit",  SpawnNthUnit,  "Spawns a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "give", give, "Like give all but without all the crap.")
 	gadgetHandler.actionHandler.AddChatAction(self, "givesort", givesort, "Gives mobiles sorted by cost.")
 	gadgetHandler.actionHandler.AddChatAction(self, "pw", PlanetwarsGive, "Spawns all planetwars structures.")
