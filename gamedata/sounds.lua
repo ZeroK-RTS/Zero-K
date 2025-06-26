@@ -146,6 +146,22 @@ local optionOverrides = {
 	}
 }
 
+local noPitchMod = {
+	"weapon/missile/missile_fire9_heavy",
+}
+
+local lowPitchMod = {
+	"weapon/emg",
+}
+
+for i = 1, #noPitchMod do 
+	optionOverrides[noPitchMod[i]] = {pitchmod = 0}
+end
+
+for i = 1, #lowPitchMod do 
+	optionOverrides[lowPitchMod[i]] = {pitchmod = 0.02}
+end
+
 local defaultOpts = {
 	pitchmod = 0.05, --0.02,
 	gainmod = 0,
