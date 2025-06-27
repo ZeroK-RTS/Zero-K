@@ -106,7 +106,7 @@ local Sounds = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
 			gain = 1.0,
 			pitch = 1.0,
-			priority = 1,
+			priority = 2,
 			maxconcurrent = 30,
 			maxdist = nil,
 		},
@@ -114,7 +114,7 @@ local Sounds = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
 			gain = 0.4,
 			pitch = 1.0,
-			priority = 1,
+			priority = 2,
 			maxconcurrent = 30,
 			maxdist = nil,
 		},
@@ -140,12 +140,13 @@ local Sounds = {
 		},
 		heavy_laser3_flat_pitch = {
 			file = "sounds/weapon/laser/heavy_laser3.wav",
+			priority = 0.5,
 			pitchmod = 0,
 		},
 		gravity_fire = {
 			file = "sounds/weapon/gravity_fire.wav",
 			gainmod = 0.8,
-			pitchmod = 0.01,
+			pitchmod = 0,
 		},
 		dgun_hit = {
 			file = "sounds/explosion/ex_med6.wav",
@@ -158,6 +159,8 @@ local Sounds = {
 --------------------------------------------------------------------------------
 -- Automagical sound handling
 --------------------------------------------------------------------------------
+
+local DISABLE_PITCHMOD = true
 
 local optionOverrides = {
 	["weapon/missile/missile_launch_short"] = {
@@ -175,6 +178,13 @@ local optionOverrides = {
 		gain = 20,
 	},
 }
+
+local priority = {
+	["weapon/laser/heavy_laser6"] = 1,
+	["weapon/laser/heavy_laser3"] = 1,
+	["explosion/ex_ultra8"] = 2,
+}
+
 local lowPitchMod = {
 	"weapon/heatray_fire",
 	"weapon/emg",
@@ -201,6 +211,8 @@ local noPitchMod = {
 	"explosion/ex_large4",
 	"weapon/gauss_fire_short",
 	"weapon/missile/rapid_rocket_hit",
+	"weapon/laser/laser_burn10",
+	"weapon/laser/laser_burn9",
 }
 
 for i = 1, #noPitchMod do 
@@ -208,15 +220,15 @@ for i = 1, #noPitchMod do
 end
 
 for i = 1, #lowPitchMod do 
-	optionOverrides[lowPitchMod[i]] = {pitchmod = 0.015}
+	optionOverrides[lowPitchMod[i]] = {pitchmod = DISABLE_PITCHMOD and 0 or 0.015}
 end
 
 for i = 1, #lowestPitchMod do 
-	optionOverrides[lowestPitchMod[i]] = {pitchmod = 0.006}
+	optionOverrides[lowestPitchMod[i]] = {pitchmod = DISABLE_PITCHMOD and 0 or 0.006}
 end
 
 local defaultOpts = {
-	pitchmod = 0.04,
+	pitchmod = DISABLE_PITCHMOD and 0 or 0.04,
 	gainmod = 0,
 }
 local replyOpts = {
@@ -250,13 +262,14 @@ local function AutoAdd(subDir, generalOpts)
 		local pathPart, ext = fullPath:match("sounds/(.*)%.(.*)")
 		if not ignoredExtensions[ext] then
 			local opts = optionOverrides[pathPart] or generalOpts
+			Spring.Echo(pathPart, opts.priority or priority[pathPart] or 0)
 			Sounds.SoundItems[pathPart] = {
 				file = fullPath,
 				rolloff = opts.rollOff,
 				dopplerscale = opts.dopplerscale,
 				maxdist = opts.maxdist,
 				maxconcurrent = opts.maxconcurrent,
-				priority = opts.priority,
+				priority = opts.priority or priority[pathPart] or 0,
 				in3d = opts.in3d,
 				gain = opts.gain,
 				gainmod = opts.gainmod,

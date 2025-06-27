@@ -103,6 +103,7 @@ return { hoverarty = {
       reloadtime              = 23,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
+      soundStartVolumne       = 7.5,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
