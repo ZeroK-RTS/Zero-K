@@ -5,6 +5,7 @@ corehlt_hit.wav
 Nanoblobs:
 mini_laser.wav
 pulse_laser2.wav
+capture_ray.wav
 
 Kanoba:
 heavylaser_fire.wav

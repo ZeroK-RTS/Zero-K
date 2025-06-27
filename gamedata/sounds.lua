@@ -134,6 +134,11 @@ local Sounds = {
 			file = "sounds/weapon/cannon/wolverine_hit.wav",
 			pitchmod = 0.008,
 		},
+		CaptureRay = {
+			file = "sounds/weapon/laser/capture_ray.wav",
+			gainmod = 0.5,
+			gain = 0.6,
+		},
 		ex_med5_flat_pitch = {
 			file = "sounds/explosion/ex_med5.wav",
 			pitchmod = 0,
@@ -182,6 +187,8 @@ local optionOverrides = {
 local priority = {
 	["weapon/laser/heavy_laser6"] = 1,
 	["weapon/laser/heavy_laser3"] = 1,
+	["weapon/missile/liche_fire"] = 1,
+	["weapon/missile/liche_hit"] = 1,
 	["explosion/ex_ultra8"] = 2,
 }
 
