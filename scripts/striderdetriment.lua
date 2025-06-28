@@ -133,46 +133,48 @@ local function DoRestore()
 end
 
 local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
+	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	mainLeg, offLeg = offLeg, mainLeg
 	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
-		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
-		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
+		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i] * speed)
+		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i] * speed)
 	end
 
 	-- swing arms and body
 	if not(isFiring) then
 		if (frontLeg == leftLeg) then
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(larmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speed)
+			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(larmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
 		else
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(rarmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speed)
+			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
+			Turn(rarmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
 		end
 	end
 	
-	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED*pelvisMult)
-	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED)
+	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED * pelvisMult * speed)
+	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED * speed)
 
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
 	end
+	speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 
 	-- passing (front foot flat under body, back foot passing with bent knee)
 	for i, p in pairs(frontLeg) do
-		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
-		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
+		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i] * speed)
+		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i] * speed)
 	end
 	--EmitSfx(impactFoot, dirtfling)
 	--EmitSfx(impactFoot, footcrater)
-	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult)
-	Turn(torso, x_axis, 0, TORSO_TILT_SPEED)
+	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult * speed)
+	Turn(torso, x_axis, 0, TORSO_TILT_SPEED * speed)
 
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
@@ -234,6 +236,7 @@ end
 -- Jumping
 local function PreJumpThread(turn, lineDist, flightDist, duration)
 	script.StopMoving()
+	local speed = math.max(0.5, GG.att_MoveChange[unitID] or 1)
 	
 	DoRestore()
 	weaponBlocked = true
@@ -242,7 +245,7 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 	Spring.MoveCtrl.SetRotation(unitID, 0, heading, 0) -- keep current heading
 	
 	local rotationRequired = -turn*GG.Script.headingToRad
-	local rotationFrames = math.ceil(math.abs(rotationRequired/JUMP_TURN_SPEED)/12)*12
+	local rotationFrames = math.ceil(math.abs(rotationRequired/JUMP_TURN_SPEED)/12/speed)*12
 
 	--Spring.MoveCtrl.SetRotation(unitID, 0, heading + rotationRequired, 0) -- keep current heading
 	--Sleep(2000)
@@ -280,22 +283,22 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
 	
 	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
-		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
+		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
+		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
 	end
-	Move(pelvis, y_axis, 0, 8)
-	Sleep(600)
+	Move(pelvis, y_axis, 0, 8 * speed)
+	Sleep(600 / speed)
 	
 	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
-		Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
+		Turn(leftLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
+		Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
 	end
-	Move(torso, y_axis, 0, 1)
-	Move(pelvis, y_axis, -20, 16)
-	Move(pelvis, z_axis, -10, 8)
-	Turn(torso, x_axis, math.rad(20), math.rad(30))
+	Move(torso, y_axis, 0, 1 * speed)
+	Move(pelvis, y_axis, -20, 16 * speed)
+	Move(pelvis, z_axis, -10, 8 * speed)
+	Turn(torso, x_axis, math.rad(20), math.rad(30) * speed)
 	
-	Turn(pelvis, z_axis, 0, math.rad(30))
+	Turn(pelvis, z_axis, 0, math.rad(30) * speed)
 	--EmitSfx(lfoot, jetfeet)
 	--EmitSfx(rfoot, jetfeet)
 end
@@ -386,6 +389,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	local SIG_AIM = 2^(num+1)
+	local speed = math.max(0.5, GG.att_MoveChange[unitID] or 1)
 	
 	isFiring = true
 	Signal(SIG_AIM)
@@ -394,7 +398,7 @@ function script.AimWeapon(num, heading, pitch)
 		manualfireAimOverride = manualfireAimOverride - 1
 		if manualfireAimOverride <= 0 then
 			manualfireAimOverride = false
-			Turn(shouldercannon, x_axis, 0, math.rad(90))
+			Turn(shouldercannon, x_axis, 0, math.rad(90) * speed)
 		end
 		Sleep(500)
 		return false
@@ -419,9 +423,9 @@ function script.AimWeapon(num, heading, pitch)
 		end
 		armAngle = math.min(0.2, math.max(-0.2, armAngle))
 		
-		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(larmcannon, y_axis, armAngle, math.rad(20))
-		Turn(larm, x_axis, -pitch, math.rad(40))
+		Turn(torso, y_axis, heading, math.rad(140) * speed)
+		Turn(larmcannon, y_axis, armAngle, math.rad(20) * speed)
+		Turn(larm, x_axis, -pitch, math.rad(40) * speed)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 	elseif num == 2 then -- Right gunpod
@@ -446,17 +450,17 @@ function script.AimWeapon(num, heading, pitch)
 		
 		armAngle = math.min(0.2, math.max(-0.2, armAngle))
 		
-		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(rarmcannon, y_axis, armAngle, math.rad(20))
-		Turn(rarm, x_axis, -pitch, math.rad(40))
+		Turn(torso, y_axis, heading, math.rad(140) * speed)
+		Turn(rarmcannon, y_axis, armAngle, math.rad(20) * speed)
+		Turn(rarm, x_axis, -pitch, math.rad(40) * speed)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 	elseif num == 3 then -- Shoulder Cannon
 		manualfireAimOverride = 60
-		Turn(torso, y_axis, heading, math.rad(90))
+		Turn(torso, y_axis, heading, math.rad(90) * speed)
 		WaitForTurn(torso, y_axis)
-		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90))
-		Move(shouldercannon, y_axis, -2, 0.7)
+		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90) * speed)
+		Move(shouldercannon, y_axis, -2, 0.7 * speed)
 		WaitForTurn(shouldercannon, x_axis)
 	elseif num == 4 then
 		Turn(aaturret, y_axis, heading - lastTorsoHeading, math.rad(360))
@@ -479,9 +483,9 @@ function script.AimWeapon(num, heading, pitch)
 			return false
 		end
 		
-		Turn(torso, y_axis, heading, math.rad(90))
-		Move(head, y_axis, 0, 10)
-		Move(head, z_axis, 0, 10)
+		Turn(torso, y_axis, heading, math.rad(90) * speed)
+		Move(head, y_axis, 0, 10 * speed)
+		Move(head, z_axis, 0, 10 * speed)
 		WaitForTurn(torso, y_axis)
 	end
 	lastTorsoHeading = heading
