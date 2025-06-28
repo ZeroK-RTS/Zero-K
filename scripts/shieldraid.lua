@@ -21,23 +21,23 @@ local SIG_RESTORE = 4
 
 -- variables
 local gun_1
-local BASE_SPEED = 1.57 * (UnitDefs[unitDefID].speed / 90)
+local BASE_SPEED = 1.6 * (UnitDefs[unitDefID].speed / 90)
 
 local function Step(front, back)
 	local slow = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	local stepMult = BASE_SPEED * slow
-	Move(back.shin, z_axis, 1.7, 11 * stepMult) --down
-	Move(front.shin, z_axis, -1.5, 11 * stepMult) --up
-	Move(base, y_axis, -0.5, 10 * stepMult)
-	Move(base, z_axis, 1, 5 * stepMult)
+	Move(back.shin, z_axis, 1.7, 12 * stepMult) --down
+	Move(front.shin, z_axis, -1.5, 12 * stepMult) --up
+	Move(base, y_axis, -0.5, 13 * stepMult)
+	Move(base, z_axis, 0.5, 5 * stepMult)
+	Turn(front.foot, x_axis, math.rad(40), math.rad(260) * stepMult)
 	Sleep(133 / math.max(0.5, slow))
 
-	Turn(back.thigh, x_axis, math.rad(85), math.rad(200) * stepMult) --back
-	Turn(front.thigh, x_axis, math.rad(5), math.rad(200) * stepMult) --forward
-	Turn(back.foot, x_axis, math.rad(15), math.rad(160) * stepMult)
-	Turn(front.foot, x_axis, math.rad(70), math.rad(320) * stepMult)
-	Move(base, y_axis, 0.5, 10 * stepMult)
-	Move(base, z_axis, -1, 8 * stepMult)
+	Turn(back.thigh, x_axis, math.rad(90), math.rad(200) * stepMult) --back
+	Turn(front.thigh, x_axis, math.rad(20), math.rad(200) * stepMult) --forward
+	Turn(back.foot, x_axis, math.rad(10), math.rad(250) * stepMult)
+	Move(base, y_axis, 1.5, 15 * stepMult)
+	Move(base, z_axis, -1.5, 8 * stepMult)
 	
 	if front == leftLeg then
 		Turn(base, z_axis, math.rad(8), math.rad(30) * stepMult)

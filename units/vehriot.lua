@@ -93,8 +93,8 @@ return { vehriot = {
       },
       
       damage                  = {
-        default = 260.2,
-        planes  = 260.2,
+        default = 250.2,
+        planes  = 250.2,
       },
 
       edgeEffectiveness       = 0.75,
@@ -103,7 +103,7 @@ return { vehriot = {
       impulseFactor           = 0.6,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 290,
+      range                   = 285,
       reloadtime              = 1.7 + 2/30, -- don't forget to tweak the high-alpha threshold at the bottom of `LuaRules/Configs/target_priority_defs.lua`
       soundHit                = [[weapon/cannon/generic_cannon]],
       soundStart              = [[weapon/cannon/outlaw_gun]],
