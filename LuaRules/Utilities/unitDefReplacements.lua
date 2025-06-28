@@ -64,7 +64,7 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	if unitID then
 		if variableCostUnit[unitDefID] then
 			local paramCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
-			if not paramCost and not debugSent then
+			if not paramCost and not debugSent and GG then
 				Spring.Utilities.UnitEcho(unitID, "variableCostUnit missing cost")
 				Spring.Echo("unitID, unitDefID, cost", unitID, unitDefID, cost)
 				debugSent = true
