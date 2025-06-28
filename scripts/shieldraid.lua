@@ -21,28 +21,31 @@ local SIG_RESTORE = 4
 
 -- variables
 local gun_1
+local BASE_SPEED = 1.57 * (UnitDefs[unitDefID].speed / 90)
 
 local function Step(front, back)
-	Move(back.shin, z_axis, 1.5, 7) --down
-	Move(front.shin, z_axis, -1.5, 10) --up
-	Move(base, y_axis, 2, 6)
-	Move(base, z_axis, 1, 5)
-	Sleep(160)
+	local slow = math.max(0.05, GG.att_MoveChange[unitID] or 1)
+	local stepMult = BASE_SPEED * slow
+	Move(back.shin, z_axis, 1.7, 11 * stepMult) --down
+	Move(front.shin, z_axis, -1.5, 11 * stepMult) --up
+	Move(base, y_axis, -0.5, 10 * stepMult)
+	Move(base, z_axis, 1, 5 * stepMult)
+	Sleep(133 / math.max(0.5, slow))
 
-	Turn(back.thigh, x_axis, math.rad(60), math.rad(130)) --back
-	Turn(front.thigh, x_axis, 0, math.rad(120)) --forward
-	Turn(back.foot, x_axis, math.rad(25))
-	Turn(front.foot, x_axis, math.rad(70))
-	Move(base, y_axis, -0.5, 9)
-	Move(base, z_axis, -1, 5)
+	Turn(back.thigh, x_axis, math.rad(85), math.rad(200) * stepMult) --back
+	Turn(front.thigh, x_axis, math.rad(5), math.rad(200) * stepMult) --forward
+	Turn(back.foot, x_axis, math.rad(15), math.rad(160) * stepMult)
+	Turn(front.foot, x_axis, math.rad(70), math.rad(320) * stepMult)
+	Move(base, y_axis, 0.5, 10 * stepMult)
+	Move(base, z_axis, -1, 8 * stepMult)
 	
 	if front == leftLeg then
-		Turn(base, z_axis, math.rad(8), math.rad(30))
+		Turn(base, z_axis, math.rad(8), math.rad(30) * stepMult)
 	else
-		Turn(base, z_axis, math.rad(-8), math.rad(30))
+		Turn(base, z_axis, math.rad(-8), math.rad(30) * stepMult)
 	end
 	
-	Sleep(200)
+	Sleep(166 / math.max(0.5, slow))
 end
 
 local function Walk()
@@ -60,7 +63,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(rightLeg.thigh, x_axis, math.rad(60))
 	Turn(leftLeg.thigh, x_axis, math.rad(60))
-				
+	
 	Move(rightLeg.shin, z_axis, 0)
 	Move(leftLeg.shin, z_axis, 0)
 	
