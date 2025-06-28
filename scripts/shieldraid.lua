@@ -24,14 +24,14 @@ local gun_1
 local BASE_SPEED = 1.6 * (UnitDefs[unitDefID].speed / 90)
 
 local function Step(front, back)
-	local slow = math.max(0.05, GG.att_MoveChange[unitID] or 1)
-	local stepMult = BASE_SPEED * slow
+	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
+	local stepMult = BASE_SPEED * speed
 	Move(back.shin, z_axis, 1.7, 12 * stepMult) --down
 	Move(front.shin, z_axis, -1.5, 12 * stepMult) --up
 	Move(base, y_axis, -0.5, 13 * stepMult)
 	Move(base, z_axis, 0.5, 5 * stepMult)
 	Turn(front.foot, x_axis, math.rad(40), math.rad(260) * stepMult)
-	Sleep(133 / math.max(0.5, slow))
+	Sleep(133 / math.max(0.5, speed))
 
 	Turn(back.thigh, x_axis, math.rad(90), math.rad(200) * stepMult) --back
 	Turn(front.thigh, x_axis, math.rad(20), math.rad(200) * stepMult) --forward
@@ -45,7 +45,7 @@ local function Step(front, back)
 		Turn(base, z_axis, math.rad(-8), math.rad(30) * stepMult)
 	end
 	
-	Sleep(166 / math.max(0.5, slow))
+	Sleep(166 / math.max(0.5, speed))
 end
 
 local function Walk()
