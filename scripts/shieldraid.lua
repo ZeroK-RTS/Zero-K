@@ -21,7 +21,7 @@ local SIG_RESTORE = 4
 
 -- variables
 local gun_1
-local BASE_SPEED = 1.6 * (UnitDefs[unitDefID].speed / 90)
+local BASE_SPEED = 1.57 * (UnitDefs[unitDefID].speed / 90)
 
 local function Step(front, back)
 	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
