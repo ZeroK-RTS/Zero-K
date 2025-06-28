@@ -125,9 +125,7 @@ local function FindAlbums(path)
 end
 
 local includedAlbums = FindAlbums('sounds/music/')
-
-local trackListName = includedAlbums.denny and 'denny' or next(includedAlbums)
-
+local trackListName = includedAlbums.superintendent and 'superintendent' or next(includedAlbums)
 local trackList = includedAlbums[trackListName].tracks
 
 
@@ -144,7 +142,7 @@ options = {
 		name = 'Track list',
 		type = 'radioButton',
 		value = trackListName,
-		items =	(function()
+		items = (function()
 			local t = {}
 			for k, v in pairs(includedAlbums) do
 				t[#t+1] = {key = k, name = v.humanName}
