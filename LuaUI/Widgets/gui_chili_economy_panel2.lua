@@ -219,8 +219,82 @@ local function FormatPercent(input, colorFunc)
 	return leadingString .. ("%.0f"):format(100*input) .. "%" .. WhiteStr
 end
 
+local function SecondsToMinutesSeconds(seconds)
+	if seconds%60 < 10 then
+		return math.floor(seconds/60) ..":0" .. math.floor(seconds%60)
+	else
+		return math.floor(seconds/60) ..":" .. math.floor(seconds%60)
+	end
+end
+
+function printThing(theKey, theTable, indent)
+	if (type(theTable) == "table") then
+		Spring.Echo(indent .. theKey .. ":")
+		for a, b in pairs(theTable) do
+			printThing(tostring(a), b, indent .. "  ")
+		end
+	else
+		Spring.Echo(indent .. theKey .. ": " .. tostring(theTable))
+	end
+end
+
+local OrangeStr = "\255\255\128\001"
+local function FormatPayback(input)
+	if input then
+		local leadingString = WhiteStr
+		local seconds = Spring.GetGameFrame() / 30
+		if input < seconds / 6 then
+			leadingString = RedStr
+		elseif input < seconds / 3 then
+			leadingString = OrangeStr
+		elseif input < seconds then
+			leadingString = YellowStr
+		end
+		return leadingString .. SecondsToMinutesSeconds(input) .. WhiteStr
+	end
+	return WhiteStr .. "-" .. WhiteStr
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function ePayback(unitDefID)
+	local def = UnitDefNames[unitDefID]
+	local teamID = Spring.GetLocalTeamID()
+	local metalOD = Spring.GetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
+	local energyOD = Spring.GetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
+	local windStrength = Spring.GetGameRulesParam("WindStrength")
+	-- Singu numbers
+	local mult = 1
+	if econMultEnabled then
+		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetMyAllyTeamID() or "")) or 1)
+	end
+	local cost = def.metalCost
+	local income = def.customParams.income_energy * mult
+	if metalOD and metalOD > 0 and energyOD and energyOD > 0 then
+		local singleMexMult = math.sqrt(energyOD) / 4
+		local mexIncome = metalOD / singleMexMult
+		local worstCasePayback = cost / (mexIncome*math.sqrt(energyOD + income)/4 - metalOD)
+		return worstCasePayback
+		-- Echo("Payback: " .. SecondsToMinutesSeconds(worstCasePayback))
+	end
+end
+
+local function fastestPayback()
+	local results = {}
+	local _, _, _, mInco, _, _, _, _ = spGetTeamResources(Spring.GetLocalTeamID(), "metal")
+	local lowestPayback = nil
+	local lowestPaybackName = nil
+	for shortName, defName in pairs({sol= "energysolar", fus= "energyfusion", sin= "energysingu"}) do
+		local buildTime = UnitDefNames[defName].metalCost / mInco
+		local payTime = ePayback(defName)
+		if not lowestPayback or lowestPayback > payTime + buildTime then
+			lowestPayback = payTime
+			lowestPaybackName = shortName
+		end
+	end
+	return lowestPaybackName, lowestPayback
+end
 
 local extraPanels
 
@@ -231,6 +305,20 @@ local function UpdateWindPanel()
 			extraPanels.wind.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
 		end
 	end
+end
+
+local function numberOfOverdriveLabels(self)
+	local i = 0
+	if options.overdriveRatio.value then
+		i = i + 1
+	end
+	if options.overdriveIncome.value then
+		i = i + 2
+	end
+	if options.overdrivePayback.value then
+		i = i + 2
+	end
+	return i
 end
 
 extraPanels = {
@@ -282,7 +370,8 @@ extraPanels = {
 	},
 	overdrive = {
 		title = "Overdrive",
-		labelCount = 3,
+		labelCount = 5,
+		currentLabelsFunc = numberOfOverdriveLabels,
 	},
 	wind = {
 		title = "Wind",
@@ -361,11 +450,17 @@ local function option_toggleExtra(self, value)
 	DoExtraToggle(self.extraKey, self.value)
 end
 
+local function option_recalculateOverdriveLabels(self, value)
+	extraPanels.overdrive.labelCount = numberOfOverdriveLabels()
+	-- Global func
+	DoExtraPanelReload("overdrive")
+end
+
 options_order = {
 	'lbl_metal', 'metalFlash', 'metalWarning',
 	'lbl_energy', 'energyFlash', 'energyWarning', 'eExcessFlash',
 	'lbl_reserve', 'enableReserveBar', 'defaultEnergyReserve','defaultMetalReserve',
-	'lbl_extra', 'panel_efficiency', 'panel_usage', 'panel_overdrive', 'panel_wind',
+	'lbl_overdrive', 'panel_overdrive', 'overdriveRatio', 'overdriveIncome', 'overdrivePayback', 'lbl_extra', 'panel_efficiency', 'panel_usage', 'panel_wind',
 	'lbl_visual', 'ecoPanelHideSpec',
 	'flowAsArrows', 'opacity',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
@@ -422,6 +517,36 @@ options = {
 		type  = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 	},
+	lbl_overdrive = {name='Overdrive', type='label'},
+	panel_overdrive = {
+		name  = 'Show Overdrive Panel',
+		type  = 'bool',
+		value = false,
+		desc = "Show overdrive energy:metal ratio, metal income, energy cost and energy building payback time. Use Ctrl+F11 to reposition and Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'overdrive',
+	},
+	overdriveRatio = {
+		name  = 'Show Energy:Metal ratio',
+		type  = 'bool',
+		value = false,
+		desc = "Show overdrive energy:metal ratio.",
+		OnChange = option_recalculateOverdriveLabels,
+	},
+	overdriveIncome = {
+		name  = 'Show Drain And Income',
+		type  = 'bool',
+		value = false,
+		desc = "Show overdrive energy:metal ratio.",
+		OnChange = option_recalculateOverdriveLabels,
+	},
+	overdrivePayback = {
+		name  = 'Show Payback Time',
+		type  = 'bool',
+		value = false,
+		desc = "Show overdrive energy building payback time.",
+		OnChange = option_recalculateOverdriveLabels,
+	},
 	lbl_extra = {name='Extras', type='label'},
 	panel_efficiency = {
 		name  = 'Show Efficiency',
@@ -438,14 +563,6 @@ options = {
 		desc = "Show the Metal Pull/Metal Income as a percentage. Use Ctrl+F11 to reposition and Escape to cancel.",
 		OnChange = option_toggleExtra,
 		extraKey = 'usage',
-	},
-	panel_overdrive = {
-		name  = 'Show Overdrive',
-		type  = 'bool',
-		value = false,
-		desc = "Show overdrive energy:metal ratio, metal income, and energy cost. Use Ctrl+F11 to reposition and Escape to cancel.",
-		OnChange = option_toggleExtra,
-		extraKey = 'overdrive',
 	},
 	panel_wind = {
 		name  = 'Show Wind',
@@ -1054,9 +1171,24 @@ function widget:GameFrame(n)
 	bar_overlay_energy:SetCaption(GetFlowStr(netEnergy, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
 
 	if extraPanels.overdrive.window then
-		extraPanels.overdrive.window.SetText(odEffStr, 1)
-		extraPanels.overdrive.window.SetText(team_metalOverdrive, 2)
-		extraPanels.overdrive.window.SetText(team_energyOverdrive, 3)
+		local ePaybackName, ePayback = fastestPayback()
+		team_ePaybackName = ePaybackName
+		team_ePayback = FormatPayback(ePayback)
+		local i = 1
+		if options.overdriveRatio.value then
+			extraPanels.overdrive.window.SetText(odEffStr, i)
+			i = i + 1
+		end
+		if options.overdriveIncome.value then
+			extraPanels.overdrive.window.SetText(team_metalOverdrive, i)
+			extraPanels.overdrive.window.SetText(team_energyOverdrive, i+1)
+			i = i + 2
+		end
+		if options.overdrivePayback.value then
+			extraPanels.overdrive.window.SetText(team_ePaybackName, i)
+			extraPanels.overdrive.window.SetText(team_ePayback, i+1)
+			i = i + 2
+		end
 	end
 	if extraPanels.usage.window then
 		if mInco+mReci > 0 then
@@ -1244,6 +1376,17 @@ end
 local function GetExtraPanel(name, extraData)
 	local show = true
 	extraData.labelCount = extraData.labelCount or 1
+	local currentLabels = extraData.labelCount
+	if extraData.currentLabelsFunc then
+		currentLabels = extraData.currentLabelsFunc()
+		Spring.Echo(extraData.currentLabelsFunc())
+		Spring.Echo(numberOfOverdriveLabels())
+	else
+		extraPanels.overdrive.labelCount = numberOfOverdriveLabels()
+		DoExtraPanelReload("overdrive")
+	end
+	Spring.Echo("overdriveLabels",numberOfOverdriveLabels())
+	Spring.Echo("extra panel", name, extraData.labelCount, currentLabels)
 	extraData.minWidth = extraData.minWidth or 100
 	
 	local extraWindow = Chili.Window:New{
@@ -1256,7 +1399,7 @@ local function GetExtraPanel(name, extraData)
 		x = 150,
 		y = 150,
 		clientWidth  = extraData.minWidth,
-		clientHeight = 37 + 35*extraData.labelCount,
+		clientHeight = 37 + 35*currentLabels,
 		minWidth  = extraData.minWidth,
 		minHeight = 72,
 		draggable = false,
@@ -1337,7 +1480,7 @@ local function GetExtraPanel(name, extraData)
 		end
 		holderPanel:SetVisibility(show)
 	end
-	
+	externalFunctions.extraWindow = extraWindow
 	return externalFunctions
 end
 
@@ -1356,6 +1499,18 @@ function DoExtraToggle(name, value)
 	if extraData.window then
 		extraData.window.Show(value)
 	end
+end
+
+function DoExtraPanelReload(name)
+	Spring.Echo("Extra reload")
+	local extraData = extraPanels[name]
+	if not extraData.window then
+		extraData.window = GetExtraPanel(name, extraData)
+	end
+	-- Recalculate window height and reshow/hide
+	extraData.window.extraWindow.clientHeight = 37 + 35*extraData.labelCount
+	extraData.window.Show(false)
+	extraData.window.Show(true)
 end
 
 --------------------------------------------------------------------------------
@@ -1417,6 +1572,7 @@ function widget:Initialize()
 	option_colourBlindUpdate()
 
 	option_recreateWindow()
+	
 end
 
 function CreateWindow(oldX, oldY, oldW, oldH)
