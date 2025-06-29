@@ -76,7 +76,7 @@ return { amphriot = {
 
     TORPEDO = {
       name                    = [[Undersea Charge Launcher]],
-      areaOfEffect            = 24,
+      areaOfEffect            = 32,
       burst                   = 2,
       burstRate               = 0.3,
       avoidFriendly           = false,
