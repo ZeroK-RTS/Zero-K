@@ -45,7 +45,7 @@ return { shieldfelon = {
 
   sightEmitHeight     = 40,
   sightDistance       = 520,
-  speed               = 42,
+  speed               = 43.5,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
