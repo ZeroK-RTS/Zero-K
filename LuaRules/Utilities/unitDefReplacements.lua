@@ -53,6 +53,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local debugSent = false
+
 function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if not (unitDefID and buildTimes[unitDefID]) then
@@ -61,10 +63,20 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	local cost = buildTimes[unitDefID]
 	if unitID then
 		if variableCostUnit[unitDefID] then
-			cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+			local paramCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+			if not paramCost and not debugSent and GG then
+				Spring.Utilities.UnitEcho(unitID, "variableCostUnit missing cost")
+				Spring.Echo("unitID, unitDefID, cost", unitID, unitDefID, cost)
+				debugSent = true
+			end
+			cost = paramCost or cost
 		else
 			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		end
+	end
+	if not cost then
+		Spring.Echo("Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
+		error("Spring.Utilities.GetUnitCost nil cost")
 	end
 	return cost
 end
@@ -322,6 +334,10 @@ if Spring.GetModOptions().techk == "1" and WG then
 			end
 		else
 			cost = cost * math.pow(2, (WG.SelectedTechLevel or 1) - 1)
+		end
+		if not cost then
+			Spring.Echo("TECHK, Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
+			error("TECHK, Spring.Utilities.GetUnitCost nil cost")
 		end
 		return cost
 	end

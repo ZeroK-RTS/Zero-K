@@ -1,10 +1,10 @@
 function widget:GetInfo()
 	return {
-		name = "Sensor Ranges Radar Preview 2",
+		name = "Sensor Ranges Radar Preview 2 WIP",
 		desc = "Raytraced Radar Range Coverage on building Radar (GL4)",
 		author = "Beherith",
 		date = "2021.07.12",
-		license = "Lua: GPLv2, GLSL: see shader files",
+		license = "GPLv2",
 		layer = 0,
 		enabled = false
 	}
@@ -51,7 +51,7 @@ local shaderSourceCache = {
 		},
 	uniformFloat = {
 		radarcenter_range = { 2000, 100, 2000, 2000 },
-		resolution = { 128 },
+		resolution = { 32 },
 	},
 	shaderConfig = shaderConfig,
 }

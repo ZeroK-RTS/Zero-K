@@ -1,6 +1,6 @@
 {
-	"shield_bar" : "護盾",
-	"health_bar" : "生命值",
+	"shield" : "護盾",
+	"health" : "生命值",
 	"building" : "建築物",
 	"morph" : "變形",
 	"stockpile" : "庫存",
@@ -8,17 +8,16 @@
 	"disarm" : "解除武裝",
 	"capture" : "捕獲",
 	"capture_reload" : "捕獲重新裝填",
-	"water_tank" : "水箱",
 	"teleport" : "傳送",
+	"teleport_pw" : "疏散",
 	"ability" : "技能",
 	"heat" : "熱量",
 	"speed" : "速度",
+	"reammo" : "重新裝填",
 	"reload" : "重新裝填",
 	"slow" : "緩速",
 	"goo" : "黏性物",
-	"reclaim" : "回收",
-	"reammo" : "重新裝填",
-	"teleport_pw" : "疏散",
+	"jump" : "跳躍",
 	"resurrect" : "復活",
-	"jump" : "跳躍"
+	"reclaim" : "回收"
 }

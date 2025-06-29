@@ -44,7 +44,7 @@ return { shieldraid = {
   },
 
   sightDistance          = 560,
-  speed                  = 90,
+  speed                  = 93,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

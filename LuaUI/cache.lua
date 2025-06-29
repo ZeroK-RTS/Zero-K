@@ -33,7 +33,7 @@ end
 
 function Spring.GetTeamColor(teamid)
   if not teamColor[teamid] then
-    teamColor[teamid] = { GetTeamColor(teamid) }
+    teamColor[teamid] = {GetTeamColor(teamid)}
   end
   return unpack(teamColor[teamid])
 end

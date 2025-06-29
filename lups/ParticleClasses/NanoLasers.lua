@@ -132,6 +132,7 @@ function NanoLasers:Draw()
 	local startPos = self.pos
 	local endPos   = self.targetpos
 
+	-- last needed Recoil 2025.04.10
 	if Spring.Utilities.IsNanOrInf(unpack(endPos)) or Spring.Utilities.IsNanOrInf(unpack(self.normdir)) or Spring.Utilities.IsNanOrInf(self.scane_mult) then
 		Spring.Echo("div0 detected", "self.scane_mult", self.scane_mult)
 		Spring.Utilities.TableEcho(startPos, "startPos")

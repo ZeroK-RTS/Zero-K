@@ -2701,11 +2701,11 @@ end
 
 if Script.IsEngineMinVersion(104, 0, 1431) then
 
-	function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua) -- cmdOpts is a bitmask
+	function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua) -- cmdOpts is a bitmask -- Is it? Seems to be a table.
 		tracy.ZoneBeginN("W:UnitCommand")
 		for _, w in r_ipairs(self.UnitCommandList) do
 			tracy.ZoneBeginN("W:UnitCommand:" .. w.whInfo.name)
-			w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
+			w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
 			tracy.ZoneEnd()
 		end
 		tracy.ZoneEnd()

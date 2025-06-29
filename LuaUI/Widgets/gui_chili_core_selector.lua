@@ -446,7 +446,11 @@ local function SelectPrecBomber()
 end
 
 local function SelectIdleCon_all()
-	Spring.SelectUnitMap(idleCons, select(4, Spring.GetModKeyState()))
+	if WG.SelectMapIgnoringRank then
+		WG.SelectMapIgnoringRank(idleCons, select(4, Spring.GetModKeyState()))
+	else
+		Spring.SelectUnitMap(idleCons, select(4, Spring.GetModKeyState()))
+	end
 end
 
 local conIndex = 1

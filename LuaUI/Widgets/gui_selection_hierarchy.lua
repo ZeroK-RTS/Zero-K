@@ -48,6 +48,7 @@ local doubleClickToleranceTime = (Spring.GetConfigInt('DoubleClickTime', 300) * 
 
 local selectionRank = {}
 local defaultRank = {}
+local disableForNextUpdate = false
 
 local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 
@@ -312,7 +313,7 @@ local function CheckControlGroupHotkeys(num)
 end
 
 local function RawGetFilteredSelection(units, subselection, subselectionCheckDone, doubleClickUnitDefID)
-	if not useSelectionFiltering then
+	if not useSelectionFiltering or disableForNextUpdate then
 		return
 	end
 	if not units then
@@ -481,9 +482,35 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Widget API for overriding selection rank
+
+function widget:Update()
+	if not disableForNextUpdate or disableForNextUpdate <= 0 then
+		widgetHandler:RemoveWidgetCallIn("Update", widget)
+		disableForNextUpdate = false
+		return
+	end
+	disableForNextUpdate = disableForNextUpdate - 1
+end
+
+
+function WG.SelectMapIgnoringRank(unitMap, append)
+	if useSelectionFiltering then
+		disableForNextUpdate = 1
+		widgetHandler:UpdateWidgetCallIn("Update", widget)
+		Spring.SelectUnitMap(unitMap, append)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Command Handling
 
 function widget:CommandsChanged()
+	if disableForNextUpdate then
+		disableForNextUpdate = false
+		return
+	end
 	if not useSelectionFiltering then
 		return
 	end

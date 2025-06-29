@@ -285,6 +285,7 @@ function widget:PlayerChanged()
 	spec, fullview = spGetSpectatingState()
 	allyTeamID = Spring.GetMyAllyTeamID()
 	if fullview ~= prevFullview or allyTeamID ~= myPrevAllyTeamID then
+		ResetWidget()
 		widget:Initialize()
 	end
 end
@@ -366,7 +367,7 @@ local function WantToDrawRangeOfUnit(unitID, unitDefID)
 end
 
 local function UpdateUnitData(unitID, unitDefID, index, instanceData)
-	local instanceDataOffset = (circleInstanceVBO.instanceIDtoIndex[unitID] - 1)* circleInstanceVBO.instanceStep
+	local instanceDataOffset = (circleInstanceVBO.instanceIDtoIndex[unitID] - 1) * circleInstanceVBO.instanceStep
 	if not isBuilding[unitDefID] then
 		local x, y, z = spGetUnitPosition(unitID)
 

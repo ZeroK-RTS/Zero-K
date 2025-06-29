@@ -176,14 +176,13 @@ function UpdateNanoParticles(self)
 				self.pos = startPos
 			end
 		end
-
 	
 		local dir      = Vsub(endPos, startPos)
 		local half_dir = Vmul(dir, 0.5)
-		local length   = Vlength(dir)
+		local dx, dy, dz = dir[1], dir[2], dir[3]
 		self.dir       = dir
-		self.normdir   = Vmul( dir, 1/length )
+		self.normdir   = {math.normalize(dx, dy, dz)}
 		self._midpos   = Vadd(startPos, half_dir)
-		self._radius   = length*0.5 + 200
+		self._radius   = math.diag(dx, dy, dz)*0.5 + 200
 	end
 end
