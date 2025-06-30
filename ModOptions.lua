@@ -246,6 +246,14 @@ local options = {
     def         = false,
   },
   {
+    key         = "aiusetechk",
+    name        = "AIs Use Tech-K",
+    desc        = "Diverts some AI metal income for automatic upgrades of factories and mexes. This lets any AI approximate an understanding of Tech-K with minimal cheating.",
+    type        = "bool",
+    section     = "experimental",
+    def         = false,
+  },
+  {
     key         = "disableresurrect",
     name        = "Disable resurrect",
     desc        = "Removes resurrect abilities from the game",

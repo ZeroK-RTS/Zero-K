@@ -18,9 +18,12 @@ if not (modoption == "1") then
 	return
 end
 
+local autoAiTech = Spring.GetModOptions().aiusetechk == "1"
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local modCommands, modCmdMap = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
 local CMD_TECH_UP = Spring.Utilities.CMD.TECH_UP
 local techCommandData = modCmdMap[CMD_TECH_UP]
@@ -46,6 +49,9 @@ local goalSet = {}
 local unitLevel = {}
 local hasTechCommand = {}
 local reclaimToRemoveUnit = {}
+
+local aiAllyTeamInfo = autoAiTech and {}
+local aiTeamAlly = autoAiTech and {}
 
 local tintCycle = {
 	{1, 0.6, 0.9},
@@ -74,6 +80,15 @@ local function IsBuilding(unitDefID)
 	return buildingDefs[unitDefID] == 1
 end
 
+local mexDefs = {}
+local function IsMex(unitDefID)
+	if not mexDefs[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		mexDefs[unitDefID] = ud.customParams.ismex and 1 or 0
+	end
+	return mexDefs[unitDefID] == 1
+end
+
 local hasFactory = {}
 local function GetFactory(unitDefID)
 	if not hasFactory[unitDefID] then
@@ -88,13 +103,17 @@ local function GetFactory(unitDefID)
 end
 
 local isBuilder = {}
-local function IsTechBuilder(unitID, unitDefID)
+local function IsBuilder(unitDefID)
 	if not isBuilder[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		isBuilder[unitDefID] = ud.canRepair and 1 or 0
 	end
-	if isBuilder[unitDefID] == 0 then
-		return false
+	return isBuilder[unitDefID] == 1
+end
+
+local function IsTechBuilder(unitID, unitDefID)
+	if not IsBuilder(unitDefID) then
+		return
 	end
 	if not hasFactory[unitDefID] then
 		local ud = UnitDefs[unitDefID]
@@ -115,6 +134,9 @@ end
 
 local function SetUnitTechLevel(unitID, level)
 	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return
+	end
 	--Spring.Utilities.UnitEcho(unitID, level)
 	
 	local sizeScale = math.pow(1.6, math.pow(level, 0.45) - 1)
@@ -327,6 +349,191 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- AI handling
+
+local function SetNormalTechInvestment(allyTeamID)
+	local allyData = aiAllyTeamInfo[allyTeamID]
+	for i = 1, #allyData.aiTeams do
+		local teamID = allyData.aiTeams[i]
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.06 + 0.05*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.25 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other", 0.02 + 0.04*math.random())
+	end
+end
+
+local function SetCatchupTechInvestment(allyTeamID)
+	local allyData = aiAllyTeamInfo[allyTeamID]
+	for i = 1, #allyData.aiTeams do
+		local teamID = allyData.aiTeams[i]
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.25 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.1 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other",  0.01)
+	end
+end
+
+local function UpdateTechStatus(allyTeamID, myLevel, enemyLevel)
+	local allyData = aiAllyTeamInfo[allyTeamID]
+	local change = false
+	if myLevel and myLevel > allyData.techLevel then
+		allyData.techLevel = myLevel
+		change = true
+	end
+	if enemyLevel and enemyLevel > allyData.spottedTechLevel then
+		allyData.spottedTechLevel = enemyLevel
+		change = true
+	end
+	if not change then
+		return
+	end
+	if allyData.techLevel < allyData.spottedTechLevel then
+		SetCatchupTechInvestment(allyTeamID)
+	else
+		SetNormalTechInvestment(allyTeamID)
+	end
+end
+
+local function SpawnCeg(unitID, level)
+	local ux, uy, uz = Spring.GetUnitPosition(unitID)
+	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	Spring.SpawnCEG("resurrect", ux, uy, uz, 0, 0, 0, (ud.xsize or 4) * (1 + 0.05*level))
+end
+
+local function AddFactorySkimMetal(teamID, metal)
+	local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+	local unitID = IterableMap.Next(allyData.factories)
+	if not unitID then
+		return
+	end
+	if not Spring.ValidUnitID(unitID) then
+		IterableMap.Remove(allyData.factories, unitID)
+		return
+	end
+	local unitLevel = (unitLevel[unitID] or 1)
+	allyData.factoryMetal = allyData.factoryMetal + metal
+	local cost = Spring.Utilities.GetUnitCost(unitID)
+	if allyData.factoryMetal >= cost and not Spring.GetUnitIsStunned(unitID) then
+		allyData.factoryMetal = allyData.factoryMetal - cost
+		UpdateTechStatus(aiTeamAlly[teamID], unitLevel + 1)
+		SetUnitTechLevel(unitID, unitLevel + 1)
+		SpawnCeg(unitID, unitLevel)
+	end
+	return true
+end
+
+local function AddMexSkimMetal(teamID, metal)
+	local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+	local unitID = IterableMap.Next(allyData.mexes)
+	if not unitID then
+		return
+	end
+	if not Spring.ValidUnitID(unitID) then
+		IterableMap.Remove(allyData.mexes, unitID)
+		return
+	end
+	local unitLevel = (unitLevel[unitID] or 1)
+	if unitLevel >= allyData.techLevel then
+		return
+	end
+	allyData.mexMetal = allyData.mexMetal + metal
+	local cost = Spring.Utilities.GetUnitCost(unitID)
+	if allyData.mexMetal >= cost and not Spring.GetUnitIsStunned(unitID) then
+		allyData.mexMetal = allyData.mexMetal - cost
+		SetUnitTechLevel(unitID, unitLevel + 1)
+		SpawnCeg(unitID, unitLevel)
+	end
+	return true
+end
+
+local function AddOtherSkimMetal(teamID, metal)
+	local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+	local unitID = IterableMap.Next(allyData.other)
+	if not unitID then
+		return
+	end
+	if not Spring.ValidUnitID(unitID) then
+		IterableMap.Remove(allyData.other, unitID)
+		return
+	end
+	local unitLevel = (unitLevel[unitID] or 1)
+	if unitLevel >= allyData.techLevel then
+		return
+	end
+	allyData.otherMetal = allyData.otherMetal + metal
+	local cost = Spring.Utilities.GetUnitCost(unitID)
+	if allyData.otherMetal >= cost and not Spring.GetUnitIsStunned(unitID) then
+		allyData.otherMetal = allyData.otherMetal - cost
+		SetUnitTechLevel(unitID, unitLevel + 1)
+		SpawnCeg(unitID, unitLevel)
+	end
+	return true
+end
+
+local function AddAiUnit(unitID, unitDefID, teamID)
+	if IsFactory(unitDefID) then
+		local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+		UpdateTechStatus(aiTeamAlly[teamID], unitLevel[unitID] or 1)
+		IterableMap.Add(allyData.factories, unitID)
+	elseif IsMex(unitDefID) then
+		local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+		IterableMap.Add(allyData.mexes, unitID)
+	elseif IsBuilding(unitDefID) then
+		local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+		IterableMap.Add(allyData.other, unitID)
+	end
+end
+
+local function RemoveAiUnit(unitID, unitDefID, teamID)
+	if IsFactory(unitDefID) then
+		local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+		IterableMap.Remove(allyData.factories, unitID)
+		allyData.techLevel = 1
+		for unitID, _ in IterableMap.Iterator(allyData.factories) do
+			allyData.techLevel = math.max(allyData.techLevel, unitLevel[unitID] or 1)
+		end
+	elseif IsMex(unitDefID) then
+		local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+		IterableMap.Remove(allyData.mexes, unitID)
+	elseif IsBuilding(unitDefID) then
+		local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
+		IterableMap.Remove(allyData.other, unitID)
+	end
+end
+
+local function SetupAiTeams()
+	if not autoAiTech then
+		return
+	end
+	
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local _, _, _, isAiTeam, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
+		if isAiTeam then
+			if not aiAllyTeamInfo[allyTeamID] then
+				aiAllyTeamInfo[allyTeamID] = {
+					aiTeams = {},
+					factories = IterableMap.New(),
+					mexes = IterableMap.New(),
+					other = IterableMap.New(),
+					factoryMetal = 0,
+					mexMetal = 0,
+					otherMetal = 0,
+					techLevel = 1,
+					spottedTechLevel = 1,
+				}
+			end
+			local allyData = aiAllyTeamInfo[allyTeamID]
+			allyData.aiTeams[#allyData.aiTeams + 1] = teamID
+			aiTeamAlly[teamID] = allyTeamID
+			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.06 + 0.05*math.random(), AddFactorySkimMetal)
+			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.25 + 0.1*math.random(), AddMexSkimMetal)
+			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other", 0.02 + 0.04*math.random(), AddOtherSkimMetal)
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local techInheritMechanics = {
 	teleport_beacon = true,
@@ -343,13 +550,19 @@ function gadget:UnitCreatedByMechanic(unitID, parentID, mechanic, extraData)
 	end
 end
 
-function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	if builderID and Spring.GetUnitCurrentCommand(builderID) == CMD.RESURRECT then
+		return
+	end
 	if builderID and (unitLevel[builderID] or 1) > 1 then
 		SetUnitTechLevel(unitID, unitLevel[builderID])
 	end
 	if IsTechBuilder(unitID, unitDefID) then
 		hasTechCommand[unitID] = true
 		Spring.InsertUnitCmdDesc(unitID, techCommandData.cmdDesc)
+	end
+	if aiTeamAlly and aiTeamAlly[teamID] then
+		AddAiUnit(unitID, unitDefID, teamID)
 	end
 end
 
@@ -363,6 +576,37 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		return
 	end
 	AddFeature(unitID, unitDefID, teamID, unitLevel[unitID])
+	if aiTeamAlly and aiTeamAlly[teamID] then
+		RemoveAiUnit(unitID, unitDefID, teamID)
+	end
+end
+
+if autoAiTech then
+	function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+		local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID, false)
+		local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID, false)
+		if newAllyTeam ~= oldAllyTeam and aiTeamAlly and aiTeamAlly[teamID] then
+			AddAiUnit(unitID, unitDefID, teamID)
+		end
+	end
+
+	function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
+		local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID, false)
+		local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID, false)
+		if newAllyTeam ~= oldAllyTeam and aiTeamAlly and aiTeamAlly[teamID] then
+			RemoveAiUnit(unitID, unitDefID, teamID)
+		end
+	end
+		
+	function gadget:UnitEnteredLos(unitID, teamID, allyTeamID, unitDefID)
+		if not aiAllyTeamInfo[allyTeamID] then
+			return
+		end
+		if Spring.GetUnitAllyTeam(unitID) ~= allyTeamID then
+			local level = unitLevel[unitID] or 1
+			UpdateTechStatus(allyTeamID, false, level)
+		end
+	end
 end
 
 function GG.GetUnitTechLevel(unitID)
@@ -371,11 +615,14 @@ end
 
 function gadget:Initialize()
 	GG.SetUnitTechLevel = SetUnitTechLevel
+	SetupAiTeams()
 	gadgetHandler:RegisterCMDID(CMD_TECH_UP)
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local level = Spring.GetUnitRulesParam(unitID, "tech_level")
-		if level then
-			SetUnitTechLevel(unitID, level)
+		if level or autoAiTech then
+			if level then
+				SetUnitTechLevel(unitID, level)
+			end
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local teamID = Spring.GetUnitTeam(unitID)
 			gadget:UnitCreated(unitID, unitDefID, teamID)

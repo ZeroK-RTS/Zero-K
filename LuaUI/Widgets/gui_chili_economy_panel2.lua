@@ -571,12 +571,13 @@ function UpdateCustomParamResourceData()
 	cp.metalBase       = spGetTeamRulesParam(teamID, "OD_metalBase") or 0
 	cp.metalOverdrive  = spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0
 	cp.metalMisc       = spGetTeamRulesParam(teamID, "OD_metalMisc") or 0
-    
+	cp.metalSkim       = spGetTeamRulesParam(teamID, "OD_metalSkim") or 0
+	
 	cp.metalReclaimTotal = spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
 	cp.metalValue        = spGetTeamRulesParam(teamID, "stats_history_unit_value_current") or 0
 	cp.nanoframeValue    = spGetTeamRulesParam(teamID, "stats_history_nano_partial_current") or 0
 	cp.nanoframeTotal    = spGetTeamRulesParam(teamID, "stats_history_nano_total_current") or 0
-
+	
 	cp.team_metalReclaimTotal = 0
 	cp.team_metalValue = 0
 	cp.team_nanoframeTotal = 0
@@ -934,7 +935,7 @@ function widget:GameFrame(n)
 	local metalOverdrive = Format(cp.metalOverdrive)
 	local metalReclaim = Format(math.max(0, mInco - cp.metalOverdrive - cp.metalBase - cp.metalMisc - mReci))
 	local metalConstructor = Format(cp.metalMisc)
-	local metalShare = Format(mReci - mSent)
+	local metalShare = Format(mReci - mSent - cp.metalSkim)
 	local metalConstruction = Format(-mExpe)
 	
 	local team_metalTotalIncome = Format(teamMInco)
