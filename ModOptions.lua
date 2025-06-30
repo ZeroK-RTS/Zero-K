@@ -876,7 +876,7 @@ local options = {
 	name    = "Pathfinder type",
 	desc    = "Sets the pathfinding system used by units.",
 	type    = "list",
-	def     = "random",
+	def     = "qtpfs",
 	section = "experimental",
 	items  = {
 		{
