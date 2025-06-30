@@ -17,7 +17,7 @@ Spring.Echo("forceSingleThreaded", forceSingleThreaded)
 
 local pathExperiment = false
 local pathfinder = Spring.GetModOptions().pathfinder or "qtpfs"
-if Script.IsEngineMinVersion and Script.IsEngineMinVersion(2025, 3, 0) and (pathfinder == "qtpfs" or (pathfinder == "random" and math.random() < 0.5)) then
+if Script.IsEngineMinVersion and Script.IsEngineMinVersion(2025, 3, 0) and (pathfinder == "qtpfs") then
 	pathExperiment = true
 	Spring.Echo("pathfinderSelection pathWithQtpfs")
 else

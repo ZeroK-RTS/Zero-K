@@ -884,11 +884,11 @@ local options = {
 			name = 'Standard',
 			desc = 'Standard pathfinder',
 		},
-		{
-			key  = 'random',
-			name = 'Random',
-			desc = 'Randomly pick a pathfinder',
-		},
+		--{ https://github.com/ZeroK-RTS/Zero-K/issues/5523
+		--	key  = 'random', 
+		--	name = 'Random',
+		--	desc = 'Randomly pick a pathfinder',
+		--},
 		{
 			key  = 'qtpfs',
 			name = 'QTPFS',
