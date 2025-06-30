@@ -102,11 +102,19 @@ local Sounds = {
 			pitchmod = 0.1,
 			gainmod = 0.05,
 		},
-		SiloLaunch = {
+		SiloLaunchEmp = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
 			gain = 1.0,
 			pitch = 1.0,
-			priority = 1,
+			priority = 2,
+			maxconcurrent = 30,
+			maxdist = nil,
+		},
+		SiloLaunch = {
+			file = "sounds/weapon/missile/tacnuke_launch.wav",
+			gain = 0.4,
+			pitch = 1.0,
+			priority = 2,
 			maxconcurrent = 30,
 			maxdist = nil,
 		},
@@ -122,12 +130,42 @@ local Sounds = {
 			gainmod = 0,
 			pitch = 0.9,
 		},
+		FirewalkerHit = {
+			file = "sounds/weapon/cannon/wolverine_hit.wav",
+			pitchmod = 0.008,
+		},
+		CaptureRay = {
+			file = "sounds/weapon/laser/capture_ray.wav",
+			gainmod = 0.5,
+			gain = 0.6,
+		},
+		ex_med5_flat_pitch = {
+			file = "sounds/explosion/ex_med5.wav",
+			pitchmod = 0,
+		},
+		heavy_laser3_flat_pitch = {
+			file = "sounds/weapon/laser/heavy_laser3.wav",
+			priority = 0.5,
+			pitchmod = 0,
+		},
+		gravity_fire = {
+			file = "sounds/weapon/gravity_fire.wav",
+			gainmod = 0.8,
+			pitchmod = 0,
+		},
+		dgun_hit = {
+			file = "sounds/explosion/ex_med6.wav",
+			gainmod = 0.7,
+			pitchmod = 0,
+		},
 	},
 }
 
 --------------------------------------------------------------------------------
 -- Automagical sound handling
 --------------------------------------------------------------------------------
+
+local DISABLE_PITCHMOD = true
 
 local optionOverrides = {
 	["weapon/missile/missile_launch_short"] = {
@@ -143,15 +181,69 @@ local optionOverrides = {
 	},
 	["weapon/cannon/plasma_fire_extra2"] = {
 		gain = 20,
-	}
+	},
 }
 
+local priority = {
+	["weapon/laser/heavy_laser6"] = 1,
+	["weapon/laser/heavy_laser3"] = 1,
+	["weapon/missile/liche_fire"] = 1,
+	["weapon/missile/liche_hit"] = 1,
+	["explosion/ex_ultra8"] = 2,
+}
+
+local lowPitchMod = {
+	"weapon/heatray_fire",
+	"weapon/emg",
+	"explosion/burn_explode",
+	"weapon/bomb_drop_short",
+	"impacts/shotgun_impactv5",
+	"explosion/ex_large5",
+	"weapon/laser/mini_laser",
+}
+
+local lowestPitchMod = {
+	"weapon/laser/pulse_laser3",
+}
+
+local noPitchMod = {
+	"weapon/missile/missile_fire9_heavy",
+	"weapon/missile/rapid_rocket_fire2",
+	"weapon/cannon/wolverine_fire",
+	"weapon/laser/pulse_laser2",
+	"weapon/shotgun_firev4",
+	"weapon/cannon/cannon_fire4",
+	"weapon/missile/rapid_rocket_fire",
+	"weapon/small_lightning",
+	"explosion/ex_large4",
+	"weapon/gauss_fire_short",
+	"weapon/missile/rapid_rocket_hit",
+	"weapon/laser/laser_burn10",
+	"weapon/laser/laser_burn9",
+}
+
+for i = 1, #noPitchMod do 
+	optionOverrides[noPitchMod[i]] = {pitchmod = 0}
+end
+
+for i = 1, #lowPitchMod do 
+	optionOverrides[lowPitchMod[i]] = {pitchmod = DISABLE_PITCHMOD and 0 or 0.015}
+end
+
+for i = 1, #lowestPitchMod do 
+	optionOverrides[lowestPitchMod[i]] = {pitchmod = DISABLE_PITCHMOD and 0 or 0.006}
+end
+
 local defaultOpts = {
-	pitchmod = 0, --0.02,
+	pitchmod = DISABLE_PITCHMOD and 0 or 0.04,
 	gainmod = 0,
 }
 local replyOpts = {
-	pitchmod = 0, --0.02,
+	pitchmod = 0, 
+	gainmod = 0,
+}
+local explosionOpts = {
+	pitchmod = 0.07,
 	gainmod = 0,
 }
 
@@ -177,13 +269,14 @@ local function AutoAdd(subDir, generalOpts)
 		local pathPart, ext = fullPath:match("sounds/(.*)%.(.*)")
 		if not ignoredExtensions[ext] then
 			local opts = optionOverrides[pathPart] or generalOpts
+			Spring.Echo(pathPart, opts.priority or priority[pathPart] or 0)
 			Sounds.SoundItems[pathPart] = {
 				file = fullPath,
 				rolloff = opts.rollOff,
 				dopplerscale = opts.dopplerscale,
 				maxdist = opts.maxdist,
 				maxconcurrent = opts.maxconcurrent,
-				priority = opts.priority,
+				priority = opts.priority or priority[pathPart] or 0,
 				in3d = opts.in3d,
 				gain = opts.gain,
 				gainmod = opts.gainmod,
@@ -196,8 +289,8 @@ end
 
 -- add sounds
 AutoAdd("weapon", defaultOpts)
-AutoAdd("explosion", defaultOpts)
 AutoAdd("reply", replyOpts)
+AutoAdd("explosion", explosionOpts)
 AutoAdd("music", noVariation)
 
 return Sounds

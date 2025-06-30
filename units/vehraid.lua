@@ -116,6 +116,7 @@ return { vehraid = {
       rgbColor                = [[1 0.1 0]],
       rgbColor2               = [[1 1 0.25]],
       soundStart              = [[weapon/heatray_fire]],
+      soundStartVolume        = 6.8,
       thickness               = 3,
       tolerance               = 5000,
       turret                  = true,
