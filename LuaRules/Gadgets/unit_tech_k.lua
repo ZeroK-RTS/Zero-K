@@ -349,13 +349,23 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- AI handling
+-- AI Handling
+
+local function SpawnCeg(unitID, level)
+	local ux, uy, uz = Spring.GetUnitPosition(unitID)
+	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	Spring.SpawnCEG("resurrect", ux, uy, uz, 0, 0, 0, (ud.xsize or 4) * (1 + 0.05*level))
+end
 
 local function SetNormalTechInvestment(allyTeamID)
 	local allyData = aiAllyTeamInfo[allyTeamID]
+	if not allyData then
+		return
+	end
+	allyData.onlyUpgradeMax = (math.random() > 0.5)
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.06 + 0.05*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", (0.045 + 0.045*math.random()) * (4 / (3 + allyData.techLevel)))
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.25 + 0.1*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other", 0.02 + 0.04*math.random())
 	end
@@ -363,10 +373,14 @@ end
 
 local function SetCatchupTechInvestment(allyTeamID)
 	local allyData = aiAllyTeamInfo[allyTeamID]
+	if not allyData then
+		return
+	end
+	allyData.onlyUpgradeMax = true
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.25 + 0.1*math.random())
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.1 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.2 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.08 + 0.1*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other",  0.01)
 	end
 end
@@ -392,11 +406,9 @@ local function UpdateTechStatus(allyTeamID, myLevel, enemyLevel)
 	end
 end
 
-local function SpawnCeg(unitID, level)
-	local ux, uy, uz = Spring.GetUnitPosition(unitID)
-	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-	Spring.SpawnCEG("resurrect", ux, uy, uz, 0, 0, 0, (ud.xsize or 4) * (1 + 0.05*level))
-end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- AI Setup
 
 local function AddFactorySkimMetal(teamID, metal)
 	local allyData = aiAllyTeamInfo[aiTeamAlly[teamID]]
@@ -412,10 +424,12 @@ local function AddFactorySkimMetal(teamID, metal)
 	allyData.factoryMetal = allyData.factoryMetal + metal
 	local cost = Spring.Utilities.GetUnitCost(unitID)
 	if allyData.factoryMetal >= cost and not Spring.GetUnitIsStunned(unitID) then
-		allyData.factoryMetal = allyData.factoryMetal - cost
-		UpdateTechStatus(aiTeamAlly[teamID], unitLevel + 1)
-		SetUnitTechLevel(unitID, unitLevel + 1)
-		SpawnCeg(unitID, unitLevel)
+		if (not allyData.onlyUpgradeMax) or (unitLevel == allyData.techLevel) then
+			allyData.factoryMetal = allyData.factoryMetal - cost
+			UpdateTechStatus(aiTeamAlly[teamID], unitLevel + 1)
+			SetUnitTechLevel(unitID, unitLevel + 1)
+			SpawnCeg(unitID, unitLevel)
+		end
 	end
 	return true
 end
@@ -525,10 +539,15 @@ local function SetupAiTeams()
 			local allyData = aiAllyTeamInfo[allyTeamID]
 			allyData.aiTeams[#allyData.aiTeams + 1] = teamID
 			aiTeamAlly[teamID] = allyTeamID
-			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.06 + 0.05*math.random(), AddFactorySkimMetal)
-			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.25 + 0.1*math.random(), AddMexSkimMetal)
-			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other", 0.02 + 0.04*math.random(), AddOtherSkimMetal)
+			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0, AddFactorySkimMetal)
+			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0, AddMexSkimMetal)
+			GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other", 0, AddOtherSkimMetal)
 		end
+	end
+	
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		SetNormalTechInvestment(allyTeamList[i])
 	end
 end
 
@@ -613,7 +632,17 @@ function GG.GetUnitTechLevel(unitID)
 	return unitLevel and unitID and unitLevel[unitID] or 1
 end
 
+local function TechUpAll(cmd,line,words,player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		SetUnitTechLevel(unitID, (unitLevel[unitID] or 1) + 1)
+	end
+end
+
 function gadget:Initialize()
+	gadgetHandler:AddChatAction("techup", TechUpAll, "Increment tech levels by 1.")
 	GG.SetUnitTechLevel = SetUnitTechLevel
 	SetupAiTeams()
 	gadgetHandler:RegisterCMDID(CMD_TECH_UP)

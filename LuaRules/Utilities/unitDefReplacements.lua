@@ -350,6 +350,14 @@ if Spring.GetModOptions().techk == "1" and WG then
 		local prefix = ""
 		local level = GetTechLevel(unitID)
 		local preLevel = level
+		while preLevel > 23 do
+			prefix = prefix .. "Absurd "
+			preLevel = preLevel - 23
+		end
+		while preLevel > 12 do
+			prefix = prefix .. "LEGENDARY "
+			preLevel = preLevel - 12
+		end
 		while preLevel > 7 do
 			prefix = prefix .. "Über "
 			preLevel = preLevel - 7

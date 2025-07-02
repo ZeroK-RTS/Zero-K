@@ -251,7 +251,7 @@ local options = {
     desc        = "Diverts some AI metal income for automatic upgrades of factories and mexes. This lets any AI approximate an understanding of Tech-K with minimal cheating.",
     type        = "bool",
     section     = "experimental",
-    def         = false,
+    def         = true,
   },
   {
     key         = "disableresurrect",
