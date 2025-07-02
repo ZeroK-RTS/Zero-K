@@ -992,7 +992,9 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if (GG.att_DeathExplodeMult[unitID] or 1) ~= 1 then
-		AddExplosions(unitID, unitDefID, teamID, GG.att_DeathExplodeMult[unitID])
+		if GG.MorphDestroy ~= unitID then
+			AddExplosions(unitID, unitDefID, teamID, GG.att_DeathExplodeMult[unitID])
+		end
 	end
 	Attributes.RemoveUnit(unitID)
 end
