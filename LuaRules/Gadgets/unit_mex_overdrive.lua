@@ -872,20 +872,14 @@ local function SkimMetalIncome(teamID, metalIncome)
 	local skimData = teamSkimMetal[teamID].sources
 	local mult = 1 / math.max(1, teamSkimMetal[teamID].total)
 	local skimmed = 0
-	local toRemove = false
-	for k, v in pairs(skimData) do
+	for k, v in pairs(Spring.Utilities.CopyTable(skimData)) do
+		-- Copy table to allow modification of future skims during the loop
 		local availible= v.proportion * metalIncome * mult
 		local used, finished = v.func(teamID, availible)
 		if used then
 			skimmed = skimmed + availible
 		end
 		if finished then
-			toRemove = toRemove or {}
-			toRemove[#toRemove + 1] = k
-		end
-	end
-	if toRemove then
-		for i = 1, #toRemove do
 			SetTeamSkim(teamID, toRemove[i])
 		end
 	end
