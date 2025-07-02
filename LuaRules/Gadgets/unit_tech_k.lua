@@ -379,7 +379,7 @@ local function SetCatchupTechInvestment(allyTeamID)
 	allyData.onlyUpgradeMax = true
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.2 + 0.1*math.random()))
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.14 + 0.1*math.random()))
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.08 + 0.1*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other",  0.01)
 	end
