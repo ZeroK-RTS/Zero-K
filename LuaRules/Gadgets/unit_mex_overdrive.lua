@@ -842,7 +842,7 @@ local function SetTeamSkim(teamID, key, proportion, func)
 		}
 	end
 	local skimData = teamSkimMetal[teamID].sources
-	if (proportion or 0) == 0 then
+	if not proportion then
 		skimData[key] = nil
 		local total = 0
 		for k, v in pairs(skimData) do
@@ -866,7 +866,7 @@ local function SetTeamSkim(teamID, key, proportion, func)
 end
 
 local function SkimMetalIncome(teamID, metalIncome)
-	if not teamSkimMetal[teamID] then
+	if (not teamSkimMetal[teamID]) or teamSkimMetal[teamID].total <= 0 then
 		return metalIncome, 0
 	end
 	local skimData = teamSkimMetal[teamID].sources

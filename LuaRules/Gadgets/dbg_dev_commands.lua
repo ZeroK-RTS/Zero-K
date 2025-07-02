@@ -1,15 +1,15 @@
 
 function gadget:GetInfo()
-  return {
-    name      = "Dev Commands",
-    desc      = "Adds useful commands.",
-    author    = "Google Frog",
-    date      = "12 Sep 2011",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true,  --  loaded by default?
-	handler   = true,
-  }
+	return {
+		name      = "Dev Commands",
+		desc      = "Adds useful commands.",
+		author    = "Google Frog",
+		date      = "12 Sep 2011",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true,  --  loaded by default?
+		handler   = true,
+	}
 end
 
 
