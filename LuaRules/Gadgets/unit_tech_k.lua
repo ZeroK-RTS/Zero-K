@@ -366,7 +366,7 @@ local function SetNormalTechInvestment(allyTeamID)
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.05 + 0.04*math.random()) * (3 / (1 + allyData.techLevel)))
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.25 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.12 + 0.06*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other", 0.02 + 0.04*math.random())
 	end
 end
@@ -380,7 +380,7 @@ local function SetCatchupTechInvestment(allyTeamID)
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.14 + 0.1*math.random()))
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.08 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.04 + 0.03*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other",  0.01)
 	end
 end
