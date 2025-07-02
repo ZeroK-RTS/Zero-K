@@ -1,6 +1,9 @@
 include "constants.lua"
 
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetUnitWeaponState = Spring.GetUnitWeaponState
+local spSetUnitWeaponState = Spring.SetUnitWeaponState
+local spGetGameFrame = Spring.GetGameFrame
 
 local base, shield, front, bottom, back = piece('base', 'shield', 'front', 'bottom', 'back')
 local rim1, door1, rim2, door2 = piece('rim1', 'door1', 'rim2', 'door2')
@@ -64,17 +67,28 @@ end
 local landRange = WeaponDefNames["hoverdepthcharge_fake_depthcharge"].range
 local seaRange  = WeaponDefNames["hoverdepthcharge_depthcharge"].range
 
+local prevMult, prevWeaponMult
+local function RangeUpdate(mult, weaponMult)
+	mult = mult or prevMult or 1
+	weaponMult = weaponMult or prevWeaponMult
+	prevMult, prevWeaponMult = mult, weaponMult
+	
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	local height = Spring.GetGroundHeight(x, z)
+	if height > -5 then
+		Spring.SetUnitMaxRange(unitID, landRange)
+		spSetUnitWeaponState(unitID, 1, "range", landRange * mult * (weaponMult and weaponMult[2] or 1))
+	else
+		Spring.SetUnitMaxRange(unitID, seaRange)
+		spSetUnitWeaponState(unitID, 1, "range", seaRange * mult *(weaponMult and weaponMult[1] or 1))
+	end
+	spSetUnitWeaponState(unitID, 2, "range", landRange * mult *(weaponMult and weaponMult[2] or 1))
+	spSetUnitWeaponState(unitID, 3, "range", landRange * mult *(weaponMult and weaponMult[2] or 1))
+end
+
 local function WeaponRangeUpdate()
 	while true do
-		local x, _, z = Spring.GetUnitPosition(unitID)
-		local height = Spring.GetGroundHeight(x, z)
-		if height > -5 then
-			Spring.SetUnitMaxRange(unitID, landRange)
-			Spring.SetUnitWeaponState(unitID, 1, "range", landRange)
-		else
-			Spring.SetUnitMaxRange(unitID, seaRange)
-			Spring.SetUnitWeaponState(unitID, 1, "range", seaRange)
-		end
+		RangeUpdate()
 		Sleep(500)
 	end
 end
@@ -83,6 +97,7 @@ end
 --------------------------------------------------------------------------------------
 
 function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	Hide(flare1)
 	Hide(flare2)
 	Hide(turret)
@@ -142,10 +157,6 @@ end
 function script.Shot(num)
 	StartThread(ShotThread)
 end
-
-local spGetUnitWeaponState = Spring.GetUnitWeaponState
-local spSetUnitWeaponState = Spring.SetUnitWeaponState
-local spGetGameFrame = Spring.GetGameFrame
 
 local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
 local RELOAD = math.ceil(depthchargeWeaponDef.reload * Game.gameSpeed)

@@ -118,25 +118,37 @@ function script.StopMoving()
 	StartThread(Stopping)
 end
 
+local prevMult, prevWeaponMult
+local function RangeUpdate(mult, weaponMult)
+	local changed = mult and true
+	mult = mult or prevMult or 1
+	weaponMult = weaponMult or prevWeaponMult
+	prevMult, prevWeaponMult = mult, weaponMult
+	
+	Spring.SetUnitWeaponState(unitID, 2, "range", torpRange * mult * (weaponMult and weaponMult[2] or 1))
+	local height = select(2, Spring.GetUnitPosition(unitID))
+	if height < ROCKET_DEPTH then
+		if changed or longRange then
+			Spring.SetUnitWeaponState(unitID, 1, "range", torpRange * mult * (weaponMult and weaponMult[2] or 1))
+			Spring.SetUnitMaxRange(unitID, torpRange * mult * (weaponMult and weaponMult[2] or 1))
+			longRange = false
+		end
+	elseif changed or not longRange then
+		Spring.SetUnitWeaponState(unitID, 1, shotRange * mult * (weaponMult and weaponMult[2] or 1))
+		Spring.SetUnitMaxRange(unitID, shotRange * mult * (weaponMult and weaponMult[2] or 1))
+		longRange = true
+	end
+end
+
 local function WeaponRangeUpdate()
 	while true do
-		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < ROCKET_DEPTH then
-			if longRange then
-				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
-				Spring.SetUnitMaxRange(unitID, torpRange)
-				longRange = false
-			end
-		elseif not longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
-			Spring.SetUnitMaxRange(unitID, shotRange)
-			longRange = true
-		end
+		RangeUpdate()
 		Sleep(200)
 	end
 end
 
 function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 end
