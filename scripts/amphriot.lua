@@ -103,29 +103,10 @@ local function ResetLegs()
 	Turn(rbfoot, x_axis, 0, math.rad(80))
 end
 
-local longRange = false
-local torpRange = WeaponDefNames["amphriot_torpedo"].range
-local shotRange = WeaponDefNames["amphriot_flechette"].range
+--local longRange = false
+--local torpRange = WeaponDefNames["amphriot_torpedo"].range
+--local shotRange = WeaponDefNames["amphriot_flechette"].range
 
---[[
-local function WeaponRangeUpdate()
-	while true do
-		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -35 then
-			if not longRange then
-				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
-				Spring.SetUnitMaxRange(unitID, torpRange)
-				longRange = true
-			end
-		elseif longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
-			Spring.SetUnitMaxRange(unitID, shotRange)
-			longRange = false
-		end
-		Sleep(200)
-	end
-end
-]]
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim functions
@@ -327,19 +308,7 @@ end
 --------------------------------------------------------------------------------------
 
 function script.Create()
-	--StartThread(Walk)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	--StartThread(WeaponRangeUpdate) -- Equal range so not required
-	--local height = select(2, Spring.GetUnitPosition(unitID))
-	--if height < -20 then
-	--	if not longRange then
-	--		Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
-	--		longRange = true
-	--	end
-	--elseif longRange then
-	--	Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
-	--	longRange = false
-	--end
 end
 
 function script.StartMoving()
