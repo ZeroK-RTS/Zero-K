@@ -765,6 +765,17 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_movestate1"
 	end
 
+	if ud.highTrajectoryType == 2 then
+		options[defName .. "_high_trajectory_1"] = {
+			name = "  Shoot High Trajectory",
+			desc = "Shoot High Trajectory: check box to turn it on",
+			type = 'bool',
+			value = false,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_high_trajectory_1"
+	end
+
 	if (ud.canFly) then
 		options[defName .. "_flylandstate_1"] = {
 			name = "  Fly/Land State",
@@ -1416,6 +1427,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 		end
 		
+		QueueState(name, "high_trajectory_1", CMD.TRAJECTORY, orderArray)
 		QueueState(name, "repeat", CMD.REPEAT, orderArray)
 		QueueState(name, "flylandstate_1_factory", CMD_AP_FLY_STATE, orderArray)
 		QueueState(name, "auto_assist", CMD_FACTORY_GUARD, orderArray)
