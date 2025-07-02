@@ -18,7 +18,7 @@ if not (modoption == "1") then
 	return
 end
 
-local autoAiTech = Spring.GetModOptions().aiusetechk == "1"
+local autoAiTech = Spring.GetModOptions().aiusetechk ~= "0"
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -362,10 +362,10 @@ local function SetNormalTechInvestment(allyTeamID)
 	if not allyData then
 		return
 	end
-	allyData.onlyUpgradeMax = (math.random() > 0.5)
+	allyData.onlyUpgradeMax = (math.random() > 0.8)
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", (0.045 + 0.045*math.random()) * (4 / (3 + allyData.techLevel)))
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.05 + 0.04*math.random()) * (3 / (1 + allyData.techLevel)))
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.25 + 0.1*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other", 0.02 + 0.04*math.random())
 	end
@@ -379,13 +379,13 @@ local function SetCatchupTechInvestment(allyTeamID)
 	allyData.onlyUpgradeMax = true
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", 0.2 + 0.1*math.random())
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.2 + 0.1*math.random()))
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.08 + 0.1*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other",  0.01)
 	end
 end
 
-local function UpdateTechStatus(allyTeamID, myLevel, enemyLevel)
+local function UpdateTechStatus(allyTeamID, myLevel, enemyLevel, factoryMult)
 	local allyData = aiAllyTeamInfo[allyTeamID]
 	local change = false
 	if myLevel and myLevel > allyData.techLevel then
@@ -394,6 +394,10 @@ local function UpdateTechStatus(allyTeamID, myLevel, enemyLevel)
 	end
 	if enemyLevel and enemyLevel > allyData.spottedTechLevel then
 		allyData.spottedTechLevel = enemyLevel
+		change = true
+	end
+	if factoryMult and factoryMult ~= allyData.factoryMult then
+		allyData.factoryMult = factoryMult
 		change = true
 	end
 	if not change then
@@ -426,11 +430,15 @@ local function AddFactorySkimMetal(teamID, metal)
 	if allyData.factoryMetal >= cost and not Spring.GetUnitIsStunned(unitID) then
 		if (not allyData.onlyUpgradeMax) or (unitLevel == allyData.techLevel) then
 			allyData.factoryMetal = allyData.factoryMetal - cost
+			allyData.bestFactoryProgress = 0
 			UpdateTechStatus(aiTeamAlly[teamID], unitLevel + 1)
 			SetUnitTechLevel(unitID, unitLevel + 1)
 			SpawnCeg(unitID, unitLevel)
 		end
 	end
+	allyData.bestFactoryProgress = math.max(allyData.bestFactoryProgress, allyData.factoryMetal / cost)
+	UpdateTechStatus(aiTeamAlly[teamID], false, false, (allyData.bestFactoryProgress > 0.15 and 3.5) or 0.2)
+	--Spring.Echo("allyData.factoryMetal", allyData.factoryMetal)
 	return true
 end
 
@@ -534,6 +542,8 @@ local function SetupAiTeams()
 					otherMetal = 0,
 					techLevel = 1,
 					spottedTechLevel = 1,
+					factoryMult = 1,
+					bestFactoryProgress = 0,
 				}
 			end
 			local allyData = aiAllyTeamInfo[allyTeamID]
