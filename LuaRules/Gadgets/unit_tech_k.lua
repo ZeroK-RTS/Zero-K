@@ -59,6 +59,10 @@ local tintCycle = {
 	{0.72, 0.82, 1},
 }
 
+local commUpgraders = {
+	[UnitDefNames["striderhub"].id] = true
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -100,6 +104,15 @@ local function GetFactory(unitDefID)
 		hasFactory[unitDefID] = factory or -1
 	end
 	return (hasFactory[unitDefID] >= 0) and hasFactory[unitDefID]
+end
+
+local isComm = {}
+local function IsComm(unitDefID)
+	if not isComm[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		isComm[unitDefID] = (ud.customParams.dynamic_comm or ud.customParams.commtype) and 1 or 0
+	end
+	return isComm[unitDefID] == 1
 end
 
 local isBuilder = {}
@@ -227,7 +240,7 @@ local function CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
 		return false
 	end
 	local targetUnitDef = Spring.GetUnitDefID(targetID)
-	if not IsBuilding(targetUnitDef) then
+	if not IsBuilding(targetUnitDef) and not (commUpgraders[unitDefID] and IsComm(targetUnitDef)) then
 		return false
 	end
 	local builderLevel = (unitLevel[unitID] or 1)
@@ -379,7 +392,7 @@ local function SetCatchupTechInvestment(allyTeamID)
 	allyData.onlyUpgradeMax = true
 	for i = 1, #allyData.aiTeams do
 		local teamID = allyData.aiTeams[i]
-		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.14 + 0.1*math.random()))
+		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_factory", allyData.factoryMult * (0.15 + 0.1*math.random()) * (1.5 / (1 + allyData.techLevel / 2)))
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_mex", 0.04 + 0.03*math.random())
 		GG.Overdrive.SetMetalIncomeSkim(teamID, "tech_other",  0.01)
 	end
@@ -604,7 +617,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if build and build < 0.8 then
 		return
 	end
-	AddFeature(unitID, unitDefID, teamID, unitLevel[unitID])
+	if GG.MorphDestroy ~= unitID then
+		AddFeature(unitID, unitDefID, teamID, unitLevel[unitID])
+	end
 	if aiTeamAlly and aiTeamAlly[teamID] then
 		RemoveAiUnit(unitID, unitDefID, teamID)
 	end

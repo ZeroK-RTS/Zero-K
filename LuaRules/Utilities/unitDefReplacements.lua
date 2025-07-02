@@ -20,7 +20,6 @@ for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	buildTimes[i] = ud.buildTime
 	if ud.customParams.level or ud.customParams.dynamic_comm then
-		variableCostUnit[i] = true
 		dynComm[i] = true
 	end
 	if ud.customParams.planetwars_structure then
@@ -63,16 +62,15 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	local cost = buildTimes[unitDefID]
 	if unitID then
 		if variableCostUnit[unitDefID] then
-			local paramCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+			local paramCost = Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 			if not paramCost and not debugSent and GG then
 				Spring.Utilities.UnitEcho(unitID, "variableCostUnit missing cost")
 				Spring.Echo("unitID, unitDefID, cost", unitID, unitDefID, cost)
 				debugSent = true
 			end
 			cost = paramCost or cost
-		else
-			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		end
+		cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 	end
 	if not cost then
 		Spring.Echo("Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
@@ -328,10 +326,9 @@ if Spring.GetModOptions().techk == "1" and WG then
 		local cost = buildTimes[unitDefID]
 		if unitID then
 			if variableCostUnit[unitDefID] then
-				cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
-			else
-				cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
+				cost = Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 			end
+			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		else
 			cost = cost * math.pow(2, (WG.SelectedTechLevel or 1) - 1)
 		end
