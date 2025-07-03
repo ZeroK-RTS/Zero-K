@@ -27,6 +27,7 @@ return { gunshipbomb = {
     idle_cloak = 1,
     stats_detonate_weapon = [[gunshipbomb_gunshipbomb_bomb]],
     avoid_sticky_keep_target = 1,
+    factory_creation_push = 8,
   },
 
   explodeAs              = [[TINY_BUILDINGEX]],
