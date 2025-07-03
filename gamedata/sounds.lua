@@ -243,7 +243,7 @@ local replyOpts = {
 	gainmod = 0,
 }
 local explosionOpts = {
-	pitchmod = 0.07,
+	pitchmod = 0.00,
 	gainmod = 0,
 }
 
