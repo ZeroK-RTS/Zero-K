@@ -994,7 +994,6 @@ function IsTargetReachable(moveID, ox,oy,oz,tx,ty,tz,radius)
 	if WG.Disable_RequestPath then
 		return "reach"
 	end
-	Spring.MarkerAddPoint(ox, oy, oz, "Path")
 	local result,lastcoordinate, waypoints
 	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
 	if path then
