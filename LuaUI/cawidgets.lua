@@ -173,6 +173,8 @@ widgetHandler = {
 	tweakMode = false,
 }
 
+VFS.Include('LuaRules/engine_compat_post.lua', nil, vfsGame)
+
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
 local flexCallIns = {
