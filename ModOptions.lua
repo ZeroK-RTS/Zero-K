@@ -905,6 +905,14 @@ local options = {
 	},
   },
   {
+	key     = "luapathrequest",
+	name    = "Allow Lua Path Requests",
+	desc    = "When enabled, the game will probably desync. Don't do it.",
+	type = "bool",
+	def	= false,
+	section = "experimental",
+  },
+  {
     key    = 'chicken',
     name   = 'Chicken',
     desc   = 'Settings for Chicken: Custom',
