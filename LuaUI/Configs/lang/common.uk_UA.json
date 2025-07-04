@@ -46,7 +46,7 @@
 	"ctrl" : "Ctrl",
 	"alt" : "Alt",
 	"health" : "Здоров'я",
-	"shields" : "Щити",
+	"shield" : "Щити",
 	"value" : "Вартість",
 	"special" : "Особливе ",
 	"ready" : "Готовий",
