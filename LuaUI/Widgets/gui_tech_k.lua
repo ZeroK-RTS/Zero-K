@@ -96,7 +96,7 @@ function widget:SelectionChanged(selection, subselection)
 		end
 	end
 	WG.SelectedTechLevel = maxLevel
-	WG.PlacementMetalMult = math.pow(1.25, maxLevel - 1)
+	WG.PlacementMetalMult = math.pow(4/3, maxLevel - 1)
 	WG.PlacementEnergyMult = math.pow(3, maxLevel - 1)
 	WG.PlacementCostMult = math.pow(2, maxLevel - 1)
 end
