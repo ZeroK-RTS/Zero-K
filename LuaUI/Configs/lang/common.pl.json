@@ -47,7 +47,7 @@
 	"ctrl" : "Ctrl",
 	"alt" : "Alt",
 	"health" : "Życie",
-	"shields" : "Tarcze",
+	"shield" : "Tarcze",
 	"value" : "Wartość",
 	"special" : "Zdolność",
 	"ready" : "gotowa",

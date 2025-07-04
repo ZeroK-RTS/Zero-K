@@ -1734,7 +1734,7 @@ local function GetSelectionStatsDisplay(parentControl)
 			WG.Translate("interface", "health") .. ": " .. Format(total_hp, false, 100) .. " / " ..  Format(total_maxhp, false, 100) .. "\n"
 		
 		if total_maxShield ~= 0 then
-			unitInfoString = unitInfoString .. WG.Translate("interface", "shields") .. ": " .. Format(total_shield, false, 100) .. " / " ..  Format(total_maxShield, false, 100) .. "\n"
+			unitInfoString = unitInfoString .. WG.Translate("interface", "shield") .. ": " .. Format(total_shield, false, 100) .. " / " ..  Format(total_maxShield, false, 100) .. "\n"
 		end
 		if total_totalbp ~= 0 then
 			unitInfoString = unitInfoString ..
