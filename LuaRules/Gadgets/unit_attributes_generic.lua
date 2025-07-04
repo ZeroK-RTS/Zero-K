@@ -993,7 +993,10 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if (GG.att_DeathExplodeMult[unitID] or 1) ~= 1 then
 		if GG.MorphDestroy ~= unitID then
-			AddExplosions(unitID, unitDefID, teamID, GG.att_DeathExplodeMult[unitID])
+			local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
+			if build and build >= 0.8 then
+				AddExplosions(unitID, unitDefID, teamID, GG.att_DeathExplodeMult[unitID])
+			end
 		end
 	end
 	Attributes.RemoveUnit(unitID)
