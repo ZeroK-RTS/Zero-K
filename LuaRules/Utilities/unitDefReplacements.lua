@@ -170,13 +170,12 @@ local function GetMexTooltip(unitID, ud)
 
 	local currentIncome = Spring.GetUnitRulesParam(unitID, "current_metalIncome")
 	local mexIncome = (Spring.GetUnitRulesParam(unitID, "mexIncome") or 0) * (ud.customParams.metal_extractor_mult or 0) * (Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1)
-	local baseFactor = Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1
 
 	if currentIncome == 0 then
 		return WG.Translate("interface", "disabled_base_metal") .. ": " .. math.round(mexIncome,2)
 	end
 
-	return WG.Translate("interface", "income") .. ": " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% " .. WG.Translate("interface", "overdrive")
+	return WG.Translate("interface", "income") .. ": " .. math.round(mexIncome,2) .. " + " .. math.round(metalMult*100) .. "% " .. WG.Translate("interface", "overdrive")
 end
 
 local function GetTerraformTooltip(unitID)
