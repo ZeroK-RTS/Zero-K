@@ -321,17 +321,19 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeUp
 		spSetUnitWeaponState(unitID, i, "sprayAngle", sprayAngle)
 		
 		spSetUnitWeaponState(unitID, i, "projectiles", moddedProjectiles)
-		if rangeUpdateRequired and not rangeUpdater[unitID] then
+		if rangeUpdateRequired then
 			if w.projectileSpeed and not projectileSpeedLock[unitID] then
 				-- Changing projectile speed without subsequently setting range causes some weapons to go to zero range. Eg Scorcher
 				local moddedSpeed = w.projectileSpeed*((weaponMods and weaponMods[i] and weaponMods[i].projSpeedMult) or 1)*projSpeedFactor
 				spSetUnitWeaponState(unitID, i, "projectileSpeed", moddedSpeed)
 			end
-			local moddedRange = w.range*((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
-			spSetUnitWeaponState(unitID, i, "range", moddedRange)
-			spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
-			if maxRangeModified < moddedRange then
-				maxRangeModified = moddedRange
+			if not rangeUpdater[unitID] then
+				local moddedRange = w.range*((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
+				spSetUnitWeaponState(unitID, i, "range", moddedRange)
+				spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
+				if maxRangeModified < moddedRange then
+					maxRangeModified = moddedRange
+				end
 			end
 		end
 		if GG.ATT_ENABLE_DAMAGE then
