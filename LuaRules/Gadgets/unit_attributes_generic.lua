@@ -234,7 +234,7 @@ local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeChange, rangeFactor, projSpeedFactor, projectilesFactor, damageFactor, minSpray, gameFrame)
+local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeUpdateRequired, rangeFactor, projSpeedFactor, projectilesFactor, damageFactor, minSpray, gameFrame)
 	if not origUnitWeapons[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 	
@@ -320,13 +320,13 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeCh
 		local sprayAngle = math.max(w.sprayAngle, minSpray)
 		spSetUnitWeaponState(unitID, i, "sprayAngle", sprayAngle)
 		
-		if w.projectileSpeed and not projectileSpeedLock[unitID] then
-			local moddedSpeed = w.projectileSpeed*((weaponMods and weaponMods[i] and weaponMods[i].projSpeedMult) or 1)*projSpeedFactor
-			spSetUnitWeaponState(unitID, i, "projectileSpeed", moddedSpeed)
-		end
-		
 		spSetUnitWeaponState(unitID, i, "projectiles", moddedProjectiles)
-		if rangeChange and not rangeUpdater[unitID] then
+		if rangeUpdateRequired and not rangeUpdater[unitID] then
+			if w.projectileSpeed and not projectileSpeedLock[unitID] then
+				-- Changing projectile speed without subsequently setting range causes some weapons to go to zero range. Eg Scorcher
+				local moddedSpeed = w.projectileSpeed*((weaponMods and weaponMods[i] and weaponMods[i].projSpeedMult) or 1)*projSpeedFactor
+				spSetUnitWeaponState(unitID, i, "projectileSpeed", moddedSpeed)
+			end
 			local moddedRange = w.range*((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
 			spSetUnitWeaponState(unitID, i, "range", moddedRange)
 			spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
@@ -346,7 +346,7 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeCh
 		end
 	end
 	
-	if rangeChange then
+	if rangeUpdateRequired then
 		if rangeUpdater[unitID] and rangeUpdater[unitID] ~= true then
 			local mods = {}
 			for i = 1, state.weaponCount do
@@ -759,7 +759,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local healthChanges = (currentHealthAdd[unitID] or 0) ~= healthAdd
 		or (currentHealthMult[unitID] or 1) ~= healthMult
 	
-	local rangeChange = (currentRange[unitID] or 1) ~= rangeMult
+	local rangeUpdateRequired = (currentRange[unitID] or 1) ~= rangeMult or (currentProjectiles[unitID] or 1) ~= projectilesMult
 	local weaponChanges = (currentReload[unitID] or 1) ~= reloadMult
 		or (currentRange[unitID] or 1) ~= rangeMult
 		or (currentProjectiles[unitID] or 1) ~= projectilesMult
@@ -794,7 +794,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	if weaponSpecificMods or weaponChanges then
-		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeChange, rangeMult, projSpeedMult, projectilesMult, damageMult, minSpray, frame)
+		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeUpdateRequired, rangeMult, projSpeedMult, projectilesMult, damageMult, minSpray, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
 		currentProjSpeed[unitID] = projSpeedMult
