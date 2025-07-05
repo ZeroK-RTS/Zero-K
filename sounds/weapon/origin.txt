@@ -54,3 +54,11 @@ heatray_fire1.wav
 heatray_fire2.wav
 
 launcher.wav - blackhole_fire.wav (Golgotha), cloaker_select.wav (Scorched 3D) and shield_select.wav (Scorched 3D)
+
+
+Sound Effects below provided by Soniss (https://sonniss.com/)
+Source: [Game Audio GDC Bundle 2016] — freely distributed collection
+License: Royalty-free for commercial and non-commercial use (per bundle license)
+Notes: All sounds used under the terms provided in the original GDC Bundle download package
+
+gauss_fire2.wav - SoundMorph - Future Weapons 2
