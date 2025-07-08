@@ -104,6 +104,7 @@ return { jumpaa = {
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       soundStart              = [[weapon/cannon/brawler_emg]],
+      soundStartVolume        = 8,
       stages                  = 10,
       sweepfire               = false,
       tolerance               = 8192,
