@@ -68,3 +68,10 @@ shell_gun.wav
 
 Apelsinsaft (CC-BY):
 cannon_fire9.wav
+
+Sound Effects below created with sources provided by Soniss (https://sonniss.com/)
+Source: [Game Audio GDC Bundle 2019] — freely distributed collection
+License: Royalty-free for commercial and non-commercial use (per bundle license)
+Notes: All sounds used under the terms provided in the original GDC Bundle download package
+
+big_bertha_gun_fire2.wav - Airborne Sound - Battlefield Howitzers
