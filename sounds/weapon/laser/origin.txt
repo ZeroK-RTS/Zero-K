@@ -37,3 +37,11 @@ laser_fire_test1.wav - GoogleFrog
 
 pulse_laser.wav - Skorpio
 pulse_laser_start.wav - Skorpio
+
+
+Sound Effects below created with sources provided by Soniss (https://sonniss.com/)
+Source: [Game Audio GDC Bundle 2015] — freely distributed collection
+License: Royalty-free for commercial and non-commercial use (per bundle license)
+Notes: All sounds used under the terms provided in the original GDC Bundle download package
+
+capture_ray.wav - SoundMorph - Modular UI - By Richard Devine
