@@ -75,3 +75,5 @@ License: Royalty-free for commercial and non-commercial use (per bundle license)
 Notes: All sounds used under the terms provided in the original GDC Bundle download package
 
 big_bertha_gun_fire2.wav - Airborne Sound - Battlefield Howitzers
+cannon_hit5.wav - Airborne Sound - Battlefield Howitzers
+lrpc_hit2.wav - Rock The Speakerbox - Broken
