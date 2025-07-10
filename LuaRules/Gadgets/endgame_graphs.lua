@@ -184,7 +184,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
-	if dontCountUnits[unitDefID] then
+	if dontCountUnits[unitDefID] or spGetUnitRulesParam(unitID, "dangerous") then
 		return
 	end
 
