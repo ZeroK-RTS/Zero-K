@@ -104,6 +104,7 @@ return { spiderscout = {
       reloadtime              = 0.233,
       rgbColor                = [[1 1 0]],
       soundStart              = [[weapon/laser/small_laser_fire]],
+      soundStartVolume        = 7,
       soundTrigger            = true,
       thickness               = 2.14476105895272,
       tolerance               = 10000,
