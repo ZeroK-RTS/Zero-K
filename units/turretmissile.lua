@@ -105,6 +105,7 @@ return { turretmissile = {
       smokeTrail              = true,
       soundHit                = [[explosion/ex_small13]],
       soundStart              = [[weapon/missile/missile_fire11]],
+      soundStartVolume        = 5,
       startVelocity           = 500,
       texture1                = [[flarescale01]],
       texture2                = [[lightsmoketrail]],
