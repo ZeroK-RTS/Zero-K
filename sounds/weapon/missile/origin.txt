@@ -46,3 +46,10 @@ emp_missile_hit.wav - Nanoblobs & Open LieroX
 vlaunch_emp_hit.wav - Nanoblobs & Open LieroX
 nalpalm_missile_hit.wav - Nanoblobs & Open LieroX
 heavymissile_launch.wav - Nanoblobs & Open LieroX
+
+Sound Effects below provided by Soniss (https://sonniss.com/)
+Source: [Game Audio GDC Bundle 2016] — freely distributed collection
+License: Royalty-free for commercial and non-commercial use (per bundle license)
+Notes: All sounds used under the terms provided in the original GDC Bundle download package
+
+seismic_missile_hit.wav - SoundMorph - RUPTURE
