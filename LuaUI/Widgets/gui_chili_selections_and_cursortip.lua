@@ -1,4 +1,7 @@
 
+
+
+
 function widget:GetInfo()
 	return {
 		name      = "Chili Selections & CursorTip v2",
@@ -292,7 +295,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'sortByHealth',
+	'selection_opacity', 'allowclickthrough', 'show_unit_details_in_selection', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'sortByHealth',
 	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar',
 	'fancySkinning', 'leftPadding',
 }
@@ -429,12 +432,25 @@ options = {
 	--	desc = "Display current command on unit's icon (only for ungrouped unit selection)",
 	--	path = selPath,
 	--},
+	show_unit_details_in_selection = {
+		name = "Show unit details in selection",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Show additional information on selected units, such as name and Icon',
+		OnChange = function(self)
+			if selectionWindow then
+				selectionWindow.ButtonStyleChanged()
+			end
+		end,
+		path = selPath,
+	},
 	uniticon_size = {
 		name = 'Icon size on selection list',
 		--desc = 'Determines how small the icon in selection list need to be.',
 		type = 'number',
 		min=30,max=100,step=1,
-		value = 57,
+		value = 75,
 		path = selPath,
 		OnChange = function(self)
 			if selectionWindow then
@@ -1296,13 +1312,18 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 	local label = Chili.Label:New{
 		name = name .. "_label",
 		x = xOffset + iconSize + 2,
-		y = initY + (textOffset or 0),
+		y = initY,
 		right = 0,
 		height = LEFT_LABEL_HEIGHT,
 		caption = IMAGE_FONT,
 		objectOverrideFont = WG.GetFont(fontSize),
 		parent = parentControl,
 	}
+
+	if type(initY) ~= "string" then
+		label.y = initY + (textOffset or 0)
+	end
+	
 	image:SetVisibility(false)
 	label:SetVisibility(false)
 	
@@ -1464,21 +1485,67 @@ local function GetUnitGroupIconButton(parentControl)
 	local unitpicBadgeUpdate
 	local healthProp
 	
-	local size = options.uniticon_size.value
-	
-	local holder = Chili.Control:New{
-		x = 0,
-		y = 0,
-		width = size,
-		height = size,
-		padding = {1,1,1,1},
-		parent = parentControl,
+	local size = options.uniticon_size.value 
+
+	local holder
+	local unitButtonViews = {
+		default = {
+			healthBar = {
+				y = "80%"
+			},
+			unitImage = {
+				y = 0,
+				right = 0,
+				left = 0,
+				bottom = "20%"
+			}
+		},
+		detailed = {
+			healthBar = {
+				y = "82%"
+			},
+			unitImage = {
+				y = "20%",
+				right = "5%",
+				left = "5%",
+				bottom = "15%",
+			}
+		}
 	}
+
+	local selectedButtonView
+
+	if options.show_unit_details_in_selection.value then
+
+		selectedButtonView = unitButtonViews.detailed
+
+		holder = Chili.Control:New{
+			x = 0,
+			y = 0,
+			width = size,
+			height = size,
+			padding = {2,2,2,2},
+			parent = parentControl,
+			classname = "button",
+		}
+	else
+
+		selectedButtonView = unitButtonViews.default
+
+		holder = Chili.Control:New{
+			x = 0,
+			y = 0,
+			width = size,
+			height = size,
+			padding = {1,1,1,1},
+			parent = parentControl,
+		}
+	end
 	
 	local reloadBar, jumpBar
 	local healthBar = Chili.Progressbar:New {
 		x = 0,
-		y = "80%",
+		y = selectedButtonView.healthBar.y,
 		right = 0,
 		height = 0,
 		max = 1,
@@ -1491,9 +1558,10 @@ local function GetUnitGroupIconButton(parentControl)
 	local unitImage = Chili.Image:New{
 		keepAspect = false,
 		x = 0,
-		y = 0,
-		right = 0,
-		bottom = "20%",
+		y = selectedButtonView.unitImage.y,
+		right = selectedButtonView.unitImage.right,
+		left = selectedButtonView.unitImage.left,
+		bottom = selectedButtonView.unitImage.bottom,
 		padding = {0,0,0,0},
 		parent = holder,
 		OnClick = {
@@ -1502,6 +1570,55 @@ local function GetUnitGroupIconButton(parentControl)
 			end
 		}
 	}
+	
+	-- local unitIconImage = Chili.Image:New{
+	-- 	keepAspect = true,
+	-- 	x = "0%",
+	-- 	y = "50%",
+	-- 	color = {1, 1, 1, 1},
+	-- 	right = "50%",
+	-- 	bottom = 0,
+	-- 	padding = {0,0,0,0},
+	-- 	parent = unitImage,
+	-- 	OnClick = {
+	-- 		function(_,_,_,button)
+	-- 			SelectionsIconClick(button, unitID, unitList, unitDefID)
+	-- 		end
+	-- 	}
+	-- }
+
+	local ud = UnitDefs[unitDefID];
+	local unitName = GetHumanName(ud, unitID)
+
+	local label = Chili.Label:New{
+		x = "5%",
+		y = "5%",
+		right = 0,
+		height = LEFT_LABEL_HEIGHT,
+		caption = "asdfasd",
+		objectOverrideFont = WG.GetFont(fontSize),
+		parent = holder,
+	}
+
+	--local unitNameUpdate = GetImageWithText(holder, "unitNameUpdate", "65%", nil, nil, NAME_FONT, nil, 2, 1)
+	
+	--local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
+	
+		-- local unitIconImage = Chili.Image:New{
+		-- keepAspect = true,
+		-- x = "0%",
+		-- y = "50%",
+		-- color = {1, 1, 1, 1},
+		-- right = "50%",
+		-- bottom = 0,
+		-- padding = {0,0,0,0},
+		-- parent = unitImage,
+		-- OnClick = {
+			-- function(_,_,_,button)
+				-- SelectionsIconClick(button, unitID, unitList, unitDefID)
+			-- end
+		-- }
+	-- }
 	
 	local groupLabel = Chili.Label:New{
 		x = 0,
@@ -1576,15 +1693,34 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 		unitDefID = newUnitDefID
 		
+		
 		local ud = UnitDefs[unitDefID]
 		if not ud then
 			return
 		end
 		
+		
+		
 		unitImage.tooltip = GetUnitSelectionTooltip(ud, unitDefID, unitID)
 		unitImage.file = "#" .. unitDefID
-		unitImage.file2 = GetUnitBorder(unitDefID)
+		
+		if options.show_unit_details_in_selection.value == false then
+			unitImage.file2 = GetUnitBorder(unitDefID)
+		end
+
 		unitImage:Invalidate()
+				
+		-- unitIconImage.tooltip = GetUnitSelectionTooltip(ud, unitDefID, unitID)
+		-- unitIconImage.file = GetUnitIcon(unitDefID)
+		-- unitImage2.file2 = GetUnitBorder(unitDefID)
+		
+		local ud = UnitDefs[unitDefID];
+		local unitName = GetHumanName(ud, unitID)
+
+		label:SetCaption(unitName)
+
+		-- unitIconImage:SetVisibility(true)
+		-- unitIconImage:Invalidate()
 	end
 	
 	local function UpdateUnits(newUnitID, newUnitList)
@@ -1866,6 +2002,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 	local function Resize(self)
 		local sizeX, sizeY = self.clientWidth, self.clientHeight
 		
+		-- local newIconSize = 75
 		local newIconSize = options.uniticon_size.value
 		local newCols = math.floor(sizeX/iconSize)
 		local newRows = math.floor(sizeY/(iconSize - SEL_BUTTON_SHORTENING))
@@ -1966,6 +2103,11 @@ local function GetMultiUnitInfoPanel(parentControl)
 		end
 	end
 	
+	function externalFunctions.ClearButtons()
+		holder:ClearChildren()
+		displayButtons = {}
+	end
+
 	function externalFunctions.SetRightPadding(newRightPadding)
 		holder._relativeBounds.left = 0
 		holder._relativeBounds.right = newRightPadding
@@ -2841,6 +2983,10 @@ local function GetSelectionWindow()
 	
 	function externalFunctions.SetSelectionIconSize(iconSize)
 		multiUnitDisplay.SetIconSize(iconSize)
+	end
+
+	function externalFunctions.ButtonStyleChanged()
+		multiUnitDisplay.ClearButtons()
 	end
 	
 	-- Initialization
