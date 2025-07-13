@@ -27,12 +27,14 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 local spAreTeamsAllied      = Spring.AreTeamsAllied
+local spGetTeamRulesParam   = Spring.GetTeamRulesParam
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spGetAllUnits         = Spring.GetAllUnits
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitExperience   = Spring.GetUnitExperience
 local spGetTeamResources    = Spring.GetTeamResources
+local spGetGameRulesParam   = Spring.GetGameRulesParam
 local GetUnitCost           = Spring.Utilities.GetUnitCost
 local GetUnitValue          = Spring.Utilities.GetUnitValue
 
@@ -50,6 +52,8 @@ local cappedComs = {}
 
 local awardData = {}
 
+local empFactor     = veryEasyFactor*4
+local reclaimFactor = veryEasyFactor*0.2 -- wrecks aren't guaranteed to leave more than 0.2 of value
 
 local minReclaimRatio = 0.15
 
@@ -65,6 +69,9 @@ local awardAbsolutes = {
 	sweeper     = 20,
 	heart       = 1*10^9, -- avoid higher values, math.floor starts returning INT_MIN at some point
 	vet         = 3,
+	shield      = 10000,
+	missile     = 1000,
+	attrition   = 1,
 }
 
 local basicEasyFactor = 0.5
@@ -121,7 +128,42 @@ local kamikaze = {
 	chicken_dodo=1,
 }
 
+local missiles = {
+	[UnitDefNames["napalmmissile"].id] = 1,
+	[UnitDefNames["tacnuke"].id] = 1,
+	[UnitDefNames["empmissile"].id] = 1,
+	[UnitDefNames["subtacmissile"].id] = 1,
+	[UnitDefNames["seismic"].id] = 1,
+}
+	
+
 local flamerWeaponDefs = {}
+local PUBLIC = {public = true}
+local bestCostByTeam = {}
+-------------------
+-- Resource tracking
+
+
+local allyTeamInfo = {}
+--local resourceInfo = {count = 0, data = {}}
+
+do
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i=1,#allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		allyTeamInfo[allyTeamID] = {
+			team = {},
+			teams = 0,
+		}
+
+		local teamList = Spring.GetTeamList(allyTeamID)
+		for j=1,#teamList do
+			local teamID = teamList[j]
+			allyTeamInfo[allyTeamID].teams = allyTeamInfo[allyTeamID].teams + 1
+			allyTeamInfo[allyTeamID].team[allyTeamInfo[allyTeamID].teams] = teamID
+		end
+	end
+end
 
 ------------------------------------------------
 -- functions
@@ -153,9 +195,10 @@ local function getMeanDamageExcept(excludeTeam)
 	return (count>0) and (mean/count) or 0
 end
 
-local function getMaxVal(valList)
+local function getMaxVal(valList, award)
 	local winTeam, maxVal = false,0
 	for team,val in pairs(valList) do
+		Spring.SetGameRulesParam(team .. "_" .. award .. "_score", val, PUBLIC)
 		if val and val > maxVal then
 			winTeam = team
 			maxVal = val
@@ -195,6 +238,94 @@ local function CopyTable(original) -- Warning: circular table references lead to
 	return copy
 end
 
+local function UpdateResourceStats(t) -- this never gets called apparently.
+
+	resourceInfo.count = resourceInfo.count + 1
+	resourceInfo.data[resourceInfo.count] = {allyRes = {}, teamRes = {}, t = t}
+
+	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
+		local teams = allyTeamData.teams
+		local team = allyTeamData.team
+
+		local allyOverdriveResources = GG.Overdrive_allyTeamResources[allyTeamID] or {}
+		resourceInfo.data[resourceInfo.count].allyRes[allyTeamID] = {
+			metal_income_total = 0,
+			metal_income_base = allyOverdriveResources.baseMetal or 0,
+			metal_income_overdrive = allyOverdriveResources.overdriveMetal or 0,
+			metal_income_other = 0,
+
+			metal_spend_total = 0,
+			metal_spend_construction = 0,
+			metal_spend_waste = 0,
+
+			metal_storage_current = 0,
+			metal_storage_free = 0,
+
+			energy_income_total = allyOverdriveResources.baseEnergy or 0,
+
+			energy_spend_total = 0,
+			energy_spend_overdrive = allyOverdriveResources.overdriveEnergy or 0,
+			energy_spend_construction = 0,
+			energy_spend_other = 0,
+			energy_spend_waste = allyOverdriveResources.wasteEnergy or 0,
+
+			energy_storage_current = 0,
+		}
+
+		local aRes = resourceInfo.data[resourceInfo.count].allyRes[allyTeamID]
+
+		for i = 1, teams do
+			local teamID = team[i]
+			local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teamID, "metal")
+			aRes.metal_spend_construction = aRes.metal_spend_construction + mExpe
+			aRes.metal_income_total = aRes.metal_income_total + mInco
+			aRes.metal_spend_total = aRes.metal_spend_total + mExpe
+			aRes.metal_storage_free = aRes.metal_storage_free + mStor - mCurr
+			aRes.metal_storage_current = aRes.metal_storage_current + mCurr
+
+			local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teamID, "energy")
+			aRes.energy_spend_total = aRes.energy_spend_total + eExpe
+			aRes.energy_storage_current = aRes.energy_storage_current + eCurr
+
+			local teamOverdriveResources = GG.Overdrive_teamResources[teamID] or {}
+			
+			resourceInfo.data[resourceInfo.count].teamRes[teamID] = {
+				metal_income_total = mInco + mReci,
+				metal_income_base = teamOverdriveResources.baseMetal or 0,
+				metal_income_overdrive = teamOverdriveResources.overdriveMetal or 0,
+				metal_income_other = 0,
+
+				metal_spend_total = mExpe + mSent,
+				metal_spend_construction = mExpe,
+
+				metal_share_net = mReci - mSent,
+
+				metal_storage_current = mCurr,
+
+				energy_income_total = eInco,
+
+				energy_spend_total = eExpe,
+				energy_spend_construction = mExpe,
+				energy_spend_other = 0,
+
+				energy_share_net = teamOverdriveResources.overdriveEnergyChange or 0,
+
+				energy_storage_current = eCurr,
+			}
+			local tRes = resourceInfo.data[resourceInfo.count].teamRes[teamID]
+
+			tRes.metal_income_other = tRes.metal_income_total - tRes.metal_income_base - tRes.metal_income_overdrive - mReci
+			tRes.energy_spend_other = tRes.energy_spend_total - tRes.energy_spend_construction + math.min(0, tRes.energy_share_net)
+		end
+
+		aRes.metal_income_other = aRes.metal_income_total - aRes.metal_income_base - aRes.metal_income_overdrive
+		aRes.metal_spend_waste = math.min(aRes.metal_storage_free - aRes.metal_income_total - aRes.metal_spend_total,0)
+
+		aRes.energy_spend_construction = aRes.metal_spend_construction
+		aRes.energy_spend_other = aRes.energy_spend_total - (aRes.energy_spend_overdrive + aRes.energy_spend_construction + aRes.energy_spend_waste)
+	end
+end
+
 local function AddAwardPoints( awardType, teamID, amount )
 	if (teamID and (teamID ~= gaiaTeamID)) then
 		awardData[awardType][teamID] = awardData[awardType][teamID] + (amount or 0)
@@ -202,35 +333,30 @@ local function AddAwardPoints( awardType, teamID, amount )
 end
 
 local function ProcessAwardData()
-
 	for awardType, data in pairs(awardData) do
 		local winningTeam
 		local maxVal
 		local easyFactor = awardEasyFactors[awardType] or 1
 		local absolute = awardAbsolutes[awardType]
 		local message
-
 		if awardType == 'vet' then
 			maxVal = expUnitExp
 			winningTeam = expUnitTeam
 		else
-			winningTeam, maxVal = getMaxVal(data)
-
+			winningTeam, maxVal = getMaxVal(data, awardType)
 		end
-
 		if winningTeam then
-
 			local compare
 			if absolute then
 				compare = absolute
-
 			else
 				compare = getMeanDamageExcept(winningTeam) * easyFactor
 			end
-
 			--if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			if maxVal > compare then
-				maxVal = floor(maxVal)
+				if awardType ~= 'attrition' and awardType ~= 'vet' then -- do not floor the attrition award, it has its own formatting. This just makes every award 100%, which is not what we want.
+					maxVal = floor(maxVal)
+				end
 				local maxValWrite = comma_value(maxVal)
 
 				if awardType == 'cap' then
@@ -262,15 +388,29 @@ local function ProcessAwardData()
 				elseif awardType == 'dragon' then
 					message = maxVal .. ' White Dragons annihilated'
 				elseif awardType == 'heart' then
-					local maxQueenKillDamage = maxVal - absolute --remove the queen kill signature: +1000000000 from the total damage
-					message = 'Damage: '.. comma_value(maxQueenKillDamage)
+					message = 'Damage: '.. comma_value(maxVal)
 				elseif awardType == 'sweeper' then
 					message = maxVal .. ' Nests wiped out'
-
 				elseif awardType == 'vet' then
 					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
+					Spring.SetGameRulesParam("vet_unitdef", UnitDefs[expUnitDefID].name, public)
 					local expUnitExpRounded = floor(expUnitExp * 100)
 					message = vetName ..', '.. expUnitExpRounded .. "% cost made"
+				elseif awardType == 'repair' then
+					message = maxValWrite .. ' allied value repaired'
+				elseif awardType == 'assistant' then
+					message = maxValWrite .. ' metal used for assisting allies'
+				elseif awardType == 'economist' then
+					message = maxValWrite .. ' metal overdriven'
+				elseif awardType == 'drone' then
+					message = 'Damaged Value : ' .. maxValWrite
+				elseif awardType == 'shield' then
+					message = 'Damage shielded: ' .. maxValWrite
+				elseif awardType == 'missile' then
+					message = 'Damaged Value : ' .. maxValWrite
+				elseif awardType == 'attrition' then
+					--Spring.Echo("Attrition rate: " .. maxVal .. "\"" .. comma_value(string.format("%.2f%%", maxVal * 100)) .. "\"")
+					message = 'Attrition rate: ' .. comma_value(string.format("%.2f%%", maxVal * 100))
 				else
 					message = 'Damaged value: '.. maxValWrite
 				end
@@ -278,6 +418,7 @@ local function ProcessAwardData()
 		end --if winningTeam
 		if message then
 			awardAward(winningTeam, awardType, message)
+			Spring.SetGameRulesParam(awardType .. "_rawscore", maxVal, PUBLIC)
 		end
 
 	end
@@ -286,11 +427,28 @@ end
 -------------------
 -- Callins
 
-function gadget:Initialize()
+function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, part)
+	if part < 0 or unitID == nil then
+		return true
+	end
+	local hp, maxhp, _, _, bp = spGetUnitHealth(unitID)
+	local otherTeam = spGetUnitTeam(unitID)
+	if otherTeam == builderTeam then
+		return true
+	end
+	if bp < 1.0 then
+		AddAwardPoints('assistant', builderTeam, part * UnitDefs[unitDefID].metalCost)
+	else
+		local _, maxHealth = Spring.GetUnitHealth(unitID)
+		local healthMetalRatio = maxHealth / UnitDefs[unitDefID].metalCost
+		AddAwardPoints('repair', builderTeam, part * healthMetalRatio)
+	end
+	return true
+end
 
-	GG.Awards = GG.Awards or {}
-	GG.Awards.AddAwardPoints = AddAwardPoints
-	
+function gadget:Initialize()
+	--_G.resourceInfo = resourceInfo
+	GG.Awards = {AddAwardPoints = AddAwardPoints}
 	local tempTeamList = Spring.GetTeamList()
 	for i=1, #tempTeamList do
 		local team = tempTeamList[i]
@@ -310,24 +468,22 @@ function gadget:Initialize()
 		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
+
 	end
 
-	local shipSMClass = Game.speedModClasses.Ship
-	for i = 1, #UnitDefs do
-		local ud = UnitDefs[i]
-
-		--[[ NB: ships that extend legs and walk onto land, like
-		     the SupCom Cybran Siren or RA3 Soviet Stingray, are
-		     technically hovercraft in Spring so would need some
-		     extra handling AFAIK. No such ship in vanilla ZK. ]]
-		if (ud.moveDef.smClass == shipSMClass) then
-			boats[i] = true
-		end
-
-		if ud.customParams.dynamic_comm then
-			comms[i] = true
+	local boatFacs = {'factoryship', 'striderhub'}
+	for _, boatFac in pairs(boatFacs) do -- Fixes the ships with legs problem, future proofing.
+		local udBoatFac = UnitDefNames[boatFac]
+		if udBoatFac then
+			for _, boatDefID in pairs(udBoatFac.buildOptions) do
+				if (UnitDefs[boatDefID].minWaterDepth > 0) then -- because striderhub
+					boats[boatDefID] = true
+				end
+			end
 		end
 	end
+	-- Gull is only available to carriers, therefore it counts towards naval awards.
+	boats[UnitDefNames["dronecarry"].id] = true
 
 	for i=1,#WeaponDefs do
 		local wcp = WeaponDefs[i].customParams or {}
@@ -335,6 +491,12 @@ function gadget:Initialize()
 			flamerWeaponDefs[i] = true
 		end
 	end
+
+	for i=1,#UnitDefs do
+		if(UnitDefs[i].customParams.dynamic_comm) then comms[i] = true
+	end
+ end
+
 end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
@@ -372,7 +534,13 @@ local             roostDefID = UnitDefNames.roost            .id
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	local experience = spGetUnitExperience(unitID)
-	if experience > expUnitExp and (experience*UnitDefs[unitDefID].metalCost > 1000) then
+	local bestTeamCost = bestCostByTeam[unitTeam] or 0
+	if experience > bestTeamCost then -- track each teams veterancy award. This way we can translate via luaui.
+		Spring.SetGameRulesParam(unitTeam .. "_vet_score", experience, PUBLIC)
+		Spring.SetGameRulesParam(unitTeam .. "_vet_unit", UnitDefs[unitDefID].name, PUBLIC)
+		bestCostByTeam[unitTeam] = experience
+	end
+	if experience > expUnitExp and (experience*UnitDefs[unitDefID].metalCost > 1000) and not (UnitDefs[unitDefID].customParams.dontcount or UnitDefs[unitDefID].metalCost == 0) then
 		expUnitExp = experience
 		expUnitTeam = unitTeam
 		expUnitDefID = unitDefID
@@ -424,10 +592,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		or (attackerTeam == unitTeam)
 		or (attackerTeam == gaiaTeamID)
 		then return end
-
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
-
 	if not spAreTeamsAllied(attackerTeam, unitTeam) then
+		local isMissile = missiles[attackerDefID] ~= nil
 		if paralyzer then
 			AddAwardPoints( 'emp', attackerTeam, costdamage )
 		elseif attackerDefID then
@@ -439,31 +606,27 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			if (flamerWeaponDefs[weaponID]) then
 				AddAwardPoints( 'fire', attackerTeam, costdamage )
 			end
-
+			if isMissile then
+				AddAwardPoints('missile', attackerTeam, costdamage)
+			end
 			-- Static Weapons
 			if (not ad.canMove) then
-
 				-- bignukes, zenith, starlight
-				if staticO_big[ad.name] then
+				if staticO_big[ad.name] then -- not lrpc, tacnuke, emp missile
 					AddAwardPoints( 'nux', attackerTeam, costdamage )
-
-				-- not lrpc, tacnuke, emp missile
-				elseif not staticO_small[ad.name] then
+				elseif not staticO_small[ad.name] and not isMissile then -- defenses that aren't missiles.
 					AddAwardPoints( 'shell', attackerTeam, costdamage )
 				end
-
 			elseif kamikaze[ad.name] then
 				AddAwardPoints( 'kam', attackerTeam, costdamage )
-
 			elseif ad.canFly and not (ad.customParams.dontcount or ad.customParams.is_drone) then
 				AddAwardPoints( 'air', attackerTeam, costdamage )
-
 			elseif boats[attackerDefID] then
 				AddAwardPoints( 'navy', attackerTeam, costdamage )
-
 			elseif comms[attackerDefID] then
 				AddAwardPoints( 'comm', attackerTeam, costdamage )
-
+			elseif ad.customParams.is_drone then
+				AddAwardPoints('drone', attackerTeam, costdamage )
 			end
 		end
 	end
@@ -475,7 +638,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end
 
-function gadget:GameOver()
+function gadget:GameOver(winningAllys)
 	gameOver = true
 
 	local units = spGetAllUnits()
@@ -485,7 +648,6 @@ function gadget:GameOver()
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
-
 	-- read externally tracked values
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
@@ -495,7 +657,6 @@ function gadget:GameOver()
 			AddAwardPoints('pwn', team, Spring.Utilities.GetHiddenTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
 		end
 	end
-
 	ProcessAwardData()
 
 	_G.awardList = awardList
