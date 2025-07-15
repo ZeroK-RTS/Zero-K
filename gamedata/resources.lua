@@ -78,7 +78,6 @@ local resources = {
 
       ["3explo"]= "cc/3explo.tga",
       AAsmoketrail= "AAsmoketrail.tga",
-      backtrail="GPL/backtrail.png",
       bigexplo= "cc/bigexplo.tga",
       bloodblast= "pd/bloodblast.png",
       bloodblastwhite= "pd/bloodblastwhite.tga",
@@ -133,6 +132,7 @@ local resources = {
       kfoom= "other/foom.tga",
       largelaser= "gpl/largelaserfalloff.png",
 	  largelaser_long= "gpl/largelaserfalloff_long.png",
+    laserbacktrail= "laserbacktrail.tga",
       lightb= "pd/lightningball.tga",
       lightb3= "pd/lightningball3.tga",
       lightb4= "pd/lightningball4.tga",

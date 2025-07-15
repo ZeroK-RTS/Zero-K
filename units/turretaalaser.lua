@@ -85,7 +85,7 @@ return { turretaalaser = {
         planes  = 14.9,
       },
 
-      duration                = 0.03,
+      duration                = 0.02,
       edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:flash1orange]],
       fireStarter             = 10,
