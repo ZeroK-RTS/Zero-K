@@ -145,7 +145,7 @@ return {
 				particlelife       = 3,
 				particlelifespread = 1,
 				particlesize       = 80,
-				particlesizespread = 20,
+				particlesizespread = 5,
 				particlespeed      = 50,
 				particlespeedspread = 2,
 				pos                = [[0, 0, 0]],
