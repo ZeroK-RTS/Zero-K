@@ -32,7 +32,7 @@ return { shieldraid = {
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[mbot.s3o]],
-  script                 = [[shieldraid.lua]],
+  script                 = [[tweakscript.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {

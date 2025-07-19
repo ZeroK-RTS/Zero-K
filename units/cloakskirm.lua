@@ -34,7 +34,7 @@ return { cloakskirm = {
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB DRONE]],
   objectName             = [[sphererock.s3o]],
-  script                 = "cloakskirm.lua",
+  script                 = "tweakscript.lua",
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

@@ -36,7 +36,7 @@ return { cloakraid = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherebot.s3o]],
-  script                 = [[cloakraid.lua]],
+  script                 = [[tweakscript.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
