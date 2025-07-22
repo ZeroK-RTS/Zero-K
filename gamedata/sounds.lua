@@ -112,7 +112,7 @@ local Sounds = {
 		},
 		SiloLaunch = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
-			gain = 0.4,
+			gain = 1.0,
 			pitch = 1.0,
 			priority = 2,
 			maxconcurrent = 30,
