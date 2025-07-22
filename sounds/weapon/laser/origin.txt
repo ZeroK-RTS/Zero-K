@@ -40,11 +40,11 @@ pulse_laser_start.wav - Skorpio
 
 
 Sound Effects below created with sources provided by Soniss (https://sonniss.com/)
-Source: [Game Audio GDC Bundle 2015, 2018, 2021-2023] — freely distributed collection
+Source: [Game Audio GDC Bundle 2015, 2018, 2020, 2021-2023] — freely distributed collection
 License: Royalty-free for commercial and non-commercial use (per bundle license)
 Notes: All sounds used under the terms provided in the original GDC Bundle download package
 
-capture_ray.wav - SoundMorph - Modular UI - By Richard Devine
+capture_ray.wav - David Dumais Audio - Sci-Fi Systems
 small_laser_hit1.wav - RYK-Sounds - Laser Guns
 small_laser_hit2.wav - RYK-Sounds - Laser Guns
 heavy_laser7.wav - Gamemaster Audio - Silenced Gun Sounds
