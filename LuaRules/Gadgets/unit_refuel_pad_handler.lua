@@ -37,6 +37,7 @@ local mcSetPosition         = Spring.MoveCtrl.SetPosition
 local mcSetRotation         = Spring.MoveCtrl.SetRotation
 local mcDisable             = Spring.MoveCtrl.Disable
 local mcEnable              = Spring.MoveCtrl.Enable
+local CMD_IMMEDIATETAKEOFF  = Spring.Utilities.CMD.IMMEDIATETAKEOFF
 
 local coroutine = coroutine
 local Sleep     = coroutine.yield
@@ -58,6 +59,24 @@ local min = math.min
 --------------------------------------------------------------------------------
 
 local mobilePadDefs = {}
+
+local takeoffCMD = {
+	id      = CMD_IMMEDIATETAKEOFF,
+	name    = "Takeoff",
+	action  = "takeoff",
+	cursor  = 'Repair',
+	type    = CMDTYPE.ICON,
+}
+
+local giveTakeOffCommandToUnits = {}
+
+for i = 1, #UnitDefs do
+	local unitDef = UnitDefs[i]
+	local movetype = Spring.Utilities.getMovetype(unitDef)
+	if (movetype == 1 or movetype == 0) and (not Spring.Utilities.tobool(unitDef.customParams.cantuseairpads)) then
+		giveTakeOffCommandToUnits[i] = true
+	end
+end
 
 for unitDefID, ud in pairs(UnitDefs) do
 	if ud.customParams.ispad and (not ud.isImmobile) then
@@ -607,4 +626,28 @@ end
 
 function gadget:GameFrame(f)
 	UpdateCoroutines()
+end
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD_IMMEDIATETAKEOFF] = true}
+end
+
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	--local isMoveCommand = (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE)
+	if landingUnit[unitID] then -- not one of us.
+		GG.LandAborted(unitID)
+		local cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
+		if cmdID == CMD_REARM or cmdID == CMD_FIND_PAD then
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
+		end
+	end
+	return false
+	--elseif isMoveCommand and cmdOptions.shift == false and not landingUnit.landed then -- user wants to move somewhere else.
+	--landingUnit[unitID].abort = true
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if giveTakeOffCommandToUnits[unitDefID] then
+		Spring.InsertUnitCmdDesc(unitID, takeoffCMD)
+	end
 end

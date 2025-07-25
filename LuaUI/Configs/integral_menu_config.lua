@@ -83,6 +83,7 @@ local commandDisplayConfig = {
 	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},
 
 	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = "Resupply: Return to nearest Airpad for repairs and, for bombers, ammo."},
+	[CMD_IMMEDIATETAKEOFF] = {texture = imageDir .. 'takeoff.png', tooltip = "Abort Landing\nImmediately take off from airpads or abort landing."},
 
 	[CMD_EXCLUDE_PAD] = {texture = imageDir .. 'Bold/excludeairpad.png', tooltip = "Exclude Airpad: Toggle whether any of your aircraft use the targeted airpad."},
 	[CMD_FIELD_FAC_SELECT] = {texture = imageDir .. 'Bold/fac_select.png', tooltip = "Copy Factory Blueprint: Copy a production option from target functional friendly factory."},
@@ -93,7 +94,7 @@ local commandDisplayConfig = {
 	[CMD_ONECLICK_WEAPON] = {},--texture = imageDir .. 'Bold/action.png'},
 	[CMD_UNIT_SET_TARGET_CIRCLE] = {texture = imageDir .. 'Bold/settarget.png'},
 	[CMD_UNIT_CANCEL_TARGET] = {texture = imageDir .. 'Bold/canceltarget.png'},
-
+	
 	[CMD_ABANDON_PW] = {texture = imageDir .. 'Bold/drop_beacon.png'},
 
 	[CMD_PLACE_BEACON] = {texture = imageDir .. 'Bold/drop_beacon.png'},
