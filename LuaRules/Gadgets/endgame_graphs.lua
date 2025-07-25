@@ -1,4 +1,3 @@
-
 if not gadgetHandler:IsSyncedCode() then
 	return
 end
@@ -18,6 +17,7 @@ end
 local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 
 local teamList = Spring.GetTeamList()
+local gaiaTeamID = Spring.GetGaiaTeamID()
 local allyTeamByTeam
 
 local spAreTeamsAllied = Spring.AreTeamsAllied
@@ -25,6 +25,7 @@ local spGetUnitHealth = Spring.GetUnitHealth
 local spGetTeamResources = Spring.GetTeamResources
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local GetUnitCost = Spring.Utilities.GetUnitCost
 
 
@@ -51,6 +52,8 @@ local damageDealtByTeamNonhax = {}
 
 local unitValueKilledByTeamHax = {}
 local unitValueKilledByTeamNonhax = {}
+local unitAttritionByTeamHax = {}
+local unitAttritionByTeamNonhax = {}
 
 local ALLIED_VISIBLE = {allied = true}
 
@@ -181,7 +184,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitReverseBuilt(unitID, unitDefID, teamID)
-	if dontCountUnits[unitDefID] then
+	if dontCountUnits[unitDefID] or spGetUnitRulesParam(unitID, "dangerous") then
 		return
 	end
 
@@ -217,6 +220,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 		cost = nanoframeCosts[index]
 
 		local lastUnitID = nanoframes[nanoframeCount]
+		nanoframesByID[unitID] = nil
 		nanoframesByID[lastUnitID] = index
 		nanoframesByID[unitID] = nil
 		nanoframeTeams[index] = nanoframeTeams[nanoframeCount]
@@ -248,9 +252,27 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 	end
 	if attackerTeam and not spAreTeamsAllied(attackerTeam, teamID) then
 		unitValueKilledByTeamHax[attackerTeam] = unitValueKilledByTeamHax[attackerTeam] + cost
+		
 		if canTeamSeeUnit(attackerTeam, unitID) then
 			unitValueKilledByTeamNonhax[attackerTeam] = unitValueKilledByTeamNonhax[attackerTeam] + cost
 		end
+	end
+	if attackerTeam then
+		local lostValue = unitValueLostByTeam[attackerTeam] or 1
+		if lostValue == 0 then
+			lostValue = 1 -- prevent NAN.
+		end
+		unitAttritionByTeamHax[attackerTeam] = unitValueKilledByTeamHax[attackerTeam] / lostValue
+		if canTeamSeeUnit(attackerTeam, unitID) then
+			unitAttritionByTeamNonhax[attackerTeam] = unitValueKilledByTeamNonhax[attackerTeam] / lostValue
+		end
+	else -- unit died through other means EG suicide
+		local lostValue = unitValueLostByTeam[teamID] or 1
+		if lostValue == 0 then
+			lostValue = 1 -- prevent NAN.
+		end
+		unitAttritionByTeamHax[teamID] = unitValueKilledByTeamHax[teamID] / lostValue
+		unitAttritionByTeamNonhax[teamID] = unitValueKilledByTeamNonhax[teamID] / lostValue
 	end
 end
 
@@ -331,13 +353,18 @@ function gadget:GameFrame(n)
 		local teamID = teamList[i]
 		mIncome[teamID] = mIncome[teamID] + GetMetalIncome  (teamID)
 		eIncome[teamID] = eIncome[teamID] + GetEnergyIncome (teamID)
-		mIncomeBase     [teamID] = mIncomeBase     [teamID] + (spGetTeamRulesParam(teamID, "OD_metalBase"     ) or 0)
-		mIncomeOverdrive[teamID] = mIncomeOverdrive[teamID] + (spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
-		mTotalBaseMex[teamID] = mTotalBaseMex[teamID] + (spGetTeamRulesParam(teamID, "OD_metalBase") or 0)
-		mTotalOverdrive[teamID] = mTotalOverdrive[teamID] + (spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
+		mIncomeBase[teamID] = mIncomeBase[teamID] + (spGetTeamRulesParam(teamID, "OD_metalBase") or 0)
+		local overdrive = (spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
+		if overdrive > 0 then
+			GG.Awards.AddAwardPoints('economist', teamID, overdrive)
+		end
+		mIncomeOverdrive[teamID] = mIncomeOverdrive[teamID] + overdrive
+        mTotalBaseMex[teamID] = mTotalBaseMex[teamID] + (spGetTeamRulesParam(teamID, "OD_metalBase") or 0)
+		mTotalOverdrive[teamID] = mTotalOverdrive[teamID] + overdrive
 
 		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamHax[teamID])
 		SetHiddenTeamRulesParam(teamID, "stats_history_unit_value_killed_current", unitValueKilledByTeamHax[teamID])
+		SetHiddenTeamRulesParam(teamID, "stats_history_attrition_current", unitAttritionByTeamHax[teamID] or 0)
 		spSetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamNonhax[teamID], ALLIED_VISIBLE)
 		spSetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID], ALLIED_VISIBLE)
 		spSetTeamRulesParam(teamID, "stats_history_metal_base_mex_current", mTotalBaseMex[teamID], ALLIED_VISIBLE)
@@ -357,10 +384,12 @@ function gadget:GameFrame(n)
 		spSetTeamRulesParam(teamID, "stats_history_unit_lost_tally_current", unitLostTallyByTeam[teamID], ALLIED_VISIBLE)
 		spSetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
 		spSetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_attrition_current",  unitAttritionByTeamNonhax[teamID] or 0, ALLIED_VISIBLE)
 		
 		if isSpringStatsHistoryFrame then
 			SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamHax[teamID])
 			SetHiddenTeamRulesParam(teamID, "stats_history_unit_value_killed_"    .. stats_index, unitValueKilledByTeamHax[teamID])
+			SetHiddenTeamRulesParam(teamID, "stats_history_attrition_" .. stats_index, unitAttritionByTeamHax[teamID] or 0)
 			spSetTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamNonhax[teamID])
 			spSetTeamRulesParam(teamID, "stats_history_damage_received_" .. stats_index, damageReceivedByTeam[teamID], ALLIED_VISIBLE)
 			spSetTeamRulesParam(teamID, "stats_history_metal_base_mex_" .. stats_index, mTotalBaseMex[teamID], ALLIED_VISIBLE)
@@ -384,6 +413,7 @@ function gadget:GameFrame(n)
 			spSetTeamRulesParam(teamID, "stats_history_unit_value_other_" .. stats_index, unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
 			spSetTeamRulesParam(teamID, "stats_history_nano_partial_" .. stats_index, partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
 			spSetTeamRulesParam(teamID, "stats_history_nano_total_" .. stats_index, totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_attrition_" .. stats_index,  unitAttritionByTeamNonhax[teamID] or 0, ALLIED_VISIBLE)
 
 			mIncome         [teamID] = 0
 			mIncomeBase     [teamID] = 0
@@ -400,7 +430,9 @@ end
 
 function gadget:GameOver()
 	gadget:GameFrame(450) -- fake history frame to snapshot end state
-
+	for teamID, attritionRate in pairs(unitAttritionByTeamHax) do
+		GG.Awards.AddAwardPoints('attrition', teamID, attritionRate)
+	end
 	Spring.SetGameRulesParam("gameover_frame", Spring.GetGameFrame())
 	Spring.SetGameRulesParam("gameover_second", math.floor(Spring.GetGameSeconds()))
 	Spring.SetGameRulesParam("gameover_historyframe", stats_index - 1)
@@ -510,8 +542,8 @@ function gadget:Initialize()
 		spSetTeamRulesParam(teamID, "stats_history_nano_total_0"       , 0, ALLIED_VISIBLE)
 
 		mTotalOverdrive     [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_overdrive_current") or 0
-		mTotalBaseMex       [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_base_mex_current") or 0
-		reclaimListByTeam   [teamID] = -1*(spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0)
+        mTotalBaseMex       [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_base_mex_current") or 0
+		reclaimListByTeam   [teamID] = -spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
 		metalExcessByTeam   [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0
 		metalSharedByTeam   [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_shared_current") or 0
 		energyExcessByTeam   [teamID] = spGetTeamRulesParam(teamID, "stats_history_energy_excess_current") or 0
@@ -523,5 +555,7 @@ function gadget:Initialize()
 		unitValueLostByTeam[teamID] =  spGetTeamRulesParam(teamID, "stats_history_unit_value_lost_current") or 0
 		unitLostTallyByTeam[teamID] =   spGetTeamRulesParam(teamID, "stats_history_unit_lost_tally_current") or 0
 		damageReceivedByTeam[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0
+		unitAttritionByTeamHax[teamID] = GetHiddenTeamRulesParam(teamID, "stats_history_attrition_current") or 0
+		unitAttritionByTeamNonhax[teamID] = Spring.GetTeamRulesParam(teamID, "stats_history_attrition_current") or 0
 	end
 end
