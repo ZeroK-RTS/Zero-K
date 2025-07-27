@@ -65,9 +65,9 @@ return { bomberstrike = {
   weaponDefs          = {
   
     MISSILE = {
-      name                    = [[Heavy Missiles]],
-      areaOfEffect            = 48,
-      cegTag                  = [[missiletrailyellow]],
+      name                    = [[Heavy Mine]],
+      areaOfEffect            = 200,
+      cegTag                  = [[banishertrail]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
@@ -78,7 +78,7 @@ return { bomberstrike = {
       },
 
       damage                  = {
-        default = 180,
+        default = 400,
       },
 
       fireStarter             = 70,
@@ -87,11 +87,11 @@ return { bomberstrike = {
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_dragonsfang.s3o]],
-      projectiles             = 2,
+      model                   = [[clawshell.s3o]],
+      projectiles             = 1,
       range                   = 550,
       reloadtime              = 1,
-      smokeTrail              = true,
+      smokeTrail              = false,
       soundHit                = [[explosion/ex_med5]],
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile_fire9_heavy]],
@@ -103,9 +103,9 @@ return { bomberstrike = {
       trajectoryHeight        = 0,
       turnRate                = 15000,
       turret                  = true,
-      weaponAcceleration      = 80,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 400,
+      weaponAcceleration      = 50,
+      weaponType              = [[MineLayer]],
+      weaponVelocity          = 150,
     },
     
   },
