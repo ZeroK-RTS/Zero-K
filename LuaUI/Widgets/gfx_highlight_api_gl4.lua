@@ -95,7 +95,7 @@ void main() {
 	#if USEQUATERNIONS == 0
 		mat4 pieceMatrix = UnitPieces[baseIndex + pieceIndex + isDynamic];
 	#else
-		Transform modelPieceTX = GetModelWorldTransform(baseIndex + pieceIndex + isDynamic);
+		Transform modelPieceTX = GetPieceModelTransform(baseIndex + isDynamic, pieceIndex);
 		mat4 pieceMatrix = TransformToMatrix(modelPieceTX);
 	#endif
 	vec4 localModelPos = pieceMatrix * vec4(pos + 0.006 * normal, 1.0);
