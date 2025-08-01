@@ -137,7 +137,7 @@ void main()
 			#if USEQUATERNIONS == 0
 				mat4 pieceMatrix = UnitPieces[instData.x + pieceIndex];
 			#else
-				Transform modelPieceTX = GetModelWorldTransform(instData.x + pieceIndex);
+				Transform modelPieceTX = GetPieceModelTransform(instData.x, pieceIndex);
 				mat4 pieceMatrix = TransformToMatrix(modelPieceTX);
 			#endif
 			placeInWorldMatrix = placeInWorldMatrix * pieceMatrix;
