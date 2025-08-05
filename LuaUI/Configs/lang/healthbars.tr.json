@@ -11,8 +11,6 @@
 	"teleport_bar" : "Işınlan",
 	"teleport_pw_bar" : "Tahliye",
 	"ability_bar" : "Yetenek",
-	"heat_bar" : "",
-	"speed_bar" : "",
 	"reammo_bar" : "Yeniden Silahlanma",
 	"reload_bar" : "Yenile",
 	"slow_bar" : "Yavaş",
