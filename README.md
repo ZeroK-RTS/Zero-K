@@ -32,6 +32,8 @@ To play the game, you need to **[Download]** the lobby.
 
 Development guide: https://zero-k.info/mediawiki/Zero-K:Developing
 
+Codebase overview: https://zread.ai/ZeroK-RTS/Zero-K/1-overview
+
 </div>
 
 <br>
