@@ -7,6 +7,7 @@ return { tele_beacon = {
 
   customParams                  = {
       dontcount = [[1]],
+      teleporter_is_beacon = true,
   },
 
   explodeAs                     = [[TINY_BUILDINGEX]],
