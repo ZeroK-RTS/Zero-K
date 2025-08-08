@@ -88,6 +88,7 @@ return { shipaa = {
       accuracy                = 50,
       areaOfEffect            = 8,
       canattackground         = false,
+      cegTag                  = [[laser_cannon_trail]],
       collideFriendly         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
