@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Chili EndGame Window",
-    desc      = "v0.005 Chili EndGame Window. Creates award control and receives stats control from another widget.",
-    author    = "CarRepairer",
-    date      = "2013-09-05",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true,
-  }
+	return {
+		name      = "Chili EndGame Window",
+		desc      = "v0.005 Chili EndGame Window. Creates award control and receives stats control from another widget.",
+		author    = "CarRepairer, localization by Shaman",
+		date      = "2013-09-05",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true,
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ local Line
 local screen0
 local color2incolor
 local incolor2color
+local winners
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -77,12 +78,22 @@ local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
+local controlsSetup = false
+local checkFont
+
 
 local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
+local text = {}
 
 local teamNames = {}
 local teamColors = {}
 local teamApmStatsLabels = {}
+local localizationNames = {
+	["apm_mousespeed"] = true,
+	["apm_clickrate"] = true,
+	["apm_keyspressed"] = true,
+	["apm_cmd"] = true,
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -98,6 +109,7 @@ options = {
 		dontRegisterAction = true,
 	},
 }
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --utilities
@@ -112,7 +124,8 @@ local function SetTeamNamesAndColors()
 			local name = Spring.GetPlayerInfo(leader, false)
 			teamNames[teamID] = name
 		end
-		teamColors[teamID] = Chili.color2incolor(Spring.GetTeamColor(teamID))
+		name = name or "Unknown"
+		teamColors[teamID] = Chili.color2incolor(Spring.GetTeamColor(teamID)) or Chili.color2incolor(1,1,1,1)
 	end
 end
 
@@ -127,22 +140,129 @@ local function SetButtonSelected(button, isSelected)
 	button:Invalidate()
 end
 
+local function comma_value(amount)
+	local formatted = amount .. ''
+	local k
+	while true do
+		formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
+		if (k==0) then
+			break
+		end
+	end
+	return formatted
+end
+
+local function GetBestFitFontSizeJapanese(text, width, wantedSize) -- Japanese is beyond stupid with GetTextWidth it seems. Need individual iconograph sizes.
+	local array = {}
+	for word in text:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+		array[#array + 1] = word
+	end
+	local fits = false
+	local currentSize = wantedSize
+	local length = 0
+	while not fits do
+		for i = 1, #array do
+			length = length + (checkFont:GetTextWidth(text, 1) * currentSize)
+		end
+		if length > width then
+			currentSize = currentSize - 1
+			length = 0
+		else
+			fits = true
+		end
+	end
+	return currentSize
+end
+	
+
+local function GetBestFitFontSize(text, width, wantedSize)
+	local fits = false
+	local currentSize = wantedSize
+	while not fits do
+		Spring.Echo("CheckSize: " .. checkFont:GetTextWidth(text, 1) * currentSize)
+		fits = checkFont:GetTextWidth(text, 1) * currentSize < width - 2
+		if not fits then
+			currentSize = currentSize - 1
+		end
+	end
+	return currentSize
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --awards
 
 local function MakeAwardPanel(awardType, record)
-	local desc = awardDescs[awardType]
-	local fontsize = desc:len() > 25 and 12 or 16
-	return Panel:New{
-		width=230;
-		height=awardPanelHeight;
+	local desc = awardDescs[awardType] -- localized via OnLocaleChanged
+	if desc == awardType then
+		desc = WG.Translate("interface", awardType) -- might not have initialized yet.
+	end
+	local fontsize, recordFontSize
+	if WG.lang == 'ja' then
+		fontsize = GetBestFitFontSizeCJK(desc, 180, 16)
+	else
+		fontsize = GetBestFitFontSize(desc, 180, 16)
+	end
+	local descLen = desc:len()
+	Spring.Echo(awardType .. " Desc Length: " .. descLen .. ", " .. fontsize)
+	local score = Spring.GetGameRulesParam(awardType .. "_rawscore")
+	if score then -- precaution.
+		if awardType == 'attrition' or awardType == 'vet' then
+			score = string.format("%.2f%%%%", score * 100)
+		else
+			if score > 1000 then
+				score = comma_value(math.floor(score))
+			else
+				score = string.format("%.1f", score)
+			end
+		end
+		if awardType ~= 'vet' then
+			record = WG.Translate("interface", awardType .. "_score", {score = score}) -- translate.
+		else
+			local bestUnit = WG.Translate("units", Spring.GetGameRulesParam("vet_unitdef") .. ".name") or UnitDefNames[bestUnitDef].humanName
+			record = WG.Translate("interface", awardType .. "_score", {score = score, unitname = bestUnit}) -- translate.
+		end
+	end
+	local recordLength = record:len()
+	if WG.lang == 'ja' then
+		recordFontSize = GetBestFitFontSizeCJK(record, 180, 16)
+	else
+		recordFontSize = GetBestFitFontSize(record, 180, 16)
+	end
+	Spring.Echo("Record Length: " .. recordLength .. ", " .. recordFontSize)
+	local myTeamID = Spring.GetMyTeamID()
+	local myScore = Spring.GetGameRulesParam(myTeamID .. "_" .. awardType .. "_score")
+	local tooltipString = WG.Translate("interface", awardType .. "_desc")
+	if myScore and myScore > 0 and awardType ~= "chickenWin" and awardType ~= "chicken" then -- chicken and chickenwin are cooperative awards that everyone gets. Just explain how they're earned.
+		if awardType == 'attrition' or awardType == 'vet' then
+			myScore = string.format("%.2f%%%%", myScore * 100) -- format in a more human readable way. These are ratios, let's present them in percentages.
+		else
+			if myScore > 999 then
+				myScore = comma_value(math.floor(myScore))
+			else
+				myScore = math.floor(myScore)
+			end
+		end
+		if awardType == "vet" then
+			local bestUnitDef = Spring.GetGameRulesParam(Spring.GetMyTeamID() .. "_vet_unit")
+			local myBestUnit = WG.Translate("units", bestUnitDef .. ".name") or UnitDefNames[bestUnitDef].humanName
+			tooltipString = tooltipString .. "\n\n" .. WG.Translate("interface", awardType .. "_yourscore", {score = myScore, unitname = myBestUnit})
+		else -- vet needs special support.
+			tooltipString = tooltipString .. "\n\n" .. WG.Translate("interface", awardType .. "_yourscore", {score = myScore})
+		end
+	end
+	local newPanel = Panel:New{
+		width=230,
+		height=awardPanelHeight,
+		HitTest = function (self, x, y) return self end,
+		tooltip = tooltipString,
 		children = {
-			Image:New{ file='LuaRules/Images/awards/trophy_'.. awardType ..'.png'; 		parent=awardPanel; x=0;y=0; width=30; height=40; objectOverrideFont = WG.GetFont(), };
-			Label:New{ caption = desc; 		autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0;	textColor={1,1,0,1}; objectOverrideFont = WG.GetFont(fontsize), };
-			Label:New{ caption = record, 	autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=20, objectOverrideFont = WG.GetFont(), };
-		}
+			Image:New{name = awardType .. "_icon", file='LuaRules/Images/awards/trophy_'.. awardType ..'.png'; 		parent=awardPanel; x=0;y=0; width=30; height=40; objectOverrideFont = WG.GetFont(), };
+			Label:New{name = awardType .. "_name", caption = desc; 		autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0;	textColor={1,1,0,1}; objectOverrideFont = WG.GetFont(fontsize), };
+			Label:New{name = awardType .. "_record", caption = record, 	autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=20, objectOverrideFont = WG.GetFont(recordFontSize), };
+		},
 	}
+	return newPanel
 end
 
 local function SetupAwardsPanel()
@@ -183,6 +303,7 @@ end
 
 local function SetupAPMPanel()
 	Label:New{
+		name = "empty",
 		parent=apmSubPanel,
 		width=200,
 		y=200,
@@ -194,38 +315,42 @@ local function SetupAPMPanel()
 		}
 	Label:New{
 		parent=apmSubPanel,
+		name = "apm_mousespeed",
 		width=200,
 		y=200,
 		height=awardPanelHeight,
-		caption = "Mouse Speed\n(Pixels/s)",
+		caption = WG.Translate("interface", "apm_mousespeed"),
 		valign='center',
 		autosize=false,
 		objectOverrideFont = WG.GetFont(),
 		}
 	Label:New{
 		parent=apmSubPanel,
+		name = "apm_clickrate",
 		width=200,
 		--y = 120,
 		height=awardPanelHeight,
-		caption = "Click Rate\n(Mouse Clicks/m)",
+		caption = WG.Translate("interface", "apm_clickrate"),
 		valign='center',
 		autosize=false,
 		objectOverrideFont = WG.GetFont(),
 		}
 	Label:New{
 		parent=apmSubPanel,
+		name = "apm_keyspressed",
 		width=200,
 		height=awardPanelHeight,
-		caption = "Key Press Rate\n(Keys Pressed/m)",
+		caption = WG.Translate("interface", "apm_keyspressed"),
 		valign='center',
 		autosize=false,
 		objectOverrideFont = WG.GetFont(),
 		}
 	Label:New{
 		parent=apmSubPanel,
+		name = "apm_cmd",
 		width=200,
 		height=awardPanelHeight,
-		caption = "APM\n(Cmds/m)",
+		caption = WG.Translate("interface", "apm_cmd"),
 		valign='center',
 		autosize=false,
 		objectOverrideFont = WG.GetFont(),
@@ -456,9 +581,10 @@ local function SetupControls()
 
 	awardButton = Button:New{
 		parent = window_endgame;
-		caption="Awards",
+		caption = WG.Translate("interface", "awards"),
 		objectOverrideFont = WG.GetFont(),
 		x=9, y=7,
+		width = 10 .. "%",
 		height=B_HEIGHT;
 		OnClick = {
 			ShowAwards
@@ -470,8 +596,9 @@ local function SetupControls()
 
 	statsButton = Button:New{
 		parent = window_endgame;
-		caption="Statistics",
-		x=86, y=7,
+		caption= WG.Translate("interface", "statistics"),
+		x= 10.9 .. "%", y=7,
+		width = 10 .. "%",
 		objectOverrideFont = WG.GetFont(),
 		height=B_HEIGHT;
 		OnClick = {
@@ -484,7 +611,8 @@ local function SetupControls()
 	apmButton = Button:New{
 		parent = window_endgame;
 		caption="APM",
-		x=86+77, y=7,
+		x= 21 .. "%", y=7,
+		width = 10 .. "%",
 		objectOverrideFont = WG.GetFont(),
 		height=B_HEIGHT;
 		OnClick = {
@@ -492,11 +620,11 @@ local function SetupControls()
 		};
 	}
 	exitButton = Button:New{
-		x = -169, -- This is is a high class nonsense here
+		x = 79 .. "%",
 		y = 7,
-		width = 160,
+		width = 20 .. "%",
 		height = B_HEIGHT,
-		caption = "Exit to Lobby",
+		caption = WG.Translate("interface", "exitlobby"),
 		objectOverrideFont = WG.GetFont(18),
 		OnClick = {
 			function()
@@ -509,13 +637,15 @@ local function SetupControls()
 		},
 		parent   = window_endgame,
 	}
+	controlsSetup = true
 end
 
-local function SetEndgameCaption(winners)
+local function SetEndgameCaption()
+	if winners == nil then return end
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	if #winners > 1 then
 		if spec then
-			endgame_caption = "Game over!"
+			endgame_caption = WG.Translate("interface", "gameover")
 			endgame_fontcolor = {1,1,1,1}
 		else
 			local i_win = false
@@ -526,10 +656,10 @@ local function SetEndgameCaption(winners)
 			end
 
 			if i_win then
-				endgame_caption = "Victory!"
+				endgame_caption = WG.Translate("interface", "victory")
 				endgame_fontcolor = {0,1,0,1}
 			else
-				endgame_caption = "Defeat!"
+				endgame_caption = WG.Translate("interface", "defeat")
 				endgame_fontcolor = {1,0,0,1}
 			end
 		end
@@ -540,20 +670,20 @@ local function SetEndgameCaption(winners)
 		end
 		if spec then
 			if (winners[1] == gaiaAllyTeamID) then
-				endgame_caption = "Draw!"
+				endgame_caption = WG.Translate("interface", "draw_result")
 				endgame_fontcolor = {1,1,1,1}
 			else
-				endgame_caption = (winnerTeamName .. " wins!")
+				endgame_caption = WG.Translate("interface", "teamwins", {name = winnerTeamName})
 				endgame_fontcolor = {1,1,1,1}
 			end
 		elseif (winners[1] == Spring.GetMyAllyTeamID()) then
-			endgame_caption = "Victory!"
+			endgame_caption = WG.Translate("interface", "victory")
 			endgame_fontcolor = {0,1,0,1}
 		elseif (winners[1] == gaiaAllyTeamID) then
-			endgame_caption = "Draw!"
+			endgame_caption = WG.Translate("interface", "draw_result")
 			endgame_fontcolor = {1,1,0,1}
 		else
-			endgame_caption = "Defeat!" -- could somehow add info on who won (eg. for FFA) but as-is it won't fit
+			endgame_caption = WG.Translate("interface", "defeat") -- could somehow add info on who won (eg. for FFA) but as-is it won't fit
 			endgame_fontcolor = {1,0,0,1}
 		end
 	end
@@ -572,6 +702,45 @@ local function StartEndgameTimer (delay)
 	gameEnded = true
 	showEndgameWindowTimer = endgameWindowDelay
 	widgetHandler:UpdateCallIn("Update")
+end
+
+local function OnLocaleChange()
+	for k, _ in pairs(awardDescs) do
+		awardDescs[k] = WG.Translate("interface", k)
+	end
+	if awardButton then
+		awardButton:SetCaption(WG.Translate("interface", "awards"))
+		awardButton:Invalidate()
+	end
+	if statsButton then
+		statsButton:SetCaption(WG.Translate("interface", "statistics"))
+		statsButton:Invalidate()
+	end
+	if apmButton then
+		apmButton:SetCaption(WG.Translate("interface", "apm"))
+		apmButton:Invalidate()
+	end
+	if exitButton then
+		exitButton:SetCaption(WG.Translate("interface", "exitlobby"))
+		exitButton:Invalidate()
+	end
+	if apmSubPanel and not apmSubPanel:IsEmpty() then
+		for name, _ in pairs(localizationNames) do
+			Spring.Echo("Updating " .. name)
+			local button = apmSubPanel:GetChildByName(name)
+			if button then
+				Spring.Echo("Applying update to " .. name)
+				button:SetCaption(WG.Translate("interface", name))
+				Spring.Echo("Caption set")
+			end
+		end
+	end
+	if gameEnded and controlsSetup then
+		SetEndgameCaption()
+		window_endgame.caption = endgame_caption
+		window_endgame:Invalidate()
+		SetupAwardsPanel()
+	end
 end
 
 function widget:Initialize()
@@ -613,11 +782,11 @@ function widget:Initialize()
 	statsButton:Hide()
 	exitButton:Hide()
 	ShowStats()
-
+	checkFont = WG.GetFont()
 	widgetHandler:RemoveCallIn("Update")
 	widgetHandler:RemoveCallIn("GameFrame")
 	if Spring.IsGameOver() then
-		window_endgame.caption = "Game aborted"
+		window_endgame.caption = WG.Translate("interface", "gameabort")
 		StartEndgameTimer(1)
 	end
 
@@ -631,10 +800,12 @@ function widget:Initialize()
 		end
 		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/graphs_icon.png", "Toggle graphs" .. toggleKey, ToggleStatsGraph)
 	end
+	WG.InitializeTranslation(OnLocaleChange, "gui_chili_endgamewindow")
 end
 
-function widget:GameOver(winners)
-	SetEndgameCaption(winners)
+function widget:GameOver(thisWinners)
+	winners = thisWinners
+	SetEndgameCaption()
 	StartEndgameTimer(endgameWindowDelay)
 end
 
