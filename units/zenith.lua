@@ -147,7 +147,7 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
@@ -206,7 +206,7 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
@@ -266,7 +266,7 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
@@ -328,7 +328,7 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
