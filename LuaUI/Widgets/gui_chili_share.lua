@@ -240,7 +240,7 @@ local function getEcoInfo(teamID)
 	local metalBase       = Spring.GetTeamRulesParam(teamID, "OD_metalBase") or 0
 	local metalOverdrive  = Spring.GetTeamRulesParam(teamID, "OD_metalOverdrive") or 0
 	local metalMisc       = Spring.GetTeamRulesParam(teamID, "OD_metalMisc") or 0
-    
+	
 	local energyIncome    = Spring.GetTeamRulesParam(teamID, "OD_energyIncome") or 0
 	local energyOverdrive = Spring.GetTeamRulesParam(teamID, "OD_energyOverdrive") or 0
 	local energyChange    = Spring.GetTeamRulesParam(teamID, "OD_energyChange") or 0
@@ -248,7 +248,6 @@ local function getEcoInfo(teamID)
 	
 	local eReclaim = eInco - math.max(0, energyChange)
 	eInco = eReclaim + energyIncome
-	
 	
 	local extraMetalPull = Spring.GetTeamRulesParam(teamID, "extraMetalPull") or 0
 	local extraEnergyPull = Spring.GetTeamRulesParam(teamID, "extraEnergyPull") or 0

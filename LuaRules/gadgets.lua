@@ -74,6 +74,7 @@ gadgetHandler = {
 	actionHandler = actionHandler,	-- FIXME: not in base
 }
 
+VFS.Include('LuaRules/engine_compat_post.lua', nil, VFSMODE)
 
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()

@@ -112,7 +112,7 @@ return { hoveraa = {
       tracks                  = true,
       turnRate                = 64000,
       weaponAcceleration      = 300,
-      weaponTimer             = 0.8333,
+      weaponTimer             = 1,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 1400,
     },

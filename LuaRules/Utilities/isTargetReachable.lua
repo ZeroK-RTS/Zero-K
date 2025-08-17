@@ -1,5 +1,8 @@
 --This function process result of Spring.PathRequest() to say whether target is reachable or not
-function Spring.Utilities.IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
+function Spring.Utilities.IsTargetReachable(moveID, ox,oy,oz,tx,ty,tz,radius)
+	if WG and WG.Disable_RequestPath or GG and GG.Disable_RequestPath then
+		return "reach", false, false
+	end
 	local result,lastcoordinate, waypoints
 	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
 	if path then

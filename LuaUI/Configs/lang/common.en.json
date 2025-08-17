@@ -47,7 +47,7 @@
 	"ctrl" : "Ctrl",
 	"alt" : "Alt",
 	"health" : "Health",
-	"shields" : "Shields",
+	"shield" : "Shield",
 	"value" : "Value",
 	"special" : "Special",
 	"ready" : "Ready",

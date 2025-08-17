@@ -859,12 +859,3 @@ if gl and not gl.ObjectLabel then -- 2025.03, but can be nil anyway due to missi
 	gl.PushDebugGroup = RET_NONE
 	gl.PopDebugGroup  = RET_NONE
 end
-
-if true then -- No engine has this yet
-	local origAddUnitDamage = Spring.AddUnitDamage
-	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
-		gadgetHandler.GG._AddUnitDamage_teamID = teamID
-		origAddUnitDamage(unitID, damage, paralyze, attackerID, weaponID)
-		gadgetHandler.GG._AddUnitDamage_teamID = nil -- TODO: deal with recursion by saving old value. But this needs testing.
-	end
-end

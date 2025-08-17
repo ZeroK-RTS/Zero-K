@@ -2283,6 +2283,9 @@ end
 
 -- This function process result of Spring.PathRequest() to say whether target is reachable or not
 function IsTargetReachable(unitID, tx,ty,tz)
+	if WG.Disable_RequestPath then
+		return true
+	end
 	local ox, oy, oz = spGetUnitPosition(unitID)	-- unit location
 	local unitDefID = spGetUnitDefID(unitID)
 	local buildDist = UnitDefs[unitDefID].buildDistance -- build range

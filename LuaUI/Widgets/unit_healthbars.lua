@@ -103,7 +103,7 @@ local messages = {
 
 local function languageChanged ()
 	for key, value in pairs(messages) do
-		messages[key] = WG.Translate ("interface", key)
+		messages[key] = WG.Translate("interface", key .. "_bar")
 	end
 end
 
@@ -1325,7 +1325,7 @@ end --//end do
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	WG.InitializeTranslation(languageChanged, GetInfo().name)
 
 	--// catch f9
 	Spring.SendCommands({"showhealthbars 0"})

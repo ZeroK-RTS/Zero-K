@@ -172,6 +172,7 @@ local function BurrowThread()
 end
 
 function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, true) -- Do not allow range changes.
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(BurrowThread)
 	if not Spring.GetUnitIsStunned(unitID) then

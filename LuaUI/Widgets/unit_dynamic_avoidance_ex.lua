@@ -57,7 +57,6 @@ local CMD_RECLAIM		= CMD.RECLAIM
 local CMD_RESURRECT		= CMD.RESURRECT
 local CMD_REPAIR		= CMD.REPAIR
 
---local spRequestPath = Spring.RequestPath
 local mathRandom = math.random
 --local spGetUnitSensorRadius  = Spring.GetUnitSensorRadius
 --------------------------------------------------------------------------------

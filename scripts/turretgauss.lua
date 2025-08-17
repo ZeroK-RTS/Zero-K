@@ -100,8 +100,20 @@ local function RestoreAfterDelay()
 	StartThread(Close);
 end
 
+local prevMult, prevWeaponMult
+local function RangeUpdate(mult, weaponMult)
+	mult = mult or prevMult or 1
+	weaponMult = weaponMult or prevWeaponMult
+	prevMult, prevWeaponMult = mult, weaponMult
+	if rangeChanged then
+		return
+	end
+	Spring.SetUnitWeaponState(unitID, 1, "range", weaponRange * mult * (weaponMult and weaponMult[1] or 1))
+end
+
 -- event handlers
 function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay);
 	
@@ -156,7 +168,8 @@ end
 
 function script.EndBurst()
 	if rangeChanged then
-		Spring.SetUnitWeaponState(unitID, 1, "range", weaponRange)
+		rangeChanged = false
+		RangeUpdate()
 	end
 end
 

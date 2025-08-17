@@ -46,7 +46,7 @@
 	"ctrl" : "Ctrl",
 	"alt" : "Alt",
 	"health" : "Health",
-	"shields" : "シールド",
+	"shield" : "シールド",
 	"value" : "値",
 	"special" : "Special",
 	"ready" : "Ready",

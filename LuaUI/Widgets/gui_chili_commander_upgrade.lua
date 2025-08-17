@@ -61,6 +61,9 @@ local ROW_COUNT = 6
 -- Index of module which is selected for the purposes of replacement.
 local activeSlotIndex
 
+-- Current commander cost multiplier
+local costMultiplier = 1
+
 -- Whether already owned modules are shown
 local alreadyOwnedShown = false
 
@@ -582,8 +585,8 @@ local mainWindowShown = false
 local mainWindow, timeLabel, costLabel, morphBuildPower
 
 function UpdateMorphCost(newCost)
-	newCost = (newCost or 0) + morphBaseCost
-	costLabel:SetCaption(math.floor(newCost))
+	newCost = ((newCost or 0) + morphBaseCost)
+	costLabel:SetCaption(math.floor(costMultiplier * newCost))
 	timeLabel:SetCaption(math.floor(newCost/morphBuildPower))
 end
 
@@ -925,6 +928,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	local profileID = Spring.GetUnitRulesParam(unitID, "comm_profileID")
+	costMultiplier = math.pow(2, (Spring.GetUnitRulesParam(unitID, "tech_level") or 1) - 1)
 	
 	if not (chassisDefs[chassis] and chassisDefs[chassis].levelDefs[math.min(chassisDefs[chassis].maxNormalLevel, level+1)]) then
 		return
