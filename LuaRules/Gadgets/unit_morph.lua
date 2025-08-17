@@ -468,7 +468,9 @@ local function FinishMorph(unitID, morphData)
 		GG.Capture.SetMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
 	end
 	
+	GG.MorphDestroy = unitID
 	Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
+	GG.MorphDestroy = nil
 	
 	--//transfer unit speed
 	local gy = Spring.GetGroundHeight(px, pz)

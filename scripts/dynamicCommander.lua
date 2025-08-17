@@ -322,20 +322,28 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	weaponsInitialized = true
 end
 
+local prevMult
+local function RangeUpdate(mult, weaponMult) -- TODO, handle weaponMult?
+	mult = mult or prevMult or 1
+	prevMult, prevWeaponMult = mult, weaponMult
+	if not Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") then
+		return
+	end
+	UpdateWeapons(
+		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
+		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
+		Spring.GetUnitRulesParam(unitID, "comm_shield_name"),
+		Spring.GetUnitRulesParam(unitID, ("comm_range_mult") or 1) * mult,
+		Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
+	)
+end
+
 local function Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	-- copy the dgun command table because we sometimes need to reinsert it
 	local cmdID = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
 	dgunTable = Spring.GetUnitCmdDescs(unitID, cmdID)[1]
-	
-	if Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") then
-		UpdateWeapons(
-			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
-			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
-			Spring.GetUnitRulesParam(unitID, "comm_shield_name"),
-			Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1,
-			Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
-		)
-	end
+	RangeUpdate()
 end
 
 

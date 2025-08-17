@@ -16,6 +16,7 @@ layout (location = 5) in uvec4 instData;
 
 //__ENGINEUNIFORMBUFFERDEFS__
 //__DEFINES__
+//__QUATERNIONDEFS__
 
 struct SUniformsBuffer {
     uint composite; //     u8 drawFlag; u8 unused1; u16 id;
@@ -58,10 +59,11 @@ out DataVS {
 	#endif
 };
 
-layout(std140, binding=0) readonly buffer MatrixBuffer {
-	mat4 UnitPieces[];
-};
-
+#if USEQUATERNIONS == 0
+	layout(std140, binding=0) readonly buffer MatrixBuffer {
+		mat4 UnitPieces[];
+	};
+#endif
 
 bool vertexClipped(vec4 clipspace, float tolerance) {
   return any(lessThan(clipspace.xyz, -clipspace.www * tolerance)) ||
@@ -71,7 +73,12 @@ bool vertexClipped(vec4 clipspace, float tolerance) {
 void main()
 {
 	uint baseIndex = instData.x; // this tells us which unit matrix to find
-	mat4 modelMatrix = UnitPieces[baseIndex]; // This gives us the models  world pos and rot matrix
+	#if USEQUATERNIONS == 0
+		mat4 modelMatrix = UnitPieces[baseIndex]; // This gives us the models  world pos and rot matrix
+	#else
+		Transform modelWorldTX = GetModelWorldTransform(instData.x);
+		mat4 modelMatrix = TransformToMatrix(modelWorldTX);
+	#endif
 
 	gl_Position = cameraViewProj * vec4(modelMatrix[3].xyz, 1.0); // We transform this vertex into the center of the model
 	v_rotationY = atan(modelMatrix[0][2], modelMatrix[0][0]); // we can get the euler Y rot of the model from the model matrix

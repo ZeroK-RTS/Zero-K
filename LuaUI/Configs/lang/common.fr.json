@@ -47,7 +47,7 @@
 	"ctrl" : "Ctrl",
 	"alt" : "Alt",
 	"health" : "Santé",
-	"shields" : "Boucliers",
+	"shield" : "Boucliers",
 	"value" : "Valeur",
 	"special" : "Spécial",
 	"ready" : "Prêt",

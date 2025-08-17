@@ -74,6 +74,7 @@ local shaderConfig = {
 	FULL_ROTATION = 0, -- the primitive is fully rotated in the units plane
 	DISCARD = 0, -- Enable alpha threshold to discard fragments below 0.01
 	--DEBUGEDGES = 1, -- set to non-nil to debug the size of the rectangles
+	USEQUATERNIONS = Engine.FeatureSupport.transformsInGL4 and "1" or "0",
 }
 
 -----------------------------------------------------------------
@@ -276,6 +277,7 @@ layout (location = 5) in uvec4 instData;
 
 //__ENGINEUNIFORMBUFFERDEFS__
 //__DEFINES__
+//__QUATERNIONDEFS__
 
 struct SUniformsBuffer {
     uint composite; //     u8 drawFlag; u8 unused1; u16 id;
@@ -316,9 +318,11 @@ out DataVS {
 	#endif
 };
 
-layout(std140, binding=0) readonly buffer MatrixBuffer {
-	mat4 UnitPieces[];
-};
+#if USEQUATERNIONS == 0
+	layout(std140, binding=0) readonly buffer MatrixBuffer {
+		mat4 UnitPieces[];
+	};
+#endif
 
 
 bool vertexClipped(vec4 clipspace, float tolerance) {
@@ -329,7 +333,12 @@ bool vertexClipped(vec4 clipspace, float tolerance) {
 void main()
 {
 	uint baseIndex = instData.x; // this tells us which unit matrix to find
-	mat4 modelMatrix = UnitPieces[baseIndex]; // This gives us the models  world pos and rot matrix
+	#if USEQUATERNIONS == 0	
+		mat4 modelMatrix = UnitPieces[baseIndex]; // This gives us the models  world pos and rot matrix
+	#else
+		Transform modelWorldTX = GetModelWorldTransform(instData.x);
+		mat4 modelMatrix = TransformToMatrix(modelWorldTX);
+	#endif
 
 	gl_Position = cameraViewProj * vec4(modelMatrix[3].xyz, 1.0); // We transform this vertex into the center of the model
 	v_rotationY = atan(modelMatrix[0][2], modelMatrix[0][0]); // we can get the euler Y rot of the model from the model matrix
@@ -625,7 +634,9 @@ end
 
 local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()
+	local quaternionDefs = LuaShader.GetQuaternionDefs()
 	vsSrc = vsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
+	vsSrc = vsSrc:gsub("//__QUATERNIONDEFS__", quaternionDefs)
 	fsSrc = fsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	gsSrc = gsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	DrawPrimitiveAtUnitShader =  LuaShader(

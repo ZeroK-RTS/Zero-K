@@ -23,7 +23,6 @@ local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 local spGetFeaturePosition = Spring.GetFeaturePosition
-local spRequestPath = Spring.RequestPath
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetGameSeconds = Spring.GetGameSeconds

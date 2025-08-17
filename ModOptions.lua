@@ -246,6 +246,14 @@ local options = {
     def         = false,
   },
   {
+    key         = "aiusetechk",
+    name        = "AIs Use Tech-K",
+    desc        = "Diverts some AI metal income for automatic upgrades of factories and mexes. This lets any AI approximate an understanding of Tech-K with minimal cheating.",
+    type        = "bool",
+    section     = "experimental",
+    def         = true,
+  },
+  {
     key         = "disableresurrect",
     name        = "Disable resurrect",
     desc        = "Removes resurrect abilities from the game",
@@ -876,7 +884,7 @@ local options = {
 	name    = "Pathfinder type",
 	desc    = "Sets the pathfinding system used by units.",
 	type    = "list",
-	def     = "random",
+	def     = "qtpfs",
 	section = "experimental",
 	items  = {
 		{
@@ -884,17 +892,25 @@ local options = {
 			name = 'Standard',
 			desc = 'Standard pathfinder',
 		},
-		{
-			key  = 'random',
-			name = 'Random',
-			desc = 'Randomly pick a pathfinder',
-		},
+		--{ https://github.com/ZeroK-RTS/Zero-K/issues/5523
+		--	key  = 'random', 
+		--	name = 'Random',
+		--	desc = 'Randomly pick a pathfinder',
+		--},
 		{
 			key  = 'qtpfs',
 			name = 'QTPFS',
 			desc = 'New Quadtree Pathfinding System (experimental)',
 		},
 	},
+  },
+  {
+	key     = "luapathrequest",
+	name    = "Allow Lua Path Requests",
+	desc    = "When enabled, the game will probably desync. Don't do it.",
+	type = "bool",
+	def	= false,
+	section = "experimental",
   },
   {
     key    = 'chicken',

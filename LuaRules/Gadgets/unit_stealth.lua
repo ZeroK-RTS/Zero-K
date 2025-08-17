@@ -19,6 +19,7 @@ local spSetUnitStealth = Spring.SetUnitStealth
 local spSetUnitSonarStealth = Spring.SetUnitSonarStealth
 
 local innateStealthCache = {}
+local allyTeams = Spring.GetAllyTeamList()
 
 local function HasInnateStealth(unitDefID)
 	if not unitDefID then
@@ -30,6 +31,16 @@ local function HasInnateStealth(unitDefID)
 	end
 	return innateStealthCache[unitDefID] == 1
 end
+
+function gadget:UnitCreated(unitID, unitDefID)
+	if HasInnateStealth(unitDefID) then
+		spSetUnitStealth(unitID, true)
+		for i = 1, #allyTeams do
+			Spring.SetUnitLosMask(unitID, allyTeams[i], 2)
+		end
+	end
+end
+
 
 function gadget:UnitCloaked(unitID)
 	if not HasInnateStealth(unitDefID) then

@@ -147,12 +147,14 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
+      smokePeriod             = 10,
+      smokeSize               = 80,
       soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
         [[null]],
-        [[null]],
+        [[largedarksmoketrail]],
         [[null]],
       },
 
