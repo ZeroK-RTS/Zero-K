@@ -29,6 +29,7 @@ if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 local USE_TERRAIN_TEXTURE_CHANGE = true -- (Spring.GetModOptions() or {}).terratex == "1"
 local ECHO_COST = false
+local ECHO_DETAILED_COST_ESTIMATE = false
 
 -- Speedups
 local cos                   = math.cos
@@ -981,8 +982,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
-			--Spring.Echo(totalCost .. "\t" .. baseCost)
-			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			if ECHO_DETAILED_COST_ESTIMATE then
+				Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			end
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -1402,7 +1404,9 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
-			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			if ECHO_DETAILED_COST_ESTIMATE then
+				Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			end
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -1884,7 +1888,9 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
-			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			if ECHO_DETAILED_COST_ESTIMATE then
+				Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			end
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -2177,7 +2183,7 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 	end
 	
 	if ECHO_COST then
-		local cost = math.floor(terraformUnit[id].totalSpent + 0.5)
+		local cost = terraformUnit[id].totalSpent
 		Spring.Echo("TerraCost", cost)
 		Spring.Utilities.UnitEcho(id, cost)
 	end
