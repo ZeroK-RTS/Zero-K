@@ -80,3 +80,4 @@ License: Royalty-free for commercial and non-commercial use (per bundle license)
 Notes: All sounds used under the terms provided in the original GDC Bundle download package
 
 ex_large18.wav - Shapeforms Audio - Sci-Fi Weapons Cyberpunk Arsenal, Olivier Girardot - Guns & Explosions
+ex_large19.wav - BluezoneCorp - Detonation - Explosion
