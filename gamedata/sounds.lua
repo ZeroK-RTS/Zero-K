@@ -182,6 +182,26 @@ local optionOverrides = {
 	["weapon/cannon/plasma_fire_extra2"] = {
 		gain = 20,
 	},
+	["weapon/laser/rapid_laser"] = {
+		maxconcurrent = 5,
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/cannon/brawler_emg"] = {
+		maxconcurrent = 5,
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/cannon/brawler_emg3"] = {
+		maxconcurrent = 3,
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/cannon/emg_hit3"] = {
+		maxconcurrent = 3,
+		gain = 1.0,
+		pitch = 1.0,
+	},
 }
 
 local priority = {
