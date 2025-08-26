@@ -188,7 +188,7 @@ local optionOverrides = {
 		pitch = 1.0,
 	},
 	["weapon/cannon/brawler_emg"] = {
-		maxconcurrent = 5,
+		maxconcurrent = 3,
 		gain = 1.0,
 		pitch = 1.0,
 	},
