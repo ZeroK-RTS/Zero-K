@@ -133,6 +133,7 @@ local Sounds = {
 		FirewalkerHit = {
 			file = "sounds/weapon/cannon/wolverine_hit.wav",
 			pitchmod = 0.008,
+			maxconcurrent = 10, --- firewalker
 		},
 		CaptureRay = {
 			file = "sounds/weapon/laser/capture_ray.wav",
@@ -183,22 +184,97 @@ local optionOverrides = {
 		gain = 20,
 	},
 	["weapon/laser/rapid_laser"] = {
-		maxconcurrent = 5,
+		maxconcurrent = 5, --- raptor toad detriment
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/laser/rapid_laser2"] = {
+		maxconcurrent = 8, --- gremlin hercules
 		gain = 1.0,
 		pitch = 1.0,
 	},
 	["weapon/cannon/brawler_emg"] = {
-		maxconcurrent = 3,
+		maxconcurrent = 3, --- toad
 		gain = 1.0,
 		pitch = 1.0,
 	},
 	["weapon/cannon/brawler_emg3"] = {
-		maxconcurrent = 3,
+		maxconcurrent = 3, --- nimbus
 		gain = 1.0,
 		pitch = 1.0,
 	},
 	["weapon/cannon/emg_hit3"] = {
-		maxconcurrent = 3,
+		maxconcurrent = 3, --- nimbus
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/laser/small_laser_fire2"] = {
+		maxconcurrent = 6, --- bandit
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/laser/lasercannon_hit"] = {
+		maxconcurrent = 6, --- hercules punisher swift bandit zephyr welder razor
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/laser/laser_burn8"] = {
+		maxconcurrent = 6, --- lotus
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/heatray_fire7"] = {
+		maxconcurrent = 7, --- scorcher
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/emg"] = {
+		maxconcurrent = 8, --- glaive
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/heavy_emg"] = {
+		maxconcurrent = 10, --- stardust, reaver
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/cannon/emg_hit"] = {
+		maxconcurrent = 6, --- stardust, reaver
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/laser/lasercannon_fire"] = {
+		maxconcurrent = 6, --- hercules zephyr welder razor
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/laser/mini_laser"] = {
+		maxconcurrent = 8, --- spicula, firefly, trisula, redback, scorpion
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/laser/small_laser_fire"] = {
+		maxconcurrent = 10, --- flea
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/flamethrower"] = {
+		maxconcurrent = 10, --- pyro dante tiamat
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/cannon/tremor_fire"] = {
+		maxconcurrent = 5, --- tremor
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/cannon/cannon_hit5"] = {
+		maxconcurrent = 10, --- tremor
+		gain = 1.0,
+		pitch = 1.0,
+	},
+	["weapon/cannon/wolverine_fire"] = {
+		maxconcurrent = 10, --- firewalker
 		gain = 1.0,
 		pitch = 1.0,
 	},
