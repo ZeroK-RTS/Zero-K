@@ -42,7 +42,7 @@ local Sounds = {
 			gainmod = 0.1,
 			pitch = 0.8,
 			gain = 0.9,
-			priority = 1,
+			priority = 2,
 		},
 		BladeHit = {
 			file = "sounds/weapon/blade/blade_hit.wav",
@@ -64,7 +64,7 @@ local Sounds = {
 			gain = 1.0,
 			pitch = 1.0,
 			priority = 0,
-			maxconcurrent = 4, --- some reasonable limits
+			maxconcurrent = 4, --- some reasonable limits (default appears to actually be 16)
 			maxdist = nil, --- no cutoff at all (engine defaults to FLT_MAX)
 		},
 		DetrimentJump = {
@@ -86,6 +86,7 @@ local Sounds = {
 			pitchmod = 0.05,
 			gainmod = 0,
 			gain = 2.4,
+			priority = 1,
 		},
 		TorpedoHitVariable = {
 			file = "sounds/explosion/wet/ex_underwater.wav",
@@ -106,7 +107,7 @@ local Sounds = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
 			gain = 1.0,
 			pitch = 1.0,
-			priority = 2,
+			priority = 3,
 			maxconcurrent = 30,
 			maxdist = nil,
 		},
@@ -114,7 +115,7 @@ local Sounds = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
 			gain = 1.0,
 			pitch = 1.0,
-			priority = 2,
+			priority = 3,
 			maxconcurrent = 30,
 			maxdist = nil,
 		},
@@ -278,6 +279,7 @@ local optionOverrides = {
 		gain = 1.0,
 		pitch = 1.0,
 	},
+
 }
 
 local priority = {
@@ -286,6 +288,17 @@ local priority = {
 	["weapon/missile/liche_fire"] = 1,
 	["weapon/missile/liche_hit"] = 1,
 	["explosion/ex_ultra8"] = 2,
+	["explosion/mini_nuke"] = 1, --- Claymore, Skuttle, Disco Rave Party, Snitch, Detriment, Lancelet, Scylla, Eos
+	["weapon/missile/emp_missile_hit"] = 1, --- Shockley, Reef, Disco Rave Party
+	["explosion/ex_large4"] = 1, --- Disco Rave Party, Quake
+	["weapon/aoe_aura3"] = 1, --- Zeno
+	["weapon/aoe_aura2"] = 1, --- Disco Rave Party, limpet
+	["weapon/missile/nalpalm_missile_hit"] = 1, --- Inferno, Disco Rave Party
+	["weapon/more_lightning"] = 1, --- Imp
+	["weapon/lightningbolt3"] = 1, --- Widow
+	["weapon/gauss_fire"] = 1, --- Phantom
+	["weapon/snipe_hit"] = 1, --- Phantom
+	["weapon/lightningbolt"] = 1, --- Thunderbird
 }
 
 local lowPitchMod = {
