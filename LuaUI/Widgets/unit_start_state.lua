@@ -116,9 +116,10 @@ local tooltips = {
 	},
 	overkill_prevention = {
 		[0] = "Disabled.",
-		[1] = "Enabled only for automatically aquired targets when set to Fire At Will.",
-		[2] = "Enabled when the unit is set to Fire At Will.",
-		[3] = "Always enabled.",
+		[1] = "Enabled only for automatically aquired targets.",
+		[2] = "Enabled when set to fire Fire At Will for all target.",
+		[3] = "Enabled except when manually queued with a single attack command.",
+		[4] = "Always enabled."
 	},
 	fire_at_shield = {
 		[0] = "Disabled.",
@@ -1022,7 +1023,7 @@ local function addUnit(defName, path)
 	if overkillPrevention then
 		options[defName .. "_overkill_prevention0"] = {
 			name = "  Overkill Prevention",
-			desc = "Control when the unit tries to prevent overkill. This is done by not shooting at units that are already likely to die due to incoming fire.",
+			desc = "Control when the unit tries to prevent overkill. This causes units to not shoot at targets that are already likely to die due to incoming fire.",
 			type = 'number',
 			value = overkillPrevention,
 			min = 0,
