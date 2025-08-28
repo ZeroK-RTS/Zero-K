@@ -94,7 +94,7 @@ return { zenith = {
       rgbColor                = [[0 0 1]],
       rgbColor2               = [[1 0.5 1]],
       size                    = 32,
-      soundStart              = [[weapon/gravity_fire]],
+      soundStart              = [[gravity_fire]],
       soundStartVolume        = 0.15,
       thickness               = 32,
       tolerance               = 5000,
@@ -149,7 +149,7 @@ return { zenith = {
       smokeTrail              = true,
       smokePeriod             = 10,
       smokeSize               = 80,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
@@ -208,7 +208,7 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
@@ -268,7 +268,7 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
@@ -330,7 +330,7 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
-      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      soundHit                = [[weapon/cannon/supergun_bass_boost2]],
       startVelocity           = 1500,
 
       textures                = {
