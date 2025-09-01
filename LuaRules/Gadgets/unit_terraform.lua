@@ -565,6 +565,17 @@ local function getPointInsideMap(x,z)
 	return x, z
 end
 
+local function SetInivisbleToEnemy(unitID, team)
+	local allyTeamList = spGetAllyTeamList()
+	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team, false)
+	for i=1, #allyTeamList do
+		local allyID = allyTeamList[i]
+		if allyID ~= unitAllyTeam then
+			spSetUnitLosMask(unitID, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
+		end
+	end
+end
+
 local function setupTerraunit(unitID, team, x, y, z)
 	y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 
@@ -574,15 +585,7 @@ local function setupTerraunit(unitID, team, x, y, z)
 	
 	spSetUnitSensorRadius(unitID,"los",0) -- REMOVE IN 0.83
 	spSetUnitSensorRadius(unitID,"airLos",0) -- REMOVE IN 0.83
-	
-	local allyTeamList = spGetAllyTeamList()
-	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team, false)
-	for i=1, #allyTeamList do
-		local allyID = allyTeamList[i]
-		if allyID ~= unitAllyTeam then
-			spSetUnitLosMask(unitID, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
-		end
-	end
+	SetInivisbleToEnemy(unitID, team)
 
 	spSetUnitHealth(unitID, {
 		health = 0.01,
@@ -3618,6 +3621,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+	if unitID and unitDefID and teamID and terraformUnitDefIDs[unitDefID] then
+		SetInivisbleToEnemy(unitID, teamID)
+	end
+end
+
 function gadget:UnitDestroyed(unitID, unitDefID)
 	if constructor[unitID] then
 		local index = constructor[unitID].index
@@ -3669,6 +3678,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		RegisterStructure(unitID, ud)
 	end
 end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Debug
