@@ -426,7 +426,7 @@ local function SetupPointStructure(point, structArea, segArea)
 	local x, z = point.x, point.z
 	if (structArea[x] and structArea[x][z]) or (GG.map_AllowPositionTerraform and not GG.map_AllowPositionTerraform(x, z)) then
 		point.diffHeight = 0.0001
-		point.structure = true
+		point.structure = structArea[x][z] or 1000
 	else
 		point.diffHeight = point.aimHeight - currHeight
 		segArea[x][z] = {orHeight = point.orHeight, diffHeight = point.diffHeight, building = false}
@@ -922,7 +922,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 						segment[i].structureArea[lx] = {}
 					end
 					for lz = s.minz,s.maxz, 8 do
-						segment[i].structureArea[lx][lz] = true
+						segment[i].structureArea[lx][lz] = (segment[i].structureArea[lx][lz] or 0) + 1
 					end
 				end
 				
@@ -1282,7 +1282,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 						segment[i].structureArea[lx] = {}
 					end
 					for lz = s.minz,s.maxz, 8 do
-						segment[i].structureArea[lx][lz] = true
+						segment[i].structureArea[lx][lz] = (segment[i].structureArea[lx][lz] or 0) + 1
 					end
 				end
 				
@@ -1773,7 +1773,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 						segment[i].structureArea[lx] = {}
 					end
 					for lz = s.minz,s.maxz, 8 do
-						segment[i].structureArea[lx][lz] = true
+						segment[i].structureArea[lx][lz] = (segment[i].structureArea[lx][lz] or 0) + 1
 					end
 				end
 				
@@ -2245,7 +2245,6 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 end
 
 local function updateTerraformEdgePoints(id)
-
 	for i = 1, terraformUnit[id].points do
 		local point = terraformUnit[id].point[i]
 		
@@ -2397,7 +2396,7 @@ local function updateTerraformCost(id)
 					if terra.area[x] and terra.area[x][z] then
 						terra.area[x][z] = nil
 					end
-					point.structure = 1
+					point.structure = true
 					areaRemoved = true
 					checkAreaRemoved = true
 				end
@@ -2417,9 +2416,7 @@ local function updateTerraformCost(id)
 		
 		local height = spGetGroundHeight(x,z)
 		point.orHeight = height
-		if point.structure == 1 then
-			point.diffHeight = 0
-		elseif point.structure then
+		if point.structure then
 			point.diffHeight = 0
 		else
 			point.diffHeight = point.aimHeight - height
@@ -2728,7 +2725,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							terra.area[terra.point[i].x][terra.point[i].z] = false
 						end
 						terra.point[i].diffHeight = 0.0001
-						terra.point[i].structure = 1
+						terra.point[i].structure = true
 						return -1
 					end
 					
@@ -2862,7 +2859,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 								terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false
 							end
 							terra.point[extraPoint[i].supportID].diffHeight = 0.0001
-							terra.point[extraPoint[i].supportID].structure = 1
+							terra.point[extraPoint[i].supportID].structure = true
 							return -1
 						end
 						
@@ -3469,12 +3466,19 @@ local function DeregisterStructure(unitID)
 						for k = 1, terraformUnit[oid].points do
 							if structure[unitID].area[terraformUnit[oid].point[k].x] then
 								if structure[unitID].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] then
-									terraformUnit[oid].point[k].structure = false
+									if terraformUnit[oid].point[k].structure == true then
+										terraformUnit[oid].point[k].structure = false
+									else
+										terraformUnit[oid].point[k].structure = terraformUnit[oid].point[k].structure - 1
+										if terraformUnit[oid].point[k].structure <= 0 then
+											terraformUnit[oid].point[k].structure = false
+										end
+									end
 									terraformUnit[oid].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] = true
 									recalc = true
 								end
 							end
-							if terraformUnit[oid].point[k].structure == 1 then
+							if terraformUnit[oid].point[k].structure == true then
 								terraformUnit[oid].point[k].structure = false
 								terraformUnit[oid].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] = true
 								recalc = true
@@ -3595,7 +3599,9 @@ local function RegisterStructure(unitID, ud)
 						local x, z = point.x, point.z
 						if structure[unitID].area[x] and structure[unitID].area[x][z] then
 							terraformUnit[oid].point[k].diffHeight = 0.0001
-							terraformUnit[oid].point[k].structure = true
+							if terraformUnit[oid].point[k].structure ~= true then
+								terraformUnit[oid].point[k].structure = (terraformUnit[oid].point[k].structure or 0) + 1
+							end
 							if area[x] and area[x][z] then
 								area[x][z] = nil
 							end
