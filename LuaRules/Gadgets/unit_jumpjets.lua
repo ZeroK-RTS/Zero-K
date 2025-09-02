@@ -73,6 +73,7 @@ local jumps = {}
 local jumping = {}
 local goalSet = {}
 local jumpReloadMod = {}
+local uniqueCoroutineCounter = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -209,7 +210,15 @@ end
 
 local function StartScript(fn)
 	local co = coroutine.create(fn)
+	coroutine.resume(co)
 	coroutines[#coroutines + 1] = co
+end
+
+local function ContinueCoroutine(unitID, coroutineID)
+	if (not Spring.ValidUnitID(unitID)) or Spring.GetUnitIsDead(unitID) then
+		return false
+	end
+	return coroutineID == uniqueCoroutineCounter[unitID]
 end
 
 local function Jump(unitID, goal, origCmdParams, mustJump)
@@ -229,6 +238,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local height           = jumpDef.height * (GG.att_JumpRangeChange[unitID] or 1)
 	local cannotJumpMidair = jumpDef.cannotJumpMidair
 	local reloadTime       = ((jumpDef.reload or 0) + (jumpReloadMod[unitID] or 0)) * 30
+	local jumpCharges      = jumpDef.charges or 1
 	local teamID           = spGetUnitTeam(unitID)
 	
 	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (start[2] < -UnitDefs[unitDefID].maxWaterDepth)) then
@@ -309,15 +319,21 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	else
 		CallAsUnitIfExists(unitID,env.preJump,turn,lineDist,flightDist,duration)
 	end
-	spSetUnitRulesParam(unitID,"jumpReload",0)
-
+	if jumpCharges > 1 then
+		spSetUnitRulesParam(unitID, "jumpReload", (spGetUnitRulesParam(unitID, "jumpReload") or 1) - 1)
+	else
+		spSetUnitRulesParam(unitID, "jumpReload", 0)
+	end
+	
 	local function JumpLoop()
+		uniqueCoroutineCounter[unitID] = (uniqueCoroutineCounter[unitID] or 0) + 1
+		local coroutineID = uniqueCoroutineCounter[unitID]
 		if delay > 0 then
 			for i = delay, 1, -1 do
 				Sleep()
 			end
 			
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
+			if not ContinueCoroutine(unitID, coroutineID) then
 				return
 			end
 			CallAsUnitIfExists(unitID,env.beginJump)
@@ -344,7 +360,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local lastX, lastY, lastZ = start[1], start[2], start[3]
 		local i = 0
 		while i < 1 do
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
+			if not ContinueCoroutine(unitID, coroutineID) then
 				return
 			end
 
@@ -408,7 +424,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		end
 
 		if reloadTime <= 1 then
-			spSetUnitRulesParam(unitID, "jumpReload", 1)
+			spSetUnitRulesParam(unitID, "jumpReload", jumpCharges)
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 			return
@@ -419,7 +435,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 
 		Sleep()
 
-		if not Spring.ValidUnitID(unitID) then
+		if not ContinueCoroutine(unitID, coroutineID) then
 			return
 		end
 
@@ -440,10 +456,10 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
 
 		local reloadSpeed = 1/reloadTime
-		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
+		local reloadAmount = (spGetUnitRulesParam(unitID, "jumpReload") or 0) + reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 
-		while reloadAmount < 1 do
-			if not Spring.ValidUnitID(unitID) then
+		while reloadAmount < jumpCharges do
+			if not ContinueCoroutine(unitID, coroutineID) then
 				return
 			end
 			morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
@@ -457,7 +473,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
 			local reloadFactor = (stunnedOrInbuild and 0) or spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
 			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
-			spSetUnitRulesParam(unitID,"jumpReload",reloadAmount)
+			spSetUnitRulesParam(unitID, "jumpReload", reloadAmount)
 			Sleep()
 		end
 	end
@@ -496,13 +512,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (not jumpDefs[unitDefID]) then
 		return
 	end
-	Spring.SetUnitRulesParam(unitID, "jumpReload", 1)
+	Spring.SetUnitRulesParam(unitID, "jumpReload", jumpDefs[unitDefID].charges or 1)
 	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
 end
 
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	if jumping[oldUnitID] then
 		jumping[oldUnitID] = nil -- empty old unit's data
+		uniqueCoroutineCounter[oldUnitID] = nil 
 	end
 	if jumpReloadMod[unitID] then
 		jumpReloadMod[unitID] = nil

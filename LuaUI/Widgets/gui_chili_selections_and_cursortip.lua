@@ -236,7 +236,7 @@ end
 local manualFireTimeDefs = {}
 local manualFireWeaponNum = {}
 local specialReloadDefs = {}
-local jumpReloadDefs = {}
+local jumpChargeDefs = {}
 local ammoRequiringDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
@@ -252,7 +252,7 @@ for unitDefID = 1, #UnitDefs do
 		specialReloadDefs[unitDefID] = tonumber(ud.customParams.specialreloadtime)
 	end
 	if ud.customParams.canjump then
-		jumpReloadDefs[unitDefID] = -1 --Signifies that reload time is not stored
+		jumpChargeDefs[unitDefID] = tonumber(ud.customParams.jump_charges) or 1
 	end
 	if ud.customParams.reammoseconds then
 		ammoRequiringDefs[unitDefID] = true
@@ -675,7 +675,7 @@ end
 local function GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
 	local specialReloadState = spGetUnitRulesParam(unitID, rulesParam)
 	if specialReloadState then
-		if reloadTime > 0 then
+		if reloadTime and reloadTime > 0 then
 			--local currentFrame, _ = Spring.GetGameFrame()
 			--local remainingTime = (specialReloadState - currentFrame)
 			--local reloadFraction = 1 - remainingTime/reloadTime
@@ -839,7 +839,7 @@ local function GetManualFireReload(unitID, unitDefID)
 	return false
 end
 
-local function GetJumpReload(unitID, unitDefID)
+local function GetJumpCharges(unitID, unitDefID)
 	if not (unitDefID and showJumpReload) then
 		return false
 	end
@@ -847,8 +847,8 @@ local function GetJumpReload(unitID, unitDefID)
 	if not unitDefID then
 		return false
 	end
-	if jumpReloadDefs[unitDefID] then
-		return jumpReloadDefs[unitDefID]
+	if jumpChargeDefs[unitDefID] then
+		return jumpChargeDefs[unitDefID]
 	end
 	return false
 end
@@ -1417,7 +1417,8 @@ local function GetCostInfoPanel(parentControl, yPos)
 	return Update
 end
 
-local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, onLeft)
+local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, charges, onLeft)
+	charges = charges or 1
 	if not reloadBar then
 		reloadBar = Chili.Progressbar:New {
 			x = (onLeft and 5) or "82%",
@@ -1440,6 +1441,20 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 		reloadFraction = GetWeaponReloadStatus(unitID, weaponNum, reloadTime)
 	elseif rulesParam then
 		reloadFraction = GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
+	end
+	if charges == 1 then
+		reloadBar._relativeBounds.top = 5
+		reloadBar:UpdateClientArea()
+		reloadBar:Invalidate()
+	elseif reloadFraction < charges then
+		if math.floor(reloadFraction) == 0 then
+			reloadBar._relativeBounds.top = 5
+		else
+			reloadBar._relativeBounds.top = string.format("%i%%", 100 * math.floor(reloadFraction) / charges)
+		end
+		reloadFraction = reloadFraction - math.floor(reloadFraction)
+		reloadBar:UpdateClientArea()
+		reloadBar:Invalidate()
 	end
 	
 	if reloadFraction and reloadFraction < 1 then
@@ -1528,9 +1543,9 @@ local function GetUnitGroupIconButton(parentControl)
 			elseif reloadBar then
 				reloadBar:SetVisibility(false)
 			end
-			local jumpReloadTime = GetJumpReload(unitID, unitDefID)
-			if jumpReloadTime then
-				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, jumpReloadTime, true)
+			local jumpCharges = GetJumpCharges(unitID, unitDefID)
+			if jumpCharges then
+				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
 			elseif jumpBar then
 				jumpBar:SetVisibility(false)
 			end
@@ -2105,9 +2120,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		elseif reloadBar then
 			reloadBar:SetVisibility(false)
 		end
-		local jumpReloadTime = GetJumpReload(unitID, unitDefID)
-		if jumpReloadTime then
-			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, jumpReloadTime, true)
+		local jumpCharges = GetJumpCharges(unitID, unitDefID)
+		if jumpCharges then
+			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
 		elseif jumpBar then
 			jumpBar:SetVisibility(false)
 		end

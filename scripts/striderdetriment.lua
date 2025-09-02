@@ -33,6 +33,12 @@ local gunFlares = {
 	{lfoot}
 }
 
+local canisters = {
+	{body = piece('canister1'), cap = piece('cap1'), hor = math.cos(-0.29), vert = math.sin(-0.29)},
+	{body = piece('canister2'), cap = piece('cap2'), hor = 1, vert = 0},
+	{body = piece('canister3'), cap = piece('cap3'), hor = math.cos(0.325), vert = math.sin(0.325)},
+}
+
 local barrels = {
 	{larmbarrel1, larmbarrel2, larmbarrel3},
 	{rarmbarrel1, rarmbarrel2, rarmbarrel3},
@@ -117,6 +123,22 @@ local takeoff_explosion = 4103 --Weapon 8
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function MoveCanister(num, proportion, speed)
+	local fullCap = 1.6
+	local emptyCan = 10
+	local emptyCap = 4.6
+	local canister = canisters[num]
+	Move(canister.body, z_axis, (1 - proportion) * emptyCan * canister.hor, speed * canister.hor)
+	Move(canister.body, y_axis, (1 - proportion) * emptyCan * canister.vert, speed * canister.vert)
+	if proportion >= 1 then
+		Move(canister.cap, z_axis, fullCap * canister.hor, speed * canister.hor)
+		Move(canister.cap, y_axis, fullCap * canister.vert, speed *canister.vert)
+	else
+		Move(canister.cap, z_axis, emptyCap * canister.hor, speed * canister.hor)
+		Move(canister.cap, y_axis, emptyCap * canister.vert, speed *canister.vert)
+	end
+end
 
 local function DoRestore()
 	Turn(head, y_axis, 0, 2)
@@ -371,6 +393,10 @@ local function RestoreAfterDelay()
 end
 
 function script.Create()
+	MoveCanister(1, 1, 100)
+	MoveCanister(2, 1, 100)
+	MoveCanister(3, 1, 100)
+
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
