@@ -18,6 +18,7 @@
 	"slow_bar" : "slow",
 	"goo_bar" : "goo",
 	"jump_bar" : "jump",
+	"jump_charge_bar" : "jump charges",
 	"resurrect_bar" : "resurrect",
 	"reclaim_bar" : "reclaim"
 }

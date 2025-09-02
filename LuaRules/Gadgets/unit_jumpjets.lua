@@ -329,6 +329,12 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local function JumpLoop()
 		uniqueCoroutineCounter[unitID] = (uniqueCoroutineCounter[unitID] or 0) + 1
 		local coroutineID = uniqueCoroutineCounter[unitID]
+		
+		Sleep() -- Script runs immediately when created, so don't do anything game mechanical yet.
+		if not ContinueCoroutine(unitID, coroutineID) then
+			return
+		end
+		
 		if delay > 0 then
 			for i = delay, 1, -1 do
 				Sleep()
@@ -459,6 +465,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local reloadSpeed = 1/reloadTime
 		local reloadAmount = (spGetUnitRulesParam(unitID, "jumpReload") or 0) + reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 
+		local callTimer = env.jumpReloadProgress and 0
 		while reloadAmount < jumpCharges do
 			if not ContinueCoroutine(unitID, coroutineID) then
 				return
@@ -472,9 +479,16 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			end
 
 			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
-			local reloadFactor = (stunnedOrInbuild and 0) or spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+			local reloadFactor = (stunnedOrInbuild and 0) or GG.att_ReloadChange[unitID] or 1
 			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
 			spSetUnitRulesParam(unitID, "jumpReload", reloadAmount)
+			if callTimer then
+				callTimer = callTimer + 1
+				if callTimer >= 10 or reloadAmount >= jumpCharges then
+					CallAsUnitIfExists(unitID, env.jumpReloadProgress, reloadAmount)
+					callTimer = 0
+				end
+			end
 			Sleep()
 		end
 	end
