@@ -1072,8 +1072,9 @@ do
 			if reloadFrame and reloadFrame > gameFrame then
 				local scriptLoaded = GetUnitRulesParam(unitID, "scriptLoaded") or ci.scriptBurst
 				reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
+				local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
 				if (reload >= 0) then
-					barDrawer.AddPercentBar("reload", reload)
+					barDrawer.AddPercentBar("reload", reload, false, barText)
 				end
 			end
 		end
