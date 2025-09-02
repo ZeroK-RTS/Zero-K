@@ -1452,7 +1452,7 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 		else
 			reloadBar._relativeBounds.top = string.format("%i%%", 100 * math.floor(reloadFraction) / charges)
 		end
-		reloadFraction = reloadFraction - math.floor(reloadFraction)
+		reloadFraction = 1 - (charges - reloadFraction) / math.ceil(charges - reloadFraction)
 		reloadBar:UpdateClientArea()
 		reloadBar:Invalidate()
 	end

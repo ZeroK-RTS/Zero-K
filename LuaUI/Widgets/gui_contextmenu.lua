@@ -1079,6 +1079,10 @@ local function printAbilities(ud, unitID, isCommander)
 		cells[#cells+1] = (cp.jump_range * ((unitID and Spring.GetUnitRulesParam(unitID, "jumpRangeMult")) or 1)) .. " elmo"
 		cells[#cells+1] = ' - Reload: '
 		cells[#cells+1] = (cp.jump_reload + ((unitID and Spring.GetUnitRulesParam(unitID, "upgradesJumpReloadMod")) or 0)) .. 's'
+		if tonumber(cp.jump_charges) or 1 > 1 then
+			cells[#cells+1] = ' - Max charges: '
+			cells[#cells+1] = tonumber(cp.jump_charges)
+		end
 		cells[#cells+1] = ' - Speed:'
 		cells[#cells+1] = numformat(30*tonumber(cp.jump_speed)) .. " elmo/s"
 		cells[#cells+1] = ' - Midair jump:'
