@@ -498,7 +498,7 @@ local function FinishMorph(unitID, morphData)
 	
 	--// transfer health
 	-- old health is declared far above
-	local _,newMaxHealth		 = Spring.GetUnitHealth(newUnit)
+	local _,newMaxHealth = Spring.GetUnitHealth(newUnit)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	if newHealth <= 1 then
 		newHealth = 1

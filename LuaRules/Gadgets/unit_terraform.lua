@@ -2530,9 +2530,7 @@ local function updateTerraformBorder(id,x,z) -- updates border for edge point x,
 end
 
 local function finishInitialisingTerraformUnit(id)
-	
 	--checkTerraformIntercepts(id) --Removed Intercept Check
-	
 	updateTerraformEdgePoints(id)
 	EchoDebug(id, "init update cost")
 	updateTerraformCost(id)
@@ -2541,7 +2539,6 @@ local function finishInitialisingTerraformUnit(id)
 	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Cost " .. terraformUnit[id].cost)
 	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Points " .. terraformUnit[id].points)
 	terraformUnit[id].fullyInitialised = true
-
 end
 
 local function addSteepnessMarker(team, x, z)
@@ -3576,7 +3573,6 @@ local function RegisterStructure(unitID, ud)
 	
 	-- check if the building is on terraform
 	for i = 1, terraformOrders do
-		
 		if (structure[unitID].minx < terraformOrder[i].border.right and
 			structure[unitID].maxx > terraformOrder[i].border.left and
 			structure[unitID].minz < terraformOrder[i].border.bottom and
