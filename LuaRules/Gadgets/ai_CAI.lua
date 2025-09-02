@@ -684,7 +684,7 @@ local function runAway(unitID, enemyID, range)
 	vectorZ = vectorZ/vectorMag
 	
 	local jump = spGetUnitRulesParam(unitID, "jumpReload")
-	if ((not jump) or jump == 1) and jumpDefs[spGetUnitDefID(unitID)] then
+	if ((not jump) or jump >= 1) and jumpDefs[spGetUnitDefID(unitID)] then
 		GiveClampedOrderToUnit(unitID, CMD_JUMP, { ex - vectorX*range, 0, ez - vectorZ*range}, 0)
 	else
 		GiveClampedOrderToUnit(unitID, CMD_MOVE_TO_USE, { ex - vectorX*range, 0, ez - vectorZ*range}, 0)
@@ -2675,7 +2675,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			local ud = UnitDefs[attackerDefID]
 			if not ud.canFly then
 				local jump = spGetUnitRulesParam(unitID, "jumpReload")
-				if ((not jump) or jump == 1) and spGetUnitSeparation(unitID, attackerID, true) < jumpDefs[unitDefID].range + 100 then
+				if ((not jump) or jump >= 1) and spGetUnitSeparation(unitID, attackerID, true) < jumpDefs[unitDefID].range + 100 then
 					local cQueue = spGetUnitCommands(unitID, 1)
 					if cQueue and (#cQueue == 0 or cQueue[1].id ~= CMD_JUMP) then
 						local x,y,z = spGetUnitPosition(attackerID)
