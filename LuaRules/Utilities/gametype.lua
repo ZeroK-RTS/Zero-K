@@ -1,9 +1,11 @@
 local teamCount
-local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isFFA, isTeamFFA, isSandbox, isPlanetWars, isSoloTeams = false, false, false, false, false, false, false, false, false, false, false
+local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop = false, false, false, false, false, false
+local isFFA, isTeamFFA, isSandbox, isPlanetWars, isSoloTeams, isFullCommshare = false, false, false, false, false, false
 do
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local allyTeamList = Spring.GetAllyTeamList()
 	local actualAllyTeamList = {}
+	local teamsWithHumans = {}
 	local allyTeamsWithHumans = {}
 	
 	isSoloTeams = true
@@ -15,6 +17,7 @@ do
 			for j = 1, #teamList do
 				if not select (4, Spring.GetTeamInfo(teamList[j], false)) then
 					humanExists = true
+					teamsWithHumans[#teamsWithHumans + 1] = teamList[j]
 				end
 				local luaAI = Spring.GetTeamLuaAI(teamList[j])
 				if luaAI and luaAI:find("Chicken") then
@@ -65,6 +68,7 @@ do
 	if #allyTeamsWithHumans == 1 then
 		isCoop = true
 	end
+	isFullCommshare = (#teamsWithHumans == 1)
 
 	if Spring.GetModOptions().planet then
 		isPlanetWars = true
@@ -76,16 +80,17 @@ function Spring.Utilities.GetTeamCount()
 end
 
 Spring.Utilities.Gametype = {
-	is1v1        = function () return is1v1        end,
-	isTeams      = function () return isTeams      end,
-	isBigTeams   = function () return isBigTeams   end,
-	isSmallTeams = function () return isSmallTeams end,
-	isChickens   = function () return isChickens   end,
-	isCoop       = function () return isCoop       end,
-	isTeamFFA    = function () return isTeamFFA    end,
-	isFFA        = function () return isFFA        end,
-	isSandbox    = function () return isSandbox    end,
-	isPlanetWars = function () return isPlanetWars end,
-	isSoloTeams  = function () return isSoloTeams  end,
-	IsSinglePlayer = function () return isSoloTeams or isSandbox end,
+	is1v1            = function () return is1v1           end,
+	isTeams          = function () return isTeams         end,
+	isBigTeams       = function () return isBigTeams      end,
+	isSmallTeams     = function () return isSmallTeams    end,
+	isChickens       = function () return isChickens      end,
+	isCoop           = function () return isCoop          end,
+	isTeamFFA        = function () return isTeamFFA       end,
+	isFFA            = function () return isFFA           end,
+	isSandbox        = function () return isSandbox       end,
+	isPlanetWars     = function () return isPlanetWars    end,
+	isSoloTeams      = function () return isSoloTeams     end,
+	isFullCommshare  = function () return isFullCommshare end,
+	IsSinglePlayer   = function () return isSoloTeams or isSandbox end,
 }
