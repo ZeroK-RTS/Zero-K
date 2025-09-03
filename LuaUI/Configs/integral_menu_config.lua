@@ -102,7 +102,13 @@ local commandDisplayConfig = {
 	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
 
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
-
+	
+	[CMD_MORPH_STOP] = {
+		DynamicDisplayFunc = function (cmdID, command)
+			return {texture = imageDir .. 'Bold/cancel.png', tex2 = command.texture}
+		end
+	},
+	
 	-- states
 	[CMD_WANT_ONOFF] = {
 		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
@@ -643,7 +649,12 @@ end
 local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
 for i = 1, #modCommands do
 	local cmd = modCommands[i]
-	commandDisplayConfig[cmd.cmdID] = {tooltip = cmd.tooltip, texture = cmd.image, stateTooltip = cmd.stateTooltip}
+	commandDisplayConfig[cmd.cmdID] = {
+		tooltip = cmd.tooltip,
+		texture = cmd.image,
+		stateTooltip = cmd.stateTooltip,
+		DynamicDisplayFunc = cmd.DynamicDisplayFunc,
+	}
 end
 
 --------------------------------------------------------------------------------
