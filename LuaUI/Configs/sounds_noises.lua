@@ -3,7 +3,7 @@
 local VOLUME_MULT = 1.13
 
 local volumeOverrides = {
-	builder_start = 1.1,
+	builder_start = 1,
 	light_bot_select2 = 0.55,
 	light_bot_select = 0.58,
 	light_bot_move = 0.8,
@@ -49,7 +49,7 @@ local volumeOverrides = {
 	
 	building_select1 = 0.8,
 	building_select2 = 0.58,
-	windmill = 0.48,
+	windmill = 0.52,
 	fusion_select = 0.37,
 	adv_fusion_select = 0.37,
 	geo_select = 0.43,

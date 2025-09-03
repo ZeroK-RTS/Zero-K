@@ -1,2 +1,5 @@
 by Ozmium (CC-BY):
 blade_soft.wav
+
+by DavidDumaisAudio
+blade_swing2.wav
