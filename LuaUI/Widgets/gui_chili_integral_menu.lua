@@ -1247,6 +1247,9 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			return
 		end
 		textBoxes[textPosition]:SetVisibility(newVisible)
+		if newVisible then
+			textBoxes[textPosition]:BringToFront()
+		end
 		
 		if (not newVisible) or (text == textBoxes[textPosition].caption) then
 			return
