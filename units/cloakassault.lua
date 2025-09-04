@@ -81,6 +81,7 @@ return { cloakassault = {
         light_camera_height = 1600,
         light_color = [[0.85 0.85 1.2]],
         light_radius = 200,
+        burst = Shared.BURST_RELIABLE,
       },
 
       cylinderTargeting      = 0,
