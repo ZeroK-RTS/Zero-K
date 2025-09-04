@@ -112,6 +112,7 @@ return { shieldassault = {
         light_camera_height = 1400,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 200,
+        burst = Shared.BURST_RELIABLE,
       },
 
       damage                  = {

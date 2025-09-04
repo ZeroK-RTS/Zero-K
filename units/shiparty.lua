@@ -74,9 +74,9 @@ return { shiparty = {
       craterBoost             = 1,
       craterMult              = 2,
 
-            customParams = {
-                burst = Shared.BURST_RELIABLE,
-            },
+      customParams = {
+        burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
         default = 600.01,
