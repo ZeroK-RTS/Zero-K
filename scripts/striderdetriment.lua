@@ -37,7 +37,7 @@ local loadingCanister = false
 local previousLoad = false
 local canisters = {
 	{loaded = true, body = piece('canister1'), cap = piece('cap1'), gib = piece('canister1_merged'), hor = math.cos(-0.2618), vert = math.sin(-0.2618)},
-	{loaded = true, body = piece('canister2'), cap = piece('cap2'), gib = piece('canister2_merged'), hor = 1, vert = 0.05}, -- Small vert for z-fighting
+	{loaded = true, body = piece('canister2'), cap = piece('cap2'), gib = piece('canister2_merged'), hor = 1, vert = 0.01}, -- Small vert for z-fighting
 	{loaded = true, body = piece('canister3'), cap = piece('cap3'), gib = piece('canister3_merged'), hor = math.cos(0.349), vert = math.sin(0.349)},
 }
 local EXTRUDE_SPEED = 0.21 * 120 / tonumber(UnitDefs[unitDefID].customParams.jump_reload)
