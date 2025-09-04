@@ -162,6 +162,24 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Allow one more second of stun so that gadgets can handle fractional seconds
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.customparams.disarmdamagemult or weaponDef.paralyzetime then
+		weaponDef.customparams.overstun_time = weaponDef.customparams.overstun_time or 1
+	end
+	if weaponDef.paralyzetime then
+		if not weaponDef.paralyzer then
+			weaponDef.customparams.extra_paratime = weaponDef.paralyzetime
+		end
+		weaponDef.customparams.emp_paratime = weaponDef.paralyzetime
+		weaponDef.paralyzetime = weaponDef.paralyzetime + weaponDef.customparams.overstun_time
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Preserve crater sizes for new engine
 -- https://github.com/spring/spring/commit/77c8378b04907417a62c25218d69ff323ba74c8d
 
@@ -400,9 +418,6 @@ end
 -- ???
 
 for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.paralyzetime and not weaponDef.paralyzer then
-		weaponDef.customparams.extra_paratime = weaponDef.paralyzetime
-	end
 	if not weaponDef.predictboost then
 		weaponDef.predictboost = 1
 	end

@@ -551,7 +551,7 @@ local function weapons2Table(cells, ws, unitID)
 		if wd.paralyzer then
 			damw = val
 			if stun_time == 0 then
-				stun_time = wd.damages.paralyzeDamageTime
+				stun_time = tonumber(wd.customParams.emp_paratime)
 			end
 		else
 			dam = val
@@ -1786,7 +1786,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		if (weaponStats.paralyzer) then
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue) .. " (P)", textColor = colorCyan, }
 			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages.paralyzeDamageTime) .. "s", textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(wepCp.emp_paratime) .. "s", textColor = color.stats_fg, }
 		else
 			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
 			local damageText
