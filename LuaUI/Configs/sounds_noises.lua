@@ -11,8 +11,8 @@ local volumeOverrides = {
 	bot_move2 = 0.25,
 	medium_bot_select = 0.52,
 	heavy_bot_move = 0.21,
-	amph_move = 0.39,
-	amph_select = 0.3,
+	amph_move = 0.3,
+	amph_select = 0.27,
 	
 	crawlie_select = 0.18,
 	spider_move = 0.18,
@@ -25,18 +25,18 @@ local volumeOverrides = {
 	vehicle_move = 0.27,
 	vehicle_select = 0.67,
 	
-	tank_move = 0.26,
-	tank_select = 0.37,
+	tank_move = 0.25,
+	tank_select = 0.34,
 	light_tank_move2 = 0.37,
 	
-	hovercraft_move = 0.63,
+	hovercraft_move = 0.59,
 	hovercraft_select = 0.83,
 	
 	gunship_select = 0.31,
-	gunship_move2 = 0.35,
-	light_gunship_select = 0.28,
-	heavy_gunship_select = 0.2,
-	heavy_gunship_move = 0.78,
+	gunship_move2 = 0.34,
+	light_gunship_select = 0.26,
+	heavy_gunship_select = 0.19,
+	heavy_gunship_move = 0.77,
 	
 	fighter_move = 0.17,
 	fighter_select = 0.3,
