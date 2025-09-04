@@ -44,7 +44,7 @@ for wid = 1, #WeaponDefs do
 		}
 		wantedWeaponList[#wantedWeaponList + 1] = wid
 	elseif wd.paralyzer or wd.customParams.extra_damage then
-		local paraTime = wd.paralyzer and wd.damages.paralyzeDamageTime or wd.customParams.extra_paratime
+		local paraTime = wd.paralyzer and wd.customParams.emp_paratime or wd.customParams.extra_paratime
 		paraWeapons[wid] = paraTime * FRAMES_PER_SECOND
 		wantedWeaponList[#wantedWeaponList + 1] = wid
 	end
@@ -228,7 +228,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	if paralyzer and (partialUnitID[unitID] or paraUnitID[unitID]) then
 		addParalysisDamageToUnit(unitID, damage, paraWeapons[weaponDefID], overstunDamageMult[weaponDefID])
 	end
-
 	return damage
 end
 
