@@ -133,7 +133,7 @@ local function HandleDamageArea(data, f)
 					if data.rangeFall ~= 0 and distance > data.plateauRadius then
 						damage = damage - damage*data.rangeFall*(distance - data.plateauRadius)/(data.radius - data.plateauRadius)
 					end
-					if data.plateauFall ~= 0 and distance < data.plateauRadius then
+					if data.plateauFall and data.plateauFall ~= 0 and distance < data.plateauRadius then
 						damage = damage - damage*data.plateauFall*(data.plateauRadius - distance)/data.plateauRadius
 					end
 					if data.impulse then
