@@ -41,11 +41,15 @@ for wid = 1, #WeaponDefs do
 			damageMult = wcp.disarmdamagemult,
 			normalDamage = 1 - (wcp.disarmdamageonly or 0),
 			disarmTimer = wcp.disarmtimer*FRAMES_PER_SECOND,
+			overstunTime = wcp.overstun_time*FRAMES_PER_SECOND,
 		}
 		wantedWeaponList[#wantedWeaponList + 1] = wid
 	elseif wd.paralyzer or wd.customParams.extra_damage then
 		local paraTime = wd.paralyzer and wd.customParams.emp_paratime or wd.customParams.extra_paratime
-		paraWeapons[wid] = paraTime * FRAMES_PER_SECOND
+		paraWeapons[wid] = {
+			empTime = paraTime * FRAMES_PER_SECOND,
+			overstunTime = wcp.overstun_time*FRAMES_PER_SECOND,
+		}
 		wantedWeaponList[#wantedWeaponList + 1] = wid
 	end
 	if wd.customParams and wd.customParams.overstun_damage_mult then
@@ -128,7 +132,7 @@ local function moveUnitID(unitID, byFrame, byUnitID, frame, extraParamFrames)
 	Spring.SetUnitRulesParam(unitID, "disarmframe", frame + extraParamFrames, LOS_ACCESS)
 end
 
-local function addParalysisDamageToUnit(unitID, damage, pTime, overstunMult)
+local function addParalysisDamageToUnit(unitID, damage, pTime, overstunTime, overstunMult)
 	local health, maxHealth, paralyzeDamage = Spring.GetUnitHealth(unitID)
 	if partialUnitID[unitID] then -- if the unit is partially paralysed
 		local extraTime = math.floor(damage/health*DECAY_FRAMES) -- time that the damage would add
@@ -152,6 +156,10 @@ local function addParalysisDamageToUnit(unitID, damage, pTime, overstunMult)
 		local newPara = paraUnitID[unitID].frameID
 		if (not pTime) or pTime > newPara - f then -- if the para time on the unit is less than this weapons para timer
 			newPara = newPara + extraTime
+			if overstunTime and overstunTime > 0 then
+				-- Overstun allows units to extend the stun near their stun threshold, usally by 1 second.
+				pTime = math.max(pTime, math.min(pTime, paraUnitID[unitID].frameID - f) + overstunTime)
+			end
 			if pTime and pTime < newPara - f then -- prevent going over para time
 				newPara = math.floor(pTime) + f
 			end
@@ -214,7 +222,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	
 	if disarmWeapons[weaponDefID] then
 		local def = disarmWeapons[weaponDefID]
-		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer, overstunDamageMult[weaponDefID])
+		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer, def.overstunTime, overstunDamageMult[weaponDefID])
 		
 		if GG.Awards and GG.Awards.AddAwardPoints then
 			local _, maxHP = Spring.GetUnitHealth(unitID)
@@ -226,7 +234,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	end
 
 	if paralyzer and (partialUnitID[unitID] or paraUnitID[unitID]) then
-		addParalysisDamageToUnit(unitID, damage, paraWeapons[weaponDefID], overstunDamageMult[weaponDefID])
+		local def = paraWeapons[weaponDefID]
+		addParalysisDamageToUnit(unitID, damage, def.empTime, def.overstunTime, overstunDamageMult[weaponDefID])
 	end
 	return damage
 end

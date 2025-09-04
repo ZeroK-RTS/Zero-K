@@ -22,6 +22,7 @@ end
 local spGetUnitHealth    = Spring.GetUnitHealth
 local spGetUnitArmored   = Spring.GetUnitArmored
 local spAddUnitDamage    = Spring.AddUnitDamage
+local GetUnitCost        = Spring.Utilities.GetUnitCost
 
 local DECAY_SECONDS = 40 -- how long it takes to decay 100% para to 0
 
@@ -82,21 +83,25 @@ local function GetStunDamage(weaponDefID, damage, health, maxHealth, paralyzeDam
 	return damageGap + (rawDamage - damageGap)*overstunDamageMult[weaponDefID]
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, rawDamage, paralyzer,
                                weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then -- the weapon deals paralysis damage
 		local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
 		if health and maxHealth and health > 0 then -- taking no chances.
-			local damage = GetStunDamage(weaponDefID, damage, health, maxHealth, paralyzeDamage)
+			if GG.Awards and GG.Awards.AddAwardPoints then
+				local cost_emped = (rawDamage / maxHealth) * GetUnitCost(unitID)
+				GG.Awards.AddAwardPoints('emp', attackerTeam, cost_emped)
+			end
+			local damage = GetStunDamage(weaponDefID, rawDamage, health, maxHealth, paralyzeDamage)
 			if overstunTime[weaponDefID] > 0 then
-				-- Overstun allows units to stun for an addition time (usually 1 second) if the current stun time on the unit is within that range.
+				-- Overstun allows units to extend the stun near their stun threshold, usally by 1 second.
 				local currentStunTime = (paralyzeDamage/maxHealth - 1) * DECAY_SECONDS
 				local maxTime = math.max(paraTime[weaponDefID], math.min(paraTime[weaponDefID], currentStunTime) + overstunTime[weaponDefID])
 				-- Solve the following for damage to limit damage by stun time:
 				--   stun time = ((damage + paralyzeDamage)/maxHealth - 1) * DECAY_SECONDS
-				damage = (maxTime/DECAY_SECONDS + 1)*maxHealth - paralyzeDamage
+				damage = math.min(damage, (maxTime/DECAY_SECONDS + 1)*maxHealth - paralyzeDamage)
 			end
-			--Spring.Echo("damage", damage, ((damage + paralyzeDamage)/maxHealth - 1) * DECAY_SECONDS, paralyzeDamage, math.random())
+			--Spring.Echo("damage", damage, ((damage + paralyzeDamage)/maxHealth - 1) * DECAY_SECONDS, paralyzeDamage, WeaponDefs[weaponDefID].damages.paralyzeDamageTime, math.random())
 			return damage
 		end
 	end
