@@ -3624,7 +3624,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	if unitID and unitDefID and teamID and terraformUnitDefIDs[unitDefID] then
+	if unitID and unitDefID and teamID and terraunitDefID == unitDefID then
 		SetInivisbleToEnemy(unitID, teamID)
 	end
 end
