@@ -127,10 +127,10 @@ local takeoff_explosion = 4103 --Weapon 8
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local fullCap = 0.5
+local emptyCan = 23
+local emptyCap = 4.6
 local function MoveCanister(num, proportion, capProp, speed)
-	local fullCap = 0.5
-	local emptyCan = 21.1
-	local emptyCap = 4.6
 	local canister = canisters[num]
 	Move(canister.body, z_axis, (1 - proportion) * emptyCan * canister.hor, speed and speed * canister.hor)
 	Move(canister.body, y_axis, (1 - proportion) * emptyCan * canister.vert, speed and speed * canister.vert)
