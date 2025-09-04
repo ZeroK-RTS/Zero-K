@@ -59,6 +59,7 @@ local spCreateUnit          = Spring.CreateUnit
 local spDestroyUnit         = Spring.DestroyUnit
 local spGetAllyTeamList     = Spring.GetAllyTeamList
 local spSetUnitLosMask      = Spring.SetUnitLosMask
+local spSetUnitLosState     = Spring.SetUnitLosState
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitHealth       = Spring.SetUnitHealth
@@ -571,7 +572,8 @@ local function SetInivisbleToEnemy(unitID, team)
 	for i=1, #allyTeamList do
 		local allyID = allyTeamList[i]
 		if allyID ~= unitAllyTeam then
-			spSetUnitLosMask(unitID, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
+			spSetUnitLosState(unitID, allyID, 0)
+			spSetUnitLosMask(unitID, allyID, 15)
 		end
 	end
 end
