@@ -60,7 +60,7 @@ return { bomberprec = {
 
   },
   sightDistance       = 780,
-  speed               = 234,
+  speed               = 246,
   turnRadius          = 300,
   workerTime          = 0,
 
