@@ -82,6 +82,7 @@ return { vehassault = {
 
       customParams        = {
         light_camera_height = 1500,
+        burst = Shared.BURST_RELIABLE,
       },
 
       damage                  = {
