@@ -29,6 +29,7 @@ if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 local USE_TERRAIN_TEXTURE_CHANGE = true -- (Spring.GetModOptions() or {}).terratex == "1"
 local ECHO_COST = false
+local ECHO_DETAILED_COST_ESTIMATE = false
 
 -- Speedups
 local cos                   = math.cos
@@ -58,6 +59,7 @@ local spCreateUnit          = Spring.CreateUnit
 local spDestroyUnit         = Spring.DestroyUnit
 local spGetAllyTeamList     = Spring.GetAllyTeamList
 local spSetUnitLosMask      = Spring.SetUnitLosMask
+local spSetUnitLosState     = Spring.SetUnitLosState
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitHealth       = Spring.SetUnitHealth
@@ -425,7 +427,7 @@ local function SetupPointStructure(point, structArea, segArea)
 	local x, z = point.x, point.z
 	if (structArea[x] and structArea[x][z]) or (GG.map_AllowPositionTerraform and not GG.map_AllowPositionTerraform(x, z)) then
 		point.diffHeight = 0.0001
-		point.structure = true
+		point.structure = structArea[x][z] or 1000
 	else
 		point.diffHeight = point.aimHeight - currHeight
 		segArea[x][z] = {orHeight = point.orHeight, diffHeight = point.diffHeight, building = false}
@@ -564,6 +566,18 @@ local function getPointInsideMap(x,z)
 	return x, z
 end
 
+local function SetInivisbleToEnemy(unitID, team)
+	local allyTeamList = spGetAllyTeamList()
+	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team, false)
+	for i=1, #allyTeamList do
+		local allyID = allyTeamList[i]
+		if allyID ~= unitAllyTeam then
+			spSetUnitLosState(unitID, allyID, 0)
+			spSetUnitLosMask(unitID, allyID, 15)
+		end
+	end
+end
+
 local function setupTerraunit(unitID, team, x, y, z)
 	y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 
@@ -573,15 +587,7 @@ local function setupTerraunit(unitID, team, x, y, z)
 	
 	spSetUnitSensorRadius(unitID,"los",0) -- REMOVE IN 0.83
 	spSetUnitSensorRadius(unitID,"airLos",0) -- REMOVE IN 0.83
-	
-	local allyTeamList = spGetAllyTeamList()
-	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team, false)
-	for i=1, #allyTeamList do
-		local allyID = allyTeamList[i]
-		if allyID ~= unitAllyTeam then
-			spSetUnitLosMask(unitID, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
-		end
-	end
+	SetInivisbleToEnemy(unitID, team)
 
 	spSetUnitHealth(unitID, {
 		health = 0.01,
@@ -918,7 +924,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 						segment[i].structureArea[lx] = {}
 					end
 					for lz = s.minz,s.maxz, 8 do
-						segment[i].structureArea[lx][lz] = true
+						segment[i].structureArea[lx][lz] = (segment[i].structureArea[lx][lz] or 0) + 1
 					end
 				end
 				
@@ -981,8 +987,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
-			--Spring.Echo(totalCost .. "\t" .. baseCost)
-			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			if ECHO_DETAILED_COST_ESTIMATE then
+				Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			end
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -1277,7 +1284,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 						segment[i].structureArea[lx] = {}
 					end
 					for lz = s.minz,s.maxz, 8 do
-						segment[i].structureArea[lx][lz] = true
+						segment[i].structureArea[lx][lz] = (segment[i].structureArea[lx][lz] or 0) + 1
 					end
 				end
 				
@@ -1402,7 +1409,9 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
-			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			if ECHO_DETAILED_COST_ESTIMATE then
+				Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			end
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -1766,7 +1775,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 						segment[i].structureArea[lx] = {}
 					end
 					for lz = s.minz,s.maxz, 8 do
-						segment[i].structureArea[lx][lz] = true
+						segment[i].structureArea[lx][lz] = (segment[i].structureArea[lx][lz] or 0) + 1
 					end
 				end
 				
@@ -1884,7 +1893,9 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
-			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			if ECHO_DETAILED_COST_ESTIMATE then
+				Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
+			end
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -2177,7 +2188,7 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 	end
 	
 	if ECHO_COST then
-		local cost = math.floor(terraformUnit[id].totalSpent + 0.5)
+		local cost = terraformUnit[id].totalSpent
 		Spring.Echo("TerraCost", cost)
 		Spring.Utilities.UnitEcho(id, cost)
 	end
@@ -2236,7 +2247,6 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 end
 
 local function updateTerraformEdgePoints(id)
-
 	for i = 1, terraformUnit[id].points do
 		local point = terraformUnit[id].point[i]
 		
@@ -2388,7 +2398,7 @@ local function updateTerraformCost(id)
 					if terra.area[x] and terra.area[x][z] then
 						terra.area[x][z] = nil
 					end
-					point.structure = 1
+					point.structure = true
 					areaRemoved = true
 					checkAreaRemoved = true
 				end
@@ -2408,9 +2418,7 @@ local function updateTerraformCost(id)
 		
 		local height = spGetGroundHeight(x,z)
 		point.orHeight = height
-		if point.structure == 1 then
-			point.diffHeight = 0
-		elseif point.structure then
+		if point.structure then
 			point.diffHeight = 0
 		else
 			point.diffHeight = point.aimHeight - height
@@ -2521,9 +2529,7 @@ local function updateTerraformBorder(id,x,z) -- updates border for edge point x,
 end
 
 local function finishInitialisingTerraformUnit(id)
-	
 	--checkTerraformIntercepts(id) --Removed Intercept Check
-	
 	updateTerraformEdgePoints(id)
 	EchoDebug(id, "init update cost")
 	updateTerraformCost(id)
@@ -2532,7 +2538,6 @@ local function finishInitialisingTerraformUnit(id)
 	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Cost " .. terraformUnit[id].cost)
 	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Points " .. terraformUnit[id].points)
 	terraformUnit[id].fullyInitialised = true
-
 end
 
 local function addSteepnessMarker(team, x, z)
@@ -2722,7 +2727,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							terra.area[terra.point[i].x][terra.point[i].z] = false
 						end
 						terra.point[i].diffHeight = 0.0001
-						terra.point[i].structure = 1
+						terra.point[i].structure = true
 						return -1
 					end
 					
@@ -2856,7 +2861,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 								terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false
 							end
 							terra.point[extraPoint[i].supportID].diffHeight = 0.0001
-							terra.point[extraPoint[i].supportID].structure = 1
+							terra.point[extraPoint[i].supportID].structure = true
 							return -1
 						end
 						
@@ -3463,12 +3468,19 @@ local function DeregisterStructure(unitID)
 						for k = 1, terraformUnit[oid].points do
 							if structure[unitID].area[terraformUnit[oid].point[k].x] then
 								if structure[unitID].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] then
-									terraformUnit[oid].point[k].structure = false
+									if terraformUnit[oid].point[k].structure == true then
+										terraformUnit[oid].point[k].structure = false
+									else
+										terraformUnit[oid].point[k].structure = terraformUnit[oid].point[k].structure - 1
+										if terraformUnit[oid].point[k].structure <= 0 then
+											terraformUnit[oid].point[k].structure = false
+										end
+									end
 									terraformUnit[oid].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] = true
 									recalc = true
 								end
 							end
-							if terraformUnit[oid].point[k].structure == 1 then
+							if terraformUnit[oid].point[k].structure == true then
 								terraformUnit[oid].point[k].structure = false
 								terraformUnit[oid].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] = true
 								recalc = true
@@ -3567,7 +3579,6 @@ local function RegisterStructure(unitID, ud)
 	
 	-- check if the building is on terraform
 	for i = 1, terraformOrders do
-		
 		if (structure[unitID].minx < terraformOrder[i].border.right and
 			structure[unitID].maxx > terraformOrder[i].border.left and
 			structure[unitID].minz < terraformOrder[i].border.bottom and
@@ -3590,7 +3601,9 @@ local function RegisterStructure(unitID, ud)
 						local x, z = point.x, point.z
 						if structure[unitID].area[x] and structure[unitID].area[x][z] then
 							terraformUnit[oid].point[k].diffHeight = 0.0001
-							terraformUnit[oid].point[k].structure = true
+							if terraformUnit[oid].point[k].structure ~= true then
+								terraformUnit[oid].point[k].structure = (terraformUnit[oid].point[k].structure or 0) + 1
+							end
 							if area[x] and area[x][z] then
 								area[x][z] = nil
 							end
@@ -3611,6 +3624,12 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+	if unitID and unitDefID and teamID and terraunitDefID == unitDefID then
+		SetInivisbleToEnemy(unitID, teamID)
+	end
+end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	if constructor[unitID] then
@@ -3663,6 +3682,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		RegisterStructure(unitID, ud)
 	end
 end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Debug

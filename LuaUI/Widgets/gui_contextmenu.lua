@@ -551,7 +551,7 @@ local function weapons2Table(cells, ws, unitID)
 		if wd.paralyzer then
 			damw = val
 			if stun_time == 0 then
-				stun_time = wd.damages.paralyzeDamageTime
+				stun_time = tonumber(wd.customParams.emp_paratime)
 			end
 		else
 			dam = val
@@ -1079,6 +1079,10 @@ local function printAbilities(ud, unitID, isCommander)
 		cells[#cells+1] = (cp.jump_range * ((unitID and Spring.GetUnitRulesParam(unitID, "jumpRangeMult")) or 1)) .. " elmo"
 		cells[#cells+1] = ' - Reload: '
 		cells[#cells+1] = (cp.jump_reload + ((unitID and Spring.GetUnitRulesParam(unitID, "upgradesJumpReloadMod")) or 0)) .. 's'
+		if tonumber(cp.jump_charges) or 1 > 1 then
+			cells[#cells+1] = ' - Max charges: '
+			cells[#cells+1] = tonumber(cp.jump_charges)
+		end
 		cells[#cells+1] = ' - Speed:'
 		cells[#cells+1] = numformat(30*tonumber(cp.jump_speed)) .. " elmo/s"
 		cells[#cells+1] = ' - Midair jump:'
@@ -1782,7 +1786,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		if (weaponStats.paralyzer) then
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue) .. " (P)", textColor = colorCyan, }
 			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages.paralyzeDamageTime) .. "s", textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(wepCp.emp_paratime) .. "s", textColor = color.stats_fg, }
 		else
 			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
 			local damageText

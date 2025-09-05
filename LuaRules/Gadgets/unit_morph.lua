@@ -441,8 +441,10 @@ local function FinishMorph(unitID, morphData)
 	--//copy unit speed
 	local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
  
-
-	Spring.SetUnitRulesParam(newUnit, "jumpReload", Spring.GetUnitRulesParam(unitID, "jumpReload") or 1)
+	local jump = Spring.GetUnitRulesParam(unitID, "jumpReload")
+	if jump then
+		Spring.SetUnitRulesParam(newUnit, "jumpReload", jump)
+	end
 	
 	local oldFieldFactoryUnit = Spring.GetUnitRulesParam(unitID, "fieldFactoryUnit")
 	if oldFieldFactoryUnit and GG.FieldConstruction_SetProduction then
@@ -496,7 +498,7 @@ local function FinishMorph(unitID, morphData)
 	
 	--// transfer health
 	-- old health is declared far above
-	local _,newMaxHealth		 = Spring.GetUnitHealth(newUnit)
+	local _,newMaxHealth = Spring.GetUnitHealth(newUnit)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	if newHealth <= 1 then
 		newHealth = 1

@@ -33,6 +33,15 @@ local gunFlares = {
 	{lfoot}
 }
 
+local loadingCanister = false
+local previousLoad = false
+local canisters = {
+	{loaded = true, body = piece('canister1'), cap = piece('cap1'), gib = piece('canister1_merged'), hor = math.cos(-0.2618), vert = math.sin(-0.2618)},
+	{loaded = true, body = piece('canister2'), cap = piece('cap2'), gib = piece('canister2_merged'), hor = 1, vert = 0.01}, -- Small vert for z-fighting
+	{loaded = true, body = piece('canister3'), cap = piece('cap3'), gib = piece('canister3_merged'), hor = math.cos(0.349), vert = math.sin(0.349)},
+}
+local EXTRUDE_SPEED = 0.21 * 120 / tonumber(UnitDefs[unitDefID].customParams.jump_reload)
+
 local barrels = {
 	{larmbarrel1, larmbarrel2, larmbarrel3},
 	{rarmbarrel1, rarmbarrel2, rarmbarrel3},
@@ -117,6 +126,28 @@ local takeoff_explosion = 4103 --Weapon 8
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local fullCap = 0.5
+local emptyCan = 23
+local emptyCap = 4.6
+local function MoveCanister(num, proportion, capProp, speed)
+	local canister = canisters[num]
+	Move(canister.body, z_axis, (1 - proportion) * emptyCan * canister.hor, speed and speed * canister.hor)
+	Move(canister.body, y_axis, (1 - proportion) * emptyCan * canister.vert, speed and speed * canister.vert)
+	
+	capProp = capProp or proportion
+	if capProp >= 1 then
+		Move(canister.cap, z_axis, fullCap * canister.hor, speed and speed * canister.hor)
+		Move(canister.cap, y_axis, fullCap * canister.vert, speed and speed *canister.vert)
+	elseif capProp >= 0.95 then
+		local dist = (fullCap - emptyCap)*(capProp - 0.95) * 15 + emptyCap
+		Move(canister.cap, z_axis, dist * canister.hor, speed and speed * canister.hor)
+		Move(canister.cap, y_axis, dist * canister.vert, speed and speed *canister.vert)
+	else
+		Move(canister.cap, z_axis, emptyCap * canister.hor, speed and speed * canister.hor)
+		Move(canister.cap, y_axis, emptyCap * canister.vert, speed and speed *canister.vert)
+	end
+end
 
 local function DoRestore()
 	Turn(head, y_axis, 0, 2)
@@ -246,6 +277,14 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 	
 	local rotationRequired = -turn*GG.Script.headingToRad
 	local rotationFrames = math.ceil(math.abs(rotationRequired/JUMP_TURN_SPEED)/12/speed)*12
+	local usingCanister = false
+	for i = 1, 3 do
+		if canisters[i].loaded then
+			usingCanister = i
+			canisters[i].loaded = false
+			break
+		end
+	end
 
 	--Spring.MoveCtrl.SetRotation(unitID, 0, heading + rotationRequired, 0) -- keep current heading
 	--Sleep(2000)
@@ -287,6 +326,9 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
 	end
 	Move(pelvis, y_axis, 0, 8 * speed)
+	if usingCanister then
+		MoveCanister(usingCanister, 1, 0, 3 / speed)
+	end
 	Sleep(600 / speed)
 	
 	for i,p in pairs(leftLeg) do
@@ -299,6 +341,17 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 	Turn(torso, x_axis, math.rad(20), math.rad(30) * speed)
 	
 	Turn(pelvis, z_axis, 0, math.rad(30) * speed)
+	
+	if usingCanister then
+		Sleep(1367) -- Timing is the essence of comedy
+		Hide(canisters[usingCanister].body)
+		Hide(canisters[usingCanister].cap)
+		MoveCanister(usingCanister, 0)
+		Explode(canisters[usingCanister].gib, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Sleep(33)
+		Show(canisters[usingCanister].body)
+		Show(canisters[usingCanister].cap)
+	end
 	--EmitSfx(lfoot, jetfeet)
 	--EmitSfx(rfoot, jetfeet)
 end
@@ -320,7 +373,34 @@ local function EndJumpThread()
 end
 
 function preJump(turn,lineDist,flightDist,duration)
-	StartThread(PreJumpThread, turn,lineDist,flightDist,duration)
+	StartThread(PreJumpThread, turn, lineDist, flightDist, duration)
+end
+
+function jumpReloadProgress(reloadAmount)
+	if not loadingCanister then
+		previousLoad = reloadAmount
+		for i = 1, 3 do
+			if not canisters[i].loaded then
+				loadingCanister = i
+				break
+			end
+		end
+	end
+	while reloadAmount < previousLoad - 0.2 do
+		previousLoad = previousLoad - 1
+	end
+	if not loadingCanister then
+		return
+	end
+	local speed = math.max(0.5, GG.att_ReloadChange[unitID] or 1)
+	reloadAmount = reloadAmount - math.floor(previousLoad)
+	if reloadAmount >= 1 then
+		canisters[loadingCanister].loaded = true
+		MoveCanister(loadingCanister, 1, false, 2.5)
+		loadingCanister = false
+	else
+		MoveCanister(loadingCanister, reloadAmount, false, speed * EXTRUDE_SPEED)
+	end
 end
 
 function beginJump()
@@ -371,6 +451,17 @@ local function RestoreAfterDelay()
 end
 
 function script.Create()
+	MoveCanister(1, 1, 100)
+	MoveCanister(2, 1, 100)
+	MoveCanister(3, 1, 100)
+
+	for i = 1, 3 do
+		Hide(piece('canister' .. i .. '_merged'))
+		Hide(piece('canister' .. i .. '_full'))
+		Hide(piece('can' .. i .. '_full_cap'))
+		Hide(piece('can' .. i .. '_full_base'))
+	end
+
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))

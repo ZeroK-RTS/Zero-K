@@ -60,7 +60,7 @@ local MISC_PAYBACK_OD_PROP = 0.15 -- Maximum proportion of overdrive metal that 
      the mechanic don't feel the need to abuse it in a lobsterpot to get ahead.
      Ideally the refund would just be for whomever actually put in resources,
      but that would involve the build step callin which is quite expensive. ]]
-local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
+local MEX_REFUND_VALUE = 125 / 85 * UnitDefNames.staticmex.metalCost
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

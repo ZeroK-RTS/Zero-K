@@ -95,6 +95,7 @@ local messages = {
 	slow = "",
 	goo = "",
 	jump = "",
+	jump_charge = "",
 
 	-- Features
 	reclaim = "",
@@ -134,7 +135,7 @@ options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', '
 	'invert_stockpile', 'invert_paralyze', 'invert_disarm', 'invert_capture',
 	'invert_capture_reload', 'invert_teleport', 'invert_teleport_pw', 'invert_ability',
 	'invert_heat', 'invert_speed', 'invert_reload', 'invert_reammo',
-	'invert_slow', 'invert_goo', 'invert_jump', 'invert_reclaim', 'invert_resurrect',
+	'invert_slow', 'invert_goo', 'invert_jump', 'invert_jump_charge', 'invert_reclaim', 'invert_resurrect',
 }
 options = {
 	showhealthbars = {
@@ -413,6 +414,15 @@ options = {
 		OnChange = OptionsChanged,
 		path = 'Settings/Interface/Healthbars/Invert'
 	},
+	invert_jump_charge = {
+		name = 'Invert jump charge bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert jump bar for additional charges',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
 	invert_reclaim = {
 		name = 'Invert reclaim bar',
 		type = 'bool',
@@ -509,6 +519,7 @@ local barColors = {
 	slow_b         = { 0.50, 0.10, 0.70, barAlpha },
 	goo            = { 0.40, 0.40, 0.40, barAlpha },
 	jump           = { 0.00, 0.80, 0.00, barAlpha },
+	jump_charge    = { 0.10, 0.50, 0.20, barAlpha },
 	jump_p         = { 0.80, 0.50, 0.00, barAlpha },
 	jump_b         = { 0.00, 0.80, 0.00, barAlpha },
 
@@ -803,8 +814,9 @@ do
 		if (not customInfo[unitDefID]) then
 			local ud = UnitDefs[unitDefID]
 			customInfo[unitDefID] = {
-				height        = Spring.Utilities.GetUnitHeight(ud) + 14,
+				height        = Spring.Utilities.GetUnitHeight(ud) + 14 + (tonumber(ud.customParams.health_bar_height) or 0),
 				canJump       = (ud.customParams.canjump and true) or false,
+				jumpCharges   = tonumber(ud.customParams.jump_charges),
 				canGoo        = (ud.customParams.grey_goo and true) or false,
 				canReammo     = (ud.customParams.reammoseconds and true) or false,
 				isPwStructure = (ud.customParams.planetwars_structure and true) or false,
@@ -1072,8 +1084,9 @@ do
 			if reloadFrame and reloadFrame > gameFrame then
 				local scriptLoaded = GetUnitRulesParam(unitID, "scriptLoaded") or ci.scriptBurst
 				reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
+				local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
 				if (reload >= 0) then
-					barDrawer.AddPercentBar("reload", reload)
+					barDrawer.AddPercentBar("reload", reload, false, barText)
 				end
 			end
 		end
@@ -1107,6 +1120,9 @@ do
 			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
 			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
 				barDrawer.AddPercentBar("jump", jumpReload)
+			elseif ci.jumpCharges and jumpReload and (jumpReload < ci.jumpCharges) then
+				local barText = string.format("%i/%i", math.floor(jumpReload), ci.jumpCharges)
+				barDrawer.AddPercentBar("jump_charge", (jumpReload - 1) / (ci.jumpCharges - 1), false, barText)
 			end
 		end
 		

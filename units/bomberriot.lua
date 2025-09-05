@@ -55,7 +55,7 @@ return { bomberriot = {
 
   },
   sightDistance       = 780,
-  speed               = 243,
+  speed               = 231,
   turnRadius          = 160,
   workerTime          = 0,
 

@@ -78,7 +78,7 @@ options = {
 	},
 	hotkey_toggle = {
 		name = 'Toggle Structure Terraform',
-		desc = 'Press during structure placement to make a strucutre on a spire or a hold. Alt + MMB also toggles this mode.',
+		desc = 'Press during structure placement to make a structure on a spire or a hold. Alt + MMB also toggles this mode.',
 		type = 'button',
 		hotkey = "B",
 		bindWithAny = true,

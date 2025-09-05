@@ -855,10 +855,16 @@ local function GetCmdPosParameters(cmdID)
 	return 1, 100
 end
 
-local function GetDisplayConfig(cmdID)
+local function GetDisplayConfig(cmdID, command)
 	local displayConfig = commandDisplayConfig[cmdID]
+	if cmdID >= CMD_MORPH_STOP and cmdID < CMD_MORPH_STOP + 1000 then
+		displayConfig = commandDisplayConfig[CMD_MORPH_STOP]
+	end
 	if not displayConfig then
 		return
+	end
+	if displayConfig.DynamicDisplayFunc then
+		displayConfig = displayConfig.DynamicDisplayFunc(cmdID, command)
 	end
 	if displayConfig.useAltConfig then
 		return displayConfig.altConfig
@@ -1167,7 +1173,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	local buildProgress
 	local textBoxes = {}
 	
-	local function SetImage(texture1, texture2)
+	local function SetImageTexture(texture1, texture2)
 		if not image then
 			image = Image:New {
 				name = name .. "_image",
@@ -1195,6 +1201,18 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image.file = texture1
 		image.file2 = texture2
 		image:Invalidate()
+	end
+	
+	local function SetImageFromConfig(displayConfig, command, state)
+		if state and displayConfig then
+			SetImageTexture(displayConfig.texture[state])
+		elseif displayConfig then
+			SetImageTexture(displayConfig.texture, displayConfig.tex2)
+		elseif command then
+			SetImageTexture(command.texture)
+		else
+			spEcho("Error, missing command displayConfig and command")
+		end
 	end
 	
 	local function SetText(textPosition, text)
@@ -1229,6 +1247,9 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			return
 		end
 		textBoxes[textPosition]:SetVisibility(newVisible)
+		if newVisible then
+			textBoxes[textPosition]:BringToFront()
+		end
 		
 		if (not newVisible) or (text == textBoxes[textPosition].caption) then
 			return
@@ -1249,7 +1270,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		isDisabled = newDisabled
 		
 		if not image then
-			SetImage("")
+			SetImageTexture("")
 		end
 		if isDisabled then
 			button.backgroundColor = BUTTON_DISABLE_COLOR
@@ -1278,7 +1299,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 		
 		if not image then
-			SetImage("")
+			SetImageTexture("")
 		end
 		
 		buildProgress = Progressbar:New{
@@ -1374,7 +1395,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				for _,textBox in pairs(textBoxes) do
 					textBox:SetCaption(NO_TEXT)
 				end
-				SetImage()
+				SetImageTexture()
 				
 				if not onMouseOverFun then
 					onMouseOverFun = function ()
@@ -1443,21 +1464,19 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		if cmdID == newCmdID then
 			if isStateCommand then
-				local displayConfig = GetDisplayConfig(cmdID)
+				local displayConfig = GetDisplayConfig(cmdID, command)
 				if displayConfig then
-					local texture = displayConfig.texture[state]
 					if displayConfig.stateTooltip then
 						button.tooltip = GetButtonTooltip(displayConfig, command, state)
 					end
-					SetImage(texture)
+					SetImageFromConfig(displayConfig, command, state)
 				end
 			elseif newCmdID and DYNAMIC_COMMANDS[newCmdID] then
 				-- Reset potentially stale special weapon iamge and tooltip.
 				-- Action is the same so hotkey does not require a reset.
-				local displayConfig = GetDisplayConfig(cmdID)
+				local displayConfig = GetDisplayConfig(cmdID, command)
 				button.tooltip = GetButtonTooltip(displayConfig, command, state)
-				local texture = (displayConfig and displayConfig.texture) or command.texture
-				SetImage(texture)
+				SetImageFromConfig(displayConfig, command)
 			end
 			if not notGlobal then
 				buttonsByCommand[cmdID] = externalFunctionsAndData
@@ -1494,7 +1513,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			SetDisabled(command.disabled)
 		end
 		
-		local displayConfig = GetDisplayConfig(cmdID)
+		local displayConfig = GetDisplayConfig(cmdID, command)
 		
 		if isBuild then
 			local ud = UnitDefs[-cmdID]
@@ -1504,7 +1523,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
-			SetImage("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
+			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
 				if cost >= 100000000 then
@@ -1533,15 +1552,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		if isStateCommand then
 			if displayConfig then
-				local texture = displayConfig.texture[state]
-				SetImage(texture)
+				SetImageFromConfig(displayConfig, command, state)
 			else
 				spEcho("Error, missing command config", cmdID)
 			end
 		else
 			if not isBuild then
-				local texture = (displayConfig and displayConfig.texture) or command.texture
-				SetImage(texture)
+				SetImageFromConfig(displayConfig, command)
 			end
 			-- Remove stockpile progress
 			if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
