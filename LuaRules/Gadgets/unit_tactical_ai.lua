@@ -845,6 +845,10 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 		return true, orderSent
 	end
 	
+	if enemy and unitData.allyTeam == spGetUnitAllyTeam(enemy) then
+		return false
+	end
+	
 	local didSwarm = false
 	if alwaysJink or (enemy and typeKnown and behaviour.swarms and behaviour.swarms[enemyUnitDef]) then
 		--Spring.Echo("unit checking swarm")

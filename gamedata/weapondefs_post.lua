@@ -337,6 +337,7 @@ for name, wd in pairs (WeaponDefs) do
 		if not cp.area_damage_plateau_fall then cp.area_damage_plateau_fall = area_damage_defaults.plateau_fall end
 
 		if not cp.area_damage_is_impulse then cp.area_damage_is_impulse = area_damage_defaults.is_impulse end
+		if not cp.area_damage_drag_factor then cp.area_damage_drag_factor = area_damage_defaults.drag_factor end
 		if not cp.area_damage_range_falloff then cp.area_damage_range_falloff = area_damage_defaults.range_falloff end
 		if not cp.area_damage_time_falloff then cp.area_damage_time_falloff = area_damage_defaults.time_falloff end
 	end
