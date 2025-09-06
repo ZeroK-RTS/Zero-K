@@ -73,6 +73,7 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 		radius = weaponInfo[weaponID].radius,
 		plateauRadius = weaponInfo[weaponID].plateauRadius,
 		plateauFall = weaponInfo[weaponID].plateauFall,
+		dragFactor = weaponInfo[weaponID].dragFactor,
 		damage = weaponDamage,
 		teamID = teamID,
 		impulse = weaponInfo[weaponID].impulse,
@@ -133,13 +134,14 @@ local function HandleDamageArea(data, f)
 					if data.rangeFall ~= 0 and distance > data.plateauRadius then
 						damage = damage - damage*data.rangeFall*(distance - data.plateauRadius)/(data.radius - data.plateauRadius)
 					end
+					local drag = data.impulse and damage*(data.dragFactor or 1)
 					if data.plateauFall and data.plateauFall ~= 0 and distance < data.plateauRadius then
 						damage = damage - damage*data.plateauFall*(data.plateauRadius - distance)/data.plateauRadius
 					end
 					if data.impulse then
 						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
 						GG.SetUnitFallDamageImmunity(u, f + 10)
-						GG.DoAirDrag(u, damage*2)
+						GG.DoAirDrag(u, drag)
 					elseif data.slow then
 						GG.addSlowDamage(u, damage, false, data.teamID)
 					else
