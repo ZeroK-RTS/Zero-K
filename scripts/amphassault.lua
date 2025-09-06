@@ -365,9 +365,9 @@ function script.Shot(num)
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		if height < 18 then
-			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz, "battle")
 		else
-			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz, "battle")
 		end
 	end
 end

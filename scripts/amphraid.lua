@@ -195,9 +195,9 @@ function script.FireWeapon(num)
 	if num == 2 then
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		if py < -8 then
-			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 8, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 8, px, py, pz, "battle")
 		else
-			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 5, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 5, px, py, pz, "battle")
 		end
 	end
 end

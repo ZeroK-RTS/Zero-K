@@ -167,7 +167,7 @@ end
 -- multi-emit workaround
 function script.BlockShot(num)
 	local px, py, pz = Spring.GetUnitPosition(unitID)
-	Spring.PlaySoundFile("sounds/weapon/laser/heavy_laser6.wav", 10, px, py, pz)
+	Spring.PlaySoundFile("sounds/weapon/laser/heavy_laser6.wav", 10, px, py, pz, "battle")
 	return false
 end
 

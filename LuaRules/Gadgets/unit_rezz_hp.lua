@@ -79,7 +79,7 @@ function gadget:GetInfo() return {
 		local spec = select(2, spGetSpectatingState())
 		local myAllyTeam = spGetLocalAllyTeamID()
 		if (spec or spIsPosInLos(x, y, z, myAllyTeam)) then
-			spPlaySoundFile("sounds/misc/resurrect.wav", 15, x, y, z)
+			spPlaySoundFile("sounds/misc/resurrect.wav", 15, x, y, z, "battle")
 		end
 	end
 	
