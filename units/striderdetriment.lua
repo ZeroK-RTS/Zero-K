@@ -28,6 +28,7 @@ return { striderdetriment = {
     jump_charges          = 3,
     jump_from_midair      = 0,
     jump_rotate_midair    = 0,
+    jump_public_reload    = 1,
     modelradius           = [[95]],
     draw_reload_num       = 3,
     selection_scale       = 1.4,
