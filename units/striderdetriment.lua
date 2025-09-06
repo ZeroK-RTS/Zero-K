@@ -297,6 +297,7 @@ return { striderdetriment = {
         smoothmult   = [[0.7]],
         smoothexponent = [[0.8]],
         smoothheightoffset = [[22]],
+        burst = Shared.BURST_UNRELIABLE,
         -- no `movestructures` because then they can "dodge" via sudden movement
       },
       
