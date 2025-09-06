@@ -41,7 +41,7 @@ return { turretheavy = {
   levelGround                   = false,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
-  metalCost                     = 1600,
+  metalCost                     = 1500,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[DDM.s3o]],
   onoffable                     = true,
@@ -147,7 +147,7 @@ return { turretheavy = {
       },
 
       damage                  = {
-        default = 1201,
+        default = 1200.1,
       },
 
       edgeEffectiveness       = 0.7,
@@ -159,7 +159,7 @@ return { turretheavy = {
       noSelfDamage            = true,
       proximityPriority       = 6,
       range                   = 650,
-      reloadtime              = 3,
+      reloadtime              = 2.8,
       soundHit                = [[weapon/cannon/cannon_hit4]],
       --soundHitVolume          = 70,
       soundStart              = [[weapon/cannon/heavy_cannon2]],
