@@ -1442,21 +1442,22 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 	elseif rulesParam then
 		reloadFraction = GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
 	end
-	if charges == 1 then
-		reloadBar._relativeBounds.top = 5
-		reloadBar:UpdateClientArea()
-		reloadBar:Invalidate()
-	elseif reloadFraction < charges then
-		if math.floor(reloadFraction) == 0 then
+	if reloadFraction then
+		if charges == 1 then
 			reloadBar._relativeBounds.top = 5
-		else
-			reloadBar._relativeBounds.top = string.format("%i%%", 100 * math.floor(reloadFraction) / charges)
+			reloadBar:UpdateClientArea()
+			reloadBar:Invalidate()
+		elseif reloadFraction < charges then
+			if math.floor(reloadFraction) == 0 then
+				reloadBar._relativeBounds.top = 5
+			else
+				reloadBar._relativeBounds.top = string.format("%i%%", 100 * math.floor(reloadFraction) / charges)
+			end
+			reloadFraction = 1 - (charges - reloadFraction) / math.ceil(charges - reloadFraction)
+			reloadBar:UpdateClientArea()
+			reloadBar:Invalidate()
 		end
-		reloadFraction = 1 - (charges - reloadFraction) / math.ceil(charges - reloadFraction)
-		reloadBar:UpdateClientArea()
-		reloadBar:Invalidate()
 	end
-	
 	if reloadFraction and reloadFraction < 1 then
 		reloadBar:SetValue(reloadFraction)
 		reloadBar:SetVisibility(true)
