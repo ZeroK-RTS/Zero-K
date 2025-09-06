@@ -69,6 +69,9 @@ end
 local addPercent
 local addTitle
 
+local myAllyTeamID = Spring.GetLocalAllyTeamID()
+local spectating = Spring.GetSpectatingState()
+
 --------------------------------------------------------------------------------
 -- LOCALISATION
 --------------------------------------------------------------------------------
@@ -127,7 +130,7 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump',
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump', 'showEnemyStatus',
 	'barScale', 'debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
@@ -166,6 +169,12 @@ options = {
 		value = true,
 		noHotkey = true,
 		desc = 'Set jump reload to flash when issuing the jump command',
+	},
+	showEnemyStatus = {
+		name = 'Show enemy status',
+		type = 'bool',
+		value = false,
+		desc = 'A few rare units (eg Detriment jump charge) show their status to enemies.',
 	},
 	barScale = {
 		name = 'Bar size scale',
@@ -764,6 +773,13 @@ do
 	local customInfo = {}
 	local ci
 
+	local function AllyOrShouldShowEnemyStatus(unitID)
+		if spectating or options.showEnemyStatus.value then
+			return true
+		end
+		return unitID and myAllyTeamID == Spring.GetUnitAllyTeam(unitID)
+	end
+
 	function JustGetOverlayInfos(unitID, unitDefID)
 		ux, uy, uz = GetUnitViewPosition(unitID)
 		if not ux then
@@ -1116,7 +1132,7 @@ do
 		end
 		
 		--// JUMPJET
-		if ci.canJump then
+		if ci.canJump and AllyOrShouldShowEnemyStatus(unitID) then
 			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
 			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
 				barDrawer.AddPercentBar("jump", jumpReload)
@@ -1339,6 +1355,11 @@ end --//end do
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function widget:PlayerChanged()
+	myAllyTeamID = Spring.GetLocalAllyTeamID()
+	spectating = Spring.GetSpectatingState()
+end
 
 function widget:Initialize()
 	WG.InitializeTranslation(languageChanged, GetInfo().name)
