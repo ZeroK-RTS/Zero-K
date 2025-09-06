@@ -37,6 +37,7 @@ local CMD_WAIT   = CMD.WAIT
 local CMD_MOVE   = CMD.MOVE
 local CMD_REMOVE = CMD.REMOVE
 local privateTable = {private = true}
+local sightTable = {inlos = true}
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitPosition      = Spring.GetUnitPosition
@@ -239,6 +240,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local cannotJumpMidair = jumpDef.cannotJumpMidair
 	local reloadTime       = ((jumpDef.reload or 0) + (jumpReloadMod[unitID] or 0)) * 30
 	local jumpCharges      = jumpDef.charges or 1
+	local publicReload     = jumpDef.publicReload
 	local teamID           = spGetUnitTeam(unitID)
 	
 	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (start[2] < -UnitDefs[unitDefID].maxWaterDepth)) then
@@ -320,9 +322,9 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		CallAsUnitIfExists(unitID,env.preJump,turn,lineDist,flightDist,duration)
 	end
 	if jumpCharges > 1 then
-		spSetUnitRulesParam(unitID, "jumpReload", (spGetUnitRulesParam(unitID, "jumpReload") or 1) - 1)
+		spSetUnitRulesParam(unitID, "jumpReload", (spGetUnitRulesParam(unitID, "jumpReload") or 1) - 1, publicReload and sightTable or privateTable)
 	else
-		spSetUnitRulesParam(unitID, "jumpReload", 0)
+		spSetUnitRulesParam(unitID, "jumpReload", 0, publicReload and sightTable or privateTable)
 	end
 	
 	local function JumpLoop()
@@ -430,7 +432,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		end
 
 		if reloadTime <= 1 then
-			spSetUnitRulesParam(unitID, "jumpReload", jumpCharges)
+			spSetUnitRulesParam(unitID, "jumpReload", jumpCharges, publicReload and sightTable or privateTable)
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 			return
@@ -480,7 +482,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
 			local reloadFactor = (stunnedOrInbuild and 0) or GG.att_ReloadChange[unitID] or 1
 			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
-			spSetUnitRulesParam(unitID, "jumpReload", reloadAmount)
+			spSetUnitRulesParam(unitID, "jumpReload", reloadAmount, publicReload and sightTable or privateTable)
 			if callTimer then
 				callTimer = callTimer + 1
 				if callTimer >= 10 or reloadAmount >= jumpCharges then

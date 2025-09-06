@@ -11,6 +11,7 @@ for id, ud in pairs (UnitDefs) do
 			delay = tonumber(cp.jump_delay),
 			delayTurnScale = tonumber(cp.jump_delay_turn_scale),
 			height = tonumber(cp.jump_height),
+			publicReload = cp.jump_public_reload and true,
 			
 			noJumpHandling =  (tonumber(cp.no_jump_handling) == 1),
 			rotateMidAir = (tonumber(cp.jump_rotate_midair) == 1),
