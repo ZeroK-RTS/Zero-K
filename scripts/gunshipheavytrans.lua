@@ -488,16 +488,25 @@ function script.QueryTransport(passengerID)
 end
 
 function script.AimFromWeapon(num)
+	if not weaponPieces[num] then
+		num = 3
+	end
 	return weaponPieces[num].aimFrom
 end
 
 function script.QueryWeapon(num)
+	if not weaponPieces[num] then
+		num = 3
+	end
 	local pieces = weaponPieces[num].query
 	return pieces[weaponPieces[num].index]
 end
 
 
 function script.Shot(num)
+	if not weaponPieces[num] then
+		num = 3
+	end
 	local index = weaponPieces[num].index
 	index = index + 1
 	if index > #(weaponPieces[num].query) then
