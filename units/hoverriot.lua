@@ -108,6 +108,7 @@ return { hoverriot = {
       reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn10]],
+      soundStartVolume        = 9,
       soundTrigger            = true,
       sweepfire               = false,
       texture1                = [[largelaser]],

@@ -105,6 +105,7 @@ return { vehsupport = {
       reloadtime              = 0.766,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med17]],
+      soundHitVolume          = 8.5,
       soundStart              = [[weapon/missile/missile_fire11]],
       startVelocity           = 450,
       texture2                = [[lightsmoketrail]],
