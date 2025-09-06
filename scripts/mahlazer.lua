@@ -325,7 +325,7 @@ function TargetingLaserUpdate()
 						--// Sound effects
 						if soundTime < 0 then
 							local px, py, pz = Spring.GetUnitPosition(unitID)
-							Spring.PlaySoundFile("sounds/weapon/laser/laser_burn6.wav", 10, px, (py + flashY)/2, pz)
+							Spring.PlaySoundFile("sounds/weapon/laser/laser_burn6.wav", 10, px, (py + flashY)/2, pz, "battle")
 							soundTime = 46
 						else
 							soundTime = soundTime - 1
