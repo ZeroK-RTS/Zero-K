@@ -231,11 +231,6 @@ local function GetMorphRate(unitID)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
-	-- do not allow morph for unfinsihed units
-	if not isFinished(unitID) then
-		return false
-	end
-	
 	-- do not allow morph for units being transported which are not combat morphs
 	if Spring.GetUnitTransporter(unitID) and not morphDef.combatMorph then
 		return false
@@ -1114,7 +1109,12 @@ end
 local function DrawMorphUnit(unitID, morphData, localTeamID)
 	local h = GetUnitHeading(unitID)
 	if (h == nil) then
-		return	--// bonus, heading is only available when the unit is in LOS
+		return --// bonus, heading is only available when the unit is in LOS
+	end
+	
+	-- Morphing nanoframe is noisy.
+	if not isFinished(unitID) then
+		return false
 	end
 	
 	local px,py,pz = spGetUnitPosition(unitID)
