@@ -76,7 +76,7 @@ return { cloakassault = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = 750,
+        extra_damage = 720,
         
         light_camera_height = 1600,
         light_color = [[0.85 0.85 1.2]],
