@@ -1136,7 +1136,7 @@ do
 			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
 			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
 				barDrawer.AddPercentBar("jump", jumpReload)
-			elseif ci.jumpCharges and jumpReload and (jumpReload < ci.jumpCharges) then
+			elseif ci.jumpCharges and jumpReload and (jumpReload < ci.jumpCharges) and (jumpReload >= 1) then
 				local barText = string.format("%i/%i", math.floor(jumpReload), ci.jumpCharges)
 				barDrawer.AddPercentBar("jump_charge", (jumpReload - 1) / (ci.jumpCharges - 1), false, barText)
 			end

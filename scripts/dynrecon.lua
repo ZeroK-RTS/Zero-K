@@ -318,6 +318,12 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
+function unmoonwalkFunc()
+	bMoving = false
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+end
+
 function script.StartMoving()
 	if not inJumpMode then
 		bMoving = true
