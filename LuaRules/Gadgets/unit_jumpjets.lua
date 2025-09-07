@@ -443,22 +443,22 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 
 		Sleep()
-
-		if not ContinueCoroutine(unitID, coroutineID) then
+		if not Spring.ValidUnitID(unitID) then
 			return
 		end
-
 		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 		if morphedTo then
 			lastJumpPosition[morphedTo] = lastJumpPosition[unitID]
 			lastJumpPosition[unitID] = nil
+			uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
 			unitID = morphedTo
+			env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
 			if not Spring.ValidUnitID(unitID) then
 				return
 			end
 		end
 
-		if Spring.GetUnitIsDead(unitID) then
+		if not ContinueCoroutine(unitID, coroutineID) then
 			return
 		end
 
@@ -470,14 +470,16 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local walkFixTimer = env.unmoonwalkFunc and 15
 		local callTimer = env.jumpReloadProgress and 0
 		while reloadAmount < jumpCharges do
-			if not ContinueCoroutine(unitID, coroutineID) then
+			if not Spring.ValidUnitID(unitID) then
 				return
 			end
 			morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 			if morphedTo then
+				uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
 				unitID = morphedTo
+				env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
 			end
-			if Spring.GetUnitIsDead(unitID) then
+			if not ContinueCoroutine(unitID, coroutineID) then
 				return
 			end
 
@@ -544,7 +546,7 @@ end
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	if jumping[oldUnitID] then
 		jumping[oldUnitID] = nil -- empty old unit's data
-		uniqueCoroutineCounter[oldUnitID] = nil 
+		uniqueCoroutineCounter[oldUnitID] = nil
 	end
 	if jumpReloadMod[unitID] then
 		jumpReloadMod[unitID] = nil
