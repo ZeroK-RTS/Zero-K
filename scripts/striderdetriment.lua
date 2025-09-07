@@ -255,7 +255,10 @@ local function StopWalk()
 end
 
 function unmoonwalkFunc()
-	StartThread(StopWalk)
+	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+	if speed == 0 then
+		StartThread(StopWalk)
+	end
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
 end
