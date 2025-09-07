@@ -91,7 +91,7 @@ return { gunshipheavyskirm = {
       },
       
       damage                  = {
-        default = 19.3,
+        default = 20,
       },
 
       edgeEffectiveness       = 0.5,
