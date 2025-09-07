@@ -319,7 +319,10 @@ function script.Create()
 end
 
 function unmoonwalkFunc()
-	bMoving = false
+	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+	if speed == 0 then
+		bMoving = false
+	end
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
 end
