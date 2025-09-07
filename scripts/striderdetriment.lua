@@ -261,14 +261,12 @@ function unmoonwalkFunc()
 end
 
 function script.StartMoving()
-	Spring.Echo("StartMoving", jumpActive, math.random())
 	if not jumpActive then
 		StartThread(Walk)
 	end
 end
 
 function script.StopMoving()
-	Spring.Echo("STOP", jumpActive, math.random())
 	StartThread(StopWalk)
 end
 
