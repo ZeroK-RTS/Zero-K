@@ -185,7 +185,7 @@ local optionOverrides = {
 		gain = 20,
 	},
 	["weapon/laser/rapid_laser"] = {
-		maxconcurrent = 5, --- raptor toad detriment
+		maxconcurrent = 6, --- raptor toad detriment
 		gain = 1.0,
 		pitch = 1.0,
 	},
@@ -195,17 +195,17 @@ local optionOverrides = {
 		pitch = 1.0,
 	},
 	["weapon/cannon/brawler_emg"] = {
-		maxconcurrent = 3, --- toad
+		maxconcurrent = 5, --- toad
 		gain = 1.0,
 		pitch = 1.0,
 	},
 	["weapon/cannon/brawler_emg3"] = {
-		maxconcurrent = 3, --- nimbus
+		maxconcurrent = 5, --- nimbus
 		gain = 1.0,
 		pitch = 1.0,
 	},
 	["weapon/cannon/emg_hit3"] = {
-		maxconcurrent = 3, --- nimbus
+		maxconcurrent = 5, --- nimbus
 		gain = 1.0,
 		pitch = 1.0,
 	},
@@ -346,14 +346,19 @@ end
 local defaultOpts = {
 	pitchmod = DISABLE_PITCHMOD and 0 or 0.04,
 	gainmod = 0,
+	maxconcurrent = 12,
+	rolloff = 1.2,
 }
 local replyOpts = {
 	pitchmod = 0, 
 	gainmod = 0,
+	rolloff = 0,
 }
 local explosionOpts = {
 	pitchmod = 0.00,
 	gainmod = 0,
+	maxconcurrent = 12,
+	rolloff = 1.2,
 }
 
 local noVariation = {
@@ -381,10 +386,10 @@ local function AutoAdd(subDir, generalOpts)
 			Spring.Echo(pathPart, opts.priority or priority[pathPart] or 0)
 			Sounds.SoundItems[pathPart] = {
 				file = fullPath,
-				rolloff = opts.rollOff,
+				rolloff = (opts.rolloff ~= nil and opts.rolloff) or (generalOpts and generalOpts.rolloff) or opts.rollOff,
 				dopplerscale = opts.dopplerscale,
 				maxdist = opts.maxdist,
-				maxconcurrent = opts.maxconcurrent,
+				maxconcurrent = (opts.maxconcurrent ~= nil and opts.maxconcurrent) or generalOpts.maxconcurrent,
 				priority = opts.priority or priority[pathPart] or 0,
 				in3d = opts.in3d,
 				gain = opts.gain,

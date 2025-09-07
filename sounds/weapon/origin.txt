@@ -65,3 +65,4 @@ gauss_fire2.wav - SoundMorph - Future Weapons 2
 energy_weapon1.wav - SmartSoundFX - Futuristic
 snipe_fire.wav - FLYSOUND - Mosin Nagant
 snipe_hit.wav - BluezoneCorp - Detonation - Explosion, Shapeforms Audio - Sci-Fi Weapons Cyberpunk Arsenal
+bomb_drop.wav - SmartSoundFX - Futuristic
