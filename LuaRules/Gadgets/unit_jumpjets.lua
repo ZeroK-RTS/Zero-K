@@ -466,6 +466,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local reloadSpeed = 1/reloadTime
 		local reloadAmount = (spGetUnitRulesParam(unitID, "jumpReload") or 0) + reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 
+		local walkFixTimer = env.unmoonwalkFunc and 15
 		local callTimer = env.jumpReloadProgress and 0
 		while reloadAmount < jumpCharges do
 			if not ContinueCoroutine(unitID, coroutineID) then
@@ -488,6 +489,13 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 				if callTimer >= 10 or reloadAmount >= jumpCharges then
 					CallAsUnitIfExists(unitID, env.jumpReloadProgress, reloadAmount)
 					callTimer = 0
+				end
+			end
+			if walkFixTimer then
+				walkFixTimer = walkFixTimer - 1
+				if walkFixTimer <= 0 then
+					CallAsUnitIfExists(unitID, env.unmoonwalkFunc)
+					walkFixTimer = false
 				end
 			end
 			Sleep()

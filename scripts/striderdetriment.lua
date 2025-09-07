@@ -254,13 +254,21 @@ local function StopWalk()
 	Turn(larm, x_axis, 0, math.rad(10))
 end
 
+function unmoonwalkFunc()
+	StartThread(StopWalk)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+end
+
 function script.StartMoving()
+	Spring.Echo("StartMoving", jumpActive, math.random())
 	if not jumpActive then
 		StartThread(Walk)
 	end
 end
 
 function script.StopMoving()
+	Spring.Echo("STOP", jumpActive, math.random())
 	StartThread(StopWalk)
 end
 
