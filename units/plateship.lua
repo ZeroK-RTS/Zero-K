@@ -62,7 +62,7 @@ return { plateship = {
   sightDistance                 = 273,
   waterline                     = 0,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy]],
+  yardMap                       = [[oouuuu oouuuu oouuuu oouuuu oouuuu oouuuu oouuuu oouuuu]],
 
   featureDefs            = {
 

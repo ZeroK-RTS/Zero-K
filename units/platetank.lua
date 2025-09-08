@@ -66,7 +66,7 @@ return { platetank = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = "oooooo oooooo oooooo oooooo yyyyyy yyyyyy yyyyyy yyyyyy",
+  yardMap                       = "oooooo oooooo oooooo oooooo uuuuuu uuuuuu uuuuuu uuuuuu",
 
   featureDefs                   = {
 

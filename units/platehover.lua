@@ -66,7 +66,7 @@ return { platehover = {
   useBuildingGroundDecal = true,
   waterline        = 1,
   workerTime       = Shared.FACTORY_BUILDPOWER,
-  yardMap          = [[oooooo oooooo yyyyyy yyyyyy yyyyyy yyyyyy]],
+  yardMap          = [[oooooo oooooo uuuuuu uuuuuu uuuuuu uuuuuu]],
 
   featureDefs      = {
 

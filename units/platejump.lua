@@ -68,7 +68,7 @@ return { platejump = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooooo ooooo ooooo yyyyy yyyyy yyyyy yyyyy]],
+  yardMap                       = [[ooooo ooooo ooooo uuuuu uuuuu uuuuu uuuuu]],
 
   featureDefs                   = {
 

@@ -67,7 +67,7 @@ return { factoryshield = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooooooo occccco occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy]],
+  yardMap                       = [[ooooooo oeeeeeo oeeeeeo oeeeeeo oeeeeeo oeeeeeo uuuuuuu uuuuuuu uuuuuuu]],
 
   featureDefs                   = {
 

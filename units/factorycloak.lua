@@ -77,7 +77,7 @@ return { factorycloak = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy",
+  yardMap                       = "ooooooo ooooooo ooooooo oeeeeeo oeeeeeo oeeeeeo oeeeeeo uuuuuuu uuuuuuu uuuuuuu",
 
   featureDefs                   = {
 
