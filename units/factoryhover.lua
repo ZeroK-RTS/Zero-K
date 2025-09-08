@@ -73,7 +73,7 @@ return { factoryhover = {
   useBuildingGroundDecal = true,
   waterline        = 1,
   workerTime       = Shared.FACTORY_BUILDPOWER,
-  yardMap          = [[xoooooox oooooooo oooooooo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox yyyyyyyy yyyyyyyy yyyyyyyy yyyyyyyy]],
+  yardMap          = [[xoooooox oooooooo oooooooo ooeeeeoo ooeeeeoo ooeeeeoo ooeeeeoo xoeeeeox uuuuuuuu uuuuuuuu uuuuuuuu uuuuuuuu]],
 
   featureDefs      = {
 
