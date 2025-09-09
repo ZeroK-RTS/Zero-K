@@ -99,7 +99,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, rawDamage, paralyzer
 				local maxTime = math.max(paraTime[weaponDefID], math.min(paraTime[weaponDefID], currentStunTime) + overstunTime[weaponDefID])
 				-- Solve the following for damage to limit damage by stun time:
 				--   stun time = ((damage + paralyzeDamage)/maxHealth - 1) * DECAY_SECONDS
-				damage = math.min(damage, (maxTime/DECAY_SECONDS + 1)*maxHealth - paralyzeDamage)
+				damage = math.max(0, math.min(damage, (maxTime/DECAY_SECONDS + 1)*maxHealth - paralyzeDamage))
 			end
 			--Spring.Echo("damage", damage, ((damage + paralyzeDamage)/maxHealth - 1) * DECAY_SECONDS, paralyzeDamage, WeaponDefs[weaponDefID].damages.paralyzeDamageTime, math.random())
 			return damage
