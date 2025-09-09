@@ -25,6 +25,7 @@ local spAddUnitDamage    = Spring.AddUnitDamage
 local GetUnitCost        = Spring.Utilities.GetUnitCost
 
 local DECAY_SECONDS = 40 -- how long it takes to decay 100% para to 0
+local paraTable = {paralyze = 0}
 
 local normalDamageMult = {}
 local wantedWeaponList = {}
@@ -102,12 +103,36 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, rawDamage, paralyzer
 				damage = math.max(0, math.min(damage, (maxTime/DECAY_SECONDS + 1)*maxHealth - paralyzeDamage))
 			end
 			--Spring.Echo("damage", damage, ((damage + paralyzeDamage)/maxHealth - 1) * DECAY_SECONDS, paralyzeDamage, WeaponDefs[weaponDefID].damages.paralyzeDamageTime, math.random())
+			if damage > 0 and damage + paralyzeDamage > maxHealth then
+				-- Engine seems to discard all paralysis damage that puts the target above the next-lowest multiple of maxHealth/DECAY_SECONDS.
+				-- So we're just going to give up on the engine and set the damage ourselves.
+				local quanta = maxHealth/DECAY_SECONDS
+				if damage > quanta then
+					paraTable.paralyze = paralyzeDamage + damage - quanta
+					Spring.SetUnitHealth(unitID, paraTable)
+					return quanta -- Returning 0 might do something weird to the unit behaviour hardcoded in the engine
+				end
+				paraTable.paralyze = paralyzeDamage + damage
+				Spring.SetUnitHealth(unitID, paraTable)
+				return 0
+			end
 			return damage
 		end
 	end
 	
 	return damage
 end
+
+--function gadget:GameFrame(f)
+--	local allUnits = Spring.GetAllUnits()
+--	for i = 1, #allUnits do
+--		local unitID = allUnits[i]
+--		local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
+--		if paralyzeDamage > 0 then
+--			Spring.Echo(unitID, paralyzeDamage, f)
+--		end
+--	end
+--end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID)
 	local mult = normalDamageMult[weaponDefID]
