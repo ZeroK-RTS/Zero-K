@@ -226,7 +226,7 @@ options = {
 		desc = "Save startboxes, splitting boxes between teams.",
 		advanced = true,
 		OnChange = function ()
-			Spring.Echo("Save startboxes, splitting boxes between teams")
+			Spring.Echo("Save startboxes, splitting boxes between teams. First half for one team, second half for the other.")
 			SaveStartboxes()
 		end,
 	},
