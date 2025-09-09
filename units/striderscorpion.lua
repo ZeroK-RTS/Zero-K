@@ -210,6 +210,7 @@ return { striderscorpion = {
       cylinderTargeting      = 0,
 
       customParams            = {
+        burst = Shared.BURST_UNRELIABLE,
         light_color = [[0.7 0.7 0.2]],
         light_radius = 320,
         gui_draw_range = 450,
@@ -217,7 +218,7 @@ return { striderscorpion = {
       },
 
       damage                  = {
-        default        = 1001,
+        default        = 1000.01,
       },
 
       duration                = 8,
