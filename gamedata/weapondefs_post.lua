@@ -173,7 +173,7 @@ for _, weaponDef in pairs(WeaponDefs) do
 			weaponDef.customparams.extra_paratime = weaponDef.paralyzetime
 		end
 		weaponDef.customparams.emp_paratime = weaponDef.paralyzetime
-		weaponDef.paralyzetime = weaponDef.paralyzetime + weaponDef.customparams.overstun_time
+		weaponDef.paralyzetime = weaponDef.paralyzetime + math.ceil(weaponDef.customparams.overstun_time)
 	end
 end
 

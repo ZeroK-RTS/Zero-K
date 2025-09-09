@@ -733,6 +733,10 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - Max stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time) .. 's\008'
 		end
+		if tonumber(cp.overstun_time) or 0 > 0 then
+			cells[#cells+1] = ' - Overstun time:'
+			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(tonumber(cp.overstun_time)) .. 's\008'
+		end
 
 		if cp.setunitsonfire then
 			cells[#cells+1] = ' - Afterburn:'
