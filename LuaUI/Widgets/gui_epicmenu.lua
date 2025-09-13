@@ -1611,7 +1611,13 @@ local function ResetWinHotkeys(path)
 		local action = GetActionName(path, option)
 		
 		UnassignKeyBind(action)
-		option.hotkey = keybind and GetReadableHotkey(keybind) or "None"
+		if keybind and type(keybind) == 'table' then
+			option.hotkey = GetReadableHotkey(keybind[1])
+		elseif keybind then
+			option.hotkey = GetReadableHotkey(keybind)
+		else
+			option.hotkey = "None"
+		end
 		Spring.Echo("keybind", option.name, keybind, option.hotkey)
 		if keybind and keybind ~= "None" then
 			AssignKeyBindAction(keybind, action)
