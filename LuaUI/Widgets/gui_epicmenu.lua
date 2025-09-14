@@ -600,22 +600,6 @@ local function WidgetEnabled(wname)
 	return order and (order > 0)
 end
 
-local function IsSinglePlayer()
-	local playerlist = Spring.GetPlayerList() or {}
-	local myPlayerID = Spring.GetMyPlayerID()
-	 for i = 1, #playerlist do
-		local playerID = playerlist[i]
-		if myPlayerID ~= playerID then
-			local _, active, spectator = Spring.GetPlayerInfo(playerID, false)
-			if active and not spectator then
-				return false
-			end
-		end
-	end
-	return true
-end
-WG.crude.IsSinglePlayer = IsSinglePlayer
-
 -- by default it allows if player is not spectating and there are no other players
 -- arg: true means trying to pause, false means trying to unpause
 local function AllowPauseOnMenuChange(pause)
@@ -637,7 +621,7 @@ local function AllowPauseOnMenuChange(pause)
 		end
 	end
 	
-	if IsSinglePlayer() == false then
+	if not Spring.Utilities.Gametype.IsSinglePlayer() then
 		return false
 	end
 	
@@ -654,7 +638,7 @@ local function CanSaveGame()
 		return IntToBool(Spring.GetModOptions().cansavegame)
 	end
 	
-	return IsSinglePlayer()
+	return Spring.Utilities.Gametype.IsSinglePlayer()
 end
 
 --------------------------------------------------------------------------------
