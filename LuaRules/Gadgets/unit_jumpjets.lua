@@ -222,6 +222,80 @@ local function ContinueCoroutine(unitID, coroutineID)
 	return coroutineID == uniqueCoroutineCounter[unitID]
 end
 
+local function FinishJump(unitID)
+	jumping[unitID] = nil
+	SetLeaveTracks(unitID, true)
+	Spring.SetUnitRulesParam(unitID, "is_jumping", 0)
+	mcDisable(unitID)
+end
+
+local function DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
+	spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+
+	Sleep()
+	if not Spring.ValidUnitID(unitID) then
+		return
+	end
+	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if morphedTo then
+		lastJumpPosition[morphedTo] = lastJumpPosition[unitID]
+		lastJumpPosition[unitID] = nil
+		uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
+		unitID = morphedTo
+		env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+	end
+
+	if not ContinueCoroutine(unitID, coroutineID) then
+		return
+	end
+
+	Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
+
+	local reloadSpeed = 1/reloadTime
+	local reloadAmount = (spGetUnitRulesParam(unitID, "jumpReload") or 0) + reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
+
+	local walkFixTimer = env.unmoonwalkFunc and 15
+	local callTimer = env.jumpReloadProgress and 0
+	while reloadAmount < jumpCharges do
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+		morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+		if morphedTo then
+			uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
+			unitID = morphedTo
+			env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
+		end
+		if not ContinueCoroutine(unitID, coroutineID) then
+			return
+		end
+
+		local stunnedOrInbuild = spGetUnitIsStunned(unitID)
+		local reloadFactor = (stunnedOrInbuild and 0) or GG.att_ReloadChange[unitID] or 1
+		reloadAmount = reloadAmount + reloadSpeed*reloadFactor
+		spSetUnitRulesParam(unitID, "jumpReload", reloadAmount, publicReload and sightTable or privateTable)
+		if callTimer then
+			callTimer = callTimer + 1
+			if callTimer >= 10 or reloadAmount >= jumpCharges then
+				CallAsUnitIfExists(unitID, env.jumpReloadProgress, reloadAmount)
+				callTimer = 0
+			end
+		end
+		if walkFixTimer then
+			walkFixTimer = walkFixTimer - 1
+			if walkFixTimer <= 0 then
+				CallAsUnitIfExists(unitID, env.unmoonwalkFunc)
+				walkFixTimer = false
+			end
+		end
+		Sleep()
+	end
+end
+
 local function Jump(unitID, goal, origCmdParams, mustJump)
 	goal[1] = math.max(OFF_MAP_LEEWAY, math.min(MAP_X - OFF_MAP_LEEWAY, goal[1]))
 	goal[3] = math.max(OFF_MAP_LEEWAY, math.min(MAP_Z - OFF_MAP_LEEWAY, goal[3]))
@@ -340,7 +414,15 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			while delay > 0 do
 				local stunned = Spring.GetUnitIsStunned(unitID)
 				if not stunned then
-					delay = delay - (GG.att_ReloadChange[unitID] or 1) -- Takes disarm and slow into account
+					delay = delay - (GG.att_ReloadChange[unitID] or 1) -- Disarm or slow
+				end
+				local attachedTransport = Spring.GetUnitTransporter(unitID)
+				if attachedTransport then
+					FinishJump(unitID)
+					-- Transport cancels jump
+					CallAsUnitIfExists(unitID, env.cancelJump)
+					DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
+					return
 				end
 				Sleep()
 				if not ContinueCoroutine(unitID, coroutineID) then
@@ -352,7 +434,6 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			if PLAY_SOUND and (not cannotJumpMidair) then	-- don't make sound if we jump with legs instead of jets
 				GG.PlayFogHiddenSound("Jump", UnitDefs[unitDefID].mass/10, start[1], start[2], start[3])
 			end
-
 			if rotateMidAir then
 				mcSetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
 				mcSetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)
@@ -391,7 +472,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			CallAsUnitIfExists(unitID, env.jumping, i * 100)
 		
 			if (not halfJump and i > 0.5) then
-				CallAsUnitIfExists(unitID,env.halfJump)
+				CallAsUnitIfExists(unitID, env.halfJump)
 				halfJump = true
 				
 				-- Do structure collision here to prevent early collision (perhaps a rejump onto the same structure?)
@@ -420,11 +501,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		end
 		local jumpEndTime = spGetGameSeconds()
 		lastJumpPosition[unitID] = origCmdParams
-		jumping[unitID] = nil
-		SetLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
-		Spring.SetUnitRulesParam(unitID, "is_jumping", 0)
-		mcDisable(unitID)
+		FinishJump(unitID)
 
 		if hitStructure then
 			-- Add unstick impulse to make the jumper bound on the structure.
@@ -442,70 +520,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			return
 		end
 
-		spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
-		spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
-
-		Sleep()
-		if not Spring.ValidUnitID(unitID) then
-			return
-		end
-		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-		if morphedTo then
-			lastJumpPosition[morphedTo] = lastJumpPosition[unitID]
-			lastJumpPosition[unitID] = nil
-			uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
-			unitID = morphedTo
-			env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
-			if not Spring.ValidUnitID(unitID) then
-				return
-			end
-		end
-
-		if not ContinueCoroutine(unitID, coroutineID) then
-			return
-		end
-
-		Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
-
-		local reloadSpeed = 1/reloadTime
-		local reloadAmount = (spGetUnitRulesParam(unitID, "jumpReload") or 0) + reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
-
-		local walkFixTimer = env.unmoonwalkFunc and 15
-		local callTimer = env.jumpReloadProgress and 0
-		while reloadAmount < jumpCharges do
-			if not Spring.ValidUnitID(unitID) then
-				return
-			end
-			morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-			if morphedTo then
-				uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
-				unitID = morphedTo
-				env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
-			end
-			if not ContinueCoroutine(unitID, coroutineID) then
-				return
-			end
-
-			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
-			local reloadFactor = (stunnedOrInbuild and 0) or GG.att_ReloadChange[unitID] or 1
-			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
-			spSetUnitRulesParam(unitID, "jumpReload", reloadAmount, publicReload and sightTable or privateTable)
-			if callTimer then
-				callTimer = callTimer + 1
-				if callTimer >= 10 or reloadAmount >= jumpCharges then
-					CallAsUnitIfExists(unitID, env.jumpReloadProgress, reloadAmount)
-					callTimer = 0
-				end
-			end
-			if walkFixTimer then
-				walkFixTimer = walkFixTimer - 1
-				if walkFixTimer <= 0 then
-					CallAsUnitIfExists(unitID, env.unmoonwalkFunc)
-					walkFixTimer = false
-				end
-			end
-			Sleep()
-		end
+		DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
 	end
 
 	StartScript(JumpLoop)

@@ -109,6 +109,7 @@ local JUMP_TURN_SPEED = math.pi/80 -- matches jump_delay_turn_scale in unitdef
 local isFiring = false
 local resetRestore = false
 local jumpActive = false
+local jumpWindup = false
 
 -- Effects
 local dirtfling = 1024
@@ -275,14 +276,16 @@ end
 
 -- Jumping
 local function PreJumpThread(turn, lineDist, flightDist, duration)
+	jumpWindup = true
 	script.StopMoving()
 	local speed = math.max(0.5, GG.att_MoveChange[unitID] or 1)
 	
 	DoRestore()
-	weaponBlocked = true
-	
-	local heading = -Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
-	Spring.MoveCtrl.SetRotation(unitID, 0, heading, 0) -- keep current heading
+	if jumpWindup then
+		weaponBlocked = true
+		local heading = -Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
+		Spring.MoveCtrl.SetRotation(unitID, 0, heading, 0) -- keep current heading
+	end
 	
 	local rotationRequired = -turn*GG.Script.headingToRad
 	local rotationFrames = math.ceil(math.abs(rotationRequired/JUMP_TURN_SPEED)/12/speed)*12
@@ -328,28 +331,33 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 		end
 	end
 	
-	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
-	
-	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
-		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
+	if jumpWindup then
+		Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
+		for i,p in pairs(leftLeg) do
+			Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
+			Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
+		end
+		Move(pelvis, y_axis, 0, 8 * speed)
 	end
-	Move(pelvis, y_axis, 0, 8 * speed)
+	
 	if usingCanister then
 		MoveCanister(usingCanister, 1, 0, 3 / speed)
 	end
-	Sleep(600 / speed)
 	
-	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
-		Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
+	if jumpWindup then
+		Sleep(600 / speed)
+		
+		for i,p in pairs(leftLeg) do
+			Turn(leftLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
+			Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
+		end
+		Move(torso, y_axis, 0, 1 * speed)
+		Move(pelvis, y_axis, -20, 16 * speed)
+		Move(pelvis, z_axis, -10, 8 * speed)
+		Turn(torso, x_axis, math.rad(20), math.rad(30) * speed)
+		
+		Turn(pelvis, z_axis, 0, math.rad(30) * speed)
 	end
-	Move(torso, y_axis, 0, 1 * speed)
-	Move(pelvis, y_axis, -20, 16 * speed)
-	Move(pelvis, z_axis, -10, 8 * speed)
-	Turn(torso, x_axis, math.rad(20), math.rad(30) * speed)
-	
-	Turn(pelvis, z_axis, 0, math.rad(30) * speed)
 	
 	if usingCanister then
 		Sleep(1367) -- Timing is the essence of comedy
@@ -363,6 +371,7 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 	end
 	--EmitSfx(lfoot, jetfeet)
 	--EmitSfx(rfoot, jetfeet)
+	jumpWindup = false
 end
 
 local function EndJumpThread()
@@ -440,6 +449,15 @@ end
 function endJump()
 	jumpActive = false
 	StartThread(EndJumpThread)
+end
+
+function cancelJump()
+	jumpWindup = false
+	jumpActive = false
+	weaponBlocked = false
+	Turn(torso, x_axis, 0, math.rad(10))
+	Move(pelvis, y_axis, 0, 5)
+	Move(pelvis, z_axis, 0, 3)
 end
 
 local function RestoreAfterDelay()
