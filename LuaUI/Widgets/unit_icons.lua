@@ -230,7 +230,7 @@ function WG.icons.SetUnitIcon(unitID, data)
 			unitHeights[unitID] = nil
 		else
 			--unitHeights[unitID] = Spring.Utilities.GetUnitHeight(ud) + iconoffset
-			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset
+			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset + (tonumber(ud.customParams.health_bar_height) or 0)
 		end
 	end
 
