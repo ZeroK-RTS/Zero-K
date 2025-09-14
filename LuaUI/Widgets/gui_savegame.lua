@@ -594,7 +594,7 @@ function widget:GameFrame(n)
 		return
 	end
 	if n % (options.autosaveFrequency.value * 1800) == 0 and n ~= 0 then
-		if Spring.GetSpectatingState() or Spring.IsReplay() or (not WG.crude.IsSinglePlayer()) then
+		if Spring.GetSpectatingState() or Spring.IsReplay() or (not Spring.Utilities.Gametype.IsSinglePlayer()) then
 			return
 		end
 		Spring.Log(widget:GetInfo().name, LOG.INFO, "Autosaving")
