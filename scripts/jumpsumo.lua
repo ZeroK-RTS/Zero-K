@@ -345,7 +345,6 @@ local function BeginJumpThread()
 	Turn(rf_shin, x_axis, math.rad(-70), math.rad(300))
 	Turn(lb_shin, x_axis, math.rad(70), math.rad(300))
 	Turn(rb_shin, x_axis, math.rad(70), math.rad(300))
-	
 end
 
 function beginJump()
@@ -368,9 +367,7 @@ function halfJump()
 	Turn(rf_pump, x_axis, 0, 1.4)
 	Turn(lb_pump, x_axis, 0, 1.4)
 	Turn(rb_pump, x_axis, 0, 1.4)
-
 end
-
 
 function endJump()
 	jumpActive = false
@@ -391,6 +388,12 @@ function endJump()
 	EmitSfx(lf_foot, dirtfling)
 	EmitSfx(rb_foot, dirtfling)
 	EmitSfx(lb_foot, dirtfling)
+end
+
+function cancelJump()
+	jumpActive = false
+	Turn(b_dome, x_axis, 0, 0.2)
+	Turn(b_dome, z_axis, 0, 0.2)
 end
 
 -- Other stuff
