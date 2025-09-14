@@ -338,13 +338,17 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		end
 		
 		if delay > 0 then
-			for i = delay, 1, -1 do
+			while delay > 0 do
+				local stunned = Spring.GetUnitIsStunned(unitID)
+				if not stunned then
+					delay = delay - (GG.att_ReloadChange[unitID] or 1) -- Takes disarm and slow into account
+				end
 				Sleep()
+				if not ContinueCoroutine(unitID, coroutineID) then
+					return
+				end
 			end
 			
-			if not ContinueCoroutine(unitID, coroutineID) then
-				return
-			end
 			CallAsUnitIfExists(unitID,env.beginJump)
 			if PLAY_SOUND and (not cannotJumpMidair) then	-- don't make sound if we jump with legs instead of jets
 				GG.PlayFogHiddenSound("Jump", UnitDefs[unitDefID].mass/10, start[1], start[2], start[3])
