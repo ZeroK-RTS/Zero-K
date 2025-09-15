@@ -21,9 +21,9 @@ return { jumpbomb = {
 
   customParams           = {
     canjump          = 1,
-    jump_range       = 400,
+    jump_range       = 10000,
     jump_height      = 120,
-    jump_speed       = 6,
+    jump_speed       = 20,
     jump_reload      = 10,
     jump_from_midair = 0,
     aimposoffset   = [[0 2 0]],
@@ -85,7 +85,7 @@ return { jumpbomb = {
   },
   weaponDefs = {
     jumpbomb_DEATH = {
-      areaOfEffect       = 180,
+      areaOfEffect       = 5300,
       craterBoost        = 4,
       craterMult         = 5,
       edgeEffectiveness  = 0.3,
