@@ -1207,7 +1207,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		if state and displayConfig then
 			SetImageTexture(displayConfig.texture[state])
 		elseif displayConfig then
-			SetImageTexture(displayConfig.texture, displayConfig.tex2)
+			SetImageTexture(displayConfig.texture or (command and command.texture), displayConfig.tex2)
 		elseif command then
 			SetImageTexture(command.texture)
 		else
