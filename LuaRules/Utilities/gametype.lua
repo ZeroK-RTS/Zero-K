@@ -39,15 +39,7 @@ do
 	teamCount = #actualAllyTeamList
 	
 	local playerlist = Spring.GetPlayerList() or {}
-	local players = 0
-	 for i = 1, #playerlist do
-		local playerID = playerlist[i]
-		local _, active, spectator = Spring.GetPlayerInfo(playerID)
-		if active and not spectator then
-			players = players + 1
-		end
-	end
-	isSinglePlayer = (players <= 1)
+	isSinglePlayer = (#playerlist <= 1)
 
 	if teamCount > 2 then
 		isFFA = true
