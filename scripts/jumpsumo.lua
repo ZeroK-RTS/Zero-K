@@ -456,7 +456,6 @@ end
 
 function unmoonwalkFunc()
 	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
-	Spring.Echo("speed", speed)
 	StartThread(Stopping)
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
