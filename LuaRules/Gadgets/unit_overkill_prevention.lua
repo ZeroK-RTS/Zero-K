@@ -168,6 +168,18 @@ local function GetRepairModifiedHealth(targetID, health, gameFrame, timeout)
 	return health
 end
 
+local function GetDecayFrameTarget(damage, health, timeout)
+	-- Disarm units will shoot when target decay frames are lower than this.
+	local maxTimer = DECAY_FRAMES + timeout
+	local timeDamage = damage * DECAY_FRAMES / health
+	if timeDamage > timeout then
+		-- I deal enough damage to max the timer from zero, so only shoot when decay is imminent
+		return DECAY_FRAMES
+	end
+	-- Shoot at units over the timer because the damage will not be wasted, and it provides leeway.
+	return DECAY_FRAMES + timeout - timeDamage
+end
+
 --[[
 	unitID, targetID - unit IDs. Self explainatory
 	fullDamage - regular damage of salvo
@@ -262,7 +274,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	end
 
 	local doomed = targetIdentified and adjHealth and (adjHealth < 0) and (fullDamage > 0) --for regular projectile
-	local disarmed = targetIdentified and disarmFrame and (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
+	local disarmed = targetIdentified and disarmFrame
+			and (disarmDamage > 0) --for disarming projectile
+			and (disarmFrame - gameFrame - timeout >= GetDecayFrameTarget(disarmDamage, adjHealth, disarmTimeout))
 
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
