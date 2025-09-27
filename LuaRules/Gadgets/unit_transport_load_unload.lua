@@ -21,6 +21,8 @@ end
 local airTransports = {}
 local lightTransport = {}
 local allowTransportCache = {}
+local transportLoadRangeElmo = 30
+local transportLoadRangeDistanceSquared = (transportLoadRangeElmo*2)^2
 
 for unitDefID, ud in pairs(UnitDefs) do
 	if (ud.isTransport and ud.canFly) then
@@ -60,7 +62,7 @@ function gadget:AllowUnitTransportLoad(transporterID, transporterUnitDefID, tran
 		return true
 	end
 	local x, y, z = Spring.GetUnitPosition(transporterID)
-	if DistSq(x, y, z, goalX, goalY, goalZ) > 256 then
+	if DistSq(x, y, z, goalX, goalY, goalZ) > transportLoadRangeDistanceSquared then
 		return false
 	end
 	if Spring.GetUnitAllyTeam(transporterID) ~= Spring.GetUnitAllyTeam(transporteeID) then
