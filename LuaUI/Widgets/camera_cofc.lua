@@ -228,7 +228,7 @@ Complete Overhead/Free Camera has six actions:
 	},
 
 	zoominfactor = { --should be lower than zoom-out-speed to help user aim tiny units
-		name = 'Zoom-in speed TEST',
+		name = 'Zoom-in speed',
 		type = 'number',
 		min = 0.1, max = 1, step = 0.05,
 		value = 0.5,
