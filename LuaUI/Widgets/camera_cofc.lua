@@ -62,7 +62,7 @@ options_order = {
 	-- 'zoomoutfromcursor',
 	'zoominfactor',
 	'zoomin',
-	'maxZoomIn',
+	'minzoomdistance',
 	'zoomoutfactor',
 	'zoomout',
 	'drifttocenter',
@@ -71,7 +71,6 @@ options_order = {
 	'tiltedzoom',
 	'tiltzoomfactor',
 	'zoomouttocenter',
-	--
 
 	'lblRotate',
 	'rotatefactor',
@@ -321,8 +320,8 @@ Complete Overhead/Free Camera has six actions:
 		path = zoomPath,
 	},
 
-	maxZoomIn = {
-		name = "Max zoom in",
+	minzoomdistance = {
+		name = "Minimum zoom distance",
 		type =  'number',
 		min = 10, max = 1500, step=10,
 		value = 10,
@@ -1589,7 +1588,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		local new_pz = cs.pz + zoz
 		-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 
-		local groundMinimum = GetMapBoundedGroundHeight(new_px, new_pz) + options.maxZoomIn.value
+		local groundMinimum = GetMapBoundedGroundHeight(new_px, new_pz) + options.minzoomdistance.value
 
 		if not options.freemode.value then
 			if new_py < groundMinimum then --zooming underground?
