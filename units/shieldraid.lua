@@ -68,6 +68,7 @@ return { shieldraid = {
     LASER = {
       name                    = [[Laser Blaster]],
       areaOfEffect            = 8,
+      cegTag                  = [[laser_cannon_trail]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
