@@ -324,7 +324,7 @@ Complete Overhead/Free Camera has six actions:
 		name = "Minimum zoom distance",
 		type =  'number',
 		min = 10, max = 1500, step=10,
-		value = 10,
+		value = 20,
 		path = zoomPath
 	},
 
