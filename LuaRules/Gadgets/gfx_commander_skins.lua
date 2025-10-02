@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date      = "May 2020",
 		license   = "GPL V2",
 		layer     = 0,
-		enabled   = Script.IsEngineMinVersion(105, 0, 500)
+		enabled   = false, --Script.IsEngineMinVersion(105, 0, 500)
 	}
 end
 
