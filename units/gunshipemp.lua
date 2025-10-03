@@ -56,7 +56,7 @@ return { gunshipemp = {
   weapons             = {
 
     {
-      def                = [[PARALYZER]],
+      def                = [[SLOWBEAM]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
@@ -107,6 +107,56 @@ return { gunshipemp = {
       turret                  = true,
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 800,
+    },
+    SLOWBEAM = {
+      name                    = [[Slowing Beam]],
+      areaOfEffect            = 8,
+      beamDecay               = 0.9,
+      beamTime                = 0.1,
+      beamttl                 = 50,
+      coreThickness           = 0,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      customparams = {
+        timeslow_onlyslow = 1,
+        timeslow_smartretarget = 0.33,
+        
+        light_camera_height = 1800,
+        light_color = [[0.6 0.22 0.8]],
+        light_radius = 200,
+      },
+
+      damage                  = {
+        default = 2000,
+      },
+
+      explosionGenerator      = [[custom:flashslow]],
+      fireStarter             = 30,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 180,
+      reloadtime              = 2.5,
+      rgbColor                = [[0.27 0 0.36]],
+      soundStart              = [[weapon/laser/pulse_laser2]],
+      soundStartVolume        = 15,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 11,
+      tolerance               = 18000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
     },
 
   },
