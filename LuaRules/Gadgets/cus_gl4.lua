@@ -723,16 +723,13 @@ local numfastTextureKeyCache = 0
 --- Hashes a table of textures to a unique integer
 -- @param textures a table of {bindposition:texture}
 -- @return a unique hash for binning
-local function GenFastTextureKey(objectDefID, objectDef, normaltexpath, texturetable) -- return integer
-	if objectDef.model == nil or objectDef.model.textures == nil then
+local function GenFastTextureKey(objectDefID, texturetable) -- return integer
+	if not texturetable then
 		return 0
 	end
 
-	local tex1 = string.lower(objectDef.model.textures.tex1 or "")
-	local tex2 = string.lower(objectDef.model.textures.tex2 or "")
-	normaltexpath = string.lower(normaltexpath or "")
-	local strkey = tex1 .. tex2 .. normaltexpath
-	for i=3, 20 do -- from 3 since 0-1-2 are tex12 and normals, and this guarantees order of the table
+	local strkey = ""
+	for i = 0, 20 do -- from 3 since 0-1-2 are tex12 and normals, and this guarantees order of the table
 		if texturetable[i] then
 			strkey = strkey .. texturetable[i]
 		end
@@ -832,6 +829,70 @@ local function WantFeaturePbr(featureDef)
 	return false
 end
 
+local function LoadUnitTextureSet(unitDefID, unitDef, texOverride1, texOverride2)
+	if not unitDef.model then
+		return
+	end
+	local lowercasetex1 = texOverride1 or string.lower(unitDef.model.textures.tex1 or "")
+	local lowercasetex2 = texOverride2 or string.lower(unitDef.model.textures.tex2 or "")
+
+	local normalTex = GetNormal(unitDef, nil)
+
+	objectDefToUniformBin[unitDefID] = unitDef.customParams and unitDef.customParams.uniformbin or "defaultunit"
+
+	local textureTable = {
+		--%102:0 = unitDef 102 s3o tex1
+		[0] = string.format("%%%s:%i", unitDefID, 0),
+		[1] = string.format("%%%s:%i", unitDefID, 1),
+		[2] = normalTex,
+		[3] = string.format("%%%s:%i", unitDefID, 0),
+		[4] = string.format("%%%s:%i", unitDefID, 1),
+		[5] = normalTex,
+		[6] = "$shadow",
+		[7] = "$reflection",
+		[8] = "$info:los",
+		[9] = GG.GetBrdfTexture(), --brdfLUT,
+		[10] = noisetex3dcube,
+	}
+	local wreckDef = unitDef.wreckName and FeatureDefNames[unitDef.wreckName:lower()]
+	local wreckTex1 = unitDef.customParams and unitDef.customParams.wrecktex1
+		or (wreckDef and wreckDef.model and string.format("%%-%s:%i", wreckDef.id, 0)) 
+		or false
+	if wreckTex1 then
+		if existingfilecache[wreckTex1] then -- this part is what ensures that these textures dont get loaded separately, but instead use ones provided by featuredefs
+			wreckTex1 = existingfilecache[wreckTex1]
+		end
+		textureTable[3] = wreckTex1
+	end
+	local wreckTex2 = unitDef.customParams and unitDef.customParams.wrecktex2
+		or (wreckDef and wreckDef.model and string.format("%%-%s:%i", wreckDef.id, 1)) 
+		or false
+	if wreckTex2 then
+		if existingfilecache[wreckTex2] then  -- this part is what ensures that these textures dont get loaded separately, but instead use ones provided by featuredefs
+			wreckTex2 = existingfilecache[wreckTex2]
+		end
+		textureTable[4] = wreckTex2
+	end
+	local wreckNormalTex = unitDef.customParams and unitDef.customParams.wrecktexn
+		or GetNormal(nil, wreckDef)
+	if wreckNormalTex then
+		if existingfilecache[wreckNormalTex] then
+			wreckNormalTex = existingfilecache[wreckNormalTex]
+		end
+		textureTable[5] = wreckNormalTex
+	end
+	
+	if unitDef.customParams and unitDef.customParams.useskinning then 
+		unitDefsUseSkinning[unitDefID] = true
+		objectDefToUniformBin[unitDefID]  = 'defaultunit' -- This will temporarily disable raptor shader
+	end
+	
+	local texKeyFast = GenFastTextureKey(unitDefID, textureTable)
+	if textureKeytoSet[texKeyFast] == nil then
+		textureKeytoSet[texKeyFast] = textureTable
+	end
+end
+
 local function initBinsAndTextures()
 	-- First cache all features that are referenced in a unitDef.corpse to ensure they go in uniformBins.wrecks
 	local wreckCache = {}
@@ -882,7 +943,7 @@ local function initBinsAndTextures()
 			local binOverride = featureDef.customParams and featureDef.customParams.uniformbin or objectDefToUniformBin[-1 * featureDefID]
 			objectDefToUniformBin[-1 * featureDefID] = binOverride
 			--Spring.Echo("Assigned feature", featureDef.name, "to uniformBin", binOverride)
-			local texKeyFast = GenFastTextureKey(-1 * featureDefID, featureDef, normalTex, textureTable)
+			local texKeyFast = GenFastTextureKey(-1 * featureDefID, textureTable)
 			if textureKeytoSet[texKeyFast] == nil then
 				textureKeytoSet[texKeyFast] = textureTable
 			end
@@ -891,70 +952,8 @@ local function initBinsAndTextures()
 
 	Spring.Echo("[CUS GL4] Init Unit bins")
 	for unitDefID, unitDef in pairs(UnitDefs) do
-		if unitDef.model then
-			local lowercasetex1 = string.lower(unitDef.model.textures.tex1 or "")
-			local lowercasetex2 = string.lower(unitDef.model.textures.tex2 or "")
-
-			local normalTex = GetNormal(unitDef, nil)
-
-			objectDefToUniformBin[unitDefID] = unitDef.customParams and unitDef.customParams.uniformbin or "defaultunit"
-
-			local textureTable = {
-				--%102:0 = unitDef 102 s3o tex1
-				[0] = string.format("%%%s:%i", unitDefID, 0),
-				[1] = string.format("%%%s:%i", unitDefID, 1),
-				[2] = normalTex,
-				[3] = string.format("%%%s:%i", unitDefID, 0),
-				[4] = string.format("%%%s:%i", unitDefID, 1),
-				[5] = normalTex,
-				[6] = "$shadow",
-				[7] = "$reflection",
-				[8] = "$info:los",
-				[9] = GG.GetBrdfTexture(), --brdfLUT,
-				[10] = noisetex3dcube,
-			}
-			local wreckDef = unitDef.wreckName and FeatureDefNames[unitDef.wreckName:lower()]
-			local wreckTex1 = unitDef.customParams and unitDef.customParams.wrecktex1
-				or (wreckDef and wreckDef.model and string.format("%%-%s:%i", wreckDef.id, 0)) 
-				or false
-			if wreckTex1 then
-				if existingfilecache[wreckTex1] then -- this part is what ensures that these textures dont get loaded separately, but instead use ones provided by featuredefs
-					wreckTex1 = existingfilecache[wreckTex1]
-				end
-				textureTable[3] = wreckTex1
-			end
-			local wreckTex2 = unitDef.customParams and unitDef.customParams.wrecktex2
-				or (wreckDef and wreckDef.model and string.format("%%-%s:%i", wreckDef.id, 1)) 
-				or false
-			if wreckTex2 then
-				if existingfilecache[wreckTex2] then  -- this part is what ensures that these textures dont get loaded separately, but instead use ones provided by featuredefs
-					wreckTex2 = existingfilecache[wreckTex2]
-				end
-				textureTable[4] = wreckTex2
-			end
-			local wreckNormalTex = unitDef.customParams and unitDef.customParams.wrecktexn
-				or GetNormal(nil, wreckDef)
-			if wreckNormalTex then
-				if existingfilecache[wreckNormalTex] then
-					wreckNormalTex = existingfilecache[wreckNormalTex]
-				end
-				textureTable[5] = wreckNormalTex
-			end
-			
-			if unitDef.customParams and unitDef.customParams.useskinning then 
-				unitDefsUseSkinning[unitDefID] = true
-				objectDefToUniformBin[unitDefID]  = 'defaultunit' -- This will temporarily disable raptor shader
-			end
-			
-			local texKeyFast = GenFastTextureKey(unitDefID, unitDef, normalTex, textureTable)
-			if textureKeytoSet[texKeyFast] == nil then
-				textureKeytoSet[texKeyFast] = textureTable
-			end
-		end
+		LoadUnitTextureSet(unitDefID, unitDef)
 	end
-
-
-
 end
 
 local preloadedTextures = false
