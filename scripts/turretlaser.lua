@@ -43,8 +43,8 @@ end
 function script.Create()
 	local ud = UnitDefs[unitDefID]
 	local midTable = ud.model
-	Spin (body, y_axis, 1, 1)
-	Move(body, y_axis, 5)
+	--Spin (body, y_axis, 1, 1)
+	--Move(body, y_axis, 5)
 	
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 22, midTable.midz}
@@ -56,6 +56,8 @@ function script.Create()
 	if stunned_or_inbuild then
 		StartThread(Open)
 	end
+	--Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 0.55)
+	--GG.UpdateUnitAttributes(unitID)
 end
 
 local function StunThread()
@@ -99,6 +101,14 @@ function script.AimWeapon(num, heading, pitch)
 	WaitForTurn(barrel, x_axis)
 	StartThread (RestoreAfterDelay)
 	return true
+end
+
+
+local lastFrame = 0
+function script.BlockShot(num)
+	Spring.Echo(Spring.GetGameFrame() - lastFrame, math.random())
+	lastFrame = Spring.GetGameFrame()
+	return false
 end
 
 function script.AimFromWeapon()
