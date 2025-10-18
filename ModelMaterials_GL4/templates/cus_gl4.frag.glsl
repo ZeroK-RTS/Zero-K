@@ -1357,7 +1357,7 @@ void main(void){
 			// This seems to be a silly way of forcing no bloom on trees, as only trees HASALPHASHADOWS
 			fragData[GBUFFER_EMITTEX_IDX] = vec4(vec3(albedoColor * emissiveness * 2.0) + outSpecularColor * 0.3, alphaBin);
 		#endif
-		fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 0.0, 0.0, alphaBin);
+		fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 255.0, 0.0, alphaBin);
 	#endif
 }
 #else //shadow pass
