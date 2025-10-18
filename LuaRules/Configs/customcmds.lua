@@ -99,7 +99,8 @@ local commands = {
 	FIELD_FAC_SELECT = 38693,
 	FIELD_FAC_UNIT_TYPE = 38694,
 	FIELD_FAC_QUEUELESS = 38695,
-
+	IMMEDIATETAKEOFF = 39384, -- Airpad abort.
+	
 	-- terraform
 	RAMP = 39734,
 	LEVEL = 39736,
