@@ -808,9 +808,30 @@ end
 -- The problem here being that tex1 and tex2 dont participate in texture key hashing.
 -- so e.g. raptors may have been drawn with incorrect textures all along, due to them being keyed 
 
-
-
 local knowntrees = VFS.Include("modelmaterials_gl4/known_feature_trees.lua")
+local function IsTree(featureDef)
+	if featureDef.customParams and featureDef.customParams.treeshader == 'yes' then
+		return true
+	end
+	local name = featureDef.name
+	if knowntrees[name] then
+		return true
+	end
+	return (name:find("tree", nil, true) or name:find("pine", nil, true)) and not name:find("stree", nil, true) -- sTREEtlight
+end
+
+local knownPbrFeatures = VFS.Include("modelmaterials_gl4/known_pbr_features.lua")
+local function WantFeaturePbr(featureDef)
+	if featureDef.customParams and featureDef.customParams.cuspbr then
+		return true
+	end
+	local name = featureDef.name
+	if knownPbrFeatures[name] then
+		return true
+	end
+	return false
+end
+
 local function initBinsAndTextures()
 	-- First cache all features that are referenced in a unitDef.corpse to ensure they go in uniformBins.wrecks
 	local wreckCache = {}
@@ -849,14 +870,13 @@ local function initBinsAndTextures()
 			
 			objectDefToUniformBin[-1 * featureDefID] = 'feature'
 
-			if (featureDef.customParams and featureDef.customParams.treeshader == 'yes')
-				or knowntrees[featureDef.name] then
+			if IsTree(featureDef) then
 				objectDefToUniformBin[-1 * featureDefID] = 'tree'
 				featuresDefsWithAlpha[-1 * featureDefID] = "yes"
-			elseif wreckCache[featureDefID] 
-				or featureDef.name:find("_x", nil, true) or featureDef.name:find("_dead", nil, true) or featureDef.name:find("_heap", nil, true) then
+			elseif wreckCache[featureDefID] or featureDef.name:find("_x", nil, true)
+					or featureDef.name:find("_dead", nil, true) or featureDef.name:find("_heap", nil, true) then
 				objectDefToUniformBin[-1 * featureDefID] = 'wreck'
-			elseif featureDef.name:find("pilha_crystal", nil, true) or (featureDef.customParams and featureDef.customParams.cuspbr) then
+			elseif WantFeaturePbr(featureDef) then
 				objectDefToUniformBin[-1 * featureDefID] = 'featurepbr'
 			end
 			local binOverride = featureDef.customParams and featureDef.customParams.uniformbin or objectDefToUniformBin[-1 * featureDefID]
