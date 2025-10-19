@@ -383,6 +383,19 @@ local function SetFixedStatePost(drawPass, shaderID)
 	end
 end
 
+local function UpdateBuildProgress(unitID, buildProgress, forceRetain)
+	local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
+	if health and build ~= buildProgress then
+		uniformCache[1] = ((build < 1) and build) or -1
+		gl.SetUnitBufferUniforms(unitID, uniformCache, 0) -- buildprogress (0.x)
+		if build < 1 or forceRetain then
+			buildProgresses[unitID] = build
+		else
+			buildProgresses[unitID] = nil
+		end
+	end
+end
+
 --------------------------------------------------------------------
 -- Helper functions that are also exposed to GG for Unsynced Luarules
 --------------------------------------------------------------------
@@ -1837,16 +1850,7 @@ function gadget:GameFrame(n)
 		ReloadCUSGL4(nil, nil, nil, Spring.GetMyPlayerID())
 	end
 	for unitID, buildProgress in pairs(buildProgresses) do
-		local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
-		if health and build ~= buildProgress then
-			uniformCache[1] = ((build < 1) and build) or -1
-			gl.SetUnitBufferUniforms(unitID, uniformCache, 0) -- buildprogress (0.x)
-			if build < 1 then
-				buildProgresses[unitID] = build
-			else
-				buildProgresses[unitID] = nil
-			end
-		end
+		UpdateBuildProgress(unitID, buildProgress)
 	end
 end
 
@@ -1971,6 +1975,11 @@ end
 function gadget:UnitFinished(unitID)
 	gl.SetUnitBufferUniforms(unitID, {-1}, 0) -- set build progress to built
 	buildProgresses[unitID] = nil
+	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
+end
+
+function gadget:UnitReverseBuilt(unitID)
+	UpdateBuildProgress(unitID, false, true)
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
 
