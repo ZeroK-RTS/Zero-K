@@ -388,7 +388,7 @@ end
 --------------------------------------------------------------------
 
 local function GetShader(drawPass, objectDefID)
-	if objectDefID == nil then
+	if not objectDefID then
 		return false
 	end
 	if objectDefID >= 0 then
@@ -408,7 +408,7 @@ end
 
 local function GetShaderName(drawPass, objectDefID)
 	-- this function does 2 table lookups, could get away with just one.
-	if objectDefID == nil then
+	if not objectDefID then
 		return false
 	end
 	if objectDefID >= 0 then
@@ -450,13 +450,6 @@ local function SetShaderUniforms(drawPass, shaderID, uniformBinID)
 	end
 end
 
-local function SetUnitTexture(unitID, tex1, tex2)
-	RemoveObject(unitID, "override_texture")
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
-end
-
-
 ------------------------- SHADERS                   ----------------------
 ------------------------- LOADING OLD CUS MATERIALS ----------------------
 
@@ -495,7 +488,7 @@ local function appendShaderDefinitionsToTemplate(template, alldefinitions)
 	local copytemplate = deepcopy(template)
 	for i, singleShaderDefs in ipairs({"shaderDefinitions", "deferredDefinitions", "shadowDefinitions", "reflectionDefinitions"}) do
 		if alldefinitions[singleShaderDefs] then
-			if copytemplate[singleShaderDefs] == nil then
+			if not copytemplate[singleShaderDefs] then
 				copytemplate[singleShaderDefs] = {}
 			end
 			for j, defline in ipairs(alldefinitions[singleShaderDefs]) do
@@ -623,7 +616,7 @@ end
 
 local function CompileLuaShader(shader, definitions, plugIns, addName, recompilation)
 	--Spring.Echo(" CompileLuaShader", shader, definitions, plugIns, addName)
-	if definitions == nil or definitions == {} then
+	if not definitions or definitions == {} then
 		Spring.Echo(addName, "nul definitions", definitions)
 	end
 	definitions = definitions or {}
@@ -772,16 +765,16 @@ local function GetNormal(unitDef, featureDef)
 	if unitDef and unitDef.model then
 		local tex1 = unittextures .. unitDef.model.textures.tex1
 		local tex2 = unittextures .. unitDef.model.textures.tex2
-		if existingfilecache[tex1] == nil and FileExists(tex1) then
+		if not existingfilecache[tex1] and FileExists(tex1) then
 			existingfilecache[tex1] = string.format("%%%i:0", unitDef.id)
 		end
-		if existingfilecache[tex2] == nil and FileExists(tex2) then
+		if not existingfilecache[tex2] and FileExists(tex2) then
 			existingfilecache[tex2] = string.format("%%%i:1", unitDef.id)
 		end
 		
 		if unitDef.customParams and unitDef.customParams.normaltex then
 			local normaltex = unitDef.customParams.normaltex
-			if existingfilecache[normaltex] == nil and FileExists(normaltex) then
+			if not existingfilecache[normaltex] and FileExists(normaltex) then
 				existingfilecache[normaltex] = normaltex
 			end
 			return normaltex
@@ -793,16 +786,16 @@ local function GetNormal(unitDef, featureDef)
 		local tex2 = unittextures .. (featureDef.model.textures.tex2 or "DOESNTEXIST.PNG")
 		
 		-- cache them:
-		if existingfilecache[tex1] == nil and FileExists(tex1) then
+		if not existingfilecache[tex1] and FileExists(tex1) then
 			existingfilecache[tex1] = string.format("%%%i:0", -1*featureDef.id)
 		end
-		if existingfilecache[tex2] == nil and FileExists(tex2) then
+		if not existingfilecache[tex2] and FileExists(tex2) then
 			existingfilecache[tex2] = string.format("%%%i:1", -1*featureDef.id)
 		end
 
 		if featureDef.customParams and featureDef.customParams.normaltex then
 			local normaltex = featureDef.customParams.normaltex
-			if existingfilecache[normaltex] == nil and FileExists(normaltex) then
+			if not existingfilecache[normaltex] and FileExists(normaltex) then
 				existingfilecache[normaltex] = normaltex
 			end
 			return normaltex
@@ -898,7 +891,7 @@ local function LoadUnitTextureSet(unitDefID, unitDef, unitID, texOverride1, texO
 	end
 	
 	local texKeyFast = GenFastTextureKey(unitDefID, textureTable, (texOverride1 or texOverride2) and unitID)
-	if textureKeytoSet[texKeyFast] == nil then
+	if not textureKeytoSet[texKeyFast] then
 		textureKeytoSet[texKeyFast] = textureTable
 	end
 end
@@ -956,7 +949,7 @@ local function initBinsAndTextures()
 			objectDefToUniformBin[-1 * featureDefID] = binOverride
 			--Spring.Echo("Assigned feature", featureDef.name, "to uniformBin", binOverride)
 			local texKeyFast = GenFastTextureKey(-1 * featureDefID, textureTable)
-			if textureKeytoSet[texKeyFast] == nil then
+			if not textureKeytoSet[texKeyFast] then
 				textureKeytoSet[texKeyFast] = textureTable
 			end
 		end
@@ -983,7 +976,7 @@ end
 --------------------------------------------------------------------
 
 local function GetObjectDefName(objectID)
-	if objectID == nil then
+	if not objectID then
 		return "Failed to GetObjectDefName(objectID): " .. tostring(objectID)
 	elseif objectID >= 0 then
 		if Spring.ValidUnitID(objectID) then
@@ -1018,15 +1011,15 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	shader = shader or GetShaderName(flag, objectDefID)
 	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
 	
-	if objectDefID == nil then
+	if not objectDefID then
 		Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
 	end
 	uniformBinID = uniformBinID or GetUniformBinID(objectDefID, "AssignObjectToBin")
 	--Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID)
 	
 	--Spring.Debug.TraceFullEcho()
-	if (texKey == nil or uniformBinID == nil) then
-		if badassigns[objectID] == nil then
+	if not texKey or not uniformBinID then
+		if not badassigns[objectID] then
 			Spring.Echo("[CUS GL4]Failure to assign to ", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
 			Spring.Echo("REPORT THIS TO GAME DEV: bad object:", GetObjectDefName(objectID))
 			badassigns[objectID] = true
@@ -1035,21 +1028,21 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	end
 
 	local unitDrawBinsFlag = unitDrawBins[flag]
-	if unitDrawBinsFlag[shader] == nil then
+	if not unitDrawBinsFlag[shader] then
 		unitDrawBinsFlag[shader] = {}
 	end
 	local unitDrawBinsFlagShader = unitDrawBinsFlag[shader]
-	if unitDrawBinsFlagShader[uniformBinID] == nil then
+	if not unitDrawBinsFlagShader[uniformBinID] then
 		unitDrawBinsFlagShader[uniformBinID] = {}
 	end
 
 	local unitDrawBinsFlagShaderUniforms = unitDrawBinsFlagShader[uniformBinID]
-	if unitDrawBinsFlagShaderUniforms[texKey] == nil then
+	if not unitDrawBinsFlagShaderUniforms[texKey] then
 		local t0 = Spring.GetTimerMicros()
 		local mybinVAO = gl.GetVAO()
 		local mybinIBO = gl.GetVBO(GL.ARRAY_BUFFER, true)
 
-		if (mybinIBO == nil) or (mybinVAO == nil) then
+		if (not mybinIBO) or (not mybinVAO) then
 			Spring.Echo("Failed to allocate IBO or VAO for CUS GL4", mybinIBO, mybinVAO)
 			--Spring.Debug.TraceFullEcho()
 			gadgetHandler:RemoveGadget()
@@ -1079,10 +1072,10 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 		-- they could share up to the shader level, but I dont know why im not using that
 		if flag == 1 then
 			deferredrawBin = unitDrawBins[0]
-			if deferredrawBin[shader] == nil then
+			if not deferredrawBin[shader] then
 				deferredrawBin[shader] = {}
 			end
-			if deferredrawBin[shader][uniformBinID] == nil then
+			if not deferredrawBin[shader][uniformBinID] then
 				deferredrawBin[shader][uniformBinID] = unitDrawBinsFlagShader[uniformBinID]
 			end
 		end
@@ -1115,7 +1108,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 		local newObjectsArray = {}
 		local newObjectsIndex = {}
 
-		if (mybinIBO == nil) or (mybinVAO == nil) then
+		if (not mybinIBO) or (not mybinVAO) then
 			Spring.Echo("Failed to allocate IBO or VAO for CUS GL4", mybinIBO, mybinVAO)
 			--Spring.Debug.TraceFullEcho()
 			gadgetHandler:RemoveGadget()
@@ -1206,7 +1199,7 @@ local function AddObject(objectID, drawFlag, reason)
 		objectDefID = -1 *  Spring.GetFeatureDefID(-1 * objectID)
 		objectIDtoDefID[objectID] = objectDefID
 	end
-	if objectDefID == nil then
+	if not objectDefID then
 		return -- This bail is needed so that we dont add/update units that dont actually exist any more, when cached from the catchup phase
 	end
 
@@ -1234,7 +1227,7 @@ local function AddObject(objectID, drawFlag, reason)
 			--gl.SetUnitBufferUniforms(objectID, uniformCache, 11) -- height is 11 (2.w)
 		end
 	else
-		if Spring.ValidFeatureID(-1 * objectID) == false then
+		if not Spring.ValidFeatureID(-1 * objectID) then
 			Spring.Echo("Invalid feature for drawmask", objectID, objectDefID)
 		end
 		Spring.SetFeatureEngineDrawMask(-1 * objectID, 255 - overrideDrawFlag) -- ~overrideDrawFlag & 255
@@ -1259,7 +1252,7 @@ local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, 
 
 				--if flag == 0 then Spring.Echo("RemoveObjectFromBin", objectID, objectDefID, texKey, shader, flag, objectIndex) end
 				--if debugmode then Spring.Echo("RemoveObjectFromBin really", objectID, objectDefID, texKey, shader, flag, objectIndex) end
-				if objectIndex == nil then
+				if not objectIndex then
 					return
 				end
 				local numobjects = unitDrawBinsFlagShaderTexKey.numobjects
@@ -1362,10 +1355,10 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 	if debugmode then Spring.Echo("RemoveObject", objectID, reason) end
 
 	local objectDefID = objectIDtoDefID[objectID]
-	if objectDefID == nil then
+	if not objectDefID then
 		return
 	end
-	--if objectID == nil then Spring.Debug.TraceFullEcho() end
+	--if not objectID then Spring.Debug.TraceFullEcho() end
 
 	--if debugmode then Spring.Debug.TraceEcho("RemoveObject", objectID) end
 
@@ -1417,7 +1410,7 @@ local function ProcessUnits(units, drawFlags, reason)
 		end
 		
 		if drawFlag % 4 > 1 then -- check if its at least in opaque or alpha pass
-			if unitsInViewport[unitID] == nil then
+			if not unitsInViewport[unitID] then
 				-- CALL the UnitViewportAPI
 				numUnitsInViewport = numUnitsInViewport + 1
 			end
@@ -1433,7 +1426,7 @@ local function ProcessUnits(units, drawFlags, reason)
 		if (drawFlag == 0) or (drawFlag >= 128) then
 			RemoveObject(unitID, reason)
 		else
-			if cusUnitIDtoDrawFlag[unitID] == nil then --object was not seen
+			if not cusUnitIDtoDrawFlag[unitID] then --object was not seen
 				if Spring.ValidUnitID(unitID) and (not spGetUnitIsCloaked(unitID)) then
 					uniformCache[1] = 0
 					gl.SetUnitBufferUniforms(unitID, uniformCache, 12) -- cloak
@@ -1453,7 +1446,7 @@ local function ProcessFeatures(features, drawFlags, reason)
 		local drawFlag = drawFlags[i]
 
 		if drawFlag % 4 > 1 then
-			if featuresInViewport[featureID] == nil then
+			if not featuresInViewport[featureID] then
 				-- CALL the UnitViewportAPI
 				numFeaturesInViewport = numFeaturesInViewport + 1
 			end
@@ -1476,7 +1469,7 @@ local function ProcessFeatures(features, drawFlags, reason)
 			end
 			if (drawFlag == 0) or (drawFlag >= 128) then
 				RemoveObject(-1 * featureID, reason)
-			elseif cusFeatureIDtoDrawFlag[featureID] == nil then --object was not seen
+			elseif not cusFeatureIDtoDrawFlag[featureID] then --object was not seen
 				AddObject(-1 * featureID, drawFlag, reason)
 			else --if cusFeatureIDtoDrawFlag[featureID] ~= drawFlag then --flags have changed
 				UpdateObject(-1 * featureID, drawFlag, reason)
@@ -1619,7 +1612,7 @@ local function initGL4()
 	modelsVertexVBO = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	modelsIndexVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false)
 
-	if modelsVertexVBO == nil or modelsIndexVBO == nil then
+	if not modelsVertexVBO or not modelsIndexVBO then
 		Spring.Echo("CUS GL4 failed to initialize VBO, exiting")
 		gadgetHandler:RemoveGadget()
 		return
@@ -1692,7 +1685,7 @@ local function DumpCUSGL4(optName, line, words, playerID)
 	end
 	Spring.Echo("[CustomUnitShadersGL4] Dumping unit bins:", debugmode)
 
-	if unitDrawBins == nil then
+	if not unitDrawBins then
 		return
 	end
 	for drawflag, bin in pairs(unitDrawBins) do
@@ -1742,7 +1735,7 @@ local function MarkBinCUSGL4(optName, line, words, playerID)
 	end
 	Spring.Echo("[CustomUnitShadersGL4] Marking Bins", optName, line, words, playerID)
 	local passnum = tonumber(line)
-	if passnum == nil then
+	if not passnum then
 		return
 	end
 
@@ -1821,6 +1814,16 @@ local function FreeTextures() -- pre we are using 2200mb
 		end
 		
 	end
+end
+
+--------------------------------------------------------------------
+-- More Unsynced Luarules API
+--------------------------------------------------------------------
+
+local function SetUnitTexture(unitID, tex1, tex2)
+	RemoveObject(unitID, "override_texture")
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
 end
 
 --------------------------------------------------------------------
@@ -2031,7 +2034,7 @@ end
 local firstDraw = false
 function gadget:DrawWorldPreUnit()
 --function gadget:DrawGenesis() -- nope, shadow flags still a frame late https://github.com/beyond-all-reason/spring/issues/264
-	if unitDrawBins == nil then
+	if not unitDrawBins then
 		return
 	end
 
@@ -2177,10 +2180,10 @@ local function drawPassBitsToNumber(opaquePass, deferredPass, drawReflection, dr
 end
 
 function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
-	if unitDrawBins == nil then
+	if not unitDrawBins then
 		return
 	end
-	if preloadedTextures == false then
+	if not preloadedTextures then
 		PreloadTextures()
 	end
 	local drawPass = drawPassBitsToNumber(true, deferredPass, drawReflection, drawRefraction)
@@ -2188,7 +2191,7 @@ function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
 end
 
 function gadget:DrawShadowUnitsLua()
-	if unitDrawBins == nil then
+	if not unitDrawBins then
 		return
 	end
 	local batches, units = ExecuteDrawPass(16)
