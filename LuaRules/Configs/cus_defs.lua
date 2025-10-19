@@ -13,7 +13,7 @@ local OPTION_TREEWIND           = 2048  -- Makes trees sway gently in the breeze
 local OPTION_PBROVERRIDE        = 4096  -- Forces Recoil default tex2 (non PBR) behaviour
 
 local defaultBitShaderOptions = OPTION_SHADOWMAPPING + OPTION_MODELSFOG
-local defaultUnitBitShaderOptions = defaultBitShaderOptions + OPTION_HEALTH_TEXTURING + OPTION_HEALTH_DISPLACE + OPTION_VERTEX_AO
+local defaultUnitBitShaderOptions = defaultBitShaderOptions + OPTION_HEALTH_TEXTURING + OPTION_HEALTH_DISPLACE + OPTION_VERTEX_AO + OPTION_NORMALMAPPING
 
 local uniformBins = {
 	-- Special overriding uniformBins go here, i.e. so that you can set different uniforms:
@@ -46,13 +46,13 @@ local uniformBins = {
 		-- by default gadget will assign these options to every unit texture set bin
 		bitOptions = defaultUnitBitShaderOptions,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1,
+		brightnessFactor = 1.15,
 	},
 	defaultunit_transparent = {
 		-- by default gadget will assign these options to every unit texture set bin
 		bitOptions = defaultUnitBitShaderOptions,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1,
+		brightnessFactor = 1.15,
 	},
 	-- These are the default featureDef uniformBins, you probably don't want to mess with them unless you really know what you're doing
 	feature = {

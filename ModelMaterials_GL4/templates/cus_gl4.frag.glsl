@@ -1165,7 +1165,7 @@ void main(void){
 			// progressLevels are a vec4 of values that progressively increase from 0 to 1,
 			// with a power curve, each next faster than the other, meaning .x is the bottom level, .w is the top level
 			vec4 progressLevels = vec4(buildProgress);
-			progressLevels = pow(progressLevels, vec4(3.0, 1.5, 0.7, 0.35));
+			progressLevels = pow(progressLevels, vec4(3.0, 1.5, 0.7, 0.35) * 2.0);
 			// Add perlin and ensure that perlin doesnt cause inaccuracy at the top of the model:
 			progressLevels = mix(progressLevels, vec4(myPerlin.g + myPerlin.b*sin(simFrame * 0.042342)), 0.05 * smoothstep(0.00, 0.05, 1.0 - buildProgress));
 			
@@ -1197,7 +1197,7 @@ void main(void){
 			// The entire model will always get the 8 elmo buildgrid:
 			//outColor.rgb = mix(outColor.rgb, vec3(1.0, 0.0, 1.0), buildGridFactor);
 			//outColor.rgb = vec3(buildGridFactor); 
-			vec3 pulseTeamColor = mix(teamCol.rgb, teamCol.rgb * 1.78, sintimefast );
+			vec3 pulseTeamColor = mix(teamCol.rgb, teamCol.rgb * 1.35, sintimefast );
 
 			// Second to bottom level, ensure that we dont emit light
 			if (height > progressLevels.x){
@@ -1228,13 +1228,13 @@ void main(void){
 				//outColor.rgb = vec3(heightProgress);
 				#if (RENDERING_MODE == 0)
 					// only modulate alpha on the forward pass
-					texColor2.a *= max(0.4, max(clamp(line,buildProgress,1), (1.0 - heightProgress)));
+					texColor2.a *= max(0.0, max(clamp(line * (0.5*buildProgress + 0.5), buildProgress, 1), buildProgress*(1.0 - heightProgress) * (1.0 - heightProgress)));
 				#endif
 			}
 
 			
 			// Always display a grid when building, but fade it out on the last 5% of buildProgress
-			float last5percent = smoothstep(0.0, 0.05, 1.01 - buildProgress);
+			float last5percent = smoothstep(0.0, 0.08, 1.02 - buildProgress);
 			outColor.rgb = mix(outColor.rgb, pulseTeamColor , line * last5percent);
 
 			// Always show level lines
@@ -1298,7 +1298,7 @@ void main(void){
 				cloakedness = 1.0 - clamp((timeInfo.x + cloakTime) / 15.0, 0.0, 1.0);
 				//outColor.r = 1.0;
 			}
-			float sintime =	fract(simFrame * 0.02); // pulses every 3 seconds
+			float sintime = fract(simFrame * 0.02); // pulses every 3 seconds
 			myPerlin.g = myPerlin.g * 0.5 + 0.5;
 			texColor2.a = 1.0 - clamp(cloakedness*0.49, 0.0, 0.49);
 			float perlinline1 = clamp(1.0 - 20* abs(myPerlin.g - fract(simFrame * 0.005)), 0.0, 1.0);
@@ -1311,7 +1311,7 @@ void main(void){
 
 			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1);
 			highLightOpacity = highLightOpacity * highLightOpacity;
-			outColor.rgb = mix(outColor.rgb, teamCol.rgb * 3.0, highLightOpacity * cloakedness);
+			outColor.rgb = mix(outColor.rgb, teamCol.rgb * 6.0, highLightOpacity * cloakedness);
 			
 			//Add bloom to the perlin noise:
 			outSpecularColor.rgb+= vec3(clamp(cloaknoise * 0.75,0.0,1.0));
