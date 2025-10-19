@@ -717,13 +717,23 @@ local blankNormalMap = "unittextures/blank_normal.dds"
 local noisetex3dcube =  "modelmaterials_gl4/noise64_cube_3.dds"
 
 local fastObjectDefIDtoTextureKey = {} -- table of  {unitDefID : TextureKey, -featureDefID : TextureKey }
+local retextureStrKeyByObjectID = {}
 local fastTextureKeyCache = {} -- a table of concatenated texture names to increasing integers
 local numfastTextureKeyCache = 0
+
+
+local function AddThenGetFastTextureKey(strkey)
+	if not fastTextureKeyCache[strkey] then
+		numfastTextureKeyCache = numfastTextureKeyCache + 1
+		fastTextureKeyCache[strkey] = numfastTextureKeyCache
+	end
+	return fastTextureKeyCache[strkey]
+end
 
 --- Hashes a table of textures to a unique integer
 -- @param textures a table of {bindposition:texture}
 -- @return a unique hash for binning
-local function GenFastTextureKey(objectDefID, texturetable) -- return integer
+local function GenFastTextureKey(objectDefID, texturetable, retextureObjectID) -- return integer
 	if not texturetable then
 		return 0
 	end
@@ -734,14 +744,11 @@ local function GenFastTextureKey(objectDefID, texturetable) -- return integer
 			strkey = strkey .. texturetable[i]
 		end
 	end
-
-	if fastTextureKeyCache[strkey] then  -- already exists
-		fastObjectDefIDtoTextureKey[objectDefID] = fastTextureKeyCache[strkey]
+	local fastTextureKey = AddThenGetFastTextureKey(strkey)
+	if retextureObjectID then
+		retextureStrKeyByObjectID[retextureObjectID] = fastTextureKey
 	else
-		numfastTextureKeyCache = numfastTextureKeyCache + 1
-		fastTextureKeyCache[strkey] = numfastTextureKeyCache
-		fastObjectDefIDtoTextureKey[objectDefID] = numfastTextureKeyCache
-		--Spring.Echo("GenFastTextureKey", strkey, fastTextureKeyCache[strkey])
+		fastObjectDefIDtoTextureKey[objectDefID] = fastTextureKey
 	end
 	return fastTextureKeyCache[strkey]
 end
@@ -829,12 +836,10 @@ local function WantFeaturePbr(featureDef)
 	return false
 end
 
-local function LoadUnitTextureSet(unitDefID, unitDef, texOverride1, texOverride2)
+local function LoadUnitTextureSet(unitDefID, unitDef, unitID, texOverride1, texOverride2)
 	if not unitDef.model then
 		return
 	end
-	local lowercasetex1 = texOverride1 or string.lower(unitDef.model.textures.tex1 or "")
-	local lowercasetex2 = texOverride2 or string.lower(unitDef.model.textures.tex2 or "")
 
 	local normalTex = GetNormal(unitDef, nil)
 
@@ -842,11 +847,11 @@ local function LoadUnitTextureSet(unitDefID, unitDef, texOverride1, texOverride2
 
 	local textureTable = {
 		--%102:0 = unitDef 102 s3o tex1
-		[0] = string.format("%%%s:%i", unitDefID, 0),
-		[1] = string.format("%%%s:%i", unitDefID, 1),
+		[0] = texOverride1 or string.format("%%%s:%i", unitDefID, 0),
+		[1] = texOverride2 or string.format("%%%s:%i", unitDefID, 1),
 		[2] = normalTex,
-		[3] = string.format("%%%s:%i", unitDefID, 0),
-		[4] = string.format("%%%s:%i", unitDefID, 1),
+		[3] = texOverride1 or string.format("%%%s:%i", unitDefID, 0),
+		[4] = texOverride2 or string.format("%%%s:%i", unitDefID, 1),
 		[5] = normalTex,
 		[6] = "$shadow",
 		[7] = "$reflection",
@@ -887,7 +892,7 @@ local function LoadUnitTextureSet(unitDefID, unitDef, texOverride1, texOverride2
 		objectDefToUniformBin[unitDefID]  = 'defaultunit' -- This will temporarily disable raptor shader
 	end
 	
-	local texKeyFast = GenFastTextureKey(unitDefID, textureTable)
+	local texKeyFast = GenFastTextureKey(unitDefID, textureTable, (texOverride1 or texOverride2) and unitID)
 	if textureKeytoSet[texKeyFast] == nil then
 		textureKeytoSet[texKeyFast] = textureTable
 	end
@@ -965,6 +970,7 @@ local function PreloadTextures()
 	gl.Texture(0, false)
 	preloadedTextures = true
 end
+
 --------------------------------------------------------------------
 -- No changes from BAR after this comment
 --------------------------------------------------------------------
@@ -1002,13 +1008,14 @@ local assigncalls = 0
 local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
 	assigncalls = (assigncalls + 1 ) % (2^20)
 	shader = shader or GetShaderName(flag, objectDefID)
-	texKey = texKey or fastObjectDefIDtoTextureKey[objectDefID]
-
+	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
+	
 	if objectDefID == nil then
 		Spring.Echo("AssignObjectToBin",objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
 	end
 	uniformBinID = uniformBinID or GetUniformBinID(objectDefID, "AssignObjectToBin")
 	--Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID)
+	
 	--	Spring.Debug.TraceFullEcho()
 	if (texKey == nil or uniformBinID == nil) then
 		if badassigns[objectID] == nil then
@@ -1227,7 +1234,7 @@ end
 
 local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, reason)
 	shader = shader or GetShaderName(flag, objectDefID)
-	texKey = texKey or fastObjectDefIDtoTextureKey[objectDefID]
+	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
 	if debugmode then Spring.Echo("RemoveObjectFromBin", objectID, objectDefID, texKey,shader,flag,uniformBinID, reason)  end
 
 	if unitDrawBins[flag][shader] then
@@ -1313,7 +1320,7 @@ local function UpdateObject(objectID, drawFlag, reason)
 
 		if hasFlagOld ~= hasFlagNew and overrideDrawFlagsCombined[flag] then
 			local shader = GetShaderName(flag, objectDefID)
-			local texKey  = fastObjectDefIDtoTextureKey[objectDefID]
+			local texKey  = retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
 			local uniformBinID = GetUniformBinID(objectDefID,'UpdateObject')
 
 			if hasFlagOld then --had this flag, but no longer have
@@ -1360,7 +1367,7 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 		if debugmode then Spring.Echo("RemoveObject Flags", objectID, flag, overrideDrawFlagsCombined[flag] ) end
 		if overrideDrawFlagsCombined[flag] then
 			local shader = GetShaderName(flag, objectDefID)
-			local texKey  = fastObjectDefIDtoTextureKey[objectDefID]
+			local texKey  = retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
 			local uniformBinID = GetUniformBinID(objectDefID,'RemoveObject')
 			RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, "removeobject")
 			--if flag == 1 then
@@ -1824,6 +1831,11 @@ local function FreeTextures() -- pre we are using 2200mb
 	
 end
 
+local function SetUnitTexture(unitID, tex1, tex2)
+	RemoveObject(unitID, "override_texture")
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
+end
 
 function gadget:Initialize()
 	gadgetHandler:AddChatAction("reloadcusgl4", ReloadCUSGL4)
@@ -1849,8 +1861,8 @@ function gadget:Initialize()
 	GG.CUSGL4.GetShader = GetShader
 	GG.CUSGL4.GetShaderName = GetShaderName
 	GG.CUSGL4.SetShaderUniforms = SetShaderUniforms
+	GG.CUSGL4.SetUnitTexture = SetUnitTexture
 	GG.CUSGL4.enabled = true
-	
 end
 
 function gadget:Shutdown()
