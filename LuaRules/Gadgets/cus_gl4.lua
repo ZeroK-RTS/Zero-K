@@ -286,7 +286,7 @@ local overrideDrawFlagsCombined = {
 	[16   ] = overrideDrawFlags[16],
 }
 
-local cusUnitIDtoDrawFlag = {} -- {unitID = drawFlag,...}, these remain positive, as they are traversed separately
+local cusUnitIDtoDrawFlag = {} -- {unitID = drawFlag, ...}, these remain positive, as they are traversed separately
 
 -- For managing under construction units:
 local buildProgresses = {} -- keys unitID, value buildprogress, updated each frame for units being built
@@ -294,7 +294,7 @@ local uniformCache = {}
 local spGetUnitHealth = Spring.GetUnitHealth
 -- local processedUnits = {}
 
-local cusFeatureIDtoDrawFlag = {} -- {featureID = drawFlag,...}, this remains positive
+local cusFeatureIDtoDrawFlag = {} -- {featureID = drawFlag, ...}, this remains positive
 -- local processedFeatures = {}
 
 -- This is the main table of all the unit drawbins:
@@ -610,7 +610,7 @@ local DEFAULT_VERSION = [[#version 430 core
 ]]
 
 local function dumpShaderCodeToFile(defs, src, filename) -- no IO in unsynced gadgets :/
-	local vsfile = io.open('cus_' .. filename .. ".glsl","w+")
+	local vsfile = io.open('cus_' .. filename .. ".glsl", "w+")
 	vsfile:write(defs .. src)
 	vsfile:close()
 end
@@ -622,7 +622,7 @@ local function dumpShaderCodeToInfolog(defs, src, filename) -- no IO in unsynced
 end
 
 local function CompileLuaShader(shader, definitions, plugIns, addName, recompilation)
-	--Spring.Echo(" CompileLuaShader",shader, definitions, plugIns, addName)
+	--Spring.Echo(" CompileLuaShader", shader, definitions, plugIns, addName)
 	if definitions == nil or definitions == {} then
 		Spring.Echo(addName, "nul definitions", definitions)
 	end
@@ -814,7 +814,7 @@ end
 -- BIG TODO:
 -- Replace lua texture names with overrides of WreckTex et al!
 --
--- %34:1 = unitDef 34 s3o tex2 (:0->tex1,:1->tex2)
+-- %34:1 = unitDef 34 s3o tex2 (:0->tex1, :1->tex2)
 -- %-102:0 = featureDef 102 s3o tex1
 -- The problem here being that tex1 and tex2 dont participate in texture key hashing.
 -- so e.g. raptors may have been drawn with incorrect textures all along, due to them being keyed
@@ -1019,7 +1019,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
 	
 	if objectDefID == nil then
-		Spring.Echo("AssignObjectToBin",objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
+		Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
 	end
 	uniformBinID = uniformBinID or GetUniformBinID(objectDefID, "AssignObjectToBin")
 	--Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID)
@@ -1086,7 +1086,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 				deferredrawBin[shader][uniformBinID] = unitDrawBinsFlagShader[uniformBinID]
 			end
 		end
-		if debugmode then Spring.Echo("Init of bin",shader, flag, texKey, uniformBinID, "took", Spring.DiffTimers(Spring.GetTimerMicros(),t0,  nil), "ms" ) end
+		if debugmode then Spring.Echo("Init of bin", shader, flag, texKey, uniformBinID, "took", Spring.DiffTimers(Spring.GetTimerMicros(), t0,  nil), "ms" ) end
 	end
 
 	local unitDrawBinsFlagShaderUniformsTexKey = unitDrawBinsFlagShaderUniforms[texKey]
@@ -1094,7 +1094,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	if unitDrawBinsFlagShaderUniformsTexKey.objectsIndex[objectID] then
 		Spring.Echo("Trying to add a unit to a bin that it is already in!")
 	else
-		if debugmode then Spring.Echo("AssignObjectToBin success:",objectID, objectDefID, flag, shader, texKey, uniformBinID) end
+		if debugmode then Spring.Echo("AssignObjectToBin success:", objectID, objectDefID, flag, shader, texKey, uniformBinID) end
 	end
 
 	local maxElements = unitDrawBinsFlagShaderUniformsTexKey.maxElements
@@ -1182,9 +1182,9 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	unitDrawBinsFlagShaderUniformsTexKey.objectsIndex[objectID  ] = numobjects
 
 	if debugmode and flag == 0 then
-		Spring.Echo("AssignObjectToBin", objectID, objectDefID, texKey,uniformBinID, shader,flag, numobjects)
+		Spring.Echo("AssignObjectToBin", objectID, objectDefID, texKey, uniformBinID, shader, flag, numobjects)
 		local objids = "objectsArray "
-		for k,v in pairs(unitDrawBinsFlagShaderUniformsTexKey.objectsArray) do
+		for k, v in pairs(unitDrawBinsFlagShaderUniformsTexKey.objectsArray) do
 			objids = objids .. tostring(k) .. ":" ..tostring(v) .. " "
 		end
 		Spring.Echo(objids)
@@ -1192,7 +1192,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 end
 
 local function AddObject(objectID, drawFlag, reason)
-	if debugmode then Spring.Echo("AddObject",objectID, objectDefID, drawFlag, reason) end
+	if debugmode then Spring.Echo("AddObject", objectID, objectDefID, drawFlag, reason) end
 
 	if (drawFlag >= 128) then --icon
 		return
@@ -1248,7 +1248,7 @@ end
 local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, reason)
 	shader = shader or GetShaderName(flag, objectDefID)
 	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
-	if debugmode then Spring.Echo("RemoveObjectFromBin", objectID, objectDefID, texKey,shader,flag,uniformBinID, reason)  end
+	if debugmode then Spring.Echo("RemoveObjectFromBin", objectID, objectDefID, texKey, shader, flag, uniformBinID, reason)  end
 
 	if unitDrawBins[flag][shader] then
 		if unitDrawBins[flag][shader][uniformBinID] then
@@ -1257,8 +1257,8 @@ local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, 
 				local unitDrawBinsFlagShaderTexKey = unitDrawBins[flag][shader][uniformBinID][texKey]
 				local objectIndex = unitDrawBinsFlagShaderTexKey.objectsIndex[objectID]
 
-				--if flag == 0 then Spring.Echo("RemoveObjectFromBin", objectID, objectDefID, texKey,shader,flag,objectIndex) end
-				--if debugmode then Spring.Echo("RemoveObjectFromBin really", objectID, objectDefID, texKey,shader,flag,objectIndex) end
+				--if flag == 0 then Spring.Echo("RemoveObjectFromBin", objectID, objectDefID, texKey, shader, flag, objectIndex) end
+				--if debugmode then Spring.Echo("RemoveObjectFromBin really", objectID, objectDefID, texKey, shader, flag, objectIndex) end
 				if objectIndex == nil then
 					return
 				end
@@ -1298,7 +1298,7 @@ local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, 
 		end
 	else
 		if debugmode then
-			local defName ='niiiil'
+			local defName = 'niiiil'
 			if objectDefID then
 				if objectDefID >= 0 then
 					defName =  UnitDefs[objectDefID].name
@@ -1308,7 +1308,7 @@ local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, 
 			end
 			Spring.Echo("Failed to find shader for", objectID, objectDefID, texKey, shader, flag, uniformBinID, defName)
 		end
-		--Spring.Debug.TraceFullEcho(30,30,30)
+		--Spring.Debug.TraceFullEcho(30, 30, 30)
 	end
 end
 
@@ -1334,7 +1334,7 @@ local function UpdateObject(objectID, drawFlag, reason)
 		if hasFlagOld ~= hasFlagNew and overrideDrawFlagsCombined[flag] then
 			local shader = GetShaderName(flag, objectDefID)
 			local texKey  = retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
-			local uniformBinID = GetUniformBinID(objectDefID,'UpdateObject')
+			local uniformBinID = GetUniformBinID(objectDefID, 'UpdateObject')
 
 			if hasFlagOld then --had this flag, but no longer have
 				RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, "nolongerhasflag")
@@ -1387,7 +1387,7 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 		if overrideDrawFlagsCombined[flag] then
 			local shader = GetShaderName(flag, objectDefID)
 			local texKey  = retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
-			local uniformBinID = GetUniformBinID(objectDefID,'RemoveObject')
+			local uniformBinID = GetUniformBinID(objectDefID, 'RemoveObject')
 			RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, "removeobject")
 			--if flag == 1 then
 			--	RemoveObjectFromBin(objectID, objectDefID, texKey, nil, 0, uniformBinID)
@@ -1487,7 +1487,7 @@ local function ProcessFeatures(features, drawFlags, reason)
 end
 
 local shaderactivations = 0
-local shaderOrder = {'tree','feature','unit','unitskinning'} -- this forces ordering, no real reason to do so, just for testing
+local shaderOrder = {'tree', 'feature', 'unit', 'unitskinning'} -- this forces ordering, no real reason to do so, just for testing
 
 local drawpassstats = {} -- a table of drawpass number and the actual number of units and batches performed by that pass
 for drawpass, _ in pairs(overrideDrawFlagsCombined) do drawpassstats[drawpass] = {shaders = 0, batches = 0, units = 0} end
@@ -1530,7 +1530,7 @@ local function ExecuteDrawPass(drawPass)
 				shaderTable:Activate()
 				shaderswaps = shaderswaps + 1
 				for uniformBinID, uniformBin in pairs(data) do
-					--Spring.Echo("Shadername", shaderId.shaderName,"uniformBinID", uniformBinID)
+					--Spring.Echo("Shadername", shaderId.shaderName, "uniformBinID", uniformBinID)
 					--local uniforms = uniformBins[uniformBinID]
 					-- TODO: only activate shader if we actually have units in its bins?
 					SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
@@ -1559,7 +1559,7 @@ local function ExecuteDrawPass(drawPass)
 	end
 	
 	if unbindtextures then
-		for i=0,10 do
+		for i = 0, 10 do
 			gl.Texture(i, false)
 		end
 	end
@@ -1583,7 +1583,7 @@ local function RecompileShaders(recompilation)
 	compileMaterialShader(unitsNormalMapTemplate, "unit", recompilation)
 	compileMaterialShader(unitsSkinningTemplate, "unitskinning", recompilation)
 	compileMaterialShader(featuresNormalMapTemplate, "feature", recompilation)
-	compileMaterialShader(treesNormalMapTemplate, "tree",recompilation)
+	compileMaterialShader(treesNormalMapTemplate, "tree", recompilation)
 end
 
 
@@ -1696,34 +1696,34 @@ local function DumpCUSGL4(optName, line, words, playerID)
 		return
 	end
 	for drawflag, bin in pairs(unitDrawBins) do
-		Spring.Echo(string.format("%i = { -- drawFlag",drawflag))
+		Spring.Echo(string.format("%i = { -- drawFlag", drawflag))
 		for shadername, uniformbin in pairs(bin) do
-			Spring.Echo(string.format("  %s = { -- shadername",shadername))
+			Spring.Echo(string.format("  %s = { -- shadername", shadername))
 			for uniformbinid, texandobjset in pairs(uniformbin) do
-				Spring.Echo(string.format("    %s = { -- uniformbin",uniformbinid))
+				Spring.Echo(string.format("    %s = { -- uniformbin", uniformbinid))
 				for texturekey, minibin in pairs(texandobjset) do
-				Spring.Echo(string.format("      %i = { -- textureset",texturekey))
+				Spring.Echo(string.format("      %i = { -- textureset", texturekey))
 					for minibinattr, minibinvalue in pairs(minibin) do
 						if type( minibinvalue ) == "table" then
-							Spring.Echo(string.format("        %s = {",minibinattr))
+							Spring.Echo(string.format("        %s = {", minibinattr))
 							if minibinattr == "objectsIndex" then
-								for k,v in pairs(minibinvalue) do
-									local objdefname = (k>=0 and Spring.GetUnitDefID(k) and UnitDefs[Spring.GetUnitDefID(k)].name) or (Spring.GetFeatureDefID(-1 * k)  and FeatureDefs[Spring.GetFeatureDefID(-1 * k) ].name) or "???"
-									Spring.Echo(string.format("          %i = %i, --(%s)", k,v,objdefname))
+								for k, v in pairs(minibinvalue) do
+									local objdefname = (k>= 0 and Spring.GetUnitDefID(k) and UnitDefs[Spring.GetUnitDefID(k)].name) or (Spring.GetFeatureDefID(-1 * k)  and FeatureDefs[Spring.GetFeatureDefID(-1 * k) ].name) or "???"
+									Spring.Echo(string.format("          %i = %i, --(%s)", k, v, objdefname))
 								end
 							elseif minibinattr == "objectsArray" then
-								for k,v in pairs(minibinvalue) do
-									local objdefname = (v>=0 and Spring.GetUnitDefID(v) and UnitDefs[Spring.GetUnitDefID(v)].name) or (Spring.GetFeatureDefID(-1 * v)  and FeatureDefs[Spring.GetFeatureDefID(-1 * v) ].name) or "???"
-									Spring.Echo(string.format("          %i = %i, --(%s)", k,v,objdefname))
+								for k, v in pairs(minibinvalue) do
+									local objdefname = (v>= 0 and Spring.GetUnitDefID(v) and UnitDefs[Spring.GetUnitDefID(v)].name) or (Spring.GetFeatureDefID(-1 * v)  and FeatureDefs[Spring.GetFeatureDefID(-1 * v) ].name) or "???"
+									Spring.Echo(string.format("          %i = %i, --(%s)", k, v, objdefname))
 								end
 							else
-								for k,v in pairs(minibinvalue) do
-									Spring.Echo(string.format("          %s = %s,", tostring(k),tostring(v)))
+								for k, v in pairs(minibinvalue) do
+									Spring.Echo(string.format("          %s = %s, ", tostring(k), tostring(v)))
 								end
 							end
-							Spring.Echo("        },")
+							Spring.Echo("        }, ")
 						else
-							Spring.Echo(string.format("        %s = %s,", tostring(minibinattr),tostring(minibinvalue)))
+							Spring.Echo(string.format("        %s = %s, ", tostring(minibinattr), tostring(minibinvalue)))
 						end
 					end
 					Spring.Echo("      },")
@@ -1760,7 +1760,7 @@ local function MarkBinCUSGL4(optName, line, words, playerID)
 							px, py, pz = Spring.GetFeaturePosition(-1* objectID)
 						end
 						if px then
-							Spring.MarkerAddPoint(px,py,pz,
+							Spring.MarkerAddPoint(px, py, pz,
 								tostring(drawPass) .. "/" ..
 								tostring(shadername) .. "/" ..
 								tostring(uniformbinid) .. "/" ..
@@ -1788,7 +1788,7 @@ local function FreeTextures() -- pre we are using 2200mb
 			local s1 = gl.DeleteTexture(textureTable[0])
 			local s2 = gl.DeleteTexture(textureTable[1])
 			
-			Spring.Echo("Freeing ",textureTable[0],textureTable[1], s1, s2)
+			Spring.Echo("Freeing ", textureTable[0], textureTable[1], s1, s2)
 		end
 	end
 
@@ -1808,15 +1808,15 @@ local function FreeTextures() -- pre we are using 2200mb
 			local s1 = gl.DeleteTexture(textureTable[0])
 			local s2 = gl.DeleteTexture(textureTable[1])
 			
-			Spring.Echo("Freeing ",textureTable[0],textureTable[1], s1, s2)
+			Spring.Echo("Freeing ", textureTable[0], textureTable[1], s1, s2)
 	end
 	
 	Spring.Echo("RawDelete")
 	local unittexfiles = VFS.DirList("unittextures/")
 	for i, fname in ipairs(unittexfiles) do
-		if string.find(fname,'chicken', nil, true) then
+		if string.find(fname, 'chicken', nil, true) then
 			local s1 = gl.DeleteTexture(fname)
-			Spring.Echo("Freeing ",fname, s1)
+			Spring.Echo("Freeing ", fname, s1)
 
 		end
 		
@@ -1831,7 +1831,7 @@ function gadget:GameFrame(n)
 	if not itsXmas and SYNCED.itsXmas then
 		itsXmas = true
 		initiated = false
-		ReloadCUSGL4(nil,nil,nil, Spring.GetMyPlayerID())
+		ReloadCUSGL4(nil, nil, nil, Spring.GetMyPlayerID())
 	end
 	for unitID, buildProgress in pairs(buildProgresses) do
 		local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
@@ -1901,7 +1901,7 @@ function gadget:Shutdown()
 	--gadgetHandler:RemoveChatAction("reloadcusgl4")
 	--gadgetHandler:RemoveChatAction("cusgl4updaterate")
 	if GG.CUSGL4 then
-		for k,v in pairs(GG.CUSGL4) do
+		for k, v in pairs(GG.CUSGL4) do
 			GG.CUSGL4[k] = nil
 		end
 	end
@@ -1917,9 +1917,9 @@ local function countbintypes(flagarray)
 	local reflcnt = 0
 	local shadcnt = 0
 
-	for i=1, #flagarray do
+	for i = 1, #flagarray do
 		local flag = flagarray[i]
-		if HasBit(flag,1) then
+		if HasBit(flag, 1) then
 			fwcnt = fwcnt + 1
 			defcnt = defcnt + 1
 		end
@@ -1968,7 +1968,7 @@ end
 function gadget:UnitFinished(unitID)
 	gl.SetUnitBufferUniforms(unitID, {-1}, 0) -- set build progress to built
 	buildProgresses[unitID] = nil
-	UpdateUnit(unitID,Spring.GetUnitDrawFlag(unitID))
+	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
 
 local unitDefModelMaxY = {}
@@ -1985,7 +1985,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12) -- clear cloak effect
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 6) -- clear selectedness effect
 	
-	UpdateUnit(unitID,Spring.GetUnitDrawFlag(unitID))
+	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
 
 function gadget:UnitGiven(unitID)
@@ -2007,14 +2007,14 @@ end
 function gadget:UnitCloaked(unitID)
 	uniformCache[1] = Spring.GetGameFrame()
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
-	UpdateUnit(unitID,Spring.GetUnitDrawFlag(unitID))
+	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 	if debugmode then
 		Spring.Echo("UnitCloaked", unitID, Spring.GetUnitDrawFlag(unitID))
 	end
 end
 
 function gadget:UnitDecloaked(unitID)
-	UpdateUnit(unitID,Spring.GetUnitDrawFlag(unitID))
+	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 	uniformCache[1] = -1 * Spring.GetGameFrame()
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
 	if debugmode then
@@ -2070,11 +2070,11 @@ function gadget:DrawWorldPreUnit()
 		local totalobjects = #units + #features + numdestroyedUnits + numdestroyedFeatures
 		
 		-- Why do we also do this processing round if #units > 0?
-		if debugmode and (#destroyedUnitIDs>0 or #units > 0) then Spring.Echo("Processing destroyedUnitIDs", #units, #destroyedUnitIDs) end
+		if debugmode and (#destroyedUnitIDs > 0 or #units > 0) then Spring.Echo("Processing destroyedUnitIDs", #units, #destroyedUnitIDs) end
 		
 		if numdestroyedUnits > 0 then
 			ProcessUnits(destroyedUnitIDs, destroyedUnitDrawFlags, "destroyed")
-			for i=numdestroyedUnits,1,-1 do
+			for i = numdestroyedUnits, 1, -1 do
 				destroyedUnitIDs[i] = nil
 				destroyedUnitDrawFlags[i] = nil
 			end
@@ -2083,7 +2083,7 @@ function gadget:DrawWorldPreUnit()
 
 		if numdestroyedFeatures > 0 then
 			ProcessFeatures(destroyedFeatureIDs, destroyedFeatureDrawFlags, "destroyed")
-			for i=numdestroyedFeatures,1,-1 do
+			for i = numdestroyedFeatures, 1, -1 do
 				destroyedFeatureIDs[i] = nil
 				destroyedFeatureDrawFlags[i] = nil
 			end
@@ -2114,11 +2114,11 @@ function gadget:DrawWorldPreUnit()
 		ProcessUnits(units, drawFlagsUnits, "changed")
 		ProcessFeatures(features, drawFlagsFeatures, "changed")
 
-		local deltat = Spring.DiffTimers(Spring.GetTimerMicros(),t0,  nil) -- in ms
+		local deltat = Spring.DiffTimers(Spring.GetTimerMicros(), t0,  nil) -- in ms
 		--Spring.Echo(deltat)
 		if (deltat > 2) and perfdebug then
 			local usecperobjectchange = (1000* deltat)  / (totalobjects)
-			Spring.Echo("[CUS GL4] [",Spring.GetDrawFrame(),"]",totalobjects," Update time 2 < ", deltat, string.format("ms, per object change: %.2fus ", usecperobjectchange),  totalobjects , 'objs')
+			Spring.Echo("[CUS GL4] [", Spring.GetDrawFrame(), "]", totalobjects, " Update time 2 < ", deltat, string.format("ms, per object change: %.2fus ", usecperobjectchange),  totalobjects , 'objs')
 			-- PERF CONCULUSION:
 				-- Additions of units are about 30 uS
 				-- Removals of units is about 50 uS
