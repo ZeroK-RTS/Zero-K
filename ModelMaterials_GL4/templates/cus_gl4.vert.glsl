@@ -699,6 +699,7 @@ void main(void)
 		const float cb = 5e-5;
 		float bias = cb * tan(acos(NdotL));
 		bias = clamp(bias, 0.0, 5.0 * cb);
+		shadowVertexPos.w = UNITUNIFORMS.userDefined[0].x; // pass in construction progress 0-1
 
 		lightVertexPos.xy += vec2(0.5);
 		lightVertexPos.z += bias;

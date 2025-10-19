@@ -251,7 +251,7 @@ float BiasedZ(float z0, vec2 dZduv, vec2 offset) {
 float GetShadowPCFRandom(float NdotL) {
 	float shadow = 0.0;
 
-	vec3 shadowCoord = shadowVertexPos.xyz; // shadowVertexPos.w is always 1.0
+	vec3 shadowCoord = shadowVertexPos.xyz; // shadowVertexPos.w has construction progress 0 to 1 or -1
 	int presetIndex = clamp(shadowsQuality, 0, SHADOW_QUALITY_PRESETS - 1);
 
 	float samplingRandomness = shadowQualityPresets[presetIndex].samplingRandomness;
@@ -1374,6 +1374,10 @@ void main(void)
 	vec4 texColor2 = texture(texture2, uvCoords.xy, 0); // note that we bind tex2 to pos0 here!
 	if (texColor2.a < 0.5 ) discard;
 #endif
+	float buildProgress = shadowVertexPos.w;
+	if (buildProgress > -0.5){
+		discard;
+	}
 }
 
 //FLUTYISBROÁFélő[]
