@@ -260,7 +260,7 @@ local overrideDrawFlags = {
 	[8]  = true , --SO_REFRAC_FLAG = 8,
 	[16] = true , --SO_SHADOW_FLAG = 16,
 	[32] = true , --SO_SHTRAN_FLAG = 32, -- this is shadow transparency flag, to draw shadows into transparent pass 
-				  --SO_DRICON_FLAG = 128, -- 
+	              --SO_DRICON_FLAG = 128, -- 
 }
 
 --implementation
@@ -325,7 +325,6 @@ local unitDrawBins = nil -- this also controls wether cusgl4 is on at all!
 
 local objectIDtoDefID = {}
 
-
 local shaders = {} -- double nested table of {drawflag : {"units":shaderID}}
 
 local modelsVertexVBO = nil
@@ -338,7 +337,7 @@ local objectTypeAttribID = 6 -- this is the attribute index for instancedata in 
 local initiated = false
 
 local function Bit(p)
-	return 2 ^ (p - 1)  -- 1-based indexing
+	return 2 ^ (p - 1) -- 1-based indexing
 end
 
 -- Typical call:  if hasbit(x, bit(3)) then ...
@@ -439,8 +438,6 @@ local function SetShaderUniforms(drawPass, shaderID, uniformBinID)
 			gl.Uniform(uniformLocationName, uniformValue)
 		end
 	end
-
-
 end
 ------------------------- SHADERS                   ----------------------
 ------------------------- LOADING OLD CUS MATERIALS ----------------------
@@ -462,18 +459,18 @@ local featuresNormalMapTemplate
 local treesNormalMapTemplate
 
 function deepcopy(orig)
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        copy = {}
-        for orig_key, orig_value in next, orig, nil do
-            copy[deepcopy(orig_key)] = deepcopy(orig_value)
-        end
-        setmetatable(copy, deepcopy(getmetatable(orig)))
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in next, orig, nil do
+			copy[deepcopy(orig_key)] = deepcopy(orig_value)
+		end
+		setmetatable(copy, deepcopy(getmetatable(orig)))
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
 end
 
 local function appendShaderDefinitionsToTemplate(template, alldefinitions)
@@ -498,7 +495,6 @@ local function initMaterials()
 		Spring.Echo("CUS GL4 enabled XMAS mode")
 	end
 
-
 	unitsNormalMapTemplate = appendShaderDefinitionsToTemplate(defaultMaterialTemplate, {
 		shaderDefinitions = {
 			"#define ENABLE_OPTION_HEALTH_TEXTURING 1",
@@ -522,7 +518,6 @@ local function initMaterials()
 			itsXmas and "#define XMAS 1" or "#define XMAS 0",
 		},
 	})
-
 
 	unitsSkinningTemplate = appendShaderDefinitionsToTemplate(defaultMaterialTemplate, {
 		shaderDefinitions = {
@@ -591,10 +586,10 @@ local function initMaterials()
 end
 
 local DEFAULT_VERSION = [[#version 430 core
-	#extension GL_ARB_uniform_buffer_object : require
-	#extension GL_ARB_shader_storage_buffer_object : require
-	#extension GL_ARB_shading_language_420pack: require
-	]]
+#extension GL_ARB_uniform_buffer_object : require
+#extension GL_ARB_shader_storage_buffer_object : require
+#extension GL_ARB_shading_language_420pack: require
+]]
 
 local function dumpShaderCodeToFile(defs, src, filename) -- no IO in unsynced gadgets :/
 	local vsfile = io.open('cus_' .. filename .. ".glsl","w+")
@@ -653,7 +648,6 @@ local function CompileLuaShader(shader, definitions, plugIns, addName, recompila
 			shader[program] = shader[program]:gsub("//__QUATERNIONDEFS__",  QUATERNIONDEFS)
 		end
 	end
-
 
 	local luaShader = LuaShader(shader, "CUS_" .. addName)
 	local compilationResult = luaShader:Initialize()
@@ -719,7 +713,6 @@ local retextureStrKeyByObjectID = {}
 local fastTextureKeyCache = {} -- a table of concatenated texture names to increasing integers
 local numfastTextureKeyCache = 0
 
-
 local function AddThenGetFastTextureKey(strkey)
 	if not fastTextureKeyCache[strkey] then
 		numfastTextureKeyCache = numfastTextureKeyCache + 1
@@ -735,7 +728,6 @@ local function GenFastTextureKey(objectDefID, texturetable, retextureObjectID) -
 	if not texturetable then
 		return 0
 	end
-
 	local strkey = ""
 	for i = 0, 20 do -- from 3 since 0-1-2 are tex12 and normals, and this guarantees order of the table
 		if texturetable[i] then
@@ -752,7 +744,6 @@ local function GenFastTextureKey(objectDefID, texturetable, retextureObjectID) -
 end
 
 local brdfLUT = "modelmaterials_gl4/brdf_0.png"
-
 local existingfilecache = {} -- this speeds up the VFS calls
 
 local function GetNormal(unitDef, featureDef)
@@ -840,9 +831,7 @@ local function LoadUnitTextureSet(unitDefID, unitDef, unitID, texOverride1, texO
 	end
 
 	local normalTex = GetNormal(unitDef, nil)
-
 	objectDefToUniformBin[unitDefID] = unitDef.customParams and unitDef.customParams.uniformbin or "defaultunit"
-
 	local textureTable = {
 		--%102:0 = unitDef 102 s3o tex1
 		[0] = texOverride1 or string.format("%%%s:%i", unitDefID, 0),
@@ -1029,13 +1018,11 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 		unitDrawBinsFlag[shader] = {}
 	end
 	local unitDrawBinsFlagShader = unitDrawBinsFlag[shader]
-
 	if unitDrawBinsFlagShader[uniformBinID] == nil then
 		unitDrawBinsFlagShader[uniformBinID] = {}
 	end
 
 	local unitDrawBinsFlagShaderUniforms = unitDrawBinsFlagShader[uniformBinID]
-
 	if unitDrawBinsFlagShaderUniforms[texKey] == nil then
 		local t0 = Spring.GetTimerMicros()
 		local mybinVAO = gl.GetVAO()
@@ -1135,10 +1122,8 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 					newObjectsIndex[unitID] = newObjectsCount
 				end
 			end
-
 			mybinIBO:InstanceDataFromUnitIDs(newObjectsArray, objectTypeAttribID)
 			mybinVAO:AddUnitsToSubmission(newObjectsArray)
-
 		else
 			-- this additional table is needed to allow for one-time translation of negative objectID to featureID
 			local newFeaturesArray = {}
@@ -1150,11 +1135,9 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 					newFeaturesArray[newObjectsCount] = -1 * featureID
 				end
 			end
-
 			mybinIBO:InstanceDataFromFeatureIDs(newFeaturesArray, objectTypeAttribID)
 			mybinVAO:AddFeaturesToSubmission(newFeaturesArray)
 		end
-
 		numobjects = newObjectsCount
 		unitDrawBinsFlagShaderUniformsTexKey.objectsArray = newObjectsArray
 		unitDrawBinsFlagShaderUniformsTexKey.objectsIndex = newObjectsIndex
@@ -1203,7 +1186,7 @@ local function AddObject(objectID, drawFlag, reason)
 		local flag = drawBinKeys[k]
 		if HasAllBits(drawFlag, flag) then
 			if overrideDrawFlagsCombined[flag] then
-								 --objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom
+				-- objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom
 				AssignObjectToBin(objectID, objectDefID, flag, nil, nil, nil,  nil, "addobject")
 			end
 		end
@@ -1392,7 +1375,6 @@ local function ProcessUnits(units, drawFlags, reason)
 		local drawFlag = drawFlags[i]
 		if debugmode then Spring.Echo("ProcessUnits", unitID, drawFlag, reason) end
 
-
 		if math_bit_and(drawFlag, 34) > 0 then -- has alpha (2) or alphashadow(32) flag 
 			-- cloaked units get mapped to pure forward + deferred, no refl/refr either
 			drawFlag = 1
@@ -1431,7 +1413,6 @@ end
 
 
 local function ProcessFeatures(features, drawFlags, reason)
-
 	for i = 1, #features do
 		local featureID = features[i]
 		local drawFlag = drawFlags[i]
@@ -1471,7 +1452,6 @@ local function ProcessFeatures(features, drawFlags, reason)
 end
 
 local shaderactivations = 0
-
 local shaderOrder = {'tree','feature','unit','unitskinning'} -- this forces ordering, no real reason to do so, just for testing
 
 local drawpassstats = {} -- a table of drawpass number and the actual number of units and batches performed by that pass
@@ -1511,18 +1491,14 @@ local function ExecuteDrawPass(drawPass)
 			end
 
 			local shaderTable = shaders[drawPass][shaderName]
-
 			if unitscountforthisshader > 0 then
 				shaderTable:Activate()
 				shaderswaps = shaderswaps + 1
 				for uniformBinID, uniformBin in pairs(data) do
-
 					--Spring.Echo("Shadername", shaderId.shaderName,"uniformBinID", uniformBinID)
 					--local uniforms = uniformBins[uniformBinID]
-
 					-- TODO: only activate shader if we actually have units in its bins?
 					SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
-
 					for _, texAndObj in pairs(uniformBin) do
 						if texAndObj.numobjects > 0  then
 							batches = batches + 1
@@ -1539,11 +1515,9 @@ local function ExecuteDrawPass(drawPass)
 
 							SetFixedStatePost(drawPass, shaderTable)
 							unbindtextures = true
-				
 						end
 					end
 				end
-
 				shaderTable:Deactivate()
 			end
 		end
@@ -1740,7 +1714,6 @@ local function DumpCUSGL4(optName, line, words, playerID)
 	end
 end
 
-
 local function MarkBinCUSGL4(optName, line, words, playerID)
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
@@ -1777,7 +1750,6 @@ local function MarkBinCUSGL4(optName, line, words, playerID)
 		end
 		Spring.Echo("Added markers for", count, "units in drawPass", drawPass)
 	end
-
 	markBin(passnum)
 end
 
@@ -1825,8 +1797,6 @@ local function FreeTextures() -- pre we are using 2200mb
 		end
 		
 	end
-	
-	
 end
 
 local function SetUnitTexture(unitID, tex1, tex2)
@@ -1897,12 +1867,7 @@ function gadget:Shutdown()
 	GG.CUSGL4 = nil
 end
 
-
-
 local updateframe = 0
-
-
-
 
 local function countbintypes(flagarray)
 	local fwcnt = 0
@@ -1943,7 +1908,6 @@ local numdestroyedFeatures = 0
 -- 4. ProcessUnits(destroyedUnitIDs)
 	-- 4.1 can either AddUnit, UpdateUnit or RemoveUnit
 -- 5. Regular draw flag changes are processed
-
 
 local function UpdateUnit(unitID, flag)
 	numdestroyedUnits = numdestroyedUnits + 1
@@ -2028,12 +1992,9 @@ function gadget:DrawWorldPreUnit()
 	if unitDrawBins == nil then return end
 
 	updateframe = (updateframe + 1) % updaterate
-
 	if updateframe == 0 then
 		local t0 = Spring.GetTimerMicros()
-		
 		local units, drawFlagsUnits, features, drawFlagsFeatures
-		
 		if autoReload.enabled then
 			if Spring.DiffTimers(Spring.GetTimer(), autoReload.lastUpdate) > autoReload.updateRate then 
 				-- Check for fs and vs src identity
@@ -2048,7 +2009,6 @@ function gadget:DrawWorldPreUnit()
 				end
 			end
 		end
-		
 		
 		if manualReload then 
 			manualReload = false
@@ -2097,7 +2057,6 @@ function gadget:DrawWorldPreUnit()
 					validFirstFeatures[numfirstfeatures] = featureID
 					firstdrawFlagsFeatures[numfirstfeatures] = flag
 				end
-
 			end
 			ProcessFeatures(validFirstFeatures, firstdrawFlagsFeatures, "firstDraw")
 
@@ -2105,10 +2064,8 @@ function gadget:DrawWorldPreUnit()
 			local firstdrawFlagsUnits = {}
 			for i, unitID in ipairs(firstunits) do firstdrawFlagsUnits[i] = 1 + 4 + 16 end
 			ProcessUnits(firstunits, firstdrawFlagsUnits, "firstDraw")
-
 			firstDraw = false
 		end
-
 
 		ProcessUnits(units, drawFlagsUnits, "changed")
 		ProcessFeatures(features, drawFlagsFeatures, "changed")
@@ -2157,17 +2114,14 @@ end
 local function drawPassBitsToNumber(opaquePass, deferredPass, drawReflection, drawRefraction)
 	local drawPass = 0
 	if deferredPass then return drawPass end
-
 	if opaquePass then
 		drawPass = drawPass + 1
 	else
 		drawPass = drawPass + 2
 	end
-
 	if drawReflection then
 		drawPass = drawPass + 4
 	end
-
 	if drawRefraction then
 		drawPass = drawPass + 8
 	end
