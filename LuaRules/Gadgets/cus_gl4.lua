@@ -336,6 +336,15 @@ local objectTypeAttribID = 6 -- this is the attribute index for instancedata in 
 
 local initiated = false
 
+local featuresDefsWithAlpha = {} -- featureDefIDs (ie trees) that should be drawn with alpha.
+local unitDefsUseSkinning = {} -- unitDefIDs that use the bones and stretchy skin system
+
+local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
+
+--------------------------------------------------------------------
+-- Helper functions
+--------------------------------------------------------------------
+
 local function Bit(p)
 	return 2 ^ (p - 1) -- 1-based indexing
 end
@@ -358,8 +367,25 @@ local function ClearBit(x, p)
 	return HasBit(x, p) and x - p or x
 end
 
-local featuresDefsWithAlpha = {}
-local unitDefsUseSkinning = {}
+local function SetFixedStatePre(drawPass, shaderID)
+	if HasBit(drawPass, 4) then
+		gl.ClipDistance(0, true)
+	elseif HasBit(drawPass, 8) then
+		gl.ClipDistance(0, true)
+	end
+end
+
+local function SetFixedStatePost(drawPass, shaderID)
+	if HasBit(drawPass, 4) then
+		gl.ClipDistance(0, false)
+	elseif HasBit(drawPass, 8) then
+		gl.ClipDistance(0, false)
+	end
+end
+
+--------------------------------------------------------------------
+-- Helper functions that are also exposed to GG for Unsynced Luarules
+--------------------------------------------------------------------
 
 local function GetShader(drawPass, objectDefID)
 	if objectDefID == nil then
@@ -400,22 +426,6 @@ local function GetShaderName(drawPass, objectDefID)
 	end
 end
 
-local function SetFixedStatePre(drawPass, shaderID)
-	if HasBit(drawPass, 4) then
-		gl.ClipDistance(0, true)
-	elseif HasBit(drawPass, 8) then
-		gl.ClipDistance(0, true)
-	end
-end
-
-local function SetFixedStatePost(drawPass, shaderID)
-	if HasBit(drawPass, 4) then
-		gl.ClipDistance(0, false)
-	elseif HasBit(drawPass, 8) then
-		gl.ClipDistance(0, false)
-	end
-end
-
 local function SetShaderUniforms(drawPass, shaderID, uniformBinID)
 	gl.UniformInt(gl.GetUniformLocation(shaderID, "drawPass"), drawPass)
 
@@ -439,6 +449,14 @@ local function SetShaderUniforms(drawPass, shaderID, uniformBinID)
 		end
 	end
 end
+
+local function SetUnitTexture(unitID, tex1, tex2)
+	RemoveObject(unitID, "override_texture")
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
+end
+
+
 ------------------------- SHADERS                   ----------------------
 ------------------------- LOADING OLD CUS MATERIALS ----------------------
 
@@ -961,8 +979,9 @@ local function PreloadTextures()
 end
 
 --------------------------------------------------------------------
--- No changes from BAR after this comment
+-- Object and bin handling
 --------------------------------------------------------------------
+
 local function GetObjectDefName(objectID)
 	if objectID == nil then
 		return "Failed to GetObjectDefName(objectID): " .. tostring(objectID)
@@ -1301,7 +1320,6 @@ local function UpdateObject(objectID, drawFlag, reason)
 	end
 
 	local objectDefID = objectIDtoDefID[objectID]
-
 	--if debugmode then Spring.Debug.TraceEcho("UpdateObject", objectID, drawFlag, objectDefID) end
 	for k = 1, #drawBinKeys do
 		local flag = drawBinKeys[k]
@@ -1387,8 +1405,6 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 	end
 end
 
-local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
-
 local function ProcessUnits(units, drawFlags, reason)
 	for i = 1, #units do
 		local unitID = units[i]
@@ -1428,7 +1444,6 @@ local function ProcessUnits(units, drawFlags, reason)
 			end
 		end
 	end
-
 end
 
 
@@ -1624,6 +1639,9 @@ local function initGL4()
 	initiated = true
 end
 
+--------------------------------------------------------------------
+-- Debug chat actions
+--------------------------------------------------------------------
 
 local function ReloadCUSGL4(optName, line, words, playerID)
 	if initiated and (not words) then
@@ -1645,27 +1663,6 @@ local function DisableCUSGL4(optName, _, _, playerID)
 	end
 	Spring.Echo("[CustomUnitShadersGL4] Disabling")
 	gadget:Shutdown()
-end
-
-
-function gadget:GameFrame(n)
-	if not itsXmas and SYNCED.itsXmas then
-		itsXmas = true
-		initiated = false
-		ReloadCUSGL4(nil,nil,nil, Spring.GetMyPlayerID())
-	end
-	for unitID, buildProgress in pairs(buildProgresses) do
-		local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
-		if health and build ~= buildProgress then
-			uniformCache[1] = ((build < 1) and build) or -1
-			gl.SetUnitBufferUniforms(unitID, uniformCache, 0) -- buildprogress (0.x)
-			if build < 1 then
-				buildProgresses[unitID] = build
-			else
-				buildProgresses[unitID] = nil
-			end
-		end
-	end
 end
 
 local updaterate = 1
@@ -1826,10 +1823,28 @@ local function FreeTextures() -- pre we are using 2200mb
 	end
 end
 
-local function SetUnitTexture(unitID, tex1, tex2)
-	RemoveObject(unitID, "override_texture")
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
+--------------------------------------------------------------------
+-- Gadget Callins
+--------------------------------------------------------------------
+
+function gadget:GameFrame(n)
+	if not itsXmas and SYNCED.itsXmas then
+		itsXmas = true
+		initiated = false
+		ReloadCUSGL4(nil,nil,nil, Spring.GetMyPlayerID())
+	end
+	for unitID, buildProgress in pairs(buildProgresses) do
+		local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
+		if health and build ~= buildProgress then
+			uniformCache[1] = ((build < 1) and build) or -1
+			gl.SetUnitBufferUniforms(unitID, uniformCache, 0) -- buildprogress (0.x)
+			if build < 1 then
+				buildProgresses[unitID] = build
+			else
+				buildProgresses[unitID] = nil
+			end
+		end
+	end
 end
 
 function gadget:Initialize()
