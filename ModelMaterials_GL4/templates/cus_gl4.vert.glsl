@@ -579,7 +579,7 @@ void main(void)
 
 
 	//worldPos.x += 64; // for dem debuggins
-	pieceVertexPosOrig.w = modelPos.y / (max(1.0, UNITUNIFORMS.userDefined[2].w)); //11 is unit height
+	pieceVertexPosOrig.w = modelPos.y / (max(1.0, UNITUNIFORMS.userDefined[2].w)); // 11 is unit height
 
 	//gl_TexCoord[0] = gl_MultiTexCoord0;
 	uint teamIndex = (instData.z & 0x000000FFu); //leftmost ubyte is teamIndex

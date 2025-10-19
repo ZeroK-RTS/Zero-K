@@ -1980,7 +1980,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 		--local unitHeight = Spring.GetUnitHeight(unitID)
 		--local maxY = UnitDefs[unitDefID].model.maxy
 		--Spring.Echo(UnitDefs[unitDefID].name, unitHeight, maxY)
-		unitDefModelMaxY[unitDefID] = UnitDefs[unitDefID].model.maxy or 10
+		local ud = UnitDefs[unitDefID]
+		unitDefModelMaxY[unitDefID] = (ud.customParams.build_effect_sweep_height and tonumber(ud.customParams.build_effect_sweep_height) or ud.model.maxy or 10)
 	end
 	uniformCache[1] = unitDefModelMaxY[unitDefID]
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 11) -- set unit height

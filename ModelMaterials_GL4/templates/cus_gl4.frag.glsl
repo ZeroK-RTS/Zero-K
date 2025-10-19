@@ -1194,7 +1194,6 @@ void main(void){
 			vec3 grid = step(0.5, clamp(1.0 - 10* fract((pieceVertexPosOrig.xyz) / gridSize), 0.0, 1.0));
 
 
-			
 			// The entire model will always get the 8 elmo buildgrid:
 			//outColor.rgb = mix(outColor.rgb, vec3(1.0, 0.0, 1.0), buildGridFactor);
 			//outColor.rgb = vec3(buildGridFactor); 
@@ -1204,7 +1203,7 @@ void main(void){
 			if (height > progressLevels.x){
 				float unemissive = 1.0 - smoothstep(progressLevels.x, progressLevels.y, height);
 				outSpecularColor.rgb *= unemissive;
-				outColor -= emissiveness * albedoColor * (1.0-  unemissive);
+				outColor -= emissiveness * albedoColor * (1.0 - unemissive);
 				emissiveness = emissiveness * unemissive;
 				//outColor.rgb = vec3(unemissive);
 			}
@@ -1235,7 +1234,7 @@ void main(void){
 
 			
 			// Always display a grid when building, but fade it out on the last 5% of buildProgress
-			float last5percent = smoothstep(0.0, 0.05, 1.0 - buildProgress);
+			float last5percent = smoothstep(0.0, 0.05, 1.01 - buildProgress);
 			outColor.rgb = mix(outColor.rgb, pulseTeamColor , line * last5percent);
 
 			// Always show level lines
