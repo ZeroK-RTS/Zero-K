@@ -232,18 +232,26 @@ local numUnitsInViewport = 0
 local featuresInViewport = {} --featureID:featureDefID
 local numFeaturesInViewport = 0
 
+-- Unit state changes whether they want to go into the transparent unit bin.
+-- The table transparentUnitBin stores whether they are actually in those bins.
+-- This table is only updated when units leave and reenter the view. TODO: update on state change.
+local transparentUnitBin = {}
+local wantTranparent = {}
+
 local objectDefToBitShaderOptions = {} -- This is a table containing positive UnitIDs, negative featureDefIDs to bitShaderOptions mapping
 
 local objectDefToUniformBin = {} -- maps unitDefID/featuredefID to a uniform bin
+local objectDefToTransparentUniformBin = {} -- As above, but for nanoframes
 -- IMPORTANT: OBJECTID AND OBJECTDEFID ARE ALWAYS POS FOR UNITS, NEG FOR FEATURES!
 -- this will still use the same shader, but we gotta switch uniforms in between for efficiency
 -- a uniform bin contains
 -- objectDefs are negative for features
 -- objectIDs are negative for features too
 
-local function GetUniformBinID(objectDefID, reason)
-	if objectDefID and objectDefToUniformBin[objectDefID] then
-		return objectDefToUniformBin[objectDefID]
+local function GetUniformBinID(objectDefID, transparent, reason)
+	local returnVal = objectDefID and (transparent and objectDefToTransparentUniformBin[objectDefID] or objectDefToUniformBin[objectDefID])
+	if returnVal then
+		return returnVal
 	else
 		if debugmode then
 			Spring.Echo("Failed to find a uniform bin id for objectDefID", objectDefID, reason)
@@ -320,7 +328,7 @@ local cusFeatureIDtoDrawFlag = {} -- {featureID = drawFlag, ...}, this remains p
 	-- numobjects = 0,  -- a 'pointer to the end'
 -- }
 
-local uniformBins, texToPreload = VFS.Include("LuaRules/Configs/cus_defs.lua", nil, VFS.ZIP)
+local uniformBins, uniformBinOrder, texToPreload = VFS.Include("LuaRules/Configs/cus_defs.lua", nil, VFS.ZIP)
 local unitDrawBins = nil -- this also controls wether cusgl4 is on at all!
 
 local objectIDtoDefID = {}
@@ -856,6 +864,7 @@ local function LoadUnitTextureSet(unitDefID, unitDef, unitID, texOverride1, texO
 
 	local normalTex = GetNormal(unitDef, nil)
 	objectDefToUniformBin[unitDefID] = unitDef.customParams and unitDef.customParams.uniformbin or "defaultunit"
+	objectDefToTransparentUniformBin[unitDefID] = objectDefToUniformBin[unitDefID] .. "_transparent"
 	local textureTable = {
 		--%102:0 = unitDef 102 s3o tex1
 		[0] = texOverride1 or string.format("%%%s:%i", unitDefID, 0),
@@ -1027,7 +1036,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	if not objectDefID then
 		Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
 	end
-	uniformBinID = uniformBinID or GetUniformBinID(objectDefID, "AssignObjectToBin")
+	uniformBinID = uniformBinID or GetUniformBinID(objectDefID, transparentUnitBin[objectID], "AssignObjectToBin")
 	--Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID)
 	
 	--Spring.Debug.TraceFullEcho()
@@ -1216,6 +1225,7 @@ local function AddObject(objectID, drawFlag, reason)
 		return -- This bail is needed so that we dont add/update units that dont actually exist any more, when cached from the catchup phase
 	end
 
+	transparentUnitBin[objectID] = (wantTranparent[objectID] or false)
 	for k = 1, #drawBinKeys do
 		local flag = drawBinKeys[k]
 		if HasAllBits(drawFlag, flag) then
@@ -1340,7 +1350,7 @@ local function UpdateObject(objectID, drawFlag, reason)
 		if hasFlagOld ~= hasFlagNew and overrideDrawFlagsCombined[flag] then
 			local shader = GetShaderName(flag, objectDefID)
 			local texKey  = retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
-			local uniformBinID = GetUniformBinID(objectDefID, 'UpdateObject')
+			local uniformBinID = GetUniformBinID(objectDefID, transparentUnitBin[objectID], 'UpdateObject')
 
 			if hasFlagOld then --had this flag, but no longer have
 				RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, "nolongerhasflag")
@@ -1393,7 +1403,7 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 		if overrideDrawFlagsCombined[flag] then
 			local shader = GetShaderName(flag, objectDefID)
 			local texKey  = retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
-			local uniformBinID = GetUniformBinID(objectDefID, 'RemoveObject')
+			local uniformBinID = GetUniformBinID(objectDefID, transparentUnitBin[objectID], 'RemoveObject')
 			RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, "removeobject")
 			--if flag == 1 then
 			--	RemoveObjectFromBin(objectID, objectDefID, texKey, nil, 0, uniformBinID)
@@ -1535,27 +1545,31 @@ local function ExecuteDrawPass(drawPass)
 			if unitscountforthisshader > 0 then
 				shaderTable:Activate()
 				shaderswaps = shaderswaps + 1
-				for uniformBinID, uniformBin in pairs(data) do
+				for i = 1, #uniformBinOrder do
+					local uniformBinID = uniformBinOrder[i]
+					uniformBin = data[uniformBinID]
 					--Spring.Echo("Shadername", shaderId.shaderName, "uniformBinID", uniformBinID)
 					--local uniforms = uniformBins[uniformBinID]
 					-- TODO: only activate shader if we actually have units in its bins?
-					SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
-					for _, texAndObj in pairs(uniformBin) do
-						if texAndObj.numobjects > 0  then
-							batches = batches + 1
-							units = units + texAndObj.numobjects
-							local mybinVAO = texAndObj.VAO
-							for bindPosition, tex in pairs(texAndObj.textures) do
-								gl.Texture(bindPosition, tex)
+					if uniformBin then
+						SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
+						for _, texAndObj in pairs(uniformBin) do
+							if texAndObj.numobjects > 0 then
+								batches = batches + 1
+								units = units + texAndObj.numobjects
+								local mybinVAO = texAndObj.VAO
+								for bindPosition, tex in pairs(texAndObj.textures) do
+									gl.Texture(bindPosition, tex)
+								end
+
+								SetFixedStatePre(drawPass, shaderTable)
+								shaderactivations = shaderactivations + 1
+
+								mybinVAO:Submit()
+
+								SetFixedStatePost(drawPass, shaderTable)
+								unbindtextures = true
 							end
-
-							SetFixedStatePre(drawPass, shaderTable)
-							shaderactivations = shaderactivations + 1
-
-							mybinVAO:Submit()
-
-							SetFixedStatePost(drawPass, shaderTable)
-							unbindtextures = true
 						end
 					end
 				end
@@ -1975,11 +1989,13 @@ end
 function gadget:UnitFinished(unitID)
 	gl.SetUnitBufferUniforms(unitID, {-1}, 0) -- set build progress to built
 	buildProgresses[unitID] = nil
+	wantTranparent[unitID] = false
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
 
 function gadget:UnitReverseBuilt(unitID)
 	UpdateBuildProgress(unitID, false, true)
+	wantTranparent[unitID] = true
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
 
@@ -1998,6 +2014,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12) -- clear cloak effect
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 6) -- clear selectedness effect
 	
+	local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
+	wantTranparent[unitID] = (build < 1)
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
 
@@ -2020,6 +2038,7 @@ end
 function gadget:UnitCloaked(unitID)
 	uniformCache[1] = Spring.GetGameFrame()
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
+	wantTranparent[unitID] = true
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 	if debugmode then
 		Spring.Echo("UnitCloaked", unitID, Spring.GetUnitDrawFlag(unitID))
@@ -2027,6 +2046,7 @@ function gadget:UnitCloaked(unitID)
 end
 
 function gadget:UnitDecloaked(unitID)
+	wantTranparent[unitID] = false
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 	uniformCache[1] = -1 * Spring.GetGameFrame()
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12)

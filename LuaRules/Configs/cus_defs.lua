@@ -48,6 +48,12 @@ local uniformBins = {
 		baseVertexDisplacement = 0.0,
 		brightnessFactor = 1,
 	},
+	defaultunit_transparent = {
+		-- by default gadget will assign these options to every unit texture set bin
+		bitOptions = defaultUnitBitShaderOptions,
+		baseVertexDisplacement = 0.0,
+		brightnessFactor = 1,
+	},
 	-- These are the default featureDef uniformBins, you probably don't want to mess with them unless you really know what you're doing
 	feature = {
 		-- by default gadget will assign these options to every (non-wreck, non-tree) feature texture set bin
@@ -81,6 +87,16 @@ local uniformBins = {
 	},
 } -- maps uniformbins to a table of uniform names/values
 
+local uniformBinOrder = {
+	"wreck",
+	"tree",
+	"treepbr",
+	"featurepbr",
+	"feature",
+	"defaultunit",
+	"defaultunit_transparent",
+}
+
 local texToPreload = {
 	-- only preload textures not loaded by engine e.g. normals or custom wreckTex
 	--[[ BAR example
@@ -94,4 +110,4 @@ local texToPreload = {
 	table.insert(texToPreload, "unittextures/leg_wreck_normal.dds")
 end--]]
 
-return uniformBins, texToPreload
+return uniformBins, uniformBinOrder, texToPreload
