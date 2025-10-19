@@ -2,14 +2,14 @@ local gadget = gadget ---@type Gadget
 
 function gadget:GetInfo()
 	return {
-		name	= "CUS GL4",
-		desc	= "Implements CustomUnitShaders for GL4 rendering pipeline",
+		name    = "CUS GL4",
+		desc    = "Implements CustomUnitShaders for GL4 rendering pipeline",
 		version = "0.5",
-		author	= "ivand, Beherith",
-		date 	= "20220310",
+		author  = "ivand, Beherith",
+		date    = "20220310",
 		license = "GNU GPL, v2 or later",
-		layer	= 0,
-		enabled	= true,
+		layer   = 0,
+		enabled = true,
 		depends = {'gl4'},
 	}
 end
@@ -193,11 +193,11 @@ end
 
 		-- Should also get the normalmaps for each unit!
 		-- PBR textures:
-			-- uniform sampler2D brdfLUT;			//9
-			-- uniform sampler2D envLUT;			//10
-			-- uniform samplerCube reflectTex; 		// 7
+			-- uniform sampler2D brdfLUT;      // 9
+			-- uniform sampler2D envLUT;       // 10
+			-- uniform samplerCube reflectTex; // 7
 
-			-- uniform sampler2D losMapTex;	//8 for features out of los maybe?
+			-- uniform sampler2D losMapTex;    // 8 for features out of los maybe?
 
 		-- We also need the skybox cubemap for PBR (samplerCube reflectTex)
 		-- We also need wrecktex for damaged units!
@@ -217,8 +217,6 @@ end
 
 -- We can use the SUniformsBuffer vec4 uni[instData.y].userDefined[5] to pass data persistent unit-info
 -- floats 0-5 are already in use by HealthBars
-
-
 
 -- Set autoReload.enabled = true to enable on-the-fly editing of shaders.
 local autoReload = {enabled = false, vssrc = "", fssrc = "", lastUpdate = Spring.GetTimer(), updateRate = 0.5}
@@ -696,20 +694,20 @@ local function compileMaterialShader(template, name, recompilation)
 end
 
 -- Order of textures in shader:
-	-- uniform sampler2D texture1;			//0
-	-- uniform sampler2D texture2;			//1
-	-- uniform sampler2D normalTex;		//2
+	-- uniform sampler2D texture1;        //0
+	-- uniform sampler2D texture2;        //1
+	-- uniform sampler2D normalTex;       //2
 
-	-- uniform sampler2D texture1w;		//3
-	-- uniform sampler2D texture2w;		//4
-	-- uniform sampler2D normalTexw;		//5
+	-- uniform sampler2D texture1w;       //3
+	-- uniform sampler2D texture2w;       //4
+	-- uniform sampler2D normalTexw;      //5
 
-	-- uniform sampler2DShadow shadowTex;	//6
-	-- uniform samplerCube reflectTex;		//7
+	-- uniform sampler2DShadow shadowTex; //6
+	-- uniform samplerCube reflectTex;    //7
 
-	-- uniform sampler2D losMapTex;	//8
+	-- uniform sampler2D losMapTex;       //8
 
-	-- uniform sampler2D brdfLUT;			//9
+	-- uniform sampler2D brdfLUT;         //9
 
 local textureKeytoSet = {} -- table of {TextureKey : {textureTable}}
 
@@ -795,7 +793,7 @@ local function GetNormal(unitDef, featureDef)
 
 		if featureDef.customParams and featureDef.customParams.normaltex then
 			local normaltex = featureDef.customParams.normaltex
-			if existingfilecache[normaltex] == nil and FileExists(normaltex) then	
+			if existingfilecache[normaltex] == nil and FileExists(normaltex) then
 				existingfilecache[normaltex] = normaltex
 			end
 			return normaltex
@@ -1016,7 +1014,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	uniformBinID = uniformBinID or GetUniformBinID(objectDefID, "AssignObjectToBin")
 	--Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID)
 	
-	--	Spring.Debug.TraceFullEcho()
+	--Spring.Debug.TraceFullEcho()
 	if (texKey == nil or uniformBinID == nil) then
 		if badassigns[objectID] == nil then
 			Spring.Echo("[CUS GL4]Failure to assign to ", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
@@ -1084,7 +1082,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	if unitDrawBinsFlagShaderUniformsTexKey.objectsIndex[objectID] then
 		Spring.Echo("Trying to add a unit to a bin that it is already in!")
 	else
-		if debugmode then Spring.Echo("AssignObjectToBin success:",objectID, objectDefID, flag, shader, texKey, uniformBinID	) end
+		if debugmode then Spring.Echo("AssignObjectToBin success:",objectID, objectDefID, flag, shader, texKey, uniformBinID) end
 	end
 
 	local maxElements = unitDrawBinsFlagShaderUniformsTexKey.maxElements
@@ -1206,7 +1204,7 @@ local function AddObject(objectID, drawFlag, reason)
 		if HasAllBits(drawFlag, flag) then
 			if overrideDrawFlagsCombined[flag] then
 								 --objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom
-				AssignObjectToBin(objectID, objectDefID, flag, nil,	nil,	  nil,	  nil, 			"addobject")
+				AssignObjectToBin(objectID, objectDefID, flag, nil, nil, nil,  nil, "addobject")
 			end
 		end
 	end
@@ -1455,7 +1453,7 @@ local function ProcessFeatures(features, drawFlags, reason)
 		-- we will solve this by simply not CUS-ing a feature that has an ID of 0
 		-- I leave this wonderful bug to any future soul who has to maintain this
 		if featureID > 0 then
-			--Spring.Echo("ProcessFeature", featureID	, drawFlag)
+			--Spring.Echo("ProcessFeature", featureID, drawFlag)
 			if math_bit_and(drawFlag, 34) > 0 then -- has alpha (2) or alphashadow(32) flag 
 				-- cloaked units get mapped to pure forward + deferred, no refl/refr either
 				drawFlag = 1
@@ -1595,14 +1593,14 @@ local function initGL4()
 	end
 
 	unitDrawBins = {
-		[0    ] = {},	-- deferred opaque
-		[1    ] = {},	-- forward  opaque
-		[1 + 4] = {},	-- forward  opaque + reflection
-		[1 + 8] = {},	-- forward  opaque + refraction
-		[2    ] = {},	-- alpha
-		[2 + 4] = {},	-- alpha + reflection
-		[2 + 8] = {},	-- alpha + refraction
-		[16   ] = {},	-- shadow
+		[0    ] = {}, -- deferred opaque
+		[1    ] = {}, -- forward  opaque
+		[1 + 4] = {}, -- forward  opaque + reflection
+		[1 + 8] = {}, -- forward  opaque + refraction
+		[2    ] = {}, -- alpha
+		[2 + 4] = {}, -- alpha + reflection
+		[2 + 8] = {}, -- alpha + refraction
+		[16   ] = {}, -- shadow
 	}
 	Spring.Echo("[CUS GL4] Initializing materials")
 
@@ -1669,7 +1667,7 @@ function gadget:GameFrame(n)
 			else
 				buildProgresses[unitID] = nil
 			end
-		end	
+		end
 	end
 end
 
