@@ -1260,28 +1260,37 @@ void main(void){
 		float selectedness = teamCol.a;
 		
 		//selectedness = 0.0;
-		if (selectedness > 0.25){
+		if (selectedness != 0.0){
 			float inselection = (selectedness == 1.0 || selectedness == 3.0) ? 1.0 : 0.0;
 			float mouseovered = (selectedness > 1.5 ) ? 1.0 : 0.0;
+			float isWreck = (selectedness < 0.0 ) ? 1.0 : 0.0;
 			float allyselected = step(abs(fract(selectedness) - 0.5), 0.25);
 			
-			float mouseOverAnimation = fract(worldVertexPos.y * (1.0/30.0) + (simFrame)  * (2.0/40.0));
+			
+			float mouseOverAnimation = fract((simFrame) * 0.03);
+			mouseOverAnimation = 0.4 + 0.5 * (min(0.5, mouseOverAnimation) + min(0.5, 1.0 - mouseOverAnimation) - 0.5);
 
 			// Base highlight amount, rgb contains the color of the highlight
 			// Alpha contains the strength of the highlight
 			vec4 selectionHighlight = vec4(0);
 			selectionHighlight.rgb = clamp(teamCol.rgb, 0.65, 1.0);
-
-
+			
+			float x100  = 80.0  / (80.0  - min(0.0, selectedness));
+			float x1000 = 1000.0 / (1000.0  - min(0.0, selectedness));
+			float r = 1.0 - x1000;
+			float g = x1000 - x100;
+			float b = x100;
+			vec3 wreckHiglight = vec3(r, g, b);
 			float dotcamera = dot(worldNormal, V);
+			
 
 			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1);
 			highLightOpacity = highLightOpacity * highLightOpacity;
 
 			vec4 mouseOverHighlight = selectionHighlight;
 
-			outColor.rgb += mouseovered * mouseOverAnimation * mouseOverHighlight.rgb * 0.5;
-			outColor.rgb += inselection * highLightOpacity * selectionHighlight.rgb;
+			outColor.rgb += (mouseOverHighlight.rgb * mouseovered + wreckHiglight * isWreck) * mouseOverAnimation;
+			outColor.rgb += inselection* highLightOpacity * selectionHighlight.rgb;
 		}
 	#endif 
 

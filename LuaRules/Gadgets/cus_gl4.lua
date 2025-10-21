@@ -2061,7 +2061,7 @@ function gadget:FeatureDestroyed(featureID)
 	destroyedFeatureDrawFlags[numdestroyedFeatures] = 0
 end
 
-local firstDraw = false
+local firstDraw = true
 function gadget:DrawWorldPreUnit()
 --function gadget:DrawGenesis() -- nope, shadow flags still a frame late https://github.com/beyond-all-reason/spring/issues/264
 	if not unitDrawBins then
@@ -2139,7 +2139,9 @@ function gadget:DrawWorldPreUnit()
 
 			local firstunits = Spring.GetVisibleUnits()
 			local firstdrawFlagsUnits = {}
-			for i, unitID in ipairs(firstunits) do firstdrawFlagsUnits[i] = 1 + 4 + 16 end
+			for i, unitID in ipairs(firstunits) do
+				firstdrawFlagsUnits[i] = 1 + 4 + 16
+			end
 			ProcessUnits(firstunits, firstdrawFlagsUnits, "firstDraw")
 			firstDraw = false
 		end
