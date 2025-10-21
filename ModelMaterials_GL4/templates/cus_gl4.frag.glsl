@@ -1289,8 +1289,8 @@ void main(void){
 
 			vec4 mouseOverHighlight = selectionHighlight;
 
-			outColor.rgb += (mouseOverHighlight.rgb * mouseovered + wreckHiglight * isWreck) * mouseOverAnimation;
-			outColor.rgb += inselection* highLightOpacity * selectionHighlight.rgb;
+			outColor.rgb += mix(-1.0 * outColor.rgb, (mouseOverHighlight.rgb * mouseovered + wreckHiglight * isWreck) * mouseOverAnimation, 0.8);
+			//outColor.rgb += inselection* highLightOpacity * selectionHighlight.rgb;
 		}
 	#endif 
 
