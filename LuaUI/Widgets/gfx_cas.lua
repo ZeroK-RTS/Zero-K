@@ -26,7 +26,7 @@ local glBlending = gl.Blending
 local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
-local defaultValue = 0.6
+local defaultValue = 0.75
 local isDisabled = (defaultValue ~= 0)
 
 -----------------------------------------------------------------
@@ -200,7 +200,7 @@ options = {
 	cas_height_scale2 = {
 		name = 'Zoom sharpening range',
 		type = 'number',
-		value = 0.2,
+		value = 0.4,
 		min = 0,
 		max = 1,
 		tooltipFunction = function(self)
