@@ -2173,21 +2173,21 @@ function gadget:DrawWorldPreUnit()
 	end
 end
 
-local nightFactorBins = {tree = 1.3, feature = 1.3, featurepbr = 1.3, treepbr = 1.3}
-local lastSunChanged = -1
+--local nightFactorBins = {tree = 1.3, feature = 1.3, featurepbr = 1.3, treepbr = 1.3}
+--local lastSunChanged = -1
 function gadget:SunChanged() -- Note that map_nightmode.lua gadget has to change sun twice in a single draw frame to update all
-	local df = Spring.GetDrawFrame()
-	if df == lastSunChanged then
-		return
-	end
-	lastSunChanged = df
-	local nightFactor = 1.0
-	if GG['NightFactor'] then
-		nightFactor = (GG['NightFactor'].red + GG['NightFactor'].green + GG['NightFactor'].blue) * 0.33
-	end
-	for uniformBinName, defaultBrightnessFactor in pairs(nightFactorBins) do
-		uniformBins[uniformBinName].brightnessFactor = defaultBrightnessFactor * nightFactor
-	end
+	--local df = Spring.GetDrawFrame()
+	--if df == lastSunChanged then
+	--	return
+	--end
+	--lastSunChanged = df
+	--local nightFactor = 1.0
+	--if GG['NightFactor'] then
+	--	nightFactor = (GG['NightFactor'].red + GG['NightFactor'].green + GG['NightFactor'].blue) * 0.33
+	--end
+	--for uniformBinName, defaultBrightnessFactor in pairs(nightFactorBins) do
+	--	uniformBins[uniformBinName].brightnessFactor = defaultBrightnessFactor * nightFactor
+	--end
 end
 
 -- Returns 0 for deferred pass
