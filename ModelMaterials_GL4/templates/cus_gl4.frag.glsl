@@ -1252,45 +1252,39 @@ void main(void){
 	// SELECTION EFFECTS!
 	#if 1
 		// unit buffer uniforms 1.z (#6)
-		// 0 means unit is un selected
-		// 1 means unit is selected
-		// +0.5 means ally also selected unit
-		// +2 means its mouseovered
-		// Sho
+		// 0 means unit is not to be highlighted
+		// <0 means highlight wreck with metal value -selectedness
+		// [1, 2) means draw self hover with intensity selectedness%1
 		float selectedness = teamCol.a;
 		
 		//selectedness = 0.0;
 		if (selectedness != 0.0){
-			float inselection = (selectedness == 1.0 || selectedness == 3.0) ? 1.0 : 0.0;
-			float mouseovered = (selectedness > 1.5 ) ? 1.0 : 0.0;
 			float isWreck = (selectedness < 0.0 ) ? 1.0 : 0.0;
-			float allyselected = step(abs(fract(selectedness) - 0.5), 0.25);
+			float mouseoverOpacity = (selectedness >= 1.0 && selectedness < 2.0) ? fract(selectedness) * 0.85 : 0.0;
 			
 			
-			float mouseOverAnimation = fract((simFrame) * 0.03);
-			mouseOverAnimation = 0.4 + 0.5 * (min(0.5, mouseOverAnimation) + min(0.5, 1.0 - mouseOverAnimation) - 0.5);
+			float mouseOverAnimation = fract((simFrame) * 0.025);
+			mouseOverAnimation = 0.4 + 0.55 * (min(0.5, mouseOverAnimation) + min(0.5, 1.0 - mouseOverAnimation) - 0.5);
 
-			// Base highlight amount, rgb contains the color of the highlight
-			// Alpha contains the strength of the highlight
-			vec4 selectionHighlight = vec4(0);
-			selectionHighlight.rgb = clamp(teamCol.rgb, 0.65, 1.0);
+			// Team colour highlight
+			vec4 mouseOverHighlight = vec4(0);
+			mouseOverHighlight.rgb = clamp(teamCol.rgb, 0.65, 1.0);
 			
+			// Wreck metal determines colour
 			float x100  = 80.0  / (80.0  - min(0.0, selectedness));
 			float x1000 = 1000.0 / (1000.0  - min(0.0, selectedness));
 			float r = 1.0 - x1000;
 			float g = x1000 - x100;
 			float b = x100;
 			vec3 wreckHiglight = vec3(r, g, b);
-			float dotcamera = dot(worldNormal, V);
 			
-
+			float dotcamera = dot(worldNormal, V);
 			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1);
 			highLightOpacity = highLightOpacity * highLightOpacity;
 
-			vec4 mouseOverHighlight = selectionHighlight;
-
-			outColor.rgb += mix(-1.0 * outColor.rgb, (mouseOverHighlight.rgb * mouseovered + wreckHiglight * isWreck) * mouseOverAnimation, 0.8);
-			//outColor.rgb += inselection* highLightOpacity * selectionHighlight.rgb;
+			// Mix some negative base colour intensity to mitigate over-highlighting bright map features
+			outColor.rgb += isWreck * mix(-1.0 * outColor.rgb, wreckHiglight * mouseOverAnimation, 0.8);
+			outColor.rgb = mix(outColor.rgb, outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, mouseoverOpacity);
 		}
 	#endif 
 

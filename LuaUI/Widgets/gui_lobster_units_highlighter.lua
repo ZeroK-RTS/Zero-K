@@ -19,6 +19,7 @@ end
 --------------------------------------------------------------------------------
 -- TODO: Make this configurable
 local unitJumpStatusLineWidth = 4
+local HIGHLIGHT_KEY = "lob_jump"
 
 -- TODO: Make colors configurable
 local LIGHTRED = {1, 0.35, 0.35, 0.4}
@@ -311,7 +312,7 @@ local function RemoveAllHighlights()
 			WG.StopHighlightUnitGL4(highlightID)
 		end
 		if WG.HighlightUnitCus then
-			WG.HighlightUnitCus(unitID, 0)
+			WG.HighlightUnitCus(unitID, HIGHLIGHT_KEY, 0)
 		end
 	end
 	highlightedUnits = false
@@ -338,7 +339,7 @@ local function UpdateHighlight()
 					end
 					if WG.HighlightUnitCus then
 						highlightedUnits[unitID] = highlightedUnits[unitID] or true
-						WG.HighlightUnitCus(unitID, -2600) -- This means yellow
+						WG.HighlightUnitCus(unitID, HIGHLIGHT_KEY, -2000) -- Yellow wreck colour
 					end
 				end
 			end
@@ -351,7 +352,7 @@ local function UpdateHighlight()
 				WG.StopHighlightUnitGL4(highlightID)
 			end
 			if WG.HighlightUnitCus then
-				WG.HighlightUnitCus(unitID, 0)
+				WG.HighlightUnitCus(unitID, HIGHLIGHT_KEY, 0)
 			end
 			highlightedUnits[unitID] = nil
 		end
@@ -387,4 +388,10 @@ end
 function widget:SelectionChanged(sel)
 	UpdateSelection(sel)
 	fullSelection = sel
+end
+
+function widget:Initialize(sel)
+	if WG.SetHighlightPriority then
+		WG.SetHighlightPriority(HIGHLIGHT_KEY, 1.4)
+	end
 end

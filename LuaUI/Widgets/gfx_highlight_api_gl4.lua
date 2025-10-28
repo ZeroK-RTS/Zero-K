@@ -11,10 +11,6 @@ function widget:GetInfo()
   }
 end
 
-
-
-	gl.SetUnitBufferUniforms(unitID, {100}, 6)
-
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
 VFS.Include(luaShaderDir.."instancevboidtable.lua")
