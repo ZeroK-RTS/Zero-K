@@ -1260,15 +1260,18 @@ void main(void){
 		//selectedness = 0.0;
 		if (selectedness != 0.0){
 			float isWreck = (selectedness < 0.0 ) ? 1.0 : 0.0;
-			float mouseoverOpacity = (selectedness >= 1.0 && selectedness < 2.0) ? fract(selectedness) * 0.85 : 0.0;
+			float mouseoverOpacity = (selectedness >= 1.0 && selectedness < 2.0) ? fract(selectedness) : 0.0;
+			float edge = fract(worldVertexPos.y * 0.06 + (simFrame) * 0.04);
+			edge = mix(edge, 0.0, edge*edge*edge*edge*edge);
 			
-			
-			float mouseOverAnimation = fract((simFrame) * 0.025);
-			mouseOverAnimation = 0.4 + 0.55 * (min(0.5, mouseOverAnimation) + min(0.5, 1.0 - mouseOverAnimation) - 0.5);
+			float wreckIntensity = fract((simFrame) * 0.025);
+			wreckIntensity = 0.4 + 0.55 * (min(0.5, wreckIntensity) + min(0.5, 1.0 - wreckIntensity) - 0.5);
+			wreckIntensity *= 0.5 + 0.5 * edge;
 
 			// Team colour highlight
 			vec4 mouseOverHighlight = vec4(0);
 			mouseOverHighlight.rgb = clamp(teamCol.rgb, 0.65, 1.0);
+			mouseoverOpacity *= 0.7 + 0.4 * edge;
 			
 			// Wreck metal determines colour
 			float x100  = 80.0  / (80.0  - min(0.0, selectedness));
@@ -1283,7 +1286,7 @@ void main(void){
 			highLightOpacity = highLightOpacity * highLightOpacity;
 
 			// Mix some negative base colour intensity to mitigate over-highlighting bright map features
-			outColor.rgb += isWreck * mix(-1.0 * outColor.rgb, wreckHiglight * mouseOverAnimation, 0.8);
+			outColor.rgb += isWreck * mix(-1.0 * outColor.rgb, wreckHiglight * wreckIntensity, 0.8);
 			outColor.rgb = mix(outColor.rgb, outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, mouseoverOpacity);
 		}
 	#endif 
