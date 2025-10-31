@@ -137,7 +137,7 @@ void main(void)
 		fragColor[GBUFFER_DIFFTEX_IDX] = diffColor;
 		fragColor[GBUFFER_SPECTEX_IDX] = vec4(texColor2.rgb, alpha);
 		fragColor[GBUFFER_EMITTEX_IDX] = vec4(0.0, 0.0, 0.0, 0.0);
-		fragColor[GBUFFER_MISCTEX_IDX] = vec4(255.0, 0.0, 0.0, 0.0);
+		fragColor[GBUFFER_MISCTEX_IDX] = vec4(0.0, 255.0, 0.0, 0.0);
 	#else
 		fragColor.rgb = mix(finalColor.rgb, fogColor.rgb, (1.0 - fogFactor) * int(shadingMode == 0) );
 		fragColor.rgb = mix(fragColor.rgb ,  nanoColor.rgb, nanoColor.a * int(shadingMode == 0));

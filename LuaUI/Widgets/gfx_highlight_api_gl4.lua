@@ -220,6 +220,11 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	if WG.HighlightUnitCus then
+		Spring.Echo("highlightUnitShader using CUS instead")
+		widgetHandler:RemoveWidget()
+		return
+	end
 
 	local vertVBO = gl.GetVBO(GL.ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false
 	local indxVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false

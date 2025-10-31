@@ -20,6 +20,7 @@ return { turretheavylaser = {
     outline_x = 115,
     outline_y = 150,
     outline_yoff = 50,
+    build_effect_sweep_height = 100,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],

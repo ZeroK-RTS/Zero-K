@@ -549,7 +549,7 @@ void main(void)
 	
 	float fulldepth = min(mapdepth, modeldepth); 
 	
-	float my_misctexvalue = texture(modelMisc, screenUV).r;
+	float my_misctexvalue = texture(modelMisc, screenUV).g;
 	float deltadepth = max(mapdepth - modeldepth, 0.0);
 	
 	//if (deltadepth > 0.0) discard; // we hit a model, bail!
@@ -564,7 +564,7 @@ void main(void)
 				vec2 pixeloffset = vec2(float(x), float(0));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
-				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).g;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
@@ -576,7 +576,7 @@ void main(void)
 				vec2 pixeloffset = vec2(float(0), float(y));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
-				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).g;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
@@ -593,7 +593,7 @@ void main(void)
 					vec2 pixeloffset = vec2(float(x), float(y));
 					vec2 screendelta = pixeloffset * viewGeometryInv;
 					
-					float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+					float misctexvalue = texture(modelMisc, screenUV+ screendelta).g;
 					float mapd = texture(mapDepths, screenUV+ screendelta).x;
 					float modd = texture(modelDepths, screenUV + screendelta).x;
 					float dd = max(mapd - modd, 0.0);

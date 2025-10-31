@@ -118,7 +118,12 @@ local function AddFeature(featureID)
 	if not (metal and metal > 1) then
 		return
 	end
-	handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.45, 0.3, 0.5, 0.35, 0, 0, 0)
+	if WG.HighlightUnitGL4 then
+		handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.45, 0.3, 0.5, 0.35, 0, 0, 0)
+	end
+	if WG.HighlightFeatureCus then
+		WG.HighlightFeatureCus(featureID, -metal)
+	end
 	--Spring.Utilities.FeatureEcho(featureID, "________________ ADD")
 end
 
@@ -141,26 +146,28 @@ local function UpdateFeatureVisibility()
 		handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
 	end
 	
-	-- Remove features that don't appear in the list of visible features.
-	local i = 1
-	while i <= #handledFeatureCheck do
-		if handledFeatureCheck[i] ~= newCheck then
-			local featureID = handledFeatureList[i]
-			if handledFeatureApiIDs[featureID] then
-				WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
-				--Spring.Utilities.FeatureEcho(featureID, "REMOVE 1")
+	if WG.HighlightUnitGL4 then
+		-- Remove features that don't appear in the list of visible features.
+		local i = 1
+		while i <= #handledFeatureCheck do
+			if handledFeatureCheck[i] ~= newCheck then
+				local featureID = handledFeatureList[i]
+				if handledFeatureApiIDs[featureID] then
+					WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
+					--Spring.Utilities.FeatureEcho(featureID, "REMOVE 1")
+				end
+				
+				handledFeatureCheck[i] = handledFeatureCheck[#handledFeatureCheck]
+				handledFeatureList[i] = handledFeatureList[#handledFeatureList]
+				handledFeatureMap[handledFeatureList[i]] = i
+				
+				handledFeatureCheck[#handledFeatureCheck] = nil
+				handledFeatureList[#handledFeatureList] = nil
+				handledFeatureMap[featureID] = nil
+				handledFeatureApiIDs[featureID] = nil
+			else
+				i = i + 1
 			end
-			
-			handledFeatureCheck[i] = handledFeatureCheck[#handledFeatureCheck]
-			handledFeatureList[i] = handledFeatureList[#handledFeatureList]
-			handledFeatureMap[handledFeatureList[i]] = i
-			
-			handledFeatureCheck[#handledFeatureCheck] = nil
-			handledFeatureList[#handledFeatureList] = nil
-			handledFeatureMap[featureID] = nil
-			handledFeatureApiIDs[featureID] = nil
-		else
-			i = i + 1
 		end
 	end
 end
@@ -178,7 +185,7 @@ end
 function widget:Update()
 	if firstUpdate then
 		firstUpdate = false
-		SetInternalEnableState(BAR_COMPAT and WG.HighlightUnitGL4)
+		SetInternalEnableState(BAR_COMPAT and (WG.HighlightUnitGL4 or WG.HighlightFeatureCus))
 	end
 	if not internalEnabled then
 		return
@@ -233,9 +240,12 @@ function widget:Update()
 			end
 		else
 			for i = 1, #handledFeatureList do
-				if handledFeatureApiIDs[handledFeatureList[i]] then
+				if WG.StopHighlightUnitGL4 and handledFeatureApiIDs[handledFeatureList[i]] then
 					WG.StopHighlightUnitGL4(handledFeatureApiIDs[handledFeatureList[i]])
 					--Spring.Utilities.FeatureEcho(featureID, "REMOVE __2")
+				end
+				if WG.HighlightFeatureCus then
+					WG.HighlightFeatureCus(handledFeatureList[i], 0)
 				end
 			end
 			handledFeatureList = false
