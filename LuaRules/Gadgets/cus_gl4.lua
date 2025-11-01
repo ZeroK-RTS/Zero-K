@@ -1644,6 +1644,11 @@ local function initGL4()
 		gadgetHandler:RemoveGadget()
 		return
 	end
+	if not GG.GetBrdfTexture then
+		Spring.Echo("CUS GL4 cannot find GG.GetBrdfTexture (no gl.CreateShader?), exiting")
+		gadgetHandler:RemoveGadget()
+		return
+	end
 
 	modelsVertexVBO:ModelsVBO()
 	modelsIndexVBO:ModelsVBO()

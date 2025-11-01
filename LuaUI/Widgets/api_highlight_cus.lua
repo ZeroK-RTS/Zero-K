@@ -78,6 +78,11 @@ function widget:UnitLeftLos(unitID)
 end
 
 function widget:Initialize()
+	if not gl.SetUnitBufferUniforms then
+		Spring.Echo("Highlight CUS API cannot find gl.SetUnitBufferUniforms, removing")
+		widgetHandler:RemoveWidget()
+		return
+	end
 	WG.HighlightUnitCus = HighlightUnitCus
 	WG.HighlightFeatureCus = HighlightFeatureCus
 end
