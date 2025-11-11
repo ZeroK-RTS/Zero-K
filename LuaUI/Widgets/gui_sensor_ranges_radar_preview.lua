@@ -155,6 +155,9 @@ local function GetRadarDrawPos(unitID, unitDefID)
 				x, z = Spring.Utilities.SnapToBuildGrid(unitDefID, Spring.GetBuildFacing(), coords[1], coords[3])
 			end
 			local y = (coords and coords[2] or spGetGroundHeight(x,z)) + radarTotalHeight[unitDefID]
+			if WG.buildingPlacementHeight then
+				y = y + WG.buildingPlacementHeight
+			end
 			if WG.placementHeight then
 				y = y + WG.placementHeight
 			end
