@@ -1,18 +1,39 @@
 function widget:GetInfo()
 	return {
-		name = "Sensor Ranges Radar Preview 2 WIP",
+		name = "Sensor Ranges Radar Preview 2",
 		desc = "Raytraced Radar Range Coverage on building Radar (GL4)",
 		author = "Beherith",
 		date = "2021.07.12",
 		license = "GPLv2",
 		layer = 0,
-		enabled = false
+		enabled = true
 	}
 end
-
 local spGetActiveCommand = Spring.GetActiveCommand
-
+local spGetGroundHeight = Spring.GetGroundHeight
 local SHADERRESOLUTION = 32 -- THIS SHOULD MATCH RADARMIPLEVEL!
+options_path = 'Settings/Interface/Building Placement'
+options_order = { 'showOnPlacement', 'showOnSelected'}
+options = {}
+-- options.shaderRes = {
+-- 	name = 'Resolution',
+-- 	type = 'number',
+-- 	min = 16, max = 32, step = 16,
+-- 	value = SHADERRESOLUTION,
+-- 	OnChange = function(self)
+-- 		SHADERRESOLUTION = self.value
+-- 	end
+-- }
+options.showOnPlacement = {
+	name = 'Radar coverage preview',
+	type = 'bool',
+	value = true,
+}
+options.showOnSelected = {
+	name = 'Selected radar coverage',
+	type = 'bool',
+	value = true,
+}
 
 local radarStructureRange = {}
 local radarTotalHeight = {}
@@ -50,8 +71,8 @@ local shaderSourceCache = {
 			heightmapTex = 0,
 		},
 	uniformFloat = {
-		radarcenter_range = { 2000, 100, 2000, 2000 },
-		resolution = { 32 },
+		radarcenter_range = { 1000, 100, 1000, 1000 },
+		resolution = { 128 },
 	},
 	shaderConfig = shaderConfig,
 }
@@ -96,23 +117,28 @@ function widget:SelectionChanged(sel)
 end
 
 local function GetRadarUnitToDraw()
-	if selectedRadarUnitID then
+	if selectedRadarUnitID and options.showOnSelected.value then
 		unitDefID = Spring.GetUnitDefID(selectedRadarUnitID)
 		if not unitDefID then
 			selectedRadarUnitID = false
 			return
 		end
 		return selectedRadarUnitID, unitDefID
-	else
+	elseif options.showOnPlacement.value then
 		local cmdID = select(2, spGetActiveCommand())
 		if cmdID == nil or cmdID >= 0 then
-			return
+			-- cmdID = WG.currentBuild and WG.currentBuild.defID
+			if not cmdID then
+				return
+			end
 		end
 		if radarStructureRange[-cmdID] then
 			return false, -cmdID
 		end
 	end
 end
+
+
 
 local function GetRadarDrawPos(unitID, unitDefID)
 	if unitID then
@@ -121,9 +147,17 @@ local function GetRadarDrawPos(unitID, unitDefID)
 	else
 		local mx, my, lp, mp, rp, offscreen = Spring.GetMouseState()
 		local _, coords = Spring.TraceScreenRay(mx, my, true, true)
-		if coords and coords[3] then
-			local x, z = Spring.Utilities.SnapToBuildGrid(unitDefID, Spring.GetBuildFacing(), coords[1], coords[3])
-			local y = coords[2] + radarTotalHeight[unitDefID]
+		if coords and coords[3] or WG.placementX then
+			local x, z
+			if WG.placementX then
+				x, z = WG.placementX, WG.placementZ
+			else
+				x, z = Spring.Utilities.SnapToBuildGrid(unitDefID, Spring.GetBuildFacing(), coords[1], coords[3])
+			end
+			local y = (coords and coords[2] or spGetGroundHeight(x,z)) + radarTotalHeight[unitDefID]
+			if WG.placementHeight then
+				y = y + WG.placementHeight
+			end
 			return x, y, z
 		end
 	end
