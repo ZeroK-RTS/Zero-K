@@ -14,6 +14,7 @@ return { spiderskirm = {
     midposoffset   = [[0 -5 0]],
     aim_lookahead  = 160,
     bait_level_default = 0,
+    normaltex = [[unittextures/recluse_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

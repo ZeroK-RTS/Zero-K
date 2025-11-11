@@ -23,6 +23,7 @@ return { mahlazer = {
     want_precise_proximity_targetting = 1,
     draw_blueprint_facing = 1,
     superweapon = 1,
+    normaltex = [[unittextures/starlight_normals.dds]],
 
     keeptooltip    = [[any string I want]],
     neededlink     = 600,

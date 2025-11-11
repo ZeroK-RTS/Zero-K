@@ -21,6 +21,7 @@ return { shipassault = {
     modelradius    = [[55]],
     turnatfullspeed = [[1]],
     extradrawrange = 800,
+    normaltex = [[unittextures/Core_normals.dds]],
 
     outline_x = 160,
     outline_y = 160,

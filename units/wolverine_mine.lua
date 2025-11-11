@@ -20,7 +20,8 @@ return { wolverine_mine = {
     mobilebuilding = [[1]],
     idle_cloak = 1,
     has_parent_unit = 1,
-	very_low_priority_target = 1,
+    very_low_priority_target = 1,
+    normaltex = [[unittextures/claw_normals.dds]],
   },
 
   explodeAs              = [[NOWEAPON]],

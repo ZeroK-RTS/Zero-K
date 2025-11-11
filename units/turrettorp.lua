@@ -13,6 +13,7 @@ return { turrettorp = {
   customParams      = {
     aimposoffset   = [[0 15 0]],
     midposoffset   = [[0 15 0]],
+    normaltex = [[unittextures/torpedolauncher_normals.dds]],
   },
 
   explodeAs         = [[MEDIUM_BUILDINGEX]],

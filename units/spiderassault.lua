@@ -18,6 +18,7 @@ return { spiderassault = {
     modelradius    = [[12]],
     cus_noflashlight = 1,
     selection_scale = 1.05,
+    normaltex = [[unittextures/hermit_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

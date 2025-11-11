@@ -34,6 +34,7 @@ return { striderdetriment = {
     selection_scale       = 1.4,
     decloak_footprint     = 6,
     health_bar_height     = 8,
+    normaltex = [[unittextures/Detriment_normals.dds]],
 
     stats_show_death_explosion = 1,
 

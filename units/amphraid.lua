@@ -19,6 +19,7 @@ return { amphraid = {
     amph_regen        = 5,
     amph_submerged_at = 40,
     aim_lookahead     = 80,
+    normaltex = [[unittextures/b_sumo_manti_gimp_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

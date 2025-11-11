@@ -23,6 +23,7 @@ return { vehcapture = {
     turnatfullspeed = [[1]],
     cus_noflashlight = 1,
     selection_scale = 1.05,
+    normaltex = [[unittextures/corvrad_normals.dds]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

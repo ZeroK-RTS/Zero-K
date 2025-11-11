@@ -45,6 +45,7 @@ return { plateshield = {
     cus_noflashlight   = 1,
     child_of_factory   = [[factoryshield]],
     buggeroff_offset   = 40,
+    normaltex = [[unittextures/corvrad_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,

@@ -22,6 +22,7 @@ return { amphcon = {
     morphtime      = 20,
     amph_regen = 10,
     amph_submerged_at = 40,
+    normaltex = [[unittextures/b_dom_morty_advcon_freaker_normals.dds]],
   },
 
   damageModifier      = 0.333,

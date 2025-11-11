@@ -19,6 +19,7 @@ return { jumpblackhole = {
     can_target_allies  = 1,
     midposoffset   = [[0 10 0]],
     health_bar_height     = 11,
+    normaltex = [[unittextures/b_dom_morty_advcon_freaker_normals.dds]],
 
     outline_x = 80,
     outline_y = 90,

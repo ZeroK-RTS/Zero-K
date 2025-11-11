@@ -16,6 +16,7 @@ return { turretlaser = {
   customParams                  = {
     aimposoffset   = [[0 22 0]],
     cus_noflashlight = 1,
+    normaltex = [[unittextures/gritty_normals.dds]],
 
     outline_x = 70,
     outline_y = 100,

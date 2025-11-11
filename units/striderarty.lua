@@ -16,6 +16,7 @@ return { striderarty = {
 
   customParams           = {
     bait_level_default = 2,
+    normaltex = [[unittextures/Catapult_normals.dds]],
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],

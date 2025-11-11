@@ -21,6 +21,7 @@ return { amphriot = {
     floattoggle    = [[1]],
     set_target_range_buffer = 35,
     selection_scale = 1.17,
+    normaltex = [[unittextures/b_sumo_manti_gimp_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

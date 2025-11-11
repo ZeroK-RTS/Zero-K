@@ -27,6 +27,7 @@ return { raveparty = {
     want_proximity_targetting = 1,
     speed_bar = 1,
     superweapon = 1,
+    normaltex = [[unittextures/Core_normals.dds]],
 
     keeptooltip    = [[any string I want]],
     neededlink     = 400,

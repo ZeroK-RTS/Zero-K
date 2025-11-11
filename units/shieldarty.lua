@@ -12,6 +12,7 @@ return { shieldarty = {
 
   customParams           = {
     bait_level_default = 1,
+    normaltex = [[unittextures/b_dom_morty_advcon_freaker_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

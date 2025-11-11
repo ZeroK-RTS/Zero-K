@@ -17,6 +17,7 @@ return { turretaaclose = {
     bait_level_default = 1,
     aim_lookahead      = 120,
     okp_damage = 700.1,
+    normaltex = [[unittextures/torpedolauncher_normals.dds]],
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],

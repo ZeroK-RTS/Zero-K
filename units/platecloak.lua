@@ -43,6 +43,7 @@ return { platecloak = {
     solid_factory      = [[3]],
     unstick_help       = [[1]],
     child_of_factory   = [[factorycloak]],
+    normaltex = [[unittextures/cremfactory_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,

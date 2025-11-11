@@ -24,6 +24,7 @@ return { tankcon = {
     midposoffset   = [[0 -4 0]],
     modelradius    = [[30]],
     selection_scale = 1.5,
+    normaltex = [[unittextures/welder_normals.dds]],
 
     outline_x = 80,
     outline_y = 80,
