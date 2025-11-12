@@ -170,12 +170,13 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		fixDefaultWater = options.override_water_with_default.value,
-		defaultSunDir   = options.override_sun_direction.value,
-		sun             = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
-		direction       = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
-		fog             = fogSettingsChanged       and GetOptionsTable(fogPath),
-		water           = waterSettingsChanged     and GetOptionsTable(waterpath),
+		fixDefaultWater      = options.override_water_with_default.value,
+		defaultSunDir        = options.override_sun_direction.value,
+		skipShadowDensityFix = options.skip_override_shadow_density.value,
+		sun                  = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
+		direction            = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
+		fog                  = fogSettingsChanged       and GetOptionsTable(fogPath),
+		water                = waterSettingsChanged     and GetOptionsTable(waterpath),
 	}
 	if OVERRIDE_CONFIG and OVERRIDE_CONFIG.forceIsland ~= nil then
 		writeTable.forceIsland = OVERRIDE_CONFIG.forceIsland
@@ -221,6 +222,25 @@ local function ToggleDefaultSunDir(self)
 	end
 end
 
+local function AdpplyShadowDensityAdjustment()
+	options.skip_override_shadow_density.value = false
+	local ground = options.groundShadowDensity.default or 1
+	local unit = options.modelShadowDensity.default or 1
+	ground = math.min(ground, 0.75)
+	unit = math.min(ground, unit)
+	options.groundShadowDensity.value = ground
+	options.modelShadowDensity.value = unit
+	options.groundShadowDensity.OnChange(options.groundShadowDensity)
+	options.modelShadowDensity.OnChange(options.modelShadowDensity)
+end
+
+local function ToggleShadowDensityAdjustment(self)
+	if self.value then
+		FullSunUpdate()
+	else
+		AdpplyShadowDensityAdjustment()
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -289,6 +309,9 @@ local function LoadSunAndFogSettings()
 	end
 	if override.defaultSunDir then
 		ApplyDefaultSunDir()
+	end
+	if not override.skipShadowDensityFix then
+		AdpplyShadowDensityAdjustment()
 	end
 end
 
@@ -491,11 +514,20 @@ local function GetOptions()
 	AddOption("override_sun_direction", {
 		name = 'Default Sun Direction',
 		type = 'bool',
-		desc = "Overrides all the water settings with a decent default.",
+		desc = "Puts the sun over your left shoulder.",
 		developmentOnly = true,
 		value = false,
 		noSave = true,
 		OnChange = ToggleDefaultSunDir,
+	})
+	AddOption("skip_override_shadow_density", {
+		name = 'Unbounded Shadow Density',
+		type = 'bool',
+		desc = "Enable to set high shadow densities, and to set unit shadow density > map shadow density.",
+		developmentOnly = true,
+		value = false,
+		noSave = true,
+		OnChange = ToggleShadowDensityAdjustment,
 	})
 	AddOption("save_map_settings", {
 		name = 'Save Settings',
