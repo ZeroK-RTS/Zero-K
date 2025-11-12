@@ -23,7 +23,7 @@ local spGetAllUnits = Spring.GetAllUnits
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
-local InstanceVBOTable = VFS.Include(luaShaderDir.."InstanceVboidTableWrapper.lua")
+local InstanceVBOTable = VFS.Include(luaShaderDir.."instancevboidtable.lua")
 
 local pushElementInstance = InstanceVBOTable.pushElementInstance
 local popElementInstance  = InstanceVBOTable.popElementInstance
@@ -56,6 +56,11 @@ layout (location = 6) in vec4 startcolorpower;
 layout (location = 7) in vec4 endcolor_endgameframe;
 layout (location = 8) in uvec4 instData;
 
+const float vertexDisplacement = 6.0; // MUST MATCH CUS vertex shader displacement
+
+#define UNITID (uni[instData.y].composite >> 16)
+#define UNITUNIFORMS uni[instData.y]
+
 //__ENGINEUNIFORMBUFFERDEFS__
 
 layout(std140, binding = 2) uniform FixedStateMatrices {
@@ -74,35 +79,95 @@ layout(std140, binding = 2) uniform FixedStateMatrices {
 	//__QUATERNIONDEFS__
 #endif
 
-
-
 struct SUniformsBuffer {
-    uint composite; //     u8 drawFlag; u8 unused1; u16 id;
+	uint composite; //     u8 drawFlag; u8 unused1; u16 id;
 
-    uint unused2;
-    uint unused3;
-    uint unused4;
+	uint unused2;
+	uint unused3;
+	uint unused4;
 
-    float maxHealth;
-    float health;
-    float unused5;
-    float unused6;
+	float maxHealth;
+	float health;
+	float unused5;
+	float unused6;
 
-    vec4 drawPos;
-    vec4 speed;
-    vec4[4] userDefined; //can't use float[16] because float in arrays occupies 4 * float space
+	vec4 drawPos;
+	vec4 speed;
+	vec4[4] userDefined; //can't use float[16] because float in arrays occupies 4 * float space
 };
 
 layout(std140, binding=1) readonly buffer UniformsBuffer {
-    SUniformsBuffer uni[];
+	SUniformsBuffer uni[];
 };
 
 out vec3 v_modelPosOrig;
 out vec4 v_startcolorpower;
 out vec4 v_endcolor_alpha;
 
+float Perlin3D( vec3 P ) { // MUST MATCH CUS vertex shader noise
+	//return 0.5;
+	//  https://github.com/BrianSharpe/Wombat/blob/master/Perlin3D.glsl
+
+	// establish our grid cell and unit position
+	vec3 Pi = floor(P);
+	vec3 Pf = P - Pi;
+	vec3 Pf_min1 = Pf - 1.0;
+
+	// clamp the domain
+	Pi.xyz = Pi.xyz - floor(Pi.xyz * ( 1.0 / 69.0 )) * 69.0;
+	vec3 Pi_inc1 = step( Pi, vec3( 69.0 - 1.5 ) ) * ( Pi + 1.0 );
+
+	// calculate the hash
+	vec4 Pt = vec4( Pi.xy, Pi_inc1.xy ) + vec2( 50.0, 161.0 ).xyxy;
+	Pt *= Pt;
+	Pt = Pt.xzxz * Pt.yyww;
+	const vec3 SOMELARGEFLOATS = vec3( 635.298681, 682.357502, 668.926525 );
+	const vec3 ZINC = vec3( 48.500388, 65.294118, 63.934599 );
+	vec3 lowz_mod = vec3( 1.0 / ( SOMELARGEFLOATS + Pi.zzz * ZINC ) );
+	vec3 highz_mod = vec3( 1.0 / ( SOMELARGEFLOATS + Pi_inc1.zzz * ZINC ) );
+	vec4 hashx0 = fract( Pt * lowz_mod.xxxx );
+	vec4 hashx1 = fract( Pt * highz_mod.xxxx );
+	vec4 hashy0 = fract( Pt * lowz_mod.yyyy );
+	vec4 hashy1 = fract( Pt * highz_mod.yyyy );
+	vec4 hashz0 = fract( Pt * lowz_mod.zzzz );
+	vec4 hashz1 = fract( Pt * highz_mod.zzzz );
+
+	// calculate the gradients
+	vec4 grad_x0 = hashx0 - 0.49999;
+	vec4 grad_y0 = hashy0 - 0.49999;
+	vec4 grad_z0 = hashz0 - 0.49999;
+	vec4 grad_x1 = hashx1 - 0.49999;
+	vec4 grad_y1 = hashy1 - 0.49999;
+	vec4 grad_z1 = hashz1 - 0.49999;
+	vec4 grad_results_0 = inversesqrt( grad_x0 * grad_x0 + grad_y0 * grad_y0 + grad_z0 * grad_z0 ) * ( vec2( Pf.x, Pf_min1.x ).xyxy * grad_x0 + vec2( Pf.y, Pf_min1.y ).xxyy * grad_y0 + Pf.zzzz * grad_z0 );
+	vec4 grad_results_1 = inversesqrt( grad_x1 * grad_x1 + grad_y1 * grad_y1 + grad_z1 * grad_z1 ) * ( vec2( Pf.x, Pf_min1.x ).xyxy * grad_x1 + vec2( Pf.y, Pf_min1.y ).xxyy * grad_y1 + Pf_min1.zzzz * grad_z1 );
+
+	// Classic Perlin Interpolation
+	vec3 blend = Pf * Pf * Pf * (Pf * (Pf * 6.0 - 15.0) + 10.0);
+	vec4 res0 = mix( grad_results_0, grad_results_1, blend.z );
+	vec4 blend2 = vec4( blend.xy, vec2( 1.0 - blend.xy ) );
+	float final = dot( res0, blend2.zxzx * blend2.wwyy );
+	return ( final * 1.1547005383792515290182975610039 );  // scale things to a strict -1.0->1.0 range  *= 1.0/sqrt(0.75)
+}
+
+float hash11(float p) {
+	const float HASHSCALE1 = 0.1031;
+	vec3 p3  = fract(vec3(p) * HASHSCALE1);
+	p3 += dot(p3, p3.yzx + 19.19);
+	return fract((p3.x + p3.y) * p3.z);
+}
+
 void main() {
 	uint baseIndex = instData.x;
+	vec4 piecePos = vec4(pos, 1.0);
+	float healthFrac = clamp(UNITUNIFORMS.health / UNITUNIFORMS.maxHealth, 0.0, 1.0);
+	
+	if (healthFrac < 0.95){
+		vec3 seedVec = 0.1 * piecePos.xyz;
+		seedVec.y += 1024.0 * hash11(float(UNITID));
+		float damageAmount = (1.0 - healthFrac) * 0.8;
+		piecePos.xyz += damageAmount * vertexDisplacement * Perlin3D(seedVec) * normalize(piecePos.xyz);
+	}
 	
 	#line 16000
 	#if USEQUATERNIONS == 0
@@ -112,7 +177,7 @@ void main() {
 		// dynamic models have one extra matrix, as their first matrix is their world pos/offset
 		//mat4 pieceMatrix = mat4mix(mat4(1.0), mat[baseIndex + pieceIndex + isDynamic ], modelMatrix[3][3]);
 		mat4 pieceMatrix = mat4mix(mat4(1.0), mat[baseIndex + pieceIndex + isDynamic ], 1.0);
-		vec4 localModelPos = pieceMatrix * vec4(pos, 1.0);
+		vec4 localModelPos = pieceMatrix * piecePos;
 
 		v_modelPosOrig = localModelPos.xyz + (modelMatrix[3].xyz)*0.3;
 		vec4 modelPos = modelMatrix * localModelPos;
@@ -121,7 +186,7 @@ void main() {
 		Transform pieceModelTransform = GetPieceModelTransform(baseIndex, pieceIndex);
 		Transform modelWorldTransform = GetModelWorldTransform(baseIndex);
 
-		v_modelPosOrig = (ApplyTransform(pieceModelTransform, vec4(pos, 1.0))).xyz;
+		v_modelPosOrig = (ApplyTransform(pieceModelTransform, piecePos)).xyz;
 
 		vec4 modelPos = ApplyTransform(modelWorldTransform, vec4(v_modelPosOrig.xyz, 1.0));
 	#endif
