@@ -20,10 +20,12 @@ local spGetUnitLosState    = Spring.GetUnitLosState
      so it is safe to cache them here even if the underlying func changes afterwards ]]
 local scriptUnitDestroyed       = Script.LuaUI.UnitDestroyed
 local scriptUnitDestroyedByTeam = Script.LuaUI.UnitDestroyedByTeam
-local scriptUnitLeftRadar	= Script.LuaUI.UnitLeftRadar
+local scriptUnitLeftRadar       = Script.LuaUI.UnitLeftRadar
+
+local _, fullview = Spring.GetSpectatingState()
+local myAllyTeamID = spGetMyAllyTeamID()
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
-	local myAllyTeamID = spGetMyAllyTeamID()
 	local spec, specFullView = spGetSpectatingState()
 	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())
 	
@@ -60,6 +62,27 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attUnitDef
 				scriptUnitDestroyed(unitID, unitDefID, unitTeam)
 			elseif losState ~= 0 and Script.LuaUI('UnitLeftRadar') then
 				scriptUnitLeftRadar(unitID, unitTeam)
+			end
+		end
+	end
+end
+
+function gadget:PlayerChanged(playerID)
+	myTeamID = Spring.GetMyTeamID()
+	myAllyTeamID = Spring.GetMyAllyTeamID()
+	_, fullview = Spring.GetSpectatingState()
+end
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
+	--Spring.Echo("gadget:UnitDamaged",unitID, unitDefID, unitTeam, damage, paralyzer)
+	if paralyzer then
+		if not fullview and not Spring.IsUnitInLos(unitID, myAllyTeamID) then
+			return
+		end
+		if damage > 0 then
+			if Script.LuaUI("UnitParalyzeDamageEffect") then
+				--Spring.Echo("UnitParalyzeDamageHealthbars", unitID, step)
+				Script.LuaUI.UnitParalyzeDamageEffect(unitID, unitDefID, damage)
 			end
 		end
 	end
