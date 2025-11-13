@@ -21,6 +21,7 @@ return { spideremp = {
     aim_lookahead  = 100,
     set_target_range_buffer = 30,
     set_target_speed_buffer = 8,
+    normaltex = [[unittextures/venom_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

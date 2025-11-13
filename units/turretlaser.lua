@@ -16,11 +16,12 @@ return { turretlaser = {
   customParams                  = {
     aimposoffset   = [[0 22 0]],
     cus_noflashlight = 1,
+    normaltex = [[unittextures/gritty_normals.dds]],
 
     outline_x = 70,
     outline_y = 100,
     outline_yoff = 32.5,
-    model_rescale = 0.8,
+    build_effect_sweep_height = 58,
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],

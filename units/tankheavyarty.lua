@@ -20,6 +20,7 @@ return { tankheavyarty = {
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
     unstick_leeway    = 60, -- Don't lose move orders if stuck while packing.
+    normaltex = [[unittextures/cortremor_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNIT]],

@@ -223,7 +223,7 @@ options = {
 	write_raw = {
 		type = 'button',
 		name = "Save Startboxes Raw",
-		desc = "Save startboxes, splitting boxes between teams.",
+		desc = "Save startboxes, splitting boxes between teams. Outputs file to MapTools/Startboxes/<map name>.lua",
 		advanced = true,
 		OnChange = function ()
 			Spring.Echo("Save startboxes, splitting boxes between teams. First half for one team, second half for the other.")
@@ -233,7 +233,7 @@ options = {
 	write_transform = {
 		type = 'button',
 		name = "Save Startboxes Transform",
-		desc = "Save startboxes, with transform.",
+		desc = "Save startboxes, with transform. Outputs file to MapTools/Startboxes/<map name>.lua",
 		advanced = true,
 		OnChange = function ()
 			Spring.Echo("Save startboxes, with transform")

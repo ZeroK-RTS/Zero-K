@@ -28,7 +28,7 @@ if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local USE_TERRAIN_TEXTURE_CHANGE = true -- (Spring.GetModOptions() or {}).terratex == "1"
-local ECHO_COST = true
+local ECHO_COST = false
 local ECHO_DETAILED_COST_ESTIMATE = false
 
 -- Speedups

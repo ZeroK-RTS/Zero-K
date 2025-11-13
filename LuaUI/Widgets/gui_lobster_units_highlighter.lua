@@ -19,6 +19,7 @@ end
 --------------------------------------------------------------------------------
 -- TODO: Make this configurable
 local unitJumpStatusLineWidth = 4
+local HIGHLIGHT_KEY = "lob_jump"
 
 -- TODO: Make colors configurable
 local LIGHTRED = {1, 0.35, 0.35, 0.4}
@@ -306,8 +307,13 @@ local function RemoveAllHighlights()
 	if not highlightedUnits then
 		return
 	end
-	for _, highlightID in pairs(highlightedUnits) do
-		WG.StopHighlightUnitGL4(highlightID)
+	for unitID, highlightID in pairs(highlightedUnits) do
+		if WG.StopHighlightUnitGL4 then
+			WG.StopHighlightUnitGL4(highlightID)
+		end
+		if WG.HighlightUnitCus then
+			WG.HighlightUnitCus(unitID, HIGHLIGHT_KEY, 0)
+		end
 	end
 	highlightedUnits = false
 end
@@ -324,11 +330,17 @@ local function UpdateHighlight()
 			if unitsInActiveLobsterRange[unitID] then
 				found[unitID] = true
 				if not highlightedUnits[unitID] then
-					highlightedUnits[unitID] = WG.HighlightUnitGL4(
-						unitID, 'unitID',
-						0.3, 0.3, 0, options.highlightStrength.value,
-						0.2, 0.15, 0.2, 0, 0, 0
-					)
+					if WG.HighlightUnitGL4 then
+						highlightedUnits[unitID] = WG.HighlightUnitGL4(
+							unitID, 'unitID',
+							0.3, 0.3, 0, options.highlightStrength.value,
+							0.2, 0.15, 0.2, 0, 0, 0
+						)
+					end
+					if WG.HighlightUnitCus then
+						highlightedUnits[unitID] = highlightedUnits[unitID] or true
+						WG.HighlightUnitCus(unitID, HIGHLIGHT_KEY, -2000) -- Yellow wreck colour
+					end
 				end
 			end
 		end
@@ -336,7 +348,12 @@ local function UpdateHighlight()
 
 	for unitID, highlightID in pairs(highlightedUnits) do
 		if not found[unitID] then
-			WG.StopHighlightUnitGL4(highlightID)
+			if WG.StopHighlightUnitGL4 then
+				WG.StopHighlightUnitGL4(highlightID)
+			end
+			if WG.HighlightUnitCus then
+				WG.HighlightUnitCus(unitID, HIGHLIGHT_KEY, 0)
+			end
 			highlightedUnits[unitID] = nil
 		end
 	end
@@ -371,4 +388,10 @@ end
 function widget:SelectionChanged(sel)
 	UpdateSelection(sel)
 	fullSelection = sel
+end
+
+function widget:Initialize(sel)
+	if WG.SetHighlightPriority then
+		WG.SetHighlightPriority(HIGHLIGHT_KEY, 1.4)
+	end
 end

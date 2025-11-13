@@ -21,6 +21,7 @@ return { turretaaheavy = {
     stockpiletime  = [[20]],
     priority_misc  = 1, -- Medium
     okp_damage = 1600,
+    normaltex = [[unittextures/Core_normals.dds]],
   },
 
   explodeAs                     = [[ESTOR_BUILDING]],

@@ -26,6 +26,7 @@ return { turretantiheavy = {
     aimposoffset   = [[0 60 0]],
     midposoffset   = [[0 0 0]],
     modelradius    = [[40]],
+    normaltex = [[unittextures/arm_annihilator_normals.dds]],
 
     stats_show_death_explosion = 1,
 

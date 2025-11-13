@@ -27,6 +27,7 @@ return { amphassault = {
     aimposoffset   = [[0 30 0]],
     midposoffset   = [[0 6 0]],
     modelradius    = [[42]],
+    normaltex = [[unittextures/b_sumo_manti_gimp_normals.dds]],
   },
 
   explodeAs           = [[BIG_UNIT]],

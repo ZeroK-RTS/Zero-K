@@ -466,6 +466,7 @@ local pathGesture = 'Settings/Interface/Gesture Menu'
 
 local pathToolbox = 'Settings/Toolbox'
 	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and saving their coordinates]], true)
+	ShButton(pathToolbox, 'Toggle Metal Spot Placer', function() spSendCommands{"luaui togglewidget Metal Spot Placer"} end, [[Press Alt+M to start placing metal extractors. Press Alt+M again to print the coordinates to infolog.txt, found in your install directory.]], true)
 
 	
 	ShButton(pathToolbox, 'Toggle Economy Announcer', function() spSendCommands{"luaui togglewidget Economic Victory Announcer v2"} end, "Toggles a widget that tracks team economies and announces 'victory' in chat, for certain manually run tournament games.")

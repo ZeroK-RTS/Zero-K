@@ -43,6 +43,7 @@ return { platespider = {
     cus_noflashlight   = 1,
     child_of_factory   = [[factoryspider]],
     buggeroff_offset   = 45,
+    normaltex = [[unittextures/corvrad_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,

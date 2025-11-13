@@ -24,6 +24,7 @@ return { zenith = {
 
     neededlink     = 400,
     pylonrange     = 150,
+    normaltex = [[unittextures/Core_normals.dds]],
   },
   
   explodeAs                     = [[ATOMIC_BLAST]],

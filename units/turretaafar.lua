@@ -18,6 +18,7 @@ return { turretaafar = {
     aimposoffset   = [[0 10 0]],
     modelradius    = [[19]],
     okp_damage = 200.1,
+    normaltex = [[unittextures/armcir_normals.dds]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

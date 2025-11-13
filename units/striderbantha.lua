@@ -23,6 +23,7 @@ return { striderbantha = {
     midposoffset          = [[0 -8 0]],
     modelradius           = [[17]],
     decloak_footprint     = 5,
+    normaltex = [[unittextures/bantha_normals.dds]],
 
     stats_show_death_explosion = 1,
   },

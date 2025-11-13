@@ -47,6 +47,7 @@ return { factoryhover = {
     parent_of_plate     = [[platehover]],
     buggeroff_radius   = 40,
     buggeroff_offset   = 5,
+    normaltex = [[unittextures/factoryhover_normals.dds]],
 
     stats_show_death_explosion = 1,
 

@@ -29,6 +29,7 @@ return { staticjammer = {
     area_cloak_shift_range = 200,
     area_cloak_recloak_rate = 1200,
     removeattack = 1,
+    normaltex = [[unittextures/radarjammer_normals.dds]],
 
     priority_misc  = 1,
     addfight       = 1,

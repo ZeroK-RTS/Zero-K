@@ -17,6 +17,7 @@ return { shieldfelon = {
     shield_color_mult = 1.1,
     dontfireatradarcommand = '1',
     aim_lookahead     = 30,
+    normaltex = [[unittextures/b_can_pyro_roach_skuttle_normals.dds]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -101,7 +102,7 @@ return { shieldfelon = {
       cylinderTargeting       = 0,
 
       customParams            = {
-        shield_drain = 75,
+        shield_drain = 78,
         
         light_camera_height = 2500,
         light_color = [[0.66 0.32 0.90]],

@@ -13,7 +13,7 @@ end
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
-VFS.Include(luaShaderDir.."instancevboidtable.lua")
+VFS.Include(luaShaderDir.."InstanceVboidTableUnwrapper.lua")
 
 local highlightunitShader, unitShapeShader
 local highlightUnitVBOTable
@@ -217,6 +217,11 @@ end
 function widget:Initialize()
 	if not Platform.glHaveGL4 then
 		Spring.Echo("highlightUnitShader no GL4 support")
+		widgetHandler:RemoveWidget()
+		return
+	end
+	if WG.HighlightUnitCus then
+		Spring.Echo("highlightUnitShader using CUS instead")
 		widgetHandler:RemoveWidget()
 		return
 	end

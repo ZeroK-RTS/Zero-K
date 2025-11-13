@@ -505,8 +505,8 @@ local barColors = {
 	-- Units
 	shield         = { 0.30, 0.00, 0.90, barAlpha },
 	-- healtas colores are in bfcolormap 
-        building       = { 0.75, 0.75, 0.75, barAlpha },
-        morph          = { 0.60, 0.60, 0.60, barAlpha },
+	building       = { 0.75, 0.75, 0.75, barAlpha },
+	morph          = { 0.60, 0.60, 0.60, barAlpha },
 	stockpile      = { 0.50, 0.50, 0.50, barAlpha },
 	paralyze       = { 0.50, 0.50, 1.00, barAlpha },
 	paralyze_p     = { 0.40, 0.40, 0.80, barAlpha },
@@ -1516,7 +1516,7 @@ do
 
 		glDepthMask(false)
 
-		DrawOverlays()
+		--DrawOverlays()
 		glMultiTexCoord(1, 1, 1, 1)
 		glColor(1, 1, 1, 1)
 

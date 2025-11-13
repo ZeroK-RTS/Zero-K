@@ -17,6 +17,7 @@ return { turretaalaser = {
     bait_level_target  = 2,
     bait_level_target_armor = 1,
     bait_level_default = 0,
+    normaltex = [[unittextures/torpedolauncher_normals.dds]],
   },
 
   damageModifier                = 0.333,

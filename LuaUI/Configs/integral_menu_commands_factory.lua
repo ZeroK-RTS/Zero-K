@@ -95,7 +95,7 @@ local factoryUnitPosDef = {
 		planeheavyfighter = unitTypes.ANTI_AIR,
 		planescout        = unitTypes.UTILITY,
 		planelightscout   = unitTypes.WEIRD_RAIDER,
-		bomberlaser        = unitTypes.ASSAULT,
+		bomberprec        = unitTypes.ASSAULT,
 		bomberheavy       = unitTypes.HEAVY_SOMETHING,
 		bomberassault     = unitTypes.ARTILLERY,
 		bomberdisarm      = unitTypes.SPECIAL,
@@ -162,7 +162,7 @@ local factoryUnitPosDef = {
 	},
 	pw_bomberfac = {
 		bomberriot        = unitTypes.RIOT,
-		bomberlaser        = unitTypes.ASSAULT,
+		bomberprec        = unitTypes.ASSAULT,
 		bomberheavy       = unitTypes.HEAVY_SOMETHING,
 		bomberdisarm      = unitTypes.SPECIAL,
 	},

@@ -21,6 +21,12 @@ in DataVS {
 out vec4 fragColor;
 
 void main() {
+	vec2 mymin = min(worldPos.xz,mapSize.xy - worldPos.xz);
+	float inboundsness = min(mymin.x, mymin.y);
+	if (inboundsness < 0)
+		discard;
+
+
 	fragColor.rgba = blendedcolor.rgba;
 
 	vec2 toedge = centerposrange.xz - worldPos.xz;
@@ -35,9 +41,8 @@ void main() {
 
 	angle = clamp(angletime, 0.2, 0.8);
 
-	vec2 mymin = min(worldPos.xz,mapSize.xy - worldPos.xz);
-	float inboundsness = min(mymin.x, mymin.y);
-	fragColor.a = min(smoothstep(0,1,fragColor.a), 1.0 - clamp(inboundsness*(-0.1),0.0,1.0));
+	fragColor.a = min(smoothstep(0,1,fragColor.a), 1.0 ); // - clamp(inboundsness*(-0.1),0.0,1.0));
+
 
 
 	if (length(worldPos.xz - radarcenter_range.xz) > radarcenter_range.w) fragColor.a = 0.0;
@@ -45,6 +50,6 @@ void main() {
 	fragColor.a = fragColor.a * angle * 0.85;
 	
 	float pulse = 1 + sin(-2.0 * sqrt(length(toedge)) + 0.033 * timeInfo.x);
-	pulse *= pulse;
+	pulse *= pulse * 0.5;
 	fragColor.a = mix(fragColor.a, fragColor.a * pulse, 0.10);
 }
