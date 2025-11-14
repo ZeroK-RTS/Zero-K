@@ -63,7 +63,8 @@ return { staticshield = {
         default = 10,
       },
 
-      exteriorShield          = true,
+      shieldForce                   = 3,
+      shieldMaxSpeed                = 90,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       shieldAlpha             = 0.2,
@@ -74,10 +75,11 @@ return { staticshield = {
       shieldPowerRegen        = 50,
       shieldPowerRegenEnergy  = 9,
       shieldRadius            = 350,
-      shieldRepulser          = false,
+      shieldRepulser          = true,
+      repulser = true,
       smartShield             = true,
       visibleShield           = false,
-      visibleShieldRepulse    = false,
+      visibleShieldRepulse    = true,
       weaponType              = [[Shield]],
     },
 

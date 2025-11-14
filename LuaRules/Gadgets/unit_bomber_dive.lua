@@ -270,7 +270,7 @@ GG.Bomber_Dive_fake_fired = Bomber_Dive_fake_fired
 
 function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile)
 
-	if proID and bomberWeaponNamesDefs[Spring.GetProjectileName(proID)] then
+	if Spring.GetProjectileName and proID and bomberWeaponNamesDefs[Spring.GetProjectileName(proID)] then
 		if proOwnerID and Spring.ValidUnitID(proOwnerID) and bombers[proOwnerID] and bombers[proOwnerID].diveState == 1 then
 			if shieldCarrierUnitID and Spring.ValidUnitID(shieldCarrierUnitID) and shieldEmitterWeaponNum then
 				--local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum].weaponDef
