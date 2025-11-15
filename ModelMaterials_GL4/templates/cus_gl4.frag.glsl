@@ -1374,21 +1374,23 @@ void main(void){
 
 void main(void)
 {
-// TODO: if we really wanna have the construction effect here, then it would be prudent to also calc construction shadows here.
-// Note that this is decidedly not free :/ 
-// COUNTERPOINT: Is the simple discard check below not pretty cheap?
-#ifdef HASALPHASHADOWS
-	vec4 texColor2 = texture(texture2, uvCoords.xy, 0); // note that we bind tex2 to pos0 here!
-	if (texColor2.a < 0.5 ) discard;
-#endif
-	float buildProgress = shadowVertexPos.w;
-	if (buildProgress > -0.5){
-		float height = clamp(pieceVertexPosOrig.w/1.0,0,1);
-		buildProgress = 0.1 + 0.9*buildProgress;
-		if (height > buildProgress) {
-			discard;
+	// TODO: if we really wanna have the construction effect here, then it would be prudent to also calc construction shadows here.
+	// Note that this is decidedly not free :/ 
+	// COUNTERPOINT: Is the simple discard check below not pretty cheap?
+	#ifdef HASALPHASHADOWS
+		vec4 texColor2 = texture(texture2, uvCoords.xy, 0); // note that we bind tex2 to pos0 here!
+		if (texColor2.a < 0.5 ) discard;
+	#endif
+	#if ENABLE_OPTION_HEALTH_TEXTURING
+		float buildProgress = shadowVertexPos.w;
+		if (buildProgress > -0.5){
+			float height = clamp(pieceVertexPosOrig.w/1.0,0,1);
+			buildProgress = 0.1 + 0.9*buildProgress;
+			if (height > buildProgress) {
+				discard;
+			}
 		}
-	}
+	#endif
 }
 
 //FLUTYISBROÁFélő[]
