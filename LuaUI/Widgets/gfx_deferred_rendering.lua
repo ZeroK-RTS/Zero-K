@@ -88,10 +88,10 @@ options = {
 	enableBloom    = {type = 'bool',   name = 'Apply Bloom Effect (HDR Only)', value = true,},
 
 	-- how bright does a fragment need to be before being considered a glow source? [0, 1]
-	illumThreshold = {type = 'number', name = 'Illumination Threshold',       value = 0.85, min = 0,    max = 1, step = 0.05,},
+	illumThreshold = {type = 'number', name = 'Illumination Threshold',       value = 0.85, min = 0,    max = 1, step = 0.01,},
 
 	-- maximum brightness of bloom additions [1, n]
-	maxBrightness  = {type = 'number', name = 'Maximum Highlight Brightness', value = 0.35, min = 0.05, max = 1, step = 0.05,},
+	maxBrightness  = {type = 'number', name = 'Maximum Highlight Brightness', value = 0.20, min = 0.05, max = 1, step = 0.01,},
 }
 
 for key,option in pairs(options) do
