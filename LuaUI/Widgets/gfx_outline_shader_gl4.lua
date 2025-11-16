@@ -45,7 +45,7 @@ end
 
 local STRENGTH_MULT_MIN = 0.1
 local STRENGTH_MULT_MAX = 12
-local DEFAULT_STRENGTH_MULT = 1
+local DEFAULT_STRENGTH_MULT = 0.75
 local STRENGTH_MAGIC_NUMBER = 2.4
 
 local SUBTLE_MIN = 50
@@ -178,6 +178,7 @@ options = {
 		name = 'Override X',
 		type = 'number',
 		min = 0, max = 300, step = 5,
+		advanced = true,
 		value = 100,
 		OnChange = function (self)
 			WG.unittrackerapi.initializeAllUnits()
@@ -188,6 +189,7 @@ options = {
 		name = 'Override Y',
 		type = 'number',
 		min = 0, max = 300, step = 5,
+		advanced = true,
 		value = 100,
 		OnChange = function (self)
 			WG.unittrackerapi.initializeAllUnits()
@@ -198,6 +200,7 @@ options = {
 		name = 'Override Y Offset',
 		type = 'number',
 		min = -200, max = 200, step = 5,
+		advanced = true,
 		value = 0,
 		OnChange = function (self)
 			WG.unittrackerapi.initializeAllUnits()
