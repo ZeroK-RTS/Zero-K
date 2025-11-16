@@ -795,7 +795,7 @@ void main(void){
 		myPerlin = textureLod(noisetex3dcube, fract(seedVec.xyz*0.1), 0.0) * 2.0 - 1.0;
 		
 		healthMix = SNORM2NORM(myPerlin.x) * (2.0 - baseVertexDisplacement);
-		healthMix = smoothstep(0.0, healthMix, max((1.0 - aoterm_fogFactor_selfIllumMod_healthFraction.w) + baseVertexDisplacement, 0.0)) * 0.8; // Reduce maximum damage shading to 80%
+		healthMix = smoothstep(0.0, healthMix, max((1.0 - aoterm_fogFactor_selfIllumMod_healthFraction.w) + baseVertexDisplacement, 0.0)) * 0.7; // Reduce maximum damage shading to 70%
 	}
 	#endif
 
@@ -852,6 +852,7 @@ void main(void){
 				if (healthMix > 0.05){
 					vec4 texColor1w = texture(texture1w, myUV);
 					vec4 texColor2w = texture(texture2w, myUV);
+					healthMix = (healthMix - 0.05) * 0.9; // Reduce damage texture maximium wreckness
 					healthMix *= (1.0 - 0.9 * texColor2.r); //emissive parts don't get too damaged
 					texColor1 = mix(texColor1, texColor1w, healthMix);
 					texColor2.xyz = mix(texColor2.xyz, texColor2w.xyz, healthMix);
