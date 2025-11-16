@@ -7,7 +7,7 @@ function widget:GetInfo()
 		license = "GNU GPL, v2 or later",
 		-- Somewhere between layer -40 and -30 GetUnitUnderCursor starts
 		-- returning nil before GetUnitsInSelectionBox includes that unit.
-		layer = -9, -- below unit_healthbars 
+		layer = -9, -- below outline shader and unit_healthbars 
 		enabled = true,
 	}
 end

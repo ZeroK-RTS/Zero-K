@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author    = "Beherith",
 		date      = "2022.03.05",
 		license   = "Lua: GNU GPL, v2 or later, GLSL: See shader files",
-		layer     = -5,
+		layer     = -10, -- Below healthbars, above selected units gl4
 		enabled   = true
 	}
 end
