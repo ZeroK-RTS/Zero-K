@@ -82,7 +82,7 @@ local CloakEffect      = {
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 local EnemyCloakEffect      = {
-  { class='UnitCloaker',options={ life=30} },
+  --{ class='UnitCloaker',options={ life=30} },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 

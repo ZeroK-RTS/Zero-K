@@ -347,7 +347,7 @@ local initiated = false
 local featuresDefsWithAlpha = {} -- featureDefIDs (ie trees) that should be drawn with alpha.
 local unitDefsUseSkinning = {} -- unitDefIDs that use the bones and stretchy skin system
 
-local ENEMY_CLOAK_FRAMES = false -- 4 -- How many extra frames to show enemy units for.
+local ENEMY_CLOAK_FRAMES = 10 -- How many extra frames to show enemy units for.
 local cloakDeferFrame = {}
 local keepDrawFlagChecking = false -- a list of units that need draw flag checking
 
@@ -1425,7 +1425,7 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 	end
 end
 
-local function ProcessCusUnit(unitID, drawFlag,  gameFrame, reason)
+local function ProcessCusUnit(unitID, drawFlag, gameFrame, reason)
 	if debugmode then Spring.Echo("ProcessUnits", unitID, drawFlag, reason) end
 
 	if cloakDeferFrame[unitID] and ((not drawFlag) or drawFlag == 0) then
@@ -1433,16 +1433,19 @@ local function ProcessCusUnit(unitID, drawFlag,  gameFrame, reason)
 			cloakDeferFrame[unitID] = nil
 		end
 		if not Spring.ValidUnitID(unitID) then
+			cloakDeferFrame[unitID] = nil
 			return
 		end
 		if cloakDeferFrame[unitID] then
 			drawFlag = 1
 			keepDrawFlagChecking = keepDrawFlagChecking or {}
 			keepDrawFlagChecking[#keepDrawFlagChecking + 1] = unitID
+		else
+			Spring.SetUnitAlwaysUpdateMatrix(unitID, false)
 		end
 	end
 	if not drawFlag then
-		drawFlag = Spring.GetUnitDrawFlag(unitID)
+		drawFlag = Spring.GetUnitDrawFlag(unitID) or 0
 	end
 
 	if math_bit_and(drawFlag, 34) > 0 then -- has alpha (2) or alphashadow(32) flag
@@ -2071,6 +2074,7 @@ function gadget:UnitCloaked(unitID)
 		gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
 		wantTranparent[unitID] = true
 		if not allyUnit then
+			Spring.SetUnitAlwaysUpdateMatrix(unitID, true)
 			keepDrawFlagChecking = keepDrawFlagChecking or {}
 			keepDrawFlagChecking[#keepDrawFlagChecking + 1] = unitID
 			cloakDeferFrame[unitID] = frame + ENEMY_CLOAK_FRAMES

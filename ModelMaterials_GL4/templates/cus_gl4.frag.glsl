@@ -1302,8 +1302,8 @@ void main(void){
 			if (cloakTime > 0){
 				if (isEnemy) {
 					cloakTime = cloakTime - 1000000.0;
-					cloakedness = (timeInfo.x - cloakTime) / 4.0;
-					if (cloakedness > 2.0) {
+					cloakedness = (timeInfo.x - cloakTime) / 9.0;
+					if (cloakedness > 1.5) {
 						// Enough time has passed to fully hide the unit, must be a spectator with a bad state
 						isEnemy = false;
 					} else {
@@ -1311,7 +1311,7 @@ void main(void){
 					}
 					cloakedness = clamp(cloakedness, 0.0, 1.0);
 				} else {
-					cloakedness = clamp((timeInfo.x - cloakTime) / 8.0, 0.0, 1.0);
+					cloakedness = clamp((timeInfo.x - cloakTime) / 9.0, 0.0, 1.0);
 				}
 				//outColor.g = 1.0;
 			}
@@ -1329,11 +1329,11 @@ void main(void){
 			float perlinline2 = clamp(1.0 - 20* abs(myPerlin.g - fract(simFrame * 0.005 + 0.5)), 0.0, 1.0);
 			float cloaknoise = cloakedness*perlinline1 + cloakedness*perlinline2;
 			if (isEnemy) {
-				texColor2.a = 1.0 - clamp(cloakedness * (1.0 + cloaknoise * 5.0), 0.0, 1.0);
+				texColor2.a = 1.0 - clamp(cloakedness * (1.0 + cloaknoise * 2.0), 0.0, 1.0);
 			} else {
-				outColor.rgb = mix(outColor.rgb, teamCol.rgb, cloakedness*0.5);
+				outColor.rgb = mix(outColor.rgb, teamCol.rgb, cloakedness*(0.2 + (perlinline2 + perlinline2) * 1.5));
 			}
-			outColor.rgb += cloaknoise * 0.85;
+			outColor.rgb += cloaknoise * 0.8;
 
 			#if 1
 			float dotcamera = dot(worldNormal, V);
