@@ -467,6 +467,7 @@ local TURNRATE_MULT_BOT = 1
 local TURNRATE_MULT_VEH = 1
 local ACCEL_MULT_BOT = 1
 local ACCEL_MULT_VEH = 1
+local TURN_ACCEL_FACTOR = 1
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
@@ -484,6 +485,7 @@ for name, ud in pairs(UnitDefs) do
 			ud.brakerate = ud.brakerate * ACCEL_MULT_BOT
 			ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor or 1.2
 		end
+		ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor * TURN_ACCEL_FACTOR
 	end
 end
 

@@ -347,6 +347,10 @@ local initiated = false
 local featuresDefsWithAlpha = {} -- featureDefIDs (ie trees) that should be drawn with alpha.
 local unitDefsUseSkinning = {} -- unitDefIDs that use the bones and stretchy skin system
 
+local ENEMY_CLOAK_FRAMES = false -- 4 -- How many extra frames to show enemy units for.
+local cloakDeferFrame = {}
+local keepDrawFlagChecking = false -- a list of units that need draw flag checking
+
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 
 --------------------------------------------------------------------
@@ -1421,47 +1425,65 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 	end
 end
 
-local function ProcessUnits(units, drawFlags, reason)
-	for i = 1, #units do
-		local unitID = units[i]
-		local drawFlag = drawFlags[i]
-		if debugmode then Spring.Echo("ProcessUnits", unitID, drawFlag, reason) end
+local function ProcessCusUnit(unitID, drawFlag,  gameFrame, reason)
+	if debugmode then Spring.Echo("ProcessUnits", unitID, drawFlag, reason) end
 
-		if math_bit_and(drawFlag, 34) > 0 then -- has alpha (2) or alphashadow(32) flag
-			-- cloaked units get mapped to pure forward + deferred, no refl/refr either
+	if cloakDeferFrame[unitID] and ((not drawFlag) or drawFlag == 0) then
+		if cloakDeferFrame[unitID] < gameFrame then
+			cloakDeferFrame[unitID] = nil
+		end
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+		if cloakDeferFrame[unitID] then
 			drawFlag = 1
+			keepDrawFlagChecking = keepDrawFlagChecking or {}
+			keepDrawFlagChecking[#keepDrawFlagChecking + 1] = unitID
 		end
-		
-		if drawFlag % 4 > 1 then -- check if its at least in opaque or alpha pass
-			if not unitsInViewport[unitID] then
-				-- CALL the UnitViewportAPI
-				numUnitsInViewport = numUnitsInViewport + 1
-			end
-			unitsInViewport[unitID] = drawFlag
-		else
-			if unitsInViewport[unitID] then
-				-- CALL the UnitViewportAPI
-				numUnitsInViewport = numUnitsInViewport - 1
-			end
-			unitsInViewport[unitID] = nil
+	end
+	if not drawFlag then
+		drawFlag = Spring.GetUnitDrawFlag(unitID)
+	end
+
+	if math_bit_and(drawFlag, 34) > 0 then -- has alpha (2) or alphashadow(32) flag
+		-- cloaked units get mapped to pure forward + deferred, no refl/refr either
+		drawFlag = 1
+	end
+	
+	if drawFlag % 4 > 1 then -- check if its at least in opaque or alpha pass
+		if not unitsInViewport[unitID] then
+			-- CALL the UnitViewportAPI
+			numUnitsInViewport = numUnitsInViewport + 1
 		end
-		
-		if (drawFlag == 0) or (drawFlag >= 128) then
-			RemoveObject(unitID, reason)
-		else
-			if not cusUnitIDtoDrawFlag[unitID] then --object was not seen
-				if Spring.ValidUnitID(unitID) and (not spGetUnitIsCloaked(unitID)) then
-					uniformCache[1] = 0
-					gl.SetUnitBufferUniforms(unitID, uniformCache, 12) -- cloak
-				end
-				AddObject(unitID, drawFlag, reason)
-			elseif cusUnitIDtoDrawFlag[unitID] ~= drawFlag then --flags have changed
-				UpdateObject(unitID, drawFlag, reason)
-			end
+		unitsInViewport[unitID] = drawFlag
+	else
+		if unitsInViewport[unitID] then
+			-- CALL the UnitViewportAPI
+			numUnitsInViewport = numUnitsInViewport - 1
+		end
+		unitsInViewport[unitID] = nil
+	end
+	
+	if (drawFlag == 0) or (drawFlag >= 128) then
+		RemoveObject(unitID, reason)
+	else
+		if not cusUnitIDtoDrawFlag[unitID] then --object was not seen
+			--if Spring.ValidUnitID(unitID) and (not spGetUnitIsCloaked(unitID)) then
+			--	uniformCache[1] = 0
+			--	gl.SetUnitBufferUniforms(unitID, uniformCache, 12) -- cloak
+			--end
+			AddObject(unitID, drawFlag, reason)
+		elseif cusUnitIDtoDrawFlag[unitID] ~= drawFlag then --flags have changed
+			UpdateObject(unitID, drawFlag, reason)
 		end
 	end
 end
 
+local function ProcessUnits(units, drawFlags, gameFrame, reason)
+	for i = 1, #units do
+		ProcessCusUnit(units[i], drawFlags and drawFlags[i], gameFrame, reason)
+	end
+end
 
 local function ProcessFeatures(features, drawFlags, reason)
 	for i = 1, #features do
@@ -2041,9 +2063,23 @@ function gadget:UnitGiven(unitID)
 end
 
 function gadget:UnitCloaked(unitID)
-	uniformCache[1] = Spring.GetGameFrame()
-	gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
-	wantTranparent[unitID] = true
+	local frame = Spring.GetGameFrame()
+	if ENEMY_CLOAK_FRAMES then
+		local _, fullview = Spring.GetSpectatingState()
+		local allyUnit = fullview or Spring.IsUnitAllied(unitID)
+		uniformCache[1] = frame + (allyUnit and 0 or 1000000)
+		gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
+		wantTranparent[unitID] = true
+		if not allyUnit then
+			keepDrawFlagChecking = keepDrawFlagChecking or {}
+			keepDrawFlagChecking[#keepDrawFlagChecking + 1] = unitID
+			cloakDeferFrame[unitID] = frame + ENEMY_CLOAK_FRAMES
+		end
+	else
+		uniformCache[1] = frame
+		gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
+		wantTranparent[unitID] = true
+	end
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 	if debugmode then
 		Spring.Echo("UnitCloaked", unitID, Spring.GetUnitDrawFlag(unitID))
@@ -2051,9 +2087,11 @@ function gadget:UnitCloaked(unitID)
 end
 
 function gadget:UnitDecloaked(unitID)
+	local _, fullview = Spring.GetSpectatingState()
+	local allyUnit = fullview or Spring.IsUnitAllied(unitID)
 	wantTranparent[unitID] = false
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
-	uniformCache[1] = -1 * Spring.GetGameFrame()
+	uniformCache[1] = -1 * Spring.GetGameFrame() - (allyUnit and 0 or 1000000)
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12)
 	if debugmode then
 		Spring.Echo("UnitDecloaked", unitID, Spring.GetUnitDrawFlag(unitID))
@@ -2074,6 +2112,7 @@ function gadget:DrawWorldPreUnit()
 	end
 
 	updateframe = (updateframe + 1) % updaterate
+	local gameFrame = Spring.GetGameFrame()
 	if updateframe == 0 then
 		local t0 = Spring.GetTimerMicros()
 		local units, drawFlagsUnits, features, drawFlagsFeatures
@@ -2106,12 +2145,15 @@ function gadget:DrawWorldPreUnit()
 		--	Spring.Echo(printDrawPassStats())
 		--end
 		local totalobjects = #units + #features + numdestroyedUnits + numdestroyedFeatures
+		if keepDrawFlagChecking then
+			totalobjects = totalobjects + #keepDrawFlagChecking
+		end
 		
 		-- Why do we also do this processing round if #units > 0?
 		if debugmode and (#destroyedUnitIDs > 0 or #units > 0) then Spring.Echo("Processing destroyedUnitIDs", #units, #destroyedUnitIDs) end
 		
 		if numdestroyedUnits > 0 then
-			ProcessUnits(destroyedUnitIDs, destroyedUnitDrawFlags, "destroyed")
+			ProcessUnits(destroyedUnitIDs, destroyedUnitDrawFlags, gameFrame, "destroyed")
 			for i = numdestroyedUnits, 1, -1 do
 				destroyedUnitIDs[i] = nil
 				destroyedUnitDrawFlags[i] = nil
@@ -2147,11 +2189,16 @@ function gadget:DrawWorldPreUnit()
 			for i, unitID in ipairs(firstunits) do
 				firstdrawFlagsUnits[i] = 1 + 4 + 16
 			end
-			ProcessUnits(firstunits, firstdrawFlagsUnits, "firstDraw")
+			ProcessUnits(firstunits, firstdrawFlagsUnits, gameFrame, "firstDraw")
 			firstDraw = false
 		end
 
-		ProcessUnits(units, drawFlagsUnits, "changed")
+		ProcessUnits(units, drawFlagsUnits, gameFrame, "changed")
+		if keepDrawFlagChecking then
+			local checkUnits = keepDrawFlagChecking
+			keepDrawFlagChecking = false
+			ProcessUnits(checkUnits, false, gameFrame, "changed")
+		end
 		ProcessFeatures(features, drawFlagsFeatures, "changed")
 
 		local deltat = Spring.DiffTimers(Spring.GetTimerMicros(), t0,  nil) -- in ms

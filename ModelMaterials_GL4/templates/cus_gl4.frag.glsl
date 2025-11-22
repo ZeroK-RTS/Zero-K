@@ -775,6 +775,7 @@ void main(void){
 	
 	vec3 worldBitangent = normalize(cross(worldNormal, worldTangent));
 	mat3 worldTBN = mat3(worldTangent, worldBitangent, worldNormal);
+	float outlineValue = 255.0;
 
 	// N - worldFragNormal
 	vec3 N;
@@ -1296,12 +1297,28 @@ void main(void){
 	#if ENABLE_OPTION_HEALTH_TEXTURING 
 		float cloakTime = worldVertexPos.w;
 		if (abs(cloakTime) > 0.5){
+			bool isEnemy = abs(cloakTime) > 1000000.0;
 			float cloakedness = 0.0;
 			if (cloakTime > 0){
-				cloakedness = clamp((timeInfo.x - cloakTime) / 15.0, 0.0, 1.0);
+				if (isEnemy) {
+					cloakTime = cloakTime - 1000000.0;
+					cloakedness = (timeInfo.x - cloakTime) / 4.0;
+					if (cloakedness > 2.0) {
+						// Enough time has passed to fully hide the unit, must be a spectator with a bad state
+						isEnemy = false;
+					} else {
+						outlineValue = 0.0;
+					}
+					cloakedness = clamp(cloakedness, 0.0, 1.0);
+				} else {
+					cloakedness = clamp((timeInfo.x - cloakTime) / 8.0, 0.0, 1.0);
+				}
 				//outColor.g = 1.0;
 			}
 			if (cloakTime < 0){
+				if (isEnemy) {
+					cloakTime = cloakTime + 1000000.0;
+				}
 				cloakedness = 1.0 - clamp((timeInfo.x + cloakTime) / 15.0, 0.0, 1.0);
 				//outColor.r = 1.0;
 			}
@@ -1309,16 +1326,21 @@ void main(void){
 			myPerlin.g = myPerlin.g * 0.5 + 0.5;
 			texColor2.a = 1.0 - clamp(cloakedness*0.49, 0.0, 0.49);
 			float perlinline1 = clamp(1.0 - 20* abs(myPerlin.g - fract(simFrame * 0.005)), 0.0, 1.0);
-			float perlinline2 = clamp(1.0 - 20* abs(myPerlin.g - fract(simFrame * 0.005 +0.5)), 0.0, 1.0);
+			float perlinline2 = clamp(1.0 - 20* abs(myPerlin.g - fract(simFrame * 0.005 + 0.5)), 0.0, 1.0);
 			float cloaknoise = cloakedness*perlinline1 + cloakedness*perlinline2;
+			if (isEnemy) {
+				texColor2.a = 1.0 - clamp(cloakedness * (1.0 + cloaknoise * 5.0), 0.0, 1.0);
+			} else {
+				outColor.rgb = mix(outColor.rgb, teamCol.rgb, cloakedness*0.5);
+			}
 			outColor.rgb += cloaknoise * 0.85;
 
 			#if 1
 			float dotcamera = dot(worldNormal, V);
 
-			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1);
+			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1)*0.8 + 0.2;
 			highLightOpacity = highLightOpacity * highLightOpacity;
-			outColor.rgb = mix(outColor.rgb, teamCol.rgb * 6.0, highLightOpacity * cloakedness);
+			outColor.rgb = mix(outColor.rgb * (1.0 - cloakedness*0.4), teamCol.rgb * 6.0, highLightOpacity * cloakedness);
 			
 			//Add bloom to the perlin noise:
 			outSpecularColor.rgb+= vec3(clamp(cloaknoise * 0.75,0.0,1.0));
@@ -1364,7 +1386,7 @@ void main(void){
 			fragData[GBUFFER_EMITTEX_IDX] = vec4(vec3(albedoColor * emissiveness * 2.0) + outSpecularColor * 0.3, alphaBin);
 		#endif
 		#ifdef ENABLE_OPTION_HEALTH_TEXTURING
-			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 255.0, 0.0, alphaBin);
+			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, outlineValue, 0.0, alphaBin);
 		#else
 			fragData[GBUFFER_MISCTEX_IDX] = vec4(float(materialIndex) / 255.0, 0.0, 0.0, alphaBin);
 		#endif
