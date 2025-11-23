@@ -1316,6 +1316,7 @@ void main(void){
 			#endif
 		} 
 	#endif
+	//outColor.rgb = texColor2.rgb;
 
 	#if (RENDERING_MODE == 0)
 		// Forward Rendering Mode
