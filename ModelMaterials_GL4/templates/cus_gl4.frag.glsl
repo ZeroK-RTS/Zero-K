@@ -206,7 +206,7 @@ const float EPS = 1e-4;
 
 /***********************************************************************/
 // PBR constants
-const float MIN_ROUGHNESS = 0.22;
+const float MIN_ROUGHNESS = 0.25;
 const float DEFAULT_F0 = 0.04;
 
 /***********************************************************************/
