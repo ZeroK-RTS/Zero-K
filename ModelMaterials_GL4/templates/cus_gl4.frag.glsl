@@ -1377,7 +1377,7 @@ void main(void)
 		float buildProgress = shadowVertexPos.w;
 		if (buildProgress > -0.5){
 			float height = clamp(pieceVertexPosOrig.w/1.0,0,1);
-			buildProgress = 0.1 + 0.9*buildProgress;
+			buildProgress = clamp(0.05 + 0.9*buildProgress, 0.2, 1.0);
 			if (height > buildProgress) {
 				discard;
 			}
