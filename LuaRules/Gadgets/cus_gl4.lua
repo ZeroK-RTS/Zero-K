@@ -546,6 +546,7 @@ local function initMaterials()
 			itsXmas and "#define XMAS 1" or "#define XMAS 0",
 		},
 		shadowDefinitions = {
+			"#define ENABLE_OPTION_HEALTH_TEXTURING 1",
 			itsXmas and "#define XMAS 1" or "",
 		},
 		reflectionDefinitions = {
@@ -572,6 +573,7 @@ local function initMaterials()
 			itsXmas and "#define XMAS 1" or "#define XMAS 0",
 		},
 		shadowDefinitions = {
+			"#define ENABLE_OPTION_HEALTH_TEXTURING 1",
 			"#define USESKINNING",
 			itsXmas and "#define XMAS 1" or "",
 		},
