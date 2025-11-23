@@ -206,7 +206,7 @@ const float EPS = 1e-4;
 
 /***********************************************************************/
 // PBR constants
-const float MIN_ROUGHNESS = 0.04;
+const float MIN_ROUGHNESS = 0.22;
 const float DEFAULT_F0 = 0.04;
 
 /***********************************************************************/
@@ -1047,34 +1047,7 @@ void main(void){
 		vec3 kD = 1.0 - F;
 		kD *= 1.0 - metalness;
 
-		///
-		#if (USE_ENVIRONMENT_DIFFUSE == 1) || (USE_ENVIRONMENT_SPECULAR == 1)
-			#if (RENDERING_MODE == 0)
-				//TextureEnvBlured(N, Rv, iblDiffuse, iblSpecular);	//needed for Intel GPU
-			#endif
-		#endif
-		///
-
-		#if (USE_ENVIRONMENT_DIFFUSE == 1)
-		{
-			#if 0
-				vec3 iblDiffuseYCbCr = RGB2YCBCR * iblDiffuse;
-				float sunAmbientLuma = dot(LUMA, sunAmbientModel.rgb);
-
-				vec2 sunAmbientLumaLeeway = vec2(pbrParams[5]);
-
-				iblDiffuseYCbCr.x = smoothclamp(iblDiffuseYCbCr.x,
-					(1.0 - sunAmbientLumaLeeway.x) * sunAmbientLuma,
-					(1.0 + sunAmbientLumaLeeway.y) * sunAmbientLuma);
-
-				iblDiffuse = YCBCR2RGB * iblDiffuseYCbCr;
-			#else
-				iblDiffuse = mix(sunAmbientModel.rgb, iblDiffuse, pbrParams[5]);
-			#endif
-		}
-		#else
-			iblDiffuse = sunAmbientModel.rgb;
-		#endif
+		iblDiffuse = sunAmbientModel.rgb;
 
 		//vec4 debugColor = vec4(albedoColor.rgb ,1.0);
 		vec3 diffuse = iblDiffuse * albedoColor * aoterm_fogFactor_selfIllumMod_healthFraction.x;
@@ -1085,10 +1058,6 @@ void main(void){
 			vec3 reflectionColor = SampleEnvironmentWithRoughness(Rv, roughness);
 		#else
 			vec3 reflectionColor = vec3(0.0);
-		#endif
-
-		#if (USE_ENVIRONMENT_SPECULAR == 1)
-			reflectionColor = mix(reflectionColor, iblSpecular, roughness);
 		#endif
 
 		//vec3 specular = reflectionColor * (F * envBRDF.x + (1.0 - F) * envBRDF.y);
