@@ -348,8 +348,9 @@ local featuresDefsWithAlpha = {} -- featureDefIDs (ie trees) that should be draw
 local unitDefsUseSkinning = {} -- unitDefIDs that use the bones and stretchy skin system
 
 local ENEMY_CLOAK_FRAMES = 10 -- How many extra frames to show enemy units for.
-local cloakDeferFrame = {}
-local keepDrawFlagChecking = false -- a list of units that need draw flag checking
+local cloakLingerUnitFrame = {}
+local cloakLingerUnitList = false -- a list of units that need draw flag checking
+local nextLingerUpdate = false
 
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 
@@ -1428,18 +1429,19 @@ end
 local function ProcessCusUnit(unitID, drawFlag, gameFrame, reason)
 	if debugmode then Spring.Echo("ProcessUnits", unitID, drawFlag, reason) end
 
-	if cloakDeferFrame[unitID] and ((not drawFlag) or drawFlag == 0) then
-		if cloakDeferFrame[unitID] < gameFrame then
-			cloakDeferFrame[unitID] = nil
+	if cloakLingerUnitFrame[unitID] and ((not drawFlag) or drawFlag == 0) then
+		if cloakLingerUnitFrame[unitID] <= gameFrame then
+			cloakLingerUnitFrame[unitID] = nil
 		end
 		if not Spring.ValidUnitID(unitID) then
-			cloakDeferFrame[unitID] = nil
+			cloakLingerUnitFrame[unitID] = nil
 			return
 		end
-		if cloakDeferFrame[unitID] then
+		if cloakLingerUnitFrame[unitID] then
 			drawFlag = 1
-			keepDrawFlagChecking = keepDrawFlagChecking or {}
-			keepDrawFlagChecking[#keepDrawFlagChecking + 1] = unitID
+			cloakLingerUnitList = cloakLingerUnitList or {}
+			cloakLingerUnitList[#cloakLingerUnitList + 1] = unitID
+			nextLingerUpdate = nextLingerUpdate and math.min(nextLingerUpdate, cloakLingerUnitFrame[unitID]) or cloakLingerUnitFrame[unitID]
 		else
 			Spring.SetUnitAlwaysUpdateMatrix(unitID, false)
 		end
@@ -2075,9 +2077,10 @@ function gadget:UnitCloaked(unitID)
 		wantTranparent[unitID] = true
 		if not allyUnit then
 			Spring.SetUnitAlwaysUpdateMatrix(unitID, true)
-			keepDrawFlagChecking = keepDrawFlagChecking or {}
-			keepDrawFlagChecking[#keepDrawFlagChecking + 1] = unitID
-			cloakDeferFrame[unitID] = frame + ENEMY_CLOAK_FRAMES
+			cloakLingerUnitList = cloakLingerUnitList or {}
+			cloakLingerUnitList[#cloakLingerUnitList + 1] = unitID
+			cloakLingerUnitFrame[unitID] = frame + ENEMY_CLOAK_FRAMES
+			nextLingerUpdate = nextLingerUpdate and math.min(nextLingerUpdate, cloakLingerUnitFrame[unitID]) or cloakLingerUnitFrame[unitID]
 		end
 	else
 		uniformCache[1] = frame
@@ -2149,8 +2152,8 @@ function gadget:DrawWorldPreUnit()
 		--	Spring.Echo(printDrawPassStats())
 		--end
 		local totalobjects = #units + #features + numdestroyedUnits + numdestroyedFeatures
-		if keepDrawFlagChecking then
-			totalobjects = totalobjects + #keepDrawFlagChecking
+		if cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate >= gameFrame) then
+			totalobjects = totalobjects + #cloakLingerUnitList
 		end
 		
 		-- Why do we also do this processing round if #units > 0?
@@ -2198,9 +2201,10 @@ function gadget:DrawWorldPreUnit()
 		end
 
 		ProcessUnits(units, drawFlagsUnits, gameFrame, "changed")
-		if keepDrawFlagChecking then
-			local checkUnits = keepDrawFlagChecking
-			keepDrawFlagChecking = false
+		if cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate >= gameFrame) then
+			local checkUnits = cloakLingerUnitList
+			cloakLingerUnitList = false
+			nextLingerUpdate = false
 			ProcessUnits(checkUnits, false, gameFrame, "changed")
 		end
 		ProcessFeatures(features, drawFlagsFeatures, "changed")
