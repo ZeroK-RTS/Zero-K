@@ -362,7 +362,7 @@ void main() {
 		lighting_width = 3.8;
 		lightning_speed = 0.95;
 	} else if (disarm) {
-		effect_level = 0.996;
+		effect_level = 0.9954;
 		noisescale = 0.31;
 		persistance = 0.45;
 		lacunarity = 2.5;
