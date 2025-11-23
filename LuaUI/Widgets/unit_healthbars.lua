@@ -1516,7 +1516,9 @@ do
 
 		glDepthMask(false)
 
-		DrawOverlays()
+		if not WG.DrawParalyzedUnitGL4 then
+			DrawOverlays()
+		end
 		glMultiTexCoord(1, 1, 1, 1)
 		glColor(1, 1, 1, 1)
 

@@ -334,30 +334,20 @@ void main() {
 	
 	// ------------------ CONFIG START --------------------
 	
-	if (paralysis_level < 0.9999) { // not fully paralyzed
-		noisescale = 0.15;
-		persistance = 0.45;
-		lacunarity = 2.5;
-		minlightningcolor = vec3(0.1, 0.1, 0.5); //blue
-		maxlightningcolor = vec3(0.9, 0.9, 0.9); //white
-		wholeunitbasecolor = vec4(0.0, 0.0, 0.0, 0.0); // none
-		lightningalpha = 1.4;
-		lighting_sharpness = 12.8; 
-		lighting_width = 3.95;
-		lightning_speed = 0.14;
+	if (paralysis_level < 0.98) { // not fully paralyzed
+		fragColor = vec4(0);
+		return;
 	}
-	else{ // fully paralyzed
-		noisescale = 0.31;
-		persistance = 0.45;
-		lacunarity = 2.5;
-		minlightningcolor = vec3(0.1, 0.1, 1.0); //blue
-		maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
-		wholeunitbasecolor = vec4(0.49, 0.43, 0.94, 0.35); // light blue base tone
-		lightningalpha = 1.2;
-		lighting_sharpness = 4.8; 
-		lighting_width = 3.8;
-		lightning_speed = 0.95;
-	}
+	noisescale = 0.31;
+	persistance = 0.45;
+	lacunarity = 2.5;
+	minlightningcolor = vec3(0.1, 0.1, 1.0); //blue
+	maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
+	wholeunitbasecolor = vec4(0.49, 0.5, 1.0, 1.0); // light blue base tone
+	lightningalpha = 1.2;
+	lighting_sharpness = 4.8; 
+	lighting_width = 3.8;
+	lightning_speed = 0.95;
 	// ------------------ CONFIG END --------------------
 	
 	vec4 noiseposition = noisescale * vec4(v_modelPosOrig, (timeInfo.x + timeInfo.w) * lightning_speed);
@@ -372,21 +362,19 @@ void main() {
 
 	vec3 lightningcolor;
 	float effectalpha;
-	if (paralysis_level < 0.9999) { 
-		//empreworktagdonotremove
-		//empreworkherealsodonotremove
-		// Calculate the lightning color based on the amount of electricity
-		lightningcolor = mix(minlightningcolor, maxlightningcolor, electricity); 
-		effectalpha = paralysis_level * lightningalpha; // less transparency non-paralyzed
-	}
-	else
-	{
-		lightningcolor = mix(minlightningcolor, maxlightningcolor, electricity);
-		effectalpha = clamp(paralysis_level * lightningalpha, 0.0, 1.0);
-	}
+	lightningcolor = mix(minlightningcolor, maxlightningcolor, electricity);
+	effectalpha = clamp(paralysis_level * lightningalpha, 0.0, 1.0);
+	float flash = abs((2.0 * fract((timeInfo.x + timeInfo.w) * 0.07)) - 1.0);
 	
 	fragColor = vec4(lightningcolor, electricity*effectalpha);
-	fragColor = max(wholeunitbasecolor, fragColor); // apply whole unit base color	
+	float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, 1.7*(timeInfo.x + timeInfo.w))) + 
+	                     snoise(0.02 * vec4(v_modelPosOrig, 1.3*(timeInfo.x + timeInfo.w)));
+	baseItensity = sqrt(abs(baseItensity) + 0.2) * (0.5 * flash + 0.2) + clamp(baseItensity * (flash - 0.5) * 0.5, -0.2, 1.0);
+	wholeunitbasecolor.a = wholeunitbasecolor.a * (0.4 + baseItensity * 0.5);
+	wholeunitbasecolor.r = wholeunitbasecolor.r + baseItensity * 0.33;
+	wholeunitbasecolor.g = wholeunitbasecolor.g + baseItensity * 0.45;
+	fragColor = max(wholeunitbasecolor, fragColor); // apply whole unit base color
+	fragColor.a *= clamp((paralysis_level - 0.98) * 50.0, 0.0, 1.0);
 }
 ]]
 
