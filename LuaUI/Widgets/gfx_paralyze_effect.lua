@@ -191,11 +191,7 @@ void main() {
 	#endif
 
 	v_endcolor_alpha.rgba = endcolor_endgameframe.rgba;
-	v_endcolor_alpha.a = clamp( (v_endcolor_alpha.a - (timeInfo.x + timeInfo.w) + 100) * 0.01, 0.0, 1.0); // fade out for end time
-
-	float paralyzestrength = uni[instData.y].userDefined[1].x; // this (paralyzedamage/maxhealth), so >=1.0 is paralyzed
-	v_endcolor_alpha.a = clamp(pow(paralyzestrength, 2.0), 0.0, 1.1);
-	v_endcolor_alpha.r = uni[instData.y].userDefined[1].y;
+	v_endcolor_alpha.a = uni[instData.y].userDefined[1].x;
 	
 	// this checks the drawFlag of wether the unit is actually being drawn (this is ==1 when then unit is both visible and drawn as a full model (not icon))
 	if ((uni[instData.y].composite & 0x00000003u) < 1u ) {
@@ -324,8 +320,20 @@ in vec4 v_endcolor_alpha;
 out vec4 fragColor;
 #line 25000
 void main() {
-	float paralysis_level = v_endcolor_alpha.a; // values of 1 are fully paralyzed 
-	float disarmed = v_endcolor_alpha.r; // can be 1 or 0
+	float input_data = v_endcolor_alpha.a; // 1: para, 2: disarm, 4: fire, fraction: slow
+	bool fire = (input_data > 3.75);
+	if (fire) {
+		input_data -= 4.0;
+	}
+	bool disarm = (input_data > 1.75);
+	if (disarm) {
+		input_data -= 2.0;
+	}
+	bool emp = (input_data > 0.75);
+	if (emp) {
+		input_data -= 1.0;
+	}
+	float slowed = input_data;
 	
 	float noisescale;
 	float persistance;
@@ -337,12 +345,12 @@ void main() {
 	float lighting_sharpness; 
 	float lighting_width; 
 	float lightning_speed;
-	float effect_level;
+	float effect_level = 0.0;
 	
 	// ------------------ CONFIG START --------------------
 	
-	if (paralysis_level > 0.98) { // not fully paralyzed
-		effect_level = paralysis_level;
+	if (emp) {
+		effect_level = 1.0;
 		noisescale = 0.31;
 		persistance = 0.45;
 		lacunarity = 2.5;
@@ -353,7 +361,7 @@ void main() {
 		lighting_sharpness = 4.8; 
 		lighting_width = 3.8;
 		lightning_speed = 0.95;
-	} else if (disarmed > 0.5) {
+	} else if (disarm) {
 		effect_level = 0.996;
 		noisescale = 0.31;
 		persistance = 0.45;
@@ -365,37 +373,51 @@ void main() {
 		lighting_sharpness = 4.8; 
 		lighting_width = 3.8;
 		lightning_speed = 0.95;
-	} else {
-		fragColor = vec4(0);
-		return;
 	}
 	// ------------------ CONFIG END --------------------
 	
-	vec4 noiseposition = noisescale * vec4(v_modelPosOrig, (timeInfo.x + timeInfo.w) * lightning_speed);
-	float noise4 = 0;
-	noise4 += pow(persistance, 1.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 1.0));
-	noise4 += pow(persistance, 2.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 2.0));
-	noise4 += pow(persistance, 3.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 3.0));
-	noise4 += pow(persistance, 4.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 4.0));
-	noise4 = (1.0 * noise4 + 0.5);
-	float electricity = clamp(1.0 - abs(noise4 - 0.5) * lighting_width, 0.0, 1.0);
-	electricity = clamp(pow(electricity, lighting_sharpness), 0.0, 1.0);
-
-	vec3 lightningcolor;
-	float effectalpha;
-	lightningcolor = mix(minlightningcolor, maxlightningcolor, electricity);
-	effectalpha = clamp(effect_level * lightningalpha, 0.0, 1.0);
+	fragColor = vec4(1.0, 1.0, 1.0, 0.0);
 	float flash = abs((2.0 * fract((timeInfo.x + timeInfo.w) * 0.07)) - 1.0);
-	
-	fragColor = vec4(lightningcolor, electricity*effectalpha);
-	float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, 1.7*(timeInfo.x + timeInfo.w))) + 
-	                     snoise(0.02 * vec4(v_modelPosOrig, 1.3*(timeInfo.x + timeInfo.w)));
-	baseItensity = sqrt(abs(baseItensity) + 0.2) * (0.5 * flash + 0.2) + clamp(baseItensity * (flash - 0.5) * 0.5, -0.2, 1.0);
-	wholeunitbasecolor.a = wholeunitbasecolor.a * (0.4 + baseItensity * 0.5);
-	wholeunitbasecolor.r = wholeunitbasecolor.r + baseItensity * 0.33;
-	wholeunitbasecolor.g = wholeunitbasecolor.g + baseItensity * 0.45;
-	fragColor = max(wholeunitbasecolor, fragColor); // apply whole unit base color
-	fragColor.a *= clamp((effect_level - 0.98) * 50.0, 0.0, 1.0);
+	if (effect_level > 0.5) {
+		vec4 noiseposition = noisescale * vec4(v_modelPosOrig, (timeInfo.x + timeInfo.w) * lightning_speed);
+		float noise4 = 0;
+		noise4 += pow(persistance, 1.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 1.0));
+		noise4 += pow(persistance, 2.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 2.0));
+		noise4 += pow(persistance, 3.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 3.0));
+		noise4 += pow(persistance, 4.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 4.0));
+		noise4 = (1.0 * noise4 + 0.5);
+		float electricity = clamp(1.0 - abs(noise4 - 0.5) * lighting_width, 0.0, 1.0);
+		electricity = clamp(pow(electricity, lighting_sharpness), 0.0, 1.0);
+
+		vec3 lightningcolor;
+		float effectalpha;
+		lightningcolor = mix(minlightningcolor, maxlightningcolor, electricity);
+		effectalpha = clamp(effect_level * lightningalpha, 0.0, 1.0);
+		
+		fragColor = vec4(lightningcolor, electricity*effectalpha);
+		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, 1.7*(timeInfo.x + timeInfo.w))) + 
+		                     snoise(0.02 * vec4(v_modelPosOrig, 1.3*(timeInfo.x + timeInfo.w)));
+		baseItensity = sqrt(abs(baseItensity) + 0.2) * (0.5 * flash + 0.2) + clamp(baseItensity * (flash - 0.5) * 0.5, -0.2, 1.0);
+		wholeunitbasecolor.a = wholeunitbasecolor.a * (0.4 + baseItensity * 0.5);
+		wholeunitbasecolor.r = wholeunitbasecolor.r + baseItensity * 0.33;
+		wholeunitbasecolor.g = wholeunitbasecolor.g + baseItensity * 0.45;
+		fragColor = max(wholeunitbasecolor, fragColor); // apply whole unit base color
+		fragColor.a *= clamp((effect_level - 0.98) * 50.0, 0.0, 1.0);
+	}
+	if (slowed > 0.001) {
+		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, -1.7*(timeInfo.x + timeInfo.w))) + 
+		                     snoise(0.02 * vec4(v_modelPosOrig, -1.3*(timeInfo.x + timeInfo.w)));
+		baseItensity = sqrt(abs(baseItensity) + 0.2);
+		vec4 slowcolor = vec4(0.9, 0.1, 0.9, baseItensity) * sqrt(slowed) * 2.0;
+		fragColor = mix(slowcolor, fragColor, 0.5 + 0.3 * clamp(effect_level, 0.0, 1.0));
+	}
+	if (fire) {
+		flash = 1.0 - flash;
+		float baseItensity = snoise(0.06 * vec4(v_modelPosOrig, 1.1*(timeInfo.x + timeInfo.w))) + 
+		                     snoise(0.073 * vec4(v_modelPosOrig, 2.2*(timeInfo.x + timeInfo.w)));
+		vec4 firecolor = vec4(1.0, 0.3, 0.0, (0.4 + 0.3*flash) * (0.3 + 0.5 * baseItensity) + 0.2 * baseItensity + 0.4 + 0.6*flash);
+		fragColor = mix(firecolor, fragColor, 0.65 + 0.2 * clamp(effect_level + slowed, 0.0, 1.0));
+	}
 }
 ]]
 
@@ -524,7 +546,9 @@ function widget:UnitCreated(unitID, unitDefID)
 
 	local health,maxHealth,paralyzeDamage,capture,build = spGetUnitHealth(unitID)
 	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
-	if (paralyzeDamage and paralyzeDamage > 0) or (disarmed == 1) then
+	local slow = spGetUnitRulesParam(unitID, "slowState")
+	local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
+	if (paralyzeDamage and paralyzeDamage > 0) or (disarmed == 1) or (slow or 0) > 0 or fire then
 		DrawParalyzedUnitGL4(unitID, unitDefID)
 	end
 end
@@ -542,7 +566,7 @@ function widget:UnitEnteredLos(unitID)
 	widget:UnitCreated(unitID, spGetUnitDefID(unitID))
 end
 
-local function UnitParalyzeOrDisarmDamageEffect(unitID, unitDefID) -- called from Healthbars Widget Forwarding GADGET!!!
+local function UnitStatusDamageEffect(unitID, unitDefID) -- called from Healthbars Widget Forwarding GADGET!!!
 	widget:UnitCreated(unitID, unitDefID)
 end
 
@@ -555,14 +579,18 @@ function widget:GameFrame(n)
 			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
 				local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
 				local disarmed = spGetUnitRulesParam(unitID, "disarmed")
-				if (not paralyzeDamage or paralyzeDamage == 0) and disarmed ~= 1 then
+				local slow = spGetUnitRulesParam(unitID, "slowState")
+				local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
+				if (not paralyzeDamage or paralyzeDamage == 0) and disarmed ~= 1 and (slow or 0) <= 0 and not fire then
 					toremove[unitID] = true
 				else
 					local para = (paralyzeDamage or 0) / (maxHealth or 1)
-					uniformcache[1] = para -- 1 to avoid div0
+					local val = (slow or 0)
+					val = val + (((para >= 1) and 1) or 0)
+					val = val + (((disarmed == 1) and 2) or 0)
+					val = val + ((fire and 4) or 0)
+					uniformcache[1] = val
 					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
-					uniformcache[1] = disarmed
-					gl.SetUnitBufferUniforms(unitID, uniformcache, 5)
 				end
 			end
 		end
@@ -588,15 +616,19 @@ function widget:Initialize()
 	end
 	WG['DrawParalyzedUnitGL4'] = DrawParalyzedUnitGL4
 	WG['StopDrawParalyzedUnitGL4'] = StopDrawParalyzedUnitGL4
-	widgetHandler:RegisterGlobal("UnitParalyzeDamageEffect", UnitParalyzeOrDisarmDamageEffect)
-	widgetHandler:RegisterGlobal("UnitDisarmDamageEffect",   UnitParalyzeOrDisarmDamageEffect)
+	widgetHandler:RegisterGlobal("UnitParalyzeDamageEffect", UnitStatusDamageEffect)
+	widgetHandler:RegisterGlobal("UnitDisarmDamageEffect",   UnitStatusDamageEffect)
+	widgetHandler:RegisterGlobal("UnitSlowDamageEffect",     UnitStatusDamageEffect)
+	widgetHandler:RegisterGlobal("UnitFireDamageEffect",     UnitStatusDamageEffect)
 end
 
 function widget:Shutdown()
 	WG['DrawParalyzedUnitGL4'] = nil
 	WG['StopDrawParalyzedUnitGL4'] = nil
-	widgetHandler:DeregisterGlobal("UnitParalyzeDamageEffect" )
-	widgetHandler:DeregisterGlobal("UnitDisarmDamageEffect" )
+	widgetHandler:DeregisterGlobal("UnitParalyzeDamageEffect")
+	widgetHandler:DeregisterGlobal("UnitDisarmDamageEffect")
+	widgetHandler:DeregisterGlobal("UnitSlowDamageEffect")
+	widgetHandler:DeregisterGlobal("UnitFireDamageEffect")
 end
 
 function widget:DrawWorld()

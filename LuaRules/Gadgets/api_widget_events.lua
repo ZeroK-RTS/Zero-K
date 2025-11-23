@@ -23,6 +23,8 @@ local scriptUnitDestroyedByTeam = Script.LuaUI.UnitDestroyedByTeam
 local scriptUnitLeftRadar       = Script.LuaUI.UnitLeftRadar
 
 local disarmWeapons = VFS.Include("LuaRules/Configs/disarm_defs.lua")
+local slowWeapons = include("LuaRules/Configs/timeslow_defs.lua")
+local fireWeapons = VFS.Include("LuaRules/Configs/fire_defs.lua")
 
 local _, fullview = Spring.GetSpectatingState()
 local myAllyTeamID = spGetMyAllyTeamID()
@@ -77,7 +79,7 @@ end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--Spring.Echo("gadget:UnitDamaged",unitID, unitDefID, unitTeam, damage, paralyzer)
-	if paralyzer or disarmWeapons[weaponDefID] then
+	if paralyzer or disarmWeapons[weaponDefID] or slowWeapons[weaponDefID] or fireWeapons[weaponDefID] then
 		if not fullview and not Spring.IsUnitInLos(unitID, myAllyTeamID) then
 			return
 		end
@@ -86,6 +88,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			Script.LuaUI.UnitParalyzeDamageEffect(unitID, unitDefID, damage)
 		elseif disarmWeapons[weaponDefID] and Script.LuaUI("UnitDisarmDamageEffect") then
 			Script.LuaUI.UnitDisarmDamageEffect(unitID, unitDefID)
+		end
+		if slowWeapons[weaponDefID] and Script.LuaUI("UnitSlowDamageEffect") then
+			Script.LuaUI.UnitSlowDamageEffect(unitID, unitDefID)
+		end
+		if fireWeapons[weaponDefID] and Script.LuaUI("UnitFireDamageEffect") then
+			Script.LuaUI.UnitFireDamageEffect(unitID, unitDefID)
 		end
 	end
 end
