@@ -1,16 +1,16 @@
 local widget = widget ---@type Widget
 
 function widget:GetInfo()
-  return {
-    name      = "Paralyze Effect",
-    version   = "v0.2",
-    desc      = "Faster gl.UnitShape, Use WG.UnitShapeGL4",
-    author    = "Beherith",
-    date      = "2021.11.04",
-    license   = "GPL V2",
-    layer     = 0,
-    enabled   = true,
-  }
+	return {
+		name      = "Paralyze Effect",
+		version   = "v0.2",
+		desc      = "Faster gl.UnitShape, Use WG.UnitShapeGL4",
+		author    = "Beherith",
+		date      = "2021.11.04",
+		license   = "GPL V2",
+		layer     = 0,
+	enabled   = true,
+	}
 end
 
 
@@ -18,8 +18,7 @@ end
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetGameFrame = Spring.GetGameFrame
-local spEcho = Spring.Echo
-local spGetAllUnits = Spring.GetAllUnits
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
@@ -196,7 +195,13 @@ void main() {
 
 	float paralyzestrength = uni[instData.y].userDefined[1].x; // this (paralyzedamage/maxhealth), so >=1.0 is paralyzed
 	v_endcolor_alpha.a = clamp(pow(paralyzestrength, 2.0), 0.0, 1.1);
-	if ((uni[instData.y].composite & 0x00000003u) < 1u ) v_endcolor_alpha.a = 0.0; // this checks the drawFlag of wether the unit is actually being drawn (this is ==1 when then unit is both visible and drawn as a full model (not icon))
+	v_endcolor_alpha.r = uni[instData.y].userDefined[1].y;
+	
+	// this checks the drawFlag of wether the unit is actually being drawn (this is ==1 when then unit is both visible and drawn as a full model (not icon))
+	if ((uni[instData.y].composite & 0x00000003u) < 1u ) {
+		v_endcolor_alpha.a = 0.0; 
+		v_endcolor_alpha.r = 0.0;
+	}
 
 	v_startcolorpower = startcolorpower;
 	
@@ -320,6 +325,7 @@ out vec4 fragColor;
 #line 25000
 void main() {
 	float paralysis_level = v_endcolor_alpha.a; // values of 1 are fully paralyzed 
+	float disarmed = v_endcolor_alpha.r; // can be 1 or 0
 	
 	float noisescale;
 	float persistance;
@@ -331,23 +337,38 @@ void main() {
 	float lighting_sharpness; 
 	float lighting_width; 
 	float lightning_speed;
+	float effect_level;
 	
 	// ------------------ CONFIG START --------------------
 	
-	if (paralysis_level < 0.98) { // not fully paralyzed
+	if (paralysis_level > 0.98) { // not fully paralyzed
+		effect_level = paralysis_level;
+		noisescale = 0.31;
+		persistance = 0.45;
+		lacunarity = 2.5;
+		minlightningcolor = vec3(0.1, 0.1, 1.0); //blue
+		maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
+		wholeunitbasecolor = vec4(0.49, 0.5, 1.0, 1.0); // light blue base tone
+		lightningalpha = 1.2;
+		lighting_sharpness = 4.8; 
+		lighting_width = 3.8;
+		lightning_speed = 0.95;
+	} else if (disarmed > 0.5) {
+		effect_level = 0.996;
+		noisescale = 0.31;
+		persistance = 0.45;
+		lacunarity = 2.5;
+		minlightningcolor = vec3(0.5, 0.5, 1.0); //blue
+		maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
+		wholeunitbasecolor = vec4(0.9, 0.9, 0.7, 1.0); // light blue base tone
+		lightningalpha = 1.2;
+		lighting_sharpness = 4.8; 
+		lighting_width = 3.8;
+		lightning_speed = 0.95;
+	} else {
 		fragColor = vec4(0);
 		return;
 	}
-	noisescale = 0.31;
-	persistance = 0.45;
-	lacunarity = 2.5;
-	minlightningcolor = vec3(0.1, 0.1, 1.0); //blue
-	maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
-	wholeunitbasecolor = vec4(0.49, 0.5, 1.0, 1.0); // light blue base tone
-	lightningalpha = 1.2;
-	lighting_sharpness = 4.8; 
-	lighting_width = 3.8;
-	lightning_speed = 0.95;
 	// ------------------ CONFIG END --------------------
 	
 	vec4 noiseposition = noisescale * vec4(v_modelPosOrig, (timeInfo.x + timeInfo.w) * lightning_speed);
@@ -363,7 +384,7 @@ void main() {
 	vec3 lightningcolor;
 	float effectalpha;
 	lightningcolor = mix(minlightningcolor, maxlightningcolor, electricity);
-	effectalpha = clamp(paralysis_level * lightningalpha, 0.0, 1.0);
+	effectalpha = clamp(effect_level * lightningalpha, 0.0, 1.0);
 	float flash = abs((2.0 * fract((timeInfo.x + timeInfo.w) * 0.07)) - 1.0);
 	
 	fragColor = vec4(lightningcolor, electricity*effectalpha);
@@ -374,7 +395,7 @@ void main() {
 	wholeunitbasecolor.r = wholeunitbasecolor.r + baseItensity * 0.33;
 	wholeunitbasecolor.g = wholeunitbasecolor.g + baseItensity * 0.45;
 	fragColor = max(wholeunitbasecolor, fragColor); // apply whole unit base color
-	fragColor.a *= clamp((paralysis_level - 0.98) * 50.0, 0.0, 1.0);
+	fragColor.a *= clamp((effect_level - 0.98) * 50.0, 0.0, 1.0);
 }
 ]]
 
@@ -422,7 +443,7 @@ local function initGL4()
 	paralyzedUnitShader = LuaShader.CheckShaderUpdates(paralyzeSourceShaderCache)
 
 	if not paralyzedUnitShader  then
-		spEcho("paralyzedUnitShaderCompiled shader compilation failed", paralyzedUnitShader)
+		Spring.Echo("paralyzedUnitShaderCompiled shader compilation failed", paralyzedUnitShader)
 		widgetHandler:RemoveWidget()
 	end
 end
@@ -434,7 +455,7 @@ local function DrawParalyzedUnitGL4(unitID, unitDefID, red_start,  green_start, 
 	-- returns: a unique handler ID number that you should store and call StopDrawParalyzedUnitGL4(uniqueID) with to stop drawing it
 	-- note that widgets are responsible for stopping the drawing of every unit that they submit!
 
-	--spEcho("DrawParalyzedUnitGL4",unitID, unitDefID, UnitDefs[unitDefID].name)
+	--Spring.Echo("DrawParalyzedUnitGL4",unitID, unitDefID, UnitDefs[unitDefID].name)
 	if paralyzedDrawUnitVBOTable.instanceIDtoIndex[unitID] then return end -- already got this unit
 	if Spring.ValidUnitID(unitID) ~= true or Spring.GetUnitIsDead(unitID) == true then return end
 	red_start = red_start or 1.0
@@ -446,7 +467,7 @@ local function DrawParalyzedUnitGL4(unitID, unitDefID, red_start,  green_start, 
 	blue_end = blue_end or 1.0
 	time_end = 500000 --time_end or spGetGameFrame()
 	unitDefID = unitDefID or spGetUnitDefID(unitID)
-
+	
 	pushElementInstance(paralyzedDrawUnitVBOTable , {
 			red_start, green_start,blue_start, power_start,
 			red_end, green_end, blue_end, time_end,
@@ -457,7 +478,7 @@ local function DrawParalyzedUnitGL4(unitID, unitDefID, red_start,  green_start, 
 		nil,
 		unitID,
 		"unitID")
-	--spEcho("Pushed",  unitID, elementID)
+	--Spring.Echo("Pushed",  unitID, elementID)
 	return unitID
 end
 
@@ -479,13 +500,10 @@ local spec, fullview
 
 local function init()
 	InstanceVBOTable.clearInstanceTable(paralyzedDrawUnitVBOTable)
-	local allUnits = spGetAllUnits()
+	local allUnits = Spring.GetAllUnits()
 	for i=1, #allUnits do
 		local unitID = allUnits[i]
-		local health,maxHealth,paralyzeDamage,capture,build = spGetUnitHealth(unitID)
-		if paralyzeDamage and paralyzeDamage > 0 then
-			widget:UnitCreated(unitID, spGetUnitDefID(unitID))
-		end
+		widget:UnitCreated(unitID, spGetUnitDefID(unitID))
 	end
 end
 
@@ -494,7 +512,7 @@ function widget:PlayerChanged(playerID)
 	local prevMyTeamID = myTeamID
 	myTeamID = Spring.GetMyTeamID()
 	if myTeamID ~= prevMyTeamID then -- TODO only really needed if onlyShowOwnTeam, or if allyteam changed?
-		--spEcho("Initializing Paralyze Effect")
+		--Spring.Echo("Initializing Paralyze Effect")
 		init()
 	end
 end
@@ -505,7 +523,8 @@ function widget:UnitCreated(unitID, unitDefID)
 	end
 
 	local health,maxHealth,paralyzeDamage,capture,build = spGetUnitHealth(unitID)
-	if paralyzeDamage and paralyzeDamage > 0 then
+	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
+	if (paralyzeDamage and paralyzeDamage > 0) or (disarmed == 1) then
 		DrawParalyzedUnitGL4(unitID, unitDefID)
 	end
 end
@@ -523,8 +542,7 @@ function widget:UnitEnteredLos(unitID)
 	widget:UnitCreated(unitID, spGetUnitDefID(unitID))
 end
 
-local function UnitParalyzeDamageEffect(unitID, unitDefID, damage) -- called from Healthbars Widget Forwarding GADGET!!!
-	--spEcho("UnitParalyzeDamageEffect",unitID, unitDefID, damage, Spring.GetUnitIsStunned(unitID)) -- DO NOTE THAT: return: nil | bool stunned_or_inbuild, bool stunned, bool inbuild
+local function UnitParalyzeOrDisarmDamageEffect(unitID, unitDefID) -- called from Healthbars Widget Forwarding GADGET!!!
 	widget:UnitCreated(unitID, unitDefID)
 end
 
@@ -536,11 +554,15 @@ function widget:GameFrame(n)
 		if n % 3 == 0 then
 			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
 				local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
-				if paralyzeDamage == 0 or paralyzeDamage == nil then
+				local disarmed = spGetUnitRulesParam(unitID, "disarmed")
+				if (not paralyzeDamage or paralyzeDamage == 0) and disarmed ~= 1 then
 					toremove[unitID] = true
 				else
-					uniformcache[1] = (paralyzeDamage or 0) / (maxHealth or 1) -- 1 to avoid div0
+					local para = (paralyzeDamage or 0) / (maxHealth or 1)
+					uniformcache[1] = para -- 1 to avoid div0
 					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+					uniformcache[1] = disarmed
+					gl.SetUnitBufferUniforms(unitID, uniformcache, 5)
 				end
 			end
 		end
@@ -559,25 +581,27 @@ function widget:Initialize()
 	initGL4()
 	init()
 	if TESTMODE then
-		for i, unitID in ipairs(spGetAllUnits()) do
+		for i, unitID in ipairs(Spring.GetAllUnits()) do
 			widget:UnitCreated(unitID)
 			gl.SetUnitBufferUniforms(unitID, {1.01}, 4)
 		end
 	end
 	WG['DrawParalyzedUnitGL4'] = DrawParalyzedUnitGL4
 	WG['StopDrawParalyzedUnitGL4'] = StopDrawParalyzedUnitGL4
-	widgetHandler:RegisterGlobal("UnitParalyzeDamageEffect",UnitParalyzeDamageEffect )
+	widgetHandler:RegisterGlobal("UnitParalyzeDamageEffect", UnitParalyzeOrDisarmDamageEffect)
+	widgetHandler:RegisterGlobal("UnitDisarmDamageEffect",   UnitParalyzeOrDisarmDamageEffect)
 end
 
 function widget:Shutdown()
 	WG['DrawParalyzedUnitGL4'] = nil
 	WG['StopDrawParalyzedUnitGL4'] = nil
 	widgetHandler:DeregisterGlobal("UnitParalyzeDamageEffect" )
+	widgetHandler:DeregisterGlobal("UnitDisarmDamageEffect" )
 end
 
 function widget:DrawWorld()
 	if paralyzedDrawUnitVBOTable.usedElements > 0 then
-		--if spGetGameFrame() % 90 == 0 then spEcho("Drawing paralyzed units #", paralyzedDrawUnitVBOTable.usedElements) end
+		--if spGetGameFrame() % 90 == 0 then Spring.Echo("Drawing paralyzed units #", paralyzedDrawUnitVBOTable.usedElements) end
 		gl.Culling(GL.BACK)
 		gl.DepthMask(false) --"BK OpenGL state resets", default is already false, could remove
 		gl.DepthTest(true)

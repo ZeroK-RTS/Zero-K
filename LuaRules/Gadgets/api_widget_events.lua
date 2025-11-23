@@ -22,6 +22,8 @@ local scriptUnitDestroyed       = Script.LuaUI.UnitDestroyed
 local scriptUnitDestroyedByTeam = Script.LuaUI.UnitDestroyedByTeam
 local scriptUnitLeftRadar       = Script.LuaUI.UnitLeftRadar
 
+local disarmWeapons = VFS.Include("LuaRules/Configs/disarm_defs.lua")
+
 local _, fullview = Spring.GetSpectatingState()
 local myAllyTeamID = spGetMyAllyTeamID()
 
@@ -73,17 +75,17 @@ function gadget:PlayerChanged(playerID)
 	_, fullview = Spring.GetSpectatingState()
 end
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--Spring.Echo("gadget:UnitDamaged",unitID, unitDefID, unitTeam, damage, paralyzer)
-	if paralyzer then
+	if paralyzer or disarmWeapons[weaponDefID] then
 		if not fullview and not Spring.IsUnitInLos(unitID, myAllyTeamID) then
 			return
 		end
-		if damage > 0 then
-			if Script.LuaUI("UnitParalyzeDamageEffect") then
-				--Spring.Echo("UnitParalyzeDamageHealthbars", unitID, step)
-				Script.LuaUI.UnitParalyzeDamageEffect(unitID, unitDefID, damage)
-			end
+		if paralyzer and damage > 0 and Script.LuaUI("UnitParalyzeDamageEffect") then
+			--Spring.Echo("UnitParalyzeDamageHealthbars", unitID, step)
+			Script.LuaUI.UnitParalyzeDamageEffect(unitID, unitDefID, damage)
+		elseif disarmWeapons[weaponDefID] and Script.LuaUI("UnitDisarmDamageEffect") then
+			Script.LuaUI.UnitDisarmDamageEffect(unitID, unitDefID)
 		end
 	end
 end
