@@ -153,7 +153,9 @@ local chassisAllDefs=VFS.Include("gamedata/modularcomms/chassises_all_defs.lua")
 for i = 1, #chassisAllDefs do
 	local chassisDef = chassisAllDefs[i].dyncomms_predefined
 	for key, value in pairs(chassisDef) do
-		ret[key]=value
+		if not value.notSelectable then
+			ret[key]=value
+		end
 	end
 end
 

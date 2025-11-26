@@ -228,7 +228,7 @@ return {
         dyntrainer_knight={
             name = "Campaign",
             chassis = "knight",
-        
+            notSelectable = (Spring.GetModOptions().campaign_chassis ~= "1"),
             modules = { -- all null because nabs want to personalize
                 {"nullbasicweapon", "nullmodule"},
                 {"nullmodule", "nullmodule"},
