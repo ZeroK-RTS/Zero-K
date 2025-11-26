@@ -211,7 +211,7 @@ end
 
 local function ApplyDefaultSunDir()
 	options.override_sun_direction.value = true
-	SunDirectionFunc(0.03, 0.75)
+	SunDirectionFunc(6, 0.75)
 end
 
 local function ToggleDefaultSunDir(self)
