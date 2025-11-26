@@ -10,7 +10,7 @@
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/base64.lua")
 
-Spring.Log = Spring.Log or function() end
+Spring.Log = Spring.Log or function(...) end
 --------------------------------------------------------------------------------
 --	HOW IT WORKS:
 --	First, it makes unitdefs as specified by the decoded modoption string, one for each unique comm type.
@@ -96,7 +96,7 @@ local function GenerateLevel0DyncommsAndWrecks()
 		local unitName = commProfile.baseUnitName
 		
 		local chassis = commProfile.chassis
-		local mappedChassis = legacyToDyncommChassisMap[chassis] or "assault"
+		local mappedChassis = legacyToDyncommChassisMap[chassis]-- or "assault"
 		if mappedChassis then
 			chassis = mappedChassis
 		end
@@ -148,6 +148,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+---@diagnostic disable-next-line: lowercase-global
 commDefs = {} --holds precedurally generated comm defs
 
 local function ProcessComm(name, config)

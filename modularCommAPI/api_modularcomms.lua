@@ -140,7 +140,7 @@ local function LoadCommData()
 	
 	-- Convert chassis to correct names.
 	for profileID, profile in pairs(newCommProfilesByProfileID) do
-		profile.chassis = legacyToDyncommChassisMap[profile.chassis]
+		profile.chassis = legacyToDyncommChassisMap[profile.chassis] or profile.chassis
 	end
 	
 	for i = 1, #UnitDefs do
@@ -157,13 +157,14 @@ local function LoadCommData()
 			legacyModulesByUnitDefName[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
 		end
 	end
-	
+
 	return newCommData, newCommProfilesByProfileID, newCommProfileIDsByPlayerID, newProfileIDByBaseDefID
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local function GetCommProfileInfo(commProfileID)
+
 	return commProfilesByProfileID[commProfileID]
 end
 

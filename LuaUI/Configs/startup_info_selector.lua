@@ -40,10 +40,18 @@ local chassisImages = {
 	support = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
 	assault = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
 	strike = "LuaUI/Images/startup_info_selector/chassis_commstrike.png",
-	knight = "LuaUI/Images/startup_info_selector/chassis_cremcom.png"
+	knight = "LuaUI/Images/startup_info_selector/chassis_cremcom.png",
 }
 
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+
+local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND , chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+
+-- chassisDefs.chassisImage
+---@cast chassisDefs table
+---@cast moduleDefNames table
+for key, value in pairs(chassisDefs) do
+	chassisImages[value.name]=value.chassisImage or chassisImages[value.name]
+end
 
 local colorWeapon = "\255\255\32\32"
 local colorConversion = "\255\255\96\0"
@@ -86,6 +94,7 @@ local function GetCommSelectTemplate(num, data)
 		tooltip = "Select "..data.name..WriteTooltip(commProfileID),
 		image = chassisImages[data.chassis],
 		cmd = "customcomm:"..commProfileID,
+---@diagnostic disable-next-line: undefined-global
 		unitname = comm1Name,
 		commProfile = commProfileID,
 		trainer = string.find(commProfileID, "trainer") ~= nil,	-- FIXME should probably be in the def table

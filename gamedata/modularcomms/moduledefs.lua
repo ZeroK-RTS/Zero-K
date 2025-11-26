@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global
 --------------------------------------------------------------------------------
 -- system functions
 --------------------------------------------------------------------------------
@@ -755,6 +756,27 @@ upgrades = {
 	}
 }
 
+include = include or VFS.Include
+
+local modulesdefs=include("gamedata/modularcomms/modules_all_defs.lua")
+
+for i = 1, #modulesdefs do
+	local moduleDefs = modulesdefs[i].moduledef
+	for key, value in pairs(moduleDefs) do
+		upgrades[key]=value
+	end
+end
+
+--[=[
+local moduleFiles=VFS.DirList("gamedata/modularcomms/modules_moduledefs", "*.lua") or {}
+
+for i = 1, #moduleFiles do
+	local moduleDefs = VFS.Include(moduleFiles[i])
+	for key, value in pairs(moduleDefs) do
+		upgrades[key]=value
+	end
+end
+]=]
 decorations = {
 	skin_recon_dark = {
 		func = function(unitDef)

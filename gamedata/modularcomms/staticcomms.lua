@@ -218,31 +218,14 @@ end
 --------------------------------------------------------------------------------------
 -- Must match dynamic_comm_defs.lua around line 800 (top of the chassis defs)
 --------------------------------------------------------------------------------------
-MakeCommanderChassisClones("dynrecon",
-	{{0}, {1}, {1}, {1}, {1}},
-	{"module_personal_shield"}
-)
 
-MakeCommanderChassisClones("dynsupport",
-	{{0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
-	{"module_personal_shield", "module_areashield", "module_resurrect"}
-)
+local chassisAllDefs=VFS.Include("gamedata/modularcomms/chassises_all_defs.lua")
 
-MakeCommanderChassisClones("dynassault",
-	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
-	{"module_personal_shield", "module_areashield"}
-)
-
-MakeCommanderChassisClones("dynstrike",
-	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
-	{"module_personal_shield", "module_areashield"}
-)
-
--- All modules may be available at any level, depending on campaign layout.
-MakeCommanderChassisClones("dynknight",
-	{{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}},
-	{"module_personal_shield", "module_areashield", "module_resurrect", "module_jumpjet"}
-)
+for i = 1, #chassisAllDefs do
+  local staticcommsDef=chassisAllDefs[i].staticcomms
+	local name,levelLimits,modules = staticcommsDef[1],staticcommsDef[2],staticcommsDef[3]
+	MakeCommanderChassisClones(name,levelLimits,modules)
+end
 
 --[[
 for name,stats in pairs(comms) do

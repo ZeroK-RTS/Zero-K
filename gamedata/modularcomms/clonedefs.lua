@@ -246,162 +246,20 @@ local copy = {
 			wreckmodel = "strikecom_dead_4.dae",
 		},
 	},
-	dynstrike1 = {
-		dynstrike0 = {
-			level = 0,
-			customparams = {shield_emit_height = 38},
-		},
-		dynstrike2 = {
-			level = 2,
-			mainstats = {health = 4600, objectname = "strikecom_1.dae", collisionvolumescales  = [[50 55 50]],},
-			customparams = {modelradius = [[28]], shield_emit_height = 41.8},
-			wreckmodel = "strikecom_dead_1.dae",
-		},
-		dynstrike3 = {
-			level = 3,
-			mainstats = {health = 5200, objectname = "strikecom_2.dae", collisionvolumescales  = [[55 60 55]],},
-			customparams = {modelradius = [[30]], shield_emit_height = 45.6},
-			wreckmodel = "strikecom_dead_2.dae",
-		},
-		dynstrike4 = {
-			level = 4,
-			mainstats = {health = 5800, objectname = "strikecom_3.dae", collisionvolumescales  = [[58 66 58]],},
-			customparams = {modelradius = [[33]], shield_emit_height = 47.5},
-			wreckmodel = "strikecom_dead_3.dae",
-		},
-		dynstrike5 = {
-			level = 5,
-			mainstats = {health = 6400, objectname = "strikecom_4.dae", collisionvolumescales  = [[60 72 60]],},
-			customparams = {modelradius = [[36]], shield_emit_height = 49.4},
-			wreckmodel = "strikecom_dead_4.dae",
-		},
-	},
-	dynrecon1 = {
-		dynrecon0 = {
-			level = 0,
-			customparams = {shield_emit_height = 30},
-		},
-		dynrecon2 = {
-			level = 2,
-			mainstats = {health = 3400, objectname = "commrecon2.s3o", aimposoffset = [[0 12 0]]},
-			customparams = {shield_emit_height = 33, jump_reload = 20, jump_speed = 4.75},
-			wreckmodel = "commrecon2_dead.s3o",
-		},
-		dynrecon3 = {
-			level = 3,
-			mainstats = {health = 3600, objectname = "commrecon3.s3o", aimposoffset = [[0 14 0]]},
-			customparams = {shield_emit_height = 36, jump_reload = 20, jump_speed = 5},
-			wreckmodel = "commrecon3_dead.s3o",
-		},
-		dynrecon4 = {
-			level = 4,
-			mainstats = {health = 3800, objectname = "commrecon4.s3o", aimposoffset = [[0 16 0]]},
-			customparams = {shield_emit_height = 37.5, jump_reload = 18, jump_speed = 5.25},
-			wreckmodel = "commrecon4_dead.s3o",
-		},
-		dynrecon5 = {
-			level = 5,
-			mainstats = {health = 4000, objectname = "commrecon5.s3o", aimposoffset = [[0 18 0]]},
-			customparams = {shield_emit_height = 39, jump_reload = 16, jump_speed = 5.5},
-			wreckmodel = "commrecon5_dead.s3o",
-		},
-	},
-	dynsupport1 = {
-		dynsupport0 = {
-			level = 0,
-			customparams = {shield_emit_height = 36, builddistance = 220},
-		},
-		dynsupport2 = {
-			level = 2,
-			mainstats = {health = 4000, objectname = "commsupport2.s3o", aimposoffset = [[0 17 0]], builddistance = 244},
-			customparams = {shield_emit_height = 39.6},
-			wreckmodel = "commsupport2_dead.s3o",
-		},
-		dynsupport3 = {
-			level = 3,
-			mainstats = {health = 4300, objectname = "commsupport3.s3o", aimposoffset = [[0 19 0]], builddistance = 256},
-			customparams = {shield_emit_height = 43.62},
-			wreckmodel = "commsupport3_dead.s3o",
-		},
-		dynsupport4 = {
-			level = 4,
-			mainstats = {health = 4600, objectname = "commsupport4.s3o", aimposoffset = [[0 22 0]], builddistance = 268},
-			customparams = {shield_emit_height = 45},
-			wreckmodel = "commsupport4_dead.s3o",
-		},
-		dynsupport5 = {
-			level = 5,
-			mainstats = {health = 5000, objectname = "commsupport5.s3o", aimposoffset = [[0 25 0]], builddistance = 280},
-			customparams = {shield_emit_height = 46.48},
-			wreckmodel = "commsupport5_dead.s3o",
-		},
-	},
-	dynassault1 = {
-		dynassault0 = {
-			level = 0,
-			customparams = {shield_emit_height = 32.5},
-		},
-		dynassault2 = {
-			level = 2,
-			collisionvolumescales  = [[50 60 50]],
-			mainstats = {health = 5000, objectname = "benzcom2.s3o"},
-			customparams = {modelradius = [[30]], shield_emit_height = 35.75},
-			wreckmodel = "benzcom2_wreck.s3o",
-		},
-		dynassault3 = {
-			level = 3,
-			collisionvolumescales  = [[55 65 55]],
-			mainstats = {health = 5700, objectname = "benzcom3.s3o",},
-			customparams = {modelradius = [[33]], shield_emit_height = 39},
-			wreckmodel = "benzcom3_wreck.s3o",
-		},
-		dynassault4 = {
-			level = 4,
-			collisionvolumescales  = [[58 68 58]],
-			mainstats = {health = 6600, objectname = "benzcom4.s3o",},
-			customparams = {modelradius = [[34]], shield_emit_height = 40.625},
-			wreckmodel = "benzcom4_wreck.s3o",
-		},
-		dynassault5 = {
-			level = 5,
-			collisionvolumescales  = [[60 71 60]],
-			mainstats = {health = 7600, objectname = "benzcom5.s3o",},
-			customparams = {modelradius = [[36]], shield_emit_height = 42.25},
-			wreckmodel = "benzcom5_wreck.s3o",
-		},
-	},
-	dynknight1 = {
-		dynknight0 = {
-			level = 0,
-			customparams = {shield_emit_height = 30},
-		},
-		dynknight2 = {
-			level = 2,
-			mainstats = {health = 4600, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
-			customparams = {modelradius = [[28]], shield_emit_height = 33},
-			wreckmodel = "cremcom2_dead.s3o",
-		},
-		dynknight3 = {
-			level = 3,
-			mainstats = {health = 5200, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
-			customparams = {modelradius = [[30]], shield_emit_height = 36},
-			wreckmodel = "cremcom3_dead.s3o",
-		},
-		dynknight4 = {
-			level = 4,
-			mainstats = {health = 5800, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
-			customparams = {modelradius = [[33]], shield_emit_height = 37.5},
-			wreckmodel = "cremcom4_dead.s3o",
-		},
-		dynknight5 = {
-			level = 5,
-			mainstats = {health = 6400, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
-			customparams = {modelradius = [[35]], shield_emit_height = 39},
-			wreckmodel = "cremcom5_dead.s3o",
-		},
-	},
 }
 
+local chassisAllDefs=VFS.Include("gamedata/modularcomms/chassises_all_defs.lua")
+
+for i = 1, #chassisAllDefs do
+	local chassisDef = chassisAllDefs[i].clonedefs
+	for key, value in pairs(chassisDef) do
+		copy[key]=value
+	end
+end
+--[=[
+VFS.Include("LuaRules/Utilities/wacky_utils.lua")
+local utils=Spring.Utilities.wacky_utils
+]=]
 for sourceName, copyTable in pairs(copy) do
 	for cloneName, stats in pairs(copyTable) do
 		-- some further modification
@@ -409,10 +267,12 @@ for sourceName, copyTable in pairs(copy) do
 		UnitDefs[cloneName].unitname = cloneName
 		
 		if stats.level > 0 then
-		
+			stats.nomainstats=stats.nomainstats or {}
 			-- copy from by-level table
 			for statName, value in pairs(statsByLevel.mainstats[stats.level]) do
-				UnitDefs[cloneName][statName] = value
+				if not stats.nomainstats[statName] then
+					UnitDefs[cloneName][statName] = value
+				end
 			end
 			--for statName, value in pairs(statsByLevel.customparams[stats.level]) do
 			--	UnitDefs[cloneName].customparams[statName] = value
@@ -427,12 +287,14 @@ for sourceName, copyTable in pairs(copy) do
 			end
 			UnitDefs[cloneName].trackwidth = UnitDefs[cloneName].trackwidth * (0.9 + 0.1*(stats.level))
 			-- features
-			UnitDefs[cloneName].featuredefs.dead.object = stats.wreckmodel
-			UnitDefs[cloneName].featuredefs.dead.footprintx = UnitDefs[cloneName].footprintx
-			UnitDefs[cloneName].featuredefs.dead.footprintz = UnitDefs[cloneName].footprintz
-			UnitDefs[cloneName].featuredefs.heap.object = stats.heapmodel
-			UnitDefs[cloneName].featuredefs.heap.footprintx = UnitDefs[cloneName].footprintx
-			UnitDefs[cloneName].featuredefs.heap.footprintz = UnitDefs[cloneName].footprintz
+			if UnitDefs[cloneName].featuredefs then
+				UnitDefs[cloneName].featuredefs.dead.object = stats.wreckmodel or UnitDefs[cloneName].featuredefs.dead.object
+				UnitDefs[cloneName].featuredefs.dead.footprintx = UnitDefs[cloneName].footprintx
+				UnitDefs[cloneName].featuredefs.dead.footprintz = UnitDefs[cloneName].footprintz
+				UnitDefs[cloneName].featuredefs.heap.object = stats.heapmodel or UnitDefs[cloneName].featuredefs.heap.object
+				UnitDefs[cloneName].featuredefs.heap.footprintx = UnitDefs[cloneName].footprintx
+				UnitDefs[cloneName].featuredefs.heap.footprintz = UnitDefs[cloneName].footprintz
+			end
 		end
 		
 		UnitDefs[cloneName].customparams.level = stats.level
