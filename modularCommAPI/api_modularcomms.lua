@@ -3,20 +3,20 @@
 
 local function GetInfo()
 	return {
-		name      = "Modular Comm Info",
-		desc      = "Helper widget/gadget that provides info on modular comms.",
-		author    = "KingRaptor",
-		date      = "2011",
-		license   = "GNU GPL, v2 or later",
-		layer     = 0,
-		api       = true,
-		enabled   = true,
+		name        = "Modular Comm Info",
+		desc        = "Helper widget/gadget that provides info on modular comms.",
+		author      = "KingRaptor",
+		date        = "2011",
+		license     = "GNU GPL, v2 or later",
+		layer       = 0,
+		api         = true,
+		enabled     = true,
 		alwaysStart = true,
 	}
 end
 
-local XG      = (widget and WG) or (GG)
-local VFSMODE = (widget and VFS.RAW_FIRST) or (VFS.ZIP_ONLY)
+local XG         = (widget and WG) or (GG)
+local VFSMODE    = (widget and VFS.RAW_FIRST) or (VFS.ZIP_ONLY)
 
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/base64.lua", nil, VFSMODE)
@@ -33,7 +33,7 @@ local legacyToDyncommChassisMap = legacyTranslators.legacyToDyncommChassisMap
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
 
-local commData = {}	-- { players = {[playerID1] = {profiles...}, [playerID2] = {profiles...}}, static = {[staticProfileID1] = {}} }
+local commData = {} -- { players = {[playerID1] = {profiles...}, [playerID2] = {profiles...}}, static = {[staticProfileID1] = {}} }
 local commProfilesByProfileID = {}
 local commProfileIDsByPlayerID = {}
 local profileIDByBaseDefID = {}
@@ -61,10 +61,10 @@ local function LoadCommData()
 		end
 		commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
 		--Spring.Echo(commDataRaw)
-		commDataFunc, err = loadstring("return "..commDataRaw)
+		commDataFunc, err = loadstring("return " .. commDataRaw)
 		if commDataFunc then
 			success, newCommProfilesByProfileID = pcall(commDataFunc)
-			if not success then	-- execute Borat
+			if not success then -- execute Borat
 				err = newCommProfilesByProfileID
 				newCommProfilesByProfileID = {}
 			end
@@ -73,18 +73,19 @@ local function LoadCommData()
 	if err then
 		Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
 	end
-	
+
 	newCommProfilesByProfileID = legacyTranslators.FixOverheadIcon(newCommProfilesByProfileID)
-	
+
 	-- comm player entries
-	local commProfilesForPlayers = {}	-- {[playerID1] = {}, [playerID2] = {}}
+	local commProfilesForPlayers = {} -- {[playerID1] = {}, [playerID2] = {}}
 	local players = Spring.GetPlayerList()
 	for i = 1, #players do
 		local playerID = players[i]
-		local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(playerID)
-		
+		local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(
+		playerID)
+
 		if (not spectator) then
-			local playerCommProfileIDs	-- [playerID] = {[commProfileID1] = {}, [commProfileID2] = {}, ...}
+			local playerCommProfileIDs -- [playerID] = {[commProfileID1] = {}, [commProfileID2] = {}, ...}
 			local playerCommProfileIDsRaw = customKeys and customKeys.commanders
 			if not (playerCommProfileIDsRaw and type(playerCommProfileIDsRaw) == 'string') then
 				err = "Comm data entry for player " .. playerName .. " is empty or in invalid format"
@@ -93,7 +94,7 @@ local function LoadCommData()
 				playerCommProfileIDsRaw = string.gsub(playerCommProfileIDsRaw, '_', '=')
 				playerCommProfileIDsRaw = Spring.Utilities.Base64Decode(playerCommProfileIDsRaw)
 				local playerCommProfileIDsFunc
-				playerCommProfileIDsFunc, err = loadstring("return "..playerCommProfileIDsRaw)
+				playerCommProfileIDsFunc, err = loadstring("return " .. playerCommProfileIDsRaw)
 				if playerCommProfileIDsFunc then
 					success, playerCommProfileIDs = pcall(playerCommProfileIDsFunc)
 					if not success then
@@ -105,7 +106,7 @@ local function LoadCommData()
 			if err then
 				Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
 			end
-			
+
 			newCommProfileIDsByPlayerID[playerID] = playerCommProfileIDs
 			local playerCommProfiles = {}
 			for i = 1, #playerCommProfileIDs do
@@ -115,7 +116,7 @@ local function LoadCommData()
 			commProfilesForPlayers[playerID] = playerCommProfiles
 		end
 	end
-	
+
 	-- morphable static comms (e.g. trainers)
 	local morphableStaticComms = {}
 	for commProfileID, commDef in pairs(predefinedDynamicComms) do
@@ -129,7 +130,7 @@ local function LoadCommData()
 	end
 	newCommData.players = commProfilesForPlayers
 	newCommData.static = morphableStaticComms
-	
+
 	for profileID, profile in pairs(newCommProfilesByProfileID) do
 		-- MAKE SURE THIS MATCHES WHAT UNITDEFGEN SETS
 		profile.baseUnitDefID = UnitDefNames[profileID .. "_base"].id
@@ -137,24 +138,24 @@ local function LoadCommData()
 		profile.baseHeapID = FeatureDefNames[profileID .. "_base_heap"].id
 		newProfileIDByBaseDefID[profile.baseUnitDefID] = profileID
 	end
-	
+
 	-- Convert chassis to correct names.
 	for profileID, profile in pairs(newCommProfilesByProfileID) do
 		profile.chassis = legacyToDyncommChassisMap[profile.chassis] or profile.chassis
 	end
-	
+
 	for i = 1, #UnitDefs do
 		if UnitDefs[i].customParams.modules then
 			local modulesRaw = {}
 			local modulesHuman = {}
-			local modulesInternalFunc = loadstring("return ".. UnitDefs[i].customParams.modules)
+			local modulesInternalFunc = loadstring("return " .. UnitDefs[i].customParams.modules)
 			local modulesInternal = modulesInternalFunc()
-			for i=1, #modulesInternal do
+			for i = 1, #modulesInternal do
 				local modulename = modulesInternal[i]
 				modulesRaw[i] = modulename
 				modulesHuman[i] = upgrades[modulename].name
 			end
-			legacyModulesByUnitDefName[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
+			legacyModulesByUnitDefName[UnitDefs[i].name] = { raw = modulesRaw, human = modulesHuman }
 		end
 	end
 
@@ -164,7 +165,6 @@ end
 --------------------------------------------------------------------------------
 
 local function GetCommProfileInfo(commProfileID)
-
 	return commProfilesByProfileID[commProfileID]
 end
 
@@ -225,7 +225,7 @@ local function Shutdown()
 	XG.ModularCommAPI = nil
 end
 
-local this = widget or gadget
+local this      = widget or gadget
 
 this.GetInfo    = GetInfo
 this.Initialize = Initialize

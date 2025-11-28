@@ -1,8 +1,9 @@
 -- mission editor compatibility
 Spring.GetModOptions = Spring.GetModOptions or function() return {} end
-local ModularCommDefsShared_={}
-ModularCommDefsShared=ModularCommDefsShared_
-ModularCommDefsShared=nil
+---@class ModularCommDefsShared
+local ModularCommDefsShared = {}
+-- ModularCommDefsShared=ModularCommDefsShared_
+-- ModularCommDefsShared=nil
 local skinDefs
 local SKIN_FILE = "LuaRules/Configs/dynamic_comm_skins.lua"
 if VFS.FileExists(SKIN_FILE) then
@@ -11,9 +12,9 @@ else
 	skinDefs = {}
 end
 ---@type integer?
-local LEVEL_BOUND = math.floor(tonumber(Spring.GetModOptions().max_com_level or 0)--[[@as integer]])
+local LEVEL_BOUND = math.floor(tonumber(Spring.GetModOptions().max_com_level or 0) --[[@as integer]])
 if LEVEL_BOUND <= 0 then
-	LEVEL_BOUND = nil -- unlimited
+	LEVEL_BOUND = nil          -- unlimited
 else
 	LEVEL_BOUND = LEVEL_BOUND - 1 -- UI counts from 1 but internals count from 0
 end
@@ -26,17 +27,18 @@ if (Spring.GetModOptions) then
 	local modOptions = Spring.GetModOptions()
 	if modOptions then
 		if modOptions.hpmult and modOptions.hpmult ~= 1 then
-			HP_MULT = tonumber(modOptions.hpmult)--[[@as number]]
+			HP_MULT = tonumber(modOptions.hpmult) --[[@as number]]
 		end
 	end
 end
 
-ModularCommDefsShared_.HP_MULT=HP_MULT
-ModularCommDefsShared_.COST_MULT=COST_MULT
+ModularCommDefsShared.HP_MULT = HP_MULT
+ModularCommDefsShared.COST_MULT = COST_MULT
 local moduleImagePath = "unitpics/"
-ModularCommDefsShared_.moduleImagePath=moduleImagePath
-local disableResurrect = (Spring.GetModOptions().disableresurrect == 1) or (Spring.GetModOptions().disableresurrect == "1")
-ModularCommDefsShared_.disableResurrect=disableResurrect
+ModularCommDefsShared.moduleImagePath = moduleImagePath
+local disableResurrect = (Spring.GetModOptions().disableresurrect == 1) or
+(Spring.GetModOptions().disableresurrect == "1")
+ModularCommDefsShared.disableResurrect = disableResurrect
 ------------------------------------------------------------------------
 -- Module Definitions
 ------------------------------------------------------------------------
@@ -58,42 +60,41 @@ local basicWeapons = {
 ModularCommDefsShared_.basicWeapons=basicWeapons
 ]=]
 
-local forAllChassisModules={
-	"nullmodule","nullbasicweapon","nulladvweapon","nulldualbasicweapon"
+local forAllChassisModules = {
+	"nullmodule", "nullbasicweapon", "nulladvweapon", "nulldualbasicweapon"
 }
 local moduleDefNames = {}
-ModularCommDefsShared_.moduleDefNames=moduleDefNames
+ModularCommDefsShared.moduleDefNames = moduleDefNames
 local moduleDefNamesToIDs = {}
-ModularCommDefsShared_.moduleDefNamesToIDs=moduleDefNamesToIDs
+ModularCommDefsShared.moduleDefNamesToIDs = moduleDefNamesToIDs
 
 
-ModularCommDefsShared_.applicationFunctionApplyWeapon=function (GetWeaponName)
-	return function (modules, sharedData)
+ModularCommDefsShared.applicationFunctionApplyWeapon = function(GetWeaponName)
+	return function(modules, sharedData)
 		if sharedData.noMoreWeapons then
 			return
 		end
 		if not sharedData.weapon1 then
-			sharedData.weapon1 = GetWeaponName(modules,sharedData)
+			sharedData.weapon1 = GetWeaponName(modules, sharedData)
 		else
-			sharedData.weapon2 = GetWeaponName(modules,sharedData)
+			sharedData.weapon2 = GetWeaponName(modules, sharedData)
 		end
 	end
 end
 
-ModularCommDefsShared_.applicationFunctionApplyNoMoreWeapon=function (GetWeaponName)
-	return function (modules, sharedData)
+ModularCommDefsShared.applicationFunctionApplyNoMoreWeapon = function(GetWeaponName)
+	return function(modules, sharedData)
 		if sharedData.noMoreWeapons then
 			return
 		end
-		local weaponName = GetWeaponName(modules,sharedData)
+		local weaponName = GetWeaponName(modules, sharedData)
 		sharedData.weapon1 = weaponName
 		sharedData.weapon2 = nil
 		sharedData.noMoreWeapons = true
 	end
 end
-ModularCommDefsShared_.UnitDefNames=UnitDefNames
-ModularCommDefsShared_.GenAdvWeaponModule=function (def)
-	
+ModularCommDefsShared.UnitDefNames = UnitDefNames
+ModularCommDefsShared.GenAdvWeaponModule = function(def)
 	local newDef = Spring.Utilities.CopyTable(def, true)
 	newDef.name = newDef.name .. "_adv"
 	newDef.slotType = "dual_basic_weapon"
@@ -101,18 +102,18 @@ ModularCommDefsShared_.GenAdvWeaponModule=function (def)
 	return newDef
 end
 local moduleDefs = {}
-local SharedEnv={ModularCommDefsShared=ModularCommDefsShared_,UnitDefNames=UnitDefNames}
+-- local SharedEnv={ModularCommDefsShared=ModularCommDefsShared_,UnitDefNames=UnitDefNames}
 
-setmetatable(SharedEnv,{__index=getfenv()})
+-- setmetatable(SharedEnv,{__index=getfenv()})
 
-local modulesalldefs=VFS.Include("gamedata/modularcomms/modules_all_defs.lua")
+local modulesalldefs = VFS.Include("gamedata/modularcomms/modules_all_defs.lua")
 --local moduleFiles=VFS.DirList("gamedata/modularcomms/modules", "*.lua") or {}
 
 for i = 1, #modulesalldefs do
-	local new_moduleDefs = modulesalldefs[i].dynamic_comm_def(ModularCommDefsShared_)
+	local new_moduleDefs = modulesalldefs[i].dynamic_comm_def(ModularCommDefsShared)
 	for key, moduleDef in pairs(new_moduleDefs) do
-		moduleDefs[#moduleDefs+1]=moduleDef
-		local def=moduleDef
+		moduleDefs[#moduleDefs + 1] = moduleDef
+		local def = moduleDef
 		if def.isBasicWeapon then
 			local newDef = Spring.Utilities.CopyTable(def, true)
 			newDef.name = newDef.name .. "_adv"
@@ -124,18 +125,18 @@ for i = 1, #modulesalldefs do
 end
 
 do
-	local i=1
-	while(i<=#moduleDefs)do
-		local md=moduleDefs[i]
-		if(md.hardcodedID and i~=md.hardcodedID) then
-			local b=md.hardcodedID
-			local mdb=moduleDefs[b]
-			if mdb.hardcodedID and mdb.hardcodedID==b then
+	local i = 1
+	while (i <= #moduleDefs) do
+		local md = moduleDefs[i]
+		if (md.hardcodedID and i ~= md.hardcodedID) then
+			local b = md.hardcodedID
+			local mdb = moduleDefs[b]
+			if mdb.hardcodedID and mdb.hardcodedID == b then
 				error("Both " .. md.name .. " and " .. mdb.name .. " has same hardcodedID " .. b)
 			end
-			moduleDefs[i],moduleDefs[b]=moduleDefs[b],md
+			moduleDefs[i], moduleDefs[b] = moduleDefs[b], md
 		else
-			i=i+1
+			i = i + 1
 		end
 	end
 end
@@ -146,15 +147,15 @@ end
 --[[ Stochastic check for module IDs,
      not perfect but should do its job.
      See the error message below. ]]
-if moduleDefs[ 1].name ~= "nullmodule"
-or moduleDefs[ 4].name ~= "nulldualbasicweapon"
-or moduleDefs[10].name ~= "commweapon_lparticlebeam"
-or moduleDefs[25].name ~= "commweapon_personal_shield"
-or moduleDefs[42].name ~= "module_ablative_armor"
-or moduleDefs[61].name ~= "commweapon_shotgun_adv" then
+if moduleDefs[1].name ~= "nullmodule"
+	or moduleDefs[4].name ~= "nulldualbasicweapon"
+	or moduleDefs[10].name ~= "commweapon_lparticlebeam"
+	or moduleDefs[25].name ~= "commweapon_personal_shield"
+	or moduleDefs[42].name ~= "module_ablative_armor"
+	or moduleDefs[61].name ~= "commweapon_shotgun_adv" then
 	Spring.Echo("MODULE IDs NEED TO STAY CONSTANT BECAUSE AI HARDCODES THEM.\n"
-	         .. "SEE https://github.com/ZeroK-RTS/Zero-K/issues/4796 \n"
-	         .. "REMEMBER TO CHANGE CircuitAI CONFIG IF MODIFYING THE LIST!")
+		.. "SEE https://github.com/ZeroK-RTS/Zero-K/issues/4796 \n"
+		.. "REMEMBER TO CHANGE CircuitAI CONFIG IF MODIFYING THE LIST!")
 	Script.Kill()
 end
 
@@ -166,10 +167,10 @@ for name, data in pairs(skinDefs) do
 		image = moduleImagePath .. "module_ablative_armor.png",
 		limit = 1,
 		cost = 0,
-		requireChassis = {data.chassis},
+		requireChassis = { data.chassis },
 		requireLevel = 0,
 		slotType = "decoration",
-		applicationFunction = function (modules, sharedData)
+		applicationFunction = function(modules, sharedData)
 			sharedData.skinOverride = name
 		end
 	}
@@ -181,43 +182,43 @@ for i = 1, #moduleDefs do
 	moduleDefNamesToIDs[moduleDefs[i].name] = data
 end
 
-local chassisAllDefs=VFS.Include("gamedata/modularcomms/chassises_all_defs.lua")
+local chassisAllDefs = VFS.Include("gamedata/modularcomms/chassises_all_defs.lua")
 
-local chassisList={}
-for _,v in pairs(chassisAllDefs) do
-	local k=v.dynamic_comm_defs_name
+local chassisList = {}
+for _, v in pairs(chassisAllDefs) do
+	local k = v.dynamic_comm_defs_name
 	moduleDefNames[k] = {}
-	chassisList[#chassisList+1]=k
+	chassisList[#chassisList + 1] = k
 end
 
 
 
 for _, moudleName in pairs(forAllChassisModules) do
-	moduleDefs[moduleDefNamesToIDs[moudleName][1]].requireChassis=chassisList
+	moduleDefs[moduleDefNamesToIDs[moudleName][1]].requireChassis = chassisList
 end
 
-local function FindModule(moduleName,requireChassis)
-	local ids=moduleDefNamesToIDs[moduleName]
+local function FindModule(moduleName, requireChassis)
+	local ids = moduleDefNamesToIDs[moduleName]
 	if not ids then
-		Spring.Echo("Warning: module " ..moduleName .. " not found")
+		Spring.Echo("Warning: module " .. moduleName .. " not found")
 		return nil
 	end
 	for _, moduleID in pairs(ids) do
-		local moduleDef=moduleDefs[moduleID]
+		local moduleDef = moduleDefs[moduleID]
 		if not requireChassis then
 			return moduleDef
 		else
-			local foundAll=true
+			local foundAll = true
 			for _, requireChassisNeeded in pairs(requireChassis) do
-				local found=false
+				local found = false
 				for _, requireChassisHas in pairs(moduleDef.requireChassis) do
-					if requireChassisHas==requireChassisNeeded then
-						found=true
+					if requireChassisHas == requireChassisNeeded then
+						found = true
 						break
 					end
 				end
 				if not found then
-					foundAll=false
+					foundAll = false
 					break
 				end
 			end
@@ -229,17 +230,17 @@ local function FindModule(moduleName,requireChassis)
 	return nil
 end
 
-ModularCommDefsShared_.FindModule=FindModule
+ModularCommDefsShared.FindModule = FindModule
 
-for _,v in pairs(chassisAllDefs) do
-	local moduleIdentities=v.dynamic_comm_defs_modules
+for _, v in pairs(chassisAllDefs) do
+	local moduleIdentities = v.dynamic_comm_defs_modules
 	if moduleIdentities then
 		for _, moduleIdentity in pairs(moduleIdentities) do
-			local moduleDef=FindModule(moduleIdentity.name,moduleIdentity.requireChassis)
+			local moduleDef = FindModule(moduleIdentity.name, moduleIdentity.requireChassis)
 			if moduleDef then
-				moduleDef.requireChassis[#moduleDef.requireChassis+1] = v.dynamic_comm_defs_name
+				moduleDef.requireChassis[#moduleDef.requireChassis + 1] = v.dynamic_comm_defs_name
 			else
-				Spring.Echo("Warning: module " ..moduleIdentity.name .. " not found")
+				Spring.Echo("Warning: module " .. moduleIdentity.name .. " not found")
 			end
 		end
 	end
@@ -249,15 +250,14 @@ for i = 1, #moduleDefs do
 	local data = moduleDefs[i]
 	local allowedChassis = moduleDefs[i].requireChassis or chassisList
 	for j = 1, #allowedChassis do
-		local chassisName=allowedChassis[j]
-		local mdn_=moduleDefNames[chassisName]
+		local chassisName = allowedChassis[j]
+		local mdn_ = moduleDefNames[chassisName]
 		if not mdn_ then
-			Spring.Echo("Error: dynamic_comm_defs.lua: missing chassis " .. tostring(chassisName) .. " for module " .. tostring(data.name))
-			
+			Spring.Echo("Error: dynamic_comm_defs.lua: missing chassis " ..
+			tostring(chassisName) .. " for module " .. tostring(data.name))
 		else
 			mdn_[data.name] = i
 		end
-		
 	end
 end
 
@@ -288,7 +288,7 @@ local morphCosts = {
 	200,
 	250,
 }
-ModularCommDefsShared_.morphCosts=morphCosts
+ModularCommDefsShared.morphCosts = morphCosts
 local morphBuildPower = {
 	5,
 	7.5,
@@ -296,28 +296,26 @@ local morphBuildPower = {
 	12.5,
 	15
 }
-ModularCommDefsShared_.morphBuildPower=morphBuildPower
+ModularCommDefsShared.morphBuildPower = morphBuildPower
 local function extraLevelCostFunction(level)
 	return level * 50 * COST_MULT
 end
-ModularCommDefsShared_.extraLevelCostFunction=extraLevelCostFunction
+ModularCommDefsShared.extraLevelCostFunction = extraLevelCostFunction
 
-ModularCommDefsShared_.GetCloneModuleString=function (chassis,listOfCloneModules)
-	return function (modulesByDefID)
-		local res=""
+ModularCommDefsShared.GetCloneModuleString = function(chassis, listOfCloneModules)
+	return function(modulesByDefID)
+		local res = ""
 		for key, value in pairs(listOfCloneModules) do
-			res=res .. (modulesByDefID[moduleDefNames[chassis][value]] or 0)
+			res = res .. (modulesByDefID[moduleDefNames[chassis][value]] or 0)
 		end
 		return res
 	end
 end
 
 do
-	
-	ModularCommDefsShared_.morphUnitDefFunction=function (name,GetCloneModuleString)
-		return function (lv)
-			return function (modulesByDefID)
-				
+	ModularCommDefsShared.morphUnitDefFunction = function(name, GetCloneModuleString)
+		return function(lv)
+			return function(modulesByDefID)
 				return UnitDefNames[name .. lv .. "_" .. GetCloneModuleString(modulesByDefID)].id
 			end
 		end
@@ -329,8 +327,8 @@ local chassisDefs = {
 
 
 for i = 1, #chassisAllDefs do
-	local chassisDef = chassisAllDefs[i].dynamic_comm_defs(ModularCommDefsShared_)
-	chassisDefs[#chassisDefs+1]=chassisDef
+	local chassisDef = chassisAllDefs[i].dynamic_comm_defs(ModularCommDefsShared)
+	chassisDefs[#chassisDefs + 1] = chassisDef
 end
 
 local chassisDefByBaseDef = {}
@@ -364,7 +362,7 @@ end
 -- Transform from human readable format into number indexed format
 for i = 1, #moduleDefs do
 	local data = moduleDefs[i]
-	
+
 	-- Required modules are a list of moduleDefIDs
 	if data.requireOneOf then
 		local newRequire = {}
@@ -378,7 +376,7 @@ for i = 1, #moduleDefs do
 		end
 		data.requireOneOf = newRequire
 	end
-	
+
 	-- Prohibiting modules are a list of moduleDefIDs too
 	if data.prohibitingModules then
 		local newProhibit = {}
@@ -392,7 +390,7 @@ for i = 1, #moduleDefs do
 		end
 		data.prohibitingModules = newProhibit
 	end
-	
+
 	-- Required chassis is a map indexed by chassisDefID
 	if data.requireChassis then
 		local newRequire = {}
@@ -424,7 +422,7 @@ for i = 1, #chassisDefs do
 			local slotData = levelData.upgradeSlots[k]
 			if type(slotData.slotAllows) == "string" then
 				slotData.empty = emptyModules[slotData.slotAllows]
-				slotData.slotAllows = {[slotData.slotAllows] = true}
+				slotData.slotAllows = { [slotData.slotAllows] = true }
 			else
 				local newSlotAllows = {}
 				slotData.empty = emptyModules[slotData.slotAllows[1]]
@@ -455,10 +453,10 @@ end
 local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwned, alreadyOwned2)
 	local data = moduleDefs[moduleDefID]
 	if (not slotAllows[data.slotType]) or (data.requireLevel or 0) > level or
-			(data.requireChassis and (not data.requireChassis[chassis])) or data.unequipable then
+		(data.requireChassis and (not data.requireChassis[chassis])) or data.unequipable then
 		return false
 	end
-	
+
 	-- Check that requirements are met
 	if data.requireOneOf then
 		local foundRequirement = false
@@ -475,7 +473,7 @@ local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwn
 			return false
 		end
 	end
-	
+
 	-- Check that nothing prohibits this module
 	if data.prohibitingModules then
 		for j = 1, #data.prohibitingModules do
@@ -485,7 +483,6 @@ local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwn
 				return false
 			end
 		end
-	
 	end
 
 	-- cheapass hack to prevent cremcom dual wielding same weapon (not supported atm)
@@ -534,7 +531,7 @@ local function GetUnitDefShield(unitDefNameOrID, shieldName)
 	for num = 1, #wepTable do
 		local wd = WeaponDefs[wepTable[num].weaponDef]
 		if wd.type == "Shield" then
-			local weaponName = string.sub(wd.name, (string.find(wd.name,"commweapon") or 0), 100)
+			local weaponName = string.sub(wd.name, (string.find(wd.name, "commweapon") or 0), 100)
 			if weaponName == shieldName then
 				return wd.id, num
 			end
@@ -563,7 +560,7 @@ if ECHO_MODULES_FOR_CIRCUIT then
 		Spring.Echo("Modules for", chassis)
 		local printList = {}
 		for name, chassisDefID in pairs(chassisModules) do
-			printList[#printList + 1] = {chassisDefID, name}
+			printList[#printList + 1] = { chassisDefID, name }
 		end
 		table.sort(printList, SortFunc)
 		for i = 1, #printList do
