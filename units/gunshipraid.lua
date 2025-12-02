@@ -104,6 +104,7 @@ return { gunshipraid = {
       reloadtime              = 4/30,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/laser_burn9]],
+      soundStartVolume        = 8.2,
       sweepfire               = false,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
