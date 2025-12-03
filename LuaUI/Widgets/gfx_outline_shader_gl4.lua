@@ -86,7 +86,6 @@ local scaleWithHeight = true
 local functionScaleWithHeight = true
 local zoomScaleRange = 0.4
 local overrideDrawBoxes = false
-local hideWithUi = true
 
 local function PrintDrawBox()
 	if overrideDrawBoxes then
@@ -101,7 +100,7 @@ local function PrintDrawBox()
 end
 
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
-options_order = {'thickness', 'scaleRange', 'scaleWithHeight', 'functionScaleWithHeight', 'disableWithUi', 'overrideDrawBox', 'overrideDrawBox_x', 'overrideDrawBox_y', 'overrideDrawBox_yoff'}
+options_order = {'thickness', 'scaleRange', 'scaleWithHeight', 'functionScaleWithHeight', 'overrideDrawBox', 'overrideDrawBox_x', 'overrideDrawBox_y', 'overrideDrawBox_yoff'}
 options = {
 	thickness = {
 		name = 'Outline Thickness',
@@ -141,16 +140,6 @@ options = {
 		noHotkey = true,
 		OnChange = function (self)
 			functionScaleWithHeight = self.value
-		end,
-	},
-	disableWithUi = {
-		name = 'Disable with hidden UI',
-		desc = 'Toggles outlines with Ctrl+F5.',
-		type = 'bool',
-		value = true,
-		noHotkey = true,
-		OnChange = function (self)
-			hideWithUi = self.value
 		end,
 	},
 	
@@ -756,7 +745,7 @@ local useStencil = true
 local STENCILOPPASS = GL_DECR -- KEEP OR DECR
 
 function widget:DrawWorld()
-	if (hideWithUi and Spring.IsGUIHidden()) or internalDisabled then
+	if internalDisabled then
 		return
 	end
 
