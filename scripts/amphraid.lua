@@ -134,7 +134,7 @@ local function RangeUpdate(mult, weaponMult)
 			longRange = false
 		end
 	elseif changed or not longRange then
-		Spring.SetUnitWeaponState(unitID, 1, shotRange * mult * (weaponMult and weaponMult[2] or 1))
+		Spring.SetUnitWeaponState(unitID, 1, "range", shotRange * mult * (weaponMult and weaponMult[2] or 1))
 		Spring.SetUnitMaxRange(unitID, shotRange * mult * (weaponMult and weaponMult[2] or 1))
 		longRange = true
 	end
