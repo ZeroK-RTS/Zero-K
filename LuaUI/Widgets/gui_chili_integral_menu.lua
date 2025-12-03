@@ -45,6 +45,9 @@ local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 local cullingSettingsList, commandCulling =  include("Configs/integral_menu_culling.lua")
 local transkey = include("Configs/transkey.lua")
 
+local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+
 -- Chili classes
 local Chili
 local Button
@@ -1098,6 +1101,18 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Button Panel
+local iconTypeCache = {}
+local function GetUnitIcon(unitDefID)
+	if unitDefID and iconTypeCache[unitDefID] then
+		return iconTypeCache[unitDefID]
+	end
+	local ud = UnitDefs[unitDefID]
+	if not ud then
+		return
+	end
+	iconTypeCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
+	return iconTypeCache[unitDefID]
+end
 
 local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
@@ -1182,6 +1197,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	end
 	
 	local image
+	local image_icon
 	local buildProgress
 	local textBoxes = {}
 	
@@ -1213,6 +1229,24 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image.file = texture1
 		image.file2 = texture2
 		image:Invalidate()
+	end
+	
+	local function SetImageIconTexture(texture1)
+		if not image_icon then
+			image_icon = Image:New {
+				name = name .. "_image_icon",
+				right = "4%",
+				bottom = "2%",
+				height=23,
+				width=23,
+				keepAspect = true,
+				file = texture1,
+				parent = button,
+			}
+			return
+		end
+		image_icon.file = texture1
+		image_icon:Invalidate()
 	end
 	
 	local function SetImageFromConfig(displayConfig, command, state)
@@ -1312,6 +1346,10 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		if not image then
 			SetImageTexture("")
+		end
+		
+		if not image_icon then
+			SetImageIconTexture("")
 		end
 		
 		buildProgress = Progressbar:New{
@@ -1535,7 +1573,6 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
-			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
 				if cost >= 100000000 then
@@ -1544,7 +1581,9 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 					cost = string.format("%.0fk", cost/1000)
 				end
 				SetText(textConfig.bottomLeft.name, cost)
+				SetImageIconTexture(GetUnitIcon(ud.id))
 			end
+			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
 		else
 			button.tooltip = GetButtonTooltip(displayConfig, command, state)
 		end

@@ -390,8 +390,8 @@ local textConfig = {
 	},
 	queue = {
 		name = "queue",
+		y = "14%",
 		right = "18%",
-		bottom = "14%",
 		align = "right",
 		fontsize = 16,
 		height = 16,
