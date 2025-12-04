@@ -1110,7 +1110,7 @@ local function GetUnitIcon(unitDefID)
 	if not ud then
 		return
 	end
-	iconTypeCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
+	iconTypeCache[unitDefID] = icontypes[ud.iconType].bitmap or ('icons/' .. ud.iconType .. iconFormat)
 	return iconTypeCache[unitDefID]
 end
 
@@ -1235,13 +1235,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		if not image_icon then
 			image_icon = Image:New {
 				name = name .. "_image_icon",
-				right = "4%",
-				bottom = "2%",
-				height=23,
-				width=23,
+				right = "0",
+				top = "0",
+				height="45%",
+				width="45%",
 				keepAspect = true,
 				file = texture1,
-				parent = button,
+				parent = image,
 			}
 			return
 		end
@@ -1573,6 +1573,8 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
+			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
+			SetImageIconTexture(GetUnitIcon(ud.id))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
 				if cost >= 100000000 then
@@ -1581,9 +1583,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 					cost = string.format("%.0fk", cost/1000)
 				end
 				SetText(textConfig.bottomLeft.name, cost)
-				SetImageIconTexture(GetUnitIcon(ud.id))
 			end
-			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
 		else
 			button.tooltip = GetButtonTooltip(displayConfig, command, state)
 		end
