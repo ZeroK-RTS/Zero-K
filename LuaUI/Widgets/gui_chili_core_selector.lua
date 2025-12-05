@@ -1766,8 +1766,6 @@ function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 	if idleCons[unitID] then
 		consToCarryingTransport[unitID] = transportID
 		transportToCarriedCons[transportID] = unitID
-		-- todo check if transport is idle here? not sure this line below does anything
-		widget:UnitFinished(transportID, Spring.GetUnitDefID(transportID), transportTeam)
 		wantUpdateCons = true
 	end
 end
