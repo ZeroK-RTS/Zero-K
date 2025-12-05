@@ -32,7 +32,7 @@ local spTraceScreenRay        = Spring.TraceScreenRay
 local spGetUnitRulesParam     = Spring.GetUnitRulesParam
 local spGetUnitPosition       = Spring.GetUnitPosition
 local spGetTeamUnits          = Spring.GetTeamUnits
-local spGetUnitTeam						= Spring.GetUnitTeam
+local spGetUnitTeam           = Spring.GetUnitTeam
 local spGetUnitCommandCount   = Spring.GetUnitCommandCount
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitCommands       = Spring.GetUnitCommands
@@ -85,10 +85,10 @@ local oldButtonList
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
+local idleTransports = {} -- [unitID] = true
+local consCarriedByEnemyTransports = {} -- [unitID] = true
 local consToCarryingTransport = {}
 local transportToCarriedCons = {}
-local consCarriedByEnemyTransports = {}
-local idleTransports = {} -- [unitID] = true
 
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
@@ -1676,6 +1676,7 @@ local function ClearData()
 	idleTransports = {}
 	transportToCarriedCons = {}
 	consToCarryingTransport = {}
+	consCarriedByEnemyTransports = {}
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
 	
