@@ -86,10 +86,10 @@ local oldButtonList
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
+local idleTransports = {} -- [unitID] = true
+local consCarriedByEnemyTransports = {} -- [unitID] = true
 local consToCarryingTransport = {}
 local transportToCarriedCons = {}
-local consCarriedByEnemyTransports = {}
-local idleTransports = {} -- [unitID] = true
 
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
@@ -1731,6 +1731,7 @@ local function ClearData()
 	idleTransports = {}
 	transportToCarriedCons = {}
 	consToCarryingTransport = {}
+	consCarriedByEnemyTransports = {}
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
 	
