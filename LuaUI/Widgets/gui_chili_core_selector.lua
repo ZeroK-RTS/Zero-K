@@ -189,7 +189,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -228,6 +228,17 @@ options = {
 				OptionsUpdateLayout()
 			end
 		end
+	},
+	allowclickthrough = {
+		name = 'Allow clicking through',
+		type='bool',
+		value=false,
+		desc = 'Mouse clicks through empty parts of the panel to act on whatever is underneath.',
+		OnChange = function(self)
+			if mainBackground then
+				mainBackground.SetAllowClickThrough(self.value)
+			end
+		end,
 	},
 	monitoridlecomms = {
 		name = 'Track idle commanders',
@@ -574,7 +585,7 @@ local function GetBackground(parent)
 		draggable = false,
 		resizable = false,
 		backgroundColor = {1, 1, 1, opacity},
-		noClickThrough = true,
+		noClickThrough = not options.allowclickthrough.value,
 		parent = parent,
 	}
 	
@@ -582,6 +593,10 @@ local function GetBackground(parent)
 	
 	function externalFunctions.GetButtonsHolder()
 		return buttonsPanel
+	end
+	
+	function externalFunctions.SetAllowClickThrough(allowClickThrough)
+		backgroundPanel.noClickThrough = not allowClickThrough
 	end
 	
 	function externalFunctions.SetSkin(className)

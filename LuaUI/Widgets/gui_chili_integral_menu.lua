@@ -137,7 +137,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
-	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'background_opacity',  'allowclickthrough', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -211,6 +211,18 @@ options = {
 		OnChange = function(self)
 			background.backgroundColor = {1,1,1,self.value}
 			background:Invalidate()
+		end,
+	},
+	allowclickthrough = {
+		name = 'Allow clicking through',
+		type='bool',
+		value=false,
+		desc = 'Mouse clicks through empty parts of the panel to act on whatever is underneath.',
+		OnChange = function(self)
+			if background then
+				background.noClickThrough = not self.value
+				background:Invalidate()
+			end
 		end,
 	},
 	keyboardType2 = {
@@ -2299,7 +2311,7 @@ local function InitializeControls()
 		noFont = true,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
-		noClickThrough = true,
+		noClickThrough = not options.allowclickthrough.value,
 		parent = mainWindow,
 	}
 	
