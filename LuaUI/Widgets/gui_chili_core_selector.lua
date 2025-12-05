@@ -32,6 +32,7 @@ local spTraceScreenRay        = Spring.TraceScreenRay
 local spGetUnitRulesParam     = Spring.GetUnitRulesParam
 local spGetUnitPosition       = Spring.GetUnitPosition
 local spGetTeamUnits          = Spring.GetTeamUnits
+local spGetUnitTeam           = Spring.GetUnitTeam
 local spGetUnitCommandCount   = Spring.GetUnitCommandCount
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitCommands       = Spring.GetUnitCommands
@@ -404,8 +405,9 @@ local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "l
 --------------------------------------------------------------------------------
 -- Selection Functions
 
-local function GetTransportUnitIdIfNeeded(unitID)
-	if consToCarryingTransport[unitID] then
+local function FromConToOwnedTransportIdIfNeeded(unitID)
+	local transportID = consToCarryingTransport[unitID]
+	if transportID ~= nil and myTeamID == spGetUnitTeam(transportID) then
 		return consToCarryingTransport[unitID]
 	end
 	return unitID
@@ -440,7 +442,7 @@ local function SelectComm()
 		end
 	end
 	
-	unitID = GetTransportUnitIdIfNeeded(unitID)
+	unitID = FromConToOwnedTransportIdIfNeeded(unitID)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	Spring.SelectUnit(unitID, shift)
 	if not shift then
@@ -495,7 +497,7 @@ end
 local function SelectIdleCon_all()
 	local consToSelect = {}
 	for uid, _ in pairs(idleCons) do
-		consToSelect[GetTransportUnitIdIfNeeded(uid)] = true
+		consToSelect[FromConToOwnedTransportIdIfNeeded(uid)] = true
 	end
 	if WG.SelectMapIgnoringRank then
 		WG.SelectMapIgnoringRank(consToSelect, select(4, Spring.GetModKeyState()))
@@ -515,7 +517,7 @@ local function SelectIdleCon()
 
 		for uid, v in pairs(idleCons) do
 			if uid ~= "count" then
-				tuid = GetTransportUnitIdIfNeeded(uid)
+				tuid = FromConToOwnedTransportIdIfNeeded(uid)
 				if (not Spring.IsUnitSelected(tuid)) then
 					local x,_,z = spGetUnitPosition(tuid)
 					dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
@@ -537,7 +539,7 @@ local function SelectIdleCon()
 			for uid, v in pairs(idleCons) do
 				if uid ~= "count" then
 					if i == conIndex then
-						tuid = GetTransportUnitIdIfNeeded(uid)
+						tuid = FromConToOwnedTransportIdIfNeeded(uid)
 						Spring.SelectUnit(tuid)
 						local x, y, z = Spring.GetUnitPosition(tuid)
 						SetCameraTarget(x, y, z)
@@ -1331,29 +1333,14 @@ local function GetConstructorButton(parent)
 			button.SetBackgroundColor((highlightPhase and buttonColorHighlight) or BUTTON_COLOR)
 		end
 		
-		--[[ echo("START BUTTON UPDATE: ")
-		for idleTrans in pairs(idleTransports) do
-			echo("idle transport: ", idleTrans)
-		end ]]
 		local total = 0
 		for uid in pairs(idleCons) do
-			--echo("Idle Con Unit: ", uid)
 			total = total + 1
-			-- HACK Why do I need to copy this variable? Do iterator variables become nil in nested scopes?
-			local tmpUID = uid
-			for carriedUnitId, transportUnitId in pairs(consToCarryingTransport) do
-				--echo("carried unit, transport unit: ", carriedUnitId, transportUnitId)
-				--echo("carried unit, idleConUnitID: ", carriedUnitId, tmpUID)
-				local isUnitCarried = (tmpUID == carriedUnitId)
-				local isUnitCarriedByBusyTransport = (not idleTransports[transportUnitId])
-				--[[ if isUnitCarried then
-					echo("unit is carried")
-				end
-				if isUnitCarriedByBusyTransport then
-					echo("unit is carried by busy transport")
-				end ]]
-				if isUnitCarried and isUnitCarriedByBusyTransport then
-					--echo("Idle Con Unit carried by busy transport: ", tmpUID, transportUnitId)
+			local transportUnitID = consToCarryingTransport[uid]
+			if transportUnitID ~= nil then
+				local isUnitCarriedByBusyTransport = idleTransports[transportUnitID] == nil
+				local isUnitCarriedByEnemyTransport = myTeamID ~= spGetUnitTeam(transportUnitID)
+				if isUnitCarriedByBusyTransport or isUnitCarriedByEnemyTransport then
 					total = total - 1
 				end
 			end
@@ -1738,6 +1725,11 @@ local function ClearData()
 	buttonList.SetImagesVisible(false)
 end
 
+local function CanConBeIdle(unitID)
+	return (consToCarryingTransport[unitID] == nil)
+	or (myTeamId == spGetUnitTeam(consToCarryingTransport[unitID]))
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- Callins
@@ -1756,6 +1748,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 			(ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not ud.isFactory) and
 			(options.monitoridlecomms.value or not ud.customParams.dynamic_comm) and
 			(options.monitoridlenano.value or ud.canMove)
+			and CanConBeIdle(unitID)
 		) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
@@ -1763,7 +1756,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
-	if idleCons[unitID] then
+	if myTeamID == unitTeam and GetUnitCanBuild(unitID, unitDefID) then
+		if myTeamID == transportTeam then
+			idleCons[unitID] = true
+		else
+			idleCons[unitID] = nil
+		end
 		consToCarryingTransport[unitID] = transportID
 		transportToCarriedCons[transportID] = unitID
 		wantUpdateCons = true
@@ -1771,31 +1769,28 @@ function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 end
 
 function widget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
-	if idleCons[unitID] then
+	if consToCarryingTransport[unitID] and GetUnitCanBuild(unitID, unitDefID) then
 		consToCarryingTransport[unitID] = nil
 		transportToCarriedCons[transportID] = nil
-		idleTransports[transportID] = nil
 		wantUpdateCons = true
+		widget:UnitGiven(unitID, unitDefID, unitTeam, nil)
 	end
 end
-
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) or exceptionArray[unitDefID] then
 		return
 	end
 	local ud = UnitDefs[unitDefID]
-	-- todo(strat) handle enemy transports! move this code up before the team check? but then... we can't select them right?
-	if transportToCarriedCons[unitID] then
+	-- todo(strat) an enemy picking up the idle con works properly but when the transport starts moving the carried unit becomes idle again (could be an function call ordering issue?)
+	if transportToCarriedCons[unitID]  then
 		local cQueue = spGetUnitCommandCount(unitID)
-		if cQueue == 0 then
+		if cQueue == 0 then -- no commands
 			widget:UnitIdle(unitID, unitDefID, myTeamID)
-		else
-			idleTransports[unitID] = nil
-			wantUpdateCons = true
 		end
-	end 
-	if GetUnitCanBuild(unitID, unitDefID) then  --- can build
+	end
+	-- don't consider cons units loaded onto enemy transports as idle
+	if GetUnitCanBuild(unitID, unitDefID) and CanConBeIdle(unitID) then  --- can build
 		local bQueue = spGetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
@@ -1821,6 +1816,13 @@ function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if consToCarryingTransport[unitID] then
+		local transportID = consToCarryingTransport[unitID]
+		consToCarryingTransport[unitID] = nil
+		transportToCarriedCons[transportID] = nil
+		idleTransports[transportID] = nil
+		wantUpdateCons = true
+	end
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
@@ -1852,15 +1854,16 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (unitTeam ~= myTeamID) then
 		return
 	end
+	if transportToCarriedCons[unitID] then
+		idleTransports[unitID] = true
+		wantUpdateCons = true
+	end
 	local ud = UnitDefs[unitDefID]
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
 	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.dynamic_comm)
-	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
+	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove)
+	and CanConBeIdle(unitID) then
 		idleCons[unitID] = true
-		wantUpdateCons = true
-	end
-	if transportToCarriedCons[unitID] then
-		idleTransports[unitID] = true
 		wantUpdateCons = true
 	end
 	local unitName = UnitDefs[unitDefID].name
