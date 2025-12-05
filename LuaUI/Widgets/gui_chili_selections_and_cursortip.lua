@@ -389,7 +389,7 @@ options = {
 	},
 	allowclickthrough = {
 		name = 'Allow clicking through', type='bool', value=false,
-		desc = 'Mouse clicks through empty parts of the panel to act on whatever is underneath.',
+		desc = 'Mouse clicks through empty parts of the panel act on whatever is underneath.',
 		path = selPath,
 		OnChange = function(self)
 			if selectionWindow then

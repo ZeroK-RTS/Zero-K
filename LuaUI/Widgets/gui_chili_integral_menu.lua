@@ -217,7 +217,7 @@ options = {
 		name = 'Allow clicking through',
 		type='bool',
 		value=false,
-		desc = 'Mouse clicks through empty parts of the panel to act on whatever is underneath.',
+		desc = 'Mouse clicks through empty parts of the panel act on whatever is underneath.',
 		OnChange = function(self)
 			if background then
 				background.noClickThrough = not self.value
