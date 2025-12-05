@@ -497,7 +497,9 @@ end
 local function SelectIdleCon_all()
 	local consToSelect = {}
 	for uid, _ in pairs(idleCons) do
-		consToSelect[FromConToOwnedTransportIdIfNeeded(uid)] = true
+		if CanConBeIdle(uid) then
+			consToSelect[FromConToOwnedTransportIdIfNeeded(uid)] = true
+		end
 	end
 	if WG.SelectMapIgnoringRank then
 		WG.SelectMapIgnoringRank(consToSelect, select(4, Spring.GetModKeyState()))
@@ -514,9 +516,15 @@ local function SelectIdleCon()
 		local pos = select(2, spTraceScreenRay(mx,my,true)) or mapMiddle
 		local mindist = math.huge
 		local muid = nil
-
-		for uid, v in pairs(idleCons) do
+		local consToSelect = {}
+		for uid, _ in pairs(idleCons) do
 			if uid ~= "count" then
+				if CanConBeIdle(uid) then
+					consToSelect[FromConToOwnedTransportIdIfNeeded(uid)] = true
+				end
+			end
+		end
+		for uid in pairs(consToSelect) do
 				tuid = FromConToOwnedTransportIdIfNeeded(uid)
 				if (not Spring.IsUnitSelected(tuid)) then
 					local x,_,z = spGetUnitPosition(tuid)
@@ -526,7 +534,6 @@ local function SelectIdleCon()
 						muid = tuid
 					end
 				end
-			end
 		end
 
 		Spring.SelectUnit(muid, true)
@@ -536,8 +543,7 @@ local function SelectIdleCon()
 		else
 			conIndex = (conIndex % idleConCount) + 1
 			local i = 1
-			for uid, v in pairs(idleCons) do
-				if uid ~= "count" then
+			for uid in pairs(consToSelect) do
 					if i == conIndex then
 						tuid = FromConToOwnedTransportIdIfNeeded(uid)
 						Spring.SelectUnit(tuid)
@@ -547,7 +553,6 @@ local function SelectIdleCon()
 					else
 						i = i + 1
 					end
-				end
 			end
 		end
 	end
