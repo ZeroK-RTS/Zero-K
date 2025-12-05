@@ -489,10 +489,14 @@ end
 
 local function SelectIdleCon_all()
 	-- todo(strat) replace the cons with their transports potentially? Is a combined group of cons and transports desirable?
+	local consToSelect = {}
+	for uid, _ in pairs(idleCons) do
+		consToSelect[GetTransportUnitIdIfNeeded(uid)] = true
+	end
 	if WG.SelectMapIgnoringRank then
-		WG.SelectMapIgnoringRank(idleCons, select(4, Spring.GetModKeyState()))
+		WG.SelectMapIgnoringRank(consToSelect, select(4, Spring.GetModKeyState()))
 	else
-		Spring.SelectUnitMap(idleCons, select(4, Spring.GetModKeyState()))
+		Spring.SelectUnitMap(consToSelect, select(4, Spring.GetModKeyState()))
 	end
 end
 
