@@ -31,6 +31,7 @@ local spGetMouseState     = Spring.GetMouseState
 local spTraceScreenRay    = Spring.TraceScreenRay
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitPosition   = Spring.GetUnitPosition
+local spGetTeamUnits = Spring.GetTeamUnits
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -81,6 +82,7 @@ local oldButtonList
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
+local consToCarryingTransport = {}
 
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
@@ -397,6 +399,13 @@ local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "l
 --------------------------------------------------------------------------------
 -- Selection Functions
 
+local function GetTransportUnitIdIfNeeded(unitID)
+	if consToCarryingTransport[unitID] then
+		return consToCarryingTransport[unitID]
+	end
+	return unitID
+end
+
 -- comm selection functionality
 local commIndex = 1
 local function SelectComm()
@@ -426,6 +435,7 @@ local function SelectComm()
 		end
 	end
 	
+	unitID = GetTransportUnitIdIfNeeded(unitID)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	Spring.SelectUnit(unitID, shift)
 	if not shift then
@@ -478,6 +488,7 @@ local function SelectPrecBomber()
 end
 
 local function SelectIdleCon_all()
+	-- todo(strat) replace the cons with their transports potentially? Is a combined group of cons and transports desirable?
 	if WG.SelectMapIgnoringRank then
 		WG.SelectMapIgnoringRank(idleCons, select(4, Spring.GetModKeyState()))
 	else
@@ -496,12 +507,13 @@ local function SelectIdleCon()
 
 		for uid, v in pairs(idleCons) do
 			if uid ~= "count" then
-				if (not Spring.IsUnitSelected(uid)) then
-					local x,_,z = spGetUnitPosition(uid)
+				tuid = GetTransportUnitIdIfNeeded(uid)
+				if (not Spring.IsUnitSelected(tuid)) then
+					local x,_,z = spGetUnitPosition(tuid)
 					dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
 					if (dist < mindist) then
 						mindist = dist
-						muid = uid
+						muid = tuid
 					end
 				end
 			end
@@ -517,8 +529,9 @@ local function SelectIdleCon()
 			for uid, v in pairs(idleCons) do
 				if uid ~= "count" then
 					if i == conIndex then
-						Spring.SelectUnit(uid)
-						local x, y, z = Spring.GetUnitPosition(uid)
+						tuid = GetTransportUnitIdIfNeeded(uid)
+						Spring.SelectUnit(tuid)
+						local x, y, z = Spring.GetUnitPosition(tuid)
 						SetCameraTarget(x, y, z)
 						return
 					else
@@ -1547,7 +1560,7 @@ end
 local function RefreshConsList()
 	idleCons = {}
 	if Spring.GetGameFrame() > 1 and myTeamID then
-		local buttonList = Spring.GetTeamUnits(myTeamID)
+		local buttonList = spGetTeamUnits(myTeamID)
 		for _,unitID in pairs(buttonList) do
 			local unitDefID = spGetUnitDefID(unitID)
 			if unitDefID then
@@ -1715,11 +1728,25 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 end
 
+function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	if idleCons[unitID] then
+		consToCarryingTransport[unitID] = transportID
+	end
+end
+
+function widget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	if idleCons[unitID] then
+		consToCarryingTransport[unitID] = nil
+	end
+end
+
+
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) or exceptionArray[unitDefID] then
 		return
 	end
 	local ud = UnitDefs[unitDefID]
+	-- todo(strat) handle case where a transport is carrying a cons and becomes idle (or not idle) and update the idle cons accordingly
 	if GetUnitCanBuild(unitID, unitDefID) then  --- can build
 		local bQueue = spGetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
