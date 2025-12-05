@@ -88,8 +88,8 @@ local commanderList = {}
 local idleCons = {}	-- [unitID] = true
 local idleTransports = {} -- [unitID] = true
 local consCarriedByEnemyTransports = {} -- [unitID] = true
-local consToCarryingTransport = {}
-local transportToCarriedCons = {}
+local fromConIDToCarryingTransportID = {}
+local fromTransportIDToCarriedConID = {}
 
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
@@ -415,12 +415,12 @@ local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "l
 	for uid, _ in pairs(consCarriedByEnemyTransports) do
 		echo(uid)
 	end
-	echo("consToCarryingTransport:")
-	for uida, uidb in pairs(consToCarryingTransport) do
+	echo("fromConIDToCarryingTransportID:")
+	for uida, uidb in pairs(fromConIDToCarryingTransportID) do
 		echo(uida, uidb)
 	end
-	echo("transportToCarriedCons: ")
-	for uida, uidb  in pairs(transportToCarriedCons) do
+	echo("fromTransportIDToCarriedConID: ")
+	for uida, uidb  in pairs(fromTransportIDToCarriedConID) do
 		echo(uida, uidb)
 	end
 end
@@ -429,10 +429,10 @@ end
 --------------------------------------------------------------------------------
 -- Selection Functions
 
-local function FromConToOwnedTransportIdIfNeeded(unitID)
-	local transportID = consToCarryingTransport[unitID]
+local function ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
+	local transportID = fromConIDToCarryingTransportID[unitID]
 	if transportID ~= nil and myTeamID == spGetUnitTeam(transportID) then
-		return consToCarryingTransport[unitID]
+		return fromConIDToCarryingTransportID[unitID]
 	end
 	return unitID
 end
@@ -466,7 +466,7 @@ local function SelectComm()
 		end
 	end
 	
-	unitID = FromConToOwnedTransportIdIfNeeded(unitID)
+	unitID = ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	Spring.SelectUnit(unitID, shift)
 	if not shift then
@@ -518,12 +518,16 @@ local function SelectPrecBomber()
 	Spring.SelectUnitArray(toBeSelected)
 end
 
+local function IsConNotCarriedByEnemyTransport(unitID)
+	return consCarriedByEnemyTransports[unitID] == nil
+end
+
 local function SelectIdleCon_all()
 	local consToSelect = {}
 	for uid, _ in pairs(idleCons) do
-		if uid ~= "count" then
-			if CanConBeIdle(uid) then
-				consToSelect[FromConToOwnedTransportIdIfNeeded(uid)] = true
+		if uid ~= nil and uid ~= "count" then
+			if IsConNotCarriedByEnemyTransport(uid) then
+				consToSelect[ConvertConIDToTransportIdCarryingItIfNeeded(uid)] = true
 			end
 		end
 	end
@@ -544,7 +548,7 @@ local function SelectIdleCon()
 		local muid = nil
 		for uid, _ in pairs(idleCons) do
 			if uid ~= "count" then
-				tuid = FromConToOwnedTransportIdIfNeeded(uid)
+				tuid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
 				if (not Spring.IsUnitSelected(tuid)) then
 					local x,_,z = spGetUnitPosition(tuid)
 					dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
@@ -566,7 +570,7 @@ local function SelectIdleCon()
 			for uid in pairs(idleCons) do
 				if uid ~= "count" then
 					if i == conIndex then
-						tuid = FromConToOwnedTransportIdIfNeeded(uid)
+						tuid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
 						Spring.SelectUnit(tuid)
 						local x, y, z = Spring.GetUnitPosition(tuid)
 						SetCameraTarget(x, y, z)
@@ -1362,7 +1366,7 @@ local function GetConstructorButton(parent)
 		
 		local total = 0
 		for uid in pairs(idleCons) do
-			local transportUnitID = consToCarryingTransport[uid]
+			local transportUnitID = fromConIDToCarryingTransportID[uid]
 			if not (transportUnitID ~= nil and idleTransports[transportUnitID] == nil) then
 				total = total + 1
 			end
@@ -1729,8 +1733,8 @@ local function ClearData()
 	commanderList = {}
 	idleCons = {}
 	idleTransports = {}
-	transportToCarriedCons = {}
-	consToCarryingTransport = {}
+	fromTransportIDToCarriedConID = {}
+	fromConIDToCarryingTransportID = {}
 	consCarriedByEnemyTransports = {}
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
@@ -1746,10 +1750,6 @@ local function ClearData()
 	InitializeUnits()
 	
 	buttonList.SetImagesVisible(false)
-end
-
-local function CanConBeIdle(unitID)
-	return consCarriedByEnemyTransports[unitID] == nil
 end
 
 -------------------------------------------------------------------------------
@@ -1770,7 +1770,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 			(ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not ud.isFactory) and
 			(options.monitoridlecomms.value or not ud.customParams.dynamic_comm) and
 			(options.monitoridlenano.value or ud.canMove)
-			and CanConBeIdle(unitID)
+			and IsConNotCarriedByEnemyTransport(unitID)
 		) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
@@ -1782,8 +1782,8 @@ function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 		if myTeamID == unitTeam then
 			if unitTeam == transportTeam then
 				idleCons[unitID] = true
-				consToCarryingTransport[unitID] = transportID
-				transportToCarriedCons[transportID] = unitID
+				fromConIDToCarryingTransportID[unitID] = transportID
+				fromTransportIDToCarriedConID[transportID] = unitID
 				wantUpdateCons = true
 			else
 				consCarriedByEnemyTransports[unitID] = true
@@ -1799,9 +1799,9 @@ function widget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transport
 		wantUpdateCons = true
 	end
 	if myTeamID == unitTeam and GetUnitCanBuild(unitID, unitDefID) then
-		if consToCarryingTransport[unitID] then
-			consToCarryingTransport[unitID] = nil
-			transportToCarriedCons[transportID] = nil
+		if fromConIDToCarryingTransportID[unitID] then
+			fromConIDToCarryingTransportID[unitID] = nil
+			fromTransportIDToCarriedConID[transportID] = nil
 			wantUpdateCons = true
 		else
 			widget:UnitGiven(unitID, unitDefID, unitTeam, nil)
@@ -1814,14 +1814,14 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 	local ud = UnitDefs[unitDefID]
-	if transportToCarriedCons[unitID] then
+	if fromTransportIDToCarriedConID[unitID] then
 		local cQueue = spGetUnitCommandCount(unitID)
 		if cQueue == 0 then -- no commands
 			widget:UnitIdle(unitID, unitDefID, myTeamID)
 		end
 	end
 	-- don't consider cons units loaded onto enemy transports as idle
-	if GetUnitCanBuild(unitID, unitDefID) and CanConBeIdle(unitID) then  --- can build
+	if GetUnitCanBuild(unitID, unitDefID) and IsConNotCarriedByEnemyTransport(unitID) then  --- can build
 		local bQueue = spGetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
@@ -1850,24 +1850,28 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
-	if consToCarryingTransport[unitID] then
-		local transportID = consToCarryingTransport[unitID]
-		consToCarryingTransport[unitID] = nil
-		transportToCarriedCons[transportID] = nil
+	-- cons carried by a transport?
+	if fromConIDToCarryingTransportID[unitID] then
+		local transportID = fromConIDToCarryingTransportID[unitID]
+		fromConIDToCarryingTransportID[unitID] = nil
+		fromTransportIDToCarriedConID[transportID] = nil
 		idleTransports[transportID] = nil
 		wantUpdateCons = true
 	end
-	if transportToCarriedCons[unitID] then
-		local conID = consToCarryingTransport[unitID]
-		consToCarryingTransport[conID] = nil
-		transportToCarriedCons[unitID] = nil
+	-- transport carrying a cons?
+	if fromTransportIDToCarriedConID[unitID] then
+		local conID = fromConIDToCarryingTransportID[unitID]
+		fromConIDToCarryingTransportID[conID] = nil
+		fromTransportIDToCarriedConID[unitID] = nil
 		idleTransports[unitID] = nil
 		wantUpdateCons = true
 	end
+	-- todo(strat) I don't think the block below is needed
+	--[[ -- transport can't be idle when it's destroyed
 	if idleTransports[unitID] then
 		idleTransports[unitID] = nil
 		wantUpdateCons = true
-	end
+	end ]]
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
@@ -1892,7 +1896,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (unitTeam ~= myTeamID) then
 		return
 	end
-	if transportToCarriedCons[unitID] then
+	if fromTransportIDToCarriedConID[unitID] then
 		idleTransports[unitID] = true
 		wantUpdateCons = true
 	end
@@ -1900,7 +1904,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
 	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.dynamic_comm)
 	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove)
-	and CanConBeIdle(unitID) then
+	and IsConNotCarriedByEnemyTransport(unitID) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
