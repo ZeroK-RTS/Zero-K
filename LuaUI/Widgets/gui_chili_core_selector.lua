@@ -1785,7 +1785,6 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 	local ud = UnitDefs[unitDefID]
-	-- todo(strat) handle case where a transport is carrying a cons and becomes idle (or not idle) and update the idle cons accordingly
 	-- todo(strat) handle enemy transports! move this code up before the team check? but then... we can't select them right?
 	if transportToCarriedCons[unitID] then
 		local cQueue = spGetUnitCommandCount(unitID)
