@@ -24,14 +24,17 @@ local GetUnitCanBuild = Spring.Utilities.GetUnitCanBuild
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-local spGetUnitDefID      = Spring.GetUnitDefID
-local spGetUnitHealth     = Spring.GetUnitHealth
-local spGetFullBuildQueue = Spring.GetFullBuildQueue
-local spGetMouseState     = Spring.GetMouseState
-local spTraceScreenRay    = Spring.TraceScreenRay
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetUnitPosition   = Spring.GetUnitPosition
-local spGetTeamUnits = Spring.GetTeamUnits
+local spGetUnitDefID          = Spring.GetUnitDefID
+local spGetUnitHealth         = Spring.GetUnitHealth
+local spGetFullBuildQueue     = Spring.GetFullBuildQueue
+local spGetMouseState         = Spring.GetMouseState
+local spTraceScreenRay        = Spring.TraceScreenRay
+local spGetUnitRulesParam     = Spring.GetUnitRulesParam
+local spGetUnitPosition       = Spring.GetUnitPosition
+local spGetTeamUnits          = Spring.GetTeamUnits
+local spGetUnitCommandCount   = Spring.GetUnitCommandCount
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local spGetUnitCommands       = Spring.GetUnitCommands
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -83,6 +86,8 @@ local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
 local consToCarryingTransport = {}
+local transportToCarriedCons = {}
+local idleTransports = {} -- [unitID] = true
 
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
@@ -1326,9 +1331,32 @@ local function GetConstructorButton(parent)
 			button.SetBackgroundColor((highlightPhase and buttonColorHighlight) or BUTTON_COLOR)
 		end
 		
+		--[[ echo("START BUTTON UPDATE: ")
+		for idleTrans in pairs(idleTransports) do
+			echo("idle transport: ", idleTrans)
+		end ]]
 		local total = 0
-		for unitID in pairs(idleCons) do
+		for uid in pairs(idleCons) do
+			--echo("Idle Con Unit: ", uid)
 			total = total + 1
+			-- HACK Why do I need to copy this variable? Do iterator variables become nil in nested scopes?
+			local tmpUID = uid
+			for carriedUnitId, transportUnitId in pairs(consToCarryingTransport) do
+				--echo("carried unit, transport unit: ", carriedUnitId, transportUnitId)
+				--echo("carried unit, idleConUnitID: ", carriedUnitId, tmpUID)
+				local isUnitCarried = (tmpUID == carriedUnitId)
+				local isUnitCarriedByBusyTransport = (not idleTransports[transportUnitId])
+				--[[ if isUnitCarried then
+					echo("unit is carried")
+				end
+				if isUnitCarriedByBusyTransport then
+					echo("unit is carried by busy transport")
+				end ]]
+				if isUnitCarried and isUnitCarriedByBusyTransport then
+					--echo("Idle Con Unit carried by busy transport: ", tmpUID, transportUnitId)
+					total = total - 1
+				end
+			end
 		end
 		idleConCount = total
 		
@@ -1580,11 +1608,11 @@ options.monitorInbuiltCons.OnChange = RefreshConsList
 -- Check current cmdID and the queue for a double-wait
 local function HasDoubleCommand(unitID, cmdID)
 	if cmdID == CMD.WAIT or cmdID == CMD.SELFD then
-		local cmdsLen = Spring.GetUnitCommandCount(unitID)
+		local cmdsLen = spGetUnitCommandCount(unitID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
-			local currCmdID = Spring.GetUnitCurrentCommand(unitID)
+			local currCmdID = spGetUnitCurrentCommand(unitID)
 			return currCmdID == CMD.WAIT
 		end
 	end
@@ -1593,9 +1621,9 @@ end
 
 -- Check the queue for an attack command
 local function isAttackQueued(unitID)
-	local cmdsLen = Spring.GetUnitCommandCount(unitID)
+	local cmdsLen = spGetUnitCommandCount(unitID)
 	if cmdsLen and (cmdsLen > 0) then
-		local cmds = Spring.GetUnitCommands(unitID,-1)
+		local cmds = spGetUnitCommands(unitID,-1)
 		for i = 1,cmdsLen do
 			if cmds and cmds[i] and ((cmds[i].id == CMD.ATTACK) or (cmds[i].id == CMD.AREA_ATTACK)) then
 				return true
@@ -1621,7 +1649,7 @@ end
 
 local function InitializeUnits()
 	if myTeamID then
-		local buttonList = Spring.GetTeamUnits(myTeamID)
+		local buttonList = spGetTeamUnits(myTeamID)
 		for _,unitID in pairs(buttonList) do
 			local unitDefID = spGetUnitDefID(unitID)
 			--Spring.Echo(unitID, unitDefID)
@@ -1691,6 +1719,9 @@ local function ClearData()
 	factoryList = {}
 	commanderList = {}
 	idleCons = {}
+	transportToCarriedCons = {}
+	consToCarryingTransport = {}
+	idleTransports = {}
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
 	
@@ -1734,12 +1765,19 @@ end
 function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	if idleCons[unitID] then
 		consToCarryingTransport[unitID] = transportID
+		transportToCarriedCons[transportID] = unitID
+		-- todo check if transport is idle here? not sure this line below does anything
+		widget:UnitFinished(transportID, Spring.GetUnitDefID(transportID), transportTeam)
+		wantUpdateCons = true
 	end
 end
 
 function widget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	if idleCons[unitID] then
 		consToCarryingTransport[unitID] = nil
+		transportToCarriedCons[transportID] = nil
+		idleTransports[transportID] = nil
+		wantUpdateCons = true
 	end
 end
 
@@ -1750,12 +1788,22 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 	local ud = UnitDefs[unitDefID]
 	-- todo(strat) handle case where a transport is carrying a cons and becomes idle (or not idle) and update the idle cons accordingly
+	-- todo(strat) handle enemy transports! move this code up before the team check? but then... we can't select them right?
+	if transportToCarriedCons[unitID] then
+		local cQueue = spGetUnitCommandCount(unitID)
+		if cQueue == 0 then
+			widget:UnitIdle(unitID, unitDefID, myTeamID)
+		else
+			idleTransports[unitID] = nil
+			wantUpdateCons = true
+		end
+	end 
 	if GetUnitCanBuild(unitID, unitDefID) then  --- can build
 		local bQueue = spGetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
 			if not ud.isFactory then
-				local cQueue = Spring.GetUnitCommandCount(unitID)
+				local cQueue = spGetUnitCommandCount(unitID)
 				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
 				if cQueue == 0 then
 					--Spring.Echo("\tCon "..unitID.." must be idle")
@@ -1778,6 +1826,10 @@ end
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
+	end
+	if idleTransports[unitID] then
+		idleTransports[unitID] = nil
+		wantUpdateCons = true
 	end
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
@@ -1810,6 +1862,10 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
+	if transportToCarriedCons[unitID] then
+		idleTransports[unitID] = true
+		wantUpdateCons = true
+	end
 	local unitName = UnitDefs[unitDefID].name
 	if (unitName == "bomberprec") then
 		setBomberReadyStatus(unitID)
@@ -1829,6 +1885,11 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 	if HasDoubleCommand(unitID,cmdID) then
 		widget:UnitIdle(unitID,unitDefID,unitTeam)
 		return
+	end
+	
+	if idleTransports[unitID] then
+		idleTransports[unitID] = nil
+		wantUpdateCons = true
 	end
 	
 	if idleCons[unitID] then
