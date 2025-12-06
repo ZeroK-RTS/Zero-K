@@ -24,18 +24,13 @@ local GetUnitCanBuild = Spring.Utilities.GetUnitCanBuild
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-local spGetUnitDefID          = Spring.GetUnitDefID
-local spGetUnitHealth         = Spring.GetUnitHealth
-local spGetFullBuildQueue     = Spring.GetFullBuildQueue
-local spGetMouseState         = Spring.GetMouseState
-local spTraceScreenRay        = Spring.TraceScreenRay
-local spGetUnitRulesParam     = Spring.GetUnitRulesParam
-local spGetUnitPosition       = Spring.GetUnitPosition
-local spGetTeamUnits          = Spring.GetTeamUnits
-local spGetUnitTeam           = Spring.GetUnitTeam
-local spGetUnitCommandCount   = Spring.GetUnitCommandCount
-local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
-local spGetUnitCommands       = Spring.GetUnitCommands
+local spGetUnitDefID      = Spring.GetUnitDefID
+local spGetUnitHealth     = Spring.GetUnitHealth
+local spGetFullBuildQueue = Spring.GetFullBuildQueue
+local spGetMouseState     = Spring.GetMouseState
+local spTraceScreenRay    = Spring.TraceScreenRay
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetUnitPosition   = Spring.GetUnitPosition
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -402,17 +397,17 @@ options = {
 
 local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) .. "\n\255\0\255\0" .. WG.Translate("interface", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) .. "\n\255\0\255\0" .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "append_to_current_selection") .. "\008"
 
---[[ local function debugState()
+local function debugState()
 	echo("idleCons:")	
-	for uid, _ in pairs(idleCons) do
+	for uid in pairs(idleCons) do
 		echo(uid)
 	end
 	echo("idleTransports:")
-	for uid, _ in pairs(idleTransports) do
+	for uid in pairs(idleTransports) do
 		echo(uid)
 	end
 	echo("consCarriedByEnemyTransports:")
-	for uid, _ in pairs(consCarriedByEnemyTransports) do
+	for uid in pairs(consCarriedByEnemyTransports) do
 		echo(uid)
 	end
 	echo("fromConIDToCarryingTransportID:")
@@ -420,18 +415,18 @@ local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "l
 		echo(uida, uidb)
 	end
 	echo("fromTransportIDToCarriedConID: ")
-	for uida, uidb  in pairs(fromTransportIDToCarriedConID) do
+	for uida, uidb in pairs(fromTransportIDToCarriedConID) do
 		echo(uida, uidb)
 	end
 end
- ]]
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Selection Functions
 
 local function ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
 	local transportID = fromConIDToCarryingTransportID[unitID]
-	if transportID ~= nil and myTeamID == spGetUnitTeam(transportID) then
+	if transportID ~= nil then
 		return fromConIDToCarryingTransportID[unitID]
 	end
 	return unitID
@@ -524,7 +519,7 @@ end
 
 local function SelectIdleCon_all()
 	local consToSelect = {}
-	for uid, _ in pairs(idleCons) do
+	for uid in pairs(idleCons) do
 		if uid ~= nil and uid ~= "count" then
 			if IsConNotCarriedByEnemyTransport(uid) then
 				consToSelect[ConvertConIDToTransportIdCarryingItIfNeeded(uid)] = true
@@ -546,7 +541,7 @@ local function SelectIdleCon()
 		local pos = select(2, spTraceScreenRay(mx,my,true)) or mapMiddle
 		local mindist = math.huge
 		local muid = nil
-		for uid, _ in pairs(idleCons) do
+		for uid, v in pairs(idleCons) do
 			if uid ~= "count" then
 				tuid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
 				if (not Spring.IsUnitSelected(tuid)) then
@@ -567,7 +562,7 @@ local function SelectIdleCon()
 		else
 			conIndex = (conIndex % idleConCount) + 1
 			local i = 1
-			for uid in pairs(idleCons) do
+			for uid, v in pairs(idleCons) do
 				if uid ~= "count" then
 					if i == conIndex then
 						tuid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
@@ -1365,9 +1360,9 @@ local function GetConstructorButton(parent)
 		end
 		
 		local total = 0
-		for uid in pairs(idleCons) do
-			local transportUnitID = fromConIDToCarryingTransportID[uid]
-			if not (transportUnitID ~= nil and idleTransports[transportUnitID] == nil) then
+		for unitID in pairs(idleCons) do
+			local transportID = fromConIDToCarryingTransportID[unitID]
+			if not (transportID ~= nil and idleTransports[transportID] == nil) then
 				total = total + 1
 			end
 		end
@@ -1604,7 +1599,7 @@ end
 local function RefreshConsList()
 	idleCons = {}
 	if Spring.GetGameFrame() > 1 and myTeamID then
-		local buttonList = spGetTeamUnits(myTeamID)
+		local buttonList = Spring.GetTeamUnits(myTeamID)
 		for _,unitID in pairs(buttonList) do
 			local unitDefID = spGetUnitDefID(unitID)
 			if unitDefID then
@@ -1621,11 +1616,11 @@ options.monitorInbuiltCons.OnChange = RefreshConsList
 -- Check current cmdID and the queue for a double-wait
 local function HasDoubleCommand(unitID, cmdID)
 	if cmdID == CMD.WAIT or cmdID == CMD.SELFD then
-		local cmdsLen = spGetUnitCommandCount(unitID)
+		local cmdsLen = Spring.GetUnitCommandCount(unitID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
-			local currCmdID = spGetUnitCurrentCommand(unitID)
+			local currCmdID = Spring.GetUnitCurrentCommand(unitID)
 			return currCmdID == CMD.WAIT
 		end
 	end
@@ -1634,9 +1629,9 @@ end
 
 -- Check the queue for an attack command
 local function isAttackQueued(unitID)
-	local cmdsLen = spGetUnitCommandCount(unitID)
+	local cmdsLen = Spring.GetUnitCommandCount(unitID)
 	if cmdsLen and (cmdsLen > 0) then
-		local cmds = spGetUnitCommands(unitID,-1)
+		local cmds = Spring.GetUnitCommands(unitID,-1)
 		for i = 1,cmdsLen do
 			if cmds and cmds[i] and ((cmds[i].id == CMD.ATTACK) or (cmds[i].id == CMD.AREA_ATTACK)) then
 				return true
@@ -1662,7 +1657,7 @@ end
 
 local function InitializeUnits()
 	if myTeamID then
-		local buttonList = spGetTeamUnits(myTeamID)
+		local buttonList = Spring.GetTeamUnits(myTeamID)
 		for _,unitID in pairs(buttonList) do
 			local unitDefID = spGetUnitDefID(unitID)
 			--Spring.Echo(unitID, unitDefID)
@@ -1815,7 +1810,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 	local ud = UnitDefs[unitDefID]
 	if fromTransportIDToCarriedConID[unitID] then
-		local cQueue = spGetUnitCommandCount(unitID)
+		local cQueue = Spring.GetUnitCommandCount(unitID)
 		if cQueue == 0 then -- no commands
 			widget:UnitIdle(unitID, unitDefID, myTeamID)
 		end
@@ -1824,9 +1819,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if GetUnitCanBuild(unitID, unitDefID) and IsConNotCarriedByEnemyTransport(unitID) then  --- can build
 		local bQueue = spGetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
-			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
 			if not ud.isFactory then
-				local cQueue = spGetUnitCommandCount(unitID)
+				local cQueue = Spring.GetUnitCommandCount(unitID)
 				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
 				if cQueue == 0 then
 					--Spring.Echo("\tCon "..unitID.." must be idle")
@@ -1964,7 +1958,7 @@ function widget:Update(dt)
 	if wantUpdateCons then
 		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton(dt)
 		wantUpdateCons = false
-		--debugState()
+		debugState()
 	end
 
 	timer = timer + dt
