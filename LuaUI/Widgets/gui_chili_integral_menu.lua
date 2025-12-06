@@ -131,6 +131,7 @@ local selectionIndex = 0
 local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
+local radarIconsOptionStateChanged = true
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
@@ -140,7 +141,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
-	'background_opacity',  'allowclickthrough', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -226,6 +227,15 @@ options = {
 				background.noClickThrough = not self.value
 				background:Invalidate()
 			end
+		end,
+	},
+	show_radar_icons = {
+		name = 'Show Radar Icons',
+		type='bool',
+		value=false,
+		desc = 'Where appropriate, the command panel will show the radar icons of units in the top-right corner of their build button.',
+		OnChange = function(self)
+			radarIconsOptionStateChanged = true
 		end,
 	},
 	keyboardType2 = {
@@ -572,6 +582,20 @@ local lastRemovedTagResetFrame = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility
+
+local function UpdateRadarIconsIfNeeded()
+	if initialized and radarIconsOptionStateChanged then
+		radarIconsOptionStateChanged = false
+		for i = 1, #commandPanels do
+			local buttons = commandPanels[i].buttons
+			if options.show_radar_icons.value then
+				buttons.ApplyRadarIcons()
+			else
+				buttons.RemoveRadarIcons()
+			end
+		end
+	end
+end
 
 local lastCmdID
 local function UpdateButtonSelection(cmdID)
@@ -1231,7 +1255,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image:Invalidate()
 	end
 	
-	local function SetImageIconTexture(texture1)
+	local function ApplyRadarIconTexture(texture1)
 		if not image_icon then
 			image_icon = Image:New {
 				name = name .. "_image_icon",
@@ -1245,8 +1269,15 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			}
 			return
 		end
+		image_icon:SetVisibility(true)
 		image_icon.file = texture1
 		image_icon:Invalidate()
+	end
+	
+	local function RemoveRadarIconTexture()
+		if image_icon then
+			image_icon:SetVisibility(false)
+		end
 	end
 	
 	local function SetImageFromConfig(displayConfig, command, state)
@@ -1338,6 +1369,17 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image:Invalidate()
 	end
 	
+	function externalFunctionsAndData.ApplyRadarIcon()
+		local ud = UnitDefs[-cmdID]
+		if ud ~= nil then
+			ApplyRadarIconTexture(GetUnitIcon(ud.id))
+		end
+	end
+	
+	function externalFunctionsAndData.RemoveRadarIcon()
+		RemoveRadarIconTexture()
+	end
+	
 	function externalFunctionsAndData.SetProgressBar(proportion)
 		if buildProgress then
 			buildProgress:SetValue(proportion or 0)
@@ -1346,10 +1388,6 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		if not image then
 			SetImageTexture("")
-		end
-		
-		if not image_icon then
-			SetImageIconTexture("")
 		end
 		
 		buildProgress = Progressbar:New{
@@ -1574,7 +1612,6 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				button.tooltip = tooltip
 			end
 			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
-			SetImageIconTexture(GetUnitIcon(ud.id))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
 				if cost >= 100000000 then
@@ -1652,6 +1689,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 	local gridMap, override
 	local gridEnabled = true
 	local gridUpdatedSinceVisible = false
+	local radarIconsEnabled = false
 	
 	local externalFunctions = {}
 	
@@ -1754,6 +1792,33 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		cmdPosition[cmdID] = pos
 		positionCmd[pos] = cmdID
 		return
+	end
+	
+	function externalFunctions.ApplyRadarIcons()
+		if radarIconsEnabled then
+			return
+		end
+		for i = 1, #buttonList do
+			buttonList[i].ApplyRadarIcon()
+		end
+		if (not parent.visible) then
+			gridUpdatedSinceVisible = true
+		end
+		radarIconsEnabled = true
+	end
+	
+	function externalFunctions.RemoveRadarIcons()
+		-- todo(strat) BUG have radar icons turned off then turn them on (works!) then turn them off again (breaks menu)
+		if not radarIconsEnabled then
+			return
+		end
+		for i = 1, #buttonList do
+			buttonList[i].RemoveRadarIcon()
+		end
+		if (not parent.visible) then
+			gridUpdatedSinceVisible = true
+		end
+		radarIconsEnabled = false
 	end
 	
 	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride, updateNonVisible)
@@ -2618,6 +2683,7 @@ function widget:Update()
 	local _,cmdID = spGetActiveCommand()
 	UpdateButtonSelection(cmdID)
 	UpdateReturnToOrders(cmdID)
+	UpdateRadarIconsIfNeeded()
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
