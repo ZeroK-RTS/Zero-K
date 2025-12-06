@@ -86,7 +86,7 @@ local scaleWithHeight = true
 local functionScaleWithHeight = true
 local zoomScaleRange = 0.4
 local overrideDrawBoxes = false
-local hideWithUi = true
+local hideWithUi = false
 
 local function PrintDrawBox()
 	if overrideDrawBoxes then
@@ -147,7 +147,7 @@ options = {
 		name = 'Disable with hidden UI',
 		desc = 'Toggles outlines with Ctrl+F5.',
 		type = 'bool',
-		value = true,
+		value = false,
 		noHotkey = true,
 		OnChange = function (self)
 			hideWithUi = self.value
