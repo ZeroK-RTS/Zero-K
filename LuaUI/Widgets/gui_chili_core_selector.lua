@@ -400,6 +400,10 @@ local function ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
 	return unitID
 end
 
+local function IsConNotCarriedByEnemyTransport(unitID)
+	return consCarriedByEnemyTransports[unitID] == nil
+end
+
 -- comm selection functionality
 local commIndex = 1
 local function SelectComm()
@@ -429,11 +433,11 @@ local function SelectComm()
 		end
 	end
 	
-	unitID = ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	Spring.SelectUnit(unitID, shift)
+	local tuid = ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
+	Spring.SelectUnit(tuid, shift)
 	if not shift then
-		local x, y, z = Spring.GetUnitPosition(unitID)
+		local x, y, z = Spring.GetUnitPosition(tuid)
 		SetCameraTarget(x, y, z)
 	end
 end
@@ -481,10 +485,6 @@ local function SelectPrecBomber()
 	Spring.SelectUnitArray(toBeSelected)
 end
 
-local function IsConNotCarriedByEnemyTransport(unitID)
-	return consCarriedByEnemyTransports[unitID] == nil
-end
-
 local function SelectIdleCon_all()
 	local consToSelect = {}
 	for uid in pairs(idleCons) do
@@ -509,6 +509,7 @@ local function SelectIdleCon()
 		local pos = select(2, spTraceScreenRay(mx,my,true)) or mapMiddle
 		local mindist = math.huge
 		local muid = nil
+
 		for uid, v in pairs(idleCons) do
 			if uid ~= "count" then
 				tuid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
@@ -1805,12 +1806,6 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		idleTransports[unitID] = nil
 		wantUpdateCons = true
 	end
-	-- todo(strat) I don't think the block below is needed
-	--[[ -- transport can't be idle when it's destroyed
-	if idleTransports[unitID] then
-		idleTransports[unitID] = nil
-		wantUpdateCons = true
-	end ]]
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
