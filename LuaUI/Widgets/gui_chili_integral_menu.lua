@@ -591,9 +591,13 @@ local lastRemovedTagResetFrame = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility
+local function UpdateRadarIconSizeString()
+	radarIconSize = string.format('%d%%', options.radar_icon_size.value)
+end
 
 local function UpdateRadarIconsIfNeeded()
 	if radarIconsOptionStateChanged then
+		UpdateRadarIconSizeString()
 		radarIconsOptionStateChanged = false
 		for i = 1, #commandPanels do
 			local buttons = commandPanels[i].buttons
@@ -1261,15 +1265,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	end
 	
 	local function ApplyRadarIconTexture(texture1)
-		local w = string.format('%d%%', options.radar_icon_size.value)
-		local h = w
 		if not image_icon then
 			image_icon = Image:New {
 				name = name .. "_image_radar_icon",
 				top = 0,
 				right = 0,
-				width=w,
-				height=h,
+				width=radarIconSize,
+				height=radarIconSize,
 				keepAspect = true,
 				resizable = true,
 				file = texture1,
@@ -1279,7 +1281,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 		image_icon:SetVisibility(true)
 		image_icon.file = texture1
-		image_icon:Resize(w, h)
+		image_icon:Resize(radarIconSize, radarIconSize)
 		image_icon:Invalidate()
 	end
 	
@@ -2353,10 +2355,11 @@ end
 --------------------------------------------------------------------------------
 -- Initialization
 
-local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
+local gridKeyMap, gridMap, gridCustomOverrides, radarIconSize -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
+	UpdateRadarIconSizeString()
 	local screenWidth, screenHeight = spGetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
