@@ -584,7 +584,7 @@ local lastRemovedTagResetFrame = false
 -- Utility
 
 local function UpdateRadarIconsIfNeeded()
-	if initialized and radarIconsOptionStateChanged then
+	if radarIconsOptionStateChanged then
 		radarIconsOptionStateChanged = false
 		for i = 1, #commandPanels do
 			local buttons = commandPanels[i].buttons
@@ -1267,6 +1267,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				file = texture1,
 				parent = image,
 			}
+			image_icon:SetVisibility(true)
 			return
 		end
 		image_icon:SetVisibility(true)
@@ -1798,27 +1799,26 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		if radarIconsEnabled then
 			return
 		end
+		radarIconsEnabled = true
 		for i = 1, #buttonList do
 			buttonList[i].ApplyRadarIcon()
 		end
 		if (not parent.visible) then
 			gridUpdatedSinceVisible = true
 		end
-		radarIconsEnabled = true
 	end
 	
 	function externalFunctions.RemoveRadarIcons()
-		-- todo(strat) BUG have radar icons turned off then turn them on (works!) then turn them off again (breaks menu)
 		if not radarIconsEnabled then
 			return
 		end
+		radarIconsEnabled = false
 		for i = 1, #buttonList do
 			buttonList[i].RemoveRadarIcon()
 		end
 		if (not parent.visible) then
 			gridUpdatedSinceVisible = true
 		end
-		radarIconsEnabled = false
 	end
 	
 	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride, updateNonVisible)
