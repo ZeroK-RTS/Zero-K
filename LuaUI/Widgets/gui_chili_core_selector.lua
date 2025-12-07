@@ -38,6 +38,7 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 local BUTTON_COLOR = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_FACTORY = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_WARNING = {1, 0.2, 0.1, 1}
+local BUTTON_COLOR_HIGHLIGHT = {1, 1, 0, 1}
 local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
 local IMAGE_COLOR_DISABLED = {0.3, 0.3, 0.3, 1}
 
@@ -102,6 +103,7 @@ local BUILD_ICON_DISABLED = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
 
 local UPDATE_FREQUENCY = 0.25
 local COMM_WARNING_TIME	= 2
+local IDLE_CONS_WARNING_TIME = 0.5
 
 local CONSTRUCTOR_ORDER = 1
 local COMMANDER_ORDER = 2
@@ -1244,6 +1246,8 @@ local function GetConstructorButton(parent)
 	end
 	
 	local active = true
+	local warningTime = false
+	local warningPhase = true
 	
 	local button = GetNewButton(
 		parent,
@@ -1274,7 +1278,19 @@ local function GetConstructorButton(parent)
 	}
 	
 	local oldTotal
-	function externalFunctions.UpdateButton()
+	function externalFunctions.UpdateButton(dt)
+		if warningTime then
+			warningTime = warningTime - dt
+			if warningTime <= 0 then
+				warningTime = false
+				warningPhase = false
+			else
+				warningPhase = not warningPhase
+			end
+			
+			button.SetBackgroundColor((warningPhase and BUTTON_COLOR_HIGHLIGHT) or BUTTON_COLOR)
+		end
+		
 		local total = 0
 		for unitID in pairs(idleCons) do
 			total = total + 1
@@ -1283,6 +1299,11 @@ local function GetConstructorButton(parent)
 		
 		if total == oldTotal then
 			return true
+		end
+		if oldTotal ~= nil and oldTotal < total then
+			warningTime = IDLE_CONS_WARNING_TIME
+		else
+			warningTime = false
 		end
 		oldTotal = total
 		
@@ -1311,7 +1332,7 @@ local function GetConstructorButton(parent)
 		button = nil
 	end
 	
-	externalFunctions.UpdateButton()
+	externalFunctions.UpdateButton(dt)
 	externalFunctions.UpdateHotkey()
 	
 	return externalFunctions
@@ -1789,7 +1810,7 @@ function widget:Update(dt)
 	end
 	
 	if wantUpdateCons then
-		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton()
+		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton(dt)
 		wantUpdateCons = false
 	end
 
