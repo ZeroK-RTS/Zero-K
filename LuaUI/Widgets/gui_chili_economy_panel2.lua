@@ -1565,7 +1565,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		caption = "0",
-		autosize = false,
+		autosize = true,
 		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_grey", {
 			outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2.
 		}),
@@ -1580,7 +1580,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		caption = positiveColourStr.."+0.0",
 		valign = "center",
 		align  = "left",
-		autosize = false,
+		autosize = true,
 		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
 			outline = true, outlineWidth = 2, outlineWeight = 2,
 		}),
@@ -1595,7 +1595,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		caption = negativeColourStr.."-0.0",
 		valign = "center",
 		align  = "left",
-		autosize = false,
+		autosize = true,
 		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
 			outline = true, outlineWidth = 2, outlineWeight = 2,
 		}),
@@ -1721,7 +1721,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		caption = "0",
-		autosize = false,
+		autosize = true,
 		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_grey", {
 			outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2.
 		}),
@@ -1736,7 +1736,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		caption = positiveColourStr.."+0.0",
 		valign = "center",
 		align  = "left",
-		autosize = false,
+		autosize = true,
 		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
 			outline = true, outlineWidth = 2, outlineWeight = 2,
 		}),
@@ -1751,7 +1751,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		caption = negativeColourStr.."-0.0",
 		valign = "center",
 		align  = "left",
-		autosize = false,
+		autosize = true,
 		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
 			outline = true, outlineWidth = 2, outlineWeight = 2,
 		}),
