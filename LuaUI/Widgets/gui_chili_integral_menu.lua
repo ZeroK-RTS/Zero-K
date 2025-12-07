@@ -131,7 +131,7 @@ local selectionIndex = 0
 local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
-local radarIconsOptionStateChanged = true
+local radarIconsOptionStateChanged = false
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
-	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -233,7 +233,16 @@ options = {
 		name = 'Show Radar Icons',
 		type='bool',
 		value=false,
-		desc = 'Where appropriate, the command panel will show the radar icons of units in the top-right corner of their build button.',
+		desc = 'Displays the unit radar icons in the top-right corner of their build button in the command panel.',
+		OnChange = function(self)
+			radarIconsOptionStateChanged = true
+		end,
+	},
+	radar_icon_size = {
+		name = "Radar Icon Size",
+		type = "number",
+		value = 50, min = 1, max = 100, step = 1,
+		desc = 'Determines the size of the unit radar icons in the command panel.',
 		OnChange = function(self)
 			radarIconsOptionStateChanged = true
 		end,
@@ -588,11 +597,7 @@ local function UpdateRadarIconsIfNeeded()
 		radarIconsOptionStateChanged = false
 		for i = 1, #commandPanels do
 			local buttons = commandPanels[i].buttons
-			if options.show_radar_icons.value then
-				buttons.ApplyRadarIcons()
-			else
-				buttons.RemoveRadarIcons()
-			end
+			buttons.UpdateRadarIcons()
 		end
 	end
 end
@@ -1256,22 +1261,25 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	end
 	
 	local function ApplyRadarIconTexture(texture1)
+		local w = string.format('%d%%', options.radar_icon_size.value)
+		local h = w
 		if not image_icon then
 			image_icon = Image:New {
-				name = name .. "_image_icon",
-				right = "0",
-				top = "0",
-				height="45%",
-				width="45%",
+				name = name .. "_image_radar_icon",
+				top = 0,
+				right = 0,
+				width=w,
+				height=h,
 				keepAspect = true,
+				resizable = true,
 				file = texture1,
 				parent = image,
 			}
-			image_icon:SetVisibility(true)
 			return
 		end
 		image_icon:SetVisibility(true)
 		image_icon.file = texture1
+		image_icon:Resize(w, h)
 		image_icon:Invalidate()
 	end
 	
@@ -1795,29 +1803,20 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		return
 	end
 	
-	function externalFunctions.ApplyRadarIcons()
-		if radarIconsEnabled then
-			return
-		end
-		radarIconsEnabled = true
-		for i = 1, #buttonList do
-			buttonList[i].ApplyRadarIcon()
-		end
-		if (not parent.visible) then
-			gridUpdatedSinceVisible = true
-		end
-	end
-	
-	function externalFunctions.RemoveRadarIcons()
-		if not radarIconsEnabled then
-			return
-		end
-		radarIconsEnabled = false
-		for i = 1, #buttonList do
-			buttonList[i].RemoveRadarIcon()
-		end
-		if (not parent.visible) then
-			gridUpdatedSinceVisible = true
+	function externalFunctions.UpdateRadarIcons()
+		if options.show_radar_icons.value then
+			radarIconsEnabled = true
+			for i = 1, #buttonList do
+				buttonList[i].ApplyRadarIcon()
+			end
+		else
+			if not radarIconsEnabled then
+				return
+			end
+			radarIconsEnabled = false
+			for i = 1, #buttonList do
+				buttonList[i].RemoveRadarIcon()
+			end
 		end
 	end
 	
@@ -2475,6 +2474,9 @@ local function InitializeControls()
 			OnTabSelect = function ()
 				data.queue.UpdateBuildProgress()
 				data.buttons.OnSelect()
+				if options.show_radar_icons.value then
+					data.buttons.UpdateRadarIcons()
+				end
 			end
 		end
 		
@@ -2482,6 +2484,10 @@ local function InitializeControls()
 	
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
+		end
+		
+		if options.show_radar_icons.value then
+			data.buttons.UpdateRadarIcons()
 		end
 	end
 	
