@@ -2035,9 +2035,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		name = "unitImage",
 		x = 0,
 		y = 0,
-		right = 0,
 		height = PIC_HEIGHT,
-		keepAspect = false,
+		keepAspect = true,
 		file = imageFile,
 		parent = leftPanel,
 	}
