@@ -73,7 +73,7 @@ return {
 			[7] = "M",
 			[8] = "COMMA",
 			[9] = "PERIOD",
-			[10] = "UNDERSCORE",
+			[10] = "MINUS",
 		},
 	},
 	azerty = {
