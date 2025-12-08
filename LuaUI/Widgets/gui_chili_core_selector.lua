@@ -103,7 +103,7 @@ local BUILD_ICON_DISABLED = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
 
 local UPDATE_FREQUENCY = 0.25
 local COMM_WARNING_TIME	= 2
-local IDLE_CONS_WARNING_TIME = 0.5
+local IDLE_CONS_HIGHLIGHT_TIME = 0.5
 
 local CONSTRUCTOR_ORDER = 1
 local COMMANDER_ORDER = 2
@@ -191,7 +191,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -241,6 +241,12 @@ options = {
 				mainBackground.SetAllowClickThrough(self.value)
 			end
 		end,
+	},
+	highlightidleconsinc = {
+		name = 'Highlight idle constructors increases',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
 	},
 	monitoridlecomms = {
 		name = 'Track idle commanders',
@@ -1246,8 +1252,8 @@ local function GetConstructorButton(parent)
 	end
 	
 	local active = true
-	local warningTime = false
-	local warningPhase = true
+	local highlightTime = false
+	local highlightPhase = true
 	
 	local button = GetNewButton(
 		parent,
@@ -1279,16 +1285,16 @@ local function GetConstructorButton(parent)
 	
 	local oldTotal
 	function externalFunctions.UpdateButton(dt)
-		if warningTime then
-			warningTime = warningTime - dt
-			if warningTime <= 0 then
-				warningTime = false
-				warningPhase = false
+		if options.highlightidleconsinc.value and highlightTime then
+			highlightTime = highlightTime - dt
+			if highlightTime <= 0 then
+				highlightTime = false
+				highlightPhase = false
 			else
-				warningPhase = not warningPhase
+				highlightPhase = not highlightPhase
 			end
 			
-			button.SetBackgroundColor((warningPhase and BUTTON_COLOR_HIGHLIGHT) or BUTTON_COLOR)
+			button.SetBackgroundColor((highlightPhase and BUTTON_COLOR_HIGHLIGHT) or BUTTON_COLOR)
 		end
 		
 		local total = 0
@@ -1300,10 +1306,10 @@ local function GetConstructorButton(parent)
 		if total == oldTotal then
 			return true
 		end
-		if oldTotal ~= nil and oldTotal < total then
-			warningTime = IDLE_CONS_WARNING_TIME
+		if options.highlightidleconsinc.value and oldTotal ~= nil and oldTotal < total then
+			highlightTime = IDLE_CONS_HIGHLIGHT_TIME
 		else
-			warningTime = false
+			highlightTime = false
 		end
 		oldTotal = total
 		
