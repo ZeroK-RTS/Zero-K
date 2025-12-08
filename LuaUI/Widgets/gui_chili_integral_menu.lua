@@ -290,7 +290,7 @@ options = {
 	label_apply = {
 		type = 'text',
 		name = 'Note: Click above to refresh',
-		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convinence.',
+		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convenience.',
 		path = customGridPath
 	},
 	label_tab = {
