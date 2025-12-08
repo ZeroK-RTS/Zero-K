@@ -38,8 +38,8 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 local BUTTON_COLOR = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_FACTORY = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_WARNING = {1, 0.2, 0.1, 1}
-local BUTTON_COLOR_HIGHLIGHT = {1, 1, 0, 1}
 local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
+local buttonColorHighlight = nil
 local IMAGE_COLOR_DISABLED = {0.3, 0.3, 0.3, 1}
 
 local stateCommands = {	-- FIXME: is there a better way of doing this?
@@ -123,6 +123,10 @@ for name in pairs(exceptionList) do
 	end
 end
 
+local function SetButtonColorHighlight(opacity)
+	buttonColorHighlight = {1,1,0,opacity}
+end
+
 local function CheckHide(forceUpdate)
 	local spec = Spring.GetSpectatingState()
 	local showButtons, showBackground
@@ -191,7 +195,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'highlightidleconsincopacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -247,6 +251,15 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+	},
+	highlightidleconsincopacity = {
+		name = 'Highlight opacity',
+		type = 'number',
+		value = 0.1,
+		min = 0.1, max = 1.0, step = 0.1,
+		OnChange = function(self)
+			SetButtonColorHighlight(self.value)
+		end,
 	},
 	monitoridlecomms = {
 		name = 'Track idle commanders',
@@ -1294,7 +1307,7 @@ local function GetConstructorButton(parent)
 				highlightPhase = not highlightPhase
 			end
 			
-			button.SetBackgroundColor((highlightPhase and BUTTON_COLOR_HIGHLIGHT) or BUTTON_COLOR)
+			button.SetBackgroundColor((highlightPhase and buttonColorHighlight) or BUTTON_COLOR)
 		end
 		
 		local total = 0
@@ -1611,7 +1624,7 @@ local function InitializeControls()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
-	
+	SetButtonColorHighlight(options.highlightidleconsincopacity.value)
 	local windowY = bottom - BUTTON_HEIGHT
 	
 	mainWindow = Window:New{
