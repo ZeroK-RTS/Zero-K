@@ -131,6 +131,11 @@ local function SetButtonColorHighlight(opacity)
 	buttonColorHighlight = {1,1,0,opacity}
 end
 
+local function CanBeAnIdleCons(ud)
+	return (ud.buildSpeed > 0) and (not exceptionArray[ud.id]) and (not ud.isFactory)
+		and (options.monitoridlecomms.value or not ud.customParams.dynamic_comm)
+		and (options.monitoridlenano.value or ud.canMove)
+end
 local function CheckHide(forceUpdate)
 	local spec = Spring.GetSpectatingState()
 	local showButtons, showBackground
@@ -1762,19 +1767,14 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		AddFac(unitID, unitDefID)
 	elseif ud.customParams.level then
 		AddComm(unitID, unitDefID)
-	elseif options.monitorInbuiltCons.value and (
-			(ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not ud.isFactory) and
-			(options.monitoridlecomms.value or not ud.customParams.dynamic_comm) and
-			(options.monitoridlenano.value or ud.canMove)
-			and IsConNotCarriedByEnemyTransport(unitID)
-		) then
+	elseif options.monitorInbuiltCons.value and CanBeAnIdleCons(ud) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
 end
 
 function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
-	if GetUnitCanBuild(unitID, unitDefID) then
+	if CanBeAnIdleCons(UnitDefs[unitDefID]) and GetUnitCanBuild(unitID, unitDefID) then
 		if myTeamID == unitTeam then
 			if unitTeam == transportTeam then
 				idleCons[unitID] = true
@@ -1890,10 +1890,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		wantUpdateCons = true
 	end
 	local ud = UnitDefs[unitDefID]
-	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
-	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.dynamic_comm)
-	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove)
-	and IsConNotCarriedByEnemyTransport(unitID) then
+	if CanBeAnIdleCons(ud) and IsConNotCarriedByEnemyTransport(unitID) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
