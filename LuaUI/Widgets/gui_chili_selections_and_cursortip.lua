@@ -546,10 +546,13 @@ local function Format(amount, displaySign, longMult)
 	return formatted
 end
 
-local function FormatPlusMinus(num)
-	if num > 0.04 then
+local function FormatPlusMinus(num, fuzz)
+	if fuzz == nil then
+		fuzz = 0.04
+	end
+	if num >= fuzz then
 		return green .. Format(num, true)
-	elseif num < -0.04 then
+	elseif num <= -fuzz then
 		return red .. Format(num, true)
 	end
 	return Format(num)
@@ -899,7 +902,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 						healthOverride = TIDAL_HEALTH
 						minWind = income
 					else
-						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
+						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0.01, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
 						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome, 1) .. " - " .. math.round(windMax * mult * energyMult, 1)
 						income = (minWindIncome + mult * energyMult * windMax)/2
 						minWind = minWindIncome
@@ -2212,7 +2215,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
 			maxHealthLabel(true, health, IMAGE.HEALTH)
 			if mousePlaceX then
-				minWindLabel(true, FormatPlusMinus(minWind), IMAGE.WIND_SPEED)
+				minWindLabel(true, FormatPlusMinus(minWind, 0), IMAGE.WIND_SPEED)
 			else
 				minWindLabel(false)
 			end
