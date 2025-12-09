@@ -1878,6 +1878,58 @@ local function FreeTextures() -- pre we are using 2200mb
 end
 
 --------------------------------------------------------------------
+-- Unit Updating
+--------------------------------------------------------------------
+
+local updateframe = 0
+
+local function countbintypes(flagarray)
+	local fwcnt = 0
+	local defcnt = 0
+	local reflcnt = 0
+	local shadcnt = 0
+
+	for i = 1, #flagarray do
+		local flag = flagarray[i]
+		if HasBit(flag, 1) then
+			fwcnt = fwcnt + 1
+			defcnt = defcnt + 1
+		end
+		if HasBit(flag, 4) then
+			reflcnt = reflcnt + 1
+		end
+		if HasBit(flag, 16) then
+			shadcnt = shadcnt + 1
+		end
+	end
+	return fwcnt, defcnt, reflcnt, shadcnt
+end
+
+local destroyedUnitIDs = {} -- maps unitID to drawflag
+local destroyedUnitDrawFlags = {}
+local numdestroyedUnits = 0
+
+local destroyedFeatureIDs = {}
+local destroyedFeatureDrawFlags = {}
+local numdestroyedFeatures = 0
+
+-- The Call order for event triggered draw changes is the following:
+--During Sim:
+-- 1. gadget:Unit*
+-- 2. UpdateUnit(unitID, flag), adds it to the destroyedUnitIDs queue
+--On next Update:
+-- 3. next gadget:DrawWorldPreUnit is called
+-- 4. ProcessUnits(destroyedUnitIDs)
+	-- 4.1 can either AddUnit, UpdateUnit or RemoveUnit
+-- 5. Regular draw flag changes are processed
+
+local function UpdateUnit(unitID, flag)
+	numdestroyedUnits = numdestroyedUnits + 1
+	destroyedUnitIDs[numdestroyedUnits] = unitID
+	destroyedUnitDrawFlags[numdestroyedUnits] = flag
+end
+
+--------------------------------------------------------------------
 -- More Unsynced Luarules API
 --------------------------------------------------------------------
 
@@ -1885,6 +1937,7 @@ local function SetUnitTexture(unitID, tex1, tex2)
 	RemoveObject(unitID, "override_texture")
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
+	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
 
 --------------------------------------------------------------------
@@ -1962,54 +2015,6 @@ function gadget:Shutdown()
 	end
 	
 	GG.CUSGL4 = nil
-end
-
-local updateframe = 0
-
-local function countbintypes(flagarray)
-	local fwcnt = 0
-	local defcnt = 0
-	local reflcnt = 0
-	local shadcnt = 0
-
-	for i = 1, #flagarray do
-		local flag = flagarray[i]
-		if HasBit(flag, 1) then
-			fwcnt = fwcnt + 1
-			defcnt = defcnt + 1
-		end
-		if HasBit(flag, 4) then
-			reflcnt = reflcnt + 1
-		end
-		if HasBit(flag, 16) then
-			shadcnt = shadcnt + 1
-		end
-	end
-	return fwcnt, defcnt, reflcnt, shadcnt
-end
-
-local destroyedUnitIDs = {} -- maps unitID to drawflag
-local destroyedUnitDrawFlags = {}
-local numdestroyedUnits = 0
-
-local destroyedFeatureIDs = {}
-local destroyedFeatureDrawFlags = {}
-local numdestroyedFeatures = 0
-
--- The Call order for event triggered draw changes is the following:
---During Sim:
--- 1. gadget:Unit*
--- 2. UpdateUnit(unitID, flag), adds it to the destroyedUnitIDs queue
---On next Update:
--- 3. next gadget:DrawWorldPreUnit is called
--- 4. ProcessUnits(destroyedUnitIDs)
-	-- 4.1 can either AddUnit, UpdateUnit or RemoveUnit
--- 5. Regular draw flag changes are processed
-
-local function UpdateUnit(unitID, flag)
-	numdestroyedUnits = numdestroyedUnits + 1
-	destroyedUnitIDs[numdestroyedUnits] = unitID
-	destroyedUnitDrawFlags[numdestroyedUnits] = flag
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, weaponDefID)

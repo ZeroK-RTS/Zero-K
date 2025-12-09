@@ -1112,7 +1112,7 @@ void main(void){
 	#endif
 
 	outColor.rgb *= brightnessFactor; // this is to correct for lack of env mapping, the nastiest hack there has ever been...
-
+	
 	//iblDiffuse, iblSpecular
 	//outColor.rgb = iblSpecular;
 	
@@ -1258,7 +1258,7 @@ void main(void){
 
 			// Mix some negative base colour intensity to mitigate over-highlighting bright map features
 			outColor.rgb += isWreck * mix(-1.0 * outColor.rgb, wreckHiglight * wreckIntensity, 0.8);
-			outColor.rgb = mix(outColor.rgb, outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, mouseoverOpacity);
+			outColor.rgb = mix(outColor.rgb, clamp(outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, 0.0, 0.95), mouseoverOpacity);
 		}
 	#endif 
 

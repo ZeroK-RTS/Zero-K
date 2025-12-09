@@ -1,4 +1,3 @@
-if not gadgetHandler:IsSyncedCode() then return end
 
 function gadget:GetInfo() return {
 	name    = "Experience",
@@ -9,6 +8,11 @@ function gadget:GetInfo() return {
 	layer   = 0,
 	enabled = true,
 } end
+
+
+local thresholdDefs = VFS.Include("LuaRules/Configs/experience_defs.lua")
+
+if gadgetHandler:IsSyncedCode() then
 
 local spGetUnitHealth = Spring.GetUnitHealth
 local spValidUnitID = Spring.ValidUnitID
@@ -62,16 +66,57 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local percentageDamage = ((hp > 0) and damage or (damage + hp)) / maxHP
 	local targetCost = getCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
 	local attackerCost = getCost(attackerID, attackerDefID)  * (GG.att_CostMult[attackerID] or 1)
-	spSetUnitExperience(attackerID, spGetUnitExperience(attackerID) + percentageDamage * targetCost / attackerCost)
+	local oldXp = spGetUnitExperience(attackerID)
+	local newXp = oldXp + percentageDamage * targetCost / attackerCost
+	if thresholdDefs[attackerDefID] and (newXp%1) ~= (oldXp%1) then
+		for i = 1, #thresholdDefs[attackerDefID] do
+			local thresholdDef = thresholdDefs[attackerDefID][i]
+			if newXp >= thresholdDef.level and oldXp < thresholdDef.level then
+				Spring.SetUnitRulesParam(attackerID, "ExperienceThreshold", i)
+				SendToUnsynced('ExperienceThreshold', attackerID)
+			end
+		end
+	end
+	spSetUnitExperience(attackerID, newXp)
 end
 
 function gadget:Initialize()
 	Spring.SetExperienceGrade(1.0)
-
 	local teams = Spring.GetTeamList()
 	for i = 1, #teams do
 		local teamID = teams[i]
 		local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
 		allyTeamByTeam[teamID] = allyTeamID
 	end
+end
+
+else -- UNSYNCED
+
+local function ExperienceThreshold(_, unitID)
+	local thresholdID = Spring.GetUnitRulesParam(unitID, "ExperienceThreshold")
+	if not thresholdID then
+		return
+	end
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return
+	end
+	local thresholdDef = thresholdDefs[unitDefID][thresholdID]
+	if not (GG.CUSGL4 and GG.CUSGL4.SetUnitTexture) then
+		return
+	end
+	GG.CUSGL4.SetUnitTexture(unitID, thresholdDef.tex1, thresholdDef.tex2)
+end
+
+local function Shutdown()
+	gadgetHandler.RemoveSyncAction("ExperienceThreshold")
+end
+
+function gadget:Initialize()
+	gadgetHandler:AddSyncAction("ExperienceThreshold", ExperienceThreshold)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		ExperienceThreshold(_, unitID)
+	end
+end
+
 end
