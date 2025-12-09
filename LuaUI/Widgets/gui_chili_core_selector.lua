@@ -39,6 +39,7 @@ local BUTTON_COLOR = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_FACTORY = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_WARNING = {1, 0.2, 0.1, 1}
 local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
+local buttonColorHighlight = nil
 local IMAGE_COLOR_DISABLED = {0.3, 0.3, 0.3, 1}
 
 local stateCommands = {	-- FIXME: is there a better way of doing this?
@@ -102,6 +103,7 @@ local BUILD_ICON_DISABLED = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
 
 local UPDATE_FREQUENCY = 0.25
 local COMM_WARNING_TIME	= 2
+local IDLE_CONS_HIGHLIGHT_TIME = 0.5
 
 local CONSTRUCTOR_ORDER = 1
 local COMMANDER_ORDER = 2
@@ -119,6 +121,10 @@ for name in pairs(exceptionList) do
 	if UnitDefNames[name] then
 		exceptionArray[UnitDefNames[name].id] = true
 	end
+end
+
+local function SetButtonColorHighlight(opacity)
+	buttonColorHighlight = {1,1,0,opacity}
 end
 
 local function CheckHide(forceUpdate)
@@ -189,7 +195,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'highlightidleconsincopacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -238,6 +244,21 @@ options = {
 			if mainBackground then
 				mainBackground.SetAllowClickThrough(self.value)
 			end
+		end,
+	},
+	highlightidleconsinc = {
+		name = 'Highlight idle constructors increases',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	highlightidleconsincopacity = {
+		name = 'Highlight opacity',
+		type = 'number',
+		value = 0.1,
+		min = 0.1, max = 1.0, step = 0.1,
+		OnChange = function(self)
+			SetButtonColorHighlight(self.value)
 		end,
 	},
 	monitoridlecomms = {
@@ -1244,6 +1265,8 @@ local function GetConstructorButton(parent)
 	end
 	
 	local active = true
+	local highlightTime = false
+	local highlightPhase = true
 	
 	local button = GetNewButton(
 		parent,
@@ -1274,7 +1297,19 @@ local function GetConstructorButton(parent)
 	}
 	
 	local oldTotal
-	function externalFunctions.UpdateButton()
+	function externalFunctions.UpdateButton(dt)
+		if options.highlightidleconsinc.value and highlightTime then
+			highlightTime = highlightTime - dt
+			if highlightTime <= 0 then
+				highlightTime = false
+				highlightPhase = false
+			else
+				highlightPhase = not highlightPhase
+			end
+			
+			button.SetBackgroundColor((highlightPhase and buttonColorHighlight) or BUTTON_COLOR)
+		end
+		
 		local total = 0
 		for unitID in pairs(idleCons) do
 			total = total + 1
@@ -1283,6 +1318,11 @@ local function GetConstructorButton(parent)
 		
 		if total == oldTotal then
 			return true
+		end
+		if options.highlightidleconsinc.value and oldTotal ~= nil and oldTotal < total then
+			highlightTime = IDLE_CONS_HIGHLIGHT_TIME
+		else
+			highlightTime = false
 		end
 		oldTotal = total
 		
@@ -1311,7 +1351,7 @@ local function GetConstructorButton(parent)
 		button = nil
 	end
 	
-	externalFunctions.UpdateButton()
+	externalFunctions.UpdateButton(dt)
 	externalFunctions.UpdateHotkey()
 	
 	return externalFunctions
@@ -1584,7 +1624,7 @@ local function InitializeControls()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
-	
+	SetButtonColorHighlight(options.highlightidleconsincopacity.value)
 	local windowY = bottom - BUTTON_HEIGHT
 	
 	mainWindow = Window:New{
@@ -1789,7 +1829,7 @@ function widget:Update(dt)
 	end
 	
 	if wantUpdateCons then
-		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton()
+		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton(dt)
 		wantUpdateCons = false
 	end
 
