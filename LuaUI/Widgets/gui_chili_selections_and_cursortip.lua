@@ -1281,6 +1281,29 @@ end
 
 local leftPanel, rightPanel
 
+local function UpdatePanelWidthsIfNeeded(parentControl, caption)
+	if parentControl ~= leftPanel or caption == nil then
+		return
+	end
+	local n = string.len(caption)
+	if nMaxCaptionCharacters ~= nil and n <= nMaxCaptionCharacters then
+		return
+	end
+	nMaxCaptionCharacters = n
+	if oldMaxCaptionCharacters == nMaxCaptionCharacters then
+		return
+	end
+	oldMaxCaptionCharacters = nMaxCaptionCharacters
+	local w = LEFT_WIDTH
+	if nMaxCaptionCharacters > 10 then
+		-- icon, characters minus the coloring tags (HACK this assumes that the string is color)
+		w = ICON_SIZE + nMaxCaptionCharacters * 5 - 4
+	end
+	leftPanel.minWidth = w
+	leftPanel:Resize(w, leftPanel.height)
+	rightPanel:SetPos(w, 0)
+end
+
 local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
 	fontSize = fontSize or IMAGE_FONT
 	iconSize = iconSize or ICON_SIZE
@@ -1319,29 +1342,7 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 			label:SetPos(nil, yPos + textOffset, nil, nil, nil, true)
 		end
 		label:SetCaption(newCaption)
-		if parentControl == leftPanel and newCaption ~= nil then
-			local n = string.len(newCaption)
-			if nMaxCaptionCharacters == nil or n > nMaxCaptionCharacters then
-				nMaxCaptionCharacters = n
-				if leftPanel ~= nil and oldMaxCaptionCharacters ~= nMaxCaptionCharacters then
-					oldMaxCaptionCharacters = nMaxCaptionCharacters
-					Spring.Echo("nMaxCaptionCharacters:", nMaxCaptionCharacters, newCaption)
-					local w = LEFT_WIDTH
-					if nMaxCaptionCharacters > 10 then
-						Spring.Echo("BIG LEFT PANEL")
-						w = ICON_SIZE + nMaxCaptionCharacters * 5 + 2
-						leftPanel.minWidth = w
-						leftPanel:Resize(w, leftPanel.height)
-						rightPanel:SetPos(w, 0)
-					else
-						Spring.Echo("NORMAL LEFT PANEL")
-						leftPanel.minWidth = w
-						leftPanel:Resize(w, leftPanel.height)
-						rightPanel:SetPos(w, 0)
-					end
-				end
-			end
-		end
+		UpdatePanelWidthsIfNeeded(parentControl, newCaption)
 		if newImage ~= imageFile then
 			if imageFile == nil then
 				label:SetPos(iconSize + 2, nil, nil, nil, nil, true)
@@ -2060,6 +2061,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		name = "unitImage",
 		x = 0,
 		y = 0,
+		left = 0,
 		height = PIC_HEIGHT,
 		keepAspect = true,
 		file = imageFile,
