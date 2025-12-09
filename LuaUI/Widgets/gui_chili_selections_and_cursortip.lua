@@ -1296,7 +1296,7 @@ local function UpdatePanelWidthsIfNeeded(parentControl, caption)
 	oldMaxCaptionCharacters = nMaxCaptionCharacters
 	local w = LEFT_WIDTH
 	if nMaxCaptionCharacters > 10 then
-		-- icon, characters minus the coloring tags (HACK this assumes that the string is color)
+		-- icon, characters minus the color tags (HACK this assumes that the string has color tags)
 		w = ICON_SIZE + nMaxCaptionCharacters * 5 - 4
 	end
 	leftPanel.minWidth = w
