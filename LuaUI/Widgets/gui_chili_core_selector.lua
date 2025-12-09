@@ -402,7 +402,7 @@ options = {
 
 local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) .. "\n\255\0\255\0" .. WG.Translate("interface", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) .. "\n\255\0\255\0" .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "append_to_current_selection") .. "\008"
 
-local function debugState()
+--[[ local function debugIdleConsState()
 	echo("idleCons:")	
 	for uid in pairs(idleCons) do
 		echo(uid)
@@ -423,7 +423,7 @@ local function debugState()
 	for uida, uidb in pairs(fromTransportIDToCarriedConID) do
 		echo(uida, uidb)
 	end
-end
+end ]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1845,7 +1845,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
-	-- cons carried by a transport?
+	-- constructor carried by a transport?
 	if fromConIDToCarryingTransportID[unitID] then
 		local transportID = fromConIDToCarryingTransportID[unitID]
 		fromConIDToCarryingTransportID[unitID] = nil
@@ -1853,7 +1853,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		idleTransports[transportID] = nil
 		wantUpdateCons = true
 	end
-	-- transport carrying a cons?
+	-- transport carrying a constructor?
 	if fromTransportIDToCarriedConID[unitID] then
 		local conID = fromConIDToCarryingTransportID[unitID]
 		fromConIDToCarryingTransportID[conID] = nil
@@ -1950,7 +1950,7 @@ function widget:Update(dt)
 	if wantUpdateCons then
 		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton(dt)
 		wantUpdateCons = false
-		debugState()
+		--debugIdleConsState()
 	end
 
 	timer = timer + dt
