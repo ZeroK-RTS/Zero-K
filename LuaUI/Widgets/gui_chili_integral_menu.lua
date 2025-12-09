@@ -233,6 +233,7 @@ options = {
 		name = 'Show Radar Icons',
 		type='bool',
 		value=false,
+		update_on_the_fly=true,
 		desc = 'Displays the unit radar icons in the top-right corner of their build button in the command panel.',
 		OnChange = function(self)
 			radarIconsOptionStateChanged = true
@@ -242,6 +243,7 @@ options = {
 		name = "Radar Icon Size",
 		type = "number",
 		value = 50, min = 1, max = 100, step = 1,
+		update_on_the_fly=true,
 		desc = 'Determines the size of the unit radar icons in the command panel.',
 		OnChange = function(self)
 			radarIconsOptionStateChanged = true
