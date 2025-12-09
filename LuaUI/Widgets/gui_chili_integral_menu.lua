@@ -131,12 +131,27 @@ local selectionIndex = 0
 local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
-local radarIconsOptionStateChanged = false
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Options
+
+local radarIconSize = nil
+local function UpdateRadarIconSizeString(size)
+	size = tonumber(size) 
+	if size then
+		radarIconSize = string.format('%d%%', size)
+	end
+end
+
+local function UpdateRadarIcons(size)
+	UpdateRadarIconSizeString(size)
+	for i = 1, #commandPanels do
+		local buttons = commandPanels[i].buttons
+		buttons.UpdateRadarIcons()
+	end
+end
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
@@ -236,7 +251,7 @@ options = {
 		update_on_the_fly=true,
 		desc = 'Displays the unit radar icons in the top-right corner of their build button in the command panel.',
 		OnChange = function(self)
-			radarIconsOptionStateChanged = true
+			UpdateRadarIcons(self.value)
 		end,
 	},
 	radar_icon_size = {
@@ -246,7 +261,7 @@ options = {
 		update_on_the_fly=true,
 		desc = 'Determines the size of the unit radar icons in the command panel.',
 		OnChange = function(self)
-			radarIconsOptionStateChanged = true
+			UpdateRadarIcons(self.value)
 		end,
 	},
 	keyboardType2 = {
@@ -593,20 +608,6 @@ local lastRemovedTagResetFrame = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility
-local function UpdateRadarIconSizeString()
-	radarIconSize = string.format('%d%%', options.radar_icon_size.value)
-end
-
-local function UpdateRadarIconsIfNeeded()
-	if radarIconsOptionStateChanged then
-		UpdateRadarIconSizeString()
-		radarIconsOptionStateChanged = false
-		for i = 1, #commandPanels do
-			local buttons = commandPanels[i].buttons
-			buttons.UpdateRadarIcons()
-		end
-	end
-end
 
 local lastCmdID
 local function UpdateButtonSelection(cmdID)
@@ -1813,10 +1814,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 			for i = 1, #buttonList do
 				buttonList[i].ApplyRadarIcon()
 			end
-		else
-			if not radarIconsEnabled then
-				return
-			end
+		elseif radarIconsEnabled then
 			radarIconsEnabled = false
 			for i = 1, #buttonList do
 				buttonList[i].RemoveRadarIcon()
@@ -2357,15 +2355,15 @@ end
 --------------------------------------------------------------------------------
 -- Initialization
 
-local gridKeyMap, gridMap, gridCustomOverrides, radarIconSize -- Configuration requires this
+local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
-	UpdateRadarIconSizeString()
 	local screenWidth, screenHeight = spGetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
-
+	UpdateRadarIconSizeString(options.radar_icon_size.value)
+	
 	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType2.value)
 	
 	local mainWindow = Window:New{
@@ -2479,9 +2477,11 @@ local function InitializeControls()
 			OnTabSelect = function ()
 				data.queue.UpdateBuildProgress()
 				data.buttons.OnSelect()
-				if options.show_radar_icons.value then
-					data.buttons.UpdateRadarIcons()
-				end
+				data.buttons.UpdateRadarIcons()
+			end
+		else
+			OnTabSelect = function ()
+				data.buttons.UpdateRadarIcons()
 			end
 		end
 		
@@ -2489,10 +2489,6 @@ local function InitializeControls()
 	
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
-		end
-		
-		if options.show_radar_icons.value then
-			data.buttons.UpdateRadarIcons()
 		end
 	end
 	
@@ -2694,7 +2690,6 @@ function widget:Update()
 	local _,cmdID = spGetActiveCommand()
 	UpdateButtonSelection(cmdID)
 	UpdateReturnToOrders(cmdID)
-	UpdateRadarIconsIfNeeded()
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
