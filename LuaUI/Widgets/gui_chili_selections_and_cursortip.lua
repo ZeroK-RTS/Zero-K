@@ -1279,6 +1279,8 @@ local function GetImage(parentControl, name, initY, imageFile, iconSize, xOffset
 	return Update
 end
 
+local leftPanel, rightPanel
+
 local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
 	fontSize = fontSize or IMAGE_FONT
 	iconSize = iconSize or ICON_SIZE
@@ -1317,6 +1319,29 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 			label:SetPos(nil, yPos + textOffset, nil, nil, nil, true)
 		end
 		label:SetCaption(newCaption)
+		if parentControl == leftPanel and newCaption ~= nil then
+			local n = string.len(newCaption)
+			if nMaxCaptionCharacters == nil or n > nMaxCaptionCharacters then
+				nMaxCaptionCharacters = n
+				if leftPanel ~= nil and oldMaxCaptionCharacters ~= nMaxCaptionCharacters then
+					oldMaxCaptionCharacters = nMaxCaptionCharacters
+					Spring.Echo("nMaxCaptionCharacters:", nMaxCaptionCharacters, newCaption)
+					local w = LEFT_WIDTH
+					if nMaxCaptionCharacters > 10 then
+						Spring.Echo("BIG LEFT PANEL")
+						w = ICON_SIZE + nMaxCaptionCharacters * 5 + 2
+						leftPanel.minWidth = w
+						leftPanel:Resize(w, leftPanel.height)
+						rightPanel:SetPos(w, 0)
+					else
+						Spring.Echo("NORMAL LEFT PANEL")
+						leftPanel.minWidth = w
+						leftPanel:Resize(w, leftPanel.height)
+						rightPanel:SetPos(w, 0)
+					end
+				end
+			end
+		end
 		if newImage ~= imageFile then
 			if imageFile == nil then
 				label:SetPos(iconSize + 2, nil, nil, nil, nil, true)
@@ -2008,18 +2033,18 @@ end
 
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local selectedUnitID
-	
-	local leftPanel = Chili.Control:New{
+	leftPanel = Chili.Control:New{
 		name = "leftPanel",
 		x = 0,
 		y = 0,
 		width = LEFT_WIDTH,
 		minWidth = LEFT_WIDTH,
 		autosize = true,
+		resizable = true,
 		padding = {0,2,0,2},
 		parent = parentControl,
 	}
-	local rightPanel = Chili.Control:New{
+	rightPanel = Chili.Control:New{
 		name = "rightPanel",
 		x = LEFT_WIDTH,
 		y = 0,
@@ -2720,6 +2745,8 @@ local function UpdateTooltip(dt, requiredOnly)
 	tooltipWindow.SetVisible(visible)
 	if visible then
 		tooltipWindow.SetPosition(mx + 20/(WG.uiScale or 1), my - 20/(WG.uiScale or 1))
+	else
+		nMaxCaptionCharacters = 0
 	end
 end
 
@@ -2930,6 +2957,9 @@ local function InitializeWindParameters()
 	tidalHeight = Spring.GetGameRulesParam("tidalHeight")
 	econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
 end
+
+local oldMaxCaptionCharacters = 0
+local nMaxCaptionCharacters = 0
 
 local updateTimer = 0
 function widget:Update(dt)
