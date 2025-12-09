@@ -1290,18 +1290,17 @@ local function UpdatePanelWidthsIfNeeded(parentControl, caption)
 		return
 	end
 	nMaxCaptionCharacters = n
-	if oldMaxCaptionCharacters == nMaxCaptionCharacters then
-		return
-	end
-	oldMaxCaptionCharacters = nMaxCaptionCharacters
 	local w = LEFT_WIDTH
 	if nMaxCaptionCharacters > 10 then
 		-- icon, characters minus the color tags (HACK this assumes that the string has color tags)
 		w = ICON_SIZE + nMaxCaptionCharacters * 5 - 4
 	end
-	leftPanel.minWidth = w
-	leftPanel:Resize(w, leftPanel.height)
-	rightPanel:SetPos(w, 0)
+	if w ~= oldLeftPanelWidth then
+		oldLeftPanelWidth = w
+		leftPanel.minWidth = w
+		leftPanel:Resize(w, leftPanel.height)
+		rightPanel:SetPos(w, 0)
+	end
 end
 
 local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
@@ -2960,7 +2959,7 @@ local function InitializeWindParameters()
 	econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
 end
 
-local oldMaxCaptionCharacters = 0
+local oldLeftPanelWidth = LEFT_WIDTH
 local nMaxCaptionCharacters = 0
 
 local updateTimer = 0
