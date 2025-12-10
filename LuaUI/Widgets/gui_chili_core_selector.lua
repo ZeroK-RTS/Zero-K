@@ -431,14 +431,11 @@ end ]]
 
 local function ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
 	local transportID = fromConIDToCarryingTransportID[unitID]
-	if transportID ~= nil then
-		return fromConIDToCarryingTransportID[unitID]
-	end
-	return unitID
+	return transportID or unitID
 end
 
 local function IsConNotCarriedByEnemyTransport(unitID)
-	return consCarriedByEnemyTransports[unitID] == nil
+	return not consCarriedByEnemyTransports[unitID]
 end
 
 -- comm selection functionality
@@ -525,7 +522,7 @@ end
 local function SelectIdleCon_all()
 	local consToSelect = {}
 	for uid in pairs(idleCons) do
-		if uid ~= nil and uid ~= "count" then
+		if uid and uid ~= "count" then
 			if IsConNotCarriedByEnemyTransport(uid) then
 				consToSelect[ConvertConIDToTransportIdCarryingItIfNeeded(uid)] = true
 			end
@@ -1368,7 +1365,8 @@ local function GetConstructorButton(parent)
 		local total = 0
 		for unitID in pairs(idleCons) do
 			local transportID = fromConIDToCarryingTransportID[unitID]
-			if not (transportID ~= nil and idleTransports[transportID] == nil) then
+			-- only count idle constructors that aren't being carried by busy transports
+			if not (transportID and (not idleTransports[transportID])) then
 				total = total + 1
 			end
 		end
