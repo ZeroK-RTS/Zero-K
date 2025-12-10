@@ -1283,15 +1283,26 @@ local function UpdatePanelWidthsIfNeeded(caption, parentPanel, otherPanel)
 	if parentPanel.name ~= "leftPanel" or caption == nil then
 		return
 	end
+	local isTooltipVersion = parentPanel.parent.name == "tooltipWindow"
 	local n = string.len(caption)
-	if nMaxCaptionCharacters ~= nil and n <= nMaxCaptionCharacters then
+	local nMax = nil
+	if isTooltipVersion then
+		nMax = nMaxCaptionCharactersForTooltip
+	else
+		nMax = nMaxCaptionCharactersForSelection
+	end
+	if nMax ~= nil and n <= nMax then
 		return
 	end
-	nMaxCaptionCharacters = n
+	if isTooltipVersion then
+		nMaxCaptionCharactersForTooltip = n
+	else
+		nMaxCaptionCharactersForSelection = n
+	end
 	local w = LEFT_WIDTH
-	if nMaxCaptionCharacters > 10 then
+	if n > 10 then
 		-- icon, characters minus the color tags (HACK this assumes that the string has color tags)
-		w = ICON_SIZE + nMaxCaptionCharacters * 5 - 4
+		w = ICON_SIZE + n * 5 - 4
 	end
 	if w ~= parentPanel.minWidth then
 		parentPanel.minWidth = w
@@ -2030,6 +2041,7 @@ end
 
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local selectedUnitID
+	
 	local leftPanel = Chili.Control:New{
 		name = "leftPanel",
 		x = 0,
@@ -2465,6 +2477,15 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		rightPanel:SetVisibility(newVisible)
 	end
 	
+	function externalFunctions.ResetPanelWidths()
+		local w = LEFT_WIDTH
+		if leftPanel.minWidth ~= w then 
+			leftPanel.minWidth = w
+			leftPanel:Resize(w, leftPanel.height)
+			rightPanel:SetPos(w, 0)
+		end
+	end
+	
 	return externalFunctions
 end
 
@@ -2744,7 +2765,7 @@ local function UpdateTooltip(dt, requiredOnly)
 	if visible then
 		tooltipWindow.SetPosition(mx + 20/(WG.uiScale or 1), my - 20/(WG.uiScale or 1))
 	else
-		nMaxCaptionCharacters = 0
+		nMaxCaptionCharactersForTooltip = 0
 	end
 end
 
@@ -2820,6 +2841,8 @@ local function GetSelectionWindow()
 
 	function externalFunctions.ShowSingleUnit(unitID, unitDefID)
 		singleUnitID, singleUnitDefID = unitID, unitDefID or spGetUnitDefID(unitID)
+		nMaxCaptionCharactersForSelection = 0
+		singleUnitDisplay.ResetPanelWidths()
 		singleUnitDisplay.SetDisplay(unitID, singleUnitDefID)
 		singleUnitDisplay.SetVisible(true)
 		multiUnitDisplay.SetUnitDisplay()
@@ -2956,7 +2979,8 @@ local function InitializeWindParameters()
 	econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
 end
 
-local nMaxCaptionCharacters = 0
+local nMaxCaptionCharactersForTooltip = 0
+local nMaxCaptionCharactersForSelection = 0
 
 local updateTimer = 0
 function widget:Update(dt)
