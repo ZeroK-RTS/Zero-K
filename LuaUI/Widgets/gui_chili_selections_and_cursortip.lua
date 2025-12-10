@@ -546,10 +546,13 @@ local function Format(amount, displaySign, longMult)
 	return formatted
 end
 
-local function FormatPlusMinus(num)
-	if num > 0.04 then
+local function FormatPlusMinus(num, fuzz)
+	if fuzz == nil then
+		fuzz = 0.04
+	end
+	if num >= fuzz then
 		return green .. Format(num, true)
-	elseif num < -0.04 then
+	elseif num <= -fuzz then
 		return red .. Format(num, true)
 	end
 	return Format(num)
@@ -886,6 +889,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	local extraText = ""
 	local healthOverride = false
 	local minWind = 0
+	local isTidal = false
 	if econDef.isWind then
 		if mousePlaceX and mousePlaceY then
 			local _, pos = spTraceScreenRay(mousePlaceX, mousePlaceY, true)
@@ -898,8 +902,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 						extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. math.round(income, 1)
 						healthOverride = TIDAL_HEALTH
 						minWind = income
+						isTidal = true
 					else
-						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
+						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0.01, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
 						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome, 1) .. " - " .. math.round(windMax * mult * energyMult, 1)
 						income = (minWindIncome + mult * energyMult * windMax)/2
 						minWind = minWindIncome
@@ -962,9 +967,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		--.. "\n extraMetal: " .. extraMetalza
 		--.. "\n unitformCasePayback: " .. unitformCasePayback
 		--.. "\n worstCasePayback: " .. worstCasePayback
-		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride, minWind
+		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride, minWind, isTidal
 	end
-	return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "more energy required"), healthOverride, minWind
+	return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "more energy required"), healthOverride, minWind, isTidal
 end
 
 local function GetPlayerCaption(teamID)
@@ -2198,7 +2203,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local ud = UnitDefs[unitDefID]
 		local extraTooltip, healthOverride
 		if not (unitID or featureID) then
-			extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+			extraTooltip, healthOverride, minWind, isTidal = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
 		if extraTooltip then
 			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
@@ -2212,7 +2217,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
 			maxHealthLabel(true, health, IMAGE.HEALTH)
 			if mousePlaceX then
-				minWindLabel(true, FormatPlusMinus(minWind), IMAGE.WIND_SPEED)
+				local img = IMAGE.WIND_SPEED
+				if isTidal then
+					img = IMAGE.ENERGY
+				end
+				minWindLabel(true, FormatPlusMinus(minWind, 0), img)
 			else
 				minWindLabel(false)
 			end
@@ -2315,9 +2324,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			end
 			costInfoUpdate(true, cyan .. smallCostDisplay, IMAGE.COST, PIC_HEIGHT + 4)
 			
-			local extraTooltip, healthOverride, minWind
+			local extraTooltip, healthOverride
 			if not (unitID or featureID) then
-				extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY, true)
+				extraTooltip, healthOverride, _, _ = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY, true)
 			end
 			if extraTooltip then
 				unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
