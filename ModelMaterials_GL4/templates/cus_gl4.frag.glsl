@@ -1237,7 +1237,7 @@ void main(void){
 			
 			float wreckIntensity = fract((simFrame) * 0.025);
 			wreckIntensity = 0.4 + 0.55 * (min(0.5, wreckIntensity) + min(0.5, 1.0 - wreckIntensity) - 0.5);
-			wreckIntensity *= 0.5 + 0.5 * edge;
+			wreckIntensity = 0.2 + wreckIntensity * 0.8 * (0.5 + 0.5 * edge);
 
 			// Team colour highlight
 			vec4 mouseOverHighlight = vec4(0);
@@ -1257,7 +1257,7 @@ void main(void){
 			highLightOpacity = highLightOpacity * highLightOpacity;
 
 			// Mix some negative base colour intensity to mitigate over-highlighting bright map features
-			outColor.rgb += isWreck * mix(-1.0 * outColor.rgb, wreckHiglight * wreckIntensity, 0.8);
+			outColor.rgb += isWreck * mix(-1.0 * clamp((outColor.rgb - 0.2) * 1.25, 0.0, 1.0), wreckHiglight * wreckIntensity, 0.8);
 			outColor.rgb = mix(outColor.rgb, clamp(outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, 0.0, 0.95), mouseoverOpacity);
 		}
 	#endif 
