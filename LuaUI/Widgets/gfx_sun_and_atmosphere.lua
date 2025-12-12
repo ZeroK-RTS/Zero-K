@@ -69,6 +69,11 @@ end
 
 local sunDir = 0
 local sunPitch = math.pi*0.8
+local forceUpdateTable = {
+	["unitAmbientColor"] = {0, 0, 0},
+	["unitDiffuseColor"] = {0, 0, 0},
+	["unitSpecularColor"] = {0, 0, 0},
+}
 
 local function FullSunUpdate()
 	local sunData = {}
@@ -76,6 +81,7 @@ local function FullSunUpdate()
 		local name = sunSettingsList[i]
 		sunData[name] = options[name].value
 	end
+	Spring.SetSunLighting(forceUpdateTable) -- Unit colours don't always update when only one key changes.
 	Spring.SetSunLighting(sunData)
 end
 
@@ -107,6 +113,8 @@ local function GetSunDirection()
 	--Spring.Echo("SunVec", sx, sy, sz, pitch, dir)
 	return pitch, dir
 end
+
+sunPitch, sunDir = GetSunDirection() -- Initialise defaults so they can be reset to.
 
 local function UpdateSunValue(name, value)
 	Spring.SetSunLighting({[name] = value}) -- For specularExponent, which isn't in sunSettingsList
