@@ -158,7 +158,7 @@ in DataVS {
 out DataGS {
 	vec2 alphaFog;
 	vec2 uv; // uvs are [0.0,2.0]  for flipping, where > 1.0 means flip
-	vec2 mirrorParams;
+	vec4 mirrorParams;
 };
 
 
@@ -179,7 +179,7 @@ bool MyEmitTestVertex(vec3 vertexOffset, bool testme) {
 	#endif
 
 	const vec2 edgeTightening = vec2(0.0); // to tighten edges a little better
-	worldPos.xz = abs(dataIn[0].vMirrorParams.xy * mapSize.xy - worldPos.xz);
+	worldPos.xz = abs(clamp(dataIn[0].vMirrorParams.xy, 0.0, 1.0) * mapSize.xy - worldPos.xz);
 	worldPos.xz += dataIn[0].vMirrorParams.zw * (mapSize.xy - edgeTightening);
 
 	float alpha = 1.0;
@@ -190,12 +190,12 @@ bool MyEmitTestVertex(vec3 vertexOffset, bool testme) {
 		alpha = 0.0;
 
 		vec2 refPoint = SNORM2NORM(dataIn[0].vMirrorParams.zw) * mapSize.xy;
-		if (dataIn[0].vMirrorParams.x != 0.0) {
+		if (dataIn[0].vMirrorParams.x > 0.0) {
 			worldPos.y -= pow((worldPos.x - refPoint.x) / curvatureBend, 2.0);
 			alpha -= pow((worldPos.x - refPoint.x) / mapSize.x, 2.0);
 		}
 
-		if (dataIn[0].vMirrorParams.y != 0.0) {
+		if (dataIn[0].vMirrorParams.y > 0.0) {
 			worldPos.y -= pow((worldPos.z - refPoint.y) / curvatureBend, 2.0);
 			alpha -= pow((worldPos.z - refPoint.y) / mapSize.y, 2.0);
 		}
@@ -274,7 +274,7 @@ void main() {
 	
 		}
 	}else{
-		if ( all(equal(dataIn[0].vMirrorParams.xy, vec2(1.0))) ) {
+		if ( all(equal(clamp(dataIn[0].vMirrorParams.xy, 0.0, 1.0), vec2(1.0))) ) {
 			if (MyEmitTestVertex(vec3(gridSize, 0.0,      0.0), true)) return;; //TR
 				MyEmitTestVertex(vec3(0.0     , 0.0,      0.0),false); //TL
 				MyEmitTestVertex(vec3(gridSize, 0.0, gridSize),false); //BR
@@ -332,7 +332,7 @@ uniform vec4 shaderParams;
 in DataGS {
 	vec2 alphaFog;
 	vec2 uv;
-	vec2 mirrorParams;
+	vec4 mirrorParams;
 };
 
 #ifdef DEFERRED_MODE
@@ -396,7 +396,14 @@ void main() {
 	expSecond = expSecond * expSecond;
 	expSecond = expSecond * expSecond * 0.5;
 	
-	float mapDistance = min(min(fractUV.x, 1.0 - fractUV.x), min(fractUV.y, 1.0 - fractUV.y));
+	float mapDistance = 0.0;
+	if (abs(mirrorParams.z) > 0.5 && abs(mirrorParams.w) > 0.5) {
+		float xd = clamp((mirrorParams.z + 1.0) * 0.5 - mirrorParams.z * fractUV.x, 0.0, 1.0);
+		float yd = clamp((mirrorParams.w + 1.0) * 0.5 - mirrorParams.w * fractUV.y, 0.0, 1.0);
+		mapDistance = sqrt(xd * xd + yd * yd);
+	} else {
+		mapDistance = min(min(fractUV.x, 1.0 - fractUV.x) + abs(mirrorParams.w), min(fractUV.y, 1.0 - fractUV.y) + abs(mirrorParams.z));
+	}
 	float vorProp = clamp((1.0 - mapDistance) * (1.0 - mapDistance) * (1.0 - mapDistance) - 0.5, 0.0, 0.5) * 2.0;
 	
 	vec4 finalColor = texture(colorTex, clampUv) * 0.5 + texture(colorTex, clampBest) * 0.5;
@@ -425,8 +432,8 @@ void main() {
 	finalColor.rgb = finalColor.rgb * (dot(mapNormal, sunDir.xyz) * 0.5 + 1.0);
 	
 	// Flip normals if the mirror is flipped, after using the sun direction
-	if (abs(mirrorParams.x) > 0.5) mapNormal.x *= -1.0; 
-	if (abs(mirrorParams.y) > 0.5)  mapNormal.z *= -1.0;
+	if (mirrorParams.x > 0.0) mapNormal.x *= -1.0; 
+	if (mirrorParams.y > 0.0)  mapNormal.z *= -1.0;
 
 	finalColor.rgb = mix(fogColor.rgb, finalColor.rgb, alphaFog.y);
 	finalColor.a = alphaFog.x; 
@@ -490,7 +497,7 @@ uniform vec4 shaderParams;
 out DataGS {
 	vec2 alphaFog;
 	vec2 uv;
-	vec2 mirrorParams;
+	vec4 mirrorParams;
 };
 #line 11000
 void main() {
@@ -501,14 +508,14 @@ void main() {
 	vec4 worldPos = vec4(uv.x, 0.0, uv.y, 1.0);
 	
 	
-	//worldPos.xz = mix(worldPos.xz, 1.0 - worldPos.xz, flip) + offset;
+	//worldPos.xz = mix(worldPos.xz, 1.0 - worldPos.xz, clamp(flip, 0.0, 1.0)) + offset;
 	worldPos.xz += offset;
 	
 	worldPos.xz *= mapSize.xy;
 	
-	uv = mix(uv, 1.0 - uv, flip);
+	uv = mix(uv, 1.0 - uv, clamp(flip, 0.0, 1.0));
 
-	mirrorParams = aMirrorParams.xy;
+	mirrorParams = aMirrorParams;
 	
 	worldPos.y = textureLod(heightTex, heightmapUVatWorldPos(uv * mapSize.xy), 0.0).x;
 	
@@ -524,12 +531,12 @@ void main() {
 		alpha = 0.0;
 
 		vec2 refPoint = SNORM2NORM(offset) * mapSize.xy;
-		if (flip.x != 0.0) {
+		if (flip.x > 0.0) {
 			worldPos.y -= pow((worldPos.x - refPoint.x) / curvatureBend, 2.0);
 			alpha -= pow((worldPos.x - refPoint.x) / mapSize.x, 2.0);
 		}
 
-		if (flip.y != 0.0) {
+		if (flip.y > 0.0) {
 			worldPos.y -= pow((worldPos.z - refPoint.y) / curvatureBend, 2.0);
 			alpha -= pow((worldPos.z - refPoint.y) / mapSize.y, 2.0);
 		}
@@ -748,64 +755,64 @@ local function UpdateMirrorParams()
 	-- spIsAABBInView params are copied from map_edge_extension.lua
 	if spIsAABBInView(-Game.mapSizeX, minY, -Game.mapSizeZ, borderMargin, maxY, borderMargin) then
 		--TL {1, 1, -1, -1}
-		mirrorParams[#mirrorParams + 1] =  1
-		mirrorParams[#mirrorParams + 1] =  1
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] = -1
 		mirrorParams[#mirrorParams + 1] = -1
 	end
 
 	if spIsAABBInView(-Game.mapSizeX, minY, -borderMargin, 0, maxY, Game.mapSizeZ) then
 		--ML {1, 0, -1,  0}
-		mirrorParams[#mirrorParams + 1] =  1
-		mirrorParams[#mirrorParams + 1] =  0
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  -Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] = -1
 		mirrorParams[#mirrorParams + 1] =  0
 	end
 
 	if spIsAABBInView(-Game.mapSizeX, minY, Game.mapSizeZ - borderMargin, borderMargin, maxY, Game.mapSizeZ * 2) then
 		--BL {1, 1, -1,  1}
-		mirrorParams[#mirrorParams + 1] =  1
-		mirrorParams[#mirrorParams + 1] =  1
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] = -1
 		mirrorParams[#mirrorParams + 1] =  1
 	end
 
 	if spIsAABBInView(-borderMargin, minY, -Game.mapSizeZ, Game.mapSizeX + borderMargin, maxY, borderMargin) then
 		--TM {0, 1,  0, -1}
-		mirrorParams[#mirrorParams + 1] =  0
-		mirrorParams[#mirrorParams + 1] =  1
+		mirrorParams[#mirrorParams + 1] =  -Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] =  0
 		mirrorParams[#mirrorParams + 1] = -1
 	end
 
 	if spIsAABBInView(-borderMargin, minY, Game.mapSizeZ * 2, Game.mapSizeX + borderMargin, maxY, Game.mapSizeZ - borderMargin) then
 		--BM {0, 1,  0,  1}
-		mirrorParams[#mirrorParams + 1] =  0
-		mirrorParams[#mirrorParams + 1] =  1
+		mirrorParams[#mirrorParams + 1] =  -Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] =  0
 		mirrorParams[#mirrorParams + 1] =  1
 	end
 
 	if spIsAABBInView(Game.mapSizeX - borderMargin, minY, -Game.mapSizeZ, Game.mapSizeX * 2, maxY, borderMargin) then
 		--TR {1, 1,  1, -1}
-		mirrorParams[#mirrorParams + 1] =  1
-		mirrorParams[#mirrorParams + 1] =  1
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] =  1
 		mirrorParams[#mirrorParams + 1] = -1
 	end
 
 	if spIsAABBInView(Game.mapSizeX - borderMargin, minY, -borderMargin, Game.mapSizeX * 2, maxY, Game.mapSizeZ) then
 		--MR {1, 0,  1,  0}
-		mirrorParams[#mirrorParams + 1] =  1
-		mirrorParams[#mirrorParams + 1] =  0
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  -Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] =  1
 		mirrorParams[#mirrorParams + 1] =  0
 	end
 
 	if spIsAABBInView(Game.mapSizeX - borderMargin, minY, Game.mapSizeZ - borderMargin, Game.mapSizeX * 2, maxY, Game.mapSizeZ * 2) then
 		--BR {1, 1,  1,  1}
-		mirrorParams[#mirrorParams + 1] =  1
-		mirrorParams[#mirrorParams + 1] =  1
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] =  Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] =  1
 		mirrorParams[#mirrorParams + 1] =  1
 	end
@@ -815,8 +822,8 @@ local function UpdateMirrorParams()
 		
 		-- EXTREMELY IMPORTANT: 
 		-- Add a blank, non-mirrored or offset one to the forward pass for the edge seams
-		mirrorParams[#mirrorParams + 1] = 0
-		mirrorParams[#mirrorParams + 1] = 0
+		mirrorParams[#mirrorParams + 1] = -Game.mapSizeX
+		mirrorParams[#mirrorParams + 1] = -Game.mapSizeZ
 		mirrorParams[#mirrorParams + 1] = 0
 		mirrorParams[#mirrorParams + 1] = 0
 		terrainInstanceVBO:Upload(mirrorParams)
