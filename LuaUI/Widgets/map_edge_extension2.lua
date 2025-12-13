@@ -343,10 +343,6 @@ in DataGS {
 	out vec4 fragColor;
 #endif
 
-vec2 random2(vec2 gridPoint) { // Book of shaders
-	return fract(sin(vec2(dot(gridPoint, vec2(127.1,311.7)), dot(gridPoint, vec2(269.5,183.3))))*43758.5453) * 0.01;
-}
-
 const mat3 RGB2YCBCR = mat3(
 	0.2126, -0.114572, 0.5,
 	0.7152, -0.385428, -0.454153,
@@ -359,57 +355,34 @@ const mat3 YCBCR2RGB = mat3(
 
 void main() {
 	vec2 fractUV = uv;
-	
-	float bestDistSq = 2.0;
-	vec2 bestVorPos = vec2(0, 0);
-	float secondBestDistSq = 2.0;
-	vec2 secondBestVorPos = vec2(0, 0);
-	for(int j=-1; j<=1; j++) {
-		for(int i=-1; i<=1; i++) {
-			vec2 vorPos = vec2(floor(fractUV.x * 100.0 + i) / 100.0, floor(fractUV.y * 100.0 + j) / 100.0);
-			vorPos = vorPos + random2(vorPos);
-			vec2 distVec = vorPos - fractUV;
-			float distSq = dot(distVec, distVec);
-			if (distSq <= bestDistSq) {
-				secondBestDistSq = bestDistSq;
-				secondBestVorPos = bestVorPos;
-				bestDistSq = distSq;
-				bestVorPos = vorPos;
-			} else if (distSq <= secondBestDistSq) {
-				secondBestDistSq = distSq;
-				secondBestVorPos = vorPos;
-			}
-		}
-	}
-
 	#define MINIMAP_HALF_TEXEL (0.5/1024.0)
 
 	// remove tiling seams from minimap texel edges
 	vec2 clampUv = clamp(fractUV, MINIMAP_HALF_TEXEL, 1.0 - MINIMAP_HALF_TEXEL); 
-	vec2 clampBest = clamp(bestVorPos, MINIMAP_HALF_TEXEL, 1.0 - MINIMAP_HALF_TEXEL); 
-	vec2 clampSecondBest = clamp(secondBestVorPos, MINIMAP_HALF_TEXEL, 1.0 - MINIMAP_HALF_TEXEL);
-	
-	float secondFrac = clamp(2.0 * bestDistSq / (bestDistSq + secondBestDistSq), 0.0, 1.0);
-	float expSecond = secondFrac * secondFrac;
-	expSecond = expSecond * expSecond;
-	expSecond = expSecond * expSecond;
-	expSecond = expSecond * expSecond;
-	expSecond = expSecond * expSecond * 0.5;
-	
+	vec2 scale = abs(mirrorParams.xy);
+
 	float mapDistance = 0.0;
 	if (abs(mirrorParams.z) > 0.5 && abs(mirrorParams.w) > 0.5) {
-		float xd = clamp((mirrorParams.z + 1.0) * 0.5 - mirrorParams.z * fractUV.x, 0.0, 1.0);
-		float yd = clamp((mirrorParams.w + 1.0) * 0.5 - mirrorParams.w * fractUV.y, 0.0, 1.0);
+		float xd = clamp((mirrorParams.z + 1.0) * 0.5 - mirrorParams.z * fractUV.x, 0.0, 1.0) * scale.x;
+		float yd = clamp((mirrorParams.w + 1.0) * 0.5 - mirrorParams.w * fractUV.y, 0.0, 1.0) * scale.y;
 		mapDistance = sqrt(xd * xd + yd * yd);
 	} else {
-		mapDistance = min(min(fractUV.x, 1.0 - fractUV.x) + abs(mirrorParams.w), min(fractUV.y, 1.0 - fractUV.y) + abs(mirrorParams.z));
+		mapDistance = min((min(fractUV.x, 1.0 - fractUV.x) + abs(mirrorParams.w)) * scale.x, (min(fractUV.y, 1.0 - fractUV.y) + abs(mirrorParams.z)) * scale.y);
 	}
-	float vorProp = clamp((1.0 - mapDistance) * (1.0 - mapDistance) * (1.0 - mapDistance) - 0.5, 0.0, 0.5) * 2.0;
+	float cellFactor = clamp(mapDistance / 1600.0, 0.0, 1.0);
+	vec2 gridCell = vec2(fractUV.x * scale.x / 32.0, fractUV.y * scale.y / 32.0);
+	float edgeDist = min(min(fract(gridCell.x), 1.0 - fract(gridCell.x)), min(fract(gridCell.y), 1.0 - fract(gridCell.y)));
+	float edgeFactor = 1.0 - clamp(edgeDist*60.0 - 0.4, 0.0, 1.0);
 	
-	vec4 finalColor = texture(colorTex, clampUv) * 0.5 + texture(colorTex, clampBest) * 0.5;
-	if (secondFrac > vorProp*0.999) {
-		finalColor = finalColor*0.2;
+	vec4 finalColor = texture(colorTex, clampUv);
+	if (edgeFactor > 0.0) {
+		finalColor = mix(vec4(0.0, 0.0, 0.0, 1.0) * edgeFactor, finalColor, cellFactor);
 	}
+	else {
+		vec2 gridMid = vec2(floor(gridCell.x) / scale.x * 32.0, floor(gridCell.y) / scale.y * 32.0);
+		finalColor = mix(texture(colorTex, gridMid), finalColor, cellFactor) * ( 0.7 + 0.3 * cellFactor);
+	}
+	
 	#if 1
 		vec3 yCbCr = RGB2YCBCR * finalColor.rgb;
 		yCbCr.x = clamp(yCbCr.x * brightness, 0.0, 1.0);
@@ -822,8 +795,8 @@ local function UpdateMirrorParams()
 		
 		-- EXTREMELY IMPORTANT: 
 		-- Add a blank, non-mirrored or offset one to the forward pass for the edge seams
-		mirrorParams[#mirrorParams + 1] = -Game.mapSizeX
-		mirrorParams[#mirrorParams + 1] = -Game.mapSizeZ
+		mirrorParams[#mirrorParams + 1] = 0
+		mirrorParams[#mirrorParams + 1] = 0
 		mirrorParams[#mirrorParams + 1] = 0
 		mirrorParams[#mirrorParams + 1] = 0
 		terrainInstanceVBO:Upload(mirrorParams)
