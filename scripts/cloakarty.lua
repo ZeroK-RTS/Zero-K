@@ -33,7 +33,6 @@ local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
-	Spring.Echo("START MOVING")
 	local side = 1
 	while true do
 		local speedmod = GetSpeedMod()
@@ -43,9 +42,6 @@ local function Walk()
 		Turn (ankle[side], x_axis, math.rad(30), math.rad(230)*truespeed)
 		Turn (thigh[side], x_axis, math.rad(-45), math.rad(135)*truespeed)
 		Turn (thigh[3-side], x_axis, math.rad(45), math.rad(135)*truespeed)
-		Spring.Echo("==== Turn callouts", Spring.GetGameFrame(), "====")
-		Spring.Echo("Turn", thigh[side], (-45)%360, 135*truespeed)
-		Spring.Echo("Turn", thigh[3-side], (45)%360, 135*truespeed)
 		if not isAiming then
 			Turn (torso, x_axis, math.rad(20) - math.rad(5)*side, math.rad(45)*truespeed)
 			Turn (torso, y_axis, math.rad(30) - math.rad(20)*side, math.rad(45)*truespeed)
@@ -59,19 +55,12 @@ local function Walk()
 		Move (waist, y_axis, -2.0, 8*truespeed)
 		
 		local x,y,z = Spring.UnitScript.GetPieceRotation(thigh[1])
-		Spring.Echo("==== PRE TURN", Spring.GetGameFrame(), "====", "wait", thigh[side])
-		Spring.Echo("Piece", thigh[1], math.floor(x%(2 * math.pi)*(180 / math.pi)))
 		x,y,z = Spring.UnitScript.GetPieceRotation(thigh[2])
-		Spring.Echo("Piece", thigh[2], math.floor(x%(2 * math.pi)*(180 / math.pi)))
 		
 		WaitForTurn (thigh[side], x_axis)
 		
 		local x,y,z = Spring.UnitScript.GetPieceRotation(thigh[1])
-		Spring.Echo("==== AFTER TURN", Spring.GetGameFrame(), "====", "wait", thigh[side])
-		Spring.Echo("Piece", thigh[1], math.floor(x%(2 * math.pi)*(180 / math.pi)))
 		x,y,z = Spring.UnitScript.GetPieceRotation(thigh[2])
-		Spring.Echo("Piece", thigh[2], math.floor(x%(2 * math.pi)*(180 / math.pi)))
-		
 		side = 3 - side
 	end
 end
