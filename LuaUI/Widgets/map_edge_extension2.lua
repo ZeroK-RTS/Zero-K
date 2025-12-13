@@ -10,7 +10,7 @@ function widget:GetInfo()
     date      = "2020",
     license   = "GPL",
     layer     = 0,
-    enabled   = true,
+    enabled   = false,
   }
 end
 
@@ -397,11 +397,11 @@ void main() {
 	expSecond = expSecond * expSecond * 0.5;
 	
 	float mapDistance = min(min(fractUV.x, 1.0 - fractUV.x), min(fractUV.y, 1.0 - fractUV.y));
-	float vorProp = (1.0 - mapDistance) * (1.0 - mapDistance) * (1.0 - mapDistance);
+	float vorProp = clamp((1.0 - mapDistance) * (1.0 - mapDistance) * (1.0 - mapDistance) - 0.5, 0.0, 0.5) * 2.0;
 	
-	vec4 finalColor = texture(colorTex, clampBest) * (1.0 - expSecond) + texture(colorTex, clampSecondBest) * expSecond;
-	if (secondFrac > vorProp) {
-		finalColor = vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 finalColor = texture(colorTex, clampUv) * 0.5 + texture(colorTex, clampBest) * 0.5;
+	if (secondFrac > vorProp*0.999) {
+		finalColor = finalColor*0.2;
 	}
 	#if 1
 		vec3 yCbCr = RGB2YCBCR * finalColor.rgb;
