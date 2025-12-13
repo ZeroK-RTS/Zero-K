@@ -1944,6 +1944,7 @@ end
 -- Gadget Callins
 --------------------------------------------------------------------
 
+local updateCloaked = 5
 function gadget:GameFrame(n)
 	if not itsXmas and SYNCED.itsXmas then
 		itsXmas = true
@@ -1952,6 +1953,18 @@ function gadget:GameFrame(n)
 	end
 	for unitID, buildProgress in pairs(buildProgresses) do
 		UpdateBuildProgress(unitID, buildProgress)
+	end
+	if updateCloaked then
+		updateCloaked = updateCloaked - 1
+		if updateCloaked <= 0 then
+			for _, unitID in ipairs(Spring.GetAllUnits()) do
+				if Spring.GetUnitIsCloaked(unitID) then
+					gadget:UnitDecloaked(unitID)
+					gadget:UnitCloaked(unitID)
+				end
+			end
+			updateCloaked = false
+		end
 	end
 end
 
