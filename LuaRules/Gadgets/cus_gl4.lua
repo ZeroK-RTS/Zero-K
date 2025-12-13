@@ -849,7 +849,7 @@ local function IsTree(featureDef)
 	if knowntrees[name] then
 		return true
 	end
-	return (name:find("tree", nil, true) or name:find("pine", nil, true)) and not name:find("stree", nil, true) -- sTREEtlight
+	return (name:find("tree", nil, true) or name:find("pine", nil, true) or name:find("palm", nil, true)) and not name:find("stree", nil, true) -- sTREEtlight
 end
 
 local knownPbrFeatures = VFS.Include("modelmaterials_gl4/known_pbr_features.lua")

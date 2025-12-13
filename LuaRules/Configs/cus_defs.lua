@@ -78,7 +78,7 @@ local uniformBins = {
 		-- any whitelisted tree in ModelMaterials_GL4/known_feature_trees.lua, or with featureDef.customParams.treeshader = 'yes', or which contains 'tree' and not 'stree'
 		bitOptions = defaultBitShaderOptions + OPTION_TREEWIND + OPTION_PBROVERRIDE,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1.1,
+		brightnessFactor = 0.9,
 	},
 	wreck = {
 		-- any feature referenced in a unitDef.corpse, or featureDef.featureDead or with '_x', '_dead' or '_heap' in the name
