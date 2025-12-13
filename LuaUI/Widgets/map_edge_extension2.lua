@@ -3,7 +3,7 @@ local widget = widget ---@type Widget
 
 function widget:GetInfo()
   return {
-    name      = "Map Edge Extension",
+    name      = "Map Edge Extension 2",
     version   = "v0.7",
     desc      = "Draws a mirrored map next to the edges of the real map",
     author    = "ivand",
@@ -51,9 +51,9 @@ local normalTex = '$ssmf_normals'
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local LuaShader = gl.LuaShader
-local InstanceVBOTable = gl.InstanceVBOTable
-
+local luaShaderDir = "LuaUI/Widgets/Include/"
+local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
+local InstanceVboTable = VFS.Include(luaShaderDir.."InstanceVboTableWrapper.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -380,12 +380,12 @@ void main() {
 		mapNormal = normalize(texture(mapNormalTex,clamp(uv, MINIMAP_HALF_TEXEL / 4.0, 1.0 - (MINIMAP_HALF_TEXEL/4.0))).rbg * 2.0 - 1.0);
 	#endif
 
-	// Flip normals if the mirror is flipped
-	if (abs(mirrorParams.x) > 0.5) mapNormal.x *= -1.0; 
-	if (abs(mirrorParams.y) > 0.5)  mapNormal.z *= -1.0;
-
 	// Apply some lighting based on the normal vector
 	finalColor.rgb = finalColor.rgb * (dot(mapNormal, sunDir.xyz) * 0.5 + 1.0);
+	
+	// Flip normals if the mirror is flipped, after using the sun direction
+	if (abs(mirrorParams.x) > 0.5) mapNormal.x *= -1.0; 
+	if (abs(mirrorParams.y) > 0.5)  mapNormal.z *= -1.0;
 
 	finalColor.rgb = mix(fogColor.rgb, finalColor.rgb, alphaFog.y);
 	finalColor.a = alphaFog.x; 
@@ -525,9 +525,6 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	if Spring.Lava.isLavaMap == true then
-		widgetHandler:RemoveWidget(self)
-	end
 
 	WG['mapedgeextension'] = {}
 	WG['mapedgeextension'].getBrightness = function()
@@ -588,8 +585,8 @@ function widget:Initialize()
 		{id = 1, name = "mirrorParams", size = 4},
 	})
 	
-	local planeVBO, numVertices = InstanceVBOTable.makePlaneVBO(1,1,Game.mapSizeX/gridSizeDeferred,Game.mapSizeZ/gridSizeDeferred)
-	local planeIndexVBO, numIndices =  InstanceVBOTable.makePlaneIndexVBO(Game.mapSizeX/gridSizeDeferred,Game.mapSizeZ/gridSizeDeferred)
+	local planeVBO, numVertices = InstanceVboTable.makePlaneVBO(1,1,Game.mapSizeX/gridSizeDeferred,Game.mapSizeZ/gridSizeDeferred)
+	local planeIndexVBO, numIndices =  InstanceVboTable.makePlaneIndexVBO(Game.mapSizeX/gridSizeDeferred,Game.mapSizeZ/gridSizeDeferred)
 	planeVAO = gl.GetVAO()
 	planeVAO:AttachVertexBuffer(planeVBO)
 	planeVAO:AttachIndexBuffer(planeIndexVBO)
