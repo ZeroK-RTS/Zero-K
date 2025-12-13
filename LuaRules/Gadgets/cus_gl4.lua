@@ -2201,7 +2201,7 @@ function gadget:DrawWorldPreUnit()
 			local firstunits = Spring.GetVisibleUnits()
 			local firstdrawFlagsUnits = {}
 			for i, unitID in ipairs(firstunits) do
-				firstdrawFlagsUnits[i] = 1 + 4 + 16
+				firstdrawFlagsUnits[i] = Spring.GetUnitDrawFlag(unitID)
 			end
 			ProcessUnits(firstunits, firstdrawFlagsUnits, gameFrame, "firstDraw")
 			firstDraw = false
