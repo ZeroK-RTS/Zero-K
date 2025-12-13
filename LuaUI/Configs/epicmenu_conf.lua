@@ -727,7 +727,7 @@ local pathSSAO = 'Settings/Graphics/Ambient Occlusion'
 	ShButton(
 		pathSSAO, 'Toggle SSAO',
 		function()
-			spSendCommands{"luaui togglewidget ssao 3"}
+			spSendCommands{"luaui togglewidget ssao 6"}
 		end, "Toggle Screen Space Ambient Occlusion. It essentially adds a bit of shading to everything.")
 	AddOption(pathSSAO,
 		{
@@ -739,9 +739,9 @@ local pathSSAO = 'Settings/Graphics/Ambient Occlusion'
 				WG.SSAO_RequireDeferredRendering = self.value
 				if WG.WidgetEnabledAndActive then
 					if self.value and not WG.WidgetEnabledAndActive("Deferred rendering") then
-						spSendCommands{"luaui disablewidget ssao 3"}
+						spSendCommands{"luaui disablewidget ssao 6"}
 					else
-						spSendCommands{"luaui enablewidget ssao 3"}
+						spSendCommands{"luaui enablewidget ssao 6"}
 					end
 				end
 			end,
