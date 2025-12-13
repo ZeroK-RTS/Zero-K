@@ -343,6 +343,10 @@ in DataGS {
 	out vec4 fragColor;
 #endif
 
+vec2 random2(vec2 gridPoint) { // Book of shaders
+	return fract(sin(vec2(dot(gridPoint, vec2(127.1,311.7)), dot(gridPoint, vec2(269.5,183.3))))*43758.5453) * 0.01;
+}
+
 const mat3 RGB2YCBCR = mat3(
 	0.2126, -0.114572, 0.5,
 	0.7152, -0.385428, -0.454153,
@@ -355,13 +359,50 @@ const mat3 YCBCR2RGB = mat3(
 
 void main() {
 	vec2 fractUV = uv;
+	
+	float bestDistSq = 2.0;
+	vec2 bestVorPos = vec2(0, 0);
+	float secondBestDistSq = 2.0;
+	vec2 secondBestVorPos = vec2(0, 0);
+	for(int j=-1; j<=1; j++) {
+		for(int i=-1; i<=1; i++) {
+			vec2 vorPos = vec2(floor(fractUV.x * 100.0 + i) / 100.0, floor(fractUV.y * 100.0 + j) / 100.0);
+			vorPos = vorPos + random2(vorPos);
+			vec2 distVec = vorPos - fractUV;
+			float distSq = dot(distVec, distVec);
+			if (distSq <= bestDistSq) {
+				secondBestDistSq = bestDistSq;
+				secondBestVorPos = bestVorPos;
+				bestDistSq = distSq;
+				bestVorPos = vorPos;
+			} else if (distSq <= secondBestDistSq) {
+				secondBestDistSq = distSq;
+				secondBestVorPos = vorPos;
+			}
+		}
+	}
 
 	#define MINIMAP_HALF_TEXEL (0.5/1024.0)
 
 	// remove tiling seams from minimap texel edges
-	vec2 clampeduv = clamp(uv, MINIMAP_HALF_TEXEL, 1.0 - MINIMAP_HALF_TEXEL); 
+	vec2 clampUv = clamp(fractUV, MINIMAP_HALF_TEXEL, 1.0 - MINIMAP_HALF_TEXEL); 
+	vec2 clampBest = clamp(bestVorPos, MINIMAP_HALF_TEXEL, 1.0 - MINIMAP_HALF_TEXEL); 
+	vec2 clampSecondBest = clamp(secondBestVorPos, MINIMAP_HALF_TEXEL, 1.0 - MINIMAP_HALF_TEXEL);
 	
-	vec4 finalColor = texture(colorTex, clampeduv);
+	float secondFrac = clamp(2.0 * bestDistSq / (bestDistSq + secondBestDistSq), 0.0, 1.0);
+	float expSecond = secondFrac * secondFrac;
+	expSecond = expSecond * expSecond;
+	expSecond = expSecond * expSecond;
+	expSecond = expSecond * expSecond;
+	expSecond = expSecond * expSecond * 0.5;
+	
+	float mapDistance = min(min(fractUV.x, 1.0 - fractUV.x), min(fractUV.y, 1.0 - fractUV.y));
+	float vorProp = (1.0 - mapDistance) * (1.0 - mapDistance) * (1.0 - mapDistance);
+	
+	vec4 finalColor = texture(colorTex, clampBest) * (1.0 - expSecond) + texture(colorTex, clampSecondBest) * expSecond;
+	if (secondFrac > vorProp) {
+		finalColor = vec4(0.0, 0.0, 0.0, 1.0);
+	}
 	#if 1
 		vec3 yCbCr = RGB2YCBCR * finalColor.rgb;
 		yCbCr.x = clamp(yCbCr.x * brightness, 0.0, 1.0);
@@ -373,11 +414,11 @@ void main() {
 	// Note that normals are Z up in textures, but Y up in the world
 	vec3 mapNormal = vec3(0);
 	#ifdef DEFERRED_MODE
-		mapNormal.xz = texture(mapNormalTex,clampeduv).ra;
+		mapNormal.xz = texture(mapNormalTex, clampUv).ra;
 		mapNormal.y = sqrt(1.0 - dot(mapNormal.xz, mapNormal.xz));
 		mapNormal = normalize(mapNormal);
 	#else
-		mapNormal = normalize(texture(mapNormalTex,clamp(uv, MINIMAP_HALF_TEXEL / 4.0, 1.0 - (MINIMAP_HALF_TEXEL/4.0))).rbg * 2.0 - 1.0);
+		mapNormal = normalize(texture(mapNormalTex,clamp(fractUV, MINIMAP_HALF_TEXEL / 4.0, 1.0 - (MINIMAP_HALF_TEXEL/4.0))).rbg * 2.0 - 1.0);
 	#endif
 
 	// Apply some lighting based on the normal vector
@@ -400,7 +441,7 @@ void main() {
 			fragData[GBUFFER_DIFFTEX_IDX] = finalColor;
 		#endif
 		#if GBUFFER_COUNT > 2
-			fragData[GBUFFER_SPECTEX_IDX] = vec4(0);		
+			fragData[GBUFFER_SPECTEX_IDX] = vec4(0);
 		#endif
 		#if GBUFFER_COUNT > 3
 			fragData[GBUFFER_EMITTEX_IDX] = vec4(0);
