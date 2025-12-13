@@ -206,7 +206,7 @@ const float EPS = 1e-4;
 
 /***********************************************************************/
 // PBR constants
-const float MIN_ROUGHNESS = 0.25;
+const float MIN_ROUGHNESS = 0.02;
 const float DEFAULT_F0 = 0.04;
 
 /***********************************************************************/
@@ -925,6 +925,20 @@ void main(void){
 	#endif
 
 	roughness = clamp(roughness, MIN_ROUGHNESS, 1.0);
+	//float pbrSample = mod(simFrame / 90.0, 4.0);
+	//if (pbrSample < 1.0) {
+	//	roughness = 0.0001;
+	//	metalness = pbrSample;
+	//} else if (pbrSample < 2.0) {
+	//	roughness = pbrSample - 1.0;
+	//	metalness = 1;
+	//} else if (pbrSample < 3.0) {
+	//	roughness = 1.0;
+	//	metalness = 3.0 - pbrSample;
+	//} else {
+	//	roughness = 4.0 - pbrSample;
+	//	metalness = 0.0;
+	//}
 
 	float roughness2 = roughness * roughness;
 	float roughness4 = roughness2 * roughness2;
@@ -1096,8 +1110,6 @@ void main(void){
 		outSpecularColor.rgb *= EXPOSURE;
 		outColor *= EXPOSURE;
 	#endif
-
-
 
 	outColor = TONEMAP(outColor);
 
