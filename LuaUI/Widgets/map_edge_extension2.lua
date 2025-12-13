@@ -372,16 +372,13 @@ void main() {
 	float cellFactor = clamp(mapDistance / 1600.0, 0.0, 1.0);
 	vec2 gridCell = vec2(fractUV.x * scale.x / 32.0, fractUV.y * scale.y / 32.0);
 	float edgeDist = min(min(fract(gridCell.x), 1.0 - fract(gridCell.x)), min(fract(gridCell.y), 1.0 - fract(gridCell.y)));
-	float edgeFactor = 1.0 - clamp(edgeDist*60.0 - 0.4, 0.0, 1.0);
+	float edgeFactor = 1.0 - clamp(edgeDist*40.0 - 0.2, 0.0, 1.0);
 	
 	vec4 finalColor = texture(colorTex, clampUv);
-	if (edgeFactor > 0.0) {
-		finalColor = mix(vec4(0.0, 0.0, 0.0, 1.0) * edgeFactor, finalColor, cellFactor);
-	}
-	else {
-		vec2 gridMid = vec2(floor(gridCell.x) / scale.x * 32.0, floor(gridCell.y) / scale.y * 32.0);
-		finalColor = mix(texture(colorTex, gridMid), finalColor, cellFactor) * ( 0.7 + 0.3 * cellFactor);
-	}
+	vec4 edgeColor = mix(vec4(0.0, 0.0, 0.0, 1.0) * edgeFactor, finalColor, cellFactor);
+	vec2 gridMid = vec2((floor(gridCell.x) + 0.5) / scale.x * 32.0, (floor(gridCell.y) + 0.5) / scale.y * 32.0);
+	finalColor = mix(texture(colorTex, gridMid), finalColor, cellFactor) * ( 0.7 + 0.3 * cellFactor);
+	finalColor = mix(finalColor, edgeColor, edgeFactor);
 	
 	#if 1
 		vec3 yCbCr = RGB2YCBCR * finalColor.rgb;
