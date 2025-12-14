@@ -414,8 +414,8 @@ void main() {
 		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, -1.7*(timeInfo.x + timeInfo.w))) + 
 		                     snoise(0.02 * vec4(v_modelPosOrig, -1.3*(timeInfo.x + timeInfo.w)));
 		baseItensity = sqrt(abs(baseItensity) + 0.2);
-		vec4 slowcolor = vec4(0.95, 0.1, 0.95, clamp((baseItensity + 0.35), 0.0, 1.0)) * sqrt(slowed) * 1.6;
-		fragColor = mix(slowcolor, fragColor, 0.5 * (1.1 - baseItensity) + (1.0 - slowed) * clamp(effect_level, 0.0, 1.0));
+		vec4 slowcolor = vec4(0.95, 0.1, 0.95, clamp((baseItensity + 0.4), 0.0, 1.0)) * sqrt(clamp(slowed, 0.0, 0.4)) * 1.4;
+		fragColor = mix(slowcolor, fragColor, 0.5 * (1.2 - baseItensity) + (1.0 - slowed) * clamp(effect_level, 0.0, 1.0));
 	}
 	if (fire) {
 		flash = 1.0 - flash;
