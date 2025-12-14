@@ -346,32 +346,38 @@ void main() {
 	float lighting_width; 
 	float lightning_speed;
 	float effect_level = 0.0;
+	float alphaRange = 0.6;
+	float alphaBase = 0.4;
 	
 	// ------------------ CONFIG START --------------------
 	
 	if (emp) {
 		effect_level = 1.0;
-		noisescale = 0.31;
+		noisescale = 0.52;
 		persistance = 0.45;
 		lacunarity = 2.5;
 		minlightningcolor = vec3(0.1, 0.1, 1.0); //blue
 		maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
 		wholeunitbasecolor = vec4(0.49, 0.5, 1.0, 1.0); // light blue base tone
+		alphaRange = 0.6;
+		alphaBase = 0.4;
 		lightningalpha = 1.2;
 		lighting_sharpness = 4.8; 
 		lighting_width = 3.8;
 		lightning_speed = 0.95;
 	} else if (disarm) {
 		effect_level = 0.9954;
-		noisescale = 0.31;
+		noisescale = 0.42;
 		persistance = 0.45;
 		lacunarity = 2.5;
-		minlightningcolor = vec3(0.5, 0.5, 1.0); //blue
+		minlightningcolor = vec3(0.8, 0.8, 0.4); //white-yellow
 		maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
-		wholeunitbasecolor = vec4(0.9, 0.9, 0.7, 1.0); // light blue base tone
-		lightningalpha = 1.2;
-		lighting_sharpness = 4.8; 
-		lighting_width = 3.8;
+		wholeunitbasecolor = vec4(0.7, 0.7, 0.55, 1.0); // light blue base tone
+		alphaRange = 1.2;
+		alphaBase = 0.3;
+		lightningalpha = 2.5;
+		lighting_sharpness = 7.8; 
+		lighting_width = 2.8;
 		lightning_speed = 0.95;
 	}
 	// ------------------ CONFIG END --------------------
@@ -398,7 +404,7 @@ void main() {
 		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, 1.7*(timeInfo.x + timeInfo.w))) + 
 		                     snoise(0.02 * vec4(v_modelPosOrig, 1.3*(timeInfo.x + timeInfo.w)));
 		baseItensity = sqrt(abs(baseItensity) + 0.2) * (0.5 * flash + 0.2) + clamp(baseItensity * (flash - 0.5) * 0.5, -0.2, 1.0);
-		wholeunitbasecolor.a = wholeunitbasecolor.a * (0.4 + baseItensity * 0.5);
+		wholeunitbasecolor.a = clamp(alphaBase + baseItensity * (0.1 + alphaRange) + electricity, 0.0, 1.0);
 		wholeunitbasecolor.r = wholeunitbasecolor.r + baseItensity * 0.33;
 		wholeunitbasecolor.g = wholeunitbasecolor.g + baseItensity * 0.45;
 		fragColor = max(wholeunitbasecolor, fragColor); // apply whole unit base color
@@ -408,15 +414,16 @@ void main() {
 		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, -1.7*(timeInfo.x + timeInfo.w))) + 
 		                     snoise(0.02 * vec4(v_modelPosOrig, -1.3*(timeInfo.x + timeInfo.w)));
 		baseItensity = sqrt(abs(baseItensity) + 0.2);
-		vec4 slowcolor = vec4(0.95, 0.1, 0.95, baseItensity) * sqrt(slowed) * 1.6;
-		fragColor = mix(slowcolor, fragColor, 0.5 + 0.3 * clamp(effect_level, 0.0, 1.0));
+		vec4 slowcolor = vec4(0.95, 0.1, 0.95, clamp((baseItensity + 0.4), 0.0, 1.0)) * sqrt(slowed) * 1.6;
+		fragColor = mix(slowcolor, fragColor, 0.5 * (1.2 - baseItensity) + (1.0 - slowed) * clamp(effect_level, 0.0, 1.0));
 	}
 	if (fire) {
 		flash = 1.0 - flash;
-		float baseItensity = snoise(0.06 * vec4(v_modelPosOrig, 1.1*(timeInfo.x + timeInfo.w))) + 
-		                     snoise(0.073 * vec4(v_modelPosOrig, 2.2*(timeInfo.x + timeInfo.w)));
-		vec4 firecolor = vec4(1.0, 0.3, 0.0, (0.4 + 0.3*flash) * (0.3 + 0.5 * baseItensity) + 0.3 * baseItensity + 0.2 + 0.7*flash);
-		fragColor = mix(firecolor, fragColor, 0.65 + 0.2 * clamp(effect_level + slowed, 0.0, 1.0));
+		float baseItensity = snoise(0.039 * vec4(v_modelPosOrig, 1.1*(timeInfo.x + timeInfo.w)));
+		float baseItensity2 = snoise(0.082 * vec4(v_modelPosOrig, 1.7*(timeInfo.x + timeInfo.w)));
+		float alpha = clamp((0.6 - 0.2*flash) * (0.3 + 0.5 * baseItensity * baseItensity2) + 0.4 * baseItensity + 0.3 * baseItensity2 + 0.4*flash, 0.0, 1.0);
+		vec4 firecolor = vec4(1.0, 0.45, 0.1, alpha);
+		fragColor = mix(firecolor, fragColor, 0.55 + 0.4 * clamp(effect_level + slowed, 0.0, 1.0));
 	}
 }
 ]]
@@ -557,9 +564,10 @@ function widget:UnitDestroyed(unitID)
 	StopDrawParalyzedUnitGL4(unitID)
 end
 
-function widget:UnitLeftLos(unitID)
-	StopDrawParalyzedUnitGL4(unitID)
-end
+-- Breaks spectators and is irrelevant for everyone else?
+--function widget:UnitLeftLos(unitID)
+--	StopDrawParalyzedUnitGL4(unitID)
+--end
 
 function widget:UnitEnteredLos(unitID)
 	if fullview then return end
@@ -574,7 +582,7 @@ local uniformcache = {0}
 local toremove = {}
 
 function widget:GameFrame(n)
-	if TESTMODE == false then 
+	if not TESTMODE then
 		if n % 3 == 0 then
 			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
 				local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
