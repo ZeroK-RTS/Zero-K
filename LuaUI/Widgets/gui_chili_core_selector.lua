@@ -468,10 +468,10 @@ local function SelectComm()
 	end
 	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	local tuid = ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
-	Spring.SelectUnit(tuid, shift)
+	unitID = ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
+	Spring.SelectUnit(unitID, shift)
 	if not shift then
-		local x, y, z = Spring.GetUnitPosition(tuid)
+		local x, y, z = Spring.GetUnitPosition(unitID)
 		SetCameraTarget(x, y, z)
 	end
 end
@@ -546,13 +546,13 @@ local function SelectIdleCon()
 
 		for uid, v in pairs(idleCons) do
 			if uid ~= "count" then
-				tuid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
-				if (not Spring.IsUnitSelected(tuid)) then
-					local x,_,z = spGetUnitPosition(tuid)
+				uid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
+				if (not Spring.IsUnitSelected(uid)) then
+					local x,_,z = spGetUnitPosition(uid)
 					dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
 					if (dist < mindist) then
 						mindist = dist
-						muid = tuid
+						muid = uid
 					end
 				end
 			end
@@ -568,9 +568,9 @@ local function SelectIdleCon()
 			for uid, v in pairs(idleCons) do
 				if uid ~= "count" then
 					if i == conIndex then
-						tuid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
-						Spring.SelectUnit(tuid)
-						local x, y, z = Spring.GetUnitPosition(tuid)
+						uid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
+						Spring.SelectUnit(uid)
+						local x, y, z = Spring.GetUnitPosition(uid)
 						SetCameraTarget(x, y, z)
 						return
 					else
