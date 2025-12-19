@@ -1257,7 +1257,7 @@ local function AddObject(objectID, drawFlag, reason)
 		cusUnitIDtoDrawFlag[objectID] = drawFlag
 		local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(objectID)
 		if health then
-			uniformCache[1] = ((build < 1) and build) or -1
+			uniformCache[1] = buildProgresses[unitID] or ((build < 1) and build) or -1
 			gl.SetUnitBufferUniforms(objectID, uniformCache, 0) -- buildprogress (0.x)
 			if build < 1 then
 				buildProgresses[objectID] = build
@@ -2049,7 +2049,6 @@ function gadget:RenderUnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:UnitFinished(unitID)
-	gl.SetUnitBufferUniforms(unitID, {-1}, 0) -- set build progress to built
 	wantTranparent[unitID] = false
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
