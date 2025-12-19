@@ -1135,6 +1135,7 @@ void main(void){
 		if (buildProgress > -0.5){
 			// myPerlin contains 4 channels of noise with decreasing frequency from r to a
 			myPerlin= myPerlin;
+			buildProgress = buildProgress * 1.05; // Counteract division in CUS gadget
 			
 			// Height is the relative height of the fragment in the model compared to the full height
 			float height = clamp(pieceVertexPosOrig.w * 0.82, 0,1);
@@ -1168,14 +1169,11 @@ void main(void){
 			// Compute anti-aliased world-space grid lines
 			vec3 fragSize = fwidth(worldVertexPos.xyz);
 			float fragSizeFactor = 1.0/dot(vec3(1.0), fragSize);
-			//vec3 buildGrid = abs(fract(worldVertexPos.xyz/8.0 - 0.5) - 0.5) * (8)/fragSize;
-			//float line = 1.0 - min(min(buildGrid.x, buildGrid.y), buildGrid.z);
-			//line = clamp(line * smoothstep(-0.5, 1.0, fragSizeFactor),0.0,1.0);
 
 			float grid1factor = clamp(1.5 - 2.5 * buildProgress, 0.0, 1.0);
 			float grid3factor = clamp(3.0 * buildProgress - 1.7, 0.0, 1.0);
 			float grid2factor = clamp(1.0 - grid1factor - grid3factor, 0.0, 1.0);
-			float widthFactor = (1.0 + clamp((buildProgress - 0.94)*135.0, 0.0, 30.0));
+			float widthFactor = (1.0 + clamp((clamp(buildProgress, 0.0, 1.0) - 0.92)*100.0, 0.0, 30.0));
 
 			vec3 buildGrid1 = abs(fract(worldVertexPos.xyz/8.0 - 0.5) - 0.5) * (6.0)/fragSize;
 			float line1 = 1.0 - min(min(buildGrid1.x, buildGrid1.y), buildGrid1.z);
@@ -1185,7 +1183,7 @@ void main(void){
 			float line3 = 1.0 - min(min(buildGrid3.x, buildGrid3.y), buildGrid3.z);
 			float line = clamp(line1 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * grid1factor +
 					clamp(line2 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * 0.5 * grid2factor +
-					clamp(line3 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * 0.25 * grid3factor;
+					clamp(line3 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * 0.25 * grid3factor * (1.0 + widthFactor * 0.01);
 
 			vec3 pulseTeamColor = mix(teamCol.rgb, teamCol.rgb * 1.35, sintimefast );
 
@@ -1222,19 +1220,18 @@ void main(void){
 				#endif
 			}
 
-			
-			// Always display a grid when building, but fade it out on the last 5% of buildProgress
-			//float last5percent = smoothstep(0.0, 0.08, 1.04 - buildProgress);
-			outColor.rgb = mix(outColor.rgb, pulseTeamColor , line);
+			// Fade build grid out after completion
+			float excessFactor = (1.0 - clamp(20.0 * (buildProgress - 1.0), 0.0, 1.0));
+			outColor.rgb = mix(outColor.rgb, pulseTeamColor, line * excessFactor);
 
 			// Always show level lines
-			outColor.rgb += vec3(levelFactor);
+			outColor.rgb += vec3(levelFactor) * excessFactor;
 
 			// Add bloom for the levels:
-			outSpecularColor+= vec3(levelFactor);
+			outSpecularColor+= vec3(levelFactor) * excessFactor;
 
 			// Add bloom for the grid lines:
-			outSpecularColor+= pulseTeamColor * line * sintimefast * 2.0 ;
+			outSpecularColor+= pulseTeamColor * line * sintimefast * 2.0 * excessFactor;
 	
 		}
 	#endif

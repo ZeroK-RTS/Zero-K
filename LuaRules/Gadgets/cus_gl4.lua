@@ -298,6 +298,7 @@ local cusUnitIDtoDrawFlag = {} -- {unitID = drawFlag, ...}, these remain positiv
 
 -- For managing under construction units:
 local buildProgresses = {} -- keys unitID, value buildprogress, updated each frame for units being built
+local buildProgressDecay = {} -- units that retain build GFX after being built.
 local uniformCache = {}
 local spGetUnitHealth = Spring.GetUnitHealth
 -- local processedUnits = {}
@@ -399,9 +400,18 @@ end
 local function UpdateBuildProgress(unitID, buildProgress, forceRetain)
 	local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
 	if health and build ~= buildProgress then
-		uniformCache[1] = ((build < 1) and build) or -1
+		build = ((build < 1) and build) or -1
+		if buildProgress and build == -1 then
+			buildProgressDecay[unitID] = (buildProgressDecay[unitID] or 0.05) - 0.003
+			if buildProgressDecay[unitID] > 0 then
+				build = 1.05 - buildProgressDecay[unitID]
+			else
+				buildProgressDecay[unitID] = false
+			end
+		end
+		uniformCache[1] = build / 1.05 -- Uniform > 1 seems to distort the model for some reason
 		gl.SetUnitBufferUniforms(unitID, uniformCache, 0) -- buildprogress (0.x)
-		if build < 1 or forceRetain then
+		if (build < 1 and build > -1) or buildProgressDecay[unitID] or forceRetain then
 			buildProgresses[unitID] = build
 		else
 			buildProgresses[unitID] = nil
@@ -1420,7 +1430,6 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 	objectIDtoDefID[objectID] = nil
 	if objectID >= 0 then
 		cusUnitIDtoDrawFlag[objectID] = nil
-		buildProgresses[objectID] = nil
 		Spring.SetUnitEngineDrawMask(objectID, 255)
 	else
 		cusFeatureIDtoDrawFlag[-1 * objectID] = nil
@@ -2032,6 +2041,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, weaponDefID)
 	--UpdateUnit(unitID, 0) -- having this here means that dying units lose CUS, RenderUnitDestroyed _should_ be fine
+	buildProgresses[unitID] = nil
 end
 
 function gadget:RenderUnitDestroyed(unitID, unitDefID)
@@ -2040,7 +2050,6 @@ end
 
 function gadget:UnitFinished(unitID)
 	gl.SetUnitBufferUniforms(unitID, {-1}, 0) -- set build progress to built
-	buildProgresses[unitID] = nil
 	wantTranparent[unitID] = false
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
