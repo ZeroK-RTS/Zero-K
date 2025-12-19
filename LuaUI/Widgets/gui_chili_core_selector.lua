@@ -35,11 +35,12 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
+local DEFAULT_IDLE_OPACITY = 0.45
 local BUTTON_COLOR = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_FACTORY = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_WARNING = {1, 0.2, 0.1, 1}
 local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
-local buttonColorHighlight = nil
+local buttonColorHighlight = {0.8, 0.8, 0.2, DEFAULT_IDLE_OPACITY}
 local IMAGE_COLOR_DISABLED = {0.3, 0.3, 0.3, 1}
 
 local stateCommands = {	-- FIXME: is there a better way of doing this?
@@ -128,7 +129,7 @@ for name in pairs(exceptionList) do
 end
 
 local function SetButtonColorHighlight(opacity)
-	buttonColorHighlight = {1,1,0,opacity}
+	buttonColorHighlight[4] = opacity
 end
 
 local function CanBeAnIdleCons(ud)
@@ -258,14 +259,14 @@ options = {
 	highlightidleconsinc = {
 		name = 'Highlight idle constructors increases',
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 	},
 	highlightidleconsincopacity = {
 		name = 'Highlight opacity',
 		type = 'number',
-		value = 0.1,
-		min = 0.1, max = 1.0, step = 0.1,
+		value = DEFAULT_IDLE_OPACITY,
+		min = 0.1, max = 1.0, step = 0.05,
 		OnChange = function(self)
 			SetButtonColorHighlight(self.value)
 		end,
@@ -1680,7 +1681,6 @@ local function InitializeControls()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
-	SetButtonColorHighlight(options.highlightidleconsincopacity.value)
 	local windowY = bottom - BUTTON_HEIGHT
 	
 	mainWindow = Window:New{
