@@ -1137,7 +1137,7 @@ void main(void){
 			myPerlin= myPerlin;
 			
 			// Height is the relative height of the fragment in the model compared to the full height
-			float height = clamp(pieceVertexPosOrig.w/1.0,0,1);
+			float height = clamp(pieceVertexPosOrig.w * 0.82, 0,1);
 
 			// Helper sinusoidal patterns:
 			float sintime = 0.5 + 0.5 * sin(simFrame * 0.1); // pulses every 3 seconds
@@ -1152,7 +1152,7 @@ void main(void){
 			// Add perlin and ensure that perlin doesnt cause inaccuracy at the top of the model:
 			progressLevels = mix(progressLevels, vec4(myPerlin.g + myPerlin.b*sin(simFrame * 0.042342)), 0.05 * smoothstep(0.00, 0.05, 1.0 - buildProgress));
 			
-			vec4 levelLines = clamp(1.0 - 100 * abs(progressLevels - vec4(height)), 0,1);
+			vec4 levelLines = clamp(1.0 - 75 * abs(progressLevels - vec4(height)), 0, 1);
 
 			// levelFactor is 1 when the height of a fragment is within 1% of a progressLevel, 0 otherwise.
 			float levelFactor = dot(levelLines, vec4(1.0));
@@ -1167,19 +1167,26 @@ void main(void){
 
 			// Compute anti-aliased world-space grid lines
 			vec3 fragSize = fwidth(worldVertexPos.xyz);
-			float fragSizeFactor = 1.0/  dot(vec3(1.0),fragSize);
-			vec3 buildGrid = abs(fract(worldVertexPos.xyz/8.0 - 0.5) - 0.5) * (8)/fragSize;
-			float line = 1.0 - min(min(buildGrid.x, buildGrid.y), buildGrid.z);
-			line = clamp(line * smoothstep(-0.5, 1.0, fragSizeFactor),0.0,1.0);
-			
-			// A dynamic grid which starts at 12 elmos size, then shrinks to 2 elmos size at 100% buildProgress
-			float gridSize = clamp((1.0 - buildProgress) * 10 + 2, 2, 12);
-			vec3 grid = step(0.5, clamp(1.0 - 10* fract((pieceVertexPosOrig.xyz) / gridSize), 0.0, 1.0));
+			float fragSizeFactor = 1.0/dot(vec3(1.0), fragSize);
+			//vec3 buildGrid = abs(fract(worldVertexPos.xyz/8.0 - 0.5) - 0.5) * (8)/fragSize;
+			//float line = 1.0 - min(min(buildGrid.x, buildGrid.y), buildGrid.z);
+			//line = clamp(line * smoothstep(-0.5, 1.0, fragSizeFactor),0.0,1.0);
 
+			float grid1factor = clamp(1.5 - 2.5 * buildProgress, 0.0, 1.0);
+			float grid3factor = clamp(3.0 * buildProgress - 1.7, 0.0, 1.0);
+			float grid2factor = clamp(1.0 - grid1factor - grid3factor, 0.0, 1.0);
+			float widthFactor = (1.0 + clamp((buildProgress - 0.94)*135.0, 0.0, 30.0));
 
-			// The entire model will always get the 8 elmo buildgrid:
-			//outColor.rgb = mix(outColor.rgb, vec3(1.0, 0.0, 1.0), buildGridFactor);
-			//outColor.rgb = vec3(buildGridFactor); 
+			vec3 buildGrid1 = abs(fract(worldVertexPos.xyz/8.0 - 0.5) - 0.5) * (6.0)/fragSize;
+			float line1 = 1.0 - min(min(buildGrid1.x, buildGrid1.y), buildGrid1.z);
+			vec3 buildGrid2 = abs(fract(worldVertexPos.xyz/4.0 - 0.5) - 0.5) * (3.0)/fragSize;
+			float line2 = 1.0 - min(min(buildGrid2.x, buildGrid2.y), buildGrid2.z);
+			vec3 buildGrid3 = abs(fract(worldVertexPos.xyz/2.0 - 0.5) - 0.5) * (1.5 / widthFactor)/fragSize;
+			float line3 = 1.0 - min(min(buildGrid3.x, buildGrid3.y), buildGrid3.z);
+			float line = clamp(line1 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * grid1factor +
+					clamp(line2 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * 0.5 * grid2factor +
+					clamp(line3 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * 0.25 * grid3factor;
+
 			vec3 pulseTeamColor = mix(teamCol.rgb, teamCol.rgb * 1.35, sintimefast );
 
 			// Second to bottom level, ensure that we dont emit light
@@ -1217,8 +1224,8 @@ void main(void){
 
 			
 			// Always display a grid when building, but fade it out on the last 5% of buildProgress
-			float last5percent = smoothstep(0.0, 0.08, 1.02 - buildProgress);
-			outColor.rgb = mix(outColor.rgb, pulseTeamColor , line * last5percent);
+			//float last5percent = smoothstep(0.0, 0.08, 1.04 - buildProgress);
+			outColor.rgb = mix(outColor.rgb, pulseTeamColor , line);
 
 			// Always show level lines
 			outColor.rgb += vec3(levelFactor);
