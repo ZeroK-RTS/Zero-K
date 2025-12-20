@@ -948,7 +948,7 @@ local function addUnit(defName, path)
 			name = "  Retreat at value",
 			desc = "Values: inherit from factory, no retreat, 33%, 65%, 99% health remaining",
 			type = 'number',
-			value = -1,
+			value = (ud.isFactory and 0) or -1,
 			min = -1,
 			max = 3,
 			step = 1,
