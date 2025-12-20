@@ -853,11 +853,12 @@ void main(void){
 				if (healthMix > 0.05){
 					vec4 texColor1w = texture(texture1w, myUV);
 					vec4 texColor2w = texture(texture2w, myUV);
-					healthMix = (healthMix - 0.05) * 0.9; // Reduce damage texture maximium wreckness
-					healthMix *= (1.0 - 0.9 * texColor2.r); //emissive parts don't get too damaged
+					healthMix = (healthMix - 0.05); // Reduce damage texture maximium wreckness
+					healthMix *= (1.0 - 0.5 * texColor2.r); //emissive parts don't get too damaged
 					texColor1 = mix(texColor1, texColor1w, healthMix);
 					texColor2.xyz = mix(texColor2.xyz, texColor2w.xyz, healthMix);
-					texColor2.z += 0.5 * healthMix; //additional roughness
+					texColor2.z += 0.5 * (1.0 - healthMix); //additional roughness
+					texColor2.y *= (0.8 + 0.2 * healthMix); //less reflectiveness
 				}
 			}
 
