@@ -496,6 +496,9 @@ void main(void)
 	#if ENABLE_OPTION_HEALTH_TEXTURING
 		float buildProgress = UNITUNIFORMS.userDefined[0].x;
 		if (buildProgress > -0.5){
+			buildProgress = buildProgress * 1.05; // Counteract division in CUS gadget
+			float excessFactor = (1.0 - clamp(20.0 * (buildProgress - 1.0), 0.0, 1.0));
+			piecePos = mix(piecePos, piecePos * 0.999 + vec4(0.01, 0.01, 0.01, 0.0), excessFactor);
 			// healthFraction, cannot, in theory be more than buildProgress
 			aoterm_fogFactor_selfIllumMod_healthFraction.w = clamp(aoterm_fogFactor_selfIllumMod_healthFraction.w / max(0.00000001,buildProgress), 0.0, 1.0);
 		}
