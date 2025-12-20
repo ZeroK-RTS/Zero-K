@@ -1273,7 +1273,7 @@ void main(void){
 			highLightOpacity = highLightOpacity * highLightOpacity;
 
 			// Mix some negative base colour intensity to mitigate over-highlighting bright map features
-			outColor.rgb += isWreck * mix(-1.0 * clamp((outColor.rgb - 0.2) * 1.25, 0.0, 1.0), wreckHiglight * wreckIntensity, 0.8);
+			outColor.rgb += isWreck * mix(-1.0 * clamp((outColor.rgb - 0.4) * 1.6, 0.0, 1.0), wreckHiglight * wreckIntensity, 0.8);
 			outColor.rgb = mix(outColor.rgb, clamp(outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, 0.0, 0.95), mouseoverOpacity);
 		}
 	#endif 
