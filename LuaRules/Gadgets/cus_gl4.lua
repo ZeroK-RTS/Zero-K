@@ -232,6 +232,8 @@ local numUnitsInViewport = 0
 local featuresInViewport = {} --featureID:featureDefID
 local numFeaturesInViewport = 0
 
+local myAllyTeamID = Spring.GetMyAllyTeamID()
+
 -- Unit state changes whether they want to go into the transparent unit bin.
 -- The table transparentUnitBin stores whether they are actually in those bins.
 -- This table is only updated when units leave and reenter the view. TODO: update on state change.
@@ -1437,6 +1439,11 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 	end
 end
 
+local function VisibleUnitPosition(unitID)
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	return x and z and Spring.IsPosInLos(x, 0, z, myAllyTeamID)
+end
+
 local function ProcessCusUnit(unitID, drawFlag, gameFrame, reason)
 	if debugmode then Spring.Echo("ProcessUnits", unitID, drawFlag, reason) end
 
@@ -1449,7 +1456,7 @@ local function ProcessCusUnit(unitID, drawFlag, gameFrame, reason)
 			return
 		end
 		if cloakLingerUnitFrame[unitID] then
-			drawFlag = 1
+			drawFlag = VisibleUnitPosition(unitID) and 1 or Spring.GetUnitDrawFlag(unitID)
 			cloakLingerUnitList = cloakLingerUnitList or {}
 			cloakLingerUnitList[#cloakLingerUnitList + 1] = unitID
 			nextLingerUpdate = nextLingerUpdate and math.min(nextLingerUpdate, cloakLingerUnitFrame[unitID]) or cloakLingerUnitFrame[unitID]
@@ -2003,6 +2010,10 @@ function gadget:Initialize()
 	GG.CUSGL4.SetShaderUniforms = SetShaderUniforms
 	GG.CUSGL4.SetUnitTexture = SetUnitTexture
 	GG.CUSGL4.enabled = true
+end
+
+function gadget:PlayerChanged(playerID)
+	myAllyTeamID = Spring.GetMyAllyTeamID()
 end
 
 function gadget:Shutdown()
