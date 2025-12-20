@@ -1153,7 +1153,7 @@ void main(void){
 			// Add perlin and ensure that perlin doesnt cause inaccuracy at the top of the model:
 			progressLevels = mix(progressLevels, vec4(myPerlin.g + myPerlin.b*sin(simFrame * 0.042342)), 0.05 * smoothstep(0.00, 0.05, 1.0 - buildProgress));
 			
-			vec4 levelLines = clamp(1.0 - 75 * abs(progressLevels - vec4(height)), 0, 1);
+			vec4 levelLines = clamp(1.0 - 90 * abs(progressLevels - vec4(height)), 0, 1);
 
 			// levelFactor is 1 when the height of a fragment is within 1% of a progressLevel, 0 otherwise.
 			float levelFactor = dot(levelLines, vec4(1.0));
@@ -1170,8 +1170,8 @@ void main(void){
 			vec3 fragSize = fwidth(worldVertexPos.xyz);
 			float fragSizeFactor = 1.0/dot(vec3(1.0), fragSize);
 
-			float grid1factor = clamp(1.5 - 2.5 * buildProgress, 0.0, 1.0);
-			float grid3factor = clamp(3.0 * buildProgress - 1.7, 0.0, 1.0);
+			float grid1factor = clamp(1.2 - 2.0 * buildProgress, 0.0, 1.0);
+			float grid3factor = clamp(2.5 * buildProgress - 1.4, 0.0, 1.0);
 			float grid2factor = clamp(1.0 - grid1factor - grid3factor, 0.0, 1.0);
 			float widthFactor = (1.0 + clamp((clamp(buildProgress, 0.0, 1.0) - 0.92)*100.0, 0.0, 30.0));
 
