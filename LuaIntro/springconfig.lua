@@ -22,4 +22,5 @@ Spring.SetConfigInt("GrassDetail", 0)
 
 -- Revert BAR breaking the small font (which it doesn't seem to even draw anywhere)
 Spring.SetConfigInt("SmallFontSize", 14) -- Engine default
+Spring.SetConfigInt("FontSize", 18)
 Spring.SetConfigInt("UnitIconsAsUI", 0)
