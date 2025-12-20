@@ -630,7 +630,9 @@ function widget:UnitCreated(unitID, unitDefID)
 	if TESTMODE then
 		DrawParalyzedUnitGL4(unitID, unitDefID)
 	end
-
+	-- Enemy units might die offscreen
+	empLinger[unitID] = nil
+	disarmLinger[unitID] = nil
 	local health,maxHealth,paralyzeDamage,capture,build = spGetUnitHealth(unitID)
 	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
 	local slow = spGetUnitRulesParam(unitID, "slowState")
