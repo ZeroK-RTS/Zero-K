@@ -12,6 +12,7 @@ return { shieldarty = {
 
   customParams           = {
     bait_level_default = 1,
+    normaltex = [[unittextures/b_dom_morty_advcon_freaker_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -22,7 +23,7 @@ return { shieldarty = {
   leaveTracks            = true,
   maxSlope               = 36,
   maxWaterDepth          = 22,
-  metalCost              = 340,
+  metalCost              = 330,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP UNARMED]],
   objectName             = [[dominator.s3o]],

@@ -182,14 +182,16 @@ for i = 1, #UnitDefs do
 	if energyIncome > 0 then
 		econStructureDefs[i] = {cost = ud.metalCost, income = energyIncome}
 	end
+	if cp.windgen then
+		econStructureDefs[i] = econStructureDefs[i] or {}
+		econStructureDefs[i].isWind = true
+	end
 
 	local mexMult = tonumber(cp.metal_extractor_mult) or 0
 	if mexMult > 0 then
 		econStructureDefs[i] = {cost = ud.metalCost, mex = mexMult}
 	end
 end
-
-econStructureDefs[UnitDefNames.energywind.id].isWind = true
 
 local TIDAL_HEALTH = UnitDefNames.energywind.customParams.tidal_health
 
@@ -232,22 +234,25 @@ for i = 1, #UnitDefs do
 end
 
 local manualFireTimeDefs = {}
+local manualFireWeaponNum = {}
 local specialReloadDefs = {}
-local jumpReloadDefs = {}
+local jumpChargeDefs = {}
 local ammoRequiringDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	local unitWeapon = (ud and ud.weapons)
-	unitWeapon = unitWeapon and unitWeapon[3]
 	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	local weaponNum = tonumber(ud.customParams.manualfire_num or 3)
+	unitWeapon = unitWeapon and unitWeapon[weaponNum]
 	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
 		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
+		manualFireWeaponNum[unitDefID] = weaponNum
 	end
 	if ud.customParams.specialreloadtime then
 		specialReloadDefs[unitDefID] = tonumber(ud.customParams.specialreloadtime)
 	end
 	if ud.customParams.canjump then
-		jumpReloadDefs[unitDefID] = -1 --Signifies that reload time is not stored
+		jumpChargeDefs[unitDefID] = tonumber(ud.customParams.jump_charges) or 1
 	end
 	if ud.customParams.reammoseconds then
 		ammoRequiringDefs[unitDefID] = true
@@ -270,7 +275,8 @@ local sameObjectIDTime = 0
 local selectedUnitsList = {}
 local commanderManualFireReload = {}
 
-local ctrlFilterUnits = false
+local ctrlFilterUnitList = false
+local ctrlFilterUnitIncluded = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -286,7 +292,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter',
+	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'sortByHealth',
 	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar',
 	'fancySkinning', 'leftPadding',
 }
@@ -391,7 +397,7 @@ options = {
 			end
 		end,
 	},
-	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton',
+	groupbehaviour = {name='Unit grouping behaviour', type='radioButton',
 		value='overflow',
 		items = {
 			{key = 'overflow',	name = 'On window overflow'},
@@ -400,7 +406,7 @@ options = {
 		},
 		path = selPath,
 	},
-	showgroupinfo = {name='Show Group Info', type='bool', value=true,
+	showgroupinfo = {name='Show group info', type='bool', value=true,
 		path = selPath,
 		OnChange = function(self)
 			if selectionWindow then
@@ -408,10 +414,10 @@ options = {
 			end
 		end,
 	},
-	ctrlFilter = {
-		name = 'Ctrl Selection Filtering',
+	sortByHealth = {
+		name = 'Sort by health',
 		type = 'bool',
-		desc = "Hold Ctrl and click on some units. These units will be selected when Ctrl is released.",
+		desc = "Selected units of the same type are sorted by health remaining. Updates whenever selection changes.",
 		value = true,
 		path = selPath,
 	},
@@ -540,10 +546,13 @@ local function Format(amount, displaySign, longMult)
 	return formatted
 end
 
-local function FormatPlusMinus(num)
-	if num > 0.04 then
+local function FormatPlusMinus(num, fuzz)
+	if fuzz == nil then
+		fuzz = 0.04
+	end
+	if num >= fuzz then
 		return green .. Format(num, true)
-	elseif num < -0.04 then
+	elseif num <= -fuzz then
 		return red .. Format(num, true)
 	end
 	return Format(num)
@@ -669,7 +678,7 @@ end
 local function GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
 	local specialReloadState = spGetUnitRulesParam(unitID, rulesParam)
 	if specialReloadState then
-		if reloadTime > 0 then
+		if reloadTime and reloadTime > 0 then
 			--local currentFrame, _ = Spring.GetGameFrame()
 			--local remainingTime = (specialReloadState - currentFrame)
 			--local reloadFraction = 1 - remainingTime/reloadTime
@@ -800,7 +809,7 @@ local function GetManualFireReload(unitID, unitDefID)
 	end
 	
 	if manualFireTimeDefs[unitDefID] then
-		return manualFireTimeDefs[unitDefID], 3
+		return manualFireTimeDefs[unitDefID], manualFireWeaponNum[unitDefID]
 	end
 	if specialReloadDefs[unitDefID] then
 		return specialReloadDefs[unitDefID], false, SPECIAL_WEAPON_RELOAD_PARAM
@@ -833,7 +842,7 @@ local function GetManualFireReload(unitID, unitDefID)
 	return false
 end
 
-local function GetJumpReload(unitID, unitDefID)
+local function GetJumpCharges(unitID, unitDefID)
 	if not (unitDefID and showJumpReload) then
 		return false
 	end
@@ -841,8 +850,8 @@ local function GetJumpReload(unitID, unitDefID)
 	if not unitDefID then
 		return false
 	end
-	if jumpReloadDefs[unitDefID] then
-		return jumpReloadDefs[unitDefID]
+	if jumpChargeDefs[unitDefID] then
+		return jumpChargeDefs[unitDefID]
 	end
 	return false
 end
@@ -876,10 +885,11 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		return
 	end
 	
-	local income = econDef.income * mult * energyMult
+	local income = (econDef.income or 0) * mult * energyMult
 	local extraText = ""
 	local healthOverride = false
 	local minWind = 0
+	local isTidal = false
 	if econDef.isWind then
 		if mousePlaceX and mousePlaceY then
 			local _, pos = spTraceScreenRay(mousePlaceX, mousePlaceY, true)
@@ -892,8 +902,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 						extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. math.round(income, 1)
 						healthOverride = TIDAL_HEALTH
 						minWind = income
+						isTidal = true
 					else
-						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
+						local minWindIncome = mult * energyMult * (windMin + (windMax - windMin)*math.max(0.01, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
 						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome, 1) .. " - " .. math.round(windMax * mult * energyMult, 1)
 						income = (minWindIncome + mult * energyMult * windMax)/2
 						minWind = minWindIncome
@@ -956,9 +967,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		--.. "\n extraMetal: " .. extraMetalza
 		--.. "\n unitformCasePayback: " .. unitformCasePayback
 		--.. "\n worstCasePayback: " .. worstCasePayback
-		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride, minWind
+		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride, minWind, isTidal
 	end
-	return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "more energy required"), healthOverride, minWind
+	return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "more energy required"), healthOverride, minWind, isTidal
 end
 
 local function GetPlayerCaption(teamID)
@@ -1007,7 +1018,7 @@ local function UpdateMouseCursor(holdingDrawKey)
 	end
 end
 
-local function SelectionsIconClick(button, unitID, unitList, unitDefID)
+local function SelectionsIconClick(button, unitID, unitList, unitDefID, healthProp, groupedButton)
 	unitID = unitID or (unitList and unitList[1])
 	
 	if not unitID then
@@ -1026,7 +1037,18 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	local newSelectedUnits
 	
 	if (button == 3) then
-		if alt or shift then
+		if shift and alt then
+			--// deselect units with health at least healthProp
+			newSelectedUnits = {}
+			for i = 1, #selectedUnitsList do
+				if selectedUnitsList[i] then
+					local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+					if maxhealth and maxhealth > 0 and health / maxhealth < healthProp then
+						newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
+					end
+				end
+			end
+		elseif alt or shift then
 			--// deselect whole block, or half if alt is held
 			local toDeselect = #unitList
 			if alt then
@@ -1044,31 +1066,69 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 			end
 		else
 			--// deselect a single unit
+			newSelectedUnits = {}
 			for i = 1, #selectedUnitsList do
-				if selectedUnitsList[i] == unitID then
-					selectedUnitsList[i] = selectedUnitsList[#selectedUnitsList]
-					selectedUnitsList[#selectedUnitsList] = nil
+				if selectedUnitsList[i] ~= unitID then
+					newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
 				end
 			end
-			newSelectedUnits = selectedUnitsList
 		end
 		spSelectUnitArray(newSelectedUnits)
 	elseif button == 1 then
 		if ctrl then
-			ctrlFilterUnits = ctrlFilterUnits or {}
-			if shift or alt then
+			ctrlFilterUnitList = ctrlFilterUnitList or {}
+			ctrlFilterUnitIncluded = ctrlFilterUnitIncluded or {}
+			if shift and alt then
+				--// select units with health at least healthProp
+				newSelectedUnits = {}
+				for i = 1, #selectedUnitsList do
+					if selectedUnitsList[i] then
+						local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+						if maxhealth and maxhealth > 0 and health / maxhealth >= healthProp then
+							if not ctrlFilterUnitIncluded[selectedUnitsList[i]] then
+								ctrlFilterUnitList[#ctrlFilterUnitList + 1] = selectedUnitsList[i]
+								ctrlFilterUnitIncluded[selectedUnitsList[i]] = true
+							end
+						end
+					end
+				end
+			elseif shift or alt then
 				local toSelect = #unitList
 				if alt then
 					toSelect = math.ceil(toSelect / 2)
 				end
 				for i = 1, toSelect do
-					ctrlFilterUnits[#ctrlFilterUnits + 1] = unitList[i]
+					if not ctrlFilterUnitIncluded[unitList[i]] then
+						ctrlFilterUnitList[#ctrlFilterUnitList + 1] = unitList[i]
+						ctrlFilterUnitIncluded[unitList[i]] = true
+					end
 				end
 			else
-				ctrlFilterUnits[#ctrlFilterUnits + 1] = unitID
+				local toSelect = unitID
+				if groupedButton and ctrlFilterUnitIncluded[toSelect] then
+					local index = 1
+					while unitList[index] and ctrlFilterUnitIncluded[toSelect] do
+						toSelect = unitList[index]
+						index = index + 1
+					end
+				end
+				ctrlFilterUnitList[#ctrlFilterUnitList + 1] = toSelect
+				ctrlFilterUnitIncluded[toSelect] = true
 			end
 		else
-			if alt then
+			if shift and alt then
+				--// select units with health at least healthProp
+				newSelectedUnits = {}
+				for i = 1, #selectedUnitsList do
+					if selectedUnitsList[i] then
+						local health, maxhealth = spGetUnitHealth(selectedUnitsList[i])
+						if maxhealth and maxhealth > 0 and health / maxhealth >= healthProp then
+							newSelectedUnits[#newSelectedUnits + 1] = selectedUnitsList[i]
+						end
+					end
+				end
+				spSelectUnitArray(newSelectedUnits)
+			elseif alt then
 				local toSelect = math.ceil(#unitList / 2)
 				newSelectedUnits = {}
 				for i = 1, toSelect do
@@ -1088,11 +1148,12 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 end
 
 local function CheckCtrlFilterRelease()
-	if not ctrlFilterUnits then
+	if not ctrlFilterUnitList then
 		return
 	end
-	spSelectUnitArray(ctrlFilterUnits)
-	ctrlFilterUnits = false
+	spSelectUnitArray(ctrlFilterUnitList)
+	ctrlFilterUnitList = false
+	ctrlFilterUnitIncluded = false
 end
 
 local cacheFeatureTooltip = {}
@@ -1178,11 +1239,12 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 			end
 		end
 		bar:SetCaption(newCaption)
+		prop = (maxValue > 0 and currentValue/maxValue) or 0
 		if colorFunc then
-			color = colorFunc(currentValue/maxValue)
+			color = colorFunc(prop)
 			bar.color = color
 		end
-		bar:SetValue(currentValue/maxValue)
+		bar:SetValue(prop)
 	end
 	
 	return UpdateBar
@@ -1360,7 +1422,8 @@ local function GetCostInfoPanel(parentControl, yPos)
 	return Update
 end
 
-local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, onLeft)
+local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, charges, onLeft)
+	charges = charges or 1
 	if not reloadBar then
 		reloadBar = Chili.Progressbar:New {
 			x = (onLeft and 5) or "82%",
@@ -1384,7 +1447,22 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 	elseif rulesParam then
 		reloadFraction = GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
 	end
-	
+	if reloadFraction then
+		if charges == 1 then
+			reloadBar._relativeBounds.top = 5
+			reloadBar:UpdateClientArea()
+			reloadBar:Invalidate()
+		elseif reloadFraction < charges then
+			if math.floor(reloadFraction) == 0 then
+				reloadBar._relativeBounds.top = 5
+			else
+				reloadBar._relativeBounds.top = string.format("%i%%", 100 * math.floor(reloadFraction) / charges)
+			end
+			reloadFraction = 1 - (charges - reloadFraction) / math.ceil(charges - reloadFraction)
+			reloadBar:UpdateClientArea()
+			reloadBar:Invalidate()
+		end
+	end
 	if reloadFraction and reloadFraction < 1 then
 		reloadBar:SetValue(reloadFraction)
 		reloadBar:SetVisibility(true)
@@ -1405,6 +1483,7 @@ local function GetUnitGroupIconButton(parentControl)
 	local unitList
 	local unitCount
 	local unitpicBadgeUpdate
+	local healthProp
 	
 	local size = options.uniticon_size.value
 	
@@ -1440,7 +1519,7 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = holder,
 		OnClick = {
 			function(_,_,_,button)
-				SelectionsIconClick(button, unitID, unitList, unitDefID)
+				SelectionsIconClick(button, unitID, unitList, unitDefID, healthProp, not unitID)
 			end
 		}
 	}
@@ -1460,8 +1539,9 @@ local function GetUnitGroupIconButton(parentControl)
 		if unitID then
 			local health, maxhealth = spGetUnitHealth(unitID)
 			if health then
-				healthBar.color = GetHealthColor(health/maxhealth)
-				healthBar:SetValue(health/maxhealth)
+				healthProp = health/maxhealth
+				healthBar.color = GetHealthColor(healthProp)
+				healthBar:SetValue(healthProp)
 			end
 			local reloadTime, weaponNum, rulesParam = GetManualFireReload(unitID, unitDefID)
 			if reloadTime then
@@ -1469,9 +1549,9 @@ local function GetUnitGroupIconButton(parentControl)
 			elseif reloadBar then
 				reloadBar:SetVisibility(false)
 			end
-			local jumpReloadTime = GetJumpReload(unitID, unitDefID)
-			if jumpReloadTime then
-				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, jumpReloadTime, true)
+			local jumpCharges = GetJumpCharges(unitID, unitDefID)
+			if jumpCharges then
+				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
 			elseif jumpBar then
 				jumpBar:SetVisibility(false)
 			end
@@ -1505,8 +1585,9 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 		
 		if totalMax > 0 then
-			healthBar.color = GetHealthColor(totalHealth/totalMax)
-			healthBar:SetValue(totalHealth/totalMax)
+			healthProp = totalHealth/totalMax
+			healthBar.color = GetHealthColor(healthProp)
+			healthBar:SetValue(healthProp)
 		end
 	end
 	
@@ -1674,7 +1755,7 @@ local function GetSelectionStatsDisplay(parentControl)
 			WG.Translate("interface", "health") .. ": " .. Format(total_hp, false, 100) .. " / " ..  Format(total_maxhp, false, 100) .. "\n"
 		
 		if total_maxShield ~= 0 then
-			unitInfoString = unitInfoString .. WG.Translate("interface", "shields") .. ": " .. Format(total_shield, false, 100) .. " / " ..  Format(total_maxShield, false, 100) .. "\n"
+			unitInfoString = unitInfoString .. WG.Translate("interface", "shield") .. ": " .. Format(total_shield, false, 100) .. " / " ..  Format(total_maxShield, false, 100) .. "\n"
 		end
 		if total_totalbp ~= 0 then
 			unitInfoString = unitInfoString ..
@@ -2045,9 +2126,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		elseif reloadBar then
 			reloadBar:SetVisibility(false)
 		end
-		local jumpReloadTime = GetJumpReload(unitID, unitDefID)
-		if jumpReloadTime then
-			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, jumpReloadTime, true)
+		local jumpCharges = GetJumpCharges(unitID, unitDefID)
+		if jumpCharges then
+			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
 		elseif jumpBar then
 			jumpBar:SetVisibility(false)
 		end
@@ -2068,7 +2149,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		local healthPos
 		if shieldBarUpdate then
-			if ud and (ud.shieldPower > 0 or ud.level) then
+			if ud and ((ud.shieldPower or 0) > 0 or ud.level) then
 				local shieldPower = (spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
 				local _, shieldCurrentPower = spGetUnitShieldState(unitID, -1)
 				if shieldCurrentPower and shieldPower then
@@ -2087,10 +2168,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		
 		if buildBarUpdate then
-			if ud and ud.buildSpeed > 0 then
+			local buildSpeed, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
+			if buildSpeed and buildSpeed > 0 then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
 				
-				local buildSpeed, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
 				local currentBuild = GetCurrentBuildSpeed(unitID, unhandicappedSpeed)
 				buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, currentBuild or 0, buildSpeed)
 			else
@@ -2122,7 +2203,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local ud = UnitDefs[unitDefID]
 		local extraTooltip, healthOverride
 		if not (unitID or featureID) then
-			extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+			extraTooltip, healthOverride, minWind, isTidal = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
 		if extraTooltip then
 			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
@@ -2136,7 +2217,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
 			maxHealthLabel(true, health, IMAGE.HEALTH)
 			if mousePlaceX then
-				minWindLabel(true, FormatPlusMinus(minWind), IMAGE.WIND_SPEED)
+				local img = IMAGE.WIND_SPEED
+				if isTidal then
+					img = IMAGE.ENERGY
+				end
+				minWindLabel(true, FormatPlusMinus(minWind, 0), img)
 			else
 				minWindLabel(false)
 			end
@@ -2239,9 +2324,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			end
 			costInfoUpdate(true, cyan .. smallCostDisplay, IMAGE.COST, PIC_HEIGHT + 4)
 			
-			local extraTooltip, healthOverride, minWind
+			local extraTooltip, healthOverride
 			if not (unitID or featureID) then
-				extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY, true)
+				extraTooltip, healthOverride, _, _ = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY, true)
 			end
 			if extraTooltip then
 				unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID) .. extraTooltip)
@@ -2799,8 +2884,36 @@ local function UpdateSelection(newSelection)
 	-- Check if selection is many, get unit list tooltip
 	-- Update group info.
 	
+	if options.sortByHealth.value then
+		local prevOrder = {}
+		for i = 1, #selectedUnitsList do
+			prevOrder[selectedUnitsList[i]] = i
+		end
+		local subSelection = true
+		for i = 1, #newSelection do
+			if not prevOrder[newSelection[i]] then
+				subSelection = false
+			end
+		end
+		if subSelection then
+			local function KeepPreviousOrder(a, b)
+				return prevOrder[a] < prevOrder[b]
+			end
+			table.sort(newSelection, KeepPreviousOrder)
+		else
+			local health = {}
+			for i = 1, #newSelection do
+				local unitID = newSelection[i]
+				health[unitID] = (unitID and Spring.GetUnitHealth(unitID)) or 0
+			end
+			local function HealthUnitSort(a, b)
+				return health[a] > health[b]
+			end
+			table.sort(newSelection, HealthUnitSort)
+		end
+	end
 	selectedUnitsList = newSelection
-	
+
 	if (not newSelection) or (#newSelection == 0) then
 		selectionWindow.SetVisible(false)
 		return
@@ -2907,8 +3020,9 @@ function widget:Initialize()
 			green .. WG.Translate("interface", "rmb")   .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
 			green .. "+ " .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
 			green .. "+ " .. WG.Translate("interface", "alt")   .. ": " .. WG.Translate("interface", "select_type_half") .. "\n" ..
-			green .. "+ " .. WG.Translate("interface", "ctrl")  .. ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
-			green .. WG.Translate("interface", "mmb")   .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "ctrl")  ..  ": " .. WG.Translate("interface", "defer_selection") .. "\n" ..
+			green .. "+ " .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "alt") .. ": " .. WG.Translate("interface", "select_health") .. "\n" ..
+			green .. WG.Translate("interface", "mmb")  ..": " .. WG.Translate("interface", "go_to") .. "\n" ..
 			green .. WG.Translate("interface", "space_click_show_stats")
 
 		unitSelectionTooltipCache = {}

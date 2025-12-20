@@ -315,7 +315,7 @@ function TargetingLaserUpdate()
 						--// Relay range
 						local _, flashY = Spring.GetUnitPiecePosition(unitID, EmitterMuzzle)
 						local _, SatelliteMuzzleY = Spring.GetUnitPiecePosition(unitID, SatelliteMuzzle)
-						newHeight = max(SatelliteMuzzleY-flashY, 1)
+						newHeight = max(SatelliteMuzzleY - flashY, 1)
 						if newHeight ~= oldHeight then
 							Spring.SetUnitWeaponState(unitID, 2, "range", newHeight)
 							Spring.SetUnitWeaponState(unitID, 3, "range", newHeight)
@@ -325,7 +325,7 @@ function TargetingLaserUpdate()
 						--// Sound effects
 						if soundTime < 0 then
 							local px, py, pz = Spring.GetUnitPosition(unitID)
-							Spring.PlaySoundFile("sounds/weapon/laser/laser_burn6.wav", 10, px, (py + flashY)/2, pz)
+							Spring.PlaySoundFile("sounds/weapon/laser/laser_burn6.wav", 10, px, (py + flashY)/2, pz, "battle")
 							soundTime = 46
 						else
 							soundTime = soundTime - 1
@@ -414,10 +414,16 @@ local function DeferredInitialize()
 	StartThread(SnapSatellite)
 end
 
-function script.Create()
-	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+local function RangeUpdate(mult, weaponMult)
+	mult = mult or 1
 	-- Give the targeter +500 extra range to allow the build UI to show what a Starlight can hit
-	Spring.SetUnitWeaponState(unitID, 1, "range", 10500)
+	Spring.SetUnitWeaponState(unitID, 1, "range", 10500 * mult * (weaponMult and weaponMult[1] or 1))
+end
+
+function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	RangeUpdate()
 
 	--Move(ShortSpikes,z_axis, -5)
 	--Move(LongSpikes,z_axis, -10)

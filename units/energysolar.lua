@@ -20,6 +20,8 @@ return { energysolar = {
     removewait      = 1,
     removestop      = 1,
     default_spacing = 0,
+    build_effect_sweep_height = 38,
+    normaltex = [[unittextures/arm_solar_normals.dds]],
 
     outline_x = 150,
     outline_y = 110,

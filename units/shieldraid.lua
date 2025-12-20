@@ -44,7 +44,7 @@ return { shieldraid = {
   },
 
   sightDistance          = 560,
-  speed                  = 90,
+  speed                  = 93,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -68,6 +68,7 @@ return { shieldraid = {
     LASER = {
       name                    = [[Laser Blaster]],
       areaOfEffect            = 8,
+      cegTag                  = [[laser_cannon_trail_thin]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,

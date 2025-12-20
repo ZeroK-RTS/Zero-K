@@ -42,6 +42,7 @@ return { platehover = {
     unstick_help       = [[1]],
     child_of_factory   = [[factoryhover]],
     buggeroff_offset   = 40,
+    normaltex = [[unittextures/factoryhover_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,
@@ -66,7 +67,7 @@ return { platehover = {
   useBuildingGroundDecal = true,
   waterline        = 1,
   workerTime       = Shared.FACTORY_BUILDPOWER,
-  yardMap          = [[oooooo oooooo yyyyyy yyyyyy yyyyyy yyyyyy]],
+  yardMap          = [[oooooo oooooo uuuuuu uuuuuu uuuuuu uuuuuu]],
 
   featureDefs      = {
 

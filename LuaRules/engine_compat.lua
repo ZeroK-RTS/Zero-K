@@ -142,6 +142,10 @@ if not Spring.GetCEGID then -- 104-1030
 	Spring.GetCEGID = RET_ONE -- 0 is SEG, 1+ are CEG
 end
 
+if SFX then -- 104-1031
+	SFX.GLOBAL = SFX.GLOBAL or 16384
+end
+
 if not Script.IsEngineMinVersion(104, 0, 1100) then
 	Script.SetWatchProjectile  = Script.SetWatchWeapon
 	Script.SetWatchExplosion   = Script.SetWatchWeapon
@@ -149,12 +153,12 @@ if not Script.IsEngineMinVersion(104, 0, 1100) then
 end
 
 if not Script.IsEngineMinVersion(104, 0, 1143) then
-	local spGetCommandQueue = Spring.GetCommandQueue
+	local spGetUnitCommands = Spring.GetUnitCommands
 	local unpacc = unpack
 	Spring.GetUnitCurrentCommand = function (unitID, index)
 		index = index or 1
 
-		local queue = spGetCommandQueue(unitID, index)
+		local queue = spGetUnitCommands(unitID, index)
 		if not queue then
 			return
 		end
@@ -447,6 +451,19 @@ end
 
 Game.metalMapSquareSize = Game.metalMapSquareSize or 16 -- BAR 105-1505
 
+if not tracy then -- BAR 105-1602
+	tracy = {
+		ZoneBegin   = RET_NONE,
+		ZoneBeginN  = RET_NONE,
+		ZoneBeginS  = RET_NONE,
+		ZoneBeginNS = RET_NONE,
+		ZoneEnd     = RET_NONE,
+		ZoneText    = RET_NONE,
+		ZoneName    = RET_NONE,
+		Message     = RET_NONE,
+	}
+end
+
 if not Spring.SetUnitHeadingAndUpDir and Script.GetSynced() then -- BAR 105-1611
 	Spring.SetUnitHeadingAndUpDir    = RET_NONE
 	Spring.SetFeatureHeadingAndUpDir = RET_NONE
@@ -615,19 +632,39 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 	end
 end
 
+if not Script.IsEngineMinVersion(105, 0, 1856) then
+	local knownBoolsT = {}
+	local originalSTRP = Spring.SetTeamRulesParam
+	local originalGTRP = Spring.GetTeamRulesParam
+	Spring.SetTeamRulesParam = function(teamID, name, value, visibility)
+		if type(value) == "boolean" then
+			knownBoolsT[name] = true
+			return originalSTRP(teamID, name, value and "1" or "0", visibility)
+		end
+		return originalSTRP(teamID, name, value, visibility)
+	end
+	Spring.GetTeamRulesParam = function(teamID, name)
+		if knownBoolsT[name] then
+			return (originalGTRP(teamID, name) == "1")
+		end
+		return originalGTRP(teamID, name)
+	end
+	-- TODO: boolean game/unit/player rules params
+end
+
 if not Script.IsEngineMinVersion(105, 0, 1873) then
 	local vfsDirList = VFS.DirList
 	local vfsSubDirs = VFS.SubDirs
 
-	local function recursiveSearch(results, dir, pattern, modes)
-		local files = vfsDirList(dir, pattern, modes)
+	local function recursiveSearch(searchFunc, results, dir, pattern, modes)
+		local files = searchFunc(dir, pattern, modes)
 		for i = 1, #files do
 			results[#results + 1] = files[i]
 		end
 
 		local subfolders = vfsSubDirs(dir, "*", modes)
 		for i = 1, #subfolders do
-			recursiveSearch(results, subfolders[i], pattern, modes)
+			recursiveSearch(searchFunc, results, subfolders[i], pattern, modes)
 		end
 	end
 
@@ -636,7 +673,17 @@ if not Script.IsEngineMinVersion(105, 0, 1873) then
 			return vfsDirList(dir, pattern, modes)
 		else
 			local results = {}
-			recursiveSearch(results, dir, pattern, modes)
+			recursiveSearch(vfsDirList, results, dir, pattern, modes)
+			return results
+		end
+	end
+
+	VFS.SubDirs = function(dir, pattern, modes, recursive)
+		if not recursive then
+			return vfsSubDirs(dir, pattern, modes)
+		else
+			local results = {}
+			recursiveSearch(vfsSubDirs, results, dir, pattern, modes)
 			return results
 		end
 	end
@@ -803,11 +850,12 @@ if not Spring.GetUnitCommandCount then -- BAR 105-2720
 	end
 end
 
-if true then -- No engine has this yet
-	local origAddUnitDamage = Spring.AddUnitDamage
-	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
-		gadgetHandler.GG._AddUnitDamage_teamID = teamID
-		origAddUnitDamage(unitID, damage, paralyze, attackerID, weaponID)
-		gadgetHandler.GG._AddUnitDamage_teamID = nil -- TODO: deal with recursion by saving old value. But this needs testing.
-	end
+if not Spring.SetMiniMapRotation then -- 2025.03
+	Spring.SetMiniMapRotation = RET_NONE
+end
+
+if gl and not gl.ObjectLabel then -- 2025.03, but can be nil anyway due to missing driver support
+	gl.ObjectLabel    = RET_NONE
+	gl.PushDebugGroup = RET_NONE
+	gl.PopDebugGroup  = RET_NONE
 end

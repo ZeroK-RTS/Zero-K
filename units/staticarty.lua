@@ -21,6 +21,7 @@ return { staticarty = {
     aimposoffset   = [[0 26 0]],
     midposoffset   = [[0 10 0]],
     bait_level_default = 1,
+    normaltex = [[unittextures/Core_normals.dds]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -71,6 +72,7 @@ return { staticarty = {
       avoidGround             = true,
       burst                   = 3,
       burstRate               = 0.133,
+      cegTag                  = [[heavy_aoe_arty_trail]],
       craterBoost             = 1,
       craterMult              = 2,
 

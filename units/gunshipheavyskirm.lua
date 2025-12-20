@@ -78,6 +78,7 @@ return { gunshipheavyskirm = {
       burnBlow                = true,
       burst                   = 4,
       burstrate               = 0.1,
+      cegTag                  = [[hmg_trail]],
       collideFriendly         = false,
       craterBoost             = 0.15,
       craterMult              = 0.3,
@@ -90,7 +91,7 @@ return { gunshipheavyskirm = {
       },
       
       damage                  = {
-        default = 19.3,
+        default = 20,
       },
 
       edgeEffectiveness       = 0.5,

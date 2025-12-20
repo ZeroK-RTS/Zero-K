@@ -5,7 +5,7 @@ local sprGetActiveCommand    = Spring.GetActiveCommand
 local sprGetDefaultCommand   = Spring.GetDefaultCommand
 local sprGetGameSeconds      = Spring.GetGameSeconds
 local sprGetSelectedUnits    = Spring.GetSelectedUnits
-local sprGetCommandQueue     = Spring.GetCommandQueue
+local sprGetUnitCommands     = Spring.GetUnitCommands
 local sprGetMouseState       = Spring.GetMouseState
 local sprGetModKeyState      = Spring.GetModKeyState
 local sprGiveOrderToUnit     = Spring.GiveOrderToUnit
@@ -186,7 +186,7 @@ local function GetWayPointsNearCursor(wpTbl, mx, my, wantAverage)
 
 	for i = 1, #selUnitsTbl do
 		local unitID = selUnitsTbl[i]
-		local commands = sprGetCommandQueue(unitID, -1)
+		local commands = sprGetUnitCommands(unitID, -1)
 
 		for cmdNum = 1, #commands do
 			local curCmd      = commands[cmdNum    ]
@@ -293,7 +293,7 @@ local function UpdateWayPoints(wpTbl)
 		local cmdUnitID = wpData[7]
 		local cmdValid  = false
 
-		local unitCmds = sprGetCommandQueue(cmdUnitID, -1)
+		local unitCmds = sprGetUnitCommands(cmdUnitID, -1)
 
 		-- check if the command has not been completed
 		-- since the MousePress() event occurred (tags

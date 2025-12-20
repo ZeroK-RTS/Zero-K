@@ -20,6 +20,7 @@ return { cloakassault = {
     modelradius    = [[12]],
     cus_noflashlight = 1,
     bait_level_default = 0,
+    normaltex = [[unittextures/spherebot_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -76,11 +77,12 @@ return { cloakassault = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = 600,
+        extra_damage = 720,
         
         light_camera_height = 1600,
         light_color = [[0.85 0.85 1.2]],
         light_radius = 200,
+        burst = Shared.BURST_RELIABLE,
       },
 
       cylinderTargeting      = 0,

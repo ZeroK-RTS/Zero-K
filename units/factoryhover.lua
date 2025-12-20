@@ -47,6 +47,7 @@ return { factoryhover = {
     parent_of_plate     = [[platehover]],
     buggeroff_radius   = 40,
     buggeroff_offset   = 5,
+    normaltex = [[unittextures/factoryhover_normals.dds]],
 
     stats_show_death_explosion = 1,
 
@@ -73,7 +74,7 @@ return { factoryhover = {
   useBuildingGroundDecal = true,
   waterline        = 1,
   workerTime       = Shared.FACTORY_BUILDPOWER,
-  yardMap          = [[xoooooox oooooooo oooooooo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox yyyyyyyy yyyyyyyy yyyyyyyy yyyyyyyy]],
+  yardMap          = [[xoooooox oooooooo ooeeeeoo ooeeeeoo ooeeeeoo ooeeeeoo ooeeeeoo xoeeeeox uuuuuuuu uuuuuuuu uuuuuuuu uuuuuuuu]],
 
   featureDefs      = {
 

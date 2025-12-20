@@ -17,7 +17,7 @@ function widget:GetInfo()
 		author    = "jK",
 		date      = "2009", --2013 May 12
 		license   = "GNU GPL, v2 or later",
-		layer     = -10, -- above gui_selectedunits_gl4, below gui_name_tags 
+		layer     = -11, -- above gui_selectedunits_gl4, below gui_name_tags 
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -66,38 +66,48 @@ for i = 1, #FeatureDefs do
 	drawnFeature[i] = (FeatureDefs[i].drawTypeString == "model")
 end
 
+local addPercent
+local addTitle
+
+local myAllyTeamID = Spring.GetLocalAllyTeamID()
+local spectating = Spring.GetSpectatingState()
+
 --------------------------------------------------------------------------------
 -- LOCALISATION
 --------------------------------------------------------------------------------
 
+-- messages are populated by localization.
 local messages = {
-	shield_bar = "shield",
-	health_bar = "health",
-	building = "building",
-	morph = "morph",
-	stockpile = "stockpile",
-	paralyze = "paralyze",
-	disarm = "disarm",
-	capture = "capture",
-	capture_reload = "capture reload",
-	water_tank = "water tank",
-	teleport = "teleport",
-	teleport_pw = "teleport",
-	ability = "ability",
-	heat = "heat",
-	speed = "speed",
-	reload = "reload",
-	reammo = "reammo",
-	slow = "slow",
-	goo = "goo",
-	jump = "jump",
-	reclaim = "reclaim",
-	resurrect = "resurrect",
+	-- Units
+	shield = "",
+	health = "",
+	building = "",
+	morph = "",
+	stockpile = "",
+	paralyze = "",
+	disarm = "",
+	capture = "",
+	capture_reload = "",
+	teleport = "",
+	teleport_pw = "",
+	ability = "",
+	heat = "",
+	speed = "",
+	reload = "",
+	reammo = "",
+	slow = "",
+	goo = "",
+	jump = "",
+	jump_charge = "",
+
+	-- Features
+	reclaim = "",
+	resurrect = "",
 }
 
 local function languageChanged ()
 	for key, value in pairs(messages) do
-		messages[key] = WG.Translate ("interface", key)
+		messages[key] = WG.Translate("interface", key .. "_bar")
 	end
 end
 
@@ -120,10 +130,15 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump',
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump', 'showEnemyStatus',
 	'barScale', 'debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
+	'invert_shield', 'invert_health', 'invert_building', 'invert_morph',
+	'invert_stockpile', 'invert_paralyze', 'invert_disarm', 'invert_capture',
+	'invert_capture_reload', 'invert_teleport', 'invert_teleport_pw', 'invert_ability',
+	'invert_heat', 'invert_speed', 'invert_reload', 'invert_reammo',
+	'invert_slow', 'invert_goo', 'invert_jump', 'invert_jump_charge', 'invert_reclaim', 'invert_resurrect',
 }
 options = {
 	showhealthbars = {
@@ -154,6 +169,12 @@ options = {
 		value = true,
 		noHotkey = true,
 		desc = 'Set jump reload to flash when issuing the jump command',
+	},
+	showEnemyStatus = {
+		name = 'Show enemy status',
+		type = 'bool',
+		value = false,
+		desc = 'A few rare units (eg Detriment jump charge) show their status to enemies.',
 	},
 	barScale = {
 		name = 'Bar size scale',
@@ -231,6 +252,204 @@ options = {
 		value = 500,
 		OnChange = OptionsChanged,
 	},
+	invert_shield = {
+		name = 'Invert shield bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert shield bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_health = {
+		name = 'Invert health bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert health bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_building = {
+		name = 'Invert building bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert building bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_morph = {
+		name = 'Invert morph bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert morph bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_stockpile = {
+		name = 'Invert stockpile bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert stockpile bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_paralyze = {
+		name = 'Invert paralyze bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert paralyze bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_disarm = {
+		name = 'Invert disarm bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert disarm bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_capture = {
+		name = 'Invert capture bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert capture bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_capture_reload = {
+		name = 'Invert capture_reload bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert capture_reload bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_teleport = {
+		name = 'Invert teleport bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert teleport bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_teleport_pw = {
+		name = 'Invert teleport_pw bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert teleport_pw bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_ability = {
+		name = 'Invert ability bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert ability bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_heat = {
+		name = 'Invert heat bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert heat bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_speed = {
+		name = 'Invert speed bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert speed bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_reload = {
+		name = 'Invert reload bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert reload bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_reammo = {
+		name = 'Invert reammo bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert reammo bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_slow = {
+		name = 'Invert slow bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert slow bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_goo = {
+		name = 'Invert goo bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert goo bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_jump = {
+		name = 'Invert jump bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert jump bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_jump_charge = {
+		name = 'Invert jump charge bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert jump bar for additional charges',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_reclaim = {
+		name = 'Invert reclaim bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert reclaim bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
+	invert_resurrect = {
+		name = 'Invert resurrect bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Invert resurrect bar',
+		OnChange = OptionsChanged,
+		path = 'Settings/Interface/Healthbars/Invert'
+	},
 }
 OptionsChanged()
 
@@ -281,31 +500,37 @@ local fbkBottom   = { 0.40, 0.40, 0.40, featureBarAlpha }
 local fbkTop      = { 0.06, 0.06, 0.06, featureBarAlpha }
 local fhpcolormap = { {0.8, 0.0, 0.0, featureBarAlpha},  {0.8, 0.6, 0.0, featureBarAlpha}, {0.0, 0.70, 0.0, featureBarAlpha} }
 
+-- durations flash _p and _b colors.
 local barColors = {
 	-- Units
-	emp            = { 0.50, 0.50, 1.00, barAlpha },
-	emp_p          = { 0.40, 0.40, 0.80, barAlpha },
-	emp_b          = { 0.60, 0.60, 0.90, barAlpha },
+	shield         = { 0.30, 0.00, 0.90, barAlpha },
+	-- healtas colores are in bfcolormap 
+        building       = { 0.75, 0.75, 0.75, barAlpha },
+        morph          = { 0.60, 0.60, 0.60, barAlpha },
+	stockpile      = { 0.50, 0.50, 0.50, barAlpha },
+	paralyze       = { 0.50, 0.50, 1.00, barAlpha },
+	paralyze_p     = { 0.40, 0.40, 0.80, barAlpha },
+	paralyze_b     = { 0.60, 0.60, 0.90, barAlpha },
 	disarm         = { 0.50, 0.50, 0.50, barAlpha },
 	disarm_p       = { 0.40, 0.40, 0.40, barAlpha },
 	disarm_b       = { 0.60, 0.60, 0.60, barAlpha },
 	capture        = { 1.00, 0.50, 0.00, barAlpha },
 	capture_reload = { 0.00, 0.60, 0.60, barAlpha },
-	build          = { 0.75, 0.75, 0.75, barAlpha },
-	stock          = { 0.50, 0.50, 0.50, barAlpha },
-	reload         = { 0.00, 0.60, 0.60, barAlpha },
-	reload2        = { 0.80, 0.60, 0.00, barAlpha },
+	teleport       = { 0.00, 0.60, 0.60, barAlpha },
+	teleport_pw    = { 0.00, 0.60, 0.60, barAlpha },
+	ability        = { 0.80, 0.60, 0.00, barAlpha },
+	heat           = { 0.80, 0.60, 0.00, barAlpha },
+	speed          = { 0.80, 0.60, 0.00, barAlpha },
 	reammo         = { 0.00, 0.60, 0.60, barAlpha },
-	jump           = { 0.00, 0.80, 0.00, barAlpha },
-	jump_p         = { 0.80, 0.50, 0.00, barAlpha },
-	sheath         = { 0.00, 0.20, 1.00, barAlpha },
-	fuel           = { 0.70, 0.30, 0.00, barAlpha },
+	reload         = { 0.00, 0.60, 0.60, barAlpha },
 	slow           = { 0.50, 0.10, 0.70, barAlpha },
+	slow_p         = { 0.50, 0.10, 0.70, barAlpha },
+	slow_b         = { 0.50, 0.10, 0.70, barAlpha },
 	goo            = { 0.40, 0.40, 0.40, barAlpha },
-	shield         = { 0.30, 0.0, 0.90, barAlpha },
-	tank           = { 0.10, 0.20, 0.90, barAlpha },
-	tele           = { 0.00, 0.60, 0.60, barAlpha },
-	tele_pw        = { 0.00, 0.60, 0.60, barAlpha },
+	jump           = { 0.00, 0.80, 0.00, barAlpha },
+	jump_charge    = { 0.10, 0.50, 0.20, barAlpha },
+	jump_p         = { 0.80, 0.50, 0.00, barAlpha },
+	jump_b         = { 0.00, 0.80, 0.00, barAlpha },
 
 	-- Features
 	resurrect = { 1.00, 0.50, 0.00, featureBarAlpha },
@@ -445,14 +670,29 @@ local function GetBarDrawer()
 		end
 	end
 
-	function externalFunc.AddBar(title, progress, color_index, text, color)
+	function externalFunc.AddPercentBar(status, percent, color, textOverride)
 		barsN = barsN + 1
-		local barInfo    = bars[barsN]
+		local barInfo = bars[barsN]
+		local progress = percent
+		if options["invert_" .. status].value then
+			progress = 1 - progress
+		end
 		if barInfo then
-			barInfo.title    = title
+			barInfo.title    = addTitle and messages[status]
 			barInfo.progress = progress
-			barInfo.color    = color or barColors[color_index]
-			barInfo.text     = text
+			barInfo.color    = color or barColors[status]
+			barInfo.text     = addPercent and (textOverride or floor(percent*100) .. '%')
+		end
+	end
+
+	function externalFunc.AddDurationBar(status, duration)
+		barsN = barsN + 1
+		local barInfo = bars[barsN]
+		if barInfo then
+			barInfo.title    = addTitle and messages[status]
+			barInfo.progress = 1
+			barInfo.color    = barColors[(status .. ((blink and "_b") or "_p"))]
+			barInfo.text     = addPercent and floor(duration) .. 's'
 		end
 	end
 
@@ -523,7 +763,6 @@ do
 	local GetUnitStockpile     = Spring.GetUnitStockpile
 	local GetUnitRulesParam    = Spring.GetUnitRulesParam
 
-	local addPercent
 	local ux, uy, uz
 	local dx, dy, dz, dist
 	local health, maxHealth, paralyzeDamage, capture, build
@@ -533,6 +772,13 @@ do
 
 	local customInfo = {}
 	local ci
+
+	local function AllyOrShouldShowEnemyStatus(unitID)
+		if spectating or options.showEnemyStatus.value then
+			return true
+		end
+		return unitID and myAllyTeamID == Spring.GetUnitAllyTeam(unitID)
+	end
 
 	function JustGetOverlayInfos(unitID, unitDefID)
 		ux, uy, uz = GetUnitViewPosition(unitID)
@@ -584,8 +830,9 @@ do
 		if (not customInfo[unitDefID]) then
 			local ud = UnitDefs[unitDefID]
 			customInfo[unitDefID] = {
-				height        = Spring.Utilities.GetUnitHeight(ud) + 14,
+				height        = Spring.Utilities.GetUnitHeight(ud) + 14 + (tonumber(ud.customParams.health_bar_height) or 0),
 				canJump       = (ud.customParams.canjump and true) or false,
+				jumpCharges   = tonumber(ud.customParams.jump_charges),
 				canGoo        = (ud.customParams.grey_goo and true) or false,
 				canReammo     = (ud.customParams.reammoseconds and true) or false,
 				isPwStructure = (ud.customParams.planetwars_structure and true) or false,
@@ -598,7 +845,6 @@ do
 				reloadTime    = ud.reloadTime,
 				primaryWeapon = ud.primaryWeapon,
 				dyanmicComm   = ud.customParams.dynamic_comm,
-				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
 				specialReload = ud.customParams.specialreloadtime,
 				specialRate   = ud.customParams.specialreload_userate,
@@ -662,14 +908,14 @@ do
 					local shieldOn, shieldPower = GetUnitShieldState(unitID, GetUnitRulesParam(unitID, "comm_shield_num"))
 					if (shieldOn)and(build == 1)and(shieldPower < commShield) then
 						shieldPower = shieldPower / commShield
-						barDrawer.AddBar(addTitle and messages.shield_bar, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
+						barDrawer.AddPercentBar("shield", shieldPower)
 					end
 				end
 			else
 				local shieldOn, shieldPower = GetUnitShieldState(unitID)
 				if (shieldOn)and(build == 1)and(shieldPower < ci.maxShield) then
 					shieldPower = shieldPower / ci.maxShield
-					barDrawer.AddBar(addTitle and messages.shield_bar, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
+					barDrawer.AddPercentBar("shield", shieldPower)
 				end
 			end
 		end
@@ -681,19 +927,18 @@ do
 				hp100 = 100
 			end
 			if (drawFullHealthBars)or(hp100 < 100) then
-				barDrawer.AddBar(addTitle and messages.health_bar, hp, nil, (addPercent and hp100..'%') or '', bfcolormap[hp100])
+				barDrawer.AddPercentBar("health", hp, bfcolormap[hp100])
 			end
 		end
 
-		--// BUILD
+		--// BUILDING
 		if (build < 1) then
-			barDrawer.AddBar(addTitle and messages.building, build, "build", (addPercent and floor(build*100) .. '%'))
+			barDrawer.AddPercentBar("building", build)
 		end
 
-		--// MORPHING
+		--// MORPH
 		if (morph) then
-			local build = morph.progress
-			barDrawer.AddBar(addTitle and messages.morph, build, "build", (addPercent and floor(build*100) .. '%'))
+			barDrawer.AddPercentBar("morph", morph.progress)
 		end
 		
 		--// STOCKPILE
@@ -704,35 +949,27 @@ do
 				stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
 			end
 			if numStockpiled and stockpileBuild and (numStockpileQued ~= 0) then
-				barDrawer.AddBar(addTitle and messages.stockpile, stockpileBuild, "stock", (addPercent and floor(stockpileBuild*100) .. '%'))
+				barDrawer.AddPercentBar("stockpile", stockpileBuild)
 			end
 		else
 			numStockpiled = false
 		end
 		
-			--// PARALYZE
+		--// PARALYZE
 		local paraTime = false
 		local stunned = GetUnitIsStunned(unitID)
 		if (emp > 0) and(emp < 1e8) then
-			local infotext = ""
 			stunned = stunned and paralyzeDamage >= empHP
 			if (stunned) then
 				paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
 				paraUnits[#paraUnits+1] = unitID
-				if (addPercent) then
-					infotext = floor(paraTime) .. 's'
-				end
-				emp = 1
+				barDrawer.AddDurationBar("paralyze", paraTime)
 			else
 				if (emp > 1) then
 					emp = 1
 				end
-				if (addPercent) then
-					infotext = floor(emp*100)..'%'
-				end
+				barDrawer.AddPercentBar("paralyze", emp)
 			end
-			local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
-			barDrawer.AddBar(addTitle and messages.paralyze, emp, empcolor_index, infotext)
 		end
 		
 		 --// DISARM
@@ -741,12 +978,12 @@ do
 			local disarmProp = (disarmFrame - gameFrame)/1200
 			if disarmProp < 1 then
 				if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
-					barDrawer.AddBar(addTitle and messages.disarm, disarmProp, "disarm", (addPercent and floor(disarmProp*100) .. '%'))
+					barDrawer.AddPercentBar("disarm", disarmProp)
 				end
 			else
 				local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
 				if (not paraTime) or disarmTime > paraTime + 0.5 then
-					barDrawer.AddBar(addTitle and messages.disarm, 1, ((blink and "disarm_b") or "disarm_p") or ("disarm"), floor(disarmTime) .. 's')
+					barDrawer.AddDurationBar("disarm", disarmTime)
 					if not stunned then
 						disarmUnits[#disarmUnits+1] = unitID
 					end
@@ -756,7 +993,7 @@ do
 		
 		--// CAPTURE (set by capture gadget)
 		if ((capture or -1) > 0) then
-			barDrawer.AddBar(addTitle and messages.capture, capture, "capture", (addPercent and floor(capture*100) .. '%'))
+			barDrawer.AddPercentBar("capture", capture)
 		end
 		
 		--// CAPTURE RECHARGE
@@ -764,18 +1001,7 @@ do
 			local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame")
 			if (captureReloadState and captureReloadState > 0) then
 				local capture = 1-(captureReloadState-gameFrame)/ci.captureReload
-				barDrawer.AddBar(addTitle and messages.capture_reload, capture, "reload", (addPercent and floor(capture*100) .. '%'))
-			end
-		end
-		
-		--// WATER TANK
-		if ci.maxWaterTank then
-			local waterTank = GetUnitRulesParam(unitID, "watertank")
-			if waterTank then
-				local prog = waterTank/ci.maxWaterTank
-				if prog < 1 then
-					barDrawer.AddBar(addTitle and messages.water_tank, prog, "tank", (addPercent and floor(prog*100) .. '%'))
-				end
+				barDrawer.AddPercentBar("capture_reload", capture)
 			end
 		end
 		
@@ -792,7 +1018,7 @@ do
 				prog = 1 - TeleportEnd
 			end
 			if prog < 1 then
-				barDrawer.AddBar(addTitle and messages.teleport, prog, "tele", (addPercent and floor(prog*100) .. '%'))
+				barDrawer.AddPercentBar("teleport", prog)
 			end
 		end
 		
@@ -802,25 +1028,25 @@ do
 			if TeleportEnd then
 				local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
 				if prog < 1 then
-					barDrawer.AddBar(addTitle and messages.teleport, prog, "tele_pw", (addPercent and floor(prog*100) .. '%'))
+					barDrawer.AddPercentBar("teleport_pw", prog)
 				end
 			end
 		end
 		
-		--// SPECIAL WEAPON
+		--// SPECIAL WEAPON / ABILITY
 		if ci.specialReload then
 			if ci.specialRate then
 				local specialReloadProp = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
 				if (specialReloadProp > 0) and (specialReloadProp < 1) then
-					local special = 1 - specialReloadProp
-					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+					local special = 1-specialReloadProp
+					barDrawer.AddPercentBar("ability", special)
 				end
 			
 			else
 				local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
 				if (specialReloadState and specialReloadState > gameFrame) then
 					local special = 1-(specialReloadState-gameFrame)/ci.specialReload -- don't divide by gamespeed, since specialReload is also in gameframes
-					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+					barDrawer.AddPercentBar("ability", special)
 				end
 			end
 		end
@@ -829,7 +1055,7 @@ do
 		if ci.heat and build == 1 then
 			local heatState = GetUnitRulesParam(unitID, "heat_bar")
 			if (heatState and heatState > 0) then
-				barDrawer.AddBar(addTitle and messages.heat, heatState, "reload2", (addPercent and floor(heatState*100) .. '%'))
+				barDrawer.AddPercentBar("heat", heatState)
 			end
 		end
 		
@@ -837,7 +1063,7 @@ do
 		if ci.speed and build == 1 then
 			local speedState = GetUnitRulesParam(unitID, "speed_bar")
 			if (speedState and speedState < 1) then
-				barDrawer.AddBar(addTitle and messages.speed, speedState, "reload2", (addPercent and floor(speedState*100) .. '%'))
+				barDrawer.AddPercentBar("speed", speedState)
 			end
 		end
 		
@@ -845,7 +1071,7 @@ do
 		if ci.canReammo then
 			local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
 			if reammoProgress then
-				barDrawer.AddBar(addTitle and messages.reammo, reammoProgress, "reammo", (addPercent and floor(reammoProgress*100) .. '%'))
+				barDrawer.AddPercentBar("reammo", reammoProgress)
 			end
 		end
 		
@@ -862,7 +1088,7 @@ do
 					if (reloadFrame > gameFrame + 6) or (GetUnitRulesParam(unitID, "reloadPaused") ~= 1) then -- UPDATE_PERIOD in unit_attributes.lua.
 						reload = 1 - ((reloadFrame-gameFrame)/gameSpeed) / ci.reloadTime;
 						if (reload >= 0) then
-							barDrawer.AddBar(addTitle and messages.reload, reload, "reload", (addPercent and floor(reload*100) .. '%'))
+							barDrawer.AddPercentBar("reload", reload)
 						end
 					end
 				end
@@ -873,10 +1099,10 @@ do
 			local reloadFrame = GetUnitRulesParam(unitID, "scriptReloadFrame")
 			if reloadFrame and reloadFrame > gameFrame then
 				local scriptLoaded = GetUnitRulesParam(unitID, "scriptLoaded") or ci.scriptBurst
-				local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
 				reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
+				local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
 				if (reload >= 0) then
-					barDrawer.AddBar(addTitle and messages.reload, reload, "reload", (addPercent and barText))
+					barDrawer.AddPercentBar("reload", reload, false, barText)
 				end
 			end
 		end
@@ -884,16 +1110,16 @@ do
 		--// SHEATH
 		--local sheathState = GetUnitRulesParam(unitID, "sheathState")
 		--if sheathState and (sheathState < 1) then
-		--	barDrawer.AddBar("sheath", sheathState, "sheath", (addPercent and floor(sheathState*100) .. '%'))
+		--	barDrawer.AddPercentBar("sheath", sheathState)
 		--end
 		
 		--// SLOW
 		local slowState = GetUnitRulesParam(unitID, "slowState")
 		if (slowState and (slowState > 0)) then
 			if slowState > 0.5 then
-				barDrawer.AddBar(addTitle and messages.slow, 1, "slow", (addPercent and floor((slowState - 0.5)*25) .. 's'))
+				barDrawer.AddDurationBar("slow", (slowState - 0.5)*25)
 			else
-				barDrawer.AddBar(addTitle and messages.slow, slowState*2, "slow", (addPercent and floor(slowState*100) .. '%'))
+				barDrawer.AddPercentBar("slow", slowState*2, false, floor(slowState*100) .. '%')
 			end
 		end
 		
@@ -901,15 +1127,18 @@ do
 		if ci.canGoo then
 			local gooState = GetUnitRulesParam(unitID, "gooState")
 			if (gooState and (gooState > 0)) then
-				barDrawer.AddBar(addTitle and messages.goo, gooState, "goo", (addPercent and floor(gooState*100) .. '%'))
+				barDrawer.AddPercentBar("goo", gooState)
 			end
 		end
 		
 		--// JUMPJET
-		if ci.canJump then
+		if ci.canJump and AllyOrShouldShowEnemyStatus(unitID) then
 			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
 			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
-				barDrawer.AddBar(addTitle and messages.jump, jumpReload, ((blink_j and "jump_p") or "jump"), (addPercent and floor(jumpReload*100) .. '%'))
+				barDrawer.AddPercentBar("jump", jumpReload)
+			elseif ci.jumpCharges and jumpReload and (jumpReload < ci.jumpCharges) and (jumpReload >= 1) then
+				local barText = string.format("%i/%i", math.floor(jumpReload), ci.jumpCharges)
+				barDrawer.AddPercentBar("jump_charge", (jumpReload - 1) / (ci.jumpCharges - 1), false, barText)
 			end
 		end
 		
@@ -960,7 +1189,7 @@ do
 	local customInfo = {}
 	local ci
 
-	function DrawFeatureInfos(featureID, featureDefID, addPercent, addTitle, fx, fy, fz)
+	function DrawFeatureInfos(featureID, featureDefID, fx, fy, fz)
 		if (not customInfo[featureDefID]) then
 			local featureDef = FeatureDefs[featureDefID or -1] or {height = 0, name = ''}
 			customInfo[featureDefID] = {
@@ -990,18 +1219,18 @@ do
 		--// BARS //-----------------------------------------------------------------------------
 		--// HEALTH
 		if (hp < featureHpThreshold)and(drawFeatureHealth) then
-			local hpcolor = {GetColor(fhpcolormap, hp)}
-			barDrawer.AddBar(addTitle and messages.health_bar, hp, nil, (addPercent and floor(hp*100) .. '%'), hpcolor)
+			hp100 = hp*100; hp100 = hp100 - hp100%1; --//same as floor(hp*100), but 10% faster
+			barDrawer.AddPercentBar("health", hp, bfcolormap[hp100])
 		end
 
 		--// RESURRECT
 		if (resurrect > 0) then
-			barDrawer.AddBar(addTitle and messages.resurrect, resurrect, "resurrect", (addPercent and floor(resurrect*100) .. '%'))
+			barDrawer.AddPercentBar("resurrect", resurrect)
 		end
 
 		--// RECLAIMING
 		if (reclaimLeft > 0 and reclaimLeft < 1) then
-			barDrawer.AddBar(addTitle and messages.reclaim, reclaimLeft, "reclaim", (addPercent and floor(reclaimLeft*100) .. '%'))
+			barDrawer.AddPercentBar("reclaim", reclaimLeft)
 		end
 
 		if barDrawer.HasBars() then
@@ -1127,8 +1356,13 @@ end --//end do
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function widget:PlayerChanged()
+	myAllyTeamID = Spring.GetLocalAllyTeamID()
+	spectating = Spring.GetSpectatingState()
+end
+
 function widget:Initialize()
-	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	WG.InitializeTranslation(languageChanged, GetInfo().name)
 
 	--// catch f9
 	Spring.SendCommands({"showhealthbars 0"})
@@ -1263,7 +1497,9 @@ do
 					dx, dy, dz = wx-cx, wy-cy, wz-cz
 					dist = dx*dx + dy*dy + dz*dz
 					if (dist < featureDistSq) then
-						DrawFeatureInfos(featureInfo[4], featureInfo[5], (dist < featurePercentSq), (dist < featureTitleSq), wx, wy, wz)
+						addTitle = dist < featureTitleSq
+						addPercent = dist < featurePercentSq
+						DrawFeatureInfos(featureInfo[4], featureInfo[5], wx, wy, wz)
 					end
 				end
 			end
@@ -1280,7 +1516,9 @@ do
 
 		glDepthMask(false)
 
-		DrawOverlays()
+		if not WG.DrawParalyzedUnitGL4 then
+			DrawOverlays()
+		end
 		glMultiTexCoord(1, 1, 1, 1)
 		glColor(1, 1, 1, 1)
 
@@ -1312,6 +1550,7 @@ do
 		sec = sec+dt
 		blink = (sec%1) < 0.5
 		blink_j = options.flashJump.value and (activeCmdID == CMD_JUMP) and ((sec%0.5) < 0.25)
+                barColors.jump = (blink_j and barColors.jump_p) or barColors.jump_b
 
 		gameFrame = GetGameFrame()
 		visibleUnits = GetVisibleUnits(-1, nil, false) --this don't need any delayed update or caching or optimization since its already done in "LUAUI/cache.lua"

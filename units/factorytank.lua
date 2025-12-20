@@ -44,6 +44,7 @@ return { factorytank = {
     factorytab       = 1,
     shared_energy_gen = 1,
     parent_of_plate   = [[platetank]],
+    normaltex = [[unittextures/factorytank_normals.dds]],
 
     stats_show_death_explosion = 1,
 
@@ -70,7 +71,7 @@ return { factorytank = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = "oooooooo oooooooo oooooooo oooooooo yccccccy yccccccy yccccccy yccccccy",
+  yardMap                       = "oooooooo oooooooo oooooooo oooooooo uccccccu uccccccu uccccccu uccccccu",
 
   featureDefs                   = {
 

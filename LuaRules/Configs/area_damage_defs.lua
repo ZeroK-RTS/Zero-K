@@ -20,6 +20,8 @@ for id, data in pairs(WeaponDefs) do
 				damage = tonumber(cp.area_damage_dps)*damageUpdateRate/30,
 				radius = tonumber(cp.area_damage_radius),
 				plateauRadius = tonumber(cp.area_damage_plateau_radius),
+				plateauFall = tonumber(cp.area_damage_plateau_fall),
+				dragFactor = tonumber(cp.area_damage_drag_factor),
 				impulse = (cp.area_damage_is_impulse == "1"),
 				slow = (cp.area_damage_is_slow == "1"),
 				duration = tonumber(cp.area_damage_duration) * 30,

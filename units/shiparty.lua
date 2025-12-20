@@ -70,12 +70,13 @@ return { shiparty = {
       avoidGround             = true,
       burst                   = 2,
       burstRate               = 0.4,
+      cegTag                  = [[medium_arty_trail]],
       craterBoost             = 1,
       craterMult              = 2,
 
-            customParams = {
-                burst = Shared.BURST_RELIABLE,
-            },
+      customParams = {
+        burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
         default = 600.01,

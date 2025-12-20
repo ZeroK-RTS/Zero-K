@@ -20,6 +20,7 @@ return { cloakskirm = {
     reload_move_penalty = 0.66,
     cus_noflashlight = 1,
     bait_level_default = 0,
+    normaltex = [[unittextures/spherebot_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

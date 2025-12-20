@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date      = "May 2020",
 		license   = "GPL V2",
 		layer     = 0,
-		enabled   = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+		enabled   = Script.IsEngineMinVersion(105, 0, 500),
 	}
 end
 
@@ -443,13 +443,23 @@ end
 -- Callins
 
 local function GetModelFragShader()
-	if Spring.Utilities.IsCurrentVersionNewerThan(105, 1450) then
+	if Script.IsEngineMinVersion(105, 0, 1450) then
 		return VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS.glsl")
 	end
 	return VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS_old1450.glsl")
 end
 
 function gadget:Initialize()
+	if GG.CUSGL4 then
+		for _, unitID in ipairs(Spring.GetAllUnits()) do
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
+			if not inbuild then
+				gadget:UnitFinished(unitID, unitDefID)
+			end
+		end
+		return
+	end
 	local vsSrc = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl")
 	local fsSrc = GetModelFragShader()
 
@@ -545,6 +555,9 @@ function gadget:Initialize()
 end
 
 function gadget:Shutdown()
+	if GG.CUSGL4 then
+		return
+	end
 	for unitID, _ in pairs(overriddenUnits) do
 		RemoveUnit(unitID)
 	end
@@ -580,6 +593,9 @@ function gadget:Shutdown()
 end
 
 function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
+	if GG.CUSGL4 then
+		return
+	end
 	local drawPass = 1 --opaque
 
 	if deferredPass then
@@ -599,6 +615,9 @@ function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
 end
 
 function gadget:DrawAlphaUnitsLua(drawReflection, drawRefraction)
+	if GG.CUSGL4 then
+		return
+	end
 	local drawPass = 2 --alpha
 
 	if drawReflection then
@@ -623,16 +642,31 @@ end
 
 local handledUnits = IterableMap.New()
 function gadget:GameFrame(n)
+	if GG.CUSGL4 then
+		return
+	end
 	IterableMap.ApplyFraction(handledUnits, 10, n%10, CheckRemoval)
 end
 
 function gadget:UnitFinished(unitID, unitDefID)
 	local skinName = Spring.GetUnitRulesParam(unitID, 'comm_texture')
+	if GG.CUSGL4 then
+		if skinName then
+			local data = skinDefs[skinName]
+			local tex1 = data.altskin
+			local tex2 = data.altskin2
+			GG.CUSGL4.SetUnitTexture(unitID, tex1, tex2)
+		end
+		return
+	end
 	ProcessUnit(unitID, unitDefID, overrideDrawFlag, skinName)
 	IterableMap.Add(handledUnits, unitID)
 end
 
 function gadget:RenderUnitDestroyed(unitID)
+	if GG.CUSGL4 then
+		return
+	end
 	RemoveUnit(unitID)
 	IterableMap.Remove(handledUnits, unitID)
 end

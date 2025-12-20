@@ -137,6 +137,7 @@ return { benzcom1 = {
     ASSAULT_CANNON = {
       name                    = [[Assault Cannon]],
       areaOfEffect            = 32,
+      cegTag                  = [[medium_plasma_trail]],
       craterBoost             = 1,
       craterMult              = 3,
     

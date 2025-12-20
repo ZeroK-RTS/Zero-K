@@ -46,6 +46,8 @@ local spGiveOrderToUnitArray  = Spring.GiveOrderToUnitArray
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor ~= "off" and not Spring.Utilities.Gametype.isCoop())
+local allowPlayerInactivity = not Spring.Utilities.Gametype.isFullCommshare()
+local MERGE_SHARE = tonumber(Spring.GetModOptions().mergeresourceshare or 0.5) or 0.5
 
 include("LuaRules/Configs/constants.lua")
 
@@ -219,7 +221,11 @@ local function UpdateTeamActivity(teamID)
 	for i = 1, #players do
 		local activeRank = GetPlayerActivity(players[i])
 		if activeRank then
-			resourceShare = resourceShare + 1
+			if resourceShare == 0 then
+				resourceShare = 1
+			else
+				resourceShare = resourceShare + MERGE_SHARE
+			end
 			if (not teamRank) or (activeRank > teamRank) then
 				teamRank = activeRank
 			end
@@ -243,6 +249,10 @@ local function UpdateTeamActivity(teamID)
 			if GetPlayerActivity(hostingPlayerID, true) and isAiTeam then
 				resourceShare = resourceShare + 1
 			end
+		end
+	elseif not allowPlayerInactivity then
+		if resourceShare == 0 then
+			resourceShare = 1
 		end
 	end
 	

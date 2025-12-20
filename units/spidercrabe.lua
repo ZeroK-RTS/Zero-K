@@ -30,7 +30,7 @@ return { spidercrabe = {
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 4,
   footprintZ             = 4,
-  health                 = 4200,
+  health                 = 4800,
   iconType               = [[spidersupport]],
   leaveTracks            = true,
   maxSlope               = 36,
@@ -79,6 +79,7 @@ return { spidercrabe = {
     ARM_CRABE_GAUSS = {
       name                    = [[Heavy Plasma Cannon]],
       areaOfEffect            = 200,
+      cegTag                  = [[crab_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0.5,
 

@@ -17,6 +17,14 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Other
+
+local unitSpawnIndex = 0
+local spawnPos = {1300, 1700}
+local speedMode = false
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Mission Creation
 
 local recentlyExported = false
@@ -115,7 +123,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 	end
 	
 	if sendCommands then
-		local commands = Spring.GetCommandQueue(unitID, -1)
+		local commands = Spring.GetUnitCommands(unitID, -1)
 		if commands and #commands > 0 then
 			local commandString = ProcessUnitCommands(inTabs, commands, unitID, not ud.isImmobile)
 			if commandString then
@@ -317,6 +325,39 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Dev
+
+local function CheatAll()
+	if not Spring.IsCheatingEnabled() then
+		Spring.SendCommands{"cheat"}
+	end
+	Spring.SendCommands{"spectator"}
+	if not Spring.IsGodModeEnabled() then
+		Spring.SendCommands{"godmode"}
+	end
+end
+
+local function FullSpeed()
+	speedMode = not speedMode
+	if speedMode then
+		Spring.SendCommands{"setmaxspeed 100"}
+		Spring.SendCommands{"setminspeed 100"}
+	else
+		Spring.SendCommands{"setminspeed 1"}
+		Spring.SendCommands{"setmaxspeed 1"}
+		Spring.SendCommands{"setmaxspeed 100"}
+		Spring.SendCommands{"setminspeed 0.1"}
+	end
+end
+
+function widget:TextCommand(command)  
+	if command == "cheatall" then
+		CheatAll()
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function widget:Update(dt)
 	if recentlyExported then
@@ -345,6 +386,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Settings/Toolbox/Dev Commands'
+options_order = {'cheat', 'nocost', 'spectator', 'godmode', 'testunit', 'cheatall', 'fullspeed', 'luauireload', 'luarulesreload', 'debug', 'debugcolvol', 'debugpath', 'singlestep', 'spawn_next_unit', 'spawn_prev_unit', 'spawn_set_pos', 'printunits', 'printunitnames', 'echoCommand', 'missionexport', 'missionexportcommands', 'missionexportselectedcommands', 'exportallyteamcommands', 'missionexportfeatures', 'moveUnit', 'moveUnitSnap', 'moveUnitDelay', 'destroyUnit', 'RotateUnitLeft', 'RotateUnitRight'}
 options = {
 	cheat = {
 		name = "Cheat",
@@ -372,7 +414,17 @@ options = {
 	testunit = {
 		name = "Spawn Testunit",
 		type = 'button',
-		action = 'give testunit',
+		action = 'give empiricaldpser 1',
+	},
+	cheatall = {
+		name = "Full Cheat",
+		type = 'button',
+		OnChange = CheatAll,
+	},
+	fullspeed = {
+		name = "Full Speed",
+		type = 'button',
+		OnChange = FullSpeed,
 	},
 	
 	luauireload = {
@@ -408,6 +460,35 @@ options = {
 		action = 'singlestep',
 	},
 	
+	
+	spawn_next_unit = {
+		name = "Spawn Next Unit",
+		type = 'button',
+		OnChange = function(self)
+			unitSpawnIndex = unitSpawnIndex + 1
+			Spring.SendCommands("luarules spawnnthunit " .. unitSpawnIndex .. " " .. spawnPos[1] .. " " .. spawnPos[2])
+		end,
+	},
+	spawn_prev_unit = {
+		name = "Spawn Prev Unit",
+		type = 'button',
+		OnChange = function(self)
+			unitSpawnIndex = unitSpawnIndex - 1
+			Spring.SendCommands("luarules spawnnthunit " .. unitSpawnIndex .. " " .. spawnPos[1] .. " " .. spawnPos[2])
+		end,
+	},
+	spawn_set_pos = {
+		name = "Set Spawn Position",
+		type = 'button',
+		OnChange = function(self)
+			local mx, my = Spring.GetMouseState()
+			local trace, pos = Spring.TraceScreenRay(mx, my, true, false, false, true)
+			if not (trace == "ground" and pos) then
+				return
+			end
+			spawnPos = pos
+		end,
+	},
 	
 	printunits = {
 		name = "Print Units",

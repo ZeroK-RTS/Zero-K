@@ -188,16 +188,19 @@ local tempPoints = {}
 
 local groups = {count = 0, data = {}}
 
-local newtonIDs = {} 		--[unitID] -> newtonGroupid
-local newtonTrianglePoints = {}	--[unitID] -> { newtonTriangle Points}
-local selectedNewtons = nil		--temprorary {newtons}
+local newtonIDs = {} --[unitID] -> newtonGroupid
+local newtonTrianglePoints = {} --[unitID] -> { newtonTriangle Points}
+local selectedNewtons = nil --temprorary {newtons}
 
 local intensivity = 255
 local colorIndex = 0
 
 local NEWTON_HIT_MEMORY = 90 -- Predict trajectory after being hit by a weapon
 local NEWTON_HIT_LEEWAY = 5 -- Do not auto-jump while being hit by Newtons, as it may end up in jumps on the launch pad.
+local NO_JUMP_COMMAND_TIME = 300 -- Frames after a manual command (after Newton hit) that a unit cannot be considered for automatic jumping.
+local JUMP_MIN_DIST_SQ = 600*600
 
+local noJump = {}
 local victim = {}
 local groupTarget = {}
 local victimStillBeingAttacked = {}
@@ -511,15 +514,30 @@ local function IssueJumpCommand(unitID, unitX, unitY, unitZ, landX, landY, landZ
 		end
 	end
 	
-	local cx,cy,cz = BoundToMap(unitX, unitY, unitZ, landX, landY, landZ)
-	
-	if removeTag then
-		spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
-		spGiveOrderToUnit(unitID, CMD.REMOVE, {removeTag}, 0 )
-	else
-		spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+	local cx, cy, cz = BoundToMap(unitX, unitY, unitZ, landX, landY, landZ)
+	if (cx - unitX)*(cx - unitX) + (cz - unitZ)*(cz - unitZ) < JUMP_MIN_DIST_SQ then
+		return
 	end
 	
+	if not cmdID then
+		-- Queue a single jump command when the queue is empty. This lets the player give a command that
+		--  ends up before this one, when both arrive on the server.
+		spGiveOrderToUnit(unitID, CMD_JUMP, {cx, cy, cz}, CMD.OPT_INTERNAL + CMD.OPT_SHIFT)
+	else
+		if removeTag then
+			local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			if cmdID_2 then
+				spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			else
+				-- Same as the queue empty case. Avoid inserting commands because that can interfer with
+				--  player commands issued simultaneously.
+				spGiveOrderToUnit(unitID, CMD_JUMP, {cx, cy, cz}, CMD.OPT_INTERNAL + CMD.OPT_SHIFT)
+			end
+			spGiveOrderToUnit(unitID, CMD.REMOVE, {removeTag}, 0 )
+		else
+			spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+		end
+	end
 	prevJump[unitID] = {cx, cy, cz}
 end
 
@@ -840,11 +858,22 @@ function EstimateCrashLocation(victimID, transportID)
 	
 	if options.jumpOnPrediction.value and jumpUnitDefIDs[defID] then
 		local frame = Spring.GetGameFrame()
-		if (not victim[victimID]) or victim[victimID] + NEWTON_HIT_LEEWAY > frame then
-			local groundHeight = spGetGroundHeight( x, z)
-			if y - groundHeight > 50 then
-				IssueJumpCommand(victimID, x,y,z, future_locationX, future_height, future_locationZ)
+		if ((not victim[victimID]) or victim[victimID] + NEWTON_HIT_LEEWAY > frame) and not (noJump[victimID] and (noJump[victimID] + NO_JUMP_COMMAND_TIME > frame)) then
+			local groundHeight = spGetGroundHeight(x, z)
+			if y - groundHeight > 180 then
+				IssueJumpCommand(victimID, x, y, z, future_locationX, future_height, future_locationZ)
 			end
+		end
+	end
+end
+
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
+	if cmdID == CMD_JUMP and (victimLandingLocation[unitID] or victim[unitID]) and not cmdOpts.internal then
+		local x, y, z = spGetUnitPosition(unitID)
+		local groundHeight = spGetGroundHeight(x, z)
+		if y - groundHeight > 50 then
+			--Spring.Utilities.UnitEcho(unitID, "NO JUMP")
+			noJump[unitID] = Spring.GetGameFrame()
 		end
 	end
 end

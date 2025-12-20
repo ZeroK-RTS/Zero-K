@@ -16,6 +16,7 @@ return { striderarty = {
 
   customParams           = {
     bait_level_default = 2,
+    normaltex = [[unittextures/Catapult_normals.dds]],
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -74,6 +75,7 @@ return { striderarty = {
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],
         light_radius = 400,
+        burst = Shared.BURST_UNRELIABLE,
       },
       
       damage                  = {

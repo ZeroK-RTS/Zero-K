@@ -85,6 +85,7 @@ return { amphsupport = {
       name                    = [[Plasma Cannon]],
       accuracy                = 480,
       areaOfEffect            = 40,
+      cegTag                  = [[light_arty_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -92,6 +93,7 @@ return { amphsupport = {
         light_camera_height = 1400,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 230,
+        burst = Shared.BURST_RELIABLE,
       },
 
       damage                  = {
@@ -106,7 +108,7 @@ return { amphsupport = {
       interceptedByShieldType = 1,
       myGravity               = 0.12,
       noSelfDamage            = true,
-      range                   = 640,
+      range                   = 645,
       reloadtime              = 1.9,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],

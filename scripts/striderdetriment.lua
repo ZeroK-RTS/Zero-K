@@ -33,6 +33,15 @@ local gunFlares = {
 	{lfoot}
 }
 
+local loadingCanister = false
+local previousLoad = false
+local canisters = {
+	{loaded = true, body = piece('canister1'), cap = piece('cap1'), gib = piece('canister1_merged'), hor = math.cos(-0.2618), vert = math.sin(-0.2618)},
+	{loaded = true, body = piece('canister2'), cap = piece('cap2'), gib = piece('canister2_merged'), hor = 1, vert = 0.01}, -- Small vert for z-fighting
+	{loaded = true, body = piece('canister3'), cap = piece('cap3'), gib = piece('canister3_merged'), hor = math.cos(0.349), vert = math.sin(0.349)},
+}
+local EXTRUDE_SPEED = 0.21 * 120 / tonumber(UnitDefs[unitDefID].customParams.jump_reload)
+
 local barrels = {
 	{larmbarrel1, larmbarrel2, larmbarrel3},
 	{rarmbarrel1, rarmbarrel2, rarmbarrel3},
@@ -100,6 +109,7 @@ local JUMP_TURN_SPEED = math.pi/80 -- matches jump_delay_turn_scale in unitdef
 local isFiring = false
 local resetRestore = false
 local jumpActive = false
+local jumpWindup = false
 
 -- Effects
 local dirtfling = 1024
@@ -118,6 +128,28 @@ local takeoff_explosion = 4103 --Weapon 8
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local fullCap = 0.5
+local emptyCan = 23
+local emptyCap = 4.6
+local function MoveCanister(num, proportion, capProp, speed)
+	local canister = canisters[num]
+	Move(canister.body, z_axis, (1 - proportion) * emptyCan * canister.hor, speed and speed * canister.hor)
+	Move(canister.body, y_axis, (1 - proportion) * emptyCan * canister.vert, speed and speed * canister.vert)
+	
+	capProp = capProp or proportion
+	if capProp >= 1 then
+		Move(canister.cap, z_axis, fullCap * canister.hor, speed and speed * canister.hor)
+		Move(canister.cap, y_axis, fullCap * canister.vert, speed and speed *canister.vert)
+	elseif capProp >= 0.95 then
+		local dist = (fullCap - emptyCap)*(capProp - 0.95) * 15 + emptyCap
+		Move(canister.cap, z_axis, dist * canister.hor, speed and speed * canister.hor)
+		Move(canister.cap, y_axis, dist * canister.vert, speed and speed *canister.vert)
+	else
+		Move(canister.cap, z_axis, emptyCap * canister.hor, speed and speed * canister.hor)
+		Move(canister.cap, y_axis, emptyCap * canister.vert, speed and speed *canister.vert)
+	end
+end
+
 local function DoRestore()
 	Turn(head, y_axis, 0, 2)
 	Move(head, y_axis, -6, 10)
@@ -133,46 +165,48 @@ local function DoRestore()
 end
 
 local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
+	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	mainLeg, offLeg = offLeg, mainLeg
 	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
-		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
-		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
+		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i] * speed)
+		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i] * speed)
 	end
 
 	-- swing arms and body
 	if not(isFiring) then
 		if (frontLeg == leftLeg) then
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(larmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speed)
+			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(larmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
 		else
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(rarmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speed)
+			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
+			Turn(rarmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
 		end
 	end
 	
-	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED*pelvisMult)
-	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED)
+	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED * pelvisMult * speed)
+	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED * speed)
 
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
 	end
+	speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 
 	-- passing (front foot flat under body, back foot passing with bent knee)
 	for i, p in pairs(frontLeg) do
-		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
-		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
+		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i] * speed)
+		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i] * speed)
 	end
 	--EmitSfx(impactFoot, dirtfling)
 	--EmitSfx(impactFoot, footcrater)
-	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult)
-	Turn(torso, x_axis, 0, TORSO_TILT_SPEED)
+	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult * speed)
+	Turn(torso, x_axis, 0, TORSO_TILT_SPEED * speed)
 
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
@@ -221,6 +255,15 @@ local function StopWalk()
 	Turn(larm, x_axis, 0, math.rad(10))
 end
 
+function unmoonwalkFunc()
+	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+	if speed == 0 then
+		StartThread(StopWalk)
+	end
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+end
+
 function script.StartMoving()
 	if not jumpActive then
 		StartThread(Walk)
@@ -233,16 +276,27 @@ end
 
 -- Jumping
 local function PreJumpThread(turn, lineDist, flightDist, duration)
+	jumpWindup = true
 	script.StopMoving()
+	local speed = math.max(0.5, GG.att_MoveChange[unitID] or 1)
 	
 	DoRestore()
-	weaponBlocked = true
-	
-	local heading = -Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
-	Spring.MoveCtrl.SetRotation(unitID, 0, heading, 0) -- keep current heading
+	if jumpWindup then
+		weaponBlocked = true
+		local heading = -Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
+		Spring.MoveCtrl.SetRotation(unitID, 0, heading, 0) -- keep current heading
+	end
 	
 	local rotationRequired = -turn*GG.Script.headingToRad
-	local rotationFrames = math.ceil(math.abs(rotationRequired/JUMP_TURN_SPEED)/12)*12
+	local rotationFrames = math.ceil(math.abs(rotationRequired/JUMP_TURN_SPEED)/12/speed)*12
+	local usingCanister = false
+	for i = 1, 3 do
+		if canisters[i].loaded then
+			usingCanister = i
+			canisters[i].loaded = false
+			break
+		end
+	end
 
 	--Spring.MoveCtrl.SetRotation(unitID, 0, heading + rotationRequired, 0) -- keep current heading
 	--Sleep(2000)
@@ -277,27 +331,47 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 		end
 	end
 	
-	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
-	
-	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
-		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
+	if jumpWindup then
+		Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
+		for i,p in pairs(leftLeg) do
+			Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
+			Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i] * speed)
+		end
+		Move(pelvis, y_axis, 0, 8 * speed)
 	end
-	Move(pelvis, y_axis, 0, 8)
-	Sleep(600)
 	
-	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
-		Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
+	if usingCanister then
+		MoveCanister(usingCanister, 1, 0, 3 / speed)
 	end
-	Move(torso, y_axis, 0, 1)
-	Move(pelvis, y_axis, -20, 16)
-	Move(pelvis, z_axis, -10, 8)
-	Turn(torso, x_axis, math.rad(20), math.rad(30))
 	
-	Turn(pelvis, z_axis, 0, math.rad(30))
+	if jumpWindup then
+		Sleep(600 / speed)
+		
+		for i,p in pairs(leftLeg) do
+			Turn(leftLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
+			Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i] * speed)
+		end
+		Move(torso, y_axis, 0, 1 * speed)
+		Move(pelvis, y_axis, -20, 16 * speed)
+		Move(pelvis, z_axis, -10, 8 * speed)
+		Turn(torso, x_axis, math.rad(20), math.rad(30) * speed)
+		
+		Turn(pelvis, z_axis, 0, math.rad(30) * speed)
+	end
+	
+	if usingCanister then
+		Sleep(1367) -- Timing is the essence of comedy
+		Hide(canisters[usingCanister].body)
+		Hide(canisters[usingCanister].cap)
+		MoveCanister(usingCanister, 0)
+		Explode(canisters[usingCanister].gib, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Sleep(33)
+		Show(canisters[usingCanister].body)
+		Show(canisters[usingCanister].cap)
+	end
 	--EmitSfx(lfoot, jetfeet)
 	--EmitSfx(rfoot, jetfeet)
+	jumpWindup = false
 end
 
 local function EndJumpThread()
@@ -317,7 +391,34 @@ local function EndJumpThread()
 end
 
 function preJump(turn,lineDist,flightDist,duration)
-	StartThread(PreJumpThread, turn,lineDist,flightDist,duration)
+	StartThread(PreJumpThread, turn, lineDist, flightDist, duration)
+end
+
+function jumpReloadProgress(reloadAmount)
+	if not loadingCanister then
+		previousLoad = reloadAmount
+		for i = 1, 3 do
+			if not canisters[i].loaded then
+				loadingCanister = i
+				break
+			end
+		end
+	end
+	while reloadAmount < previousLoad - 0.2 do
+		previousLoad = previousLoad - 1
+	end
+	if not loadingCanister then
+		return
+	end
+	local speed = math.max(0.5, GG.att_ReloadChange[unitID] or 1)
+	reloadAmount = reloadAmount - math.floor(previousLoad)
+	if reloadAmount >= 1 then
+		canisters[loadingCanister].loaded = true
+		MoveCanister(loadingCanister, 1, false, 2.5)
+		loadingCanister = false
+	else
+		MoveCanister(loadingCanister, reloadAmount, false, speed * EXTRUDE_SPEED)
+	end
 end
 
 function beginJump()
@@ -350,6 +451,15 @@ function endJump()
 	StartThread(EndJumpThread)
 end
 
+function cancelJump()
+	jumpWindup = false
+	jumpActive = false
+	weaponBlocked = false
+	Turn(torso, x_axis, 0, math.rad(10))
+	Move(pelvis, y_axis, 0, 5)
+	Move(pelvis, z_axis, 0, 3)
+end
+
 local function RestoreAfterDelay()
 	local counter = 2
 	while true do
@@ -368,6 +478,17 @@ local function RestoreAfterDelay()
 end
 
 function script.Create()
+	MoveCanister(1, 1, 100)
+	MoveCanister(2, 1, 100)
+	MoveCanister(3, 1, 100)
+
+	for i = 1, 3 do
+		Hide(piece('canister' .. i .. '_merged'))
+		Hide(piece('canister' .. i .. '_full'))
+		Hide(piece('can' .. i .. '_full_cap'))
+		Hide(piece('can' .. i .. '_full_base'))
+	end
+
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
@@ -386,6 +507,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	local SIG_AIM = 2^(num+1)
+	local speed = math.max(0.5, GG.att_MoveChange[unitID] or 1)
 	
 	isFiring = true
 	Signal(SIG_AIM)
@@ -394,7 +516,7 @@ function script.AimWeapon(num, heading, pitch)
 		manualfireAimOverride = manualfireAimOverride - 1
 		if manualfireAimOverride <= 0 then
 			manualfireAimOverride = false
-			Turn(shouldercannon, x_axis, 0, math.rad(90))
+			Turn(shouldercannon, x_axis, 0, math.rad(90) * speed)
 		end
 		Sleep(500)
 		return false
@@ -419,9 +541,9 @@ function script.AimWeapon(num, heading, pitch)
 		end
 		armAngle = math.min(0.2, math.max(-0.2, armAngle))
 		
-		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(larmcannon, y_axis, armAngle, math.rad(20))
-		Turn(larm, x_axis, -pitch, math.rad(40))
+		Turn(torso, y_axis, heading, math.rad(140) * speed)
+		Turn(larmcannon, y_axis, armAngle, math.rad(20) * speed)
+		Turn(larm, x_axis, -pitch, math.rad(40) * speed)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 	elseif num == 2 then -- Right gunpod
@@ -446,17 +568,17 @@ function script.AimWeapon(num, heading, pitch)
 		
 		armAngle = math.min(0.2, math.max(-0.2, armAngle))
 		
-		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(rarmcannon, y_axis, armAngle, math.rad(20))
-		Turn(rarm, x_axis, -pitch, math.rad(40))
+		Turn(torso, y_axis, heading, math.rad(140) * speed)
+		Turn(rarmcannon, y_axis, armAngle, math.rad(20) * speed)
+		Turn(rarm, x_axis, -pitch, math.rad(40) * speed)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 	elseif num == 3 then -- Shoulder Cannon
 		manualfireAimOverride = 60
-		Turn(torso, y_axis, heading, math.rad(90))
+		Turn(torso, y_axis, heading, math.rad(90) * speed)
 		WaitForTurn(torso, y_axis)
-		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90))
-		Move(shouldercannon, y_axis, -2, 0.7)
+		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90) * speed)
+		Move(shouldercannon, y_axis, -2, 0.7 * speed)
 		WaitForTurn(shouldercannon, x_axis)
 	elseif num == 4 then
 		Turn(aaturret, y_axis, heading - lastTorsoHeading, math.rad(360))
@@ -479,9 +601,9 @@ function script.AimWeapon(num, heading, pitch)
 			return false
 		end
 		
-		Turn(torso, y_axis, heading, math.rad(90))
-		Move(head, y_axis, 0, 10)
-		Move(head, z_axis, 0, 10)
+		Turn(torso, y_axis, heading, math.rad(90) * speed)
+		Move(head, y_axis, 0, 10 * speed)
+		Move(head, z_axis, 0, 10 * speed)
 		WaitForTurn(torso, y_axis)
 	end
 	lastTorsoHeading = heading

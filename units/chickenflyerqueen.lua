@@ -23,6 +23,7 @@ return { chickenflyerqueen = {
     outline_x = 400,
     outline_y = 400,
     outline_yoff = 90,
+    normaltex = [[unittextures/chicken_normals.dds]],
   },
 
   explodeAs           = [[NOWEAPON]],

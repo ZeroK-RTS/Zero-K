@@ -22,6 +22,7 @@ return { amphfloater = {
     sink_on_emp        = 0,
     floattoggle        = [[1]],
     selection_scale    = 0.85,
+    normaltex = [[unittextures/b_can_pyro_roach_skuttle_normals.dds]],
 
     outline_x = 80,
     outline_y = 80,

@@ -2,16 +2,16 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Unit Start State",
-    desc      = "Configurable starting unit states for units",
-    author    = "GoogleFrog",
-    date      = "13 April 2011", --last update: 29 January 2014
-    license   = "GNU GPL, v2 or later",
-	handler   = false,
-    layer     = 1,
-    enabled   = true,  --  loaded by default?
-  }
+	return {
+		name      = "Unit Start State",
+		desc      = "Configurable starting unit states for units",
+		author    = "GoogleFrog",
+		date      = "13 April 2011", --last update: 29 January 2014
+		license   = "GNU GPL, v2 or later",
+		handler   = false,
+		layer     = 1,
+		enabled   = true,  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local overkillPrevention, overkillPreventionBlackHole, _, overkillPreventionLobster = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local overkillPrevention, overkillPreventionBlackHole, _, overkillPreventionLobster, OVERKILL_STATES = include("LuaRules/Configs/overkill_prevention_defs.lua")
 local baitPreventionDefault = include("LuaRules/Configs/bait_prevention_defs.lua")
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
@@ -116,9 +116,10 @@ local tooltips = {
 	},
 	overkill_prevention = {
 		[0] = "Disabled.",
-		[1] = "Enabled only for automatically aquired targets when set to Fire At Will.",
-		[2] = "Enabled when the unit is set to Fire At Will.",
-		[3] = "Always enabled.",
+		[1] = "Enabled only for automatically aquired targets.",
+		[2] = "Enabled when set to fire Fire At Will for all target.",
+		[3] = "Enabled except when manually queued with a single attack command.",
+		[4] = "Always enabled."
 	},
 	fire_at_shield = {
 		[0] = "Disabled.",
@@ -765,6 +766,17 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_movestate1"
 	end
 
+	if ud.highTrajectoryType == 2 then
+		options[defName .. "_high_trajectory_1"] = {
+			name = "  Shoot High Trajectory",
+			desc = "Shoot High Trajectory: check box to turn it on",
+			type = 'bool',
+			value = false,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_high_trajectory_1"
+	end
+
 	if (ud.canFly) then
 		options[defName .. "_flylandstate_1"] = {
 			name = "  Fly/Land State",
@@ -936,7 +948,7 @@ local function addUnit(defName, path)
 			name = "  Retreat at value",
 			desc = "Values: inherit from factory, no retreat, 33%, 65%, 99% health remaining",
 			type = 'number',
-			value = -1,
+			value = (ud.isFactory and 0) or -1,
 			min = -1,
 			max = 3,
 			step = 1,
@@ -1011,11 +1023,11 @@ local function addUnit(defName, path)
 	if overkillPrevention then
 		options[defName .. "_overkill_prevention0"] = {
 			name = "  Overkill Prevention",
-			desc = "Control when the unit tries to prevent overkill. This is done by not shooting at units that are already likely to die due to incoming fire.",
+			desc = "Control when the unit tries to prevent overkill. This causes units to not shoot at targets that are already likely to die due to incoming fire.",
 			type = 'number',
 			value = overkillPrevention,
 			min = 0,
-			max = 3,
+			max = OVERKILL_STATES - 1,
 			step = 1,
 			path = path,
 			tooltipFunction = tooltipFunc.overkill_prevention,
@@ -1416,6 +1428,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			orderArray[#orderArray + 1] = {CMD.IDLEMODE, {value}, CMD.OPT_SHIFT}
 		end
 		
+		QueueState(name, "high_trajectory_1", CMD.TRAJECTORY, orderArray)
 		QueueState(name, "repeat", CMD.REPEAT, orderArray)
 		QueueState(name, "flylandstate_1_factory", CMD_AP_FLY_STATE, orderArray)
 		QueueState(name, "auto_assist", CMD_FACTORY_GUARD, orderArray)

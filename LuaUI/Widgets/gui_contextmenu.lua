@@ -343,16 +343,27 @@ function comma_value(amount, displayPlusMinus, forceDecimal)
 
 	-- amount is a string when ToSI is used before calling this function
 	if amount and type(amount) == "number" then
-		if (amount == 0) then formatted = "0" else
+		if (amount == 0) then
+			formatted = "0"
+		else
 			if (amount < 2 and (amount * 100)%100 ~=0) then
-				if displayPlusMinus then formatted = strFormat("%+.2f", amount)
-				else formatted = strFormat("%.2f", amount) end
+				if displayPlusMinus then
+					formatted = strFormat("%+.2f", amount)
+				else
+					formatted = strFormat("%.2f", amount)
+				end
 			elseif (amount < 20 and (amount * 10)%10 ~=0) or forceDecimal then
-				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
-				else formatted = strFormat("%.1f", amount) end
+				if displayPlusMinus then
+					formatted = strFormat("%+.1f", amount)
+				else
+					formatted = strFormat("%.1f", amount)
+				end
 			else
-				if displayPlusMinus then formatted = strFormat("%+d", amount)
-				else formatted = strFormat("%d", amount) end
+				if displayPlusMinus then
+					formatted = strFormat("%+d", amount)
+				else
+					formatted = strFormat("%d", amount)
+				end
 			end
 		end
 	elseif amount then
@@ -477,22 +488,22 @@ local function weapons2Table(cells, ws, unitID)
 	if wd.isShield then
 		local regen, drain = GetShieldRegenDrain(wd)
 		cells[#cells+1] = ' - Strength:'
-		cells[#cells+1] = wd.shieldPower .. " HP"
+		cells[#cells+1] = numformat(wd.shieldPower * (unitID and Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)) .. " HP"
 		cells[#cells+1] = ' - Regen:'
 		cells[#cells+1] = regen .. " HP/s"
 		if wd.customParams.shield_rate_charge then
 			cells[#cells+1] = ' - Regen change:'
-			cells[#cells+1] = tonumber(wd.customParams.shield_rate_charge) .. " HP/s²"
+			cells[#cells+1] = numformat(wd.customParams.shield_rate_charge * (unitID and Spring.GetUnitRulesParam(unitID, "totalStaticShieldRegen") or 1)) .. " HP/s²"
 		end
 		cells[#cells+1] = ' - Regen cost:'
 		cells[#cells+1] = drain .. " E/s"
-		local rechargeDelay = tonumber(wd.shieldrechargedelay or wd.customParams.shield_recharge_delay)
+		local rechargeDelay = wd.shieldrechargedelay or tonumber(wd.customParams.shield_recharge_delay)
 		if rechargeDelay and rechargeDelay > 0 then
 			cells[#cells+1] = ' - Regen delay:'
-			cells[#cells+1] = rechargeDelay .. " s"
+			cells[#cells+1] = numformat(rechargeDelay) .. " s"
 		end
 		cells[#cells+1] = ' - Radius:'
-		cells[#cells+1] = wd.shieldRadius .. " elmo"
+		cells[#cells+1] = numformat(wd.shieldRadius) .. " elmo"
 		if wd.customParams.unlinked then
 			cells[#cells+1] = ' - Does not link with other shields'
 			cells[#cells+1] = ''
@@ -540,7 +551,7 @@ local function weapons2Table(cells, ws, unitID)
 		if wd.paralyzer then
 			damw = val
 			if stun_time == 0 then
-				stun_time = wd.damages.paralyzeDamageTime
+				stun_time = tonumber(wd.customParams.emp_paratime)
 			end
 		else
 			dam = val
@@ -559,6 +570,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 		
 		local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
+		mult = mult * (unitID and Spring.GetUnitRulesParam(unitID, "projectilesMult") or 1)
 
 		local dps_str, dam_str, shield_dam_str = '', '', ''
 		local damageTypes = 0
@@ -721,6 +733,10 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - Max stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time) .. 's\008'
 		end
+		if tonumber(cp.overstun_time) or 0 > 0 then
+			cells[#cells+1] = ' - Overstun time:'
+			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(tonumber(cp.overstun_time)) .. 's\008'
+		end
 
 		if cp.setunitsonfire then
 			cells[#cells+1] = ' - Afterburn:'
@@ -730,8 +746,9 @@ local function weapons2Table(cells, ws, unitID)
 
 		if show_range then
 			local range = cp.truerange or wd.range
+			local mult = unitID and ((Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1) * (Spring.GetUnitRulesParam(unitID, "rangeMult") or 1)) or 1
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1)) .. " elmo"
+			cells[#cells+1] = numformat(range * mult) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
@@ -742,7 +759,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		if show_projectile_speed then
 			cells[#cells+1] = ' - Projectile speed:'
-			cells[#cells+1] = numformat(wd.projectilespeed*30) .. " elmo/s"
+			cells[#cells+1] = numformat(wd.projectilespeed * 30 * ((unitID and Spring.GetUnitRulesParam(unitID, "projectileSpeedMult")) or 1)) .. " elmo/s"
 		elseif hitscan[wd.type] then
 			cells[#cells+1] = ' - Instantly hits'
 			cells[#cells+1] = ''
@@ -937,7 +954,7 @@ local function weapons2Table(cells, ws, unitID)
 	return cells
 end
 
-local function printAbilities(ud, unitID)
+local function printAbilities(ud, unitID, isCommander)
 	local cells = {}
 
 	local cp = ud.customParams
@@ -1002,7 +1019,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if ud.canCloak and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
+	if ud.canCloak and (not (unitID and isCommander) or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
 		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
@@ -1063,9 +1080,13 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = 'Jumping'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Range:'
-		cells[#cells+1] = cp.jump_range .. " elmo"
+		cells[#cells+1] = (cp.jump_range * ((unitID and Spring.GetUnitRulesParam(unitID, "jumpRangeMult")) or 1)) .. " elmo"
 		cells[#cells+1] = ' - Reload: '
 		cells[#cells+1] = (cp.jump_reload + ((unitID and Spring.GetUnitRulesParam(unitID, "upgradesJumpReloadMod")) or 0)) .. 's'
+		if tonumber(cp.jump_charges) or 1 > 1 then
+			cells[#cells+1] = ' - Max charges: '
+			cells[#cells+1] = tonumber(cp.jump_charges)
+		end
 		cells[#cells+1] = ' - Speed:'
 		cells[#cells+1] = numformat(30*tonumber(cp.jump_speed)) .. " elmo/s"
 		cells[#cells+1] = ' - Midair jump:'
@@ -1333,19 +1354,21 @@ local function printAbilities(ud, unitID)
 	return cells
 end
 
-local function printWeapons(unitDef, unitID)
+local function printWeapons(unitDef, unitID, isCommander)
 	local weaponStats = {}
 
 	local wd = WeaponDefs
-	if not wd then return false end
+	if not wd then
+		return false
+	end
 	
 	local ucp = unitDef.customParams
 	
-	for i=1, #unitDef.weapons do
-		if not unitID or -- filter out commander weapons not in current loadout
-		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
-		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
-		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_num")) then
+	for i = 1, #unitDef.weapons do
+		if not isCommander or -- filter out commander weapons not in current loadout
+				(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
+				or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
+				or i == Spring.GetUnitRulesParam(unitID, "comm_shield_num")) then
 			local weapon = unitDef.weapons[i]
 			local weaponID = weapon.weaponDef
 			local weaponDef = WeaponDefs[weaponID]
@@ -1461,6 +1484,16 @@ local function GetWeapon(weaponName)
 	return WeaponDefNames[weaponName]
 end
 
+local function GetUnitMaxHealth(unitID, ud)
+	if unitID then
+		local _, maxHealth = Spring.GetUnitHealth(unitID)
+		if maxHealth then
+			return maxHealth
+		end
+	end
+	return ud.health
+end
+
 local function printunitinfo(ud, buttonWidth, unitID)
 	local icons = {
 		Image:New{
@@ -1511,14 +1544,14 @@ local function printunitinfo(ud, buttonWidth, unitID)
 
 	local isCommander = (unitID and Spring.GetUnitRulesParam(unitID, "comm_level"))
 
-	local cost = numformat(ud.metalCost)
-	local health = numformat(ud.health)
-	local speed = numformat(ud.speed, true) -- Speeds often have 0.5s
+	local cost = numformat(Spring.Utilities.GetUnitCost(unitID, ud.id))
+	local health = numformat(GetUnitMaxHealth(unitID, ud))
+	local speed = numformat(ud.speed * (unitID and Spring.GetUnitRulesParam(unitID, "totalStaticMoveSpeedChange") or 1), true) -- Speeds often have 0.5s
 	local mass = numformat(ud.mass)
 	
 	-- stuff for modular commanders
 	local legacyModules, legacyCommCost
-	if ud.customParams.commtype and not isCommander then	-- old style pregenerated commander (still used in missions etc.)
+	if ud.customParams.commtype and not isCommander then -- old style pregenerated commander (still used in missions etc.)
 		legacyModules = WG.ModularCommAPI and WG.ModularCommAPI.GetLegacyModulesForComm(ud.id)
 		legacyCommCost = ud.customParams.cost -- or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
 	end
@@ -1612,25 +1645,28 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	local metal = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_metalIncome") or 0) or ((ud.metalMake or 0) + (ud.customParams.income_metal or 0)))
 
 	if metal ~= 0 then
+		local mult = (unitID and Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Metal: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (metal > 0 and '+' or '') .. numformat(metal) .. " M/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = (metal > 0 and '+' or '') .. numformat(metal * mult) .. " M/s", textColor = color.stats_fg, }
 	end
 	
 	local energy = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0) or ((ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0)))
 
 	if energy ~= 0 then
+		local mult = (unitID and Spring.GetUnitRulesParam(unitID, "totalStaticEnergyMult") or 1)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy) .. " E/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy * mult) .. " E/s", textColor = color.stats_fg, }
 	end
 	
+	local senseMult = (unitID and Spring.GetUnitRulesParam(unitID, "senseMult") or 1)
 	if ud.sightDistance > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sightDistance) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sightDistance * senseMult) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if (ud.sonarDistance > 0) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sonar: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarDistance) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarDistance * senseMult) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.cruiseAltitude > 0 then
@@ -1689,7 +1725,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		end
 	end
 
-	local cells = printAbilities(ud, isCommander and unitID)
+	local cells = printAbilities(ud, unitID, isCommander)
 	
 	if cells and #cells > 0 then
 
@@ -1703,7 +1739,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		end
 	end
 
-	cells = printWeapons(ud, isCommander and unitID)
+	cells = printWeapons(ud, unitID, isCommander)
 	
 	if cells and #cells > 0 then
 		
@@ -1742,16 +1778,19 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Death Explosion', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 
+		local expMult = unitID and Spring.GetUnitRulesParam(unitID, "deathExplodeMult") or 1
+		expMult = math.max(1, math.floor(expMult - 0.5) + 1) -- Attributes only supports integer mults at this point.
+
 		local weaponName = ud.customParams.stats_detonate_weapon or ud.deathExplosion:lower()
 		local weaponStats = GetWeapon( weaponName )
 		local wepCp = weaponStats.customParams
-		local damageValue = tonumber(weaponStats.customParams.stats_damage)
+		local damageValue = tonumber(weaponStats.customParams.stats_damage) * expMult
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		if (weaponStats.paralyzer) then
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue) .. " (P)", textColor = colorCyan, }
 			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages.paralyzeDamageTime) .. "s", textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(wepCp.emp_paratime) .. "s", textColor = color.stats_fg, }
 		else
 			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
 			local damageText
@@ -1767,8 +1806,15 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			statschildren[#statschildren+1] = Label:New{ caption = damageText, textColor = color.stats_fg, }
 		end
 
+		local radius = weaponStats.damageAreaOfEffect
+		if expMult > 1 then
+			local maxRadius = radius
+			local expLevel = 1 + math.log(expMult) / math.log(2)
+			local maxRadius = (5 + 15*expLevel)*(50 + math.pow(radius, 0.8))/100 + radius
+			radius = (radius + maxRadius) / 2 -- Just a rule of thumb
+		end
 		statschildren[#statschildren+1] = Label:New{ caption = 'AoE radius: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damageAreaOfEffect) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(radius) .. " elmo", textColor = color.stats_fg, }
 		
 		if (weaponStats.customParams.setunitsonfire) then
 			statschildren[#statschildren+1] = Label:New{ caption = 'Afterburn: ', textColor = color.stats_fg, }

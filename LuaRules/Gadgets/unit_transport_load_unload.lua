@@ -22,6 +22,13 @@ local airTransports = {}
 local lightTransport = {}
 local allowTransportCache = {}
 
+local pickupDistSq = 16^2
+local waitDistSq = 80^2
+
+local waitTimer = {}
+local waitTag = {}
+local waiters = {}
+
 for unitDefID, ud in pairs(UnitDefs) do
 	if (ud.isTransport and ud.canFly) then
 		airTransports[unitDefID] = true
@@ -60,10 +67,24 @@ function gadget:AllowUnitTransportLoad(transporterID, transporterUnitDefID, tran
 		return true
 	end
 	local x, y, z = Spring.GetUnitPosition(transporterID)
-	if DistSq(x, y, z, goalX, goalY, goalZ) > 256 then
+	local isAlly = (Spring.GetUnitAllyTeam(transporterID) == Spring.GetUnitAllyTeam(transporteeID))
+	local distSq = DistSq(x, y, z, goalX, goalY, goalZ)
+	if distSq > pickupDistSq then
+		if isAlly and distSq < waitDistSq then
+			local cmdID = Spring.GetUnitCurrentCommand(transporteeID)
+			if cmdID ~= CMD.WAIT and not waitTag[transporteeID] then
+				Spring.GiveOrderToUnit(transporteeID, CMD.WAIT, {}, {})
+				local cmdID2, _, cmdTag = Spring.GetUnitCurrentCommand(transporteeID)
+				if cmdID2 == CMD.WAIT then
+					waitTimer[transporteeID] = 2
+					waitTag[transporteeID] = cmdTag
+					waiters[#waiters + 1] = transporteeID
+				end
+			end
+		end
 		return false
 	end
-	if Spring.GetUnitAllyTeam(transporterID) ~= Spring.GetUnitAllyTeam(transporteeID) then
+	if not isAlly then
 		local _,_,_,speed = Spring.GetUnitVelocity(transporteeID)
 		if speed > 0.5 then
 			return false
@@ -76,7 +97,7 @@ function gadget:AllowUnitTransportLoad(transporterID, transporterUnitDefID, tran
 			end
 		end
 	end
-	Spring.SetUnitVelocity(transporterID, 0,0,0)
+	Spring.SetUnitVelocity(transporterID, 0, 0, 0)
 	return true
 end
 
@@ -97,4 +118,27 @@ function gadget:AllowUnitTransportUnload(transporterID, transporterUnitDefID, tr
 	end
 	Spring.SetUnitVelocity(transporterID, 0,0,0)
 	return true
+end
+
+function gadget:GameFrame(n)
+	if (#waiters == 0) or (n%16 ~= 0) then
+		return
+	end
+	for i = #waiters, 1, -1 do
+		local unitID = waiters[i]
+		if (waitTimer[unitID] or 0) > 1 then
+			waitTimer[unitID] = waitTimer[unitID] - 1
+		else
+			if Spring.ValidUnitID(unitID) then
+				local cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
+				if cmdID == CMD.WAIT and cmdTag == waitTag[unitID] then
+					Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
+				end
+			end
+			waitTag[unitID] = nil
+			waitTimer[unitID] = nil
+			waiters[i] = waiters[#waiters]
+			waiters[#waiters] = nil
+		end
+	end
 end

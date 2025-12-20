@@ -20,6 +20,7 @@ return { cloakaa = {
     bait_level_default = 0,
     modelradius    = [[11]],
     cus_noflashlight = 1,
+    normaltex = [[unittextures/spherebot_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

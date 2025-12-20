@@ -20,10 +20,16 @@ local spGetUnitLosState    = Spring.GetUnitLosState
      so it is safe to cache them here even if the underlying func changes afterwards ]]
 local scriptUnitDestroyed       = Script.LuaUI.UnitDestroyed
 local scriptUnitDestroyedByTeam = Script.LuaUI.UnitDestroyedByTeam
-local scriptUnitLeftRadar	= Script.LuaUI.UnitLeftRadar
+local scriptUnitLeftRadar       = Script.LuaUI.UnitLeftRadar
+
+local disarmWeapons = VFS.Include("LuaRules/Configs/disarm_defs.lua")
+local slowWeapons = include("LuaRules/Configs/timeslow_defs.lua")
+local fireWeapons = VFS.Include("LuaRules/Configs/fire_defs.lua")
+
+local _, fullview = Spring.GetSpectatingState()
+local myAllyTeamID = spGetMyAllyTeamID()
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
-	local myAllyTeamID = spGetMyAllyTeamID()
 	local spec, specFullView = spGetSpectatingState()
 	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())
 	
@@ -61,6 +67,33 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attUnitDef
 			elseif losState ~= 0 and Script.LuaUI('UnitLeftRadar') then
 				scriptUnitLeftRadar(unitID, unitTeam)
 			end
+		end
+	end
+end
+
+function gadget:PlayerChanged(playerID)
+	myTeamID = Spring.GetMyTeamID()
+	myAllyTeamID = Spring.GetMyAllyTeamID()
+	_, fullview = Spring.GetSpectatingState()
+end
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+	--Spring.Echo("gadget:UnitDamaged",unitID, unitDefID, unitTeam, damage, paralyzer)
+	if paralyzer or disarmWeapons[weaponDefID] or slowWeapons[weaponDefID] or fireWeapons[weaponDefID] then
+		if not fullview and not Spring.IsUnitInLos(unitID, myAllyTeamID) then
+			return
+		end
+		if paralyzer and damage > 0 and Script.LuaUI("UnitParalyzeDamageEffect") then
+			--Spring.Echo("UnitParalyzeDamageHealthbars", unitID, step)
+			Script.LuaUI.UnitParalyzeDamageEffect(unitID, unitDefID, damage)
+		elseif disarmWeapons[weaponDefID] and Script.LuaUI("UnitDisarmDamageEffect") then
+			Script.LuaUI.UnitDisarmDamageEffect(unitID, unitDefID)
+		end
+		if slowWeapons[weaponDefID] and Script.LuaUI("UnitSlowDamageEffect") then
+			Script.LuaUI.UnitSlowDamageEffect(unitID, unitDefID)
+		end
+		if fireWeapons[weaponDefID] and Script.LuaUI("UnitFireDamageEffect") then
+			Script.LuaUI.UnitFireDamageEffect(unitID, unitDefID)
 		end
 	end
 end

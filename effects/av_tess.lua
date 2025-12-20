@@ -3,13 +3,13 @@
 return {
   ["av_tess"] = {
     air                = true,
-    count              = 10,
+    count              = 5,
     ground             = true,
     water              = true,
     debris1 = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
-      count              = 20,
+      count              = 2,
       ground             = true,
       water              = true,
       properties = {
@@ -25,7 +25,7 @@ return {
         particlelife       = [[50 i-0.5]],
         particlelifespread = 0,
         particlesize       = [[10 r10]],
-        particlesizespread = 0,
+        particlesizespread = 8,
         particlespeed      = 3,
         particlespeedspread = 1,
         pos                = [[0, 0, 0]],
@@ -37,7 +37,7 @@ return {
     debris2 = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
-      count              = 20,
+      count              = 2,
       ground             = true,
       water              = true,
       properties = {
@@ -52,8 +52,8 @@ return {
         numparticles       = 5,
         particlelife       = 150,
         particlelifespread = 0,
-        particlesize       = [[1 r10]],
-        particlesizespread = 0,
+        particlesize       = [[10 r10]],
+        particlesizespread = 8,
         particlespeed      = 5,
         particlespeedspread = 8,
         pos                = [[0, 0, 0]],
@@ -122,7 +122,7 @@ return {
 	  alwaysvisible      = true,
       air                = true,
       class              = [[CSimpleParticleSystem]],
-      count              = 10,
+      count              = 5,
       ground             = true,
       water              = true,
       properties = {

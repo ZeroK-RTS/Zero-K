@@ -74,6 +74,7 @@ return { turretriot = {
       areaOfEffect            = 96,
       avoidFeature            = false,
       burnblow                = true,
+      cegTag                  = [[hmg_trail]],
       craterBoost             = 0.15,
       craterMult              = 0.3,
 

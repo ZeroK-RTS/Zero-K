@@ -15,6 +15,7 @@ return { chicken = {
     outline_x = 70,
     outline_y = 70,
     outline_yoff = 15,
+    normaltex = [[unittextures/chicken_normals.dds]],
   },
 
   explodeAs           = [[NOWEAPON]],

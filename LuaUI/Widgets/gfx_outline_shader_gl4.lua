@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author    = "Beherith",
 		date      = "2022.03.05",
 		license   = "Lua: GNU GPL, v2 or later, GLSL: See shader files",
-		layer     = -5,
+		layer     = -10, -- Below healthbars, above selected units gl4
 		enabled   = true
 	}
 end
@@ -18,7 +18,7 @@ local luaShaderDir = "LuaUI/Widgets/Include/"
 --local texture = 'LuaUI/Images/halo.dds'
 local internalDisabled = false
 
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+local BAR_COMPAT = Script.IsEngineMinVersion(105, 0, 500)
 
 local unitConf = {}
 
@@ -45,7 +45,7 @@ end
 
 local STRENGTH_MULT_MIN = 0.1
 local STRENGTH_MULT_MAX = 12
-local DEFAULT_STRENGTH_MULT = 1
+local DEFAULT_STRENGTH_MULT = 0.8
 local STRENGTH_MAGIC_NUMBER = 2.4
 
 local SUBTLE_MIN = 50
@@ -74,6 +74,7 @@ local shaderConfig = {
 	FULL_ROTATION = 0, -- the primitive is fully rotated in the units plane
 	DISCARD = 0, -- Enable alpha threshold to discard fragments below 0.01
 	--DEBUGEDGES = 1, -- set to non-nil to debug the size of the rectangles
+	USEQUATERNIONS = Engine.FeatureSupport.transformsInGL4 and "1" or "0",
 }
 
 -----------------------------------------------------------------
@@ -177,6 +178,7 @@ options = {
 		name = 'Override X',
 		type = 'number',
 		min = 0, max = 300, step = 5,
+		advanced = true,
 		value = 100,
 		OnChange = function (self)
 			WG.unittrackerapi.initializeAllUnits()
@@ -187,6 +189,7 @@ options = {
 		name = 'Override Y',
 		type = 'number',
 		min = 0, max = 300, step = 5,
+		advanced = true,
 		value = 100,
 		OnChange = function (self)
 			WG.unittrackerapi.initializeAllUnits()
@@ -197,6 +200,7 @@ options = {
 		name = 'Override Y Offset',
 		type = 'number',
 		min = -200, max = 200, step = 5,
+		advanced = true,
 		value = 0,
 		OnChange = function (self)
 			WG.unittrackerapi.initializeAllUnits()
@@ -276,6 +280,7 @@ layout (location = 5) in uvec4 instData;
 
 //__ENGINEUNIFORMBUFFERDEFS__
 //__DEFINES__
+//__QUATERNIONDEFS__
 
 struct SUniformsBuffer {
     uint composite; //     u8 drawFlag; u8 unused1; u16 id;
@@ -316,9 +321,11 @@ out DataVS {
 	#endif
 };
 
-layout(std140, binding=0) readonly buffer MatrixBuffer {
-	mat4 UnitPieces[];
-};
+#if USEQUATERNIONS == 0
+	layout(std140, binding=0) readonly buffer MatrixBuffer {
+		mat4 UnitPieces[];
+	};
+#endif
 
 
 bool vertexClipped(vec4 clipspace, float tolerance) {
@@ -329,7 +336,12 @@ bool vertexClipped(vec4 clipspace, float tolerance) {
 void main()
 {
 	uint baseIndex = instData.x; // this tells us which unit matrix to find
-	mat4 modelMatrix = UnitPieces[baseIndex]; // This gives us the models  world pos and rot matrix
+	#if USEQUATERNIONS == 0	
+		mat4 modelMatrix = UnitPieces[baseIndex]; // This gives us the models  world pos and rot matrix
+	#else
+		Transform modelWorldTX = GetModelWorldTransform(instData.x);
+		mat4 modelMatrix = TransformToMatrix(modelWorldTX);
+	#endif
 
 	gl_Position = cameraViewProj * vec4(modelMatrix[3].xyz, 1.0); // We transform this vertex into the center of the model
 	v_rotationY = atan(modelMatrix[0][2], modelMatrix[0][0]); // we can get the euler Y rot of the model from the model matrix
@@ -540,7 +552,7 @@ void main(void)
 	
 	float fulldepth = min(mapdepth, modeldepth); 
 	
-	float my_misctexvalue = texture(modelMisc, screenUV).r;
+	float my_misctexvalue = texture(modelMisc, screenUV).g;
 	float deltadepth = max(mapdepth - modeldepth, 0.0);
 	
 	//if (deltadepth > 0.0) discard; // we hit a model, bail!
@@ -555,7 +567,7 @@ void main(void)
 				vec2 pixeloffset = vec2(float(x), float(0));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
-				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).g;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
@@ -567,7 +579,7 @@ void main(void)
 				vec2 pixeloffset = vec2(float(0), float(y));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
-				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).g;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
@@ -584,7 +596,7 @@ void main(void)
 					vec2 pixeloffset = vec2(float(x), float(y));
 					vec2 screendelta = pixeloffset * viewGeometryInv;
 					
-					float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+					float misctexvalue = texture(modelMisc, screenUV+ screendelta).g;
 					float mapd = texture(mapDepths, screenUV+ screendelta).x;
 					float modd = texture(modelDepths, screenUV + screendelta).x;
 					float dd = max(mapd - modd, 0.0);
@@ -625,7 +637,9 @@ end
 
 local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()
+	local quaternionDefs = LuaShader.GetQuaternionDefs()
 	vsSrc = vsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
+	vsSrc = vsSrc:gsub("//__QUATERNIONDEFS__", quaternionDefs)
 	fsSrc = fsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	gsSrc = gsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	DrawPrimitiveAtUnitShader =  LuaShader(

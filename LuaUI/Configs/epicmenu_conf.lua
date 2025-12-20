@@ -194,6 +194,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Line Formations']          = imgPath..'commands/bold/move.png',
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
+	['Settings/Interface/Selection Filtering']      = imgPath..'epicmenu/selection_rank.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
@@ -219,6 +220,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
 	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
 	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
+	['Settings/HUD Panels/Nuke Warning']            = imgPath..'nuke_button_48.png',
 	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
 	
 	['Settings/Spectating/Action Tracking Camera']  = imgPath..'epicmenu/video_camera.png',
@@ -464,6 +466,7 @@ local pathGesture = 'Settings/Interface/Gesture Menu'
 
 local pathToolbox = 'Settings/Toolbox'
 	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and saving their coordinates]], true)
+	ShButton(pathToolbox, 'Toggle Metal Spot Placer', function() spSendCommands{"luaui togglewidget Metal Spot Placer"} end, [[Press Alt+M to start placing metal extractors. Press Alt+M again to print the coordinates to infolog.txt, found in your install directory.]], true)
 
 	
 	ShButton(pathToolbox, 'Toggle Economy Announcer', function() spSendCommands{"luaui togglewidget Economic Victory Announcer v2"} end, "Toggles a widget that tracks team economies and announces 'victory' in chat, for certain manually run tournament games.")
@@ -724,7 +727,7 @@ local pathSSAO = 'Settings/Graphics/Ambient Occlusion'
 	ShButton(
 		pathSSAO, 'Toggle SSAO',
 		function()
-			spSendCommands{"luaui togglewidget ssao 3"}
+			spSendCommands{"luaui togglewidget ssao 6"}
 		end, "Toggle Screen Space Ambient Occlusion. It essentially adds a bit of shading to everything.")
 	AddOption(pathSSAO,
 		{
@@ -736,9 +739,9 @@ local pathSSAO = 'Settings/Graphics/Ambient Occlusion'
 				WG.SSAO_RequireDeferredRendering = self.value
 				if WG.WidgetEnabledAndActive then
 					if self.value and not WG.WidgetEnabledAndActive("Deferred rendering") then
-						spSendCommands{"luaui disablewidget ssao 3"}
+						spSendCommands{"luaui disablewidget ssao 6"}
 					else
-						spSendCommands{"luaui enablewidget ssao 3"}
+						spSendCommands{"luaui enablewidget ssao 6"}
 					end
 				end
 			end,

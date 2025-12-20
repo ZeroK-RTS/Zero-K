@@ -14,6 +14,7 @@ return { spideraa = {
     bait_level_default = 0,
     cus_noflashlight = 1,
     okp_damage = 265.1,
+    normaltex = [[unittextures/tarantula_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

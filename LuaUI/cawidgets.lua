@@ -173,6 +173,8 @@ widgetHandler = {
 	tweakMode = false,
 }
 
+VFS.Include('LuaRules/engine_compat_post.lua', nil, vfsGame)
+
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
 local flexCallIns = {
@@ -243,6 +245,7 @@ local flexCallIns = {
 	'DrawShadowFeaturesLua',
 	'RecvSkirmishAIMessage',
 	'SelectionChanged',
+	'TeamColorsChanged',
 	'AddConsoleMessage',
 	'Save',
 	'Load',
@@ -1682,6 +1685,16 @@ function widgetHandler:CommandsChanged()
 end
 
 
+function widgetHandler:TeamColorsChanged()
+	tracy.ZoneBeginN("W:TeamColorsChanged")
+	for _, w in r_ipairs(self.TeamColorsChangedList) do
+		tracy.ZoneBeginN("W:TeamColorsChanged:" .. w.whInfo.name)
+		w:TeamColorsChanged();
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
 --------------------------------------------------------------------------------
 --
 --  Drawing call-ins
@@ -2690,11 +2703,11 @@ end
 
 if Script.IsEngineMinVersion(104, 0, 1431) then
 
-	function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua) -- cmdOpts is a bitmask
+	function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua) -- cmdOpts is a bitmask -- Is it? Seems to be a table.
 		tracy.ZoneBeginN("W:UnitCommand")
 		for _, w in r_ipairs(self.UnitCommandList) do
 			tracy.ZoneBeginN("W:UnitCommand:" .. w.whInfo.name)
-			w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
+			w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
 			tracy.ZoneEnd()
 		end
 		tracy.ZoneEnd()

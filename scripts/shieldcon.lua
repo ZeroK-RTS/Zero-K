@@ -24,22 +24,23 @@ local SIG_MOVE = 2
 local PACE = 2
 
 local function Step(front, back)
-	Turn(front.thigh, x_axis, math.rad(-10), math.rad(36) * PACE)
-	Turn(front.uppercalf, x_axis, math.rad(-68), math.rad(83) * PACE)
-	Turn(front.foot, x_axis, math.rad(60), math.rad(90) * PACE)
-	Move(front.lowercalf, z_axis, 0, 3 * PACE)
-	Move(front.lowercalf, y_axis, 0, 3 * PACE)
+	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
+	Turn(front.thigh, x_axis, math.rad(-10), math.rad(36) * PACE * speed)
+	Turn(front.uppercalf, x_axis, math.rad(-68), math.rad(83) * PACE * speed)
+	Turn(front.foot, x_axis, math.rad(60), math.rad(90) * PACE * speed)
+	Move(front.lowercalf, z_axis, 0, 3 * PACE * speed)
+	Move(front.lowercalf, y_axis, 0, 3 * PACE * speed)
 
-	Turn(back.thigh, x_axis, math.rad(26), math.rad(36) * PACE)
-	Turn(back.uppercalf, x_axis, math.rad(15), math.rad(83) * PACE)
-	Turn(back.foot, x_axis, math.rad(-30), math.rad(90) * PACE)
-	Move(back.lowercalf, z_axis, -1.1, 2.2 * PACE)
-	Move(back.lowercalf, y_axis, -1.1, 2.2 * PACE)
+	Turn(back.thigh, x_axis, math.rad(26), math.rad(36) * PACE * speed)
+	Turn(back.uppercalf, x_axis, math.rad(15), math.rad(83) * PACE * speed)
+	Turn(back.foot, x_axis, math.rad(-30), math.rad(90) * PACE * speed)
+	Move(back.lowercalf, z_axis, -1.1, 2.2 * PACE * speed)
+	Move(back.lowercalf, y_axis, -1.1, 2.2 * PACE * speed)
 		
 	if front == leftLeg then
-		Turn(pelvis, z_axis, math.rad(10), math.rad(15) * PACE)
+		Turn(pelvis, z_axis, math.rad(10), math.rad(15) * PACE * speed)
 	else
-		Turn(pelvis, z_axis, math.rad(-10), math.rad(15) * PACE)
+		Turn(pelvis, z_axis, math.rad(-10), math.rad(15) * PACE * speed)
 	end
 
 	WaitForTurn(front.thigh, x_axis)

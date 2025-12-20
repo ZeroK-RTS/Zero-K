@@ -74,6 +74,7 @@ gadgetHandler = {
 	actionHandler = actionHandler,	-- FIXME: not in base
 }
 
+VFS.Include('LuaRules/engine_compat_post.lua', nil, VFSMODE)
 
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
@@ -1678,18 +1679,14 @@ function gadgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam, factID, fact
 end
 
 
-function gadgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, pre)
+function gadgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, weaponDefID)
 	tracy.ZoneBeginN("G:UnitDestroyed")
-	if pre == false then
-		tracy.ZoneEnd()
-		return
-	end
 	if gadgetHandler.GG._AddUnitDamage_teamID then
 		attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
 	end
 	for _,g in r_ipairs(self.UnitDestroyedList) do
 		tracy.ZoneBeginN("G:UnitDestroyed:" .. g.ghInfo.name)
-		g:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+		g:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, weaponDefID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()

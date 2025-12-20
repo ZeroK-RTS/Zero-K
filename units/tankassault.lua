@@ -78,8 +78,13 @@ return { tankassault = {
       areaOfEffect            = 32,
       burst                   = 2,
       burstRate               = 0.2,
+      cegTag                  = [[medium_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
         default = 320.1,

@@ -14,12 +14,13 @@ return { spiderskirm = {
     midposoffset   = [[0 -5 0]],
     aim_lookahead  = 160,
     bait_level_default = 0,
+    normaltex = [[unittextures/recluse_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
-  health                 = 650,
+  health                 = 680,
   iconType               = [[spiderskirm]],
   leaveTracks            = true,
   maxSlope               = 72,
@@ -37,7 +38,7 @@ return { spiderskirm = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 52,
-  turnRate               = 1680,
+  turnRate               = 1800,
 
   weapons                = {
 

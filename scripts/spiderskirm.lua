@@ -78,6 +78,7 @@ local function RestoreLegs()
 end
 
 function script.Create()
+	GG.Attributes.SetProjectileSpeedLock(unitID, true)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitWeaponState(unitID, 1, "projectileSpeed", 10)
 end

@@ -28,7 +28,7 @@ local spGetUnitSeparation	= Spring.GetUnitSeparation
 local spGetUnitDirection	=Spring.GetUnitDirection
 local spGetUnitsInRectangle =Spring.GetUnitsInRectangle
 local spGetVisibleUnits = Spring.GetVisibleUnits
-local spGetCommandQueue	= Spring.GetCommandQueue
+local spGetUnitCommands	= Spring.GetUnitCommands
 local spGetGameSeconds	= Spring.GetGameSeconds
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGetPlayerInfo = Spring.GetPlayerInfo
@@ -57,7 +57,6 @@ local CMD_RECLAIM		= CMD.RECLAIM
 local CMD_RESURRECT		= CMD.RESURRECT
 local CMD_REPAIR		= CMD.REPAIR
 
---local spRequestPath = Spring.RequestPath
 local mathRandom = math.random
 --local spGetUnitSensorRadius  = Spring.GetUnitSensorRadius
 --------------------------------------------------------------------------------
@@ -506,7 +505,7 @@ function DoCalculation(passedInfo)
 		for i=1, unitInMotion["count"], 1 do
 			local unitID= unitInMotion[i]["unitID"] --get unitID for commandqueue
 			if not spGetUnitIsDead(unitID) and (spGetUnitTeam(unitID)==persistentData["myTeamID"]) then --prevent execution if unit died during transit
-				local cQueue = spGetCommandQueue(unitID,-1)
+				local cQueue = spGetUnitCommands(unitID,-1)
 				gateKeeperOutput = GateKeeperOrCommandFilter(cQueue,persistentData, unitInMotion[i]) --filter/alter unwanted unit state by reading the command queue
 				if gateKeeperOutput["allowExecution"] then
 					--cQueue = cQueueTemp --cQueueTemp has been altered for identification, copy it to cQueue for use in DoCalculation() phase (note: command is not yet issued)
@@ -650,7 +649,7 @@ function RefreshWatchdogList (unitID, commandTTL)
 					commandTTL[unitID][i].countDown = commandTTL[unitID][i].countDown - (1*returnToReclaimOffset) --count-down until zero and stop. Each iteration is minus 1 and then exit loop after 1 enty, or when countDown==0 remove command and then go to next entry and minus 2 and exit loop.
 					break --//exit the iteration, do not go to next iteration until this entry expire first...
 				elseif commandTTL[unitID][i].countDown <=0 then --if commandTTL is found to reach ZERO then remove the command, assume a 'TIMEOUT', then remove *this* watchdog entry
-					local cQueue = spGetCommandQueue(unitID, 1) --// get unit's immediate command
+					local cQueue = spGetUnitCommands(unitID, 1) --// get unit's immediate command
 					local cmdID, _, cmdTag, firstParam, _, secondParam = Spring.GetUnitCurrentCommand(unitID)
 					if cmdID and
 					( firstParam == commandTTL[unitID][i].widgetCommand[1]) and

@@ -8,6 +8,7 @@ return { chicken_rafflesia = {
 
   customParams                  = {
     shield_emit_offset = -4,
+    normaltex = [[unittextures/chicken_rafflesia_normals.dds]],
   },
 
   explodeAs                     = [[NOWEAPON]],

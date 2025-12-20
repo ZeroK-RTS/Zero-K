@@ -39,7 +39,7 @@ local CMD_STOP				= CMD.STOP
 local spGiveOrderToUnit		= Spring.GiveOrderToUnit
 local spGetTeamUnits		= Spring.GetTeamUnits
 local spGetUnitTeam			= Spring.GetUnitTeam
-local spGetCommandQueue		= Spring.GetCommandQueue
+local spGetUnitCommands		= Spring.GetUnitCommands
 local spGetGameSeconds		= Spring.GetGameSeconds
 local spGetGroundBlocked	= Spring.GetGroundBlocked
 local spCreateUnit			= Spring.CreateUnit
@@ -994,7 +994,7 @@ local function MorphQueen()
 	local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(tempID)
 	local xp = Spring.GetUnitExperience(tempID)
 	local heading = Spring.GetUnitHeading(tempID)
-	local cmdQueue = spGetCommandQueue(tempID, -1)
+	local cmdQueue = spGetUnitCommands(tempID, -1)
 	local queenOwner = spGetUnitTeam(tempID)
 	
 	if Spring.GetUnitIsStunned(tempID) or (Spring.GetUnitRulesParam(tempID, "disarmed") == 1) then	-- postpone morph

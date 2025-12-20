@@ -22,6 +22,7 @@ return { cloakriot = {
     selection_scale   = 0.85,
     aim_lookahead     = 120,
     set_target_range_buffer = 35,
+    normaltex = [[unittextures/spherebot_normals.dds]],
 
     outline_x = 80,
     outline_y = 80,
@@ -84,6 +85,7 @@ return { cloakriot = {
       burnblow                = true,
       burst                   = 3,
       burstrate               = 0.1,
+      cegTag                  = [[hmg_trail_light]],
       craterBoost             = 0.15,
       craterMult              = 0.3,
 

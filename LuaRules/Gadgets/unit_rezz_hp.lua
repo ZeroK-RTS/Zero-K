@@ -79,13 +79,13 @@ function gadget:GetInfo() return {
 		local spec = select(2, spGetSpectatingState())
 		local myAllyTeam = spGetLocalAllyTeamID()
 		if (spec or spIsPosInLos(x, y, z, myAllyTeam)) then
-			spPlaySoundFile("sounds/misc/resurrect.wav", 15, x, y, z)
+			spPlaySoundFile("sounds/misc/resurrect.wav", 15, x, y, z, "battle")
 		end
 	end
 	
 	function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		if (builderID) then
-			local command = Spring.GetCommandQueue(builderID, 1)[1]
+			local command = Spring.GetUnitCommands(builderID, 1)[1]
 			if (command and command.id == CMD_RESURRECT) then
 				local unitDef = unitDefID and UnitDefs[unitDefID]
 				-- add CEG and play sound

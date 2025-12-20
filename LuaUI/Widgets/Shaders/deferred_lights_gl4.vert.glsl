@@ -3,9 +3,7 @@
 #extension GL_ARB_shader_storage_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 
-// This file is going to be licensed under some sort of GPL-compatible license, but authors are dragging
-// their feet. Avoid copying for now (unless this header rots for years on end), and check back later.
-// See https://github.com/ZeroK-RTS/Zero-K/issues/5328
+// Shader licensed under GNU GPL, v2 or later. Relicensed from MIT, preserving the notice "(c) Beherith (mysterme@gmail.com)".
 
 #line 5000
 
@@ -21,13 +19,15 @@ layout (location = 8) in vec4 color2; //
 layout (location = 9) in uint pieceIndex; // for piece type lights
 layout (location = 10) in uvec4 instData; // matoffset, uniformoffset, teamIndex, drawFlags {id = 5, name = 'instData', size = 4, type = GL.UNSIGNED_INT},
 
-			
 //__ENGINEUNIFORMBUFFERDEFS__
 //__DEFINES__
+//__QUATERNIONDEFS__
 
-layout(std140, binding = 0) readonly buffer MatrixBuffer {
-	mat4 mat[];
-};
+#if USEQUATERNIONS == 0
+	layout(std140, binding = 0) readonly buffer MatrixBuffer {
+		mat4 UnitPieces[];
+	};
+#endif
 
 struct SUniformsBuffer {
 	uint composite; //     u8 drawFlag; u8 unused1; u16 id;
@@ -49,7 +49,6 @@ struct SUniformsBuffer {
 layout(std140, binding=1) readonly buffer UniformsBuffer {
 	SUniformsBuffer uni[];
 };
-
 #line 10000
 
 uniform float pointbeamcone = 0;// = 0; // 0 = point, 1 = beam, 2 = cone
@@ -126,10 +125,21 @@ void main()
 	vec3 lightCenterPosition =  v_worldPosRad.xyz;
 	v_lightcolor = lightcolor;
 	if (attachedtounitID > 0){
-		mat4 worldMatrix = mat[instData.x];
+		#if USEQUATERNIONS == 0
+			mat4 worldMatrix = UnitPieces[instData.x];
+		#else
+			Transform modelWorldTX = GetModelWorldTransform(instData.x);
+			mat4 worldMatrix = TransformToMatrix(modelWorldTX);
+		#endif
+		
 		placeInWorldMatrix = worldMatrix;
 		if (pieceIndex > 0u) {
-			mat4 pieceMatrix = mat[instData.x + pieceIndex];
+			#if USEQUATERNIONS == 0
+				mat4 pieceMatrix = UnitPieces[instData.x + pieceIndex];
+			#else
+				Transform modelPieceTX = GetPieceModelTransform(instData.x, pieceIndex);
+				mat4 pieceMatrix = TransformToMatrix(modelPieceTX);
+			#endif
 			placeInWorldMatrix = placeInWorldMatrix * pieceMatrix;
 		}
 		//uint drawFlags = (instData.z & 0x0000100u);// >> 8 ; // hopefully this works

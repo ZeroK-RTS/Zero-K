@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
-    layer     = -12, -- above gui_name_tags
+    layer     = -13, -- above gui_name_tags
     enabled   = true,  -- loaded by default?
   }
 end
@@ -230,7 +230,7 @@ function WG.icons.SetUnitIcon(unitID, data)
 			unitHeights[unitID] = nil
 		else
 			--unitHeights[unitID] = Spring.Utilities.GetUnitHeight(ud) + iconoffset
-			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset
+			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset + (tonumber(ud.customParams.health_bar_height) or 0)
 		end
 	end
 

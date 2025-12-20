@@ -7,7 +7,7 @@ function widget:GetInfo()
 		license = "GNU GPL, v2 or later",
 		-- Somewhere between layer -40 and -30 GetUnitUnderCursor starts
 		-- returning nil before GetUnitsInSelectionBox includes that unit.
-		layer = -9, -- below unit_healthbars 
+		layer = -9, -- below outline shader and unit_healthbars 
 		enabled = true,
 	}
 end
@@ -321,6 +321,7 @@ function Init()
 	shaderConfig.USETEXTURE = 0
 	shaderConfig.POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 16.0 / gl_Position.w;" -- Pull forward a little to reduce ground clipping. This only affects the drawWorld pass.
 	shaderConfig.POST_SHADING = "fragColor.rgba = vec4(g_color.rgb, opacity * (texcolor.a * " .. platterOpacity .. " + texcolor.a * sign(addRadius) * " .. (outlineOpacity - platterOpacity) .. "));"
+	shaderConfig.USEQUATERNIONS = Engine.FeatureSupport.transformsInGL4 and "1" or "0"
 	selectionShader = InitDrawPrimitiveAtUnitShader(shaderConfig, "selectedUnits")
 	hoverSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_hover")
 	localSelectionVBO = InitDrawPrimitiveAtUnitVBO("selectedUnits_local")

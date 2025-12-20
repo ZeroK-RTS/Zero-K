@@ -101,7 +101,8 @@ end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-	local newAttributesEffect = false
+	local newAttributesEffect = {}
+	newAttributesEffect.cost = totalCost / ud.metalCost
 	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
 	if data.speedMultPost or data.speedMod then
@@ -152,7 +153,6 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if buildPowerMult ~= 1 then
 		-- Needs to use the new system so static can be set, to display properly on the UI.
-		newAttributesEffect = newAttributesEffect or {}
 		newAttributesEffect.build = buildPowerMult
 	end
 	
@@ -166,7 +166,6 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
 		newHealth = math.max(health + data.healthBonus, 1)
-		newAttributesEffect = newAttributesEffect or {}
 		newAttributesEffect.healthAdd = data.healthBonus
 	end
 	
@@ -198,9 +197,6 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	end
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
-	local effectiveMass = (((totalCost/2) + (maxHealth/8))^0.6)*6.5
-	Spring.SetUnitRulesParam(unitID, "massOverride", effectiveMass, INLOS)
-	
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
 	
 	if newAttributesEffect then
@@ -283,7 +279,6 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	Spring.SetUnitRulesParam(unitID, "comm_level",         level, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis",       chassis, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_name",          name, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_cost",          totalCost, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
@@ -295,12 +290,6 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	if staticLevel then -- unmorphable
 		Spring.SetUnitRulesParam(unitID, "comm_staticLevel",   staticLevel, INLOS)
 	end
-	
-	Spring.SetUnitCosts(unitID, {
-		buildTime = totalCost,
-		metalCost = totalCost,
-		energyCost = totalCost
-	})
 	
 	-- Set module unitRulesParams
 	-- Decorations are kept seperate from other module types.

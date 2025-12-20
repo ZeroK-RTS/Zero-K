@@ -88,6 +88,7 @@ local emptyTable = {} -- for speedups
 ]]--
 
 local MAX_MORPH = 0 -- Set in morph defs
+local MISC_PRIO_KEY = 2
 
 --------------------------------------------------------------------------------
 --	COMMON
@@ -206,7 +207,7 @@ local function ReAssignAssists(newUnit,oldUnit)
 			GG.SetUnitTarget(unitID, newUnit)
 		end
 		
-		local cmds = Spring.GetCommandQueue(unitID, -1)
+		local cmds = Spring.GetUnitCommands(unitID, -1)
 		for j = 1, #cmds do
 			local cmd = cmds[j]
 			local params = cmd.params
@@ -230,11 +231,6 @@ local function GetMorphRate(unitID)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
-	-- do not allow morph for unfinsihed units
-	if not isFinished(unitID) then
-		return false
-	end
-	
 	-- do not allow morph for units being transported which are not combat morphs
 	if Spring.GetUnitTransporter(unitID) and not morphDef.combatMorph then
 		return false
@@ -275,7 +271,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
 	
 	local newMorphRate = GetMorphRate(unitID)
-	GG.StartMiscPriorityResourcing(unitID, (newMorphRate*costMult*morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
+	GG.StartMiscPriorityResourcing(unitID, (newMorphRate*costMult*morphDef.metal/morphDef.time), nil, MISC_PRIO_KEY) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
 	morphUnits[unitID].morphRate = newMorphRate
 	return true
 end
@@ -285,13 +281,13 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
 	if not morphData then
 		return
 	end
-	GG.StopMiscPriorityResourcing(unitID, 2)
+	GG.StopMiscPriorityResourcing(unitID, MISC_PRIO_KEY)
 	morphData.teamID = newTeamID
-	GG.StartMiscPriorityResourcing(unitID, (morphData.costMult*morphData.def.metal / morphData.def.time), false, 2)
+	GG.StartMiscPriorityResourcing(unitID, (morphData.costMult*morphData.def.metal / morphData.def.time), false, MISC_PRIO_KEY)
 end
 
 local function StopMorph(unitID, morphData)
-	GG.StopMiscPriorityResourcing(unitID, 2) --is using unit_priority.lua gadget to handle morph priority.
+	GG.StopMiscPriorityResourcing(unitID, MISC_PRIO_KEY) --is using unit_priority.lua gadget to handle morph priority.
 	morphUnits[unitID] = nil
 	if not morphData.combatMorph then
 		Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
@@ -422,7 +418,7 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitRulesParam(unitID, "facplop", 0, {inlos = true})
 	end
 	--//copy command queue
-	local cmds = Spring.GetCommandQueue(unitID, -1)
+	local cmds = Spring.GetUnitCommands(unitID, -1)
 
 	local states = Spring.GetUnitStates(unitID) -- This can be left in table-state mode until REVERSE_COMPAT is not an issue.
 	states.retreat = Spring.GetUnitRulesParam(unitID, "retreatState") or 0
@@ -440,8 +436,10 @@ local function FinishMorph(unitID, morphData)
 	--//copy unit speed
 	local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
  
-
-	Spring.SetUnitRulesParam(newUnit, "jumpReload", Spring.GetUnitRulesParam(unitID, "jumpReload") or 1)
+	local jump = Spring.GetUnitRulesParam(unitID, "jumpReload")
+	if jump then
+		Spring.SetUnitRulesParam(newUnit, "jumpReload", jump)
+	end
 	
 	local oldFieldFactoryUnit = Spring.GetUnitRulesParam(unitID, "fieldFactoryUnit")
 	if oldFieldFactoryUnit and GG.FieldConstruction_SetProduction then
@@ -467,7 +465,9 @@ local function FinishMorph(unitID, morphData)
 		GG.Capture.SetMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
 	end
 	
+	GG.MorphDestroy = unitID
 	Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
+	GG.MorphDestroy = nil
 	
 	--//transfer unit speed
 	local gy = Spring.GetGroundHeight(px, pz)
@@ -493,7 +493,7 @@ local function FinishMorph(unitID, morphData)
 	
 	--// transfer health
 	-- old health is declared far above
-	local _,newMaxHealth		 = Spring.GetUnitHealth(newUnit)
+	local _,newMaxHealth = Spring.GetUnitHealth(newUnit)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	if newHealth <= 1 then
 		newHealth = 1
@@ -1109,7 +1109,12 @@ end
 local function DrawMorphUnit(unitID, morphData, localTeamID)
 	local h = GetUnitHeading(unitID)
 	if (h == nil) then
-		return	--// bonus, heading is only available when the unit is in LOS
+		return --// bonus, heading is only available when the unit is in LOS
+	end
+	
+	-- Morphing nanoframe is noisy.
+	if not isFinished(unitID) then
+		return false
 	end
 	
 	local px,py,pz = spGetUnitPosition(unitID)

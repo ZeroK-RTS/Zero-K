@@ -33,7 +33,7 @@ end
 
 function Spring.GetTeamColor(teamid)
   if not teamColor[teamid] then
-    teamColor[teamid] = { GetTeamColor(teamid) }
+    teamColor[teamid] = {GetTeamColor(teamid)}
   end
   return unpack(teamColor[teamid])
 end
@@ -127,3 +127,6 @@ function Spring.SetCameraTarget(x, y, z, transTime)
 		return SetCameraTarget(x, y, z, transTime) --return new results
 	end
 end
+
+-- not yet supported (can screw up the minimap)
+Spring.SetMiniMapRotation = function() end

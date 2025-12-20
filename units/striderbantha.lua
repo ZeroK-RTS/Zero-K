@@ -2,7 +2,7 @@ return { striderbantha = {
   name                   = [[Paladin]],
   description            = [[Ranged Support Strider]],
   acceleration           = 0.314,
-  autoheal               = 20,
+  autoheal               = 10,
   brakeRate              = 1.327,
   builder                = false,
   buildPic               = [[striderbantha.png]],
@@ -23,6 +23,7 @@ return { striderbantha = {
     midposoffset          = [[0 -8 0]],
     modelradius           = [[17]],
     decloak_footprint     = 5,
+    normaltex = [[unittextures/bantha_normals.dds]],
 
     stats_show_death_explosion = 1,
   },

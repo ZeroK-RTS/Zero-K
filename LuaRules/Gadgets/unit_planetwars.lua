@@ -610,7 +610,7 @@ end
 local function TeleportOut(unitID)
 	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
 	Spring.SpawnCEG("gate", x, y, z)
-	Spring.PlaySoundFile("sounds/misc/teleport_alt.wav", 20, x, y, z)
+	Spring.PlaySoundFile("sounds/misc/teleport_alt.wav", 20, x, y, z, "battle")
 	removingTeleportingUnit = true
 	Spring.DestroyUnit(unitID, false, true)
 	removingTeleportingUnit = false
@@ -656,7 +656,7 @@ function gadget:GameFrame(frame)
 				Spring.SpawnCEG("teleport_out", x, y, z)
 			end
 			if frame % 45 == 0 then
-				Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2, x, y, z)
+				Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2, x, y, z, "battle")
 			end
 		end
 	end

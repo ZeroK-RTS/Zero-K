@@ -15,6 +15,15 @@ if (modoptions and (modoptions.mtpath == 0 or modoptions.mtpath == "0")) then
 end
 Spring.Echo("forceSingleThreaded", forceSingleThreaded)
 
+local pathExperiment = false
+local pathfinder = Spring.GetModOptions().pathfinder or "qtpfs"
+if Script.IsEngineMinVersion and Script.IsEngineMinVersion(2025, 3, 0) and (pathfinder == "qtpfs") then
+	pathExperiment = true
+	Spring.Echo("pathfinderSelection pathWithQtpfs")
+else
+	Spring.Echo("pathfinderSelection pathWithOld")
+end
+
 local modrules  = {
   
   movement = {
@@ -87,6 +96,7 @@ local modrules  = {
       losMipLevel = 2,  -- defaults to 1
       losMul      = 1,  -- defaults to 1
       airMipLevel = 2,  -- defaults to 2
+      radarMipLevel = 2, -- defaults to 2
     },
   },
 
@@ -143,8 +153,8 @@ local modrules  = {
     allowTake = false,
     enableSmoothMesh = false,
     LuaAllocLimit = 2560,
-    pathFinderSystem = 0, --(Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0, -- QTPFS causes desync https://springrts.com/mantis/view.php?id=5936
-    pathFinderUpdateRate = 0.0000001,
+    pathFinderSystem = (pathExperiment and 1) or 0,
+    pathFinderUpdateRate = (pathExperiment and 1) or 0.0000001,
     pathFinderRawDistMult = 100000,
     pfForceSingleThreaded = forceSingleThreaded,
     pfForceUpdateSingleThreaded = forceSingleThreaded,

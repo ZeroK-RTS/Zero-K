@@ -307,6 +307,13 @@ local function CopyTable(tableToCopy, deep)
 	return copy
 end
 
+local function Clone(value)
+	if type(value) == "table" then
+		return CopyTable(value, deep)
+	end
+	return value
+end
+
 --[[
 local function tableMerge(t1, t2, appendIndex)
 	for k, v in pairs(t2) do
@@ -420,7 +427,10 @@ WG.crude.SetMasterVolume = function (newVolume, viaTrackbar)
 end
 
 WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
-	if (WG.music_start_volume or 0 > 0) then
+	if Spring.Utilities.IsNanOrInf(newVolume) then
+		newVolume = 0
+	end
+	if ((WG.music_start_volume or 0) > 0) then
 		Spring.SetSoundStreamVolume(newVolume / WG.music_start_volume)
 	else
 		Spring.SetSoundStreamVolume(newVolume)
@@ -590,22 +600,6 @@ local function WidgetEnabled(wname)
 	return order and (order > 0)
 end
 
-local function IsSinglePlayer()
-	local playerlist = Spring.GetPlayerList() or {}
-	local myPlayerID = Spring.GetMyPlayerID()
-	 for i = 1, #playerlist do
-		local playerID = playerlist[i]
-		if myPlayerID ~= playerID then
-			local _, active, spectator = Spring.GetPlayerInfo(playerID, false)
-			if active and not spectator then
-				return false
-			end
-		end
-	end
-	return true
-end
-WG.crude.IsSinglePlayer = IsSinglePlayer
-
 -- by default it allows if player is not spectating and there are no other players
 -- arg: true means trying to pause, false means trying to unpause
 local function AllowPauseOnMenuChange(pause)
@@ -627,7 +621,7 @@ local function AllowPauseOnMenuChange(pause)
 		end
 	end
 	
-	if IsSinglePlayer() == false then
+	if not Spring.Utilities.Gametype.IsSinglePlayer() then
 		return false
 	end
 	
@@ -644,7 +638,7 @@ local function CanSaveGame()
 		return IntToBool(Spring.GetModOptions().cansavegame)
 	end
 	
-	return IsSinglePlayer()
+	return Spring.Utilities.Gametype.IsSinglePlayer()
 end
 
 --------------------------------------------------------------------------------
@@ -1096,7 +1090,7 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 	
 	if option.type ~= 'button' and option.type ~= 'label' and option.default == nil then
 		if option.value ~= nil then
-			option.default = option.value
+			option.default = Clone(option.value)
 		else
 			option.default = newval
 		end
@@ -1338,8 +1332,7 @@ local function IntegrateWidget(w, addoptions, index)
 		end
 		
 		--store default
-		w.options[k].default = w.options[k].value
-		
+		w.options[k].default = Clone(w.options[k].value)
 		
 		option.key = k
 		option.wname = wname
@@ -1602,7 +1595,13 @@ local function ResetWinHotkeys(path)
 		local action = GetActionName(path, option)
 		
 		UnassignKeyBind(action)
-		option.hotkey = keybind and GetReadableHotkey(keybind) or "None"
+		if keybind and type(keybind) == 'table' then
+			option.hotkey = GetReadableHotkey(keybind[1])
+		elseif keybind then
+			option.hotkey = GetReadableHotkey(keybind)
+		else
+			option.hotkey = "None"
+		end
 		Spring.Echo("keybind", option.name, keybind, option.hotkey)
 		if keybind and keybind ~= "None" then
 			AssignKeyBindAction(keybind, action)
@@ -1634,7 +1633,7 @@ local function ResetWinSettings(path)
 					option.value = option.default
 					option.OnChange(option)
 				elseif option.type == 'colors' then
-					option.color = option.default
+					option.color = Clone(option.default)
 					option.OnChange(option)
 				end
 			else

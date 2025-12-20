@@ -92,7 +92,6 @@ function IsObject(v)
 	return ((type(v) == "metatable") or (type(v) == "userdata")) and (v.classname)
 end
 
-
 function IsNumber(v)
 	return (type(v) == "number")
 end
@@ -336,10 +335,14 @@ function table:shallowcopy()
 	return newTable
 end
 
-function table:arrayshallowcopy()
-	local newArray = {}
-	for i = 1, #self do
-		newArray[i] = self[i]
+function table:deepcopy()
+	local newTable = {}
+	for k, v in pairs(self) do
+		if type(v) == 'table' then
+			newTable[k] = table.deepcopy(v)
+		else
+			newTable[k] = v
+		end
 	end
 	return newTable
 end
@@ -347,12 +350,6 @@ end
 function table:arrayappend(t)
 	for i = 1, #t do
 		self[#self + 1] = t[i]
-	end
-end
-
-function table:arraymap(fun)
-	for i = 1, #self do
-		newTable[i] = fun(self[i])
 	end
 end
 
@@ -399,14 +396,13 @@ end
 
 function table:merge(table2)
 	for i, v in pairs(table2) do
-		if (type(v) == 'table') then
-			local sv = type(self[i])
-			if (sv == 'table') or (sv == 'nil') then
-				if (sv == 'nil') then self[i] = {} end
-				table.merge(self[i], v)
-			end
-		elseif (self[i] == nil) then
-			self[i] = v
+		local sv = self[i]
+		if type(v) ~= 'table' or (sv and type(sv) ~= 'table') then
+			self[i] = sv or v
+		elseif sv then
+			table.merge(sv, v)
+		else
+			self[i] = table.deepcopy(v)
 		end
 	end
 	return self

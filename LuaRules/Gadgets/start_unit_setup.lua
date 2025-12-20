@@ -39,8 +39,8 @@ local fixedStartPos = (modOptions.fixedstartpos == "1")
 
 local modStartMetal = START_METAL
 local modStartEnergy = START_ENERGY
-local modInnateMetal = INNATE_INC_METAL
-local modInnateEnergy = INNATE_INC_ENERGY
+local modInnateMetal = INNATE_INC_METAL * (tonumber(Spring.GetModOptions().metalmult) or 1)
+local modInnateEnergy = INNATE_INC_ENERGY * (tonumber(Spring.GetModOptions().energymult) or 1)
 
 local storageUnits = {
 	{
@@ -484,7 +484,7 @@ local function StartUnitPicked(playerID, name)
 			if startUnit then
 				local newCommID = Spring.CreateUnit(startUnit, pos.x, pos.y, pos.z , "s", 0)
 				if oldCommID then
-					local cmds = Spring.GetCommandQueue(oldCommID, -1)
+					local cmds = Spring.GetUnitCommands(oldCommID, -1)
 					--//transfer command queue
 					for i = 1, #cmds do
 						local cmd = cmds[i]

@@ -428,6 +428,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx, cy, cz -- command position
 		
 		local pointDis = Dist(ex, ez, ux, uz)
+		if pointDis == 0 then
+			ex, ez = math.random()*2 - 1, math.random()*2 - 1
+			pointDis = Dist(ex, ez, ux, uz)
+		end
 		UpdateJink(behaviour, unitData)
 		
 		-- jink towards the enemy
@@ -839,6 +843,10 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 		return true, orderSent
+	end
+	
+	if enemy and unitData.allyTeam == spGetUnitAllyTeam(enemy) then
+		return false
 	end
 	
 	local didSwarm = false

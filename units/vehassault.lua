@@ -76,11 +76,13 @@ return { vehassault = {
     PLASMA = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 32,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams        = {
         light_camera_height = 1500,
+        burst = Shared.BURST_RELIABLE,
       },
 
       damage                  = {

@@ -135,13 +135,13 @@ function script.BlockShot(num, targetID)
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
-	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 40, false, false, false) then
+	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 45, false, false, false) then
 		-- Remove attack command on blocked target, if it is followed by another attack command. This is commands queued in an area.
 		local cmdID, _, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
 		if cmdID == CMD.ATTACK and (not cp_2) and cp_1 == targetID then
 			local cmdID_2, _, _, cp_1_2, cp_2_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 			if cmdID_2 == CMD.ATTACK and (not cp_2_2) then
-				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				local cQueue = Spring.GetUnitCommands(unitID, 1)
 				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
 			end
 		end
@@ -187,7 +187,19 @@ function script.BlockShot(num, targetID)
 		--return true
 	--end
 	
-	if targetID and (not isTooFast) and GG.Script.OverkillPreventionCheck(unitID, targetID, damage, 270, 35, 0.025) then
+	-- 50 frames is empircally required vs 1-shottable targets, but err on the side of caution in case of strong targets.
+	local timeout = isTooFast and 15 or 42
+	if targetID and not isTooFast then
+		local targetHealth = CallAsTeam(Spring.GetUnitTeam(unitID),
+			function ()
+				return Spring.GetUnitHealth(targetID)
+			end)
+		if targetHealth and targetHealth <= 800 then
+			timeout = 50
+		end
+	end
+	
+	if targetID and GG.Script.OverkillPreventionCheck(unitID, targetID, damage, 270, timeout, 0.025) then
 		return true
 	end
 	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)

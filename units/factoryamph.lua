@@ -47,6 +47,7 @@ return { factoryamph = {
     shared_energy_gen  = 1,
     cus_noflashlight   = 1,
     parent_of_plate    = [[plateamph]],
+    normaltex = [[unittextures/corvrad_normals.dds]],
 
     stats_show_death_explosion = 1,
 
