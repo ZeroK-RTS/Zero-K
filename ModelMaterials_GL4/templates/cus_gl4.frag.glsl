@@ -1171,7 +1171,7 @@ void main(void){
 			float fragSizeFactor = 1.0/dot(vec3(1.0), fragSize);
 
 			float grid1factor = clamp(1.2 - 2.0 * buildProgress, 0.0, 1.0);
-			float grid3factor = clamp(2.5 * buildProgress - 1.4, 0.0, 1.0);
+			float grid3factor = clamp(2.4 * buildProgress - 1.35, 0.0, 1.0);
 			float grid2factor = clamp(1.0 - grid1factor - grid3factor, 0.0, 1.0);
 			float widthFactor = (1.0 + clamp((clamp(buildProgress, 0.0, 1.0) - 0.92)*100.0, 0.0, 30.0));
 
