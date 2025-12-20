@@ -569,7 +569,7 @@ function widget:GameFrame(n)
 		if n % UPDATE_RATE == 0 then
 			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
 				local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
-				local para = (paralyzeDamage or 0) / (maxHealth or 1) > 1 and 1
+				local para = (paralyzeDamage or 0) / (maxHealth > 0.1 and maxHealth or 1) > 1 and 1
 				local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
 				local slow = spGetUnitRulesParam(unitID, "slowState")
 				local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
@@ -640,7 +640,7 @@ function widget:UnitCreated(unitID, unitDefID)
 	end
 end
 
-function widget:UnitDestroyed(unitID)
+function widget:RenderUnitDestroyed(unitID)
 	StopDrawParalyzedUnitGL4(unitID)
 	empLinger[unitID] = nil
 	disarmLinger[unitID] = nil
