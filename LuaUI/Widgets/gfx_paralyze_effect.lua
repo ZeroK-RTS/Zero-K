@@ -561,7 +561,7 @@ local uniformcache = {0}
 local toremove = {}
 local empLinger = {}
 local disarmLinger = {}
-local LINGER_FRAMES = 7
+local LINGER_FRAMES = 9
 local UPDATE_RATE = 2
 
 function widget:GameFrame(n)
