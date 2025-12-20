@@ -321,19 +321,29 @@ out vec4 fragColor;
 #line 25000
 void main() {
 	float input_data = v_endcolor_alpha.a; // 1: para, 2: disarm, 4: fire, fraction: slow
-	bool fire = (input_data > 3.75);
+	bool fire = (input_data > 7.95);
 	if (fire) {
-		input_data -= 4.0;
+		input_data -= 7.0;
 	}
-	bool disarm = (input_data > 1.75);
+	bool emp = (input_data > 3.95);
+	float stunAmount = 1.0;
+	if (emp) {
+		input_data -= 4.0;
+		stunAmount = fract(input_data) - 0.01;
+		input_data -= 0.11;
+	}
+	bool disarm = (input_data > 1.95);
 	if (disarm) {
 		input_data -= 2.0;
+		stunAmount = fract(input_data) - 0.01;
+		input_data -= 0.11;
 	}
-	bool emp = (input_data > 0.75);
-	if (emp) {
+	float slowed = 0.0;
+	if (input_data > 0.95) {
 		input_data -= 1.0;
+		slowed = input_data;
+		stunAmount -= slowed;
 	}
-	float slowed = input_data;
 	
 	float noisescale;
 	float persistance;
@@ -353,7 +363,7 @@ void main() {
 	
 	if (emp) {
 		effect_level = 1.0;
-		noisescale = 0.52;
+		noisescale = 0.49;
 		persistance = 0.45;
 		lacunarity = 2.5;
 		minlightningcolor = vec3(0.1, 0.1, 1.0); //blue
@@ -367,12 +377,12 @@ void main() {
 		lightning_speed = 0.95;
 	} else if (disarm) {
 		effect_level = 0.9954;
-		noisescale = 0.42;
+		noisescale = 0.49;
 		persistance = 0.45;
 		lacunarity = 2.5;
 		minlightningcolor = vec3(0.8, 0.8, 0.4); //white-yellow
 		maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
-		wholeunitbasecolor = vec4(0.7, 0.7, 0.55, 1.0); // light blue base tone
+		wholeunitbasecolor = vec4(0.7, 0.7, 0.55, 0.85); // light blue base tone
 		alphaRange = 1.2;
 		alphaBase = 0.3;
 		lightningalpha = 2.5;
@@ -385,6 +395,7 @@ void main() {
 	fragColor = vec4(1.0, 1.0, 1.0, 0.0);
 	float flash = abs((2.0 * fract((timeInfo.x + timeInfo.w) * 0.07)) - 1.0);
 	if (effect_level > 0.5) {
+		stunAmount = stunAmount * 10.0;
 		vec4 noiseposition = noisescale * vec4(v_modelPosOrig, (timeInfo.x + timeInfo.w) * lightning_speed);
 		float noise4 = 0;
 		noise4 += pow(persistance, 1.0) * snoise(noiseposition * 0.025 * pow(lacunarity, 1.0));
@@ -404,18 +415,18 @@ void main() {
 		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, 1.7*(timeInfo.x + timeInfo.w))) + 
 		                     snoise(0.02 * vec4(v_modelPosOrig, 1.3*(timeInfo.x + timeInfo.w)));
 		baseItensity = sqrt(abs(baseItensity) + 0.2) * (0.5 * flash + 0.2) + clamp(baseItensity * (flash - 0.5) * 0.5, -0.2, 1.0);
-		wholeunitbasecolor.a = clamp(alphaBase + baseItensity * (0.1 + alphaRange) + electricity, 0.0, 1.0);
+		wholeunitbasecolor.a = clamp((alphaBase + baseItensity * (0.1 + alphaRange)) * stunAmount * stunAmount + electricity, 0.0, 1.0);
 		wholeunitbasecolor.r = wholeunitbasecolor.r + baseItensity * 0.33;
 		wholeunitbasecolor.g = wholeunitbasecolor.g + baseItensity * 0.45;
 		fragColor = max(wholeunitbasecolor, fragColor); // apply whole unit base color
-		fragColor.a *= clamp((effect_level - 0.98) * 50.0, 0.0, 1.0);
+		fragColor.a *= clamp((effect_level - 0.98) * 50.0 * stunAmount, 0.0, 1.0);
 	}
 	if (slowed > 0.001) {
 		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, -1.7*(timeInfo.x + timeInfo.w))) + 
 		                     snoise(0.02 * vec4(v_modelPosOrig, -1.3*(timeInfo.x + timeInfo.w)));
 		baseItensity = sqrt(abs(baseItensity) + 0.2);
-		vec4 slowcolor = vec4(1.0, 0.1, 1.0, clamp((baseItensity + 0.4), 0.0, 1.0)) * sqrt(clamp(slowed, 0.0, 0.4));
-		fragColor = mix(slowcolor, fragColor, 0.5 * (1.2 - baseItensity) + (1.0 - slowed) * clamp(effect_level, 0.0, 1.0));
+		vec4 slowcolor = vec4(1.0, 0.1, 1.0, clamp((baseItensity + 0.2), 0.0, 1.0)) * sqrt(clamp(slowed, 0.0, 0.45));
+		fragColor = mix(slowcolor, fragColor, 0.5 * (1.32 - baseItensity) + (1.0 - slowed) * clamp(effect_level * 0.8, 0.0, 1.0));
 	}
 	if (fire) {
 		flash = 1.0 - flash;
@@ -546,6 +557,75 @@ function widget:PlayerChanged(playerID)
 	end
 end
 
+local uniformcache = {0}
+local toremove = {}
+local empLinger = {}
+local disarmLinger = {}
+local LINGER_FRAMES = 7
+local UPDATE_RATE = 2
+
+function widget:GameFrame(n)
+	if not TESTMODE then
+		if n % UPDATE_RATE == 0 then
+			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
+				local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
+				local para = (paralyzeDamage or 0) / (maxHealth or 1) > 1 and 1
+				local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
+				local slow = spGetUnitRulesParam(unitID, "slowState")
+				local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
+				
+				local wantRemove = (not para) and (not disarmed) and (slow or 0) <= 0 and (not fire)
+				if (not para) and (not disarmed) then
+					if empLinger[unitID] then
+						empLinger[unitID] = empLinger[unitID] - UPDATE_RATE
+						if empLinger[unitID] > 0 then
+							para = empLinger[unitID] / LINGER_FRAMES
+							wantRemove = false
+						else
+							empLinger[unitID] = nil
+						end
+					elseif disarmLinger[unitID] then
+						disarmLinger[unitID] = disarmLinger[unitID] - UPDATE_RATE
+						if disarmLinger[unitID] > 0 then
+							disarmed = disarmLinger[unitID] / LINGER_FRAMES
+							wantRemove = false
+						else
+							disarmLinger[unitID] = nil
+						end
+					end
+				end
+				
+				if wantRemove then
+					toremove[unitID] = true
+				else
+					if para == 1 then
+						empLinger[unitID] = LINGER_FRAMES
+					end
+					if disarmed == 1 then
+						disarmLinger[unitID] = LINGER_FRAMES
+					end
+					local val = 0
+					if (slow or 0) > 0 then
+						val = val + 1 + slow
+					end
+					if disarmed then
+						val = val + 2.01 + 0.1 * disarmed
+					elseif para then
+						val = val + 4.01 + 0.1 * para
+					end
+					val = val + ((fire and 8) or 0)
+					uniformcache[1] = val
+					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+				end
+			end
+		end
+		for unitID, _ in pairs(toremove) do
+			StopDrawParalyzedUnitGL4(unitID)
+			toremove[unitID] = nil
+		end
+	end
+end
+
 function widget:UnitCreated(unitID, unitDefID)
 	if TESTMODE then
 		DrawParalyzedUnitGL4(unitID, unitDefID)
@@ -562,6 +642,8 @@ end
 
 function widget:UnitDestroyed(unitID)
 	StopDrawParalyzedUnitGL4(unitID)
+	empLinger[unitID] = nil
+	disarmLinger[unitID] = nil
 end
 
 -- Breaks spectators and is irrelevant for everyone else?
@@ -576,37 +658,6 @@ end
 
 local function UnitStatusDamageEffect(unitID, unitDefID) -- called from Healthbars Widget Forwarding GADGET!!!
 	widget:UnitCreated(unitID, unitDefID)
-end
-
-local uniformcache = {0}
-local toremove = {}
-
-function widget:GameFrame(n)
-	if not TESTMODE then
-		if n % 3 == 0 then
-			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
-				local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
-				local disarmed = spGetUnitRulesParam(unitID, "disarmed")
-				local slow = spGetUnitRulesParam(unitID, "slowState")
-				local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
-				if (not paralyzeDamage or paralyzeDamage == 0) and disarmed ~= 1 and (slow or 0) <= 0 and not fire then
-					toremove[unitID] = true
-				else
-					local para = (paralyzeDamage or 0) / (maxHealth or 1)
-					local val = (slow or 0)
-					val = val + (((para >= 1) and 1) or 0)
-					val = val + (((disarmed == 1) and 2) or 0)
-					val = val + ((fire and 4) or 0)
-					uniformcache[1] = val
-					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
-				end
-			end
-		end
-		for unitID, _ in pairs(toremove) do
-			StopDrawParalyzedUnitGL4(unitID)
-			toremove[unitID] = nil
-		end
-	end
 end
 
 function widget:Initialize()
