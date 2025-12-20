@@ -2191,7 +2191,8 @@ function gadget:DrawWorldPreUnit()
 		--	Spring.Echo(printDrawPassStats())
 		--end
 		local totalobjects = #units + #features + numdestroyedUnits + numdestroyedFeatures
-		if cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate >= gameFrame) then
+		local wantCloakUpdate = cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate <= gameFrame)
+		if wantCloakUpdate then
 			totalobjects = totalobjects + #cloakLingerUnitList
 		end
 		
@@ -2240,7 +2241,7 @@ function gadget:DrawWorldPreUnit()
 		end
 
 		ProcessUnits(units, drawFlagsUnits, gameFrame, "changed")
-		if cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate >= gameFrame) then
+		if wantCloakUpdate then
 			local checkUnits = cloakLingerUnitList
 			cloakLingerUnitList = false
 			nextLingerUpdate = false
