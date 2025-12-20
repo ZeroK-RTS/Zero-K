@@ -1248,7 +1248,7 @@ void main(void){
 		if (selectedness != 0.0){
 			float isWreck = (selectedness < 0.0 ) ? 1.0 : 0.0;
 			float mouseoverOpacity = (selectedness >= 1.0 && selectedness < 2.0) ? fract(selectedness) : 0.0;
-			float edge = fract(worldVertexPos.y * 0.06 + (simFrame) * 0.04);
+			float edge = fract(worldVertexPos.y * 0.03 + (simFrame) * 0.04);
 			edge = mix(edge, 0.0, edge*edge*edge*edge*edge);
 			
 			float wreckIntensity = fract((simFrame) * 0.025);
@@ -1258,7 +1258,7 @@ void main(void){
 			// Team colour highlight
 			vec4 mouseOverHighlight = vec4(0);
 			mouseOverHighlight.rgb = clamp(teamCol.rgb, 0.65, 1.0);
-			mouseoverOpacity *= 0.7 + 0.4 * edge;
+			mouseoverOpacity *= 0.3 + 0.7 * edge;
 			
 			// Wreck metal determines colour
 			float x100  = 80.0  / (80.0  - min(0.0, selectedness));
