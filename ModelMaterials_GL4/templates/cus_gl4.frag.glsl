@@ -1314,8 +1314,8 @@ void main(void){
 			float sintime = fract(simFrame * 0.02); // pulses every 3 seconds
 			myPerlin.g = myPerlin.g * 0.5 + 0.5;
 			texColor2.a = 1.0 - clamp(cloakedness*0.4, 0.0, 0.4);
-			float perlinline1 = clamp(1.0 - 15.0* abs(myPerlin.g - fract(simFrame * 0.005)), 0.0, 1.0);
-			float perlinline2 = clamp(1.0 - 15.0* abs(myPerlin.g - fract(simFrame * 0.005 + 0.5)), 0.0, 1.0);
+			float perlinline1 = clamp(1.0 - 18.0* abs(myPerlin.g - fract(simFrame * 0.005)), 0.0, 1.0);
+			float perlinline2 = clamp(1.0 - 18.0* abs(myPerlin.g - fract(simFrame * 0.005 + 0.5)), 0.0, 1.0);
 			float cloaknoise = cloakedness*perlinline1 + cloakedness*perlinline2;
 			if (isEnemy) {
 				texColor2.a = 1.0 - clamp(cloakedness * (1.0 + cloaknoise * 2.0), 0.0, 1.0);
@@ -1325,11 +1325,11 @@ void main(void){
 			outColor.rgb += cloaknoise;
 
 			#if 1
-			float dotcamera = dot(worldNormal, V) * 0.7 + 0.3;
+			float dotcamera = dot(worldNormal, V);
 
-			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1)*0.8 + 0.05;
+			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1)*0.6 + 0.05;
 			highLightOpacity = highLightOpacity * highLightOpacity;
-			outColor.rgb = mix(outColor.rgb * (1.0 - cloakedness*0.4), teamCol.rgb * 6.0, highLightOpacity * cloakedness);
+			outColor.rgb = mix(outColor.rgb * (1.0 - cloakedness*0.32), teamCol.rgb * 6.0, highLightOpacity * cloakedness);
 			
 			//Add bloom to the perlin noise:
 			outSpecularColor.rgb += vec3(clamp(cloaknoise * 0.75,0.0,1.0));
