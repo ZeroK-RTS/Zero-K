@@ -104,6 +104,7 @@ return { shipassault = {
         craterMult              = 0,
 
         customParams            = {
+            combatRange = 225,
             force_ignore_ground = [[1]],
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
@@ -148,15 +149,12 @@ return { shipassault = {
     },
     
     MISSILE      = {
-      name                    = [[Destroyer Missiles]],
+      name                    = [[Destroyer Missile]],
       areaOfEffect            = 48,
       cegTag                  = [[missiletrailyellow]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-      customParams            = {
-        combatRange = 265,
-      },
       damage                  = {
         default = 400.01,
       },
@@ -187,7 +185,7 @@ return { shipassault = {
     },
     
     MISSILE_SALVO      = {
-      name                    = [[Destroyer Missiles Salvo]],
+      name                    = [[Destroyer Missile Salvo]],
       areaOfEffect            = 48,
       avoidFeature            = false,
       avoidFriendly           = false,
@@ -199,9 +197,6 @@ return { shipassault = {
       commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
-      customParams            = {
-        combatRange = 265,
-      },
       damage                  = {
         default = 400.01,
       },
