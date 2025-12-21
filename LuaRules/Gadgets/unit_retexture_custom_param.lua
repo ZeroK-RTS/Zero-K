@@ -41,12 +41,6 @@ function gadget:UnitCreated(unitID, unitDefID)
 	end
 	local tex1 = tex1UnitDefIDs[unitDefID]
 	local tex2 = tex2UnitDefIDs[unitDefID]
-	if tex1 then
-		tex1 = "unittextures/" .. tex1
-	end
-	if tex2 then
-		tex2 = "unittextures/" .. tex2
-	end
 	if GG.CUSGL4 and GG.CUSGL4.SetUnitTexture then
 		GG.CUSGL4.SetUnitTexture(unitID, tex1, tex2)
 	end
