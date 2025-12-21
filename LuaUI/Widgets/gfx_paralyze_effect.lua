@@ -429,7 +429,7 @@ void main() {
 		                     snoise(0.02 * vec4(v_modelPosOrig, -1.3*(timeInfo.x + timeInfo.w)));
 		baseItensity = sqrt(abs(baseItensity) + 0.25);
 		vec4 slowcolor = vec4(1.0, 0.1, 1.0, clamp((baseItensity + 0.2), 0.0, 1.0)) * sqrt(1.6 * clamp(slowed, 0.0, 0.45));
-		fragColor = mix(slowcolor, fragColor, 0.5 * (1.35 - baseItensity) - (0.5 - slowed) * clamp(effect_level * 0.8, 0.0, 1.0));
+		fragColor = mix(slowcolor, fragColor, clamp((1.2 - baseItensity) + 1.7 * (0.5 - slowed) * clamp(effect_level, 0.0, 1.0), 0.0, 1.0));
 	}
 	if (fire) {
 		flash = 1.0 - flash;
@@ -571,54 +571,58 @@ function widget:GameFrame(n)
 	if not TESTMODE then
 		if n % UPDATE_RATE == 0 then
 			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
-				local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
-				local para = (paralyzeDamage or 0) / (maxHealth > 0.1 and maxHealth or 1) > 1 and 1
-				local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
-				local slow = spGetUnitRulesParam(unitID, "slowState")
-				local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
-				
-				local wantRemove = (not para) and (not disarmed) and (slow or 0) <= 0 and (not fire)
-				if (not para) and (not disarmed) then
-					if empLinger[unitID] then
-						empLinger[unitID] = empLinger[unitID] - UPDATE_RATE
-						if empLinger[unitID] > 0 then
-							para = empLinger[unitID] / LINGER_FRAMES
-							wantRemove = false
-						else
-							empLinger[unitID] = nil
+				if Spring.ValidUnitID(unitID) then
+					local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
+					local para = ((paralyzeDamage or 0) / (((maxHealth or 0) > 0.1) and maxHealth or 1)) > 1 and 1
+					local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
+					local slow = spGetUnitRulesParam(unitID, "slowState")
+					local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
+					
+					local wantRemove = (not para) and (not disarmed) and (slow or 0) <= 0 and (not fire)
+					if (not para) and (not disarmed) then
+						if empLinger[unitID] then
+							empLinger[unitID] = empLinger[unitID] - UPDATE_RATE
+							if empLinger[unitID] > 0 then
+								para = empLinger[unitID] / LINGER_FRAMES
+								wantRemove = false
+							else
+								empLinger[unitID] = nil
+							end
+						elseif disarmLinger[unitID] then
+							disarmLinger[unitID] = disarmLinger[unitID] - UPDATE_RATE
+							if disarmLinger[unitID] > 0 then
+								disarmed = disarmLinger[unitID] / LINGER_FRAMES
+								wantRemove = false
+							else
+								disarmLinger[unitID] = nil
+							end
 						end
-					elseif disarmLinger[unitID] then
-						disarmLinger[unitID] = disarmLinger[unitID] - UPDATE_RATE
-						if disarmLinger[unitID] > 0 then
-							disarmed = disarmLinger[unitID] / LINGER_FRAMES
-							wantRemove = false
-						else
+					end
+					
+					if wantRemove then
+						toremove[unitID] = true
+					else
+						if para == 1 then
+							empLinger[unitID] = LINGER_FRAMES
 							disarmLinger[unitID] = nil
+						elseif disarmed == 1 then
+							disarmLinger[unitID] = LINGER_FRAMES
 						end
+						local val = 0
+						if (slow or 0) > 0 then
+							val = val + 1 + slow
+						end
+						if para then
+							val = val + 4.01 + 0.1 * para
+						elseif disarmed then
+							val = val + 2.01 + 0.1 * disarmed
+						end
+						val = val + ((fire and 8) or 0)
+						uniformcache[1] = val
+						gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
 					end
-				end
-				
-				if wantRemove then
-					toremove[unitID] = true
 				else
-					if para == 1 then
-						empLinger[unitID] = LINGER_FRAMES
-					end
-					if disarmed == 1 then
-						disarmLinger[unitID] = LINGER_FRAMES
-					end
-					local val = 0
-					if (slow or 0) > 0 then
-						val = val + 1 + slow
-					end
-					if para then
-						val = val + 4.01 + 0.1 * para
-					elseif disarmed then
-						val = val + 2.01 + 0.1 * disarmed
-					end
-					val = val + ((fire and 8) or 0)
-					uniformcache[1] = val
-					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+					toremove[unitID] = true
 				end
 			end
 		end
