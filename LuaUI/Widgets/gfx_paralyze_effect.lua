@@ -358,6 +358,7 @@ void main() {
 	float effect_level = 0.0;
 	float alphaRange = 0.6;
 	float alphaBase = 0.4;
+	float lightningMult = 1.0;
 	
 	// ------------------ CONFIG START --------------------
 	
@@ -375,6 +376,7 @@ void main() {
 		lighting_sharpness = 4.8; 
 		lighting_width = 3.8;
 		lightning_speed = 0.95;
+		lightningMult = 1.0;
 	} else if (disarm) {
 		effect_level = 0.9954;
 		noisescale = 0.49;
@@ -383,12 +385,13 @@ void main() {
 		minlightningcolor = vec3(0.8, 0.8, 0.4); //white-yellow
 		maxlightningcolor = vec3(1.0, 1.0, 1.0); //white
 		wholeunitbasecolor = vec4(0.7, 0.7, 0.55, 0.85); // light blue base tone
-		alphaRange = 1.2;
-		alphaBase = 0.3;
+		alphaRange = 0.9;
+		alphaBase = 0.4;
 		lightningalpha = 2.5;
-		lighting_sharpness = 7.8; 
-		lighting_width = 2.8;
+		lighting_sharpness = 4.8; 
+		lighting_width = 4.8;
 		lightning_speed = 0.95;
+		lightningMult = 1.8;
 	}
 	// ------------------ CONFIG END --------------------
 	
@@ -411,7 +414,7 @@ void main() {
 		lightningcolor = mix(minlightningcolor, maxlightningcolor, electricity);
 		effectalpha = clamp(effect_level * lightningalpha, 0.0, 1.0);
 		
-		fragColor = vec4(lightningcolor, electricity*effectalpha);
+		fragColor = vec4(lightningcolor, electricity*effectalpha*lightningMult);
 		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, 1.7*(timeInfo.x + timeInfo.w))) + 
 		                     snoise(0.02 * vec4(v_modelPosOrig, 1.3*(timeInfo.x + timeInfo.w)));
 		baseItensity = sqrt(abs(baseItensity) + 0.2) * (0.5 * flash + 0.2) + clamp(baseItensity * (flash - 0.5) * 0.5, -0.2, 1.0);
@@ -424,9 +427,9 @@ void main() {
 	if (slowed > 0.001) {
 		float baseItensity = snoise(0.032 * vec4(v_modelPosOrig, -1.7*(timeInfo.x + timeInfo.w))) + 
 		                     snoise(0.02 * vec4(v_modelPosOrig, -1.3*(timeInfo.x + timeInfo.w)));
-		baseItensity = sqrt(abs(baseItensity) + 0.2);
-		vec4 slowcolor = vec4(1.0, 0.1, 1.0, clamp((baseItensity + 0.2), 0.0, 1.0)) * sqrt(clamp(slowed, 0.0, 0.45));
-		fragColor = mix(slowcolor, fragColor, 0.5 * (1.32 - baseItensity) + (1.0 - slowed) * clamp(effect_level * 0.8, 0.0, 1.0));
+		baseItensity = sqrt(abs(baseItensity) + 0.25);
+		vec4 slowcolor = vec4(1.0, 0.1, 1.0, clamp((baseItensity + 0.2), 0.0, 1.0)) * sqrt(1.6 * clamp(slowed, 0.0, 0.45));
+		fragColor = mix(slowcolor, fragColor, 0.5 * (1.35 - baseItensity) - (0.5 - slowed) * clamp(effect_level * 0.8, 0.0, 1.0));
 	}
 	if (fire) {
 		flash = 1.0 - flash;
@@ -608,10 +611,10 @@ function widget:GameFrame(n)
 					if (slow or 0) > 0 then
 						val = val + 1 + slow
 					end
-					if disarmed then
-						val = val + 2.01 + 0.1 * disarmed
-					elseif para then
+					if para then
 						val = val + 4.01 + 0.1 * para
+					elseif disarmed then
+						val = val + 2.01 + 0.1 * disarmed
 					end
 					val = val + ((fire and 8) or 0)
 					uniformcache[1] = val

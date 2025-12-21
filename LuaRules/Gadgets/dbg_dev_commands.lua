@@ -704,6 +704,17 @@ local function damage(cmd,line,words,player)
 	end
 end
 
+local function lightDamage(cmd,line,words,player)
+	if spIsCheatingEnabled() then
+		local units = Spring.GetAllUnits()
+		for i=1, #units do
+			local unitID = units[i]
+			local health, maxHealth = Spring.GetUnitHealth(unitID)
+			Spring.SetUnitHealth(unitID, health  - maxHealth * 0.1)
+		end
+	end
+end
+
 local function clear(cmd,line,words,player)
 	if spIsCheatingEnabled() then
 		local units = Spring.GetAllUnits()
@@ -975,6 +986,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "nf", nanoFrame, "Sets nanoframe values.")
 	gadgetHandler.actionHandler.AddChatAction(self, "rez", rezAll, "Resurrects wrecks for former owners.")
 	gadgetHandler.actionHandler.AddChatAction(self, "damage", damage, "Damages everything.")
+	gadgetHandler.actionHandler.AddChatAction(self, "ld", lightDamage, "Damages everything by 10%.")
 	gadgetHandler.actionHandler.AddChatAction(self, "color", ColorTest, "Spawns units for color test.")
 	gadgetHandler.actionHandler.AddChatAction(self, "clear", clear, "Clears all units and wreckage.")
 	gadgetHandler.actionHandler.AddChatAction(self, "uclear", uclear, "Clears all units.")
