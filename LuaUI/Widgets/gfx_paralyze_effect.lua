@@ -160,7 +160,14 @@ void main() {
 	uint baseIndex = instData.x;
 	vec4 piecePos = vec4(pos, 1.0);
 	float healthFrac = clamp(UNITUNIFORMS.health / UNITUNIFORMS.maxHealth, 0.0, 1.0);
-	
+	float buildProgress = UNITUNIFORMS.userDefined[0].x;
+
+	if (buildProgress > -0.5){
+		buildProgress = buildProgress * 1.05; // Counteract division in CUS gadget
+		float excessFactor = (1.0 - clamp(20.0 * (buildProgress - 1.0), 0.0, 1.0));
+		// healthFraction, cannot, in theory be more than buildProgress
+		healthFrac = clamp(healthFrac / max(0.00000001, buildProgress), 0.0, 1.0);
+	}
 	if (healthFrac < 0.95){
 		vec3 seedVec = 0.1 * piecePos.xyz;
 		seedVec.y += 1024.0 * hash11(float(UNITID));
