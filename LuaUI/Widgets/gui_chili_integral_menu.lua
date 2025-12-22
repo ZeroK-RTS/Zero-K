@@ -1852,6 +1852,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		for i = 1, #buttonList do
 			buttonList[i].OnVisibleGridKeyUpdate()
 		end
+		externalFunctions.UpdateRadarIcons()
 		gridUpdatedSinceVisible = false
 	end
 	
@@ -2478,11 +2479,6 @@ local function InitializeControls()
 			OnTabSelect = function ()
 				data.queue.UpdateBuildProgress()
 				data.buttons.OnSelect()
-				data.buttons.UpdateRadarIcons()
-			end
-		else
-			OnTabSelect = function ()
-				data.buttons.UpdateRadarIcons()
 			end
 		end
 		
