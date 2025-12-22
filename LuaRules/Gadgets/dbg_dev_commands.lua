@@ -506,7 +506,7 @@ local function give(cmd,line,words,player)
 	local buildlist = UnitDefNames["armcom1"].buildOptions
 	local INCREMENT = 128
 	local orderUnit = {}
-	local baseOffX, baseOffZ = 2600, 3000
+	local baseOffX, baseOffZ = 200, 200
 	local zOffset = 0
 	for i = 1, #buildlist do
 		local udid = buildlist[i]
