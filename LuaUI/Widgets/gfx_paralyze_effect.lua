@@ -16,7 +16,7 @@ end
 
 -- Localized Spring API for performance
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitHealth = Spring.GetUnitHealth
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameFrame = Spring.GetGameFrame
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
@@ -579,8 +579,8 @@ function widget:GameFrame(n)
 		if n % UPDATE_RATE == 0 then
 			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
 				if Spring.ValidUnitID(unitID) then
-					local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
-					local para = ((paralyzeDamage or 0) / (((maxHealth or 0) > 0.1) and maxHealth or 1)) > 1 and 1
+					local _, stunned = spGetUnitIsStunned(unitID)
+					local para = stunned and 1
 					local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
 					local slow = spGetUnitRulesParam(unitID, "slowState")
 					local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
@@ -647,11 +647,11 @@ function widget:UnitCreated(unitID, unitDefID)
 	-- Enemy units might die offscreen
 	empLinger[unitID] = nil
 	disarmLinger[unitID] = nil
-	local health,maxHealth,paralyzeDamage,capture,build = spGetUnitHealth(unitID)
+	local _, stunned = spGetUnitIsStunned(unitID)
 	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
 	local slow = spGetUnitRulesParam(unitID, "slowState")
 	local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
-	if (paralyzeDamage and paralyzeDamage > 0) or (disarmed == 1) or (slow or 0) > 0 or fire then
+	if stunned or (disarmed == 1) or (slow or 0) > 0 or fire then
 		DrawParalyzedUnitGL4(unitID, unitDefID)
 	end
 end
