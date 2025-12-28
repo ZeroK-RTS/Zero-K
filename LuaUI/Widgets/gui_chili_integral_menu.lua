@@ -271,6 +271,7 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'Colemak (standard)', key = 'colemak', hotkey = nil},
 			{name = 'Dvorak (standard)', key = 'dvorak', hotkey = nil},
 			{name = 'Workman (standard)', key = 'workman', hotkey = nil},
 			{name = 'Configure in "Custom" (below)', key = 'custom', hotkey = nil},
