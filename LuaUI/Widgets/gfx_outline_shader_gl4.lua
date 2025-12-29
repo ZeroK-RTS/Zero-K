@@ -138,7 +138,7 @@ options = {
 		desc = 'Controls the shape of outline width changes at different zoom levels.',
 		type = 'number',
 		min = 0.1, max = 2, step = 0.05,
-		value = 0.65,
+		value = 0.7,
 	},
 	disableWithUi = {
 		name = 'Disable with hidden UI',
