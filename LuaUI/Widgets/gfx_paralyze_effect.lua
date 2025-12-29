@@ -573,6 +573,7 @@ local empLinger = {}
 local disarmLinger = {}
 local LINGER_FRAMES = 9
 local UPDATE_RATE = 2
+local uniformSet = {}
 
 function widget:GameFrame(n)
 	if not TESTMODE then
@@ -627,9 +628,11 @@ function widget:GameFrame(n)
 						val = val + ((fire and 8) or 0)
 						uniformcache[1] = val
 						gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+						uniformSet[unitID] = true
 					end
 				else
 					toremove[unitID] = true
+					uniformSet[unitID] = nil
 				end
 			end
 		end
@@ -648,7 +651,9 @@ function widget:UnitCreated(unitID, unitDefID)
 	empLinger[unitID] = nil
 	disarmLinger[unitID] = nil
 	uniformcache[1] = 0
-	gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+	if not uniformSet[unitID] then
+		gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+	end
 	local _, stunned = spGetUnitIsStunned(unitID)
 	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
 	local slow = spGetUnitRulesParam(unitID, "slowState")
@@ -662,6 +667,7 @@ function widget:RenderUnitDestroyed(unitID)
 	StopDrawParalyzedUnitGL4(unitID)
 	empLinger[unitID] = nil
 	disarmLinger[unitID] = nil
+	uniformSet[unitID] = nil
 end
 
 -- Breaks spectators and is irrelevant for everyone else?
@@ -671,6 +677,7 @@ end
 
 function widget:UnitEnteredLos(unitID)
 	if fullview then return end
+	uniformSet[unitID] = nil
 	widget:UnitCreated(unitID, spGetUnitDefID(unitID))
 end
 
