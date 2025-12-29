@@ -330,7 +330,7 @@ void main() {
 	float input_data = v_endcolor_alpha.a; // 1: para, 2: disarm, 4: fire, fraction: slow
 	bool fire = (input_data > 7.95);
 	if (fire) {
-		input_data -= 7.0;
+		input_data -= 8.0;
 	}
 	bool emp = (input_data > 3.95);
 	float stunAmount = 1.0;
