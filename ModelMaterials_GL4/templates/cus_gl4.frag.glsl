@@ -115,7 +115,8 @@ uniform float brightnessFactor = 1.5;
 
 float simFrame = (timeInfo.z * 30.0);
 
-float textureLODBias =  -0.1; //-0.5 * sin (simFrame * 0.1) - 0.5;
+float textureLODBiasUnit =  -0.1; //-0.5 * sin (simFrame * 0.1) - 0.5;
+float textureLODBiasFeature =  -0.5; //-0.5 * sin (simFrame * 0.1) - 0.5;
 
 //uniform float pbrParams[8];
 
@@ -808,7 +809,7 @@ void main(void){
 		#ifdef ENABLE_OPTION_HEALTH_TEXTURING
 			if (BITMASK_FIELD(bitOptions, OPTION_HEALTH_TEXTURING) || BITMASK_FIELD(bitOptions, OPTION_HEALTH_TEXRAPTORS)) {
 				if (healthMix > 0.05){
-					vec3 tbnNormalw = NORM2SNORM(texture(normalTexw, myUV, textureLODBias).xyz);
+					vec3 tbnNormalw = NORM2SNORM(texture(normalTexw, myUV, textureLODBiasUnit).xyz);
 					wrecknormal = tbnNormalw;
 					tbnNormal = mix(tbnNormal, tbnNormalw, healthMix);
 				}
@@ -823,8 +824,14 @@ void main(void){
 
 
 
-	vec4 texColor1 = texture(texture1, myUV, textureLODBias);
-	vec4 texColor2 = texture(texture2, myUV, textureLODBias);
+	#ifdef ENABLE_OPTION_HEALTH_TEXTURING
+	vec4 texColor1 = texture(texture1, myUV, textureLODBiasUnit);
+	vec4 texColor2 = texture(texture2, myUV, textureLODBiasUnit);
+	#else
+	vec4 texColor1 = texture(texture1, myUV, textureLODBiasFeature);
+	vec4 texColor2 = texture(texture2, myUV, textureLODBiasFeature);
+	
+	#endif
 
 	#ifdef SHIFT_RGBHSV
 	/*
