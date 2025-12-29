@@ -45,11 +45,11 @@ end
 
 local STRENGTH_MULT_MIN = 0.1
 local STRENGTH_MULT_MAX = 12
-local DEFAULT_STRENGTH_MULT = 0.8
-local STRENGTH_MAGIC_NUMBER = 2.4
+local DEFAULT_STRENGTH_MULT = 1
+local STRENGTH_MAGIC_NUMBER = 2.2
 
 local SUBTLE_MIN = 50
-local SUBTLE_MAX = 4000
+local SUBTLE_MAX = 3500
 
 local shaderConfig = {
 	TRANSPARENCY = 1, -- transparency of the stuff drawn
@@ -81,12 +81,7 @@ local shaderConfig = {
 -- Configuration
 -----------------------------------------------------------------
 
-local configStrengthMult = DEFAULT_STRENGTH_MULT
-local scaleWithHeight = true
-local functionScaleWithHeight = true
-local zoomScaleRange = 0.4
 local overrideDrawBoxes = false
-local hideWithUi = true
 
 local function PrintDrawBox()
 	if overrideDrawBoxes then
@@ -101,7 +96,7 @@ local function PrintDrawBox()
 end
 
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
-options_order = {'thickness', 'scaleRange', 'scaleWithHeight', 'functionScaleWithHeight', 'disableWithUi', 'overrideDrawBox', 'overrideDrawBox_x', 'overrideDrawBox_y', 'overrideDrawBox_yoff'}
+options_order = {'thickness', 'scaleWithHeight', 'functionScaleWithHeight', 'zoomScaleRange', 'scaleRate', 'zoomScaleExponent',  'disableWithUi', 'overrideDrawBox', 'overrideDrawBox_x', 'overrideDrawBox_y', 'overrideDrawBox_yoff'}
 options = {
 	thickness = {
 		name = 'Outline Thickness',
@@ -109,29 +104,13 @@ options = {
 		type = 'number',
 		min = 0.2, max = 5, step = 0.05,
 		value = DEFAULT_STRENGTH_MULT,
-		OnChange = function (self)
-			configStrengthMult = self.value
-		end,
-	},
-	scaleRange = {
-		name = 'Zoom Scale Minimum',
-		desc = 'Minimum outline thickness muliplier when zoomed out.',
-		type = 'number',
-		min = 0, max = 1, step = 0.01,
-		value = zoomScaleRange,
-		OnChange = function (self)
-			zoomScaleRange = self.value
-		end,
 	},
 	scaleWithHeight = {
 		name = 'Scale With Distance',
 		desc = 'Reduces the screen space width of outlines when zoomed out.',
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
-		OnChange = function (self)
-			scaleWithHeight = self.value
-		end,
 	},
 	functionScaleWithHeight = {
 		name = 'Subtle Scale With Distance',
@@ -139,9 +118,27 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		OnChange = function (self)
-			functionScaleWithHeight = self.value
-		end,
+	},
+	zoomScaleRange = {
+		name = 'Zoom Scale Minimum',
+		desc = 'Minimum outline thickness muliplier when zoomed out.',
+		type = 'number',
+		min = 0, max = 1, step = 0.01,
+		value = 0.4,
+	},
+	scaleRate = {
+		name = 'Outline Scale Rate',
+		desc = 'How the outlines change with zoom distance.',
+		type = 'number',
+		min = 0.2, max = 5, step = 0.05,
+		value = STRENGTH_MAGIC_NUMBER,
+	},
+	zoomScaleExponent = {
+		name = 'Zoom Scale Exponent',
+		desc = 'Controls the shape of outline width changes at different zoom levels.',
+		type = 'number',
+		min = 0.1, max = 2, step = 0.05,
+		value = 0.65,
 	},
 	disableWithUi = {
 		name = 'Disable with hidden UI',
@@ -149,9 +146,6 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		OnChange = function (self)
-			hideWithUi = self.value
-		end,
 	},
 	
 	-- Debug
@@ -214,7 +208,7 @@ options = {
 -----------------------------------------------------------------
 
 local function GetZoomScale()
-	if not (scaleWithHeight or functionScaleWithHeight) then
+	if not (options.scaleWithHeight.value or options.functionScaleWithHeight.value) then
 		return 1
 	end
 	local cs = Spring.GetCameraState()
@@ -226,30 +220,31 @@ local function GetZoomScale()
 		cameraHeight = cs.py - gy
 	end
 	cameraHeight = math.max(1.0, cameraHeight)
-	--Spring.Echo("cameraHeight", cameraHeight, zoomScaleRange)
+	--Spring.Echo("cameraHeight", cameraHeight, options.zoomScaleRange.value)
 
-	if functionScaleWithHeight then
+	if options.functionScaleWithHeight.value then
 		if cameraHeight < SUBTLE_MIN then
 			return 1
 		end
 		if cameraHeight > SUBTLE_MAX then
-			return zoomScaleRange
+			return options.zoomScaleRange.value
 		end
 		
-		local zoomScale = (math.cos(math.pi*((cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN))^0.75) + 1)/2
+		local zoomScale = (math.cos(math.pi*((cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN))^options.zoomScaleExponent.value) + 1)/2
 		--Spring.Echo("zoomScale", zoomScale)
-		return zoomScale*(1 - zoomScaleRange) + zoomScaleRange
+		return zoomScale*(1 - options.zoomScaleRange.value) + options.zoomScaleRange.value
 	end
 
 	local scaleFactor = 250.0 / cameraHeight
-	scaleFactor = math.min(math.max(zoomScaleRange, scaleFactor), 1.0)
+	scaleFactor = math.min(math.max(options.zoomScaleRange.value, scaleFactor), 1.0)
 	--Spring.Echo("cameraHeight", cameraHeight, "scaleFactor", scaleFactor)
 	return scaleFactor
 end
 
 local function GetThicknessWithZoomScale()
-	local strengthMult = configStrengthMult*GetZoomScale()*STRENGTH_MAGIC_NUMBER
+	local strengthMult = options.thickness.value * GetZoomScale() * options.scaleRate.value
 	strengthMult = math.max(STRENGTH_MULT_MIN, math.min(STRENGTH_MULT_MAX, strengthMult))
+	--Spring.Echo(strengthMult)
 	return strengthMult
 end
 
@@ -756,7 +751,7 @@ local useStencil = true
 local STENCILOPPASS = GL_DECR -- KEEP OR DECR
 
 function widget:DrawWorld()
-	if (hideWithUi and Spring.IsGUIHidden()) or internalDisabled then
+	if (options.disableWithUi.value and Spring.IsGUIHidden()) or internalDisabled then
 		return
 	end
 
