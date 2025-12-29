@@ -647,6 +647,8 @@ function widget:UnitCreated(unitID, unitDefID)
 	-- Enemy units might die offscreen
 	empLinger[unitID] = nil
 	disarmLinger[unitID] = nil
+	uniformcache[1] = 0
+	gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
 	local _, stunned = spGetUnitIsStunned(unitID)
 	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
 	local slow = spGetUnitRulesParam(unitID, "slowState")
