@@ -858,8 +858,8 @@ void main(void){
 
 			if (BITMASK_FIELD(bitOptions, OPTION_HEALTH_TEXTURING)) {
 				if (healthMix > 0.05){
-					vec4 texColor1w = texture(texture1w, myUV);
-					vec4 texColor2w = texture(texture2w, myUV);
+					vec4 texColor1w = texture(texture1w, myUV, textureLODBiasFeature);
+					vec4 texColor2w = texture(texture2w, myUV, textureLODBiasFeature);
 					healthMix = (healthMix - 0.05); // Reduce damage texture maximium wreckness
 					healthMix *= (1.0 - 0.5 * texColor2.r); //emissive parts don't get too damaged
 					texColor1 = mix(texColor1, texColor1w, healthMix);
