@@ -115,7 +115,7 @@ uniform float brightnessFactor = 1.5;
 
 float simFrame = (timeInfo.z * 30.0);
 
-float textureLODBias =  -0.5; //-0.5 * sin (simFrame * 0.1) - 0.5;
+float textureLODBias =  -0.1; //-0.5 * sin (simFrame * 0.1) - 0.5;
 
 //uniform float pbrParams[8];
 
