@@ -119,7 +119,10 @@ local function OptionsChanged()
 	drawBarPercentages = options.drawBarPercentages.value
 	barScale = options.barScale.value
 	debugMode = options.debugMode.value
-	
+
+
+	barWidth = options.barWidth.value
+	barHeight = options.barHeight.value
 	healthbarDistSq    = options.unitMaxHeight.value*options.unitMaxHeight.value
 	healthbarPercentSq = options.unitPercentHeight.value*options.unitPercentHeight.value
 	healthbarTitleSq   = options.unitTitleHeight.value*options.unitTitleHeight.value
@@ -131,7 +134,7 @@ end
 
 options_path = 'Settings/Interface/Healthbars'
 options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump', 'showEnemyStatus',
-	'barScale', 'debugMode', 'minReloadTime',
+	'barScale','barWidth','barHeight','debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
 	'invert_shield', 'invert_health', 'invert_building', 'invert_morph',
@@ -141,6 +144,7 @@ options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', '
 	'invert_slow', 'invert_goo', 'invert_jump', 'invert_jump_charge', 'invert_reclaim', 'invert_resurrect',
 }
 options = {
+
 	showhealthbars = {
 		name = 'Show Healthbars',
 		type = 'bool',
@@ -183,6 +187,24 @@ options = {
 		min = 0.5,
 		max = 6,
 		step = 0.25,
+		OnChange = OptionsChanged,
+	},
+	barWidth = {
+		name = 'Bar width',
+		type = 'number',
+		value= 15,
+		min  = 5,
+		step = 2.5,
+		max = 25,
+		OnChange = OptionsChanged,
+	},	
+	barHeight = {
+		name = 'Bar Height',
+		type = 'number',
+		value= 3,
+		min  = 1,
+		step = .5,
+		max = 5,
 		OnChange = OptionsChanged,
 	},
 	minReloadTime = {
