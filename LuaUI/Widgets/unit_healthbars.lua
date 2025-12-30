@@ -193,9 +193,9 @@ options = {
 		name = 'Bar width',
 		type = 'number',
 		value= 15,
-		min  = 5,
+		min  = 2.5,
 		step = 2.5,
-		max = 25,
+		max = 20,
 		OnChange = OptionsChanged,
 	},	
 	barHeight = {
