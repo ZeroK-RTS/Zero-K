@@ -1282,6 +1282,8 @@ function Spring.GetFeatureBlocking(featureID) end
 function Spring.GetFeatureNoSelect(featureID) end
 
 ---@param featureID integer
+---@return string|""|nil featureDefName
+---@return Facing buildFacing
 function Spring.GetFeatureResurrect(featureID) end
 
 ---@param featureID integer
