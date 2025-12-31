@@ -58,6 +58,10 @@
         "duplicate-set-field",
         "lowercase-global"
     ],
+    "runtime.path": [
+        "?",
+        "?.lua"
+    ],
     "runtime.special": {
         "include":"require",
         "VFS.Include":"require"

@@ -30,10 +30,15 @@
     "diagnostics.disable": [
         "duplicate-set-field"
     ],
-    // "runtime.special": {
-    //     "include":"require",
-    //     "VFS.Include":"require"
-    // },
+    "runtime.path": [
+        "?",
+        "?.lua"
+    ],
+    "runtime.special": {
+        "include":"require",
+        "VFS.Include":"require",
+        "shard_include": "require"
+    },
     "Lua.workspace.library": [
         "../zk-stable"
     ],
