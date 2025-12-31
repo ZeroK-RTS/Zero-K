@@ -16,7 +16,7 @@ VFS={}
 ---@param filename string
 ---@param enviroment table|nil
 ---@param mode number|nil
----@return any
+---@return any ...any
 function VFS.Include(filename,enviroment ,mode ) end
 
 ---check whether a file exist
