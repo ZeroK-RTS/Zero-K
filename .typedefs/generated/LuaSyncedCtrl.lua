@@ -218,7 +218,7 @@ function Spring.GetCOBScriptID(unitID, funcName) end
 ---@param y number
 ---@param z number
 ---@param facing Facing
----@param teamID TeamId
+---@param teamID TeamId?
 ---@param build boolean? (Default: false) the unit is created in "being built" state with buildProgress = 0
 ---@param flattenGround boolean? (Default: true) the unit flattens ground, if it normally does so
 ---@param unitID UnitId? requests specific unitID
