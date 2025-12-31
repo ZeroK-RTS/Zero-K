@@ -33,6 +33,7 @@
         "duplicate-set-field",
         "cast-local-type" // because it is frequently used
     ],
+    "completion.requireSeparator": "/",
     "runtime.path": [
         "?",
         "?.lua"

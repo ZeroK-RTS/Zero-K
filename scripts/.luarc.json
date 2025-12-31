@@ -59,6 +59,7 @@
         "duplicate-set-field",
         "lowercase-global"
     ],
+    "completion.requireSeparator": "/",
     "runtime.path": [
         "?",
         "?.lua"
