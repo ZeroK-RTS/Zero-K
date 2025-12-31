@@ -90,6 +90,7 @@
 ---@field cmdID integer
 ---@field params number[]?
 ---@field options CommandOptions?
+---@field tag integer?
 
 ---Command Description
 ---
