@@ -1197,6 +1197,7 @@ function Spring.FindUnitCmdDesc(unitID,cmdID) end
 ---@return boolean
 function Spring.ValidFeatureID(featureID) end
 
+---@return integer[] featureIDs
 function Spring.GetAllFeatures() end
 
 ---@param featureID integer
