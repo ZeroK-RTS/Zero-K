@@ -1231,8 +1231,18 @@ function Spring.GetFeatureRadius(featureID) end
 function Spring.GetFeatureMass(featureID) end
 
 ---@param featureID integer
----@return number x,number y,number z
-function Spring.GetFeaturePosition(featureID) end
+---@param midPos boolean? (Default: false) return midpoint as well
+---@param aimPos boolean? (Default: false) return aimpoint as well
+---@return number basePointX
+---@return number basePointY
+---@return number basePointZ
+---@return number? midPointX
+---@return number midPointY
+---@return number midPointZ
+---@return number? aimPointX
+---@return number aimPointY
+---@return number aimPointZ
+function Spring.GetFeaturePosition(featureID,midPos,aimPos) end
 
 ---@param featureID1 number
 ---@param featureID2 number
