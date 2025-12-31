@@ -28,8 +28,6 @@ return { bomberassault = {
     air_manual_fire_weapon = 3,
     manualfire_desc        = [[Fire Special Weapon: Fire a cluster of temporary shield generators.]],
   },
-
-  selfDestructAs         = [[ESTOR_BUILDING]],
   floater             = true,
   footprintX          = 4,
   footprintZ          = 4,
