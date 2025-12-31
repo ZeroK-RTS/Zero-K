@@ -26,7 +26,7 @@ local INLOS_ACCESS = {inlos = true}
 
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 local suCopyTable = Spring.Utilities.CopyTable
-local spGetUnitDefID=Spring.GetUnitDefID
+local spGetUnitDefID = Spring.GetUnitDefID
 
 local rescaleUnitDefIDs = {}
 for i = 1, #UnitDefs do
