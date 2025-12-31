@@ -513,8 +513,8 @@ function Spring.SetUnitBuildSpeed(builderID, buildSpeed, repairSpeed, reclaimSpe
 function Spring.SetUnitNanoPieces(builderID, pieces) end
 
 ---@param unitID UnitId
----@param isblocking boolean
----@param isSolidObjectCollidable boolean
+---@param isblocking boolean?
+---@param isSolidObjectCollidable boolean?
 ---@param isProjectileCollidable boolean?
 ---@param isRaySegmentCollidable boolean?
 ---@param crushable boolean?
