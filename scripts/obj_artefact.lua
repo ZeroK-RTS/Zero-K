@@ -49,7 +49,7 @@ end
 function script.Create()
 	Turn(pump2, y_axis, -0.523598776)
 	Turn(pump3, y_axis, 0.523598776)
-	GG.UnitModelRescale(unitID, 1.4)
+	-- GG.UnitModelRescale(unitID, 1.4)
 	local inactive = Spring.GetUnitIsStunned(unitID)
 	if not inactive then
 		StartThread(Initialize)
