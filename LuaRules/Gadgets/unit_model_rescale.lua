@@ -82,10 +82,7 @@ local function UnitModelRescale(unitID, scale, offset)
 			origPieceTable[unitID] = {Spring.GetUnitPieceMatrix(unitID, base)}
 		end
 		local unitDefID = spGetUnitDefID(unitID)
-		local base_scale=rescaleUnitDefIDs[unitDefID]
-		if base_scale then
-			scale = scale * base_scale
-		end
+		scale = scale * (rescaleUnitDefIDs[unitDefID] or 1)
 		SetScale(unitID, base, scale, offset)
 	end
 end
@@ -101,7 +98,6 @@ function gadget:Shutdown()
 end
 
 GG.UnitModelRescale = UnitModelRescale
-
 
 if next(rescaleUnitDefIDs) then
 	function gadget:UnitCreated(unitID, unitDefID)
