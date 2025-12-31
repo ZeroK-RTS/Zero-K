@@ -2,33 +2,36 @@
     "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
     "diagnostics.globalsRegex": ["CMD_.*"],
     "diagnostics.globals": [
-        "VFS",
-        "UnitDefs",
-        "UnitDefNames",
-        "FeatureDefs",
-        "ModularCommDefsShared",
-        "piece",
-        "GG",
-        "Script",
-        "WG",
-        "widgetHandler",
-        "widget",
-        "GameData",
-        "Shared",
         "gadget",
-        "DEFS",
-        "LOG",
-        "FeatureDefNames",
-        "SendToUnsynced",
-        "CMD",
-        "WeaponDefs",
-        "CMDTYPE",
-        "WeaponDefNames"
+        "widget"
+        // "VFS",
+        // "UnitDefs",
+        // "UnitDefNames",
+        // "FeatureDefs",
+        // "ModularCommDefsShared",
+        // "piece",
+        // "GG",
+        // "Script",
+        // "WG",
+        // "widgetHandler",
+        // "widget",
+        // "GameData",
+        // "Shared",
+        // "gadget",
+        // "DEFS",
+        // "LOG",
+        // "FeatureDefNames",
+        // "SendToUnsynced",
+        // "CMD",
+        // "WeaponDefs",
+        // "CMDTYPE",
+        // "WeaponDefNames"
         //,{ "name": "script", "include": "scripts/**.lua" }
     ],
     "runtime.version": "Lua 5.1",
     "diagnostics.disable": [
-        "duplicate-set-field"
+        "duplicate-set-field",
+        "cast-local-type" // because it is frequently used
     ],
     "runtime.path": [
         "?",
@@ -39,11 +42,8 @@
         "VFS.Include":"require",
         "shard_include": "require"
     },
-    "Lua.workspace.library": [
-        "../zk-stable"
-    ],
-    "Lua.workspace.checkThirdParty": false,
-    "Lua.workspace.ignoreDir": [
+    
+    "workspace.ignoreDir": [
         "scripts/**"
     ]
 }
