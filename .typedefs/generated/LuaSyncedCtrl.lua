@@ -984,11 +984,17 @@ function Spring.SetFeatureResurrect(featureID, unitDef, facing, progress) end
 ---
 ---@param featureID integer
 ---@param enable boolean?
----@param arg1 number?
----@param arg2 number?
----@param argn number?
+---@param arg1 number? initialVelocityX or velocityMaskX
+---@param arg2 number? initialVelocityY or velocityMaskY
+---@param arg3 number? initialVelocityZ or velocityMaskZ
+---@param arg4 number? accelerationX or impulseMaskX
+---@param arg5 number? accelerationY or impulseMaskY
+---@param arg6 number? accelerationZ or impulseMaskZ
+---@param arg7 number? movementMaskX
+---@param arg8 number? movementMaskY
+---@param arg9 number? movementMaskZ
 ---@return nil
-function Spring.SetFeatureMoveCtrl(featureID, enable, arg1, arg2, argn) end
+function Spring.SetFeatureMoveCtrl(featureID, enable, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) end
 
 ---@param featureID integer
 ---@param posX number
