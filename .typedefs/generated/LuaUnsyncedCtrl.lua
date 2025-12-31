@@ -672,7 +672,7 @@ function Spring.ReplaceMouseCursor(oldFileName, newFileName, hotSpotTopLeft) end
 ---
 ---@param cmdID integer
 ---@param cmdReference (string|number)? iconname | cmdID_cloneIcon
----@param RGBA rgba?
+---@param RGBA rgba_list?
 ---@param showArea boolean?
 ---@return boolean? assigned
 function Spring.SetCustomCommandDrawData(cmdID, cmdReference, RGBA, showArea ) end
