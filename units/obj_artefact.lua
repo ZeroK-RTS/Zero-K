@@ -22,7 +22,7 @@ return { obj_artefact = {
     no_xp = 1,
     bait_level_target = 1,
     very_low_priority_target = 1,
-    model_rescale=1.4
+    model_rescale = 1.4,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],
