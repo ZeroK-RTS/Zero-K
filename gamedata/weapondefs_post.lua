@@ -151,6 +151,18 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Nicer missile trails https://github.com/beyond-all-reason/RecoilEngine/pull/2736/files
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.smoketrail and not weaponDef.smokeperiod then
+		weaponDef.smokeperiod = 1
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Set lenient fire tolerance
 
 for _, weaponDef in pairs(WeaponDefs) do
