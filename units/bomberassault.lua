@@ -29,7 +29,7 @@ return { bomberassault = {
     manualfire_desc        = [[Fire Special Weapon: Fire a cluster of temporary shield generators.]],
   },
 
-  selfDestructAs         = [[ESTOR_BUILDING]],
+  explodeAs           = [[ESTOR_BUILDING]],
   floater             = true,
   footprintX          = 4,
   footprintZ          = 4,
@@ -49,7 +49,7 @@ return { bomberassault = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[zeppelin.dae]],
   script              = [[bomberassault.lua]],
-  selfDestructAs         = [[ESTOR_BUILDING]],
+  selfDestructAs      = [[ESTOR_BUILDING]],
   sightDistance       = 660,
   speed               = 185,
   turnRadius          = 120,
