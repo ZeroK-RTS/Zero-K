@@ -16,7 +16,7 @@ end
 
 -- Localized Spring API for performance
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local utGetIsUnitEmped = Spring.Utilities.GetIsUnitEmped
 local spGetGameFrame = Spring.GetGameFrame
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
@@ -580,8 +580,7 @@ function widget:GameFrame(n)
 		if n % UPDATE_RATE == 0 then
 			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
 				if Spring.ValidUnitID(unitID) then
-					local _, stunned = spGetUnitIsStunned(unitID)
-					local para = stunned and 1
+					local para = utGetIsUnitEmped(unitID) and 1
 					local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
 					local slow = spGetUnitRulesParam(unitID, "slowState")
 					local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
@@ -654,7 +653,7 @@ function widget:UnitCreated(unitID, unitDefID)
 	if not uniformSet[unitID] then
 		gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
 	end
-	local _, stunned = spGetUnitIsStunned(unitID)
+	local stunned = utGetIsUnitEmped(unitID)
 	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
 	local slow = spGetUnitRulesParam(unitID, "slowState")
 	local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
