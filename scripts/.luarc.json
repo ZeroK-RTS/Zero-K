@@ -31,7 +31,8 @@
     "runtime.version": "Lua 5.1",
     "diagnostics.disable": [
         "duplicate-set-field",
-        "lowercase-global"
+        "lowercase-global",
+		"cast-local-type"
     ],
     "completion.requireSeparator": "/",
     "runtime.path": [
