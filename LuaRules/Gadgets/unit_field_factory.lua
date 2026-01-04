@@ -94,6 +94,16 @@ local factoryDefIDs = {}
 local fieldBuildOpts = {}
 do
 	local alreadyAdded = {}
+
+	-- FIXME: assumes all constructors have the same buildlists
+	local buildableDirectly = VFS.Include("gamedata/buildoptions.lua")
+	for i = 1, #buildableDirectly do
+		local ud = UnitDefNames[buildableDirectly[i]]
+		if ud then
+			alreadyAdded[ud.id] = true
+		end
+	end
+
 	for i = 1, #factories do
 		local factoryName = factories[i]
 		local ud = UnitDefNames[factoryName]
