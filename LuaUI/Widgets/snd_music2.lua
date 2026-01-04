@@ -124,12 +124,153 @@ local function FindAlbums(path)
 	return albums
 end
 
+local unitExceptions = include("Configs/snd_music_exception.lua")
+
+local warThreshold = 5000
+local peaceThreshold = 1000
+local PLAYLIST_FILE = 'sounds/music/playlist.lua'
+local LOOP_BUFFER = 0.015 -- if looping track is this close to the end, go ahead and loop
+local UPDATE_PERIOD = 1
+local MUSIC_VOLUME_DEFAULT = 0.25
+
+local musicType = 'peace'
+local dethklok = {} -- keeps track of the number of doods killed in each time frame
+local timeframetimer = 0
+local timeframetimer_short = 0
+local loopTrack = ''
+local previousTrack = ''
+local previousTrackType = ''
+local currentTrackName = ''
+local haltMusic = false
+local looping = false
+local musicMuted = false
+local musicPaused = false
+
+local initialized = false
+local gameStarted = Spring.GetGameFrame() > 0
+local widgetReloaded = gameStarted
+
+local myTeam = Spring.GetMyTeamID()
+local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
+local defeat = false
+
+local spToggleSoundStreamPaused = Spring.PauseSoundStream
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
 local includedAlbums = FindAlbums('sounds/music/')
 local trackListName = includedAlbums.superintendent and 'superintendent' or next(includedAlbums)
 local trackList = includedAlbums[trackListName].tracks
 
+local musicTrackWindow
+local musicTrackPanel
+local musicTrackName
+local musicTrackProgress
 
+panel_path = 'Settings/HUD Panels/Music Player'
 options_path = 'Settings/Audio'
+
+local function UpdateMusicText(track)
+	currentTrackName = track or currentTrackName
+	if not musicTrackName then
+		return
+	end
+	musicTrackName:SetCaption(currentTrackName)
+end
+
+local function FormatSeconds(seconds)
+	local minutes = math.floor(seconds / 60)
+	return minutes .. ":" .. string.format("%02d", seconds - 60 * minutes)
+end
+
+local function UpdateMusicProgress(seconds, trackLength)
+	if not musicTrackProgress then
+		return
+	end
+	musicTrackProgress:SetCaption(FormatSeconds(seconds) .. " / " .. FormatSeconds(trackLength))
+end
+
+local function InitMusicPanel()
+	musicTrackWindow = WG.Chili.Window:New{
+		parent = WG.Chili.Screen0,
+		noFont = true,
+		dockable = true,
+		name="MusicPlayerWindow",
+		padding = {0,-1,0,0},
+		x = 0,
+		y = 120,
+		clientWidth  = 300,
+		clientHeight = 40,
+		minHeight = 40,
+		backgroundColor = {0, 0, 0, 0},
+		color = {0, 0, 0, 0},
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		minimizable = false,
+		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then
+				return false
+			end
+			WG.crude.OpenPath(panel_path)
+			WG.crude.ShowMenu()
+			return true
+		end},
+	}
+	musicTrackPanel = WG.Chili.Panel:New{
+		parent = musicTrackWindow,
+		dockable = true,
+		name = name,
+		padding = {0,0,0,0},
+		color = {1, 1, 1, options.background_opacity.value},
+		y      = 0,
+		x      = 0,
+		right  = 0,
+		bottom = 0,
+		classname = "main_window_small_very_flat",
+	}
+	musicTrackName = WG.Chili.Label:New{
+		parent = musicTrackPanel,
+		x      = 14,
+		y      = 6,
+		right  = 14,
+		bottom = 8,
+		caption = "",
+		align  = "left",
+		valign  = "top",
+		autosize = false,
+		--font   = {
+		--	size = 36,
+		--	outline = true,
+		--	outlineWidth = 2,
+		--	outlineWeight = 2,
+		--},
+	}
+	if options.music_progress.value then
+		musicTrackProgress = WG.Chili.Label:New{
+			parent = musicTrackPanel,
+			x      = 14,
+			y      = 6,
+			right  = 14,
+			bottom = 8,
+			caption = "",
+			align  = "right",
+			valign  = "bottom",
+			autosize = false,
+			--font   = {
+			--	size = 36,
+			--	outline = true,
+			--	outlineWidth = 2,
+			--	outlineWeight = 2,
+			--},
+		}
+	else
+		musicTrackProgress = false
+	end
+	UpdateMusicText()
+end
+
 options = {
 	pausemusic = {
 		name = 'Pause Music',
@@ -137,6 +278,53 @@ options = {
 		value = false,
 		desc = "Music pauses with game",
 		noHotkey = true,
+	},
+	background_opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 1, min = 0, max = 1, step = 0.01,
+		path = panel_path,
+		OnChange = function(self)
+			if musicTrackWindow then
+				musicTrackPanel.color[4] = self.value
+				Spring.Echo("self.value", self.value)
+				musicTrackPanel:Invalidate()
+			end
+		end
+	},
+	show_music = {
+		name = 'Show Track',
+		type = 'bool',
+		value = false,
+		desc = "Show currently playing music track",
+		path = panel_path,
+		OnChange = function(self)
+			local value = self.value
+			if musicTrackWindow then
+				musicTrackWindow:Dispose()
+				musicTrackWindow = false
+			end
+			if value and not musicTrackWindow then
+				InitMusicPanel()
+			end
+		end
+	},
+	music_progress = {
+		name = 'Show Progress',
+		type = 'bool',
+		value = true,
+		desc = "Show progress through current track",
+		path = panel_path,
+		OnChange = function(self)
+			local value = options.show_music.value
+			if musicTrackWindow then
+				musicTrackWindow:Dispose()
+				musicTrackWindow = false
+			end
+			if value and not musicTrackWindow then
+				InitMusicPanel()
+			end
+		end
 	},
 	albumSelection = {
 		name = 'Track list',
@@ -187,40 +375,9 @@ options = {
 	},
 }
 
-local unitExceptions = include("Configs/snd_music_exception.lua")
-
-local warThreshold = 5000
-local peaceThreshold = 1000
-local PLAYLIST_FILE = 'sounds/music/playlist.lua'
-local LOOP_BUFFER = 0.015 -- if looping track is this close to the end, go ahead and loop
-local UPDATE_PERIOD = 1
-local MUSIC_VOLUME_DEFAULT = 0.25
-
-local musicType = 'peace'
-local dethklok = {} -- keeps track of the number of doods killed in each time frame
-local timeframetimer = 0
-local timeframetimer_short = 0
-local loopTrack = ''
-local previousTrack = ''
-local previousTrackType = ''
-local haltMusic = false
-local looping = false
-local musicMuted = false
-local musicPaused = false
-
-local initialized = false
-local gameStarted = Spring.GetGameFrame() > 0
-local widgetReloaded = gameStarted
-
-local myTeam = Spring.GetMyTeamID()
-local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
-local defeat = false
-
-local spToggleSoundStreamPaused = Spring.PauseSoundStream
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 local function GetMusicType()
 	return musicType
 end
@@ -235,6 +392,7 @@ local function StartLoopingTrack(trackInit, trackLoop)
 	
 	loopTrack = trackLoop
 	Spring.PlaySoundStream(trackInit, WG.music_volume or MUSIC_VOLUME_DEFAULT)
+	UpdateMusicText(trackInit)
 	looping = 0.5
 end
 
@@ -284,6 +442,7 @@ local function StartTrack(track)
 	end
 	previousTrack = newTrack
 	Spring.PlaySoundStream(newTrack,WG.music_volume or MUSIC_VOLUME_DEFAULT)
+	UpdateMusicText(newTrack)
 	
 	WG.music_start_volume = WG.music_volume
 end
@@ -334,6 +493,7 @@ function widget:Update(dt)
 	timeframetimer_short = timeframetimer_short + dt
 	if timeframetimer_short > 0.03 then
 		local playedTime, totalTime = Spring.GetSoundStreamTime()
+		UpdateMusicProgress(playedTime, totalTime)
 		playedTime = tonumber( ("%.2f"):format(playedTime) )
 		if looping then
 			if looping == 0.5 then
@@ -341,6 +501,7 @@ function widget:Update(dt)
 			elseif playedTime >= totalTime - LOOP_BUFFER then
 				Spring.StopSoundStream()
 				Spring.PlaySoundStream(loopTrack,WG.music_volume or MUSIC_VOLUME_DEFAULT)
+				UpdateMusicText(loopTrack)
 			end
 		end
 		timeframetimer_short = 0
@@ -378,6 +539,7 @@ function widget:Update(dt)
 		end
 		
 		local playedTime, totalTime = Spring.GetSoundStreamTime()
+		UpdateMusicProgress(playedTime, totalTime)
 		playedTime = math.floor(playedTime)
 		totalTime = math.floor(totalTime)
 		local _, _, paused = Spring.GetGameSpeed()
@@ -503,6 +665,7 @@ local function PlayGameOverMusic(gameWon)
 	looping = false
 	Spring.StopSoundStream()
 	Spring.PlaySoundStream(track,WG.music_volume or MUSIC_VOLUME_DEFAULT)
+	UpdateMusicText(track)
 	WG.music_start_volume = WG.music_volume
 end
 

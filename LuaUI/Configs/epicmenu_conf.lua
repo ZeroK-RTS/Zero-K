@@ -215,6 +215,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Unit Stats Help Window']  = imgPath..'advplayerslist/random.png',
 	['Settings/HUD Panels/Player List']             = imgPath..'epicmenu/people.png',
 	['Settings/HUD Panels/Extras/Docking']          = imgPath..'epicmenu/anchor.png',
+	['Settings/HUD Panels/Music Player']            = imgPath..'epicmenu/vol.png',
 	['Settings/HUD Panels/Selected Units Panel']    = imgPath..'epicmenu/grid.png',
 	['Settings/HUD Panels/Command Panel']           = imgPath..'epicmenu/control_panel.png',
 	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
