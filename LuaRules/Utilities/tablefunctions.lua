@@ -212,3 +212,10 @@ function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
 		collectgarbage("collect")
 	end
 end
+
+function Spring.Utilities.UsefulTableToCustomKey(inputTable)
+	if not inputTable then
+		return
+	end
+	return Spring.Utilities.Base64Encode(Spring.Utilities.TableToString(inputTable))
+end
