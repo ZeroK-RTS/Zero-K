@@ -25,7 +25,7 @@ local aoeLineWidthMult     = 64
 local scatterColor         = {1, 1, 0, 1}
 local scatterLineWidthMult = 1024
 local depthColor           = {1, 0, 0, 0.5}
-local depthLineWidth       = 1
+local depthLineWidth       = 3
 local circleDivs           = 64
 local minSpread            = 8 --weapons with this spread or less are ignored
 local numAoECircles        = 9
@@ -259,6 +259,18 @@ local function getWeaponInfo(weaponDef, unitDef)
 		retData.aoe = aoe
 	else
 		retData.aoe = 0
+	end
+	if (weaponDef.uptime or 0) > 0 then
+		-- In the first frame the projectile moves startVelocity + 2*Acceleration
+		local startSpeed = math.min(weaponDef.startvelocity + weaponDef.weaponAcceleration, weaponDef.projectilespeed)
+		retData.vlaunch = {
+			upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 3,
+			accel = weaponDef.weaponAcceleration,
+			turnRate = weaponDef.turnRate,
+			startSpeed = startSpeed,
+			startHeight = 0,
+			endSpeed = weaponDef.projectilespeed,
+		}
 	end
 	retData.cost = cost
 	retData.mobile = not unitDef.isImmobile
@@ -777,6 +789,118 @@ local function LeashDrawRange(unitID, range, tx, ty, tz)
 end
 
 --------------------------------------------------------------------------------
+--Vlaunch missile calculation
+--------------------------------------------------------------------------------
+
+local function DrawVlaunchImpact(hx, hy, hz, tx, ty, tz)
+	glColor(depthColor)
+	glLineWidth(depthLineWidth)
+	glLineStipple(1, 255)
+	glBeginEnd(GL_LINES, VertexList, {{hx,hy,hz},{tx,ty,tz}})
+	glLineStipple(false)
+	glColor(1,1,1,1)
+	glLineWidth(1)
+end
+
+local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
+	local vlaunch = info.vlaunch
+	local speed = vlaunch.startSpeed
+	local y = vlaunch.startHeight
+	local horDist = math.sqrt((fx - tx)*(fx - tx) + (fz - tz)*(fz - tz))
+	local vertDist = ty - fy
+	
+	if info.range + 10 < horDist then
+		return false
+	end
+	
+	-- Fly upwards
+	for i = 1, vlaunch.upFrames do
+		speed = math.min(vlaunch.endSpeed, speed + vlaunch.accel)
+		y = y + speed
+	end
+	
+	-- Turn to point at target
+	local pitch = math.pi/2
+	local hor = 0
+	local timeout = 1000
+	while pitch > -1.7 and timeout > 0 do
+		-- vlanuch missiles don't accelerate while turning.
+		pitch = pitch - vlaunch.turnRate
+		hor = hor + math.cos(pitch) * speed
+		y = y + math.sin(pitch) * speed
+		
+		if horDist <= hor then
+			-- Impact site is within turning circle, assume no terrain is in the way.
+			return false
+		end
+		
+		local pitchToTarget = math.atan((vertDist - y) / (horDist - hor))
+		if pitchToTarget > pitch then
+			pitch = pitchToTarget
+			break
+		end
+		timeout = timeout - 1
+	end
+	
+	-- Fly towards target and hit it.
+	local velUnitHor, velUnitY = math.cos(pitch), math.sin(pitch)
+	local toX, toZ = (tx - fx) / horDist, (tz - fz) / horDist
+	local oldX, oldY, oldZ = false, false, false
+	local distSq = (horDist - hor)*(horDist - hor) + (vertDist - y)*(vertDist - y)
+	local prevDistSq = false
+	local speedFactor = 1
+	local accelerating = (vlaunch.accel > 0)
+	timeout = 1000
+	while (distSq > 100000 or (((not prevDistSq) or distSq < prevDistSq) and distSq > 3000)) and timeout > 0 do
+		if accelerating then
+			speed = speed + vlaunch.accel
+			if speed > vlaunch.endSpeed then
+				speed = vlaunch.endSpeed
+				accelerating = false
+			end
+		end
+		prevDistSq = distSq
+		hor = hor + velUnitHor * speed * speedFactor
+		y = y + velUnitY * speed * speedFactor
+		distSq = (horDist - hor)*(horDist - hor) + (vertDist - y)*(vertDist - y)
+		local px, py, pz = fx + toX*hor, fy + y, fz + toZ*hor
+		local groundHeight = (GetGroundHeight(px, pz) or 0)
+		if groundHeight + 3 > py then
+			return px, groundHeight, pz
+		end
+		local aboveGround = py - groundHeight
+		if aboveGround < 80 and oldX then
+			-- Interpolate when near the ground. Does the engine do this? Not sure.
+			for i = 1, 3 do
+				local prop = i/4
+				local ix, iy, iz = prop*px + (1 - prop)*oldX, prop*py + (1 - prop)*oldY, prop*pz + (1 - prop)*oldZ
+				groundHeight = (GetGroundHeight(ix, iz) or 0)
+				if groundHeight + 3 > iy then
+					return ix, iy, iz
+				end
+			end
+		end
+		
+		-- Save some time if we are super high in the sky.
+		if not accelerating then
+			if aboveGround > 1200 then
+				speedFactor = 40
+			elseif aboveGround > 800 then
+				speedFactor = 20
+			elseif aboveGround > 500 then
+				speedFactor = 5
+			else
+				speedFactor = 1
+			end
+		end
+		
+		timeout = timeout - 1
+		oldX, oldY, oldZ = px, py, pz
+	end
+	return false
+end
+
+--------------------------------------------------------------------------------
 --Main draw
 --------------------------------------------------------------------------------
 
@@ -817,6 +941,13 @@ local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeR
 	end
 
 	local weaponType = info.type
+	if info.vlaunch then
+		local hx, hy, hz = CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
+		if hx then
+			DrawVlaunchImpact(hx, hy, hz, tx, ty, tz)
+			tx, ty, tz = hx, hy, hz
+		end
+	end
 
 	if (weaponType == "noexplode") then
 		DrawNoExplode(info.aoe, fx, fy, fz, tx, ty, tz, info.range)
