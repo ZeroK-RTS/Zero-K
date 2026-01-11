@@ -236,6 +236,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--
+-- Apply implicit default StarburstLauncher turn rate (for lua).
+-- See https://github.com/beyond-all-reason/RecoilEngine/issues/2762
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "StarburstLauncher" and (weaponDef.turnrate or 0) == 0 then
+		weaponDef.turnrate = 18775
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local modOptions
 if (Spring.GetModOptions) then
