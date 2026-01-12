@@ -118,7 +118,7 @@ end
 
 local function GetRadarUnitToDraw()
 	if selectedRadarUnitID and options.showOnSelected.value then
-		unitDefID = Spring.GetUnitDefID(selectedRadarUnitID)
+		local unitDefID = Spring.GetUnitDefID(selectedRadarUnitID)
 		if not unitDefID then
 			selectedRadarUnitID = false
 			return
