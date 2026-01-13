@@ -29,6 +29,18 @@ local depthLineWidth       = 3
 local circleDivs           = 64
 local minSpread            = 8 --weapons with this spread or less are ignored
 local numAoECircles        = 9
+
+local BUFFER = 20
+local startHeights = {
+	["missileslow_weapon"] = -40 - BUFFER,
+	["seismic_seismic_weapon"] = -27 - BUFFER,
+	["tacnuke_weapon"] = -22 - BUFFER,
+	["empmissile_emp_weapon"] = -17 - BUFFER,
+	["napalmmissile_weapon"] = -27 - BUFFER,
+	["shipcarrier_disarm_rocket"] = -25 - BUFFER,
+	["subtacmissile_tacnuke"] = -25 - BUFFER,
+}
+
 --------------------------------------------------------------------------------
 --vars
 --------------------------------------------------------------------------------
@@ -264,11 +276,11 @@ local function getWeaponInfo(weaponDef, unitDef)
 		-- In the first frame the projectile moves startVelocity + 2*Acceleration
 		local startSpeed = math.min(weaponDef.startvelocity + weaponDef.weaponAcceleration, weaponDef.projectilespeed)
 		retData.vlaunch = {
-			upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 3,
+			upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 2,
 			accel = weaponDef.weaponAcceleration,
 			turnRate = weaponDef.turnRate,
 			startSpeed = startSpeed,
-			startHeight = 0,
+			startHeight = startHeights[weaponDef.name] or 0,
 			endSpeed = weaponDef.projectilespeed,
 		}
 	end
@@ -813,10 +825,18 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 		return false
 	end
 	
+	--if doEcho then
+	--	Spring.Utilities.TableEcho(vlaunch)
+	--end
+	
 	-- Fly upwards
 	for i = 1, vlaunch.upFrames do
 		speed = math.min(vlaunch.endSpeed, speed + vlaunch.accel)
 		y = y + speed
+		--if doEcho then
+		--	Spring.Echo("GUP", 0, fy + y, speed)
+		--	doEcho = false
+		--end
 	end
 	
 	-- Turn to point at target
@@ -829,13 +849,17 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 		hor = hor + math.cos(pitch) * speed
 		y = y + math.sin(pitch) * speed
 		
+		--if doEcho then
+		--	Spring.Echo("TRN", hor, fy + y, speed)
+		--	doEcho = false
+		--end
 		if horDist <= hor then
 			-- Impact site is within turning circle, assume no terrain is in the way.
 			return false
 		end
 		
 		local pitchToTarget = math.atan((vertDist - y) / (horDist - hor))
-		if pitchToTarget > pitch then
+		if math.abs(pitchToTarget - pitch) < 0.14154 then -- Snap to target when within acos(0.99) radians
 			pitch = pitchToTarget
 			break
 		end
@@ -864,8 +888,12 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 		y = y + velUnitY * speed * speedFactor
 		distSq = (horDist - hor)*(horDist - hor) + (vertDist - y)*(vertDist - y)
 		local px, py, pz = fx + toX*hor, fy + y, fz + toZ*hor
+		--if doEcho then
+		--	Spring.Echo("FLY", hor, py, speed)
+		--	doEcho = false
+		--end
 		local groundHeight = (GetGroundHeight(px, pz) or 0)
-		if groundHeight + 3 > py then
+		if groundHeight + 5 > py then
 			return px, groundHeight, pz
 		end
 		local aboveGround = py - groundHeight
@@ -875,7 +903,7 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 				local prop = i/4
 				local ix, iy, iz = prop*px + (1 - prop)*oldX, prop*py + (1 - prop)*oldY, prop*pz + (1 - prop)*oldZ
 				groundHeight = (GetGroundHeight(ix, iz) or 0)
-				if groundHeight + 3 > iy then
+				if groundHeight + 5 > iy then
 					return ix, iy, iz
 				end
 			end
