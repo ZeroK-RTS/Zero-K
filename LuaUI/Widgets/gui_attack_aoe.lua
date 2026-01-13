@@ -156,7 +156,10 @@ local function GetMouseTargetPosition()
 	if (mouseTargetType == "ground") then
 		return mouseTarget[1], mouseTarget[2], mouseTarget[3], true
 	elseif (mouseTargetType == "unit") then
-		local _,_,_, ax, ay, az = GetUnitPosition(mouseTarget, false, true)
+		local ux, uy, uz, ax, ay, az = GetUnitPosition(mouseTarget, false, true)
+		if not ax then
+			return ux, uy, uz
+		end
 		return ax, ay, az
 	elseif (mouseTargetType == "feature") then
 		local _, coords = TraceScreenRay(mx, my, true, true, false, true)
