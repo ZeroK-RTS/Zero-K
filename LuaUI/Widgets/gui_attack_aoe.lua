@@ -150,12 +150,14 @@ end
 
 local function GetMouseTargetPosition()
 	local mx, my = GetMouseState()
-	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true, false, true)
+	local alt = Spring.GetModKeyState()
+	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, alt, true, false, true)
 
 	if (mouseTargetType == "ground") then
 		return mouseTarget[1], mouseTarget[2], mouseTarget[3], true
 	elseif (mouseTargetType == "unit") then
-		return GetUnitPosition(mouseTarget)
+		local _,_,_, ax, ay, az = GetUnitPosition(mouseTarget, false, true)
+		return ax, ay, az
 	elseif (mouseTargetType == "feature") then
 		local _, coords = TraceScreenRay(mx, my, true, true, false, true)
 		if coords and coords[3] then
