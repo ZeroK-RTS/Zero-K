@@ -34,6 +34,11 @@ local UsefulTableToCustomKey = Spring.Utilities.UsefulTableToCustomKey
 local modOptions = Spring.GetModOptions() or {}
 local rewardDefs = VFS.Include("LuaRules/Configs/RogueK/reward_defs.lua")
 
+local bringToFrontWait = 2
+
+local LOADOUT_ICON_SIZE = 64
+local MAIN_TITLE_HEIGHT = 22
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Globals
@@ -42,14 +47,32 @@ local Chili
 local screen0
 
 local rewardButtons = {}
-local loadout = {}
+local currentLoadout = {}
+
+local blackBackground
+local loadoutDisplay 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utils
 
+local function AddItemToLoadout(reward)
+	local targetTable
+	local itemType, itemTypeIndex
+	if reward.factory then
+		targetTable = currentLoadout.factories[reward.factory].units
+		itemType = "factory"
+		itemTypeIndex = reward.factory
+	elseif reward.structure then
+		targetTable = currentLoadout.structures
+		itemType = "structure"
+	end
+	targetTable[#targetTable + 1] = reward
+	loadoutDisplay.AddToLoadoutDisplay(reward)
+end
+
 local function SendLoadout()
-	local encoded = UsefulTableToCustomKey(loadout)
+	local encoded = UsefulTableToCustomKey(currentLoadout)
 	Spring.SendLuaRulesMsg("rk_loadout " .. encoded)
 end
 
@@ -64,26 +87,22 @@ local function DisableRewardCategoryButton(buttonID)
 	rewardButtons[buttonID].SetDisabled(true)
 end
 
-local function SelectReward(buttonID, rewardID, rewardName)
-	local reward = rewardDefs.flatRewards[rewardName]
-	local targetTable
-	if reward.factory then
-		targetTable = loadout.factories[reward.factory].units
-	elseif reward.structure then
-		targetTable = loadout.structures
-	end
-	targetTable[#targetTable + 1] = {
-		name = rewardName
-	}
-	
-	SendLoadout()
-	DisableRewardCategoryButton(buttonID)
+local function ClickFirstEnabledButton()
 	for i = 1, #rewardButtons do
 		if not rewardButtons[i].IsDisabled() then
 			ClickRewardCategoryButton(i)
 			return
 		end
 	end
+end
+
+local function SelectReward(buttonID, rewardID, rewardName)
+	local reward = rewardDefs.flatRewards[rewardName]
+	Spring.SendLuaRulesMsg("rk_selected_reward " .. rewardID)
+	AddItemToLoadout(reward)
+	SendLoadout()
+	DisableRewardCategoryButton(buttonID)
+	ClickFirstEnabledButton()
 end
 
 --------------------------------------------------------------------------------
@@ -130,7 +149,6 @@ local function SetupRewardSelectionView(parent)
 		rewardID = newRewardID
 		local optionsShown = Spring.GetTeamRulesParam(teamID, "rk_reward_display_count_" .. rewardID)
 		local rewardOptions = {}
-		Spring.Echo("optionsShown", optionsShown, rewardID)
 		for i = 1, optionsShown do
 			rewardOptions[i] = Spring.GetTeamRulesParam(teamID, "rk_reward_option_" .. rewardID .. "_" .. i)
 		end
@@ -252,12 +270,14 @@ end
 local function SetupRewardList(leftPanel, rightPanel)
 	local teamID = Spring.GetMyTeamID()
 	local rewards = {}
-	local rewardID = 1
-	local found = Spring.GetTeamRulesParam(teamID, "rk_reward_name_" .. rewardID)
-	while found do
-		rewards[rewardID] = found
-		rewardID = rewardID + 1
-		found = Spring.GetTeamRulesParam(teamID, "rk_reward_name_" .. rewardID)
+	do
+		local rewardID = 1
+		local found = Spring.GetTeamRulesParam(teamID, "rk_reward_name_" .. rewardID)
+		while found do
+			rewards[rewardID] = found
+			rewardID = rewardID + 1
+			found = Spring.GetTeamRulesParam(teamID, "rk_reward_name_" .. rewardID)
+		end
 	end
 	
 	local rewardSelectionView = SetupRewardSelectionView(rightPanel)
@@ -270,6 +290,9 @@ local function SetupRewardList(leftPanel, rightPanel)
 		local reward = rewardDefs.categories[rewards[i]]
 		local buttonID = #rewardButtons + 1
 		rewardButtons[buttonID] = NewRewardListButton(leftPanel, rewardSelectionView, galaxyMap, pos, SIZE, reward, buttonID, i)
+		if Spring.GetTeamRulesParam(teamID, "rk_reward_used_" .. i) == 1 then
+			rewardButtons[buttonID].SetDisabled(true)
+		end
 		pos = pos + SIZE + SPACING
 	end
 	
@@ -285,9 +308,162 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function GetIconPosition(index, iconsAcross, paragraphOffset)
+	if index%iconsAcross == 0 then
+		paragraphOffset = paragraphOffset + (LOADOUT_ICON_SIZE + 4)
+	end
+
+	local x = index%iconsAcross*(LOADOUT_ICON_SIZE + 4)
+	local y = paragraphOffset - LOADOUT_ICON_SIZE - 4
+	return x, y, paragraphOffset
+end
+
+local function MakeRewardList(holder, name, leftBound, rightBound, itemList)
+	local rewardsHolder = Chili.Control:New {
+		x = leftBound,
+		y = 0,
+		right = rightBound,
+		height = 10,
+		padding = {0, 0, 0, 0},
+		parent = holder,
+	}
+	local posIndex = 0
+	local paragraphOffset = 0
+	local iconsAcross = math.floor(rewardsHolder.width/(LOADOUT_ICON_SIZE + 4))
+
+	if name then
+		Chili.TextBox:New {
+			x = 1,
+			y = paragraphOffset + 5,
+			right = 4,
+			height = 30,
+			text = name,
+			font = {size = 16},
+			parent = rewardsHolder
+		}
+		paragraphOffset = MAIN_TITLE_HEIGHT
+	end
+
+	local itemControls = {}
+	local externalFunctions = {}
+	
+	function externalFunctions.AddItem(item)
+		x, y, paragraphOffset = GetIconPosition(posIndex, iconsAcross, paragraphOffset)
+		local rawTooltip = item.name
+		local imageControl = Chili.Image:New{
+			x = x,
+			y = y,
+			width = LOADOUT_ICON_SIZE,
+			height = LOADOUT_ICON_SIZE,
+			keepAspect = true,
+			color = color,
+			tooltip = item.name,
+			file = 'unitpics/' .. item.name .. '.png',
+			parent = rewardsHolder,
+		}
+		local text = Chili.TextBox:New{
+			text = item.humanName or item.name,
+			parent = imageControl,
+		}
+		itemControls[#itemControls + 1] = {
+			image = imageControl,
+		}
+		posIndex = posIndex + 1
+	end
+
+	for i = 1, #itemList do
+		externalFunctions.AddItem(itemList[i])
+	end
+	
+	function externalFunctions.ResizeFunction(xSize)
+		iconsAcross = math.floor(xSize/(LOADOUT_ICON_SIZE + 4))
+		paragraphOffset = (name and MAIN_TITLE_HEIGHT) or 0
+		posIndex = 0
+		for i = 1, #itemControls do
+			x, y, paragraphOffset = GetIconPosition(posIndex, iconsAcross, paragraphOffset)
+			itemControls[i].image:SetPos(x, y)
+
+			posIndex = posIndex + 1
+		end
+	end
+
+	function externalFunctions.SetPosition(position)
+		rewardsHolder:SetPos(nil, position, nil, paragraphOffset)
+		return position + paragraphOffset + 4
+	end
+
+	return externalFunctions
+end
+
+
+local function SetupLoadoutPanel(bottomPanel)
+	local teamID = Spring.GetMyTeamID()
+	if not currentLoadout then
+		return
+	end
+	
+	local structures
+	local factories = {}
+	local function ResizeLoadout(xSize)
+		local offset = 5
+		if structures then
+			structures.ResizeFunction(xSize / 2)
+			offset = structures.SetPosition(offset)
+		end
+		
+		offset = 5
+		for i = 1, #factories do
+			factories[i].ResizeFunction(xSize / 2)
+			offset = factories[i].SetPosition(offset)
+		end
+	end
+
+	local loadoutPanel = Chili.ScrollPanel:New {
+		parent = Chili.Control:New{
+			parent = bottomPanel,
+			x = 0,
+			y = 0,
+			right = 0,
+			bottom = 0,
+			padding = {10, 0, 10, 10},
+		},
+		x = 0,
+		right = 0,
+		y = 0,
+		bottom = 0,
+		OnResize = {
+			function(self, xSize, ySize)
+				ResizeLoadout(xSize)
+			end
+		},
+	}
+	
+	structures = MakeRewardList(loadoutPanel, "Structures", "50%", 12, currentLoadout.structures)
+	for i = 1, #currentLoadout.factories do
+		factories[i] = MakeRewardList(loadoutPanel, "Factory " .. i, 12, "50%", currentLoadout.factories[i].units)
+	end
+	ResizeLoadout(loadoutPanel.width)
+	
+	local externalFuncs = {}
+	
+	function externalFuncs.AddToLoadoutDisplay(item)
+		if item.factory then
+			factories[item.factory].AddItem(item)
+		elseif item.structure then
+			structures.AddItem(item)
+		end
+		ResizeLoadout(loadoutPanel.width)
+	end
+	
+	return externalFuncs
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function MakePostgamePanel()
 	WG.SetMinimapVisibility(false)
-	local black = Chili.Window:New{
+	blackBackground = Chili.Window:New{
 		parent = screen0,
 		classname = "window_black",
 		name = "RogueRewards",
@@ -301,14 +477,14 @@ local function MakePostgamePanel()
 		resizable = false,
 	}
 	local window = Chili.Window:New{
-		parent = black,
+		parent = blackBackground,
 		classname = "main_window_opaque",
 		name = "RogueRewards",
 		caption = "",
 		x = '16%',
-		y = '10%',
+		y = '7%',
 		right  = '16%',
-		bottom = '10%',
+		bottom = '5%',
 		minWidth  = 500,
 		minHeight = 400,
 		draggable = false,
@@ -320,12 +496,12 @@ local function MakePostgamePanel()
 		x = 0,
 		y = 0,
 		right  = 0,
-		bottom = '34%',
+		bottom = '40%',
 	}
 	local bottomPanel = Chili.Control:New{
 		parent = window,
 		x = 0,
-		y = '66%',
+		y = '60%',
 		right  = 0,
 		bottom = 0,
 	}
@@ -360,31 +536,18 @@ local function MakePostgamePanel()
 		verticalScrollbar   = true,
 		horizontalScrollbar = true,
 	}
-	local loadoutPanel = Chili.ScrollPanel:New {
-		parent = Chili.Control:New{
-			parent = bottomPanel,
-			x = 0,
-			y = 0,
-			right = 0,
-			bottom = 0,
-			padding = {10, 0, 10, 10},
-		},
-		x = 0,
-		right = 0,
-		y = 0,
-		bottom = 0,
-	}
 	SetupRewardList(rewardListPanel, mainDisplay)
+	loadoutDisplay = SetupLoadoutPanel(bottomPanel)
+	blackBackground:BringToFront()
 end
 
 local function InitializeRewardSelection()
-
 	local teamID = Spring.GetMyTeamID()
-	local _,_,_,_,_,_, customKeys = Spring.GetTeamInfo(teamID, true)
-	loadout = CustomKeyToUsefulTable(customKeys.rk_loadout)
+	local encoded = Spring.GetTeamRulesParam(teamID, "rk_loadout")
+	currentLoadout = CustomKeyToUsefulTable(encoded)
 	
 	MakePostgamePanel()
-	ClickRewardCategoryButton(1)
+	ClickFirstEnabledButton()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -403,5 +566,15 @@ function widget:Initialize()
 	
 	if tonumber(modOptions.rk_post_game_only or 0) == 1 then
 		InitializeRewardSelection()
+	end
+end
+
+function widget:Update(dt)
+	if blackBackground and bringToFrontWait then
+		bringToFrontWait = bringToFrontWait - dt
+		if bringToFrontWait <= 0 then
+			blackBackground:BringToFront()
+			bringToFrontWait = false
+		end
 	end
 end

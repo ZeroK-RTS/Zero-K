@@ -52,16 +52,33 @@ local function SetupTeamProgression(teamID, rewards)
 	end
 end
 
-function gadget:RecvLuaMsg(message, playerID)
-	if not (message and string.find(message, "rk_loadout")) then
-		return
-	end
+local function UpdateLoadout(message, playerID)
 	local _, _, spectator, teamID = Spring.GetPlayerInfo(playerID)
 	if spectator then
 		return
 	end
 	local loadout = message:sub(12)
 	Spring.SetTeamRulesParam(teamID, "rk_loadout", loadout)
+end
+
+local function SetRewardUsed(message, playerID)
+	local _, _, spectator, teamID = Spring.GetPlayerInfo(playerID)
+	if spectator then
+		return
+	end
+	local rewardID = tonumber(message:sub(20))
+	Spring.SetTeamRulesParam(teamID, "rk_reward_used_" .. rewardID, 1)
+end
+
+function gadget:RecvLuaMsg(message, playerID)
+	if not message then
+		return
+	end
+	if string.find(message, "rk_loadout") then
+		UpdateLoadout(message, playerID)
+	elseif string.find(message, "rk_selected_reward") then
+		SetRewardUsed(message, playerID)
+	end
 end
 
 local function SetupProgression()
