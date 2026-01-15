@@ -894,7 +894,7 @@ function widget:DrawWorldPreUnit()
 	gl.Texture(1, false)
 	gl.Texture(2, false)
 
-	gl.DepthTest(GL.ALWAYS)
+	--gl.DepthTest(GL.ALWAYS)
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 	gl.Culling(GL.BACK)
