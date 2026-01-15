@@ -861,6 +861,7 @@ function widget:DrawGroundDeferred()
 	--gl.DepthTest(false)
 	--gl.DepthMask(false)
 	gl.Culling(GL.BACK)
+	gl.Culling(false)
 
 end
 
@@ -898,6 +899,7 @@ function widget:DrawWorldPreUnit()
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 	gl.Culling(GL.BACK)
+	gl.Culling(false)
 end
 
 local lastSunChanged = -1
