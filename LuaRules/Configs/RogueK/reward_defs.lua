@@ -13,6 +13,8 @@ local function MakeUnitUnlock(name)
 	local def = {
 		name = name,
 		humanName = ud.humanName,
+		description = (ud.humanName or "???") .. " - " .. (Spring.Utilities.GetDescription(ud) or ""),
+		image = 'unitpics/' .. name .. '.png',
 		unitDefName = name,
 		structure = not moveType,
 		factory = moveType and ((moveType == 2 and 1) or 3),
@@ -20,6 +22,33 @@ local function MakeUnitUnlock(name)
 	unitUnlocks[name] = def
 	return def
 end
+
+local commChassiOptions = {
+	{
+		name = "commstrike",
+		humanName = "Strike Chassis",
+		image = 'unitpics/commstrike.png',
+		commander = true,
+	},
+	{
+		name = "commsupport",
+		humanName = "Engineer Chassis",
+		image = 'unitpics/commsupport.png',
+		commander = true,
+	},
+	{
+		name = "commrecon",
+		humanName = "Recon Chassis",
+		image = 'unitpics/commrecon.png',
+		commander = true,
+	},
+	{
+		name = "commassault",
+		humanName = "Guardian Chassis",
+		image = 'unitpics/commassault.png',
+		commander = true,
+	},
+}
 
 local function ProcessUnitList(unitList)
 	local out = {}
@@ -30,6 +59,11 @@ local function ProcessUnitList(unitList)
 end
 
 local categories = {
+	comm_chassis = {
+		humanName = "Commander",
+		base_options = 4,
+		options = commChassiOptions,
+	},
 	constructor = {
 		humanName = "Constructor",
 		options = ProcessUnitList({
@@ -68,11 +102,26 @@ local categories = {
 			"turretemp",
 		}),
 	},
+	start_structures = {
+		humanName = "Starting Structures",
+		options = ProcessUnitList({
+			"staticmex",
+			"energywind",
+			"energysolar",
+			"staticradar",
+		}),
+	},
 }
+
+-- How many options are shown for a reward and how many extra are added with tech points.
+local BASE_OPTIONS = 3
+local TECH_OPTIONS = 3
 
 local flatRewards = {}
 local alreadyIn = {}
 for reward, data in pairs(categories) do
+	data.base_options = data.base_options or BASE_OPTIONS
+	data.extra_options = data.extra_options or TECH_OPTIONS
 	for i = 1, #data.options do
 		local name = data.options[i].name
 		if not alreadyIn[name] then

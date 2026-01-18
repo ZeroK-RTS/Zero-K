@@ -26,9 +26,6 @@ local CustomKeyToUsefulTable = Spring.Utilities.CustomKeyToUsefulTable
 
 local PLAYER_ALLYTEAM = 0
 
--- How many options are shown for a reward and how many extra are added with tech points.
-local BASE_OPTIONS = 3
-local TECH_OPTIONS = 3
 
 local extraRewards = {} -- TODO, mid-mission bonus objective rewards are registered here
 
@@ -38,13 +35,13 @@ local function SetupTeamProgression(teamID, rewards)
 	-- The host reads rk_loadout when creating the next game. Players send updated
 	-- loadouts to luarules for this purpose.
 	Spring.SetTeamRulesParam(teamID, "rk_loadout", customKeys.rk_loadout)
+	Spring.Echo("Writing loading for", teamID)
 	
 	for i = 1, #rewards do
 		local reward = rewardDefs.categories[rewards[i]]
-		Spring.Echo("humanNamehumanNamehumanName", reward.humanName)
 		Spring.SetTeamRulesParam(teamID, "rk_reward_name_" .. i, rewards[i])
-		Spring.SetTeamRulesParam(teamID, "rk_reward_display_count_" .. i, BASE_OPTIONS)
-		Spring.SetTeamRulesParam(teamID, "rk_reward_display_tech_" .. i, TECH_OPTIONS)
+		Spring.SetTeamRulesParam(teamID, "rk_reward_display_count_" .. i, reward.base_options)
+		Spring.SetTeamRulesParam(teamID, "rk_reward_display_extra_per_tech_" .. i, reward.extra_options)
 		Spring.Utilities.PermuteList(reward.options)
 		for j = 1, #reward.options do
 			Spring.SetTeamRulesParam(teamID, "rk_reward_option_" .. i .. "_" .. j, reward.options[j].name)

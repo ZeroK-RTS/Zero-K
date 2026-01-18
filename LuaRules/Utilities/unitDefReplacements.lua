@@ -269,7 +269,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	end
 
 	local name_override = ud.customParams.statsname or ud.name
-	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+	local desc = (WG and WG.Translate ("units", name_override .. ".description")) or ud.tooltip
 	local isValidUnit = Spring.ValidUnitID(unitID)
 	if isValidUnit then
 		local customTooltip = GetCustomTooltip(unitID, ud)
@@ -280,7 +280,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	
 	local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
 	if buildSpeed > 0 then
-		return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
+		return (WG and WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)})) or desc
 	end
 	return desc
 end
@@ -389,7 +389,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 		end
 
 		local name_override = ud.customParams.statsname or ud.name
-		local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+		local desc = (WG and WG.Translate ("units", name_override .. ".description")) or ud.tooltip
 		local isValidUnit = Spring.ValidUnitID(unitID)
 		if isValidUnit then
 			local tech = GetTechLevel(unitID) or 1
@@ -405,7 +405,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 				local mult = math.pow(2, (WG.SelectedTechLevel or 1) - 1)
 				buildSpeed = buildSpeed * mult
 			end
-			return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
+			return (WG and WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)})) or desc
 		end
 		return desc
 	end

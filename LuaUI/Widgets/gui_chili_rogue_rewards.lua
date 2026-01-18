@@ -54,7 +54,7 @@ local loadoutDisplay
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Utils
+-- Loadout Handling
 
 local function AddItemToLoadout(reward)
 	local targetTable
@@ -66,6 +66,9 @@ local function AddItemToLoadout(reward)
 	elseif reward.structure then
 		targetTable = currentLoadout.structures
 		itemType = "structure"
+	elseif reward.commander then
+		targetTable = currentLoadout.commander
+		itemType = "commander"
 	end
 	targetTable[#targetTable + 1] = reward
 	loadoutDisplay.AddToLoadoutDisplay(reward)
@@ -75,6 +78,21 @@ local function SendLoadout()
 	local encoded = UsefulTableToCustomKey(currentLoadout)
 	Spring.SendLuaRulesMsg("rk_loadout " .. encoded)
 end
+
+local function ReadLoadout()
+	local teamID = Spring.GetMyTeamID()
+	local encoded = Spring.GetTeamRulesParam(teamID, "rk_loadout")
+	local loadout = CustomKeyToUsefulTable(encoded)
+	if loadout.needInit then
+		loadout = VFS.Include("LuaRules/Configs/RogueK/base_loadout.lua")
+	end
+	return loadout
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Utils
+
 
 local function ClickRewardCategoryButton(buttonID)
 	for i = 1, #rewardButtons do
@@ -155,9 +173,6 @@ local function SetupRewardSelectionView(parent)
 		holder:SetVisibility(true)
 	
 		for i = 1, math.max(#buttons, #rewardOptions) do
-			if not rewardOptions[i] then
-				buttons[i]:SetVisibility(false)
-			end
 			if not buttons[i] then
 				buttons[i] = Chili.Button:New{
 					parent = holder,
@@ -168,10 +183,15 @@ local function SetupRewardSelectionView(parent)
 					height = 45,
 				}
 			end
-			local rewardName = rewardOptions[i]
-			buttons[i]:SetCaption(rewardDefs.flatRewards[rewardName].humanName)
-			buttons[i].OnClick[1] = function ()
-				SelectReward(buttonID, rewardID, rewardName)
+			if rewardOptions[i] then
+				local rewardName = rewardOptions[i]
+				buttons[i]:SetCaption(rewardDefs.flatRewards[rewardName].humanName)
+				buttons[i].OnClick[1] = function ()
+					SelectReward(buttonID, rewardID, rewardName)
+				end
+				buttons[i]:SetVisibility(true)
+			else
+				buttons[i]:SetVisibility(false)
 			end
 		end
 	end
@@ -349,24 +369,35 @@ local function MakeRewardList(holder, name, leftBound, rightBound, itemList)
 	
 	function externalFunctions.AddItem(item)
 		x, y, paragraphOffset = GetIconPosition(posIndex, iconsAcross, paragraphOffset)
-		local rawTooltip = item.name
-		local imageControl = Chili.Image:New{
+		local button = Chili.Button:New{
 			x = x,
 			y = y,
 			width = LOADOUT_ICON_SIZE,
 			height = LOADOUT_ICON_SIZE,
-			keepAspect = true,
-			color = color,
-			tooltip = item.name,
-			file = 'unitpics/' .. item.name .. '.png',
+			tooltip = item.description,
+			caption = false,
+			padding = {0, 0, 0, 0},
+			noFont = true,
 			parent = rewardsHolder,
+		}
+		local image = Chili.Image:New{
+			x = 0,
+			y = 0,
+			width = LOADOUT_ICON_SIZE,
+			height = LOADOUT_ICON_SIZE,
+			file = item.image,
+			parent = button,
 		}
 		local text = Chili.TextBox:New{
 			text = item.humanName or item.name,
-			parent = imageControl,
+			x = 4,
+			y = 4,
+			right = 4,
+			font = {size = 10},
+			parent = image,
 		}
 		itemControls[#itemControls + 1] = {
-			image = imageControl,
+			button = button,
 		}
 		posIndex = posIndex + 1
 	end
@@ -381,7 +412,7 @@ local function MakeRewardList(holder, name, leftBound, rightBound, itemList)
 		posIndex = 0
 		for i = 1, #itemControls do
 			x, y, paragraphOffset = GetIconPosition(posIndex, iconsAcross, paragraphOffset)
-			itemControls[i].image:SetPos(x, y)
+			itemControls[i].button:SetPos(x, y)
 
 			posIndex = posIndex + 1
 		end
@@ -402,13 +433,17 @@ local function SetupLoadoutPanel(bottomPanel)
 		return
 	end
 	
-	local structures
+	local structures, commanderModules
 	local factories = {}
 	local function ResizeLoadout(xSize)
 		local offset = 5
 		if structures then
 			structures.ResizeFunction(xSize / 2)
 			offset = structures.SetPosition(offset)
+		end
+		if commanderModules then
+			commanderModules.ResizeFunction(xSize / 2)
+			offset = commanderModules.SetPosition(offset)
 		end
 		
 		offset = 5
@@ -439,6 +474,7 @@ local function SetupLoadoutPanel(bottomPanel)
 	}
 	
 	structures = MakeRewardList(loadoutPanel, "Structures", "50%", 12, currentLoadout.structures)
+	commanderModules = MakeRewardList(loadoutPanel, "Commander", "50%", 12, currentLoadout.commander)
 	for i = 1, #currentLoadout.factories do
 		factories[i] = MakeRewardList(loadoutPanel, "Factory " .. i, 12, "50%", currentLoadout.factories[i].units)
 	end
@@ -451,6 +487,8 @@ local function SetupLoadoutPanel(bottomPanel)
 			factories[item.factory].AddItem(item)
 		elseif item.structure then
 			structures.AddItem(item)
+		elseif item.commander then
+			commanderModules.AddItem(item)
 		end
 		ResizeLoadout(loadoutPanel.width)
 	end
@@ -542,10 +580,7 @@ local function MakePostgamePanel()
 end
 
 local function InitializeRewardSelection()
-	local teamID = Spring.GetMyTeamID()
-	local encoded = Spring.GetTeamRulesParam(teamID, "rk_loadout")
-	currentLoadout = CustomKeyToUsefulTable(encoded)
-	
+	currentLoadout = ReadLoadout()
 	MakePostgamePanel()
 	ClickFirstEnabledButton()
 end
