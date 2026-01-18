@@ -826,7 +826,7 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 	local horDist = math.sqrt((fx - tx)*(fx - tx) + (fz - tz)*(fz - tz))
 	local vertDist = ty - fy
 	
-	if info.range + 10 < horDist then
+	if info.range + 10 < horDist or horDist < 100 then
 		return false
 	end
 	
@@ -974,7 +974,7 @@ local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeR
 	end
 
 	local weaponType = info.type
-	if info.vlaunch then
+	if info.vlaunch and info.circleMode ~= "cloaker" then
 		local hx, hy, hz = CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 		if hx then
 			DrawVlaunchImpact(hx, hy, hz, tx, ty, tz)
