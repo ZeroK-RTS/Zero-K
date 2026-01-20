@@ -659,30 +659,7 @@ skin.main_window_tall = {
 }
 
 skin.main_window = {
-	TileImage = ":c:tech_mainwindow_opaque.png",
-	tiles = {176, 64, 176, 64}, --// tile widths: left, top, right, bottom
-	padding = {10, 6, 10, 6},
-	hitpadding = {4, 4, 4, 4},
-
-	captionColor = {1, 1, 1, 0.45},
-	backgroundColor = {0.1, 0.1, 0.1, 0.7},
-
-	boxes = {
-		resize = {-23, -19, -12, -8},
-		drag = {0, 0, "100%", 10},
-	},
-
-	NCHitTest = NCHitTestWithPadding,
-	NCMouseDown = WindowNCMouseDown,
-	NCMouseDownPostChildren = WindowNCMouseDownPostChildren,
-
-	DrawControl = DrawWindow,
-	DrawDragGrip = function() end,
-	DrawResizeGrip = DrawResizeGrip,
-}
-
-skin.main_window_opaque = {
-	TileImage = ":c:tech_mainwindow_opaque.png",
+	TileImage = ":c:tech_mainwindow.png",
 	tiles = {176, 64, 176, 64}, --// tile widths: left, top, right, bottom
 	padding = {10, 6, 10, 6},
 	hitpadding = {4, 4, 4, 4},

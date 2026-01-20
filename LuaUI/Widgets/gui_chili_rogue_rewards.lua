@@ -49,6 +49,8 @@ local screen0
 local rewardButtons = {}
 local currentLoadout = {}
 
+local planetButtons = {}
+
 local blackBackground
 local loadoutDisplay 
 
@@ -93,6 +95,11 @@ end
 --------------------------------------------------------------------------------
 -- Utils
 
+local function ClickPlanet(planetID)
+	for i = 1, #planetButtons do
+		planetButtons[i].SetSelection(planetID == i)
+	end
+end
 
 local function ClickRewardCategoryButton(buttonID)
 	for i = 1, #rewardButtons do
@@ -127,16 +134,103 @@ end
 --------------------------------------------------------------------------------
 -- Galaxy Map
 
+local function StartBattle()
+	
+end
+
+local function GetPlanet(parent, planetID, planetDef)
+	local isSelected = false
+	local isDisabled = false
+	local oldFont = WG.GetSpecialFont(14, "internal_white", {outlineColor = {0, 0, 0, 1}, color = {1, 1, 1, 1}})
+	
+	local button = Chili.Button:New{
+		parent = parent,
+		caption = planetDef.humanName,
+		OnClick = {function () ClickPlanet(planetID) end},
+		x = 200 + planetDef.pos[1] * 100,
+		y = planetDef.pos[2] * 100,
+		width = 70,
+		height = 70,
+	}
+	
+	local externalFuncs = {}
+	function externalFuncs.SetDisabled(newDisabled)
+		if newDisabled == isDisabled then
+			return
+		end
+		isDisabled = newDisabled
+		if isDisabled then
+			button.backgroundColor = BUTTON_DISABLE_COLOR
+			button.focusColor = BUTTON_DISABLE_FOCUS_COLOR
+			button.borderColor = BUTTON_DISABLE_FOCUS_COLOR
+			function button:HitTest(x,y) return false end
+			button.font = WG.GetSpecialFont(14, "integral_grey", {outlineColor = {0, 0, 0, 1}, color = {0.6, 0.6, 0.6, 1}})
+		else
+			button.backgroundColor = BUTTON_COLOR
+			button.focusColor = BUTTON_FOCUS_COLOR
+			button.borderColor = BUTTON_BORDER_COLOR
+			button.font = oldFont
+			function button:HitTest(x,y) return self end
+		end
+		button:Invalidate()
+	end
+	
+	function externalFuncs.SetSelection(newIsSelected)
+		if isSelected == newIsSelected then
+			return
+		end
+		isSelected = newIsSelected
+		if isSelected then
+			button.backgroundColor = SELECT_BUTTON_COLOR
+			button.focusColor = SELECT_BUTTON_FOCUS_COLOR
+		else
+			button.backgroundColor = BUTTON_COLOR
+			button.focusColor = BUTTON_FOCUS_COLOR
+		end
+		button:Invalidate()
+	end
+	
+	return externalFuncs
+end
+
 local function SetupGalaxyMap(parent)
+	local galaxy = CustomKeyToUsefulTable(modOptions.rk_galaxy)
+	
+	local holder = Chili.Control:New{
+		parent = parent,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		padding = {10, 10, 10, 10},
+	}
+	
+	local startButton = Chili.Button:New{
+		parent = holder,
+		caption = "Start Battle",
+		OnClick = {function () StartBattle() end},
+		x = 20,
+		y = 20,
+		width = 140,
+		height = 70,
+	}
+	
+	for i = 1, #galaxy.planets do
+		local planetDef = galaxy.planets[i]
+		planetButtons[i] = GetPlanet(holder, i, planetDef)
+		if planetDef.state then
+			planetButtons[i].SetDisabled(true)
+		end
+	end
 	
 	local externalFuncs = {}
 	function externalFuncs.Show()
-	
+		holder:SetVisibility(true)
 	end
 	function externalFuncs.Hide()
-	
+		holder:SetVisibility(false)
 	end
-	
+	externalFuncs.Hide()
 	return externalFuncs
 end
 
@@ -425,7 +519,6 @@ local function MakeRewardList(holder, name, leftBound, rightBound, itemList)
 
 	return externalFunctions
 end
-
 
 local function SetupLoadoutPanel(bottomPanel)
 	local teamID = Spring.GetMyTeamID()

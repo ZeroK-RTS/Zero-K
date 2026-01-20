@@ -9,6 +9,7 @@ local planetwarsStructure = {}
 local buildPlate = {}
 local buildPowerCache = {}
 local rangeCache = {}
+local baseDefCache = {}
 local dynComm = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
@@ -128,6 +129,19 @@ function Spring.Utilities.GetUnitRange(unitID, unitDefID)
 		return (range > 0) and range
 	end
 	return Spring.GetUnitRulesParam(unitID, "comm_max_range") or GetCachedBaseRange(unitDefID), Spring.GetUnitRulesParam(unitID, "primary_weapon_range")
+end
+
+function Spring.Utilities.GetBaseDefID(unitDefID)
+	if not unitDefID then
+		return unitDefID
+	end
+	if baseDefCache then
+		return baseDefCache[unitDefID]
+	end
+	local ud = UnitDefs[unitDefID]
+	local bud = ud.customParams.baseDef and UnitDefNames[ud.customParams.baseDef]
+	baseDefCache[unitDefID] = bud and bud.id or unitDefID
+	return baseDefCache[unitDefID]
 end
 
 -------------------------------------------------------------------------------------

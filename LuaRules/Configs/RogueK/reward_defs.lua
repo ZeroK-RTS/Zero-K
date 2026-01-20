@@ -93,7 +93,6 @@ local categories = {
 	light_turret = {
 		humanName = "Turret",
 		options = ProcessUnitList({
-			"turretlaser",
 			"turretmissile",
 			"turretimpulse",
 			"turretgauss",
@@ -108,6 +107,8 @@ local categories = {
 			"staticmex",
 			"energywind",
 			"energysolar",
+			"turretlaser",
+			"staticrearm",
 			"staticradar",
 		}),
 	},
