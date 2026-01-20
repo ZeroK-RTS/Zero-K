@@ -3834,6 +3834,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if unitDefID == terraunitDefID then
 		terraUnits[unitID] = true
 		Spring.UnitRendering.SetUnitLuaDraw(unitID, true)
+		if Spring.SetUnitIconDraw then
+			Spring.SetUnitIconDraw(unitID, false)
+		end
 	end
 end
 
