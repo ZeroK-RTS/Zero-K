@@ -7,6 +7,7 @@ return { shipassault = {
   builder                = false,
   buildPic               = [[shipassault.png]],
   canGuard               = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[SHIP]],
@@ -31,6 +32,7 @@ return { shipassault = {
     selectionscalemult = 1.18,
     selectionwidthscalemult = 1.25,
     selectioninherit = 1,
+    manualfire_desc = [[Fire Special Weapon: Fire a rocket salvo.]]
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -80,6 +82,12 @@ return { shipassault = {
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
+    
+    {
+      def                = [[MISSILE_SALVO]],
+      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+    },
 
   },
 
@@ -96,6 +104,7 @@ return { shipassault = {
         craterMult              = 0,
 
         customParams            = {
+            combatRange = 225,
             force_ignore_ground = [[1]],
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
@@ -140,15 +149,12 @@ return { shipassault = {
     },
     
     MISSILE      = {
-      name                    = [[Destroyer Missiles]],
+      name                    = [[Destroyer Missile]],
       areaOfEffect            = 48,
       cegTag                  = [[missiletrailyellow]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-      customParams            = {
-        combatRange = 265,
-      },
       damage                  = {
         default = 400.01,
       },
@@ -164,6 +170,48 @@ return { shipassault = {
       noSelfDamage            = true,
       range                   = 800,
       reloadtime              = 16,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/missile_fire12]],
+      soundStart              = [[weapon/missile/missile_fire10]],
+      startVelocity           = 100,
+      tolerance               = 4000,
+      turnrate                = 30000,
+      turret                  = true,
+      --waterWeapon           = true,
+      weaponAcceleration      = 300,
+      weaponTimer             = 1,
+      weaponType              = [[StarburstLauncher]],
+      weaponVelocity          = 1800,
+    },
+    
+    MISSILE_SALVO      = {
+      name                    = [[Destroyer Missile Salvo]],
+      areaOfEffect            = 48,
+      avoidFeature            = false,
+      avoidFriendly           = false,
+      avoidNeutral            = false,
+      burst                   = 4,
+      burstrate               = 0.1,
+      cegTag                  = [[missiletrailyellow]],
+      collideFriendly         = false,
+      commandfire             = true,
+      craterBoost             = 1,
+      craterMult              = 2,
+      damage                  = {
+        default = 400.01,
+      },
+
+      edgeEffectiveness       = 0.5,
+      fireStarter             = 100,
+      fixedLauncher           = true,
+      flightTime              = 4,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_hailstorm.s3o]],
+      noSelfDamage            = true,
+      range                   = 800,
+      reloadtime              = 64,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/missile_fire12]],
       soundStart              = [[weapon/missile/missile_fire10]],
