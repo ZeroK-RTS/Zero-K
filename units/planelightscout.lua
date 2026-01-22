@@ -101,7 +101,7 @@ return { planelightscout = {
       edgeEffectiveness  = 0.4,
       explosionGenerator = "custom:scan_explode",
       soundHit           = [[explosion/scan_explode]],
-      soundHitVolume     = 4,
+      soundHitVolume     = 10,
     },
   }
 } }

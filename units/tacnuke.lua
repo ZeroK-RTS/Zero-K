@@ -68,7 +68,7 @@ return { tacnuke = {
       customParams            = {
         burst = Shared.BURST_RELIABLE,
 
-      lups_explodelife = 1.5,
+        lups_explodelife = 1.5,
         stats_hide_dps = 1, -- meaningless
         stats_hide_reload = 1,
         
@@ -94,6 +94,7 @@ return { tacnuke = {
       smokeTrail              = false,
       soundHit                = [[explosion/mini_nuke]],
       soundStart              = [[SiloLaunch]],
+      soundStartVolume        = 10,
       tolerance               = 4000,
       turnrate                = 18000,
       weaponAcceleration      = 180,

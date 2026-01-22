@@ -104,6 +104,7 @@ return { turretheavylaser = {
       rgbColor                = [[0 0 1]],
       scrollSpeed             = 5,
       soundStart              = [[weapon/laser/heavy_laser3]],
+      soundStartVolume        = 8.5,
       sweepfire               = false,
       texture1                = [[largelaser]],
       texture2                = [[flare]],

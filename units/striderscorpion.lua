@@ -190,6 +190,7 @@ return { striderscorpion = {
       reloadtime              = 2,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
+      soundStartVolume        = 8,
       soundTrigger            = true,
       sprayAngle              = 700,
       texture1                = [[lightning]],
