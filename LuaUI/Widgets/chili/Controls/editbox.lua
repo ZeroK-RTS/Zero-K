@@ -122,6 +122,7 @@ end
 
 --// =============================================================================
 
+
 local function explode(div, str)
 	str = tostring(str)
 	local arr = {}
@@ -130,7 +131,7 @@ local function explode(div, str)
 
 	while j <= N do
 		local c = str:sub(j, j)
-		if c == '\255' then
+		if c == '\255' or c == '\017' then
 			j = j + 3
 		elseif c == div then
 			arr[#arr + 1] = str:sub(i, j - 1)
@@ -144,7 +145,7 @@ local function explode(div, str)
 	end
 
 	return arr
- end
+end
 
 --- Sets the EditBox text
 -- @string newtext text to be set

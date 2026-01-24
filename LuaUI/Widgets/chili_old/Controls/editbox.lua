@@ -112,7 +112,7 @@ local function explode(div, str)
 
 	while j <= N do
 		local c = str:sub(j, j)
-		if c == '\255' then
+		if c == '\255' or c == '\017' then
 			j = j + 3
 		elseif c == div then
 			arr[#arr + 1] = str:sub(i, j - 1)
@@ -126,7 +126,7 @@ local function explode(div, str)
 	end
 
 	return arr
- end
+end
 
 --- Sets the EditBox text
 -- @string newtext text to be set
@@ -239,6 +239,10 @@ function EditBox:_GeneratePhysicalLines(logicalLineID)
 	end
 
 	local wrappedText = font:WrapText(text, width, height)
+	if text:find("TEST") then
+		Spring.Echo("text", text:byte(1, 5))
+		Spring.Echo("wrappedText", wrappedText:byte(1, 5))
+	end
 
 	local y = 0
 	local fontLineHeight = font:GetLineHeight() + self.lineSpacing
