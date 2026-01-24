@@ -3,20 +3,31 @@ if not Attributes then
     Attributes={}
     GG.Attributes=Attributes
 end
-
+--[=[
+	handledAttributeNames->attributeNames
+	new -> setup current table
+	newDataHandler->UpdateUnitAttributes set inital local
+	fold->UpdateUnitAttributes iterating
+	apply->UpdateUnitAttributes handling result
+	clear -> CleanupAttributeDataForUnit
+	handler file script-> set GG and functions
+	initialize-> gadget:Initialize
+]=]
 
 ---@class AttributesDataHandler
----@field fold fun(domainData:table)
----@field apply fun()
+---@field fold fun(domainData:table) collect data from attributes
+---@field apply fun() handling result
 
 ---@class AttributesHandler
----@field newDataHandler fun(frame:number):AttributesDataHandler
----@field clear fun()
+---@field newDataHandler fun(frame:number):AttributesDataHandler prepare for collecting data from attributes
+---@field clear fun() when a unit's attributes cleared
 
 ---@class AttributesHandlerFactory
----@field new fun(unitID:UnitId,unitDefID:UnitDefId):AttributesHandler
----@field initialize nil|fun()
----@field handledAttributeNames table<string,boolean>
+---@field new fun(unitID:UnitId,unitDefID:UnitDefId):AttributesHandler create handler for a unit that has attributes.
+---@field initialize nil|fun() gadget:Initialize
+---@field handledAttributeNames table<string,boolean|nil> attribute names used (not used yet)
+
+---@class AttributesHandlersFileReturn:{[string]:AttributesHandlerFactory}
 
 ---@type list<AttributesHandlerFactory>
 local HandlersFactory=Attributes.HandlersFactory
