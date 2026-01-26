@@ -95,6 +95,15 @@ end
 --------------------------------------------------------------------------------
 -- Utils
 
+local function GetSelectedPlanet()
+	for i = 1, #planetButtons do
+		if planetButtons[i].IsSelected() then
+			local planetID, planetDef = planetButtons[i].GetPlanet()
+			return planetID, planetDef
+		end
+	end
+end
+
 local function ClickPlanet(planetID)
 	for i = 1, #planetButtons do
 		planetButtons[i].SetSelection(planetID == i)
@@ -135,7 +144,39 @@ end
 -- Galaxy Map
 
 local function StartBattle()
+	local planetID, planetDef = GetSelectedPlanet()
+	if not planetID then
+		return
+	end
+	local startScript = CustomKeyToUsefulTable(modOptions.start_script)
+	local modoptions = startScript.modoptions
+	Spring.Utilities.TableEcho(startScript)
 	
+	-- Encode loadout so it can be added to after the battle.
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local teamLoadout = Spring.GetTeamRulesParam(teamID, "rk_loadout")
+		if teamLoadout then
+			local teamString = "team" .. teamID
+			startScript[teamString].rk_loadout = teamLoadout
+		end
+	end
+	
+	-- Set map parameters
+	startScript.mapname = planetDef.map
+	local currentPlanetID = modoptions.rk_battle_planet
+	
+	-- Galaxy map update
+	modoptions.rk_battle_planet = planetID
+	modoptions.rk_post_game_only = 0
+	
+	-- TODO: Setup the player factions from their loadouts (make the units, setup factory etc - to be read by _posts)
+	
+	-- Save script
+	modoptions.start_script = UsefulTableToCustomKey(startScript)
+	local encodedScript = UsefulTableToCustomKey(startScript)
+	Spring.SendLuaMenuMsg("startFromScript_" .. encodedScript)
 end
 
 local function GetPlanet(parent, planetID, planetDef)
@@ -151,6 +192,7 @@ local function GetPlanet(parent, planetID, planetDef)
 		y = planetDef.pos[2] * 100,
 		width = 70,
 		height = 70,
+		tooltip = planetDef.humanName .. "\n" .. planetDef.map
 	}
 	
 	local externalFuncs = {}
@@ -188,6 +230,14 @@ local function GetPlanet(parent, planetID, planetDef)
 			button.focusColor = BUTTON_FOCUS_COLOR
 		end
 		button:Invalidate()
+	end
+	
+	function externalFuncs.IsSelected()
+		return isSelected
+	end
+	
+	function externalFuncs.GetPlanet()
+		return planetID, planetDef
 	end
 	
 	return externalFuncs
@@ -596,10 +646,9 @@ local function MakePostgamePanel()
 	WG.SetMinimapVisibility(false)
 	blackBackground = Chili.Window:New{
 		parent = screen0,
-		classname = "window_black",
 		name = "RogueRewards",
 		caption = "",
-		color = {0, 0, 0, 0.7}, -- Transparent for debug
+		color = {0, 0, 0, 0.5}, -- Transparent for debug
 		x = 0,
 		y = 0,
 		right  = 0,
@@ -609,7 +658,7 @@ local function MakePostgamePanel()
 	}
 	local window = Chili.Window:New{
 		parent = blackBackground,
-		classname = "main_window_opaque",
+		classname = "main_window",
 		name = "RogueRewards",
 		caption = "",
 		x = '16%',
@@ -620,6 +669,7 @@ local function MakePostgamePanel()
 		minHeight = 400,
 		draggable = false,
 		resizable = false,
+		noClickThrough = true,
 	}
 	
 	local topPanel = Chili.Control:New{
