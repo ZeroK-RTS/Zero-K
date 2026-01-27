@@ -538,7 +538,7 @@ local function UpdateTrajectory(unitID, data)
 			if IsStunnedOrDead(data.lobID) then
 				return true
 			end
-			if not SendUnitToTarget(unitID, data.launchMult*math.min(1, 1 - (data.sidewaysCounter - 5)/8), data.flyTimeMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
+			if not SendUnitToTarget(unitID, data.launchMult*math.min(1, 1 - (data.sidewaysCounter - 3)/5), data.flyTimeMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
 				return true -- remove unit
 			end
 		end
@@ -554,7 +554,6 @@ local function ReinstatePhysics(unitID, data)
 		SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
 		data.drag = data.drag + 0.05
 		if data.drag >= 1 then
-			Spring.SetUnitLeaveTracks(unitID, true)
 			SetUnitDrag(unitID, 1)
 			data.drag = nil
 			GG.Floating_CheckAddFlyingFloat(unitID, data.unitDefID)
@@ -563,6 +562,10 @@ local function ReinstatePhysics(unitID, data)
 	
 	if data.collisionResistence then
 		GG.SetCollisionDamageMult(unitID, math.max(0, math.min(1, data.collisionResistence)))
+		if data.collisionResistence > 0 and not data.reinstatedTracks then
+			Spring.SetUnitLeaveTracks(unitID, true)
+			data.reinstatedTracks = true
+		end
 		data.collisionResistence = data.collisionResistence + 0.066
 		if data.collisionResistence >= 1 then
 			GG.SetCollisionDamageMult(unitID)
