@@ -722,7 +722,7 @@ local function GetUnitRegenString(unitID, ud)
 				end
 				if ud.customParams.amph_regen then
 					local x,y,z = Spring.GetUnitPosition(unitID)
-					local h = Spring.GetGroundHeight(x,z) or y
+					local h = (y < 0 and Spring.GetGroundHeight(x,z)) or y
 					if (h < 0) then
 						regen = regen + math.min(ud.customParams.amph_regen, ud.customParams.amph_regen*(-h / ud.customParams.amph_submerged_at))
 					end
