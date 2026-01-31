@@ -62,6 +62,7 @@ include "constants.lua"
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local LOS_ACCESS = {inlos = true}
 
 -- Signal definitions
 local SIG_AIM = 2

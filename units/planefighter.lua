@@ -101,6 +101,7 @@ return { planefighter = {
     SWIFT_GUN  = {
       name                    = [[Mini Laser Blaster]],
       areaOfEffect            = 8,
+      cegTag                  = [[laser_cannon_trail]],
       collideFriendly         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,

@@ -1609,14 +1609,14 @@ end
 
 local inCreated = false
 local finishedDuringCreated = false -- assumes non-recursive create
-function gadgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function gadgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("G:UnitCreated")
 
 	finishedDuringCreated = false
 	inCreated = true
 	for _,g in r_ipairs(self.UnitCreatedList) do
 		tracy.ZoneBeginN("G:UnitCreated:" .. g.ghInfo.name)
-		g:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+		g:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	inCreated = false

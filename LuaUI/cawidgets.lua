@@ -2572,22 +2572,22 @@ end
 --  Unit call-ins
 --
 
-function widgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function widgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("W:UnitCreated")
 	for _, w in r_ipairs(self.UnitCreatedList) do
 		tracy.ZoneBeginN("W:UnitCreated:" .. w.whInfo.name)
-		w:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+		w:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
 end
 
 -- NB: called via Lua at the moment, not engine
-function widgetHandler:UnitResurrected(unitID, unitDefID, unitTeam, builderID)
+function widgetHandler:UnitResurrected(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("W:UnitResurrected")
 	for _, w in r_ipairs(self.UnitResurrectedList) do
 		tracy.ZoneBeginN("W:UnitResurrected:" .. w.whInfo.name)
-		w:UnitResurrected(unitID, unitDefID, unitTeam, builderID)
+		w:UnitResurrected(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()

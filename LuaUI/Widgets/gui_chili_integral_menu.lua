@@ -45,6 +45,9 @@ local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 local cullingSettingsList, commandCulling =  include("Configs/integral_menu_culling.lua")
 local transkey = include("Configs/transkey.lua")
 
+local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+
 -- Chili classes
 local Chili
 local Button
@@ -134,10 +137,26 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
 -- Widget Options
 
+local radarIconSize = nil
+local function UpdateRadarIconSizeString(size)
+	size = tonumber(size) 
+	if size then
+		radarIconSize = string.format('%d%%', size)
+	end
+end
+
+local function UpdateRadarIcons(size)
+	UpdateRadarIconSizeString(size)
+	for i = 1, #commandPanels do
+		local buttons = commandPanels[i].buttons
+		buttons.UpdateRadarIcons()
+	end
+end
+
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
-	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -213,6 +232,38 @@ options = {
 			background:Invalidate()
 		end,
 	},
+	allowclickthrough = {
+		name = 'Allow clicking through',
+		type='bool',
+		value=false,
+		desc = 'Mouse clicks through empty parts of the panel act on whatever is underneath.',
+		OnChange = function(self)
+			if background then
+				background.noClickThrough = not self.value
+				background:Invalidate()
+			end
+		end,
+	},
+	show_radar_icons = {
+		name = 'Show Radar Icons',
+		type='bool',
+		value=false,
+		update_on_the_fly=true,
+		desc = 'Displays the unit radar icons in the top-right corner of their build button in the command panel.',
+		OnChange = function(self)
+			UpdateRadarIcons(self.value)
+		end,
+	},
+	radar_icon_size = {
+		name = "Radar Icon Size",
+		type = "number",
+		value = 50, min = 1, max = 100, step = 1,
+		update_on_the_fly=true,
+		desc = 'Determines the size of the unit radar icons in the command panel.',
+		OnChange = function(self)
+			UpdateRadarIcons(self.value)
+		end,
+	},
 	keyboardType2 = {
 		type='radioButton',
 		name='Grid Keyboard Layout',
@@ -220,7 +271,9 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'Colemak (standard)', key = 'colemak', hotkey = nil},
 			{name = 'Dvorak (standard)', key = 'dvorak', hotkey = nil},
+			{name = 'Workman (standard)', key = 'workman', hotkey = nil},
 			{name = 'Configure in "Custom" (below)', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
@@ -278,7 +331,7 @@ options = {
 	label_apply = {
 		type = 'text',
 		name = 'Note: Click above to refresh',
-		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convinence.',
+		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convenience.',
 		path = customGridPath
 	},
 	label_tab = {
@@ -1086,6 +1139,18 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Button Panel
+local iconTypeCache = {}
+local function GetUnitIcon(unitDefID)
+	if unitDefID and iconTypeCache[unitDefID] then
+		return iconTypeCache[unitDefID]
+	end
+	local ud = UnitDefs[unitDefID]
+	if not ud then
+		return
+	end
+	iconTypeCache[unitDefID] = icontypes[ud.iconType].bitmap or ('icons/' .. ud.iconType .. iconFormat)
+	return iconTypeCache[unitDefID]
+end
 
 local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
@@ -1170,6 +1235,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	end
 	
 	local image
+	local image_icon
 	local buildProgress
 	local textBoxes = {}
 	
@@ -1201,6 +1267,33 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image.file = texture1
 		image.file2 = texture2
 		image:Invalidate()
+	end
+	
+	local function ApplyRadarIconTexture(texture1)
+		if not image_icon then
+			image_icon = Image:New {
+				name = name .. "_image_radar_icon",
+				top = 0,
+				right = 0,
+				width=radarIconSize,
+				height=radarIconSize,
+				keepAspect = true,
+				resizable = true,
+				file = texture1,
+				parent = image,
+			}
+			return
+		end
+		image_icon:SetVisibility(true)
+		image_icon.file = texture1
+		image_icon:Resize(radarIconSize, radarIconSize)
+		image_icon:Invalidate()
+	end
+	
+	local function RemoveRadarIconTexture()
+		if image_icon then
+			image_icon:SetVisibility(false)
+		end
 	end
 	
 	local function SetImageFromConfig(displayConfig, command, state)
@@ -1290,6 +1383,17 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		button:Invalidate()
 		image:Invalidate()
+	end
+	
+	function externalFunctionsAndData.ApplyRadarIcon()
+		local ud = UnitDefs[-cmdID]
+		if ud ~= nil then
+			ApplyRadarIconTexture(GetUnitIcon(ud.id))
+		end
+	end
+	
+	function externalFunctionsAndData.RemoveRadarIcon()
+		RemoveRadarIconTexture()
 	end
 	
 	function externalFunctionsAndData.SetProgressBar(proportion)
@@ -1601,6 +1705,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 	local gridMap, override
 	local gridEnabled = true
 	local gridUpdatedSinceVisible = false
+	local radarIconsEnabled = false
 	
 	local externalFunctions = {}
 	
@@ -1705,6 +1810,20 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		return
 	end
 	
+	function externalFunctions.UpdateRadarIcons()
+		if options.show_radar_icons.value then
+			radarIconsEnabled = true
+			for i = 1, #buttonList do
+				buttonList[i].ApplyRadarIcon()
+			end
+		elseif radarIconsEnabled then
+			radarIconsEnabled = false
+			for i = 1, #buttonList do
+				buttonList[i].RemoveRadarIcon()
+			end
+		end
+	end
+	
 	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride, updateNonVisible)
 		gridMap = newGridMap or gridMap
 		override = newOverride or override
@@ -1734,6 +1853,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		for i = 1, #buttonList do
 			buttonList[i].OnVisibleGridKeyUpdate()
 		end
+		externalFunctions.UpdateRadarIcons()
 		gridUpdatedSinceVisible = false
 	end
 	
@@ -2245,7 +2365,8 @@ local function InitializeControls()
 	local screenWidth, screenHeight = spGetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
-
+	UpdateRadarIconSizeString(options.radar_icon_size.value)
+	
 	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType2.value)
 	
 	local mainWindow = Window:New{
@@ -2299,7 +2420,7 @@ local function InitializeControls()
 		noFont = true,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
-		noClickThrough = true,
+		noClickThrough = not options.allowclickthrough.value,
 		parent = mainWindow,
 	}
 	

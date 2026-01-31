@@ -948,7 +948,7 @@ local function addUnit(defName, path)
 			name = "  Retreat at value",
 			desc = "Values: inherit from factory, no retreat, 33%, 65%, 99% health remaining",
 			type = 'number',
-			value = -1,
+			value = (ud.isFactory and 0) or -1,
 			min = -1,
 			max = 3,
 			step = 1,
@@ -1147,8 +1147,16 @@ local function AddFactoryOfUnits(defName, plateDefName)
 		addUnit(plateDefName, name)
 	end
 	for i = 1, #ud.buildOptions do
-		addUnit(UnitDefs[ud.buildOptions[i]].name, name)
-		unitsToFactory[UnitDefs[ud.buildOptions[i]].name] = defName
+		local buildeeDef = UnitDefs[ud.buildOptions[i]]
+		local buildeeDefName = buildeeDef.name
+		addUnit(buildeeDefName, name)
+
+		-- sufficiently insane mods can have factories build each other,
+		-- leading to infinite recursion with "inherit from fac" states
+		if not buildeeDef.isFactory then
+
+			unitsToFactory[buildeeDefName] = defName
+		end
 	end
 end
 

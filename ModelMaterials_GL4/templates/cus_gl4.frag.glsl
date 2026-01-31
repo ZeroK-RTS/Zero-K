@@ -115,7 +115,8 @@ uniform float brightnessFactor = 1.5;
 
 float simFrame = (timeInfo.z * 30.0);
 
-float textureLODBias =  -0.5; //-0.5 * sin (simFrame * 0.1) - 0.5;
+float textureLODBiasUnit =  -0.1; //-0.5 * sin (simFrame * 0.1) - 0.5;
+float textureLODBiasFeature =  -0.5; //-0.5 * sin (simFrame * 0.1) - 0.5;
 
 //uniform float pbrParams[8];
 
@@ -206,7 +207,7 @@ const float EPS = 1e-4;
 
 /***********************************************************************/
 // PBR constants
-const float MIN_ROUGHNESS = 0.25;
+const float MIN_ROUGHNESS = 0.02;
 const float DEFAULT_F0 = 0.04;
 
 /***********************************************************************/
@@ -808,7 +809,7 @@ void main(void){
 		#ifdef ENABLE_OPTION_HEALTH_TEXTURING
 			if (BITMASK_FIELD(bitOptions, OPTION_HEALTH_TEXTURING) || BITMASK_FIELD(bitOptions, OPTION_HEALTH_TEXRAPTORS)) {
 				if (healthMix > 0.05){
-					vec3 tbnNormalw = NORM2SNORM(texture(normalTexw, myUV, textureLODBias).xyz);
+					vec3 tbnNormalw = NORM2SNORM(texture(normalTexw, myUV, textureLODBiasUnit).xyz);
 					wrecknormal = tbnNormalw;
 					tbnNormal = mix(tbnNormal, tbnNormalw, healthMix);
 				}
@@ -823,8 +824,14 @@ void main(void){
 
 
 
-	vec4 texColor1 = texture(texture1, myUV, textureLODBias);
-	vec4 texColor2 = texture(texture2, myUV, textureLODBias);
+	#ifdef ENABLE_OPTION_HEALTH_TEXTURING
+	vec4 texColor1 = texture(texture1, myUV, textureLODBiasUnit);
+	vec4 texColor2 = texture(texture2, myUV, textureLODBiasUnit);
+	#else
+	vec4 texColor1 = texture(texture1, myUV, textureLODBiasFeature);
+	vec4 texColor2 = texture(texture2, myUV, textureLODBiasFeature);
+	
+	#endif
 
 	#ifdef SHIFT_RGBHSV
 	/*
@@ -851,13 +858,14 @@ void main(void){
 
 			if (BITMASK_FIELD(bitOptions, OPTION_HEALTH_TEXTURING)) {
 				if (healthMix > 0.05){
-					vec4 texColor1w = texture(texture1w, myUV);
-					vec4 texColor2w = texture(texture2w, myUV);
-					healthMix = (healthMix - 0.05) * 0.9; // Reduce damage texture maximium wreckness
-					healthMix *= (1.0 - 0.9 * texColor2.r); //emissive parts don't get too damaged
+					vec4 texColor1w = texture(texture1w, myUV, textureLODBiasFeature);
+					vec4 texColor2w = texture(texture2w, myUV, textureLODBiasFeature);
+					healthMix = (healthMix - 0.05); // Reduce damage texture maximium wreckness
+					healthMix *= (1.0 - 0.5 * texColor2.r); //emissive parts don't get too damaged
 					texColor1 = mix(texColor1, texColor1w, healthMix);
 					texColor2.xyz = mix(texColor2.xyz, texColor2w.xyz, healthMix);
-					texColor2.z += 0.5 * healthMix; //additional roughness
+					texColor2.z += 0.5 * (1.0 - healthMix); //additional roughness
+					texColor2.y *= (0.8 + 0.2 * healthMix); //less reflectiveness
 				}
 			}
 
@@ -925,6 +933,20 @@ void main(void){
 	#endif
 
 	roughness = clamp(roughness, MIN_ROUGHNESS, 1.0);
+	//float pbrSample = mod(simFrame / 90.0, 4.0);
+	//if (pbrSample < 1.0) {
+	//	roughness = 0.0001;
+	//	metalness = pbrSample;
+	//} else if (pbrSample < 2.0) {
+	//	roughness = pbrSample - 1.0;
+	//	metalness = 1;
+	//} else if (pbrSample < 3.0) {
+	//	roughness = 1.0;
+	//	metalness = 3.0 - pbrSample;
+	//} else {
+	//	roughness = 4.0 - pbrSample;
+	//	metalness = 0.0;
+	//}
 
 	float roughness2 = roughness * roughness;
 	float roughness4 = roughness2 * roughness2;
@@ -1097,8 +1119,6 @@ void main(void){
 		outColor *= EXPOSURE;
 	#endif
 
-
-
 	outColor = TONEMAP(outColor);
 
 	if (BITMASK_FIELD(bitOptions, OPTION_MODELSFOG)) {
@@ -1112,7 +1132,7 @@ void main(void){
 	#endif
 
 	outColor.rgb *= brightnessFactor; // this is to correct for lack of env mapping, the nastiest hack there has ever been...
-
+	
 	//iblDiffuse, iblSpecular
 	//outColor.rgb = iblSpecular;
 	
@@ -1123,9 +1143,10 @@ void main(void){
 		if (buildProgress > -0.5){
 			// myPerlin contains 4 channels of noise with decreasing frequency from r to a
 			myPerlin= myPerlin;
+			buildProgress = buildProgress * 1.05; // Counteract division in CUS gadget
 			
 			// Height is the relative height of the fragment in the model compared to the full height
-			float height = clamp(pieceVertexPosOrig.w/1.0,0,1);
+			float height = clamp(pieceVertexPosOrig.w * 0.82, 0,1);
 
 			// Helper sinusoidal patterns:
 			float sintime = 0.5 + 0.5 * sin(simFrame * 0.1); // pulses every 3 seconds
@@ -1140,7 +1161,7 @@ void main(void){
 			// Add perlin and ensure that perlin doesnt cause inaccuracy at the top of the model:
 			progressLevels = mix(progressLevels, vec4(myPerlin.g + myPerlin.b*sin(simFrame * 0.042342)), 0.05 * smoothstep(0.00, 0.05, 1.0 - buildProgress));
 			
-			vec4 levelLines = clamp(1.0 - 100 * abs(progressLevels - vec4(height)), 0,1);
+			vec4 levelLines = clamp(1.0 - 90 * abs(progressLevels - vec4(height)), 0, 1);
 
 			// levelFactor is 1 when the height of a fragment is within 1% of a progressLevel, 0 otherwise.
 			float levelFactor = dot(levelLines, vec4(1.0));
@@ -1155,19 +1176,23 @@ void main(void){
 
 			// Compute anti-aliased world-space grid lines
 			vec3 fragSize = fwidth(worldVertexPos.xyz);
-			float fragSizeFactor = 1.0/  dot(vec3(1.0),fragSize);
-			vec3 buildGrid = abs(fract(worldVertexPos.xyz/8.0 - 0.5) - 0.5) * (8)/fragSize;
-			float line = 1.0 - min(min(buildGrid.x, buildGrid.y), buildGrid.z);
-			line = clamp(line * smoothstep(-0.5, 1.0, fragSizeFactor),0.0,1.0);
-			
-			// A dynamic grid which starts at 12 elmos size, then shrinks to 2 elmos size at 100% buildProgress
-			float gridSize = clamp((1.0 - buildProgress) * 10 + 2, 2, 12);
-			vec3 grid = step(0.5, clamp(1.0 - 10* fract((pieceVertexPosOrig.xyz) / gridSize), 0.0, 1.0));
+			float fragSizeFactor = 1.0/dot(vec3(1.0), fragSize);
 
+			float grid1factor = clamp(1.2 - 2.0 * buildProgress, 0.0, 1.0);
+			float grid3factor = clamp(2.4 * buildProgress - 1.35, 0.0, 1.0);
+			float grid2factor = clamp(1.0 - grid1factor - grid3factor, 0.0, 1.0);
+			float widthFactor = (1.0 + clamp((clamp(buildProgress, 0.0, 1.0) - 0.92)*100.0, 0.0, 30.0));
 
-			// The entire model will always get the 8 elmo buildgrid:
-			//outColor.rgb = mix(outColor.rgb, vec3(1.0, 0.0, 1.0), buildGridFactor);
-			//outColor.rgb = vec3(buildGridFactor); 
+			vec3 buildGrid1 = abs(fract(worldVertexPos.xyz/8.0 - 0.5) - 0.5) * (6.0)/fragSize;
+			float line1 = 1.0 - min(min(buildGrid1.x, buildGrid1.y), buildGrid1.z);
+			vec3 buildGrid2 = abs(fract(worldVertexPos.xyz/4.0 - 0.5) - 0.5) * (3.0)/fragSize;
+			float line2 = 1.0 - min(min(buildGrid2.x, buildGrid2.y), buildGrid2.z);
+			vec3 buildGrid3 = abs(fract(worldVertexPos.xyz/2.0 - 0.5) - 0.5) * (1.5 / widthFactor)/fragSize;
+			float line3 = 1.0 - min(min(buildGrid3.x, buildGrid3.y), buildGrid3.z);
+			float line = clamp(line1 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * grid1factor +
+					clamp(line2 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * 0.5 * grid2factor +
+					clamp(line3 * smoothstep(-0.5, 1.0, fragSizeFactor), 0.0, 1.0) * 0.25 * grid3factor * (1.0 + widthFactor * 0.01);
+
 			vec3 pulseTeamColor = mix(teamCol.rgb, teamCol.rgb * 1.35, sintimefast );
 
 			// Second to bottom level, ensure that we dont emit light
@@ -1203,19 +1228,18 @@ void main(void){
 				#endif
 			}
 
-			
-			// Always display a grid when building, but fade it out on the last 5% of buildProgress
-			float last5percent = smoothstep(0.0, 0.08, 1.02 - buildProgress);
-			outColor.rgb = mix(outColor.rgb, pulseTeamColor , line * last5percent);
+			// Fade build grid out after completion
+			float excessFactor = (1.0 - clamp(20.0 * (buildProgress - 1.0), 0.0, 1.0));
+			outColor.rgb = mix(outColor.rgb, pulseTeamColor, line * excessFactor);
 
 			// Always show level lines
-			outColor.rgb += vec3(levelFactor);
+			outColor.rgb += vec3(levelFactor) * excessFactor;
 
 			// Add bloom for the levels:
-			outSpecularColor+= vec3(levelFactor);
+			outSpecularColor+= vec3(levelFactor) * excessFactor;
 
 			// Add bloom for the grid lines:
-			outSpecularColor+= pulseTeamColor * line * sintimefast * 2.0 ;
+			outSpecularColor+= pulseTeamColor * line * sintimefast * 2.0 * excessFactor;
 	
 		}
 	#endif
@@ -1232,17 +1256,20 @@ void main(void){
 		if (selectedness != 0.0){
 			float isWreck = (selectedness < 0.0 ) ? 1.0 : 0.0;
 			float mouseoverOpacity = (selectedness >= 1.0 && selectedness < 2.0) ? fract(selectedness) : 0.0;
-			float edge = fract(worldVertexPos.y * 0.06 + (simFrame) * 0.04);
-			edge = mix(edge, 0.0, edge*edge*edge*edge*edge);
+			float edge = fract(worldVertexPos.y * 0.03 + (simFrame) * 0.045);
+			float edgePower = edge*edge;
+			edgePower = edgePower*edgePower;
+			edgePower = edgePower*edgePower*edgePower;
+			edge = mix(edge, 0.0, edgePower);
 			
 			float wreckIntensity = fract((simFrame) * 0.025);
 			wreckIntensity = 0.4 + 0.55 * (min(0.5, wreckIntensity) + min(0.5, 1.0 - wreckIntensity) - 0.5);
-			wreckIntensity *= 0.5 + 0.5 * edge;
+			wreckIntensity = 0.15 + wreckIntensity * 0.85 * (0.15 + 0.85 * edge);
 
 			// Team colour highlight
 			vec4 mouseOverHighlight = vec4(0);
 			mouseOverHighlight.rgb = clamp(teamCol.rgb, 0.65, 1.0);
-			mouseoverOpacity *= 0.7 + 0.4 * edge;
+			mouseoverOpacity *= 0.3 + 0.7 * edge;
 			
 			// Wreck metal determines colour
 			float x100  = 80.0  / (80.0  - min(0.0, selectedness));
@@ -1257,8 +1284,8 @@ void main(void){
 			highLightOpacity = highLightOpacity * highLightOpacity;
 
 			// Mix some negative base colour intensity to mitigate over-highlighting bright map features
-			outColor.rgb += isWreck * mix(-1.0 * outColor.rgb, wreckHiglight * wreckIntensity, 0.8);
-			outColor.rgb = mix(outColor.rgb, outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, mouseoverOpacity);
+			outColor.rgb += isWreck * mix(-1.0 * clamp((outColor.rgb - 0.4) * 1.6, 0.0, 1.0), wreckHiglight * wreckIntensity, 0.8);
+			outColor.rgb = mix(outColor.rgb, clamp(outColor.rgb + mouseOverHighlight.rgb * mouseoverOpacity, 0.0, 0.95), mouseoverOpacity);
 		}
 	#endif 
 
@@ -1293,26 +1320,26 @@ void main(void){
 			}
 			float sintime = fract(simFrame * 0.02); // pulses every 3 seconds
 			myPerlin.g = myPerlin.g * 0.5 + 0.5;
-			texColor2.a = 1.0 - clamp(cloakedness*0.49, 0.0, 0.49);
-			float perlinline1 = clamp(1.0 - 20* abs(myPerlin.g - fract(simFrame * 0.005)), 0.0, 1.0);
-			float perlinline2 = clamp(1.0 - 20* abs(myPerlin.g - fract(simFrame * 0.005 + 0.5)), 0.0, 1.0);
+			texColor2.a = 1.0 - clamp(cloakedness*0.4, 0.0, 0.4);
+			float perlinline1 = clamp(1.0 - 18.0* abs(myPerlin.g - fract(simFrame * 0.005)), 0.0, 1.0);
+			float perlinline2 = clamp(1.0 - 18.0* abs(myPerlin.g - fract(simFrame * 0.005 + 0.5)), 0.0, 1.0);
 			float cloaknoise = cloakedness*perlinline1 + cloakedness*perlinline2;
 			if (isEnemy) {
 				texColor2.a = 1.0 - clamp(cloakedness * (1.0 + cloaknoise * 2.0), 0.0, 1.0);
 			} else {
 				outColor.rgb = mix(outColor.rgb, teamCol.rgb, cloakedness*(0.2 + (perlinline2 + perlinline2) * 1.5));
 			}
-			outColor.rgb += cloaknoise * 0.8;
+			outColor.rgb += cloaknoise;
 
 			#if 1
 			float dotcamera = dot(worldNormal, V);
 
-			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1)*0.8 + 0.2;
+			float highLightOpacity = clamp(1.0 - dotcamera, 0, 1)*0.6 + 0.05;
 			highLightOpacity = highLightOpacity * highLightOpacity;
-			outColor.rgb = mix(outColor.rgb * (1.0 - cloakedness*0.4), teamCol.rgb * 6.0, highLightOpacity * cloakedness);
+			outColor.rgb = mix(outColor.rgb * (1.0 - cloakedness*0.32), teamCol.rgb * 6.0, highLightOpacity * cloakedness);
 			
 			//Add bloom to the perlin noise:
-			outSpecularColor.rgb+= vec3(clamp(cloaknoise * 0.75,0.0,1.0));
+			outSpecularColor.rgb += vec3(clamp(cloaknoise * 0.75,0.0,1.0));
 			#endif
 		} 
 	#endif

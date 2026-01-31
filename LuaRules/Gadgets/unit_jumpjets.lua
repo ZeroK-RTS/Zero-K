@@ -63,13 +63,14 @@ local mcSetRotation          = MoveCtrl.SetRotation
 local mcDisable              = MoveCtrl.Disable
 local mcEnable               = MoveCtrl.Enable
 
-local SetLeaveTracks = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
+local SetLeaveTracks         = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
+local utRandomPointInCircle  = Spring.Utilities.Vector.RandomPointInCircle
 
 local emptyTable = {}
 
 local coroutines = {}
 local lastJumpPosition = {}
-local landBoxSize = 50
+local landBoxSize = 40
 local OFF_MAP_LEEWAY = 1
 local jumps = {}
 local jumping = {}
@@ -544,6 +545,27 @@ local function UpdateCoroutines()
 	end
 end
 
+local function ValidJumpLocation(unitDefID, pos)
+	if spTestMoveOrderX(unitDefID, pos[1], pos[2], pos[3]) then
+		return true
+	end
+	-- Check whether the terrain is the source of the blockage. If it is not then
+	-- conclude that the blockage is a structure.
+	-- Jumping into water is allowed.
+	
+	local normal = select(2, spGetGroundNormal(pos[1],pos[3]))
+	-- Most of the time the normal will be close to 1 because structures are built on
+	-- flat ground. This check captures high slope tolerance things such as Windgens and
+	-- small turrets.
+	if normal < 0.6 then
+		-- Ground is too steep for bots to walk on.
+		return false
+	end
+	
+	-- Ground is fine, must contain a blocking structure.
+	return true
+end
+
 function gadget:Initialize()
 	Spring.SetGameRulesParam("jumpJets", 1)
 	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 0.7})
@@ -573,7 +595,6 @@ function gadget:UnitDestroyed(oldUnitID, unitDefID)
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-
 	if cmdID == CMD.INSERT and cmdParams[2] == CMD_JUMP then
 		return gadget:AllowCommand(unitID, unitDefID, teamID, CMD_JUMP, {cmdParams[4], cmdParams[5], cmdParams[6]}, cmdParams[3])
 	end
@@ -590,25 +611,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 	
 	if cmdID == CMD_JUMP and cmdParams[3] then
-		if spTestMoveOrderX(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3]) then
-			return true
-		else
-			-- Check whether the terrain is the source of the blockage. If it is not then
-			-- conclude that the blockage is a structure.
-			-- Jumping into water is allowed.
-			
-			local normal = select(2, spGetGroundNormal(cmdParams[1],cmdParams[3]))
-			-- Most of the time the normal will be close to 1 because structures are built on
-			-- flat ground. This check captures high slope tolerance things such as Windgens and
-			-- small turrets.
-			if normal < 0.6 then
-				-- Ground is too steep for bots to walk on.
-				return false
-			end
-			
-			-- Ground is fine, must contain a blocking structure.
-			return true
-		end
+		return ValidJumpLocation(unitDefID, cmdParams)
 	end
 	if goalSet[unitID] then
 		goalSet[unitID] = nil
@@ -678,11 +681,24 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				jumps[coords] = {1, currFrame} --memorize coordinate so that next unit can choose different landing site
 				return true, false -- command was used but don't remove it (unit have not finish jump yet)
 			else
-				local r = landBoxSize*jumps[coords][1]^0.5/2
-				local randpos = {
-					cmdParams[1] + random(-r, r),
-					cmdParams[2],
-					cmdParams[3] + random(-r, r)}
+				local radius = landBoxSize*jumps[coords][1]^0.5/2
+				local tries = 3
+				local randpos = {0, cmdParams[2], 0}
+				while tries > 0 do
+					local offset = utRandomPointInCircle(radius)
+					randpos[1] = cmdParams[1] + offset[1]
+					randpos[3] = cmdParams[3] + offset[2]
+					if ValidJumpLocation(unitDefID, randpos) then
+						tries = 0
+					elseif tries == 1 then
+						tries = 0
+						randpos[1] = cmdParams[1]
+						randpos[3] = cmdParams[3]
+					else
+						tries = tries - 1
+						radius = radius * 0.8
+					end
+				end
 				local didJump, removeCommand = Jump(unitID, randpos, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used

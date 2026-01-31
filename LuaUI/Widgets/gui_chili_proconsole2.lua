@@ -1431,7 +1431,7 @@ function widget:Update(s)
 			SwapBacklog()
 		end
 		firstUpdate = false
-		SetInputFontSize(15)
+		SetInputFontSize(18)
 	end
 end
 
@@ -1606,7 +1606,7 @@ function widget:Shutdown()
 	if (window_chat) then
 		window_chat:Dispose()
 	end
-	SetInputFontSize(20)
+	SetInputFontSize(18)
 	Spring.SendCommands({"console 1", "inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
 	

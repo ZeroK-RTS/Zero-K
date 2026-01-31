@@ -66,6 +66,7 @@ local weaponBlocked = false
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
+local SIG_MOONWALK = 4
 
 local PACE = 0.8
 
@@ -255,13 +256,28 @@ local function StopWalk()
 	Turn(larm, x_axis, 0, math.rad(10))
 end
 
-function unmoonwalkFunc()
-	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
-	if speed == 0 then
-		StartThread(StopWalk)
+local function MoonwalkThread()
+	Signal(SIG_MOONWALK)
+	SetSignalMask(SIG_MOONWALK)
+	while true do
+		local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+		if speed < 0.4 then
+			StartThread(StopWalk)
+		else
+			StartThread(Walk)
+		end
+		
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local h = Spring.GetGroundHeight(x, z)
+		if math.abs(h - y) < 0.01 then
+			return
+		end
+		Sleep(800)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+end
+
+function unmoonwalkFunc()
+	StartThread(MoonwalkThread)
 end
 
 function script.StartMoving()

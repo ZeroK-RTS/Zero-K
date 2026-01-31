@@ -32,7 +32,7 @@ local function Close()
 
 	SetUnitValue(COB.YARD_OPEN, 0)
 	--SetUnitValue(COB.BUGGER_OFF, 0)
-	SetInBuildDistance(fals)
+	SetInBuildDistance(false)
 
 	Move (nano, y_axis, 0, 17.5)
 	WaitForMove (nano, y_axis)

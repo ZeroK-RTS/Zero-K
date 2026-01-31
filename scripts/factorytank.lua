@@ -141,6 +141,11 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {pipe, lidh2, piece "smoke_1"})
 	Spring.SetUnitNanoPieces(unitID, {emit})
+	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	while buildprogress < 1 do
+		Sleep(250)
+		buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	end
 	StartThread(Open)
 end
 

@@ -13,7 +13,7 @@ return { spideraa = {
   customParams           = {
     bait_level_default = 0,
     cus_noflashlight = 1,
-    okp_damage = 265.1,
+    okp_damage = 305.1,
     normaltex = [[unittextures/tarantula_normals.dds]],
   },
 
@@ -70,8 +70,8 @@ return { spideraa = {
       },
 
       damage                  = {
-        default = 27,
-        planes  = 270.01,
+        default = 31,
+        planes  = 310.01,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

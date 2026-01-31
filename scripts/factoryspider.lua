@@ -13,6 +13,7 @@ local function Open ()
 	Turn (arm_2, x_axis, math.rad(170), math.rad(170))
 	Turn (arm_3, x_axis, math.rad(-60), math.rad(60))
 	Turn (nanobase, x_axis, math.rad(10), math.rad(10))
+	WaitForTurn(nanobase, x_axis)
 
 	SetUnitValue(COB.YARD_OPEN, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
@@ -37,6 +38,12 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
+	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	while buildprogress < 1 do
+		Sleep(250)
+		buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	end
+	StartThread(Open)
 end
 
 function script.Activate ()

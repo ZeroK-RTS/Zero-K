@@ -356,18 +356,18 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	
 	--// Radar dot handling. Radar dots are not handled by subsequent areas because a unit which is
 	-- identified but not visible cannot have priority based on health or other status effects.
-	local visiblity = cache_GetUnitVisibility(targetID, allyTeam)
+	local visibility = cache_GetUnitVisibility(targetID, allyTeam)
 
-	if visiblity ~= 2 then
+	if visibility ~= 2 then
 		local wobbleAdd = (radarDotPenalty[attackerWeaponDefID] or 0)
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
 		if radarWobblePenalty[attackerWeaponDefID] and (visibility == 0 or not remStatic[enemyUnitDefID]) then
 			wobbleAdd = radarWobblePenalty[attackerWeaponDefID]
 		end
 		
-		if visiblity == 0 then
+		if visibility == 0 then
 			return true, 25 + wobbleAdd + velocityAdd + lastShotBonus
-		elseif visiblity == 1 then
+		elseif visibility == 1 then
 			-- If the unit type is accessible then it can be included in the priority calculation.
 			return true, GetPriority(enemyUnitDefID, attackerWeaponDefID) + wobbleAdd + velocityAdd + 1.5 + lastShotBonus
 		end

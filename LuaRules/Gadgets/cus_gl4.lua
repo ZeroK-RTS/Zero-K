@@ -232,6 +232,8 @@ local numUnitsInViewport = 0
 local featuresInViewport = {} --featureID:featureDefID
 local numFeaturesInViewport = 0
 
+local myAllyTeamID = Spring.GetMyAllyTeamID()
+
 -- Unit state changes whether they want to go into the transparent unit bin.
 -- The table transparentUnitBin stores whether they are actually in those bins.
 -- This table is only updated when units leave and reenter the view. TODO: update on state change.
@@ -298,6 +300,7 @@ local cusUnitIDtoDrawFlag = {} -- {unitID = drawFlag, ...}, these remain positiv
 
 -- For managing under construction units:
 local buildProgresses = {} -- keys unitID, value buildprogress, updated each frame for units being built
+local buildProgressDecay = {} -- units that retain build GFX after being built.
 local uniformCache = {}
 local spGetUnitHealth = Spring.GetUnitHealth
 -- local processedUnits = {}
@@ -399,9 +402,18 @@ end
 local function UpdateBuildProgress(unitID, buildProgress, forceRetain)
 	local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
 	if health and build ~= buildProgress then
-		uniformCache[1] = ((build < 1) and build) or -1
+		build = ((build < 1) and build) or -1
+		if buildProgress and build == -1 then
+			buildProgressDecay[unitID] = (buildProgressDecay[unitID] or 0.05) - 0.003
+			if buildProgressDecay[unitID] > 0 then
+				build = 1.05 - buildProgressDecay[unitID]
+			else
+				buildProgressDecay[unitID] = false
+			end
+		end
+		uniformCache[1] = build / 1.05 -- Uniform > 1 seems to distort the model for some reason
 		gl.SetUnitBufferUniforms(unitID, uniformCache, 0) -- buildprogress (0.x)
-		if build < 1 or forceRetain then
+		if (build < 1 and build > -1) or buildProgressDecay[unitID] or forceRetain then
 			buildProgresses[unitID] = build
 		else
 			buildProgresses[unitID] = nil
@@ -849,7 +861,7 @@ local function IsTree(featureDef)
 	if knowntrees[name] then
 		return true
 	end
-	return (name:find("tree", nil, true) or name:find("pine", nil, true)) and not name:find("stree", nil, true) -- sTREEtlight
+	return (name:find("tree", nil, true) or name:find("pine", nil, true) or name:find("palm", nil, true)) and not name:find("stree", nil, true) -- sTREEtlight
 end
 
 local knownPbrFeatures = VFS.Include("modelmaterials_gl4/known_pbr_features.lua")
@@ -1247,7 +1259,7 @@ local function AddObject(objectID, drawFlag, reason)
 		cusUnitIDtoDrawFlag[objectID] = drawFlag
 		local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(objectID)
 		if health then
-			uniformCache[1] = ((build < 1) and build) or -1
+			uniformCache[1] = buildProgresses[unitID] or ((build < 1) and build) or -1
 			gl.SetUnitBufferUniforms(objectID, uniformCache, 0) -- buildprogress (0.x)
 			if build < 1 then
 				buildProgresses[objectID] = build
@@ -1420,12 +1432,16 @@ local function RemoveObject(objectID, reason) -- we get pos/neg objectID here
 	objectIDtoDefID[objectID] = nil
 	if objectID >= 0 then
 		cusUnitIDtoDrawFlag[objectID] = nil
-		buildProgresses[objectID] = nil
 		Spring.SetUnitEngineDrawMask(objectID, 255)
 	else
 		cusFeatureIDtoDrawFlag[-1 * objectID] = nil
 		Spring.SetFeatureEngineDrawMask(-1 * objectID, 255)
 	end
+end
+
+local function VisibleUnitPosition(unitID)
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	return x and z and Spring.IsPosInLos(x, 0, z, myAllyTeamID)
 end
 
 local function ProcessCusUnit(unitID, drawFlag, gameFrame, reason)
@@ -1440,7 +1456,7 @@ local function ProcessCusUnit(unitID, drawFlag, gameFrame, reason)
 			return
 		end
 		if cloakLingerUnitFrame[unitID] then
-			drawFlag = 1
+			drawFlag = VisibleUnitPosition(unitID) and 1 or Spring.GetUnitDrawFlag(unitID)
 			cloakLingerUnitList = cloakLingerUnitList or {}
 			cloakLingerUnitList[#cloakLingerUnitList + 1] = unitID
 			nextLingerUpdate = nextLingerUpdate and math.min(nextLingerUpdate, cloakLingerUnitFrame[unitID]) or cloakLingerUnitFrame[unitID]
@@ -1878,91 +1894,8 @@ local function FreeTextures() -- pre we are using 2200mb
 end
 
 --------------------------------------------------------------------
--- More Unsynced Luarules API
+-- Unit Updating
 --------------------------------------------------------------------
-
-local function SetUnitTexture(unitID, tex1, tex2)
-	RemoveObject(unitID, "override_texture")
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
-end
-
---------------------------------------------------------------------
--- Gadget Callins
---------------------------------------------------------------------
-
-function gadget:GameFrame(n)
-	if not itsXmas and SYNCED.itsXmas then
-		itsXmas = true
-		initiated = false
-		ReloadCUSGL4(nil, nil, nil, Spring.GetMyPlayerID())
-	end
-	for unitID, buildProgress in pairs(buildProgresses) do
-		UpdateBuildProgress(unitID, buildProgress)
-	end
-end
-
-function gadget:Initialize()
-	gadgetHandler:AddChatAction("reloadcusgl4", ReloadCUSGL4)
-	gadgetHandler:AddChatAction("disablecusgl4", DisableCUSGL4)
-	gadgetHandler:AddChatAction("cusgl4updaterate", CUSGL4updaterate)
-	gadgetHandler:AddChatAction("debugcusgl4", DebugCUSGL4)
-	gadgetHandler:AddChatAction("dumpcusgl4", DumpCUSGL4)
-	gadgetHandler:AddChatAction("markbincusgl4", MarkBinCUSGL4)
-	gadgetHandler:AddChatAction("freetextures", FreeTextures)
-	if not initiated and tonumber(Spring.GetConfigInt("cus2", 1) or 1) == 1 then
-		initGL4()
-	end
-	
-	GG.CUSGL4 = {}
-	GG.CUSGL4.unitsInViewport = unitsInViewport
-	GG.CUSGL4.featuresInViewport = featuresInViewport
-	GG.CUSGL4.objectDefToBitShaderOptions = objectDefToBitShaderOptions
-	GG.CUSGL4.objectDefToUniformBin = objectDefToUniformBin
-	GG.CUSGL4.GetUniformBinID = GetUniformBinID
-	GG.CUSGL4.uniformBins = uniformBins
-	GG.CUSGL4.uniformBins = uniformBins
-	GG.CUSGL4.shaders = shaders
-	GG.CUSGL4.GetShader = GetShader
-	GG.CUSGL4.GetShaderName = GetShaderName
-	GG.CUSGL4.SetShaderUniforms = SetShaderUniforms
-	GG.CUSGL4.SetUnitTexture = SetUnitTexture
-	GG.CUSGL4.enabled = true
-end
-
-function gadget:Shutdown()
-	if debugmode then Spring.Echo(unitDrawBins, 'unitDrawBins') end
-
-	for unitID, _ in pairs(cusUnitIDtoDrawFlag) do
-		RemoveObject(unitID, "shutdown")
-	end
-
-	for featureID, _ in pairs(cusFeatureIDtoDrawFlag) do
-		RemoveObject(-1 * featureID, "shutdown")
-	end
-	if unitDrawBins then
-		for drawFlag, bins in pairs(unitDrawBins) do
-			for shaderName, _ in pairs(bins) do
-				shaders[drawFlag][shaderName]:Finalize()
-			end
-		end
-	end
-	modelsVertexVBO = nil
-	modelsIndexVBO = nil
-
-	unitDrawBins = nil
-	initiated = false
-	--gadgetHandler:RemoveChatAction("disablecusgl4")
-	--gadgetHandler:RemoveChatAction("reloadcusgl4")
-	--gadgetHandler:RemoveChatAction("cusgl4updaterate")
-	if GG.CUSGL4 then
-		for k, v in pairs(GG.CUSGL4) do
-			GG.CUSGL4[k] = nil
-		end
-	end
-	
-	GG.CUSGL4 = nil
-end
 
 local updateframe = 0
 
@@ -2012,8 +1945,114 @@ local function UpdateUnit(unitID, flag)
 	destroyedUnitDrawFlags[numdestroyedUnits] = flag
 end
 
+--------------------------------------------------------------------
+-- More Unsynced Luarules API
+--------------------------------------------------------------------
+
+local function SetUnitTexture(unitID, tex1, tex2)
+	RemoveObject(unitID, "override_texture")
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	LoadUnitTextureSet(unitDefID, UnitDefs[unitDefID], unitID, tex1, tex2)
+	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
+end
+
+--------------------------------------------------------------------
+-- Gadget Callins
+--------------------------------------------------------------------
+
+local updateCloaked = 5
+function gadget:GameFrame(n)
+	if not itsXmas and SYNCED.itsXmas then
+		itsXmas = true
+		initiated = false
+		ReloadCUSGL4(nil, nil, nil, Spring.GetMyPlayerID())
+	end
+	for unitID, buildProgress in pairs(buildProgresses) do
+		UpdateBuildProgress(unitID, buildProgress)
+	end
+	if updateCloaked then
+		updateCloaked = updateCloaked - 1
+		if updateCloaked <= 0 then
+			for _, unitID in ipairs(Spring.GetAllUnits()) do
+				if Spring.GetUnitIsCloaked(unitID) then
+					gadget:UnitDecloaked(unitID)
+					gadget:UnitCloaked(unitID)
+				end
+			end
+			updateCloaked = false
+		end
+	end
+end
+
+function gadget:Initialize()
+	gadgetHandler:AddChatAction("reloadcusgl4", ReloadCUSGL4)
+	gadgetHandler:AddChatAction("disablecusgl4", DisableCUSGL4)
+	gadgetHandler:AddChatAction("cusgl4updaterate", CUSGL4updaterate)
+	gadgetHandler:AddChatAction("debugcusgl4", DebugCUSGL4)
+	gadgetHandler:AddChatAction("dumpcusgl4", DumpCUSGL4)
+	gadgetHandler:AddChatAction("markbincusgl4", MarkBinCUSGL4)
+	gadgetHandler:AddChatAction("freetextures", FreeTextures)
+	if not initiated and tonumber(Spring.GetConfigInt("cus2", 1) or 1) == 1 then
+		initGL4()
+	end
+	
+	GG.CUSGL4 = {}
+	GG.CUSGL4.unitsInViewport = unitsInViewport
+	GG.CUSGL4.featuresInViewport = featuresInViewport
+	GG.CUSGL4.objectDefToBitShaderOptions = objectDefToBitShaderOptions
+	GG.CUSGL4.objectDefToUniformBin = objectDefToUniformBin
+	GG.CUSGL4.GetUniformBinID = GetUniformBinID
+	GG.CUSGL4.uniformBins = uniformBins
+	GG.CUSGL4.uniformBins = uniformBins
+	GG.CUSGL4.shaders = shaders
+	GG.CUSGL4.GetShader = GetShader
+	GG.CUSGL4.GetShaderName = GetShaderName
+	GG.CUSGL4.SetShaderUniforms = SetShaderUniforms
+	GG.CUSGL4.SetUnitTexture = SetUnitTexture
+	GG.CUSGL4.enabled = true
+end
+
+function gadget:PlayerChanged(playerID)
+	myAllyTeamID = Spring.GetMyAllyTeamID()
+end
+
+function gadget:Shutdown()
+	if debugmode then Spring.Echo(unitDrawBins, 'unitDrawBins') end
+
+	for unitID, _ in pairs(cusUnitIDtoDrawFlag) do
+		RemoveObject(unitID, "shutdown")
+	end
+
+	for featureID, _ in pairs(cusFeatureIDtoDrawFlag) do
+		RemoveObject(-1 * featureID, "shutdown")
+	end
+	if unitDrawBins then
+		for drawFlag, bins in pairs(unitDrawBins) do
+			for shaderName, _ in pairs(bins) do
+				shaders[drawFlag][shaderName]:Finalize()
+			end
+		end
+	end
+	modelsVertexVBO = nil
+	modelsIndexVBO = nil
+
+	unitDrawBins = nil
+	initiated = false
+	--gadgetHandler:RemoveChatAction("disablecusgl4")
+	--gadgetHandler:RemoveChatAction("reloadcusgl4")
+	--gadgetHandler:RemoveChatAction("cusgl4updaterate")
+	if GG.CUSGL4 then
+		for k, v in pairs(GG.CUSGL4) do
+			GG.CUSGL4[k] = nil
+		end
+	end
+	
+	GG.CUSGL4 = nil
+end
+
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, weaponDefID)
 	--UpdateUnit(unitID, 0) -- having this here means that dying units lose CUS, RenderUnitDestroyed _should_ be fine
+	buildProgresses[unitID] = nil
 end
 
 function gadget:RenderUnitDestroyed(unitID, unitDefID)
@@ -2021,8 +2060,6 @@ function gadget:RenderUnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:UnitFinished(unitID)
-	gl.SetUnitBufferUniforms(unitID, {-1}, 0) -- set build progress to built
-	buildProgresses[unitID] = nil
 	wantTranparent[unitID] = false
 	UpdateUnit(unitID, Spring.GetUnitDrawFlag(unitID))
 end
@@ -2154,7 +2191,8 @@ function gadget:DrawWorldPreUnit()
 		--	Spring.Echo(printDrawPassStats())
 		--end
 		local totalobjects = #units + #features + numdestroyedUnits + numdestroyedFeatures
-		if cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate >= gameFrame) then
+		local wantCloakUpdate = cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate <= gameFrame)
+		if wantCloakUpdate then
 			totalobjects = totalobjects + #cloakLingerUnitList
 		end
 		
@@ -2196,14 +2234,14 @@ function gadget:DrawWorldPreUnit()
 			local firstunits = Spring.GetVisibleUnits()
 			local firstdrawFlagsUnits = {}
 			for i, unitID in ipairs(firstunits) do
-				firstdrawFlagsUnits[i] = 1 + 4 + 16
+				firstdrawFlagsUnits[i] = Spring.GetUnitDrawFlag(unitID)
 			end
 			ProcessUnits(firstunits, firstdrawFlagsUnits, gameFrame, "firstDraw")
 			firstDraw = false
 		end
 
 		ProcessUnits(units, drawFlagsUnits, gameFrame, "changed")
-		if cloakLingerUnitList and ((not nextLingerUpdate) or nextLingerUpdate >= gameFrame) then
+		if wantCloakUpdate then
 			local checkUnits = cloakLingerUnitList
 			cloakLingerUnitList = false
 			nextLingerUpdate = false

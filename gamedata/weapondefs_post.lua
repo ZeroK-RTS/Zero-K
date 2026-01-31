@@ -151,6 +151,18 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Nicer missile trails https://github.com/beyond-all-reason/RecoilEngine/pull/2736/files
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.smoketrail and not weaponDef.smokeperiod then
+		weaponDef.smokeperiod = 1
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Set lenient fire tolerance
 
 for _, weaponDef in pairs(WeaponDefs) do
@@ -219,6 +231,18 @@ end
 for _, weaponDef in pairs(WeaponDefs) do
 	if weaponDef.weapontype == "LaserCannon" then
 		weaponDef.burnblow = false
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Apply implicit default StarburstLauncher turn rate (for lua).
+-- See https://github.com/beyond-all-reason/RecoilEngine/issues/2762
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "StarburstLauncher" and (weaponDef.turnrate or 0) == 0 then
+		weaponDef.turnrate = 18775
 	end
 end
 

@@ -1,0 +1,26 @@
+return {
+	["defaultSunDir"]= false,
+	["sun"]= {
+		["groundDiffuseColor"]= {1, 1, 1, 1},
+		["groundAmbientColor"]= {0.55000001, 0.50999999, 0.50999999, 1},
+		["unitSpecularColor"]= {0.86666667, 0.60000002, 0.60000002, 1},
+		["modelShadowDensity"]= 0.75,
+		["specularExponent"]= 30,
+		["groundSpecularColor"]= {0, 0, 0, 1},
+		["groundShadowDensity"]= 0.75,
+		["unitDiffuseColor"]= {0.69523811, 0.69047618, 0.69047618, 1},
+		["unitAmbientColor"]= {0.52380955, 0.52857143, 0.52380955, 1},
+	},
+	["fog"]= {
+		["sunColor"]= {0.80000001, 0.80000001, 0.80000001, 1},
+		["fogStart"]= 0.99000001,
+		["fogColor"]= {0.80000001, 0.80000001, 0.80000001, 1},
+		["cloudColor"]= {0.80000001, 0.80000001, 0.80000001, 1},
+		["skyColor"]= {0.80000001, 0.80000001, 0.80000001, 1},
+		["fogEnd"]= 1,
+	},
+	["water"]= false,
+	["fixDefaultWater"]= false,
+	["direction"]= false,
+	["skipShadowDensityFix"]= false,
+}

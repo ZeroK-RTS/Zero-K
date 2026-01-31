@@ -170,9 +170,14 @@ function script.Create()
 	--Move(Root, z_axis, -40)
 	--StartThread(Test)
 	
-	StartThread(Open)
-	
 	Spring.SetUnitNanoPieces(unitID, {Nano1, Nano2})
+	
+	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	while buildprogress < 1 do
+		Sleep(250)
+		buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	end
+	StartThread(Open)
 end
 
 function script.StopBuilding()

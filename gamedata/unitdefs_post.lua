@@ -112,6 +112,30 @@ do
 	end
 end
 
+-- New units
+
+
+do
+	local append = false
+	local modoptName = "extraunits"
+	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
+		local units = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
+		if type(tweaks) == "table" then
+			Spring.Echo("Loading extraunits modoption", append or 0)
+			for name, ud in pairs(units) do
+				Spring.Echo("Loading extraunit " .. name)
+				local ud = lowerkeys(ud)
+				if ud.customparams.base_def then
+					Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(UnitDefs[ud.customparams.base_def]), true)
+				end
+				UnitDefs[name] = ud
+			end
+		end
+		append = (append or 0) + 1
+		modoptName = "extraunits" .. append
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

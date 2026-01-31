@@ -555,6 +555,14 @@ local options = {
     def     = "",
   },
   {
+    key     = "extraunits",
+    name    = "Extra Units",
+    desc    = "A base64 encoded definition of extra units. Use customparams.base_def to use an existing unit as a base.",
+    section = 'experimental',
+    type    = "string",
+    def     = "",
+  },
+  {
     key     = "option_notes",
     name    = "Notes",
     desc    = "A message that is displayed at the start of the game.",

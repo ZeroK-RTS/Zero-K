@@ -54,7 +54,13 @@ function script.Create()
 	Move(center2, z_axis, 20)
 	Move(side1, z_axis, 20)
 	Move(side2, z_axis, 10)
-	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
+	
+	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	while buildprogress < 1 do
+		Sleep(250)
+		buildprogress = select(5, Spring.GetUnitHealth(unitID))
+	end
+	StartThread(Open)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
