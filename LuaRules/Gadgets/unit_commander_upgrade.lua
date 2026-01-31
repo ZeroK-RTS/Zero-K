@@ -42,7 +42,7 @@ local commanderCloakShieldDef = {
 	minrad = 64,
 	maxrad = 320, -- Update a number in dynamic_comm_defs
 	recloakRate = 800, -- Update a number in dynamic_comm_defs
-
+	
 	growRate = 512,
 	shrinkRate = 2048,
 	selfCloak = true,
@@ -82,19 +82,19 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 			weapon1 = "commweapon_beamlaser"
 		end
 	end
-
+	
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	weapon1 = weapon1 or (chassis and chassisDefs[chassis] and chassisDefs[chassis].initWeapon) or "commweapon_beamlaser"
-
+	
 	if chassis and chassisDefs[chassis] and chassisDefs[chassis].secondPeashooter and (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then
 		weapon2 = "commweapon_beamlaser"
 	end
-
+	
 	rangeMult = rangeMult or Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
 	damageMult = damageMult or Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)
-
+	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult, damageMult)
 end
@@ -103,24 +103,24 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 	local newAttributesEffect = {}
 	newAttributesEffect.cost = totalCost / ud.metalCost
-
+	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
 	if data.speedMultPost or data.speedMod then
 		local speedMult = (data.speedMultPost or 1)*((data.speedMod or 0) + ud.speed)/ud.speed
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", speedMult, INLOS)
 	end
-
+	
 	if data.jumpReloadMod then
 		Spring.SetUnitRulesParam(unitID, "upgradesJumpReloadMod", data.jumpReloadMod, INLOS)
 		if GG.SetJumpReloadMod then
 			GG.SetJumpReloadMod(unitID, data.jumpReloadMod)
 		end
 	end
-
+	
 	if data.radarRange then
 		Spring.SetUnitRulesParam(unitID, "radarRangeOverride", data.radarRange, INLOS)
 	end
-
+	
 	if data.radarJammingRange then
 		Spring.SetUnitRulesParam(unitID, "jammingRangeOverride", data.radarJammingRange, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_jamming_cost", COMMANDER_JAMMING_COST, INLOS)
@@ -130,38 +130,38 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 			Spring.RemoveUnitCmdDesc(unitID, onOffCmd)
 		end
 	end
-
+	
 	if data.decloakDistance then
 		Spring.SetUnitCloak(unitID, false, data.decloakDistance)
 		Spring.SetUnitRulesParam(unitID, "comm_decloak_distance", data.decloakDistance, INLOS)
 	end
-
+	
 	if data.personalCloak then
 		Spring.SetUnitRulesParam(unitID, "comm_personal_cloak", 1, INLOS)
 	end
-
+	
 	if data.areaCloak then
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak", 1, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_upkeep", data.cloakFieldUpkeep, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_area_recloak_rate", data.cloakFieldRecloakRate, INLOS)
 	end
-
+	
 	local buildPowerMult = ((data.bonusBuildPower or 0) + ud.buildSpeed)/ud.buildSpeed
 	data.metalIncome = (data.metalIncome or 0)
 	data.energyIncome = (data.energyIncome or 0)
-
+	
 	if buildPowerMult ~= 1 then
 		-- Needs to use the new system so static can be set, to display properly on the UI.
 		newAttributesEffect.build = buildPowerMult
 	end
-
+	
 	if data.metalIncome and GG.Overdrive then
 		Spring.SetUnitRulesParam(unitID, "comm_income_metal", data.metalIncome, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_income_energy", data.energyIncome, INLOS)
 		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome, true)
 	end
-
+	
 	---@type false|number
 	local newHealth = false
 	if data.healthBonus then
@@ -169,15 +169,15 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		newHealth = math.max(health + data.healthBonus, 1)
 		newAttributesEffect.healthAdd = data.healthBonus
 	end
-
+	
 	if data.skinOverride then
 		Spring.SetUnitRulesParam(unitID, "comm_texture", data.skinOverride, INLOS)
 	end
-
+	
 	if data.bannerOverhead then
 		Spring.SetUnitRulesParam(unitID, "comm_banner_overhead", images.overhead or "fakeunit", INLOS)
 	end
-
+	
 	if data.drones or data.droneheavyslows then
 		if data.drones then
 			Spring.SetUnitRulesParam(unitID, "carrier_count_drone", data.drones, INLOS)
@@ -189,17 +189,17 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 			GG.Drones_InitializeDynamicCarrier(unitID)
 		end
 	end
-
+	
 	if data.autorepairRate then
 		Spring.SetUnitRulesParam(unitID, "comm_autorepair_rate", data.autorepairRate, INLOS)
 		if GG.SetUnitIdleRegen then
 			GG.SetUnitIdleRegen(unitID, 0, data.autorepairRate / 2)
 		end
 	end
-
+	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
-
+	
 	if newAttributesEffect then
 		newAttributesEffect.static = true
 		GG.Attributes.AddEffect(unitID, "comm_upgrade", newAttributesEffect)
@@ -218,40 +218,40 @@ local function ApplyModuleEffectsFromUnitRulesParams(unitID)
 			Spring.RemoveUnitCmdDesc(unitID, onOffCmd)
 		end
 	end
-
+	
 	local decloakDist = Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")
 	if decloakDist then
 		Spring.SetUnitCloak(unitID, false, decloakDist)
 	end
-
+	
 	if GG.Overdrive then
 		local mInc = Spring.GetUnitRulesParam(unitID, "comm_income_metal")
 		local eInc = Spring.GetUnitRulesParam(unitID, "comm_income_energy")
 		GG.Overdrive.AddUnitResourceGeneration(unitID, mInc or 0, eInc or 0, true, true)
 	end
-
+	
 	if Spring.GetUnitRulesParam(unitID, "carrier_count_drone") or Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow") then
 		if GG.Drones_InitializeDynamicCarrier then
 			GG.Drones_InitializeDynamicCarrier(unitID)
 		end
 	end
-
+	
 	local autoRegen = Spring.GetUnitRulesParam(unitID, "comm_autorepair_rate")
 	if autoRegen and GG.SetUnitIdleRegen then
 		GG.SetUnitIdleRegen(unitID, 0, autoRegen / 2)
 	end
-
+	
 	ApplyWeaponData(unitID, Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
 		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
 		Spring.GetUnitRulesParam(unitID, "comm_shield_name"))
-
+	
 	-- Do this all the time as it will be needed almost always.
 	GG.UpdateUnitAttributes(unitID)
 end
 
 local function GetModuleEffectsData(moduleList, level, chassis)
 	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
-
+	
 	local moduleEffectData = {}
 	for i = 1, #moduleList do
 		local moduleDef = moduleDefs[moduleList[i]]
@@ -259,12 +259,12 @@ local function GetModuleEffectsData(moduleList, level, chassis)
 			moduleDef.applicationFunction(moduleByDefID, moduleEffectData)
 		end
 	end
-
+	
 	local levelFunction = chassisDefs[chassis or 1].levelDefs[math.min(chassisDefs[chassis or 1].maxNormalLevel, level or 1)].chassisApplicationFunction
 	if levelFunction then
 		levelFunction(moduleByDefID, moduleEffectData)
 	end
-
+	
 	return moduleEffectData
 end
 
@@ -275,7 +275,7 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	if not moduleEffectData then
 		moduleEffectData = GetModuleEffectsData(moduleList, level, chassis)
 	end
-
+	
 	-- Start setting required unitRulesParams
 	Spring.SetUnitRulesParam(unitID, "comm_level",         level, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis",       chassis, INLOS)
@@ -283,15 +283,15 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
-
+	
 	if profileID then
 		Spring.SetUnitRulesParam(unitID, "comm_profileID",     profileID, INLOS)
 	end
-
+	
 	if staticLevel then -- unmorphable
 		Spring.SetUnitRulesParam(unitID, "comm_staticLevel",   staticLevel, INLOS)
 	end
-
+	
 	-- Set module unitRulesParams
 	-- Decorations are kept seperate from other module types.
 	-- basic_weapon, adv_weapon and module all count as modules.
@@ -301,9 +301,9 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 		SetUnitRulesModule(unitID, counts, moduleDefID)
 	end
 	SetUnitRulesModuleCounts(unitID, counts)
-
+	
 	ApplyModuleEffects(unitID, moduleEffectData, totalCost, images or {})
-
+	
 	if staticLevel then
 		-- Newly created commander, set to full health
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
@@ -314,26 +314,26 @@ end
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
 	-- Calculate Module effects
 	local moduleEffectData = GetModuleEffectsData(upgradeDef.moduleList, upgradeDef.level, upgradeDef.chassis)
-
+	
 	-- Create Unit, set appropriate global data first
 	-- These variables are set such that other gadgets can notice the effect
 	-- within UnitCreated.
 	if moduleEffectData.shield then
 		unitCreatedShield, unitCreatedShieldNum = upgradeUtilities.GetUnitDefShield(defName, moduleEffectData.shield)
 	end
-
+	
 	if moduleEffectData.personalCloak then
 		unitCreatedCloak = true
 	end
-
+	
 	if moduleEffectData.radarJammingRange then
 		unitCreatedJammingRange = COMMANDER_JAMMING_COST
 	end
-
+	
 	if moduleEffectData.areaCloak then
 		unitCreatedCloakShield = true
 	end
-
+	
 	unitCreatedWeaponNums = {}
 	if moduleEffectData.weapon1 then
 		unitCreatedWeaponNums[moduleEffectData.weapon1] = 1
@@ -344,19 +344,19 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	if moduleEffectData.shield then
 		unitCreatedWeaponNums[moduleEffectData.shield] = 3
 	end
-
+	
 	interallyCreatedUnit = true
-
+	
 	internalCreationUpgradeDef = upgradeDef
 	internalCreationModuleEffectData = moduleEffectData
-
+	
 	local unitID = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
-
+	
 	-- Unset the variables which need to be present at unit creation
 	interallyCreatedUnit = false
 	internalCreationUpgradeDef = nil
 	internalCreationModuleEffectData = nil
-
+	
 	unitCreatedShield = nil
 	unitCreatedShieldNum = nil
 	unitCreatedShield = nil
@@ -364,11 +364,11 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedJammingRange = nil
 	unitCreatedCloakShield = nil
 	unitCreatedWeaponNums = nil
-
+	
 	if not unitID then
 		return false
 	end
-
+	
 	return unitID
 end
 
@@ -387,14 +387,14 @@ local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, mod
 			end
 		end
 	end
-
+	
 	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
-
+	
 	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
 	local chassisData = chassisDefs[chassisDefID]
 	local chassisLevel = math.min(chassisData.maxNormalLevel, targetLevel)
 	local unitDefID = chassisData.levelDefs[chassisLevel].morphUnitDefFunction(moduleByDefID)
-
+	
 	local upgradeDef = {
 		level = targetLevel,
 		staticLevel = targetLevel,
@@ -408,9 +408,9 @@ local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, mod
 		images = commProfileInfo.images,
 		profileID = dyncommID,
 	}
-
+	
 	local unitID = Upgrades_CreateUpgradedUnit(unitDefID, x, y, z, facing, teamID, false, upgradeDef)
-
+	
 	return unitID
 end
 
@@ -423,22 +423,22 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 		Spring.Echo("Incorrect dynamic comm chassis", commProfileInfo.chassis, "dyncommID: " .. dyncommID)
 		return false
 	end
-
+	
 	local chassisData = chassisDefs[chassisDefID]
 	if chassisData.notSelectable and not staticLevel then
 		Spring.Echo("Chassis not selectable", commProfileInfo.chassis)
 		return false
 	end
-
+	
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
-
+	
 	local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
 	local moduleList = {chassisModuleDefs.econ, chassisModuleDefs.module_radarnet}
 	local moduleCost = 0
 	for i = 1, #moduleList do
 		moduleCost = moduleCost + moduleDefs[moduleList[i]].cost
 	end
-
+	
 	if commProfileInfo.decorations then
 		for i = 1, #commProfileInfo.decorations do
 			local decName = commProfileInfo.decorations[i]
@@ -447,11 +447,11 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 			end
 		end
 	end
-
+	
 	if staticLevel then
 		return CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, staticLevel)
 	end
-
+	
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID,
@@ -464,9 +464,9 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 		images = commProfileInfo.images,
 		profileID = dyncommID
 	}
-
+	
 	local unitID = Upgrades_CreateUpgradedUnit(baseUnitDefID, x, y, z, facing, teamID, false, upgradeDef)
-
+	
 	return unitID
 end
 
@@ -474,7 +474,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if Spring.GetUnitRulesParam(unitID, "comm_level") then
 		return
 	end
-
+	
 	if interallyCreatedUnit then
 		InitializeDynamicCommander(
 			unitID,
@@ -493,12 +493,12 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		)
 		return
 	end
-
+	
 	local profileID = GG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
 	if profileID then
 		local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(profileID)
 		local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
-
+		
 		-- Add decorations
 		local moduleList = {}
 		if commProfileInfo.decorations then
@@ -509,7 +509,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 				end
 			end
 		end
-
+		
 		InitializeDynamicCommander(
 			unitID,
 			0,
@@ -526,10 +526,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		)
 		return
 	end
-
+	
 	if chassisDefByBaseDef[unitDefID] then
 		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
-
+		
 		InitializeDynamicCommander(
 			unitID,
 			0,
@@ -554,30 +554,30 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	if #params <= 4 then
 		return false
 	end
-
+	
 	local pLevel = params[1]
 	local pChassis = params[2]
 	local pAlreadyCount = params[3]
 	local pNewCount = params[4]
-
+	
 	if #params ~= 4 + pAlreadyCount + pNewCount then
 		return false
 	end
-
+	
 	if Spring.GetUnitRulesParam(unitID, "comm_staticLevel") then
 		return false
 	end
-
+	
 	-- Make sure level and chassis match.
 	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	if level ~= pLevel or chassis ~= pChassis then
 		return false
 	end
-
+	
 	local newLevel = level + 1
 	local newLevelBounded = math.min(chassisDefs[chassis].maxNormalLevel, level + 1)
-
+	
 	-- If unbounded level is disallowed then the comm might be invalid
 	if LEVEL_BOUND and newLevel > LEVEL_BOUND then
 		return false
@@ -590,36 +590,36 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 		pAlreadyOwned[i] = params[index]
 		index = index + 1
 	end
-
+	
 	-- Find the modules which are already owned
 	local alreadyOwned = {}
 	local fullModuleList = {}
-
+	
 	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 	for i = 1, moduleCount do
 		local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
 		alreadyOwned[#alreadyOwned + 1] = module
 		fullModuleList[#fullModuleList + 1] = module
 	end
-
+	
 	-- Strictly speaking sort is not required. It is for leniency
 	table.sort(alreadyOwned)
 	table.sort(pAlreadyOwned)
-
+	
 	-- alreadyOwned does not contain decoration modules so pAlreadyOwned
 	-- should not contain decoration modules. The check fails if pAlreadyOwned
 	-- contains decorations.
 	if not upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, pAlreadyOwned) then
 		return false
 	end
-
+	
 	-- Check the validity of the new module set
 	local pNewModules = {}
 	for i = 1, pNewCount do
 		pNewModules[#pNewModules + 1] = params[index]
 		index = index + 1
 	end
-
+	
 	-- Finish the full modules list
 	-- Empty module slots do not make it into this list
 	for i = 1, #pNewModules  do
@@ -627,14 +627,14 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 			fullModuleList[#fullModuleList + 1] = pNewModules[i]
 		end
 	end
-
+	
 	local modulesByDefID = upgradeUtilities.ModuleListToByDefID(fullModuleList)
-
+	
 	-- Determine Cost and check that the new modules are valid.
 	local levelDefs = chassisDefs[chassis].levelDefs[newLevelBounded]
 	local slotDefs = levelDefs.upgradeSlots
 	local cost = 0
-
+	
 	for i = 1, #pNewModules do
 		local moduleDefID = pNewModules[i]
 		if upgradeUtilities.ModuleIsValid(newLevelBounded, chassis, slotDefs[i].slotAllows, moduleDefID, modulesByDefID) then
@@ -643,7 +643,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 			return false
 		end
 	end
-
+	
 	-- Add Decorations, they are modules but not part of the previous checks.
 	-- Assumed to be valid here because they cannot be added by this function.
 	local decCount = Spring.GetUnitRulesParam(unitID, "comm_decoration_count")
@@ -651,25 +651,25 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 		local decoration = Spring.GetUnitRulesParam(unitID, "comm_decoration_" .. i)
 		fullModuleList[#fullModuleList + 1] = decoration
 	end
-
+	
 	local images = {}
 	local bannerOverhead = Spring.GetUnitRulesParam(unitID, "comm_banner_overhead")
 	if bannerOverhead then
 		images.overhead = bannerOverhead
 	end
-
+	
 	-- The command is now known to be valid. Construct the morphDef.
-
+	
 	if newLevel ~= newLevelBounded then
 		cost = cost + chassisDefs[chassis].extraLevelCostFunction(newLevel)
 	else
 		cost = cost + levelDefs.morphBaseCost
 	end
 	local targetUnitDefID = levelDefs.morphUnitDefFunction(modulesByDefID)
-
+	
 	local morphTime = cost/levelDefs.morphBuildPower
 	local increment = (1 / (30 * morphTime))
-
+	
 	local morphDef = {
 		upgradeDef = {
 			name = Spring.GetUnitRulesParam(unitID, "comm_name"),
@@ -696,7 +696,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 		cmd = nil, -- for completeness
 		facing = nil,
 	}
-
+	
 	return true, targetUnitDefID, morphDef
 end
 
@@ -734,7 +734,7 @@ function gadget:Initialize()
 	GG.Upgrades_CreateUpgradedUnit         = Upgrades_CreateUpgradedUnit
 	GG.Upgrades_CreateStarterDyncomm       = Upgrades_CreateStarterDyncomm
 	GG.Upgrades_GetValidAndMorphAttributes = Upgrades_GetValidAndMorphAttributes
-
+	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
