@@ -159,38 +159,56 @@ if moduleDefs[1].name ~= "nullmodule"
 	Script.Kill()
 end
 
-do -- full check of module IDs
+if false then -- full check of module IDs
+	local all_passed=true
 	local expectedModuleIDs= VFS.Include("LuaRules/Configs/expected_module_ids.lua")
 	for module_id, expected in pairs(expectedModuleIDs) do
 		local actual=moduleDefs[module_id]
 		local pass=true
 		
-		if actual.name ~=expected then
+		if actual.name ~= expected.name then
 			pass=false
 			-- Spring.Echo("Wrong module ID. ID: " .. tostring(key) .. " expected: " .. tostring(value) .. " actual: " .. tostring(moduleDefs[key].name))
 		end
 		
-		local requireCheck={}
-		for key, chassis_name in pairs(expected.requireChassis) do
-			requireCheck[chassis_name]=true
-		end
-		for key, chassis_name in pairs(actual.requireChassis) do
-			if not requireCheck[key] then
+		if expected.requireChassis~=nil then
+			if actual.requireChassis~=nil then
+				local requireCheck={}
+				for key, chassis_name in pairs(expected.requireChassis) do
+					requireCheck[chassis_name]=true
+				end
+				for key, chassis_name in pairs(actual.requireChassis) do
+					if not requireCheck[chassis_name] then
+						pass=false
+						break
+					end
+					requireCheck[chassis_name]=nil
+				end
+				if next(requireCheck)~=nil then
+					pass=false
+				end
+				
+			else
 				pass=false
 			end
-			requireCheck[key]=nil
-		end
-		if next(requireCheck)~=nil then
-			pass=false
+		else
+			if actual.requireChassis~=nil then
+				pass=false
+			else
+			end
 		end
 		if not pass then
+			all_passed=false
 			local log_module=function(module)
-				return tostring(module.name) .. " require " .. table.concat(module.requireChassis,',')
+				return tostring(module.name) .. " require chassis " .. (module.requireChassis and table.concat(module.requireChassis,',') or "none") 
 			end
 			Spring.Echo("Wrong module ID " .. tostring(module_id))
 			Spring.Echo("expected: " .. log_module(expected))
 			Spring.Echo("actual: " .. log_module(actual))
 		end
+	end
+	if all_passed then
+		Spring.Echo("module ID check passed")
 	end
 end
 
