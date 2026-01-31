@@ -159,6 +159,41 @@ if moduleDefs[1].name ~= "nullmodule"
 	Script.Kill()
 end
 
+do -- full check of module IDs
+	local expectedModuleIDs= VFS.Include("LuaRules/Configs/expected_module_ids.lua")
+	for module_id, expected in pairs(expectedModuleIDs) do
+		local actual=moduleDefs[module_id]
+		local pass=true
+		
+		if actual.name ~=expected then
+			pass=false
+			-- Spring.Echo("Wrong module ID. ID: " .. tostring(key) .. " expected: " .. tostring(value) .. " actual: " .. tostring(moduleDefs[key].name))
+		end
+		
+		local requireCheck={}
+		for key, chassis_name in pairs(expected.requireChassis) do
+			requireCheck[chassis_name]=true
+		end
+		for key, chassis_name in pairs(actual.requireChassis) do
+			if not requireCheck[key] then
+				pass=false
+			end
+			requireCheck[key]=nil
+		end
+		if next(requireCheck)~=nil then
+			pass=false
+		end
+		if not pass then
+			local log_module=function(module)
+				return tostring(module.name) .. " require " .. table.concat(module.requireChassis,',')
+			end
+			Spring.Echo("Wrong module ID " .. tostring(module_id))
+			Spring.Echo("expected: " .. log_module(expected))
+			Spring.Echo("actual: " .. log_module(actual))
+		end
+	end
+end
+
 for name, data in pairs(skinDefs) do
 	moduleDefs[#moduleDefs + 1] = {
 		name = "skin_" .. name,
