@@ -101,7 +101,6 @@ end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-
 	local newAttributesEffect = {}
 	newAttributesEffect.cost = totalCost / ud.metalCost
 
@@ -153,9 +152,8 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	data.energyIncome = (data.energyIncome or 0)
 
 	if buildPowerMult ~= 1 then
-
+		-- Needs to use the new system so static can be set, to display properly on the UI.
 		newAttributesEffect.build = buildPowerMult
-
 	end
 
 	if data.metalIncome and GG.Overdrive then
@@ -166,17 +164,10 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 
 	---@type false|number
 	local newHealth = false
-
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-
 		newHealth = math.max(health + data.healthBonus, 1)
-
-		newAttributesEffect = newAttributesEffect or {}
-
 		newAttributesEffect.healthAdd = data.healthBonus
-		
-		
 	end
 
 	if data.skinOverride then
@@ -207,24 +198,15 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	end
 
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
-
-
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
 
 	if newAttributesEffect then
-
 		newAttributesEffect.static = true
-
 		GG.Attributes.AddEffect(unitID, "comm_upgrade", newAttributesEffect)
-
 		if newHealth then
-
 			Spring.SetUnitHealth(unitID, newHealth) -- Override scaled health change from GG.Attributes
-
 		end
-
 	end
-
 	-- Do this all the time as it will be needed almost always.
 	GG.UpdateUnitAttributes(unitID)
 end
@@ -298,7 +280,6 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	Spring.SetUnitRulesParam(unitID, "comm_level",         level, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis",       chassis, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_name",          name, INLOS)
-
 	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
@@ -310,7 +291,6 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	if staticLevel then -- unmorphable
 		Spring.SetUnitRulesParam(unitID, "comm_staticLevel",   staticLevel, INLOS)
 	end
-
 
 	-- Set module unitRulesParams
 	-- Decorations are kept seperate from other module types.
@@ -445,7 +425,6 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	end
 
 	local chassisData = chassisDefs[chassisDefID]
-
 	if chassisData.notSelectable and not staticLevel then
 		Spring.Echo("Chassis not selectable", commProfileInfo.chassis)
 		return false
