@@ -37,7 +37,7 @@ ModularCommDefsShared.COST_MULT = COST_MULT
 local moduleImagePath = "unitpics/"
 ModularCommDefsShared.moduleImagePath = moduleImagePath
 local disableResurrect = (Spring.GetModOptions().disableresurrect == 1) or
-(Spring.GetModOptions().disableresurrect == "1")
+	(Spring.GetModOptions().disableresurrect == "1")
 ModularCommDefsShared.disableResurrect = disableResurrect
 ------------------------------------------------------------------------
 -- Module Definitions
@@ -254,7 +254,7 @@ for i = 1, #moduleDefs do
 		local mdn_ = moduleDefNames[chassisName]
 		if not mdn_ then
 			Spring.Echo("Error: dynamic_comm_defs.lua: missing chassis " ..
-			tostring(chassisName) .. " for module " .. tostring(data.name))
+				tostring(chassisName) .. " for module " .. tostring(data.name))
 		else
 			mdn_[data.name] = i
 		end
