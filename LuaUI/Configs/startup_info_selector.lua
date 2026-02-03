@@ -40,15 +40,11 @@ local chassisImages = {
 	support = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
 	assault = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
 	strike = "LuaUI/Images/startup_info_selector/chassis_commstrike.png",
-	knight = "LuaUI/Images/startup_info_selector/chassis_cremcom.png",
+	knight = "LuaUI/Images/startup_info_selector/chassis_cremcom.png"
 }
 
-local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS
-.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
--- chassisDefs.chassisImage
----@cast chassisDefs table
----@cast moduleDefNames table
 for key, value in pairs(chassisDefs) do
 	chassisImages[value.name] = value.chassisImage or chassisImages[value.name]
 end
