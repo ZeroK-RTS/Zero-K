@@ -1774,11 +1774,26 @@ function widgetHandler:DrawWorld()
 end
 
 
+local alreadyShiftedThisFrame = false
+local depthTestModes = {"NEVER", "LESS", "EQUAL", "LEQUAL", "GREATER", "NOTEQUAL", "GEQUAL", "ALWAYS", false}
+local currentIndex = 1
+local currentMode = GL.NEVER
 function widgetHandler:DrawWorldPreUnit()
 	tracy.ZoneBeginN("W:DrawWorldPreUnit")
+	if Spring.GetGameFrame() % 30 ~= 0 then
+		alreadyShiftedThisFrame = false
+	elseif not alreadyShiftedThisFrame then
+		alreadyShiftedThisFrame = true
+		currentIndex = (currentIndex % #depthTestModes) + 1
+		currentMode = depthTestModes[currentIndex] and GL[depthTestModes[currentIndex]]
+		Spring.Echo("Cycling depthtest mode to", currentIndex, depthTestModes[currentIndex], currentMode)
+	end
+
 	for _, w in r_ipairs(self.DrawWorldPreUnitList) do
 		gl.Fog(true)
 		tracy.ZoneBeginN("W:DrawWorldPreUnit:" .. w.whInfo.name)
+		-- Spring.Echo("W:DrawWorldPreUnit:" .. w.whInfo.name)
+		gl.DepthTest(currentMode)
 		w:DrawWorldPreUnit()
 		tracy.ZoneEnd()
 	end
