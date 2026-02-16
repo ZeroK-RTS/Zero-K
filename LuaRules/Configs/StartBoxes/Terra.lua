@@ -71,16 +71,16 @@ local layout = {
 	}, -- mirrored automatically
 }
 
-for i = 1, #layout[0].boxes[1] do
-	layout[1].boxes[1][i] = {
-		Game.mapSizeX - layout[0].boxes[1][i][1],
-		Game.mapSizeZ - layout[0].boxes[1][i][2]
+for i = 1, #layout[1].boxes[1] do
+	layout[2].boxes[1][i] = {
+		Game.mapSizeX - layout[1].boxes[1][i][1],
+		Game.mapSizeZ - layout[1].boxes[1][i][2]
 	}
 end
-for i = 1, #layout[0].startpoints do
-	layout[1].startpoints[i] = {
-		Game.mapSizeX - layout[0].startpoints[i][1],
-		Game.mapSizeZ - layout[0].startpoints[i][2]
+for i = 1, #layout[1].startpoints do
+	layout[2].startpoints[i] = {
+		Game.mapSizeX - layout[1].startpoints[i][1],
+		Game.mapSizeZ - layout[1].startpoints[i][2]
 	}
 end
 

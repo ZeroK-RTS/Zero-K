@@ -283,13 +283,13 @@ local boxes = {
 
 -- use a smaller box for duel
 if #Spring.GetTeamList(0) == 1 and #Spring.GetTeamList(1) == 1 then
-	boxes[0].boxes[2] = nil
 	boxes[1].boxes[2] = nil
+	boxes[2].boxes[2] = nil
 
-	boxes[0].startpoints[2] = nil
-	boxes[0].startpoints[3] = nil
 	boxes[1].startpoints[2] = nil
 	boxes[1].startpoints[3] = nil
+	boxes[2].startpoints[2] = nil
+	boxes[2].startpoints[3] = nil
 end
 
 return boxes, { 2 }

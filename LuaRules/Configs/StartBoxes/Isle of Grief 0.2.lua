@@ -163,20 +163,20 @@ local layout = {
 	},
 }
 
-for j = 1, #layout[0].boxes do
-	layout[1].boxes[j] = {}
-	for i = 1, #layout[0].boxes[j] do
-		layout[1].boxes[j][i] = {
-			Game.mapSizeX - layout[0].boxes[j][i][1],
-			Game.mapSizeZ - layout[0].boxes[j][i][2]
+for j = 1, #layout[1].boxes do
+	layout[2].boxes[j] = {}
+	for i = 1, #layout[1].boxes[j] do
+		layout[2].boxes[j][i] = {
+			Game.mapSizeX - layout[1].boxes[j][i][1],
+			Game.mapSizeZ - layout[1].boxes[j][i][2]
 		}
 	end
 end
 
-for i = 1, #layout[0].startpoints do
-	layout[1].startpoints[i] = {
-		Game.mapSizeX - layout[0].startpoints[i][1],
-		Game.mapSizeZ - layout[0].startpoints[i][2]
+for i = 1, #layout[1].startpoints do
+	layout[2].startpoints[i] = {
+		Game.mapSizeX - layout[1].startpoints[i][1],
+		Game.mapSizeZ - layout[1].startpoints[i][2]
 	}
 end
 

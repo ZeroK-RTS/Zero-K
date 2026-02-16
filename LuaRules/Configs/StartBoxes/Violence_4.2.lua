@@ -32,16 +32,16 @@ local center = {Game.mapSizeX / 2, Game.mapSizeZ / 2}
 
 for area = 1, 4 do
 	local phi = math.pi * area * 0.4
-	for vertex = 1, #layout[0].boxes[1] do
-		local dx = (layout[0].boxes[1][vertex][1] - center[1])
-		local dy = (layout[0].boxes[1][vertex][2] - center[2])
+	for vertex = 1, #layout[1].boxes[1] do
+		local dx = (layout[1].boxes[1][vertex][1] - center[1])
+		local dy = (layout[1].boxes[1][vertex][2] - center[2])
 		layout[area].boxes[1][vertex] = {
 			center[1] + dx*math.cos(phi) + dy*math.sin(-phi),
 			center[2] + dx*math.sin(phi) + dy*math.cos(phi)
 		}
 	end
-	local dx = (layout[0].startpoints[1][1] - center[1])
-	local dy = (layout[0].startpoints[1][2] - center[2])
+	local dx = (layout[1].startpoints[1][1] - center[1])
+	local dy = (layout[1].startpoints[1][2] - center[2])
 	layout[area].startpoints[1] = {
 		center[1] + dx*math.cos(phi) + dy*math.sin(-phi),
 		center[2] + dx*math.sin(phi) + dy*math.cos(phi)

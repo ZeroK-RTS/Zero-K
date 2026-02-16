@@ -198,7 +198,7 @@ local boxes = {
 
 -- use smaller boxes for <= 2v2
 if (#Spring.GetTeamList(0) < 2 and #Spring.GetTeamList(1) < 2) then
-	boxes[0].boxes[0] = {
+	boxes[1].boxes[1] = {
 		{
 			{1744, 3496},
 			{1584, 3659},
@@ -277,7 +277,7 @@ if (#Spring.GetTeamList(0) < 2 and #Spring.GetTeamList(1) < 2) then
 			{1759, 3398},
 		},
 	}
-	boxes[1].boxes[0] = {
+	boxes[2].boxes[1] = {
 		{
 			{7899, 4075},
 			{7784, 3975},
@@ -362,11 +362,11 @@ if (#Spring.GetTeamList(0) < 2 and #Spring.GetTeamList(1) < 2) then
 			{7922, 4012},
 		},
 	}
-	boxes[0].startpoints = {
+	boxes[1].startpoints = {
 		{786, 2032},
 		{717, 3344},
 	}
-	boxes[1].startpoints = {
+	boxes[2].startpoints = {
 		{7551, 2124},
 		{7620, 3257},
 	}

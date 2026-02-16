@@ -341,10 +341,10 @@ local layout = {
 }
 
 if Spring.Utilities.Gametype.is1v1() then
-	layout[0].boxes[2] = nil
 	layout[1].boxes[2] = nil
-	layout[0].startpoints[3] = nil
+	layout[2].boxes[2] = nil
 	layout[1].startpoints[3] = nil
+	layout[2].startpoints[3] = nil
 end
 
 return layout, { 2 }
