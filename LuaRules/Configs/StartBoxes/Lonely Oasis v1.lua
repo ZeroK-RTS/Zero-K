@@ -1,5 +1,5 @@
 local boxes = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{5486, 2151},
@@ -142,7 +142,7 @@ local boxes = {
 		nameLong = "North-East",
 		nameShort = "NE",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{1664, 4973},
