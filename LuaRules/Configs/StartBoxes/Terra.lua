@@ -1,5 +1,5 @@
 local layout = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{Game.mapSizeX / 2, 1},
@@ -63,7 +63,7 @@ local layout = {
 		nameLong  = "North",
 		nameShort = "N",
 	},
-	[1] = {
+	{
 		boxes = {{}},
 		startpoints = {},
 		nameLong  = "South",
