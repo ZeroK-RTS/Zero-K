@@ -1,5 +1,5 @@
 local ret = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{5383, 8188},
@@ -188,7 +188,7 @@ local ret = {
 		nameLong = "South-East",
 		nameShort = "SE",
 	},
-	[1] = {
+	{
 		boxes = { },
 		startpoints = { },
 		nameLong = "North-West",
