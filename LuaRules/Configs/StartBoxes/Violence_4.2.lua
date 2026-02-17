@@ -1,5 +1,5 @@
 local layout = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{4599.8403320313, 3195.0278320313},
@@ -22,10 +22,10 @@ local layout = {
 			{4907, 3359},
 		},
 	},
-	[1] = { boxes = {{}}, startpoints = {}, },
-	[2] = { boxes = {{}}, startpoints = {}, },
-	[3] = { boxes = {{}}, startpoints = {}, },
-	[4] = { boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
 }
 
 local center = {Game.mapSizeX / 2, Game.mapSizeZ / 2}
