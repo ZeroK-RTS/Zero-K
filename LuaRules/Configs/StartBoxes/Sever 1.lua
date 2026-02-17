@@ -1,5 +1,5 @@
 local layout = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{4996, 2533},
@@ -159,7 +159,7 @@ local layout = {
 		nameLong = "East",
 		nameShort = "E",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{2172, 4638},
