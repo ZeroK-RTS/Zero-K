@@ -1,5 +1,5 @@
 local layout = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{1955.5284423828, 4691.412109375},
@@ -104,10 +104,10 @@ local layout = {
 			{1755, 4672},
 		},
 	},
-	[1] = { boxes = {{}}, startpoints = {}, },
-	[2] = { boxes = {{}}, startpoints = {}, },
-	[3] = { boxes = {{}}, startpoints = {}, },
-	[4] = { boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
+	{ boxes = {{}}, startpoints = {}, },
 }
 
 local center = {4614, 4619}
