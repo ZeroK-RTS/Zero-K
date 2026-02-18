@@ -1,9 +1,8 @@
 --linear constant 65536
 
-include "constants.lua"
-include "utility.lua"
-include 'letsNotFailAtTrig.lua'
-include 'reliableStartMoving.lua'
+Spring.Utilities.CacheInclude("utility.lua")
+Spring.Utilities.CacheInclude("constants.lua")
+Spring.Utilities.CacheInclude('reliableStartMoving.lua')
 
 -- unused piece: base
 local pelvis, body = piece('pelvis', 'body')
