@@ -1,9 +1,9 @@
 
 --by Chris Mackey
-include "constants.lua"
-include "JumpRetreat.lua"
-include 'letsNotFailAtTrig.lua'
-
+Spring.Utilities.CacheInclude("constants.lua")
+Spring.Utilities.CacheInclude("constants.lua")
+local trig = Spring.Utilities.CacheInclude("letsNotFailAtTrig.lua")
+local getTheActuallyCorrectHeadingAndPitch = trig.getTheActuallyCorrectHeadingAndPitch
 --pieces
 local b_dome = piece "b_dome"
 local t_dome = piece "t_dome"
