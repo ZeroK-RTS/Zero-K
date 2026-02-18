@@ -1,9 +1,12 @@
-include 'constants.lua'
-include 'letsNotFailAtTrig.lua'
+Spring.Utilities.CacheInclude("constants.lua")
+local trig = Spring.Utilities.CacheInclude('letsNotFailAtTrig.lua')
 
 -- by MergeNine
 
 -- shortcuts
+local getTheActuallyCorrectHeadingAndPitch = trig.getTheActuallyCorrectHeadingAndPitch
+local hat   = trig.hat
+local cross = trig.cross
 local GetUnitPosition = Spring.GetUnitPosition
 local SpawnCEG = Spring.SpawnCEG
 local GetGroundHeight = Spring.GetGroundHeight
