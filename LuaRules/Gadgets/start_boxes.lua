@@ -58,7 +58,7 @@ local function GetBoxID(allyTeamID)
 	if not teamID then
 		return
 	end
-	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id") + 1 -- default to 1-indexed
 	return boxID
 end
 
@@ -337,6 +337,7 @@ local function GetTeamNames (allyTeamID)
 	then
 		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		if boxID then
+			boxID = boxID + 1 -- default to 1-indexed
 			local box = startboxConfig[boxID]
 			if box.nameLong and box.nameShort then
 				return box.nameLong, box.nameShort, clanLongName, clanShortName
@@ -520,6 +521,9 @@ function gadget:AllowStartPosition(playerID, teamID, readyState, x, y, z, rx, ry
 	end
 
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	if boxID then
+   		boxID = boxID + 1 -- default to 1-indexed
+	end
 
 	if (not boxID) or CheckStartbox(boxID, x, z) then
 		Spring.SetTeamRulesParam (teamID, "valid_startpos", 1)
@@ -539,6 +543,9 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	end
 
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	if boxID then
+    	boxID = boxID + 1 -- default to 1-indexed
+	end
 
 	local xz = dataStr:sub(command:len()+1)
 	local slash = xz:find("/",1,true)
@@ -573,8 +580,9 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 					local enemyteams = Spring.GetTeamList(value)
 					local _,value1 = next(enemyteams)
 					if value1 then
-						local enemybox = Spring.GetTeamRulesParam(value1, "start_box_id")
+						local enemybox = Spring.GetTeamRulesParam(value1, "start_box_id") 
 						if (enemybox) then
+							enemybox = enemybox + 1 -- default to 1-indexed
 							enemyboxes[enemybox] = true
 						end
 					end
