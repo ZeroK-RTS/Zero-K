@@ -417,7 +417,7 @@ function gadget:Initialize()
 
 		for i = 1, #allyTeamList do
 			local allyTeamID = allyTeamList[i]
-			local boxID = allyTeamList[i]
+			local boxID = allyTeamList[i] + 1 -- default to 1-indexed
 			if startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
