@@ -70,6 +70,7 @@ options_order = {
 	'selectemptytransports',
 	'uikey6',
 	'lbl_other',
+	'clear_selection',
 	'select_missiles'
 }
 options = {
@@ -180,6 +181,11 @@ options = {
 		dontRegisterAction = true,
 	},
 	
+	clear_selection = { type = 'button',
+		name = 'Clear Selection',
+		desc = 'Deselects all units.',
+		action = 'deselect',
+	},
 	select_missiles = { type = 'button',
 		name = 'Select missiles',
 		desc = 'Select missiles of all currently selected missile silos.',
