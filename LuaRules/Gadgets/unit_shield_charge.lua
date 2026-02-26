@@ -2,26 +2,28 @@
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "Shield Charge",
-    desc      = "Reimplementation of charging for shields. Intended for attributes and priority support.",
-    author    = "Google Frog",
-    date      = "16 August 2015",
-    license   = "GNU GPL, v2 or later",
-    layer     = -1,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name    = "Shield Charge",
+		desc    = "Reimplementation of charging for shields. Intended for attributes and priority support.",
+		author  = "Google Frog",
+		date    = "16 August 2015",
+		license = "GNU GPL, v2 or later",
+		layer   = -1,
+		enabled = true --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 if (not gadgetHandler:IsSyncedCode()) then
-  return false  --  no unsynced code
+	return false --  no unsynced code
 end
 
 include("LuaRules/Configs/constants.lua")
 
+---@diagnostic disable-next-line: undefined-global
+local TEAM_SLOWUPDATE_RATE  = TEAM_SLOWUPDATE_RATE
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -74,9 +76,20 @@ for unitDefID = 1, #UnitDefs do
 end
 
 local commShieldDefs = {
-	WeaponDefNames["commweapon_areashield"],
-	WeaponDefNames["commweapon_personal_shield"],
+	--WeaponDefNames["commweapon_areashield"],
+	--WeaponDefNames["commweapon_personal_shield"],
+	--WeaponDefNames["commweapon_chickenshield"]
 }
+
+local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
+for i = 1, #weaponsList do
+	local name, array = VFS.Include(weaponsList[i])
+	local wd = WeaponDefNames[name]
+	if wd.type == [[Shield]] then
+		commShieldDefs[#commShieldDefs + 1] = wd
+	end
+end
+
 
 for i = 1, #commShieldDefs do
 	local wd = commShieldDefs[i]
@@ -111,6 +124,7 @@ function gadget:GameFrame(n)
 
 	local updatePriority = (n % TEAM_SLOWUPDATE_RATE == 0)
 	local setParam = ((n % 30) == 8)
+	---@type false|table
 	local toDestroy = false
 	
 	for i = 1, unitCount do

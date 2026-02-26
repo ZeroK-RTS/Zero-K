@@ -1,0 +1,17 @@
+return {
+    clonedefs={
+
+    },
+    dynamic_comm_defs=function(shared)
+        
+    end,
+    dyncomm_chassis_generator={
+
+    },
+    dyncomms_predefined={
+
+    },
+    staticcomms={
+
+    }
+}
