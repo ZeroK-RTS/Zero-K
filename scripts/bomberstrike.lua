@@ -38,7 +38,7 @@ end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, {wingtipl, wingtipr, head})
 	Turn(turret, y_axis, math.pi)
 	Move(wingl, x_axis, -5, 7)
@@ -64,7 +64,7 @@ end
 function script.StopMoving()
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.AimWeapon(num, heading, pitch)
