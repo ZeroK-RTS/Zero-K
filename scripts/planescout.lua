@@ -32,10 +32,22 @@ function script.StopMoving()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
+local function freeze()
+	while true do
+		local state = Spring.GetUnitMoveTypeData(unitID)
+		local x, y, z = Spring.GetUnitVelocity(unitID)
+		if state and state.aircraftState == "landing"
+		and x == 0 and z == 0 then
+			Spring.Echo("setting desired fly height for when the unit next takes off! (but actually just freezes the unit)")
+			Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", 1000)
+			return
+		end
+		Sleep(33)
+	end
+end
 
 function script.Create()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(freeze)
 end
 
 function script.Killed(recentDamage, maxHealth)
