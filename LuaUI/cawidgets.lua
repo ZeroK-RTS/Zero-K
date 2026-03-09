@@ -36,6 +36,7 @@ Spring.Utilities.json = vfsInclude("LuaRules/Utilities/json.lua"          , nil,
 
 vfsInclude("LuaRules/Utilities/globals.lua"          , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/stringfunctions.lua"          , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/debugFunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
@@ -44,6 +45,7 @@ vfsInclude("LuaRules/Utilities/vector.lua"           , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitTypeChecker.lua"  , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/function_override.lua", nil, vfsGame)
 vfsInclude("LuaRules/Utilities/minimap.lua"          , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/modules.lua"          , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/lobbyStuff.lua"       , nil, vfsGame)
 vfsInclude("LuaUI/Utilities/truncate.lua"            , nil, vfsGame)
 vfsInclude("LuaUI/keysym.lua"                        , nil, vfsGame)
@@ -631,6 +633,7 @@ local restrictedWhitelist = {
 	     no reason for them to have access anyway. ]]
 	['LuaUI/Widgets/gfx_projectile_lights.lua'] = true,
 	['LuaUI/Widgets/gfx_deferred_rendering_gl4.lua'] = true,
+	['LuaUI/Widgets/gfx_distortion_gl4.lua'] = true,
 }
 
 for i = 1, #restrictedFunctions do
