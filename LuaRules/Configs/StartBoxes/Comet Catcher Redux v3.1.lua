@@ -1,5 +1,5 @@
 local layout = Spring.Utilities.Gametype.is1v1() and {
-	[0] = {
+	{
 		nameLong = "North-East",
 		nameShort = "NE",
 		startpoints = {
@@ -15,7 +15,7 @@ local layout = Spring.Utilities.Gametype.is1v1() and {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "South-West",
 		nameShort = "SW",
 		startpoints = {
@@ -32,7 +32,7 @@ local layout = Spring.Utilities.Gametype.is1v1() and {
 		},
 	},
 } or  {
-	[0] = {
+	{
 		nameLong = "North",
 		nameShort = "N",
 		startpoints = {
@@ -49,7 +49,7 @@ local layout = Spring.Utilities.Gametype.is1v1() and {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "South",
 		nameShort = "S",
 		startpoints = {

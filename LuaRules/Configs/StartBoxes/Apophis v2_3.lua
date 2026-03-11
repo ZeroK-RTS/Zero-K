@@ -4,7 +4,7 @@
 --local y2 = 2000
 
 return {
-	[0] = {
+	{
 		nameLong = "South",
 		nameShort = "S",
 		startpoints = {
@@ -19,7 +19,7 @@ return {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "North",
 		nameShort = "N",
 		startpoints = {

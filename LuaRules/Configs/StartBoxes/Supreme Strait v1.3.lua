@@ -1,7 +1,7 @@
 local boxFuncs = VFS.Include("LuaRules/Configs/StartBoxes/helpers.lua")
 
 local layout = {
-	[0] = {
+	{
 		nameLong = "South-West",
 		nameShort = "SW",
 		startpoints = {
@@ -74,7 +74,7 @@ local layout = {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "North-West",
 		nameShort = "NW",
 		startpoints = {

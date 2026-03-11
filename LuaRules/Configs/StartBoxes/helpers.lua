@@ -1,19 +1,19 @@
 local funcs = {}
 
 function funcs.RotateMirrorBoxes(layout)
-	layout[1].boxes = {{}}
-	layout[1].startpoints = {}
+	layout[2].boxes = {{}}
+	layout[2].startpoints = {}
 	
-	for i = 1, #layout[0].boxes[1] do
-		layout[1].boxes[1][i] = {
-			Game.mapSizeX - layout[0].boxes[1][i][1],
-			Game.mapSizeZ - layout[0].boxes[1][i][2]
+	for i = 1, #layout[1].boxes[1] do
+		layout[2].boxes[1][i] = {
+			Game.mapSizeX - layout[1].boxes[1][i][1],
+			Game.mapSizeZ - layout[1].boxes[1][i][2]
 		}
 	end
-	for i = 1, #layout[0].startpoints do
-		layout[1].startpoints[i] = {
-			Game.mapSizeX - layout[0].startpoints[i][1],
-			Game.mapSizeZ - layout[0].startpoints[i][2]
+	for i = 1, #layout[1].startpoints do
+		layout[2].startpoints[i] = {
+			Game.mapSizeX - layout[1].startpoints[i][1],
+			Game.mapSizeZ - layout[1].startpoints[i][2]
 		}
 	end
 	return layout
@@ -22,7 +22,7 @@ end
 function funcs.NorthSouthBoxes(extent)
 	local percent = extent / Game.mapSizeZ
 	local layout = {
-		[0] = {
+		{
 			nameLong = "North",
 			nameShort = "N",
 			startpoints = {
@@ -37,7 +37,7 @@ function funcs.NorthSouthBoxes(extent)
 				},
 			},
 		},
-		[1] = {
+		{
 			boxes = {{}},
 			startpoints = {},
 			nameLong  = "South",
@@ -51,7 +51,7 @@ end
 function funcs.EastWestBoxes(extent)
 	local percent = extent / Game.mapSizeX
 	local layout = {
-		[0] = {
+		{
 			nameLong = "West",
 			nameShort = "W",
 			startpoints = {
@@ -66,7 +66,7 @@ function funcs.EastWestBoxes(extent)
 				},
 			},
 		},
-		[1] = {
+		{
 			boxes = {{}},
 			startpoints = {},
 			nameLong  = "East",

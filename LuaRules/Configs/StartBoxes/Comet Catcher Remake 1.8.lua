@@ -1,7 +1,7 @@
 local boxFuncs = VFS.Include("LuaRules/Configs/StartBoxes/helpers.lua")
 
 local layout = Spring.Utilities.Gametype.is1v1() and {
-	[0] = {
+	{
 		nameLong = "North-West",
 		nameShort = "NW",
 		startpoints = {
@@ -17,7 +17,7 @@ local layout = Spring.Utilities.Gametype.is1v1() and {
 			}
 		},
 	},
-	[1] = {
+	{
 		nameLong = "South-East",
 		nameShort = "SE",
 		startpoints = {
@@ -34,7 +34,7 @@ local layout = Spring.Utilities.Gametype.is1v1() and {
 		},
 	},
 } or boxFuncs.RotateMirrorBoxes({
-	[0] = {
+	{
 		nameLong = "West",
 		nameShort = "W",
 		startpoints = {
@@ -49,7 +49,7 @@ local layout = Spring.Utilities.Gametype.is1v1() and {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "East",
 		nameShort = "SE",
 	},
