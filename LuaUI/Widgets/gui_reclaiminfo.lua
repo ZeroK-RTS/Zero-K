@@ -42,6 +42,10 @@ local inMinimap = false --mouse cursor in minimap
 
 local LIVE_RECLAIM_EFFICIENCY = Game.reclaimUnitEfficiency
 
+if type(Game.reclaimUnitEfficiency) == "table" then
+	LIVE_RECLAIM_EFFICIENCY = Game.reclaimUnitEfficiency[1]
+end
+
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
