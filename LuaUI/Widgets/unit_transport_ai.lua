@@ -73,15 +73,6 @@ local autoCallTransportCmdDesc = {
 	pos = {CMD.ONOFF, CMD.REPEAT, CMD.MOVE_STATE, CMD.FIRE_STATE, CMD_RETREAT},
 }
 
-local unitAICmdDesc = {
-	id      = CMD_UNIT_AI,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Unit AI',
-	action  = 'unitai',
-	tooltip	= 'Toggles smart unit AI for the unit',
-	params 	= {0, 'AI Off','AI On'}
-}
-
 options_path = 'Settings/Unit Behaviour/Transport AI'
 options = {
 	transportFromFactory = {
@@ -573,17 +564,6 @@ function widget:CommandsChanged()
 			autoCallTransportCmdDesc.params[1] = order
 			table.insert(customCommands, autoCallTransportCmdDesc)
 			searchCall = false
-		end
-
-		if searchTransport and transportDef[unitDefID] then
-			local customCommands = widgetHandler.customCommands
-			local order = 0
-			if activeTransports[units[1]] then
-				order = 1
-			end
-			unitAICmdDesc.params[1] = order
-			table.insert(customCommands, unitAICmdDesc)
-			searchTransport = false
 		end
 	end
 end

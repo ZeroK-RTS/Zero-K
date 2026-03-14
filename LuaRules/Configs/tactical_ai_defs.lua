@@ -2068,6 +2068,14 @@ local behaviourConfig = {
 		name = "energysolar",
 		externallyHandled = true,
 	},
+	{
+		name = "gunshiptrans",
+		externallyHandled = true,
+	},
+	{
+		name = "gunshipheavytrans",
+		externallyHandled = true,
+	},
 }
 
 --------------------------------------------------------------------------------
