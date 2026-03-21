@@ -18,6 +18,8 @@ if not (modoption == "1") then
 	return
 end
 
+GG.ATT_ENABLE_DAMAGE = true
+
 local autoAiTech = Spring.GetModOptions().aiusetechk ~= "0"
 
 --------------------------------------------------------------------------------
@@ -153,7 +155,7 @@ local function SetUnitTechLevel(unitID, level)
 	--Spring.Utilities.UnitEcho(unitID, level)
 	
 	local sizeScale = math.pow(1.6, math.pow(level, 0.45) - 1)
-	local projectiles = math.pow(2, level - 1)
+	-- local projectiles = math.pow(2, level - 1)
 	local range = math.pow(1.1, level - 1)
 	
 	if level > 1 then
@@ -166,7 +168,8 @@ local function SetUnitTechLevel(unitID, level)
 	
 	local simpleDoubling = math.pow(2, level - 1)
 	GG.Attributes.AddEffect(unitID, "tech", {
-		projectiles = projectiles,
+		-- projectiles = projectiles,
+		damage = simpleDoubling,
 		--move =  math.pow(0.95, level - 1),
 		range = range,
 		jumpRange = range,
@@ -187,6 +190,15 @@ local function SetUnitTechLevel(unitID, level)
 	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.1, sizeScale, 1 + (sizeScale - 1)*0.1})
 	GG.UnitModelRescale(unitID, sizeScale)
 	Spring.SetUnitRulesParam(unitID, "tech_level", level, INLOS_ACCESS)
+	local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+	if unitDef.metalStorage then
+		print("Updating m")
+		Spring.SetUnitStorage(unitID, "m", simpleDoubling * unitDef.metalStorage)
+	end
+	if unitDef.energyStorage then
+		print("Updating e")
+		Spring.SetUnitStorage(unitID, "e", simpleDoubling * unitDef.energyStorage)
+	end
 	unitLevel[unitID] = level
 	
 	if (not hasTechCommand[unitID]) and IsTechBuilder(unitID, unitDefID) then
