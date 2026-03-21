@@ -147,6 +147,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+    local level = unitLevel[unitID] or 1
+    local storage_scaling = math.pow(9/4, level - 1), -- Effective 3x
+    local unitDef = UnitDefs[unitDefID]
+
+    if unitDef.metalStorage then
+        Spring.SetUnitStorage(unitID, "m", storage_scaling * unitDef.metalStorage)
+    end
+    if unitDef.energyStorage then
+        Spring.SetUnitStorage(unitID, "e", storage_scaling * unitDef.energyStorage)
+    end
+end
+
 local function SetUnitTechLevel(unitID, level)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if not unitDefID then
@@ -190,15 +203,6 @@ local function SetUnitTechLevel(unitID, level)
 	GG.SetColvolScales(unitID, {1 + (sizeScale - 1)*0.1, sizeScale, 1 + (sizeScale - 1)*0.1})
 	GG.UnitModelRescale(unitID, sizeScale)
 	Spring.SetUnitRulesParam(unitID, "tech_level", level, INLOS_ACCESS)
-	local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
-	if unitDef.metalStorage then
-		print("Updating m")
-		Spring.SetUnitStorage(unitID, "m", simpleDoubling * unitDef.metalStorage)
-	end
-	if unitDef.energyStorage then
-		print("Updating e")
-		Spring.SetUnitStorage(unitID, "e", simpleDoubling * unitDef.energyStorage)
-	end
 	unitLevel[unitID] = level
 	
 	if (not hasTechCommand[unitID]) and IsTechBuilder(unitID, unitDefID) then
