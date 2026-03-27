@@ -95,6 +95,7 @@ return { gunshipskirm = {
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
       soundStart              = [[weapon/missile/rocket_fire]],
+      soundStartVolume        = 8.5,
       soundTrigger            = true,
       startVelocity           = 250,
       texture2                = [[purpletrail]],
