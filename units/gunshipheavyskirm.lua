@@ -52,7 +52,7 @@ return { gunshipheavyskirm = {
     },
 
   },
-  sightDistance       = 660,
+  sightDistance       = 740,
   speed               = 99,
   turnRate            = 600,
   workerTime          = 0,
