@@ -1,4 +1,4 @@
-local suported_playercounts = {5, 11, 16}
+local supported_playercounts = {5, 11, 16}
 --[[ The 16 startpoints form a planar graph where each vertex is a 3-mex startpoint and has 3 edges, which
      are veh-pathable passages to other vertices with 2 mexes in between. The lack of connection means there
      are mountains in between (there are some mexes and geospots in the mountains but they are standalone).
@@ -11,22 +11,22 @@ local suported_playercounts = {5, 11, 16}
      for other player counts but I don't have the mana to do that so only did the obvious geo-related ones. ]]
 
 local potential_starts = { -- x, z, hasGeoButIsLandlocked, connectedVertices (geo)
-	[ 1] = { 1628, 3881, false, {  2 , ( 3),   4  }},
-	[ 2] = { 3300, 1179, false, {  1 , ( 3),   5  }},
-	[ 3] = { 3853, 3498,  true, {  1 ,   2 , ( 6) }},
-	[ 4] = { 3420, 6195, false, {  1 , ( 6),   7  }},
-	[ 5] = { 5861, 1299, false, {  2 , ( 6),   8  }},
-	[ 6] = { 5983, 4260,  true, {( 3),   4 ,   5  }},
-	[ 7] = { 6448, 6681, false, {  4 , ( 9),  10  }},
-	[ 8] = { 9085, 1259, false, {  5 , (11),  13  }},
-	[ 9] = { 8387, 4180,  true, {  7 ,  10 , (11) }},
-	[10] = { 9000, 6533, false, {  7 , ( 9),  12  }},
-	[11] = {10710, 3457,  true, {  8 , ( 9),  12  }},
-	[12] = {10926, 6131, false, { 10 , (11),  15  }},
-	[13] = {12784, 1325, false, {  8 , (14),  16  }},
-	[14] = {12742, 4092,  true, { 13 ,  15 ,  16  }}, -- not connected to any geo, though has one itself
-	[15] = {13729, 6509, false, { 12 , (14),  16  }},
-	[16] = {14914, 2751, false, { 13 , (14),  15  }},
+    { 1628, 3881, false, {2,  3,  4}},
+    { 3300, 1179, false, {1,  3,  5}},
+    { 3853, 3498, true,  {1,  2,  6}},
+    { 3420, 6195, false, {1,  6,  7}},
+    { 5861, 1299, false, {2,  6,  8}},
+    { 5983, 4260, true,  {3,  4,  5}},
+    { 6448, 6681, false, {4,  9,  10}},
+    { 9085, 1259, false, {5,  11, 13}},
+    { 8387, 4180, true,  {7,  10, 11}},
+    { 9000, 6533, false, {7,  9,  12}},
+    {10710, 3457, true,  {8,  9,  12}},
+    {10926, 6131, false, {10, 11, 15}},
+    {12784, 1325, false, {8,  14, 16}},
+    {12742, 4092, true,  {13, 15, 16}}, -- not connected to any geo, though has one itself
+    {13729, 6509, false, {12, 14, 16}},
+    {14914, 2751, false, {13, 14, 15}},
 }
 
 
@@ -70,4 +70,4 @@ for i = 1, #starts do
 	end
 end
 
-return ret, suported_playercounts
+return ret, supported_playercounts

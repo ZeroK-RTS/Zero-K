@@ -139,13 +139,13 @@ for i = 1, #starts do
 end
 
 return {
-	[0] = {
+	{
 		nameLong = "South-West",
 		nameShort = "SW",
 		startpoints = starts,
 		boxes = boxes,
 	},
-	[1] = {
+	{
 		nameLong = "North-East",
 		nameShort = "NE",
 		startpoints = starts_mirrored,
