@@ -23,6 +23,12 @@ local icontypes = {
     radiusadjust=0,
   },
   
+-- commander egg
+  commander_egg = {
+    bitmap='icons/commander_egg_icon.dds',
+    size=2.5,
+  },
+
 -- commanders
   commander0 = {
     bitmap='icons/armcommander.dds',

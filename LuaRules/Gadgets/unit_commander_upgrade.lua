@@ -431,6 +431,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
 	local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
+	-- Base modules for all starting commanders. Keep in sync with fallback in chassisDefByBaseDef block below.
 	local moduleList = {chassisModuleDefs.econ, chassisModuleDefs.module_radarnet}
 	local moduleCost = 0
 	for i = 1, #moduleList do
@@ -526,19 +527,30 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 	
 	if chassisDefByBaseDef[unitDefID] then
-		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
-		
+		-- Fallback for dynamic comms created outside the normal spawn path (e.g. hatched from commander egg).
+		-- Base modules must match Upgrades_CreateStarterDyncomm above.
+		local chassisDefID = chassisDefByBaseDef[unitDefID]
+		local chassisData = chassisDefs[chassisDefID]
+		local chassisModuleDefs = moduleDefNames[chassisData.name] or {}
+		local moduleList = {}
+		if chassisModuleDefs.econ then
+			moduleList[#moduleList + 1] = chassisModuleDefs.econ
+		end
+		if chassisModuleDefs.module_radarnet then
+			moduleList[#moduleList + 1] = chassisModuleDefs.module_radarnet
+		end
+
 		InitializeDynamicCommander(
 			unitID,
 			0,
-			chassisDefByBaseDef[unitDefID],
+			chassisDefID,
 			UnitDefs[unitDefID].metalCost,
-			"Guinea Pig",
+			"Hatched Commander",
 			unitDefID,
 			chassisData.baseWreckID,
 			chassisData.baseHeapID,
-			{},
-			{}
+			moduleList,
+			false
 		)
 		return
 	end

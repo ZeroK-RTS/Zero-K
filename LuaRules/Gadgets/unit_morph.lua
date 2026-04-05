@@ -235,7 +235,29 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	if Spring.GetUnitTransporter(unitID) and not morphDef.combatMorph then
 		return false
 	end
-	
+
+	-- do not allow hatching a commander if the team already has one or is hatching one
+	local targetDef = UnitDefs[morphDef.into]
+	if targetDef and targetDef.customParams and targetDef.customParams.dynamic_comm then
+		local teamUnits = Spring.GetTeamUnits(teamID)
+		for i = 1, #teamUnits do
+			if teamUnits[i] ~= unitID then
+				-- check for existing commander on this team
+				if Spring.GetUnitRulesParam(teamUnits[i], "comm_level") then
+					return false
+				end
+				-- check for another egg already morphing into a commander
+				local otherMorph = morphUnits[teamUnits[i]]
+				if otherMorph and otherMorph.def and otherMorph.def.into then
+					local otherTarget = UnitDefs[otherMorph.def.into]
+					if otherTarget and otherTarget.customParams and otherTarget.customParams.dynamic_comm then
+						return false
+					end
+				end
+			end
+		end
+	end
+
 	Spring.SetUnitRulesParam(unitID, "morphing", 1)
 
 	if not morphDef.combatMorph then
@@ -451,7 +473,13 @@ local function FinishMorph(unitID, morphData)
 	SendToUnsynced("unit_morph_finished", unitID, newUnit)
 	GG.wasMorphedTo[unitID] = newUnit
 	Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
-	
+
+	-- tag egg-hatched commanders so they can be tracked across team transfers
+	local newUnitDef = UnitDefs[Spring.GetUnitDefID(newUnit)]
+	if newUnitDef and newUnitDef.customParams and newUnitDef.customParams.dynamic_comm then
+		Spring.SetUnitRulesParam(newUnit, "egg_hatched_team", unitTeam)
+	end
+
 	Spring.SetUnitBlocking(newUnit, true)
 	
 	-- copy disarmed
@@ -716,6 +744,14 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		StopMorph(unitID, morphUnits[unitID])
 		morphUnits[unitID] = nil
 	end
+end
+
+function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
+	-- prevent giving away egg-hatched commanders (but allow capture by enemies)
+	if not capture and Spring.GetUnitRulesParam(unitID, "egg_hatched_team") then
+		return false
+	end
+	return true
 end
 
 --------------------------------------------------------------------------------
