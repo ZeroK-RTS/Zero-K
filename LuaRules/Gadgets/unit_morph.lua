@@ -284,7 +284,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		for _, origTeamID in ipairs(origTeams) do
 			local maxComms = Spring.GetTeamRulesParam(origTeamID, "start_comm_count") or 1
 			local current = commsByTeam[origTeamID] or 0
-			Spring.Echo("[EggHatch] origTeam=" .. origTeamID .. " maxComms=" .. maxComms .. " current=" .. current)
+			--Spring.Echo("[EggHatch] origTeam=" .. origTeamID .. " maxComms=" .. maxComms .. " current=" .. current)
 			if current < maxComms then
 				hatchForTeam = origTeamID
 				break
@@ -292,8 +292,8 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		end
 
 		if not hatchForTeam then
-			Spring.Echo("[EggHatch] No team needs a commander, hard reject")
-			Spring.SendMessageToTeam(teamID, "Cannot hatch: all commanders are still alive.")
+			--Spring.Echo("[EggHatch] No team needs a commander, hard reject")
+			Spring.SendMessageToTeam(teamID, "game_message: Cannot hatch: all commanders are still alive.")
 			return false, true -- not started, hard reject (no team needs a commander)
 		end
 		Spring.Echo("[EggHatch] Hatching for team " .. hatchForTeam)
