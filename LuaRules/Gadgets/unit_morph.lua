@@ -296,7 +296,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 			Spring.SendMessageToTeam(teamID, "game_message: Cannot hatch: all commanders are still alive.")
 			return false, true -- not started, hard reject (no team needs a commander)
 		end
-		Spring.Echo("[EggHatch] Hatching for team " .. hatchForTeam)
+		--Spring.Echo("[EggHatch] Hatching for team " .. hatchForTeam)
 
 		-- mark this egg so other eggs know this team is already being served
 		Spring.SetUnitRulesParam(unitID, "egg_morph_owner_team", hatchForTeam)
