@@ -6,9 +6,12 @@ return { commander_egg = {
   canMove             = true,
   cantBeTransported   = false,
   category            = [[LAND UNARMED]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[90 80 90]],
-  collisionVolumeType    = [[CylY]],
+  collisionVolumeOffsets  = [[0 0 0]],
+  collisionVolumeScales   = [[90 80 90]],
+  collisionVolumeType     = [[CylY]],
+  selectionVolumeOffsets  = [[0 0 0]],
+  selectionVolumeScales   = [[40 40 40]],
+  selectionVolumeType     = [[CylY]],
   corpse              = [[DEAD]],
 
   customParams        = {

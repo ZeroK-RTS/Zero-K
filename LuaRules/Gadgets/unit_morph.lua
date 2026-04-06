@@ -236,22 +236,45 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		return false
 	end
 
-	-- do not allow hatching a commander if the team already has one or is hatching one
+	-- do not allow hatching if a commander with the same owner is alive anywhere
+	-- uses commander_owner tag (set by start_unit_setup for starting comms, and by FinishMorph for hatched comms)
 	local targetDef = UnitDefs[morphDef.into]
 	if targetDef and targetDef.customParams and targetDef.customParams.dynamic_comm then
-		local teamUnits = Spring.GetTeamUnits(teamID)
-		for i = 1, #teamUnits do
-			if teamUnits[i] ~= unitID then
-				-- check for existing commander on this team
-				if Spring.GetUnitRulesParam(teamUnits[i], "comm_level") then
-					return false
-				end
-				-- check for another egg already morphing into a commander
-				local otherMorph = morphUnits[teamUnits[i]]
-				if otherMorph and otherMorph.def and otherMorph.def.into then
-					local otherTarget = UnitDefs[otherMorph.def.into]
-					if otherTarget and otherTarget.customParams and otherTarget.customParams.dynamic_comm then
+		-- get egg owner's name
+		local ownerName
+		local playerList = Spring.GetPlayerList(teamID)
+		for _, pid in ipairs(playerList) do
+			local name, _, isSpec = Spring.GetPlayerInfo(pid, false)
+			if not isSpec then
+				ownerName = name
+				break
+			end
+		end
+		if not ownerName then
+			local isAI = select(4, Spring.GetTeamInfo(teamID, false))
+			if isAI then
+				ownerName = select(2, Spring.GetAIInfo(teamID))
+			end
+		end
+
+		if ownerName then
+			-- search all units in the game for a commander with this owner
+			local allUnits = Spring.GetAllUnits()
+			for i = 1, #allUnits do
+				if allUnits[i] ~= unitID then
+					if Spring.GetUnitRulesParam(allUnits[i], "commander_owner") == ownerName then
 						return false
+					end
+				end
+			end
+			-- also check eggs already morphing into commanders
+			for morphUnitID, morphData in pairs(morphUnits) do
+				if morphUnitID ~= unitID and morphData.def and morphData.def.into then
+					local otherTarget = UnitDefs[morphData.def.into]
+					if otherTarget and otherTarget.customParams and otherTarget.customParams.dynamic_comm then
+						if Spring.GetUnitTeam(morphUnitID) == teamID then
+							return false
+						end
 					end
 				end
 			end
@@ -474,10 +497,29 @@ local function FinishMorph(unitID, morphData)
 	GG.wasMorphedTo[unitID] = newUnit
 	Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
 
-	-- tag egg-hatched commanders so they can be tracked across team transfers
+	-- tag hatched commanders with owner name (matching start_unit_setup convention)
 	local newUnitDef = UnitDefs[Spring.GetUnitDefID(newUnit)]
 	if newUnitDef and newUnitDef.customParams and newUnitDef.customParams.dynamic_comm then
 		Spring.SetUnitRulesParam(newUnit, "egg_hatched_team", unitTeam)
+		-- set commander_owner to match the player who owned the egg
+		local ownerName
+		local playerList = Spring.GetPlayerList(unitTeam)
+		for _, pid in ipairs(playerList) do
+			local name, _, isSpec = Spring.GetPlayerInfo(pid, false)
+			if not isSpec then
+				ownerName = name
+				break
+			end
+		end
+		if not ownerName then
+			local isAI = select(4, Spring.GetTeamInfo(unitTeam, false))
+			if isAI then
+				ownerName = select(2, Spring.GetAIInfo(unitTeam))
+			end
+		end
+		if ownerName then
+			Spring.SetUnitRulesParam(newUnit, "commander_owner", ownerName, {inlos = true})
+		end
 	end
 
 	Spring.SetUnitBlocking(newUnit, true)
