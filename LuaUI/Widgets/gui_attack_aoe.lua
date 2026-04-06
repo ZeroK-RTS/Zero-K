@@ -826,7 +826,7 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 	local horDist = math.sqrt((fx - tx)*(fx - tx) + (fz - tz)*(fz - tz))
 	local vertDist = ty - fy
 	
-	if info.range + 10 < horDist or horDist < 100 then
+	if (not info.range) or info.range + 10 < horDist or horDist < 100 then
 		return false
 	end
 	
