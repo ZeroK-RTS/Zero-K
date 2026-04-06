@@ -2,7 +2,7 @@
 	"commander_egg" : {
 		"name" : "Commander Egg",
 		"description" : "Evolves into a Commander. EMP explosion on death.",
-		"helptext" : "Evolves into a Commander of your choice (Strike, Guardian, Recon, or Engineer). You can only have one commander at a time - the egg will not hatch if you already have a living commander. Egg-hatched commanders cannot be given to allies. On death or detonation, releases a powerful EMP blast (30000 damage, 280 radius, 45s paralyze) equivalent to a Shockley missile. Can be transported by Hercules only."
+		"helptext" : "Evolves into a Commander of your choice (Strike, Guardian, Recon, or Engineer). The egg will only hatch if a player on the team is missing a commander. Each player can have up to their starting number of commanders. On death or detonation, releases a powerful EMP blast (30000 damage, 280 radius, 45s paralyze) equivalent to a Shockley missile. Can be transported by Hercules only."
 	},
 	"starlight_satellite" : {
 		"name" : "Glint",

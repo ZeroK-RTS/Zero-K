@@ -3,6 +3,7 @@ return { commander_egg = {
   description         = [[Morphs into a Commander. EMP explosion on death.]],
   builder             = false,
   buildPic            = [[commander_egg.png]],
+  blocking            = true,
   canMove             = true,
   cantBeTransported   = false,
   category            = [[LAND UNARMED]],
@@ -41,8 +42,8 @@ return { commander_egg = {
   },
 
   explodeAs           = [[COMMANDER_EGG_EMP]],
-  footprintX          = 2,
-  footprintZ          = 2,
+  footprintX          = 3,
+  footprintZ          = 3,
   health              = 1500,
   iconType            = [[commander_egg]],
   maxSlope            = 36,
@@ -53,7 +54,6 @@ return { commander_egg = {
   selfDestructAs      = [[COMMANDER_EGG_EMP]],
   sightDistance        = 300,
   speed               = 0.01,
-  yardMap             = [[oooo]],
 
   weaponDefs          = {
     COMMANDER_EGG_EMP = {
