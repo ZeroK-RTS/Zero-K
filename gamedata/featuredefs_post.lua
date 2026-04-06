@@ -193,9 +193,7 @@ local function ProcessUnitDef(udName, ud)
     local fullName = udName .. '_' .. ud.corpse:lower()
     local fd = FeatureDefs[fullName]
     if (fd) then
-      if ud.customparams and (ud.customparams.dynamic_comm or ud.customparams.commtype) then
-        fd.resurrectable = 0
-      elseif fd.resurrectable ~= 0 then
+      if fd.resurrectable ~= 0 then
         fd.resurrectable = 1
       end
       ud.corpse = fullName
