@@ -538,20 +538,6 @@ local function FinishMorph(unitID, morphData)
 				return
 			end
 			Spring.SetUnitRulesParam(newUnit, "commander_owner_team", hatchForTeam, {inlos = true})
-			-- resolve owner name for UI (nametag/tooltip)
-			local isAI = select(4, Spring.GetTeamInfo(hatchForTeam, false))
-			local ownerName
-			if isAI then
-				ownerName = select(2, Spring.GetAIInfo(hatchForTeam))
-			else
-				local leaderID = select(2, Spring.GetTeamInfo(hatchForTeam, false))
-				if leaderID then
-					ownerName = Spring.GetPlayerInfo(leaderID, false)
-				end
-			end
-			if ownerName then
-				Spring.SetUnitRulesParam(newUnit, "commander_owner", ownerName, {inlos = true})
-			end
 			-- register with share_mode so unmerge returns this commander to the correct team
 			if GG.ShareMode_RegisterUnit then
 				GG.ShareMode_RegisterUnit(newUnit, hatchForTeam)
