@@ -449,9 +449,10 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			name = Spring.GetPlayerInfo(playerID, false)
 		end
 		Spring.SetUnitRulesParam(unitID, "commander_owner", name, {inlos = true})
-		-- track starting commander count per player name (for egg morph limiting)
-		local prevCount = Spring.GetGameRulesParam("startComms_" .. name) or 0
-		Spring.SetGameRulesParam("startComms_" .. name, prevCount + 1)
+		Spring.SetUnitRulesParam(unitID, "commander_owner_team", teamID, {inlos = true})
+		-- track starting commander count per team (for egg morph limiting)
+		local prevCount = Spring.GetTeamRulesParam(teamID, "start_comm_count") or 0
+		Spring.SetTeamRulesParam(teamID, "start_comm_count", prevCount + 1)
 		return true
 	end
 	return false

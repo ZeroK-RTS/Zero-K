@@ -236,62 +236,66 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		return false
 	end
 
-	-- Commander egg hatching: find a player on this team who is missing a commander.
-	-- Each player has a max commander count set at game start (startComms_<name>, usually 1).
-	-- Commanders are tracked by commander_owner tag which persists across give/commshare.
+	-- Commander egg hatching: find an original team on this team that is missing a commander.
+	-- Each team has a start_comm_count set at game start (usually 1, can be higher for imba).
+	-- Commanders are tracked by commander_owner_team which persists across give/commshare.
 	local targetDef = UnitDefs[morphDef.into]
 	if targetDef and targetDef.customParams and targetDef.customParams.dynamic_comm then
-		-- gather player names on this team
-		local playerNames = {}
+		-- gather original team IDs that belong to this team (handles commshare)
+		local origTeams = {}
 		local isAI = select(4, Spring.GetTeamInfo(teamID, false))
 		if isAI then
-			playerNames[1] = select(2, Spring.GetAIInfo(teamID))
+			origTeams[1] = teamID
 		else
 			local playerList = Spring.GetPlayerList(teamID)
+			local seen = {}
 			for _, pid in ipairs(playerList) do
-				local name, _, isSpec = Spring.GetPlayerInfo(pid, false)
+				local _, _, isSpec = Spring.GetPlayerInfo(pid, false)
 				if not isSpec then
-					playerNames[#playerNames + 1] = name
+					local origTeamID = Spring.GetPlayerRulesParam(pid, "commshare_orig_teamid") or teamID
+					if not seen[origTeamID] then
+						seen[origTeamID] = true
+						origTeams[#origTeams + 1] = origTeamID
+					end
 				end
 			end
 		end
 
-		-- count living commanders per player (across ALL units in the game)
-		-- also count eggs already morphing into commanders (assigned to a player via egg_morph_owner)
-		local commsByOwner = {}
+		-- count living commanders per original team (across ALL units in the game)
+		-- also count eggs already morphing into commanders (reserved via egg_morph_owner_team)
+		local commsByTeam = {}
 		local allUnits = Spring.GetAllUnits()
 		for i = 1, #allUnits do
 			local uid = allUnits[i]
 			if uid ~= unitID then
-				local owner = Spring.GetUnitRulesParam(uid, "commander_owner")
-				if owner and Spring.GetUnitRulesParam(uid, "comm_level") then
-					commsByOwner[owner] = (commsByOwner[owner] or 0) + 1
+				local ownerTeam = Spring.GetUnitRulesParam(uid, "commander_owner_team")
+				if ownerTeam and Spring.GetUnitRulesParam(uid, "comm_level") then
+					commsByTeam[ownerTeam] = (commsByTeam[ownerTeam] or 0) + 1
 				end
-				-- count eggs already morphing for a specific player
-				local morphOwner = Spring.GetUnitRulesParam(uid, "egg_morph_owner")
-				if morphOwner then
-					commsByOwner[morphOwner] = (commsByOwner[morphOwner] or 0) + 1
+				local morphOwnerTeam = Spring.GetUnitRulesParam(uid, "egg_morph_owner_team")
+				if morphOwnerTeam then
+					commsByTeam[morphOwnerTeam] = (commsByTeam[morphOwnerTeam] or 0) + 1
 				end
 			end
 		end
 
-		-- find a player who needs a commander
-		local hatchFor = nil
-		for _, name in ipairs(playerNames) do
-			local maxComms = Spring.GetGameRulesParam("startComms_" .. name) or 1
-			local current = commsByOwner[name] or 0
+		-- find an original team that needs a commander
+		local hatchForTeam = nil
+		for _, origTeamID in ipairs(origTeams) do
+			local maxComms = Spring.GetTeamRulesParam(origTeamID, "start_comm_count") or 1
+			local current = commsByTeam[origTeamID] or 0
 			if current < maxComms then
-				hatchFor = name
+				hatchForTeam = origTeamID
 				break
 			end
 		end
 
-		if not hatchFor then
+		if not hatchForTeam then
 			return false
 		end
 
-		-- mark this egg so other eggs know this player is already being served
-		Spring.SetUnitRulesParam(unitID, "egg_morph_owner", hatchFor)
+		-- mark this egg so other eggs know this team is already being served
+		Spring.SetUnitRulesParam(unitID, "egg_morph_owner_team", hatchForTeam)
 	end
 
 	Spring.SetUnitRulesParam(unitID, "morphing", 1)
@@ -348,7 +352,7 @@ local function StopMorph(unitID, morphData)
 	GG.StopMiscPriorityResourcing(unitID, MISC_PRIO_KEY) --is using unit_priority.lua gadget to handle morph priority.
 	morphUnits[unitID] = nil
 	-- clear egg morph reservation
-	Spring.SetUnitRulesParam(unitID, "egg_morph_owner", nil)
+	Spring.SetUnitRulesParam(unitID, "egg_morph_owner_team", nil)
 	if not morphData.combatMorph then
 		Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
 		GG.UpdateUnitAttributes(unitID)
@@ -512,29 +516,46 @@ local function FinishMorph(unitID, morphData)
 	GG.wasMorphedTo[unitID] = newUnit
 	Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
 
-	-- tag hatched commanders with owner name for per-player tracking
+	-- tag hatched commanders with owner team for tracking
 	local newUnitDef = UnitDefs[Spring.GetUnitDefID(newUnit)]
 	if newUnitDef and newUnitDef.customParams and newUnitDef.customParams.dynamic_comm then
-		local hatchFor = Spring.GetUnitRulesParam(unitID, "egg_morph_owner")
-		if hatchFor then
-			-- final check: verify this player still needs a commander
-			local maxComms = Spring.GetGameRulesParam("startComms_" .. hatchFor) or 1
+		local hatchForTeam = Spring.GetUnitRulesParam(unitID, "egg_morph_owner_team")
+		if hatchForTeam then
+			-- final check: verify this team still needs a commander
+			local maxComms = Spring.GetTeamRulesParam(hatchForTeam, "start_comm_count") or 1
 			local current = 0
 			local allUnits = Spring.GetAllUnits()
 			for i = 1, #allUnits do
 				if allUnits[i] ~= unitID and allUnits[i] ~= newUnit then
-					if Spring.GetUnitRulesParam(allUnits[i], "commander_owner") == hatchFor
+					if Spring.GetUnitRulesParam(allUnits[i], "commander_owner_team") == hatchForTeam
 					   and Spring.GetUnitRulesParam(allUnits[i], "comm_level") then
 						current = current + 1
 					end
 				end
 			end
 			if current >= maxComms then
-				-- player already has enough commanders, destroy the hatched unit and refund
 				Spring.DestroyUnit(newUnit, false, true)
 				return
 			end
-			Spring.SetUnitRulesParam(newUnit, "commander_owner", hatchFor, {inlos = true})
+			Spring.SetUnitRulesParam(newUnit, "commander_owner_team", hatchForTeam, {inlos = true})
+			-- resolve owner name for UI (nametag/tooltip)
+			local isAI = select(4, Spring.GetTeamInfo(hatchForTeam, false))
+			local ownerName
+			if isAI then
+				ownerName = select(2, Spring.GetAIInfo(hatchForTeam))
+			else
+				local leaderID = select(2, Spring.GetTeamInfo(hatchForTeam, false))
+				if leaderID then
+					ownerName = Spring.GetPlayerInfo(leaderID, false)
+				end
+			end
+			if ownerName then
+				Spring.SetUnitRulesParam(newUnit, "commander_owner", ownerName, {inlos = true})
+			end
+			-- register with share_mode so unmerge returns this commander to the correct team
+			if GG.ShareMode_RegisterUnit then
+				GG.ShareMode_RegisterUnit(newUnit, hatchForTeam)
+			end
 		end
 	end
 

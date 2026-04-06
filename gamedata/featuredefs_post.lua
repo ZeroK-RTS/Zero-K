@@ -220,6 +220,25 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Block resurrection for commander wrecks (units with dynamic_comm or commtype)
+
+for udName, ud in pairs(UnitDefs) do
+	if istable(ud) then
+		local cp = ud.customparams
+		if istable(cp) and (cp.dynamic_comm or cp.commtype) then
+			if isstring(ud.corpse) then
+				local fullName = udName .. '_' .. ud.corpse:lower()
+				local fd = FeatureDefs[fullName]
+				if fd then
+					fd.resurrectable = 0
+				end
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- resurrectable = -1 seems to be broken, set it to 0 for all values which are not 1
 
 for name, def in pairs(FeatureDefs) do
