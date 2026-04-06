@@ -292,8 +292,9 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		end
 
 		if not hatchForTeam then
-			Spring.Echo("[EggHatch] No team needs a commander, blocking morph")
-			return false
+			Spring.Echo("[EggHatch] No team needs a commander, hard reject")
+			Spring.SendMessageToTeam(teamID, "Cannot hatch: all commanders are still alive.")
+			return false, true -- not started, hard reject (no team needs a commander)
 		end
 		Spring.Echo("[EggHatch] Hatching for team " .. hatchForTeam)
 
@@ -821,7 +822,8 @@ end
 function gadget:GameFrame(n)
 	-- start pending morphs
 	for unitID, data in pairs(morphToStart) do
-		if StartMorph(unitID, unpack(data)) then
+		local started, hardReject = StartMorph(unitID, unpack(data))
+		if started or hardReject then
 			morphToStart[unitID] = nil
 		end
 	end
