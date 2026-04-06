@@ -284,6 +284,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		for _, origTeamID in ipairs(origTeams) do
 			local maxComms = Spring.GetTeamRulesParam(origTeamID, "start_comm_count") or 1
 			local current = commsByTeam[origTeamID] or 0
+			Spring.Echo("[EggHatch] origTeam=" .. origTeamID .. " maxComms=" .. maxComms .. " current=" .. current)
 			if current < maxComms then
 				hatchForTeam = origTeamID
 				break
@@ -291,8 +292,10 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		end
 
 		if not hatchForTeam then
+			Spring.Echo("[EggHatch] No team needs a commander, blocking morph")
 			return false
 		end
+		Spring.Echo("[EggHatch] Hatching for team " .. hatchForTeam)
 
 		-- mark this egg so other eggs know this team is already being served
 		Spring.SetUnitRulesParam(unitID, "egg_morph_owner_team", hatchForTeam)
