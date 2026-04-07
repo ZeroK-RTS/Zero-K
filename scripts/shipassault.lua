@@ -74,6 +74,10 @@ function script.BlockShot(num, targetID)
 	if num == 2 and GG.OverkillPrevention_CheckBlock(unitID, targetID, 400.1, 90, false, false, true) then
 		return true
 	end
+	if num == 2 then
+		local reloadState = Spring.GetUnitWeaponState(unitID, 3, 'reloadState')
+		return not (reloadState and (reloadState < 0 or reloadState < Spring.GetGameFrame()))
+	end
 	return false
 end
 
@@ -95,7 +99,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(sleeves, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
-	elseif num == 2 then
+	elseif num == 2 or num == 3 then
 		return true
 	end
 end
@@ -114,7 +118,7 @@ function script.Shot(num)
 		EmitSfx(gunPieces[gun_1].flare, 1024)
 		Move(gunPieces[gun_1].flare, z_axis, 0)
 		StartThread(Recoil, gunPieces[gun_1].barrel)
-	elseif num == 2 then
+	elseif num == 2 or num == 3 then
 		missileNum = missileNum + 1
 		if missileNum > 4 then missileNum = 1 end
 		EmitSfx(missiles[missileNum], 1025)
