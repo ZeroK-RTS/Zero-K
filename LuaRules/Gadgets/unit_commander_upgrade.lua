@@ -533,18 +533,21 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		local chassisData = chassisDefs[chassisDefID]
 		local chassisModuleDefs = moduleDefNames[chassisData.name] or {}
 		local moduleList = {}
+		local moduleCost = 0
 		if chassisModuleDefs.econ then
 			moduleList[#moduleList + 1] = chassisModuleDefs.econ
+			moduleCost = moduleCost + moduleDefs[chassisModuleDefs.econ].cost
 		end
 		if chassisModuleDefs.module_radarnet then
 			moduleList[#moduleList + 1] = chassisModuleDefs.module_radarnet
+			moduleCost = moduleCost + moduleDefs[chassisModuleDefs.module_radarnet].cost
 		end
 
 		InitializeDynamicCommander(
 			unitID,
 			0,
 			chassisDefID,
-			UnitDefs[unitDefID].metalCost,
+			UnitDefs[unitDefID].metalCost + moduleCost,
 			"Hatched Commander",
 			unitDefID,
 			chassisData.baseWreckID,
