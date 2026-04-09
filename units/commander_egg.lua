@@ -3,7 +3,6 @@ return { commander_egg = {
   description         = [[Morphs into a Commander. EMP explosion on death.]],
   builder             = false,
   buildPic            = [[commander_egg.png]],
-  blocking            = true,
   canMove             = true,
   cantBeTransported   = false,
   category            = [[LAND UNARMED]],
@@ -18,25 +17,25 @@ return { commander_egg = {
   customParams        = {
     instantselfd = [[1]],
     massmult = 0.1,
-    requireheavytrans = 1,
+    midposoffset = [[0 15 0]],
 
     morphto_1    = [[dynstrike0]],
-    morphtime_1  = 30,
+    morphtime_1  = 60,
     morphcost_1  = 0,
     combatmorph_1 = [[0]],
 
     morphto_2    = [[dynassault0]],
-    morphtime_2  = 30,
+    morphtime_2  = 60,
     morphcost_2  = 0,
     combatmorph_2 = [[0]],
 
     morphto_3    = [[dynrecon0]],
-    morphtime_3  = 30,
+    morphtime_3  = 60,
     morphcost_3  = 0,
     combatmorph_3 = [[0]],
 
     morphto_4    = [[dynsupport0]],
-    morphtime_4  = 30,
+    morphtime_4  = 60,
     morphcost_4  = 0,
     combatmorph_4 = [[0]],
   },
@@ -47,13 +46,13 @@ return { commander_egg = {
   health              = 1500,
   iconType            = [[commander_egg]],
   maxSlope            = 36,
-  metalCost           = 500,
-  movementClass       = [[AKBOT2]],
+  metalCost           = 600,
+  movementClass       = [[KBOT3]],
   objectName          = [[commander_egg.s3o]],
   script              = [[commander_egg.lua]],
   selfDestructAs      = [[COMMANDER_EGG_EMP]],
   sightDistance        = 300,
-  speed               = 0.01,
+  speed               = 40,
 
   weaponDefs          = {
     COMMANDER_EGG_EMP = {
