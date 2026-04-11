@@ -158,7 +158,7 @@ local spToggleSoundStreamPaused = Spring.PauseSoundStream
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local includedAlbums = FindAlbums('sounds/music/')
-local trackListName = includedAlbums.superintendent and 'superintendent' or next(includedAlbums)
+local trackListName = includedAlbums.d700 and 'd700' or next(includedAlbums)
 local trackList = includedAlbums[trackListName].tracks
 
 local musicTrackWindow
@@ -326,7 +326,7 @@ options = {
 			end
 		end
 	},
-	albumSelection = {
+	albumSelection_2 = {
 		name = 'Track list',
 		type = 'radioButton',
 		value = trackListName,
@@ -572,11 +572,11 @@ function widget:GameID(id)
 	while seed > 1e8 do
 		seed = seed^0.8
 	end
-	if options.albumSelection.value == 'random' then
+	if options.albumSelection_2.value == 'random' then
 		if Spring.GetSoundStreamTime() < 0.5 then -- we don't change current album if a briefing track has started
 			randomChosen = false
 			randomAlbumUseSeed = true
-			options.albumSelection:OnChange()
+			options.albumSelection_2:OnChange()
 		end
 	end
 	randomAlbumUseSeed = false
