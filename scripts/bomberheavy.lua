@@ -171,7 +171,7 @@ end
 
 function script.StopMoving()
 	StartThread(Stopping)
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 end
 
 local function ShowBallWhenConstructionFinished()
@@ -203,7 +203,7 @@ function script.Create()
 	Hide(radiator_R)
 
 	SetInitialBomberSettings()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 
 	StartThread(ShowBallWhenConstructionFinished)
