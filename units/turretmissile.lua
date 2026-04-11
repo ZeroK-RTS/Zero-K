@@ -97,6 +97,7 @@ return { turretmissile = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       metalpershot            = 0,
       model                   = [[hobbes.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,

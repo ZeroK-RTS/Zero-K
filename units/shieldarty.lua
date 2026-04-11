@@ -90,6 +90,7 @@ return { shieldarty = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_merl.s3o]],
       noSelfDamage            = true,
       range                   = 940,

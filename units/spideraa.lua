@@ -81,6 +81,7 @@ return { spideraa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 1000,

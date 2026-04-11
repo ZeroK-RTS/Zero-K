@@ -94,6 +94,7 @@ return { wolverine_mine = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_b_fabby.s3o]],
       range                   = 115,
       reloadtime              = 20,

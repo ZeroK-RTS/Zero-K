@@ -89,6 +89,7 @@ return { gunshipskirm = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_maverick.s3o]],
       range                   = 360,
       reloadtime              = 5,

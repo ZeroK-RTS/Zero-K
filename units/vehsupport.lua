@@ -100,6 +100,7 @@ return { vehsupport = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_frostshard.s3o]],
       range                   = 595,
       reloadtime              = 0.766,

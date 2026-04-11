@@ -98,6 +98,7 @@ return { hoveraa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[hovermissile.s3o]],
       noSelfDamage            = true,
       range                   = 820,
