@@ -236,70 +236,12 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		return false
 	end
 
-	-- Commander egg hatching: find an original team on this team that is missing a commander.
-	-- Each team has a start_comm_count set at game start (usually 1, can be higher for imba).
-	-- Commanders are tracked by commander_owner_team which persists across give/commshare.
-	local targetDef = UnitDefs[morphDef.into]
-	if targetDef and targetDef.customParams and targetDef.customParams.dynamic_comm then
-		-- gather original team IDs that belong to this team (handles commshare)
-		local origTeams = {}
-		local isAI = select(4, Spring.GetTeamInfo(teamID, false))
-		if isAI then
-			origTeams[1] = teamID
-		else
-			local playerList = Spring.GetPlayerList(teamID)
-			local seen = {}
-			for _, pid in ipairs(playerList) do
-				local _, _, isSpec = Spring.GetPlayerInfo(pid, false)
-				if not isSpec then
-					local origTeamID = Spring.GetPlayerRulesParam(pid, "commshare_orig_teamid") or teamID
-					if not seen[origTeamID] then
-						seen[origTeamID] = true
-						origTeams[#origTeams + 1] = origTeamID
-					end
-				end
-			end
+	-- generic morph pre-check hook (used by unit_commander_egg.lua)
+	if GG.MorphPreCheck then
+		local allowed, hardReject = GG.MorphPreCheck(unitID, morphDef.into, teamID)
+		if allowed == false then
+			return false, hardReject
 		end
-
-		-- count living commanders per original team (across ALL units in the game)
-		-- also count eggs already morphing into commanders (reserved via egg_morph_owner_team)
-		local commsByTeam = {}
-		local allUnits = Spring.GetAllUnits()
-		for i = 1, #allUnits do
-			local uid = allUnits[i]
-			if uid ~= unitID then
-				local ownerTeam = Spring.GetUnitRulesParam(uid, "commander_owner_team")
-				if ownerTeam and Spring.GetUnitRulesParam(uid, "comm_level") then
-					commsByTeam[ownerTeam] = (commsByTeam[ownerTeam] or 0) + 1
-				end
-				local morphOwnerTeam = Spring.GetUnitRulesParam(uid, "egg_morph_owner_team")
-				if morphOwnerTeam then
-					commsByTeam[morphOwnerTeam] = (commsByTeam[morphOwnerTeam] or 0) + 1
-				end
-			end
-		end
-
-		-- find an original team that needs a commander
-		local hatchForTeam = nil
-		for _, origTeamID in ipairs(origTeams) do
-			local maxComms = Spring.GetTeamRulesParam(origTeamID, "start_comm_count") or 1
-			local current = commsByTeam[origTeamID] or 0
-			--Spring.Echo("[EggHatch] origTeam=" .. origTeamID .. " maxComms=" .. maxComms .. " current=" .. current)
-			if current < maxComms then
-				hatchForTeam = origTeamID
-				break
-			end
-		end
-
-		if not hatchForTeam then
-			--Spring.Echo("[EggHatch] No team needs a commander, hard reject")
-			Spring.SendMessageToTeam(teamID, "game_message: Cannot hatch: all commanders are still alive.")
-			return false, true -- not started, hard reject (no team needs a commander)
-		end
-		--Spring.Echo("[EggHatch] Hatching for team " .. hatchForTeam)
-
-		-- mark this egg so other eggs know this team is already being served
-		Spring.SetUnitRulesParam(unitID, "egg_morph_owner_team", hatchForTeam)
 	end
 
 	Spring.SetUnitRulesParam(unitID, "morphing", 1)
@@ -339,24 +281,31 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	local newMorphRate = GetMorphRate(unitID)
 	GG.StartMiscPriorityResourcing(unitID, (newMorphRate*costMult*morphDef.metal/morphDef.time), nil, MISC_PRIO_KEY) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
 	morphUnits[unitID].morphRate = newMorphRate
+
+	-- generic morph started hook (used by unit_commander_egg.lua)
+	if GG.MorphStarted then
+		GG.MorphStarted(unitID, morphDef.into, teamID)
+	end
+
 	return true
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
 	local morphData = morphUnits[unitID]
-	if not morphData then
-		return
+	if morphData then
+		GG.StopMiscPriorityResourcing(unitID, MISC_PRIO_KEY)
+		morphData.teamID = newTeamID
+		GG.StartMiscPriorityResourcing(unitID, (morphData.costMult*morphData.def.metal / morphData.def.time), false, MISC_PRIO_KEY)
 	end
-	GG.StopMiscPriorityResourcing(unitID, MISC_PRIO_KEY)
-	morphData.teamID = newTeamID
-	GG.StartMiscPriorityResourcing(unitID, (morphData.costMult*morphData.def.metal / morphData.def.time), false, MISC_PRIO_KEY)
 end
 
 local function StopMorph(unitID, morphData)
 	GG.StopMiscPriorityResourcing(unitID, MISC_PRIO_KEY) --is using unit_priority.lua gadget to handle morph priority.
 	morphUnits[unitID] = nil
-	-- clear egg morph reservation
-	Spring.SetUnitRulesParam(unitID, "egg_morph_owner_team", nil)
+	-- generic morph cancelled hook (used by unit_commander_egg.lua)
+	if GG.MorphCancelled then
+		GG.MorphCancelled(unitID)
+	end
 	if not morphData.combatMorph then
 		Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
 		GG.UpdateUnitAttributes(unitID)
@@ -520,32 +469,12 @@ local function FinishMorph(unitID, morphData)
 	GG.wasMorphedTo[unitID] = newUnit
 	Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
 
-	-- tag hatched commanders with owner team for tracking
-	local newUnitDef = UnitDefs[Spring.GetUnitDefID(newUnit)]
-	if newUnitDef and newUnitDef.customParams and newUnitDef.customParams.dynamic_comm then
-		local hatchForTeam = Spring.GetUnitRulesParam(unitID, "egg_morph_owner_team")
-		if hatchForTeam then
-			-- final check: verify this team still needs a commander
-			local maxComms = Spring.GetTeamRulesParam(hatchForTeam, "start_comm_count") or 1
-			local current = 0
-			local allUnits = Spring.GetAllUnits()
-			for i = 1, #allUnits do
-				if allUnits[i] ~= unitID and allUnits[i] ~= newUnit then
-					if Spring.GetUnitRulesParam(allUnits[i], "commander_owner_team") == hatchForTeam
-					   and Spring.GetUnitRulesParam(allUnits[i], "comm_level") then
-						current = current + 1
-					end
-				end
-			end
-			if current >= maxComms then
-				Spring.DestroyUnit(newUnit, false, true)
-				return
-			end
-			Spring.SetUnitRulesParam(newUnit, "commander_owner_team", hatchForTeam, {inlos = true})
-			-- register with share_mode so unmerge returns this commander to the correct team
-			if GG.ShareMode_RegisterUnit then
-				GG.ShareMode_RegisterUnit(newUnit, hatchForTeam)
-			end
+	-- generic morph completed hook (used by unit_commander_egg.lua)
+	-- return false to abort (destroy new unit)
+	if GG.MorphCompleted then
+		if GG.MorphCompleted(unitID, newUnit, unitTeam) == false then
+			Spring.DestroyUnit(newUnit, false, true)
+			return
 		end
 	end
 
@@ -814,10 +743,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		morphUnits[unitID] = nil
 	end
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function gadget:GameFrame(n)
 	-- start pending morphs
