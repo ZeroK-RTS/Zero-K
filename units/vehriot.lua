@@ -64,6 +64,7 @@ return { vehriot = {
 
     {
       def                = [[vehriot_WEAPON]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

@@ -70,26 +70,32 @@ return { raveparty = {
 
     {
       def                = [[RED_KILLER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[ORANGE_ROASTER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[YELLOW_SLAMMER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[GREEN_STAMPER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[BLUE_SHOCKER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[VIOLET_SLUGGER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
   },

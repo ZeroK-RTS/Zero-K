@@ -15,6 +15,7 @@ return { amphaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 150,
     bait_level_default = 0,
     amph_regen        = 20,
     amph_submerged_at = 40,

@@ -19,6 +19,7 @@ return { jumpscout = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 160,
     bait_level_default = 1,
     modelradius    = [[10]],
     

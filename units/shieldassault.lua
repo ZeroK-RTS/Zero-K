@@ -15,6 +15,7 @@ return { shieldassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 120,
     bait_level_default = 0,
     shield_emit_height = 17,
     cus_noflashlight   = 1,
@@ -66,6 +67,7 @@ return { shieldassault = {
 
     {
       def                = [[THUD_WEAPON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

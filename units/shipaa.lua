@@ -17,6 +17,7 @@ return { shipaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 120,
     bait_level_default = 0,
     modelradius    = [[45]],
     turnatfullspeed = [[1]],
@@ -75,6 +76,7 @@ return { shipaa = {
 
     [2] = {
       def                = [[AALASER]],
+      accurateLeading    = 1,
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 

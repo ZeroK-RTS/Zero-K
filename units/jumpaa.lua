@@ -12,6 +12,7 @@ return { jumpaa = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 100,
     bait_level_default = 0,
     canjump            = 1,
     jump_range         = 400,
@@ -60,6 +61,7 @@ return { jumpaa = {
 
     {
       def                = [[EMG]],
+      accurateLeading    = 1,
       --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },

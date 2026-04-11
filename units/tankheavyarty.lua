@@ -63,6 +63,7 @@ return { tankheavyarty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 2,
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
@@ -105,6 +106,7 @@ return { tankheavyarty = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 450,
       myGravity               = 0.1,
       noSelfDamage            = false,
       range                   = 1160,

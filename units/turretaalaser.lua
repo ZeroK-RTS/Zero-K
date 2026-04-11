@@ -14,6 +14,7 @@ return { turretaalaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    aim_lookahead      = 20,
     bait_level_target  = 2,
     bait_level_target_armor = 1,
     bait_level_default = 0,
@@ -53,6 +54,7 @@ return { turretaalaser = {
 
     {
       def                = [[AAGUN]],
+      accurateLeading    = 1,
       --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },

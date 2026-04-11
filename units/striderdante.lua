@@ -13,8 +13,9 @@ return { striderdante = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    decloak_footprint     = 5,
-    manualfire_desc = [[Fire Special Weapon: Fire a napalm rocket salvo.]]
+    aim_lookahead      = 120,
+    decloak_footprint  = 5,
+    manualfire_desc    = [[Fire Special Weapon: Fire a napalm rocket salvo.]]
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
@@ -57,6 +58,7 @@ return { striderdante = {
 
     {
       def                = [[NAPALM_ROCKETS]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -64,6 +66,7 @@ return { striderdante = {
 
     {
       def                = [[HEATRAY]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -77,6 +80,7 @@ return { striderdante = {
 
     {
       def                = [[DANTE_FLAMER]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIREPROOF]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
@@ -229,6 +233,7 @@ return { striderdante = {
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 2,
+      leadLimit               = 200,
       model                   = [[wep_m_hailstorm.s3o]],
       range                   = 420,
       reloadtime              = 2,

@@ -44,6 +44,7 @@ return { spiderskirm = {
 
     {
       def                = [[ADV_ROCKET]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER FIXEDWING GUNSHIP]],
     },

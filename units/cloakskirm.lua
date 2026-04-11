@@ -14,7 +14,7 @@ return { cloakskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aim_lookahead  = 60,
+    aim_lookahead  = 120,
     modelradius    = [[18]],
     midposoffset   = [[0 6 0]],
     reload_move_penalty = 0.66,
@@ -60,6 +60,7 @@ return { cloakskirm = {
 
     {
       def                = [[BOT_ROCKET]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

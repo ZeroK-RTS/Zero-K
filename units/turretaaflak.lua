@@ -14,7 +14,8 @@ return { turretaaflak = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    aimposoffset   = [[0 16 0]],
+    aim_lookahead      = 120,
+    aimposoffset       = [[0 16 0]],
     bait_level_default = 0,
   },
 
@@ -50,6 +51,7 @@ return { turretaaflak = {
 
     {
       def                = [[ARMFLAK_GUN]],
+      accurateLeading    = 1,
       --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },

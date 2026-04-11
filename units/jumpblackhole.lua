@@ -15,6 +15,7 @@ return { jumpblackhole = {
   corpse                = [[DEAD]],
 
   customParams          = {
+    aim_lookahead      = 80,
     bait_level_default = 0,
     can_target_allies  = 1,
     midposoffset   = [[0 10 0]],
@@ -70,6 +71,7 @@ return { jumpblackhole = {
 
     {
       def                = [[BLACK_HOLE]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },

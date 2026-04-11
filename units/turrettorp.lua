@@ -11,9 +11,10 @@ return { turrettorp = {
   corpse            = [[DEAD]],
 
   customParams      = {
-    aimposoffset   = [[0 15 0]],
-    midposoffset   = [[0 15 0]],
-    normaltex = [[unittextures/torpedolauncher_normals.dds]],
+    aim_lookahead      = 60,
+    aimposoffset       = [[0 15 0]],
+    midposoffset       = [[0 15 0]],
+    normaltex          = [[unittextures/torpedolauncher_normals.dds]],
   },
 
   explodeAs         = [[MEDIUM_BUILDINGEX]],

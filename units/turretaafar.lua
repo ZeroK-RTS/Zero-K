@@ -14,11 +14,12 @@ return { turretaafar = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    aim_lookahead      = 20,
     bait_level_default = 0,
-    aimposoffset   = [[0 10 0]],
-    modelradius    = [[19]],
-    okp_damage = 200.1,
-    normaltex = [[unittextures/armcir_normals.dds]],
+    aimposoffset       = [[0 10 0]],
+    modelradius        = [[19]],
+    okp_damage         = 200.1,
+    normaltex          = [[unittextures/armcir_normals.dds]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

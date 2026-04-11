@@ -14,7 +14,7 @@ return { shieldskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aim_lookahead  = 80,
+    aim_lookahead  = 120,
     aimposoffset   = [[0 5 0]],
     midposoffset   = [[0 5 0]],
     modelradius    = [[14]],
@@ -59,6 +59,7 @@ return { shieldskirm = {
 
     {
       def                = [[STORM_ROCKET]],
+      accurateLeading    = 1,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 

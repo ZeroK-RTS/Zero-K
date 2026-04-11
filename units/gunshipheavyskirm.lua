@@ -61,6 +61,7 @@ return { gunshipheavyskirm = {
 
     {
       def                = [[EMG]],
+      accurateLeading    = 2,
       mainDir            = [[0 0 1]],
       maxAngleDif        = 70,
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],

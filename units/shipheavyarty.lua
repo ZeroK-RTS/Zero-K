@@ -16,8 +16,9 @@ return { shipheavyarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 120,
     bait_level_default = 1,
-    modelradius    = [[80]],
+    modelradius        = [[80]],
 
     outline_x = 340,
     outline_y = 340,
@@ -63,6 +64,7 @@ return { shipheavyarty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 3,
       mainDir            = [[0 0 1]],
       maxAngleDif        = 330,
       badTargetCategory  = [[GUNSHIP]],
@@ -72,6 +74,7 @@ return { shipheavyarty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 3,
       mainDir            = [[0 0 -1]],
       maxAngleDif        = 330,
       badTargetCategory  = [[GUNSHIP]],
@@ -81,6 +84,7 @@ return { shipheavyarty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 3,
       mainDir            = [[0 0 -1]],
       maxAngleDif        = 330,
       badTargetCategory  = [[GUNSHIP]],

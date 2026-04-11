@@ -15,13 +15,14 @@ return { staticarty = {
   collisionVolumeType           = [[ellipsoid]],
 
   customParams                  = {
-    keeptooltip = [[any string I want]],
-    neededlink  = 50,
-    pylonrange  = 50,
-    aimposoffset   = [[0 26 0]],
-    midposoffset   = [[0 10 0]],
+    aim_lookahead      = 120,
+    keeptooltip        = [[any string I want]],
+    neededlink         = 50,
+    pylonrange         = 50,
+    aimposoffset       = [[0 26 0]],
+    midposoffset       = [[0 10 0]],
     bait_level_default = 1,
-    normaltex = [[unittextures/Core_normals.dds]],
+    normaltex          = [[unittextures/Core_normals.dds]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -56,6 +57,7 @@ return { staticarty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 3,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
@@ -91,6 +93,7 @@ return { staticarty = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 600,
       mygravity               = 0.1,
       range                   = 1850,
       reloadtime              = 10,

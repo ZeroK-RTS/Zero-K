@@ -14,6 +14,7 @@ return { spiderassault = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 120,
     bait_level_default = 0,
     modelradius    = [[12]],
     cus_noflashlight = 1,
@@ -61,6 +62,7 @@ return { spiderassault = {
 
     {
       def                = [[THUD_WEAPON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

@@ -17,12 +17,13 @@ return { striderbantha = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    bait_level_default    = 0,
-    extradrawrange        = 465,
-    aimposoffset          = [[0 -8 0]],
-    midposoffset          = [[0 -8 0]],
-    modelradius           = [[17]],
-    decloak_footprint     = 5,
+    aim_lookahead      = 120,
+    bait_level_default = 0,
+    extradrawrange     = 465,
+    aimposoffset       = [[0 -8 0]],
+    midposoffset       = [[0 -8 0]],
+    modelradius        = [[17]],
+    decloak_footprint  = 5,
     normaltex = [[unittextures/bantha_normals.dds]],
 
     stats_show_death_explosion = 1,
@@ -168,6 +169,7 @@ return { striderbantha = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[banthamissile.s3o]],
       noSelfDamage            = true,
       paralyzer               = true,

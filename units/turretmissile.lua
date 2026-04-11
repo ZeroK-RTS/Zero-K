@@ -14,7 +14,8 @@ return { turretmissile = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    aimposoffset   = [[0 20 0]],
+    aim_lookahead      = 60,
+    aimposoffset       = [[0 20 0]],
     bait_level_default = 0,
     okp_damage = 103,
 

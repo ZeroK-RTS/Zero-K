@@ -19,6 +19,7 @@ return { cloaksnipe = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 80,
     bait_level_default = 1,
     modelradius    = [[15]],
     dontfireatradarcommand = '0',
@@ -72,6 +73,7 @@ return { cloaksnipe = {
 
     {
       def                = [[SHOCKRIFLE]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

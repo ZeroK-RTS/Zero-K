@@ -18,6 +18,7 @@ return { amphassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 50,
     bait_level_default = 1,
     amph_regen = 40,
     amph_submerged_at = 40,

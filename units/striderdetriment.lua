@@ -18,6 +18,7 @@ return { striderdetriment = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead         = 120,
     canjump               = 1,
     jump_range            = 840,
     jump_height           = 420,

@@ -14,9 +14,10 @@ return { turretlaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    aimposoffset   = [[0 22 0]],
-    cus_noflashlight = 1,
-    normaltex = [[unittextures/gritty_normals.dds]],
+    aim_lookahead      = 60,
+    aimposoffset       = [[0 22 0]],
+    cus_noflashlight   = 1,
+    normaltex          = [[unittextures/gritty_normals.dds]],
 
     outline_x = 70,
     outline_y = 100,

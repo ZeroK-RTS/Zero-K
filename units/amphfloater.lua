@@ -16,7 +16,7 @@ return { amphfloater = {
 
   customParams           = {
     bait_level_default = 0,
-    aim_lookahead      = 60,
+    aim_lookahead      = 100,
     amph_regen         = 60,
     amph_submerged_at  = 30,
     sink_on_emp        = 0,
@@ -64,11 +64,13 @@ return { amphfloater = {
   weapons                = {
     {
       def                = [[CANNON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     {
       def                = [[FAKE_CANNON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

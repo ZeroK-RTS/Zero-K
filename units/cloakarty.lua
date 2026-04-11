@@ -14,6 +14,7 @@ return { cloakarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 140,
     bait_level_default = 0,
     modelradius       = [[14]],
     selection_scale   = 0.85,
@@ -62,6 +63,7 @@ return { cloakarty = {
 
     {
       def                = [[HAMMER_WEAPON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },

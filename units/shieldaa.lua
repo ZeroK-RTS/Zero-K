@@ -14,6 +14,7 @@ return { shieldaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 150,
     bait_level_default = 0,
     okp_damage = 70.1,
 
