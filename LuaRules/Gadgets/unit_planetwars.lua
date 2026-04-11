@@ -63,8 +63,8 @@ local allyTeamRole = {
 }
 
 local hqDefIDs = {
-	[0] = UnitDefNames["pw_hq_attacker"].id,
-	[1] = UnitDefNames["pw_hq_defender"].id,
+	[0] = {UnitDefNames["pw_hq_attacker"].id, UnitDefNames["pw_hq_attacker_extra"].id,},
+	[1] = {UnitDefNames["pw_hq_defender"].id, UnitDefNames["pw_hq_defender_extra"].id,},
 }
 
 if DEBUG_MODE then
@@ -85,7 +85,8 @@ end
 
 local structureSpawnData = {}
 local unitsByID = {}
-local hqs = {}
+local hqUnitAllyTeam = {}
+local allyTeamHqCount = {}
 local hqsDestroyed = {}
 local destroyedStructures = {data = {}, count = 0}
 local evacuateStructureString = false
@@ -113,7 +114,6 @@ local EVAC_STATE = {
 
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
-GG.PlanetWars.hqs = hqs
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -536,7 +536,7 @@ local function SpawnStructuresInBox(boxData, teamID)
 	end
 end
 
-local function SpawnHQ(teamID, boxData, hqDefID)
+local function SpawnHQ(teamID, allyTeamID, boxData, hqDefID)
 	teamID = teamID or gaiaTeamID
 	
 	local x, z = GetRandomPosition(boxData)
@@ -555,9 +555,9 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 	
 	local giveUp = 0
 	while (Spring.TestBuildOrder(hqDefID, x, 0 ,z, direction) == 0 or
-		  (lava and Spring.GetGroundHeight(x,z) <= 0) or
-		  CheckOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
-		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
+			(lava and Spring.GetGroundHeight(x,z) <= 0) or
+			CheckOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+			(startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
 		x, z = GetRandomPosition(boxData)
 		giveUp = giveUp + 1
 		if giveUp > 80 then
@@ -587,7 +587,8 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
 	
 	local unitID = Spring.CreateUnit(hqDefID, x, y, z, direction, teamID)
-	hqs[unitID] = true
+	hqUnitAllyTeam[unitID] = allyTeamID
+	allyTeamHqCount[allyTeamID] = (allyTeamHqCount[allyTeamID] or 0) + 1
 	
 	--Spring.SetUnitNeutral(unitID,true) -- Makes structures not auto-attacked.
 end
@@ -690,14 +691,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		UpdateEvacState()
 		CheckRemoveWormhole(unitID, unitDefID)
 	end
-	if hqs[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam, false))
-		hqsDestroyed[#hqsDestroyed+1] = allyTeam
-		
+	if hqUnitAllyTeam[unitID] then
+		local allyTeamID = hqUnitAllyTeam[unitID]
+		allyTeamHqCount[allyTeamID] = (allyTeamHqCount[allyTeamID] or 0) - 1
+		if allyTeamHqCount[allyTeamID] <= 0 then
+			hqsDestroyed[#hqsDestroyed+1] = allyTeamID
+		end
+		hqUnitAllyTeam[unitID] = nil
 		destroyedStructureCount = destroyedStructureCount + 1
 		Spring.SetGameRulesParam("pw_structureDestroyed_" .. destroyedStructureCount, UnitDefs[unitDefID].name)
-		
-		hqs[unitID] = nil
 	end
 	if unitID == teleportingUnit then
 		teleportingUnit = nil
@@ -711,11 +713,13 @@ function gadget:GamePreload()
 	end
 	
 	-- spawn field command centers
-	for i = 0, 1 do
-		local teamList = Spring.GetTeamList(i) or {0}
+	for allyTeamID = 0, 1 do
+		local teamList = Spring.GetTeamList(allyTeamID) or {0}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
-		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefIDs[i])
+		for j = 1, #hqDefIDs[allyTeamID] do
+			SpawnHQ(teamID, allyTeamID, planetwarsBoxes[allyTeamRole[allyTeamID]], hqDefIDs[allyTeamID][j])
+		end
 	end
 	
 	Spring.SetGameRulesParam("pw_structureList_count", planetwarsStructureCount)
@@ -860,13 +864,18 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:GameOver()
+	Spring.Echo("== PLANETWARS STATE ==")
 	for i = 1, destroyedStructures.count do
 		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled," .. destroyedStructures.data[i])
+		Spring.Echo("structurekilled", destroyedStructures.data[i])
 	end
 	if evacuateStructureString then
 		Spring.SendCommands("wbynum 255 SPRINGIE:pwEvacuate " .. evacuateStructureString)
+		Spring.Echo("evacuateStructureString", evacuateStructureString)
 	end
 	for i = 1, #hqsDestroyed do
 		Spring.SendCommands("wbynum 255 SPRINGIE:hqkilled,".. hqsDestroyed[i])
+		Spring.Echo("hqkilled", hqsDestroyed[i])
 	end
+	Spring.Echo("== END STATE ==")
 end

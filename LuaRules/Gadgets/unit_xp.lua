@@ -64,8 +64,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local hp, maxHP = spGetUnitHealth(unitID)
 
 	local percentageDamage = math.max(0, ((hp > 0) and damage or (damage + hp)) / maxHP) -- Units can be damaged further as they die.
-	local targetCost = getCost(unitID, unitDefID) * (GG.att_CostMult[unitID] or 1)
-	local attackerCost = getCost(attackerID, attackerDefID)  * (GG.att_CostMult[attackerID] or 1)
+	local targetCost = getCost(unitID, unitDefID)
+	local attackerCost = getCost(attackerID, attackerDefID)
 	local oldXp = spGetUnitExperience(attackerID)
 	local newXp = oldXp + percentageDamage * targetCost / attackerCost
 	if thresholdDefs[attackerDefID] and (newXp%1) ~= (oldXp%1) then

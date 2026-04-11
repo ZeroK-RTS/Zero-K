@@ -72,7 +72,7 @@ local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].wea
 --------------------------------------------------------------------------------
 local dead = false
 local armsFree = true
-local dgunning = false
+local dgunAim = false
 local resetRestore = false
 local rightArmPitch = 0
 
@@ -344,9 +344,15 @@ function script.QueryWeapon(num)
 	return pieces[weaponPieces[num].index]
 end
 
+local function PrioritiseDgun()
+	dgunAim = true
+	Sleep(500)
+	dgunAim = false
+end
+
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-		if dgunning then return false end
+		if dgunAim then return false end
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		armsFree = false
@@ -361,7 +367,7 @@ function script.AimWeapon(num, heading, pitch)
 		rightArmPitch = -pitch
 		return true
 	elseif num == 2 then
-		if dgunning then return false end
+		if dgunAim then return false end
 		Signal(SIG_AIM_2)
 		SetSignalMask(SIG_AIM_2)
 		Turn(torso, y_axis, heading, math.rad(200))
@@ -369,7 +375,7 @@ function script.AimWeapon(num, heading, pitch)
 		resetRestore = true
 		return true
 	elseif num == 3 then
-		dgunning = true
+		StartThread(PrioritiseDgun)
 		resetRestore = true
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
@@ -391,12 +397,11 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_AIM_2)
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 		GG.UpdateUnitAttributes(unitID)
-		dgunning = false
 		
 		rightArmPitch = -pitch
 		return true
 	elseif num == 4 then
-		if dgunning then return false end
+		if dgunAim then return false end
 		Signal(SIG_AIM_4)
 		SetSignalMask(SIG_AIM_4)
 	
@@ -409,6 +414,18 @@ function script.AimWeapon(num, heading, pitch)
 		return true
 	end
 	return true
+end
+
+function script.FireWeapon(num)
+	if num == 3 then
+		dgunAim = true
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
+		GG.UpdateUnitAttributes(unitID)
+		Sleep(SALVO_TIME)
+		dgunAim = false
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+		GG.UpdateUnitAttributes(unitID)
+	end
 end
 
 function script.Shot(num)
@@ -435,17 +452,7 @@ function script.BlockShot(num, targetID)
 	return not (reloadState and (reloadState < 0 or reloadState < Spring.GetGameFrame()))
 end
 
-function script.FireWeapon(num)
-	if num == 3 then
-		dgunning = true
-		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
-		GG.UpdateUnitAttributes(unitID)
-		Sleep(SALVO_TIME)
-		dgunning = false
-		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
-		GG.UpdateUnitAttributes(unitID)
-	end
-end
+
 
 function OnLoadGame()
 	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
