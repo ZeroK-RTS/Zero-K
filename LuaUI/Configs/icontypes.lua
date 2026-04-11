@@ -1299,6 +1299,11 @@ local icontypes = {
 	distance = 1.3,
     size = 3.0,
   },
+  pw_assault_small = {
+    bitmap='icons/pw_assault.png',
+	distance = 1.3,
+    size = 2.1,
+  },
   pw_bomberfac = {
     bitmap='icons/pw_bomberfac.png',
 	distance = 1.6,

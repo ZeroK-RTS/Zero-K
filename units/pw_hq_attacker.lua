@@ -21,7 +21,7 @@ return { pw_hq_attacker = {
   levelGround                   = false,
   iconType                      = [[pw_assault]],
   maxSlope                      = 18,
-  metalCost                     = 1000,
+  metalCost                     = 150,
   noAutoFire                    = false,
   objectName                    = [[pw_hq.s3o]],
   reclaimable                   = false,
@@ -80,8 +80,8 @@ return { pw_hq_attacker = {
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 6,
-      footprintZ       = 6,
+      footprintX       = 8,
+      footprintZ       = 8,
       object           = [[debris4x4b.s3o]],
     },
   },

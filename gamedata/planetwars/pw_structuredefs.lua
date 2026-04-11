@@ -291,7 +291,7 @@ local structureConfig = {
 	end,
 
 	pw_wormhole = function(unitDef)
-		unitDef.health = 12000
+		unitDef.health = 15000
 		unitDef.name = "Wormhole Generator"
 		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_estorage.dae"
@@ -312,7 +312,7 @@ local structureConfig = {
 	end,
 
 	pw_wormhole2 = function(unitDef)
-		unitDef.health = 15000
+		unitDef.health = 18000
 		unitDef.name = "Improved Wormhole"
 		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_gaspowerstation.dae"
