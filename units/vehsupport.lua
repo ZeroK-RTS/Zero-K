@@ -18,10 +18,12 @@ return { vehsupport = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[13]],
-    aimposoffset   = [[0 10 0]],
-    chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
-    okp_damage = 35,
+    aim_lookahead      = 50,
+    modelradius        = [[13]],
+    aimposoffset       = [[0 10 0]],
+    chase_everything   = [[1]], -- Does not get stupidtarget added to noChaseCats
+    okp_damage         = 35,
+    set_target_range_buffer = 25,
 
     outline_x = 80,
     outline_y = 80,

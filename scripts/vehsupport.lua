@@ -331,8 +331,9 @@ function script.Shot()
 	lastShotFrame = Spring.GetGameFrame() + FIGHT_FIRE_TIME
 end
 
-local lowerRangeBuffer = 575^2
-local upperRangeBuffer = 610^2
+local weaponRange = WeaponDefNames["vehsupport_cortruck_missile"].range
+local lowerRangeBuffer = (weaponRange - tonumber(UnitDefs[unitDefID].customParams.set_target_range_buffer))^2
+local upperRangeBuffer = (weaponRange + 10)^2
 local function IsDistanceNearEdgeOfRange(ux, uz, tx, tz)
 	distSq = Vector.DistSq(ux, uz, tx, tz)
 	return (distSq > lowerRangeBuffer) and (distSq < upperRangeBuffer)

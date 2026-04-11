@@ -15,10 +15,11 @@ return { amphriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 10,
-    amph_submerged_at = 40,
-    sink_on_emp    = 1,
-    floattoggle    = [[1]],
+    aim_lookahead      = 120,
+    amph_regen         = 10,
+    amph_submerged_at  = 40,
+    sink_on_emp        = 1,
+    floattoggle        = [[1]],
     set_target_range_buffer = 35,
     selection_scale = 1.17,
     normaltex = [[unittextures/b_sumo_manti_gimp_normals.dds]],

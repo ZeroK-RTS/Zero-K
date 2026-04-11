@@ -34,7 +34,7 @@ local evacuateCmdDesc = {
 	action  = "evacuate",
 	cursor  = 'Repair',
 	type    = CMDTYPE.ICON,
-	tooltip = "Evacuates the structure from the battle via wormhole teleportation.",
+	tooltip = "Save the structure by teleporting it away. Shares a global cooldown.",
 }
 
 local spGetGroundHeight = Spring.GetGroundHeight
