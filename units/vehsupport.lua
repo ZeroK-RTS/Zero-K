@@ -23,7 +23,7 @@ return { vehsupport = {
     aimposoffset       = [[0 10 0]],
     chase_everything   = [[1]], -- Does not get stupidtarget added to noChaseCats
     okp_damage         = 35,
-    set_target_range_buffer = 25,
+    set_target_range_buffer = 30,
 
     outline_x = 80,
     outline_y = 80,
@@ -104,7 +104,7 @@ return { vehsupport = {
       interceptedByShieldType = 2,
       leadlimit               = 0,
       model                   = [[wep_m_frostshard.s3o]],
-      range                   = 595,
+      range                   = 600,
       reloadtime              = 0.766,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med17]],
