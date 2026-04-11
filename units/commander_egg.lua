@@ -16,7 +16,6 @@ return { commander_egg = {
 
   customParams        = {
     instantselfd = [[1]],
-    massmult = 0.1,
     midposoffset = [[0 15 0]],
     modelradius = [[15]],
 
