@@ -18,6 +18,7 @@ return { commander_egg = {
     instantselfd = [[1]],
     massmult = 0.1,
     midposoffset = [[0 15 0]],
+    modelradius = [[15]],
 
     morphto_1    = [[dynstrike0]],
     morphtime_1  = 60,
