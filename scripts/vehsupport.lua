@@ -29,6 +29,7 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
+local Vector = Spring.Utilities.Vector
 
 local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
@@ -330,7 +331,25 @@ function script.Shot()
 	lastShotFrame = Spring.GetGameFrame() + FIGHT_FIRE_TIME
 end
 
+local lowerRangeBuffer = 575^2
+local upperRangeBuffer = 610^2
+local function IsDistanceNearEdgeOfRange(ux, uz, tx, tz)
+	distSq = Vector.DistSq(ux, uz, tx, tz)
+	return (distSq > lowerRangeBuffer) and (distSq < upperRangeBuffer)
+end
+
 function script.BlockShot(num, targetID)
+	if not targetID then -- Ground target, block shooting right at the edge of range.
+		local ux, _, uz = spGetUnitPosition(unitID)
+		local tx, _, tz = GG.GetUnitGroundTarget(unitID)
+		local ax, _, az = GG.GetUnitAttackCommandTarget(unitID)
+		if ux and tz and IsDistanceNearEdgeOfRange(ux, uz, tx, tz) then
+			return true
+		end
+		if ux and az and IsDistanceNearEdgeOfRange(ux, uz, ax, az) then
+			return true
+		end
+	end
 	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 600, 30, 0.05, true)
 end
 

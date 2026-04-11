@@ -105,6 +105,7 @@ return { turretheavylaser = {
       scrollSpeed             = 5,
       soundStart              = [[weapon/laser/heavy_laser3]],
       sweepfire               = false,
+      targetborder            = 0.9,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
