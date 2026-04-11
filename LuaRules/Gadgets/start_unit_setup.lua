@@ -686,6 +686,12 @@ local function SetStartLocation(teamID, x, z)
     luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
 end
 GG.SetStartLocation = SetStartLocation
+GG.SpawnStartUnit = SpawnStartUnit
+
+function GG.ScheduleMidGameSpawn(frame, teamID, playerID)
+	scheduledSpawn[frame] = scheduledSpawn[frame] or {}
+	scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
+end
 
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("faction:",1,true) then
