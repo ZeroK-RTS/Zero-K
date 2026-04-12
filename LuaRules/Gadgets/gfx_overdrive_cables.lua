@@ -27,6 +27,9 @@ if gadgetHandler:IsSyncedCode() then
 
 -------------------------------------------------------------------------------------
 -- SYNCED
+-- Reads gridNumber from unit_mex_overdrive as source of truth.
+-- Periodically computes desired spanning tree edges per grid.
+-- Diffs against current edges to produce grow/wither animations.
 -------------------------------------------------------------------------------------
 
 local spGetUnitPosition   = Spring.GetUnitPosition
@@ -39,20 +42,19 @@ local spValidUnitID       = Spring.ValidUnitID
 local sqrt  = math.sqrt
 local max   = math.max
 local min   = math.min
-local huge  = math.huge
 
 -------------------------------------------------------------------------------------
 -- Config
 -------------------------------------------------------------------------------------
 
+local SYNC_PERIOD       = 30  -- frames between grid sync (~1/s)
+local TICK_PERIOD       = 3
 local SEND_PERIOD       = 6
-local TICK_PERIOD       = 3   -- only tick edges every N frames (not every frame)
-local GROWTH_RATE       = 250 -- elmos per second
-local WITHER_RATE       = 400 -- elmos per second
+local GROWTH_RATE       = 250 -- elmos/s
+local WITHER_RATE       = 400
 local GAME_SPEED        = Game.gameSpeed or 30
-local GROWTH_PER_TICK   = GROWTH_RATE / GAME_SPEED * 3 -- adjusted for TICK_PERIOD
-local WITHER_PER_TICK   = WITHER_RATE / GAME_SPEED * 3
-local MIN_CABLE_CAPACITY = 0.5
+local GROWTH_PER_TICK   = GROWTH_RATE / GAME_SPEED * TICK_PERIOD
+local WITHER_PER_TICK   = WITHER_RATE / GAME_SPEED * TICK_PERIOD
 
 -------------------------------------------------------------------------------------
 -- Unit definitions
@@ -80,28 +82,26 @@ for i = 1, #UnitDefs do
 end
 
 -------------------------------------------------------------------------------------
--- Persistent tree data per allyTeam
+-- State
 -------------------------------------------------------------------------------------
 
-local trees = {}
+-- All tracked pylons per allyTeam: nodes[allyTeamID][unitID] = {x, z, range, unitDefID}
+local nodes = {}
+
+-- Current animated edges: edges[edgeKey] = {parentID, childID, px, pz, cx, cz, length, progress, withering}
+-- edgeKey = parentID .. ":" .. childID (string)
+local edges = {}
+
+-- Desired edges from last grid sync: desiredEdges[edgeKey] = true
+local desiredEdges = {}
+
 local treeVersion = 0
 local dirty = false
-
--- Queue of nodes that just became connected and need orphan scanning.
--- Processed outside of edge iteration to avoid modifying edges during pairs().
-local newlyConnected = {} -- list of {tree, unitID}
-
-local function InitTree(allyTeamID)
-	trees[allyTeamID] = {
-		nodes = {},
-		edges = {},
-	}
-end
 
 do
 	local allyTeamList = Spring.GetAllyTeamList()
 	for i = 1, #allyTeamList do
-		InitTree(allyTeamList[i])
+		nodes[allyTeamList[i]] = {}
 	end
 end
 
@@ -115,120 +115,14 @@ local function Dist(x1, z1, x2, z2)
 	return sqrt(dx * dx + dz * dz)
 end
 
-local function InRange(n1, n2)
-	return Dist(n1.x, n1.z, n2.x, n2.z) < (n1.range + n2.range)
-end
-
--- Is a node connected? Iterative (no recursion) to avoid stack overflow.
-local function IsConnected(tree, unitID)
-	local visited = {}
-	local current = unitID
-	while current do
-		if visited[current] then return false end -- cycle detected, bail
-		visited[current] = true
-		local node = tree.nodes[current]
-		if not node then return false end
-		if node.isRoot then return true end
-		local edge = tree.edges[current]
-		if not edge then return false end
-		if not edge.grown then return false end
-		current = edge.parentID
-	end
-	return false
-end
-
--- Find root of a node's subtree (follow parent chain up).
-local function FindRoot(tree, unitID)
-	local visited = {}
-	local current = unitID
-	while current do
-		if visited[current] then return current end
-		visited[current] = true
-		local node = tree.nodes[current]
-		if not node then return current end
-		if node.isRoot then return current end
-		if not node.parent then return current end
-		current = node.parent
-	end
-	return unitID
-end
-
--- Find the nearest connected node within range of (x, z, range).
-local function FindNearestConnected(tree, x, z, range, excludeID)
-	local bestID = nil
-	local bestDist = huge
-	for uid, node in pairs(tree.nodes) do
-		if uid ~= excludeID and IsConnected(tree, uid) then
-			local d = Dist(x, z, node.x, node.z)
-			if d < (range + node.range) and d < bestDist then
-				bestDist = d
-				bestID = uid
-			end
-		end
-	end
-	return bestID, bestDist
-end
-
--- Find all nearby nodes in range that belong to DIFFERENT root subtrees.
--- Returns list of {nodeID, rootID} for each unique foreign root.
-local function FindNearbyForeignRoots(tree, unitID)
-	local node = tree.nodes[unitID]
-	if not node then return {} end
-	local myRoot = FindRoot(tree, unitID)
-	local foundRoots = {} -- [rootID] = nearest nodeID in that subtree
-	local foundDists = {}
-
-	for uid, other in pairs(tree.nodes) do
-		if uid ~= unitID and InRange(node, other) then
-			local otherRoot = FindRoot(tree, uid)
-			if otherRoot ~= myRoot then
-				local d = Dist(node.x, node.z, other.x, other.z)
-				if not foundRoots[otherRoot] or d < foundDists[otherRoot] then
-					foundRoots[otherRoot] = uid
-					foundDists[otherRoot] = d
-				end
-			end
-		end
-	end
-
-	local result = {}
-	for rootID, nearestID in pairs(foundRoots) do
-		result[#result + 1] = { nodeID = nearestID, rootID = rootID }
-	end
-	return result
-end
-
--- Connect a node to nearby foreign subtrees by creating edges to their roots.
--- Called OUTSIDE of edge iteration.
-local function BridgeNearbySubtrees(tree, unitID)
-	local node = tree.nodes[unitID]
-	if not node then return end
-
-	local foreignRoots = FindNearbyForeignRoots(tree, unitID)
-	for i = 1, #foreignRoots do
-		local rootID = foreignRoots[i].rootID
-		local rootNode = tree.nodes[rootID]
-		-- Re-check: root must still be a root and not already have an edge
-		if rootNode and rootNode.isRoot and not tree.edges[rootID] then
-			tree.edges[rootID] = {
-				parentID = unitID,
-				childID = rootID,
-				length = max(1, Dist(node.x, node.z, rootNode.x, rootNode.z)),
-				progress = 0,
-				grown = false,
-				withering = false,
-			}
-			rootNode.parent = unitID
-			rootNode.isRoot = false
-			node.children[rootID] = true
-			dirty = true
-		end
+local function EdgeKey(parentID, childID)
+	-- Canonical key: smaller ID first to avoid duplicates
+	if parentID < childID then
+		return parentID .. ":" .. childID
+	else
+		return childID .. ":" .. parentID
 	end
 end
-
--------------------------------------------------------------------------------------
--- Node capacity
--------------------------------------------------------------------------------------
 
 local function GetNodeCapacity(unitID, unitDefID)
 	if not spValidUnitID(unitID) then return 0, 0 end
@@ -236,8 +130,7 @@ local function GetNodeCapacity(unitID, unitDefID)
 		(spGetUnitRulesParam(unitID, "disarmed") == 1)
 	if stunned then return 0, 0 end
 
-	local production = 0
-	local consumption = 0
+	local production, consumption = 0, 0
 	if generatorDefs[unitDefID] then
 		production = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
 	end
@@ -248,210 +141,221 @@ local function GetNodeCapacity(unitID, unitDefID)
 end
 
 -------------------------------------------------------------------------------------
--- Tree mutations
+-- Grid sync: read gridNumber, compute spanning trees, diff edges
 -------------------------------------------------------------------------------------
 
-local function OnPylonAdded(allyTeamID, unitID, unitDefID)
-	local x, _, z = spGetUnitPosition(unitID)
-	local range = pylonDefs[unitDefID]
-	if not range then return end
+local function SyncWithGrid()
+	local newDesired = {}
 
-	local tree = trees[allyTeamID]
-	if tree.nodes[unitID] then return end
+	for allyTeamID, allyNodes in pairs(nodes) do
+		-- Group pylons by gridNumber
+		local pylonsByGrid = {} -- [gridID] = { {unitID, x, z, range, unitDefID}, ... }
+		for unitID, node in pairs(allyNodes) do
+			if spValidUnitID(unitID) then
+				local gridID = spGetUnitRulesParam(unitID, "gridNumber") or 0
+				if gridID > 0 then
+					if not pylonsByGrid[gridID] then
+						pylonsByGrid[gridID] = {}
+					end
+					local list = pylonsByGrid[gridID]
+					list[#list + 1] = {
+						unitID = unitID,
+						x = node.x, z = node.z,
+						range = node.range,
+						unitDefID = node.unitDefID,
+					}
+				end
+			end
+		end
 
-	-- Create node
-	tree.nodes[unitID] = {
-		x = x, z = z, range = range, unitDefID = unitDefID,
-		parent = nil, children = {}, isRoot = false,
-	}
+		-- For each grid, build minimum spanning tree via Prim's algorithm.
+		-- Each node always connects to its nearest already-connected neighbor.
+		for gridID, pylons in pairs(pylonsByGrid) do
+			if #pylons >= 2 then
+				-- Pick root: highest production
+				local bestRoot = 1
+				local bestProd = -1
+				for i = 1, #pylons do
+					local prod = GetNodeCapacity(pylons[i].unitID, pylons[i].unitDefID)
+					if prod > bestProd then
+						bestProd = prod
+						bestRoot = i
+					end
+				end
 
-	-- Find nearest node in range (connected or not — we link to nearest in any case)
-	local bestID = nil
-	local bestDist = huge
-	for uid, node in pairs(tree.nodes) do
-		if uid ~= unitID then
-			local d = Dist(x, z, node.x, node.z)
-			if d < (range + node.range) and d < bestDist then
-				bestDist = d
-				bestID = uid
+				local inTree = {}
+				inTree[bestRoot] = true
+				local treeSize = 1
+
+				while treeSize < #pylons do
+					local bestDistSq = math.huge
+					local bestJ = nil
+					local bestParentIdx = nil
+
+					for j = 1, #pylons do
+						if not inTree[j] then
+							local other = pylons[j]
+							for k = 1, #pylons do
+								if inTree[k] then
+									local curr = pylons[k]
+									local dx = curr.x - other.x
+									local dz = curr.z - other.z
+									local distSq = dx * dx + dz * dz
+									local combinedRange = curr.range + other.range
+									if distSq < combinedRange * combinedRange and distSq < bestDistSq then
+										bestDistSq = distSq
+										bestJ = j
+										bestParentIdx = k
+									end
+								end
+							end
+						end
+					end
+
+					if not bestJ then break end
+
+					inTree[bestJ] = true
+					treeSize = treeSize + 1
+
+					local parent = pylons[bestParentIdx]
+					local child = pylons[bestJ]
+					local key = EdgeKey(parent.unitID, child.unitID)
+					newDesired[key] = {
+						parentID = parent.unitID,
+						childID = child.unitID,
+						px = parent.x, pz = parent.z,
+						cx = child.x, cz = child.z,
+					}
+				end
 			end
 		end
 	end
 
-	if bestID then
-		local nearNode = tree.nodes[bestID]
-		local length = max(1, Dist(x, z, nearNode.x, nearNode.z))
-		tree.edges[unitID] = {
-			parentID = bestID,
-			childID = unitID,
-			length = length,
-			progress = 0,
-			grown = false,
-			withering = false,
-		}
-		tree.nodes[unitID].parent = bestID
-		nearNode.children[unitID] = true
-		-- Also bridge any other subtrees in range
-		newlyConnected[#newlyConnected + 1] = { tree = tree, unitID = unitID }
-	else
-		-- No node in range — become a root
-		tree.nodes[unitID].isRoot = true
-	end
-
-	dirty = true
-end
-
-local function OnPylonRemoved(allyTeamID, unitID)
-	local tree = trees[allyTeamID]
-	local node = tree.nodes[unitID]
-	if not node then return end
-
-	-- Collect immediate children
-	local orphans = {}
-	for childID, _ in pairs(node.children) do
-		orphans[#orphans + 1] = childID
-	end
-
-	-- Remove our parent edge
-	if node.parent then
-		local parentNode = tree.nodes[node.parent]
-		if parentNode then
-			parentNode.children[unitID] = nil
-		end
-	end
-	tree.edges[unitID] = nil
-
-	-- Remove children's parent edges
-	for _, childID in ipairs(orphans) do
-		tree.edges[childID] = nil
-		local childNode = tree.nodes[childID]
-		if childNode then
-			childNode.parent = nil
+	-- Diff: find new edges, removed edges, unchanged edges
+	-- New edges: in newDesired but not in desiredEdges → create growing edge
+	for key, info in pairs(newDesired) do
+		if not edges[key] then
+			local length = max(1, Dist(info.px, info.pz, info.cx, info.cz))
+			edges[key] = {
+				parentID = info.parentID,
+				childID = info.childID,
+				px = info.px, pz = info.pz,
+				cx = info.cx, cz = info.cz,
+				length = length,
+				progress = 0,
+				withering = false,
+			}
+			dirty = true
+		elseif edges[key].withering then
+			-- Was withering, now wanted again — reverse direction
+			edges[key].withering = false
+			dirty = true
 		end
 	end
 
-	-- Remove node
-	tree.nodes[unitID] = nil
-
-	-- Reconnect orphans
-	for _, childID in ipairs(orphans) do
-		local childNode = tree.nodes[childID]
-		if childNode then
-			local nearestID = FindNearestConnected(tree, childNode.x, childNode.z, childNode.range, childID)
-			if nearestID then
-				local nearNode = tree.nodes[nearestID]
-				local length = max(1, Dist(childNode.x, childNode.z, nearNode.x, nearNode.z))
-				tree.edges[childID] = {
-					parentID = nearestID,
-					childID = childID,
-					length = length,
-					progress = 0,
-					grown = false,
-					withering = false,
-				}
-				childNode.parent = nearestID
-				childNode.isRoot = false
-				nearNode.children[childID] = true
-			else
-				childNode.isRoot = true
-				-- This orphan root might be able to adopt other orphans
-				newlyConnected[#newlyConnected + 1] = { tree = tree, unitID = childID }
-			end
+	-- Removed edges: in desiredEdges but not in newDesired → start withering
+	for key, _ in pairs(desiredEdges) do
+		if not newDesired[key] and edges[key] and not edges[key].withering then
+			edges[key].withering = true
+			dirty = true
 		end
 	end
 
-	dirty = true
+	desiredEdges = newDesired
 end
 
 -------------------------------------------------------------------------------------
--- Edge growth tick — called periodically, NOT every frame
+-- Edge growth / wither tick
 -------------------------------------------------------------------------------------
 
 local function TickEdges()
-	-- Grow / wither all edges. Collect newly-grown nodes for orphan scanning.
-	for _, tree in pairs(trees) do
-		local toRemove = {}
+	local toRemove = {}
 
-		for childID, edge in pairs(tree.edges) do
-			if edge.withering then
-				edge.progress = edge.progress - WITHER_PER_TICK
-				if edge.progress <= 0 then
-					toRemove[#toRemove + 1] = childID
-				end
-				edge.grown = false
-				dirty = true
-			elseif edge.progress < edge.length then
-				edge.progress = min(edge.length, edge.progress + GROWTH_PER_TICK)
-				if edge.progress >= edge.length then
-					edge.grown = true
-					-- Queue orphan scan (do NOT modify edges here)
-					newlyConnected[#newlyConnected + 1] = { tree = tree, unitID = childID }
-				end
-				dirty = true
+	for key, edge in pairs(edges) do
+		if edge.withering then
+			edge.progress = edge.progress - WITHER_PER_TICK
+			if edge.progress <= 0 then
+				toRemove[#toRemove + 1] = key
 			end
-		end
-
-		-- Remove fully-withered edges (after iteration)
-		for i = 1, #toRemove do
-			local childID = toRemove[i]
-			local edge = tree.edges[childID]
-			if edge then
-				local parentNode = tree.nodes[edge.parentID]
-				if parentNode then
-					parentNode.children[childID] = nil
-				end
-				local childNode = tree.nodes[childID]
-				if childNode then
-					childNode.parent = nil
-					childNode.isRoot = true
-				end
-			end
-			tree.edges[childID] = nil
+			dirty = true
+		elseif edge.progress < edge.length then
+			edge.progress = min(edge.length, edge.progress + GROWTH_PER_TICK)
+			dirty = true
 		end
 	end
 
-	-- Process newly connected nodes (adopt nearby orphan roots).
-	-- This is safe because we're outside the edges iteration.
-	local batch = newlyConnected
-	newlyConnected = {}
-	for i = 1, #batch do
-		local item = batch[i]
-		if item.tree.nodes[item.unitID] then
-			BridgeNearbySubtrees(item.tree, item.unitID)
-		end
+	for i = 1, #toRemove do
+		edges[toRemove[i]] = nil
 	end
 end
 
 -------------------------------------------------------------------------------------
--- Flow computation (post-order DFS on fully-grown edges)
+-- Flow computation: per-edge capacity via post-order DFS on spanning tree
 -------------------------------------------------------------------------------------
 
-local function ComputeSubtreeFlows(tree, unitID, flowResults)
-	local node = tree.nodes[unitID]
-	if not node then return 0, 0 end
+local function ComputeFlows()
+	-- Rebuild tree structure for DFS from edges
+	local children = {} -- [parentID] = { childID, ... }
+	local roots = {}    -- [unitID] = true
+	local parentOf = {} -- [childID] = parentID
+	local edgeByChild = {} -- [childID] = edgeKey
 
-	local prod, cons = GetNodeCapacity(unitID, node.unitDefID)
-
-	for childID, _ in pairs(node.children) do
-		local edge = tree.edges[childID]
-		if edge and edge.grown then
-			local childProd, childCons = ComputeSubtreeFlows(tree, childID, flowResults)
-			prod = prod + childProd
-			cons = cons + childCons
-			flowResults[childID] = max(childProd, childCons)
+	-- Collect all participating nodes
+	local nodeSet = {}
+	for key, edge in pairs(edges) do
+		if edge.progress >= edge.length and not edge.withering then
+			-- Fully grown edge — use BFS parent→child direction from desired edges
+			local info = desiredEdges[key]
+			if info then
+				local pid, cid = info.parentID, info.childID
+				if not children[pid] then children[pid] = {} end
+				children[pid][#children[pid] + 1] = cid
+				parentOf[cid] = pid
+				edgeByChild[cid] = key
+				nodeSet[pid] = true
+				nodeSet[cid] = true
+			end
 		end
 	end
 
-	return prod, cons
-end
-
-local function ComputeFlows(tree)
-	local flowResults = {}
-	for unitID, node in pairs(tree.nodes) do
-		if node.isRoot then
-			ComputeSubtreeFlows(tree, unitID, flowResults)
+	-- Find roots (nodes with no parent)
+	for uid, _ in pairs(nodeSet) do
+		if not parentOf[uid] then
+			roots[uid] = true
 		end
 	end
+
+	-- Post-order DFS
+	local flowResults = {} -- [edgeKey] = capacity
+	local function dfs(uid)
+		local prod, cons = 0, 0
+		-- Get this node's capacity from any allyTeam
+		for _, allyNodes in pairs(nodes) do
+			local node = allyNodes[uid]
+			if node then
+				local p, c = GetNodeCapacity(uid, node.unitDefID)
+				prod = prod + p
+				cons = cons + c
+				break
+			end
+		end
+
+		if children[uid] then
+			for i = 1, #children[uid] do
+				local cid = children[uid][i]
+				local cProd, cCons = dfs(cid)
+				prod = prod + cProd
+				cons = cons + cCons
+				flowResults[edgeByChild[cid]] = max(cProd, cCons)
+			end
+		end
+		return prod, cons
+	end
+
+	for uid, _ in pairs(roots) do
+		dfs(uid)
+	end
+
 	return flowResults
 end
 
@@ -459,32 +363,32 @@ end
 -- Send state to unsynced
 -------------------------------------------------------------------------------------
 
-local function SendTreesToUnsynced()
-	for allyTeamID, tree in pairs(trees) do
-		local flows = ComputeFlows(tree)
+local function SendToUnsyncedAll()
+	local flows = ComputeFlows()
 
-		local edgeCount = 0
-		local parentXs, parentZs = {}, {}
-		local childXs, childZs = {}, {}
-		local progresses, lengths, capacities = {}, {}, {}
+	local edgeCount = 0
+	local parentXs, parentZs = {}, {}
+	local childXs, childZs = {}, {}
+	local progresses, lengths, capacities = {}, {}, {}
+	local allyTeamID = 0 -- we send all edges in one batch
 
-		for childID, edge in pairs(tree.edges) do
-			local parentNode = tree.nodes[edge.parentID]
-			local childNode = tree.nodes[childID]
-			if parentNode and childNode and edge.progress > 0 then
-				edgeCount = edgeCount + 1
-				parentXs[edgeCount] = parentNode.x
-				parentZs[edgeCount] = parentNode.z
-				childXs[edgeCount] = childNode.x
-				childZs[edgeCount] = childNode.z
-				progresses[edgeCount] = edge.progress
-				lengths[edgeCount] = edge.length
-				capacities[edgeCount] = flows[childID] or 0
-			end
+	for key, edge in pairs(edges) do
+		if edge.progress > 0 then
+			edgeCount = edgeCount + 1
+			parentXs[edgeCount] = edge.px
+			parentZs[edgeCount] = edge.pz
+			childXs[edgeCount] = edge.cx
+			childZs[edgeCount] = edge.cz
+			progresses[edgeCount] = edge.progress
+			lengths[edgeCount] = edge.length
+			capacities[edgeCount] = flows[key] or 0
 		end
+	end
 
+	-- Send for each allyTeam that has nodes (spectators see all)
+	for atID, _ in pairs(nodes) do
 		_G.CableTreeData = {
-			allyTeamID = allyTeamID,
+			allyTeamID = atID,
 			version = treeVersion,
 			edgeCount = edgeCount,
 			parentXs = parentXs, parentZs = parentZs,
@@ -501,29 +405,42 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:GameFrame(n)
+	if n % SYNC_PERIOD == 2 then
+		SyncWithGrid()
+	end
+
 	if n % TICK_PERIOD == 0 then
 		TickEdges()
 	end
 
 	if dirty and (n % SEND_PERIOD == 0) then
 		treeVersion = treeVersion + 1
-		SendTreesToUnsynced()
+		SendToUnsyncedAll()
 		dirty = false
 	end
 end
 
 -------------------------------------------------------------------------------------
--- Unit lifecycle
+-- Unit lifecycle: only track node positions
 -------------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if not pylonDefs[unitDefID] then return end
-	OnPylonAdded(spGetUnitAllyTeam(unitID), unitID, unitDefID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
+	local x, _, z = spGetUnitPosition(unitID)
+	nodes[allyTeamID][unitID] = {
+		x = x, z = z,
+		range = pylonDefs[unitDefID],
+		unitDefID = unitDefID,
+	}
+	dirty = true
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if not pylonDefs[unitDefID] then return end
-	OnPylonRemoved(spGetUnitAllyTeam(unitID), unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
+	nodes[allyTeamID][unitID] = nil
+	dirty = true
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
@@ -531,28 +448,29 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 	local _, _, _, _, _, newAlly = Spring.GetTeamInfo(newTeam, false)
 	local _, _, _, _, _, oldAlly = Spring.GetTeamInfo(oldTeam, false)
 	if newAlly ~= oldAlly then
-		OnPylonRemoved(oldAlly, unitID)
-		OnPylonAdded(newAlly, unitID, unitDefID)
+		nodes[oldAlly][unitID] = nil
+		local x, _, z = spGetUnitPosition(unitID)
+		nodes[newAlly][unitID] = {
+			x = x, z = z,
+			range = pylonDefs[unitDefID],
+			unitDefID = unitDefID,
+		}
+		dirty = true
 	end
 end
 
 function gadget:Initialize()
-	GG.CableTree = trees
+	GG.CableTree = { nodes = nodes, edges = edges }
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID and pylonDefs[unitDefID] then
-			OnPylonAdded(spGetUnitAllyTeam(unitID), unitID, unitDefID)
-		end
-	end
-	-- Process any queued orphan adoptions from init
-	if #newlyConnected > 0 then
-		local batch = newlyConnected
-		newlyConnected = {}
-		for i = 1, #batch do
-			local item = batch[i]
-			if item.tree.nodes[item.unitID] then
-				AdoptNearbyOrphans(item.tree, item.unitID)
-			end
+			local allyTeamID = spGetUnitAllyTeam(unitID)
+			local x, _, z = spGetUnitPosition(unitID)
+			nodes[allyTeamID][unitID] = {
+				x = x, z = z,
+				range = pylonDefs[unitDefID],
+				unitDefID = unitDefID,
+			}
 		end
 	end
 end
@@ -563,7 +481,7 @@ end
 else -- UNSYNCED
 
 -------------------------------------------------------------------------------------
--- UNSYNCED — Renders cable edges onto ground texture
+-- UNSYNCED — PCB-style cable rendering onto ground texture
 -------------------------------------------------------------------------------------
 
 local glTexture       = gl.Texture
@@ -573,7 +491,6 @@ local glTexRect       = gl.TexRect
 local glResetState    = gl.ResetState
 local glResetMatrices = gl.ResetMatrices
 local glVertex        = gl.Vertex
-local glTexCoord      = gl.TexCoord
 
 local spGetMapSquareTexture = Spring.GetMapSquareTexture
 local spSetMapSquareTexture = Spring.SetMapSquareTexture
@@ -584,6 +501,10 @@ local floor = math.floor
 local sqrt  = math.sqrt
 local max   = math.max
 local min   = math.min
+local abs   = math.abs
+local PI    = math.pi
+local cos   = math.cos
+local sin   = math.sin
 
 local MAP_WIDTH    = Game.mapSizeX
 local MAP_HEIGHT   = Game.mapSizeZ
@@ -591,12 +512,24 @@ local SQUARE_SIZE  = 1024
 local SQUARES_X    = MAP_WIDTH / SQUARE_SIZE
 local SQUARES_Z    = MAP_HEIGHT / SQUARE_SIZE
 
-local CABLE_TEXTURE    = "LuaRules/Images/overdrive/cable.png"
-local CABLE_TEX_HEIGHT = 64
+-------------------------------------------------------------------------------------
+-- PCB style config
+-------------------------------------------------------------------------------------
 
-local MIN_CABLE_WIDTH  = 6
-local MAX_CABLE_WIDTH  = 28
+local MIN_TRACE_WIDTH  = 5     -- min trace width in elmos
+local MAX_TRACE_WIDTH  = 22    -- max trace width in elmos
 local MAX_CAPACITY_REF = 100
+local PAD_RADIUS_MULT  = 1.8   -- pad radius = trace_width * this
+local PAD_SEGMENTS     = 12    -- polygon segments for circular pads
+local VIA_RADIUS       = 3     -- small via dots along traces
+local VIA_SPACING      = 80    -- elmos between via dots
+
+-- Colors (copper on dark substrate)
+local TRACE_BORDER_COLOR = { 0.02, 0.04, 0.06, 0.92 }
+local TRACE_COPPER_COLOR = { 0.75, 0.55, 0.20, 0.95 } -- default copper
+local PAD_BORDER_COLOR   = { 0.02, 0.04, 0.06, 0.95 }
+local PAD_COPPER_COLOR   = { 0.85, 0.65, 0.25, 0.95 }
+local VIA_COLOR          = { 0.15, 0.12, 0.08, 0.90 }
 
 -------------------------------------------------------------------------------------
 -- State
@@ -610,93 +543,149 @@ local needsRedraw = false
 local drawnSquares = {}
 
 -------------------------------------------------------------------------------------
--- FBO management
+-- Helpers
 -------------------------------------------------------------------------------------
-
-local function GetSquareFBO(sx, sz)
-	if not squareFBOs[sx] then squareFBOs[sx] = {} end
-	if squareFBOs[sx][sz] then return squareFBOs[sx][sz] end
-	local fbo = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
-		fbo = true, min_filter = GL.LINEAR_MIPMAP_NEAREST,
-	})
-	if not fbo then return nil end
-	squareFBOs[sx][sz] = fbo
-	return fbo
-end
 
 local function SquareKey(sx, sz)
 	return sx * 10000 + sz
 end
 
+local function GetTraceWidth(capacity)
+	local t = min(1, capacity / MAX_CAPACITY_REF)
+	return MIN_TRACE_WIDTH + t * (MAX_TRACE_WIDTH - MIN_TRACE_WIDTH)
+end
+
+-- Get trace color based on capacity (copper tint shifts brighter with more flow)
+local function GetTraceColor(capacity)
+	local t = min(1, capacity / MAX_CAPACITY_REF)
+	return 0.55 + t * 0.35,   -- R: warm copper to bright gold
+	       0.40 + t * 0.30,   -- G
+	       0.12 + t * 0.15,   -- B
+	       0.95
+end
+
 -------------------------------------------------------------------------------------
--- Draw textured cable onto FBO
+-- PCB routing: Manhattan + 45° chamfer
+-- Given endpoints (x1,z1) → (x2,z2), produce 2-3 segments:
+--   horizontal → 45° diagonal → vertical (or reverse)
 -------------------------------------------------------------------------------------
 
-local function DrawCableOnSquare(sx, sz, fbo, x1, z1, x2, z2, width)
-	local sqX = sx * SQUARE_SIZE
-	local sqZ = sz * SQUARE_SIZE
+local function RoutePCB(x1, z1, x2, z2)
 	local dx = x2 - x1
 	local dz = z2 - z1
-	local len = sqrt(dx * dx + dz * dz)
-	if len < 1 then return end
+	local adx = abs(dx)
+	local adz = abs(dz)
 
-	local hw = width * 0.5
-	local px = -dz / len * hw
-	local pz =  dx / len * hw
+	-- If nearly aligned (horizontal or vertical), just one segment
+	if adx < 2 or adz < 2 then
+		return {{ x1, z1, x2, z2 }}
+	end
 
-	local c1x, c1z = x1 - px, z1 - pz
-	local c2x, c2z = x1 + px, z1 + pz
-	local c3x, c3z = x2 + px, z2 + pz
-	local c4x, c4z = x2 - px, z2 - pz
+	-- The shorter axis determines the 45° diagonal length
+	local diagLen = min(adx, adz)
+	local segments = {}
 
-	local function w2t(wx, wz)
+	if adx >= adz then
+		-- Mostly horizontal: go horizontal first, then 45° diagonal
+		local horizLen = adx - diagLen
+		local sx = (dx > 0) and 1 or -1
+		local sz = (dz > 0) and 1 or -1
+
+		local mx = x1 + sx * horizLen
+		local mz = z1
+		-- Horizontal segment
+		if horizLen > 2 then
+			segments[#segments + 1] = { x1, z1, mx, mz }
+		end
+		-- 45° diagonal segment
+		segments[#segments + 1] = { mx, mz, x2, z2 }
+	else
+		-- Mostly vertical: go vertical first, then 45° diagonal
+		local vertLen = adz - diagLen
+		local sx = (dx > 0) and 1 or -1
+		local sz = (dz > 0) and 1 or -1
+
+		local mx = x1
+		local mz = z1 + sz * vertLen
+		-- Vertical segment
+		if vertLen > 2 then
+			segments[#segments + 1] = { x1, z1, mx, mz }
+		end
+		-- 45° diagonal segment
+		segments[#segments + 1] = { mx, mz, x2, z2 }
+	end
+
+	return segments
+end
+
+-------------------------------------------------------------------------------------
+-- Drawing primitives (all in FBO NDC space)
+-------------------------------------------------------------------------------------
+
+-- Convert world coords to FBO NDC [-1, 1] for a given square
+local function MakeW2T(sqX, sqZ)
+	return function(wx, wz)
 		return 2 * (wx - sqX) / SQUARE_SIZE - 1,
 		       2 * (wz - sqZ) / SQUARE_SIZE - 1
 	end
+end
 
-	local vTile = len / CABLE_TEX_HEIGHT
-	local t1x, t1z = w2t(c1x, c1z)
-	local t2x, t2z = w2t(c2x, c2z)
-	local t3x, t3z = w2t(c3x, c3z)
-	local t4x, t4z = w2t(c4x, c4z)
+-- Emit a quad for a trace segment (call inside gl.BeginEnd GL.QUADS)
+local function EmitTraceQuad(w2t, x1, z1, x2, z2, hw)
+	local dx = x2 - x1
+	local dz = z2 - z1
+	local len = sqrt(dx * dx + dz * dz)
+	if len < 0.5 then return end
 
-	gl.RenderToTexture(fbo, function()
-		gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-		glColor(1, 1, 1, 1)
-		gl.BeginEnd(GL.QUADS, function()
-			glTexCoord(0, 0)     glVertex(t1x, t1z, 0)
-			glTexCoord(1, 0)     glVertex(t2x, t2z, 0)
-			glTexCoord(1, vTile) glVertex(t3x, t3z, 0)
-			glTexCoord(0, vTile) glVertex(t4x, t4z, 0)
-		end)
-	end)
+	local px = -dz / len * hw
+	local pz =  dx / len * hw
+
+	local t1x, t1z = w2t(x1 - px, z1 - pz)
+	local t2x, t2z = w2t(x1 + px, z1 + pz)
+	local t3x, t3z = w2t(x2 + px, z2 + pz)
+	local t4x, t4z = w2t(x2 - px, z2 - pz)
+
+	glVertex(t1x, t1z, 0)
+	glVertex(t2x, t2z, 0)
+	glVertex(t3x, t3z, 0)
+	glVertex(t4x, t4z, 0)
+end
+
+-- Emit a filled circle (call inside gl.BeginEnd GL.TRIANGLE_FAN)
+local function EmitCircle(w2t, cx, cz, radius)
+	local tx, tz = w2t(cx, cz)
+	glVertex(tx, tz, 0) -- center
+	for i = 0, PAD_SEGMENTS do
+		local angle = (i / PAD_SEGMENTS) * PI * 2
+		local px, pz = w2t(cx + cos(angle) * radius, cz + sin(angle) * radius)
+		glVertex(px, pz, 0)
+	end
 end
 
 -------------------------------------------------------------------------------------
--- Cable width from capacity
+-- Drawing hook
 -------------------------------------------------------------------------------------
 
-local function GetCableWidth(capacity)
-	local t = min(1, capacity / MAX_CAPACITY_REF)
-	return MIN_CABLE_WIDTH + t * t * (MAX_CABLE_WIDTH - MIN_CABLE_WIDTH)
-end
+function gadget:DrawGenesis()
+	if not needsRedraw then return end
+	if #renderEdges == 0 then
+		needsRedraw = false
+		return
+	end
 
--------------------------------------------------------------------------------------
--- Full redraw
--------------------------------------------------------------------------------------
-
-local function RedrawCables()
 	glResetState()
 	glResetMatrices()
 
-	-- Revert previous squares
+	-- Revert previously modified squares
 	for _, sq in pairs(drawnSquares) do
 		spSetMapSquareTexture(sq.sx, sq.sz, "")
 	end
 
-	-- Build draw list with growth interpolation
-	local drawList = {}
+	-- Build draw list with growth interpolation + PCB routing
+	local allSegments = {}  -- { {x1,z1,x2,z2, width, capacity}, ... }
+	local allPads = {}      -- { {cx, cz, radius}, ... }
+	local padSet = {}       -- dedup pads by position
+
 	for i = 1, #renderEdges do
 		local e = renderEdges[i]
 		if e.length > 0 then
@@ -704,29 +693,64 @@ local function RedrawCables()
 			if frac > 0.01 then
 				local ex = e.px + frac * (e.cx - e.px)
 				local ez = e.pz + frac * (e.cz - e.pz)
-				drawList[#drawList + 1] = {
-					x1 = e.px, z1 = e.pz, x2 = ex, z2 = ez,
-					capacity = e.capacity,
-				}
+				local w = GetTraceWidth(e.capacity)
+
+				-- Route as PCB (Manhattan + 45°)
+				local segments = RoutePCB(e.px, e.pz, ex, ez)
+				for j = 1, #segments do
+					local s = segments[j]
+					allSegments[#allSegments + 1] = {
+						x1 = s[1], z1 = s[2], x2 = s[3], z2 = s[4],
+						width = w, capacity = e.capacity,
+					}
+				end
+
+				-- Pad at parent position
+				local pkey = floor(e.px) .. "," .. floor(e.pz)
+				if not padSet[pkey] then
+					padSet[pkey] = true
+					allPads[#allPads + 1] = { cx = e.px, cz = e.pz, radius = w * PAD_RADIUS_MULT }
+				end
+
+				-- Pad at child position (only if fully grown)
+				if frac >= 0.99 then
+					local ckey = floor(e.cx) .. "," .. floor(e.cz)
+					if not padSet[ckey] then
+						padSet[ckey] = true
+						allPads[#allPads + 1] = { cx = e.cx, cz = e.cz, radius = w * PAD_RADIUS_MULT }
+					end
+				end
 			end
 		end
 	end
 
-	if #drawList == 0 then
+	if #allSegments == 0 then
 		needsRedraw = false
 		return
 	end
 
-	-- Determine needed squares
+	-- Collect needed squares (from segments + pads)
 	local neededSquares = {}
-	for i = 1, #drawList do
-		local c = drawList[i]
-		-- Use generous margin — 100 elmos
-		local m = 100
-		local minSx = max(0, floor((min(c.x1, c.x2) - m) / SQUARE_SIZE))
-		local maxSx = min(SQUARES_X - 1, floor((max(c.x1, c.x2) + m) / SQUARE_SIZE))
-		local minSz = max(0, floor((min(c.z1, c.z2) - m) / SQUARE_SIZE))
-		local maxSz = min(SQUARES_Z - 1, floor((max(c.z1, c.z2) + m) / SQUARE_SIZE))
+	for i = 1, #allSegments do
+		local s = allSegments[i]
+		local m = s.width + 20
+		local minSx = max(0, floor((min(s.x1, s.x2) - m) / SQUARE_SIZE))
+		local maxSx = min(SQUARES_X - 1, floor((max(s.x1, s.x2) + m) / SQUARE_SIZE))
+		local minSz = max(0, floor((min(s.z1, s.z2) - m) / SQUARE_SIZE))
+		local maxSz = min(SQUARES_Z - 1, floor((max(s.z1, s.z2) + m) / SQUARE_SIZE))
+		for sx = minSx, maxSx do
+			for sz = minSz, maxSz do
+				neededSquares[SquareKey(sx, sz)] = { sx = sx, sz = sz }
+			end
+		end
+	end
+	for i = 1, #allPads do
+		local p = allPads[i]
+		local m = p.radius + 5
+		local minSx = max(0, floor((p.cx - m) / SQUARE_SIZE))
+		local maxSx = min(SQUARES_X - 1, floor((p.cx + m) / SQUARE_SIZE))
+		local minSz = max(0, floor((p.cz - m) / SQUARE_SIZE))
+		local maxSz = min(SQUARES_Z - 1, floor((p.cz + m) / SQUARE_SIZE))
 		for sx = minSx, maxSx do
 			for sz = minSz, maxSz do
 				neededSquares[SquareKey(sx, sz)] = { sx = sx, sz = sz }
@@ -734,40 +758,110 @@ local function RedrawCables()
 		end
 	end
 
-	Spring.Echo("[CableTree][U] Drawing " .. #drawList .. " cables on " .. (function() local n=0; for _ in pairs(neededSquares) do n=n+1 end; return n end)() .. " squares")
-
-	-- Snapshot current map texture into FBOs then draw cables
+	-- Render on each needed square
 	drawnSquares = {}
 	for key, sq in pairs(neededSquares) do
-		local fbo = GetSquareFBO(sq.sx, sq.sz)
-		if not fbo then
-			Spring.Echo("[CableTree][U] FBO creation failed for " .. sq.sx .. "," .. sq.sz)
-		else
-			-- Snapshot current texture
-			spGetMapSquareTexture(sq.sx, sq.sz, 0, fbo)
+		local sx, sz = sq.sx, sq.sz
 
-			-- TEST: Draw a big bright red X across the entire square to verify FBO pipeline
-			gl.RenderToTexture(fbo, function()
+		-- Ensure FBO pair exists
+		if not squareFBOs[sx] then squareFBOs[sx] = {} end
+		if not squareFBOs[sx][sz] then
+			local cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
+				fbo = true, min_filter = GL.LINEAR_MIPMAP_NEAREST,
+				wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
+			})
+			local orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
+				fbo = true,
+				wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
+			})
+			if cur and orig then
+				squareFBOs[sx][sz] = { cur = cur, orig = orig }
+			else
+				if cur then gl.DeleteTextureFBO(cur) end
+				if orig then gl.DeleteTextureFBO(orig) end
+			end
+		end
+
+		local pair = squareFBOs[sx] and squareFBOs[sx][sz]
+		if pair then
+			-- Snapshot orig, copy to cur
+			spGetMapSquareTexture(sx, sz, 0, pair.orig)
+			glTexture(pair.orig)
+			gl.RenderToTexture(pair.cur, function()
+				glTexRect(-1, 1, 1, -1)
+			end)
+			glTexture(false)
+
+			local sqX = sx * SQUARE_SIZE
+			local sqZ = sz * SQUARE_SIZE
+			local w2t = MakeW2T(sqX, sqZ)
+
+			gl.RenderToTexture(pair.cur, function()
 				gl.Texture(false)
-				glColor(1, 0, 0, 1)
-				-- Big diagonal cross filling 80% of the square
+
+				-- Layer 1: Trace borders (dark substrate)
+				glColor(TRACE_BORDER_COLOR[1], TRACE_BORDER_COLOR[2], TRACE_BORDER_COLOR[3], TRACE_BORDER_COLOR[4])
 				gl.BeginEnd(GL.QUADS, function()
-					-- Horizontal bar across center
-					glVertex(-0.8, -0.05, 0)
-					glVertex( 0.8, -0.05, 0)
-					glVertex( 0.8,  0.05, 0)
-					glVertex(-0.8,  0.05, 0)
-					-- Vertical bar across center
-					glVertex(-0.05, -0.8, 0)
-					glVertex( 0.05, -0.8, 0)
-					glVertex( 0.05,  0.8, 0)
-					glVertex(-0.05,  0.8, 0)
+					for i = 1, #allSegments do
+						local s = allSegments[i]
+						EmitTraceQuad(w2t, s.x1, s.z1, s.x2, s.z2, s.width * 0.55)
+					end
 				end)
+
+				-- Layer 2: Trace copper fill
+				gl.BeginEnd(GL.QUADS, function()
+					for i = 1, #allSegments do
+						local s = allSegments[i]
+						local r, g, b, a = GetTraceColor(s.capacity)
+						glColor(r, g, b, a)
+						EmitTraceQuad(w2t, s.x1, s.z1, s.x2, s.z2, s.width * 0.4)
+					end
+				end)
+
+				-- Layer 3: Pad borders
+				glColor(PAD_BORDER_COLOR[1], PAD_BORDER_COLOR[2], PAD_BORDER_COLOR[3], PAD_BORDER_COLOR[4])
+				for i = 1, #allPads do
+					local p = allPads[i]
+					gl.BeginEnd(GL.TRIANGLE_FAN, function()
+						EmitCircle(w2t, p.cx, p.cz, p.radius)
+					end)
+				end
+
+				-- Layer 4: Pad copper fill
+				glColor(PAD_COPPER_COLOR[1], PAD_COPPER_COLOR[2], PAD_COPPER_COLOR[3], PAD_COPPER_COLOR[4])
+				for i = 1, #allPads do
+					local p = allPads[i]
+					gl.BeginEnd(GL.TRIANGLE_FAN, function()
+						EmitCircle(w2t, p.cx, p.cz, p.radius * 0.75)
+					end)
+				end
+
+				-- Layer 5: Via dots along traces
+				glColor(VIA_COLOR[1], VIA_COLOR[2], VIA_COLOR[3], VIA_COLOR[4])
+				for i = 1, #allSegments do
+					local s = allSegments[i]
+					local dx = s.x2 - s.x1
+					local dz = s.z2 - s.z1
+					local len = sqrt(dx * dx + dz * dz)
+					if len > VIA_SPACING then
+						local steps = floor(len / VIA_SPACING)
+						for v = 1, steps do
+							local t = v / (steps + 1)
+							local vx = s.x1 + t * dx
+							local vz = s.z1 + t * dz
+							gl.BeginEnd(GL.TRIANGLE_FAN, function()
+								EmitCircle(w2t, vx, vz, VIA_RADIUS)
+							end)
+						end
+					end
+				end
+
 				glColor(1, 1, 1, 1)
 			end)
 
-			gl.GenerateMipmap(fbo)
-			spSetMapSquareTexture(sq.sx, sq.sz, fbo)
+			-- Apply
+			gl.GenerateMipmap(pair.cur)
+			spSetMapSquareTexture(sx, sz, pair.cur)
 			drawnSquares[key] = sq
 		end
 	end
@@ -811,177 +905,6 @@ local function OnCableTreeUpdate()
 	end
 
 	needsRedraw = true
-end
-
--------------------------------------------------------------------------------------
--- Drawing hook
--------------------------------------------------------------------------------------
-
-local drawCount = 0
-
-function gadget:DrawGenesis()
-	if not needsRedraw then return end
-	if #renderEdges == 0 then
-		needsRedraw = false
-		return
-	end
-
-	drawCount = drawCount + 1
-
-	glResetState()
-	glResetMatrices()
-
-	-- Revert previously modified squares
-	for _, sq in pairs(drawnSquares) do
-		spSetMapSquareTexture(sq.sx, sq.sz, "")
-	end
-
-	-- Build draw list with growth interpolation
-	local drawList = {}
-	for i = 1, #renderEdges do
-		local e = renderEdges[i]
-		if e.length > 0 then
-			local frac = min(1, e.progress / e.length)
-			if frac > 0.01 then
-				drawList[#drawList + 1] = {
-					x1 = e.px, z1 = e.pz,
-					x2 = e.px + frac * (e.cx - e.px),
-					z2 = e.pz + frac * (e.cz - e.pz),
-					capacity = e.capacity,
-				}
-			end
-		end
-	end
-
-	if #drawList == 0 then
-		needsRedraw = false
-		return
-	end
-
-	-- Collect all squares that need updating
-	local neededSquares = {}
-	for i = 1, #drawList do
-		local c = drawList[i]
-		local m = 100
-		local minSx = max(0, floor((min(c.x1, c.x2) - m) / SQUARE_SIZE))
-		local maxSx = min(SQUARES_X - 1, floor((max(c.x1, c.x2) + m) / SQUARE_SIZE))
-		local minSz = max(0, floor((min(c.z1, c.z2) - m) / SQUARE_SIZE))
-		local maxSz = min(SQUARES_Z - 1, floor((max(c.z1, c.z2) + m) / SQUARE_SIZE))
-		for sx = minSx, maxSx do
-			for sz = minSz, maxSz do
-				neededSquares[SquareKey(sx, sz)] = { sx = sx, sz = sz }
-			end
-		end
-	end
-
-	-- For each square: create orig+cur pair, snapshot, draw cables, apply
-	-- Using the exact pattern proven by terrain_texture_handler
-	drawnSquares = {}
-	for key, sq in pairs(neededSquares) do
-		local sx, sz = sq.sx, sq.sz
-
-		-- Get or create the FBO pair for this square
-		if not squareFBOs[sx] then squareFBOs[sx] = {} end
-		if not squareFBOs[sx][sz] then
-			local cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-				fbo = true, min_filter = GL.LINEAR_MIPMAP_NEAREST,
-				wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
-			})
-			local orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-				fbo = true,
-				wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
-			})
-			if cur and orig then
-				squareFBOs[sx][sz] = { cur = cur, orig = orig }
-			else
-				if cur then gl.DeleteTextureFBO(cur) end
-				if orig then gl.DeleteTextureFBO(orig) end
-			end
-		end
-
-		local pair = squareFBOs[sx] and squareFBOs[sx][sz]
-		if pair then
-			-- Snapshot: capture current map texture into orig
-			spGetMapSquareTexture(sx, sz, 0, pair.orig)
-
-			-- Copy orig → cur
-			glTexture(pair.orig)
-			gl.RenderToTexture(pair.cur, function()
-				glTexRect(-1, 1, 1, -1)
-			end)
-			glTexture(false)
-
-			-- Draw cables onto cur: border + glowing core
-			local sqX = sx * SQUARE_SIZE
-			local sqZ = sz * SQUARE_SIZE
-
-			local function w2t(wx, wz)
-				return 2 * (wx - sqX) / SQUARE_SIZE - 1,
-				       2 * (wz - sqZ) / SQUARE_SIZE - 1
-			end
-
-			local function drawQuad(x1, z1, x2, z2, hw, dx, dz, len)
-				local px = -dz / len * hw
-				local pz =  dx / len * hw
-				local t1x, t1z = w2t(x1 - px, z1 - pz)
-				local t2x, t2z = w2t(x1 + px, z1 + pz)
-				local t3x, t3z = w2t(x2 + px, z2 + pz)
-				local t4x, t4z = w2t(x2 - px, z2 - pz)
-				glVertex(t1x, t1z, 0)
-				glVertex(t2x, t2z, 0)
-				glVertex(t3x, t3z, 0)
-				glVertex(t4x, t4z, 0)
-			end
-
-			gl.RenderToTexture(pair.cur, function()
-				gl.Texture(false)
-
-				-- Pass 1: dark border (full width)
-				gl.BeginEnd(GL.QUADS, function()
-					for i = 1, #drawList do
-						local c = drawList[i]
-						local cdx = c.x2 - c.x1
-						local cdz = c.z2 - c.z1
-						local clen = sqrt(cdx * cdx + cdz * cdz)
-						if clen > 1 then
-							local w = GetCableWidth(c.capacity)
-							glColor(0.04, 0.08, 0.12, 0.9)
-							drawQuad(c.x1, c.z1, c.x2, c.z2, w * 0.5, cdx, cdz, clen)
-						end
-					end
-				end)
-
-				-- Pass 2: glowing inner core (60% width, color by capacity)
-				gl.BeginEnd(GL.QUADS, function()
-					for i = 1, #drawList do
-						local c = drawList[i]
-						local cdx = c.x2 - c.x1
-						local cdz = c.z2 - c.z1
-						local clen = sqrt(cdx * cdx + cdz * cdz)
-						if clen > 1 then
-							local w = GetCableWidth(c.capacity)
-							-- Color: blue for low capacity, bright cyan for high
-							local t = min(1, c.capacity / MAX_CAPACITY_REF)
-							local r = 0.05 + t * 0.15
-							local g = 0.3 + t * 0.5
-							local b = 0.7 + t * 0.3
-							glColor(r, g, b, 0.95)
-							drawQuad(c.x1, c.z1, c.x2, c.z2, w * 0.3, cdx, cdz, clen)
-						end
-					end
-				end)
-
-				glColor(1, 1, 1, 1)
-			end)
-
-			-- Apply
-			gl.GenerateMipmap(pair.cur)
-			spSetMapSquareTexture(sx, sz, pair.cur)
-			drawnSquares[key] = sq
-		end
-	end
-
-	needsRedraw = false
 end
 
 -------------------------------------------------------------------------------------
