@@ -1,5 +1,5 @@
 local duelbox = {
-	[0] = {
+	{
 		nameLong = "West",
 		nameShort = "W",
 		startpoints = {
@@ -15,7 +15,7 @@ local duelbox = {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "East",
 		nameShort = "E",
 		startpoints = {
@@ -34,7 +34,7 @@ local duelbox = {
 }
 
 local teamsbox = {
-	[0] = {
+	{
 		nameLong = "West",
 		nameShort = "W",
 		startpoints = {
@@ -49,7 +49,7 @@ local teamsbox = {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "East",
 		nameShort = "E",
 		startpoints = {

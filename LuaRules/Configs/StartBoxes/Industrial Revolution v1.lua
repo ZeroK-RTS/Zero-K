@@ -1,5 +1,5 @@
 local ret = {
-	[0] = {
+	{
 		nameLong = "West",
 		nameShort = "W",
 		startpoints = {
@@ -19,7 +19,7 @@ local ret = {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "East",
 		nameShort = "E",
 
@@ -30,13 +30,13 @@ local ret = {
 }
 
 -- mirror west into east
-for i = 1, #ret[0].startpoints do
-	ret[1].startpoints[i] = {Game.mapSizeX - ret[0].startpoints[i][1], ret[0].startpoints[i][2]}
+for i = 1, #ret[1].startpoints do
+	ret[2].startpoints[i] = {Game.mapSizeX - ret[1].startpoints[i][1], ret[1].startpoints[i][2]}
 end
-for i = 1, #ret[0].boxes do
-	ret[1].boxes[i] = {}
-	for j = 1, #ret[0].boxes[i] do
-		ret[1].boxes[i][j] = {Game.mapSizeX - ret[0].boxes[i][j][1], ret[0].boxes[i][j][2]}
+for i = 1, #ret[1].boxes do
+	ret[2].boxes[i] = {}
+	for j = 1, #ret[1].boxes[i] do
+		ret[2].boxes[i][j] = {Game.mapSizeX - ret[1].boxes[i][j][1], ret[1].boxes[i][j][2]}
 	end
 end
 
