@@ -1,4 +1,4 @@
-local suported_playercounts = {5, 11, 16}
+local supported_playercounts = {5, 11, 16}
 --[[ The 16 startpoints form a planar graph where each vertex is a 3-mex startpoint and has 3 edges, which
      are veh-pathable passages to other vertices with 2 mexes in between. The lack of connection means there
      are mountains in between (there are some mexes and geospots in the mountains but they are standalone).
@@ -58,16 +58,16 @@ end
 -- convert the above to boxes (256 radius circles)
 local ret = {}
 for i = 1, #starts do
-	ret[i-1] = {
+	ret[i] = {
 		startpoints = { { starts[i][1], starts[i][2] } },
 		boxes = { { } },
 	}
 	for j = 1, 16 do
-		ret[i-1].boxes[1][j] = {
+		ret[i].boxes[1][j] = {
 			starts[i][1] + 256 * math.sin(j * math.pi / 8),
 			starts[i][2] + 256 * math.cos(j * math.pi / 8),
 		}
 	end
 end
 
-return ret, suported_playercounts
+return ret, supported_playercounts
