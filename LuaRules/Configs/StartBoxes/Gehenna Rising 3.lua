@@ -643,7 +643,7 @@ local ret = {}
 local tc = Spring.Utilities.GetTeamCount()
 if tc > 4 then
 	for i = 1, (tc > 12 and 16 or tc > 8 and 12 or 8) do
-		ret[i-1] = {
+		ret[i] = {
 			boxes = {
 				areas[i],
 			}
@@ -651,7 +651,7 @@ if tc > 4 then
 	end
 else
 	for i = 1, 4 do
-		ret[i-1] = {
+		ret[i] = {
 			boxes = {
 				areas[i],
 				areas[4+i],
@@ -661,14 +661,14 @@ else
 		}
 	end
 
-	ret[0].nameLong = "North-West"
-	ret[0].nameShort = "NW"
-	ret[1].nameLong = "North-East"
-	ret[1].nameShort = "NE"
-	ret[2].nameLong = "South-East"
-	ret[2].nameShort = "SE"
-	ret[3].nameLong = "South-West"
-	ret[3].nameShort = "SW"
+	ret[1].nameLong = "North-West"
+	ret[1].nameShort = "NW"
+	ret[2].nameLong = "North-East"
+	ret[2].nameShort = "NE"
+	ret[3].nameLong = "South-East"
+	ret[3].nameShort = "SE"
+	ret[4].nameLong = "South-West"
+	ret[4].nameShort = "SW"
 end
 
 -- generate startpoints as circle middles
