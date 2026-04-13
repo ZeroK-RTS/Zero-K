@@ -954,10 +954,8 @@ local function BuildCableVertices()
 			end
 		end
 
-		-- Compute left/right vertices + cumulative U distance at each waypoint
-		local lefts = {}
-		local rights = {}
-		local uDist = {} -- cumulative distance along path
+		-- Cumulative distance along path
+		local uDist = {}
 		uDist[1] = 0
 		for i = 2, #pts do
 			local dx = pts[i].x - pts[i-1].x
@@ -965,43 +963,77 @@ local function BuildCableVertices()
 			uDist[i] = uDist[i-1] + sqrt(dx*dx + dz*dz)
 		end
 
-		for i = 1, #pts do
-			local hw = (wds[i] or wds[#wds] or 5) * 0.55
-			local p = perps[i]
-			local y = spGetGroundHeight(pts[i].x, pts[i].z) + 2
-			lefts[i]  = { x = pts[i].x - p.nx * hw, y = y, z = pts[i].z - p.nz * hw }
-			rights[i] = { x = pts[i].x + p.nx * hw, y = y, z = pts[i].z + p.nz * hw }
-		end
+		-- Generate N separate cable strands, each as its own ribbon
+		-- at different heights and lateral offsets
+		local numStrands = branch == 1 and 2 or (2 + floor(min(1, cap / MAX_CAPACITY_REF) * 2))
+		local strandRadius = max(2, (wds[1] or 5) * 0.25) -- each strand is ~25% of total width
 
-		-- Emit triangles: 8 floats per vert (pos3 + data3 + uv2)
-		for i = 1, #pts - 1 do
-			local L1, R1 = lefts[i], rights[i]
-			local L2, R2 = lefts[i+1], rights[i+1]
-			local u1, u2 = uDist[i], uDist[i+1]
+		for strand = 1, numStrands do
+			local strandSeed = strand * 17.3 + 5.7
+			-- Hash for deterministic strand color ID
+			local colorID = floor(Hash(strandSeed, 0, 0) * 2 + 2) -- 0..3 mapped
 
-			-- Tri 1: L1, R1, R2
-			verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
-			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
-			verts[#verts+1]=u1;   verts[#verts+1]=-1
-			verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
-			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
-			verts[#verts+1]=u1;   verts[#verts+1]=1
-			verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
-			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
-			verts[#verts+1]=u2;   verts[#verts+1]=1
+			for i = 1, #pts do
+				local w = wds[i] or wds[#wds] or 5
+				local p = perps[i]
+				local baseY = spGetGroundHeight(pts[i].x, pts[i].z)
 
-			-- Tri 2: L1, R2, L2
-			verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
-			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
-			verts[#verts+1]=u1;   verts[#verts+1]=-1
-			verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
-			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
-			verts[#verts+1]=u2;   verts[#verts+1]=1
-			verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
-			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
-			verts[#verts+1]=u2;   verts[#verts+1]=-1
+				-- Lateral offset: smooth weave across the bundle width
+				local uScaled = (uDist[i] or 0) * 0.012
+				local lateralBase = (strand - (numStrands + 1) * 0.5) * (w * 0.3 / numStrands)
+				local lateralNoise = (Hash(uScaled * (0.8 + strand * 0.3), strandSeed, strandSeed) * 0.5 +
+				                      Hash(uScaled * 0.4 + 3.0, strandSeed + 7, strandSeed) * 0.3) * w * 0.3
+				local lateralOffset = lateralBase + lateralNoise
 
-			vertCount = vertCount + 6
+				-- Height offset: cables stack vertically, with noise
+				local heightBase = (strand - 1) * strandRadius * 1.2
+				local heightNoise = Hash(uScaled * 0.6, strandSeed + 13, strandSeed) * strandRadius * 0.8
+				local heightOffset = heightBase + heightNoise + 1.5
+
+				-- Position: center point offset laterally and vertically
+				local cx = pts[i].x + p.nx * lateralOffset
+				local cz = pts[i].z + p.nz * lateralOffset
+				local cy = baseY + heightOffset
+
+				-- Left/right edges of this strand
+				local sr = strandRadius * 0.55
+				pts[i]["sL" .. strand] = { x = cx - p.nx * sr, y = cy, z = cz - p.nz * sr }
+				pts[i]["sR" .. strand] = { x = cx + p.nx * sr, y = cy, z = cz + p.nz * sr }
+			end
+
+			-- Emit triangles for this strand
+			for i = 1, #pts - 1 do
+				local L1 = pts[i]["sL" .. strand]
+				local R1 = pts[i]["sR" .. strand]
+				local L2 = pts[i+1]["sL" .. strand]
+				local R2 = pts[i+1]["sR" .. strand]
+				local u1, u2 = uDist[i], uDist[i+1]
+				local br = branch == 1 and 1 or 0
+
+				-- Tri 1
+				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
+				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
+				verts[#verts+1]=u1;   verts[#verts+1]=-1
+				verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
+				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
+				verts[#verts+1]=u1;   verts[#verts+1]=1
+				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
+				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
+				verts[#verts+1]=u2;   verts[#verts+1]=1
+
+				-- Tri 2
+				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
+				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
+				verts[#verts+1]=u1;   verts[#verts+1]=-1
+				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
+				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
+				verts[#verts+1]=u2;   verts[#verts+1]=1
+				verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
+				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
+				verts[#verts+1]=u2;   verts[#verts+1]=-1
+
+				vertCount = vertCount + 6
+			end
 		end
 
 		end -- if #pts >= 2
@@ -1145,7 +1177,6 @@ void main() {
 	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
 
-	// Snapshot ghosting
 	vec2 snapUV = clamp(worldPos.xz / mapDims, vec2(0.0), vec2(1.0));
 	vec4 snapColor = texture(snapshotTex, snapUV);
 
@@ -1158,60 +1189,49 @@ void main() {
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
 	float fullLOS = smoothstep(0.3, 0.8, losState);
 
-	// --- Electric discharge using cable-aligned UVs ---
-	// u = distance along cable (elmos), v = across (-1 to +1)
-	float along = cableUV.x * 0.06;          // scale along to noise frequency
-	float across = cableUV.y * 0.5 + 0.5;    // remap -1..+1 to 0..1
+	// v = -1 to +1 across this individual strand ribbon
+	float v = cableUV.y; // -1 left edge, +1 right edge
+	float t = abs(v);     // 0 at center, 1 at edge
 
-	float timeShift = gameTime * 2.5 * fullLOS;
+	// Cylinder normal: round cross-section
+	// The strand ribbon is flat, but we fake a round normal
+	float ny = sqrt(max(0.0, 1.0 - t * t)); // hemisphere: 1 at center, 0 at edge
+	float nx = v;                             // sideways: -1 left, +1 right
+	vec3 cylNormal = normalize(vec3(nx * 0.5, ny, nx * 0.5));
 
-	// Main bolt: noise displaces center position across the ribbon
-	// Subtract time so energy flows root→leaf (direction of increasing u)
-	float boltOffset = fbm(vec2(along * 4.0 - timeShift, along * 0.7 + 5.0)) - 0.5;
+	// Sun diffuse lighting
+	float diffuse = max(0.15, dot(cylNormal, normalize(sunDir.xyz)));
 
-	// Secondary bolt (slightly different frequency)
-	float bolt2Offset = fbm(vec2(along * 6.0 + timeShift * 0.8, along * 1.3 + 19.0)) - 0.5;
+	// Specular (Blinn-Phong)
+	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
+	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
+	float spec = pow(max(0.0, dot(cylNormal, halfDir)), 40.0) * 0.45;
 
-	// Distance from bolt centers
-	float boltCenter = 0.5 + boltOffset * 0.5;
-	float bolt2Center = 0.5 + bolt2Offset * 0.4;
-	float distBolt1 = abs(across - boltCenter);
-	float distBolt2 = abs(across - bolt2Center);
+	// Per-strand color from isBranch field (encodes colorID * 0.1 + branch flag)
+	float colorID = floor(fract(isBranch) * 10.0 + 0.5);
+	vec3 baseColor;
+	if (colorID < 1.0)      baseColor = vec3(0.32, 0.20, 0.07); // brown
+	else if (colorID < 2.0) baseColor = vec3(0.14, 0.28, 0.09); // dark green
+	else if (colorID < 3.0) baseColor = vec3(0.38, 0.26, 0.11); // copper
+	else                    baseColor = vec3(0.22, 0.11, 0.07); // dark red-brown
 
-	// Sharp core (gaussian falloff)
-	float coreW = 0.05 + capT * 0.05;
-	float core1 = exp(-distBolt1 * distBolt1 / (coreW * coreW));
-	float core2 = exp(-distBolt2 * distBolt2 / (coreW * 1.8 * coreW * 1.8)) * 0.35;
+	baseColor *= (1.0 + capT * 0.3);
 
-	// Outer glow
-	float glowW = 0.18 + capT * 0.08;
-	float glow = exp(-distBolt1 * distBolt1 / (glowW * glowW)) * 0.5;
+	// Final lit color
+	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.88) * spec;
 
-	float intensity = core1 + core2 + glow;
+	// Subtle surface texture noise
+	float surfNoise = hash(worldPos.xz * 0.5) * 0.06;
+	color += vec3(surfNoise * 0.5, surfNoise * 0.3, surfNoise * 0.1);
 
-	// Flicker
-	float flicker = 0.7 + 0.3 * hash(vec2(floor(gameTime * 10.0), floor(along * 3.0)));
-	intensity *= mix(1.0, flicker, fullLOS);
+	// Soft edge fade (anti-alias at strand border)
+	float edgeFade = smoothstep(1.0, 0.8, t);
 
-	// Branch dimming
-	if (isBranch > 0.5) intensity *= 0.45;
-
-	// Color
-	vec3 coreColor = mix(vec3(0.6, 0.75, 1.0), vec3(1.0, 1.0, 1.0), core1);
-	vec3 glowColor = mix(vec3(0.08, 0.12, 0.35), vec3(0.3, 0.5, 1.0), capT);
-	vec3 color = coreColor * (core1 + core2) + glowColor * glow;
-
-	// Edge fade at ribbon borders
-	float edgeDist = 1.0 - abs(cableUV.y); // 0 at edges, 1 at center
-	float edgeFade = smoothstep(0.0, 0.2, edgeDist);
-
-	float dimFactor = mix(0.35, 1.0, fullLOS);
+	// Dim in radar
+	float dimFactor = mix(0.3, 1.0, fullLOS);
 	color *= dimFactor;
 
-	float alpha = clamp(intensity * edgeFade, 0.0, 1.0) * 0.95;
-	if (alpha < 0.02) discard;
-
-	fragColor = vec4(color, alpha);
+	fragColor = vec4(color, edgeFade * 0.95);
 }
 ]]
 
