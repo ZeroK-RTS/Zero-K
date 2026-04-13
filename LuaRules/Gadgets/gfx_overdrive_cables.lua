@@ -637,23 +637,35 @@ local SQUARES_X    = MAP_WIDTH / SQUARE_SIZE
 local SQUARES_Z    = MAP_HEIGHT / SQUARE_SIZE
 
 -------------------------------------------------------------------------------------
--- PCB style config
+-- Organic tree style config
 -------------------------------------------------------------------------------------
 
-local MIN_TRACE_WIDTH  = 5     -- min trace width in elmos
-local MAX_TRACE_WIDTH  = 22    -- max trace width in elmos
+local MIN_TRUNK_WIDTH  = 4
+local MAX_TRUNK_WIDTH  = 20
 local MAX_CAPACITY_REF = 100
-local PAD_RADIUS_MULT  = 1.8   -- pad radius = trace_width * this
-local PAD_SEGMENTS     = 12    -- polygon segments for circular pads
-local VIA_RADIUS       = 3     -- small via dots along traces
-local VIA_SPACING      = 80    -- elmos between via dots
+local PAD_SEGMENTS     = 10
 
--- Colors (copper on dark substrate)
-local TRACE_BORDER_COLOR = { 0.02, 0.04, 0.06, 0.92 }
-local TRACE_COPPER_COLOR = { 0.75, 0.55, 0.20, 0.95 } -- default copper
-local PAD_BORDER_COLOR   = { 0.02, 0.04, 0.06, 0.95 }
-local PAD_COPPER_COLOR   = { 0.85, 0.65, 0.25, 0.95 }
-local VIA_COLOR          = { 0.15, 0.12, 0.08, 0.90 }
+-- Noise & branching
+local SEG_LENGTH       = 16    -- subdivide cables every N elmos
+local NOISE_AMP        = 0.6   -- noise amplitude as fraction of width
+local BRANCH_CHANCE    = 0.25  -- chance of side branch per segment
+local BRANCH_LEN_MIN   = 15   -- min branch length (elmos)
+local BRANCH_LEN_MAX   = 50   -- max branch length
+local BRANCH_ANGLE_MIN = 0.4  -- min angle offset (radians, ~23°)
+local BRANCH_ANGLE_MAX = 1.1  -- max angle offset (radians, ~63°)
+local BRANCH_WIDTH     = 0.5  -- branch width as fraction of parent
+local TWIG_CHANCE      = 0.3  -- chance of sub-branch from a branch
+local TWIG_LEN_MIN     = 8
+local TWIG_LEN_MAX     = 25
+local TWIG_WIDTH       = 0.4
+local TAPER_START      = 0.7  -- start tapering at this fraction along cable
+
+-- Colors (organic: dark bark border, greenish/amber glow)
+local BARK_COLOR  = { 0.06, 0.04, 0.02, 0.90 }
+local INNER_COLOR = { 0.20, 0.55, 0.15, 0.85 } -- green energy
+local INNER_COLOR_HIGH = { 0.50, 0.80, 0.20, 0.90 } -- bright for high capacity
+local PAD_BARK_COLOR  = { 0.08, 0.05, 0.02, 0.92 }
+local PAD_INNER_COLOR = { 0.25, 0.60, 0.18, 0.90 }
 
 -------------------------------------------------------------------------------------
 -- State
@@ -693,110 +705,139 @@ end
 -- Returns list of segments { {x1, z1, x2, z2}, ... }
 -------------------------------------------------------------------------------------
 
-local function RoutePCB(x1, z1, x2, z2)
+-------------------------------------------------------------------------------------
+-- Deterministic noise: hash-based pseudo-random from position
+-- Returns value in [-1, 1], stable for same inputs across redraws
+-------------------------------------------------------------------------------------
+
+local function Hash(x, z, seed)
+	local h = sin(x * 12.9898 + z * 78.233 + (seed or 0) * 43.17) * 43758.5453
+	return (h - floor(h)) * 2 - 1 -- [-1, 1]
+end
+
+local function HashUnit(x, z, seed) -- [0, 1]
+	return (Hash(x, z, seed) + 1) * 0.5
+end
+
+-------------------------------------------------------------------------------------
+-- Organic tree path generator
+-- Takes a cable edge and produces many small noisy segments + side branches.
+-------------------------------------------------------------------------------------
+
+local function GetTrunkWidth(capacity)
+	local t = min(1, capacity / MAX_CAPACITY_REF)
+	return MIN_TRUNK_WIDTH + t * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH)
+end
+
+-- Generate noisy path points along a line from (x1,z1) to (x2,z2)
+-- Returns array of {x, z} waypoints with perpendicular noise
+local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
 	local dx = x2 - x1
 	local dz = z2 - z1
-	local adx = abs(dx)
-	local adz = abs(dz)
-
-	if adx < 2 or adz < 2 then
-		return {{ x1, z1, x2, z2 }}
+	local len = sqrt(dx * dx + dz * dz)
+	if len < 2 then
+		return { {x = x1, z = z1}, {x = x2, z = z2} }
 	end
 
-	local diagLen = min(adx, adz)
-	local segments = {}
+	local steps = max(2, floor(len / SEG_LENGTH))
+	local nx = -dz / len -- perpendicular
+	local nz =  dx / len
 
-	if adx >= adz then
-		local horizLen = adx - diagLen
-		local sx = (dx > 0) and 1 or -1
-		local mx = x1 + sx * horizLen
-		if horizLen > 2 then
-			segments[#segments + 1] = { x1, z1, mx, z1 }
+	local points = {}
+	for i = 0, steps do
+		local t = i / steps
+		local px = x1 + t * dx
+		local pz = z1 + t * dz
+
+		-- No noise at endpoints (connect cleanly to pads)
+		local noiseScale = 1
+		if t < 0.1 then noiseScale = t / 0.1
+		elseif t > 0.9 then noiseScale = (1 - t) / 0.1 end
+
+		local n = Hash(px * 0.1, pz * 0.1, seed) * amplitude * noiseScale
+		points[#points + 1] = { x = px + nx * n, z = pz + nz * n }
+	end
+	return points
+end
+
+-- Generate organic segments for one cable edge.
+-- Returns list of { x1, z1, x2, z2, width, capacity, isBranch }
+local function GenerateOrganicEdge(ex1, ez1, ex2, ez2, capacity)
+	local segments = {}
+	local trunkW = GetTrunkWidth(capacity)
+	local len = sqrt((ex2 - ex1)^2 + (ez2 - ez1)^2)
+	if len < 2 then return segments end
+
+	local dx = (ex2 - ex1) / len
+	local dz = (ez2 - ez1) / len
+
+	-- Generate noisy trunk path
+	local path = NoisyPath(ex1, ez1, ex2, ez2, trunkW * NOISE_AMP, ex1 + ez1)
+
+	-- Emit trunk segments with taper
+	for i = 1, #path - 1 do
+		local p1 = path[i]
+		local p2 = path[i + 1]
+		local t = (i - 1) / (#path - 1) -- 0..1 along cable
+
+		-- Taper: full width until TAPER_START, then narrow to 60%
+		local w = trunkW
+		if t > TAPER_START then
+			local taperT = (t - TAPER_START) / (1 - TAPER_START)
+			w = trunkW * (1 - taperT * 0.4)
 		end
-		segments[#segments + 1] = { mx, z1, x2, z2 }
-	else
-		local vertLen = adz - diagLen
-		local sz = (dz > 0) and 1 or -1
-		local mz = z1 + sz * vertLen
-		if vertLen > 2 then
-			segments[#segments + 1] = { x1, z1, x1, mz }
+
+		segments[#segments + 1] = {
+			x1 = p1.x, z1 = p1.z, x2 = p2.x, z2 = p2.z,
+			width = w, capacity = capacity, isBranch = false,
+		}
+
+		-- Side branches
+		if i > 1 and i < #path - 1 then
+			local branchSeed = p1.x * 7.13 + p1.z * 3.77
+			if HashUnit(p1.x, p1.z, branchSeed) < BRANCH_CHANCE then
+				-- Branch direction: perpendicular with random angle offset
+				local side = (Hash(p1.x, p1.z, branchSeed + 1) > 0) and 1 or -1
+				local angle = BRANCH_ANGLE_MIN + HashUnit(p1.x, p1.z, branchSeed + 2) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN)
+				local bAngle = math.atan2(dz, dx) + side * angle
+				local bLen = BRANCH_LEN_MIN + HashUnit(p1.x, p1.z, branchSeed + 3) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN)
+				local bx2 = p1.x + cos(bAngle) * bLen
+				local bz2 = p1.z + sin(bAngle) * bLen
+				local bw = w * BRANCH_WIDTH
+
+				-- Noisy branch path (fewer segments)
+				local bPath = NoisyPath(p1.x, p1.z, bx2, bz2, bw * 0.8, branchSeed + 10)
+				for bi = 1, #bPath - 1 do
+					local bp1 = bPath[bi]
+					local bp2 = bPath[bi + 1]
+					local bt = bi / (#bPath - 1)
+					local bwTaper = bw * (1 - bt * 0.6) -- taper to 40% at tip
+
+					segments[#segments + 1] = {
+						x1 = bp1.x, z1 = bp1.z, x2 = bp2.x, z2 = bp2.z,
+						width = bwTaper, capacity = capacity * 0.3, isBranch = true,
+					}
+
+					-- Sub-twigs
+					if bi > 1 and bi < #bPath - 1 and HashUnit(bp1.x, bp1.z, branchSeed + 20 + bi) < TWIG_CHANCE then
+						local tSide = (Hash(bp1.x, bp1.z, branchSeed + 30 + bi) > 0) and 1 or -1
+						local tAngle = bAngle + tSide * (0.3 + HashUnit(bp1.x, bp1.z, branchSeed + 40 + bi) * 0.8)
+						local tLen = TWIG_LEN_MIN + HashUnit(bp1.x, bp1.z, branchSeed + 50 + bi) * (TWIG_LEN_MAX - TWIG_LEN_MIN)
+						local tx2 = bp1.x + cos(tAngle) * tLen
+						local tz2 = bp1.z + sin(tAngle) * tLen
+						local tw = bwTaper * TWIG_WIDTH
+
+						segments[#segments + 1] = {
+							x1 = bp1.x, z1 = bp1.z, x2 = tx2, z2 = tz2,
+							width = tw, capacity = capacity * 0.1, isBranch = true,
+						}
+					end
+				end
+			end
 		end
-		segments[#segments + 1] = { x1, mz, x2, z2 }
 	end
 
 	return segments
-end
-
--------------------------------------------------------------------------------------
--- Segment merging: when multiple routed edges produce collinear overlapping
--- segments, merge them into a single segment with accumulated capacity.
--- Only merges axis-aligned (horizontal/vertical) segments.
--------------------------------------------------------------------------------------
-
-local SNAP = 16 -- snap resolution for merging (elmos)
-
-local function SegKey(isHoriz, fixed, lo, hi)
-	-- Key for an axis-aligned segment: axis + snapped fixed coord + interval
-	return (isHoriz and "H" or "V") .. floor(fixed / SNAP) .. ":" .. floor(lo / SNAP) .. ":" .. floor(hi / SNAP)
-end
-
-local function MergeSegments(rawSegments)
-	-- rawSegments = { {x1,z1,x2,z2,capacity}, ... }
-	-- Returns merged list: { {x1,z1,x2,z2,capacity}, ... }
-
-	local axisSegs = {} -- [segKey] = { fixed, lo, hi, capacity, isHoriz }
-	local diagSegs = {} -- diagonal segments can't be merged, pass through
-
-	for i = 1, #rawSegments do
-		local s = rawSegments[i]
-		local dx = abs(s[3] - s[1])
-		local dz = abs(s[4] - s[2])
-
-		if dz < 2 then
-			-- Horizontal segment
-			local fixed = s[2]
-			local lo = min(s[1], s[3])
-			local hi = max(s[1], s[3])
-			local key = SegKey(true, fixed, lo, hi)
-			if axisSegs[key] then
-				axisSegs[key].capacity = axisSegs[key].capacity + s[5]
-			else
-				axisSegs[key] = { fixed = fixed, lo = lo, hi = hi, capacity = s[5], isHoriz = true }
-			end
-		elseif dx < 2 then
-			-- Vertical segment
-			local fixed = s[1]
-			local lo = min(s[2], s[4])
-			local hi = max(s[2], s[4])
-			local key = SegKey(false, fixed, lo, hi)
-			if axisSegs[key] then
-				axisSegs[key].capacity = axisSegs[key].capacity + s[5]
-			else
-				axisSegs[key] = { fixed = fixed, lo = lo, hi = hi, capacity = s[5], isHoriz = false }
-			end
-		else
-			-- Diagonal — just pass through
-			diagSegs[#diagSegs + 1] = { s[1], s[2], s[3], s[4], capacity = s[5] }
-		end
-	end
-
-	-- Convert back to segment list with named fields
-	local result = {}
-	for _, seg in pairs(axisSegs) do
-		local w = GetTraceWidth(seg.capacity)
-		if seg.isHoriz then
-			result[#result + 1] = { x1 = seg.lo, z1 = seg.fixed, x2 = seg.hi, z2 = seg.fixed, width = w, capacity = seg.capacity }
-		else
-			result[#result + 1] = { x1 = seg.fixed, z1 = seg.lo, x2 = seg.fixed, z2 = seg.hi, width = w, capacity = seg.capacity }
-		end
-	end
-	for i = 1, #diagSegs do
-		local d = diagSegs[i]
-		local w = GetTraceWidth(d.capacity)
-		result[#result + 1] = { x1 = d[1], z1 = d[2], x2 = d[3], z2 = d[4], width = w, capacity = d.capacity }
-	end
-
-	return result
 end
 
 -------------------------------------------------------------------------------------
@@ -862,11 +903,10 @@ function gadget:DrawGenesis()
 		spSetMapSquareTexture(sq.sx, sq.sz, "")
 	end
 
-	-- Step 1: Route all edges as PCB segments, collect raw segments with capacity
-	local rawSegments = {}
+	-- Generate organic tree segments from all edges
+	local allSegments = {}
 	local allPads = {}
 	local padSet = {}
-	local maxPadRadius = {}  -- [padKey] = max radius seen
 
 	for i = 1, #renderEdges do
 		local e = renderEdges[i]
@@ -877,49 +917,40 @@ function gadget:DrawGenesis()
 				local ez = e.pz + frac * (e.cz - e.pz)
 				local cap = max(1, e.capacity)
 
-				local segments = RoutePCB(e.px, e.pz, ex, ez)
-				for j = 1, #segments do
-					local s = segments[j]
-					rawSegments[#rawSegments + 1] = { s[1], s[2], s[3], s[4], cap }
+				-- Generate organic noisy path with branches
+				local segs = GenerateOrganicEdge(e.px, e.pz, ex, ez, cap)
+				for j = 1, #segs do
+					allSegments[#allSegments + 1] = segs[j]
 				end
 
-				-- Pads at endpoints (accumulate max radius)
-				local w = GetTraceWidth(cap)
+				-- Pads at endpoints
+				local w = GetTrunkWidth(cap)
 				local pkey = floor(e.px) .. "," .. floor(e.pz)
-				if not maxPadRadius[pkey] or w * PAD_RADIUS_MULT > maxPadRadius[pkey] then
-					maxPadRadius[pkey] = w * PAD_RADIUS_MULT
-					padSet[pkey] = { cx = e.px, cz = e.pz }
+				if not padSet[pkey] then
+					padSet[pkey] = true
+					allPads[#allPads + 1] = { cx = e.px, cz = e.pz, radius = w * 1.5 }
 				end
-
 				if frac >= 0.99 then
 					local ckey = floor(e.cx) .. "," .. floor(e.cz)
-					if not maxPadRadius[ckey] or w * PAD_RADIUS_MULT > maxPadRadius[ckey] then
-						maxPadRadius[ckey] = w * PAD_RADIUS_MULT
-						padSet[ckey] = { cx = e.cx, cz = e.cz }
+					if not padSet[ckey] then
+						padSet[ckey] = true
+						allPads[#allPads + 1] = { cx = e.cx, cz = e.cz, radius = w * 1.2 }
 					end
 				end
 			end
 		end
 	end
 
-	if #rawSegments == 0 then
+	if #allSegments == 0 then
 		needsRedraw = false
 		return
-	end
-
-	-- Step 2: Merge overlapping axis-aligned segments (reinforcement)
-	local allSegments = MergeSegments(rawSegments)
-
-	-- Build pad list with accumulated radii
-	for pkey, pdata in pairs(padSet) do
-		allPads[#allPads + 1] = { cx = pdata.cx, cz = pdata.cz, radius = maxPadRadius[pkey] }
 	end
 
 	-- Collect needed squares (from segments + pads)
 	local neededSquares = {}
 	for i = 1, #allSegments do
 		local s = allSegments[i]
-		local m = s.width + 20
+		local m = s.width + 60 -- extra margin for branch noise
 		local minSx = max(0, floor((min(s.x1, s.x2) - m) / SQUARE_SIZE))
 		local maxSx = min(SQUARES_X - 1, floor((max(s.x1, s.x2) + m) / SQUARE_SIZE))
 		local minSz = max(0, floor((min(s.z1, s.z2) - m) / SQUARE_SIZE))
@@ -985,8 +1016,8 @@ function gadget:DrawGenesis()
 			gl.RenderToTexture(pair.cur, function()
 				gl.Texture(false)
 
-				-- Layer 1: Trace borders (dark substrate)
-				glColor(TRACE_BORDER_COLOR[1], TRACE_BORDER_COLOR[2], TRACE_BORDER_COLOR[3], TRACE_BORDER_COLOR[4])
+				-- Layer 1: Dark bark border (all segments)
+				glColor(BARK_COLOR[1], BARK_COLOR[2], BARK_COLOR[3], BARK_COLOR[4])
 				gl.BeginEnd(GL.QUADS, function()
 					for i = 1, #allSegments do
 						local s = allSegments[i]
@@ -994,22 +1025,23 @@ function gadget:DrawGenesis()
 					end
 				end)
 
-				-- Layer 2: Trace copper fill (additive so overlapping traces reinforce)
-				gl.Blending(GL.SRC_ALPHA, GL.ONE)
+				-- Layer 2: Inner glow (energy color, varies by capacity)
 				gl.BeginEnd(GL.QUADS, function()
 					for i = 1, #allSegments do
 						local s = allSegments[i]
-						local r, g, b, a = GetTraceColor(s.capacity)
+						local t = min(1, s.capacity / MAX_CAPACITY_REF)
+						local r = INNER_COLOR[1] + t * (INNER_COLOR_HIGH[1] - INNER_COLOR[1])
+						local g = INNER_COLOR[2] + t * (INNER_COLOR_HIGH[2] - INNER_COLOR[2])
+						local b = INNER_COLOR[3] + t * (INNER_COLOR_HIGH[3] - INNER_COLOR[3])
+						local a = INNER_COLOR[4]
+						if s.isBranch then a = a * 0.7 end
 						glColor(r, g, b, a)
-						EmitTraceQuad(w2t, s.x1, s.z1, s.x2, s.z2, s.width * 0.4)
+						EmitTraceQuad(w2t, s.x1, s.z1, s.x2, s.z2, s.width * 0.35)
 					end
 				end)
 
-				-- Reset blending for pads
-				gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-
-				-- Layer 3: Pad borders
-				glColor(PAD_BORDER_COLOR[1], PAD_BORDER_COLOR[2], PAD_BORDER_COLOR[3], PAD_BORDER_COLOR[4])
+				-- Layer 3: Pad borders (dark bark circles at nodes)
+				glColor(PAD_BARK_COLOR[1], PAD_BARK_COLOR[2], PAD_BARK_COLOR[3], PAD_BARK_COLOR[4])
 				for i = 1, #allPads do
 					local p = allPads[i]
 					gl.BeginEnd(GL.TRIANGLE_FAN, function()
@@ -1017,33 +1049,13 @@ function gadget:DrawGenesis()
 					end)
 				end
 
-				-- Layer 4: Pad copper fill
-				glColor(PAD_COPPER_COLOR[1], PAD_COPPER_COLOR[2], PAD_COPPER_COLOR[3], PAD_COPPER_COLOR[4])
+				-- Layer 4: Pad inner glow
+				glColor(PAD_INNER_COLOR[1], PAD_INNER_COLOR[2], PAD_INNER_COLOR[3], PAD_INNER_COLOR[4])
 				for i = 1, #allPads do
 					local p = allPads[i]
 					gl.BeginEnd(GL.TRIANGLE_FAN, function()
-						EmitCircle(w2t, p.cx, p.cz, p.radius * 0.75)
+						EmitCircle(w2t, p.cx, p.cz, p.radius * 0.65)
 					end)
-				end
-
-				-- Layer 5: Via dots along traces
-				glColor(VIA_COLOR[1], VIA_COLOR[2], VIA_COLOR[3], VIA_COLOR[4])
-				for i = 1, #allSegments do
-					local s = allSegments[i]
-					local dx = s.x2 - s.x1
-					local dz = s.z2 - s.z1
-					local len = sqrt(dx * dx + dz * dz)
-					if len > VIA_SPACING then
-						local steps = floor(len / VIA_SPACING)
-						for v = 1, steps do
-							local t = v / (steps + 1)
-							local vx = s.x1 + t * dx
-							local vz = s.z1 + t * dz
-							gl.BeginEnd(GL.TRIANGLE_FAN, function()
-								EmitCircle(w2t, vx, vz, VIA_RADIUS)
-							end)
-						end
-					end
 				end
 
 				glColor(1, 1, 1, 1)
