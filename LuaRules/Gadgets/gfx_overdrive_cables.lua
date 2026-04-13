@@ -660,9 +660,15 @@ local edgesByAllyTeam = {}
 local lastVersions = {}
 local needsRebuild = false
 
-local cableShader
-local cableVAO
+local cableShader       -- 3D shader for live cables + snapshot sampling
+local cableVAO          -- live cable geometry
 local numCableVerts = 0
+
+local snapshotTex       -- persistent 2D texture (top-down map projection)
+local snapshotShader    -- simple shader to render cables to snapshot
+local SNAPSHOT_SCALE = 4 -- snapshot pixels per elmo (4 = quarter resolution)
+local snapshotW, snapshotH
+local needsSnapshotUpdate = false
 
 -------------------------------------------------------------------------------------
 -- Deterministic noise
@@ -993,13 +999,69 @@ end
 -- Shader sources
 -------------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------------
+-- Snapshot shader: renders cables flat (top-down) into the snapshot texture.
+-- Only updates pixels in LOS. Uses $info to mask.
+-------------------------------------------------------------------------------------
+
+local snapVSSrc = [[
+#version 420
+#extension GL_ARB_uniform_buffer_object : require
+#extension GL_ARB_shading_language_420pack: require
+
+layout (location = 0) in vec3 vertPos;
+layout (location = 1) in vec3 vertData; // capacity, isBranch, width
+
+uniform vec2 mapDims; // mapSizeX, mapSizeZ
+
+out float vCapacity;
+out float vIsBranch;
+
+void main() {
+	vCapacity = vertData.x;
+	vIsBranch = vertData.y;
+	// Project to NDC: map (0..mapSizeX, 0..mapSizeZ) -> (-1..1, -1..1)
+	vec2 ndc = (vertPos.xz / mapDims) * 2.0 - 1.0;
+	gl_Position = vec4(ndc, 0.0, 1.0);
+}
+]]
+
+local snapFSSrc = [[
+#version 330
+
+in float vCapacity;
+in float vIsBranch;
+
+out vec4 fragColor;
+
+float hash(vec2 p) {
+	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main() {
+	float capT = clamp(vCapacity / 100.0, 0.0, 1.0);
+	vec3 barkColor = vec3(0.06, 0.04, 0.02);
+	vec3 innerColor = mix(vec3(0.20, 0.55, 0.15), vec3(0.50, 0.80, 0.20), capT);
+
+	float n = hash(gl_FragCoord.xy * 0.3);
+	float innerMix = 0.4 + 0.2 * n;
+	if (vIsBranch > 0.5) innerMix *= 0.6;
+
+	fragColor = vec4(mix(barkColor, innerColor, innerMix), 1.0);
+}
+]]
+
+-------------------------------------------------------------------------------------
+-- Main 3D shader: draws live cables in LOS, samples snapshot for fog areas
+-------------------------------------------------------------------------------------
+
 local cableVSSrc = [[
 #version 420
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 
-layout (location = 0) in vec3 vertPos;    // x, y, z in world space
-layout (location = 1) in vec3 vertData;   // capacity, isBranch, width
+layout (location = 0) in vec3 vertPos;
+layout (location = 1) in vec3 vertData; // capacity, isBranch, width
 
 out DataVS {
 	vec3 worldPos;
@@ -1025,7 +1087,9 @@ local cableFSSrc = [[
 #extension GL_ARB_shading_language_420pack: require
 
 uniform sampler2D infoTex;
+uniform sampler2D snapshotTex;
 uniform float gameTime;
+uniform vec2 mapDims;
 
 in DataVS {
 	vec3 worldPos;
@@ -1038,47 +1102,48 @@ in DataVS {
 
 out vec4 fragColor;
 
-// Noise for procedural texture
 float hash(vec2 p) {
-	float h = dot(p, vec2(12.9898, 78.233));
-	return fract(sin(h) * 43758.5453);
+	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 void main() {
-	// LOS check
+	// LOS state
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
 
-	// Unexplored: discard
-	if (losState < 0.05) discard;
+	// Sample snapshot for this world position
+	vec2 snapUV = clamp(worldPos.xz / mapDims, vec2(0.0), vec2(1.0));
+	vec4 snapColor = texture(snapshotTex, snapUV);
 
-	// Capacity-based color
+	// Fully unexplored: show snapshot if it has data, otherwise discard
+	if (losState < 0.05) {
+		if (snapColor.a < 0.1) discard;
+		fragColor = vec4(snapColor.rgb * 0.35, snapColor.a * 0.7);
+		return;
+	}
+
+	// In radar/fog: blend snapshot (dimmed) with fading live geometry
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
-
-	// Bark border color (dark)
 	vec3 barkColor = vec3(0.06, 0.04, 0.02);
-	// Inner glow: green energy, brighter with capacity
 	vec3 innerColor = mix(vec3(0.20, 0.55, 0.15), vec3(0.50, 0.80, 0.20), capT);
 
-	// Simple procedural: mostly bark with inner glow
-	// Use a simple threshold based on noise for organic feel
 	float n = hash(worldPos.xz * 0.1);
 	float innerMix = 0.4 + 0.2 * n;
 	if (isBranch > 0.5) innerMix *= 0.6;
 
-	vec3 baseColor = mix(barkColor, innerColor, innerMix);
+	vec3 liveColor = mix(barkColor, innerColor, innerMix);
 
-	// Animated energy pulse (only in full LOS)
+	// Animated pulse (only full LOS)
 	float fullLOS = step(0.7, losState);
 	float pulse = 0.5 + 0.5 * sin(gameTime * 3.0 + worldPos.x * 0.05 + worldPos.z * 0.05);
-	baseColor += innerColor * pulse * 0.15 * fullLOS * capT;
+	liveColor += innerColor * pulse * 0.15 * fullLOS * capT;
 
-	// Dim in radar/previously-seen areas
-	float dimFactor = mix(0.4, 1.0, smoothstep(0.3, 0.8, losState));
-	baseColor *= dimFactor;
+	// Blend: full LOS = live color, radar = dimmed live, low = snapshot
+	float liveFactor = smoothstep(0.3, 0.8, losState);
+	float dimFactor = mix(0.4, 1.0, liveFactor);
 
-	fragColor = vec4(baseColor, 0.9);
+	fragColor = vec4(liveColor * dimFactor, 0.9);
 }
 ]]
 
@@ -1087,12 +1152,30 @@ void main() {
 -------------------------------------------------------------------------------------
 
 function gadget:DrawWorldPreUnit()
-	if not cableShader or numCableVerts == 0 then return end
+	if not cableShader or numCableVerts == 0 or not cableVAO then return end
 
+	-- Update snapshot texture if needed (must happen in a draw callin)
+	if needsSnapshotUpdate and snapshotTex and snapshotShader then
+		gl.RenderToTexture(snapshotTex, function()
+			gl.Clear(GL.COLOR_BUFFER_BIT, 0, 0, 0, 0)
+			snapshotShader:Activate()
+			snapshotShader:SetUniform("mapDims", MAP_WIDTH, MAP_HEIGHT)
+			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
+			cableVAO:DrawArrays(GL.TRIANGLES, numCableVerts)
+			snapshotShader:Deactivate()
+		end)
+		needsSnapshotUpdate = false
+	end
+
+	-- Draw live 3D cables
 	cableShader:Activate()
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds())
+	cableShader:SetUniform("mapDims", MAP_WIDTH, MAP_HEIGHT)
 
 	gl.Texture(0, "$info")
+	if snapshotTex then
+		gl.Texture(1, snapshotTex)
+	end
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(false)
 	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
@@ -1101,6 +1184,7 @@ function gadget:DrawWorldPreUnit()
 
 	cableShader:Deactivate()
 	gl.Texture(0, false)
+	gl.Texture(1, false)
 	gl.DepthTest(false)
 end
 
@@ -1112,13 +1196,12 @@ local function RebuildVBO()
 	local verts, vertCount = BuildCableVertices()
 	if vertCount == 0 then
 		numCableVerts = 0
+		needsRebuild = false
 		return
 	end
 
-	if cableVAO then
-		-- Recreate
-		cableVAO = nil
-	end
+	-- Rebuild VBO/VAO
+	cableVAO = nil
 
 	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	if not vbo then return end
@@ -1135,6 +1218,8 @@ local function RebuildVBO()
 	end
 
 	numCableVerts = vertCount
+
+	needsSnapshotUpdate = true
 	needsRebuild = false
 end
 
@@ -1187,12 +1272,42 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Initialize()
-	if not gl.CreateShader or not gl.GetVBO or not gl.GetVAO then
+	if not gl.CreateShader or not gl.GetVBO or not gl.GetVAO or not gl.RenderToTexture then
 		Spring.Echo("[CableTree] Missing GL support, disabling")
 		gadgetHandler:RemoveGadget()
 		return
 	end
 
+	-- Create snapshot texture (map-sized, reduced resolution)
+	snapshotW = floor(MAP_WIDTH / SNAPSHOT_SCALE)
+	snapshotH = floor(MAP_HEIGHT / SNAPSHOT_SCALE)
+	snapshotTex = gl.CreateTexture(snapshotW, snapshotH, {
+		fbo = true,
+		min_filter = GL.LINEAR,
+		mag_filter = GL.LINEAR,
+		wrap_s = GL.CLAMP_TO_EDGE,
+		wrap_t = GL.CLAMP_TO_EDGE,
+	})
+	if not snapshotTex then
+		Spring.Echo("[CableTree] Failed to create snapshot texture")
+	end
+
+	-- Compile snapshot shader (flat 2D projection)
+	snapshotShader = LuaShader({
+		vertex = snapVSSrc,
+		fragment = snapFSSrc,
+		uniformFloat = {
+			mapDims = 0,
+		},
+	}, "Cable Snapshot Shader")
+
+	local snapCompiled = snapshotShader:Initialize()
+	if not snapCompiled then
+		Spring.Echo("[CableTree] Snapshot shader failed to compile")
+		snapshotShader = nil
+	end
+
+	-- Compile main 3D cable shader
 	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()
 	local vsSrc = cableVSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	local fsSrc = cableFSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
@@ -1202,9 +1317,11 @@ function gadget:Initialize()
 		fragment = fsSrc,
 		uniformInt = {
 			infoTex = 0,
+			snapshotTex = 1,
 		},
 		uniformFloat = {
 			gameTime = 0,
+			mapDims = 0,
 		},
 	}, "Cable Tree Shader")
 
@@ -1221,6 +1338,12 @@ end
 function gadget:Shutdown()
 	if cableShader then
 		cableShader:Finalize()
+	end
+	if snapshotShader then
+		snapshotShader:Finalize()
+	end
+	if snapshotTex then
+		gl.DeleteTextureFBO(snapshotTex)
 	end
 	cableVAO = nil
 	gadgetHandler:RemoveSyncAction("CableTreeUpdate")
