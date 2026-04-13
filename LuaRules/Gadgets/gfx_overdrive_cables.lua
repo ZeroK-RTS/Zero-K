@@ -42,6 +42,7 @@ local spValidUnitID       = Spring.ValidUnitID
 local sqrt  = math.sqrt
 local max   = math.max
 local min   = math.min
+local floor = math.floor
 
 -------------------------------------------------------------------------------------
 -- Config
@@ -88,12 +89,16 @@ end
 -- All tracked pylons per allyTeam: nodes[allyTeamID][unitID] = {x, z, range, unitDefID}
 local nodes = {}
 
--- Current animated edges: edges[edgeKey] = {parentID, childID, px, pz, cx, cz, length, progress, withering}
--- edgeKey = parentID .. ":" .. childID (string)
+-- Edges: edges[edgeKey] = {parentID, childID, px, pz, cx, cz, length, progress, withering, gridKey}
 local edges = {}
 
--- Desired edges from last grid sync: desiredEdges[edgeKey] = true
+-- Desired edges: desiredEdges[edgeKey] = true
 local desiredEdges = {}
+
+-- Change detection
+local lastGridNum = {} -- [unitID] = gridNumber
+local lastGridMembers = {} -- [gridKey] = { [unitID]=true } — who was in each grid last time
+local structureChanged = true
 
 local treeVersion = 0
 local dirty = false
@@ -115,13 +120,13 @@ local function Dist(x1, z1, x2, z2)
 	return sqrt(dx * dx + dz * dz)
 end
 
-local function EdgeKey(parentID, childID)
-	-- Canonical key: smaller ID first to avoid duplicates
-	if parentID < childID then
-		return parentID .. ":" .. childID
-	else
-		return childID .. ":" .. parentID
-	end
+local function EdgeKey(id1, id2)
+	if id1 < id2 then return id1 .. ":" .. id2
+	else return id2 .. ":" .. id1 end
+end
+
+local function GridKey(allyTeamID, gridID)
+	return allyTeamID .. ":" .. gridID
 end
 
 local function GetNodeCapacity(unitID, unitDefID)
@@ -129,7 +134,6 @@ local function GetNodeCapacity(unitID, unitDefID)
 	local stunned = spGetUnitIsStunned(unitID) or
 		(spGetUnitRulesParam(unitID, "disarmed") == 1)
 	if stunned then return 0, 0 end
-
 	local production, consumption = 0, 0
 	if generatorDefs[unitDefID] then
 		production = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
@@ -141,127 +145,225 @@ local function GetNodeCapacity(unitID, unitDefID)
 end
 
 -------------------------------------------------------------------------------------
--- Grid sync: read gridNumber, compute spanning trees, diff edges
+-- Per-grid Prim's MST — only runs for grids whose membership changed.
+-- O(k²) per changed grid where k = grid size (typically 10-50, trivial).
 -------------------------------------------------------------------------------------
 
-local function SyncWithGrid()
-	local newDesired = {}
+local SPATIAL_CELL = 600 -- spatial hash cell size (covers max pylon range pair)
 
-	for allyTeamID, allyNodes in pairs(nodes) do
-		-- Group pylons by gridNumber
-		local pylonsByGrid = {} -- [gridID] = { {unitID, x, z, range, unitDefID}, ... }
-		for unitID, node in pairs(allyNodes) do
-			if spValidUnitID(unitID) then
-				local gridID = spGetUnitRulesParam(unitID, "gridNumber") or 0
-				if gridID > 0 then
-					if not pylonsByGrid[gridID] then
-						pylonsByGrid[gridID] = {}
-					end
-					local list = pylonsByGrid[gridID]
-					list[#list + 1] = {
-						unitID = unitID,
-						x = node.x, z = node.z,
-						range = node.range,
-						unitDefID = node.unitDefID,
-					}
-				end
+local function BuildGridMST(allyTeamID, gridID)
+	local pylons = {}
+	for unitID, node in pairs(nodes[allyTeamID]) do
+		if spValidUnitID(unitID) then
+			local gid = spGetUnitRulesParam(unitID, "gridNumber") or 0
+			if gid == gridID then
+				pylons[#pylons + 1] = {
+					unitID = unitID, x = node.x, z = node.z,
+					range = node.range, unitDefID = node.unitDefID,
+				}
 			end
 		end
+	end
 
-		-- For each grid, build minimum spanning tree via Prim's algorithm.
-		-- Each node always connects to its nearest already-connected neighbor.
-		for gridID, pylons in pairs(pylonsByGrid) do
-			if #pylons >= 2 then
-				-- Pick root: highest production
-				local bestRoot = 1
-				local bestProd = -1
-				for i = 1, #pylons do
-					local prod = GetNodeCapacity(pylons[i].unitID, pylons[i].unitDefID)
-					if prod > bestProd then
-						bestProd = prod
-						bestRoot = i
-					end
-				end
+	local result = {}
+	if #pylons < 2 then return result end
 
-				local inTree = {}
-				inTree[bestRoot] = true
-				local treeSize = 1
+	-- Build spatial hash for fast neighbor lookup
+	local cells = {} -- [cellKey] = { idx, idx, ... }
+	for i = 1, #pylons do
+		local p = pylons[i]
+		local cx = floor(p.x / SPATIAL_CELL)
+		local cz = floor(p.z / SPATIAL_CELL)
+		local ck = cx * 100000 + cz
+		if not cells[ck] then cells[ck] = {} end
+		cells[ck][#cells[ck] + 1] = i
+	end
 
-				while treeSize < #pylons do
-					local bestDistSq = math.huge
-					local bestJ = nil
-					local bestParentIdx = nil
-
-					for j = 1, #pylons do
-						if not inTree[j] then
-							local other = pylons[j]
-							for k = 1, #pylons do
-								if inTree[k] then
-									local curr = pylons[k]
-									local dx = curr.x - other.x
-									local dz = curr.z - other.z
-									local distSq = dx * dx + dz * dz
-									local combinedRange = curr.range + other.range
-									if distSq < combinedRange * combinedRange and distSq < bestDistSq then
-										bestDistSq = distSq
-										bestJ = j
-										bestParentIdx = k
-									end
-								end
+	-- Precompute neighbor lists (indices within range)
+	local neighbors = {} -- [idx] = { idx, idx, ... }
+	for i = 1, #pylons do
+		neighbors[i] = {}
+		local p = pylons[i]
+		local cx = floor(p.x / SPATIAL_CELL)
+		local cz = floor(p.z / SPATIAL_CELL)
+		-- Check 3x3 neighborhood of cells
+		for dcx = -1, 1 do
+			for dcz = -1, 1 do
+				local ck = (cx + dcx) * 100000 + (cz + dcz)
+				local cell = cells[ck]
+				if cell then
+					for ci = 1, #cell do
+						local j = cell[ci]
+						if j ~= i then
+							local o = pylons[j]
+							local dx = p.x - o.x
+							local dz = p.z - o.z
+							local cr = p.range + o.range
+							if dx * dx + dz * dz < cr * cr then
+								neighbors[i][#neighbors[i] + 1] = j
 							end
 						end
 					end
-
-					if not bestJ then break end
-
-					inTree[bestJ] = true
-					treeSize = treeSize + 1
-
-					local parent = pylons[bestParentIdx]
-					local child = pylons[bestJ]
-					local key = EdgeKey(parent.unitID, child.unitID)
-					newDesired[key] = {
-						parentID = parent.unitID,
-						childID = child.unitID,
-						px = parent.x, pz = parent.z,
-						cx = child.x, cz = child.z,
-					}
 				end
 			end
 		end
 	end
 
-	-- Diff: find new edges, removed edges, unchanged edges
-	-- New edges: in newDesired but not in desiredEdges → create growing edge
-	for key, info in pairs(newDesired) do
-		if not edges[key] then
-			local length = max(1, Dist(info.px, info.pz, info.cx, info.cz))
-			edges[key] = {
-				parentID = info.parentID,
-				childID = info.childID,
-				px = info.px, pz = info.pz,
-				cx = info.cx, cz = info.cz,
-				length = length,
-				progress = 0,
-				withering = false,
-			}
-			dirty = true
-		elseif edges[key].withering then
-			-- Was withering, now wanted again — reverse direction
-			edges[key].withering = false
-			dirty = true
+	-- Root = highest production
+	local bestRoot = 1
+	local bestProd = -1
+	for i = 1, #pylons do
+		local prod = GetNodeCapacity(pylons[i].unitID, pylons[i].unitDefID)
+		if prod > bestProd then bestProd = prod; bestRoot = i end
+	end
+
+	-- Prim's MST using neighbor lists: O(n * avg_neighbors)
+	local inTree = { [bestRoot] = true }
+	local treeSize = 1
+	-- Frontier: unvisited nodes adjacent to tree. Track best distance per node.
+	local bestEdge = {} -- [idx] = { distSq, treeIdx }
+	for _, j in ipairs(neighbors[bestRoot]) do
+		local p = pylons[bestRoot]
+		local o = pylons[j]
+		local dx = p.x - o.x
+		local dz = p.z - o.z
+		bestEdge[j] = { distSq = dx * dx + dz * dz, from = bestRoot }
+	end
+
+	while treeSize < #pylons do
+		-- Find frontier node with smallest distance
+		local bestDistSq = math.huge
+		local bestJ = nil
+		for j, be in pairs(bestEdge) do
+			if not inTree[j] and be.distSq < bestDistSq then
+				bestDistSq = be.distSq
+				bestJ = j
+			end
+		end
+
+		if not bestJ then break end
+		inTree[bestJ] = true
+		treeSize = treeSize + 1
+
+		local parentIdx = bestEdge[bestJ].from
+		bestEdge[bestJ] = nil
+
+		local p, c = pylons[parentIdx], pylons[bestJ]
+		local key = EdgeKey(p.unitID, c.unitID)
+		result[key] = {
+			parentID = p.unitID, childID = c.unitID,
+			px = p.x, pz = p.z, cx = c.x, cz = c.z,
+		}
+
+		-- Update frontier: check neighbors of newly added node
+		for _, j in ipairs(neighbors[bestJ]) do
+			if not inTree[j] then
+				local o = pylons[j]
+				local nj = pylons[bestJ]
+				local dx = nj.x - o.x
+				local dz = nj.z - o.z
+				local distSq = dx * dx + dz * dz
+				if not bestEdge[j] or distSq < bestEdge[j].distSq then
+					bestEdge[j] = { distSq = distSq, from = bestJ }
+				end
+			end
 		end
 	end
 
-	-- Removed edges: in desiredEdges but not in newDesired → start withering
-	for key, _ in pairs(desiredEdges) do
-		if not newDesired[key] and edges[key] and not edges[key].withering then
-			edges[key].withering = true
-			dirty = true
+	return result
+end
+
+-------------------------------------------------------------------------------------
+-- Grid sync: detect gridNumber changes, rebuild only affected grids
+-------------------------------------------------------------------------------------
+
+-- Per-grid desired edges
+local desiredByGrid = {} -- [gridKey] = { [edgeKey] = info }
+
+local function SyncWithGrid()
+	-- Detect which grids changed
+	local changedGrids = {} -- [gridKey] = { allyTeamID, gridID }
+
+	for allyTeamID, allyNodes in pairs(nodes) do
+		-- Clean up dead units first
+		local toRemove = {}
+		for unitID, _ in pairs(allyNodes) do
+			if not spValidUnitID(unitID) then
+				toRemove[#toRemove + 1] = unitID
+			end
+		end
+		for i = 1, #toRemove do
+			local uid = toRemove[i]
+			local oldGrid = lastGridNum[uid] or 0
+			if oldGrid > 0 then
+				changedGrids[GridKey(allyTeamID, oldGrid)] = { allyTeamID = allyTeamID, gridID = oldGrid }
+			end
+			allyNodes[uid] = nil
+			lastGridNum[uid] = nil
+		end
+
+		-- Check living units for grid changes
+		for unitID, _ in pairs(allyNodes) do
+			local gridID = spGetUnitRulesParam(unitID, "gridNumber") or 0
+			local oldGrid = lastGridNum[unitID] or 0
+			if gridID ~= oldGrid then
+				lastGridNum[unitID] = gridID
+				if oldGrid > 0 then
+					changedGrids[GridKey(allyTeamID, oldGrid)] = { allyTeamID = allyTeamID, gridID = oldGrid }
+				end
+				if gridID > 0 then
+					changedGrids[GridKey(allyTeamID, gridID)] = { allyTeamID = allyTeamID, gridID = gridID }
+				end
+			end
 		end
 	end
 
-	desiredEdges = newDesired
+	-- Nothing changed?
+	local hasChanges = false
+	for _ in pairs(changedGrids) do hasChanges = true; break end
+	if not hasChanges then
+		structureChanged = false
+		return
+	end
+
+	-- Rebuild only changed grids
+	for gk, info in pairs(changedGrids) do
+		-- Wither old edges for this grid
+		if desiredByGrid[gk] then
+			for ek, _ in pairs(desiredByGrid[gk]) do
+				if edges[ek] and not edges[ek].withering then
+					edges[ek].withering = true
+					desiredEdges[ek] = nil
+					dirty = true
+				end
+			end
+		end
+
+		-- Compute new MST
+		local newEdges = BuildGridMST(info.allyTeamID, info.gridID)
+		desiredByGrid[gk] = newEdges
+
+		-- Create or revive edges
+		for ek, einfo in pairs(newEdges) do
+			desiredEdges[ek] = true
+			if edges[ek] then
+				if edges[ek].withering then
+					edges[ek].withering = false
+					dirty = true
+				end
+			else
+				edges[ek] = {
+					parentID = einfo.parentID, childID = einfo.childID,
+					px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
+					length = max(1, Dist(einfo.px, einfo.pz, einfo.cx, einfo.cz)),
+					progress = 0, withering = false,
+				}
+				dirty = true
+			end
+		end
+	end
+
+	structureChanged = false
 end
 
 -------------------------------------------------------------------------------------
@@ -304,17 +406,13 @@ local function ComputeFlows()
 	local nodeSet = {}
 	for key, edge in pairs(edges) do
 		if edge.progress >= edge.length and not edge.withering then
-			-- Fully grown edge — use BFS parent→child direction from desired edges
-			local info = desiredEdges[key]
-			if info then
-				local pid, cid = info.parentID, info.childID
-				if not children[pid] then children[pid] = {} end
-				children[pid][#children[pid] + 1] = cid
-				parentOf[cid] = pid
-				edgeByChild[cid] = key
-				nodeSet[pid] = true
-				nodeSet[cid] = true
-			end
+			local pid, cid = edge.parentID, edge.childID
+			if not children[pid] then children[pid] = {} end
+			children[pid][#children[pid] + 1] = cid
+			parentOf[cid] = pid
+			edgeByChild[cid] = key
+			nodeSet[pid] = true
+			nodeSet[cid] = true
 		end
 	end
 
@@ -366,35 +464,53 @@ end
 local function SendToUnsyncedAll()
 	local flows = ComputeFlows()
 
-	local edgeCount = 0
-	local parentXs, parentZs = {}, {}
-	local childXs, childZs = {}, {}
-	local progresses, lengths, capacities = {}, {}, {}
-	local allyTeamID = 0 -- we send all edges in one batch
+	-- Build per-allyTeam edge lists (so unsynced only sees own team's cables)
+	local perAlly = {} -- [allyTeamID] = { edgeCount, parentXs, ... }
 
+	-- Figure out which allyTeam each edge belongs to by checking parentID
 	for key, edge in pairs(edges) do
 		if edge.progress > 0 then
-			edgeCount = edgeCount + 1
-			parentXs[edgeCount] = edge.px
-			parentZs[edgeCount] = edge.pz
-			childXs[edgeCount] = edge.cx
-			childZs[edgeCount] = edge.cz
-			progresses[edgeCount] = edge.progress
-			lengths[edgeCount] = edge.length
-			capacities[edgeCount] = flows[key] or 0
+			-- Find allyTeam of this edge's parent
+			local atID
+			for allyTeamID, allyNodes in pairs(nodes) do
+				if allyNodes[edge.parentID] or allyNodes[edge.childID] then
+					atID = allyTeamID
+					break
+				end
+			end
+			if atID then
+				if not perAlly[atID] then
+					perAlly[atID] = {
+						edgeCount = 0,
+						parentXs = {}, parentZs = {},
+						childXs = {}, childZs = {},
+						progresses = {}, lengths = {}, capacities = {},
+					}
+				end
+				local pa = perAlly[atID]
+				pa.edgeCount = pa.edgeCount + 1
+				local n = pa.edgeCount
+				pa.parentXs[n] = edge.px
+				pa.parentZs[n] = edge.pz
+				pa.childXs[n] = edge.cx
+				pa.childZs[n] = edge.cz
+				pa.progresses[n] = edge.progress
+				pa.lengths[n] = edge.length
+				pa.capacities[n] = flows[key] or 0
+			end
 		end
 	end
 
-	-- Send for each allyTeam that has nodes (spectators see all)
-	for atID, _ in pairs(nodes) do
+	-- Send one message per allyTeam
+	for atID, pa in pairs(perAlly) do
 		_G.CableTreeData = {
 			allyTeamID = atID,
 			version = treeVersion,
-			edgeCount = edgeCount,
-			parentXs = parentXs, parentZs = parentZs,
-			childXs = childXs, childZs = childZs,
-			progresses = progresses, lengths = lengths,
-			capacities = capacities,
+			edgeCount = pa.edgeCount,
+			parentXs = pa.parentXs, parentZs = pa.parentZs,
+			childXs = pa.childXs, childZs = pa.childZs,
+			progresses = pa.progresses, lengths = pa.lengths,
+			capacities = pa.capacities,
 		}
 		SendToUnsynced("CableTreeUpdate")
 	end
@@ -405,6 +521,8 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:GameFrame(n)
+	-- Check for gridNumber changes even without unit create/destroy
+	-- (stun, disable, activate can change grid membership)
 	if n % SYNC_PERIOD == 2 then
 		SyncWithGrid()
 	end
@@ -433,29 +551,35 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		range = pylonDefs[unitDefID],
 		unitDefID = unitDefID,
 	}
-	dirty = true
+	structureChanged = true
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if not pylonDefs[unitDefID] then return end
-	local allyTeamID = spGetUnitAllyTeam(unitID)
-	nodes[allyTeamID][unitID] = nil
-	dirty = true
+	-- Don't remove from nodes/lastGridNum here.
+	-- SyncWithGrid will detect the dead unit via spValidUnitID,
+	-- mark the affected grid as changed, and clean up.
+	structureChanged = true
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 	if not pylonDefs[unitDefID] then return end
 	local _, _, _, _, _, newAlly = Spring.GetTeamInfo(newTeam, false)
 	local _, _, _, _, _, oldAlly = Spring.GetTeamInfo(oldTeam, false)
+	if not newAlly or not oldAlly then return end
 	if newAlly ~= oldAlly then
-		nodes[oldAlly][unitID] = nil
-		local x, _, z = spGetUnitPosition(unitID)
-		nodes[newAlly][unitID] = {
-			x = x, z = z,
-			range = pylonDefs[unitDefID],
-			unitDefID = unitDefID,
-		}
-		dirty = true
+		-- Remove from old allyTeam, add to new
+		if nodes[oldAlly] then nodes[oldAlly][unitID] = nil end
+		lastGridNum[unitID] = nil
+		if nodes[newAlly] then
+			local x, _, z = spGetUnitPosition(unitID)
+			nodes[newAlly][unitID] = {
+				x = x, z = z,
+				range = pylonDefs[unitDefID],
+				unitDefID = unitDefID,
+			}
+		end
+		structureChanged = true
 	end
 end
 
@@ -566,8 +690,7 @@ end
 
 -------------------------------------------------------------------------------------
 -- PCB routing: Manhattan + 45° chamfer
--- Given endpoints (x1,z1) → (x2,z2), produce 2-3 segments:
---   horizontal → 45° diagonal → vertical (or reverse)
+-- Returns list of segments { {x1, z1, x2, z2}, ... }
 -------------------------------------------------------------------------------------
 
 local function RoutePCB(x1, z1, x2, z2)
@@ -576,46 +699,104 @@ local function RoutePCB(x1, z1, x2, z2)
 	local adx = abs(dx)
 	local adz = abs(dz)
 
-	-- If nearly aligned (horizontal or vertical), just one segment
 	if adx < 2 or adz < 2 then
 		return {{ x1, z1, x2, z2 }}
 	end
 
-	-- The shorter axis determines the 45° diagonal length
 	local diagLen = min(adx, adz)
 	local segments = {}
 
 	if adx >= adz then
-		-- Mostly horizontal: go horizontal first, then 45° diagonal
 		local horizLen = adx - diagLen
 		local sx = (dx > 0) and 1 or -1
-		local sz = (dz > 0) and 1 or -1
-
 		local mx = x1 + sx * horizLen
-		local mz = z1
-		-- Horizontal segment
 		if horizLen > 2 then
-			segments[#segments + 1] = { x1, z1, mx, mz }
+			segments[#segments + 1] = { x1, z1, mx, z1 }
 		end
-		-- 45° diagonal segment
-		segments[#segments + 1] = { mx, mz, x2, z2 }
+		segments[#segments + 1] = { mx, z1, x2, z2 }
 	else
-		-- Mostly vertical: go vertical first, then 45° diagonal
 		local vertLen = adz - diagLen
-		local sx = (dx > 0) and 1 or -1
 		local sz = (dz > 0) and 1 or -1
-
-		local mx = x1
 		local mz = z1 + sz * vertLen
-		-- Vertical segment
 		if vertLen > 2 then
-			segments[#segments + 1] = { x1, z1, mx, mz }
+			segments[#segments + 1] = { x1, z1, x1, mz }
 		end
-		-- 45° diagonal segment
-		segments[#segments + 1] = { mx, mz, x2, z2 }
+		segments[#segments + 1] = { x1, mz, x2, z2 }
 	end
 
 	return segments
+end
+
+-------------------------------------------------------------------------------------
+-- Segment merging: when multiple routed edges produce collinear overlapping
+-- segments, merge them into a single segment with accumulated capacity.
+-- Only merges axis-aligned (horizontal/vertical) segments.
+-------------------------------------------------------------------------------------
+
+local SNAP = 16 -- snap resolution for merging (elmos)
+
+local function SegKey(isHoriz, fixed, lo, hi)
+	-- Key for an axis-aligned segment: axis + snapped fixed coord + interval
+	return (isHoriz and "H" or "V") .. floor(fixed / SNAP) .. ":" .. floor(lo / SNAP) .. ":" .. floor(hi / SNAP)
+end
+
+local function MergeSegments(rawSegments)
+	-- rawSegments = { {x1,z1,x2,z2,capacity}, ... }
+	-- Returns merged list: { {x1,z1,x2,z2,capacity}, ... }
+
+	local axisSegs = {} -- [segKey] = { fixed, lo, hi, capacity, isHoriz }
+	local diagSegs = {} -- diagonal segments can't be merged, pass through
+
+	for i = 1, #rawSegments do
+		local s = rawSegments[i]
+		local dx = abs(s[3] - s[1])
+		local dz = abs(s[4] - s[2])
+
+		if dz < 2 then
+			-- Horizontal segment
+			local fixed = s[2]
+			local lo = min(s[1], s[3])
+			local hi = max(s[1], s[3])
+			local key = SegKey(true, fixed, lo, hi)
+			if axisSegs[key] then
+				axisSegs[key].capacity = axisSegs[key].capacity + s[5]
+			else
+				axisSegs[key] = { fixed = fixed, lo = lo, hi = hi, capacity = s[5], isHoriz = true }
+			end
+		elseif dx < 2 then
+			-- Vertical segment
+			local fixed = s[1]
+			local lo = min(s[2], s[4])
+			local hi = max(s[2], s[4])
+			local key = SegKey(false, fixed, lo, hi)
+			if axisSegs[key] then
+				axisSegs[key].capacity = axisSegs[key].capacity + s[5]
+			else
+				axisSegs[key] = { fixed = fixed, lo = lo, hi = hi, capacity = s[5], isHoriz = false }
+			end
+		else
+			-- Diagonal — just pass through
+			diagSegs[#diagSegs + 1] = { s[1], s[2], s[3], s[4], capacity = s[5] }
+		end
+	end
+
+	-- Convert back to segment list with named fields
+	local result = {}
+	for _, seg in pairs(axisSegs) do
+		local w = GetTraceWidth(seg.capacity)
+		if seg.isHoriz then
+			result[#result + 1] = { x1 = seg.lo, z1 = seg.fixed, x2 = seg.hi, z2 = seg.fixed, width = w, capacity = seg.capacity }
+		else
+			result[#result + 1] = { x1 = seg.fixed, z1 = seg.lo, x2 = seg.fixed, z2 = seg.hi, width = w, capacity = seg.capacity }
+		end
+	end
+	for i = 1, #diagSegs do
+		local d = diagSegs[i]
+		local w = GetTraceWidth(d.capacity)
+		result[#result + 1] = { x1 = d[1], z1 = d[2], x2 = d[3], z2 = d[4], width = w, capacity = d.capacity }
+	end
+
+	return result
 end
 
 -------------------------------------------------------------------------------------
@@ -681,10 +862,11 @@ function gadget:DrawGenesis()
 		spSetMapSquareTexture(sq.sx, sq.sz, "")
 	end
 
-	-- Build draw list with growth interpolation + PCB routing
-	local allSegments = {}  -- { {x1,z1,x2,z2, width, capacity}, ... }
-	local allPads = {}      -- { {cx, cz, radius}, ... }
-	local padSet = {}       -- dedup pads by position
+	-- Step 1: Route all edges as PCB segments, collect raw segments with capacity
+	local rawSegments = {}
+	local allPads = {}
+	local padSet = {}
+	local maxPadRadius = {}  -- [padKey] = max radius seen
 
 	for i = 1, #renderEdges do
 		local e = renderEdges[i]
@@ -693,40 +875,44 @@ function gadget:DrawGenesis()
 			if frac > 0.01 then
 				local ex = e.px + frac * (e.cx - e.px)
 				local ez = e.pz + frac * (e.cz - e.pz)
-				local w = GetTraceWidth(e.capacity)
+				local cap = max(1, e.capacity)
 
-				-- Route as PCB (Manhattan + 45°)
 				local segments = RoutePCB(e.px, e.pz, ex, ez)
 				for j = 1, #segments do
 					local s = segments[j]
-					allSegments[#allSegments + 1] = {
-						x1 = s[1], z1 = s[2], x2 = s[3], z2 = s[4],
-						width = w, capacity = e.capacity,
-					}
+					rawSegments[#rawSegments + 1] = { s[1], s[2], s[3], s[4], cap }
 				end
 
-				-- Pad at parent position
+				-- Pads at endpoints (accumulate max radius)
+				local w = GetTraceWidth(cap)
 				local pkey = floor(e.px) .. "," .. floor(e.pz)
-				if not padSet[pkey] then
-					padSet[pkey] = true
-					allPads[#allPads + 1] = { cx = e.px, cz = e.pz, radius = w * PAD_RADIUS_MULT }
+				if not maxPadRadius[pkey] or w * PAD_RADIUS_MULT > maxPadRadius[pkey] then
+					maxPadRadius[pkey] = w * PAD_RADIUS_MULT
+					padSet[pkey] = { cx = e.px, cz = e.pz }
 				end
 
-				-- Pad at child position (only if fully grown)
 				if frac >= 0.99 then
 					local ckey = floor(e.cx) .. "," .. floor(e.cz)
-					if not padSet[ckey] then
-						padSet[ckey] = true
-						allPads[#allPads + 1] = { cx = e.cx, cz = e.cz, radius = w * PAD_RADIUS_MULT }
+					if not maxPadRadius[ckey] or w * PAD_RADIUS_MULT > maxPadRadius[ckey] then
+						maxPadRadius[ckey] = w * PAD_RADIUS_MULT
+						padSet[ckey] = { cx = e.cx, cz = e.cz }
 					end
 				end
 			end
 		end
 	end
 
-	if #allSegments == 0 then
+	if #rawSegments == 0 then
 		needsRedraw = false
 		return
+	end
+
+	-- Step 2: Merge overlapping axis-aligned segments (reinforcement)
+	local allSegments = MergeSegments(rawSegments)
+
+	-- Build pad list with accumulated radii
+	for pkey, pdata in pairs(padSet) do
+		allPads[#allPads + 1] = { cx = pdata.cx, cz = pdata.cz, radius = maxPadRadius[pkey] }
 	end
 
 	-- Collect needed squares (from segments + pads)
@@ -808,7 +994,8 @@ function gadget:DrawGenesis()
 					end
 				end)
 
-				-- Layer 2: Trace copper fill
+				-- Layer 2: Trace copper fill (additive so overlapping traces reinforce)
+				gl.Blending(GL.SRC_ALPHA, GL.ONE)
 				gl.BeginEnd(GL.QUADS, function()
 					for i = 1, #allSegments do
 						local s = allSegments[i]
@@ -817,6 +1004,9 @@ function gadget:DrawGenesis()
 						EmitTraceQuad(w2t, s.x1, s.z1, s.x2, s.z2, s.width * 0.4)
 					end
 				end)
+
+				-- Reset blending for pads
+				gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 
 				-- Layer 3: Pad borders
 				glColor(PAD_BORDER_COLOR[1], PAD_BORDER_COLOR[2], PAD_BORDER_COLOR[3], PAD_BORDER_COLOR[4])
