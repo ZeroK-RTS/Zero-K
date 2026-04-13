@@ -605,21 +605,14 @@ end
 else -- UNSYNCED
 
 -------------------------------------------------------------------------------------
--- UNSYNCED — PCB-style cable rendering onto ground texture
+-- UNSYNCED — Shader-based cable rendering via DrawWorldPreUnit
+-- Cables are drawn as quad strips projected onto ground height.
+-- Fragment shader: procedural organic texture, LOS-gated animation.
 -------------------------------------------------------------------------------------
 
-local glTexture       = gl.Texture
-local glCreateTexture = gl.CreateTexture
-local glColor         = gl.Color
-local glTexRect       = gl.TexRect
-local glResetState    = gl.ResetState
-local glResetMatrices = gl.ResetMatrices
-local glVertex        = gl.Vertex
-
-local spGetMapSquareTexture = Spring.GetMapSquareTexture
-local spSetMapSquareTexture = Spring.SetMapSquareTexture
-local spGetMyAllyTeamID     = Spring.GetMyAllyTeamID
-local spGetSpectatingState  = Spring.GetSpectatingState
+local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
+local spGetSpectatingState = Spring.GetSpectatingState
+local spGetGroundHeight    = Spring.GetGroundHeight
 
 local floor = math.floor
 local sqrt  = math.sqrt
@@ -629,108 +622,66 @@ local abs   = math.abs
 local PI    = math.pi
 local cos   = math.cos
 local sin   = math.sin
+local atan2 = math.atan2
 
-local MAP_WIDTH    = Game.mapSizeX
-local MAP_HEIGHT   = Game.mapSizeZ
-local SQUARE_SIZE  = 1024
-local SQUARES_X    = MAP_WIDTH / SQUARE_SIZE
-local SQUARES_Z    = MAP_HEIGHT / SQUARE_SIZE
+local MAP_WIDTH  = Game.mapSizeX
+local MAP_HEIGHT = Game.mapSizeZ
+
+local luaShaderDir = "LuaUI/Widgets/Include/"
+local LuaShader = VFS.Include(luaShaderDir .. "LuaShader.lua")
+VFS.Include(luaShaderDir .. "instancevbotable.lua")
 
 -------------------------------------------------------------------------------------
--- Organic tree style config
+-- Config
 -------------------------------------------------------------------------------------
 
 local MIN_TRUNK_WIDTH  = 4
 local MAX_TRUNK_WIDTH  = 20
 local MAX_CAPACITY_REF = 100
-local PAD_SEGMENTS     = 10
 
--- Noise & branching
-local SEG_LENGTH       = 16    -- subdivide cables every N elmos
-local NOISE_AMP        = 0.6   -- noise amplitude as fraction of width
-local BRANCH_CHANCE    = 0.25  -- chance of side branch per segment
-local BRANCH_LEN_MIN   = 15   -- min branch length (elmos)
-local BRANCH_LEN_MAX   = 50   -- max branch length
-local BRANCH_ANGLE_MIN = 0.4  -- min angle offset (radians, ~23°)
-local BRANCH_ANGLE_MAX = 1.1  -- max angle offset (radians, ~63°)
-local BRANCH_WIDTH     = 0.5  -- branch width as fraction of parent
-local TWIG_CHANCE      = 0.3  -- chance of sub-branch from a branch
-local TWIG_LEN_MIN     = 8
-local TWIG_LEN_MAX     = 25
-local TWIG_WIDTH       = 0.4
-local TAPER_START      = 0.7  -- start tapering at this fraction along cable
+local SEG_LENGTH       = 10    -- shorter = smoother curves
+local NOISE_AMP        = 0.6
+local BRANCH_CHANCE    = 0.25
+local BRANCH_LEN_MIN   = 15
+local BRANCH_LEN_MAX   = 50
+local BRANCH_ANGLE_MIN = 0.4
+local BRANCH_ANGLE_MAX = 1.1
+local BRANCH_WIDTH     = 0.5
 
--- Colors (organic: dark bark border, greenish/amber glow)
-local BARK_COLOR  = { 0.06, 0.04, 0.02, 0.90 }
-local INNER_COLOR = { 0.20, 0.55, 0.15, 0.85 } -- green energy
-local INNER_COLOR_HIGH = { 0.50, 0.80, 0.20, 0.90 } -- bright for high capacity
-local PAD_BARK_COLOR  = { 0.08, 0.05, 0.02, 0.92 }
-local PAD_INNER_COLOR = { 0.25, 0.60, 0.18, 0.90 }
+local MERGE_ANGLE    = 0.8
+local STEM_FRACTION  = 0.35
 
 -------------------------------------------------------------------------------------
 -- State
 -------------------------------------------------------------------------------------
 
-local squareFBOs = {}
 local renderEdges = {}
 local edgesByAllyTeam = {}
 local lastVersions = {}
-local needsRedraw = false
-local drawnSquares = {}
+local needsRebuild = false
+
+local cableShader
+local cableVAO
+local numCableVerts = 0
 
 -------------------------------------------------------------------------------------
--- Helpers
--------------------------------------------------------------------------------------
-
-local function SquareKey(sx, sz)
-	return sx * 10000 + sz
-end
-
-local function GetTraceWidth(capacity)
-	local t = min(1, capacity / MAX_CAPACITY_REF)
-	return MIN_TRACE_WIDTH + t * (MAX_TRACE_WIDTH - MIN_TRACE_WIDTH)
-end
-
--- Get trace color based on capacity (copper tint shifts brighter with more flow)
-local function GetTraceColor(capacity)
-	local t = min(1, capacity / MAX_CAPACITY_REF)
-	return 0.55 + t * 0.35,   -- R: warm copper to bright gold
-	       0.40 + t * 0.30,   -- G
-	       0.12 + t * 0.15,   -- B
-	       0.95
-end
-
--------------------------------------------------------------------------------------
--- PCB routing: Manhattan + 45° chamfer
--- Returns list of segments { {x1, z1, x2, z2}, ... }
--------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------
--- Deterministic noise: hash-based pseudo-random from position
--- Returns value in [-1, 1], stable for same inputs across redraws
+-- Deterministic noise
 -------------------------------------------------------------------------------------
 
 local function Hash(x, z, seed)
 	local h = sin(x * 12.9898 + z * 78.233 + (seed or 0) * 43.17) * 43758.5453
-	return (h - floor(h)) * 2 - 1 -- [-1, 1]
+	return (h - floor(h)) * 2 - 1
 end
 
-local function HashUnit(x, z, seed) -- [0, 1]
+local function HashUnit(x, z, seed)
 	return (Hash(x, z, seed) + 1) * 0.5
 end
-
--------------------------------------------------------------------------------------
--- Organic tree path generator
--- Takes a cable edge and produces many small noisy segments + side branches.
--------------------------------------------------------------------------------------
 
 local function GetTrunkWidth(capacity)
 	local t = min(1, capacity / MAX_CAPACITY_REF)
 	return MIN_TRUNK_WIDTH + t * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH)
 end
 
--- Generate noisy path points along a line from (x1,z1) to (x2,z2)
--- Returns array of {x, z} waypoints with perpendicular noise
 local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
 	local dx = x2 - x1
 	local dz = z2 - z1
@@ -738,22 +689,17 @@ local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
 	if len < 2 then
 		return { {x = x1, z = z1}, {x = x2, z = z2} }
 	end
-
 	local steps = max(2, floor(len / SEG_LENGTH))
-	local nx = -dz / len -- perpendicular
+	local nx = -dz / len
 	local nz =  dx / len
-
 	local points = {}
 	for i = 0, steps do
 		local t = i / steps
 		local px = x1 + t * dx
 		local pz = z1 + t * dz
-
-		-- No noise at endpoints (connect cleanly to pads)
 		local noiseScale = 1
 		if t < 0.1 then noiseScale = t / 0.1
 		elseif t > 0.9 then noiseScale = (1 - t) / 0.1 end
-
 		local n = Hash(px * 0.1, pz * 0.1, seed) * amplitude * noiseScale
 		points[#points + 1] = { x = px + nx * n, z = pz + nz * n }
 	end
@@ -761,35 +707,33 @@ local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
 end
 
 -------------------------------------------------------------------------------------
--- Tree-level organic router
--- Builds a node graph from edges, DFS from roots.
--- At each junction, heaviest child continues the trunk, others branch off.
--- Shared trunk segments carry combined flow → naturally thicker.
+-- Organic tree router (same logic, outputs vertex data for VBO)
 -------------------------------------------------------------------------------------
 
-local atan2 = math.atan2
+local function normalizeAngle(a)
+	while a > PI do a = a - PI * 2 end
+	while a < -PI do a = a + PI * 2 end
+	return a
+end
 
--- Generate all organic segments from the full set of renderEdges.
--- Returns { segments, pads }
-local function GenerateOrganicTree(renderEdges)
-	local allSegments = {}
-	local allPads = {}
-	local padSet = {}
+-- Build all cable geometry from renderEdges, return flat vertex array.
+-- Paths are converted to smooth triangle strips with averaged normals at junctions.
+local function BuildCableVertices()
+	if #renderEdges == 0 then return {}, 0 end
 
-	-- Step 1: Build node graph from edges
-	-- nodePos[key] = { x, z }
-	-- nodeChildren[key] = { { key=childKey, cap=capacity, frac=growthFrac }, ... }
-	-- nodeParent[key] = { key=parentKey }
+	-- Each path = { points = { {x,z}, ... }, widths = { w, ... }, capacity, isBranch }
+	local allPaths = {}
+
+	-- Same tree-building + routing code as before, but collect into allSegs
 	local nodePos = {}
-	local nodeChildren = {} -- [posKey] = list of child info
-	local nodeParent = {}   -- [posKey] = parent posKey
-	local roots = {}        -- [posKey] = true
+	local nodeChildren = {}
+	local nodeParent = {}
+	local roots = {}
 
 	local function posKey(x, z)
 		return floor(x) .. ":" .. floor(z)
 	end
 
-	-- Parse edges into tree structure
 	for i = 1, #renderEdges do
 		local e = renderEdges[i]
 		if e.length > 0 then
@@ -799,10 +743,8 @@ local function GenerateOrganicTree(renderEdges)
 				local ex = e.px + frac * (e.cx - e.px)
 				local ez = e.pz + frac * (e.cz - e.pz)
 				local ck = posKey(ex, ez)
-
 				nodePos[pk] = { x = e.px, z = e.pz }
 				nodePos[ck] = { x = ex, z = ez }
-
 				if not nodeChildren[pk] then nodeChildren[pk] = {} end
 				nodeChildren[pk][#nodeChildren[pk] + 1] = {
 					key = ck, cap = max(1, e.capacity), frac = frac,
@@ -812,71 +754,64 @@ local function GenerateOrganicTree(renderEdges)
 		end
 	end
 
-	-- Find roots (nodes with no parent)
 	for pk, _ in pairs(nodePos) do
-		if not nodeParent[pk] then
-			roots[pk] = true
-		end
+		if not nodeParent[pk] then roots[pk] = true end
 	end
 
-	-- Step 2: DFS routing — at each node, trunk continues toward heaviest child
 	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch)
 		local path = NoisyPath(x1, z1, x2, z2, widthStart * NOISE_AMP, seed)
-		for pi = 1, #path - 1 do
+		local widths = {}
+		for pi = 1, #path do
+			local t = (pi - 1) / max(1, #path - 1)
+			widths[pi] = widthStart + t * (widthEnd - widthStart)
+		end
+		allPaths[#allPaths + 1] = {
+			points = path, widths = widths,
+			capacity = capacity, isBranch = isBranch and 1 or 0,
+		}
+		-- Twigs: spawn from ribbon edge, not center
+		for pi = 2, #path - 1 do
 			local p1 = path[pi]
-			local p2 = path[pi + 1]
-			local t = (pi - 1) / max(1, #path - 2)
-			local w = widthStart + t * (widthEnd - widthStart)
-			allSegments[#allSegments + 1] = {
-				x1 = p1.x, z1 = p1.z, x2 = p2.x, z2 = p2.z,
-				width = w, capacity = capacity, isBranch = isBranch,
-			}
+			local w = widths[pi]
+			local tseed = p1.x * 7.13 + p1.z * 3.77
+			local chance = isBranch and (BRANCH_CHANCE * 0.5) or BRANCH_CHANCE
+			local lenScale = isBranch and 0.6 or 1.0
+			if HashUnit(p1.x, p1.z, tseed) < chance then
+				local dx = x2 - x1
+				local dz = z2 - z1
+				local pathLen = sqrt(dx * dx + dz * dz)
+				if pathLen < 1 then pathLen = 1 end
+				local baseAngle = atan2(dz, dx)
+				local side = (Hash(p1.x, p1.z, tseed + 1) > 0) and 1 or -1
+				local angle = baseAngle + side * (BRANCH_ANGLE_MIN + HashUnit(p1.x, p1.z, tseed + 2) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN))
+				local bLen = (BRANCH_LEN_MIN + HashUnit(p1.x, p1.z, tseed + 3) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN)) * lenScale
 
-			-- Decorative side twigs (on both trunks and branches, smaller on branches)
-			if pi > 1 and pi < #path - 1 then
-				local tseed = p1.x * 7.13 + p1.z * 3.77
-				local chance = isBranch and (BRANCH_CHANCE * 0.5) or BRANCH_CHANCE
-				local lenScale = isBranch and 0.6 or 1.0
-				if HashUnit(p1.x, p1.z, tseed) < chance then
-					local dx = x2 - x1
-					local dz = z2 - z1
-					local baseAngle = atan2(dz, dx)
-					local side = (Hash(p1.x, p1.z, tseed + 1) > 0) and 1 or -1
-					local angle = baseAngle + side * (BRANCH_ANGLE_MIN + HashUnit(p1.x, p1.z, tseed + 2) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN))
-					local bLen = (BRANCH_LEN_MIN + HashUnit(p1.x, p1.z, tseed + 3) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN)) * lenScale
-					local bx2 = p1.x + cos(angle) * bLen
-					local bz2 = p1.z + sin(angle) * bLen
-					local bw = w * BRANCH_WIDTH * (isBranch and 0.6 or 1.0)
+				-- Offset start point to ribbon edge (perpendicular to path direction)
+				local perpX = -dz / pathLen * side
+				local perpZ =  dx / pathLen * side
+				local edgeX = p1.x + perpX * w * 0.45
+				local edgeZ = p1.z + perpZ * w * 0.45
 
-					local twigPath = NoisyPath(p1.x, p1.z, bx2, bz2, bw * 0.6, tseed + 10)
-					for ti = 1, #twigPath - 1 do
-						local tp1 = twigPath[ti]
-						local tp2 = twigPath[ti + 1]
-						local tt = ti / max(1, #twigPath - 1)
-						allSegments[#allSegments + 1] = {
-							x1 = tp1.x, z1 = tp1.z, x2 = tp2.x, z2 = tp2.z,
-							width = bw * (1 - tt * 0.7),
-							capacity = capacity * 0.1, isBranch = true,
-						}
-					end
+				local bx2 = edgeX + cos(angle) * bLen
+				local bz2 = edgeZ + sin(angle) * bLen
+				local bw = w * BRANCH_WIDTH * (isBranch and 0.6 or 1.0)
+				local twigPts = NoisyPath(edgeX, edgeZ, bx2, bz2, bw * 0.6, tseed + 10)
+				local twigWidths = {}
+				-- Start at parent width, taper to thin tip
+				twigWidths[1] = min(bw, w * 0.4)
+				for ti = 2, #twigPts do
+					local tt = (ti - 1) / max(1, #twigPts - 1)
+					twigWidths[ti] = twigWidths[1] * (1 - tt * 0.8)
 				end
+				allPaths[#allPaths + 1] = {
+					points = twigPts, widths = twigWidths,
+					capacity = capacity, isBranch = 1, -- same capacity as parent for color match
+				}
 			end
 		end
 	end
 
-	-- Normalize angle to [-pi, pi]
-	local function normalizeAngle(a)
-		while a > PI do a = a - PI * 2 end
-		while a < -PI do a = a + PI * 2 end
-		return a
-	end
-
-	-- Cluster children by direction. Children within MERGE_ANGLE share a stem.
-	local MERGE_ANGLE = 0.8 -- ~45 degrees
-	local STEM_FRACTION = 0.35 -- shared stem = 35% of min child distance
-
 	local function clusterByDirection(pos, children)
-		-- Compute angle to each child
 		for i = 1, #children do
 			local cpos = nodePos[children[i].key]
 			if cpos then
@@ -884,16 +819,11 @@ local function GenerateOrganicTree(renderEdges)
 				children[i].dist = sqrt((cpos.x - pos.x)^2 + (cpos.z - pos.z)^2)
 			end
 		end
-
-		-- Sort by angle
 		table.sort(children, function(a, b) return (a.angle or 0) < (b.angle or 0) end)
-
-		-- Greedy clustering: consecutive children within MERGE_ANGLE
 		local clusters = {}
 		local current = { children[1] }
 		for i = 2, #children do
-			local diff = abs(normalizeAngle(children[i].angle - children[i-1].angle))
-			if diff < MERGE_ANGLE then
+			if abs(normalizeAngle(children[i].angle - children[i-1].angle)) < MERGE_ANGLE then
 				current[#current + 1] = children[i]
 			else
 				clusters[#clusters + 1] = current
@@ -901,342 +831,311 @@ local function GenerateOrganicTree(renderEdges)
 			end
 		end
 		clusters[#clusters + 1] = current
-
-		-- Also check wrap-around (first and last might be close)
 		if #clusters > 1 then
-			local first = clusters[1]
-			local last = clusters[#clusters]
-			local diff = abs(normalizeAngle(first[1].angle - last[#last].angle))
-			if diff < MERGE_ANGLE then
-				-- Merge last into first
-				for i = 1, #last do
-					first[#first + 1] = last[i]
-				end
+			local first, last = clusters[1], clusters[#clusters]
+			if abs(normalizeAngle(first[1].angle - last[#last].angle)) < MERGE_ANGLE then
+				for i = 1, #last do first[#first + 1] = last[i] end
 				clusters[#clusters] = nil
 			end
 		end
-
 		return clusters
 	end
 
-	local function routeNode(pk, incomingAngle)
+	local function routeNode(pk)
 		local pos = nodePos[pk]
 		if not pos then return end
 		local children = nodeChildren[pk]
 		if not children or #children == 0 then return end
 
-		-- Total capacity
 		local totalCap = 0
 		for i = 1, #children do totalCap = totalCap + children[i].cap end
 		local trunkW = GetTrunkWidth(totalCap)
 
-		-- Single child: just route directly
 		if #children == 1 then
 			local child = children[1]
 			local cpos = nodePos[child.key]
 			if cpos then
-				emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z,
-					trunkW, GetTrunkWidth(child.cap), totalCap,
-					pos.x + pos.z, false)
-				routeNode(child.key, atan2(cpos.z - pos.z, cpos.x - pos.x))
+				emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, trunkW, GetTrunkWidth(child.cap), totalCap, pos.x + pos.z, false)
+				routeNode(child.key)
 			end
 			return
 		end
 
-		-- Multiple children: cluster by direction and route with shared stems
 		local clusters = clusterByDirection(pos, children)
-
 		for ci = 1, #clusters do
 			local cluster = clusters[ci]
-
 			if #cluster == 1 then
-				-- Solo child in this direction: branch directly
 				local child = cluster[1]
 				local cpos = nodePos[child.key]
 				if cpos then
-					local branchW = GetTrunkWidth(child.cap)
-					emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z,
-						min(branchW * 1.3, trunkW * 0.7), branchW * 0.8,
-						child.cap, pos.x * 3.7 + pos.z * 1.3 + ci, #clusters > 1)
-					routeNode(child.key, child.angle or 0)
+					local bw = GetTrunkWidth(child.cap)
+					emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, min(bw * 1.3, trunkW * 0.7), bw * 0.8, child.cap, pos.x * 3.7 + pos.z * 1.3 + ci, #clusters > 1)
+					routeNode(child.key)
 				end
 			else
-				-- Multiple children in similar direction: shared stem then split
-				-- Circular mean for angle (handles wraparound correctly)
-				local avgCos = 0
-				local avgSin = 0
-				local clusterCap = 0
-				local minDist = math.huge
+				local avgCos, avgSin, clusterCap, minDist = 0, 0, 0, math.huge
 				for i = 1, #cluster do
 					local a = cluster[i].angle or 0
 					avgCos = avgCos + cos(a)
 					avgSin = avgSin + sin(a)
 					clusterCap = clusterCap + cluster[i].cap
-					if cluster[i].dist and cluster[i].dist < minDist then
-						minDist = cluster[i].dist
-					end
+					if cluster[i].dist and cluster[i].dist < minDist then minDist = cluster[i].dist end
 				end
 				local avgAngle = atan2(avgSin, avgCos)
 				local stemLen = min(minDist * STEM_FRACTION, 120)
-
-				-- Shared stem from node in average direction
 				local stemX = pos.x + cos(avgAngle) * stemLen
 				local stemZ = pos.z + sin(avgAngle) * stemLen
 				local stemW = GetTrunkWidth(clusterCap)
-
-				emitNoisyPath(pos.x, pos.z, stemX, stemZ,
-					stemW, stemW * 0.9, clusterCap,
-					pos.x + pos.z + ci * 7.3, false)
-
-				-- From stem tip, individual branches to each child
-				-- Sort cluster by capacity for nice ordering
+				emitNoisyPath(pos.x, pos.z, stemX, stemZ, stemW, stemW * 0.9, clusterCap, pos.x + pos.z + ci * 7.3, false)
 				table.sort(cluster, function(a, b) return a.cap > b.cap end)
-
 				for i = 1, #cluster do
 					local child = cluster[i]
 					local cpos = nodePos[child.key]
 					if cpos then
-						local branchW = GetTrunkWidth(child.cap)
-						local startW = min(branchW * 1.2, stemW * 0.6)
-						emitNoisyPath(stemX, stemZ, cpos.x, cpos.z,
-							startW, branchW * 0.7, child.cap,
-							stemX * 2.1 + stemZ * 5.3 + i, i > 1)
-						routeNode(child.key, atan2(cpos.z - stemZ, cpos.x - stemX))
+						local bw = GetTrunkWidth(child.cap)
+						emitNoisyPath(stemX, stemZ, cpos.x, cpos.z, min(bw * 1.2, stemW * 0.6), bw * 0.7, child.cap, stemX * 2.1 + stemZ * 5.3 + i, i > 1)
+						routeNode(child.key)
 					end
 				end
 			end
 		end
 	end
 
-	-- Step 3: Route from each root
-	for pk, _ in pairs(roots) do
-		local pos = nodePos[pk]
-		if pos then
-			-- Add root pad
-			local children = nodeChildren[pk]
-			local totalCap = 0
-			if children then
-				for i = 1, #children do totalCap = totalCap + children[i].cap end
+	for pk, _ in pairs(roots) do routeNode(pk) end
+
+	-- Convert paths to smooth triangle strips.
+	-- At each waypoint, compute perpendicular averaged from incoming+outgoing directions.
+	-- Each pair of consecutive waypoints forms a quad (2 triangles, 6 verts).
+	local verts = {}
+	local vertCount = 0
+
+	for pi = 1, #allPaths do
+		local path = allPaths[pi]
+		local pts = path.points
+		local wds = path.widths
+		local cap = path.capacity
+		local branch = path.isBranch
+
+		if #pts >= 2 then
+
+		-- Compute averaged perpendicular at each waypoint
+		local perps = {} -- { {nx, nz}, ... } perpendicular directions at each point
+		for i = 1, #pts do
+			local px, pz = 0, 0
+			if i > 1 then
+				local dx = pts[i].x - pts[i-1].x
+				local dz = pts[i].z - pts[i-1].z
+				local len = sqrt(dx*dx + dz*dz)
+				if len > 0.01 then
+					px = px + (-dz/len)
+					pz = pz + ( dx/len)
+				end
 			end
-			local w = GetTrunkWidth(max(1, totalCap))
-			local pkey = posKey(pos.x, pos.z)
-			if not padSet[pkey] then
-				padSet[pkey] = true
-				allPads[#allPads + 1] = { cx = pos.x, cz = pos.z, radius = w * 1.5 }
+			if i < #pts then
+				local dx = pts[i+1].x - pts[i].x
+				local dz = pts[i+1].z - pts[i].z
+				local len = sqrt(dx*dx + dz*dz)
+				if len > 0.01 then
+					px = px + (-dz/len)
+					pz = pz + ( dx/len)
+				end
 			end
-
-			routeNode(pk, 0)
-		end
-	end
-
-	-- Add pads at all leaf nodes
-	for pk, pos in pairs(nodePos) do
-		if not nodeChildren[pk] or #nodeChildren[pk] == 0 then
-			local pkey = posKey(pos.x, pos.z)
-			if not padSet[pkey] then
-				padSet[pkey] = true
-				allPads[#allPads + 1] = { cx = pos.x, cz = pos.z, radius = GetTrunkWidth(1) * 1.2 }
-			end
-		end
-	end
-
-	return allSegments, allPads
-end
-
--------------------------------------------------------------------------------------
--- Drawing primitives (all in FBO NDC space)
--------------------------------------------------------------------------------------
-
--- Convert world coords to FBO NDC [-1, 1] for a given square
-local function MakeW2T(sqX, sqZ)
-	return function(wx, wz)
-		return 2 * (wx - sqX) / SQUARE_SIZE - 1,
-		       2 * (wz - sqZ) / SQUARE_SIZE - 1
-	end
-end
-
--- Emit a quad for a trace segment (call inside gl.BeginEnd GL.QUADS)
-local function EmitTraceQuad(w2t, x1, z1, x2, z2, hw)
-	local dx = x2 - x1
-	local dz = z2 - z1
-	local len = sqrt(dx * dx + dz * dz)
-	if len < 0.5 then return end
-
-	local px = -dz / len * hw
-	local pz =  dx / len * hw
-
-	local t1x, t1z = w2t(x1 - px, z1 - pz)
-	local t2x, t2z = w2t(x1 + px, z1 + pz)
-	local t3x, t3z = w2t(x2 + px, z2 + pz)
-	local t4x, t4z = w2t(x2 - px, z2 - pz)
-
-	glVertex(t1x, t1z, 0)
-	glVertex(t2x, t2z, 0)
-	glVertex(t3x, t3z, 0)
-	glVertex(t4x, t4z, 0)
-end
-
--- Emit a filled circle (call inside gl.BeginEnd GL.TRIANGLE_FAN)
-local function EmitCircle(w2t, cx, cz, radius)
-	local tx, tz = w2t(cx, cz)
-	glVertex(tx, tz, 0) -- center
-	for i = 0, PAD_SEGMENTS do
-		local angle = (i / PAD_SEGMENTS) * PI * 2
-		local px, pz = w2t(cx + cos(angle) * radius, cz + sin(angle) * radius)
-		glVertex(px, pz, 0)
-	end
-end
-
--------------------------------------------------------------------------------------
--- Drawing hook
--------------------------------------------------------------------------------------
-
-function gadget:DrawGenesis()
-	if not needsRedraw then return end
-	if #renderEdges == 0 then
-		needsRedraw = false
-		return
-	end
-
-	glResetState()
-	glResetMatrices()
-
-	-- Revert previously modified squares
-	for _, sq in pairs(drawnSquares) do
-		spSetMapSquareTexture(sq.sx, sq.sz, "")
-	end
-
-	-- Generate organic tree from all edges (tree-level routing with merging)
-	local allSegments, allPads = GenerateOrganicTree(renderEdges)
-
-	if #allSegments == 0 then
-		needsRedraw = false
-		return
-	end
-
-	-- Collect needed squares (from segments + pads)
-	local neededSquares = {}
-	for i = 1, #allSegments do
-		local s = allSegments[i]
-		local m = s.width + 60 -- extra margin for branch noise
-		local minSx = max(0, floor((min(s.x1, s.x2) - m) / SQUARE_SIZE))
-		local maxSx = min(SQUARES_X - 1, floor((max(s.x1, s.x2) + m) / SQUARE_SIZE))
-		local minSz = max(0, floor((min(s.z1, s.z2) - m) / SQUARE_SIZE))
-		local maxSz = min(SQUARES_Z - 1, floor((max(s.z1, s.z2) + m) / SQUARE_SIZE))
-		for sx = minSx, maxSx do
-			for sz = minSz, maxSz do
-				neededSquares[SquareKey(sx, sz)] = { sx = sx, sz = sz }
-			end
-		end
-	end
-	for i = 1, #allPads do
-		local p = allPads[i]
-		local m = p.radius + 5
-		local minSx = max(0, floor((p.cx - m) / SQUARE_SIZE))
-		local maxSx = min(SQUARES_X - 1, floor((p.cx + m) / SQUARE_SIZE))
-		local minSz = max(0, floor((p.cz - m) / SQUARE_SIZE))
-		local maxSz = min(SQUARES_Z - 1, floor((p.cz + m) / SQUARE_SIZE))
-		for sx = minSx, maxSx do
-			for sz = minSz, maxSz do
-				neededSquares[SquareKey(sx, sz)] = { sx = sx, sz = sz }
-			end
-		end
-	end
-
-	-- Render on each needed square
-	drawnSquares = {}
-	for key, sq in pairs(neededSquares) do
-		local sx, sz = sq.sx, sq.sz
-
-		-- Ensure FBO pair exists
-		if not squareFBOs[sx] then squareFBOs[sx] = {} end
-		if not squareFBOs[sx][sz] then
-			local cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-				fbo = true, min_filter = GL.LINEAR_MIPMAP_NEAREST,
-				wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
-			})
-			local orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-				fbo = true,
-				wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE,
-			})
-			if cur and orig then
-				squareFBOs[sx][sz] = { cur = cur, orig = orig }
+			local plen = sqrt(px*px + pz*pz)
+			if plen > 0.01 then
+				perps[i] = { nx = px/plen, nz = pz/plen }
 			else
-				if cur then gl.DeleteTextureFBO(cur) end
-				if orig then gl.DeleteTextureFBO(orig) end
+				perps[i] = { nx = 0, nz = 1 }
 			end
 		end
 
-		local pair = squareFBOs[sx] and squareFBOs[sx][sz]
-		if pair then
-			-- Snapshot orig, copy to cur
-			spGetMapSquareTexture(sx, sz, 0, pair.orig)
-			glTexture(pair.orig)
-			gl.RenderToTexture(pair.cur, function()
-				glTexRect(-1, 1, 1, -1)
-			end)
-			glTexture(false)
-
-			local sqX = sx * SQUARE_SIZE
-			local sqZ = sz * SQUARE_SIZE
-			local w2t = MakeW2T(sqX, sqZ)
-
-			gl.RenderToTexture(pair.cur, function()
-				gl.Texture(false)
-
-				-- Layer 1: Dark bark border (all segments)
-				glColor(BARK_COLOR[1], BARK_COLOR[2], BARK_COLOR[3], BARK_COLOR[4])
-				gl.BeginEnd(GL.QUADS, function()
-					for i = 1, #allSegments do
-						local s = allSegments[i]
-						EmitTraceQuad(w2t, s.x1, s.z1, s.x2, s.z2, s.width * 0.55)
-					end
-				end)
-
-				-- Layer 2: Inner glow (energy color, varies by capacity)
-				gl.BeginEnd(GL.QUADS, function()
-					for i = 1, #allSegments do
-						local s = allSegments[i]
-						local t = min(1, s.capacity / MAX_CAPACITY_REF)
-						local r = INNER_COLOR[1] + t * (INNER_COLOR_HIGH[1] - INNER_COLOR[1])
-						local g = INNER_COLOR[2] + t * (INNER_COLOR_HIGH[2] - INNER_COLOR[2])
-						local b = INNER_COLOR[3] + t * (INNER_COLOR_HIGH[3] - INNER_COLOR[3])
-						local a = INNER_COLOR[4]
-						if s.isBranch then a = a * 0.7 end
-						glColor(r, g, b, a)
-						EmitTraceQuad(w2t, s.x1, s.z1, s.x2, s.z2, s.width * 0.35)
-					end
-				end)
-
-				-- Layer 3: Pad borders (dark bark circles at nodes)
-				glColor(PAD_BARK_COLOR[1], PAD_BARK_COLOR[2], PAD_BARK_COLOR[3], PAD_BARK_COLOR[4])
-				for i = 1, #allPads do
-					local p = allPads[i]
-					gl.BeginEnd(GL.TRIANGLE_FAN, function()
-						EmitCircle(w2t, p.cx, p.cz, p.radius)
-					end)
-				end
-
-				-- Layer 4: Pad inner glow
-				glColor(PAD_INNER_COLOR[1], PAD_INNER_COLOR[2], PAD_INNER_COLOR[3], PAD_INNER_COLOR[4])
-				for i = 1, #allPads do
-					local p = allPads[i]
-					gl.BeginEnd(GL.TRIANGLE_FAN, function()
-						EmitCircle(w2t, p.cx, p.cz, p.radius * 0.65)
-					end)
-				end
-
-				glColor(1, 1, 1, 1)
-			end)
-
-			-- Apply
-			gl.GenerateMipmap(pair.cur)
-			spSetMapSquareTexture(sx, sz, pair.cur)
-			drawnSquares[key] = sq
+		-- Compute left/right vertices at each waypoint
+		local lefts = {}
+		local rights = {}
+		for i = 1, #pts do
+			local hw = (wds[i] or wds[#wds] or 5) * 0.55
+			local p = perps[i]
+			local y = spGetGroundHeight(pts[i].x, pts[i].z) + 2
+			lefts[i]  = { x = pts[i].x - p.nx * hw, y = y, z = pts[i].z - p.nz * hw }
+			rights[i] = { x = pts[i].x + p.nx * hw, y = y, z = pts[i].z + p.nz * hw }
 		end
+
+		-- Emit triangles for each consecutive pair (quad = 2 tris)
+		for i = 1, #pts - 1 do
+			local L1, R1 = lefts[i], rights[i]
+			local L2, R2 = lefts[i+1], rights[i+1]
+
+			-- Tri 1: L1, R1, R2
+			verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
+			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
+			verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
+			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
+			verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
+			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
+
+			-- Tri 2: L1, R2, L2
+			verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
+			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
+			verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
+			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
+			verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
+			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
+
+			vertCount = vertCount + 6
+		end
+
+		end -- if #pts >= 2
 	end
 
-	needsRedraw = false
+	return verts, vertCount
+end
+
+-------------------------------------------------------------------------------------
+-- Shader sources
+-------------------------------------------------------------------------------------
+
+local cableVSSrc = [[
+#version 420
+#extension GL_ARB_uniform_buffer_object : require
+#extension GL_ARB_shading_language_420pack: require
+
+layout (location = 0) in vec3 vertPos;    // x, y, z in world space
+layout (location = 1) in vec3 vertData;   // capacity, isBranch, width
+
+out DataVS {
+	vec3 worldPos;
+	float capacity;
+	float isBranch;
+	float width;
+};
+
+//__ENGINEUNIFORMBUFFERDEFS__
+
+void main() {
+	worldPos = vertPos;
+	capacity = vertData.x;
+	isBranch = vertData.y;
+	width = vertData.z;
+	gl_Position = cameraViewProj * vec4(vertPos, 1.0);
+}
+]]
+
+local cableFSSrc = [[
+#version 330
+#extension GL_ARB_uniform_buffer_object : require
+#extension GL_ARB_shading_language_420pack: require
+
+uniform sampler2D infoTex;
+uniform float gameTime;
+
+in DataVS {
+	vec3 worldPos;
+	float capacity;
+	float isBranch;
+	float width;
+};
+
+//__ENGINEUNIFORMBUFFERDEFS__
+
+out vec4 fragColor;
+
+// Noise for procedural texture
+float hash(vec2 p) {
+	float h = dot(p, vec2(12.9898, 78.233));
+	return fract(sin(h) * 43758.5453);
+}
+
+void main() {
+	// LOS check
+	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
+	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
+	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
+
+	// Unexplored: discard
+	if (losState < 0.05) discard;
+
+	// Capacity-based color
+	float capT = clamp(capacity / 100.0, 0.0, 1.0);
+
+	// Bark border color (dark)
+	vec3 barkColor = vec3(0.06, 0.04, 0.02);
+	// Inner glow: green energy, brighter with capacity
+	vec3 innerColor = mix(vec3(0.20, 0.55, 0.15), vec3(0.50, 0.80, 0.20), capT);
+
+	// Simple procedural: mostly bark with inner glow
+	// Use a simple threshold based on noise for organic feel
+	float n = hash(worldPos.xz * 0.1);
+	float innerMix = 0.4 + 0.2 * n;
+	if (isBranch > 0.5) innerMix *= 0.6;
+
+	vec3 baseColor = mix(barkColor, innerColor, innerMix);
+
+	// Animated energy pulse (only in full LOS)
+	float fullLOS = step(0.7, losState);
+	float pulse = 0.5 + 0.5 * sin(gameTime * 3.0 + worldPos.x * 0.05 + worldPos.z * 0.05);
+	baseColor += innerColor * pulse * 0.15 * fullLOS * capT;
+
+	// Dim in radar/previously-seen areas
+	float dimFactor = mix(0.4, 1.0, smoothstep(0.3, 0.8, losState));
+	baseColor *= dimFactor;
+
+	fragColor = vec4(baseColor, 0.9);
+}
+]]
+
+-------------------------------------------------------------------------------------
+-- Drawing
+-------------------------------------------------------------------------------------
+
+function gadget:DrawWorldPreUnit()
+	if not cableShader or numCableVerts == 0 then return end
+
+	cableShader:Activate()
+	cableShader:SetUniform("gameTime", Spring.GetGameSeconds())
+
+	gl.Texture(0, "$info")
+	gl.DepthTest(GL.LEQUAL)
+	gl.DepthMask(false)
+	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
+
+	cableVAO:DrawArrays(GL.TRIANGLES, numCableVerts)
+
+	cableShader:Deactivate()
+	gl.Texture(0, false)
+	gl.DepthTest(false)
+end
+
+-------------------------------------------------------------------------------------
+-- VBO rebuild
+-------------------------------------------------------------------------------------
+
+local function RebuildVBO()
+	local verts, vertCount = BuildCableVertices()
+	if vertCount == 0 then
+		numCableVerts = 0
+		return
+	end
+
+	if cableVAO then
+		-- Recreate
+		cableVAO = nil
+	end
+
+	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
+	if not vbo then return end
+
+	vbo:Define(vertCount, {
+		{ id = 0, name = "vertPos",  size = 3 },
+		{ id = 1, name = "vertData", size = 3 },
+	})
+	vbo:Upload(verts)
+
+	cableVAO = gl.GetVAO()
+	if cableVAO then
+		cableVAO:AttachVertexBuffer(vbo)
+	end
+
+	numCableVerts = vertCount
+	needsRebuild = false
 end
 
 -------------------------------------------------------------------------------------
@@ -1274,33 +1173,56 @@ local function OnCableTreeUpdate()
 		end
 	end
 
-	needsRedraw = true
+	needsRebuild = true
 end
 
 -------------------------------------------------------------------------------------
 -- Lifecycle
 -------------------------------------------------------------------------------------
 
+function gadget:GameFrame(n)
+	if needsRebuild and n % 6 == 0 then
+		RebuildVBO()
+	end
+end
+
 function gadget:Initialize()
-	if not gl.RenderToTexture then
+	if not gl.CreateShader or not gl.GetVBO or not gl.GetVAO then
+		Spring.Echo("[CableTree] Missing GL support, disabling")
 		gadgetHandler:RemoveGadget()
 		return
 	end
+
+	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()
+	local vsSrc = cableVSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
+	local fsSrc = cableFSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
+
+	cableShader = LuaShader({
+		vertex = vsSrc,
+		fragment = fsSrc,
+		uniformInt = {
+			infoTex = 0,
+		},
+		uniformFloat = {
+			gameTime = 0,
+		},
+	}, "Cable Tree Shader")
+
+	local compiled = cableShader:Initialize()
+	if not compiled then
+		Spring.Echo("[CableTree] Shader compilation failed")
+		gadgetHandler:RemoveGadget()
+		return
+	end
+
 	gadgetHandler:AddSyncAction("CableTreeUpdate", OnCableTreeUpdate)
 end
 
 function gadget:Shutdown()
-	for _, sq in pairs(drawnSquares) do
-		spSetMapSquareTexture(sq.sx, sq.sz, "")
+	if cableShader then
+		cableShader:Finalize()
 	end
-	for sx, szMap in pairs(squareFBOs) do
-		for sz, pair in pairs(szMap) do
-			if pair.cur then gl.DeleteTextureFBO(pair.cur) end
-			if pair.orig then gl.DeleteTextureFBO(pair.orig) end
-		end
-	end
-	squareFBOs = {}
-	drawnSquares = {}
+	cableVAO = nil
 	gadgetHandler:RemoveSyncAction("CableTreeUpdate")
 end
 
