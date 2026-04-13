@@ -954,9 +954,17 @@ local function BuildCableVertices()
 			end
 		end
 
-		-- Compute left/right vertices at each waypoint
+		-- Compute left/right vertices + cumulative U distance at each waypoint
 		local lefts = {}
 		local rights = {}
+		local uDist = {} -- cumulative distance along path
+		uDist[1] = 0
+		for i = 2, #pts do
+			local dx = pts[i].x - pts[i-1].x
+			local dz = pts[i].z - pts[i-1].z
+			uDist[i] = uDist[i-1] + sqrt(dx*dx + dz*dz)
+		end
+
 		for i = 1, #pts do
 			local hw = (wds[i] or wds[#wds] or 5) * 0.55
 			local p = perps[i]
@@ -965,26 +973,33 @@ local function BuildCableVertices()
 			rights[i] = { x = pts[i].x + p.nx * hw, y = y, z = pts[i].z + p.nz * hw }
 		end
 
-		-- Emit triangles for each consecutive pair (quad = 2 tris)
+		-- Emit triangles: 8 floats per vert (pos3 + data3 + uv2)
 		for i = 1, #pts - 1 do
 			local L1, R1 = lefts[i], rights[i]
 			local L2, R2 = lefts[i+1], rights[i+1]
+			local u1, u2 = uDist[i], uDist[i+1]
 
 			-- Tri 1: L1, R1, R2
 			verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
 			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
+			verts[#verts+1]=u1;   verts[#verts+1]=-1
 			verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
 			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
+			verts[#verts+1]=u1;   verts[#verts+1]=1
 			verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
+			verts[#verts+1]=u2;   verts[#verts+1]=1
 
 			-- Tri 2: L1, R2, L2
 			verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
 			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i] or 5
+			verts[#verts+1]=u1;   verts[#verts+1]=-1
 			verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
+			verts[#verts+1]=u2;   verts[#verts+1]=1
 			verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
 			verts[#verts+1]=cap;  verts[#verts+1]=branch; verts[#verts+1]=wds[i+1] or 5
+			verts[#verts+1]=u2;   verts[#verts+1]=-1
 
 			vertCount = vertCount + 6
 		end
@@ -1010,9 +1025,10 @@ local snapVSSrc = [[
 #extension GL_ARB_shading_language_420pack: require
 
 layout (location = 0) in vec3 vertPos;
-layout (location = 1) in vec3 vertData; // capacity, isBranch, width
+layout (location = 1) in vec3 vertData;
+layout (location = 2) in vec2 vertUV;
 
-uniform vec2 mapDims; // mapSizeX, mapSizeZ
+uniform vec2 mapDims;
 
 out float vCapacity;
 out float vIsBranch;
@@ -1020,7 +1036,6 @@ out float vIsBranch;
 void main() {
 	vCapacity = vertData.x;
 	vIsBranch = vertData.y;
-	// Project to NDC: map (0..mapSizeX, 0..mapSizeZ) -> (-1..1, -1..1)
 	vec2 ndc = (vertPos.xz / mapDims) * 2.0 - 1.0;
 	gl_Position = vec4(ndc, 0.0, 1.0);
 }
@@ -1034,20 +1049,12 @@ in float vIsBranch;
 
 out vec4 fragColor;
 
-float hash(vec2 p) {
-	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
 void main() {
 	float capT = clamp(vCapacity / 100.0, 0.0, 1.0);
-	vec3 barkColor = vec3(0.06, 0.04, 0.02);
-	vec3 innerColor = mix(vec3(0.20, 0.55, 0.15), vec3(0.50, 0.80, 0.20), capT);
-
-	float n = hash(gl_FragCoord.xy * 0.3);
-	float innerMix = 0.4 + 0.2 * n;
-	if (vIsBranch > 0.5) innerMix *= 0.6;
-
-	fragColor = vec4(mix(barkColor, innerColor, innerMix), 1.0);
+	// Electric blue for snapshot (static, no animation)
+	vec3 color = mix(vec3(0.15, 0.2, 0.5), vec3(0.4, 0.6, 1.0), capT);
+	if (vIsBranch > 0.5) color *= 0.5;
+	fragColor = vec4(color, 1.0);
 }
 ]]
 
@@ -1061,13 +1068,15 @@ local cableVSSrc = [[
 #extension GL_ARB_shading_language_420pack: require
 
 layout (location = 0) in vec3 vertPos;
-layout (location = 1) in vec3 vertData; // capacity, isBranch, width
+layout (location = 1) in vec3 vertData;
+layout (location = 2) in vec2 vertUV;   // u = along cable, v = -1(left) to +1(right)
 
 out DataVS {
 	vec3 worldPos;
 	float capacity;
 	float isBranch;
 	float width;
+	vec2 cableUV;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1077,6 +1086,7 @@ void main() {
 	capacity = vertData.x;
 	isBranch = vertData.y;
 	width = vertData.z;
+	cableUV = vertUV;
 	gl_Position = cameraViewProj * vec4(vertPos, 1.0);
 }
 ]]
@@ -1096,6 +1106,7 @@ in DataVS {
 	float capacity;
 	float isBranch;
 	float width;
+	vec2 cableUV;  // u = distance along cable (elmos), v = -1(left) to +1(right)
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1106,44 +1117,101 @@ float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
+float noise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	float a = hash(i);
+	float b = hash(i + vec2(1.0, 0.0));
+	float c = hash(i + vec2(0.0, 1.0));
+	float d = hash(i + vec2(1.0, 1.0));
+	return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float fbm(vec2 p) {
+	float val = 0.0;
+	float amp = 0.5;
+	for (int i = 0; i < 3; i++) {
+		val += amp * noise(p);
+		p *= 2.1;
+		amp *= 0.5;
+	}
+	return val;
+}
+
 void main() {
-	// LOS state
+	// LOS
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
 
-	// Sample snapshot for this world position
+	// Snapshot ghosting
 	vec2 snapUV = clamp(worldPos.xz / mapDims, vec2(0.0), vec2(1.0));
 	vec4 snapColor = texture(snapshotTex, snapUV);
 
-	// Fully unexplored: show snapshot if it has data, otherwise discard
 	if (losState < 0.05) {
 		if (snapColor.a < 0.1) discard;
-		fragColor = vec4(snapColor.rgb * 0.35, snapColor.a * 0.7);
+		fragColor = vec4(snapColor.rgb * 0.3, snapColor.a * 0.6);
 		return;
 	}
 
-	// In radar/fog: blend snapshot (dimmed) with fading live geometry
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
-	vec3 barkColor = vec3(0.06, 0.04, 0.02);
-	vec3 innerColor = mix(vec3(0.20, 0.55, 0.15), vec3(0.50, 0.80, 0.20), capT);
+	float fullLOS = smoothstep(0.3, 0.8, losState);
 
-	float n = hash(worldPos.xz * 0.1);
-	float innerMix = 0.4 + 0.2 * n;
-	if (isBranch > 0.5) innerMix *= 0.6;
+	// --- Electric discharge using cable-aligned UVs ---
+	// u = distance along cable (elmos), v = across (-1 to +1)
+	float along = cableUV.x * 0.06;          // scale along to noise frequency
+	float across = cableUV.y * 0.5 + 0.5;    // remap -1..+1 to 0..1
 
-	vec3 liveColor = mix(barkColor, innerColor, innerMix);
+	float timeShift = gameTime * 2.5 * fullLOS;
 
-	// Animated pulse (only full LOS)
-	float fullLOS = step(0.7, losState);
-	float pulse = 0.5 + 0.5 * sin(gameTime * 3.0 + worldPos.x * 0.05 + worldPos.z * 0.05);
-	liveColor += innerColor * pulse * 0.15 * fullLOS * capT;
+	// Main bolt: noise displaces center position across the ribbon
+	// Subtract time so energy flows root→leaf (direction of increasing u)
+	float boltOffset = fbm(vec2(along * 4.0 - timeShift, along * 0.7 + 5.0)) - 0.5;
 
-	// Blend: full LOS = live color, radar = dimmed live, low = snapshot
-	float liveFactor = smoothstep(0.3, 0.8, losState);
-	float dimFactor = mix(0.4, 1.0, liveFactor);
+	// Secondary bolt (slightly different frequency)
+	float bolt2Offset = fbm(vec2(along * 6.0 + timeShift * 0.8, along * 1.3 + 19.0)) - 0.5;
 
-	fragColor = vec4(liveColor * dimFactor, 0.9);
+	// Distance from bolt centers
+	float boltCenter = 0.5 + boltOffset * 0.5;
+	float bolt2Center = 0.5 + bolt2Offset * 0.4;
+	float distBolt1 = abs(across - boltCenter);
+	float distBolt2 = abs(across - bolt2Center);
+
+	// Sharp core (gaussian falloff)
+	float coreW = 0.05 + capT * 0.05;
+	float core1 = exp(-distBolt1 * distBolt1 / (coreW * coreW));
+	float core2 = exp(-distBolt2 * distBolt2 / (coreW * 1.8 * coreW * 1.8)) * 0.35;
+
+	// Outer glow
+	float glowW = 0.18 + capT * 0.08;
+	float glow = exp(-distBolt1 * distBolt1 / (glowW * glowW)) * 0.5;
+
+	float intensity = core1 + core2 + glow;
+
+	// Flicker
+	float flicker = 0.7 + 0.3 * hash(vec2(floor(gameTime * 10.0), floor(along * 3.0)));
+	intensity *= mix(1.0, flicker, fullLOS);
+
+	// Branch dimming
+	if (isBranch > 0.5) intensity *= 0.45;
+
+	// Color
+	vec3 coreColor = mix(vec3(0.6, 0.75, 1.0), vec3(1.0, 1.0, 1.0), core1);
+	vec3 glowColor = mix(vec3(0.08, 0.12, 0.35), vec3(0.3, 0.5, 1.0), capT);
+	vec3 color = coreColor * (core1 + core2) + glowColor * glow;
+
+	// Edge fade at ribbon borders
+	float edgeDist = 1.0 - abs(cableUV.y); // 0 at edges, 1 at center
+	float edgeFade = smoothstep(0.0, 0.2, edgeDist);
+
+	float dimFactor = mix(0.35, 1.0, fullLOS);
+	color *= dimFactor;
+
+	float alpha = clamp(intensity * edgeFade, 0.0, 1.0) * 0.95;
+	if (alpha < 0.02) discard;
+
+	fragColor = vec4(color, alpha);
 }
 ]]
 
@@ -1209,6 +1277,7 @@ local function RebuildVBO()
 	vbo:Define(vertCount, {
 		{ id = 0, name = "vertPos",  size = 3 },
 		{ id = 1, name = "vertData", size = 3 },
+		{ id = 2, name = "vertUV",   size = 2 },
 	})
 	vbo:Upload(verts)
 
