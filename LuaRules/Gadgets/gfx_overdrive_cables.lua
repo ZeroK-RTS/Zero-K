@@ -760,76 +760,103 @@ local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
 	return points
 end
 
--- Generate organic segments for one cable edge.
--- Returns list of { x1, z1, x2, z2, width, capacity, isBranch }
-local function GenerateOrganicEdge(ex1, ez1, ex2, ez2, capacity)
-	local segments = {}
-	local trunkW = GetTrunkWidth(capacity)
-	local len = sqrt((ex2 - ex1)^2 + (ez2 - ez1)^2)
-	if len < 2 then return segments end
+-------------------------------------------------------------------------------------
+-- Tree-level organic router
+-- Builds a node graph from edges, DFS from roots.
+-- At each junction, heaviest child continues the trunk, others branch off.
+-- Shared trunk segments carry combined flow → naturally thicker.
+-------------------------------------------------------------------------------------
 
-	local dx = (ex2 - ex1) / len
-	local dz = (ez2 - ez1) / len
+local atan2 = math.atan2
 
-	-- Generate noisy trunk path
-	local path = NoisyPath(ex1, ez1, ex2, ez2, trunkW * NOISE_AMP, ex1 + ez1)
+-- Generate all organic segments from the full set of renderEdges.
+-- Returns { segments, pads }
+local function GenerateOrganicTree(renderEdges)
+	local allSegments = {}
+	local allPads = {}
+	local padSet = {}
 
-	-- Emit trunk segments with taper
-	for i = 1, #path - 1 do
-		local p1 = path[i]
-		local p2 = path[i + 1]
-		local t = (i - 1) / (#path - 1) -- 0..1 along cable
+	-- Step 1: Build node graph from edges
+	-- nodePos[key] = { x, z }
+	-- nodeChildren[key] = { { key=childKey, cap=capacity, frac=growthFrac }, ... }
+	-- nodeParent[key] = { key=parentKey }
+	local nodePos = {}
+	local nodeChildren = {} -- [posKey] = list of child info
+	local nodeParent = {}   -- [posKey] = parent posKey
+	local roots = {}        -- [posKey] = true
 
-		-- Taper: full width until TAPER_START, then narrow to 60%
-		local w = trunkW
-		if t > TAPER_START then
-			local taperT = (t - TAPER_START) / (1 - TAPER_START)
-			w = trunkW * (1 - taperT * 0.4)
+	local function posKey(x, z)
+		return floor(x) .. ":" .. floor(z)
+	end
+
+	-- Parse edges into tree structure
+	for i = 1, #renderEdges do
+		local e = renderEdges[i]
+		if e.length > 0 then
+			local frac = min(1, e.progress / e.length)
+			if frac > 0.01 then
+				local pk = posKey(e.px, e.pz)
+				local ex = e.px + frac * (e.cx - e.px)
+				local ez = e.pz + frac * (e.cz - e.pz)
+				local ck = posKey(ex, ez)
+
+				nodePos[pk] = { x = e.px, z = e.pz }
+				nodePos[ck] = { x = ex, z = ez }
+
+				if not nodeChildren[pk] then nodeChildren[pk] = {} end
+				nodeChildren[pk][#nodeChildren[pk] + 1] = {
+					key = ck, cap = max(1, e.capacity), frac = frac,
+				}
+				nodeParent[ck] = pk
+			end
 		end
+	end
 
-		segments[#segments + 1] = {
-			x1 = p1.x, z1 = p1.z, x2 = p2.x, z2 = p2.z,
-			width = w, capacity = capacity, isBranch = false,
-		}
+	-- Find roots (nodes with no parent)
+	for pk, _ in pairs(nodePos) do
+		if not nodeParent[pk] then
+			roots[pk] = true
+		end
+	end
 
-		-- Side branches
-		if i > 1 and i < #path - 1 then
-			local branchSeed = p1.x * 7.13 + p1.z * 3.77
-			if HashUnit(p1.x, p1.z, branchSeed) < BRANCH_CHANCE then
-				-- Branch direction: perpendicular with random angle offset
-				local side = (Hash(p1.x, p1.z, branchSeed + 1) > 0) and 1 or -1
-				local angle = BRANCH_ANGLE_MIN + HashUnit(p1.x, p1.z, branchSeed + 2) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN)
-				local bAngle = math.atan2(dz, dx) + side * angle
-				local bLen = BRANCH_LEN_MIN + HashUnit(p1.x, p1.z, branchSeed + 3) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN)
-				local bx2 = p1.x + cos(bAngle) * bLen
-				local bz2 = p1.z + sin(bAngle) * bLen
-				local bw = w * BRANCH_WIDTH
+	-- Step 2: DFS routing — at each node, trunk continues toward heaviest child
+	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch)
+		local path = NoisyPath(x1, z1, x2, z2, widthStart * NOISE_AMP, seed)
+		for pi = 1, #path - 1 do
+			local p1 = path[pi]
+			local p2 = path[pi + 1]
+			local t = (pi - 1) / max(1, #path - 2)
+			local w = widthStart + t * (widthEnd - widthStart)
+			allSegments[#allSegments + 1] = {
+				x1 = p1.x, z1 = p1.z, x2 = p2.x, z2 = p2.z,
+				width = w, capacity = capacity, isBranch = isBranch,
+			}
 
-				-- Noisy branch path (fewer segments)
-				local bPath = NoisyPath(p1.x, p1.z, bx2, bz2, bw * 0.8, branchSeed + 10)
-				for bi = 1, #bPath - 1 do
-					local bp1 = bPath[bi]
-					local bp2 = bPath[bi + 1]
-					local bt = bi / (#bPath - 1)
-					local bwTaper = bw * (1 - bt * 0.6) -- taper to 40% at tip
+			-- Decorative side twigs (on both trunks and branches, smaller on branches)
+			if pi > 1 and pi < #path - 1 then
+				local tseed = p1.x * 7.13 + p1.z * 3.77
+				local chance = isBranch and (BRANCH_CHANCE * 0.5) or BRANCH_CHANCE
+				local lenScale = isBranch and 0.6 or 1.0
+				if HashUnit(p1.x, p1.z, tseed) < chance then
+					local dx = x2 - x1
+					local dz = z2 - z1
+					local baseAngle = atan2(dz, dx)
+					local side = (Hash(p1.x, p1.z, tseed + 1) > 0) and 1 or -1
+					local angle = baseAngle + side * (BRANCH_ANGLE_MIN + HashUnit(p1.x, p1.z, tseed + 2) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN))
+					local bLen = (BRANCH_LEN_MIN + HashUnit(p1.x, p1.z, tseed + 3) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN)) * lenScale
+					local bx2 = p1.x + cos(angle) * bLen
+					local bz2 = p1.z + sin(angle) * bLen
+					local bw = w * BRANCH_WIDTH * (isBranch and 0.6 or 1.0)
 
-					segments[#segments + 1] = {
-						x1 = bp1.x, z1 = bp1.z, x2 = bp2.x, z2 = bp2.z,
-						width = bwTaper, capacity = capacity * 0.3, isBranch = true,
-					}
-
-					-- Sub-twigs
-					if bi > 1 and bi < #bPath - 1 and HashUnit(bp1.x, bp1.z, branchSeed + 20 + bi) < TWIG_CHANCE then
-						local tSide = (Hash(bp1.x, bp1.z, branchSeed + 30 + bi) > 0) and 1 or -1
-						local tAngle = bAngle + tSide * (0.3 + HashUnit(bp1.x, bp1.z, branchSeed + 40 + bi) * 0.8)
-						local tLen = TWIG_LEN_MIN + HashUnit(bp1.x, bp1.z, branchSeed + 50 + bi) * (TWIG_LEN_MAX - TWIG_LEN_MIN)
-						local tx2 = bp1.x + cos(tAngle) * tLen
-						local tz2 = bp1.z + sin(tAngle) * tLen
-						local tw = bwTaper * TWIG_WIDTH
-
-						segments[#segments + 1] = {
-							x1 = bp1.x, z1 = bp1.z, x2 = tx2, z2 = tz2,
-							width = tw, capacity = capacity * 0.1, isBranch = true,
+					local twigPath = NoisyPath(p1.x, p1.z, bx2, bz2, bw * 0.6, tseed + 10)
+					for ti = 1, #twigPath - 1 do
+						local tp1 = twigPath[ti]
+						local tp2 = twigPath[ti + 1]
+						local tt = ti / max(1, #twigPath - 1)
+						allSegments[#allSegments + 1] = {
+							x1 = tp1.x, z1 = tp1.z, x2 = tp2.x, z2 = tp2.z,
+							width = bw * (1 - tt * 0.7),
+							capacity = capacity * 0.1, isBranch = true,
 						}
 					end
 				end
@@ -837,7 +864,183 @@ local function GenerateOrganicEdge(ex1, ez1, ex2, ez2, capacity)
 		end
 	end
 
-	return segments
+	-- Normalize angle to [-pi, pi]
+	local function normalizeAngle(a)
+		while a > PI do a = a - PI * 2 end
+		while a < -PI do a = a + PI * 2 end
+		return a
+	end
+
+	-- Cluster children by direction. Children within MERGE_ANGLE share a stem.
+	local MERGE_ANGLE = 0.8 -- ~45 degrees
+	local STEM_FRACTION = 0.35 -- shared stem = 35% of min child distance
+
+	local function clusterByDirection(pos, children)
+		-- Compute angle to each child
+		for i = 1, #children do
+			local cpos = nodePos[children[i].key]
+			if cpos then
+				children[i].angle = atan2(cpos.z - pos.z, cpos.x - pos.x)
+				children[i].dist = sqrt((cpos.x - pos.x)^2 + (cpos.z - pos.z)^2)
+			end
+		end
+
+		-- Sort by angle
+		table.sort(children, function(a, b) return (a.angle or 0) < (b.angle or 0) end)
+
+		-- Greedy clustering: consecutive children within MERGE_ANGLE
+		local clusters = {}
+		local current = { children[1] }
+		for i = 2, #children do
+			local diff = abs(normalizeAngle(children[i].angle - children[i-1].angle))
+			if diff < MERGE_ANGLE then
+				current[#current + 1] = children[i]
+			else
+				clusters[#clusters + 1] = current
+				current = { children[i] }
+			end
+		end
+		clusters[#clusters + 1] = current
+
+		-- Also check wrap-around (first and last might be close)
+		if #clusters > 1 then
+			local first = clusters[1]
+			local last = clusters[#clusters]
+			local diff = abs(normalizeAngle(first[1].angle - last[#last].angle))
+			if diff < MERGE_ANGLE then
+				-- Merge last into first
+				for i = 1, #last do
+					first[#first + 1] = last[i]
+				end
+				clusters[#clusters] = nil
+			end
+		end
+
+		return clusters
+	end
+
+	local function routeNode(pk, incomingAngle)
+		local pos = nodePos[pk]
+		if not pos then return end
+		local children = nodeChildren[pk]
+		if not children or #children == 0 then return end
+
+		-- Total capacity
+		local totalCap = 0
+		for i = 1, #children do totalCap = totalCap + children[i].cap end
+		local trunkW = GetTrunkWidth(totalCap)
+
+		-- Single child: just route directly
+		if #children == 1 then
+			local child = children[1]
+			local cpos = nodePos[child.key]
+			if cpos then
+				emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z,
+					trunkW, GetTrunkWidth(child.cap), totalCap,
+					pos.x + pos.z, false)
+				routeNode(child.key, atan2(cpos.z - pos.z, cpos.x - pos.x))
+			end
+			return
+		end
+
+		-- Multiple children: cluster by direction and route with shared stems
+		local clusters = clusterByDirection(pos, children)
+
+		for ci = 1, #clusters do
+			local cluster = clusters[ci]
+
+			if #cluster == 1 then
+				-- Solo child in this direction: branch directly
+				local child = cluster[1]
+				local cpos = nodePos[child.key]
+				if cpos then
+					local branchW = GetTrunkWidth(child.cap)
+					emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z,
+						min(branchW * 1.3, trunkW * 0.7), branchW * 0.8,
+						child.cap, pos.x * 3.7 + pos.z * 1.3 + ci, #clusters > 1)
+					routeNode(child.key, child.angle or 0)
+				end
+			else
+				-- Multiple children in similar direction: shared stem then split
+				-- Circular mean for angle (handles wraparound correctly)
+				local avgCos = 0
+				local avgSin = 0
+				local clusterCap = 0
+				local minDist = math.huge
+				for i = 1, #cluster do
+					local a = cluster[i].angle or 0
+					avgCos = avgCos + cos(a)
+					avgSin = avgSin + sin(a)
+					clusterCap = clusterCap + cluster[i].cap
+					if cluster[i].dist and cluster[i].dist < minDist then
+						minDist = cluster[i].dist
+					end
+				end
+				local avgAngle = atan2(avgSin, avgCos)
+				local stemLen = min(minDist * STEM_FRACTION, 120)
+
+				-- Shared stem from node in average direction
+				local stemX = pos.x + cos(avgAngle) * stemLen
+				local stemZ = pos.z + sin(avgAngle) * stemLen
+				local stemW = GetTrunkWidth(clusterCap)
+
+				emitNoisyPath(pos.x, pos.z, stemX, stemZ,
+					stemW, stemW * 0.9, clusterCap,
+					pos.x + pos.z + ci * 7.3, false)
+
+				-- From stem tip, individual branches to each child
+				-- Sort cluster by capacity for nice ordering
+				table.sort(cluster, function(a, b) return a.cap > b.cap end)
+
+				for i = 1, #cluster do
+					local child = cluster[i]
+					local cpos = nodePos[child.key]
+					if cpos then
+						local branchW = GetTrunkWidth(child.cap)
+						local startW = min(branchW * 1.2, stemW * 0.6)
+						emitNoisyPath(stemX, stemZ, cpos.x, cpos.z,
+							startW, branchW * 0.7, child.cap,
+							stemX * 2.1 + stemZ * 5.3 + i, i > 1)
+						routeNode(child.key, atan2(cpos.z - stemZ, cpos.x - stemX))
+					end
+				end
+			end
+		end
+	end
+
+	-- Step 3: Route from each root
+	for pk, _ in pairs(roots) do
+		local pos = nodePos[pk]
+		if pos then
+			-- Add root pad
+			local children = nodeChildren[pk]
+			local totalCap = 0
+			if children then
+				for i = 1, #children do totalCap = totalCap + children[i].cap end
+			end
+			local w = GetTrunkWidth(max(1, totalCap))
+			local pkey = posKey(pos.x, pos.z)
+			if not padSet[pkey] then
+				padSet[pkey] = true
+				allPads[#allPads + 1] = { cx = pos.x, cz = pos.z, radius = w * 1.5 }
+			end
+
+			routeNode(pk, 0)
+		end
+	end
+
+	-- Add pads at all leaf nodes
+	for pk, pos in pairs(nodePos) do
+		if not nodeChildren[pk] or #nodeChildren[pk] == 0 then
+			local pkey = posKey(pos.x, pos.z)
+			if not padSet[pkey] then
+				padSet[pkey] = true
+				allPads[#allPads + 1] = { cx = pos.x, cz = pos.z, radius = GetTrunkWidth(1) * 1.2 }
+			end
+		end
+	end
+
+	return allSegments, allPads
 end
 
 -------------------------------------------------------------------------------------
@@ -903,43 +1106,8 @@ function gadget:DrawGenesis()
 		spSetMapSquareTexture(sq.sx, sq.sz, "")
 	end
 
-	-- Generate organic tree segments from all edges
-	local allSegments = {}
-	local allPads = {}
-	local padSet = {}
-
-	for i = 1, #renderEdges do
-		local e = renderEdges[i]
-		if e.length > 0 then
-			local frac = min(1, e.progress / e.length)
-			if frac > 0.01 then
-				local ex = e.px + frac * (e.cx - e.px)
-				local ez = e.pz + frac * (e.cz - e.pz)
-				local cap = max(1, e.capacity)
-
-				-- Generate organic noisy path with branches
-				local segs = GenerateOrganicEdge(e.px, e.pz, ex, ez, cap)
-				for j = 1, #segs do
-					allSegments[#allSegments + 1] = segs[j]
-				end
-
-				-- Pads at endpoints
-				local w = GetTrunkWidth(cap)
-				local pkey = floor(e.px) .. "," .. floor(e.pz)
-				if not padSet[pkey] then
-					padSet[pkey] = true
-					allPads[#allPads + 1] = { cx = e.px, cz = e.pz, radius = w * 1.5 }
-				end
-				if frac >= 0.99 then
-					local ckey = floor(e.cx) .. "," .. floor(e.cz)
-					if not padSet[ckey] then
-						padSet[ckey] = true
-						allPads[#allPads + 1] = { cx = e.cx, cz = e.cz, radius = w * 1.2 }
-					end
-				end
-			end
-		end
-	end
+	-- Generate organic tree from all edges (tree-level routing with merging)
+	local allSegments, allPads = GenerateOrganicTree(renderEdges)
 
 	if #allSegments == 0 then
 		needsRedraw = false
