@@ -164,7 +164,7 @@ options = {
 
 
 local function PlaySound(filename, ...)
-	local path = filename..".WAV"
+	local path = filename..".wav"
 	if (VFS.FileExists(path)) then
 		Spring.PlaySoundFile(path, ...)
 	else
