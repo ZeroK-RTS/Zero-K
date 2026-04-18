@@ -9,6 +9,7 @@ unitDef.objectName = [[pw_hq_small.s3o]]
 unitDef.iconType = [[pw_assault_small]]
 unitDef.footprintX = 5
 unitDef.footprintZ = 5
+unitDef.yardMap = string.rep('o', 5*5)
 unitDef.collisionVolumeOffsets = [[0 0 0]]
 unitDef.collisionVolumeScales  = [[75 110 75]]
 unitDef.collisionVolumeType    = [[ellipsoid]]
