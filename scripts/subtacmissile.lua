@@ -64,7 +64,7 @@ function script.EndBurst()
 	     actually spawned so the Turn would ruin the spawnpoint, up to
 	     clipping it into other units or seaside cliffs. ]]
 	Hide (missile)
-	Turn (missile, x_axis, 0)
+	Turn (missile, x_axis, 0, math.rad(90))
 
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 	Turn (door1, z_axis, 0, math.rad(80)*slowMult)
