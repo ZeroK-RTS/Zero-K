@@ -18,6 +18,8 @@ if not (modoption == "1") then
 	return
 end
 
+GG.ATT_ENABLE_DAMAGE = true
+
 local autoAiTech = Spring.GetModOptions().aiusetechk ~= "0"
 
 --------------------------------------------------------------------------------
@@ -145,6 +147,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+    local level = unitLevel[unitID] or 1
+    local storage_scaling = math.pow(9/4, level - 1), -- Effective 3x
+    local unitDef = UnitDefs[unitDefID]
+
+    if unitDef.metalStorage then
+        Spring.SetUnitStorage(unitID, "m", storage_scaling * unitDef.metalStorage)
+    end
+    if unitDef.energyStorage then
+        Spring.SetUnitStorage(unitID, "e", storage_scaling * unitDef.energyStorage)
+    end
+end
+
 local function SetUnitTechLevel(unitID, level)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if not unitDefID then
@@ -153,7 +168,7 @@ local function SetUnitTechLevel(unitID, level)
 	--Spring.Utilities.UnitEcho(unitID, level)
 	
 	local sizeScale = math.pow(1.6, math.pow(level, 0.45) - 1)
-	local projectiles = math.pow(2, level - 1)
+	-- local projectiles = math.pow(2, level - 1)
 	local range = math.pow(1.1, level - 1)
 	
 	if level > 1 then
@@ -166,7 +181,8 @@ local function SetUnitTechLevel(unitID, level)
 	
 	local simpleDoubling = math.pow(2, level - 1)
 	GG.Attributes.AddEffect(unitID, "tech", {
-		projectiles = projectiles,
+		-- projectiles = projectiles,
+		damage = simpleDoubling,
 		--move =  math.pow(0.95, level - 1),
 		range = range,
 		jumpRange = range,
