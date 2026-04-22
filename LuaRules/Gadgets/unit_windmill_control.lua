@@ -246,7 +246,6 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("WindMin",windMin)
 	Spring.SetGameRulesParam("WindMax",windMax)
 	Spring.SetGameRulesParam("WindHeading", 0)
-	Spring.SetGameRulesParam("WindStrength", 0)
 	Spring.SetGameRulesParam("tidalHeight", TIDAL_HEIGHT)
 
 	local minWindMult = 1
