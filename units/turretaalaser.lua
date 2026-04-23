@@ -33,7 +33,7 @@ return { turretaalaser = {
   metalCost                     = 280,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[aapopup.s3o]],
+  objectName                    = [[aapopup.dae]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
   sfxtypes                      = {
