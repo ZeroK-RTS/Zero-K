@@ -1028,9 +1028,11 @@ local cableVSSrc = [[
 #extension GL_ARB_shading_language_420pack: require
 
 layout (location = 0) in vec3 vertPos;
-layout (location = 1) in vec3 vertData;   // capacity, isBranch, width
-layout (location = 2) in vec2 vertUV;     // u = along cable, v = -1..+1 across
-layout (location = 3) in vec2 vertPerp;   // cross-section direction (nx, nz) in XZ plane
+layout (location = 1) in vec3 vertData;
+layout (location = 2) in vec2 vertUV;
+layout (location = 3) in vec2 vertPerp;
+
+uniform sampler2D heightmapTex;
 
 out DataVS {
 	vec3 worldPos;
@@ -1043,14 +1045,28 @@ out DataVS {
 
 //__ENGINEUNIFORMBUFFERDEFS__
 
+vec2 inverseMapSize = 1.0 / mapSize.xy;
+
+float heightAtWorldPos(vec2 w) {
+	const vec2 heightmaptexel = vec2(8.0, 8.0);
+	w += vec2(-8.0, -8.0) * (w * inverseMapSize) + vec2(4.0, 4.0);
+	vec2 uvhm = clamp(w, heightmaptexel, mapSize.xy - heightmaptexel);
+	uvhm = uvhm * inverseMapSize;
+	return textureLod(heightmapTex, uvhm, 0.0).x;
+}
+
 void main() {
-	worldPos = vertPos;
+	// Resample current ground height (so cables track terraform in real time)
+	vec3 pos = vertPos;
+	pos.y = heightAtWorldPos(vertPos.xz) + 2.0;
+
+	worldPos = pos;
 	capacity = vertData.x;
 	isBranch = vertData.y;
 	width = vertData.z;
 	cableUV = vertUV;
 	perp = vertPerp;
-	gl_Position = cameraViewProj * vec4(vertPos, 1.0);
+	gl_Position = cameraViewProj * vec4(pos, 1.0);
 }
 ]]
 
@@ -1248,15 +1264,17 @@ function gadget:DrawWorldPreUnit()
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds())
 
 	gl.Texture(0, "$info")
+	gl.Texture(1, "$heightmap")
 	gl.Culling(false)
-	gl.DepthTest(GL.LEQUAL)   -- don't draw below terrain
-	gl.DepthMask(true)         -- write to depth buffer (units below won't render over us)
-	gl.Blending(false)         -- fully opaque like lava
+	gl.DepthTest(GL.LEQUAL)
+	gl.DepthMask(true)
+	gl.Blending(false)
 
 	cableVAO:DrawArrays(GL.TRIANGLES, numCableVerts)
 
 	cableShader:Deactivate()
 	gl.Texture(0, false)
+	gl.Texture(1, false)
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 	gl.Culling(GL.BACK)
@@ -1291,6 +1309,7 @@ function gadget:Initialize()
 		fragment = fsSrc,
 		uniformInt = {
 			infoTex = 0,
+			heightmapTex = 1,
 		},
 		uniformFloat = {
 			gameTime = 0,
