@@ -635,8 +635,8 @@ VFS.Include(luaShaderDir .. "instancevbotable.lua")
 -- Config
 -------------------------------------------------------------------------------------
 
-local MIN_TRUNK_WIDTH  = 4
-local MAX_TRUNK_WIDTH  = 20
+local MIN_TRUNK_WIDTH  = 3
+local MAX_TRUNK_WIDTH  = 12
 local MAX_CAPACITY_REF = 100
 
 local SEG_LENGTH       = 10    -- shorter = smoother curves
@@ -1114,13 +1114,42 @@ void main() {
 	float surfN = hash(worldPos.xz * 0.5) * 0.04;
 	baseColor += vec3(surfN);
 
-	// Apply lighting
-	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
-
-	// LOS-aware dimming
+	// LOS state (needed first for animation gating)
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
+	float fullLOS = smoothstep(0.7, 1.0, losState);
+
+	// Apply lighting
+	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
+
+	// Traveling energy pulses along the cable
+	// cableUV.x = distance along cable in elmos
+	float along = cableUV.x;
+	float pulseSpeed = 180.0;   // elmos/second
+	float pulsePeriod = 500.0;  // elmos between pulses (spacing)
+	float pulseWidth = 35.0;    // elmos (pulse extent)
+
+	// Phase offset per cable branch (derived from perp direction so each cable differs)
+	float phaseOffset = (perp.x * 17.3 + perp.y * 31.7) * 100.0;
+
+	// Shift "along" backwards over time so pulses travel forward (+u direction)
+	float shifted = along - gameTime * pulseSpeed + phaseOffset;
+	float pulsePos = mod(shifted, pulsePeriod);
+
+	// Gaussian falloff — bright bright pulse center, fades to edges
+	float pulseIntensity = exp(-pulsePos * pulsePos / (pulseWidth * pulseWidth));
+
+	// Second staggered pulse for richer pattern
+	float shifted2 = along - gameTime * pulseSpeed * 0.7 + phaseOffset * 1.5 + pulsePeriod * 0.4;
+	float pulsePos2 = mod(shifted2, pulsePeriod);
+	pulseIntensity += exp(-pulsePos2 * pulsePos2 / (pulseWidth * pulseWidth)) * 0.6;
+
+	// Pulse color: bright white-green core, more intense at cable center (innerMix)
+	vec3 pulseColor = vec3(0.7, 1.0, 0.6);
+	color += pulseColor * pulseIntensity * innerMix * fullLOS * 0.9;
+
+	// LOS-aware dimming
 	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
 	color *= dimFactor;
 
