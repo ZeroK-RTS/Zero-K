@@ -722,9 +722,10 @@ local function normalizeAngle(a)
 	return a
 end
 
--- Build all cable geometry from renderEdges, return flat vertex array.
--- Paths are converted to smooth triangle strips with averaged normals at junctions.
-local function BuildCableVertices()
+-- Build organic tree geometry from renderEdges.
+-- Returns two lists: segments {{x1,z1,x2,z2,width,capacity,isBranch}, ...}
+-- and pads {{cx,cz,radius}, ...} for FBO rendering.
+local function GenerateOrganicTree()
 	if #renderEdges == 0 then return {}, 0 end
 
 	-- Each path = { points = { {x,z}, ... }, widths = { w, ... }, capacity, isBranch }
@@ -909,9 +910,8 @@ local function BuildCableVertices()
 
 	for pk, _ in pairs(roots) do routeNode(pk) end
 
-	-- Convert paths to smooth triangle strips.
-	-- At each waypoint, compute perpendicular averaged from incoming+outgoing directions.
-	-- Each pair of consecutive waypoints forms a quad (2 triangles, 6 verts).
+	-- Convert paths to triangle strip vertices (smooth ribbons with averaged normals)
+	-- Format per vertex: x, y, z, capacity, isBranch, width, u, v
 	local verts = {}
 	local vertCount = 0
 
@@ -923,176 +923,95 @@ local function BuildCableVertices()
 		local branch = path.isBranch
 
 		if #pts >= 2 then
+			-- Averaged perpendicular at each waypoint
+			local perps = {}
+			for i = 1, #pts do
+				local px, pz = 0, 0
+				if i > 1 then
+					local dx = pts[i].x - pts[i-1].x
+					local dz = pts[i].z - pts[i-1].z
+					local len = sqrt(dx*dx + dz*dz)
+					if len > 0.01 then px = px + (-dz/len); pz = pz + (dx/len) end
+				end
+				if i < #pts then
+					local dx = pts[i+1].x - pts[i].x
+					local dz = pts[i+1].z - pts[i].z
+					local len = sqrt(dx*dx + dz*dz)
+					if len > 0.01 then px = px + (-dz/len); pz = pz + (dx/len) end
+				end
+				local plen = sqrt(px*px + pz*pz)
+				if plen > 0.01 then
+					perps[i] = { nx = px/plen, nz = pz/plen }
+				else
+					perps[i] = { nx = 0, nz = 1 }
+				end
+			end
 
-		-- Compute averaged perpendicular at each waypoint
-		local perps = {} -- { {nx, nz}, ... } perpendicular directions at each point
-		for i = 1, #pts do
-			local px, pz = 0, 0
-			if i > 1 then
+			-- Cumulative U distance
+			local uDist = { [1] = 0 }
+			for i = 2, #pts do
 				local dx = pts[i].x - pts[i-1].x
 				local dz = pts[i].z - pts[i-1].z
-				local len = sqrt(dx*dx + dz*dz)
-				if len > 0.01 then
-					px = px + (-dz/len)
-					pz = pz + ( dx/len)
-				end
+				uDist[i] = uDist[i-1] + sqrt(dx*dx + dz*dz)
 			end
-			if i < #pts then
-				local dx = pts[i+1].x - pts[i].x
-				local dz = pts[i+1].z - pts[i].z
-				local len = sqrt(dx*dx + dz*dz)
-				if len > 0.01 then
-					px = px + (-dz/len)
-					pz = pz + ( dx/len)
-				end
-			end
-			local plen = sqrt(px*px + pz*pz)
-			if plen > 0.01 then
-				perps[i] = { nx = px/plen, nz = pz/plen }
-			else
-				perps[i] = { nx = 0, nz = 1 }
-			end
-		end
 
-		-- Cumulative distance along path
-		local uDist = {}
-		uDist[1] = 0
-		for i = 2, #pts do
-			local dx = pts[i].x - pts[i-1].x
-			local dz = pts[i].z - pts[i-1].z
-			uDist[i] = uDist[i-1] + sqrt(dx*dx + dz*dz)
-		end
-
-		-- Generate N separate cable strands, each as its own ribbon
-		-- at different heights and lateral offsets
-		local numStrands = branch == 1 and 2 or (2 + floor(min(1, cap / MAX_CAPACITY_REF) * 2))
-		local strandRadius = max(2, (wds[1] or 5) * 0.25) -- each strand is ~25% of total width
-
-		for strand = 1, numStrands do
-			local strandSeed = strand * 17.3 + 5.7
-			-- Hash for deterministic strand color ID
-			local colorID = floor(Hash(strandSeed, 0, 0) * 2 + 2) -- 0..3 mapped
-
+			-- Left/right vertices at each waypoint
+			local lefts = {}
+			local rights = {}
 			for i = 1, #pts do
-				local w = wds[i] or wds[#wds] or 5
+				local hw = (wds[i] or 5) * 0.55
 				local p = perps[i]
-				local baseY = spGetGroundHeight(pts[i].x, pts[i].z)
-
-				-- Lateral offset: smooth weave across the bundle width
-				local uScaled = (uDist[i] or 0) * 0.012
-				local lateralBase = (strand - (numStrands + 1) * 0.5) * (w * 0.3 / numStrands)
-				local lateralNoise = (Hash(uScaled * (0.8 + strand * 0.3), strandSeed, strandSeed) * 0.5 +
-				                      Hash(uScaled * 0.4 + 3.0, strandSeed + 7, strandSeed) * 0.3) * w * 0.3
-				local lateralOffset = lateralBase + lateralNoise
-
-				-- Height offset: cables stack vertically, with noise
-				local heightBase = (strand - 1) * strandRadius * 1.2
-				local heightNoise = Hash(uScaled * 0.6, strandSeed + 13, strandSeed) * strandRadius * 0.8
-				local heightOffset = heightBase + heightNoise + 1.5
-
-				-- Position: center point offset laterally and vertically
-				local cx = pts[i].x + p.nx * lateralOffset
-				local cz = pts[i].z + p.nz * lateralOffset
-				local cy = baseY + heightOffset
-
-				-- Left/right edges of this strand
-				local sr = strandRadius * 0.55
-				pts[i]["sL" .. strand] = { x = cx - p.nx * sr, y = cy, z = cz - p.nz * sr }
-				pts[i]["sR" .. strand] = { x = cx + p.nx * sr, y = cy, z = cz + p.nz * sr }
+				local y = spGetGroundHeight(pts[i].x, pts[i].z) + 2
+				lefts[i]  = { x = pts[i].x - p.nx * hw, y = y, z = pts[i].z - p.nz * hw }
+				rights[i] = { x = pts[i].x + p.nx * hw, y = y, z = pts[i].z + p.nz * hw }
 			end
 
-			-- Emit triangles for this strand
+			local brVal = branch == 1 and 1 or 0
+
 			for i = 1, #pts - 1 do
-				local L1 = pts[i]["sL" .. strand]
-				local R1 = pts[i]["sR" .. strand]
-				local L2 = pts[i+1]["sL" .. strand]
-				local R2 = pts[i+1]["sR" .. strand]
+				local L1, R1, L2, R2 = lefts[i], rights[i], lefts[i+1], rights[i+1]
 				local u1, u2 = uDist[i], uDist[i+1]
-				local br = branch == 1 and 1 or 0
+				local w1, w2 = wds[i] or 5, wds[i+1] or 5
 
-				-- Tri 1
+				-- Tri 1: L1, R1, R2
 				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
-				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
-				verts[#verts+1]=u1;   verts[#verts+1]=-1
+				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
+				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
-				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
-				verts[#verts+1]=u1;   verts[#verts+1]=1
+				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
+				verts[#verts+1]=u1; verts[#verts+1]=1
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
-				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
-				verts[#verts+1]=u2;   verts[#verts+1]=1
+				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
+				verts[#verts+1]=u2; verts[#verts+1]=1
 
-				-- Tri 2
+				-- Tri 2: L1, R2, L2
 				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
-				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
-				verts[#verts+1]=u1;   verts[#verts+1]=-1
+				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
+				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
-				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
-				verts[#verts+1]=u2;   verts[#verts+1]=1
+				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
+				verts[#verts+1]=u2; verts[#verts+1]=1
 				verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
-				verts[#verts+1]=cap;  verts[#verts+1]=br + colorID * 0.1; verts[#verts+1]=strandRadius * 2
-				verts[#verts+1]=u2;   verts[#verts+1]=-1
+				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
+				verts[#verts+1]=u2; verts[#verts+1]=-1
 
 				vertCount = vertCount + 6
 			end
 		end
-
-		end -- if #pts >= 2
 	end
 
 	return verts, vertCount
 end
 
--------------------------------------------------------------------------------------
--- Shader sources
--------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
--- Snapshot shader: renders cables flat (top-down) into the snapshot texture.
--- Only updates pixels in LOS. Uses $info to mask.
+-- Deferred G-buffer rendering via DrawGroundDeferred.
+-- Outputs normals + albedo to MRT targets; engine applies lighting/shadows/fog.
 -------------------------------------------------------------------------------------
 
-local snapVSSrc = [[
-#version 420
-#extension GL_ARB_uniform_buffer_object : require
-#extension GL_ARB_shading_language_420pack: require
-
-layout (location = 0) in vec3 vertPos;
-layout (location = 1) in vec3 vertData;
-layout (location = 2) in vec2 vertUV;
-
-uniform vec2 mapDims;
-
-out float vCapacity;
-out float vIsBranch;
-
-void main() {
-	vCapacity = vertData.x;
-	vIsBranch = vertData.y;
-	vec2 ndc = (vertPos.xz / mapDims) * 2.0 - 1.0;
-	gl_Position = vec4(ndc, 0.0, 1.0);
-}
-]]
-
-local snapFSSrc = [[
-#version 330
-
-in float vCapacity;
-in float vIsBranch;
-
-out vec4 fragColor;
-
-void main() {
-	float capT = clamp(vCapacity / 100.0, 0.0, 1.0);
-	// Electric blue for snapshot (static, no animation)
-	vec3 color = mix(vec3(0.15, 0.2, 0.5), vec3(0.4, 0.6, 1.0), capT);
-	if (vIsBranch > 0.5) color *= 0.5;
-	fragColor = vec4(color, 1.0);
-}
-]]
-
--------------------------------------------------------------------------------------
--- Main 3D shader: draws live cables in LOS, samples snapshot for fog areas
--------------------------------------------------------------------------------------
+local cableShader
+local cableVAO
+local numCableVerts = 0
 
 local cableVSSrc = [[
 #version 420
@@ -1100,8 +1019,8 @@ local cableVSSrc = [[
 #extension GL_ARB_shading_language_420pack: require
 
 layout (location = 0) in vec3 vertPos;
-layout (location = 1) in vec3 vertData;
-layout (location = 2) in vec2 vertUV;   // u = along cable, v = -1(left) to +1(right)
+layout (location = 1) in vec3 vertData;   // capacity, isBranch, width
+layout (location = 2) in vec2 vertUV;     // u = along cable, v = -1..+1 across
 
 out DataVS {
 	vec3 worldPos;
@@ -1129,16 +1048,14 @@ local cableFSSrc = [[
 #extension GL_ARB_shading_language_420pack: require
 
 uniform sampler2D infoTex;
-uniform sampler2D snapshotTex;
 uniform float gameTime;
-uniform vec2 mapDims;
 
 in DataVS {
 	vec3 worldPos;
 	float capacity;
 	float isBranch;
 	float width;
-	vec2 cableUV;  // u = distance along cable (elmos), v = -1(left) to +1(right)
+	vec2 cableUV;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1149,173 +1066,58 @@ float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-float noise(vec2 p) {
-	vec2 i = floor(p);
-	vec2 f = fract(p);
-	f = f * f * (3.0 - 2.0 * f);
-	float a = hash(i);
-	float b = hash(i + vec2(1.0, 0.0));
-	float c = hash(i + vec2(0.0, 1.0));
-	float d = hash(i + vec2(1.0, 1.0));
-	return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-}
-
-float fbm(vec2 p) {
-	float val = 0.0;
-	float amp = 0.5;
-	for (int i = 0; i < 3; i++) {
-		val += amp * noise(p);
-		p *= 2.1;
-		amp *= 0.5;
-	}
-	return val;
-}
-
 void main() {
-	// LOS
+	float v = cableUV.y;
+	float t = abs(v);
+	// Hard discard at edge — no alpha fade (prevents transparency artifacts)
+	if (t > 0.90) discard;
+
+	// Fake cylinder normal (flat ribbon → round appearance)
+	float ny = sqrt(max(0.0, 1.0 - t * t));
+	float nx = v;
+	vec3 cylNormal = normalize(vec3(nx * 0.4, ny, nx * 0.4));
+
+	// Own lighting (forward rendered, no engine lighting applies)
+	float diffuse = max(0.25, dot(cylNormal, normalize(sunDir.xyz)));
+
+	// Specular
+	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
+	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
+	float spec = pow(max(0.0, dot(cylNormal, halfDir)), 24.0) * 0.35;
+
+	// Capacity-based color (green glow)
+	float capT = clamp(capacity / 100.0, 0.0, 1.0);
+	vec3 barkColor  = vec3(0.06, 0.04, 0.02);
+	vec3 innerColor = mix(vec3(0.20, 0.55, 0.15), vec3(0.50, 0.80, 0.20), capT);
+
+	float innerMix = smoothstep(0.85, 0.15, t);
+	if (isBranch > 0.5) innerMix *= 0.7;
+	vec3 baseColor = mix(barkColor, innerColor, innerMix);
+
+	// Surface noise detail
+	float surfN = hash(worldPos.xz * 0.5) * 0.04;
+	baseColor += vec3(surfN);
+
+	// Apply lighting
+	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
+
+	// LOS-aware dimming
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
-
-	vec2 snapUV = clamp(worldPos.xz / mapDims, vec2(0.0), vec2(1.0));
-	vec4 snapColor = texture(snapshotTex, snapUV);
-
-	if (losState < 0.05) {
-		if (snapColor.a < 0.1) discard;
-		fragColor = vec4(snapColor.rgb * 0.3, snapColor.a * 0.6);
-		return;
-	}
-
-	float capT = clamp(capacity / 100.0, 0.0, 1.0);
-	float fullLOS = smoothstep(0.3, 0.8, losState);
-
-	// v = -1 to +1 across this individual strand ribbon
-	float v = cableUV.y; // -1 left edge, +1 right edge
-	float t = abs(v);     // 0 at center, 1 at edge
-
-	// Cylinder normal: round cross-section
-	// The strand ribbon is flat, but we fake a round normal
-	float ny = sqrt(max(0.0, 1.0 - t * t)); // hemisphere: 1 at center, 0 at edge
-	float nx = v;                             // sideways: -1 left, +1 right
-	vec3 cylNormal = normalize(vec3(nx * 0.5, ny, nx * 0.5));
-
-	// Sun diffuse lighting
-	float diffuse = max(0.15, dot(cylNormal, normalize(sunDir.xyz)));
-
-	// Specular (Blinn-Phong)
-	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
-	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
-	float spec = pow(max(0.0, dot(cylNormal, halfDir)), 40.0) * 0.45;
-
-	// Per-strand color from isBranch field (encodes colorID * 0.1 + branch flag)
-	float colorID = floor(fract(isBranch) * 10.0 + 0.5);
-	vec3 baseColor;
-	if (colorID < 1.0)      baseColor = vec3(0.32, 0.20, 0.07); // brown
-	else if (colorID < 2.0) baseColor = vec3(0.14, 0.28, 0.09); // dark green
-	else if (colorID < 3.0) baseColor = vec3(0.38, 0.26, 0.11); // copper
-	else                    baseColor = vec3(0.22, 0.11, 0.07); // dark red-brown
-
-	baseColor *= (1.0 + capT * 0.3);
-
-	// Final lit color
-	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.88) * spec;
-
-	// Subtle surface texture noise
-	float surfNoise = hash(worldPos.xz * 0.5) * 0.06;
-	color += vec3(surfNoise * 0.5, surfNoise * 0.3, surfNoise * 0.1);
-
-	// Soft edge fade (anti-alias at strand border)
-	float edgeFade = smoothstep(1.0, 0.8, t);
-
-	// Dim in radar
-	float dimFactor = mix(0.3, 1.0, fullLOS);
+	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
 	color *= dimFactor;
 
-	fragColor = vec4(color, edgeFade * 0.95);
+	// FULLY OPAQUE output — like lava. No alpha blending.
+	fragColor = vec4(color, 1.0);
 }
 ]]
-
--------------------------------------------------------------------------------------
--- Drawing
--------------------------------------------------------------------------------------
-
-function gadget:DrawWorldPreUnit()
-	if not cableShader or numCableVerts == 0 or not cableVAO then return end
-
-	-- Update snapshot texture if needed (must happen in a draw callin)
-	if needsSnapshotUpdate and snapshotTex and snapshotShader then
-		gl.RenderToTexture(snapshotTex, function()
-			gl.Clear(GL.COLOR_BUFFER_BIT, 0, 0, 0, 0)
-			snapshotShader:Activate()
-			snapshotShader:SetUniform("mapDims", MAP_WIDTH, MAP_HEIGHT)
-			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-			cableVAO:DrawArrays(GL.TRIANGLES, numCableVerts)
-			snapshotShader:Deactivate()
-		end)
-		needsSnapshotUpdate = false
-	end
-
-	-- Draw live 3D cables
-	cableShader:Activate()
-	cableShader:SetUniform("gameTime", Spring.GetGameSeconds())
-	cableShader:SetUniform("mapDims", MAP_WIDTH, MAP_HEIGHT)
-
-	gl.Texture(0, "$info")
-	if snapshotTex then
-		gl.Texture(1, snapshotTex)
-	end
-	gl.DepthTest(GL.LEQUAL)
-	gl.DepthMask(false)
-	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-
-	cableVAO:DrawArrays(GL.TRIANGLES, numCableVerts)
-
-	cableShader:Deactivate()
-	gl.Texture(0, false)
-	gl.Texture(1, false)
-	gl.DepthTest(false)
-end
-
--------------------------------------------------------------------------------------
--- VBO rebuild
--------------------------------------------------------------------------------------
-
-local function RebuildVBO()
-	local verts, vertCount = BuildCableVertices()
-	if vertCount == 0 then
-		numCableVerts = 0
-		needsRebuild = false
-		return
-	end
-
-	-- Rebuild VBO/VAO
-	cableVAO = nil
-
-	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
-	if not vbo then return end
-
-	vbo:Define(vertCount, {
-		{ id = 0, name = "vertPos",  size = 3 },
-		{ id = 1, name = "vertData", size = 3 },
-		{ id = 2, name = "vertUV",   size = 2 },
-	})
-	vbo:Upload(verts)
-
-	cableVAO = gl.GetVAO()
-	if cableVAO then
-		cableVAO:AttachVertexBuffer(vbo)
-	end
-
-	numCableVerts = vertCount
-
-	needsSnapshotUpdate = true
-	needsRebuild = false
-end
 
 -------------------------------------------------------------------------------------
 -- Receive data from synced
 -------------------------------------------------------------------------------------
 
+local updateCount = 0
 local function OnCableTreeUpdate()
 	local data = SYNCED.CableTreeData
 	if not data then return end
@@ -1327,6 +1129,11 @@ local function OnCableTreeUpdate()
 	if not (spec or fullview) and allyTeamID ~= myAllyTeam then return end
 	if lastVersions[allyTeamID] and data.version == lastVersions[allyTeamID] then return end
 	lastVersions[allyTeamID] = data.version
+
+	updateCount = updateCount + 1
+	if updateCount <= 3 then
+		Spring.Echo("[CableTree][U] OnCableTreeUpdate #" .. updateCount .. " ally=" .. allyTeamID .. " edges=" .. (data.edgeCount or 0))
+	end
 
 	local edges = {}
 	local count = data.edgeCount or 0
@@ -1351,7 +1158,35 @@ local function OnCableTreeUpdate()
 end
 
 -------------------------------------------------------------------------------------
--- Lifecycle
+-- VBO rebuild
+-------------------------------------------------------------------------------------
+
+local function RebuildVBO()
+	local verts, vertCount = GenerateOrganicTree()
+	Spring.Echo("[CableTree][U] RebuildVBO edges=" .. #renderEdges .. " verts=" .. vertCount)
+	if vertCount == 0 then
+		numCableVerts = 0
+		needsRebuild = false
+		return
+	end
+
+	cableVAO = nil
+	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
+	if not vbo then return end
+	vbo:Define(vertCount, {
+		{ id = 0, name = "vertPos",  size = 3 },
+		{ id = 1, name = "vertData", size = 3 },
+		{ id = 2, name = "vertUV",   size = 2 },
+	})
+	vbo:Upload(verts)
+	cableVAO = gl.GetVAO()
+	if cableVAO then cableVAO:AttachVertexBuffer(vbo) end
+	numCableVerts = vertCount
+	needsRebuild = false
+end
+
+-------------------------------------------------------------------------------------
+-- Drawing via DrawGroundDeferred (G-buffer MRT output)
 -------------------------------------------------------------------------------------
 
 function gadget:GameFrame(n)
@@ -1360,43 +1195,47 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:DrawWorldPreUnit()
+	if not cableVAO or numCableVerts == 0 or not cableShader then return end
+
+	cableShader:Activate()
+	cableShader:SetUniform("gameTime", Spring.GetGameSeconds())
+
+	gl.Texture(0, "$info")
+	gl.Culling(false)
+	gl.DepthTest(GL.LEQUAL)   -- don't draw below terrain
+	gl.DepthMask(true)         -- write to depth buffer (units below won't render over us)
+	gl.Blending(false)         -- fully opaque like lava
+
+	cableVAO:DrawArrays(GL.TRIANGLES, numCableVerts)
+
+	cableShader:Deactivate()
+	gl.Texture(0, false)
+	gl.DepthTest(false)
+	gl.DepthMask(false)
+	gl.Culling(GL.BACK)
+end
+
+-------------------------------------------------------------------------------------
+-- Lifecycle
+-------------------------------------------------------------------------------------
+
 function gadget:Initialize()
-	if not gl.CreateShader or not gl.GetVBO or not gl.GetVAO or not gl.RenderToTexture then
-		Spring.Echo("[CableTree] Missing GL support, disabling")
+	Spring.Echo("[CableTree][Unsynced] Initialize called")
+	local deferredEvents = Spring.GetConfigInt("AllowDrawMapDeferredEvents", -1)
+	local deferredMap = Spring.GetConfigInt("AllowDeferredMapRendering", -1)
+	Spring.Echo("[CableTree][Unsynced] AllowDrawMapDeferredEvents = " .. tostring(deferredEvents))
+	Spring.Echo("[CableTree][Unsynced] AllowDeferredMapRendering = " .. tostring(deferredMap))
+	if deferredEvents ~= 1 then
+		Spring.Echo("[CableTree][Unsynced] Setting AllowDrawMapDeferredEvents=1 (takes effect on next engine restart!)")
+		Spring.SetConfigInt("AllowDrawMapDeferredEvents", 1)
+	end
+	if not gl.CreateShader or not gl.GetVBO or not gl.GetVAO then
+		Spring.Echo("[CableTree][Unsynced] Missing GL support, disabling")
 		gadgetHandler:RemoveGadget()
 		return
 	end
 
-	-- Create snapshot texture (map-sized, reduced resolution)
-	snapshotW = floor(MAP_WIDTH / SNAPSHOT_SCALE)
-	snapshotH = floor(MAP_HEIGHT / SNAPSHOT_SCALE)
-	snapshotTex = gl.CreateTexture(snapshotW, snapshotH, {
-		fbo = true,
-		min_filter = GL.LINEAR,
-		mag_filter = GL.LINEAR,
-		wrap_s = GL.CLAMP_TO_EDGE,
-		wrap_t = GL.CLAMP_TO_EDGE,
-	})
-	if not snapshotTex then
-		Spring.Echo("[CableTree] Failed to create snapshot texture")
-	end
-
-	-- Compile snapshot shader (flat 2D projection)
-	snapshotShader = LuaShader({
-		vertex = snapVSSrc,
-		fragment = snapFSSrc,
-		uniformFloat = {
-			mapDims = 0,
-		},
-	}, "Cable Snapshot Shader")
-
-	local snapCompiled = snapshotShader:Initialize()
-	if not snapCompiled then
-		Spring.Echo("[CableTree] Snapshot shader failed to compile")
-		snapshotShader = nil
-	end
-
-	-- Compile main 3D cable shader
 	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()
 	local vsSrc = cableVSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	local fsSrc = cableFSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
@@ -1406,34 +1245,23 @@ function gadget:Initialize()
 		fragment = fsSrc,
 		uniformInt = {
 			infoTex = 0,
-			snapshotTex = 1,
 		},
 		uniformFloat = {
 			gameTime = 0,
-			mapDims = 0,
 		},
-	}, "Cable Tree Shader")
+	}, "Cable Forward Shader")
 
-	local compiled = cableShader:Initialize()
-	if not compiled then
-		Spring.Echo("[CableTree] Shader compilation failed")
+	if not cableShader:Initialize() then
+		Spring.Echo("[CableTree][Unsynced] Shader compile failed")
 		gadgetHandler:RemoveGadget()
 		return
 	end
-
+	Spring.Echo("[CableTree][Unsynced] Shader OK, ready for DrawGroundDeferred")
 	gadgetHandler:AddSyncAction("CableTreeUpdate", OnCableTreeUpdate)
 end
 
 function gadget:Shutdown()
-	if cableShader then
-		cableShader:Finalize()
-	end
-	if snapshotShader then
-		snapshotShader:Finalize()
-	end
-	if snapshotTex then
-		gl.DeleteTextureFBO(snapshotTex)
-	end
+	if cableShader then cableShader:Finalize() end
 	cableVAO = nil
 	gadgetHandler:RemoveSyncAction("CableTreeUpdate")
 end
