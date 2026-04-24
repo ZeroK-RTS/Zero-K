@@ -972,28 +972,37 @@ local function GenerateOrganicTree()
 				local L1, R1, L2, R2 = lefts[i], rights[i], lefts[i+1], rights[i+1]
 				local u1, u2 = uDist[i], uDist[i+1]
 				local w1, w2 = wds[i] or 5, wds[i+1] or 5
+				-- Perpendicular (cross-section direction) at each waypoint
+				local p1x, p1z = perps[i].nx, perps[i].nz
+				local p2x, p2z = perps[i+1].nx, perps[i+1].nz
 
 				-- Tri 1: L1, R1, R2
 				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=-1
+				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=1
+				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
+				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 
 				-- Tri 2: L1, R2, L2
 				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=-1
+				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
+				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 				verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=-1
+				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 
 				vertCount = vertCount + 6
 			end
@@ -1021,6 +1030,7 @@ local cableVSSrc = [[
 layout (location = 0) in vec3 vertPos;
 layout (location = 1) in vec3 vertData;   // capacity, isBranch, width
 layout (location = 2) in vec2 vertUV;     // u = along cable, v = -1..+1 across
+layout (location = 3) in vec2 vertPerp;   // cross-section direction (nx, nz) in XZ plane
 
 out DataVS {
 	vec3 worldPos;
@@ -1028,6 +1038,7 @@ out DataVS {
 	float isBranch;
 	float width;
 	vec2 cableUV;
+	vec2 perp;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1038,6 +1049,7 @@ void main() {
 	isBranch = vertData.y;
 	width = vertData.z;
 	cableUV = vertUV;
+	perp = vertPerp;
 	gl_Position = cameraViewProj * vec4(vertPos, 1.0);
 }
 ]]
@@ -1056,6 +1068,7 @@ in DataVS {
 	float isBranch;
 	float width;
 	vec2 cableUV;
+	vec2 perp;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1069,13 +1082,16 @@ float hash(vec2 p) {
 void main() {
 	float v = cableUV.y;
 	float t = abs(v);
-	// Hard discard at edge — no alpha fade (prevents transparency artifacts)
 	if (t > 0.90) discard;
 
-	// Fake cylinder normal (flat ribbon → round appearance)
-	float ny = sqrt(max(0.0, 1.0 - t * t));
-	float nx = v;
-	vec3 cylNormal = normalize(vec3(nx * 0.4, ny, nx * 0.4));
+	// Proper cylinder cross-section normal.
+	// perp is the cross-section direction in world XZ (perpendicular to cable tangent).
+	// At v=0 (cable center), normal points up (+Y).
+	// At v=±1 (edges), normal points along perp × sign(v).
+	// Interpolate via cylinder equation: up*sqrt(1-v²) + side*v
+	vec3 perp3D = normalize(vec3(perp.x, 0.0, perp.y));
+	float up = sqrt(max(0.0, 1.0 - v * v));
+	vec3 cylNormal = normalize(vec3(0.0, up, 0.0) + perp3D * v);
 
 	// Own lighting (forward rendered, no engine lighting applies)
 	float diffuse = max(0.25, dot(cylNormal, normalize(sunDir.xyz)));
@@ -1174,9 +1190,10 @@ local function RebuildVBO()
 	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	if not vbo then return end
 	vbo:Define(vertCount, {
-		{ id = 0, name = "vertPos",  size = 3 },
-		{ id = 1, name = "vertData", size = 3 },
-		{ id = 2, name = "vertUV",   size = 2 },
+		{ id = 0, name = "vertPos",   size = 3 },
+		{ id = 1, name = "vertData",  size = 3 },
+		{ id = 2, name = "vertUV",    size = 2 },
+		{ id = 3, name = "vertPerp",  size = 2 },
 	})
 	vbo:Upload(verts)
 	cableVAO = gl.GetVAO()
