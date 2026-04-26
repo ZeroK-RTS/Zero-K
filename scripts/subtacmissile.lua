@@ -64,6 +64,9 @@ function script.EndBurst()
 	     actually spawned so the Turn would ruin the spawnpoint, up to
 	     clipping it into other units or seaside cliffs. ]]
 	Hide (missile)
+
+	-- the turnrate is a dummy value needed to interrupt other ongoing turns,
+	-- without it an ongoing Turn from Aim() will immediately make it erect again
 	Turn (missile, x_axis, 0, math.rad(90))
 
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
