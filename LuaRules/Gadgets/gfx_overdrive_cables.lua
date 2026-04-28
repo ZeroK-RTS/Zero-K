@@ -291,75 +291,73 @@ local function BuildGridMST(allyTeamID, gridID)
 end
 
 -------------------------------------------------------------------------------------
--- Grid sync: detect gridNumber changes, rebuild only affected grids
+-- Grid sync: snapshot every pylon's current gridNumber, rebuild every grid in
+-- the snapshot, diff resulting edge set against `edges` so survivors keep
+-- their stable identity (and unsynced animation state) while drops/adds flip
+-- topologyDirty. Stateless w.r.t. previous gridIDs — robust against gridID
+-- reuse, merges, splits, and rules-param resets we can't observe.
 -------------------------------------------------------------------------------------
 
--- Per-grid desired edges
-local desiredByGrid = {} -- [gridKey] = { [edgeKey] = info }
-
 local function SyncWithGrid()
-	-- Detect which grids changed
-	local changedGrids = {} -- [gridKey] = { allyTeamID, gridID }
-
+	-- Drop dead units. lastGridNum is now only used as a fast change-skip
+	-- hint (so we don't re-read rules-params if nothing moved); it does NOT
+	-- gate inclusion in BuildGridMST any more.
 	for allyTeamID, allyNodes in pairs(nodes) do
-		-- Clean up dead units first
-		local toRemove = {}
+		local toRemove
 		for unitID, _ in pairs(allyNodes) do
 			if not spValidUnitID(unitID) then
+				toRemove = toRemove or {}
 				toRemove[#toRemove + 1] = unitID
 			end
 		end
-		for i = 1, #toRemove do
-			local uid = toRemove[i]
-			local oldGrid = lastGridNum[uid] or 0
-			if oldGrid > 0 then
-				changedGrids[GridKey(allyTeamID, oldGrid)] = { allyTeamID = allyTeamID, gridID = oldGrid }
-			end
-			allyNodes[uid] = nil
-			lastGridNum[uid] = nil
-			allyOfUnit[uid] = nil
-		end
-
-		-- Check living units for grid changes. Inactive units (in-build, EMP'd,
-		-- disarmed, morphing) are treated as gridless so they're excluded from
-		-- the MST; the active->inactive transition naturally rebuilds the grid.
-		for unitID, _ in pairs(allyNodes) do
-			local gridID = (IsActiveForGrid(unitID) and (spGetUnitRulesParam(unitID, "gridNumber") or 0)) or 0
-			local oldGrid = lastGridNum[unitID] or 0
-			if gridID ~= oldGrid then
-				lastGridNum[unitID] = gridID
-				if oldGrid > 0 then
-					changedGrids[GridKey(allyTeamID, oldGrid)] = { allyTeamID = allyTeamID, gridID = oldGrid }
-				end
-				if gridID > 0 then
-					changedGrids[GridKey(allyTeamID, gridID)] = { allyTeamID = allyTeamID, gridID = gridID }
-				end
+		if toRemove then
+			for i = 1, #toRemove do
+				local uid = toRemove[i]
+				allyNodes[uid] = nil
+				lastGridNum[uid] = nil
+				allyOfUnit[uid] = nil
 			end
 		end
 	end
 
-	-- Rebuild only changed grids. Diff old vs new MST so unchanged edges
-	-- are preserved (no spurious add/remove churn).
-	for gk, info in pairs(changedGrids) do
-		local oldDesired = desiredByGrid[gk] or {}
-		local newDesired = BuildGridMST(info.allyTeamID, info.gridID)
-		desiredByGrid[gk] = newDesired
-
-		for ek in pairs(oldDesired) do
-			if not newDesired[ek] and edges[ek] then
-				edges[ek] = nil
-				topologyDirty = true
+	-- Refresh lastGridNum from rules-params, group all live pylons by current
+	-- (allyTeamID, gridID). Inactive pylons (under construction, EMP'd, etc.)
+	-- map to gridID 0 and are excluded from the MST.
+	local gridsToBuild = {} -- [gridKey] = { allyTeamID, gridID }
+	for allyTeamID, allyNodes in pairs(nodes) do
+		for unitID, _ in pairs(allyNodes) do
+			local gridID = (IsActiveForGrid(unitID) and (spGetUnitRulesParam(unitID, "gridNumber") or 0)) or 0
+			lastGridNum[unitID] = gridID
+			if gridID > 0 then
+				gridsToBuild[GridKey(allyTeamID, gridID)] = { allyTeamID = allyTeamID, gridID = gridID }
 			end
 		end
+	end
 
-		for ek, einfo in pairs(newDesired) do
-			if not edges[ek] then
-				edges[ek] = {
-					parentID = einfo.parentID, childID = einfo.childID,
-					px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
-				}
-				topologyDirty = true
-			end
+	-- Build the desired edge set from scratch.
+	local newEdges = {}
+	for _, info in pairs(gridsToBuild) do
+		local mst = BuildGridMST(info.allyTeamID, info.gridID)
+		for ek, einfo in pairs(mst) do
+			newEdges[ek] = einfo
+		end
+	end
+
+	-- Diff: drop missing, add new. Survivors keep their entry (and their
+	-- ComputeMaxPotentials reorientation) untouched.
+	for ek, _ in pairs(edges) do
+		if not newEdges[ek] then
+			edges[ek] = nil
+			topologyDirty = true
+		end
+	end
+	for ek, einfo in pairs(newEdges) do
+		if not edges[ek] then
+			edges[ek] = {
+				parentID = einfo.parentID, childID = einfo.childID,
+				px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
+			}
+			topologyDirty = true
 		end
 	end
 end
@@ -793,9 +791,10 @@ local function GenerateOrganicTree()
 	local allPaths = {}
 
 	local nodePos = {}
-	local nodeChildren = {}
-	local nodeParent = {}
-	local roots = {}
+	-- Undirected adjacency: every edge contributes one entry to each endpoint.
+	-- `side` is 1 for parent end, 2 for child end (used so each edge ends up
+	-- with one attach point on each side after clustering).
+	local nodeNeighbors = {}
 
 	local function posKey(x, z)
 		return floor(x) .. ":" .. floor(z)
@@ -807,16 +806,17 @@ local function GenerateOrganicTree()
 		local ck = posKey(e.cx, e.cz)
 		nodePos[pk] = { x = e.px, z = e.pz }
 		nodePos[ck] = { x = e.cx, z = e.cz }
-		if not nodeChildren[pk] then nodeChildren[pk] = {} end
-		nodeChildren[pk][#nodeChildren[pk] + 1] = {
-			key = ck, cap = max(1, e.capacity),
+		nodeNeighbors[pk] = nodeNeighbors[pk] or {}
+		nodeNeighbors[ck] = nodeNeighbors[ck] or {}
+		local cap = max(1, e.capacity)
+		nodeNeighbors[pk][#nodeNeighbors[pk] + 1] = {
+			nKey = ck, edgeIdx = i, side = 1, cap = cap,
 			appearFrame = e.appearFrame, witherFrame = e.witherFrame,
 		}
-		nodeParent[ck] = pk
-	end
-
-	for pk, _ in pairs(nodePos) do
-		if not nodeParent[pk] then roots[pk] = true end
+		nodeNeighbors[ck][#nodeNeighbors[ck] + 1] = {
+			nKey = pk, edgeIdx = i, side = 2, cap = cap,
+			appearFrame = e.appearFrame, witherFrame = e.witherFrame,
+		}
 	end
 
 	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch, appearFrame, witherFrame)
@@ -874,26 +874,20 @@ local function GenerateOrganicTree()
 		end
 	end
 
-	local function clusterByDirection(pos, children)
-		for i = 1, #children do
-			local cpos = nodePos[children[i].key]
-			if cpos then
-				children[i].angle = atan2(cpos.z - pos.z, cpos.x - pos.x)
-				children[i].dist = sqrt((cpos.x - pos.x)^2 + (cpos.z - pos.z)^2)
-			end
-		end
-		table.sort(children, function(a, b) return (a.angle or 0) < (b.angle or 0) end)
-		local clusters = {}
-		local current = { children[1] }
-		for i = 2, #children do
-			if abs(normalizeAngle(children[i].angle - children[i-1].angle)) < MERGE_ANGLE then
-				current[#current + 1] = children[i]
+	-- Generic angle clustering: groups items whose angles are within MERGE_ANGLE
+	-- of an immediate neighbour (after sorting). Handles wrap-around.
+	local function clusterByAngle(items)
+		if #items == 0 then return {} end
+		table.sort(items, function(a, b) return (a.angle or 0) < (b.angle or 0) end)
+		local clusters = { { items[1] } }
+		for i = 2, #items do
+			local cur = clusters[#clusters]
+			if abs(normalizeAngle(items[i].angle - items[i-1].angle)) < MERGE_ANGLE then
+				cur[#cur + 1] = items[i]
 			else
-				clusters[#clusters + 1] = current
-				current = { children[i] }
+				clusters[#clusters + 1] = { items[i] }
 			end
 		end
-		clusters[#clusters + 1] = current
 		if #clusters > 1 then
 			local first, last = clusters[1], clusters[#clusters]
 			if abs(normalizeAngle(first[1].angle - last[#last].angle)) < MERGE_ANGLE then
@@ -904,53 +898,43 @@ local function GenerateOrganicTree()
 		return clusters
 	end
 
-	local function routeNode(pk)
-		local pos = nodePos[pk]
-		if not pos then return end
-		local children = nodeChildren[pk]
-		if not children or #children == 0 then return end
-
-		local totalCap = 0
-		for i = 1, #children do totalCap = totalCap + children[i].cap end
-		local trunkW = GetTrunkWidth(totalCap)
-
-		if #children == 1 then
-			local child = children[1]
-			local cpos = nodePos[child.key]
-			if cpos then
-				emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, trunkW, GetTrunkWidth(child.cap), totalCap, pos.x + pos.z, false, child.appearFrame, child.witherFrame)
-				routeNode(child.key)
+	-- For each node, cluster all incident half-edges by direction. A cluster
+	-- of >=2 emits a stem cable from the node along the cluster's average
+	-- direction; every edge in that cluster gets the stem-end as its attach
+	-- point on this side. Singletons attach directly at the node.
+	local edgeAttach = {}  -- [edgeIdx][side] = {x, z, hasStem, stemW}
+	for nk, nbrs in pairs(nodeNeighbors) do
+		local pos = nodePos[nk]
+		for i = 1, #nbrs do
+			local n = nbrs[i]
+			local npos = nodePos[n.nKey]
+			if npos then
+				n.angle = atan2(npos.z - pos.z, npos.x - pos.x)
+				n.dist = sqrt((npos.x - pos.x)^2 + (npos.z - pos.z)^2)
 			end
-			return
 		end
-
-		local clusters = clusterByDirection(pos, children)
+		local clusters = clusterByAngle(nbrs)
 		for ci = 1, #clusters do
 			local cluster = clusters[ci]
 			if #cluster == 1 then
-				local child = cluster[1]
-				local cpos = nodePos[child.key]
-				if cpos then
-					local bw = GetTrunkWidth(child.cap)
-					emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, min(bw * 1.3, trunkW * 0.7), bw * 0.8, child.cap, pos.x * 3.7 + pos.z * 1.3 + ci, #clusters > 1, child.appearFrame, child.witherFrame)
-					routeNode(child.key)
-				end
+				local n = cluster[1]
+				edgeAttach[n.edgeIdx] = edgeAttach[n.edgeIdx] or {}
+				edgeAttach[n.edgeIdx][n.side] = { x = pos.x, z = pos.z, hasStem = false }
 			else
 				local avgCos, avgSin, clusterCap, minDist = 0, 0, 0, math.huge
-				-- Stem frames: appear with the earliest child; wither only if all children withering
 				local stemAppear = math.huge
 				local stemWither = -math.huge
 				local allWither = true
 				for i = 1, #cluster do
-					local a = cluster[i].angle or 0
-					avgCos = avgCos + cos(a)
-					avgSin = avgSin + sin(a)
-					clusterCap = clusterCap + cluster[i].cap
-					if cluster[i].dist and cluster[i].dist < minDist then minDist = cluster[i].dist end
-					local af = cluster[i].appearFrame or 0
+					local n = cluster[i]
+					avgCos = avgCos + cos(n.angle)
+					avgSin = avgSin + sin(n.angle)
+					clusterCap = clusterCap + n.cap
+					if n.dist and n.dist < minDist then minDist = n.dist end
+					local af = n.appearFrame or 0
 					if af < stemAppear then stemAppear = af end
-					if cluster[i].witherFrame then
-						if cluster[i].witherFrame > stemWither then stemWither = cluster[i].witherFrame end
+					if n.witherFrame then
+						if n.witherFrame > stemWither then stemWither = n.witherFrame end
 					else
 						allWither = false
 					end
@@ -959,25 +943,48 @@ local function GenerateOrganicTree()
 				local stemWitherFinal = (allWither and stemWither > -math.huge) and stemWither or nil
 				local avgAngle = atan2(avgSin, avgCos)
 				local stemLen = min(minDist * STEM_FRACTION, 120)
+				if stemLen < 4 then stemLen = 4 end
 				local stemX = pos.x + cos(avgAngle) * stemLen
 				local stemZ = pos.z + sin(avgAngle) * stemLen
 				local stemW = GetTrunkWidth(clusterCap)
-				emitNoisyPath(pos.x, pos.z, stemX, stemZ, stemW, stemW * 0.9, clusterCap, pos.x + pos.z + ci * 7.3, false, stemAppear, stemWitherFinal)
-				table.sort(cluster, function(a, b) return a.cap > b.cap end)
+
+				-- Emit the stem itself.
+				emitNoisyPath(pos.x, pos.z, stemX, stemZ,
+					stemW, stemW * 0.9, clusterCap,
+					pos.x + pos.z + ci * 7.3,
+					false, stemAppear, stemWitherFinal)
+
 				for i = 1, #cluster do
-					local child = cluster[i]
-					local cpos = nodePos[child.key]
-					if cpos then
-						local bw = GetTrunkWidth(child.cap)
-						emitNoisyPath(stemX, stemZ, cpos.x, cpos.z, min(bw * 1.2, stemW * 0.6), bw * 0.7, child.cap, stemX * 2.1 + stemZ * 5.3 + i, i > 1, child.appearFrame, child.witherFrame)
-						routeNode(child.key)
-					end
+					local n = cluster[i]
+					edgeAttach[n.edgeIdx] = edgeAttach[n.edgeIdx] or {}
+					edgeAttach[n.edgeIdx][n.side] = {
+						x = stemX, z = stemZ, hasStem = true, stemW = stemW,
+					}
 				end
 			end
 		end
 	end
 
-	for pk, _ in pairs(roots) do routeNode(pk) end
+	-- Emit each edge once between its two attach points. Width: an end that
+	-- attaches at a stem is sized to dock cleanly into that stem (a fraction
+	-- of stem width); an end at a bare node uses the edge's own trunk width.
+	for i = 1, #renderEdges do
+		local e = renderEdges[i]
+		local attach = edgeAttach[i]
+		if attach and attach[1] and attach[2] then
+			local cap = max(1, e.capacity)
+			local edgeW = GetTrunkWidth(cap)
+			local function endWidth(a)
+				if a.hasStem then return min(edgeW * 1.2, a.stemW * 0.55) end
+				return edgeW
+			end
+			local startW = endWidth(attach[1])
+			local endW   = endWidth(attach[2])
+			emitNoisyPath(attach[1].x, attach[1].z, attach[2].x, attach[2].z,
+				startW, endW, cap, attach[1].x + attach[1].z + i * 1.3,
+				false, e.appearFrame, e.witherFrame)
+		end
+	end
 
 	-- Convert paths to triangle strip vertices (smooth ribbons with averaged normals)
 	-- Format per vertex: x, y, z, capacity, isBranch, width, u, v
