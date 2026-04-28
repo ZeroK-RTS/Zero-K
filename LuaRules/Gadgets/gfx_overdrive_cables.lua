@@ -89,6 +89,9 @@ end
 -- All tracked pylons per allyTeam: nodes[allyTeamID][unitID] = {x, z, range, unitDefID}
 local nodes = {}
 
+-- Reverse index: unitID -> allyTeamID, for O(1) edge->ally lookup during send
+local allyOfUnit = {}
+
 -- Edges: edges[edgeKey] = {parentID, childID, px, pz, cx, cz, length, progress, withering, gridKey}
 local edges = {}
 
@@ -97,7 +100,6 @@ local desiredEdges = {}
 
 -- Change detection
 local lastGridNum = {} -- [unitID] = gridNumber
-local lastGridMembers = {} -- [gridKey] = { [unitID]=true } — who was in each grid last time
 local structureChanged = true
 
 local treeVersion = 0
@@ -300,6 +302,7 @@ local function SyncWithGrid()
 			end
 			allyNodes[uid] = nil
 			lastGridNum[uid] = nil
+			allyOfUnit[uid] = nil
 		end
 
 		-- Check living units for grid changes
@@ -467,17 +470,9 @@ local function SendToUnsyncedAll()
 	-- Build per-allyTeam edge lists (so unsynced only sees own team's cables)
 	local perAlly = {} -- [allyTeamID] = { edgeCount, parentXs, ... }
 
-	-- Figure out which allyTeam each edge belongs to by checking parentID
 	for key, edge in pairs(edges) do
 		if edge.progress > 0 then
-			-- Find allyTeam of this edge's parent
-			local atID
-			for allyTeamID, allyNodes in pairs(nodes) do
-				if allyNodes[edge.parentID] or allyNodes[edge.childID] then
-					atID = allyTeamID
-					break
-				end
-			end
+			local atID = allyOfUnit[edge.parentID] or allyOfUnit[edge.childID]
 			if atID then
 				if not perAlly[atID] then
 					perAlly[atID] = {
@@ -551,6 +546,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		range = pylonDefs[unitDefID],
 		unitDefID = unitDefID,
 	}
+	allyOfUnit[unitID] = allyTeamID
 	structureChanged = true
 end
 
@@ -571,6 +567,7 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 		-- Remove from old allyTeam, add to new
 		if nodes[oldAlly] then nodes[oldAlly][unitID] = nil end
 		lastGridNum[unitID] = nil
+		allyOfUnit[unitID] = nil
 		if nodes[newAlly] then
 			local x, _, z = spGetUnitPosition(unitID)
 			nodes[newAlly][unitID] = {
@@ -578,6 +575,7 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 				range = pylonDefs[unitDefID],
 				unitDefID = unitDefID,
 			}
+			allyOfUnit[unitID] = newAlly
 		end
 		structureChanged = true
 	end
@@ -595,6 +593,7 @@ function gadget:Initialize()
 				range = pylonDefs[unitDefID],
 				unitDefID = unitDefID,
 			}
+			allyOfUnit[unitID] = allyTeamID
 		end
 	end
 end
@@ -660,15 +659,9 @@ local edgesByAllyTeam = {}
 local lastVersions = {}
 local needsRebuild = false
 
-local cableShader       -- 3D shader for live cables + snapshot sampling
+local cableShader       -- forward shader for cable rendering
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
-
-local snapshotTex       -- persistent 2D texture (top-down map projection)
-local snapshotShader    -- simple shader to render cables to snapshot
-local SNAPSHOT_SCALE = 4 -- snapshot pixels per elmo (4 = quarter resolution)
-local snapshotW, snapshotH
-local needsSnapshotUpdate = false
 
 -------------------------------------------------------------------------------------
 -- Deterministic noise
@@ -1014,13 +1007,11 @@ end
 
 
 -------------------------------------------------------------------------------------
--- Deferred G-buffer rendering via DrawGroundDeferred.
--- Outputs normals + albedo to MRT targets; engine applies lighting/shadows/fog.
+-- Forward cable rendering via DrawWorldPreUnit.
+-- Vertex shader resamples heightmap each frame so cables follow terraform.
+-- Fragment shader does its own diffuse+specular lighting on a synthesized
+-- cylinder normal, plus traveling energy pulses gated by LOS ($info).
 -------------------------------------------------------------------------------------
-
-local cableShader
-local cableVAO
-local numCableVerts = 0
 
 local cableVSSrc = [[
 #version 420
@@ -1178,7 +1169,6 @@ void main() {
 -- Receive data from synced
 -------------------------------------------------------------------------------------
 
-local updateCount = 0
 local function OnCableTreeUpdate()
 	local data = SYNCED.CableTreeData
 	if not data then return end
@@ -1190,11 +1180,6 @@ local function OnCableTreeUpdate()
 	if not (spec or fullview) and allyTeamID ~= myAllyTeam then return end
 	if lastVersions[allyTeamID] and data.version == lastVersions[allyTeamID] then return end
 	lastVersions[allyTeamID] = data.version
-
-	updateCount = updateCount + 1
-	if updateCount <= 3 then
-		Spring.Echo("[CableTree][U] OnCableTreeUpdate #" .. updateCount .. " ally=" .. allyTeamID .. " edges=" .. (data.edgeCount or 0))
-	end
 
 	local edges = {}
 	local count = data.edgeCount or 0
@@ -1224,7 +1209,6 @@ end
 
 local function RebuildVBO()
 	local verts, vertCount = GenerateOrganicTree()
-	Spring.Echo("[CableTree][U] RebuildVBO edges=" .. #renderEdges .. " verts=" .. vertCount)
 	if vertCount == 0 then
 		numCableVerts = 0
 		needsRebuild = false
@@ -1248,7 +1232,7 @@ local function RebuildVBO()
 end
 
 -------------------------------------------------------------------------------------
--- Drawing via DrawGroundDeferred (G-buffer MRT output)
+-- Drawing via DrawWorldPreUnit (forward, opaque)
 -------------------------------------------------------------------------------------
 
 function gadget:GameFrame(n)
@@ -1285,17 +1269,7 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:Initialize()
-	Spring.Echo("[CableTree][Unsynced] Initialize called")
-	local deferredEvents = Spring.GetConfigInt("AllowDrawMapDeferredEvents", -1)
-	local deferredMap = Spring.GetConfigInt("AllowDeferredMapRendering", -1)
-	Spring.Echo("[CableTree][Unsynced] AllowDrawMapDeferredEvents = " .. tostring(deferredEvents))
-	Spring.Echo("[CableTree][Unsynced] AllowDeferredMapRendering = " .. tostring(deferredMap))
-	if deferredEvents ~= 1 then
-		Spring.Echo("[CableTree][Unsynced] Setting AllowDrawMapDeferredEvents=1 (takes effect on next engine restart!)")
-		Spring.SetConfigInt("AllowDrawMapDeferredEvents", 1)
-	end
 	if not gl.CreateShader or not gl.GetVBO or not gl.GetVAO then
-		Spring.Echo("[CableTree][Unsynced] Missing GL support, disabling")
 		gadgetHandler:RemoveGadget()
 		return
 	end
@@ -1317,11 +1291,10 @@ function gadget:Initialize()
 	}, "Cable Forward Shader")
 
 	if not cableShader:Initialize() then
-		Spring.Echo("[CableTree][Unsynced] Shader compile failed")
+		Spring.Echo("[CableTree] Shader compile failed")
 		gadgetHandler:RemoveGadget()
 		return
 	end
-	Spring.Echo("[CableTree][Unsynced] Shader OK, ready for DrawGroundDeferred")
 	gadgetHandler:AddSyncAction("CableTreeUpdate", OnCableTreeUpdate)
 end
 
