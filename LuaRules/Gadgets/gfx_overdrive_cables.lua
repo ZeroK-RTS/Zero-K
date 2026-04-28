@@ -55,8 +55,19 @@ local floor = math.floor
 -- Config
 -------------------------------------------------------------------------------------
 
-local SYNC_PERIOD       = 30  -- frames between grid sync (~1/s); also send cadence
+local SYNC_PERIOD       = 30   -- frames between grid sync (~1/s); also send cadence
 local DEBUG_FLOW        = true -- echo per-edge capacity table on every Send
+-- Spanning-tree topology mode:
+--   "euclidean"  visually-pleasing layout — every pair of pylons in the same
+--                grid is a candidate edge (subject to MST_CANDIDATE_R), so
+--                co-linear chains form naturally and long-range pylons don't
+--                fan into stars. Cables may not match actual pylon-to-pylon
+--                links the engine uses internally.
+--   "realistic"  cables only between pylons whose pylon ranges actually reach
+--                each other (the engine's own connectivity graph). Faithful
+--                to physical wiring; can produce hub-fan stars and miss
+--                trunk-sharing opportunities.
+local MST_MODE          = "euclidean"
 
 -------------------------------------------------------------------------------------
 -- Unit definitions
@@ -163,11 +174,18 @@ local function GetNodeDmax(unitDefID)
 end
 
 -------------------------------------------------------------------------------------
--- Per-grid Prim's MST — only runs for grids whose membership changed.
--- O(k²) per changed grid where k = grid size (typically 10-50, trivial).
+-- Per-grid Euclidean MST — Prim's where every pair within visual reach is a
+-- candidate (no per-pylon range filter). Grid membership is whatever
+-- unit_mex_overdrive decides; once "these N pylons are one grid", we lay the
+-- shortest-total-cable spanning tree over them. This produces co-linear chains
+-- and avoids hub-fan artifacts a long-range pylon would otherwise create.
+-- The spatial hash still gates candidate pairs to a generous radius so very
+-- large grids stay sub-quadratic; cell size is set large enough that any
+-- realistic MST edge falls within a 3x3 cell neighbourhood.
 -------------------------------------------------------------------------------------
 
-local SPATIAL_CELL = 600 -- spatial hash cell size (covers max pylon range pair)
+local SPATIAL_CELL    = 2000  -- cell size; 3x3 neighbourhood covers ~4000 elmo pairs
+local MST_CANDIDATE_R = 4000  -- hard cap on candidate-pair distance (squared below)
 
 local function BuildGridMST(allyTeamID, gridID)
 	local pylons = {}
@@ -185,8 +203,8 @@ local function BuildGridMST(allyTeamID, gridID)
 	local result = {}
 	if #pylons < 2 then return result end
 
-	-- Build spatial hash for fast neighbor lookup
-	local cells = {} -- [cellKey] = { idx, idx, ... }
+	-- Spatial hash bucket pylons by cell.
+	local cells = {}
 	for i = 1, #pylons do
 		local p = pylons[i]
 		local cx = floor(p.x / SPATIAL_CELL)
@@ -196,14 +214,18 @@ local function BuildGridMST(allyTeamID, gridID)
 		cells[ck][#cells[ck] + 1] = i
 	end
 
-	-- Precompute neighbor lists (indices within range)
-	local neighbors = {} -- [idx] = { idx, idx, ... }
+	-- Neighbour list. In "euclidean" mode every pair within MST_CANDIDATE_R is
+	-- a candidate (clean visual MST). In "realistic" mode we keep the engine's
+	-- pylon-range filter (cables only where pylons can actually reach each
+	-- other) — faithful to physical wiring.
+	local rSq = MST_CANDIDATE_R * MST_CANDIDATE_R
+	local euclidean = MST_MODE == "euclidean"
+	local neighbors = {}
 	for i = 1, #pylons do
 		neighbors[i] = {}
 		local p = pylons[i]
 		local cx = floor(p.x / SPATIAL_CELL)
 		local cz = floor(p.z / SPATIAL_CELL)
-		-- Check 3x3 neighborhood of cells
 		for dcx = -1, 1 do
 			for dcz = -1, 1 do
 				local ck = (cx + dcx) * 100000 + (cz + dcz)
@@ -215,8 +237,10 @@ local function BuildGridMST(allyTeamID, gridID)
 							local o = pylons[j]
 							local dx = p.x - o.x
 							local dz = p.z - o.z
-							local cr = p.range + o.range
-							if dx * dx + dz * dz < cr * cr then
+							local distSq = dx * dx + dz * dz
+							local cap = euclidean and rSq
+								or ((p.range + o.range) * (p.range + o.range))
+							if distSq < cap then
 								neighbors[i][#neighbors[i] + 1] = j
 							end
 						end
