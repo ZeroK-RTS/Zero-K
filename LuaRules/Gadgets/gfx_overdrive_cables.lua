@@ -1401,12 +1401,15 @@ float hash1(float n) {
 // Shading: faint inner glow + Fresnel rim + small offset highlight, all with
 // smoothstep edges to avoid pixelation at oblique camera angles. Returns
 // (body, specular).
-vec2 bubbleLayer(float along, float phase, float spacing,
+// `phase` is the integrated travel distance baked + extrapolated by the
+// caller (CPU integrates ∫ speed dt, shader extrapolates the last segment
+// with the current speed). Subtracting from `along` advects bubbles smoothly
+// across speed changes.
+//
+// Returns vec3: (body, specular, halo). Caller composites all three with
+// possibly different colour weights for richer look.
+vec3 bubbleLayer(float along, float phase, float spacing,
                  float radiusMax, float v, float halfWidthE, float layerSeed) {
-	// `phase` is the integrated travel distance baked + extrapolated by the
-	// caller (CPU integrates ∫ speed dt, shader extrapolates the last
-	// segment with the current speed). Subtracting it from `along` advects
-	// the bubble field smoothly even when speed steps between frames.
 	float along2 = along - phase;
 	float idxLow  = floor(along2 / spacing);
 	float coord   = along2 - idxLow * spacing;     // [0, spacing)
@@ -1416,48 +1419,54 @@ vec2 bubbleLayer(float along, float phase, float spacing,
 	float h1 = hash1(idxNear + layerSeed);
 	float h2 = hash1(idxNear + layerSeed + 71.3);
 	// Bubble radius in elmos. Random per bubble; clamped so it sits within
-	// the cable cross-section even on thin twigs (otherwise the bubble
-	// gets clipped to a near-1D horizontal stripe).
-	float radiusE = radiusMax * (0.65 + 0.35 * h1);
-	radiusE = min(radiusE, halfWidthE * 0.95);
-	if (radiusE < 0.5) return vec2(0.0);
+	// the cable cross-section even on thin twigs.
+	float radiusE = radiusMax * (0.7 + 0.3 * h1);
+	radiusE = min(radiusE, halfWidthE * 0.97);
+	if (radiusE < 0.5) return vec3(0.0);
 
 	// Cross-axis offset: in elmos, only as much margin as the cable can
 	// afford. Skinny cables → bubble centred; chunky cables → bubble can
 	// drift a little off-axis.
 	float crossMargin = max(0.0, halfWidthE - radiusE);
-	float yOffsetE    = (h2 - 0.5) * crossMargin * 1.2;
+	float yOffsetE    = (h2 - 0.5) * crossMargin * 1.0;
 
 	float dCrossE = v * halfWidthE - yOffsetE;
-	float r2 = (dAlong * dAlong + dCrossE * dCrossE) / (radiusE * radiusE);
-	if (r2 >= 1.0) return vec2(0.0);
-	float r = sqrt(r2);
+	// Use the wider "halo radius" for the early-exit so the halo, which
+	// extends past r=1, isn't truncated.
+	float haloR = radiusE * 1.5;
+	float r2H = (dAlong * dAlong + dCrossE * dCrossE) / (haloR * haloR);
+	if (r2H >= 1.0) return vec3(0.0);
 
+	float r2 = (dAlong * dAlong + dCrossE * dCrossE) / (radiusE * radiusE);
+	float r  = sqrt(r2);
 	float xn = dAlong / radiusE;
 	float yn = dCrossE / radiusE;
 
-	// Anti-alias bubble edge using screen-space derivative. Without this,
-	// thick cables (where one bubble covers many pixels) showed staircase
-	// pixelation on the rim. fwidth(r) ≈ how much r changes per pixel; we
-	// soften every smoothstep edge by that amount so transitions span ~1
-	// pixel regardless of camera distance.
+	// Screen-space derivative AA. Keeps every smoothstep edge ~1 pixel wide
+	// regardless of zoom; fixes thick-cable staircase pixelation.
 	float aa = clamp(fwidth(r) * 1.4, 0.005, 0.20);
 
-	// Inner glow: faint disc for body luminosity, with AA outer cutoff.
-	float body = (1.0 - smoothstep(0.0, 1.0, r))
-	           * (1.0 - smoothstep(1.0 - aa, 1.0, r)) * 0.50;
+	// HOT CORE — Gaussian-style bright nucleus, peaks at r=0. Reads as
+	// glowing plasma rather than a flat disc.
+	float core = exp(-r2 * 4.5);
+	core *= 1.0 - smoothstep(1.0 - aa, 1.0, r);
 
-	// Fresnel-like rim brightest near r=0.82, faded both ways with AA edges.
-	float rim = smoothstep(0.50 - aa, 0.82, r)
-	          * (1.0 - smoothstep(0.82, 1.0 - aa * 0.5, r));
+	// SHARP RIM — thin meniscus highlight near r ≈ 0.85.
+	float rim = smoothstep(0.55 - aa, 0.85, r)
+	          * (1.0 - smoothstep(0.85, 1.0 - aa * 0.4, r));
+	rim *= 1.4;
 
-	// Small specular highlight offset toward the light direction.
-	vec2 hd = vec2(xn + 0.30, yn + 0.40);
+	// SPECULAR — small bright dot offset toward the light direction.
+	vec2 hd = vec2(xn + 0.32, yn + 0.42);
 	float hr = length(hd);
-	float spec = 1.0 - smoothstep(0.0, 0.30 + aa, hr);
-	spec *= spec;
+	float spec = 1.0 - smoothstep(0.0, 0.22 + aa, hr);
+	spec *= spec * spec;   // cubed → very sharp
 
-	return vec2(body + rim, spec);
+	// HALO — soft additive bloom outside the bubble's hard edge. Extends
+	// from r=0 out to r=1.5 with a gentle Gaussian falloff.
+	float halo = exp(-r2 * 0.9) * 0.45;
+
+	return vec3(core + rim, spec, halo);
 }
 
 // HSL → RGB at S=1, L=0.5 — matches LuaUI/Headers/overdrive.lua's GetGridColor
@@ -1502,14 +1511,39 @@ void main() {
 		if (along < witherFront) discard;
 	}
 
-	// Proper cylinder cross-section normal.
-	// perp is the cross-section direction in world XZ (perpendicular to cable tangent).
-	// At v=0 (cable center), normal points up (+Y).
-	// At v=±1 (edges), normal points along perp × sign(v).
-	// Interpolate via cylinder equation: up*sqrt(1-v²) + side*v
+	// Cylinder cross-section normal that respects cable slope.
+	//
+	// `perp` is the *horizontal* cross-section direction baked at the
+	// vertex. The cable's true tangent in world space (which can have a Y
+	// component when the cable climbs/descends) is reconstructed from
+	// screen-space derivatives of `cableUV.x` (= along) versus worldPos —
+	// this works because `along` is monotone along the cable and screen
+	// derivatives sample along the surface. With both vectors known, the
+	// real "up" direction relative to the cable is cross(tangent, perp);
+	// this rotates with the slope, so an uphill cable shades brightest on
+	// its actual top side instead of where a horizontal cable would.
 	vec3 perp3D = normalize(vec3(perp.x, 0.0, perp.y));
+
+	vec3 dWdx = dFdx(worldPos);
+	vec3 dWdy = dFdy(worldPos);
+	float duDx = dFdx(cableUV.x);
+	float duDy = dFdy(cableUV.x);
+	float denom = duDx * duDx + duDy * duDy;
+	vec3 cableT;
+	if (denom > 1e-6) {
+		cableT = normalize((dWdx * duDx + dWdy * duDy) / denom);
+	} else {
+		// Fallback if derivatives are degenerate (single-pixel cable, etc.):
+		// horizontal tangent perpendicular to perp.
+		cableT = normalize(vec3(perp.y, 0.0, -perp.x));
+	}
+
+	vec3 trueUp = cross(cableT, perp3D);
+	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
+	trueUp = normalize(trueUp);
+
 	float up = sqrt(max(0.0, 1.0 - v * v));
-	vec3 cylNormal = normalize(vec3(0.0, up, 0.0) + perp3D * v);
+	vec3 cylNormal = normalize(trueUp * up + perp3D * v);
 
 	// Own lighting (forward rendered, no engine lighting applies)
 	float diffuse = max(0.25, dot(cylNormal, normalize(sunDir.xyz)));
@@ -1569,19 +1603,27 @@ void main() {
 	float halfWidthE = width * 0.5;       // cable cross half-extent in elmos
 
 	// Two layers of mixed-size bubbles. Density is fixed (constant spacing);
-	// per-bubble radius jitter inside each layer gives the small/big mix
-	// the user wants. Sizes are in elmos so the bubbles are world-round.
-	vec2 bA = bubbleLayer(along, phase, 75.0, 7.5, v, halfWidthE,  3.7);
-	vec2 bB = bubbleLayer(along, phase, 32.0, 4.0, v, halfWidthE, 19.1);
+	// per-bubble radius jitter inside each layer gives the small/big mix.
+	// Each layer returns (body, spec, halo); we composite them with
+	// different colour weights so the bubble reads as glowing plasma.
+	vec3 bA = bubbleLayer(along, phase, 75.0, 7.5, v, halfWidthE,  3.7);
+	vec3 bB = bubbleLayer(along, phase, 32.0, 4.0, v, halfWidthE, 19.1);
 
 	float bubbleBody = bA.x + bB.x * 0.85;
 	float bubbleSpec = bA.y + bB.y * 0.85;
+	float bubbleHalo = bA.z + bB.z * 0.55;
 
-	// Bubble colour = grid efficiency colour; whiten the highlight for glow.
+	// Bubble colour: keep the grid efficiency hue (low dilution → punchier).
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
-	vec3 bubbleColor = mix(gridColor, vec3(1.0), 0.25);
-	color += bubbleColor * bubbleBody * fullLOS * 1.4;
-	color += vec3(1.0)   * bubbleSpec * fullLOS * 0.8;
+	vec3 bubbleColor = mix(gridColor, vec3(1.0), 0.15);
+	vec3 haloColor   = gridColor;            // pure grid-colour halo
+
+	// Halo first (soft underglow), then body (hot core/rim), then a pure-
+	// white specular pop on top. Multipliers are tuned for "energy" feel —
+	// the halo gives bloom, the core gives plasma, the spec gives sparkle.
+	color += haloColor   * bubbleHalo * fullLOS * 0.70;
+	color += bubbleColor * bubbleBody * fullLOS * 2.0;
+	color += vec3(1.0)   * bubbleSpec * fullLOS * 1.2;
 
 	// LOS-aware dimming
 	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
