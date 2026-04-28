@@ -173,6 +173,25 @@ local function GetNodeDmax(unitDefID)
 	return voltageByDef[unitDefID] or 0
 end
 
+-- Current real production: any generator publishes "current_energyIncome"
+-- (windgens, solar, fusion, singu — all set by unit_mex_overdrive each tick).
+local function GetNodePcurrent(unitID, unitDefID)
+	if not generatorDefs[unitDefID] then return 0 end
+	return spGetUnitRulesParam(unitID, "current_energyIncome") or 0
+end
+
+-- Current real draw: mexes consume "overdrive_energyDrain" (per-mex E spent
+-- on overdrive this tick). Voltage units (turrets etc.) only need the grid to
+-- *reach* their voltage — they don't continuously sink energy — so they read
+-- as zero current draw. That keeps cables to idle starlights/desolators
+-- showing zero flow even though their nameplate Dmax is high.
+local function GetNodeDcurrent(unitID, unitDefID)
+	if mexDefs[unitDefID] then
+		return spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0
+	end
+	return 0
+end
+
 -------------------------------------------------------------------------------------
 -- Per-grid Euclidean MST — Prim's where every pair within visual reach is a
 -- candidate (no per-pylon range filter). Grid membership is whatever
@@ -478,12 +497,17 @@ local function ComputeMaxPotentials()
 	end
 
 	-- Post-order traversal: subPmax/subDmax of each node's subtree (inclusive).
+	-- Same pass also accumulates subPcur/subDcur using current rules-params,
+	-- so we can derive both nameplate capacity and live flow per edge below.
 	local subPmax, subDmax = {}, {}
+	local subPcur, subDcur = {}, {}
 	for i = 1, #order do
 		local u = order[i]
 		local did = nodeUnitDefID(u)
 		subPmax[u] = did and GetNodePmax(did) or 0
 		subDmax[u] = did and GetNodeDmax(did) or 0
+		subPcur[u] = did and GetNodePcurrent(u, did) or 0
+		subDcur[u] = did and GetNodeDcurrent(u, did) or 0
 	end
 	for i = #order, 1, -1 do
 		local u = order[i]
@@ -491,13 +515,18 @@ local function ComputeMaxPotentials()
 		if pi then
 			subPmax[pi.parent] = subPmax[pi.parent] + subPmax[u]
 			subDmax[pi.parent] = subDmax[pi.parent] + subDmax[u]
+			subPcur[pi.parent] = subPcur[pi.parent] + subPcur[u]
+			subDcur[pi.parent] = subDcur[pi.parent] + subDcur[u]
 		end
 	end
 
 	-- Per edge: subtree side = the deeper node (the child in DFS rooting).
 	-- capAB = max flow subtree -> other; capBA = max flow other -> subtree.
 	-- Whichever is larger sets parent on the source side.
+	-- `flow` (current) is computed in the same direction the cable is oriented:
+	--   flow = min(srcPcur, dstDcur) on the chosen flow side.
 	local capacities = {}
+	local flows = {}
 	local debugLog = DEBUG_FLOW and {} or nil
 	local function fmtD(v) return v >= INF_DRAW * 0.5 and "INF" or string.format("%.0f", v) end
 
@@ -507,6 +536,10 @@ local function ComputeMaxPotentials()
 		-- Find root of cid's component (walk up parentInTree).
 		local r = cid
 		while parentInTree[r] do r = parentInTree[r].parent end
+
+		-- Max-potential capacity (drives cable thickness). Symmetric: pick the
+		-- larger of the two cut-flows; the one that wins also names the
+		-- "potential source" side.
 		local totalP, totalD = subPmax[r], subDmax[r]
 		local sP, sD = subPmax[cid], subDmax[cid]
 		local oP, oD = totalP - sP, totalD - sD
@@ -515,14 +548,33 @@ local function ComputeMaxPotentials()
 		local cap = (capAB > capBA) and capAB or capBA
 		capacities[key] = cap
 
-		-- Orient: parent goes on the source side of dominant flow.
+		-- Current flow: same min-cut math against *live* production / draw.
+		-- We compute both directions; the winner sets both magnitude and
+		-- direction. This matters when max-potential and current direction
+		-- disagree — e.g., a stunned fusion has Pmax > 0 but Pcurrent == 0,
+		-- so a small solar on the other side actually drives flow.
+		local totalPcur, totalDcur = subPcur[r], subDcur[r]
+		local sPc, sDc = subPcur[cid], subDcur[cid]
+		local oPc, oDc = totalPcur - sPc, totalDcur - sDc
+		local flowAB = (sPc < oDc) and sPc or oDc   -- subtree -> other
+		local flowBA = (oPc < sDc) and oPc or sDc   -- other -> subtree
+		local flow, flowSrcSubtree
+		if flowAB >= flowBA then
+			flow, flowSrcSubtree = flowAB, true
+		else
+			flow, flowSrcSubtree = flowBA, false
+		end
+		if flow < 0 then flow = 0 end
+		flows[key] = flow
+
+		-- Orient: parent goes on the *current* flow source side. When flow is
+		-- zero the orientation is arbitrary; bubbles sit still anyway, so the
+		-- direction doesn't matter visually.
 		local edge = edges[key]
 		if edge then
-			local srcSubtree = capAB > capBA
-			local newParent = srcSubtree and cid or pid
-			local newChild  = srcSubtree and pid or cid
+			local newParent = flowSrcSubtree and cid or pid
+			local newChild  = flowSrcSubtree and pid or cid
 			if edge.parentID ~= newParent then
-				-- Look up positions from `nodes` to get fresh coords.
 				local function findNode(uid)
 					for _, allyNodes in pairs(nodes) do
 						local n = allyNodes[uid]
@@ -544,9 +596,9 @@ local function ComputeMaxPotentials()
 				return d and UnitDefs[d].name or tostring(uid)
 			end
 			local e = edges[key]
-			debugLog[#debugLog + 1] = string.format("  %-13s -> %-13s  sP=%-7.1f sD=%-5s oP=%-7.1f oD=%-5s  cap=%.1f",
+			debugLog[#debugLog + 1] = string.format("  %-13s -> %-13s  sP=%-7.1f sD=%-5s oP=%-7.1f oD=%-5s  cap=%.1f flow=%.1f",
 				nameOf(e.parentID), nameOf(e.childID),
-				sP, fmtD(sD), oP, fmtD(oD), cap)
+				sP, fmtD(sD), oP, fmtD(oD), cap, flow)
 		end
 	end
 
@@ -555,7 +607,7 @@ local function ComputeMaxPotentials()
 		for i = 1, #debugLog do Spring.Echo(debugLog[i]) end
 	end
 
-	return capacities
+	return capacities, flows
 end
 
 -------------------------------------------------------------------------------------
@@ -565,16 +617,19 @@ end
 -------------------------------------------------------------------------------------
 
 local function SendAll()
-	local flows = ComputeMaxPotentials()
+	local capacities, flows = ComputeMaxPotentials()
 
 	-- Bin edges by ally, in one pass.
-	local perAlly = {}  -- [ally] = { keys, pxs, pzs, cxs, czs, caps, n }
+	local perAlly = {}
 	for key, edge in pairs(edges) do
 		local ally = allyOfUnit[edge.parentID] or allyOfUnit[edge.childID]
 		if ally then
 			local pa = perAlly[ally]
 			if not pa then
-				pa = { keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {}, caps = {}, n = 0 }
+				pa = {
+					keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
+					caps = {}, flows = {}, effs = {}, n = 0,
+				}
 				perAlly[ally] = pa
 			end
 			pa.n = pa.n + 1
@@ -582,7 +637,15 @@ local function SendAll()
 			pa.keys[i] = key
 			pa.pxs[i], pa.pzs[i] = edge.px, edge.pz
 			pa.cxs[i], pa.czs[i] = edge.cx, edge.cz
-			pa.caps[i] = flows[key] or 0
+			pa.caps[i]  = capacities[key] or 0
+			pa.flows[i] = flows[key] or 0
+			-- Grid efficiency (E/M ratio) is uniform across a grid; read it from
+			-- the parent end. Negative means "no grid" (sentinel from
+			-- unit_mex_overdrive); we forward 0 in that case → magenta in shader.
+			local eff = spGetUnitRulesParam(edge.parentID, "gridefficiency")
+				or spGetUnitRulesParam(edge.childID, "gridefficiency") or 0
+			if eff < 0 then eff = 0 end
+			pa.effs[i] = eff
 		end
 	end
 
@@ -591,7 +654,8 @@ local function SendAll()
 		_G.CableTreeFull = {
 			allyTeamID = ally, edgeCount = pa.n,
 			keys = pa.keys, pxs = pa.pxs, pzs = pa.pzs,
-			cxs = pa.cxs, czs = pa.czs, caps = pa.caps,
+			cxs = pa.cxs, czs = pa.czs,
+			caps = pa.caps, flows = pa.flows, effs = pa.effs,
 		}
 		SendToUnsynced("CableTreeFull")
 		alliesWithEdges[ally] = true
@@ -603,7 +667,8 @@ local function SendAll()
 		if not perAlly[ally] then
 			_G.CableTreeFull = {
 				allyTeamID = ally, edgeCount = 0,
-				keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {}, caps = {},
+				keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
+				caps = {}, flows = {}, effs = {},
 			}
 			SendToUnsynced("CableTreeFull")
 			alliesWithEdges[ally] = nil
@@ -618,10 +683,12 @@ end
 function gadget:GameFrame(n)
 	if n % SYNC_PERIOD == 2 then
 		SyncWithGrid()
-		if topologyDirty then
-			SendAll()
-			topologyDirty = false
-		end
+		-- Always send: flow magnitudes and grid efficiency colour change every
+		-- tick, so unsynced needs the periodic refresh even when topology is
+		-- unchanged. Diff cost on the unsynced side is cheap (key lookup +
+		-- attribute upload); geometry only re-generates when keys change.
+		SendAll()
+		topologyDirty = false
 	end
 end
 
@@ -726,7 +793,10 @@ local MAX_TRUNK_WIDTH  = 12
 local MAX_CAPACITY_REF = 100
 
 local SEG_LENGTH       = 10    -- shorter = smoother curves
-local NOISE_AMP        = 0.6
+-- Noise amplitude is in absolute elmos (not a fraction of cable width). Tying
+-- it to width made thick trunks visibly more wobbly than thin twigs, which is
+-- the opposite of the intended look (a thick trunk should read as "stable").
+local NOISE_AMP_ABS    = 1.0
 local BRANCH_CHANCE    = 0.25
 local BRANCH_LEN_MIN   = 15
 local BRANCH_LEN_MAX   = 50
@@ -784,6 +854,10 @@ local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
 	local nx = -dz / len
 	local nz =  dx / len
 	local points = {}
+	-- Cap effective amplitude by a fraction of the segment length: very short
+	-- cables shouldn't get the same wiggle as long ones.
+	local effAmp = amplitude
+	if len < 80 then effAmp = amplitude * (len / 80) end
 	for i = 0, steps do
 		local t = i / steps
 		local px = x1 + t * dx
@@ -791,7 +865,7 @@ local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
 		local noiseScale = 1
 		if t < 0.1 then noiseScale = t / 0.1
 		elseif t > 0.9 then noiseScale = (1 - t) / 0.1 end
-		local n = Hash(px * 0.1, pz * 0.1, seed) * amplitude * noiseScale
+		local n = Hash(px * 0.1, pz * 0.1, seed) * effAmp * noiseScale
 		points[#points + 1] = { x = px + nx * n, z = pz + nz * n }
 	end
 	return points
@@ -833,18 +907,20 @@ local function GenerateOrganicTree()
 		nodeNeighbors[pk] = nodeNeighbors[pk] or {}
 		nodeNeighbors[ck] = nodeNeighbors[ck] or {}
 		local cap = max(1, e.capacity)
+		local flow = e.flow or 0
+		local eff = e.eff or 0
 		nodeNeighbors[pk][#nodeNeighbors[pk] + 1] = {
-			nKey = ck, edgeIdx = i, side = 1, cap = cap,
+			nKey = ck, edgeIdx = i, side = 1, cap = cap, flow = flow, eff = eff,
 			appearFrame = e.appearFrame, witherFrame = e.witherFrame,
 		}
 		nodeNeighbors[ck][#nodeNeighbors[ck] + 1] = {
-			nKey = pk, edgeIdx = i, side = 2, cap = cap,
+			nKey = pk, edgeIdx = i, side = 2, cap = cap, flow = flow, eff = eff,
 			appearFrame = e.appearFrame, witherFrame = e.witherFrame,
 		}
 	end
 
-	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch, appearFrame, witherFrame)
-		local path = NoisyPath(x1, z1, x2, z2, widthStart * NOISE_AMP, seed)
+	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch, appearFrame, witherFrame, flow, eff)
+		local path = NoisyPath(x1, z1, x2, z2, NOISE_AMP_ABS, seed)
 		local widths = {}
 		for pi = 1, #path do
 			local t = (pi - 1) / max(1, #path - 1)
@@ -854,8 +930,11 @@ local function GenerateOrganicTree()
 			points = path, widths = widths,
 			capacity = capacity, isBranch = isBranch and 1 or 0,
 			appearFrame = appearFrame, witherFrame = witherFrame,
+			flow = flow or 0, eff = eff or 0,
 		}
-		-- Twigs: spawn from ribbon edge, not center
+		-- Twigs: spawn from ribbon edge, not center. Twigs are decorative;
+		-- they share the parent's flow/eff so pulse animation is consistent
+		-- across the visual cluster.
 		for pi = 2, #path - 1 do
 			local p1 = path[pi]
 			local w = widths[pi]
@@ -881,7 +960,7 @@ local function GenerateOrganicTree()
 				local bx2 = edgeX + cos(angle) * bLen
 				local bz2 = edgeZ + sin(angle) * bLen
 				local bw = w * BRANCH_WIDTH * (isBranch and 0.6 or 1.0)
-				local twigPts = NoisyPath(edgeX, edgeZ, bx2, bz2, bw * 0.6, tseed + 10)
+				local twigPts = NoisyPath(edgeX, edgeZ, bx2, bz2, NOISE_AMP_ABS * 0.7, tseed + 10)
 				local twigWidths = {}
 				-- Start at parent width, taper to thin tip
 				twigWidths[1] = min(bw, w * 0.4)
@@ -893,6 +972,7 @@ local function GenerateOrganicTree()
 					points = twigPts, widths = twigWidths,
 					capacity = capacity, isBranch = 1,
 					appearFrame = appearFrame, witherFrame = witherFrame,
+					flow = flow or 0, eff = eff or 0,
 				}
 			end
 		end
@@ -945,7 +1025,16 @@ local function GenerateOrganicTree()
 				edgeAttach[n.edgeIdx] = edgeAttach[n.edgeIdx] or {}
 				edgeAttach[n.edgeIdx][n.side] = { x = pos.x, z = pos.z, hasStem = false }
 			else
+				-- Aggregate cluster data: average direction, summed cap, weighted
+				-- mean flow/eff, and *signed* flow (positive when flow leaves the
+				-- node along this cluster, negative when it enters). The sign
+				-- decides whether the stem path is emitted node->stemTip
+				-- (outward) or stemTip->node (inward), so pulses always travel
+				-- in the actual direction of energy flow.
 				local avgCos, avgSin, clusterCap, minDist = 0, 0, 0, math.huge
+				local clusterFlow = 0
+				local netFlowSigned = 0
+				local effSum, capForEff = 0, 0
 				local stemAppear = math.huge
 				local stemWither = -math.huge
 				local allWither = true
@@ -954,6 +1043,12 @@ local function GenerateOrganicTree()
 					avgCos = avgCos + cos(n.angle)
 					avgSin = avgSin + sin(n.angle)
 					clusterCap = clusterCap + n.cap
+					clusterFlow = clusterFlow + (n.flow or 0)
+					-- side=1 → this node is the parent (source) → flow leaves
+					-- side=2 → this node is the child (sink)   → flow enters
+					netFlowSigned = netFlowSigned + ((n.side == 1) and (n.flow or 0) or -(n.flow or 0))
+					effSum = effSum + (n.eff or 0) * n.cap
+					capForEff = capForEff + n.cap
 					if n.dist and n.dist < minDist then minDist = n.dist end
 					local af = n.appearFrame or 0
 					if af < stemAppear then stemAppear = af end
@@ -971,12 +1066,25 @@ local function GenerateOrganicTree()
 				local stemX = pos.x + cos(avgAngle) * stemLen
 				local stemZ = pos.z + sin(avgAngle) * stemLen
 				local stemW = GetTrunkWidth(clusterCap)
+				local stemEff = capForEff > 0 and (effSum / capForEff) or 0
 
-				-- Emit the stem itself.
-				emitNoisyPath(pos.x, pos.z, stemX, stemZ,
-					stemW, stemW * 0.9, clusterCap,
-					pos.x + pos.z + ci * 7.3,
-					false, stemAppear, stemWitherFinal)
+				-- Stem is wider at the node side (where the cables merge) and a
+				-- bit thinner at the tip — emit accordingly so the merged trunk
+				-- reads visually regardless of flow direction.
+				local outward = netFlowSigned >= 0
+				if outward then
+					emitNoisyPath(pos.x, pos.z, stemX, stemZ,
+						stemW, stemW * 0.9, clusterCap,
+						pos.x + pos.z + ci * 7.3,
+						false, stemAppear, stemWitherFinal,
+						clusterFlow, stemEff)
+				else
+					emitNoisyPath(stemX, stemZ, pos.x, pos.z,
+						stemW * 0.9, stemW, clusterCap,
+						pos.x + pos.z + ci * 7.3,
+						false, stemAppear, stemWitherFinal,
+						clusterFlow, stemEff)
+				end
 
 				for i = 1, #cluster do
 					local n = cluster[i]
@@ -989,9 +1097,10 @@ local function GenerateOrganicTree()
 		end
 	end
 
-	-- Emit each edge once between its two attach points. Width: an end that
-	-- attaches at a stem is sized to dock cleanly into that stem (a fraction
-	-- of stem width); an end at a bare node uses the edge's own trunk width.
+	-- Emit each edge once between its two attach points. attach[1] is the
+	-- parent (source) end and attach[2] is the child (sink) end, so emitting
+	-- attach[1] -> attach[2] makes pulses travel in the +u direction = actual
+	-- direction of energy flow.
 	for i = 1, #renderEdges do
 		local e = renderEdges[i]
 		local attach = edgeAttach[i]
@@ -1004,9 +1113,16 @@ local function GenerateOrganicTree()
 			end
 			local startW = endWidth(attach[1])
 			local endW   = endWidth(attach[2])
+			-- Seed must be stable across VBO rebuilds, otherwise the noise
+			-- pattern reshuffles every send (~1 Hz) and the eye reads it as
+			-- the animation "resetting". Use deterministic coords of both
+			-- endpoints — independent of pairs() iteration order.
+			local seed = attach[1].x * 0.137 + attach[1].z * 0.781
+				+ attach[2].x * 0.293 + attach[2].z * 0.461
 			emitNoisyPath(attach[1].x, attach[1].z, attach[2].x, attach[2].z,
-				startW, endW, cap, attach[1].x + attach[1].z + i * 1.3,
-				false, e.appearFrame, e.witherFrame)
+				startW, endW, cap, seed,
+				false, e.appearFrame, e.witherFrame,
+				e.flow or 0, e.eff or 0)
 		end
 	end
 
@@ -1023,6 +1139,8 @@ local function GenerateOrganicTree()
 		local branch = path.isBranch
 		local appearTime = (path.appearFrame or 0) / GAME_SPEED
 		local witherTime = path.witherFrame and (path.witherFrame / GAME_SPEED) or 0
+		local pathEff  = path.eff or 0
+		local pathFlow = path.flow or 0
 
 		if #pts >= 2 then
 			-- Averaged perpendicular at each waypoint
@@ -1084,16 +1202,19 @@ local function GenerateOrganicTree()
 				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
 				verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
 
 				-- Tri 2: L1, R2, L2
 				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
@@ -1101,16 +1222,19 @@ local function GenerateOrganicTree()
 				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
 				verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=-1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
 
 				vertCount = vertCount + 6
 			end
@@ -1138,6 +1262,7 @@ layout (location = 1) in vec3 vertData;
 layout (location = 2) in vec2 vertUV;
 layout (location = 3) in vec2 vertPerp;
 layout (location = 4) in vec2 vertTime;  // x = appearTime (s), y = witherTime (s, 0 = not withering)
+layout (location = 5) in vec2 vertGrid;  // x = grid efficiency (E/M ratio), y = current flow (E/s)
 
 uniform sampler2D heightmapTex;
 
@@ -1149,6 +1274,7 @@ out DataVS {
 	vec2 cableUV;
 	vec2 perp;
 	vec2 timeData;
+	vec2 gridData;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1175,6 +1301,7 @@ void main() {
 	cableUV = vertUV;
 	perp = vertPerp;
 	timeData = vertTime;
+	gridData = vertGrid;
 	gl_Position = cameraViewProj * vec4(pos, 1.0);
 }
 ]]
@@ -1195,6 +1322,7 @@ in DataVS {
 	vec2 cableUV;
 	vec2 perp;
 	vec2 timeData;  // x = appearTime, y = witherTime (0 = not withering)
+	vec2 gridData;  // x = efficiency (E/M ratio), y = current flow (E/s)
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1206,6 +1334,97 @@ out vec4 fragColor;
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float hash1(float n) {
+	return fract(sin(n * 12.9898) * 43758.5453);
+}
+
+// One layer of advecting bubbles drawn as world-space-round glassy spheroids.
+// Density is fixed per layer (`spacing` constant); only `speed` changes with
+// flow. Each bubble has hash-derived size + cross-axis offset jitter so the
+// cable looks like bubbly fluid rather than a metronome.
+//
+// Crucially, distance is measured in actual world-space elmos in BOTH axes
+// (along + cross), so bubbles are real circles regardless of cable thickness.
+// `halfWidthE` is the cable cross half-extent in elmos at this fragment
+// (= width * 0.5); `radiusE` is each bubble's target radius in elmos and is
+// clamped so big bubbles fit inside thin cables instead of clipping to a
+// stripe.
+//
+// Shading: faint inner glow + Fresnel rim + small offset highlight, all with
+// smoothstep edges to avoid pixelation at oblique camera angles. Returns
+// (body, specular).
+vec2 bubbleLayer(float along, float t, float speed, float spacing,
+                 float radiusMax, float v, float halfWidthE, float layerSeed) {
+	float along2 = along - t * speed;
+	float idxLow  = floor(along2 / spacing);
+	float coord   = along2 - idxLow * spacing;     // [0, spacing)
+	float idxNear = (coord < spacing * 0.5) ? idxLow : (idxLow + 1.0);
+	float dAlong  = (coord < spacing * 0.5) ? coord : (spacing - coord);
+
+	float h1 = hash1(idxNear + layerSeed);
+	float h2 = hash1(idxNear + layerSeed + 71.3);
+	// Bubble radius in elmos. Random per bubble; clamped so it sits within
+	// the cable cross-section even on thin twigs (otherwise the bubble
+	// gets clipped to a near-1D horizontal stripe).
+	float radiusE = radiusMax * (0.65 + 0.35 * h1);
+	radiusE = min(radiusE, halfWidthE * 0.95);
+	if (radiusE < 0.5) return vec2(0.0);
+
+	// Cross-axis offset: in elmos, only as much margin as the cable can
+	// afford. Skinny cables → bubble centred; chunky cables → bubble can
+	// drift a little off-axis.
+	float crossMargin = max(0.0, halfWidthE - radiusE);
+	float yOffsetE    = (h2 - 0.5) * crossMargin * 1.2;
+
+	float dCrossE = v * halfWidthE - yOffsetE;
+	float r2 = (dAlong * dAlong + dCrossE * dCrossE) / (radiusE * radiusE);
+	if (r2 >= 1.0) return vec2(0.0);
+	float r = sqrt(r2);
+
+	float xn = dAlong / radiusE;
+	float yn = dCrossE / radiusE;
+
+	// Inner glow: faint disc for body luminosity.
+	float body = (1.0 - smoothstep(0.0, 1.0, r)) * 0.45;
+
+	// Fresnel-like rim brightest near r=0.82, faded both ways.
+	float rim = smoothstep(0.50, 0.82, r) * (1.0 - smoothstep(0.82, 1.0, r));
+
+	// Small specular highlight offset toward the light direction.
+	vec2 hd = vec2(xn + 0.30, yn + 0.40);
+	float hr = length(hd);
+	float spec = 1.0 - smoothstep(0.0, 0.30, hr);
+	spec *= spec;
+
+	return vec2(body + rim, spec);
+}
+
+// HSL → RGB at S=1, L=0.5 — matches LuaUI/Headers/overdrive.lua's GetGridColor
+// (hue is the same triangle wave used for the panel/grid colour). Hue in [0,1).
+vec3 hueToRgb(float h) {
+	h = fract(h);
+	float r = clamp(abs(h * 6.0 - 3.0) - 1.0, 0.0, 1.0);
+	float g = clamp(2.0 - abs(h * 6.0 - 2.0), 0.0, 1.0);
+	float b = clamp(2.0 - abs(h * 6.0 - 4.0), 0.0, 1.0);
+	return vec3(r, g, b);
+}
+
+// efficiency (energy/metal ratio) → bubble colour, matching the economy
+// panel's grid swatch (LuaUI/Headers/overdrive.lua). The Lua side computes
+// `h = 5760 / (eff+2)^2` (clamped at eff < 3.5 to h = 190) and then feeds
+// `h / 255` into HSLtoRGB — so the hue divisor here is 255, not 360.
+// Result: low-load grids are blue/teal, fully-saturated grids go yellow→red.
+vec3 gridEfficiencyColor(float eff) {
+	if (eff <= 0.0) return vec3(1.0, 0.25, 1.0);
+	float h;
+	if (eff < 3.5) {
+		h = 190.0;
+	} else {
+		h = 5760.0 / ((eff + 2.0) * (eff + 2.0));
+	}
+	return hueToRgb(h / 255.0);
 }
 
 void main() {
@@ -1263,30 +1482,39 @@ void main() {
 	// Apply lighting
 	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
 
-	// Traveling energy pulses along the cable.
-	// "along" is already in scope from the grow/wither cut above.
-	float pulseSpeed = 180.0;   // elmos/second
-	float pulsePeriod = 500.0;  // elmos between pulses (spacing)
-	float pulseWidth = 35.0;    // elmos (pulse extent)
+	// Energy bubbles travelling along the cable, like fluid in a pipe.
+	//
+	// Design:
+	//   - +u is the direction of energy flow (synced reorients edges by
+	//     current flow); all cables share one global phase so we never get
+	//     the optical illusion of "counter motion" inside a single cable.
+	//   - Density (bubbles per elmo) is FIXED: every cable shows the same
+	//     bubbly look regardless of how loaded it is. What changes with
+	//     flow is the SPEED bubbles travel at — zero flow leaves them
+	//     motionless; high flow makes them zip.
+	//   - Three layered streams of bubbles (big, medium, small) with random
+	//     per-bubble size + cross-axis offset, so the cable looks like a
+	//     real bubbly slurry instead of a metronome of identical dots.
+	const float FLOW_REF = 80.0;
+	float flow = gridData.y;
+	float flowNorm = clamp(flow / FLOW_REF, 0.0, 1.6);
+	float bubbleSpeed = 220.0 * flowNorm;  // exact zero at zero flow
+	float halfWidthE  = width * 0.5;       // cable cross half-extent in elmos
 
-	// Phase offset per cable branch (derived from perp direction so each cable differs)
-	float phaseOffset = (perp.x * 17.3 + perp.y * 31.7) * 100.0;
+	// Two layers of mixed-size bubbles. Density is fixed (constant spacing);
+	// per-bubble radius jitter inside each layer gives the small/big mix
+	// the user wants. Sizes are in elmos so the bubbles are world-round.
+	vec2 bA = bubbleLayer(along, gameTime, bubbleSpeed, 75.0, 7.5,  v, halfWidthE,  3.7);
+	vec2 bB = bubbleLayer(along, gameTime, bubbleSpeed, 32.0, 4.0,  v, halfWidthE, 19.1);
 
-	// Shift "along" backwards over time so pulses travel forward (+u direction)
-	float shifted = along - gameTime * pulseSpeed + phaseOffset;
-	float pulsePos = mod(shifted, pulsePeriod);
+	float bubbleBody = bA.x + bB.x * 0.85;
+	float bubbleSpec = bA.y + bB.y * 0.85;
 
-	// Gaussian falloff — bright bright pulse center, fades to edges
-	float pulseIntensity = exp(-pulsePos * pulsePos / (pulseWidth * pulseWidth));
-
-	// Second staggered pulse for richer pattern
-	float shifted2 = along - gameTime * pulseSpeed * 0.7 + phaseOffset * 1.5 + pulsePeriod * 0.4;
-	float pulsePos2 = mod(shifted2, pulsePeriod);
-	pulseIntensity += exp(-pulsePos2 * pulsePos2 / (pulseWidth * pulseWidth)) * 0.6;
-
-	// Pulse color: bright white-green core, more intense at cable center (innerMix)
-	vec3 pulseColor = vec3(0.7, 1.0, 0.6);
-	color += pulseColor * pulseIntensity * innerMix * fullLOS * 0.9;
+	// Bubble colour = grid efficiency colour; whiten the highlight for glow.
+	vec3 gridColor   = gridEfficiencyColor(gridData.x);
+	vec3 bubbleColor = mix(gridColor, vec3(1.0), 0.25);
+	color += bubbleColor * bubbleBody * fullLOS * 1.4;
+	color += vec3(1.0)   * bubbleSpec * fullLOS * 0.8;
 
 	// LOS-aware dimming
 	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
@@ -1342,11 +1570,13 @@ local function OnCableTreeFull()
 		end
 	end
 
-	-- Add new, refresh capacity on survivors.
+	-- Add new, refresh capacity / flow / efficiency on survivors.
 	for k, i in pairs(incoming) do
 		local e = existing[k]
 		if e and not e.witherFrame then
 			e.capacity = data.caps[i]
+			e.flow     = data.flows and data.flows[i] or 0
+			e.eff      = data.effs  and data.effs[i]  or 0
 			-- positions are stable for unchanged edges; assign anyway in case parent moved
 			e.px, e.pz = data.pxs[i], data.pzs[i]
 			e.cx, e.cz = data.cxs[i], data.czs[i]
@@ -1355,6 +1585,8 @@ local function OnCableTreeFull()
 				px = data.pxs[i], pz = data.pzs[i],
 				cx = data.cxs[i], cz = data.czs[i],
 				capacity = data.caps[i],
+				flow     = data.flows and data.flows[i] or 0,
+				eff      = data.effs  and data.effs[i]  or 0,
 				appearFrame = frame,
 				witherFrame = nil,
 			}
@@ -1387,6 +1619,7 @@ local function RebuildVBO()
 		{ id = 2, name = "vertUV",    size = 2 },
 		{ id = 3, name = "vertPerp",  size = 2 },
 		{ id = 4, name = "vertTime",  size = 2 },
+		{ id = 5, name = "vertGrid",  size = 2 },  -- (efficiency, flow magnitude)
 	})
 	vbo:Upload(verts)
 	cableVAO = gl.GetVAO()
