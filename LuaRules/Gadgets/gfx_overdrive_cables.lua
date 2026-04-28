@@ -56,6 +56,7 @@ local floor = math.floor
 -------------------------------------------------------------------------------------
 
 local SYNC_PERIOD       = 30  -- frames between grid sync (~1/s); also send cadence
+local DEBUG_FLOW        = true -- echo per-edge capacity table on every Send
 
 -------------------------------------------------------------------------------------
 -- Unit definitions
@@ -64,6 +65,9 @@ local SYNC_PERIOD       = 30  -- frames between grid sync (~1/s); also send cade
 local pylonDefs = {}
 local mexDefs = {}
 local generatorDefs = {}
+local pmaxByDef = {}      -- [defID] = nameplate production for non-wind generators
+local isWindgenByDef = {} -- [defID] = true (production resolved via WindMax at runtime)
+local voltageByDef = {}   -- [defID] = neededlink value (counts as static Dmax)
 
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
@@ -80,6 +84,30 @@ for i = 1, #UnitDefs do
 	if energyIncome > 0 or isWind then
 		generatorDefs[i] = true
 	end
+	if energyIncome > 0 then
+		pmaxByDef[i] = energyIncome
+	end
+	if isWind then
+		isWindgenByDef[i] = true
+	end
+	local nl = tonumber(cp.neededlink)
+	if nl and nl > 0 then
+		voltageByDef[i] = nl
+	end
+end
+
+-- Mex draw treated as effectively unbounded for max-potential math. Large
+-- enough that min(Pmax, INF_DRAW) collapses to Pmax cleanly, small enough to
+-- survive float subtraction (totalDmax - subtreeDmax) without precision loss.
+local INF_DRAW = 1e9
+
+-- WindMax is set by unit_windmill_control.lua at game start; resolve lazily.
+local cachedWindMax
+local function GetWindMax()
+	if cachedWindMax then return cachedWindMax end
+	local v = Spring.GetGameRulesParam("WindMax")
+	if v then cachedWindMax = v end
+	return v or 2.5
 end
 
 -------------------------------------------------------------------------------------
@@ -121,19 +149,17 @@ local function GridKey(allyTeamID, gridID)
 	return allyTeamID .. ":" .. gridID
 end
 
-local function GetNodeCapacity(unitID, unitDefID)
-	if not spValidUnitID(unitID) then return 0, 0 end
-	local stunned = spGetUnitIsStunned(unitID) or
-		(spGetUnitRulesParam(unitID, "disarmed") == 1)
-	if stunned then return 0, 0 end
-	local production, consumption = 0, 0
-	if generatorDefs[unitDefID] then
-		production = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
-	end
-	if mexDefs[unitDefID] then
-		consumption = spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0
-	end
-	return production, consumption
+-- Stable nameplate production: solar/fusion/sing fixed; windgen = current WindMax.
+local function GetNodePmax(unitDefID)
+	if isWindgenByDef[unitDefID] then return GetWindMax() end
+	return pmaxByDef[unitDefID] or 0
+end
+
+-- Static draw: mex = effectively infinite (any flow saturates it),
+-- voltage units contribute their neededlink threshold.
+local function GetNodeDmax(unitDefID)
+	if mexDefs[unitDefID] then return INF_DRAW end
+	return voltageByDef[unitDefID] or 0
 end
 
 -------------------------------------------------------------------------------------
@@ -200,11 +226,11 @@ local function BuildGridMST(allyTeamID, gridID)
 		end
 	end
 
-	-- Root = highest production
+	-- Root = highest nameplate production (stable across wind/load).
 	local bestRoot = 1
 	local bestProd = -1
 	for i = 1, #pylons do
-		local prod = GetNodeCapacity(pylons[i].unitID, pylons[i].unitDefID)
+		local prod = GetNodePmax(pylons[i].unitDefID)
 		if prod > bestProd then bestProd = prod; bestRoot = i end
 	end
 
@@ -339,67 +365,175 @@ local function SyncWithGrid()
 end
 
 -------------------------------------------------------------------------------------
--- Flow computation: per-edge capacity via post-order DFS on spanning tree
+-- Max-potential per edge: max flow that could ever cross the cable, given the
+-- nameplate production and static draw (mex = ∞, voltage units = neededlink)
+-- on each side of the cut. Two passes per tree:
+--   1. Post-order DFS aggregates subtreePmax / subtreeDmax per child edge.
+--   2. Per edge, otherSide = total − subtreeSide; capacity is symmetric:
+--        max( min(sP, oDmax), min(oP, sDmax) )
+-- With ∞ mex draw this collapses: when both sides have a mex, capacity becomes
+-- max(sP, oP) (= the larger producer half feeds the smaller). When only one
+-- side has a mex, capacity = the producer-side Pmax. Voltage-only cuts use
+-- the (finite) sum of neededlink thresholds.
 -------------------------------------------------------------------------------------
 
-local function ComputeFlows()
-	-- Rebuild tree structure for DFS from edges
-	local children = {} -- [parentID] = { childID, ... }
-	local roots = {}    -- [unitID] = true
-	local parentOf = {} -- [childID] = parentID
-	local edgeByChild = {} -- [childID] = edgeKey
-
-	-- Collect all participating nodes (visual grow/wither doesn't gate flow)
+local function ComputeMaxPotentials()
+	-- Treat edges as undirected: stored parent/child reflects MST traversal
+	-- order at the time the edge was inserted, NOT actual energy flow. We
+	-- re-derive both subtree sums and parent/child orientation here, then
+	-- write the orientation back so downstream rendering animates correctly.
+	local adj = {}                  -- [unitID] = { {neigh = id, key = ek}, ... }
 	local nodeSet = {}
-	for key, edge in pairs(edges) do
-		local pid, cid = edge.parentID, edge.childID
-		if not children[pid] then children[pid] = {} end
-		children[pid][#children[pid] + 1] = cid
-		parentOf[cid] = pid
-		edgeByChild[cid] = key
-		nodeSet[pid] = true
-		nodeSet[cid] = true
-	end
-
-	-- Find roots (nodes with no parent)
-	for uid, _ in pairs(nodeSet) do
-		if not parentOf[uid] then
-			roots[uid] = true
-		end
-	end
-
-	-- Post-order DFS
-	local flowResults = {} -- [edgeKey] = capacity
-	local function dfs(uid)
-		local prod, cons = 0, 0
-		-- Get this node's capacity from any allyTeam
+	local function nodeUnitDefID(uid)
 		for _, allyNodes in pairs(nodes) do
-			local node = allyNodes[uid]
-			if node then
-				local p, c = GetNodeCapacity(uid, node.unitDefID)
-				prod = prod + p
-				cons = cons + c
-				break
+			local n = allyNodes[uid]
+			if n then return n.unitDefID end
+		end
+		return nil
+	end
+
+	for key, edge in pairs(edges) do
+		local a, b = edge.parentID, edge.childID
+		adj[a] = adj[a] or {}; adj[a][#adj[a] + 1] = { neigh = b, key = key }
+		adj[b] = adj[b] or {}; adj[b][#adj[b] + 1] = { neigh = a, key = key }
+		nodeSet[a] = true
+		nodeSet[b] = true
+	end
+
+	-- Per-component DFS rooted at the highest-Pmax node in that component.
+	-- parentInTree maps child -> { parent, edgeKey } so subtree sums are well-defined.
+	local parentInTree = {}
+	local order = {}                -- DFS visit order, used for post-order pass
+	local visited = {}
+
+	local function dfsRoot(rootID)
+		visited[rootID] = true
+		order[#order + 1] = rootID
+		local stack = { rootID }
+		while #stack > 0 do
+			local u = stack[#stack]; stack[#stack] = nil
+			local ns = adj[u]
+			if ns then
+				for i = 1, #ns do
+					local nb, ek = ns[i].neigh, ns[i].key
+					if not visited[nb] then
+						visited[nb] = true
+						parentInTree[nb] = { parent = u, key = ek }
+						order[#order + 1] = nb
+						stack[#stack + 1] = nb
+					end
+				end
+			end
+		end
+	end
+
+	for uid in pairs(nodeSet) do
+		if not visited[uid] then
+			-- pick best root within this component: highest Pmax
+			local componentNodes = {}
+			local stk = { uid }
+			local seen = { [uid] = true }
+			while #stk > 0 do
+				local v = stk[#stk]; stk[#stk] = nil
+				componentNodes[#componentNodes + 1] = v
+				local ns = adj[v]
+				if ns then
+					for i = 1, #ns do
+						local nb = ns[i].neigh
+						if not seen[nb] then seen[nb] = true; stk[#stk + 1] = nb end
+					end
+				end
+			end
+			local bestID, bestP = uid, -1
+			for i = 1, #componentNodes do
+				local v = componentNodes[i]
+				local did = nodeUnitDefID(v)
+				local p = did and GetNodePmax(did) or 0
+				if p > bestP then bestP = p; bestID = v end
+			end
+			dfsRoot(bestID)
+		end
+	end
+
+	-- Post-order traversal: subPmax/subDmax of each node's subtree (inclusive).
+	local subPmax, subDmax = {}, {}
+	for i = 1, #order do
+		local u = order[i]
+		local did = nodeUnitDefID(u)
+		subPmax[u] = did and GetNodePmax(did) or 0
+		subDmax[u] = did and GetNodeDmax(did) or 0
+	end
+	for i = #order, 1, -1 do
+		local u = order[i]
+		local pi = parentInTree[u]
+		if pi then
+			subPmax[pi.parent] = subPmax[pi.parent] + subPmax[u]
+			subDmax[pi.parent] = subDmax[pi.parent] + subDmax[u]
+		end
+	end
+
+	-- Per edge: subtree side = the deeper node (the child in DFS rooting).
+	-- capAB = max flow subtree -> other; capBA = max flow other -> subtree.
+	-- Whichever is larger sets parent on the source side.
+	local capacities = {}
+	local debugLog = DEBUG_FLOW and {} or nil
+	local function fmtD(v) return v >= INF_DRAW * 0.5 and "INF" or string.format("%.0f", v) end
+
+	for cid, info in pairs(parentInTree) do
+		local key = info.key
+		local pid = info.parent
+		-- Find root of cid's component (walk up parentInTree).
+		local r = cid
+		while parentInTree[r] do r = parentInTree[r].parent end
+		local totalP, totalD = subPmax[r], subDmax[r]
+		local sP, sD = subPmax[cid], subDmax[cid]
+		local oP, oD = totalP - sP, totalD - sD
+		local capAB = (sP < oD) and sP or oD   -- subtree -> other
+		local capBA = (oP < sD) and oP or sD   -- other -> subtree
+		local cap = (capAB > capBA) and capAB or capBA
+		capacities[key] = cap
+
+		-- Orient: parent goes on the source side of dominant flow.
+		local edge = edges[key]
+		if edge then
+			local srcSubtree = capAB > capBA
+			local newParent = srcSubtree and cid or pid
+			local newChild  = srcSubtree and pid or cid
+			if edge.parentID ~= newParent then
+				-- Look up positions from `nodes` to get fresh coords.
+				local function findNode(uid)
+					for _, allyNodes in pairs(nodes) do
+						local n = allyNodes[uid]
+						if n then return n end
+					end
+				end
+				local np, nc = findNode(newParent), findNode(newChild)
+				if np and nc then
+					edge.parentID, edge.childID = newParent, newChild
+					edge.px, edge.pz = np.x, np.z
+					edge.cx, edge.cz = nc.x, nc.z
+				end
 			end
 		end
 
-		if children[uid] then
-			for i = 1, #children[uid] do
-				local cid = children[uid][i]
-				local cProd, cCons = dfs(cid)
-				prod = prod + cProd
-				cons = cons + cCons
-				flowResults[edgeByChild[cid]] = max(cProd, cCons)
+		if debugLog then
+			local function nameOf(uid)
+				local d = nodeUnitDefID(uid)
+				return d and UnitDefs[d].name or tostring(uid)
 			end
+			local e = edges[key]
+			debugLog[#debugLog + 1] = string.format("  %-13s -> %-13s  sP=%-7.1f sD=%-5s oP=%-7.1f oD=%-5s  cap=%.1f",
+				nameOf(e.parentID), nameOf(e.childID),
+				sP, fmtD(sD), oP, fmtD(oD), cap)
 		end
-		return prod, cons
 	end
 
-	for uid, _ in pairs(roots) do
-		dfs(uid)
+	if debugLog and #debugLog > 0 then
+		Spring.Echo("[OD-cables] capacities:")
+		for i = 1, #debugLog do Spring.Echo(debugLog[i]) end
 	end
 
-	return flowResults
+	return capacities
 end
 
 -------------------------------------------------------------------------------------
@@ -409,7 +543,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function SendAll()
-	local flows = ComputeFlows()
+	local flows = ComputeMaxPotentials()
 
 	-- Bin edges by ally, in one pass.
 	local perAlly = {}  -- [ally] = { keys, pxs, pzs, cxs, czs, caps, n }
