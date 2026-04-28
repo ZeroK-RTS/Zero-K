@@ -56,8 +56,8 @@ local floor = math.floor
 -- Config
 -------------------------------------------------------------------------------------
 
-local SYNC_PERIOD       = 30   -- frames between grid sync (~1/s); also send cadence
-local DEBUG_FLOW        = true -- echo per-edge capacity table on every Send
+local SYNC_PERIOD       = 30    -- frames between grid sync (~1/s); also send cadence
+local DEBUG_FLOW        = false -- echo per-edge capacity table on every Send (chatty)
 -- Spanning-tree topology mode:
 --   "euclidean"  visually-pleasing layout — every pair of pylons in the same
 --                grid is a candidate edge (subject to MST_CANDIDATE_R), so
@@ -147,6 +147,10 @@ do
 		nodes[allyTeamList[i]] = {}
 	end
 end
+
+-- Runtime toggles, driven by the /cabletree chat command (see CableTreeCmd).
+local cableEnabled = true
+local cablePerf    = false
 
 -------------------------------------------------------------------------------------
 -- Helpers
@@ -697,7 +701,25 @@ end
 -- GameFrame
 -------------------------------------------------------------------------------------
 
+-- Sends one zero-edge snapshot per ally that currently has cables, so the
+-- unsynced side clears its geometry. Used when the visualization is toggled
+-- off so no stale cables linger.
+local function ClearAll()
+	for ally in pairs(alliesWithEdges) do
+		_G.CableTreeFull = {
+			allyTeamID = ally, edgeCount = 0,
+			keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
+			caps = {}, flows = {}, effs = {},
+		}
+		SendToUnsynced("CableTreeFull")
+	end
+	alliesWithEdges = {}
+	edges = {}
+	topologyDirty = false
+end
+
 function gadget:GameFrame(n)
+	if not cableEnabled then return end
 	if n % SYNC_PERIOD == 2 then
 		SyncWithGrid()
 		-- Always send: flow magnitudes and grid efficiency colour change every
@@ -706,7 +728,50 @@ function gadget:GameFrame(n)
 		-- attribute upload); geometry only re-generates when keys change.
 		SendAll()
 		topologyDirty = false
+		-- Synced has no timing API (Spring.GetTimer is unsynced-only, and the
+		-- sandbox doesn't expose `os`). Just report the edge count from here;
+		-- the real cost numbers come from the unsynced rebuild log, which
+		-- captures the heavier path (geometry + VBO upload).
+		if cablePerf then
+			local nEdges = 0
+			for _ in pairs(edges) do nEdges = nEdges + 1 end
+			Spring.Echo(string.format("[CableTree] sync edges=%d", nEdges))
+		end
 	end
+end
+
+-- /cabletree              — toggle on/off
+-- /cabletree on / off     — explicit
+-- /cabletree perf         — toggle per-cycle timing log
+-- /cabletree status       — print current state
+local function CableTreeCmd(cmd, line, words, playerID)
+	local arg = (words and words[1]) or ""
+	if arg == "" or arg == "toggle" then
+		cableEnabled = not cableEnabled
+		if not cableEnabled then ClearAll() end
+		Spring.Echo("[CableTree] " .. (cableEnabled and "ON" or "OFF"))
+	elseif arg == "on" then
+		cableEnabled = true
+		Spring.Echo("[CableTree] ON")
+	elseif arg == "off" then
+		cableEnabled = false
+		ClearAll()
+		Spring.Echo("[CableTree] OFF")
+	elseif arg == "perf" then
+		cablePerf = not cablePerf
+		_G.CableTreePerf = { perf = cablePerf }
+		SendToUnsynced("CableTreePerf")
+		Spring.Echo("[CableTree] perf logging " .. (cablePerf and "ON" or "OFF"))
+	elseif arg == "status" then
+		local nEdges = 0
+		for _ in pairs(edges) do nEdges = nEdges + 1 end
+		Spring.Echo(string.format(
+			"[CableTree] enabled=%s perf=%s edges=%d",
+			tostring(cableEnabled), tostring(cablePerf), nEdges))
+	else
+		Spring.Echo("[CableTree] usage: /cabletree [on|off|toggle|perf|status]")
+	end
+	return true
 end
 
 -------------------------------------------------------------------------------------
@@ -754,6 +819,7 @@ end
 
 function gadget:Initialize()
 	GG.CableTree = { nodes = nodes, edges = edges }
+	gadgetHandler:AddChatAction("cabletree", CableTreeCmd)
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID and pylonDefs[unitDefID] then
@@ -854,6 +920,7 @@ local needsRebuild = false
 local cableShader       -- forward shader for cable rendering
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
+local drawPerf = false  -- toggled by the synced /cabletree perf command
 -- Game-second timestamp captured the moment the current VBO's bubblePhase
 -- snapshots were taken. The shader extrapolates each cable's phase forward
 -- from this anchor using `phase = bakedPhase + flowToSpeed(flow) * (gameTime
@@ -1731,6 +1798,8 @@ end
 -------------------------------------------------------------------------------------
 
 local function RebuildVBO()
+	local tStart = drawPerf and Spring.GetTimer() or nil
+
 	-- Snapshot every edge's bubble phase to NOW before geometry generation,
 	-- and re-anchor; the shader will extrapolate from `bubbleBakeTime`.
 	bubbleBakeTime = Spring.GetGameSeconds()
@@ -1743,6 +1812,7 @@ local function RebuildVBO()
 		end
 	end
 
+	local tGen0 = drawPerf and Spring.GetTimer() or nil
 	local verts, vertCount = GenerateOrganicTree()
 	if vertCount == 0 then
 		numCableVerts = 0
@@ -1761,11 +1831,22 @@ local function RebuildVBO()
 		{ id = 4, name = "vertTime",  size = 2 },
 		{ id = 5, name = "vertGrid",  size = 3 },  -- (efficiency, flow E/s, bubble phase elmos)
 	})
+	local tUp0 = drawPerf and Spring.GetTimer() or nil
 	vbo:Upload(verts)
 	cableVAO = gl.GetVAO()
 	if cableVAO then cableVAO:AttachVertexBuffer(vbo) end
 	numCableVerts = vertCount
 	needsRebuild = false
+
+	if drawPerf then
+		local tEnd = Spring.GetTimer()
+		Spring.Echo(string.format(
+			"[CableTree] draw rebuild: phase=%.2f ms  geom=%.2f ms  upload=%.2f ms  verts=%d",
+			Spring.DiffTimers(tGen0, tStart) * 1000,
+			Spring.DiffTimers(tUp0,  tGen0)  * 1000,
+			Spring.DiffTimers(tEnd,  tUp0)   * 1000,
+			vertCount))
+	end
 end
 
 -------------------------------------------------------------------------------------
@@ -1855,12 +1936,17 @@ function gadget:Initialize()
 		return
 	end
 	gadgetHandler:AddSyncAction("CableTreeFull", OnCableTreeFull)
+	gadgetHandler:AddSyncAction("CableTreePerf", function()
+		local data = SYNCED.CableTreePerf
+		if data then drawPerf = data.perf and true or false end
+	end)
 end
 
 function gadget:Shutdown()
 	if cableShader then cableShader:Finalize() end
 	cableVAO = nil
 	gadgetHandler:RemoveSyncAction("CableTreeFull")
+	gadgetHandler:RemoveSyncAction("CableTreePerf")
 end
 
 end -- UNSYNCED
