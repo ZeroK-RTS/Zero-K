@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Overdrive Cable Tree Visualization
--- Maintains a persistent tree that grows organically as pylons are built/destroyed.
--- Cables grow from nearest connected node toward new pylons.
--- Cables wither when pylons are destroyed; orphans reconnect.
--- Per-edge energy flows computed on fully-grown edges only.
+-- Synced: maintains topology + per-edge capacity, sends Full/Delta to unsynced.
+-- Unsynced: organic-tree geometry, gameframe-based grow/wither animation in shader.
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -28,8 +26,8 @@ if gadgetHandler:IsSyncedCode() then
 -------------------------------------------------------------------------------------
 -- SYNCED
 -- Reads gridNumber from unit_mex_overdrive as source of truth.
--- Periodically computes desired spanning tree edges per grid.
--- Diffs against current edges to produce grow/wither animations.
+-- Periodically computes desired spanning tree edges per grid and sends
+-- Full or Delta updates to unsynced. Visual progress is unsynced-only.
 -------------------------------------------------------------------------------------
 
 local spGetUnitPosition   = Spring.GetUnitPosition
@@ -39,23 +37,25 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spValidUnitID       = Spring.ValidUnitID
 
+-- Mirrors the "currentlyActive" check in unit_mex_overdrive.lua so we only
+-- show cables for pylons actually contributing to the grid. GetUnitIsStunned
+-- covers under-construction, EMP'd, and transported units.
+local function IsActiveForGrid(unitID)
+	if spGetUnitIsStunned(unitID) then return false end
+	if spGetUnitRulesParam(unitID, "disarmed") == 1 then return false end
+	if spGetUnitRulesParam(unitID, "morphDisable") == 1 then return false end
+	return true
+end
+
 local sqrt  = math.sqrt
 local max   = math.max
-local min   = math.min
 local floor = math.floor
 
 -------------------------------------------------------------------------------------
 -- Config
 -------------------------------------------------------------------------------------
 
-local SYNC_PERIOD       = 30  -- frames between grid sync (~1/s)
-local TICK_PERIOD       = 3
-local SEND_PERIOD       = 6
-local GROWTH_RATE       = 250 -- elmos/s
-local WITHER_RATE       = 400
-local GAME_SPEED        = Game.gameSpeed or 30
-local GROWTH_PER_TICK   = GROWTH_RATE / GAME_SPEED * TICK_PERIOD
-local WITHER_PER_TICK   = WITHER_RATE / GAME_SPEED * TICK_PERIOD
+local SYNC_PERIOD       = 30  -- frames between grid sync (~1/s); also send cadence
 
 -------------------------------------------------------------------------------------
 -- Unit definitions
@@ -92,18 +92,14 @@ local nodes = {}
 -- Reverse index: unitID -> allyTeamID, for O(1) edge->ally lookup during send
 local allyOfUnit = {}
 
--- Edges: edges[edgeKey] = {parentID, childID, px, pz, cx, cz, length, progress, withering, gridKey}
+-- Edges: edges[edgeKey] = {parentID, childID, px, pz, cx, cz}
+-- Visual progress (grow/wither) is unsynced-only, gameframe-driven.
 local edges = {}
-
--- Desired edges: desiredEdges[edgeKey] = true
-local desiredEdges = {}
 
 -- Change detection
 local lastGridNum = {} -- [unitID] = gridNumber
-local structureChanged = true
-
-local treeVersion = 0
-local dirty = false
+local topologyDirty = false -- set true when SyncWithGrid actually adds or removes an edge
+local alliesWithEdges = {}  -- [ally] = true if last send had edges (for empty-clear)
 
 do
 	local allyTeamList = Spring.GetAllyTeamList()
@@ -115,12 +111,6 @@ end
 -------------------------------------------------------------------------------------
 -- Helpers
 -------------------------------------------------------------------------------------
-
-local function Dist(x1, z1, x2, z2)
-	local dx = x1 - x2
-	local dz = z1 - z2
-	return sqrt(dx * dx + dz * dz)
-end
 
 local function EdgeKey(id1, id2)
 	if id1 < id2 then return id1 .. ":" .. id2
@@ -155,15 +145,14 @@ local SPATIAL_CELL = 600 -- spatial hash cell size (covers max pylon range pair)
 
 local function BuildGridMST(allyTeamID, gridID)
 	local pylons = {}
+	-- lastGridNum is the authoritative effective-grid map maintained by
+	-- SyncWithGrid (already accounts for active/inactive state).
 	for unitID, node in pairs(nodes[allyTeamID]) do
-		if spValidUnitID(unitID) then
-			local gid = spGetUnitRulesParam(unitID, "gridNumber") or 0
-			if gid == gridID then
-				pylons[#pylons + 1] = {
-					unitID = unitID, x = node.x, z = node.z,
-					range = node.range, unitDefID = node.unitDefID,
-				}
-			end
+		if lastGridNum[unitID] == gridID then
+			pylons[#pylons + 1] = {
+				unitID = unitID, x = node.x, z = node.z,
+				range = node.range, unitDefID = node.unitDefID,
+			}
 		end
 	end
 
@@ -305,9 +294,11 @@ local function SyncWithGrid()
 			allyOfUnit[uid] = nil
 		end
 
-		-- Check living units for grid changes
+		-- Check living units for grid changes. Inactive units (in-build, EMP'd,
+		-- disarmed, morphing) are treated as gridless so they're excluded from
+		-- the MST; the active->inactive transition naturally rebuilds the grid.
 		for unitID, _ in pairs(allyNodes) do
-			local gridID = spGetUnitRulesParam(unitID, "gridNumber") or 0
+			local gridID = (IsActiveForGrid(unitID) and (spGetUnitRulesParam(unitID, "gridNumber") or 0)) or 0
 			local oldGrid = lastGridNum[unitID] or 0
 			if gridID ~= oldGrid then
 				lastGridNum[unitID] = gridID
@@ -321,76 +312,29 @@ local function SyncWithGrid()
 		end
 	end
 
-	-- Nothing changed?
-	local hasChanges = false
-	for _ in pairs(changedGrids) do hasChanges = true; break end
-	if not hasChanges then
-		structureChanged = false
-		return
-	end
-
-	-- Rebuild only changed grids
+	-- Rebuild only changed grids. Diff old vs new MST so unchanged edges
+	-- are preserved (no spurious add/remove churn).
 	for gk, info in pairs(changedGrids) do
-		-- Wither old edges for this grid
-		if desiredByGrid[gk] then
-			for ek, _ in pairs(desiredByGrid[gk]) do
-				if edges[ek] and not edges[ek].withering then
-					edges[ek].withering = true
-					desiredEdges[ek] = nil
-					dirty = true
-				end
+		local oldDesired = desiredByGrid[gk] or {}
+		local newDesired = BuildGridMST(info.allyTeamID, info.gridID)
+		desiredByGrid[gk] = newDesired
+
+		for ek in pairs(oldDesired) do
+			if not newDesired[ek] and edges[ek] then
+				edges[ek] = nil
+				topologyDirty = true
 			end
 		end
 
-		-- Compute new MST
-		local newEdges = BuildGridMST(info.allyTeamID, info.gridID)
-		desiredByGrid[gk] = newEdges
-
-		-- Create or revive edges
-		for ek, einfo in pairs(newEdges) do
-			desiredEdges[ek] = true
-			if edges[ek] then
-				if edges[ek].withering then
-					edges[ek].withering = false
-					dirty = true
-				end
-			else
+		for ek, einfo in pairs(newDesired) do
+			if not edges[ek] then
 				edges[ek] = {
 					parentID = einfo.parentID, childID = einfo.childID,
 					px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
-					length = max(1, Dist(einfo.px, einfo.pz, einfo.cx, einfo.cz)),
-					progress = 0, withering = false,
 				}
-				dirty = true
+				topologyDirty = true
 			end
 		end
-	end
-
-	structureChanged = false
-end
-
--------------------------------------------------------------------------------------
--- Edge growth / wither tick
--------------------------------------------------------------------------------------
-
-local function TickEdges()
-	local toRemove = {}
-
-	for key, edge in pairs(edges) do
-		if edge.withering then
-			edge.progress = edge.progress - WITHER_PER_TICK
-			if edge.progress <= 0 then
-				toRemove[#toRemove + 1] = key
-			end
-			dirty = true
-		elseif edge.progress < edge.length then
-			edge.progress = min(edge.length, edge.progress + GROWTH_PER_TICK)
-			dirty = true
-		end
-	end
-
-	for i = 1, #toRemove do
-		edges[toRemove[i]] = nil
 	end
 end
 
@@ -405,18 +349,16 @@ local function ComputeFlows()
 	local parentOf = {} -- [childID] = parentID
 	local edgeByChild = {} -- [childID] = edgeKey
 
-	-- Collect all participating nodes
+	-- Collect all participating nodes (visual grow/wither doesn't gate flow)
 	local nodeSet = {}
 	for key, edge in pairs(edges) do
-		if edge.progress >= edge.length and not edge.withering then
-			local pid, cid = edge.parentID, edge.childID
-			if not children[pid] then children[pid] = {} end
-			children[pid][#children[pid] + 1] = cid
-			parentOf[cid] = pid
-			edgeByChild[cid] = key
-			nodeSet[pid] = true
-			nodeSet[cid] = true
-		end
+		local pid, cid = edge.parentID, edge.childID
+		if not children[pid] then children[pid] = {} end
+		children[pid][#children[pid] + 1] = cid
+		parentOf[cid] = pid
+		edgeByChild[cid] = key
+		nodeSet[pid] = true
+		nodeSet[cid] = true
 	end
 
 	-- Find roots (nodes with no parent)
@@ -461,53 +403,55 @@ local function ComputeFlows()
 end
 
 -------------------------------------------------------------------------------------
--- Send state to unsynced
+-- Send state to unsynced. One Full snapshot per ally, only when topology changed.
+-- Capacity drift between topology changes is ignored (acceptable: cable colour
+-- only updates when the grid actually mutates).
 -------------------------------------------------------------------------------------
 
-local function SendToUnsyncedAll()
+local function SendAll()
 	local flows = ComputeFlows()
 
-	-- Build per-allyTeam edge lists (so unsynced only sees own team's cables)
-	local perAlly = {} -- [allyTeamID] = { edgeCount, parentXs, ... }
-
+	-- Bin edges by ally, in one pass.
+	local perAlly = {}  -- [ally] = { keys, pxs, pzs, cxs, czs, caps, n }
 	for key, edge in pairs(edges) do
-		if edge.progress > 0 then
-			local atID = allyOfUnit[edge.parentID] or allyOfUnit[edge.childID]
-			if atID then
-				if not perAlly[atID] then
-					perAlly[atID] = {
-						edgeCount = 0,
-						parentXs = {}, parentZs = {},
-						childXs = {}, childZs = {},
-						progresses = {}, lengths = {}, capacities = {},
-					}
-				end
-				local pa = perAlly[atID]
-				pa.edgeCount = pa.edgeCount + 1
-				local n = pa.edgeCount
-				pa.parentXs[n] = edge.px
-				pa.parentZs[n] = edge.pz
-				pa.childXs[n] = edge.cx
-				pa.childZs[n] = edge.cz
-				pa.progresses[n] = edge.progress
-				pa.lengths[n] = edge.length
-				pa.capacities[n] = flows[key] or 0
+		local ally = allyOfUnit[edge.parentID] or allyOfUnit[edge.childID]
+		if ally then
+			local pa = perAlly[ally]
+			if not pa then
+				pa = { keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {}, caps = {}, n = 0 }
+				perAlly[ally] = pa
 			end
+			pa.n = pa.n + 1
+			local i = pa.n
+			pa.keys[i] = key
+			pa.pxs[i], pa.pzs[i] = edge.px, edge.pz
+			pa.cxs[i], pa.czs[i] = edge.cx, edge.cz
+			pa.caps[i] = flows[key] or 0
 		end
 	end
 
-	-- Send one message per allyTeam
-	for atID, pa in pairs(perAlly) do
-		_G.CableTreeData = {
-			allyTeamID = atID,
-			version = treeVersion,
-			edgeCount = pa.edgeCount,
-			parentXs = pa.parentXs, parentZs = pa.parentZs,
-			childXs = pa.childXs, childZs = pa.childZs,
-			progresses = pa.progresses, lengths = pa.lengths,
-			capacities = pa.capacities,
+	-- Fire one message per ally that currently has edges.
+	for ally, pa in pairs(perAlly) do
+		_G.CableTreeFull = {
+			allyTeamID = ally, edgeCount = pa.n,
+			keys = pa.keys, pxs = pa.pxs, pzs = pa.pzs,
+			cxs = pa.cxs, czs = pa.czs, caps = pa.caps,
 		}
-		SendToUnsynced("CableTreeUpdate")
+		SendToUnsynced("CableTreeFull")
+		alliesWithEdges[ally] = true
+	end
+
+	-- Allies whose last edge just disappeared get one zero-edge snapshot so
+	-- unsynced clears them; then we forget them.
+	for ally in pairs(alliesWithEdges) do
+		if not perAlly[ally] then
+			_G.CableTreeFull = {
+				allyTeamID = ally, edgeCount = 0,
+				keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {}, caps = {},
+			}
+			SendToUnsynced("CableTreeFull")
+			alliesWithEdges[ally] = nil
+		end
 	end
 end
 
@@ -516,20 +460,12 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:GameFrame(n)
-	-- Check for gridNumber changes even without unit create/destroy
-	-- (stun, disable, activate can change grid membership)
 	if n % SYNC_PERIOD == 2 then
 		SyncWithGrid()
-	end
-
-	if n % TICK_PERIOD == 0 then
-		TickEdges()
-	end
-
-	if dirty and (n % SEND_PERIOD == 0) then
-		treeVersion = treeVersion + 1
-		SendToUnsyncedAll()
-		dirty = false
+		if topologyDirty then
+			SendAll()
+			topologyDirty = false
+		end
 	end
 end
 
@@ -547,15 +483,12 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		unitDefID = unitDefID,
 	}
 	allyOfUnit[unitID] = allyTeamID
-	structureChanged = true
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if not pylonDefs[unitDefID] then return end
 	-- Don't remove from nodes/lastGridNum here.
 	-- SyncWithGrid will detect the dead unit via spValidUnitID,
 	-- mark the affected grid as changed, and clean up.
-	structureChanged = true
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
@@ -564,7 +497,6 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 	local _, _, _, _, _, oldAlly = Spring.GetTeamInfo(oldTeam, false)
 	if not newAlly or not oldAlly then return end
 	if newAlly ~= oldAlly then
-		-- Remove from old allyTeam, add to new
 		if nodes[oldAlly] then nodes[oldAlly][unitID] = nil end
 		lastGridNum[unitID] = nil
 		allyOfUnit[unitID] = nil
@@ -577,7 +509,6 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 			}
 			allyOfUnit[unitID] = newAlly
 		end
-		structureChanged = true
 	end
 end
 
@@ -650,13 +581,18 @@ local BRANCH_WIDTH     = 0.5
 local MERGE_ANGLE    = 0.8
 local STEM_FRACTION  = 0.35
 
+-- Visual grow/wither animation rates (elmos/sec); fragment shader trims geometry.
+local GROWTH_RATE = 250
+local WITHER_RATE = 400
+local GAME_SPEED  = Game.gameSpeed or 30
+
 -------------------------------------------------------------------------------------
 -- State
 -------------------------------------------------------------------------------------
 
-local renderEdges = {}
+-- edgesByAllyTeam[ally][edgeKey] = { px, pz, cx, cz, capacity, appearFrame, witherFrame }
 local edgesByAllyTeam = {}
-local lastVersions = {}
+local renderEdges = {}
 local needsRebuild = false
 
 local cableShader       -- forward shader for cable rendering
@@ -715,16 +651,13 @@ local function normalizeAngle(a)
 	return a
 end
 
--- Build organic tree geometry from renderEdges.
--- Returns two lists: segments {{x1,z1,x2,z2,width,capacity,isBranch}, ...}
--- and pads {{cx,cz,radius}, ...} for FBO rendering.
+-- Build organic tree geometry from renderEdges (full edges; growth/wither
+-- is animated in the fragment shader via appearTime / witherTime).
 local function GenerateOrganicTree()
 	if #renderEdges == 0 then return {}, 0 end
 
-	-- Each path = { points = { {x,z}, ... }, widths = { w, ... }, capacity, isBranch }
 	local allPaths = {}
 
-	-- Same tree-building + routing code as before, but collect into allSegs
 	local nodePos = {}
 	local nodeChildren = {}
 	local nodeParent = {}
@@ -736,29 +669,23 @@ local function GenerateOrganicTree()
 
 	for i = 1, #renderEdges do
 		local e = renderEdges[i]
-		if e.length > 0 then
-			local frac = min(1, e.progress / e.length)
-			if frac > 0.01 then
-				local pk = posKey(e.px, e.pz)
-				local ex = e.px + frac * (e.cx - e.px)
-				local ez = e.pz + frac * (e.cz - e.pz)
-				local ck = posKey(ex, ez)
-				nodePos[pk] = { x = e.px, z = e.pz }
-				nodePos[ck] = { x = ex, z = ez }
-				if not nodeChildren[pk] then nodeChildren[pk] = {} end
-				nodeChildren[pk][#nodeChildren[pk] + 1] = {
-					key = ck, cap = max(1, e.capacity), frac = frac,
-				}
-				nodeParent[ck] = pk
-			end
-		end
+		local pk = posKey(e.px, e.pz)
+		local ck = posKey(e.cx, e.cz)
+		nodePos[pk] = { x = e.px, z = e.pz }
+		nodePos[ck] = { x = e.cx, z = e.cz }
+		if not nodeChildren[pk] then nodeChildren[pk] = {} end
+		nodeChildren[pk][#nodeChildren[pk] + 1] = {
+			key = ck, cap = max(1, e.capacity),
+			appearFrame = e.appearFrame, witherFrame = e.witherFrame,
+		}
+		nodeParent[ck] = pk
 	end
 
 	for pk, _ in pairs(nodePos) do
 		if not nodeParent[pk] then roots[pk] = true end
 	end
 
-	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch)
+	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch, appearFrame, witherFrame)
 		local path = NoisyPath(x1, z1, x2, z2, widthStart * NOISE_AMP, seed)
 		local widths = {}
 		for pi = 1, #path do
@@ -768,6 +695,7 @@ local function GenerateOrganicTree()
 		allPaths[#allPaths + 1] = {
 			points = path, widths = widths,
 			capacity = capacity, isBranch = isBranch and 1 or 0,
+			appearFrame = appearFrame, witherFrame = witherFrame,
 		}
 		-- Twigs: spawn from ribbon edge, not center
 		for pi = 2, #path - 1 do
@@ -805,7 +733,8 @@ local function GenerateOrganicTree()
 				end
 				allPaths[#allPaths + 1] = {
 					points = twigPts, widths = twigWidths,
-					capacity = capacity, isBranch = 1, -- same capacity as parent for color match
+					capacity = capacity, isBranch = 1,
+					appearFrame = appearFrame, witherFrame = witherFrame,
 				}
 			end
 		end
@@ -855,7 +784,7 @@ local function GenerateOrganicTree()
 			local child = children[1]
 			local cpos = nodePos[child.key]
 			if cpos then
-				emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, trunkW, GetTrunkWidth(child.cap), totalCap, pos.x + pos.z, false)
+				emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, trunkW, GetTrunkWidth(child.cap), totalCap, pos.x + pos.z, false, child.appearFrame, child.witherFrame)
 				routeNode(child.key)
 			end
 			return
@@ -869,31 +798,44 @@ local function GenerateOrganicTree()
 				local cpos = nodePos[child.key]
 				if cpos then
 					local bw = GetTrunkWidth(child.cap)
-					emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, min(bw * 1.3, trunkW * 0.7), bw * 0.8, child.cap, pos.x * 3.7 + pos.z * 1.3 + ci, #clusters > 1)
+					emitNoisyPath(pos.x, pos.z, cpos.x, cpos.z, min(bw * 1.3, trunkW * 0.7), bw * 0.8, child.cap, pos.x * 3.7 + pos.z * 1.3 + ci, #clusters > 1, child.appearFrame, child.witherFrame)
 					routeNode(child.key)
 				end
 			else
 				local avgCos, avgSin, clusterCap, minDist = 0, 0, 0, math.huge
+				-- Stem frames: appear with the earliest child; wither only if all children withering
+				local stemAppear = math.huge
+				local stemWither = -math.huge
+				local allWither = true
 				for i = 1, #cluster do
 					local a = cluster[i].angle or 0
 					avgCos = avgCos + cos(a)
 					avgSin = avgSin + sin(a)
 					clusterCap = clusterCap + cluster[i].cap
 					if cluster[i].dist and cluster[i].dist < minDist then minDist = cluster[i].dist end
+					local af = cluster[i].appearFrame or 0
+					if af < stemAppear then stemAppear = af end
+					if cluster[i].witherFrame then
+						if cluster[i].witherFrame > stemWither then stemWither = cluster[i].witherFrame end
+					else
+						allWither = false
+					end
 				end
+				if stemAppear == math.huge then stemAppear = 0 end
+				local stemWitherFinal = (allWither and stemWither > -math.huge) and stemWither or nil
 				local avgAngle = atan2(avgSin, avgCos)
 				local stemLen = min(minDist * STEM_FRACTION, 120)
 				local stemX = pos.x + cos(avgAngle) * stemLen
 				local stemZ = pos.z + sin(avgAngle) * stemLen
 				local stemW = GetTrunkWidth(clusterCap)
-				emitNoisyPath(pos.x, pos.z, stemX, stemZ, stemW, stemW * 0.9, clusterCap, pos.x + pos.z + ci * 7.3, false)
+				emitNoisyPath(pos.x, pos.z, stemX, stemZ, stemW, stemW * 0.9, clusterCap, pos.x + pos.z + ci * 7.3, false, stemAppear, stemWitherFinal)
 				table.sort(cluster, function(a, b) return a.cap > b.cap end)
 				for i = 1, #cluster do
 					local child = cluster[i]
 					local cpos = nodePos[child.key]
 					if cpos then
 						local bw = GetTrunkWidth(child.cap)
-						emitNoisyPath(stemX, stemZ, cpos.x, cpos.z, min(bw * 1.2, stemW * 0.6), bw * 0.7, child.cap, stemX * 2.1 + stemZ * 5.3 + i, i > 1)
+						emitNoisyPath(stemX, stemZ, cpos.x, cpos.z, min(bw * 1.2, stemW * 0.6), bw * 0.7, child.cap, stemX * 2.1 + stemZ * 5.3 + i, i > 1, child.appearFrame, child.witherFrame)
 						routeNode(child.key)
 					end
 				end
@@ -914,6 +856,8 @@ local function GenerateOrganicTree()
 		local wds = path.widths
 		local cap = path.capacity
 		local branch = path.isBranch
+		local appearTime = (path.appearFrame or 0) / GAME_SPEED
+		local witherTime = path.witherFrame and (path.witherFrame / GAME_SPEED) or 0
 
 		if #pts >= 2 then
 			-- Averaged perpendicular at each waypoint
@@ -974,28 +918,34 @@ local function GenerateOrganicTree()
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
+				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
 				verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
+				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
+				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
 
 				-- Tri 2: L1, R2, L2
 				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
+				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
+				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
 				verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=-1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
+				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
 
 				vertCount = vertCount + 6
 			end
@@ -1022,6 +972,7 @@ layout (location = 0) in vec3 vertPos;
 layout (location = 1) in vec3 vertData;
 layout (location = 2) in vec2 vertUV;
 layout (location = 3) in vec2 vertPerp;
+layout (location = 4) in vec2 vertTime;  // x = appearTime (s), y = witherTime (s, 0 = not withering)
 
 uniform sampler2D heightmapTex;
 
@@ -1032,6 +983,7 @@ out DataVS {
 	float width;
 	vec2 cableUV;
 	vec2 perp;
+	vec2 timeData;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1057,6 +1009,7 @@ void main() {
 	width = vertData.z;
 	cableUV = vertUV;
 	perp = vertPerp;
+	timeData = vertTime;
 	gl_Position = cameraViewProj * vec4(pos, 1.0);
 }
 ]]
@@ -1076,9 +1029,13 @@ in DataVS {
 	float width;
 	vec2 cableUV;
 	vec2 perp;
+	vec2 timeData;  // x = appearTime, y = witherTime (0 = not withering)
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
+
+const float GROWTH_RATE = 250.0;  // elmos/s — must match unsynced GROWTH_RATE
+const float WITHER_RATE = 400.0;
 
 out vec4 fragColor;
 
@@ -1090,6 +1047,17 @@ void main() {
 	float v = cableUV.y;
 	float t = abs(v);
 	if (t > 0.90) discard;
+
+	// Visual grow/wither: cableUV.x is distance along cable in elmos.
+	// Growth front advances from u=0 forward.
+	float along = cableUV.x;
+	float visibleFront = (gameTime - timeData.x) * GROWTH_RATE;
+	if (along > visibleFront) discard;
+	// Wither: tail eats forward from u=0 (witherTime > 0 means withering).
+	if (timeData.y > 0.5) {
+		float witherFront = (gameTime - timeData.y) * WITHER_RATE;
+		if (along < witherFront) discard;
+	}
 
 	// Proper cylinder cross-section normal.
 	// perp is the cross-section direction in world XZ (perpendicular to cable tangent).
@@ -1130,9 +1098,8 @@ void main() {
 	// Apply lighting
 	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
 
-	// Traveling energy pulses along the cable
-	// cableUV.x = distance along cable in elmos
-	float along = cableUV.x;
+	// Traveling energy pulses along the cable.
+	// "along" is already in scope from the grow/wither cut above.
 	float pulseSpeed = 180.0;   // elmos/second
 	float pulsePeriod = 500.0;  // elmos between pulses (spacing)
 	float pulseWidth = 35.0;    // elmos (pulse extent)
@@ -1169,37 +1136,68 @@ void main() {
 -- Receive data from synced
 -------------------------------------------------------------------------------------
 
-local function OnCableTreeUpdate()
-	local data = SYNCED.CableTreeData
-	if not data then return end
-
+local function shouldAcceptForAlly(allyTeamID)
 	local spec, fullview = spGetSpectatingState()
 	local myAllyTeam = spGetMyAllyTeamID()
-	local allyTeamID = data.allyTeamID
+	if (spec or fullview) then return true end
+	return allyTeamID == myAllyTeam
+end
 
-	if not (spec or fullview) and allyTeamID ~= myAllyTeam then return end
-	if lastVersions[allyTeamID] and data.version == lastVersions[allyTeamID] then return end
-	lastVersions[allyTeamID] = data.version
-
-	local edges = {}
-	local count = data.edgeCount or 0
-	for i = 1, count do
-		edges[i] = {
-			px = data.parentXs[i], pz = data.parentZs[i],
-			cx = data.childXs[i],  cz = data.childZs[i],
-			progress = data.progresses[i], length = data.lengths[i],
-			capacity = data.capacities[i],
-		}
-	end
-	edgesByAllyTeam[allyTeamID] = edges
-
+local function RebuildRenderEdges()
 	renderEdges = {}
-	for _, teamEdges in pairs(edgesByAllyTeam) do
-		for j = 1, #teamEdges do
-			renderEdges[#renderEdges + 1] = teamEdges[j]
+	for _, edges in pairs(edgesByAllyTeam) do
+		for _, e in pairs(edges) do
+			renderEdges[#renderEdges + 1] = e
+		end
+	end
+end
+
+-- In-place diff of the incoming Full snapshot against existing state:
+-- survivors keep their appearFrame (no animation restart), missing edges
+-- get marked withering, new edges get appearFrame = current frame.
+local function OnCableTreeFull()
+	local data = SYNCED.CableTreeFull
+	if not data then return end
+	local ally = data.allyTeamID
+	if not shouldAcceptForAlly(ally) then return end
+
+	local frame = Spring.GetGameFrame()
+	local existing = edgesByAllyTeam[ally] or {}
+
+	-- Build a fast lookup of incoming keys.
+	local incoming = {}
+	for i = 1, data.edgeCount do
+		incoming[data.keys[i]] = i
+	end
+
+	-- Mark missing edges as withering (or leave them withering if already so).
+	for k, e in pairs(existing) do
+		if not incoming[k] and not e.witherFrame then
+			e.witherFrame = frame
 		end
 	end
 
+	-- Add new, refresh capacity on survivors.
+	for k, i in pairs(incoming) do
+		local e = existing[k]
+		if e and not e.witherFrame then
+			e.capacity = data.caps[i]
+			-- positions are stable for unchanged edges; assign anyway in case parent moved
+			e.px, e.pz = data.pxs[i], data.pzs[i]
+			e.cx, e.cz = data.cxs[i], data.czs[i]
+		else
+			existing[k] = {
+				px = data.pxs[i], pz = data.pzs[i],
+				cx = data.cxs[i], cz = data.czs[i],
+				capacity = data.caps[i],
+				appearFrame = frame,
+				witherFrame = nil,
+			}
+		end
+	end
+
+	edgesByAllyTeam[ally] = existing
+	RebuildRenderEdges()
 	needsRebuild = true
 end
 
@@ -1223,6 +1221,7 @@ local function RebuildVBO()
 		{ id = 1, name = "vertData",  size = 3 },
 		{ id = 2, name = "vertUV",    size = 2 },
 		{ id = 3, name = "vertPerp",  size = 2 },
+		{ id = 4, name = "vertTime",  size = 2 },
 	})
 	vbo:Upload(verts)
 	cableVAO = gl.GetVAO()
@@ -1235,7 +1234,27 @@ end
 -- Drawing via DrawWorldPreUnit (forward, opaque)
 -------------------------------------------------------------------------------------
 
+-- Conservative cap on how long a withering edge stays in geometry; the
+-- fragment shader has already discarded its pixels long before this.
+-- Worst case path length ~2000 elmos / 400 elmos/sec = 5s; pad to be safe.
+local WITHER_HOLD_FRAMES = 8 * GAME_SPEED
+
 function gadget:GameFrame(n)
+	-- Drop fully-withered edges so geometry doesn't grow unboundedly.
+	local dropped = false
+	for ally, edges in pairs(edgesByAllyTeam) do
+		for k, e in pairs(edges) do
+			if e.witherFrame and (n - e.witherFrame) >= WITHER_HOLD_FRAMES then
+				edges[k] = nil
+				dropped = true
+			end
+		end
+	end
+	if dropped then
+		RebuildRenderEdges()
+		needsRebuild = true
+	end
+
 	if needsRebuild and n % 6 == 0 then
 		RebuildVBO()
 	end
@@ -1295,13 +1314,13 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget()
 		return
 	end
-	gadgetHandler:AddSyncAction("CableTreeUpdate", OnCableTreeUpdate)
+	gadgetHandler:AddSyncAction("CableTreeFull", OnCableTreeFull)
 end
 
 function gadget:Shutdown()
 	if cableShader then cableShader:Finalize() end
 	cableVAO = nil
-	gadgetHandler:RemoveSyncAction("CableTreeUpdate")
+	gadgetHandler:RemoveSyncAction("CableTreeFull")
 end
 
 end -- UNSYNCED
