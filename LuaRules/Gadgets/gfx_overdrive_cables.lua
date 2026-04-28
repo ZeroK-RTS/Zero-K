@@ -36,6 +36,7 @@ local spGetUnitDefID      = Spring.GetUnitDefID
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spValidUnitID       = Spring.ValidUnitID
+local spGetUnitResources  = Spring.GetUnitResources
 
 -- Mirrors the "currentlyActive" check in unit_mex_overdrive.lua so we only
 -- show cables for pylons actually contributing to the grid. GetUnitIsStunned
@@ -180,16 +181,23 @@ local function GetNodePcurrent(unitID, unitDefID)
 	return spGetUnitRulesParam(unitID, "current_energyIncome") or 0
 end
 
--- Current real draw: mexes consume "overdrive_energyDrain" (per-mex E spent
--- on overdrive this tick). Voltage units (turrets etc.) only need the grid to
--- *reach* their voltage — they don't continuously sink energy — so they read
--- as zero current draw. That keeps cables to idle starlights/desolators
--- showing zero flow even though their nameplate Dmax is high.
+-- Current real draw. Mexes consume via the overdrive system, which the
+-- mex_overdrive gadget reports per-unit as "overdrive_energyDrain". Every
+-- *other* pylon-tracked unit (strider hubs building units, factories,
+-- firing turrets, charging weapons, …) reports its live consumption via
+-- Spring.GetUnitResources().energyUse — so that's the right quantity to
+-- treat as cable draw at the consumer end.
+--
+-- The two are mutually exclusive: mexes don't have direct energyUse for the
+-- OD spend (the mex_overdrive gadget allocates from the team pool, not via
+-- the mex's own use), and non-mex consumers don't have an
+-- "overdrive_energyDrain" rules-param.
 local function GetNodeDcurrent(unitID, unitDefID)
 	if mexDefs[unitDefID] then
 		return spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0
 	end
-	return 0
+	local _, _, _, eUse = spGetUnitResources(unitID)
+	return eUse or 0
 end
 
 -------------------------------------------------------------------------------------
@@ -547,6 +555,7 @@ local function ComputeMaxPotentials()
 		local capBA = (oP < sD) and oP or sD   -- other -> subtree
 		local cap = (capAB > capBA) and capAB or capBA
 		capacities[key] = cap
+		local potentialSrcSubtree = capAB > capBA  -- fallback orientation when flow == 0
 
 		-- Current flow: same min-cut math against *live* production / draw.
 		-- We compute both directions; the winner sets both magnitude and
@@ -565,11 +574,19 @@ local function ComputeMaxPotentials()
 			flow, flowSrcSubtree = flowBA, false
 		end
 		if flow < 0 then flow = 0 end
+		-- At zero current flow the cable still has a meaningful "intended"
+		-- direction: the side that would draw if it could. For an idle turret
+		-- (voltage unit, Pcurrent=0, Dcurrent=0 but Dmax>0), that's the
+		-- turret side. Use the max-potential orientation as fallback so the
+		-- cable visually points AT the consumer; bubbles are motionless
+		-- anyway because flow == 0.
+		if flow <= 0 then
+			flowSrcSubtree = potentialSrcSubtree
+		end
 		flows[key] = flow
 
-		-- Orient: parent goes on the *current* flow source side. When flow is
-		-- zero the orientation is arbitrary; bubbles sit still anyway, so the
-		-- direction doesn't matter visually.
+		-- Orient: parent = source side (current flow when nonzero, max-
+		-- potential otherwise — handled by the fallback above).
 		local edge = edges[key]
 		if edge then
 			local newParent = flowSrcSubtree and cid or pid
@@ -812,6 +829,19 @@ local GROWTH_RATE = 250
 local WITHER_RATE = 400
 local GAME_SPEED  = Game.gameSpeed or 30
 
+-- Bubble speed mapping — must mirror the formula in the fragment shader. We
+-- integrate phase = ∫ speed(t) dt CPU-side per edge, so speed changes don't
+-- jump bubbles across the cable; the shader just extrapolates from the last
+-- anchor with the current speed.
+local BUBBLE_FLOW_REF  = 80
+local BUBBLE_MAX_SPEED = 220
+local function flowToSpeed(flow)
+	if not flow or flow < 0 then return 0 end
+	local n = flow / BUBBLE_FLOW_REF
+	if n > 1.6 then n = 1.6 end
+	return BUBBLE_MAX_SPEED * n
+end
+
 -------------------------------------------------------------------------------------
 -- State
 -------------------------------------------------------------------------------------
@@ -824,6 +854,12 @@ local needsRebuild = false
 local cableShader       -- forward shader for cable rendering
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
+-- Game-second timestamp captured the moment the current VBO's bubblePhase
+-- snapshots were taken. The shader extrapolates each cable's phase forward
+-- from this anchor using `phase = bakedPhase + flowToSpeed(flow) * (gameTime
+-- - bakeTime)`, which means flow changes update the rate of advance without
+-- ever teleporting the bubbles.
+local bubbleBakeTime = 0
 
 -------------------------------------------------------------------------------------
 -- Deterministic noise
@@ -909,17 +945,20 @@ local function GenerateOrganicTree()
 		local cap = max(1, e.capacity)
 		local flow = e.flow or 0
 		local eff = e.eff or 0
+		local bubblePhase = e.bubblePhase or 0
 		nodeNeighbors[pk][#nodeNeighbors[pk] + 1] = {
 			nKey = ck, edgeIdx = i, side = 1, cap = cap, flow = flow, eff = eff,
+			bubblePhase = bubblePhase,
 			appearFrame = e.appearFrame, witherFrame = e.witherFrame,
 		}
 		nodeNeighbors[ck][#nodeNeighbors[ck] + 1] = {
 			nKey = pk, edgeIdx = i, side = 2, cap = cap, flow = flow, eff = eff,
+			bubblePhase = bubblePhase,
 			appearFrame = e.appearFrame, witherFrame = e.witherFrame,
 		}
 	end
 
-	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch, appearFrame, witherFrame, flow, eff)
+	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch, appearFrame, witherFrame, flow, eff, bubblePhase)
 		local path = NoisyPath(x1, z1, x2, z2, NOISE_AMP_ABS, seed)
 		local widths = {}
 		for pi = 1, #path do
@@ -931,6 +970,7 @@ local function GenerateOrganicTree()
 			capacity = capacity, isBranch = isBranch and 1 or 0,
 			appearFrame = appearFrame, witherFrame = witherFrame,
 			flow = flow or 0, eff = eff or 0,
+			bubblePhase = bubblePhase or 0,
 		}
 		-- Twigs: spawn from ribbon edge, not center. Twigs are decorative;
 		-- they share the parent's flow/eff so pulse animation is consistent
@@ -973,6 +1013,7 @@ local function GenerateOrganicTree()
 					capacity = capacity, isBranch = 1,
 					appearFrame = appearFrame, witherFrame = witherFrame,
 					flow = flow or 0, eff = eff or 0,
+					bubblePhase = bubblePhase or 0,
 				}
 			end
 		end
@@ -1035,6 +1076,7 @@ local function GenerateOrganicTree()
 				local clusterFlow = 0
 				local netFlowSigned = 0
 				local effSum, capForEff = 0, 0
+				local phaseSum = 0
 				local stemAppear = math.huge
 				local stemWither = -math.huge
 				local allWither = true
@@ -1048,6 +1090,7 @@ local function GenerateOrganicTree()
 					-- side=2 → this node is the child (sink)   → flow enters
 					netFlowSigned = netFlowSigned + ((n.side == 1) and (n.flow or 0) or -(n.flow or 0))
 					effSum = effSum + (n.eff or 0) * n.cap
+					phaseSum = phaseSum + (n.bubblePhase or 0) * n.cap
 					capForEff = capForEff + n.cap
 					if n.dist and n.dist < minDist then minDist = n.dist end
 					local af = n.appearFrame or 0
@@ -1067,6 +1110,7 @@ local function GenerateOrganicTree()
 				local stemZ = pos.z + sin(avgAngle) * stemLen
 				local stemW = GetTrunkWidth(clusterCap)
 				local stemEff = capForEff > 0 and (effSum / capForEff) or 0
+				local stemPhase = capForEff > 0 and (phaseSum / capForEff) or 0
 
 				-- Stem is wider at the node side (where the cables merge) and a
 				-- bit thinner at the tip — emit accordingly so the merged trunk
@@ -1077,13 +1121,13 @@ local function GenerateOrganicTree()
 						stemW, stemW * 0.9, clusterCap,
 						pos.x + pos.z + ci * 7.3,
 						false, stemAppear, stemWitherFinal,
-						clusterFlow, stemEff)
+						clusterFlow, stemEff, stemPhase)
 				else
 					emitNoisyPath(stemX, stemZ, pos.x, pos.z,
 						stemW * 0.9, stemW, clusterCap,
 						pos.x + pos.z + ci * 7.3,
 						false, stemAppear, stemWitherFinal,
-						clusterFlow, stemEff)
+						clusterFlow, stemEff, stemPhase)
 				end
 
 				for i = 1, #cluster do
@@ -1122,7 +1166,7 @@ local function GenerateOrganicTree()
 			emitNoisyPath(attach[1].x, attach[1].z, attach[2].x, attach[2].z,
 				startW, endW, cap, seed,
 				false, e.appearFrame, e.witherFrame,
-				e.flow or 0, e.eff or 0)
+				e.flow or 0, e.eff or 0, e.bubblePhase or 0)
 		end
 	end
 
@@ -1139,8 +1183,9 @@ local function GenerateOrganicTree()
 		local branch = path.isBranch
 		local appearTime = (path.appearFrame or 0) / GAME_SPEED
 		local witherTime = path.witherFrame and (path.witherFrame / GAME_SPEED) or 0
-		local pathEff  = path.eff or 0
-		local pathFlow = path.flow or 0
+		local pathEff   = path.eff or 0
+		local pathFlow  = path.flow or 0
+		local pathPhase = path.bubblePhase or 0
 
 		if #pts >= 2 then
 			-- Averaged perpendicular at each waypoint
@@ -1202,19 +1247,19 @@ local function GenerateOrganicTree()
 				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
 				verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
 				verts[#verts+1]=u1; verts[#verts+1]=1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
 
 				-- Tri 2: L1, R2, L2
 				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
@@ -1222,19 +1267,19 @@ local function GenerateOrganicTree()
 				verts[#verts+1]=u1; verts[#verts+1]=-1
 				verts[#verts+1]=p1x; verts[#verts+1]=p1z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
 				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
 				verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
 				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
 				verts[#verts+1]=u2; verts[#verts+1]=-1
 				verts[#verts+1]=p2x; verts[#verts+1]=p2z
 				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow
+				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
 
 				vertCount = vertCount + 6
 			end
@@ -1262,7 +1307,7 @@ layout (location = 1) in vec3 vertData;
 layout (location = 2) in vec2 vertUV;
 layout (location = 3) in vec2 vertPerp;
 layout (location = 4) in vec2 vertTime;  // x = appearTime (s), y = witherTime (s, 0 = not withering)
-layout (location = 5) in vec2 vertGrid;  // x = grid efficiency (E/M ratio), y = current flow (E/s)
+layout (location = 5) in vec3 vertGrid;  // x = grid efficiency (E/M ratio), y = current flow (E/s), z = bubble phase at bake (elmos)
 
 uniform sampler2D heightmapTex;
 
@@ -1274,7 +1319,7 @@ out DataVS {
 	vec2 cableUV;
 	vec2 perp;
 	vec2 timeData;
-	vec2 gridData;
+	vec3 gridData;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1313,6 +1358,7 @@ local cableFSSrc = [[
 
 uniform sampler2D infoTex;
 uniform float gameTime;
+uniform float bakeTime;
 
 in DataVS {
 	vec3 worldPos;
@@ -1322,7 +1368,7 @@ in DataVS {
 	vec2 cableUV;
 	vec2 perp;
 	vec2 timeData;  // x = appearTime, y = witherTime (0 = not withering)
-	vec2 gridData;  // x = efficiency (E/M ratio), y = current flow (E/s)
+	vec3 gridData;  // x = efficiency (E/M), y = flow (E/s), z = bubble phase at bake (elmos)
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1355,9 +1401,13 @@ float hash1(float n) {
 // Shading: faint inner glow + Fresnel rim + small offset highlight, all with
 // smoothstep edges to avoid pixelation at oblique camera angles. Returns
 // (body, specular).
-vec2 bubbleLayer(float along, float t, float speed, float spacing,
+vec2 bubbleLayer(float along, float phase, float spacing,
                  float radiusMax, float v, float halfWidthE, float layerSeed) {
-	float along2 = along - t * speed;
+	// `phase` is the integrated travel distance baked + extrapolated by the
+	// caller (CPU integrates ∫ speed dt, shader extrapolates the last
+	// segment with the current speed). Subtracting it from `along` advects
+	// the bubble field smoothly even when speed steps between frames.
+	float along2 = along - phase;
 	float idxLow  = floor(along2 / spacing);
 	float coord   = along2 - idxLow * spacing;     // [0, spacing)
 	float idxNear = (coord < spacing * 0.5) ? idxLow : (idxLow + 1.0);
@@ -1386,16 +1436,25 @@ vec2 bubbleLayer(float along, float t, float speed, float spacing,
 	float xn = dAlong / radiusE;
 	float yn = dCrossE / radiusE;
 
-	// Inner glow: faint disc for body luminosity.
-	float body = (1.0 - smoothstep(0.0, 1.0, r)) * 0.45;
+	// Anti-alias bubble edge using screen-space derivative. Without this,
+	// thick cables (where one bubble covers many pixels) showed staircase
+	// pixelation on the rim. fwidth(r) ≈ how much r changes per pixel; we
+	// soften every smoothstep edge by that amount so transitions span ~1
+	// pixel regardless of camera distance.
+	float aa = clamp(fwidth(r) * 1.4, 0.005, 0.20);
 
-	// Fresnel-like rim brightest near r=0.82, faded both ways.
-	float rim = smoothstep(0.50, 0.82, r) * (1.0 - smoothstep(0.82, 1.0, r));
+	// Inner glow: faint disc for body luminosity, with AA outer cutoff.
+	float body = (1.0 - smoothstep(0.0, 1.0, r))
+	           * (1.0 - smoothstep(1.0 - aa, 1.0, r)) * 0.50;
+
+	// Fresnel-like rim brightest near r=0.82, faded both ways with AA edges.
+	float rim = smoothstep(0.50 - aa, 0.82, r)
+	          * (1.0 - smoothstep(0.82, 1.0 - aa * 0.5, r));
 
 	// Small specular highlight offset toward the light direction.
 	vec2 hd = vec2(xn + 0.30, yn + 0.40);
 	float hr = length(hd);
-	float spec = 1.0 - smoothstep(0.0, 0.30, hr);
+	float spec = 1.0 - smoothstep(0.0, 0.30 + aa, hr);
 	spec *= spec;
 
 	return vec2(body + rim, spec);
@@ -1495,17 +1554,25 @@ void main() {
 	//   - Three layered streams of bubbles (big, medium, small) with random
 	//     per-bubble size + cross-axis offset, so the cable looks like a
 	//     real bubbly slurry instead of a metronome of identical dots.
-	const float FLOW_REF = 80.0;
+	// Bubble speed mapping must match the CPU's flowToSpeed (otherwise the
+	// CPU-integrated phase and shader-extrapolated phase disagree and we get
+	// the very jumps this anchor scheme exists to eliminate).
+	const float FLOW_REF  = 80.0;
+	const float MAX_SPEED = 220.0;
 	float flow = gridData.y;
-	float flowNorm = clamp(flow / FLOW_REF, 0.0, 1.6);
-	float bubbleSpeed = 220.0 * flowNorm;  // exact zero at zero flow
-	float halfWidthE  = width * 0.5;       // cable cross half-extent in elmos
+	float speed = MAX_SPEED * clamp(flow / FLOW_REF, 0.0, 1.6);
+
+	// Phase = CPU's baked phase (snapshot at bakeTime) + linear extrapolation
+	// at the current speed. Speed *changes* update the rate of advance from
+	// here — bubbles don't teleport.
+	float phase = gridData.z + speed * (gameTime - bakeTime);
+	float halfWidthE = width * 0.5;       // cable cross half-extent in elmos
 
 	// Two layers of mixed-size bubbles. Density is fixed (constant spacing);
 	// per-bubble radius jitter inside each layer gives the small/big mix
 	// the user wants. Sizes are in elmos so the bubbles are world-round.
-	vec2 bA = bubbleLayer(along, gameTime, bubbleSpeed, 75.0, 7.5,  v, halfWidthE,  3.7);
-	vec2 bB = bubbleLayer(along, gameTime, bubbleSpeed, 32.0, 4.0,  v, halfWidthE, 19.1);
+	vec2 bA = bubbleLayer(along, phase, 75.0, 7.5, v, halfWidthE,  3.7);
+	vec2 bB = bubbleLayer(along, phase, 32.0, 4.0, v, halfWidthE, 19.1);
 
 	float bubbleBody = bA.x + bB.x * 0.85;
 	float bubbleSpec = bA.y + bB.y * 0.85;
@@ -1571,12 +1638,26 @@ local function OnCableTreeFull()
 	end
 
 	-- Add new, refresh capacity / flow / efficiency on survivors.
+	-- For each surviving edge, we integrate its bubble phase up to NOW with
+	-- the *old* speed before swapping in the new one. That way, when flow
+	-- (and hence speed) changes, the bubble position remains continuous —
+	-- it just starts evolving at a different rate from this moment on.
+	local nowSec = Spring.GetGameSeconds()
 	for k, i in pairs(incoming) do
 		local e = existing[k]
+		local newFlow = data.flows and data.flows[i] or 0
 		if e and not e.witherFrame then
+			-- Catch the phase up to `nowSec` using whatever speed the cable
+			-- was running at since its last anchor.
+			local oldSpeed = e.bubbleSpeed or 0
+			local oldAnchor = e.bubbleAnchorTime or nowSec
+			e.bubblePhase = (e.bubblePhase or 0) + oldSpeed * (nowSec - oldAnchor)
+			e.bubbleAnchorTime = nowSec
+			e.bubbleSpeed = flowToSpeed(newFlow)
+
 			e.capacity = data.caps[i]
-			e.flow     = data.flows and data.flows[i] or 0
-			e.eff      = data.effs  and data.effs[i]  or 0
+			e.flow     = newFlow
+			e.eff      = data.effs and data.effs[i] or 0
 			-- positions are stable for unchanged edges; assign anyway in case parent moved
 			e.px, e.pz = data.pxs[i], data.pzs[i]
 			e.cx, e.cz = data.cxs[i], data.czs[i]
@@ -1585,10 +1666,15 @@ local function OnCableTreeFull()
 				px = data.pxs[i], pz = data.pzs[i],
 				cx = data.cxs[i], cz = data.czs[i],
 				capacity = data.caps[i],
-				flow     = data.flows and data.flows[i] or 0,
-				eff      = data.effs  and data.effs[i]  or 0,
+				flow     = newFlow,
+				eff      = data.effs and data.effs[i] or 0,
 				appearFrame = frame,
 				witherFrame = nil,
+				-- Fresh edge starts with zero phase; speed is set so the
+				-- shader can extrapolate forward from this anchor.
+				bubblePhase      = 0,
+				bubbleAnchorTime = nowSec,
+				bubbleSpeed      = flowToSpeed(newFlow),
 			}
 		end
 	end
@@ -1603,6 +1689,18 @@ end
 -------------------------------------------------------------------------------------
 
 local function RebuildVBO()
+	-- Snapshot every edge's bubble phase to NOW before geometry generation,
+	-- and re-anchor; the shader will extrapolate from `bubbleBakeTime`.
+	bubbleBakeTime = Spring.GetGameSeconds()
+	for _, edges in pairs(edgesByAllyTeam) do
+		for _, e in pairs(edges) do
+			local oldSpeed = e.bubbleSpeed or 0
+			local oldAnchor = e.bubbleAnchorTime or bubbleBakeTime
+			e.bubblePhase = (e.bubblePhase or 0) + oldSpeed * (bubbleBakeTime - oldAnchor)
+			e.bubbleAnchorTime = bubbleBakeTime
+		end
+	end
+
 	local verts, vertCount = GenerateOrganicTree()
 	if vertCount == 0 then
 		numCableVerts = 0
@@ -1619,7 +1717,7 @@ local function RebuildVBO()
 		{ id = 2, name = "vertUV",    size = 2 },
 		{ id = 3, name = "vertPerp",  size = 2 },
 		{ id = 4, name = "vertTime",  size = 2 },
-		{ id = 5, name = "vertGrid",  size = 2 },  -- (efficiency, flow magnitude)
+		{ id = 5, name = "vertGrid",  size = 3 },  -- (efficiency, flow E/s, bubble phase elmos)
 	})
 	vbo:Upload(verts)
 	cableVAO = gl.GetVAO()
@@ -1663,6 +1761,7 @@ function gadget:DrawWorldPreUnit()
 
 	cableShader:Activate()
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds())
+	cableShader:SetUniform("bakeTime", bubbleBakeTime)
 
 	gl.Texture(0, "$info")
 	gl.Texture(1, "$heightmap")
@@ -1704,6 +1803,7 @@ function gadget:Initialize()
 		},
 		uniformFloat = {
 			gameTime = 0,
+			bakeTime = 0,
 		},
 	}, "Cable Forward Shader")
 
