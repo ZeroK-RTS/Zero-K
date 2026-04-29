@@ -1239,6 +1239,7 @@ out DataGS {
 	vec2 perp;
 	vec2 timeData;
 	vec3 gridData;
+	float localU;     // twig-local along (0 at root, bLen at tip). Unused for main ribbon.
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1251,6 +1252,18 @@ float heightAtWorldPos(vec2 w) {
 	vec2 uvhm = clamp(w, heightmaptexel, mapSize.xy - heightmaptexel);
 	uvhm = uvhm * inverseMapSize;
 	return textureLod(heightmapTex, uvhm, 0.0).x;
+}
+
+// Terrain normal at a world XZ point via 4-tap finite-difference of the
+// heightmap. Cheap (4 fetches) and good enough for placing twigs into the
+// slope's local tangent plane.
+vec3 terrainNormal(vec2 xz) {
+	const float E = 8.0;
+	float hxR = heightAtWorldPos(xz + vec2( E, 0.0));
+	float hxL = heightAtWorldPos(xz + vec2(-E, 0.0));
+	float hzU = heightAtWorldPos(xz + vec2(0.0,  E));
+	float hzD = heightAtWorldPos(xz + vec2(0.0, -E));
+	return normalize(vec3(hxL - hxR, 2.0 * E, hzD - hzU));
 }
 
 // Mirror of Lua-side Hash() / NoisyPath() so cables look exactly like before.
@@ -1268,21 +1281,23 @@ float gsNoiseScale(float t) {
 
 const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25 boundaries × 2). Cable lengths are bounded by pylon range so this isn't expected to clamp in practice.
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
-const float NOISE_AMP_ABS     = 2.5;
+const float NOISE_AMP_ABS     = 4.0;
 const float WIDTH_FACTOR      = 0.55;
 const float MIN_TRUNK_WIDTH   = 3.0;
 const float MAX_TRUNK_WIDTH   = 12.0;
 const float MAX_CAPACITY_REF  = 100.0;
 
 // Twig parameters mirror the Lua-side BRANCH_* constants.
-const float BRANCH_CHANCE     = 0.55;
+const float BRANCH_CHANCE     = 0.78;
 const float BRANCH_LEN_MIN    = 15.0;
 const float BRANCH_LEN_MAX    = 50.0;
 const float BRANCH_ANGLE_MIN  = 0.4;
 const float BRANCH_ANGLE_MAX  = 1.1;
-const float BRANCH_WIDTH      = 0.5;
+const float BRANCH_WIDTH      = 0.85;
 
 float gOutBranch = 0.0;
+
+float gOutLocalU = 0.0;  // set per-vertex by twig emitters; main ribbon leaves at 0.
 
 void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
              float w, vec3 grid, vec2 td, float cap) {
@@ -1294,6 +1309,7 @@ void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
 	perp = perpHere;
 	timeData = td;
 	gridData = grid;
+	localU = gOutLocalU;
 	gl_Position = cameraViewProj * vec4(wp, 1.0);
 	EmitVertex();
 }
@@ -1359,40 +1375,57 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	float bLen = BRANCH_LEN_MIN +
 		gsHashU(spawn.x, spawn.y, twigSeed + 3.0) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN);
 
-	// Build twig direction relative to the cable's straight tangent.
-	vec2 dirAB = d / max(length(d), 0.001);
-	float baseAngle = atan(dirAB.y, dirAB.x);
-	float angle = baseAngle + side * angleOff;
-	vec2 twigDir = vec2(cos(angle), sin(angle));
-	vec2 twigPerp = vec2(-twigDir.y, twigDir.x);
+	float twigW    = max(2.5, widthVal * BRANCH_WIDTH);
+	float twigHWr  = min(twigW, widthVal * 0.55) * WIDTH_FACTOR;
+	float twigHWt  = twigHWr * 0.25;
 
-	// Spawn at the ribbon edge so the twig pokes out of the side, not the
-	// midline.
-	vec2 root = spawn + perpAB * (halfMainW * 0.45 * side);
-	vec2 tip  = root + twigDir * bLen;
+	// Build the twig as a flat ribbon in the slope's local tangent plane at
+	// the spawn point. This way, viewing perpendicular to the slope, the twig
+	// looks exactly like a flat-ground twig — no downhill tilt artefact.
+	//
+	// Basis: N = terrain normal at spawn; T = cable tangent projected into the
+	// slope plane; B = N × T (in-slope perp to cable). Twig direction is
+	// (cos(angleOff)*T + side*sin(angleOff)*B), and twigPerp3D = N × twigDir3D.
+	vec3 N = terrainNormal(spawn);
+	vec3 cableDirH = normalize(vec3(d.x, 0.0, d.y));
+	vec3 T = normalize(cableDirH - dot(cableDirH, N) * N);
+	vec3 B = normalize(cross(N, T));
 
-	float twigW    = max(2.0, widthVal * BRANCH_WIDTH);
-	float twigHWr  = min(twigW, widthVal * 0.4) * WIDTH_FACTOR;
-	float twigHWt  = twigHWr * 0.2;
+	float ca = cos(angleOff);
+	float sa = sin(angleOff) * side;
+	vec3 twigDir3D  = ca * T + sa * B;
+	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
 
-	// Drape the twig along the terrain like the main ribbon. Higher clearance
-	// (+5) avoids the lower endpoint clipping into ground on steep slopes
-	// while still keeping the twig glued to the surface.
-	float yRoot = heightAtWorldPos(root) + 5.0;
-	float yTip  = heightAtWorldPos(tip)  + 5.0;
+	float clearance = 5.0;
+	vec3 spawn3D = vec3(spawn.x, heightAtWorldPos(spawn), spawn.y) + N * clearance;
 
-	vec3 rootL = vec3(root.x - twigPerp.x * twigHWr, yRoot, root.y - twigPerp.y * twigHWr);
-	vec3 rootR = vec3(root.x + twigPerp.x * twigHWr, yRoot, root.y + twigPerp.y * twigHWr);
-	vec3 tipL  = vec3(tip.x  - twigPerp.x * twigHWt, yTip,  tip.y  - twigPerp.y * twigHWt);
-	vec3 tipR  = vec3(tip.x  + twigPerp.x * twigHWt, yTip,  tip.y  + twigPerp.y * twigHWt);
+	// Anchor the root to the spawn-side edge of the cable's in-slope cross
+	// section so the twig pokes out of the side, not the midline.
+	vec3 root3D = spawn3D + B * (halfMainW * 0.45 * side);
+	vec3 tip3D  = root3D + twigDir3D * bLen;
+
+	vec3 rootL = root3D - twigPerp3D * twigHWr;
+	vec3 rootR = root3D + twigPerp3D * twigHWr;
+	vec3 tipL  = tip3D  - twigPerp3D * twigHWt;
+	vec3 tipR  = tip3D  + twigPerp3D * twigHWt;
+
+	// Horizontal projection of twigPerp for the FS varying (the FS reconstructs
+	// the cable normal via screen-space derivatives + this horizontal hint).
+	vec2 twigPerpH = vec2(twigPerp3D.x, twigPerp3D.z);
+	float lh = length(twigPerpH);
+	if (lh > 1e-4) twigPerpH /= lh; else twigPerpH = vec2(1.0, 0.0);
 
 	// cableUV.x carries the cable-wide along distance so the FS growth gate
 	// hides this twig until the main growth front has reached spawnAlongMain.
+	// localU is twig-local along (0..bLen) — the FS uses it for the synced
+	// single-bubble animation in twigs (independent of cable-global phase).
 	gOutBranch = 1.0;
-	emitVtx(rootL, twigPerp, vec2(spawnAlongMain,        -1.0), twigW,       gridD, timeD, cap);
-	emitVtx(rootR, twigPerp, vec2(spawnAlongMain,         1.0), twigW,       gridD, timeD, cap);
-	emitVtx(tipL,  twigPerp, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.2, gridD, timeD, cap);
-	emitVtx(tipR,  twigPerp, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.2, gridD, timeD, cap);
+	gOutLocalU = 0.0;
+	emitVtx(rootL, twigPerpH, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
+	emitVtx(rootR, twigPerpH, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
+	gOutLocalU = bLen;
+	emitVtx(tipL,  twigPerpH, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.25, gridD, timeD, cap);
+	emitVtx(tipR,  twigPerpH, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.25, gridD, timeD, cap);
 	EndPrimitive();
 }
 
@@ -1442,7 +1475,7 @@ void main() {
 		// Surviving twigs are then respread across [0.15, 0.85] so spacing
 		// remains roughly even regardless of twig count.
 		int idx = gl_InvocationID - 1;          // 0..3
-		int expectedTwigs = clamp(int(len3D / 110.0 + 0.5), 0, 4);
+		int expectedTwigs = clamp(int(len3D / 85.0 + 0.5), 0, 4);
 		if (idx >= expectedTwigs) return;
 		float tCenterRaw = 0.15 + (float(idx) + 0.5) * (0.7 / float(expectedTwigs));
 		// Snap to a main-ribbon segment vertex. The cable is rendered as
@@ -1478,6 +1511,7 @@ in DataGS {
 	vec2 perp;
 	vec2 timeData;  // x = appearTime, y = witherTime (0 = not withering)
 	vec3 gridData;  // x = efficiency (E/M), y = flow (E/s), z = bubble phase at bake (elmos)
+	float localU;   // twig-local along (0 at root, bLen at tip). Unused for main ribbon.
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1711,16 +1745,28 @@ void main() {
 	float phase = gridData.z + speed * (gameTime - bakeTime);
 	float halfWidthE = width * 0.5;       // cable cross half-extent in elmos
 
-	// Two layers of mixed-size bubbles. Density is fixed (constant spacing);
-	// per-bubble radius jitter inside each layer gives the small/big mix.
-	// Each layer returns (body, spec, halo); we composite them with
-	// different colour weights so the bubble reads as glowing plasma.
-	vec3 bA = bubbleLayer(along, phase, 75.0, 7.5, v, halfWidthE,  3.7);
-	vec3 bB = bubbleLayer(along, phase, 32.0, 4.0, v, halfWidthE, 19.1);
-
-	float bubbleBody = bA.x + bB.x * 0.85;
-	float bubbleSpec = bA.y + bB.y * 0.85;
-	float bubbleHalo = bA.z + bB.z * 0.55;
+	// Bubble pass: main ribbon uses two layers of advecting bubbles. Twigs
+	// instead show ONE synced bubble traversing twig-local space at the main
+	// cable's speed, with period = TWIG_SPACING/speed. Using gameTime*speed as
+	// the global phase makes every twig in a cable pulse in lockstep — that's
+	// the "bug-as-feature" Licho asked to bring back.
+	float bubbleBody, bubbleSpec, bubbleHalo;
+	if (isBranch > 0.5) {
+		const float TWIG_SPACING = 75.0;
+		float twigPhase = mod(gameTime * speed, TWIG_SPACING);
+		// Single-bubble layer: spacing=TWIG_SPACING, radius slightly bigger so
+		// the pulse reads clearly on short twigs.
+		vec3 bT = bubbleLayer(localU, twigPhase, TWIG_SPACING, 5.0, v, halfWidthE, 0.0);
+		bubbleBody = bT.x;
+		bubbleSpec = bT.y;
+		bubbleHalo = bT.z;
+	} else {
+		vec3 bA = bubbleLayer(along, phase, 75.0, 7.5, v, halfWidthE,  3.7);
+		vec3 bB = bubbleLayer(along, phase, 32.0, 4.0, v, halfWidthE, 19.1);
+		bubbleBody = bA.x + bB.x * 0.85;
+		bubbleSpec = bA.y + bB.y * 0.85;
+		bubbleHalo = bA.z + bB.z * 0.55;
+	}
 
 	// Bubble colour: keep the grid efficiency hue (low dilution → punchier).
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
