@@ -1266,8 +1266,9 @@ float gsNoiseScale(float t) {
 	return 1.0;
 }
 
-const int   SEGMENTS          = 24;
-const float NOISE_AMP_ABS     = 1.0;
+const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25 boundaries × 2). Cable lengths are bounded by pylon range so this isn't expected to clamp in practice.
+const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
+const float NOISE_AMP_ABS     = 2.5;
 const float WIDTH_FACTOR      = 0.55;
 const float MIN_TRUNK_WIDTH   = 3.0;
 const float MAX_TRUNK_WIDTH   = 12.0;
@@ -1299,20 +1300,24 @@ void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
 
 void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
                     float halfW, float widthVal, float effAmp, float seed,
-                    vec3 gridD, vec2 timeD, float cap) {
+                    vec3 gridD, vec2 timeD, float cap, int numSeg) {
 	gOutBranch = 0.0;
+	// `along` is fed into the FS as cableUV.x and drives bubble advection.
+	// It MUST be a 3D arc length, otherwise downslope cables look like the
+	// flow is racing because the same 2D Δalong covers more visible meters.
 	float along = 0.0;
-	vec2 prevP = a;
-	for (int i = 0; i <= SEGMENTS; i++) {
-		float t = float(i) / float(SEGMENTS);
+	vec3  prev3D = vec3(0.0);
+	for (int i = 0; i <= numSeg; i++) {
+		float t = float(i) / float(numSeg);
 		vec2 base = a + d * t;
 		float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
 		vec2 p = base + perpAB * n;
 
-		if (i > 0) along += distance(prevP, p);
-		prevP = p;
-
 		float y = heightAtWorldPos(p) + 2.0;
+		vec3 curr3D = vec3(p.x, y, p.y);
+		if (i > 0) along += distance(prev3D, curr3D);
+		prev3D = curr3D;
+
 		vec3 leftPos  = vec3(p.x - perpAB.x * halfW, y, p.y - perpAB.y * halfW);
 		vec3 rightPos = vec3(p.x + perpAB.x * halfW, y, p.y + perpAB.y * halfW);
 
@@ -1396,8 +1401,27 @@ void main() {
 	float effAmp = NOISE_AMP_ABS * (lenAB < 80.0 ? (lenAB / 80.0) : 1.0);
 	float seed   = a.x * 0.137 + a.y * 0.781 + b.x * 0.293 + b.y * 0.461;
 
+	// Coarse 3D length: 6 sub-spans of the straight a→b path, summing the
+	// terrain-aware Euclidean distance between samples. Slopes inflate len3D
+	// versus lenAB, so hilly cables get more turns AND tighter 2D spacing per
+	// segment (because each segment is len3D/numSeg in 3D arc, but spaced
+	// uniformly in 2D parameter t). Noise wiggle is ignored here — keeping the
+	// scan cheap matters more than a few % accuracy on segment count.
+	float len3D = 0.0;
+	{
+		vec3 prev3 = vec3(a.x, heightAtWorldPos(a) + 2.0, a.y);
+		for (int j = 1; j <= 6; j++) {
+			float tj = float(j) * (1.0 / 6.0);
+			vec2 bj = a + d * tj;
+			vec3 p3 = vec3(bj.x, heightAtWorldPos(bj) + 2.0, bj.y);
+			len3D += distance(p3, prev3);
+			prev3 = p3;
+		}
+	}
+	int numSeg = clamp(int(len3D / SEG_LEN_TARGET + 0.5), 1, MAX_SEGMENTS);
+
 	if (gl_InvocationID == 0) {
-		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap);
+		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg);
 	} else {
 		// 4 potential twigs spread across the cable interior; each invocation
 		// owns one slot. tCenter is biased into [0.15, 0.85] so twigs don't
