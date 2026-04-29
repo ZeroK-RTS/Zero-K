@@ -80,6 +80,12 @@ local generatorDefs = {}
 local pmaxByDef = {}      -- [defID] = nameplate production for non-wind generators
 local isWindgenByDef = {} -- [defID] = true (production resolved via WindMax at runtime)
 local voltageByDef = {}   -- [defID] = neededlink value (counts as static Dmax)
+-- Per-tick consumer set: only nodes whose def could plausibly draw current
+-- get hit with Spring.GetUnitResources / overdrive_energyDrain reads each
+-- ComputeMaxPotentials cycle. Pure generators (windmill, solar, fusion) and
+-- range-only pylons are skipped — at 1500+ pylons that read alone took the
+-- bulk of the 1Hz hitch.
+local consumerByDef = {}
 
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
@@ -105,6 +111,13 @@ for i = 1, #UnitDefs do
 	local nl = tonumber(cp.neededlink)
 	if nl and nl > 0 then
 		voltageByDef[i] = nl
+	end
+	-- Mex / voltage unit / anything that builds (factory, strider hub,
+	-- builder commander, etc.) can draw energy on the cable.
+	local hasBuildPower = (udef.buildSpeed and udef.buildSpeed > 0) or
+		(udef.buildPower and udef.buildPower > 0)
+	if mexDefs[i] or voltageByDef[i] or hasBuildPower then
+		consumerByDef[i] = true
 	end
 end
 
@@ -648,12 +661,15 @@ local function ComputeMaxPotentials()
 
 	-- subDcur DOES still need per-node reads — mex draw and turret
 	-- consumption fluctuate per tick and are not derivable from anything
-	-- topology-cached.
+	-- topology-cached. But we only call into the engine for nodes whose def
+	-- can possibly draw (mexes, voltage units, builders). Pure generators
+	-- (windmills/solar/fusion) and range-only pylons stay at 0 → at 1500+
+	-- pylons this skips most of the per-tick rules-param reads.
 	local subDcur = {}
 	for i = 1, #order do
 		local u = order[i]
 		local did = nodeDefByUID[u]
-		subDcur[u] = did and GetNodeDcurrent(u, did) or 0
+		subDcur[u] = (did and consumerByDef[did]) and GetNodeDcurrent(u, did) or 0
 	end
 	for i = #order, 1, -1 do
 		local u = order[i]
@@ -1188,21 +1204,22 @@ void main() {
 
 -- (dead-code block removed)
 
--- Full GS: takes one GL_LINES primitive (the cable's two endpoints), generates
--- a wiggly path with `SEGMENTS` waypoints, samples the heightmap per waypoint
--- for terraform-correct y, and emits one triangle_strip ribbon.
--- #version 330 because that's what works alongside the engine UBO bindings
--- and the existing #version 420 VS/FS — matches outline_shader_gl4's pattern.
+-- Full GS: takes one GL_LINES primitive (cable endpoints) and emits the cable
+-- ribbon. Uses GS invocations: each invocation runs main() with its own
+-- max_vertices budget, so we can:
+--   invocation 0          → main wiggly ribbon (SEGMENTS+1 boundaries × 2 verts)
+--   invocations 1..N-1    → one twig each (4 verts), conditional on a hash
+-- This sidesteps the per-program max_vertices limit and keeps the FS body
+-- unchanged.
 local cableGSSrc = [[
 #version 330
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
+#extension GL_ARB_gpu_shader5 : require
 
-layout (lines) in;
-// max_vertices is constrained by GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS
-// (spec minimum 1024). With ~19 components emitted per vertex (gl_Position +
-// DataGS payload), we have headroom for ~50 vertices total → 24-segment
-// ribbon (25 boundary samples × 2 verts = 50 verts).
+layout (lines, invocations = 5) in;
+// 50 verts/invocation comfortably fits min-spec total components budget;
+// invocation 0 uses ~50, twig invocations use 4.
 layout (triangle_strip, max_vertices = 50) out;
 
 uniform sampler2D heightmapTex;
@@ -1240,24 +1257,37 @@ float heightAtWorldPos(vec2 w) {
 float gsHash(float x, float z, float seed) {
 	return fract(sin(x * 12.9898 + z * 78.233 + seed * 43.17) * 43758.5453) * 2.0 - 1.0;
 }
+float gsHashU(float x, float z, float seed) {  // [0,1] variant
+	return (gsHash(x, z, seed) + 1.0) * 0.5;
+}
 float gsNoiseScale(float t) {
 	if (t < 0.1) return t / 0.1;
 	if (t > 0.9) return (1.0 - t) / 0.1;
 	return 1.0;
 }
 
-const int   SEGMENTS         = 24;
-const float NOISE_AMP_ABS    = 1.0;
-const float WIDTH_FACTOR     = 0.55;
-const float MIN_TRUNK_WIDTH  = 3.0;
-const float MAX_TRUNK_WIDTH  = 12.0;
-const float MAX_CAPACITY_REF = 100.0;
+const int   SEGMENTS          = 24;
+const float NOISE_AMP_ABS     = 1.0;
+const float WIDTH_FACTOR      = 0.55;
+const float MIN_TRUNK_WIDTH   = 3.0;
+const float MAX_TRUNK_WIDTH   = 12.0;
+const float MAX_CAPACITY_REF  = 100.0;
+
+// Twig parameters mirror the Lua-side BRANCH_* constants.
+const float BRANCH_CHANCE     = 0.55;
+const float BRANCH_LEN_MIN    = 15.0;
+const float BRANCH_LEN_MAX    = 50.0;
+const float BRANCH_ANGLE_MIN  = 0.4;
+const float BRANCH_ANGLE_MAX  = 1.1;
+const float BRANCH_WIDTH      = 0.5;
+
+float gOutBranch = 0.0;
 
 void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
              float w, vec3 grid, vec2 td, float cap) {
 	worldPos = wp;
 	capacity = cap;
-	isBranch = 0.0;
+	isBranch = gOutBranch;
 	width = w;
 	cableUV = cuv;
 	perp = perpHere;
@@ -1267,29 +1297,10 @@ void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
 	EmitVertex();
 }
 
-void main() {
-	vec2 a = dataIn[0].vsWorldXZ;
-	vec2 b = dataIn[1].vsWorldXZ;
-	vec2 d = b - a;
-	float lenAB = length(d);
-	if (lenAB < 0.5) return;
-	vec2 dirAB  = d / lenAB;
-	vec2 perpAB = vec2(-dirAB.y, dirAB.x);
-
-	float cap   = dataIn[0].vsCableData.x;
-	vec2  timeD = dataIn[0].vsCableData.yz;
-	vec3  gridD = dataIn[0].vsGridData;
-
-	float widthVal = MIN_TRUNK_WIDTH +
-		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
-	float halfW = widthVal * WIDTH_FACTOR;
-	float effAmp = NOISE_AMP_ABS * (lenAB < 80.0 ? (lenAB / 80.0) : 1.0);
-
-	// Stable seed derived purely from endpoint coords — same as old CPU path.
-	float seed = a.x * 0.137 + a.y * 0.781 + b.x * 0.293 + b.y * 0.461;
-
-	// Wiggly ribbon: per-segment noise applied perpendicular to the straight
-	// line direction — same formula as the old Lua-side NoisyPath().
+void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
+                    float halfW, float widthVal, float effAmp, float seed,
+                    vec3 gridD, vec2 timeD, float cap) {
+	gOutBranch = 0.0;
 	float along = 0.0;
 	vec2 prevP = a;
 	for (int i = 0; i <= SEGMENTS; i++) {
@@ -1309,6 +1320,93 @@ void main() {
 		emitVtx(rightPos, perpAB, vec2(along,  1.0), widthVal, gridD, timeD, cap);
 	}
 	EndPrimitive();
+}
+
+// Emit a small lateral twig at parametric position tCenter along the main
+// (wiggly) cable, deterministic on the cable seed + tCenter so the same
+// twigs appear every frame in the same place. Returns silently when the
+// hash says "no twig here" — leaving an empty primitive, which is a no-op.
+void emitTwig(vec2 a, vec2 d, vec2 perpAB,
+              float halfMainW, float widthVal, float effAmp, float seed,
+              vec3 gridD, vec2 timeD, float cap, float tCenter, float invSeed) {
+	// Resolve spawn point on the wiggly main path at tCenter.
+	vec2 base = a + d * tCenter;
+	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(tCenter);
+	vec2 spawn = base + perpAB * n;
+
+	float twigSeed = spawn.x * 7.13 + spawn.y * 3.77 + invSeed;
+	float chance = gsHashU(spawn.x, spawn.y, twigSeed);
+	if (chance > BRANCH_CHANCE) return;
+
+	// Side & angle off the main direction.
+	float side = (gsHash(spawn.x, spawn.y, twigSeed + 1.0) > 0.0) ? 1.0 : -1.0;
+	float angleOff = BRANCH_ANGLE_MIN +
+		gsHashU(spawn.x, spawn.y, twigSeed + 2.0) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN);
+	float bLen = BRANCH_LEN_MIN +
+		gsHashU(spawn.x, spawn.y, twigSeed + 3.0) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN);
+
+	// Build twig direction relative to the cable's straight tangent.
+	vec2 dirAB = d / max(length(d), 0.001);
+	float baseAngle = atan(dirAB.y, dirAB.x);
+	float angle = baseAngle + side * angleOff;
+	vec2 twigDir = vec2(cos(angle), sin(angle));
+	vec2 twigPerp = vec2(-twigDir.y, twigDir.x);
+
+	// Spawn at the ribbon edge so the twig pokes out of the side, not the
+	// midline.
+	vec2 root = spawn + perpAB * (halfMainW * 0.45 * side);
+	vec2 tip  = root + twigDir * bLen;
+
+	float twigW    = max(2.0, widthVal * BRANCH_WIDTH);
+	float twigHWr  = min(twigW, widthVal * 0.4) * WIDTH_FACTOR;
+	float twigHWt  = twigHWr * 0.2;
+
+	float yRoot = heightAtWorldPos(root) + 2.0;
+	float yTip  = heightAtWorldPos(tip)  + 2.0;
+
+	vec3 rootL = vec3(root.x - twigPerp.x * twigHWr, yRoot, root.y - twigPerp.y * twigHWr);
+	vec3 rootR = vec3(root.x + twigPerp.x * twigHWr, yRoot, root.y + twigPerp.y * twigHWr);
+	vec3 tipL  = vec3(tip.x  - twigPerp.x * twigHWt, yTip,  tip.y  - twigPerp.y * twigHWt);
+	vec3 tipR  = vec3(tip.x  + twigPerp.x * twigHWt, yTip,  tip.y  + twigPerp.y * twigHWt);
+
+	gOutBranch = 1.0;
+	emitVtx(rootL, twigPerp, vec2(0.0,  -1.0), twigW,        gridD, timeD, cap);
+	emitVtx(rootR, twigPerp, vec2(0.0,   1.0), twigW,        gridD, timeD, cap);
+	emitVtx(tipL,  twigPerp, vec2(bLen, -1.0), twigW * 0.2,  gridD, timeD, cap);
+	emitVtx(tipR,  twigPerp, vec2(bLen,  1.0), twigW * 0.2,  gridD, timeD, cap);
+	EndPrimitive();
+}
+
+void main() {
+	vec2 a = dataIn[0].vsWorldXZ;
+	vec2 b = dataIn[1].vsWorldXZ;
+	vec2 d = b - a;
+	float lenAB = length(d);
+	if (lenAB < 0.5) return;
+	vec2 dirAB  = d / lenAB;
+	vec2 perpAB = vec2(-dirAB.y, dirAB.x);
+
+	float cap   = dataIn[0].vsCableData.x;
+	vec2  timeD = dataIn[0].vsCableData.yz;
+	vec3  gridD = dataIn[0].vsGridData;
+
+	float widthVal = MIN_TRUNK_WIDTH +
+		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
+	float halfW  = widthVal * WIDTH_FACTOR;
+	float effAmp = NOISE_AMP_ABS * (lenAB < 80.0 ? (lenAB / 80.0) : 1.0);
+	float seed   = a.x * 0.137 + a.y * 0.781 + b.x * 0.293 + b.y * 0.461;
+
+	if (gl_InvocationID == 0) {
+		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap);
+	} else {
+		// 4 potential twigs spread across the cable interior; each invocation
+		// owns one slot. tCenter is biased into [0.15, 0.85] so twigs don't
+		// overlap the endpoint cluster regions.
+		int idx = gl_InvocationID - 1;          // 0..3
+		float tCenter = 0.15 + (float(idx) + 0.5) * (0.7 / 4.0);
+		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
+		         gridD, timeD, cap, tCenter, float(idx) * 13.7);
+	}
 }
 ]]
 
@@ -1627,6 +1725,7 @@ local function OnCableTreeFull()
 	local ally = data.allyTeamID
 	if not shouldAcceptForAlly(ally) then return end
 
+	local tStart = drawPerf and Spring.GetTimer() or nil
 	local frame = Spring.GetGameFrame()
 	local existing = edgesByAllyTeam[ally] or {}
 
@@ -1689,8 +1788,18 @@ local function OnCableTreeFull()
 	end
 
 	edgesByAllyTeam[ally] = existing
+	local tDiff = drawPerf and Spring.GetTimer() or nil
 	RebuildRenderEdges()
 	needsRebuild = true
+
+	if drawPerf then
+		local tEnd = Spring.GetTimer()
+		Spring.Echo(string.format(
+			"[CableTree] OnCableTreeFull: diff=%.2f ms  rebuildIdx=%.2f ms  edges=%d",
+			Spring.DiffTimers(tDiff,  tStart) * 1000,
+			Spring.DiffTimers(tEnd,   tDiff)  * 1000,
+			data.edgeCount))
+	end
 end
 
 -------------------------------------------------------------------------------------
