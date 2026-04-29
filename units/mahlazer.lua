@@ -133,7 +133,7 @@ return { mahlazer = {
       craterMult              = 0,
 
       customParams              = {
-        stats_damage = 18000,
+        stats_damage = 19500,
         stats_hide_shield_damage = 1,
         light_radius = 0,
         lups_noshockwave = [[1]],
