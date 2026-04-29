@@ -1260,10 +1260,8 @@ out DataGS {
 	float isBranch;
 	float width;
 	vec2 cableUV;
-	vec2 perp;       // horizontal (XZ) projection of slope-aligned cross direction
 	vec2 timeData;
 	vec4 gridData;
-	float localU;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1321,25 +1319,23 @@ const float BRANCH_WIDTH      = 0.85;
 
 float gOutBranch = 0.0;
 
-float gOutLocalU = 0.0;  // set per-vertex by twig emitters; main ribbon leaves at 0.
-
-void emitVtx(vec3 wp, vec3 perpHere, vec2 cuv,
+void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
              float w, vec4 grid, vec2 td, float cap) {
 	worldPos = wp;
 	capacity = cap;
 	isBranch = gOutBranch;
 	width = w;
 	cableUV = cuv;
-	// We bake only the *horizontal* projection of the slope-aligned cross
-	// direction. The FS reconstructs the full 3D direction by rotating it
-	// into the local surface tangent plane (using screen-space derivatives
-	// of worldPos), so we don't need to spend a fresh varying on the Y
-	// component — the GS-output varying budget on this hardware is tight
-	// and adding any extra component pushes the linker over.
-	perp = perpHere.xz;
 	timeData = td;
 	gridData = grid;
-	localU = gOutLocalU;
+	// Per-vertex cable along-direction. Smoothly interpolated across the
+	// triangle strip → the FS gets a continuously rotating tangent across
+	// the cable, so the cylinder cross-section's lit direction tracks the
+	// cable's path (highlight bends with up/down hills) instead of being
+	// flat-shaded per triangle. perp3D and trueUp are derived from this in
+	// the FS as cross(worldUp, tangent), so we don't need a separate `perp`
+	// varying — the cross-section axis is implied by the smooth tangent.
+	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
 	gl_Position = cameraViewProj * vec4(wp, 1.0);
 	EmitVertex();
 }
@@ -1500,14 +1496,27 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		float midY = max(center3D.y, 0.5 * (leftPos.y + rightPos.y));
 		center3D.y = midY;
 
+		// Per-vertex tangent: forward-diff at vertex 0 (chord direction), and
+		// back-diff for subsequent vertices (centerline direction from the
+		// previous vertex). Smoothly interpolated across the triangle strip,
+		// this gives the FS a continuous cable along-direction so the
+		// cylinder normal bends with up/down hills. (Geometry itself is rigid:
+		// adjacent vertices share the same B3 cross-direction, so the ribbon
+		// cannot twist around its axis.)
+		vec3 vtxTangent;
+		if (i == 0) {
+			vtxTangent = cableDirH_g;
+		} else {
+			vtxTangent = center3D - prev3D;
+			float vtL = length(vtxTangent);
+			vtxTangent = (vtL > 1e-4) ? vtxTangent / vtL : cableDirH_g;
+		}
+
 		if (i > 0) along += distance(prev3D, center3D);
 		prev3D = center3D;
 
-		// Pass B3 (slope-aligned cross direction) as the perp varying — the FS
-		// reconstructs the cylinder cross-coordinate from this. Using horizontal
-		// perpAB here previously caused a corkscrew/twist on cross-slopes.
-		emitVtx(leftPos,  B3, vec2(along, -1.0), widthVal, gridD, timeD, cap);
-		emitVtx(rightPos, B3, vec2(along,  1.0), widthVal, gridD, timeD, cap);
+		emitVtx(leftPos,  vtxTangent, vec2(along, -1.0), widthVal, gridD, timeD, cap);
+		emitVtx(rightPos, vtxTangent, vec2(along,  1.0), widthVal, gridD, timeD, cap);
 	}
 	EndPrimitive();
 }
@@ -1576,17 +1585,14 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 
 	// cableUV.x carries the cable-wide along distance so the FS growth gate
 	// hides this twig until the main growth front has reached spawnAlongMain.
-	// localU is twig-local along (0..bLen) — the FS uses it for synced single-
-	// bubble animation in twigs. Pass twigPerp3D in (the FS only uses the .xz
-	// horizontal projection from `perp` to sign-align the reconstructed
-	// surface-tangent perp3D, but emitVtx accepts vec3 so caller stays clean).
+	// vsTangent for twigs is the twigDir3D (the twig's along-direction); the
+	// FS derives perp3D from cross(worldUp, vsTangent) so cylindrical lighting
+	// follows the twig's pointing direction.
 	gOutBranch = 1.0;
-	gOutLocalU = 0.0;
-	emitVtx(rootL, twigPerp3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
-	emitVtx(rootR, twigPerp3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
-	gOutLocalU = bLen;
-	emitVtx(tipL,  twigPerp3D, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.25, gridD, timeD, cap);
-	emitVtx(tipR,  twigPerp3D, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.25, gridD, timeD, cap);
+	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
+	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
+	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.25, gridD, timeD, cap);
+	emitVtx(tipR,  twigDir3D, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.25, gridD, timeD, cap);
 	EndPrimitive();
 }
 
@@ -1689,10 +1695,8 @@ in DataGS {
 	float isBranch;
 	float width;
 	vec2 cableUV;
-	vec2 perp;       // horizontal (XZ) projection of slope-aligned cross direction
 	vec2 timeData;
 	vec4 gridData;
-	float localU;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1835,47 +1839,41 @@ void main() {
 		if (along < witherFront) discard;
 	}
 
-	// Cylinder cross-section normal that respects cable slope.
+	// Cylinder cross-section normal that respects cable slope, derived from
+	// the smoothly-interpolated cable tangent passed in by the GS.
 	//
-	// `perp` (vec2) is only the horizontal (XZ) projection of the slope-aligned
-	// cross direction — the GS varying budget on this hardware is tight, so we
-	// can't afford a full vec3. We reconstruct the actual 3D cross direction
-	// here in the FS, in two steps:
-	//   (1) `cableT`  = world-space cable tangent, recovered from screen-space
-	//                   derivatives of `cableUV.x` (along) vs worldPos.
-	//   (2) `surfN`   = visible surface normal at this fragment, recovered as
-	//                   `cross(dWdx, dWdy)`. This is the cable-ribbon's local
-	//                   surface plane normal — i.e., the slope's normal where
-	//                   the cable is laying.
-	//   (3) `perp3D`  = `cross(cableT, surfN)`, signed-aligned with the
-	//                   horizontal hint `perp.xy`.
-	// This way a cable on a cross-slope correctly tilts its cylindrical
-	// cross-section into the slope's plane (no corkscrew) without baking the Y
-	// component as a separate varying.
-	vec3 dWdx = dFdx(worldPos);
-	vec3 dWdy = dFdy(worldPos);
+	// `vsTangent` is set per-vertex to the local cable along-direction (back-
+	// diff of adjacent centerline vertices). The triangle-strip rasteriser
+	// linearly interpolates it across triangles → adjacent fragments along the
+	// cable see a continuously rotating tangent, so the cylinder's lit side
+	// bends smoothly with up/down hills instead of stepping per triangle (as
+	// happens when the basis is reconstructed from `dFdx(worldPos)`, which is
+	// flat per triangle).
+	//
+	// Cross-section axis is `cross(worldUp, cableT)` — purely horizontal, which
+	// matches the GS's global B3 (≈ cross(Navg, T_g)) closely enough for any
+	// terrain whose Navg is near +Y. Sign matches: GS emits leftPos at -B3
+	// (cableUV.y = -1), rightPos at +B3 (cableUV.y = +1), and `cross(Y, T)`
+	// gives the same direction as cross(Navg, T) up to a small Y component.
+	// Reconstruct cable tangent from screen-space derivatives of (worldPos, cableUV.x).
+	// This is per-triangle flat (cableUV.x is linearly interpolated, so derivatives
+	// are constant within a triangle), but cheaper than passing a vec3 varying.
+	vec3 dWdx_loc = dFdx(worldPos);
+	vec3 dWdy_loc = dFdy(worldPos);
 	float duDx = dFdx(cableUV.x);
 	float duDy = dFdy(cableUV.x);
-	float denom = duDx * duDx + duDy * duDy;
-	vec3 cableT;
-	if (denom > 1e-6) {
-		cableT = normalize((dWdx * duDx + dWdy * duDy) / denom);
-	} else {
-		// Fallback if derivatives are degenerate (single-pixel cable, etc.):
-		// horizontal tangent perpendicular to perp.
-		cableT = normalize(vec3(perp.y, 0.0, -perp.x));
-	}
-
-	vec3 surfaceN = cross(dWdx, dWdy);
-	float surfaceNL = length(surfaceN);
-	if (surfaceNL > 1e-4) surfaceN /= surfaceNL; else surfaceN = vec3(0.0, 1.0, 0.0);
-	if (surfaceN.y < 0.0) surfaceN = -surfaceN;
-	vec3 perp3D = cross(cableT, surfaceN);
+	float duDenom = duDx * duDx + duDy * duDy;
+	vec3 cableT = (duDenom > 1e-6)
+	    ? normalize((dWdx_loc * duDx + dWdy_loc * duDy) / duDenom)
+	    : vec3(1.0, 0.0, 0.0);
+	vec3 perp3D = cross(vec3(0.0, 1.0, 0.0), cableT);
 	float perp3DL = length(perp3D);
-	if (perp3DL > 1e-4) perp3D /= perp3DL; else perp3D = vec3(perp.x, 0.0, perp.y);
-	// Sign-align with the horizontal hint so the L/R sides match what the GS
-	// emitted (left vertex still carries cableUV.y = -1).
-	if (dot(perp3D.xz, perp) < 0.0) perp3D = -perp3D;
+	if (perp3DL > 1e-3) {
+		perp3D /= perp3DL;
+	} else {
+		// Cable nearly vertical — pick an arbitrary horizontal perp.
+		perp3D = vec3(1.0, 0.0, 0.0);
+	}
 
 	vec3 trueUp = cross(cableT, perp3D);
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
@@ -2035,8 +2033,16 @@ void main() {
 	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), 0.15);
 	vec3 haloColor   = grayedGrid;
 
-	// Composition order is chosen so the bubble core never picks up the bark's
-	// hue:
+	// LOS-aware dimming on the BARK ONLY. Bubbles are plasma — they're emissive
+	// and shouldn't fade with LOS-darkness; previously the dim was applied
+	// after bubble composition, which made the glowing balls visibly disappear
+	// as they crossed dim/shadow regions. Now the bark dims, then bubbles are
+	// composed at full emissive brightness on top, so they remain visible as
+	// "lights in the dark".
+	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
+	color *= dimFactor;
+
+	// Composition order:
 	//   - Halo: additive (soft underglow that should mix with bark colour).
 	//   - Body: max() over current colour, so the dark green/brown bark can't
 	//     leak into the bubble's true grid hue. Plain additive composition
@@ -2048,10 +2054,6 @@ void main() {
 	vec3 bubbleEmissive = bubbleColor * bubbleBody * fullLOS * 1.85;
 	color = max(color, bubbleEmissive);
 	color += vec3(1.0) * bubbleSpec * fullLOS * 1.10;
-
-	// LOS-aware dimming
-	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
-	color *= dimFactor;
 
 	// FULLY OPAQUE output — like lava. No alpha blending.
 	fragColor = vec4(color, 1.0);
