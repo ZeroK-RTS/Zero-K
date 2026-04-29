@@ -1260,10 +1260,10 @@ out DataGS {
 	float isBranch;
 	float width;
 	vec2 cableUV;
-	vec2 perp;
+	vec2 perp;       // horizontal (XZ) projection of slope-aligned cross direction
 	vec2 timeData;
 	vec4 gridData;
-	float localU;     // twig-local along (0 at root, bLen at tip). Unused for main ribbon.
+	float localU;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1323,14 +1323,20 @@ float gOutBranch = 0.0;
 
 float gOutLocalU = 0.0;  // set per-vertex by twig emitters; main ribbon leaves at 0.
 
-void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
+void emitVtx(vec3 wp, vec3 perpHere, vec2 cuv,
              float w, vec4 grid, vec2 td, float cap) {
 	worldPos = wp;
 	capacity = cap;
 	isBranch = gOutBranch;
 	width = w;
 	cableUV = cuv;
-	perp = perpHere;
+	// We bake only the *horizontal* projection of the slope-aligned cross
+	// direction. The FS reconstructs the full 3D direction by rotating it
+	// into the local surface tangent plane (using screen-space derivatives
+	// of worldPos), so we don't need to spend a fresh varying on the Y
+	// component — the GS-output varying budget on this hardware is tight
+	// and adding any extra component pushes the linker over.
+	perp = perpHere.xz;
 	timeData = td;
 	gridData = grid;
 	localU = gOutLocalU;
@@ -1419,7 +1425,7 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		// Now: N = terrain normal at p; T = horizontal cable tangent projected
 		// into the slope plane; B = N × T. L = center3D + B*halfW (with B's sign
 		// chosen to land on `-perpAB`), R = center3D - B*halfW.
-		float yC = heightAtWorldPos(p) + 6.0;
+		float yC = heightAtWorldPos(p) + 3.0;
 		vec3 center3D = vec3(p.x, yC, p.y);
 
 		vec3 N = terrainNormal(p);
@@ -1439,7 +1445,7 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		// below the actual heightmap at their XZ. Raise to local terrain +
 		// minClearance whenever that happens. On linear terrain the L/R points
 		// already sit at clearance above ground so this is a no-op there.
-		float minSideClearance = 3.0;
+		float minSideClearance = 1.5;
 		float hL_xz = heightAtWorldPos(leftPos.xz)  + minSideClearance;
 		float hR_xz = heightAtWorldPos(rightPos.xz) + minSideClearance;
 		leftPos.y  = max(leftPos.y,  hL_xz);
@@ -1453,8 +1459,11 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		if (i > 0) along += distance(prev3D, center3D);
 		prev3D = center3D;
 
-		emitVtx(leftPos,  perpAB, vec2(along, -1.0), widthVal, gridD, timeD, cap);
-		emitVtx(rightPos, perpAB, vec2(along,  1.0), widthVal, gridD, timeD, cap);
+		// Pass B3 (slope-aligned cross direction) as the perp varying — the FS
+		// reconstructs the cylinder cross-coordinate from this. Using horizontal
+		// perpAB here previously caused a corkscrew/twist on cross-slopes.
+		emitVtx(leftPos,  B3, vec2(along, -1.0), widthVal, gridD, timeD, cap);
+		emitVtx(rightPos, B3, vec2(along,  1.0), widthVal, gridD, timeD, cap);
 	}
 	EndPrimitive();
 }
@@ -1508,7 +1517,7 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	vec3 twigDir3D  = ca * T + sa * B;
 	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
 
-	float clearance = 5.0;
+	float clearance = 2.5;
 	vec3 spawn3D = vec3(spawn.x, heightAtWorldPos(spawn), spawn.y) + N * clearance;
 
 	// Anchor the root to the spawn-side edge of the cable's in-slope cross
@@ -1521,23 +1530,19 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	vec3 tipL  = tip3D  - twigPerp3D * twigHWt;
 	vec3 tipR  = tip3D  + twigPerp3D * twigHWt;
 
-	// Horizontal projection of twigPerp for the FS varying (the FS reconstructs
-	// the cable normal via screen-space derivatives + this horizontal hint).
-	vec2 twigPerpH = vec2(twigPerp3D.x, twigPerp3D.z);
-	float lh = length(twigPerpH);
-	if (lh > 1e-4) twigPerpH /= lh; else twigPerpH = vec2(1.0, 0.0);
-
 	// cableUV.x carries the cable-wide along distance so the FS growth gate
 	// hides this twig until the main growth front has reached spawnAlongMain.
-	// localU is twig-local along (0..bLen) — the FS uses it for the synced
-	// single-bubble animation in twigs (independent of cable-global phase).
+	// localU is twig-local along (0..bLen) — the FS uses it for synced single-
+	// bubble animation in twigs. Pass twigPerp3D in (the FS only uses the .xz
+	// horizontal projection from `perp` to sign-align the reconstructed
+	// surface-tangent perp3D, but emitVtx accepts vec3 so caller stays clean).
 	gOutBranch = 1.0;
 	gOutLocalU = 0.0;
-	emitVtx(rootL, twigPerpH, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
-	emitVtx(rootR, twigPerpH, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
+	emitVtx(rootL, twigPerp3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
+	emitVtx(rootR, twigPerp3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
 	gOutLocalU = bLen;
-	emitVtx(tipL,  twigPerpH, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.25, gridD, timeD, cap);
-	emitVtx(tipR,  twigPerpH, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.25, gridD, timeD, cap);
+	emitVtx(tipL,  twigPerp3D, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.25, gridD, timeD, cap);
+	emitVtx(tipR,  twigPerp3D, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.25, gridD, timeD, cap);
 	EndPrimitive();
 }
 
@@ -1640,10 +1645,10 @@ in DataGS {
 	float isBranch;
 	float width;
 	vec2 cableUV;
-	vec2 perp;
-	vec2 timeData;  // x = appearTime, y = witherTime (0 = not withering)
-	vec4 gridData;  // x = efficiency (E/M), y = flow (E/s), z = bubble phase at bake (elmos), w = isOwnAlly (1 own, 0 enemy)
-	float localU;   // twig-local along (0 at root, bLen at tip). Unused for main ribbon.
+	vec2 perp;       // horizontal (XZ) projection of slope-aligned cross direction
+	vec2 timeData;
+	vec4 gridData;
+	float localU;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1788,17 +1793,21 @@ void main() {
 
 	// Cylinder cross-section normal that respects cable slope.
 	//
-	// `perp` is the *horizontal* cross-section direction baked at the
-	// vertex. The cable's true tangent in world space (which can have a Y
-	// component when the cable climbs/descends) is reconstructed from
-	// screen-space derivatives of `cableUV.x` (= along) versus worldPos —
-	// this works because `along` is monotone along the cable and screen
-	// derivatives sample along the surface. With both vectors known, the
-	// real "up" direction relative to the cable is cross(tangent, perp);
-	// this rotates with the slope, so an uphill cable shades brightest on
-	// its actual top side instead of where a horizontal cable would.
-	vec3 perp3D = normalize(vec3(perp.x, 0.0, perp.y));
-
+	// `perp` (vec2) is only the horizontal (XZ) projection of the slope-aligned
+	// cross direction — the GS varying budget on this hardware is tight, so we
+	// can't afford a full vec3. We reconstruct the actual 3D cross direction
+	// here in the FS, in two steps:
+	//   (1) `cableT`  = world-space cable tangent, recovered from screen-space
+	//                   derivatives of `cableUV.x` (along) vs worldPos.
+	//   (2) `surfN`   = visible surface normal at this fragment, recovered as
+	//                   `cross(dWdx, dWdy)`. This is the cable-ribbon's local
+	//                   surface plane normal — i.e., the slope's normal where
+	//                   the cable is laying.
+	//   (3) `perp3D`  = `cross(cableT, surfN)`, signed-aligned with the
+	//                   horizontal hint `perp.xy`.
+	// This way a cable on a cross-slope correctly tilts its cylindrical
+	// cross-section into the slope's plane (no corkscrew) without baking the Y
+	// component as a separate varying.
 	vec3 dWdx = dFdx(worldPos);
 	vec3 dWdy = dFdy(worldPos);
 	float duDx = dFdx(cableUV.x);
@@ -1812,6 +1821,17 @@ void main() {
 		// horizontal tangent perpendicular to perp.
 		cableT = normalize(vec3(perp.y, 0.0, -perp.x));
 	}
+
+	vec3 surfaceN = cross(dWdx, dWdy);
+	float surfaceNL = length(surfaceN);
+	if (surfaceNL > 1e-4) surfaceN /= surfaceNL; else surfaceN = vec3(0.0, 1.0, 0.0);
+	if (surfaceN.y < 0.0) surfaceN = -surfaceN;
+	vec3 perp3D = cross(cableT, surfaceN);
+	float perp3DL = length(perp3D);
+	if (perp3DL > 1e-4) perp3D /= perp3DL; else perp3D = vec3(perp.x, 0.0, perp.y);
+	// Sign-align with the horizontal hint so the L/R sides match what the GS
+	// emitted (left vertex still carries cableUV.y = -1).
+	if (dot(perp3D.xz, perp) < 0.0) perp3D = -perp3D;
 
 	vec3 trueUp = cross(cableT, perp3D);
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
@@ -1848,10 +1868,28 @@ void main() {
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
 	float fullLOS = smoothstep(0.7, 1.0, losState);
 
-	// Enemy cables: only show in actual LOS (no ghost / no out-of-LOS render).
-	// Own cables show even out-of-LOS, dimmed (existing dimFactor handles it).
+	// Enemy cables out of LOS: render as a flat dim ghost reflecting the last
+	// known state (the synced gadget broadcasts every ally team's grid to all
+	// clients, so we already hold the last-received topology even after LOS
+	// is lost). Skip live shading + bubble animation — ghost is static so it
+	// reads as "memory" rather than current activity. Own cables stay live
+	// (they're always visible to the local viewer).
+	//
+	// We early-out here so the bubble layer pass and bark lighting below
+	// don't run for ghosts; they'd be wasted work.
 	float isOwnAlly = gridData.w;
-	if (isOwnAlly < 0.5 && losState < 0.45) discard;
+	if (isOwnAlly < 0.5 && losState < 0.45) {
+		// Capacity-tinted ghost: thicker grid lines glow slightly more.
+		float capT = clamp(capacity / 100.0, 0.0, 1.0);
+		// Electric blue, desaturated. Branches are dimmer than trunk.
+		vec3 ghostBase = mix(vec3(0.10, 0.18, 0.35), vec3(0.20, 0.36, 0.65), capT);
+		if (isBranch > 0.5) ghostBase *= 0.55;
+		// Edge falloff so the ribbon edges fade rather than hard-cut, giving
+		// the ghost a softer "remembered impression" look.
+		float edgeFade = 1.0 - smoothstep(0.55, 0.90, t);
+		fragColor = vec4(ghostBase * edgeFade, 1.0);
+		return;
+	}
 
 	// Apply lighting
 	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
