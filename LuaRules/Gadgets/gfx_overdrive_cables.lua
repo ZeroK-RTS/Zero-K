@@ -1313,13 +1313,21 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
 		vec2 p = base + perpAB * n;
 
-		float y = heightAtWorldPos(p) + 2.0;
-		vec3 curr3D = vec3(p.x, y, p.y);
+		// Sample heightmap independently at the two ribbon edges so the strip
+		// drapes across cross-slope terrain instead of clipping into the uphill
+		// side. `along` uses the (untwisted) centerline.
+		vec2 leftXZ  = vec2(p.x - perpAB.x * halfW, p.y - perpAB.y * halfW);
+		vec2 rightXZ = vec2(p.x + perpAB.x * halfW, p.y + perpAB.y * halfW);
+		float yC = heightAtWorldPos(p)       + 5.0;
+		float yL = heightAtWorldPos(leftXZ)  + 5.0;
+		float yR = heightAtWorldPos(rightXZ) + 5.0;
+
+		vec3 curr3D = vec3(p.x, yC, p.y);
 		if (i > 0) along += distance(prev3D, curr3D);
 		prev3D = curr3D;
 
-		vec3 leftPos  = vec3(p.x - perpAB.x * halfW, y, p.y - perpAB.y * halfW);
-		vec3 rightPos = vec3(p.x + perpAB.x * halfW, y, p.y + perpAB.y * halfW);
+		vec3 leftPos  = vec3(leftXZ.x,  yL, leftXZ.y);
+		vec3 rightPos = vec3(rightXZ.x, yR, rightXZ.y);
 
 		emitVtx(leftPos,  perpAB, vec2(along, -1.0), widthVal, gridD, timeD, cap);
 		emitVtx(rightPos, perpAB, vec2(along,  1.0), widthVal, gridD, timeD, cap);
@@ -1333,7 +1341,8 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 // hash says "no twig here" — leaving an empty primitive, which is a no-op.
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
-              vec3 gridD, vec2 timeD, float cap, float tCenter, float invSeed) {
+              vec3 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
+              float spawnAlongMain) {
 	// Resolve spawn point on the wiggly main path at tCenter.
 	vec2 base = a + d * tCenter;
 	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(tCenter);
@@ -1366,19 +1375,24 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	float twigHWr  = min(twigW, widthVal * 0.4) * WIDTH_FACTOR;
 	float twigHWt  = twigHWr * 0.2;
 
-	float yRoot = heightAtWorldPos(root) + 2.0;
-	float yTip  = heightAtWorldPos(tip)  + 2.0;
+	// Drape the twig along the terrain like the main ribbon. Higher clearance
+	// (+5) avoids the lower endpoint clipping into ground on steep slopes
+	// while still keeping the twig glued to the surface.
+	float yRoot = heightAtWorldPos(root) + 5.0;
+	float yTip  = heightAtWorldPos(tip)  + 5.0;
 
 	vec3 rootL = vec3(root.x - twigPerp.x * twigHWr, yRoot, root.y - twigPerp.y * twigHWr);
 	vec3 rootR = vec3(root.x + twigPerp.x * twigHWr, yRoot, root.y + twigPerp.y * twigHWr);
 	vec3 tipL  = vec3(tip.x  - twigPerp.x * twigHWt, yTip,  tip.y  - twigPerp.y * twigHWt);
 	vec3 tipR  = vec3(tip.x  + twigPerp.x * twigHWt, yTip,  tip.y  + twigPerp.y * twigHWt);
 
+	// cableUV.x carries the cable-wide along distance so the FS growth gate
+	// hides this twig until the main growth front has reached spawnAlongMain.
 	gOutBranch = 1.0;
-	emitVtx(rootL, twigPerp, vec2(0.0,  -1.0), twigW,        gridD, timeD, cap);
-	emitVtx(rootR, twigPerp, vec2(0.0,   1.0), twigW,        gridD, timeD, cap);
-	emitVtx(tipL,  twigPerp, vec2(bLen, -1.0), twigW * 0.2,  gridD, timeD, cap);
-	emitVtx(tipR,  twigPerp, vec2(bLen,  1.0), twigW * 0.2,  gridD, timeD, cap);
+	emitVtx(rootL, twigPerp, vec2(spawnAlongMain,        -1.0), twigW,       gridD, timeD, cap);
+	emitVtx(rootR, twigPerp, vec2(spawnAlongMain,         1.0), twigW,       gridD, timeD, cap);
+	emitVtx(tipL,  twigPerp, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.2, gridD, timeD, cap);
+	emitVtx(tipR,  twigPerp, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.2, gridD, timeD, cap);
 	EndPrimitive();
 }
 
@@ -1423,13 +1437,25 @@ void main() {
 	if (gl_InvocationID == 0) {
 		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg);
 	} else {
-		// 4 potential twigs spread across the cable interior; each invocation
-		// owns one slot. tCenter is biased into [0.15, 0.85] so twigs don't
-		// overlap the endpoint cluster regions.
+		// Twig density scales with 3D arc length: ~one twig per 110 elmos,
+		// capped at 4. Short cables get 0-1 twigs, long ones get the full set.
+		// Surviving twigs are then respread across [0.15, 0.85] so spacing
+		// remains roughly even regardless of twig count.
 		int idx = gl_InvocationID - 1;          // 0..3
-		float tCenter = 0.15 + (float(idx) + 0.5) * (0.7 / 4.0);
+		int expectedTwigs = clamp(int(len3D / 110.0 + 0.5), 0, 4);
+		if (idx >= expectedTwigs) return;
+		float tCenterRaw = 0.15 + (float(idx) + 0.5) * (0.7 / float(expectedTwigs));
+		// Snap to a main-ribbon segment vertex. The cable is rendered as
+		// piecewise-linear chords between samples at t = i/numSeg, so anchoring
+		// the twig at the analytical centerline (which curves between samples)
+		// would leave the root edge floating off the visible cable surface.
+		// Snapping makes the spawn point coincide with an actual rendered
+		// vertex of the main ribbon.
+		float tCenter = clamp(round(tCenterRaw * float(numSeg)), 1.0, float(numSeg) - 1.0)
+		              / float(numSeg);
+		float spawnAlongMain = len3D * tCenter;
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, float(idx) * 13.7);
+		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain);
 	}
 }
 ]]
@@ -1701,12 +1727,19 @@ void main() {
 	vec3 bubbleColor = mix(gridColor, vec3(1.0), 0.15);
 	vec3 haloColor   = gridColor;            // pure grid-colour halo
 
-	// Halo first (soft underglow), then body (hot core/rim), then a pure-
-	// white specular pop on top. Multipliers are tuned for "energy" feel —
-	// the halo gives bloom, the core gives plasma, the spec gives sparkle.
-	color += haloColor   * bubbleHalo * fullLOS * 0.70;
-	color += bubbleColor * bubbleBody * fullLOS * 2.0;
-	color += vec3(1.0)   * bubbleSpec * fullLOS * 1.2;
+	// Composition order is chosen so the bubble core never picks up the bark's
+	// hue:
+	//   - Halo: additive (soft underglow that should mix with bark colour).
+	//   - Body: max() over current colour, so the dark green/brown bark can't
+	//     leak into the bubble's true grid hue. Plain additive composition
+	//     causes hue shifts (orange → yellow, magenta → pink) because the
+	//     bark's green channel piles onto the emissive. max() lets the
+	//     emissive plasma show its real colour through the cable in shadow.
+	//   - Spec: additive white sparkle on top.
+	color += haloColor * bubbleHalo * fullLOS * 0.70;
+	vec3 bubbleEmissive = bubbleColor * bubbleBody * fullLOS * 2.0;
+	color = max(color, bubbleEmissive);
+	color += vec3(1.0) * bubbleSpec * fullLOS * 1.2;
 
 	// LOS-aware dimming
 	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
