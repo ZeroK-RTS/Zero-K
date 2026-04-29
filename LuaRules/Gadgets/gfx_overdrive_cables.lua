@@ -1410,6 +1410,38 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 	float along = 0.0;
 	vec3  prev3D = vec3(0.0);
 	float lenAB = length(d);
+
+	// Cross-section basis — computed ONCE for the whole cable. Earlier we built
+	// N/T3/B3 per-vertex from `terrainNormal(p)`. That made adjacent vertices
+	// disagree about which way is "+B3" whenever the local terrain normal
+	// rotated between them (rolling terrain, hilltops, cross-slope crossings).
+	// Adjacent vertices' left/right edges then sat at slightly different
+	// rotational positions around the cable axis, so the ribbon physically
+	// twisted between them — visible as a corkscrew. The lighting was already
+	// correct; the geometry was twisted.
+	//
+	// Anchoring the basis to a chord-averaged Navg gives every vertex the SAME
+	// "+B3" direction. Per-vertex slope tilt still happens via the side-clamp
+	// (each side vertex independently lifted to local terrain+clearance), so
+	// the ribbon still appears to follow the slope — it just can't rotate
+	// around its own axis between segments.
+	vec3 Navg;
+	{
+		vec3 nAcc = vec3(0.0);
+		for (int j = 0; j < 5; j++) {
+			float tj = (float(j) + 0.5) * (1.0 / 5.0);
+			nAcc += terrainNormal(a + d * tj);
+		}
+		Navg = normalize(nAcc);
+	}
+	vec3 cableDirH_g = normalize(vec3(d.x, 0.0, d.y));
+	vec3 T3_g = cableDirH_g - dot(cableDirH_g, Navg) * Navg;
+	float T3gL = length(T3_g);
+	T3_g = (T3gL > 1e-4) ? T3_g / T3gL : cableDirH_g;
+	vec3 B3 = normalize(cross(Navg, T3_g));
+	vec3 perpRefH = normalize(vec3(-perpAB.x, 0.0, -perpAB.y));
+	if (dot(B3, perpRefH) < 0.0) B3 = -B3;
+
 	for (int i = 0; i <= numSeg; i++) {
 		float t = float(i) / float(numSeg);
 		vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
@@ -1417,28 +1449,40 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
 		vec2 p = base + perpAB * n;
 
-		// Build the cable's local cross-section in the slope's tangent plane at
-		// `p` so the visible 3D L→R distance is exactly `widthVal` regardless of
-		// terrain tilt. The previous version offset L/R purely in horizontal XZ
-		// then sampled height independently, which made the visible cross-section
-		// inflate on cross-slopes (sqrt((2*halfW)^2 + (yL-yR)^2) > 2*halfW).
-		// Now: N = terrain normal at p; T = horizontal cable tangent projected
-		// into the slope plane; B = N × T. L = center3D + B*halfW (with B's sign
-		// chosen to land on `-perpAB`), R = center3D - B*halfW.
-		float yC = heightAtWorldPos(p) + 3.0;
+		// Anti-underground (along-cable): linear interpolation between two
+		// adjacent segment vertices can dip below terrain on convex/rolling
+		// slopes (the chord cuts under the heightmap between samples). Lift
+		// the centerline Y to the MAX heightmap value sampled within a window
+		// that COVERS THE FULL SEGMENT to either side of this vertex — i.e.
+		// up to the next vertex's position. That way adjacent vertices' max
+		// envelopes overlap at the segment midpoint, and the linearly
+		// interpolated ribbon between them stays above any terrain peak in
+		// the gap. Earlier the window was 0.95 × half-step which JUST missed
+		// the segment midpoint, leaving a thin band where the cable could
+		// still dip under (and bubbles got z-occluded in those spots).
+		float yC = heightAtWorldPos(p);
+		{
+			vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
+			float fullStep = lenAB / float(numSeg);   // full segment span
+			yC = max(yC, heightAtWorldPos(p + dirH * (fullStep * 0.30)));
+			yC = max(yC, heightAtWorldPos(p - dirH * (fullStep * 0.30)));
+			yC = max(yC, heightAtWorldPos(p + dirH * (fullStep * 0.55)));
+			yC = max(yC, heightAtWorldPos(p - dirH * (fullStep * 0.55)));
+			yC = max(yC, heightAtWorldPos(p + dirH * (fullStep * 0.85)));
+			yC = max(yC, heightAtWorldPos(p - dirH * (fullStep * 0.85)));
+		}
+		yC += 3.0;
 		vec3 center3D = vec3(p.x, yC, p.y);
 
-		vec3 N = terrainNormal(p);
-		vec3 cableDirH = normalize(vec3(d.x, 0.0, d.y));
-		vec3 T3 = normalize(cableDirH - dot(cableDirH, N) * N);
-		vec3 B3 = normalize(cross(N, T3));
-		// Align B3 with -perpAB so cableUV.y signs match the prior convention
-		// (left vertex carries cableUV.y = -1).
-		vec3 perpRefH = normalize(vec3(-perpAB.x, 0.0, -perpAB.y));
-		if (dot(B3, perpRefH) < 0.0) B3 = -B3;
-
-		vec3 leftPos  = center3D + B3 * halfW;
-		vec3 rightPos = center3D - B3 * halfW;
+		// Geometry convention MUST match the twig emitter:
+		//   v = -1  →  vertex at center − B3*halfW  (so outward = −B3)
+		//   v = +1  →  vertex at center + B3*halfW  (so outward = +B3)
+		// The FS reconstructs perp3D ≈ B3, then cylNormal = perp3D * v at the
+		// side, which therefore matches the *actual* outward direction. Prior
+		// version had these swapped, which inverted the lit side relative to
+		// the sun on every cable (and was inconsistent with twigs).
+		vec3 leftPos  = center3D - B3 * halfW;
+		vec3 rightPos = center3D + B3 * halfW;
 
 		// Anti-underground clamp: on terrain that curves up faster than linear
 		// (concave cross-slope), the slope-tangent-plane offset can put L or R
@@ -1879,15 +1923,20 @@ void main() {
 	// don't run for ghosts; they'd be wasted work.
 	float isOwnAlly = gridData.w;
 	if (isOwnAlly < 0.5 && losState < 0.45) {
-		// Capacity-tinted ghost: thicker grid lines glow slightly more.
+		// Neutral grayish ghost — a "remembered" cable, not a live circuit.
+		// Capacity barely tints brightness so thicker grid lines read slightly
+		// brighter without picking up a hue. Branches are a touch dimmer.
 		float capT = clamp(capacity / 100.0, 0.0, 1.0);
-		// Electric blue, desaturated. Branches are dimmer than trunk.
-		vec3 ghostBase = mix(vec3(0.10, 0.18, 0.35), vec3(0.20, 0.36, 0.65), capT);
-		if (isBranch > 0.5) ghostBase *= 0.55;
+		vec3 ghostBase = mix(vec3(0.30), vec3(0.55), capT);
+		if (isBranch > 0.5) ghostBase *= 0.65;
 		// Edge falloff so the ribbon edges fade rather than hard-cut, giving
 		// the ghost a softer "remembered impression" look.
 		float edgeFade = 1.0 - smoothstep(0.55, 0.90, t);
-		fragColor = vec4(ghostBase * edgeFade, 1.0);
+		// Alpha < 1 so the ghost composes against the world (DrawWorldPreUnit
+		// enables alpha blending). Edge fade also drives alpha so the silhouette
+		// dissolves smoothly rather than hard-clipping at t=0.9.
+		float ghostA = 0.55 * edgeFade;
+		fragColor = vec4(ghostBase * edgeFade, ghostA);
 		return;
 	}
 
@@ -1946,38 +1995,30 @@ void main() {
 	// at the main cable's speed.
 	float bubbleBody, bubbleSpec, bubbleHalo;
 	if (isBranch > 0.5) {
-		// "Electric crackle" — synchronized power buzzing on twigs.
+		// Discrete synchronized flash — the entire twig blinks ON for a brief
+		// window, then OFF, then ON again, etc. No along-twig gradient, no
+		// continuous pulsing/crackle. Every twig of a cable shares `phase`, so
+		// all twigs in the cable flash at the same instant. Phase advance rate
+		// = speed, so faster grids flash more often.
 		//
-		// CRITICAL constraint: every spatial reference inside this branch must
-		// be cross-cable only (`v`), never along-twig. Any along-twig gradient
-		// keyed off a temporally advancing scalar can be read as motion, and a
-		// motion that wraps around at phase reset reads as "backwards bouncing".
-		// We use ONLY `phase` (time-like, per-cable, shared across all twigs) and
-		// `v` (cross-cable shape). No `localU`, no `along`, no `worldPos`-along.
-		//
-		// Two stacked uniform-in-space components, both functions of phase only:
-		//   * crackle: high-frequency hash-driven flicker, ticks per ~5 elmos of
-		//     phase. Reads as electric arcing in the conduit. Brightness is a
-		//     random scalar per tick, identical across the entire twig surface.
-		//   * zap:     occasional bigger Gaussian-shaped pulse, ~1 per 220 elmos
-		//     of phase. Reads as a "power surge" hitting the twigs.
-		//
-		// All twigs of a cable share `phase`, so they crackle / zap in lockstep.
-		// Phase advance rate = speed, so faster grids buzz / zap faster.
-		const float TICK     = 5.0;     // elmos of phase per crackle tick
-		const float ZAP_PER  = 220.0;   // elmos of phase per power zap
-		float tickIdx = floor(phase / TICK);
-		float h0 = hash1(tickIdx);
-		float h1 = hash1(tickIdx + 17.3);
-		float crackle = h0 * h0 * step(0.55, h1);   // sparse + biased dim
-		float zapPhase = mod(phase, ZAP_PER) / ZAP_PER;
-		float zd = zapPhase - 0.08;                  // peak shortly after wrap
-		float zap = exp(-zd * zd * 90.0);            // Gaussian, sharp
-		float cross = 1.0 - smoothstep(0.6, 1.0, v * v);
-		float intensity = (crackle * 0.55 + zap * 1.10) * cross;
+		// Why a square-ish window with smoothstep edges (instead of a
+		// continuous Gaussian/sine): the user wants "all on at once, then off",
+		// not a wave. The 0.012-wide smoothstep edges only exist to avoid hard
+		// frame-boundary popping; mid-window the brightness is flat 1.0.
+		const float FLASH_PERIOD = 160.0;   // elmos of phase between flashes
+		const float FLASH_ON     = 0.10;    // duty cycle (fraction of period lit)
+		const float EDGE         = 0.012;
+		float cyc = mod(phase, FLASH_PERIOD) / FLASH_PERIOD;
+		float flashOn = smoothstep(0.0, EDGE, cyc)
+		              * (1.0 - smoothstep(FLASH_ON - EDGE, FLASH_ON, cyc));
+		// Mild cross-axis taper so the edge of the ribbon isn't quite as bright
+		// as the centre — gives the flash some volume rather than reading as a
+		// flat painted card. No along-twig variation.
+		float crossT = 1.0 - smoothstep(0.7, 1.0, v * v);
+		float intensity = flashOn * crossT * 1.5;
 		bubbleBody = intensity * 1.20;
-		bubbleSpec = intensity * 0.70;
-		bubbleHalo = intensity * 0.50;
+		bubbleSpec = intensity * 0.65;
+		bubbleHalo = intensity * 0.55;
 	} else {
 		vec3 bA = bubbleLayer(along, phase, spacingA, 7.5, v, halfWidthE,  3.7);
 		vec3 bB = bubbleLayer(along, phase, spacingB, 4.0, v, halfWidthE, 19.1);
@@ -2228,7 +2269,15 @@ function gadget:DrawWorldPreUnit()
 	if not cableVAO or numCableVerts == 0 or not cableShader then return end
 
 	cableShader:Activate()
-	cableShader:SetUniform("gameTime", Spring.GetGameSeconds())
+	-- Smooth gameTime: GetGameSeconds() ticks at the sim rate (GAME_SPEED).
+	-- At higher game speeds each sim step covers more game-time, so the
+	-- per-frame phase delta the FS sees gets bigger and bubbles visibly jump
+	-- between sim ticks. Adding GetFrameTimeOffset() (the [0,1] fraction
+	-- through the current sim interval, used by the engine for visual interp)
+	-- divided by GAME_SPEED gives a continuous time that advances smoothly
+	-- between sim ticks on all game speeds.
+	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
+	cableShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
 	cableShader:SetUniform("bakeTime", bubbleBakeTime)
 
 	gl.Texture(0, "$info")
@@ -2236,7 +2285,9 @@ function gadget:DrawWorldPreUnit()
 	gl.Culling(false)
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(true)
-	gl.Blending(false)
+	-- Standard alpha blending. Live cables write alpha=1.0 (visually identical
+	-- to no-blend), ghosts write alpha<1.0 to compose against the world.
+	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 
 	-- GL_LINES: every 2 verts form one cable; the geometry shader expands
 	-- them into a triangle_strip ribbon.
