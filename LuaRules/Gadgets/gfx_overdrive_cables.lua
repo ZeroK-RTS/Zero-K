@@ -1109,464 +1109,44 @@ local function normalizeAngle(a)
 	return a
 end
 
--- Build organic tree geometry from renderEdges (full edges; growth/wither
--- is animated in the fragment shader via appearTime / witherTime).
--- Generic angle clustering: groups items whose angles are within MERGE_ANGLE
--- of an immediate neighbour (after sorting). Handles wrap-around.
-local function clusterByAngle(items)
-	if #items == 0 then return {} end
-	table.sort(items, function(a, b) return (a.angle or 0) < (b.angle or 0) end)
-	local clusters = { { items[1] } }
-	for i = 2, #items do
-		local cur = clusters[#clusters]
-		if abs(normalizeAngle(items[i].angle - items[i-1].angle)) < MERGE_ANGLE then
-			cur[#cur + 1] = items[i]
-		else
-			clusters[#clusters + 1] = { items[i] }
-		end
-	end
-	if #clusters > 1 then
-		local first, last = clusters[1], clusters[#clusters]
-		if abs(normalizeAngle(first[1].angle - last[#last].angle)) < MERGE_ANGLE then
-			for i = 1, #last do first[#first + 1] = last[i] end
-			clusters[#clusters] = nil
-		end
-	end
-	return clusters
-end
-
--- Phase 1: heavy build. Walks renderEdges, clusters per-node, emits noisy
--- paths + twigs + cluster stems. Each `emitNoisyPath` call produces one or
--- more allPaths entries that all share a single `prov` object — the prov
--- carries the dynamic fields (flow/eff/bubblePhase/appear/wither) and is
--- refreshed in-place on cache-hit calls so we don't need to regenerate
--- geometry on every send.
-local function BuildAllPaths()
-	local allPaths = {}
-	local provs = {}
-
-	local nodePos = {}
-	-- Undirected adjacency: every edge contributes one entry to each endpoint.
-	-- `side` is 1 for parent end, 2 for child end (used so each edge ends up
-	-- with one attach point on each side after clustering).
-	local nodeNeighbors = {}
-
-	local function posKey(x, z)
-		return floor(x) .. ":" .. floor(z)
-	end
-
-	for i = 1, #renderEdges do
-		local e = renderEdges[i]
-		local pk = posKey(e.px, e.pz)
-		local ck = posKey(e.cx, e.cz)
-		nodePos[pk] = { x = e.px, z = e.pz }
-		nodePos[ck] = { x = e.cx, z = e.cz }
-		nodeNeighbors[pk] = nodeNeighbors[pk] or {}
-		nodeNeighbors[ck] = nodeNeighbors[ck] or {}
-		local cap = max(1, e.capacity)
-		nodeNeighbors[pk][#nodeNeighbors[pk] + 1] = {
-			nKey = ck, edgeIdx = i, side = 1, cap = cap,
-		}
-		nodeNeighbors[ck][#nodeNeighbors[ck] + 1] = {
-			nKey = pk, edgeIdx = i, side = 2, cap = cap,
-		}
-	end
-
-	local function emitNoisyPath(x1, z1, x2, z2, widthStart, widthEnd, capacity, seed, isBranch, prov)
-		local path = NoisyPath(x1, z1, x2, z2, NOISE_AMP_ABS, seed)
-		local widths = {}
-		for pi = 1, #path do
-			local t = (pi - 1) / max(1, #path - 1)
-			widths[pi] = widthStart + t * (widthEnd - widthStart)
-		end
-		allPaths[#allPaths + 1] = {
-			points = path, widths = widths,
-			capacity = capacity, isBranch = isBranch and 1 or 0,
-			prov = prov,
-		}
-		-- Twigs: spawn from ribbon edge, not center. They share the parent's
-		-- prov so dynamic fields stay consistent across the visual cluster.
-		for pi = 2, #path - 1 do
-			local p1 = path[pi]
-			local w = widths[pi]
-			local tseed = p1.x * 7.13 + p1.z * 3.77
-			local chance = isBranch and (BRANCH_CHANCE * 0.5) or BRANCH_CHANCE
-			local lenScale = isBranch and 0.6 or 1.0
-			if HashUnit(p1.x, p1.z, tseed) < chance then
-				local dx = x2 - x1
-				local dz = z2 - z1
-				local pathLen = sqrt(dx * dx + dz * dz)
-				if pathLen < 1 then pathLen = 1 end
-				local baseAngle = atan2(dz, dx)
-				local side = (Hash(p1.x, p1.z, tseed + 1) > 0) and 1 or -1
-				local angle = baseAngle + side * (BRANCH_ANGLE_MIN + HashUnit(p1.x, p1.z, tseed + 2) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN))
-				local bLen = (BRANCH_LEN_MIN + HashUnit(p1.x, p1.z, tseed + 3) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN)) * lenScale
-
-				local perpX = -dz / pathLen * side
-				local perpZ =  dx / pathLen * side
-				local edgeX = p1.x + perpX * w * 0.45
-				local edgeZ = p1.z + perpZ * w * 0.45
-
-				local bx2 = edgeX + cos(angle) * bLen
-				local bz2 = edgeZ + sin(angle) * bLen
-				local bw = w * BRANCH_WIDTH * (isBranch and 0.6 or 1.0)
-				local twigPts = NoisyPath(edgeX, edgeZ, bx2, bz2, NOISE_AMP_ABS * 0.7, tseed + 10)
-				local twigWidths = {}
-				twigWidths[1] = min(bw, w * 0.4)
-				for ti = 2, #twigPts do
-					local tt = (ti - 1) / max(1, #twigPts - 1)
-					twigWidths[ti] = twigWidths[1] * (1 - tt * 0.8)
-				end
-				allPaths[#allPaths + 1] = {
-					points = twigPts, widths = twigWidths,
-					capacity = capacity, isBranch = 1,
-					prov = prov,
-				}
-			end
-		end
-	end
-
-	-- For each node, cluster all incident half-edges by direction. A cluster
-	-- of >=2 emits a stem cable from the node along the cluster's average
-	-- direction; every edge in that cluster gets the stem-end as its attach
-	-- point on this side. Singletons attach directly at the node.
-	local edgeAttach = {}
-	for nk, nbrs in pairs(nodeNeighbors) do
-		local pos = nodePos[nk]
-		for i = 1, #nbrs do
-			local n = nbrs[i]
-			local npos = nodePos[n.nKey]
-			if npos then
-				n.angle = atan2(npos.z - pos.z, npos.x - pos.x)
-				n.dist = sqrt((npos.x - pos.x)^2 + (npos.z - pos.z)^2)
-			end
-		end
-		local clusters = clusterByAngle(nbrs)
-		for ci = 1, #clusters do
-			local cluster = clusters[ci]
-			if #cluster == 1 then
-				local n = cluster[1]
-				edgeAttach[n.edgeIdx] = edgeAttach[n.edgeIdx] or {}
-				edgeAttach[n.edgeIdx][n.side] = { x = pos.x, z = pos.z, hasStem = false }
-			else
-				-- Aggregate cluster geometry. Dynamic fields are computed once
-				-- here for the initial prov; refresh path will re-read them
-				-- from renderEdgesByKey via prov.members on cache-hit calls.
-				local avgCos, avgSin, clusterCap, minDist = 0, 0, 0, math.huge
-				local clusterFlow = 0
-				local netFlowSigned = 0
-				local effSum, capForEff = 0, 0
-				local phaseSum = 0
-				local stemAppear = math.huge
-				local stemWither = -math.huge
-				local allWither = true
-				local members = {}
-				for i = 1, #cluster do
-					local n = cluster[i]
-					local re = renderEdges[n.edgeIdx]
-					local f = re.flow or 0
-					local effv = re.eff or 0
-					local phasev = re.bubblePhase or 0
-					avgCos = avgCos + cos(n.angle)
-					avgSin = avgSin + sin(n.angle)
-					clusterCap = clusterCap + n.cap
-					clusterFlow = clusterFlow + f
-					-- side=1 → this node is the parent (source) → flow leaves
-					-- side=2 → this node is the child (sink)   → flow enters
-					netFlowSigned = netFlowSigned + ((n.side == 1) and f or -f)
-					effSum = effSum + effv * n.cap
-					phaseSum = phaseSum + phasev * n.cap
-					capForEff = capForEff + n.cap
-					if n.dist and n.dist < minDist then minDist = n.dist end
-					local af = re.appearFrame or 0
-					if af < stemAppear then stemAppear = af end
-					if re.witherFrame then
-						if re.witherFrame > stemWither then stemWither = re.witherFrame end
-					else
-						allWither = false
-					end
-					members[#members + 1] = { key = re.key, side = n.side, cap = n.cap }
-				end
-				if stemAppear == math.huge then stemAppear = 0 end
-				local stemWitherFinal = (allWither and stemWither > -math.huge) and stemWither or nil
-				local avgAngle = atan2(avgSin, avgCos)
-				local stemLen = min(minDist * STEM_FRACTION, 120)
-				if stemLen < 4 then stemLen = 4 end
-				local stemX = pos.x + cos(avgAngle) * stemLen
-				local stemZ = pos.z + sin(avgAngle) * stemLen
-				local stemW = GetTrunkWidth(clusterCap)
-				local outward = netFlowSigned >= 0
-
-				local prov = {
-					kind = "stem",
-					members = members,
-					capForEff = capForEff,
-					outward = outward,
-					flow = clusterFlow,
-					eff = (capForEff > 0) and (effSum / capForEff) or 0,
-					bubblePhase = (capForEff > 0) and (phaseSum / capForEff) or 0,
-					appearFrame = stemAppear,
-					witherFrame = stemWitherFinal,
-				}
-				provs[#provs + 1] = prov
-
-				if outward then
-					emitNoisyPath(pos.x, pos.z, stemX, stemZ,
-						stemW, stemW * 0.9, clusterCap,
-						pos.x + pos.z + ci * 7.3, false, prov)
-				else
-					emitNoisyPath(stemX, stemZ, pos.x, pos.z,
-						stemW * 0.9, stemW, clusterCap,
-						pos.x + pos.z + ci * 7.3, false, prov)
-				end
-
-				for i = 1, #cluster do
-					local n = cluster[i]
-					edgeAttach[n.edgeIdx] = edgeAttach[n.edgeIdx] or {}
-					edgeAttach[n.edgeIdx][n.side] = {
-						x = stemX, z = stemZ, hasStem = true, stemW = stemW,
-					}
-				end
-			end
-		end
-	end
-
-	-- Emit each edge once between its two attach points. attach[1] is the
-	-- parent (source) end and attach[2] is the child (sink) end, so emitting
-	-- attach[1] -> attach[2] makes pulses travel in the +u direction = actual
-	-- direction of energy flow.
-	for i = 1, #renderEdges do
-		local e = renderEdges[i]
-		local attach = edgeAttach[i]
-		if attach and attach[1] and attach[2] then
-			local cap = max(1, e.capacity)
-			local edgeW = GetTrunkWidth(cap)
-			local function endWidth(a)
-				if a.hasStem then return min(edgeW * 1.2, a.stemW * 0.55) end
-				return edgeW
-			end
-			local startW = endWidth(attach[1])
-			local endW   = endWidth(attach[2])
-			local seed = attach[1].x * 0.137 + attach[1].z * 0.781
-				+ attach[2].x * 0.293 + attach[2].z * 0.461
-			local prov = {
-				kind = "edge",
-				key = e.key,
-				flow = e.flow or 0, eff = e.eff or 0,
-				bubblePhase = e.bubblePhase or 0,
-				appearFrame = e.appearFrame, witherFrame = e.witherFrame,
-			}
-			provs[#provs + 1] = prov
-			emitNoisyPath(attach[1].x, attach[1].z, attach[2].x, attach[2].z,
-				startW, endW, cap, seed, false, prov)
-		end
-	end
-
-	return allPaths, provs
-end
-
--- Phase 2: refresh dynamic fields on cached provs from the current
--- renderEdgesByKey. A cluster sign-flip (net flow direction reversed)
--- invalidates the cache so the next call regenerates with the correct
--- emission direction.
-local function RefreshProvs(provs)
-	for i = 1, #provs do
-		local p = provs[i]
-		if p.kind == "edge" then
-			local e = renderEdgesByKey[p.key]
-			if e then
-				p.flow = e.flow or 0
-				p.eff  = e.eff or 0
-				p.bubblePhase = e.bubblePhase or 0
-				p.appearFrame = e.appearFrame
-				p.witherFrame = e.witherFrame
-			end
-		else
-			local clusterFlow = 0
-			local netFlowSigned = 0
-			local effSum, phaseSum = 0, 0
-			local stemAppear, stemWither = math.huge, -math.huge
-			local allWither = true
-			local members = p.members
-			for j = 1, #members do
-				local m = members[j]
-				local e = renderEdgesByKey[m.key]
-				if e then
-					local f = e.flow or 0
-					clusterFlow = clusterFlow + f
-					netFlowSigned = netFlowSigned + ((m.side == 1) and f or -f)
-					effSum = effSum + (e.eff or 0) * m.cap
-					phaseSum = phaseSum + (e.bubblePhase or 0) * m.cap
-					local af = e.appearFrame or 0
-					if af < stemAppear then stemAppear = af end
-					if e.witherFrame then
-						if e.witherFrame > stemWither then stemWither = e.witherFrame end
-					else
-						allWither = false
-					end
-				end
-			end
-			if (netFlowSigned >= 0) ~= p.outward then
-				geomCache.valid = false
-			end
-			p.flow = clusterFlow
-			p.eff = (p.capForEff > 0) and (effSum / p.capForEff) or 0
-			p.bubblePhase = (p.capForEff > 0) and (phaseSum / p.capForEff) or 0
-			if stemAppear == math.huge then stemAppear = 0 end
-			p.appearFrame = stemAppear
-			p.witherFrame = (allWither and stemWither > -math.huge) and stemWither or nil
-		end
-	end
-end
-
--- Phase 3: convert cached paths to triangle vertices. Reads dynamic fields
--- from path.prov (refreshed per-call). All other per-vertex data is purely
--- a function of (points, widths) and stays constant across cache-hit calls.
-local function EmitVerts(allPaths)
-	local verts = {}
-	local vertCount = 0
-
-	for pi = 1, #allPaths do
-		local path = allPaths[pi]
-		local pts = path.points
-		local wds = path.widths
-		local cap = path.capacity
-		local branch = path.isBranch
-		local prov = path.prov
-		local appearTime = (prov.appearFrame or 0) / GAME_SPEED
-		local witherTime = prov.witherFrame and (prov.witherFrame / GAME_SPEED) or 0
-		local pathEff   = prov.eff or 0
-		local pathFlow  = prov.flow or 0
-		local pathPhase = prov.bubblePhase or 0
-
-		if #pts >= 2 then
-			-- Averaged perpendicular at each waypoint
-			local perps = {}
-			for i = 1, #pts do
-				local px, pz = 0, 0
-				if i > 1 then
-					local dx = pts[i].x - pts[i-1].x
-					local dz = pts[i].z - pts[i-1].z
-					local len = sqrt(dx*dx + dz*dz)
-					if len > 0.01 then px = px + (-dz/len); pz = pz + (dx/len) end
-				end
-				if i < #pts then
-					local dx = pts[i+1].x - pts[i].x
-					local dz = pts[i+1].z - pts[i].z
-					local len = sqrt(dx*dx + dz*dz)
-					if len > 0.01 then px = px + (-dz/len); pz = pz + (dx/len) end
-				end
-				local plen = sqrt(px*px + pz*pz)
-				if plen > 0.01 then
-					perps[i] = { nx = px/plen, nz = pz/plen }
-				else
-					perps[i] = { nx = 0, nz = 1 }
-				end
-			end
-
-			-- Cumulative U distance
-			local uDist = { [1] = 0 }
-			for i = 2, #pts do
-				local dx = pts[i].x - pts[i-1].x
-				local dz = pts[i].z - pts[i-1].z
-				uDist[i] = uDist[i-1] + sqrt(dx*dx + dz*dz)
-			end
-
-			-- Left/right vertices at each waypoint
-			local lefts = {}
-			local rights = {}
-			for i = 1, #pts do
-				local hw = (wds[i] or 5) * 0.55
-				local p = perps[i]
-				local y = spGetGroundHeight(pts[i].x, pts[i].z) + 2
-				lefts[i]  = { x = pts[i].x - p.nx * hw, y = y, z = pts[i].z - p.nz * hw }
-				rights[i] = { x = pts[i].x + p.nx * hw, y = y, z = pts[i].z + p.nz * hw }
-			end
-
-			local brVal = branch == 1 and 1 or 0
-
-			for i = 1, #pts - 1 do
-				local L1, R1, L2, R2 = lefts[i], rights[i], lefts[i+1], rights[i+1]
-				local u1, u2 = uDist[i], uDist[i+1]
-				local w1, w2 = wds[i] or 5, wds[i+1] or 5
-				-- Perpendicular (cross-section direction) at each waypoint
-				local p1x, p1z = perps[i].nx, perps[i].nz
-				local p2x, p2z = perps[i+1].nx, perps[i+1].nz
-
-				-- Tri 1: L1, R1, R2
-				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
-				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
-				verts[#verts+1]=u1; verts[#verts+1]=-1
-				verts[#verts+1]=p1x; verts[#verts+1]=p1z
-				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
-				verts[#verts+1]=R1.x; verts[#verts+1]=R1.y; verts[#verts+1]=R1.z
-				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
-				verts[#verts+1]=u1; verts[#verts+1]=1
-				verts[#verts+1]=p1x; verts[#verts+1]=p1z
-				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
-				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
-				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
-				verts[#verts+1]=u2; verts[#verts+1]=1
-				verts[#verts+1]=p2x; verts[#verts+1]=p2z
-				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
-
-				-- Tri 2: L1, R2, L2
-				verts[#verts+1]=L1.x; verts[#verts+1]=L1.y; verts[#verts+1]=L1.z
-				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w1
-				verts[#verts+1]=u1; verts[#verts+1]=-1
-				verts[#verts+1]=p1x; verts[#verts+1]=p1z
-				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
-				verts[#verts+1]=R2.x; verts[#verts+1]=R2.y; verts[#verts+1]=R2.z
-				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
-				verts[#verts+1]=u2; verts[#verts+1]=1
-				verts[#verts+1]=p2x; verts[#verts+1]=p2z
-				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
-				verts[#verts+1]=L2.x; verts[#verts+1]=L2.y; verts[#verts+1]=L2.z
-				verts[#verts+1]=cap; verts[#verts+1]=brVal; verts[#verts+1]=w2
-				verts[#verts+1]=u2; verts[#verts+1]=-1
-				verts[#verts+1]=p2x; verts[#verts+1]=p2z
-				verts[#verts+1]=appearTime; verts[#verts+1]=witherTime
-				verts[#verts+1]=pathEff; verts[#verts+1]=pathFlow; verts[#verts+1]=pathPhase
-
-				vertCount = vertCount + 6
-			end
-		end
-	end
-
-	return verts, vertCount
-end
-
--- Top-level entrypoint. On topology-stable rebuilds, walks the cached provs
--- to refresh dynamic fields and re-emits verts using cached path geometry —
--- no NoisyPath, no clustering, no twig generation. On topology change,
--- rebuilds allPaths from scratch.
+-- Per-edge VBO build: emit two vertices per cable (the two endpoints), each
+-- carrying the same per-edge payload. The geometry shader expands each line
+-- into the noisy wiggly ribbon. CPU work shrinks from "build full triangle
+-- soup" (lots of NoisyPath / clustering / twig generation) to "iterate edges".
+-- Cluster stems and twigs are deliberately gone in this first GS pass — to be
+-- reintroduced as either CPU-emitted phantom edges (stems) or GS-side branches
+-- (twigs) once the basic pipeline is verified.
 local function GenerateOrganicTree()
-	if #renderEdges == 0 then
-		geomCache.valid = false
-		geomCache.allPaths = nil
-		geomCache.provs = nil
-		return {}, 0
-	end
+	local n = #renderEdges
+	if n == 0 then return {}, 0 end
 
-	if geomCache.valid then
-		RefreshProvs(geomCache.provs)
-	end
-	-- RefreshProvs may flip geomCache.valid off if it detected a sign change.
-	if not geomCache.valid then
-		local allPaths, provs = BuildAllPaths()
-		geomCache.allPaths = allPaths
-		geomCache.provs = provs
-		geomCache.valid = true
-	end
+	local verts = {}
+	local k = 0
+	for i = 1, n do
+		local e = renderEdges[i]
+		local cap = max(1, e.capacity or 1)
+		local appearTime = (e.appearFrame or 0) / GAME_SPEED
+		local witherTime = e.witherFrame and (e.witherFrame / GAME_SPEED) or 0
+		local eff = e.eff or 0
+		local flow = e.flow or 0
+		local phase = e.bubblePhase or 0
 
-	return EmitVerts(geomCache.allPaths)
+		-- Vertex 0: parent end
+		verts[k+1] = e.px;          verts[k+2] = e.pz
+		verts[k+3] = cap;           verts[k+4] = appearTime;  verts[k+5] = witherTime
+		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = phase
+		-- Vertex 1: child end (same per-edge payload)
+		verts[k+9] = e.cx;          verts[k+10] = e.cz
+		verts[k+11] = cap;          verts[k+12] = appearTime; verts[k+13] = witherTime
+		verts[k+14] = eff;          verts[k+15] = flow;       verts[k+16] = phase
+		k = k + 16
+	end
+	return verts, n * 2
 end
 
+-- Old generic angle clustering — kept commented as a reference for when we
+-- reintroduce CPU-side stem merging (cluster decomposition is a graph
+-- operation that doesn't fit cleanly in a geometry shader).
 
 -------------------------------------------------------------------------------------
 -- Forward cable rendering via DrawWorldPreUnit.
@@ -1575,21 +1155,65 @@ end
 -- cylinder normal, plus traveling energy pulses gated by LOS ($info).
 -------------------------------------------------------------------------------------
 
+-- Pass-through VS: each cable is a single GL_LINES primitive (2 vertices,
+-- both carrying the same per-edge attributes). The geometry shader then
+-- expands the line into a wiggly noisy ribbon with N segments. All the
+-- expensive per-vertex math that used to live on the CPU now lives on the GPU.
 local cableVSSrc = [[
 #version 420
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 
-layout (location = 0) in vec3 vertPos;
-layout (location = 1) in vec3 vertData;
-layout (location = 2) in vec2 vertUV;
-layout (location = 3) in vec2 vertPerp;
-layout (location = 4) in vec2 vertTime;  // x = appearTime (s), y = witherTime (s, 0 = not withering)
-layout (location = 5) in vec3 vertGrid;  // x = grid efficiency (E/M ratio), y = current flow (E/s), z = bubble phase at bake (elmos)
+layout (location = 0) in vec2 vertPos;     // (x, z) world coords
+layout (location = 1) in vec3 vertData;    // (capacity, appearTime, witherTime)
+layout (location = 2) in vec3 vertGrid;    // (gridEfficiency, flow, bubblePhase)
+
+out gl_PerVertex {
+	vec4 gl_Position;
+};
+
+out DataVS {
+	vec2 vsWorldXZ;
+	vec3 vsCableData;
+	vec3 vsGridData;
+};
+
+void main() {
+	vsWorldXZ   = vertPos;
+	vsCableData = vertData;
+	vsGridData  = vertGrid;
+	gl_Position = vec4(0.0);
+}
+]]
+
+-- (dead-code block removed)
+
+-- Full GS: takes one GL_LINES primitive (the cable's two endpoints), generates
+-- a wiggly path with `SEGMENTS` waypoints, samples the heightmap per waypoint
+-- for terraform-correct y, and emits one triangle_strip ribbon.
+-- #version 330 because that's what works alongside the engine UBO bindings
+-- and the existing #version 420 VS/FS — matches outline_shader_gl4's pattern.
+local cableGSSrc = [[
+#version 330
+#extension GL_ARB_uniform_buffer_object : require
+#extension GL_ARB_shading_language_420pack: require
+
+layout (lines) in;
+// max_vertices is constrained by GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS
+// (spec minimum 1024). With ~19 components emitted per vertex (gl_Position +
+// DataGS payload), we have headroom for ~50 vertices total → 24-segment
+// ribbon (25 boundary samples × 2 verts = 50 verts).
+layout (triangle_strip, max_vertices = 50) out;
 
 uniform sampler2D heightmapTex;
 
-out DataVS {
+in DataVS {
+	vec2 vsWorldXZ;
+	vec3 vsCableData;
+	vec3 vsGridData;
+} dataIn[];
+
+out DataGS {
 	vec3 worldPos;
 	float capacity;
 	float isBranch;
@@ -1612,25 +1236,84 @@ float heightAtWorldPos(vec2 w) {
 	return textureLod(heightmapTex, uvhm, 0.0).x;
 }
 
-void main() {
-	// Resample current ground height (so cables track terraform in real time)
-	vec3 pos = vertPos;
-	pos.y = heightAtWorldPos(vertPos.xz) + 2.0;
+// Mirror of Lua-side Hash() / NoisyPath() so cables look exactly like before.
+float gsHash(float x, float z, float seed) {
+	return fract(sin(x * 12.9898 + z * 78.233 + seed * 43.17) * 43758.5453) * 2.0 - 1.0;
+}
+float gsNoiseScale(float t) {
+	if (t < 0.1) return t / 0.1;
+	if (t > 0.9) return (1.0 - t) / 0.1;
+	return 1.0;
+}
 
-	worldPos = pos;
-	capacity = vertData.x;
-	isBranch = vertData.y;
-	width = vertData.z;
-	cableUV = vertUV;
-	perp = vertPerp;
-	timeData = vertTime;
-	gridData = vertGrid;
-	gl_Position = cameraViewProj * vec4(pos, 1.0);
+const int   SEGMENTS         = 24;
+const float NOISE_AMP_ABS    = 1.0;
+const float WIDTH_FACTOR     = 0.55;
+const float MIN_TRUNK_WIDTH  = 3.0;
+const float MAX_TRUNK_WIDTH  = 12.0;
+const float MAX_CAPACITY_REF = 100.0;
+
+void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
+             float w, vec3 grid, vec2 td, float cap) {
+	worldPos = wp;
+	capacity = cap;
+	isBranch = 0.0;
+	width = w;
+	cableUV = cuv;
+	perp = perpHere;
+	timeData = td;
+	gridData = grid;
+	gl_Position = cameraViewProj * vec4(wp, 1.0);
+	EmitVertex();
+}
+
+void main() {
+	vec2 a = dataIn[0].vsWorldXZ;
+	vec2 b = dataIn[1].vsWorldXZ;
+	vec2 d = b - a;
+	float lenAB = length(d);
+	if (lenAB < 0.5) return;
+	vec2 dirAB  = d / lenAB;
+	vec2 perpAB = vec2(-dirAB.y, dirAB.x);
+
+	float cap   = dataIn[0].vsCableData.x;
+	vec2  timeD = dataIn[0].vsCableData.yz;
+	vec3  gridD = dataIn[0].vsGridData;
+
+	float widthVal = MIN_TRUNK_WIDTH +
+		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
+	float halfW = widthVal * WIDTH_FACTOR;
+	float effAmp = NOISE_AMP_ABS * (lenAB < 80.0 ? (lenAB / 80.0) : 1.0);
+
+	// Stable seed derived purely from endpoint coords — same as old CPU path.
+	float seed = a.x * 0.137 + a.y * 0.781 + b.x * 0.293 + b.y * 0.461;
+
+	// Wiggly ribbon: per-segment noise applied perpendicular to the straight
+	// line direction — same formula as the old Lua-side NoisyPath().
+	float along = 0.0;
+	vec2 prevP = a;
+	for (int i = 0; i <= SEGMENTS; i++) {
+		float t = float(i) / float(SEGMENTS);
+		vec2 base = a + d * t;
+		float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
+		vec2 p = base + perpAB * n;
+
+		if (i > 0) along += distance(prevP, p);
+		prevP = p;
+
+		float y = heightAtWorldPos(p) + 2.0;
+		vec3 leftPos  = vec3(p.x - perpAB.x * halfW, y, p.y - perpAB.y * halfW);
+		vec3 rightPos = vec3(p.x + perpAB.x * halfW, y, p.y + perpAB.y * halfW);
+
+		emitVtx(leftPos,  perpAB, vec2(along, -1.0), widthVal, gridD, timeD, cap);
+		emitVtx(rightPos, perpAB, vec2(along,  1.0), widthVal, gridD, timeD, cap);
+	}
+	EndPrimitive();
 }
 ]]
 
 local cableFSSrc = [[
-#version 330
+#version 420
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 
@@ -1638,7 +1321,7 @@ uniform sampler2D infoTex;
 uniform float gameTime;
 uniform float bakeTime;
 
-in DataVS {
+in DataGS {
 	vec3 worldPos;
 	float capacity;
 	float isBranch;
@@ -2030,7 +1713,6 @@ local function RebuildVBO()
 	end
 
 	local tGen0 = drawPerf and Spring.GetTimer() or nil
-	local cacheHit = geomCache.valid
 	local verts, vertCount = GenerateOrganicTree()
 	if vertCount == 0 then
 		numCableVerts = 0
@@ -2041,13 +1723,13 @@ local function RebuildVBO()
 	cableVAO = nil
 	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	if not vbo then return end
+	-- Per-vertex layout (8 floats): vertPos(2) + vertData(3) + vertGrid(3).
+	-- Two vertices per cable form one GL_LINES primitive; the geometry shader
+	-- expands each line into a wiggly ribbon at draw time.
 	vbo:Define(vertCount, {
-		{ id = 0, name = "vertPos",   size = 3 },
-		{ id = 1, name = "vertData",  size = 3 },
-		{ id = 2, name = "vertUV",    size = 2 },
-		{ id = 3, name = "vertPerp",  size = 2 },
-		{ id = 4, name = "vertTime",  size = 2 },
-		{ id = 5, name = "vertGrid",  size = 3 },  -- (efficiency, flow E/s, bubble phase elmos)
+		{ id = 0, name = "vertPos",   size = 2 },
+		{ id = 1, name = "vertData",  size = 3 },  -- (capacity, appearTime, witherTime)
+		{ id = 2, name = "vertGrid",  size = 3 },  -- (efficiency, flow E/s, bubble phase elmos)
 	})
 	local tUp0 = drawPerf and Spring.GetTimer() or nil
 	vbo:Upload(verts)
@@ -2059,12 +1741,11 @@ local function RebuildVBO()
 	if drawPerf then
 		local tEnd = Spring.GetTimer()
 		Spring.Echo(string.format(
-			"[CableTree] draw rebuild (%s): phase=%.2f ms  geom=%.2f ms  upload=%.2f ms  verts=%d",
-			cacheHit and "cache-hit" or "FULL",
+			"[CableTree] draw rebuild: phase=%.2f ms  build=%.2f ms  upload=%.2f ms  verts=%d edges=%d",
 			Spring.DiffTimers(tGen0, tStart) * 1000,
 			Spring.DiffTimers(tUp0,  tGen0)  * 1000,
 			Spring.DiffTimers(tEnd,  tUp0)   * 1000,
-			vertCount))
+			vertCount, vertCount / 2))
 	end
 end
 
@@ -2113,7 +1794,9 @@ function gadget:DrawWorldPreUnit()
 	gl.DepthMask(true)
 	gl.Blending(false)
 
-	cableVAO:DrawArrays(GL.TRIANGLES, numCableVerts)
+	-- GL_LINES: every 2 verts form one cable; the geometry shader expands
+	-- them into a triangle_strip ribbon.
+	cableVAO:DrawArrays(GL.LINES, numCableVerts)
 
 	cableShader:Deactivate()
 	gl.Texture(0, false)
@@ -2135,10 +1818,13 @@ function gadget:Initialize()
 
 	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()
 	local vsSrc = cableVSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
+	local gsSrc = cableGSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	local fsSrc = cableFSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
+
 
 	cableShader = LuaShader({
 		vertex = vsSrc,
+		geometry = gsSrc,
 		fragment = fsSrc,
 		uniformInt = {
 			infoTex = 0,
