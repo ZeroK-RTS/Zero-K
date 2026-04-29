@@ -1169,16 +1169,17 @@ local function GenerateOrganicTree()
 		local eff = e.eff or 0
 		local flow = e.flow or 0
 		local phase = e.bubblePhase or 0
+		local isOwn = e.isOwnAlly and 1 or 0
 
-		-- Vertex 0: parent end
+		-- Vertex 0: parent end (9 floats: pos2 + data3 + grid4)
 		verts[k+1] = e.px;          verts[k+2] = e.pz
 		verts[k+3] = cap;           verts[k+4] = appearTime;  verts[k+5] = witherTime
-		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = phase
+		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = phase;       verts[k+9] = isOwn
 		-- Vertex 1: child end (same per-edge payload)
-		verts[k+9] = e.cx;          verts[k+10] = e.cz
-		verts[k+11] = cap;          verts[k+12] = appearTime; verts[k+13] = witherTime
-		verts[k+14] = eff;          verts[k+15] = flow;       verts[k+16] = phase
-		k = k + 16
+		verts[k+10] = e.cx;         verts[k+11] = e.cz
+		verts[k+12] = cap;          verts[k+13] = appearTime; verts[k+14] = witherTime
+		verts[k+15] = eff;          verts[k+16] = flow;       verts[k+17] = phase;      verts[k+18] = isOwn
+		k = k + 18
 	end
 	return verts, n * 2
 end
@@ -1205,7 +1206,7 @@ local cableVSSrc = [[
 
 layout (location = 0) in vec2 vertPos;     // (x, z) world coords
 layout (location = 1) in vec3 vertData;    // (capacity, appearTime, witherTime)
-layout (location = 2) in vec3 vertGrid;    // (gridEfficiency, flow, bubblePhase)
+layout (location = 2) in vec4 vertGrid;    // (gridEfficiency, flow, bubblePhase, isOwnAlly)
 
 out gl_PerVertex {
 	vec4 gl_Position;
@@ -1214,7 +1215,7 @@ out gl_PerVertex {
 out DataVS {
 	vec2 vsWorldXZ;
 	vec3 vsCableData;
-	vec3 vsGridData;
+	vec4 vsGridData;
 };
 
 void main() {
@@ -1250,7 +1251,7 @@ uniform sampler2D heightmapTex;
 in DataVS {
 	vec2 vsWorldXZ;
 	vec3 vsCableData;
-	vec3 vsGridData;
+	vec4 vsGridData;
 } dataIn[];
 
 out DataGS {
@@ -1261,7 +1262,7 @@ out DataGS {
 	vec2 cableUV;
 	vec2 perp;
 	vec2 timeData;
-	vec3 gridData;
+	vec4 gridData;
 	float localU;     // twig-local along (0 at root, bLen at tip). Unused for main ribbon.
 };
 
@@ -1323,7 +1324,7 @@ float gOutBranch = 0.0;
 float gOutLocalU = 0.0;  // set per-vertex by twig emitters; main ribbon leaves at 0.
 
 void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
-             float w, vec3 grid, vec2 td, float cap) {
+             float w, vec4 grid, vec2 td, float cap) {
 	worldPos = wp;
 	capacity = cap;
 	isBranch = gOutBranch;
@@ -1337,36 +1338,120 @@ void emitVtx(vec3 wp, vec2 perpHere, vec2 cuv,
 	EmitVertex();
 }
 
+// Arc-bias parameters: at each point along the cable, probe the heightmap
+// sideways and pull the centerline toward the lower-elevation side. The
+// per-point lateral budget shrinks tent-style toward the endpoints, so the
+// path is anchored at the pylons and free in the middle — worst case the
+// whole cable forms a smooth arc. Adds *on top of* the existing high-frequency
+// wiggle (which gives bark/seam variation), so the result is "arched chord
+// with bark wiggle" rather than either alone.
+const float ARC_PROBE_DIST   = 35.0;   // elmos to each side for the slope probe
+const float ARC_MAX_DEV_FRAC = 0.18;   // midpoint cap = ARC_MAX_DEV_FRAC * lenAB
+const float ARC_DH_SAT       = 6.0;    // probe Δheight (elmos) at which pull saturates to maxDev
+const float ARC_MIN_LEN      = 80.0;   // shorter cables: skip arc bias entirely
+
+// Computes ONE cable-global pull direction by averaging dh probes at 5
+// anchor points along the chord. Computed once per cable in main() and
+// reused for all segments and twigs.
+//
+// Why averaging instead of per-t probing:
+// Probing dh at *each* segment t evaluates a fresh terrain feature at the
+// chord position, so the pull direction can flip between adjacent segments
+// — the cable then 90°-zigzags through the terrain. A single global dh
+// (signed mean across the chord) produces a monotonic arc: the whole cable
+// bends in one direction, magnitude shaped by the tent envelope. Micro
+// wiggles still come from the existing high-frequency noise pass, so the
+// "still perturbed for micro wiggles" property is preserved.
+float cableArcDh(vec2 a, vec2 d, vec2 perpAB, float lenAB) {
+	if (lenAB <= ARC_MIN_LEN) return 0.0;
+	float dhSum = 0.0;
+	for (int j = 0; j < 5; j++) {
+		float tj = (float(j) + 0.5) * (1.0 / 5.0);   // 0.1, 0.3, 0.5, 0.7, 0.9
+		vec2 mj = a + d * tj;
+		float hL = heightAtWorldPos(mj - perpAB * ARC_PROBE_DIST);
+		float hR = heightAtWorldPos(mj + perpAB * ARC_PROBE_DIST);
+		dhSum += (hR - hL);
+	}
+	return dhSum * (1.0 / 5.0);
+}
+
+// Returns the arc-biased centerline point at parameter t along the chord.
+// `dh` is the cable-global signed pull magnitude from cableArcDh().
+//
+// Pull saturation: rather than a linear gain (which left visibly steep
+// terrain only weakly arched, then reverted to chord beyond budget), we
+// smoothstep from 0 to maxDev as |dh| grows from 0 → ARC_DH_SAT. So as
+// soon as there's any meaningful slope, the cable commits to the maximum
+// allowed lateral deviation — it goes "as far around the hill as the
+// arc budget permits" rather than reverting to the steep chord.
+vec2 arcBiasedCenter(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB, float dh) {
+	vec2 base = a + d * t;
+	if (lenAB <= ARC_MIN_LEN) return base;
+	float tent = 4.0 * t * (1.0 - t);
+	float maxDev = lenAB * ARC_MAX_DEV_FRAC * tent;
+	float pull = sign(dh) * maxDev * smoothstep(0.0, ARC_DH_SAT, abs(dh));
+	// dh>0 (right higher) → pull base toward left = -perpAB * |pull|.
+	return base - perpAB * pull;
+}
+
 void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
                     float halfW, float widthVal, float effAmp, float seed,
-                    vec3 gridD, vec2 timeD, float cap, int numSeg) {
+                    vec4 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
 	gOutBranch = 0.0;
 	// `along` is fed into the FS as cableUV.x and drives bubble advection.
 	// It MUST be a 3D arc length, otherwise downslope cables look like the
 	// flow is racing because the same 2D Δalong covers more visible meters.
 	float along = 0.0;
 	vec3  prev3D = vec3(0.0);
+	float lenAB = length(d);
 	for (int i = 0; i <= numSeg; i++) {
 		float t = float(i) / float(numSeg);
-		vec2 base = a + d * t;
+		vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
+
 		float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
 		vec2 p = base + perpAB * n;
 
-		// Sample heightmap independently at the two ribbon edges so the strip
-		// drapes across cross-slope terrain instead of clipping into the uphill
-		// side. `along` uses the (untwisted) centerline.
-		vec2 leftXZ  = vec2(p.x - perpAB.x * halfW, p.y - perpAB.y * halfW);
-		vec2 rightXZ = vec2(p.x + perpAB.x * halfW, p.y + perpAB.y * halfW);
-		float yC = heightAtWorldPos(p)       + 5.0;
-		float yL = heightAtWorldPos(leftXZ)  + 5.0;
-		float yR = heightAtWorldPos(rightXZ) + 5.0;
+		// Build the cable's local cross-section in the slope's tangent plane at
+		// `p` so the visible 3D L→R distance is exactly `widthVal` regardless of
+		// terrain tilt. The previous version offset L/R purely in horizontal XZ
+		// then sampled height independently, which made the visible cross-section
+		// inflate on cross-slopes (sqrt((2*halfW)^2 + (yL-yR)^2) > 2*halfW).
+		// Now: N = terrain normal at p; T = horizontal cable tangent projected
+		// into the slope plane; B = N × T. L = center3D + B*halfW (with B's sign
+		// chosen to land on `-perpAB`), R = center3D - B*halfW.
+		float yC = heightAtWorldPos(p) + 6.0;
+		vec3 center3D = vec3(p.x, yC, p.y);
 
-		vec3 curr3D = vec3(p.x, yC, p.y);
-		if (i > 0) along += distance(prev3D, curr3D);
-		prev3D = curr3D;
+		vec3 N = terrainNormal(p);
+		vec3 cableDirH = normalize(vec3(d.x, 0.0, d.y));
+		vec3 T3 = normalize(cableDirH - dot(cableDirH, N) * N);
+		vec3 B3 = normalize(cross(N, T3));
+		// Align B3 with -perpAB so cableUV.y signs match the prior convention
+		// (left vertex carries cableUV.y = -1).
+		vec3 perpRefH = normalize(vec3(-perpAB.x, 0.0, -perpAB.y));
+		if (dot(B3, perpRefH) < 0.0) B3 = -B3;
 
-		vec3 leftPos  = vec3(leftXZ.x,  yL, leftXZ.y);
-		vec3 rightPos = vec3(rightXZ.x, yR, rightXZ.y);
+		vec3 leftPos  = center3D + B3 * halfW;
+		vec3 rightPos = center3D - B3 * halfW;
+
+		// Anti-underground clamp: on terrain that curves up faster than linear
+		// (concave cross-slope), the slope-tangent-plane offset can put L or R
+		// below the actual heightmap at their XZ. Raise to local terrain +
+		// minClearance whenever that happens. On linear terrain the L/R points
+		// already sit at clearance above ground so this is a no-op there.
+		float minSideClearance = 3.0;
+		float hL_xz = heightAtWorldPos(leftPos.xz)  + minSideClearance;
+		float hR_xz = heightAtWorldPos(rightPos.xz) + minSideClearance;
+		leftPos.y  = max(leftPos.y,  hL_xz);
+		rightPos.y = max(rightPos.y, hR_xz);
+
+		// Also raise center3D if a clamp lifted the sides above it (preserves the
+		// cylinder appearance — center should never sit below a side vertex).
+		float midY = max(center3D.y, 0.5 * (leftPos.y + rightPos.y));
+		center3D.y = midY;
+
+		if (i > 0) along += distance(prev3D, center3D);
+		prev3D = center3D;
 
 		emitVtx(leftPos,  perpAB, vec2(along, -1.0), widthVal, gridD, timeD, cap);
 		emitVtx(rightPos, perpAB, vec2(along,  1.0), widthVal, gridD, timeD, cap);
@@ -1380,10 +1465,11 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 // hash says "no twig here" — leaving an empty primitive, which is a no-op.
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
-              vec3 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
-              float spawnAlongMain, int twigIdx) {
-	// Resolve spawn point on the wiggly main path at tCenter.
-	vec2 base = a + d * tCenter;
+              vec4 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
+              float spawnAlongMain, int twigIdx, float arcDh) {
+	// Resolve spawn point on the wiggly main path at tCenter. Apply the same
+	// arc bias as the main ribbon so twigs root on the visible cable.
+	vec2 base = arcBiasedCenter(a, d, perpAB, tCenter, length(d), arcDh);
 	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(tCenter);
 	vec2 spawn = base + perpAB * n;
 
@@ -1466,7 +1552,7 @@ void main() {
 
 	float cap   = dataIn[0].vsCableData.x;
 	vec2  timeD = dataIn[0].vsCableData.yz;
-	vec3  gridD = dataIn[0].vsGridData;
+	vec4  gridD = dataIn[0].vsGridData;
 
 	float widthVal = MIN_TRUNK_WIDTH +
 		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
@@ -1480,21 +1566,41 @@ void main() {
 	// segment (because each segment is len3D/numSeg in 3D arc, but spaced
 	// uniformly in 2D parameter t). Noise wiggle is ignored here — keeping the
 	// scan cheap matters more than a few % accuracy on segment count.
+	//
+	// Also tracks slope curvature: if the second derivative of height along
+	// the chord is large (terrain undulates rather than ramps), bump segment
+	// count further so the linear interpolation between vertices doesn't dip
+	// underground between samples.
 	float len3D = 0.0;
+	float curv  = 0.0;
 	{
-		vec3 prev3 = vec3(a.x, heightAtWorldPos(a) + 2.0, a.y);
+		float h0 = heightAtWorldPos(a) + 2.0;
+		vec3 prev3 = vec3(a.x, h0, a.y);
+		float prevDy = 0.0;
 		for (int j = 1; j <= 6; j++) {
 			float tj = float(j) * (1.0 / 6.0);
 			vec2 bj = a + d * tj;
-			vec3 p3 = vec3(bj.x, heightAtWorldPos(bj) + 2.0, bj.y);
+			float hj = heightAtWorldPos(bj) + 2.0;
+			vec3 p3 = vec3(bj.x, hj, bj.y);
 			len3D += distance(p3, prev3);
+			float dy = hj - prev3.y;
+			if (j > 1) curv += abs(dy - prevDy);  // sum |Δslope| as curvature proxy
+			prevDy = dy;
 			prev3 = p3;
 		}
 	}
-	int numSeg = clamp(int(len3D / SEG_LEN_TARGET + 0.5), 1, MAX_SEGMENTS);
+	// Bump segment count by curvature: every 6 elmos of cumulative |Δslope|
+	// adds one extra segment, capped at MAX_SEGMENTS.
+	int baseSeg = int(len3D / SEG_LEN_TARGET + 0.5);
+	int curvSeg = int(curv * (1.0 / 6.0));
+	int numSeg = clamp(baseSeg + curvSeg, 1, MAX_SEGMENTS);
+
+	// One global pull direction per cable: averaged dh across 5 chord anchors.
+	// Per-segment probing was the source of zigzag — see cableArcDh comment.
+	float arcDh = cableArcDh(a, d, perpAB, lenAB);
 
 	if (gl_InvocationID == 0) {
-		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg);
+		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
 	} else {
 		// Twig density scales with 3D arc length: ~one twig per 110 elmos,
 		// capped at 4. Short cables get 0-1 twigs, long ones get the full set.
@@ -1514,7 +1620,7 @@ void main() {
 		              / float(numSeg);
 		float spawnAlongMain = len3D * tCenter;
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx);
+		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx, arcDh);
 	}
 }
 ]]
@@ -1536,7 +1642,7 @@ in DataGS {
 	vec2 cableUV;
 	vec2 perp;
 	vec2 timeData;  // x = appearTime, y = witherTime (0 = not withering)
-	vec3 gridData;  // x = efficiency (E/M), y = flow (E/s), z = bubble phase at bake (elmos)
+	vec4 gridData;  // x = efficiency (E/M), y = flow (E/s), z = bubble phase at bake (elmos), w = isOwnAlly (1 own, 0 enemy)
 	float localU;   // twig-local along (0 at root, bLen at tip). Unused for main ribbon.
 };
 
@@ -1742,6 +1848,11 @@ void main() {
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
 	float fullLOS = smoothstep(0.7, 1.0, losState);
 
+	// Enemy cables: only show in actual LOS (no ghost / no out-of-LOS render).
+	// Own cables show even out-of-LOS, dimmed (existing dimFactor handles it).
+	float isOwnAlly = gridData.w;
+	if (isOwnAlly < 0.5 && losState < 0.45) discard;
+
 	// Apply lighting
 	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
 
@@ -1797,26 +1908,38 @@ void main() {
 	// at the main cable's speed.
 	float bubbleBody, bubbleSpec, bubbleHalo;
 	if (isBranch > 0.5) {
-		// Synced uniform "power spark": the whole twig flashes bright at once,
-		// like an electrical discharge. NO spatial position dependence — every
-		// pixel of the twig has identical brightness — so the eye cannot
-		// perceive any directional motion (and therefore cannot misperceive
-		// reflection / back-and-forth). All twigs of a cable share `phase`,
-		// so they spark together. Frequency = speed / PERIOD (linear in flow).
+		// "Electric crackle" — synchronized power buzzing on twigs.
 		//
-		// Envelope: very fast rise (~3% of period), then exponential decay.
-		// Reads as a sharp "zap" of energy along the conduit.
-		const float PERIOD = 220.0;
-		float pulse = mod(phase, PERIOD) / PERIOD;       // [0,1)
-		float rise  = smoothstep(0.0, 0.03, pulse);
-		float decay = exp(-pulse * 9.0);                  // dies before next cycle
-		float spark = rise * decay;
-		float v2    = v * v;
-		float cross = 1.0 - smoothstep(0.7, 1.0, v2);
-		spark *= cross;
-		bubbleBody = spark * 1.30;
-		bubbleSpec = spark * 0.65;
-		bubbleHalo = spark * 0.55;
+		// CRITICAL constraint: every spatial reference inside this branch must
+		// be cross-cable only (`v`), never along-twig. Any along-twig gradient
+		// keyed off a temporally advancing scalar can be read as motion, and a
+		// motion that wraps around at phase reset reads as "backwards bouncing".
+		// We use ONLY `phase` (time-like, per-cable, shared across all twigs) and
+		// `v` (cross-cable shape). No `localU`, no `along`, no `worldPos`-along.
+		//
+		// Two stacked uniform-in-space components, both functions of phase only:
+		//   * crackle: high-frequency hash-driven flicker, ticks per ~5 elmos of
+		//     phase. Reads as electric arcing in the conduit. Brightness is a
+		//     random scalar per tick, identical across the entire twig surface.
+		//   * zap:     occasional bigger Gaussian-shaped pulse, ~1 per 220 elmos
+		//     of phase. Reads as a "power surge" hitting the twigs.
+		//
+		// All twigs of a cable share `phase`, so they crackle / zap in lockstep.
+		// Phase advance rate = speed, so faster grids buzz / zap faster.
+		const float TICK     = 5.0;     // elmos of phase per crackle tick
+		const float ZAP_PER  = 220.0;   // elmos of phase per power zap
+		float tickIdx = floor(phase / TICK);
+		float h0 = hash1(tickIdx);
+		float h1 = hash1(tickIdx + 17.3);
+		float crackle = h0 * h0 * step(0.55, h1);   // sparse + biased dim
+		float zapPhase = mod(phase, ZAP_PER) / ZAP_PER;
+		float zd = zapPhase - 0.08;                  // peak shortly after wrap
+		float zap = exp(-zd * zd * 90.0);            // Gaussian, sharp
+		float cross = 1.0 - smoothstep(0.6, 1.0, v * v);
+		float intensity = (crackle * 0.55 + zap * 1.10) * cross;
+		bubbleBody = intensity * 1.20;
+		bubbleSpec = intensity * 0.70;
+		bubbleHalo = intensity * 0.50;
 	} else {
 		vec3 bA = bubbleLayer(along, phase, spacingA, 7.5, v, halfWidthE,  3.7);
 		vec3 bB = bubbleLayer(along, phase, spacingB, 4.0, v, halfWidthE, 19.1);
@@ -1860,11 +1983,13 @@ void main() {
 -- Receive data from synced
 -------------------------------------------------------------------------------------
 
-local function shouldAcceptForAlly(allyTeamID)
+-- Whether the local viewer should treat `allyTeamID`'s cables as "own"
+-- (always visible, optionally ghosted out of LOS) vs "enemy" (only visible
+-- inside actual LOS). Specs and full-view see everything as own.
+local function isOwnAlly(allyTeamID)
 	local spec, fullview = spGetSpectatingState()
-	local myAllyTeam = spGetMyAllyTeamID()
 	if (spec or fullview) then return true end
-	return allyTeamID == myAllyTeam
+	return allyTeamID == spGetMyAllyTeamID()
 end
 
 local function RebuildRenderEdges()
@@ -1886,7 +2011,9 @@ local function OnCableTreeFull()
 	local data = SYNCED.CableTreeFull
 	if not data then return end
 	local ally = data.allyTeamID
-	if not shouldAcceptForAlly(ally) then return end
+	-- Always accept; the FS gates enemy fragments by LOS so unscouted enemy
+	-- cables are invisible without dropping their data here.
+	local ownAlly = isOwnAlly(ally)
 
 	local tStart = drawPerf and Spring.GetTimer() or nil
 	local frame = Spring.GetGameFrame()
@@ -1927,6 +2054,7 @@ local function OnCableTreeFull()
 			e.capacity = data.caps[i]
 			e.flow     = newFlow
 			e.eff      = data.effs and data.effs[i] or 0
+			e.isOwnAlly = ownAlly
 			-- positions are stable for unchanged edges; assign anyway in case parent moved
 			e.px, e.pz = data.pxs[i], data.pzs[i]
 			e.cx, e.cz = data.cxs[i], data.czs[i]
@@ -1937,6 +2065,7 @@ local function OnCableTreeFull()
 				capacity = data.caps[i],
 				flow     = newFlow,
 				eff      = data.effs and data.effs[i] or 0,
+				isOwnAlly = ownAlly,
 				appearFrame = frame,
 				witherFrame = nil,
 				key      = k,
@@ -1995,13 +2124,13 @@ local function RebuildVBO()
 	cableVAO = nil
 	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	if not vbo then return end
-	-- Per-vertex layout (8 floats): vertPos(2) + vertData(3) + vertGrid(3).
+	-- Per-vertex layout (9 floats): vertPos(2) + vertData(3) + vertGrid(4).
 	-- Two vertices per cable form one GL_LINES primitive; the geometry shader
 	-- expands each line into a wiggly ribbon at draw time.
 	vbo:Define(vertCount, {
 		{ id = 0, name = "vertPos",   size = 2 },
 		{ id = 1, name = "vertData",  size = 3 },  -- (capacity, appearTime, witherTime)
-		{ id = 2, name = "vertGrid",  size = 3 },  -- (efficiency, flow E/s, bubble phase elmos)
+		{ id = 2, name = "vertGrid",  size = 4 },  -- (efficiency, flow E/s, bubble phase elmos, isOwnAlly)
 	})
 	local tUp0 = drawPerf and Spring.GetTimer() or nil
 	vbo:Upload(verts)
