@@ -185,8 +185,13 @@ do
 end
 
 -- Runtime toggles, driven by the /cabletree chat command (see CableTreeCmd).
-local cableEnabled = true
-local cablePerf    = false
+-- cableFlowMode = full bubble animation + per-tick consumer draw reads.
+-- cableFlowMode = false: static cables, no per-tick reads, no bubbles.
+-- Persistence happens on the unsynced side (Spring.GetConfigInt is
+-- unsynced-only); unsynced bootstraps synced via a Lua rules msg on init.
+local cableEnabled  = true
+local cablePerf     = false
+local cableFlowMode = true
 
 -------------------------------------------------------------------------------------
 -- Helpers
@@ -630,52 +635,59 @@ local function BuildMpCache()
 	mpCache.valid          = true
 end
 
-local function ComputeMaxPotentials()
+-- `flowMode = false` skips the per-tick consumer rules-param reads and the
+-- post-order subDcur accumulation, returning all flows = 0. At 1500+ pylons
+-- this is the bulk of the per-tick cost (the only path that scales with the
+-- consumer set size). Capacities still come from the static cache, and edge
+-- reorientation falls back to capacity direction so the layout stays stable.
+local function ComputeMaxPotentials(flowMode)
 	if not mpCache.valid then BuildMpCache() end
 	local order          = mpCache.order
 	local parentInTree   = mpCache.parentInTree
 	local componentRoot  = mpCache.componentRoot
 	local subPmax        = mpCache.subPmax
 	local subDmax        = mpCache.subDmax
-	local subPmaxNonWind = mpCache.subPmaxNonWind
-	local subWindCount   = mpCache.subWindCount
-	local subWindBase    = mpCache.subWindBase
 
-	-- Per-tick wind globals: one read each, then everything is arithmetic.
-	local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
-	local _, _, _, currStrength = Spring.GetWind()
-	currStrength = currStrength or 0
-	local windFrac = (windMax > 0) and (currStrength / windMax) or 0
-	if windFrac < 0 then windFrac = 0 elseif windFrac > 1 then windFrac = 1 end
+	local subPcur, subDcur
+	if flowMode then
+		local subPmaxNonWind = mpCache.subPmaxNonWind
+		local subWindCount   = mpCache.subWindCount
+		local subWindBase    = mpCache.subWindBase
 
-	-- subPcur derived directly from cached aggregates — no per-node Pcur read.
-	-- Wind: linear-in-strength sum collapses to (1-f)*base + f*windMax*N.
-	-- Non-wind generators in MST are assumed to be producing nameplate
-	-- (any inactive generator has gridID=0 and so isn't in the cached tree).
-	local subPcur = {}
-	for i = 1, #order do
-		local u = order[i]
-		subPcur[u] = subWindBase[u] + windFrac * (windMax * subWindCount[u] - subWindBase[u])
-			+ subPmaxNonWind[u]
-	end
+		-- Per-tick wind globals: one read each, then everything is arithmetic.
+		local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
+		local _, _, _, currStrength = Spring.GetWind()
+		currStrength = currStrength or 0
+		local windFrac = (windMax > 0) and (currStrength / windMax) or 0
+		if windFrac < 0 then windFrac = 0 elseif windFrac > 1 then windFrac = 1 end
 
-	-- subDcur DOES still need per-node reads — mex draw and turret
-	-- consumption fluctuate per tick and are not derivable from anything
-	-- topology-cached. But we only call into the engine for nodes whose def
-	-- can possibly draw (mexes, voltage units, builders). Pure generators
-	-- (windmills/solar/fusion) and range-only pylons stay at 0 → at 1500+
-	-- pylons this skips most of the per-tick rules-param reads.
-	local subDcur = {}
-	for i = 1, #order do
-		local u = order[i]
-		local did = nodeDefByUID[u]
-		subDcur[u] = (did and consumerByDef[did]) and GetNodeDcurrent(u, did) or 0
-	end
-	for i = #order, 1, -1 do
-		local u = order[i]
-		local pi = parentInTree[u]
-		if pi then
-			subDcur[pi.parent] = subDcur[pi.parent] + subDcur[u]
+		-- subPcur derived directly from cached aggregates — no per-node Pcur
+		-- read. Wind: linear-in-strength sum collapses to
+		-- (1-f)*base + f*windMax*N. Non-wind generators in MST are assumed to
+		-- be at nameplate (inactive ones have gridID=0 and aren't cached).
+		subPcur = {}
+		for i = 1, #order do
+			local u = order[i]
+			subPcur[u] = subWindBase[u] + windFrac * (windMax * subWindCount[u] - subWindBase[u])
+				+ subPmaxNonWind[u]
+		end
+
+		-- subDcur DOES still need per-node reads — mex draw and turret
+		-- consumption fluctuate per tick. We restrict reads to nodes whose
+		-- def can possibly draw (mexes, voltage units, builders); pure
+		-- generators (windmills/solar/fusion) and range-only pylons stay at 0.
+		subDcur = {}
+		for i = 1, #order do
+			local u = order[i]
+			local did = nodeDefByUID[u]
+			subDcur[u] = (did and consumerByDef[did]) and GetNodeDcurrent(u, did) or 0
+		end
+		for i = #order, 1, -1 do
+			local u = order[i]
+			local pi = parentInTree[u]
+			if pi then
+				subDcur[pi.parent] = subDcur[pi.parent] + subDcur[u]
+			end
 		end
 	end
 
@@ -700,19 +712,23 @@ local function ComputeMaxPotentials()
 		capacities[key] = cap
 		local potentialSrcSubtree = capAB > capBA
 
-		local totalPcur, totalDcur = subPcur[r], subDcur[r]
-		local sPc, sDc = subPcur[cid], subDcur[cid]
-		local oPc, oDc = totalPcur - sPc, totalDcur - sDc
-		local flowAB = (sPc < oDc) and sPc or oDc
-		local flowBA = (oPc < sDc) and oPc or sDc
 		local flow, flowSrcSubtree
-		if flowAB >= flowBA then
-			flow, flowSrcSubtree = flowAB, true
+		if flowMode then
+			local totalPcur, totalDcur = subPcur[r], subDcur[r]
+			local sPc, sDc = subPcur[cid], subDcur[cid]
+			local oPc, oDc = totalPcur - sPc, totalDcur - sDc
+			local flowAB = (sPc < oDc) and sPc or oDc
+			local flowBA = (oPc < sDc) and oPc or sDc
+			if flowAB >= flowBA then
+				flow, flowSrcSubtree = flowAB, true
+			else
+				flow, flowSrcSubtree = flowBA, false
+			end
+			if flow < 0 then flow = 0 end
+			if flow <= 0 then flowSrcSubtree = potentialSrcSubtree end
 		else
-			flow, flowSrcSubtree = flowBA, false
+			flow, flowSrcSubtree = 0, potentialSrcSubtree
 		end
-		if flow < 0 then flow = 0 end
-		if flow <= 0 then flowSrcSubtree = potentialSrcSubtree end
 		flows[key] = flow
 
 		local edge = edges[key]
@@ -757,7 +773,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function SendAll()
-	local capacities, flows = ComputeMaxPotentials()
+	local capacities, flows = ComputeMaxPotentials(cableFlowMode)
 
 	-- Bin edges by ally, in one pass.
 	local perAlly = {}
@@ -841,12 +857,15 @@ function gadget:GameFrame(n)
 	if not cableEnabled then return end
 	if n % SYNC_PERIOD == 2 then
 		SyncWithGrid()
-		-- Always send: flow magnitudes and grid efficiency colour change every
-		-- tick, so unsynced needs the periodic refresh even when topology is
-		-- unchanged. Diff cost on the unsynced side is cheap (key lookup +
-		-- attribute upload); geometry only re-generates when keys change.
-		SendAll()
-		topologyDirty = false
+		-- Flow mode: always send (flow magnitudes + grid efficiency colour
+		-- change every tick). No-flow mode: only send on topology change —
+		-- there's no per-tick state to refresh, and the per-tick send cost
+		-- (capacity-only ComputeMaxPotentials + per-ally upload) is the
+		-- entire point of the toggle.
+		if cableFlowMode or topologyDirty then
+			SendAll()
+			topologyDirty = false
+		end
 		-- Synced has no timing API (Spring.GetTimer is unsynced-only, and the
 		-- sandbox doesn't expose `os`). Just report the edge count from here;
 		-- the real cost numbers come from the unsynced rebuild log, which
@@ -859,8 +878,28 @@ function gadget:GameFrame(n)
 	end
 end
 
+-- Tells unsynced whether to gate the FS bubble pass. Synced is the source of
+-- truth (chat command runs here); unsynced mirrors via SendToUnsynced.
+local function PushFlowModeToUnsynced()
+	_G.CableTreeFlowMode = { flowMode = cableFlowMode }
+	SendToUnsynced("CableTreeFlowMode")
+end
+
+local function SetFlowMode(on)
+	if cableFlowMode == on then return end
+	cableFlowMode = on
+	PushFlowModeToUnsynced()
+	-- Force one fresh send so the new mode takes effect immediately rather
+	-- than waiting for the next topology change (which might never come on
+	-- a settled grid).
+	SendAll()
+	topologyDirty = false
+end
+
 -- /cabletree              — toggle on/off
 -- /cabletree on / off     — explicit
+-- /cabletree flow on/off  — toggle bubble animation + per-tick flow reads
+--                           (the heavy path at 1500+ pylons)
 -- /cabletree perf         — toggle per-cycle timing log
 -- /cabletree status       — print current state
 local function CableTreeCmd(cmd, line, words, playerID)
@@ -876,6 +915,12 @@ local function CableTreeCmd(cmd, line, words, playerID)
 		cableEnabled = false
 		ClearAll()
 		Spring.Echo("[CableTree] OFF")
+	elseif arg == "flow" then
+		local sub = (words and words[2]) or ""
+		if sub == "on" then SetFlowMode(true)
+		elseif sub == "off" then SetFlowMode(false)
+		else SetFlowMode(not cableFlowMode) end
+		Spring.Echo("[CableTree] flow animation " .. (cableFlowMode and "ON" or "OFF"))
 	elseif arg == "perf" then
 		cablePerf = not cablePerf
 		_G.CableTreePerf = { perf = cablePerf }
@@ -885,10 +930,11 @@ local function CableTreeCmd(cmd, line, words, playerID)
 		local nEdges = 0
 		for _ in pairs(edges) do nEdges = nEdges + 1 end
 		Spring.Echo(string.format(
-			"[CableTree] enabled=%s perf=%s edges=%d",
-			tostring(cableEnabled), tostring(cablePerf), nEdges))
+			"[CableTree] enabled=%s flow=%s perf=%s edges=%d",
+			tostring(cableEnabled), tostring(cableFlowMode),
+			tostring(cablePerf), nEdges))
 	else
-		Spring.Echo("[CableTree] usage: /cabletree [on|off|toggle|perf|status]")
+		Spring.Echo("[CableTree] usage: /cabletree [on|off|toggle|flow on/off|perf|status]")
 	end
 	return true
 end
@@ -939,6 +985,18 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 			allyOfUnit[unitID] = newAlly
 			nodeDefByUID[unitID] = unitDefID
 		end
+	end
+end
+
+-- Unsynced bootstraps synced with the player's persisted flow setting via
+-- Spring.SendLuaRulesMsg (see unsynced gadget:Initialize). Format:
+-- "cabletree:flow:on" / "cabletree:flow:off". We only react to that exact
+-- prefix; other messages pass through untouched.
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg == "cabletree:flow:on" then
+		SetFlowMode(true)
+	elseif msg == "cabletree:flow:off" then
+		SetFlowMode(false)
 	end
 end
 
@@ -1085,6 +1143,10 @@ local cableShader       -- forward shader for cable rendering
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
 local drawPerf = false  -- toggled by the synced /cabletree perf command
+-- Mirrors synced cableFlowMode. Drives the FS `enableFlow` uniform; both
+-- sides initialise from the same Spring config key so the toggle survives
+-- reloads even before the synced side gets a chance to push.
+local flowMode = (Spring.GetConfigInt("OverdriveCableFlow", 1) or 1) ~= 0
 -- Game-second timestamp captured the moment the current VBO's bubblePhase
 -- snapshots were taken. The shader extrapolates each cable's phase forward
 -- from this anchor using `phase = bakedPhase + flowToSpeed(flow) * (gameTime
@@ -1318,6 +1380,16 @@ const float BRANCH_ANGLE_MIN  = 0.4;
 const float BRANCH_ANGLE_MAX  = 1.1;
 const float BRANCH_WIDTH      = 0.85;
 
+// Vertical clearance over the heightmap. CENTERLINE_CLEAR is added on top of
+// the max-of-window lift, so it doesn't need a big pad. TWIG_CLEAR is set
+// 0.6 elmos below CENTERLINE_CLEAR so the twig sits just under the trunk's
+// centerline at the junction (avoids z-fighting while staying visually
+// attached). SIDE_CLEAR catches concave cross-slopes where the slope-tangent
+// offset would otherwise place the side vertex below local terrain.
+const float CENTERLINE_CLEAR  = 1.5;
+const float TWIG_CLEAR        = 0.9;
+const float SIDE_CLEAR        = 0.8;
+
 float gOutBranch = 0.0;
 float gOutSpawnAlong = 0.0;  // set by emitTwig per-twig; main ribbon leaves at 0.
 
@@ -1392,6 +1464,34 @@ vec2 arcBiasedCenter(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB, float dh
 	return base - perpAB * pull;
 }
 
+// Wiggly cable point at chord parameter t — arc-biased centerline plus
+// high-frequency noise. Used by both main ribbon (per-segment) and twig
+// emitter (at spawn) so they sit on the same path.
+vec2 wigglyCablePoint(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB,
+                      float arcDh, float effAmp, float seed) {
+	vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
+	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
+	return base + perpAB * n;
+}
+
+// Lift y to the max heightmap value sampled within ±fullStep along dirH.
+// Linear interpolation between adjacent segment vertices can dip below
+// terrain on convex/rolling slopes — taking the max within a window that
+// covers the next vertex's position guarantees adjacent envelopes overlap
+// at the segment midpoint, so the rendered ribbon stays above any peak in
+// the gap. Used by the main ribbon (centerline lift) and twig emitter
+// (spawn point lift) so they share the same vertical anchor.
+float maxHeightInWindow(vec2 p, vec2 dirH, float fullStep) {
+	float yMax = heightAtWorldPos(p);
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.30)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.30)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.55)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.55)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.85)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.85)));
+	return yMax;
+}
+
 void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
                     float halfW, float widthVal, float effAmp, float seed,
                     vec4 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
@@ -1434,36 +1534,15 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 	vec3 perpRefH = normalize(vec3(-perpAB.x, 0.0, -perpAB.y));
 	if (dot(B3, perpRefH) < 0.0) B3 = -B3;
 
+	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
+	float fullStep = lenAB / float(numSeg);   // full segment span
+
 	for (int i = 0; i <= numSeg; i++) {
 		float t = float(i) / float(numSeg);
-		vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
+		vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
 
-		float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
-		vec2 p = base + perpAB * n;
-
-		// Anti-underground (along-cable): linear interpolation between two
-		// adjacent segment vertices can dip below terrain on convex/rolling
-		// slopes (the chord cuts under the heightmap between samples). Lift
-		// the centerline Y to the MAX heightmap value sampled within a window
-		// that COVERS THE FULL SEGMENT to either side of this vertex — i.e.
-		// up to the next vertex's position. That way adjacent vertices' max
-		// envelopes overlap at the segment midpoint, and the linearly
-		// interpolated ribbon between them stays above any terrain peak in
-		// the gap. Earlier the window was 0.95 × half-step which JUST missed
-		// the segment midpoint, leaving a thin band where the cable could
-		// still dip under (and bubbles got z-occluded in those spots).
-		float yC = heightAtWorldPos(p);
-		{
-			vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-			float fullStep = lenAB / float(numSeg);   // full segment span
-			yC = max(yC, heightAtWorldPos(p + dirH * (fullStep * 0.30)));
-			yC = max(yC, heightAtWorldPos(p - dirH * (fullStep * 0.30)));
-			yC = max(yC, heightAtWorldPos(p + dirH * (fullStep * 0.55)));
-			yC = max(yC, heightAtWorldPos(p - dirH * (fullStep * 0.55)));
-			yC = max(yC, heightAtWorldPos(p + dirH * (fullStep * 0.85)));
-			yC = max(yC, heightAtWorldPos(p - dirH * (fullStep * 0.85)));
-		}
-		yC += 1.5;   // centerline clearance — was 3.0; max-of-window lift already prevents under-terrain dips so we don't need a big pad on top.
+		// Anti-underground (along-cable): see maxHeightInWindow comment.
+		float yC = maxHeightInWindow(p, dirH, fullStep) + CENTERLINE_CLEAR;
 		vec3 center3D = vec3(p.x, yC, p.y);
 
 		// Geometry convention MUST match the twig emitter:
@@ -1479,13 +1558,10 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		// Anti-underground clamp: on terrain that curves up faster than linear
 		// (concave cross-slope), the slope-tangent-plane offset can put L or R
 		// below the actual heightmap at their XZ. Raise to local terrain +
-		// minClearance whenever that happens. On linear terrain the L/R points
+		// SIDE_CLEAR whenever that happens. On linear terrain the L/R points
 		// already sit at clearance above ground so this is a no-op there.
-		float minSideClearance = 0.8;
-		float hL_xz = heightAtWorldPos(leftPos.xz)  + minSideClearance;
-		float hR_xz = heightAtWorldPos(rightPos.xz) + minSideClearance;
-		leftPos.y  = max(leftPos.y,  hL_xz);
-		rightPos.y = max(rightPos.y, hR_xz);
+		leftPos.y  = max(leftPos.y,  heightAtWorldPos(leftPos.xz)  + SIDE_CLEAR);
+		rightPos.y = max(rightPos.y, heightAtWorldPos(rightPos.xz) + SIDE_CLEAR);
 
 		// Also raise center3D if a clamp lifted the sides above it (preserves the
 		// cylinder appearance — center should never sit below a side vertex).
@@ -1525,11 +1601,10 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
               vec4 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
               float spawnAlongMain, int twigIdx, float arcDh, int numSeg) {
-	// Resolve spawn point on the wiggly main path at tCenter. Apply the same
-	// arc bias as the main ribbon so twigs root on the visible cable.
-	vec2 base = arcBiasedCenter(a, d, perpAB, tCenter, length(d), arcDh);
-	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(tCenter);
-	vec2 spawn = base + perpAB * n;
+	// Resolve spawn point on the wiggly main path at tCenter so twigs root on
+	// the visible cable.
+	float lenAB = length(d);
+	vec2 spawn = wigglyCablePoint(a, d, perpAB, tCenter, lenAB, arcDh, effAmp, seed);
 
 	float twigSeed = spawn.x * 7.13 + spawn.y * 3.77 + invSeed;
 	float chance = gsHashU(spawn.x, spawn.y, twigSeed);
@@ -1576,24 +1651,13 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	vec3 twigDir3D  = ca * T + sa * B;
 	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
 
-	// Anchor the spawn at the SAME height the main ribbon's centerline sits at
-	// for this t — i.e., apply the same max-of-window lift that emitMainRibbon
-	// uses. Without this, on slopes spawn3D = local-terrain + small clearance,
-	// while the main cable's centerline = max-over-window + clearance, so the
-	// twig visibly detaches from the cable trunk and floats just above terrain.
-	float spawnYc = heightAtWorldPos(spawn);
-	{
-		float lenAB = length(d);
-		vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-		float fullStep = lenAB / float(numSeg);
-		spawnYc = max(spawnYc, heightAtWorldPos(spawn + dirH * (fullStep * 0.30)));
-		spawnYc = max(spawnYc, heightAtWorldPos(spawn - dirH * (fullStep * 0.30)));
-		spawnYc = max(spawnYc, heightAtWorldPos(spawn + dirH * (fullStep * 0.55)));
-		spawnYc = max(spawnYc, heightAtWorldPos(spawn - dirH * (fullStep * 0.55)));
-		spawnYc = max(spawnYc, heightAtWorldPos(spawn + dirH * (fullStep * 0.85)));
-		spawnYc = max(spawnYc, heightAtWorldPos(spawn - dirH * (fullStep * 0.85)));
-	}
-	spawnYc += 0.9;   // 0.6 elmos below main ribbon's centerline (which is +1.5) — avoids z-fighting at the junction while keeping the twig visually attached to the trunk.
+	// Anchor spawn to the same max-of-window lift the main ribbon uses, so the
+	// twig roots on the visible trunk. TWIG_CLEAR is slightly less than
+	// CENTERLINE_CLEAR so the junction sits just under the trunk's centerline
+	// (z-fight avoidance, see TWIG_CLEAR comment).
+	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
+	float fullStep = lenAB / float(numSeg);
+	float spawnYc = maxHeightInWindow(spawn, dirH, fullStep) + TWIG_CLEAR;
 	vec3 spawn3D = vec3(spawn.x, spawnYc, spawn.y);
 
 	// Anchor the root to the spawn-side edge of the cable's in-slope cross
@@ -1713,6 +1777,7 @@ local cableFSSrc = [[
 uniform sampler2D infoTex;
 uniform float gameTime;
 uniform float bakeTime;
+uniform float enableFlow;   // 1.0 = full bubble pass; 0.0 = static cables (no animation)
 
 in DataGS {
 	vec3 worldPos;
@@ -1727,8 +1792,77 @@ in DataGS {
 
 //__ENGINEUNIFORMBUFFERDEFS__
 
-const float GROWTH_RATE = 250.0;  // elmos/s — must match unsynced GROWTH_RATE
-const float WITHER_RATE = 400.0;
+// =====================================================================
+// VISUAL TUNING — knobs you most likely want to tweak when devving.
+// Pure aesthetic constants; nothing here changes geometry or topology.
+// =====================================================================
+
+// Grow/wither animation rates (elmos/s) — must match unsynced GROWTH_RATE/
+// WITHER_RATE so the CPU-side bubble phase anchor and the FS-side growth
+// front sweep at the same speed.
+const float GROWTH_RATE        = 250.0;
+const float WITHER_RATE        = 400.0;
+
+// Bark / inner colours. Bark = visible outer cable; inner = brighter core
+// shown through the centre line by `innerMix`. capT (capacity / 100) only
+// blends `innerColor` between two grey levels; no hue.
+const vec3  BARK_COLOR         = vec3(0.55);
+const vec3  INNER_COLOR_LO     = vec3(0.65);   // capT = 0
+const vec3  INNER_COLOR_HI     = vec3(0.85);   // capT = 1
+const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
+
+// Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
+// (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
+// synthetic cylinder normal.
+const float DIFFUSE_FLOOR      = 0.25;
+const float SPEC_EXP           = 24.0;
+const float SPEC_MAGNITUDE     = 0.35;
+const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
+
+// LOS / ghost: dim factor remaps losState through this range; fullLOS uses
+// a hard threshold so bubbles only animate inside actual visibility.
+const float DIM_LOS_LO         = 0.3;
+const float DIM_LOS_HI         = 0.8;
+const float DIM_FACTOR_MIN     = 0.3;          // bark brightness at full darkness
+const float FULLLOS_LO         = 0.7;
+const float FULLLOS_HI         = 1.0;
+
+// Enemy ghost (non-own ally outside LOS): flat dim look, no animation.
+const vec3  GHOST_BASE_LO      = vec3(0.30);   // capT = 0
+const vec3  GHOST_BASE_HI      = vec3(0.55);   // capT = 1
+const float GHOST_BRANCH_DAMP  = 0.65;
+const float GHOST_LOS_THRESH   = 0.45;
+const float GHOST_ALPHA_MAX    = 0.55;
+
+// Bubble flow mapping. Must mirror Lua flowToSpeed() exactly for CPU-baked
+// phase anchoring + FS extrapolation to remain continuous across baking.
+const float MAX_SPEED          = 110.0;
+const float FLOW_REF           = 50.0;
+const float MIN_TRUNK_W        = 3.0;
+const float SPACING_A          = 105.0;        // big bubble layer
+const float SPACING_B          = 48.0;         // small bubble layer
+const float BUBBLE_BIG_R       = 7.5;
+const float BUBBLE_SMALL_R     = 4.0;
+
+// Bubble compositing weights.
+const float HALO_WEIGHT        = 0.70;
+const float BODY_WEIGHT        = 1.85;
+const float SPEC_WEIGHT        = 1.10;
+const float GRID_DESAT         = 0.18;         // how much to mute saturated grid hue
+const float BUBBLE_WHITE_MIX   = 0.15;         // mix into pure white for "hot core"
+const float HALO_WEIGHT_LAYER  = 0.55;         // layer-B halo blend
+
+// Twig pulse: a fast wave sweeps along the cable's `along` axis (used to
+// pick which twig fires next, encoding direction-from-root). When the wave
+// passes a twig's root, a slow sub-wave sweeps the twig itself.
+const float CABLE_PROP_SPEED   = 400.0;        // elmos/s — fast inter-twig stagger
+const float CABLE_PROP_PERIOD  = 2800.0;       // elmos → 7s recurrence at 400/s
+const float TWIG_SWEEP_SPEED   = 90.0;         // elmos/s — visible motion within a twig
+const float PULSE_HW           = 5.0;          // Gaussian sigma in elmos
+const float PULSE_INTENSITY    = 0.55;
+const float PULSE_BODY_W       = 1.10;
+const float PULSE_SPEC_W       = 0.55;
+const float PULSE_HALO_W       = 0.50;
 
 out vec4 fragColor;
 
@@ -1909,22 +2043,20 @@ void main() {
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v);
 
 	// Own lighting (forward rendered, no engine lighting applies)
-	float diffuse = max(0.25, dot(cylNormal, normalize(sunDir.xyz)));
+	float diffuse = max(DIFFUSE_FLOOR, dot(cylNormal, normalize(sunDir.xyz)));
 
 	// Specular
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
 	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
-	float spec = pow(max(0.0, dot(cylNormal, halfDir)), 24.0) * 0.35;
+	float spec = pow(max(0.0, dot(cylNormal, halfDir)), SPEC_EXP) * SPEC_MAGNITUDE;
 
-	// Light-gray cable test: bark and inner are neutral grays, lit only by
-	// diffuse + bubble glow. Industrial conduit look.
+	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
-	vec3 barkColor  = vec3(0.55, 0.55, 0.55);
-	vec3 innerColor = mix(vec3(0.65, 0.65, 0.65), vec3(0.85, 0.85, 0.85), capT);
+	vec3 innerColor = mix(INNER_COLOR_LO, INNER_COLOR_HI, capT);
 
 	float innerMix = smoothstep(0.85, 0.15, t);
-	if (isBranch > 0.5) innerMix *= 0.7;
-	vec3 baseColor = mix(barkColor, innerColor, innerMix);
+	if (isBranch > 0.5) innerMix *= TWIG_INNER_DAMPEN;
+	vec3 baseColor = mix(BARK_COLOR, innerColor, innerMix);
 
 	// Surface noise detail
 	float surfN = hash(worldPos.xz * 0.5) * 0.04;
@@ -1934,7 +2066,7 @@ void main() {
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
 	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
-	float fullLOS = smoothstep(0.7, 1.0, losState);
+	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
 	// Enemy cables out of LOS: render as a flat dim ghost reflecting the last
 	// known state (the synced gadget broadcasts every ally team's grid to all
@@ -1946,26 +2078,35 @@ void main() {
 	// We early-out here so the bubble layer pass and bark lighting below
 	// don't run for ghosts; they'd be wasted work.
 	float isOwnAlly = gridData.w;
-	if (isOwnAlly < 0.5 && losState < 0.45) {
+	if (isOwnAlly < 0.5 && losState < GHOST_LOS_THRESH) {
 		// Neutral grayish ghost — a "remembered" cable, not a live circuit.
 		// Capacity barely tints brightness so thicker grid lines read slightly
 		// brighter without picking up a hue. Branches are a touch dimmer.
 		float capT = clamp(capacity / 100.0, 0.0, 1.0);
-		vec3 ghostBase = mix(vec3(0.30), vec3(0.55), capT);
-		if (isBranch > 0.5) ghostBase *= 0.65;
+		vec3 ghostBase = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT);
+		if (isBranch > 0.5) ghostBase *= GHOST_BRANCH_DAMP;
 		// Edge falloff so the ribbon edges fade rather than hard-cut, giving
-		// the ghost a softer "remembered impression" look.
+		// the ghost a softer "remembered impression" look. Drives alpha too,
+		// so the silhouette dissolves smoothly instead of hard-clipping at t=0.9.
 		float edgeFade = 1.0 - smoothstep(0.55, 0.90, t);
-		// Alpha < 1 so the ghost composes against the world (DrawWorldPreUnit
-		// enables alpha blending). Edge fade also drives alpha so the silhouette
-		// dissolves smoothly rather than hard-clipping at t=0.9.
-		float ghostA = 0.55 * edgeFade;
-		fragColor = vec4(ghostBase * edgeFade, ghostA);
+		fragColor = vec4(ghostBase * edgeFade, GHOST_ALPHA_MAX * edgeFade);
 		return;
 	}
 
 	// Apply lighting
-	vec3 color = baseColor * diffuse + vec3(1.0, 0.95, 0.85) * spec;
+	vec3 color = baseColor * diffuse + SPEC_TINT * spec;
+
+	// Static-cable detail level: skip the entire bubble pass and bark dim.
+	// `enableFlow` is a uniform driven by the synced /cabletree flow toggle,
+	// so the same draw call cheaply shortcuts to a flat-lit cable when the
+	// player has opted out of the animated visual.
+	if (enableFlow < 0.5) {
+		// Still apply LOS-aware bark dim so out-of-LOS cables read as
+		// shadowed; just don't add bubble glow on top.
+		color *= mix(DIM_FACTOR_MIN, 1.0, smoothstep(DIM_LOS_LO, DIM_LOS_HI, losState));
+		fragColor = vec4(color, 1.0);
+		return;
+	}
 
 	// Energy bubbles travelling along the cable, like fluid in a pipe.
 	//
@@ -1977,9 +2118,9 @@ void main() {
 	//     bubbly look regardless of how loaded it is. What changes with
 	//     flow is the SPEED bubbles travel at — zero flow leaves them
 	//     motionless; high flow makes them zip.
-	//   - Three layered streams of bubbles (big, medium, small) with random
-	//     per-bubble size + cross-axis offset, so the cable looks like a
-	//     real bubbly slurry instead of a metronome of identical dots.
+	//   - Two layered streams of bubbles (big + small) with random per-bubble
+	//     size + cross-axis offset, so the cable looks like a real bubbly
+	//     slurry instead of a metronome of identical dots.
 	// Bubble speed/density mapping. MUST match the CPU's flowToSpeed for the
 	// integrated phase anchoring to stay consistent.
 	//
@@ -1987,9 +2128,6 @@ void main() {
 	// and density together. Each scales as sqrt(flow/FLOW_REF) and ramps
 	// monotonically, so they read as one fused "more lively" signal. Their
 	// product = (sqrt(...))² is linear in flow, matching actual throughput.
-	const float MAX_SPEED   = 110.0;
-	const float FLOW_REF    = 50.0;
-	const float MIN_TRUNK_W = 3.0;
 	float flow = gridData.y;
 	// Linear thickness divisor: a cable 4× thicker than min gets its flow
 	// signal scaled to 1/4 before the sqrt → ~0.5× visual liveliness. Slight
@@ -2010,94 +2148,70 @@ void main() {
 	// `n=0.3` so a near-zero-flow cable still shows widely-spaced bubbles
 	// rather than nothing or overlapping spam.
 	float spacingMul = max(0.3, n);
-	float spacingA = 105.0 / spacingMul;
-	float spacingB = 48.0  / spacingMul;
+	float spacingA = SPACING_A / spacingMul;
+	float spacingB = SPACING_B / spacingMul;
 
 	// Bubble pass: main ribbon uses two advecting bubble layers; twigs do a
-	// single synchronized flash (whole twig glows at the same instant, once
-	// per `FLASH_PERIOD` elmos of phase). All twigs share `phase`, so every
-	// twig of a cable flashes in lockstep at a rate driven by the main-cable
-	// speed — no per-twig flow, just a discrete pulse signalling "power
-	// pulse reached the limb".
+	// two-stage wave (see CABLE_PROP_SPEED + TWIG_SWEEP_SPEED).
 	float bubbleBody, bubbleSpec, bubbleHalo;
 	if (isBranch > 0.5) {
-		// Two-stage wavefront:
-		//   1. CABLE_PROP_SPEED is a FAST virtual wave that sweeps along the
-		//      cable's `along` axis. Twigs at lower spawnAlongMain get "hit"
-		//      earlier, encoding direction-from-root via stagger.
-		//   2. When the cable wave passes a twig's root, a SLOWER sub-wave
-		//      starts at twig-local 0 and propagates through that twig at
-		//      TWIG_SWEEP_SPEED. This way the inter-twig stagger feels
-		//      snappy while the visible motion *within* each twig stays at
-		//      a comfortable speed.
-		// Without spawnAlongMain we couldn't decouple these — both speeds
-		// would be tied to the same propagation rate.
-		const float CABLE_PROP_SPEED  = 400.0;    // elmos/sec — fast inter-twig stagger
-		// Recurrence period: 2800 elmos / 400 elmos/sec = 7 sec between waves.
-		// Made the wave a sparse "every several seconds" event rather than a
-		// constant pulse train, so it reads as a periodic energy surge instead
-		// of nervous flicker.
-		const float CABLE_PROP_PERIOD = 2800.0;   // elmos
-		const float TWIG_SWEEP_SPEED  = 90.0;     // elmos/sec — visible motion within a twig
-		const float PULSE_HW          = 5.0;      // Gaussian sigma in elmos
-
-		// Elmos along the cable since the wave passed THIS twig's root
-		// (wraps every CABLE_PROP_PERIOD elmos). Subtracting spawnAlongMain
-		// from `gameTime * speed` gives a per-twig "time since root was hit"
-		// in elmos-of-cable-wave-travel.
+		// Two-stage wavefront (decoupled cable-stagger + twig-sweep):
+		//   1. CABLE_PROP_SPEED sweeps a virtual fast wave along the cable's
+		//      `along` axis. Twigs at lower spawnAlongMain get hit earlier,
+		//      so the stagger encodes direction-from-root.
+		//   2. When that wave passes a twig's root, a slower sub-wave starts
+		//      at twig-local 0 and propagates through the twig at
+		//      TWIG_SWEEP_SPEED. Inter-twig stagger feels snappy while motion
+		//      *within* a twig stays comfortable.
+		// `spawnAlongMain` is what lets us decouple these — without it both
+		// speeds would be tied to the same propagation rate.
 		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED - spawnAlongMain, CABLE_PROP_PERIOD);
-		// Convert to seconds, then to twig-local sub-wave position.
 		float subwavePos = TWIG_SWEEP_SPEED * (wavePassedElmos / CABLE_PROP_SPEED);
-
-		// Fragment's twig-local along (0 at root, bLen at tip).
 		float localAlong = along - spawnAlongMain;
 		float d = localAlong - subwavePos;
-		// No wrap correction needed: when subwavePos overshoots the twig
-		// length the Gaussian naturally falls to ~0 (fragment is too far
-		// from the now-passed sub-wave).
+		// No wrap correction: when subwavePos overshoots the twig the
+		// Gaussian naturally falls to ~0 for any fragment.
 		float pulse = exp(-(d * d) / (PULSE_HW * PULSE_HW));
 		float crossT = 1.0 - smoothstep(0.7, 1.0, v * v);
-		float intensity = pulse * crossT * 0.55;
-		bubbleBody = intensity * 1.10;
-		bubbleSpec = intensity * 0.55;
-		bubbleHalo = intensity * 0.50;
+		float intensity = pulse * crossT * PULSE_INTENSITY;
+		bubbleBody = intensity * PULSE_BODY_W;
+		bubbleSpec = intensity * PULSE_SPEC_W;
+		bubbleHalo = intensity * PULSE_HALO_W;
 	} else {
-		vec3 bA = bubbleLayer(along, phase, spacingA, 7.5, v, halfWidthE,  3.7);
-		vec3 bB = bubbleLayer(along, phase, spacingB, 4.0, v, halfWidthE, 19.1);
+		vec3 bA = bubbleLayer(along, phase, spacingA, BUBBLE_BIG_R,   v, halfWidthE,  3.7);
+		vec3 bB = bubbleLayer(along, phase, spacingB, BUBBLE_SMALL_R, v, halfWidthE, 19.1);
 		bubbleBody = bA.x + bB.x * 0.85;
 		bubbleSpec = bA.y + bB.y * 0.85;
-		bubbleHalo = bA.z + bB.z * 0.55;
+		bubbleHalo = bA.z + bB.z * HALO_WEIGHT_LAYER;
 	}
 
 	// Bubble colour: grid-efficiency hue, lightly toned down so it still
 	// glows clearly but isn't neon-saturated.
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
 	float gridLum    = dot(gridColor, vec3(0.299, 0.587, 0.114));
-	vec3 grayedGrid  = mix(gridColor, vec3(gridLum), 0.18);
-	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), 0.15);
+	vec3 grayedGrid  = mix(gridColor, vec3(gridLum), GRID_DESAT);
+	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), BUBBLE_WHITE_MIX);
 	vec3 haloColor   = grayedGrid;
 
-	// LOS-aware dimming on the BARK ONLY. Bubbles are plasma — they're emissive
-	// and shouldn't fade with LOS-darkness; previously the dim was applied
-	// after bubble composition, which made the glowing balls visibly disappear
-	// as they crossed dim/shadow regions. Now the bark dims, then bubbles are
-	// composed at full emissive brightness on top, so they remain visible as
-	// "lights in the dark".
-	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
+	// LOS-aware dimming on the BARK ONLY. Bubbles are plasma — emissive, so
+	// they shouldn't fade in shadow. Composing them after the dim means
+	// glowing balls remain "lights in the dark" rather than disappearing in
+	// LOS-dim regions.
+	float dimFactor = mix(DIM_FACTOR_MIN, 1.0, smoothstep(DIM_LOS_LO, DIM_LOS_HI, losState));
 	color *= dimFactor;
 
 	// Composition order:
 	//   - Halo: additive (soft underglow that should mix with bark colour).
-	//   - Body: max() over current colour, so the dark green/brown bark can't
-	//     leak into the bubble's true grid hue. Plain additive composition
-	//     causes hue shifts (orange → yellow, magenta → pink) because the
-	//     bark's green channel piles onto the emissive. max() lets the
-	//     emissive plasma show its real colour through the cable in shadow.
+	//   - Body: max() over current colour, so dark bark can't leak into the
+	//     bubble's true grid hue. Plain additive composition causes hue
+	//     shifts (orange → yellow, magenta → pink) because the bark's green
+	//     channel piles onto the emissive. max() lets the emissive plasma
+	//     show its real colour through the cable in shadow.
 	//   - Spec: additive white sparkle on top.
-	color += haloColor * bubbleHalo * fullLOS * 0.70;
-	vec3 bubbleEmissive = bubbleColor * bubbleBody * fullLOS * 1.85;
+	color += haloColor * bubbleHalo * fullLOS * HALO_WEIGHT;
+	vec3 bubbleEmissive = bubbleColor * bubbleBody * fullLOS * BODY_WEIGHT;
 	color = max(color, bubbleEmissive);
-	color += vec3(1.0) * bubbleSpec * fullLOS * 1.10;
+	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
 
 	// FULLY OPAQUE output — like lava. No alpha blending.
 	fragColor = vec4(color, 1.0);
@@ -2325,6 +2439,7 @@ function gadget:DrawWorldPreUnit()
 	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
 	cableShader:SetUniform("bakeTime", bubbleBakeTime)
+	cableShader:SetUniform("enableFlow", flowMode and 1.0 or 0.0)
 
 	gl.Texture(0, "$info")
 	gl.Texture(1, "$heightmap")
@@ -2374,6 +2489,7 @@ function gadget:Initialize()
 		uniformFloat = {
 			gameTime = 0,
 			bakeTime = 0,
+			enableFlow = flowMode and 1.0 or 0.0,
 		},
 	}, "Cable Forward Shader")
 
@@ -2387,6 +2503,23 @@ function gadget:Initialize()
 		local data = SYNCED.CableTreePerf
 		if data then drawPerf = data.perf and true or false end
 	end)
+	gadgetHandler:AddSyncAction("CableTreeFlowMode", function()
+		local data = SYNCED.CableTreeFlowMode
+		if data then
+			local newMode = data.flowMode and true or false
+			if newMode ~= flowMode then
+				flowMode = newMode
+				-- Persist on this (unsynced) side; synced cannot read config.
+				Spring.SetConfigInt("OverdriveCableFlow", flowMode and 1 or 0)
+			end
+		end
+	end)
+	-- Bootstrap synced with the persisted setting. Synced defaults to ON;
+	-- if the user previously turned flow off, we tell synced to switch.
+	-- (When already ON, this is a no-op on the synced side.)
+	if not flowMode then
+		Spring.SendLuaRulesMsg("cabletree:flow:off")
+	end
 end
 
 function gadget:Shutdown()
@@ -2394,6 +2527,7 @@ function gadget:Shutdown()
 	cableVAO = nil
 	gadgetHandler:RemoveSyncAction("CableTreeFull")
 	gadgetHandler:RemoveSyncAction("CableTreePerf")
+	gadgetHandler:RemoveSyncAction("CableTreeFlowMode")
 end
 
 end -- UNSYNCED
