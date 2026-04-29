@@ -1467,7 +1467,7 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 			yC = max(yC, heightAtWorldPos(p + dirH * (fullStep * 0.85)));
 			yC = max(yC, heightAtWorldPos(p - dirH * (fullStep * 0.85)));
 		}
-		yC += 3.0;
+		yC += 1.5;   // centerline clearance — was 3.0; max-of-window lift already prevents under-terrain dips so we don't need a big pad on top.
 		vec3 center3D = vec3(p.x, yC, p.y);
 
 		// Geometry convention MUST match the twig emitter:
@@ -1485,7 +1485,7 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		// below the actual heightmap at their XZ. Raise to local terrain +
 		// minClearance whenever that happens. On linear terrain the L/R points
 		// already sit at clearance above ground so this is a no-op there.
-		float minSideClearance = 1.5;
+		float minSideClearance = 0.8;
 		float hL_xz = heightAtWorldPos(leftPos.xz)  + minSideClearance;
 		float hR_xz = heightAtWorldPos(rightPos.xz) + minSideClearance;
 		leftPos.y  = max(leftPos.y,  hL_xz);
@@ -1528,7 +1528,7 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
               vec4 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
-              float spawnAlongMain, int twigIdx, float arcDh) {
+              float spawnAlongMain, int twigIdx, float arcDh, int numSeg) {
 	// Resolve spawn point on the wiggly main path at tCenter. Apply the same
 	// arc bias as the main ribbon so twigs root on the visible cable.
 	vec2 base = arcBiasedCenter(a, d, perpAB, tCenter, length(d), arcDh);
@@ -1570,8 +1570,25 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	vec3 twigDir3D  = ca * T + sa * B;
 	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
 
-	float clearance = 2.5;
-	vec3 spawn3D = vec3(spawn.x, heightAtWorldPos(spawn), spawn.y) + N * clearance;
+	// Anchor the spawn at the SAME height the main ribbon's centerline sits at
+	// for this t — i.e., apply the same max-of-window lift that emitMainRibbon
+	// uses. Without this, on slopes spawn3D = local-terrain + small clearance,
+	// while the main cable's centerline = max-over-window + clearance, so the
+	// twig visibly detaches from the cable trunk and floats just above terrain.
+	float spawnYc = heightAtWorldPos(spawn);
+	{
+		float lenAB = length(d);
+		vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
+		float fullStep = lenAB / float(numSeg);
+		spawnYc = max(spawnYc, heightAtWorldPos(spawn + dirH * (fullStep * 0.30)));
+		spawnYc = max(spawnYc, heightAtWorldPos(spawn - dirH * (fullStep * 0.30)));
+		spawnYc = max(spawnYc, heightAtWorldPos(spawn + dirH * (fullStep * 0.55)));
+		spawnYc = max(spawnYc, heightAtWorldPos(spawn - dirH * (fullStep * 0.55)));
+		spawnYc = max(spawnYc, heightAtWorldPos(spawn + dirH * (fullStep * 0.85)));
+		spawnYc = max(spawnYc, heightAtWorldPos(spawn - dirH * (fullStep * 0.85)));
+	}
+	spawnYc += 0.9;   // 0.6 elmos below main ribbon's centerline (which is +1.5) — avoids z-fighting at the junction while keeping the twig visually attached to the trunk.
+	vec3 spawn3D = vec3(spawn.x, spawnYc, spawn.y);
 
 	// Anchor the root to the spawn-side edge of the cable's in-slope cross
 	// section so the twig pokes out of the side, not the midline.
@@ -1675,7 +1692,7 @@ void main() {
 		              / float(numSeg);
 		float spawnAlongMain = len3D * tCenter;
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx, arcDh);
+		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx, arcDh, numSeg);
 	}
 }
 ]]
@@ -1987,37 +2004,14 @@ void main() {
 	float spacingA = 105.0 / spacingMul;
 	float spacingB = 48.0  / spacingMul;
 
-	// Bubble pass: main ribbon uses two layers of advecting bubbles whose
-	// spacing is modulated by densityFactor. Twigs instead show synced bubbles
-	// at the same big-bubble rhythm so every twig in a cable pulses in lockstep
-	// at the main cable's speed.
+	// Bubble pass: same advecting-bubble layers on both main ribbon and twigs.
+	// Twigs share `phase` and `speed` with the cable, so a bubble crossing the
+	// junction continues into the twig at the same flow rate; on a long twig
+	// you'll see one or two travelling balls heading from cable toward tip
+	// (since cableUV.x increases with twig-along), matching the main cable's
+	// fluid look rather than a strobe flash.
 	float bubbleBody, bubbleSpec, bubbleHalo;
-	if (isBranch > 0.5) {
-		// Discrete synchronized flash — the entire twig blinks ON for a brief
-		// window, then OFF, then ON again, etc. No along-twig gradient, no
-		// continuous pulsing/crackle. Every twig of a cable shares `phase`, so
-		// all twigs in the cable flash at the same instant. Phase advance rate
-		// = speed, so faster grids flash more often.
-		//
-		// Why a square-ish window with smoothstep edges (instead of a
-		// continuous Gaussian/sine): the user wants "all on at once, then off",
-		// not a wave. The 0.012-wide smoothstep edges only exist to avoid hard
-		// frame-boundary popping; mid-window the brightness is flat 1.0.
-		const float FLASH_PERIOD = 160.0;   // elmos of phase between flashes
-		const float FLASH_ON     = 0.10;    // duty cycle (fraction of period lit)
-		const float EDGE         = 0.012;
-		float cyc = mod(phase, FLASH_PERIOD) / FLASH_PERIOD;
-		float flashOn = smoothstep(0.0, EDGE, cyc)
-		              * (1.0 - smoothstep(FLASH_ON - EDGE, FLASH_ON, cyc));
-		// Mild cross-axis taper so the edge of the ribbon isn't quite as bright
-		// as the centre — gives the flash some volume rather than reading as a
-		// flat painted card. No along-twig variation.
-		float crossT = 1.0 - smoothstep(0.7, 1.0, v * v);
-		float intensity = flashOn * crossT * 1.5;
-		bubbleBody = intensity * 1.20;
-		bubbleSpec = intensity * 0.65;
-		bubbleHalo = intensity * 0.55;
-	} else {
+	{
 		vec3 bA = bubbleLayer(along, phase, spacingA, 7.5, v, halfWidthE,  3.7);
 		vec3 bB = bubbleLayer(along, phase, spacingB, 4.0, v, halfWidthE, 19.1);
 		bubbleBody = bA.x + bB.x * 0.85;
