@@ -68,7 +68,7 @@ return { commander_egg = {
       },
 
       damage                  = {
-        default = 30002.4,
+        default = 20001.6,
       },
 
       edgeEffectiveness       = 1,
@@ -77,7 +77,7 @@ return { commander_egg = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       paralyzer               = true,
-      paralyzeTime            = 45,
+      paralyzeTime            = 25,
       soundHit                = [[weapon/missile/emp_missile_hit]],
     },
   },
