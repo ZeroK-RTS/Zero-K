@@ -1262,6 +1262,7 @@ out DataGS {
 	vec2 cableUV;
 	vec2 timeData;
 	vec4 gridData;
+	float spawnAlongMain;  // twig-only: global cableUV.x of the twig's root; 0 for main ribbon. Lets the FS compute twig-local along for sub-wave animation.
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -1318,6 +1319,7 @@ const float BRANCH_ANGLE_MAX  = 1.1;
 const float BRANCH_WIDTH      = 0.85;
 
 float gOutBranch = 0.0;
+float gOutSpawnAlong = 0.0;  // set by emitTwig per-twig; main ribbon leaves at 0.
 
 void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
              float w, vec4 grid, vec2 td, float cap) {
@@ -1328,13 +1330,7 @@ void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
 	cableUV = cuv;
 	timeData = td;
 	gridData = grid;
-	// Per-vertex cable along-direction. Smoothly interpolated across the
-	// triangle strip → the FS gets a continuously rotating tangent across
-	// the cable, so the cylinder cross-section's lit direction tracks the
-	// cable's path (highlight bends with up/down hills) instead of being
-	// flat-shaded per triangle. perp3D and trueUp are derived from this in
-	// the FS as cross(worldUp, tangent), so we don't need a separate `perp`
-	// varying — the cross-section axis is implied by the smooth tangent.
+	spawnAlongMain = gOutSpawnAlong;
 	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
 	gl_Position = cameraViewProj * vec4(wp, 1.0);
 	EmitVertex();
@@ -1551,7 +1547,17 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 
 	float twigW    = max(2.5, widthVal * BRANCH_WIDTH);
 	float twigHWr  = min(twigW, widthVal * 0.55) * WIDTH_FACTOR;
-	float twigHWt  = twigHWr * 0.25;
+	// Geometric cone taper at 0.45 — visible shape narrows toward the tip
+	// (looks like a branch, not a tube). The WIDTH varying we pass to the FS
+	// stays UNIFORM at `twigW` along the entire twig, so bubble math sees
+	// constant halfWidthE and bubble radius/spacing don't change with along
+	// position. The visible bubble naturally fits the tapered geometry: in v
+	// space the bubble keeps the same cross-axis extent (relative to the
+	// cable's UV cross), which projects to a smaller world-cross at the
+	// thinner tip. At the very end the cable's `t > 0.9` cross discard clips
+	// any bubble that runs off the tip. This decouples "bubble flow looks
+	// uniform" from "twig has cone shape".
+	float twigHWt  = twigHWr * 0.45;
 
 	// Build the twig as a flat ribbon in the slope's local tangent plane at
 	// the spawn point. This way, viewing perpendicular to the slope, the twig
@@ -1606,11 +1612,13 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// FS derives perp3D from cross(worldUp, vsTangent) so cylindrical lighting
 	// follows the twig's pointing direction.
 	gOutBranch = 1.0;
+	gOutSpawnAlong = spawnAlongMain;   // shared by all 4 twig vertices; lets FS compute twig-local along
 	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
 	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
-	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW * 0.25, gridD, timeD, cap);
-	emitVtx(tipR,  twigDir3D, vec2(spawnAlongMain + bLen,  1.0), twigW * 0.25, gridD, timeD, cap);
+	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridD, timeD, cap);
+	emitVtx(tipR,  twigDir3D, vec2(spawnAlongMain + bLen,  1.0), twigW, gridD, timeD, cap);
 	EndPrimitive();
+	gOutSpawnAlong = 0.0;
 }
 
 void main() {
@@ -1714,6 +1722,7 @@ in DataGS {
 	vec2 cableUV;
 	vec2 timeData;
 	vec4 gridData;
+	float spawnAlongMain;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -2004,14 +2013,55 @@ void main() {
 	float spacingA = 105.0 / spacingMul;
 	float spacingB = 48.0  / spacingMul;
 
-	// Bubble pass: same advecting-bubble layers on both main ribbon and twigs.
-	// Twigs share `phase` and `speed` with the cable, so a bubble crossing the
-	// junction continues into the twig at the same flow rate; on a long twig
-	// you'll see one or two travelling balls heading from cable toward tip
-	// (since cableUV.x increases with twig-along), matching the main cable's
-	// fluid look rather than a strobe flash.
+	// Bubble pass: main ribbon uses two advecting bubble layers; twigs do a
+	// single synchronized flash (whole twig glows at the same instant, once
+	// per `FLASH_PERIOD` elmos of phase). All twigs share `phase`, so every
+	// twig of a cable flashes in lockstep at a rate driven by the main-cable
+	// speed — no per-twig flow, just a discrete pulse signalling "power
+	// pulse reached the limb".
 	float bubbleBody, bubbleSpec, bubbleHalo;
-	{
+	if (isBranch > 0.5) {
+		// Two-stage wavefront:
+		//   1. CABLE_PROP_SPEED is a FAST virtual wave that sweeps along the
+		//      cable's `along` axis. Twigs at lower spawnAlongMain get "hit"
+		//      earlier, encoding direction-from-root via stagger.
+		//   2. When the cable wave passes a twig's root, a SLOWER sub-wave
+		//      starts at twig-local 0 and propagates through that twig at
+		//      TWIG_SWEEP_SPEED. This way the inter-twig stagger feels
+		//      snappy while the visible motion *within* each twig stays at
+		//      a comfortable speed.
+		// Without spawnAlongMain we couldn't decouple these — both speeds
+		// would be tied to the same propagation rate.
+		const float CABLE_PROP_SPEED  = 400.0;    // elmos/sec — fast inter-twig stagger
+		// Recurrence period: 2800 elmos / 400 elmos/sec = 7 sec between waves.
+		// Made the wave a sparse "every several seconds" event rather than a
+		// constant pulse train, so it reads as a periodic energy surge instead
+		// of nervous flicker.
+		const float CABLE_PROP_PERIOD = 2800.0;   // elmos
+		const float TWIG_SWEEP_SPEED  = 90.0;     // elmos/sec — visible motion within a twig
+		const float PULSE_HW          = 5.0;      // Gaussian sigma in elmos
+
+		// Elmos along the cable since the wave passed THIS twig's root
+		// (wraps every CABLE_PROP_PERIOD elmos). Subtracting spawnAlongMain
+		// from `gameTime * speed` gives a per-twig "time since root was hit"
+		// in elmos-of-cable-wave-travel.
+		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED - spawnAlongMain, CABLE_PROP_PERIOD);
+		// Convert to seconds, then to twig-local sub-wave position.
+		float subwavePos = TWIG_SWEEP_SPEED * (wavePassedElmos / CABLE_PROP_SPEED);
+
+		// Fragment's twig-local along (0 at root, bLen at tip).
+		float localAlong = along - spawnAlongMain;
+		float d = localAlong - subwavePos;
+		// No wrap correction needed: when subwavePos overshoots the twig
+		// length the Gaussian naturally falls to ~0 (fragment is too far
+		// from the now-passed sub-wave).
+		float pulse = exp(-(d * d) / (PULSE_HW * PULSE_HW));
+		float crossT = 1.0 - smoothstep(0.7, 1.0, v * v);
+		float intensity = pulse * crossT * 0.55;
+		bubbleBody = intensity * 1.10;
+		bubbleSpec = intensity * 0.55;
+		bubbleHalo = intensity * 0.50;
+	} else {
 		vec3 bA = bubbleLayer(along, phase, spacingA, 7.5, v, halfWidthE,  3.7);
 		vec3 bB = bubbleLayer(along, phase, spacingB, 4.0, v, halfWidthE, 19.1);
 		bubbleBody = bA.x + bB.x * 0.85;
