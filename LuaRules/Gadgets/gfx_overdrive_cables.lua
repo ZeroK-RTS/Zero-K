@@ -1025,13 +1025,36 @@ local GAME_SPEED  = Game.gameSpeed or 30
 -- integrate phase = ∫ speed(t) dt CPU-side per edge, so speed changes don't
 -- jump bubbles across the cable; the shader just extrapolates from the last
 -- anchor with the current speed.
-local BUBBLE_FLOW_REF  = 80
-local BUBBLE_MAX_SPEED = 220
-local function flowToSpeed(flow)
-	if not flow or flow < 0 then return 0 end
-	local n = flow / BUBBLE_FLOW_REF
-	if n > 1.6 then n = 1.6 end
-	return BUBBLE_MAX_SPEED * n
+--
+-- Cable-thickness/capacity is treated as orthogonal identity (it's the cable's
+-- "how big a pipe" reading, NOT a flow signal). Flow itself is encoded by
+-- speed + density only. Each scales as sqrt(flow / FLOW_REF) and they grow
+-- together, so the product (= perceived flow ≈ density × speed) is linear in
+-- flow. One unified "more lively" gestalt instead of three integrated dials.
+local BUBBLE_MAX_SPEED      = 110
+local BUBBLE_FLOW_REF       = 50.0   -- flow at which n=1 (reference speed/density)
+local BUBBLE_TRUNK_W_MIN    = 3.0    -- mirror of GLSL MIN_TRUNK_WIDTH
+local BUBBLE_TRUNK_W_MAX    = 12.0   -- mirror of GLSL MAX_TRUNK_WIDTH
+local BUBBLE_CAP_REF        = 100.0
+
+local function widthOfCapacity(cap)
+	local t = (cap or 0) / BUBBLE_CAP_REF
+	if t < 0 then t = 0 elseif t > 1 then t = 1 end
+	return BUBBLE_TRUNK_W_MIN + t * (BUBBLE_TRUNK_W_MAX - BUBBLE_TRUNK_W_MIN)
+end
+
+-- Slight negative bias for thicker cables: divide flow by (width/minWidth).
+-- A max-thickness cable (4× minWidth) sees its flow signal scaled to 1/4
+-- before the sqrt, yielding ~0.5× visual liveliness vs a thin cable at the
+-- same actual flow. Conveys "this thick cable is wide so the same flow looks
+-- relatively calmer through it" without the heavier 2.5-power weighting we
+-- tried before.
+local function flowToSpeed(flow, capacity)
+	if not flow or flow <= 0 then return 0 end
+	local widthVal = widthOfCapacity(capacity)
+	local thicknessRatio = widthVal / BUBBLE_TRUNK_W_MIN
+	local effFlow = flow / thicknessRatio
+	return BUBBLE_MAX_SPEED * math.sqrt(effFlow / BUBBLE_FLOW_REF)
 end
 
 -------------------------------------------------------------------------------------
@@ -1731,38 +1754,53 @@ void main() {
 	//   - Three layered streams of bubbles (big, medium, small) with random
 	//     per-bubble size + cross-axis offset, so the cable looks like a
 	//     real bubbly slurry instead of a metronome of identical dots.
-	// Bubble speed mapping must match the CPU's flowToSpeed (otherwise the
-	// CPU-integrated phase and shader-extrapolated phase disagree and we get
-	// the very jumps this anchor scheme exists to eliminate).
-	const float FLOW_REF  = 80.0;
-	const float MAX_SPEED = 220.0;
+	// Bubble speed/density mapping. MUST match the CPU's flowToSpeed for the
+	// integrated phase anchoring to stay consistent.
+	//
+	// Cable thickness conveys capacity (orthogonal); flow is encoded by speed
+	// and density together. Each scales as sqrt(flow/FLOW_REF) and ramps
+	// monotonically, so they read as one fused "more lively" signal. Their
+	// product = (sqrt(...))² is linear in flow, matching actual throughput.
+	const float MAX_SPEED   = 110.0;
+	const float FLOW_REF    = 50.0;
+	const float MIN_TRUNK_W = 3.0;
 	float flow = gridData.y;
-	float speed = MAX_SPEED * clamp(flow / FLOW_REF, 0.0, 1.6);
+	// Linear thickness divisor: a cable 4× thicker than min gets its flow
+	// signal scaled to 1/4 before the sqrt → ~0.5× visual liveliness. Slight
+	// negative bias for thick cables, matching the CPU's flowToSpeed.
+	float thicknessRatio = max(1.0, width / MIN_TRUNK_W);
+	float effFlow = max(flow, 0.0) / thicknessRatio;
+	float n = sqrt(effFlow / FLOW_REF);
+	float speed = MAX_SPEED * n;
+
+	float halfWidthE = width * 0.5;        // cable cross half-extent in elmos
 
 	// Phase = CPU's baked phase (snapshot at bakeTime) + linear extrapolation
 	// at the current speed. Speed *changes* update the rate of advance from
 	// here — bubbles don't teleport.
 	float phase = gridData.z + speed * (gameTime - bakeTime);
-	float halfWidthE = width * 0.5;       // cable cross half-extent in elmos
 
-	// Bubble pass: main ribbon uses two layers of advecting bubbles. Twigs
-	// instead show ONE synced bubble traversing twig-local space at the main
-	// cable's speed, with period = TWIG_SPACING/speed. Using gameTime*speed as
-	// the global phase makes every twig in a cable pulse in lockstep — that's
-	// the "bug-as-feature" Licho asked to bring back.
+	// Density: spacing inversely scales with the same sqrt factor, floored at
+	// `n=0.3` so a near-zero-flow cable still shows widely-spaced bubbles
+	// rather than nothing or overlapping spam.
+	float spacingMul = max(0.3, n);
+	float spacingA = 105.0 / spacingMul;
+	float spacingB = 48.0  / spacingMul;
+
+	// Bubble pass: main ribbon uses two layers of advecting bubbles whose
+	// spacing is modulated by densityFactor. Twigs instead show synced bubbles
+	// at the same big-bubble rhythm so every twig in a cable pulses in lockstep
+	// at the main cable's speed.
 	float bubbleBody, bubbleSpec, bubbleHalo;
 	if (isBranch > 0.5) {
-		const float TWIG_SPACING = 75.0;
-		float twigPhase = mod(gameTime * speed, TWIG_SPACING);
-		// Single-bubble layer: spacing=TWIG_SPACING, radius slightly bigger so
-		// the pulse reads clearly on short twigs.
-		vec3 bT = bubbleLayer(localU, twigPhase, TWIG_SPACING, 5.0, v, halfWidthE, 0.0);
+		float twigPhase = mod(gameTime * speed, spacingA);
+		vec3 bT = bubbleLayer(localU, twigPhase, spacingA, 5.0, v, halfWidthE, 0.0);
 		bubbleBody = bT.x;
 		bubbleSpec = bT.y;
 		bubbleHalo = bT.z;
 	} else {
-		vec3 bA = bubbleLayer(along, phase, 75.0, 7.5, v, halfWidthE,  3.7);
-		vec3 bB = bubbleLayer(along, phase, 32.0, 4.0, v, halfWidthE, 19.1);
+		vec3 bA = bubbleLayer(along, phase, spacingA, 7.5, v, halfWidthE,  3.7);
+		vec3 bB = bubbleLayer(along, phase, spacingB, 4.0, v, halfWidthE, 19.1);
 		bubbleBody = bA.x + bB.x * 0.85;
 		bubbleSpec = bA.y + bB.y * 0.85;
 		bubbleHalo = bA.z + bB.z * 0.55;
@@ -1862,7 +1900,7 @@ local function OnCableTreeFull()
 			local oldAnchor = e.bubbleAnchorTime or nowSec
 			e.bubblePhase = (e.bubblePhase or 0) + oldSpeed * (nowSec - oldAnchor)
 			e.bubbleAnchorTime = nowSec
-			e.bubbleSpeed = flowToSpeed(newFlow)
+			e.bubbleSpeed = flowToSpeed(newFlow, data.caps[i])
 
 			e.capacity = data.caps[i]
 			e.flow     = newFlow
@@ -1884,7 +1922,7 @@ local function OnCableTreeFull()
 				-- shader can extrapolate forward from this anchor.
 				bubblePhase      = 0,
 				bubbleAnchorTime = nowSec,
-				bubbleSpeed      = flowToSpeed(newFlow),
+				bubbleSpeed      = flowToSpeed(newFlow, data.caps[i]),
 			}
 			geomCache.valid = false   -- topology change → full geometry rebuild
 		end
@@ -1987,7 +2025,12 @@ function gadget:GameFrame(n)
 		geomCache.valid = false
 	end
 
-	if needsRebuild and n % 6 == 0 then
+	-- Rebuild immediately when dirty. Throttling caused visible phase jumps:
+	-- between OnCableTreeFull (which mutates per-edge bubbleSpeed) and the
+	-- rebake, the shader still extrapolates with the OLD speed, then snaps to
+	-- the new baked state. The jump magnitude is Δspeed × (bakeTime - nowSec)
+	-- so any latency here directly produces a visible discontinuity.
+	if needsRebuild then
 		RebuildVBO()
 	end
 end
