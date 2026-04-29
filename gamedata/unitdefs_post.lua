@@ -714,6 +714,16 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Commanders cannot be reclaimed
+--
+for name, ud in pairs(UnitDefs) do
+	if ud.customparams and (ud.customparams.dynamic_comm or ud.customparams.commtype) then
+		ud.reclaimable = false
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Set incomes
 --
 

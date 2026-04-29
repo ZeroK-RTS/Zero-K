@@ -442,13 +442,10 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 		end
 		
-		local name = "noname" -- Backup for when player does not choose a commander and then resigns.
-		if isAI then
-			name = select(2, Spring.GetAIInfo(teamID))
-		else
-			name = Spring.GetPlayerInfo(playerID, false)
-		end
-		Spring.SetUnitRulesParam(unitID, "commander_owner", name, {inlos = true})
+		Spring.SetUnitRulesParam(unitID, "commander_owner_team", teamID, {inlos = true})
+		-- track starting commander count per team (for egg morph limiting)
+		local prevCount = Spring.GetTeamRulesParam(teamID, "start_comm_count") or 0
+		Spring.SetTeamRulesParam(teamID, "start_comm_count", prevCount + 1)
 		return true
 	end
 	return false
