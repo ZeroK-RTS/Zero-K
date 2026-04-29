@@ -68,7 +68,7 @@ local DEBUG_FLOW        = false -- echo per-edge capacity table on every Send (c
 --                each other (the engine's own connectivity graph). Faithful
 --                to physical wiring; can produce hub-fan stars and miss
 --                trunk-sharing opportunities.
-local MST_MODE          = "euclidean"
+local MST_MODE          = "realistic"
 
 -------------------------------------------------------------------------------------
 -- Unit definitions
@@ -1381,7 +1381,7 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
               vec3 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
-              float spawnAlongMain) {
+              float spawnAlongMain, int twigIdx) {
 	// Resolve spawn point on the wiggly main path at tCenter.
 	vec2 base = a + d * tCenter;
 	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(tCenter);
@@ -1391,8 +1391,11 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	float chance = gsHashU(spawn.x, spawn.y, twigSeed);
 	if (chance > BRANCH_CHANCE) return;
 
-	// Side & angle off the main direction.
-	float side = (gsHash(spawn.x, spawn.y, twigSeed + 1.0) > 0.0) ? 1.0 : -1.0;
+	// Side: STRICTLY alternate by twigIdx so neighbouring twigs along the
+	// main cable land on opposite sides. Two same-side adjacent twigs flashing
+	// in lockstep look like a single pulse "bouncing" — alternating sides
+	// breaks that visual coupling. Angle is still hash-randomised below.
+	float side = ((twigIdx & 1) == 0) ? 1.0 : -1.0;
 	float angleOff = BRANCH_ANGLE_MIN +
 		gsHashU(spawn.x, spawn.y, twigSeed + 2.0) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN);
 	float bLen = BRANCH_LEN_MIN +
@@ -1511,7 +1514,7 @@ void main() {
 		              / float(numSeg);
 		float spawnAlongMain = len3D * tCenter;
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain);
+		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx);
 	}
 }
 ]]
@@ -1719,10 +1722,11 @@ void main() {
 	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
 	float spec = pow(max(0.0, dot(cylNormal, halfDir)), 24.0) * 0.35;
 
-	// Capacity-based color (green glow)
+	// Light-gray cable test: bark and inner are neutral grays, lit only by
+	// diffuse + bubble glow. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
-	vec3 barkColor  = vec3(0.06, 0.04, 0.02);
-	vec3 innerColor = mix(vec3(0.20, 0.55, 0.15), vec3(0.50, 0.80, 0.20), capT);
+	vec3 barkColor  = vec3(0.55, 0.55, 0.55);
+	vec3 innerColor = mix(vec3(0.65, 0.65, 0.65), vec3(0.85, 0.85, 0.85), capT);
 
 	float innerMix = smoothstep(0.85, 0.15, t);
 	if (isBranch > 0.5) innerMix *= 0.7;
@@ -1793,11 +1797,26 @@ void main() {
 	// at the main cable's speed.
 	float bubbleBody, bubbleSpec, bubbleHalo;
 	if (isBranch > 0.5) {
-		float twigPhase = mod(gameTime * speed, spacingA);
-		vec3 bT = bubbleLayer(localU, twigPhase, spacingA, 5.0, v, halfWidthE, 0.0);
-		bubbleBody = bT.x;
-		bubbleSpec = bT.y;
-		bubbleHalo = bT.z;
+		// Synced uniform "power spark": the whole twig flashes bright at once,
+		// like an electrical discharge. NO spatial position dependence — every
+		// pixel of the twig has identical brightness — so the eye cannot
+		// perceive any directional motion (and therefore cannot misperceive
+		// reflection / back-and-forth). All twigs of a cable share `phase`,
+		// so they spark together. Frequency = speed / PERIOD (linear in flow).
+		//
+		// Envelope: very fast rise (~3% of period), then exponential decay.
+		// Reads as a sharp "zap" of energy along the conduit.
+		const float PERIOD = 220.0;
+		float pulse = mod(phase, PERIOD) / PERIOD;       // [0,1)
+		float rise  = smoothstep(0.0, 0.03, pulse);
+		float decay = exp(-pulse * 9.0);                  // dies before next cycle
+		float spark = rise * decay;
+		float v2    = v * v;
+		float cross = 1.0 - smoothstep(0.7, 1.0, v2);
+		spark *= cross;
+		bubbleBody = spark * 1.30;
+		bubbleSpec = spark * 0.65;
+		bubbleHalo = spark * 0.55;
 	} else {
 		vec3 bA = bubbleLayer(along, phase, spacingA, 7.5, v, halfWidthE,  3.7);
 		vec3 bB = bubbleLayer(along, phase, spacingB, 4.0, v, halfWidthE, 19.1);
@@ -1806,10 +1825,13 @@ void main() {
 		bubbleHalo = bA.z + bB.z * 0.55;
 	}
 
-	// Bubble colour: keep the grid efficiency hue (low dilution → punchier).
+	// Bubble colour: grid-efficiency hue, lightly toned down so it still
+	// glows clearly but isn't neon-saturated.
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
-	vec3 bubbleColor = mix(gridColor, vec3(1.0), 0.15);
-	vec3 haloColor   = gridColor;            // pure grid-colour halo
+	float gridLum    = dot(gridColor, vec3(0.299, 0.587, 0.114));
+	vec3 grayedGrid  = mix(gridColor, vec3(gridLum), 0.18);
+	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), 0.15);
+	vec3 haloColor   = grayedGrid;
 
 	// Composition order is chosen so the bubble core never picks up the bark's
 	// hue:
@@ -1821,9 +1843,9 @@ void main() {
 	//     emissive plasma show its real colour through the cable in shadow.
 	//   - Spec: additive white sparkle on top.
 	color += haloColor * bubbleHalo * fullLOS * 0.70;
-	vec3 bubbleEmissive = bubbleColor * bubbleBody * fullLOS * 2.0;
+	vec3 bubbleEmissive = bubbleColor * bubbleBody * fullLOS * 1.85;
 	color = max(color, bubbleEmissive);
-	color += vec3(1.0) * bubbleSpec * fullLOS * 1.2;
+	color += vec3(1.0) * bubbleSpec * fullLOS * 1.10;
 
 	// LOS-aware dimming
 	float dimFactor = mix(0.3, 1.0, smoothstep(0.3, 0.8, losState));
