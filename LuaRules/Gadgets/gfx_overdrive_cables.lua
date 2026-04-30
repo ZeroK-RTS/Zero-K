@@ -1201,24 +1201,16 @@ local function SyncWithGrid()
 end
 
 -------------------------------------------------------------------------------------
--- Per edge:
---   capacity (visual cable thickness) = max(min(sP, oDmax), min(oP, sDmax))
---                                       over nameplate Pmax / Dmax. Min-cut.
---   flow     (visual bubble rate)     = max-of-min-cuts over current Pcur/Dcur.
--- Both quantities are min-cut over the partition (subtree | rest); capacity
--- uses static nameplate, flow uses live consumption. A subtree's signed net
--- surplus is NOT used for flow — that would attribute phantom flow toward
--- the DFS root for energy that physically goes to team storage and never
--- traverses any wire. Team storage is intentionally invisible: producer-rich
--- regions show low throughput, not artificial outflow.
---
--- Two passes per tree:
+-- Max-potential per edge: max flow that could ever cross the cable, given the
+-- nameplate production and static draw (mex = ∞, voltage units = neededlink)
+-- on each side of the cut. Two passes per tree:
 --   1. Post-order DFS aggregates subtreePmax / subtreeDmax per child edge.
---   2. Per edge, otherSide = total − subtreeSide; capacity uses min-cut.
--- With ∞ mex draw the capacity collapses: when both sides have a mex,
--- capacity becomes max(sP, oP). When only one side has a mex, capacity =
--- producer-side Pmax. Voltage-only cuts use the (finite) sum of neededlink
--- thresholds.
+--   2. Per edge, otherSide = total − subtreeSide; capacity is symmetric:
+--        max( min(sP, oDmax), min(oP, sDmax) )
+-- With ∞ mex draw this collapses: when both sides have a mex, capacity becomes
+-- max(sP, oP) (= the larger producer half feeds the smaller). When only one
+-- side has a mex, capacity = the producer-side Pmax. Voltage-only cuts use
+-- the (finite) sum of neededlink thresholds.
 -------------------------------------------------------------------------------------
 
 -- Build the topology-stable mpCache: adjacency, DFS order, parentInTree,
@@ -1381,17 +1373,22 @@ local function ComputeMaxPotentials(flowMode)
 		local subWindCount   = mpCache.subWindCount
 		local subWindBase    = mpCache.subWindBase
 
-		-- Per-tick wind globals: one read each, then everything is arithmetic.
+		-- ZK's per-windmill formula (unit_windmill_control.lua:142):
+		--   windEnergy_i = (windMax − curr_strength) * myMin_i + curr_strength
+		-- This is linear in curr_strength, so the subtree sum is also linear:
+		--   Σ windE = subWindBase * (1 − f) + windMax * f * subWindCount
+		-- where f = curr_strength / windMax = WindStrength rules-param ∈ [0,1].
+		--
+		-- IMPORTANT: ZK's `strength` and Spring.GetWind() are different. The
+		-- engine-side GetWind() is NOT capped to windMax (returns ~27 on a
+		-- map whose windMax=2.5) — using it forces windFrac to clamp to 1
+		-- every tick, attributing windMax × N to wind output (~2× truth).
+		-- The authoritative ZK value is GameRulesParam("WindStrength").
 		local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
-		local _, _, _, currStrength = Spring.GetWind()
-		currStrength = currStrength or 0
-		local windFrac = (windMax > 0) and (currStrength / windMax) or 0
+		local windFrac = Spring.GetGameRulesParam("WindStrength") or 0
 		if windFrac < 0 then windFrac = 0 elseif windFrac > 1 then windFrac = 1 end
 
-		-- subPcur derived directly from cached aggregates — no per-node Pcur
-		-- read. Wind: linear-in-strength sum collapses to
-		-- (1-f)*base + f*windMax*N. Non-wind generators in MST are assumed to
-		-- be at nameplate (inactive ones have gridID=0 and aren't cached).
+		-- subPcur from cached aggregates: 0 per-pylon reads.
 		subPcur = {}
 		for i = 1, #order do
 			local u = order[i]
@@ -1399,10 +1396,7 @@ local function ComputeMaxPotentials(flowMode)
 				+ subPmaxNonWind[u]
 		end
 
-		-- subDcur DOES still need per-node reads — mex draw and turret
-		-- consumption fluctuate per tick. We restrict reads to nodes whose
-		-- def can possibly draw (mexes, voltage units, builders); pure
-		-- generators (windmills/solar/fusion) and range-only pylons stay at 0.
+		-- Consumer reads still per-tick (mex draw / builder energyUse fluctuate).
 		subDcur = {}
 		for i = 1, #order do
 			local u = order[i]
@@ -1441,13 +1435,6 @@ local function ComputeMaxPotentials(flowMode)
 
 		local flow, flowSrcSubtree
 		if flowMode then
-			-- Min-cut over current Pcur/Dcur: each edge shows the saturating
-			-- flow given local production/draw bottlenecks, not conservation
-			-- flow under a virtual storage sink. This is what a cable can
-			-- physically carry right now; team storage soaking up surplus is
-			-- intentionally invisible (storage isn't a node, so producer-rich
-			-- regions correctly show *less* throughput, not phantom outflow
-			-- toward an arbitrary DFS root).
 			local totalPcur, totalDcur = subPcur[r], subDcur[r]
 			local sPc, sDc = subPcur[cid], subDcur[cid]
 			local oPc, oDc = totalPcur - sPc, totalDcur - sDc
@@ -1542,10 +1529,7 @@ local function ConsumersOrWindChanged()
 			return true
 		end
 	end
-	local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
-	local _, _, _, currStrength = Spring.GetWind()
-	currStrength = currStrength or 0
-	local newWindFrac = (windMax > 0) and (currStrength / windMax) or 0
+	local newWindFrac = Spring.GetGameRulesParam("WindStrength") or 0
 	if newWindFrac < 0 then newWindFrac = 0 elseif newWindFrac > 1 then newWindFrac = 1 end
 	if math.abs(newWindFrac - lastWindFrac) > 0.05 then return true end
 	return false
@@ -1667,10 +1651,7 @@ local function SendAll()
 		lastConsumerDcur[uid] = GetNodeDcurrent(uid, did)
 	end
 	do
-		local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
-		local _, _, _, currStrength = Spring.GetWind()
-		currStrength = currStrength or 0
-		local newWindFrac = (windMax > 0) and (currStrength / windMax) or 0
+		local newWindFrac = Spring.GetGameRulesParam("WindStrength") or 0
 		if newWindFrac < 0 then newWindFrac = 0 elseif newWindFrac > 1 then newWindFrac = 1 end
 		lastWindFrac = newWindFrac
 	end
