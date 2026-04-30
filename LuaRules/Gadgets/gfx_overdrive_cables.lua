@@ -1942,7 +1942,9 @@ VFS.Include(luaShaderDir .. "instancevbotable.lua")
 
 local MIN_TRUNK_WIDTH  = 3
 local MAX_TRUNK_WIDTH  = 12
-local MAX_CAPACITY_REF = 100
+-- One singu's output (energysingu.energyMake = 225) saturates the cable to
+-- max thickness. Below that, thickness scales linearly with capacity.
+local MAX_CAPACITY_REF = 225
 
 local SEG_LENGTH       = 10    -- shorter = smoother curves
 -- Noise amplitude is in absolute elmos (not a fraction of cable width). Tying
@@ -1978,7 +1980,7 @@ local BUBBLE_MAX_SPEED      = 110
 local BUBBLE_FLOW_REF       = 50.0   -- flow at which n=1 (reference speed/density)
 local BUBBLE_TRUNK_W_MIN    = 3.0    -- mirror of GLSL MIN_TRUNK_WIDTH
 local BUBBLE_TRUNK_W_MAX    = 12.0   -- mirror of GLSL MAX_TRUNK_WIDTH
-local BUBBLE_CAP_REF        = 100.0
+local BUBBLE_CAP_REF        = 225.0  -- mirror of MAX_CAPACITY_REF (one singu)
 
 local function widthOfCapacity(cap)
 	local t = (cap or 0) / BUBBLE_CAP_REF

@@ -78,7 +78,7 @@ const float NOISE_AMP_ABS     = 4.0;
 const float WIDTH_FACTOR      = 0.55;
 const float MIN_TRUNK_WIDTH   = 3.0;
 const float MAX_TRUNK_WIDTH   = 12.0;
-const float MAX_CAPACITY_REF  = 100.0;
+const float MAX_CAPACITY_REF  = 225.0; // one singu (energysingu.energyMake)
 
 // Twig parameters mirror the Lua-side BRANCH_* constants.
 const float BRANCH_CHANCE     = 0.78;
