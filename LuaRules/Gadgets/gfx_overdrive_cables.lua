@@ -201,6 +201,12 @@ local consumerNodeIndex = {}        -- [unitID] = unitDefID
 local lastConsumerDcur  = {}        -- [unitID] = last-seen Dcurrent reading
 local lastWindFrac      = -1        -- last-tick windFrac for change detection
 
+local function GetCurWindFrac()
+	local f = Spring.GetGameRulesParam("WindStrength") or 0
+	if f < 0 then return 0 elseif f > 1 then return 1 end
+	return f
+end
+
 -- Spatial-hash and candidate-cap constants. Declared early so the pylon-
 -- neighbour helpers below capture them as upvalues. Re-referenced (without
 -- redeclaration) by BuildGridMSTFromScratch and the incremental MST ops.
@@ -1385,8 +1391,7 @@ local function ComputeMaxPotentials(flowMode)
 		-- every tick, attributing windMax × N to wind output (~2× truth).
 		-- The authoritative ZK value is GameRulesParam("WindStrength").
 		local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
-		local windFrac = Spring.GetGameRulesParam("WindStrength") or 0
-		if windFrac < 0 then windFrac = 0 elseif windFrac > 1 then windFrac = 1 end
+		local windFrac = GetCurWindFrac()
 
 		-- subPcur from cached aggregates: 0 per-pylon reads.
 		subPcur = {}
@@ -1529,9 +1534,7 @@ local function ConsumersOrWindChanged()
 			return true
 		end
 	end
-	local newWindFrac = Spring.GetGameRulesParam("WindStrength") or 0
-	if newWindFrac < 0 then newWindFrac = 0 elseif newWindFrac > 1 then newWindFrac = 1 end
-	if math.abs(newWindFrac - lastWindFrac) > 0.05 then return true end
+	if math.abs(GetCurWindFrac() - lastWindFrac) > 0.05 then return true end
 	return false
 end
 
@@ -1650,11 +1653,7 @@ local function SendAll()
 	for uid, did in pairs(consumerNodeIndex) do
 		lastConsumerDcur[uid] = GetNodeDcurrent(uid, did)
 	end
-	do
-		local newWindFrac = Spring.GetGameRulesParam("WindStrength") or 0
-		if newWindFrac < 0 then newWindFrac = 0 elseif newWindFrac > 1 then newWindFrac = 1 end
-		lastWindFrac = newWindFrac
-	end
+	lastWindFrac = GetCurWindFrac()
 
 	if perf then
 		local tEnd = Spring.GetTimer()
@@ -1980,7 +1979,7 @@ local BUBBLE_MAX_SPEED      = 110
 local BUBBLE_FLOW_REF       = 50.0   -- flow at which n=1 (reference speed/density)
 local BUBBLE_TRUNK_W_MIN    = 3.0    -- mirror of GLSL MIN_TRUNK_WIDTH
 local BUBBLE_TRUNK_W_MAX    = 12.0   -- mirror of GLSL MAX_TRUNK_WIDTH
-local BUBBLE_CAP_REF        = 225.0  -- mirror of MAX_CAPACITY_REF (one singu)
+local BUBBLE_CAP_REF        = MAX_CAPACITY_REF
 
 local function widthOfCapacity(cap)
 	local t = (cap or 0) / BUBBLE_CAP_REF
