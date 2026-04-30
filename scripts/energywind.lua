@@ -8,12 +8,12 @@ local smokePiece = {base}
 local hpi = math.pi*0.5
 
 local UPDATE_PERIOD = 1000
+local BUILD_PERIOD = 500
 
 local turnSpeed = math.rad(20)
 local waterFanSpin = math.rad(30)
 
 local SIG_ANIM = 1
-local SIG_WIND = 2
 local isWind, baseWind, rangeWind
 
 local rand = math.random
@@ -40,16 +40,21 @@ local function BobTidal()
 end
 
 local oldWindStrength, oldWindHeading
-local function SpinWind()
-	SetSignalMask(SIG_WIND)
+function SpinWind()
 	while true do
-		if GG.WindStrength and ((oldWindStrength ~= GG.WindStrength) or (oldWindHeading ~= GG.WindHeading)) then
-			oldWindStrength, oldWindHeading = GG.WindStrength, GG.WindHeading
-			local st = baseWind + (GG.WindStrength or 0)*rangeWind
-			Spin(fan, z_axis, -st*(0.94 + 0.08*rand()))
-			Turn(cradle, y_axis, GG.WindHeading - baseDirection + math.pi, turnSpeed)
+		if select(5, Spring.GetUnitHealth(unitID)) < 1 then
+			oldWindStrength = nil
+			StopSpin(fan, z_axis)
+			Sleep(BUILD_PERIOD)
+		else
+			if GG.WindStrength and ((oldWindStrength ~= GG.WindStrength) or (oldWindHeading ~= GG.WindHeading)) then
+				oldWindStrength, oldWindHeading = GG.WindStrength, GG.WindHeading
+				local st = baseWind + (GG.WindStrength or 0)*rangeWind
+				Spin(fan, z_axis, -st*(0.94 + 0.08*rand()))
+				Turn(cradle, y_axis, GG.WindHeading - baseDirection + math.pi, turnSpeed)
+			end
+			Sleep(UPDATE_PERIOD + 200*rand())
 		end
-		Sleep(UPDATE_PERIOD + 200*rand())
 
 		if GG.Wind_SpinDisabled then
 			StopSpin(fan, z_axis)
@@ -58,39 +63,10 @@ local function SpinWind()
 	end
 end
 
--- Started/stopped via script.Activate/script.Deactivate (since the unit def has
--- activateWhenBuilt=true). Avoids a per-second Spring.GetUnitHealth poll on every
--- windmill just to detect build completion. EMP/disarm also stops the spin via
--- engine-driven Deactivate, matching the behaviour of other ZK animated buildings.
-function script.Activate()
-	if not isWind then
-		return
-	end
-	Signal(SIG_WIND)
-	oldWindStrength, oldWindHeading = nil, nil
-	StartThread(SpinWind)
-end
-
-function script.Deactivate()
-	if not isWind then
-		return
-	end
-	Signal(SIG_WIND)
-	StopSpin(fan, z_axis)
-end
-
 function InitializeWind()
 	isWind, baseWind, rangeWind = GG.SetupWindmill(unitID)
 	if isWind then
-		-- Spin starts on script.Activate (engine fires it when build completes,
-		-- because the unit def sets activateWhenBuilt=true).
-		-- For the /windanim debug toggle re-init path, kick the thread now if the
-		-- unit is already built and active.
-		if Spring.GetUnitIsActive(unitID) then
-			Signal(SIG_WIND)
-			oldWindStrength, oldWindHeading = nil, nil
-			StartThread(SpinWind)
-		end
+		StartThread(SpinWind)
 	else
 		StartThread(BobTidal)
 		Hide(base)

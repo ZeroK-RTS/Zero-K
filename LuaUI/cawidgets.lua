@@ -1838,7 +1838,6 @@ function widgetHandler:DrawWorldRefraction()
 end
 
 
-
 function widgetHandler:DrawUnitsPostDeferred()
 	tracy.ZoneBeginN("W:DrawUnitsPostDeferred")
 	for _, w in r_ipairs(self.DrawUnitsPostDeferredList) do

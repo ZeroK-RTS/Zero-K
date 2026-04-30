@@ -2273,9 +2273,6 @@ function gadgetHandler:DrawWorldRefraction()
 end
 
 
-
-
-
 function gadgetHandler:DrawScreenEffects(vsx, vsy)
 	tracy.ZoneBeginN("G:DrawScreenEffects")
 	for _,g in r_ipairs(self.DrawScreenEffectsList) do
