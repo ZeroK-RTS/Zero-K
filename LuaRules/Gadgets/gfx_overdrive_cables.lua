@@ -1204,18 +1204,13 @@ end
 -- Per edge:
 --   capacity (visual cable thickness) = max(min(sP, oDmax), min(oP, sDmax))
 --                                       over nameplate Pmax / Dmax. Min-cut.
---   flow     (visual bubble rate)     = signed subtree-side net surplus
---                                       (sPcur − sDcur). Conservation at every
---                                       interior node holds automatically; the
---                                       global imbalance is absorbed/supplied
---                                       by team storage at the DFS root.
--- These are different quantities. Capacity is the upper bound on what the
--- cable could ever carry; flow is what is physically moving right now. Using
--- max-of-min-cuts for *flow* (the previous formulation) misroutes edges in
--- mixed-surplus configurations — e.g. a junction whose three subtrees each
--- have positive surplus would render as three inflows with no outflow, energy
--- stuck at the node — because min-cut picks the larger of two simultaneously
--- feasible flows rather than the actual net imbalance.
+--   flow     (visual bubble rate)     = max-of-min-cuts over current Pcur/Dcur.
+-- Both quantities are min-cut over the partition (subtree | rest); capacity
+-- uses static nameplate, flow uses live consumption. A subtree's signed net
+-- surplus is NOT used for flow — that would attribute phantom flow toward
+-- the DFS root for energy that physically goes to team storage and never
+-- traverses any wire. Team storage is intentionally invisible: producer-rich
+-- regions show low throughput, not artificial outflow.
 --
 -- Two passes per tree:
 --   1. Post-order DFS aggregates subtreePmax / subtreeDmax per child edge.
@@ -1446,25 +1441,25 @@ local function ComputeMaxPotentials(flowMode)
 
 		local flow, flowSrcSubtree
 		if flowMode then
-			-- Real flow on a tree edge = signed net surplus of the subtree side.
-			-- Conservation at every interior node holds automatically: for any
-			-- node v with incident subtree-cuts, sum of signed edge flows equals
-			-- v's own (Pcur − Dcur), with the global imbalance absorbed/supplied
-			-- by team storage (conceptually a virtual sink/source at the DFS
-			-- root). The previous max-of-min-cuts formulation gave *capacity*,
-			-- not flow, and misrouted edges in mixed-surplus configurations:
-			-- e.g. a degree-3 junction whose three subtrees each have positive
-			-- surplus would render as 3 inflows with 0 outflow (net +N "stuck"
-			-- at the junction), violating conservation.
+			-- Min-cut over current Pcur/Dcur: each edge shows the saturating
+			-- flow given local production/draw bottlenecks, not conservation
+			-- flow under a virtual storage sink. This is what a cable can
+			-- physically carry right now; team storage soaking up surplus is
+			-- intentionally invisible (storage isn't a node, so producer-rich
+			-- regions correctly show *less* throughput, not phantom outflow
+			-- toward an arbitrary DFS root).
+			local totalPcur, totalDcur = subPcur[r], subDcur[r]
 			local sPc, sDc = subPcur[cid], subDcur[cid]
-			local subtreeSurplus = sPc - sDc
-			if subtreeSurplus > 0 then
-				flow, flowSrcSubtree = subtreeSurplus, true
-			elseif subtreeSurplus < 0 then
-				flow, flowSrcSubtree = -subtreeSurplus, false
+			local oPc, oDc = totalPcur - sPc, totalDcur - sDc
+			local flowAB = (sPc < oDc) and sPc or oDc
+			local flowBA = (oPc < sDc) and oPc or sDc
+			if flowAB >= flowBA then
+				flow, flowSrcSubtree = flowAB, true
 			else
-				flow, flowSrcSubtree = 0, potentialSrcSubtree
+				flow, flowSrcSubtree = flowBA, false
 			end
+			if flow < 0 then flow = 0 end
+			if flow <= 0 then flowSrcSubtree = potentialSrcSubtree end
 		else
 			flow, flowSrcSubtree = 0, potentialSrcSubtree
 		end
