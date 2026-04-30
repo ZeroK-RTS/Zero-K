@@ -63,12 +63,12 @@ end
 
 local ret = {}
 for i = 1, #starts do
-	ret[i-1] = {
+	ret[i] = {
 		startpoints = { { starts[i][1], starts[i][2] } },
 		boxes = { { } },
 	}
 	for j = 1, 16 do
-		ret[i-1].boxes[1][j] = {
+		ret[i].boxes[1][j] = {
 			starts[i][1] + 256 * math.sin(j * math.pi / 8),
 			starts[i][2] + 256 * math.cos(j * math.pi / 8),
 		}

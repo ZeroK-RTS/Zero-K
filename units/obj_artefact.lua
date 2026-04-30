@@ -43,6 +43,7 @@ return { obj_artefact = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
+  yardMap                       = string.rep('o', 7*7),
 
   featureDefs                   = {
   },

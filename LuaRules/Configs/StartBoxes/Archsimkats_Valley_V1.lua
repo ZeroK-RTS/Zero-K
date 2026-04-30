@@ -1,5 +1,5 @@
 local ret = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{5383, 8188},
@@ -188,7 +188,7 @@ local ret = {
 		nameLong = "South-East",
 		nameShort = "SE",
 	},
-	[1] = {
+	{
 		boxes = { },
 		startpoints = { },
 		nameLong = "North-West",
@@ -196,8 +196,8 @@ local ret = {
 	},
 }
 
-local sourceConf = ret[0]
-local mirrorConf = ret[1]
+local sourceConf = ret[1]
+local mirrorConf = ret[2]
 local sourceBoxes = sourceConf.boxes
 local mirrorBoxes = mirrorConf.boxes
 local sourceStartpoints = sourceConf.startpoints

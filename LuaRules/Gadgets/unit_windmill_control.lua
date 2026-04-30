@@ -85,6 +85,27 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Seeded wind
+
+if tonumber(Spring.GetModOptions().wind_seed or 0) ~= 0 then
+	-- I don't really want to keep reseeding the global generator, but that
+	-- seems like the only (simple) way. I with lua had random generator objects.
+	
+	if not Spring.GetGameRulesParam("WindRandomSeed") then
+		-- Survive luarules reload
+		Spring.SetGameRulesParam("WindRandomSeed", tonumber(Spring.GetModOptions().wind_seed or 0))
+	end
+	
+	rand = function ()
+		math.randomseed(Spring.GetGameRulesParam("WindRandomSeed") or 0)
+		local retValue = math.random()
+		Spring.SetGameRulesParam("WindRandomSeed", math.random(10000000))
+		return retValue
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Debug
 
 local function ToggleWindAnimation(cmd, line, words, player)
@@ -116,7 +137,7 @@ local function UpdateWindStrengthAndDir()
 		strength = strength + strength_step
 		step_count = step_count - 1
 	end
-	local _, _, _, windStrength, x, _, z = spGetWind()
+	local _, _, _, _, x, _, z = spGetWind()
 	local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
 	
 	GG.WindHeading = windHeading
@@ -225,7 +246,6 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("WindMin",windMin)
 	Spring.SetGameRulesParam("WindMax",windMax)
 	Spring.SetGameRulesParam("WindHeading", 0)
-	Spring.SetGameRulesParam("WindStrength", 0)
 	Spring.SetGameRulesParam("tidalHeight", TIDAL_HEIGHT)
 
 	local minWindMult = 1
@@ -252,7 +272,11 @@ function gadget:Initialize()
 	-- effect between 0% (flat maps) and 100% (mountained maps)
 	--slope = minWindMult * 1/(1+math.exp(4 - groundExtreme/105))
 
-	strength = (rand() * windRange) + windMin
+	strength = Spring.GetGameRulesParam("WindStrength")
+	if not strength then
+		strength = (rand() * windRange) + windMin
+	end
+	
 
 	for i = 1, #teamList do
 		teamEnergy[teamList[i]] = 0

@@ -5,7 +5,7 @@ local slice = 2 * math.pi / teams
 
 local layout = {}
 for i = 1, teams do
-	layout[i-1] = {
+	layout[i] = {
 		boxes = {
 			{
 				{center[1], center[2]}
@@ -13,12 +13,12 @@ for i = 1, teams do
 		},
 	}
 	for j = 0, 10 do
-		layout[i-1].boxes[1][j+2] = {
+		layout[i].boxes[1][j+2] = {
 			center[1] + radius * math.sin((i-(j * 0.1)) * slice),
 			center[2] + radius * math.cos((i-(j * 0.1)) * slice)
 		}
 	end
-	layout[i-1].startpoints = {{
+	layout[i].startpoints = {{
 		center[1] + radius * math.sin((i-0.5) * slice) * 0.5,
 		center[2] + radius * math.cos((i-0.5) * slice) * 0.5
 	}}

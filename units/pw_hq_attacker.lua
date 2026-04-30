@@ -32,7 +32,7 @@ return { pw_hq_attacker = {
   waterline                     = 10,
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
-  --yardMap                       = [[oooooooooooooooooooo]],
+  yardMap                       = string.rep('o', 8*8),
 
   weapons                = {
 

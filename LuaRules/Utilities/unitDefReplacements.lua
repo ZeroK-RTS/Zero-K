@@ -210,9 +210,17 @@ local function GetZenithTooltip (unitID)
 end
 
 local function GetAvatarTooltip(unitID)
-	local commOwner = Spring.GetUnitRulesParam(unitID, "commander_owner")
-	if not commOwner then return end
-	return commOwner or ""
+	local ownerTeam = Spring.GetUnitRulesParam(unitID, "commander_owner_team")
+	if not ownerTeam then return end
+	local isAI = select(4, Spring.GetTeamInfo(ownerTeam, false))
+	if isAI then
+		return select(2, Spring.GetAIInfo(ownerTeam)) or ""
+	end
+	local leaderID = select(2, Spring.GetTeamInfo(ownerTeam, false))
+	if leaderID then
+		return (Spring.GetPlayerInfo(leaderID, false)) or ""
+	end
+	return ""
 end
 
 local function GetPlanetwarsTooltip(unitID, ud)

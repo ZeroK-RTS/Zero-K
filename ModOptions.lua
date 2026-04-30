@@ -837,6 +837,17 @@ local options = {
 		step    = 1,
 	},
 	{
+		key     = 'wind_seed',
+		name    = 'Wind Seed',
+		desc    = 'Random seed for wind rate throughout the game.',
+		type    = 'number',
+		section = 'mapsettings',
+		def     = 0,
+		min     = 0,
+		max     = 10000000,
+		step    = 1,
+	},
+	{
 		key     = "allyteam_long_name_1",
 		name    = "Team 1 Name Override",
 		desc    = "Overrides the name of team 1 in the player list.",

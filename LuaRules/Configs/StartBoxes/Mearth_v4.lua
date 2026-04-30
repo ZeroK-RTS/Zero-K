@@ -55,14 +55,14 @@ end
 -- convert the above to boxes (256 radius circles)
 local ret = {}
 for i = 1, #starting_triples do
-	ret[i-1] = {
+	ret[i] = {
 		nameLong  = starting_triples[i][3],
 		nameShort = starting_triples[i][4],
 		startpoints = { { starting_triples[i][1], starting_triples[i][2] } },
 		boxes = { { } },
 	}
 	for j = 1, 10 do
-		ret[i-1].boxes[1][j] = {
+		ret[i].boxes[1][j] = {
 			starting_triples[i][1] + 256 * math.sin(j * math.pi / 5),
 			starting_triples[i][2] + 256 * math.cos(j * math.pi / 5),
 		}

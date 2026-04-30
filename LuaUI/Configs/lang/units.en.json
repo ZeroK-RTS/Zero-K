@@ -1,4 +1,9 @@
 {
+	"commander_egg" : {
+		"name" : "Commander Egg",
+		"description" : "Evolves into a Commander. EMP explosion on death.",
+		"helptext" : "Evolves into a Commander of your choice (Strike, Guardian, Recon, or Engineer). Morph takes 60 seconds. The egg will only hatch if a player on the team is missing a commander. Each player can have up to their starting number of commanders. On death or detonation, releases a powerful EMP blast (20000 damage, 280 radius, 25s paralyze). Can be transported by air transports."
+	},
 	"starlight_satellite" : {
 		"name" : "Glint",
 		"description" : "Starlight relay satellite",

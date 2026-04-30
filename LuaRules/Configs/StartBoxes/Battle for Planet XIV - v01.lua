@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		boxes = {
 			{
 				{7000, 7000},
@@ -175,7 +175,7 @@ return {
 		nameLong = "South-East",
 		nameShort = "SE",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{1611.8095703125, 1000},
@@ -353,7 +353,7 @@ return {
 		nameLong = "North-West",
 		nameShort = "NW",
 	},
-	[2] = {
+	{
 		boxes = {
 			{
 				{1200, 7000},
@@ -505,7 +505,7 @@ return {
 		nameLong = "South-West",
 		nameShort = "SW",
 	},
-	[3] = {
+	{
 		boxes = {
 			{
 				{6770, 1620},
