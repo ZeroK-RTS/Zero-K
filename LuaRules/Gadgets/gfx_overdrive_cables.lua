@@ -2389,9 +2389,10 @@ function gadget:DrawWorldPreUnit()
 	gl.Culling(false)
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(true)
-	-- Standard alpha blending. Live cables write alpha=1.0 (visually identical
-	-- to no-blend), ghosts write alpha<1.0 to compose against the world.
-	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
+	-- Fully opaque output — every path writes alpha=1.0 (enemy ghost branch
+	-- is gone; out-of-LOS enemy fragments are discarded). Disable blending
+	-- so depth-tested cables compose cleanly against the world.
+	gl.Blending(false)
 
 	-- GL_LINES: every 2 verts form one cable; the geometry shader expands
 	-- them into a triangle_strip ribbon.

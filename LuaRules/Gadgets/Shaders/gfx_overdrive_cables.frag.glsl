@@ -55,12 +55,10 @@ const float DIM_FACTOR_MIN     = 0.3;          // bark brightness at full darkne
 const float FULLLOS_LO         = 0.7;
 const float FULLLOS_HI         = 1.0;
 
-// Enemy ghost (non-own ally outside LOS): flat dim look, no animation.
-const vec3  GHOST_BASE_LO      = vec3(0.30);   // capT = 0
-const vec3  GHOST_BASE_HI      = vec3(0.55);   // capT = 1
-const float GHOST_BRANCH_DAMP  = 0.65;
-const float GHOST_LOS_THRESH   = 0.45;
-const float GHOST_ALPHA_MAX    = 0.55;
+// Enemy LOS gating: below this losState, enemy fragments are hidden entirely
+// (no ghost). Own-ally fragments ignore this threshold — they fade via
+// dimFactor instead but always render.
+const float ENEMY_LOS_CUT      = 0.5;
 
 // Bubble flow mapping. Must mirror Lua flowToSpeed() exactly for CPU-baked
 // phase anchoring + FS extrapolation to remain continuous across baking.
@@ -297,30 +295,12 @@ void main() {
 	float losState = texture(infoTex, losUV).r;
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
-	// Enemy cables out of LOS: render as a flat dim ghost reflecting the last
-	// known state (the synced gadget broadcasts every ally team's grid to all
-	// clients, so we already hold the last-received topology even after LOS
-	// is lost). Skip live shading + bubble animation — ghost is static so it
-	// reads as "memory" rather than current activity. Own cables stay live
-	// (they're always visible to the local viewer).
-	//
-	// We early-out here so the bubble layer pass and bark lighting below
-	// don't run for ghosts; they'd be wasted work.
+	// Enemy cables outside LOS: hide entirely (proper ghosting will be added
+	// later as a separate pass with last-seen geometry; the live pass should
+	// only show what's actually visible right now). Own ally always renders
+	// — fades via dimFactor for fog, but stays on screen.
 	float isOwnAlly = gridData.w;
-	if (isOwnAlly < 0.5 && losState < GHOST_LOS_THRESH) {
-		// Neutral grayish ghost — a "remembered" cable, not a live circuit.
-		// Capacity barely tints brightness so thicker grid lines read slightly
-		// brighter without picking up a hue. Branches are a touch dimmer.
-		float capT = clamp(capacity / 100.0, 0.0, 1.0);
-		vec3 ghostBase = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT);
-		if (isBranch > 0.5) ghostBase *= GHOST_BRANCH_DAMP;
-		// Edge falloff so the ribbon edges fade rather than hard-cut, giving
-		// the ghost a softer "remembered impression" look. Drives alpha too,
-		// so the silhouette dissolves smoothly instead of hard-clipping at t=0.9.
-		float edgeFade = 1.0 - smoothstep(0.55, 0.90, t);
-		fragColor = vec4(ghostBase * edgeFade, GHOST_ALPHA_MAX * edgeFade);
-		return;
-	}
+	if (isOwnAlly < 0.5 && losState < ENEMY_LOS_CUT) discard;
 
 	// Apply lighting
 	vec3 color = baseColor * diffuse + SPEC_TINT * spec;
