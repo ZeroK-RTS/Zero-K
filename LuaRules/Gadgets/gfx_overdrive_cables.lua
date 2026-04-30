@@ -1201,16 +1201,29 @@ local function SyncWithGrid()
 end
 
 -------------------------------------------------------------------------------------
--- Max-potential per edge: max flow that could ever cross the cable, given the
--- nameplate production and static draw (mex = ∞, voltage units = neededlink)
--- on each side of the cut. Two passes per tree:
+-- Per edge:
+--   capacity (visual cable thickness) = max(min(sP, oDmax), min(oP, sDmax))
+--                                       over nameplate Pmax / Dmax. Min-cut.
+--   flow     (visual bubble rate)     = signed subtree-side net surplus
+--                                       (sPcur − sDcur). Conservation at every
+--                                       interior node holds automatically; the
+--                                       global imbalance is absorbed/supplied
+--                                       by team storage at the DFS root.
+-- These are different quantities. Capacity is the upper bound on what the
+-- cable could ever carry; flow is what is physically moving right now. Using
+-- max-of-min-cuts for *flow* (the previous formulation) misroutes edges in
+-- mixed-surplus configurations — e.g. a junction whose three subtrees each
+-- have positive surplus would render as three inflows with no outflow, energy
+-- stuck at the node — because min-cut picks the larger of two simultaneously
+-- feasible flows rather than the actual net imbalance.
+--
+-- Two passes per tree:
 --   1. Post-order DFS aggregates subtreePmax / subtreeDmax per child edge.
---   2. Per edge, otherSide = total − subtreeSide; capacity is symmetric:
---        max( min(sP, oDmax), min(oP, sDmax) )
--- With ∞ mex draw this collapses: when both sides have a mex, capacity becomes
--- max(sP, oP) (= the larger producer half feeds the smaller). When only one
--- side has a mex, capacity = the producer-side Pmax. Voltage-only cuts use
--- the (finite) sum of neededlink thresholds.
+--   2. Per edge, otherSide = total − subtreeSide; capacity uses min-cut.
+-- With ∞ mex draw the capacity collapses: when both sides have a mex,
+-- capacity becomes max(sP, oP). When only one side has a mex, capacity =
+-- producer-side Pmax. Voltage-only cuts use the (finite) sum of neededlink
+-- thresholds.
 -------------------------------------------------------------------------------------
 
 -- Build the topology-stable mpCache: adjacency, DFS order, parentInTree,
@@ -1433,18 +1446,25 @@ local function ComputeMaxPotentials(flowMode)
 
 		local flow, flowSrcSubtree
 		if flowMode then
-			local totalPcur, totalDcur = subPcur[r], subDcur[r]
+			-- Real flow on a tree edge = signed net surplus of the subtree side.
+			-- Conservation at every interior node holds automatically: for any
+			-- node v with incident subtree-cuts, sum of signed edge flows equals
+			-- v's own (Pcur − Dcur), with the global imbalance absorbed/supplied
+			-- by team storage (conceptually a virtual sink/source at the DFS
+			-- root). The previous max-of-min-cuts formulation gave *capacity*,
+			-- not flow, and misrouted edges in mixed-surplus configurations:
+			-- e.g. a degree-3 junction whose three subtrees each have positive
+			-- surplus would render as 3 inflows with 0 outflow (net +N "stuck"
+			-- at the junction), violating conservation.
 			local sPc, sDc = subPcur[cid], subDcur[cid]
-			local oPc, oDc = totalPcur - sPc, totalDcur - sDc
-			local flowAB = (sPc < oDc) and sPc or oDc
-			local flowBA = (oPc < sDc) and oPc or sDc
-			if flowAB >= flowBA then
-				flow, flowSrcSubtree = flowAB, true
+			local subtreeSurplus = sPc - sDc
+			if subtreeSurplus > 0 then
+				flow, flowSrcSubtree = subtreeSurplus, true
+			elseif subtreeSurplus < 0 then
+				flow, flowSrcSubtree = -subtreeSurplus, false
 			else
-				flow, flowSrcSubtree = flowBA, false
+				flow, flowSrcSubtree = 0, potentialSrcSubtree
 			end
-			if flow < 0 then flow = 0 end
-			if flow <= 0 then flowSrcSubtree = potentialSrcSubtree end
 		else
 			flow, flowSrcSubtree = 0, potentialSrcSubtree
 		end
