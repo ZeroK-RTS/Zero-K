@@ -290,10 +290,11 @@ void main() {
 	float surfN = hash(worldPos.xz * 0.5) * 0.04;
 	baseColor += vec3(surfN);
 
-	// LOS state (needed first for animation gating)
+	// LOS state — sampled from $info:los (single-channel red), the engine's
+	// actual game-logic LOS texture. Independent of the user's overlay toggle:
+	// 0.0 = unscouted, 1.0 = currently in LOS.
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
-	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
-	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
+	float losState = texture(infoTex, losUV).r;
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
 	// Enemy cables out of LOS: render as a flat dim ghost reflecting the last

@@ -2380,7 +2380,11 @@ function gadget:DrawWorldPreUnit()
 	cableShader:SetUniform("bakeTime", bubbleBakeTime)
 	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
 
-	gl.Texture(0, "$info")
+	-- $info:los is the actual game-logic LOS texture (single-channel red), NOT
+	-- the user's visual LOS-overlay (which is what plain $info samples and which
+	-- becomes a height-map view when the overlay is toggled off — defeating any
+	-- LOS gating done against it).
+	gl.Texture(0, "$info:los")
 	gl.Texture(1, "$heightmap")
 	gl.Culling(false)
 	gl.DepthTest(GL.LEQUAL)
