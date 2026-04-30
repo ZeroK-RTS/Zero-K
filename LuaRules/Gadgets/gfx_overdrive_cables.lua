@@ -356,6 +356,71 @@ local cableDetail = readDetailFromConfig()
 local cableEnabled  = cableDetail ~= DETAIL_OFF
 local cablePerf     = false
 local cableFlowMode = cableDetail == DETAIL_FULL
+-- Ghost rendering: when on, the GS samples LOS at each cable segment center
+-- and atomicOr's the per-edge coverage SSBO. A separate ghost pass (slice 3)
+-- consumes those bits to render last-seen segments of dead/orphaned enemy
+-- cables. Slice 1 only fills the SSBO so we can verify the bit accumulation;
+-- the live render is unchanged.
+local cableGhosts = (Spring.GetConfigInt("OverdriveCableGhosts", 1) or 1) ~= 0
+
+-- ---------------------------------------------------------------------------
+-- Per-edge coverage SSBO (slice 1: bits set by GS, not yet consumed)
+-- ---------------------------------------------------------------------------
+-- Each cable owns one slot in `coverageSSBO`. The GS atomicOr's bit `i`
+-- whenever segment `i` is currently in LOS during the live pass. The slot
+-- index is allocated CPU-side per edgeKey and freed when the edge has no
+-- live presence and no remaining ghost coverage.
+--
+-- Slot numbering is decoupled from edge identity (which is `EdgeKey =
+-- min(uidA,uidB):max(uidA,uidB)`, persistent across topology rerouting):
+-- the unitID-pair stays the same logical cable, and slotByKey maps that
+-- string to a small numeric SSBO index suitable for shader array lookup.
+--
+-- Layout note: Spring's VBO API requires vec4-aligned attributes for SSBO
+-- definition. We declare a single 4-float column and only use .x as the
+-- coverage uint (re-interpreted via uvec4 in the shader). The remaining 3
+-- floats per slot are unused — total cost ~64KB at COVERAGE_MAX_SLOTS=4096,
+-- still trivial.
+local COVERAGE_MAX_SLOTS = 4096
+local coverageSSBO       -- gl.GetVBO(GL.SHADER_STORAGE_BUFFER); allocated in Initialize
+local slotByKey      = {}    -- edgeKey -> slot
+local keyBySlot      = {}    -- slot -> edgeKey
+local freeSlots      = {}    -- stack of recycled slot IDs
+local nextSlot       = 0     -- next never-allocated slot
+
+local function AllocSlot(edgeKey)
+	local s = slotByKey[edgeKey]
+	if s then return s end
+	local n = #freeSlots
+	if n > 0 then
+		s = freeSlots[n]; freeSlots[n] = nil
+	else
+		if nextSlot >= COVERAGE_MAX_SLOTS then return nil end
+		s = nextSlot
+		nextSlot = nextSlot + 1
+	end
+	slotByKey[edgeKey] = s
+	keyBySlot[s] = edgeKey
+	-- Recycled slots get zeroed at FreeSlot time, so AllocSlot doesn't need
+	-- to upload here. Initial allocation works too because the SSBO is
+	-- zero-initialised at gadget:Initialize.
+	return s
+end
+
+local function FreeSlot(edgeKey)
+	local s = slotByKey[edgeKey]
+	if not s then return end
+	slotByKey[edgeKey] = nil
+	keyBySlot[s] = nil
+	freeSlots[#freeSlots + 1] = s
+	-- Wipe the slot before it can be re-handed-out to a different edge.
+	-- Upload one vec4 of zeros at element offset s. Args: (data, attribIdx,
+	-- elemOffset). attribIdx=0 is our only attribute; elemOffset places the
+	-- single-element write at slot s.
+	if coverageSSBO then
+		coverageSSBO:Upload({0, 0, 0, 0}, 0, s)
+	end
+end
 
 -- Per-tick perf stats. Filled by SyncWithGrid / ComputeMaxPotentials /
 -- SendAll only when cablePerf is on; RunSyncTick reads them and emits one
@@ -1778,8 +1843,40 @@ end
 
 -- /cabletree detail off|noflow|full  — set detail level (the menu widget
 --                                       drives this; can also be typed)
+-- /cabletree ghosts on|off           — toggle per-segment ghost tracking
+-- /cabletree ghosts dump <slot>      — print coverage bits for a slot
+-- /cabletree ghosts dumpkey <key>    — print coverage bits for an edgeKey
 -- /cabletree perf                    — toggle per-cycle timing log
 -- /cabletree status                  — print current state
+local function ToUint(v)
+	local n = math.floor((v or 0) + 0.5)
+	if n < 0 then n = n + 4294967296 end
+	return n
+end
+
+local function FormatCoverage(slot)
+	if not coverageSSBO or not slot or slot < 0 then return "—" end
+	-- LuaVBOImpl::Download maps the buffer with GL_MAP_READ_BIT, which by
+	-- spec does NOT flush incoherent shader writes. Without an explicit
+	-- glMemoryBarrier, GS atomicOr writes are invisible to the readback.
+	-- Recoil exposes gl.MemoryBarrier (LuaOpenGL.cpp:2945); barrier flags
+	-- in LuaConstGL.cpp.
+	if gl.MemoryBarrier and GL.SHADER_STORAGE_BARRIER_BIT then
+		gl.MemoryBarrier(GL.SHADER_STORAGE_BARRIER_BIT + GL.BUFFER_UPDATE_BARRIER_BIT)
+	end
+	-- Detach the indexed binding before MapBuffer (mirrors printf pattern).
+	coverageSSBO:UnbindBufferRange(6)
+	local data = coverageSSBO:Download(0, slot, 1, true) or {}
+	local x, y, z, w = ToUint(data[1]), ToUint(data[2]), ToUint(data[3]), ToUint(data[4])
+	-- Convert .x to 24-bit binary string aligned with MAX_SEGMENTS.
+	local bits = {}
+	for i = 23, 0, -1 do
+		bits[#bits + 1] = (math.floor(x / (2 ^ i)) % 2 == 1) and "1" or "0"
+	end
+	return string.format("x=0x%06x  y=0x%x  z=0x%x  w=0x%x  bits=%s",
+		x, y, z, w, table.concat(bits))
+end
+
 local function CableTreeCmd(cmd, line, words, playerID)
 	local arg = (words and words[1]) or ""
 	if arg == "detail" then
@@ -1791,17 +1888,52 @@ local function CableTreeCmd(cmd, line, words, playerID)
 		else
 			Spring.Echo("[CableTree] usage: /cabletree detail off|noflow|full")
 		end
+	elseif arg == "ghosts" then
+		local sub = (words and words[2]) or ""
+		if sub == "on" or sub == "off" then
+			cableGhosts = (sub == "on")
+			Spring.SetConfigInt("OverdriveCableGhosts", cableGhosts and 1 or 0)
+			Spring.Echo("[CableTree] ghosts " .. (cableGhosts and "ON" or "OFF"))
+		elseif sub == "dump" then
+			local slot = tonumber(words and words[3] or "")
+			if slot then
+				Spring.Echo(string.format("[CableTree] coverage[%d] = %s",
+					slot, FormatCoverage(slot)))
+			else
+				Spring.Echo("[CableTree] usage: /cabletree ghosts dump <slot>")
+			end
+		elseif sub == "dumpkey" then
+			local key = words and words[3] or ""
+			local slot = slotByKey[key]
+			if slot then
+				Spring.Echo(string.format("[CableTree] coverage[%s slot=%d] = %s",
+					key, slot, FormatCoverage(slot)))
+			else
+				Spring.Echo("[CableTree] no slot for edgeKey '" .. key .. "'")
+			end
+		else
+			local nSlots = 0
+			for _ in pairs(slotByKey) do nSlots = nSlots + 1 end
+			Spring.Echo(string.format(
+				"[CableTree] ghosts %s; %d slots in use, nextSlot=%d, free=%d",
+				cableGhosts and "ON" or "OFF",
+				nSlots, nextSlot, #freeSlots))
+			Spring.Echo("[CableTree] usage: /cabletree ghosts on|off | dump <slot> | dumpkey <key>")
+		end
 	elseif arg == "perf" then
 		cablePerf = not cablePerf
 		Spring.Echo("[CableTree] perf logging " .. (cablePerf and "ON" or "OFF"))
 	elseif arg == "status" then
 		local nEdges = 0
 		for _ in pairs(edges) do nEdges = nEdges + 1 end
+		local nSlots = 0
+		for _ in pairs(slotByKey) do nSlots = nSlots + 1 end
 		Spring.Echo(string.format(
-			"[CableTree] detail=%s perf=%s edges=%d",
-			DETAIL_NAMES[cableDetail], tostring(cablePerf), nEdges))
+			"[CableTree] detail=%s perf=%s ghosts=%s edges=%d slots=%d",
+			DETAIL_NAMES[cableDetail], tostring(cablePerf),
+			tostring(cableGhosts), nEdges, nSlots))
 	else
-		Spring.Echo("[CableTree] usage: /cabletree detail off|noflow|full | perf | status")
+		Spring.Echo("[CableTree] usage: /cabletree detail off|noflow|full | ghosts | perf | status")
 	end
 	return true
 end
@@ -2011,6 +2143,21 @@ local renderEdges = {}
 local renderEdgesByKey = {}    -- flat lookup: edgeKey -> renderEdge entry
 local needsRebuild = false
 
+-- Orphaned enemy edges that the local viewer has seen at least one segment of
+-- in LOS. The synced gadget broadcasts every ally team's grid to all clients,
+-- but a player shouldn't *learn* that an enemy edge died until they re-scout
+-- the area. We snapshot the geometry the moment synced removes the edge and
+-- render it via a separate VBO using the same shader; the FS gates it by the
+-- per-segment coverage bits the live pass set.
+--
+-- ghostEdges[edgeKey] = { px, pz, cx, cz, capacity, slot, key }
+-- The slot reference keeps the SSBO entry alive (we don't FreeSlot until the
+-- ghost itself retires after a re-scout-clear pass).
+local ghostEdges = {}
+local ghostVAO
+local numGhostVerts = 0
+local ghostNeedsRebuild = false
+
 -- Geometry cache. Topology-stable rebuilds reuse `allPaths` (the noisy paths,
 -- twigs and cluster stems). Per-call, we walk the prov objects (one per
 -- emitNoisyPath invocation) and refresh just the dynamic fields (flow, eff,
@@ -2115,18 +2262,78 @@ local function GenerateOrganicTree()
 		local flow = e.flow or 0
 		local phase = e.bubblePhase or 0
 		local isOwn = e.isOwnAlly and 1 or 0
+		-- Coverage SSBO slot index, or -1 to disable bit updates / lookups
+		-- on the GS side. Stored as float here for VBO layout simplicity;
+		-- VS casts to int for the GS to consume. Negative values fit fine
+		-- through the float<-int round-trip for any reasonable slot count.
+		local slot = e.slot or -1
 
-		-- Vertex 0: parent end (9 floats: pos2 + data3 + grid4)
+		-- Vertex 0: parent end (10 floats: pos2 + data3 + grid4 + slot)
 		verts[k+1] = e.px;          verts[k+2] = e.pz
 		verts[k+3] = cap;           verts[k+4] = appearTime;  verts[k+5] = witherTime
 		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = phase;       verts[k+9] = isOwn
+		verts[k+10] = slot
 		-- Vertex 1: child end (same per-edge payload)
-		verts[k+10] = e.cx;         verts[k+11] = e.cz
-		verts[k+12] = cap;          verts[k+13] = appearTime; verts[k+14] = witherTime
-		verts[k+15] = eff;          verts[k+16] = flow;       verts[k+17] = phase;      verts[k+18] = isOwn
-		k = k + 18
+		verts[k+11] = e.cx;         verts[k+12] = e.cz
+		verts[k+13] = cap;          verts[k+14] = appearTime; verts[k+15] = witherTime
+		verts[k+16] = eff;          verts[k+17] = flow;       verts[k+18] = phase;      verts[k+19] = isOwn
+		verts[k+20] = slot
+		k = k + 20
 	end
 	return verts, n * 2
+end
+
+-- Build verts for the ghost VBO from `ghostEdges`. Same per-vertex layout as
+-- the live pass (10 floats), so the same VS/GS/FS chain handles both. The FS
+-- distinguishes ghosts via gridData.w = -1.0 (sentinel; live edges send 0/1).
+local function GenerateGhostTree()
+	local verts = {}
+	local k = 0
+	local count = 0
+	for _, e in pairs(ghostEdges) do
+		local cap   = max(1, e.capacity or 1)
+		local slot  = e.slot or -1
+		-- Ghost edges have no temporal animation: appear=0, wither=0, no flow,
+		-- no bubble phase. gridData.w = -1.0 tells the FS "always ghost".
+		local apT, wiT  = 0.0, 0.0
+		local eff, flow = 0.0, 0.0
+		local phase     = 0.0
+		local ghostFlag = -1.0
+
+		verts[k+1]  = e.px;  verts[k+2]  = e.pz
+		verts[k+3]  = cap;   verts[k+4]  = apT;       verts[k+5]  = wiT
+		verts[k+6]  = eff;   verts[k+7]  = flow;      verts[k+8]  = phase;     verts[k+9]  = ghostFlag
+		verts[k+10] = slot
+		verts[k+11] = e.cx;  verts[k+12] = e.cz
+		verts[k+13] = cap;   verts[k+14] = apT;       verts[k+15] = wiT
+		verts[k+16] = eff;   verts[k+17] = flow;      verts[k+18] = phase;     verts[k+19] = ghostFlag
+		verts[k+20] = slot
+		k = k + 20
+		count = count + 1
+	end
+	return verts, count * 2
+end
+
+local function RebuildGhostVBO()
+	ghostNeedsRebuild = false
+	local verts, vertCount = GenerateGhostTree()
+	if vertCount == 0 then
+		ghostVAO = nil
+		numGhostVerts = 0
+		return
+	end
+	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
+	if not vbo then return end
+	vbo:Define(vertCount, {
+		{ id = 0, name = "vertPos",   size = 2 },
+		{ id = 1, name = "vertData",  size = 3 },
+		{ id = 2, name = "vertGrid",  size = 4 },
+		{ id = 3, name = "vertSlot",  size = 1 },
+	})
+	vbo:Upload(verts)
+	ghostVAO = gl.GetVAO()
+	if ghostVAO then ghostVAO:AttachVertexBuffer(vbo) end
+	numGhostVerts = vertCount
 end
 
 -- Old generic angle clustering — kept commented as a reference for when we
@@ -2197,11 +2404,40 @@ function OnCableTreeFull(data)
 		incoming[data.keys[i]] = i
 	end
 
-	-- Mark missing edges as withering (or leave them withering if already so).
+	-- Edges that synced no longer reports.
+	-- Own-ally → start withering animation (player knows their grid lost a
+	-- pylon, the visual reflects that).
+	-- Enemy → snapshot into ghostEdges and remove from live immediately. The
+	-- player doesn't know the cable died, so it should keep rendering as a
+	-- ghost at the last-seen segments until they re-scout. Wither animation
+	-- is skipped because that would leak the death event.
 	for k, e in pairs(existing) do
 		if not incoming[k] and not e.witherFrame then
-			e.witherFrame = frame
+			if not e.isOwnAlly then
+				if e.slot and e.slot >= 0 then
+					ghostEdges[k] = {
+						px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
+						capacity = e.capacity or 0,
+						slot = e.slot,
+						key = k,
+					}
+					ghostNeedsRebuild = true
+				end
+				existing[k] = nil
+			else
+				e.witherFrame = frame
+			end
 			geomCache.valid = false   -- topology change → full geometry rebuild
+		end
+	end
+
+	-- If a fresh edge resurrects an old ghost (enemy rebuilt the same pylon
+	-- pair), drop the ghost — live takes over. The slot stays bound to the
+	-- live edge via slotByKey; bits accumulated under the ghost get inherited.
+	for k in pairs(incoming) do
+		if ghostEdges[k] then
+			ghostEdges[k] = nil
+			ghostNeedsRebuild = true
 		end
 	end
 
@@ -2230,7 +2466,16 @@ function OnCableTreeFull(data)
 			-- positions are stable for unchanged edges; assign anyway in case parent moved
 			e.px, e.pz = data.pxs[i], data.pzs[i]
 			e.cx, e.cz = data.cxs[i], data.czs[i]
+			-- Late-bind a coverage slot if missing (e.g., gadget was reloaded
+			-- after the SSBO was added but with pre-existing edges).
+			if not e.slot then e.slot = AllocSlot(k) or -1 end
 		else
+			-- Fresh edge: allocate a coverage SSBO slot. Slot is keyed by the
+			-- unitID-pair (k = "minUid:maxUid") so reroutes across the same
+			-- pylons stay in the same slot. Slot returns nil if the pool is
+			-- exhausted (4096 simultaneous tracked edges); we still create
+			-- the edge but with slot = -1 (GS treats as "don't update bits").
+			local slot = AllocSlot(k) or -1
 			existing[k] = {
 				px = data.pxs[i], pz = data.pzs[i],
 				cx = data.cxs[i], cz = data.czs[i],
@@ -2241,6 +2486,7 @@ function OnCableTreeFull(data)
 				appearFrame = frame,
 				witherFrame = nil,
 				key      = k,
+				slot     = slot,
 				-- Fresh edge starts with zero phase; speed is set so the
 				-- shader can extrapolate forward from this anchor.
 				bubblePhase      = 0,
@@ -2296,13 +2542,14 @@ local function RebuildVBO()
 	cableVAO = nil
 	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	if not vbo then return end
-	-- Per-vertex layout (9 floats): vertPos(2) + vertData(3) + vertGrid(4).
-	-- Two vertices per cable form one GL_LINES primitive; the geometry shader
-	-- expands each line into a wiggly ribbon at draw time.
+	-- Per-vertex layout (10 floats): vertPos(2) + vertData(3) + vertGrid(4)
+	-- + vertSlot(1). Two vertices per cable form one GL_LINES primitive; the
+	-- geometry shader expands each line into a wiggly ribbon at draw time.
 	vbo:Define(vertCount, {
 		{ id = 0, name = "vertPos",   size = 2 },
 		{ id = 1, name = "vertData",  size = 3 },  -- (capacity, appearTime, witherTime)
 		{ id = 2, name = "vertGrid",  size = 4 },  -- (efficiency, flow E/s, bubble phase elmos, isOwnAlly)
+		{ id = 3, name = "vertSlot",  size = 1 },  -- coverage SSBO slot, or -1
 	})
 	local tUp0 = cablePerf and Spring.GetTimer() or nil
 	vbo:Upload(verts)
@@ -2362,6 +2609,12 @@ function gadget:GameFrame(n)
 	if needsRebuild then
 		RebuildVBO()
 	end
+
+	-- 4) Ghost VBO follows the orphaned-enemy table. Rebuilds are rare —
+	--    only when an enemy edge dies (snapshot in) or resurrects (drop).
+	if ghostNeedsRebuild then
+		RebuildGhostVBO()
+	end
 end
 
 function gadget:DrawWorldPreUnit()
@@ -2380,6 +2633,16 @@ function gadget:DrawWorldPreUnit()
 	cableShader:SetUniform("bakeTime", bubbleBakeTime)
 	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
 
+	-- Bind the per-edge coverage SSBO at binding=6 for GS atomicOr writes
+	-- and (slice 3) ghost-pass reads. Always bound when shader is active so
+	-- we don't have to manage a separate ghost program.
+	if coverageSSBO then
+		local b = coverageSSBO:BindBufferRange(6)
+		if cablePerf and Spring.GetGameFrame() % 30 == 0 then
+			Spring.Echo("[CableTree] SSBO BindBufferRange(6) -> " .. tostring(b))
+		end
+	end
+
 	-- $info:los is the actual game-logic LOS texture (single-channel red), NOT
 	-- the user's visual LOS-overlay (which is what plain $info samples and which
 	-- becomes a height-map view when the overlay is toggled off — defeating any
@@ -2397,6 +2660,20 @@ function gadget:DrawWorldPreUnit()
 	-- GL_LINES: every 2 verts form one cable; the geometry shader expands
 	-- them into a triangle_strip ribbon.
 	cableVAO:DrawArrays(GL.LINES, numCableVerts)
+
+	-- Ghost pass: orphaned enemy edges. Same shader, same SSBO; the FS uses
+	-- gridData.w=-1.0 sentinel to force the ghost branch regardless of LOS.
+	if ghostVAO and numGhostVerts > 0 then
+		ghostVAO:DrawArrays(GL.LINES, numGhostVerts)
+	end
+
+	-- Make GS atomicOr writes visible to subsequent SSBO consumers (slice 3
+	-- ghost pass) and to CPU-side Download. Without this barrier the writes
+	-- live in the shader-store cache and never become coherent with later
+	-- map/read operations on the same buffer.
+	if gl.MemoryBarrier and GL.SHADER_STORAGE_BARRIER_BIT then
+		gl.MemoryBarrier(GL.SHADER_STORAGE_BARRIER_BIT + GL.BUFFER_UPDATE_BARRIER_BIT)
+	end
 
 	cableShader:Deactivate()
 	gl.Texture(0, false)
@@ -2442,6 +2719,27 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget()
 		return
 	end
+
+	-- Per-edge coverage SSBO. Spring's VBO API requires vec4-aligned attribs,
+	-- so each slot is one 4-float row; we only use .x (the coverage uint).
+	-- Bit `i` of slot[s].x = "segment i of the cable in slot s has been in LOS
+	-- at least once". Persistent across frames; initial values zero.
+	-- gl.GetVBO(target, freqUpdated_bool). freqUpdated=true → GL_DYNAMIC_DRAW
+	-- on the underlying buffer, suitable for shader writes. Defaulting to
+	-- false marks it static, which on some drivers traps shader stores.
+	coverageSSBO = gl.GetVBO(GL.SHADER_STORAGE_BUFFER, true)
+	if coverageSSBO then
+		coverageSSBO:Define(COVERAGE_MAX_SLOTS, {
+			{ id = 0, name = "coverageData", size = 4 },
+		})
+		local zeros = {}
+		for i = 1, 4 * COVERAGE_MAX_SLOTS do zeros[i] = 0 end
+		coverageSSBO:Upload(zeros)
+	else
+		Spring.Echo("[CableTree] SSBO unsupported; ghosting disabled")
+		cableGhosts = false
+	end
+
 	-- Topology side: register chat command + scan existing pylons.
 	InitTopology()
 end

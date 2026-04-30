@@ -1,7 +1,8 @@
-#version 330
+#version 430
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 #extension GL_ARB_gpu_shader5 : require
+#extension GL_ARB_shader_storage_buffer_object : require
 
 // Full GS: takes one GL_LINES primitive (cable endpoints) and emits the cable
 // ribbon. Uses GS invocations: each invocation runs main() with its own
@@ -18,12 +19,29 @@ layout (triangle_strip, max_vertices = 50) out;
 
 uniform sampler2D heightmapTex;
 
+// Per-edge "have I been seen" bitmask. Bit `i` of `.x` is set when segment
+// `i` of this cable is currently in LOS. Persistent across frames; never
+// cleared in slice 1 (slice 3 will clear bits during the ghost pass when
+// the player's LOS confirms the area is empty).
+//
+// Slots are declared as uvec4 because Spring's VBO API requires vec4-aligned
+// attributes; we only use `.x` and ignore `.yzw`.
+layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
+	uvec4 cableCoverage[];
+};
+
 in DataVS {
 	vec2 vsWorldXZ;
 	vec3 vsCableData;
 	vec4 vsGridData;
+	flat int vsSlot;
 } dataIn[];
 
+// Block must match `in DataGS` in gfx_overdrive_cables.frag.glsl exactly.
+// gsLenPerSeg packed at the head of `cableUV` to avoid an extra varying:
+// .x = along-elmos (existing), .y = cross [-1,1] (existing).
+// Instead, pack lenPerSeg + slot into spawnAlongMain.zw — but that's vec2.
+// Simpler: keep it as one float and check max-comp budget.
 out DataGS {
 	vec3 worldPos;
 	float capacity;
@@ -32,7 +50,9 @@ out DataGS {
 	vec2 cableUV;
 	vec2 timeData;
 	vec4 gridData;
-	float spawnAlongMain;  // twig-only: global cableUV.x of the twig's root; 0 for main ribbon. Lets the FS compute twig-local along for sub-wave animation.
+	float spawnAlongMain;
+	flat int gsSlot;
+	flat int gsNumSeg;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -100,6 +120,9 @@ const float SIDE_CLEAR        = 0.8;
 
 float gOutBranch = 0.0;
 float gOutSpawnAlong = 0.0;  // set by emitTwig per-twig; main ribbon leaves at 0.
+int   gOutSlot       = -1;   // SSBO slot for this cable; carried into every emitVtx.
+int   gOutNumSeg     = 0;    // segment count for this cable.
+float gOutLenPerSeg  = 0.0;  // along-elmos per segment; FS divides cableUV.x by this to get segIdx.
 
 void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
              float w, vec4 grid, vec2 td, float cap) {
@@ -111,6 +134,8 @@ void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
 	timeData = td;
 	gridData = grid;
 	spawnAlongMain = gOutSpawnAlong;
+	gsSlot = gOutSlot;
+	gsNumSeg = gOutNumSeg;
 	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
 	gl_Position = cameraViewProj * vec4(wp, 1.0);
 	EmitVertex();
@@ -450,6 +475,14 @@ void main() {
 	// One global pull direction per cable: averaged dh across 5 chord anchors.
 	// Per-segment probing was the source of zigzag — see cableArcDh comment.
 	float arcDh = cableArcDh(a, d, perpAB, lenAB);
+
+	gOutSlot       = dataIn[0].vsSlot;
+	gOutNumSeg     = numSeg;
+	// Approximate the cable's total along-distance with len3D (the GS later
+	// recomputes it precisely as a sum of segment distances; for FS bit
+	// indexing the chord-based len3D is close enough — both ends of the
+	// segment fall in the same bit at LOS-tile resolution).
+	gOutLenPerSeg  = (numSeg > 0) ? (len3D / float(numSeg)) : 1.0;
 
 	if (gl_InvocationID == 0) {
 		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);

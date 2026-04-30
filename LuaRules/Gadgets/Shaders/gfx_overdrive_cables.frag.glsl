@@ -1,11 +1,17 @@
-#version 420
+#version 430
 #extension GL_ARB_uniform_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
+#extension GL_ARB_shader_storage_buffer_object : require
 
 uniform sampler2D infoTex;
 uniform float gameTime;
 uniform float bakeTime;
 uniform float enableFlow;   // 1.0 = full bubble pass; 0.0 = static cables (no animation)
+
+// Same SSBO as the GS — slot 0 is the FS-write probe target (debug only).
+layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
+	uvec4 cableCoverage[];
+};
 
 in DataGS {
 	vec3 worldPos;
@@ -16,6 +22,8 @@ in DataGS {
 	vec2 timeData;
 	vec4 gridData;
 	float spawnAlongMain;
+	flat int gsSlot;
+	flat int gsNumSeg;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -209,6 +217,12 @@ vec3 gridEfficiencyColor(float eff) {
 	return hueToRgb(h / 255.0);
 }
 
+// Ghost shading constants — flat memory render for unscouted enemy fragments
+// that fall inside the seen-segment range.
+const vec3  GHOST_BASE_LO      = vec3(0.30);   // capT = 0
+const vec3  GHOST_BASE_HI      = vec3(0.55);   // capT = 1
+const float GHOST_BRANCH_DAMP  = 0.65;
+
 void main() {
 	float v = cableUV.y;
 	float t = abs(v);
@@ -295,12 +309,50 @@ void main() {
 	float losState = texture(infoTex, losUV).r;
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
-	// Enemy cables outside LOS: hide entirely (proper ghosting will be added
-	// later as a separate pass with last-seen geometry; the live pass should
-	// only show what's actually visible right now). Own ally always renders
-	// — fades via dimFactor for fog, but stays on screen.
+	// Per-fragment segment index. Without a baked len-per-segment we use a
+	// single bit (bit 0) for the whole cable in slice 1; per-segment
+	// resolution comes when we wire len-per-segment via a uniform/varying.
+	uint segBit = 1u;
+
+	// FS-side coverage update: any fragment that's actually rasterised AND
+	// currently in LOS marks its cable as seen.
+	if (losState >= ENEMY_LOS_CUT && gsSlot >= 0) {
+		atomicOr(cableCoverage[gsSlot].x, segBit);
+	}
+
+	// Three render classes for the FS:
+	//   isOwnAlly =  1.0 → own ally, always live (existing path below).
+	//   isOwnAlly =  0.0 → live enemy edge: render live in LOS, ghost in fog
+	//                       (gated by segment bit), discard if never seen.
+	//   isOwnAlly = -1.0 → orphaned ghost (synced removed it; we kept a
+	//                       snapshot). Always render ghost gated by segment
+	//                       bit; never live, regardless of LOS. This is the
+	//                       "you don't know it died" persistence.
 	float isOwnAlly = gridData.w;
-	if (isOwnAlly < 0.5 && losState < ENEMY_LOS_CUT) discard;
+	bool isGhostEdge = isOwnAlly < -0.5;
+
+	// Re-scout clear: when a ghost fragment ends up in LOS the player has
+	// confirmed the area is empty (the live edge is gone). atomicAnd off
+	// this segment's bit and discard so it stops rendering. Per-fragment
+	// granularity, so partial scouts thin the ghost progressively. Only
+	// the ghost VBO does this — live edges set bits via atomicOr below
+	// and never want to clear them.
+	if (isGhostEdge && losState >= ENEMY_LOS_CUT && gsSlot >= 0) {
+		atomicAnd(cableCoverage[gsSlot].x, ~segBit);
+		discard;
+	}
+
+	bool enemyOutOfLOS = (isOwnAlly < 0.5 && isOwnAlly > -0.5 && losState < ENEMY_LOS_CUT);
+	if (isGhostEdge || enemyOutOfLOS) {
+		uint cov = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
+		if ((cov & segBit) == 0u) discard;
+		float capT2 = clamp(capacity / 100.0, 0.0, 1.0);
+		vec3 ghost = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT2);
+		if (isBranch > 0.5) ghost *= GHOST_BRANCH_DAMP;
+		float edgeFade = 1.0 - smoothstep(0.55, 0.90, t);
+		fragColor = vec4(ghost * edgeFade, 1.0);
+		return;
+	}
 
 	// Apply lighting
 	vec3 color = baseColor * diffuse + SPEC_TINT * spec;

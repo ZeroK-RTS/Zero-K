@@ -27,6 +27,7 @@ function widget:GetInfo()
 end
 
 local DETAIL_KEY = "OverdriveCableDetail"
+local GHOSTS_KEY = "OverdriveCableGhosts"
 local KEY_BY_LEVEL = { [0] = 'off', [1] = 'noflow', [2] = 'full' }
 local LEVEL_BY_KEY = { off = 0, noflow = 1, full = 2 }
 
@@ -35,8 +36,12 @@ local function readCurrentDetailKey()
 	return KEY_BY_LEVEL[v] or 'full'
 end
 
+local function readCurrentGhosts()
+	return (Spring.GetConfigInt(GHOSTS_KEY, 1) or 1) ~= 0
+end
+
 options_path = 'Settings/Graphics/Overdrive Cables'
-options_order = { 'cabletree_detail' }
+options_order = { 'cabletree_detail', 'cabletree_ghosts' }
 
 options = {
 	cabletree_detail = {
@@ -54,6 +59,16 @@ options = {
 		end,
 		noHotkey = true,
 	},
+	cabletree_ghosts = {
+		name  = 'Show cable ghosts in fog',
+		desc  = 'When on, segments of enemy cables you have scouted at least once stay visible as a flat ghost when they drop out of LOS, until you re-scout the area and confirm it is empty.',
+		type  = 'bool',
+		value = true,
+		OnChange = function(self)
+			Spring.SendCommands("luarules cabletree ghosts " .. (self.value and "on" or "off"))
+		end,
+		noHotkey = true,
+	},
 }
 
 function widget:Initialize()
@@ -62,9 +77,11 @@ function widget:Initialize()
 	-- whatever it's running at right now is the authoritative value. Push
 	-- it back into the option so the menu reflects truth.
 	options.cabletree_detail.value = readCurrentDetailKey()
+	options.cabletree_ghosts.value = readCurrentGhosts()
 	-- And ensure the gadget agrees with whatever was saved (idempotent —
-	-- the gadget's SetDetailLevel returns early if level is unchanged).
+	-- the gadget's setters return early if state is unchanged).
 	Spring.SendCommands("luarules cabletree detail " .. options.cabletree_detail.value)
+	Spring.SendCommands("luarules cabletree ghosts " .. (options.cabletree_ghosts.value and "on" or "off"))
 end
 
 -- Persistence: the gadget owns the truth via Spring.GetConfigInt. We let the
@@ -72,11 +89,17 @@ end
 -- of the value so the radio button shows correctly the moment the menu opens
 -- — but on Initialize we override it with the gadget's actual value.
 function widget:GetConfigData()
-	return { value = options.cabletree_detail.value }
+	return {
+		value  = options.cabletree_detail.value,
+		ghosts = options.cabletree_ghosts.value,
+	}
 end
 
 function widget:SetConfigData(data)
 	if data and data.value and LEVEL_BY_KEY[data.value] then
 		options.cabletree_detail.value = data.value
+	end
+	if data and type(data.ghosts) == "boolean" then
+		options.cabletree_ghosts.value = data.ghosts
 	end
 end
