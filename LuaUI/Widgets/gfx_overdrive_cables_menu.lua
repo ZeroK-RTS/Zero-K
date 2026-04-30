@@ -35,7 +35,7 @@ local function readCurrentDetailKey()
 	return KEY_BY_LEVEL[v] or 'full'
 end
 
-options_path = 'Settings/Graphics/Game Graphics'
+options_path = 'Settings/Graphics/Overdrive Cables'
 options_order = { 'cabletree_detail' }
 
 options = {
