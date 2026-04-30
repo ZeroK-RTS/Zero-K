@@ -18,16 +18,26 @@ function gadget:GetInfo()
 	}
 end
 
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
+-- Pure-visualization gadget: nothing here affects simulation, so we skip the
+-- synced sandbox entirely. Unsynced gadgets still receive UnitCreated /
+-- UnitDestroyed / UnitGiven for ALL units regardless of LOS (unlike widgets),
+-- which is what we need to keep ghost cables alive after enemy pylons leave
+-- LOS. Since each client's unsynced sandbox sees the same engine state and
+-- runs the same code, every client independently reaches the same topology
+-- without any synced→unsynced channel.
+if gadgetHandler:IsSyncedCode() then return false end
 
-if gadgetHandler:IsSyncedCode() then
+-- Forward declaration: SendAll (topology side, defined below) hands its
+-- per-ally snapshot directly to OnCableTreeFull (rendering side, defined
+-- much further down). Both are file-scope locals; the body assignment for
+-- OnCableTreeFull happens in the rendering section.
+local OnCableTreeFull
 
 -------------------------------------------------------------------------------------
--- SYNCED
+-- Topology + flow computation (was previously the synced half).
 -- Reads gridNumber from unit_mex_overdrive as source of truth.
--- Periodically computes desired spanning tree edges per grid and sends
--- Full or Delta updates to unsynced. Visual progress is unsynced-only.
+-- Periodically computes desired spanning tree edges per grid; OnCableTreeFull
+-- below consumes the result directly (no sandbox crossover).
 -------------------------------------------------------------------------------------
 
 local spGetUnitPosition   = Spring.GetUnitPosition
@@ -167,6 +177,142 @@ local pendingGridDirty = {}         -- [gridKey] = { ally, gridID }
 -- table per node per tick).
 local nodeDefByUID = {}             -- [unitID] = unitDefID
 
+-- Per-unit static cache: minWind (set once by unit_windmill_control at unit
+-- creation, never changes thereafter). Without this, BuildMpCache re-reads
+-- Spring.GetUnitRulesParam("minWind") for every windmill on every topology
+-- change — at 3500 windmills that's ~3.5ms of cross-boundary calls, fired on
+-- every cascade tick during destruction events. Cache on first read; drop
+-- on UnitDestroyed (handled where nodeDefByUID is cleared).
+local minWindByUID = {}             -- [unitID] = cached minWind value (E/s)
+local function GetCachedMinWind(uid)
+	local v = minWindByUID[uid]
+	if v ~= nil then return v end
+	v = spGetUnitRulesParam(uid, "minWind") or 0
+	minWindByUID[uid] = v
+	return v
+end
+
+-- Index of pylon-eligible CONSUMER units only (mexes, voltage units, builders).
+-- Maintained on UnitCreated / SyncWithGrid death-sweep / UnitGiven so SendAll
+-- can do a cheap O(consumers) pre-check (~50 reads at 4000 nodes) instead of
+-- always running the O(N) ComputeMaxPotentials. Generators (windmills/solar/
+-- fusion) never appear here; only nodes whose defs publish a non-zero draw.
+local consumerNodeIndex = {}        -- [unitID] = unitDefID
+local lastConsumerDcur  = {}        -- [unitID] = last-seen Dcurrent reading
+local lastWindFrac      = -1        -- last-tick windFrac for change detection
+
+-- Spatial-hash and candidate-cap constants. Declared early so the pylon-
+-- neighbour helpers below capture them as upvalues. Re-referenced (without
+-- redeclaration) by BuildGridMSTFromScratch and the incremental MST ops.
+local SPATIAL_CELL       = 2000   -- cell size; 3x3 covers ~4000-elmo pairs
+local MST_CANDIDATE_R    = 4000   -- hard cap on candidate-pair distance
+local MST_CANDIDATE_R_SQ = MST_CANDIDATE_R * MST_CANDIDATE_R
+local MST_EUCLIDEAN_MODE = MST_MODE == "euclidean"
+
+-- Global precomputed neighbour index. The MST candidate-set for any pylon is
+-- a function ONLY of (positions, ranges) of nearby same-ally pylons — all
+-- static once a pylon exists. So we compute it once on UnitCreated and reuse
+-- on every MST build/update.
+--
+-- Without this, BuildGridMSTFromScratch was rebuilding neighbour lists from
+-- the spatial hash on every call: 3×3 cells × cellsize candidates × N pylons.
+-- In dense scenes (4000 windmills @ 110 elmo spacing → ~325 pylons per
+-- 2000-elmo cell → 3000 candidates per pylon) that's 12M iterations per
+-- rebuild — the dominant cost. With cached neighbours, MST builders just
+-- iterate `pylonNeighbours[uid]` (typical degree 20-50) and filter by grid
+-- membership.
+--
+-- Bidirectional: pylonNeighbours[a][b] and pylonNeighbours[b][a] are both
+-- set, both with the same distSq. Same-ally only.
+local pylonNeighbours = {}          -- [uid] = { [otherUid] = distSq }
+
+-- Per-ally spatial hash maintained alongside `nodes`. Used to find neighbour
+-- candidates when a pylon is created — ONE 3×3-cell scan against the live
+-- ally hash, then bidirectional add. Subsequent MST work consumes
+-- pylonNeighbours directly without ever touching the hash.
+local pylonSpatialHash = {}         -- [allyID] = { [cellKey] = { uid1, ... } }
+
+local function PylonCellKey(x, z)
+	return floor(x / SPATIAL_CELL) * 100000 + floor(z / SPATIAL_CELL)
+end
+
+local function PylonAddSpatial(allyID, uid, x, z)
+	local hash = pylonSpatialHash[allyID]
+	if not hash then hash = {}; pylonSpatialHash[allyID] = hash end
+	local ck = PylonCellKey(x, z)
+	local cell = hash[ck]
+	if not cell then cell = {}; hash[ck] = cell end
+	cell[#cell + 1] = uid
+end
+
+local function PylonRemoveSpatial(allyID, uid, x, z)
+	local hash = pylonSpatialHash[allyID]
+	if not hash then return end
+	local cell = hash[PylonCellKey(x, z)]
+	if not cell then return end
+	for i = 1, #cell do
+		if cell[i] == uid then
+			cell[i] = cell[#cell]
+			cell[#cell] = nil
+			return
+		end
+	end
+end
+
+-- Walk the 3×3 spatial-hash neighbourhood of `uid`'s ally; for every other
+-- pylon within candidate cap, write a bidirectional pylonNeighbours entry.
+local function PylonBuildNeighbours(allyID, uid)
+	local allyNodes = nodes[allyID]
+	if not allyNodes then return end
+	local node = allyNodes[uid]
+	if not node then return end
+	local hash = pylonSpatialHash[allyID]
+	if not hash then return end
+	local nb = pylonNeighbours[uid]
+	if not nb then nb = {}; pylonNeighbours[uid] = nb end
+	local px, pz, pr = node.x, node.z, node.range
+	local cx = floor(px / SPATIAL_CELL)
+	local cz = floor(pz / SPATIAL_CELL)
+	local euclidean = MST_EUCLIDEAN_MODE
+	local rSq = MST_CANDIDATE_R_SQ
+	for dcx = -1, 1 do
+		for dcz = -1, 1 do
+			local cell = hash[(cx + dcx) * 100000 + (cz + dcz)]
+			if cell then
+				for ci = 1, #cell do
+					local j = cell[ci]
+					if j ~= uid then
+						local jnode = allyNodes[j]
+						if jnode then
+							local dx = px - jnode.x
+							local dz = pz - jnode.z
+							local distSq = dx * dx + dz * dz
+							local cap = euclidean and rSq
+								or ((pr + jnode.range) * (pr + jnode.range))
+							if distSq < cap then
+								nb[j] = distSq
+								local other = pylonNeighbours[j]
+								if not other then other = {}; pylonNeighbours[j] = other end
+								other[uid] = distSq
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+local function PylonClearNeighbours(uid)
+	local nb = pylonNeighbours[uid]
+	if not nb then return end
+	for n in pairs(nb) do
+		local other = pylonNeighbours[n]
+		if other then other[uid] = nil end
+	end
+	pylonNeighbours[uid] = nil
+end
+
 -- mpCache: topology-stable cache used by ComputeMaxPotentials. Adjacency,
 -- DFS visit order, parentInTree, per-component root, and *static* per-subtree
 -- aggregates (Pmax, Dmax, plus wind-decomposed terms) are computed once per
@@ -184,14 +330,61 @@ do
 	end
 end
 
+-- Detail level — three states, persisted under OverdriveCableDetail:
+--   0 = off    (no cables drawn at all; clears geometry)
+--   1 = noflow (static lines; skips per-tick flow reads + FS bubble pass)
+--   2 = full   (default: animated bubbles, per-tick flow updates)
+-- The two derived flags (cableEnabled / cableFlowMode) drive existing code
+-- paths unchanged; only the chat command + widget settings menu speak in
+-- terms of the unified detail level.
+local DETAIL_OFF, DETAIL_NOFLOW, DETAIL_FULL = 0, 1, 2
+
+local function readDetailFromConfig()
+	local v = Spring.GetConfigInt("OverdriveCableDetail", DETAIL_FULL) or DETAIL_FULL
+	if v < DETAIL_OFF or v > DETAIL_FULL then v = DETAIL_FULL end
+	return v
+end
+local cableDetail = readDetailFromConfig()
+
 -- Runtime toggles, driven by the /cabletree chat command (see CableTreeCmd).
--- cableFlowMode = full bubble animation + per-tick consumer draw reads.
--- cableFlowMode = false: static cables, no per-tick reads, no bubbles.
--- Persistence happens on the unsynced side (Spring.GetConfigInt is
--- unsynced-only); unsynced bootstraps synced via a Lua rules msg on init.
-local cableEnabled  = true
+local cableEnabled  = cableDetail ~= DETAIL_OFF
 local cablePerf     = false
-local cableFlowMode = true
+local cableFlowMode = cableDetail == DETAIL_FULL
+
+-- Per-tick perf stats. Filled by SyncWithGrid / ComputeMaxPotentials /
+-- SendAll only when cablePerf is on; RunSyncTick reads them and emits one
+-- summary line per tick. Module-scope for zero-cost write paths when perf
+-- is off (the writers gate on cablePerf themselves).
+local perfStats = {
+	dropMs = 0, refreshMs = 0, mstMs = 0, mstRebuilds = 0, mstIncrements = 0,
+	composeMs = 0, diffMs = 0,
+	mpBuildMs = 0, mpComputeMs = 0,
+	binMs = 0, dispatchMs = 0,
+	skipped = 0,
+	-- Slowest single MST rebuild this tick: ms, member count, and a
+	-- breakdown of what the heap-Prim spent its time on.
+	worstRebuildMs = 0, worstRebuildN = 0,
+	worstRebuildHashMs = 0, worstRebuildNeighMs = 0, worstRebuildPrimMs = 0,
+	-- Slowest single incremental this tick: ms, members removed/added.
+	worstIncrMs = 0, worstIncrRem = 0, worstIncrAdd = 0,
+}
+
+-- Last-sent snapshot of per-edge (flow, eff) so SendAll can short-circuit
+-- when nothing meaningfully changed. Quiet ticks (settled grid, no draw
+-- spikes) become near-zero on the topology side.
+local lastSentFlow = {}   -- [edgeKey] = flow (E/s)
+local lastSentEff  = {}   -- [edgeKey] = grid efficiency
+-- A send is forced if max relative flow change exceeds this OR any eff
+-- changed by more than EFF_EPSILON. The thresholds are loose because
+-- visual-flow only needs ballpark accuracy: bubble speed ∝ sqrt(flow), so
+-- a 10% flow change is ~5% bubble-speed change — well below perception.
+local FLOW_REL_EPSILON = 0.10
+local FLOW_ABS_EPSILON = 0.5    -- E/s, for tiny flows where relative is noisy
+local EFF_EPSILON      = 0.02
+-- Force a refresh at least this often even when stable, so any drift in
+-- the FS phase extrapolation doesn't accumulate without bound.
+local FORCE_SEND_TICKS = 5      -- ~5 seconds at SYNC_PERIOD=30 / 30fps
+local ticksSinceSend   = 0
 
 -------------------------------------------------------------------------------------
 -- Helpers
@@ -206,12 +399,40 @@ local function GridKey(allyTeamID, gridID)
 	return allyTeamID .. ":" .. gridID
 end
 
-local function MarkGridDirty(ally, gridID)
-	if not gridID or gridID <= 0 or not ally then return end
+-- Track per-tick membership changes per grid. SyncWithGrid then applies them
+-- incrementally on top of the cached MST instead of rebuilding the whole grid
+-- from scratch — Prim's full rebuild on a 4000-node grid is ~800ms; the
+-- incremental path stays in the local-neighborhood of the affected nodes.
+--
+-- pendingGridDirty[gk] = { ally, gridID, adds = { uid1, uid2, ... }, removes = { uid1, ... } }
+-- The same uid never appears in both adds and removes for the same grid in
+-- a single tick (membership flip is observed once in step 2 of SyncWithGrid).
+local function GetPendingEntry(ally, gridID)
+	if not gridID or gridID <= 0 or not ally then return nil end
 	local gk = GridKey(ally, gridID)
-	if not pendingGridDirty[gk] then
-		pendingGridDirty[gk] = { ally = ally, gridID = gridID }
+	local entry = pendingGridDirty[gk]
+	if not entry then
+		entry = { ally = ally, gridID = gridID, adds = {}, removes = {} }
+		pendingGridDirty[gk] = entry
 	end
+	return entry
+end
+
+local function MarkGridAdd(ally, gridID, uid)
+	local entry = GetPendingEntry(ally, gridID)
+	if entry then entry.adds[#entry.adds + 1] = uid end
+end
+
+local function MarkGridRemove(ally, gridID, uid)
+	local entry = GetPendingEntry(ally, gridID)
+	if entry then entry.removes[#entry.removes + 1] = uid end
+end
+
+-- Backward-compat for callers (UnitGiven) that just want to flag a grid as
+-- needing reconsideration without naming a specific unit (e.g. when a whole
+-- pylon's affiliation changes).
+local function MarkGridDirty(ally, gridID)
+	GetPendingEntry(ally, gridID)
 end
 
 -- Stable nameplate production: solar/fusion/sing fixed; windgen = current WindMax.
@@ -254,144 +475,500 @@ local function GetNodeDcurrent(unitID, unitDefID)
 end
 
 -------------------------------------------------------------------------------------
--- Per-grid Euclidean MST — Prim's where every pair within visual reach is a
--- candidate (no per-pylon range filter). Grid membership is whatever
--- unit_mex_overdrive decides; once "these N pylons are one grid", we lay the
--- shortest-total-cable spanning tree over them. This produces co-linear chains
--- and avoids hub-fan artifacts a long-range pylon would otherwise create.
--- The spatial hash still gates candidate pairs to a generous radius so very
--- large grids stay sub-quadratic; cell size is set large enough that any
--- realistic MST edge falls within a 3x3 cell neighbourhood.
+-- Per-grid MST. The MST cache is *incremental*: when a single pylon joins/
+-- leaves a grid we patch the local neighbourhood instead of rebuilding the
+-- whole tree (Prim's full rebuild on a 4000-node grid is ~800ms; an
+-- incremental remove-and-reconnect of one node is ~ms).
+--
+-- Algorithm:
+--  - Add: cheapest cross-edge from new node to current tree (Prim cut prop).
+--  - Remove: cut all incident tree edges, identify the resulting components,
+--            Borůvka-merge them back via cheapest cross-edges (using the
+--            spatial hash so each merge is local-neighborhood-bounded).
+--  - From scratch (new grid): Prim's expanding from the highest-production
+--    seed; same code path as a "single batch add" into an empty MST.
+--
+-- Spatial hashing gates candidate pairs to a generous radius so even huge
+-- grids stay sub-quadratic; cell size is set so any realistic MST edge
+-- falls within a 3x3 cell neighbourhood.
+--
+-- mstByGrid[gk] = { ally, gridID, members = {[uid]=true}, edges = {[ek]=einfo}, adj = {[uid]={[neighbor]=true}} }
+-- `adj` is the persistent undirected adjacency derived from `edges`, kept up
+-- to date by MstAddEdge / MstRemoveEdge so incremental ops don't have to
+-- rebuild it per call.
 -------------------------------------------------------------------------------------
 
-local SPATIAL_CELL    = 2000  -- cell size; 3x3 neighbourhood covers ~4000 elmo pairs
-local MST_CANDIDATE_R = 4000  -- hard cap on candidate-pair distance (squared below)
+-- (SPATIAL_CELL / MST_CANDIDATE_R_SQ / MST_EUCLIDEAN_MODE are declared near
+-- the top of the file so the pylon-neighbour helpers can see them as upvalues.)
 
-local function BuildGridMST(allyTeamID, gridID)
-	local pylons = {}
-	-- lastGridNum is the authoritative effective-grid map maintained by
-	-- SyncWithGrid (already accounts for active/inactive state).
-	for unitID, node in pairs(nodes[allyTeamID]) do
-		if lastGridNum[unitID] == gridID then
-			pylons[#pylons + 1] = {
-				unitID = unitID, x = node.x, z = node.z,
-				range = node.range, unitDefID = node.unitDefID,
-			}
-		end
-	end
-
-	local result = {}
-	if #pylons < 2 then return result end
-
-	-- Spatial hash bucket pylons by cell.
+-- Build a spatial hash over EVERY pylon in an ally team (not just the ones
+-- in a particular grid). Reused across all dirty grids of that ally inside
+-- a single SyncWithGrid call. cells[ck] = {uid, ...}, allyNodes[uid] = node.
+local function BuildAllySpatialHash(allyTeamID)
 	local cells = {}
-	for i = 1, #pylons do
-		local p = pylons[i]
-		local cx = floor(p.x / SPATIAL_CELL)
-		local cz = floor(p.z / SPATIAL_CELL)
+	local allyNodes = nodes[allyTeamID]
+	if not allyNodes then return cells, nil end
+	for uid, node in pairs(allyNodes) do
+		local cx = floor(node.x / SPATIAL_CELL)
+		local cz = floor(node.z / SPATIAL_CELL)
 		local ck = cx * 100000 + cz
-		if not cells[ck] then cells[ck] = {} end
-		cells[ck][#cells[ck] + 1] = i
+		local cell = cells[ck]
+		if not cell then cell = {}; cells[ck] = cell end
+		cell[#cell + 1] = uid
 	end
+	return cells, allyNodes
+end
 
-	-- Neighbour list. In "euclidean" mode every pair within MST_CANDIDATE_R is
-	-- a candidate (clean visual MST). In "realistic" mode we keep the engine's
-	-- pylon-range filter (cables only where pylons can actually reach each
-	-- other) — faithful to physical wiring.
-	local rSq = MST_CANDIDATE_R * MST_CANDIDATE_R
-	local euclidean = MST_MODE == "euclidean"
-	local neighbors = {}
-	for i = 1, #pylons do
-		neighbors[i] = {}
-		local p = pylons[i]
-		local cx = floor(p.x / SPATIAL_CELL)
-		local cz = floor(p.z / SPATIAL_CELL)
-		for dcx = -1, 1 do
-			for dcz = -1, 1 do
-				local ck = (cx + dcx) * 100000 + (cz + dcz)
-				local cell = cells[ck]
-				if cell then
-					for ci = 1, #cell do
-						local j = cell[ci]
-						if j ~= i then
-							local o = pylons[j]
-							local dx = p.x - o.x
-							local dz = p.z - o.z
-							local distSq = dx * dx + dz * dz
-							local cap = euclidean and rSq
-								or ((p.range + o.range) * (p.range + o.range))
-							if distSq < cap then
-								neighbors[i][#neighbors[i] + 1] = j
-							end
+-- Distance² between two pylons; returns nil if the pair exceeds the candidate
+-- cap (so the caller treats them as non-candidates).
+local function CandidateDistSq(p, o)
+	local dx = p.x - o.x
+	local dz = p.z - o.z
+	local distSq = dx * dx + dz * dz
+	local cap = MST_EUCLIDEAN_MODE and MST_CANDIDATE_R_SQ
+		or ((p.range + o.range) * (p.range + o.range))
+	if distSq >= cap then return nil end
+	return distSq
+end
+
+-- Edge add/remove primitives that keep `mst.edges` and `mst.adj` in lock-step.
+local function MstAddEdge(mst, fromUid, toUid, einfo)
+	mst.edges[EdgeKey(fromUid, toUid)] = einfo
+	local af = mst.adj[fromUid]; if not af then af = {}; mst.adj[fromUid] = af end
+	local at = mst.adj[toUid];   if not at then at = {}; mst.adj[toUid]   = at end
+	af[toUid] = true
+	at[fromUid] = true
+end
+
+local function MstRemoveEdge(mst, fromUid, toUid)
+	mst.edges[EdgeKey(fromUid, toUid)] = nil
+	local af = mst.adj[fromUid]; if af then af[toUid] = nil; if not next(af) then mst.adj[fromUid] = nil end end
+	local at = mst.adj[toUid];   if at then at[fromUid] = nil; if not next(at) then mst.adj[toUid]   = nil end end
+end
+
+-- Mint a fresh edge info record (the einfo shape that downstream consumers expect).
+local function MakeEdgeInfo(fromUid, toUid, allyNodes)
+	local p1 = allyNodes[fromUid]
+	local p2 = allyNodes[toUid]
+	return {
+		parentID = fromUid, childID = toUid,
+		px = p1.x, pz = p1.z, cx = p2.x, cz = p2.z,
+	}
+end
+
+-- Spatial-hash neighbour iteration: walks the 3×3 cell block around `uid`
+-- and invokes `cb(j, distSq)` for every other pylon within candidate cap.
+local function ForEachCandidate(uid, allyNodes, cells, cb)
+	local p = allyNodes[uid]
+	if not p then return end
+	local cx = floor(p.x / SPATIAL_CELL)
+	local cz = floor(p.z / SPATIAL_CELL)
+	for dcx = -1, 1 do
+		for dcz = -1, 1 do
+			local ck = (cx + dcx) * 100000 + (cz + dcz)
+			local cell = cells[ck]
+			if cell then
+				for ci = 1, #cell do
+					local j = cell[ci]
+					if j ~= uid then
+						local o = allyNodes[j]
+						if o then
+							local distSq = CandidateDistSq(p, o)
+							if distSq then cb(j, distSq) end
 						end
 					end
 				end
 			end
 		end
 	end
+end
 
-	-- Root = highest nameplate production (stable across wind/load).
-	local bestRoot = 1
-	local bestProd = -1
-	for i = 1, #pylons do
-		local prod = GetNodePmax(pylons[i].unitDefID)
-		if prod > bestProd then bestProd = prod; bestRoot = i end
+-- Add a batch of new nodes to the MST via Prim's expansion. The current
+-- members form the starting "tree"; pending adds are attached one at a
+-- time by cheapest cross-edge. With existing tree as the frontier, this is
+-- Prim correct for the merged member set (Cut Property: the cheapest edge
+-- crossing any cut is in some MST, so picking cheapest pending↔tree at each
+-- step yields an MST).
+local function MstAddNodes(mst, addUids, allyNodes, cells)
+	if not allyNodes then return end
+
+	local pending = {}    -- [uid] = true
+	local toAddCount = 0
+	for i = 1, #addUids do
+		local uid = addUids[i]
+		if not mst.members[uid] and allyNodes[uid] then
+			pending[uid] = true
+			toAddCount = toAddCount + 1
+		end
+	end
+	if toAddCount == 0 then return end
+
+	-- bestEdge[uid] = { distSq, fromUid } — uid is pending, fromUid is in tree.
+	local bestEdge = {}
+	-- Seed bestEdge for each pending against current members.
+	-- For each pending uid, walk its 3×3 cells and check existing members.
+	-- (If tree is currently empty, no seeding happens; we'll bootstrap below.)
+	if next(mst.members) then
+		for uid in pairs(pending) do
+			ForEachCandidate(uid, allyNodes, cells, function(j, distSq)
+				if mst.members[j] then
+					local cur = bestEdge[uid]
+					if not cur or distSq < cur.distSq then
+						bestEdge[uid] = { distSq = distSq, fromUid = j }
+					end
+				end
+			end)
+		end
 	end
 
-	-- Prim's MST using neighbor lists: O(n * avg_neighbors)
-	local inTree = { [bestRoot] = true }
-	local treeSize = 1
-	-- Frontier: unvisited nodes adjacent to tree. Track best distance per node.
-	local bestEdge = {} -- [idx] = { distSq, treeIdx }
-	for _, j in ipairs(neighbors[bestRoot]) do
-		local p = pylons[bestRoot]
-		local o = pylons[j]
-		local dx = p.x - o.x
-		local dz = p.z - o.z
-		bestEdge[j] = { distSq = dx * dx + dz * dz, from = bestRoot }
-	end
-
-	while treeSize < #pylons do
-		-- Find frontier node with smallest distance
-		local bestDistSq = math.huge
-		local bestJ = nil
-		for j, be in pairs(bestEdge) do
-			if not inTree[j] and be.distSq < bestDistSq then
-				bestDistSq = be.distSq
-				bestJ = j
+	-- Prim expansion loop.
+	while toAddCount > 0 do
+		-- Pick cheapest pending uid that has a candidate edge.
+		local pickUid, pickDistSq = nil, math.huge
+		for uid in pairs(pending) do
+			local be = bestEdge[uid]
+			if be and be.distSq < pickDistSq then
+				pickUid, pickDistSq = uid, be.distSq
 			end
 		end
 
-		if not bestJ then break end
-		inTree[bestJ] = true
+		if not pickUid then
+			-- No reachable pending. Either tree is empty (bootstrap) OR the
+			-- remaining pending are unreachable from the tree. In both cases
+			-- seed an arbitrary pending as a new member without an edge; the
+			-- next iterations will discover edges to it from the rest of the
+			-- pending pool via ForEachCandidate's neighbour update below.
+			local seed = next(pending)
+			mst.members[seed] = true
+			pending[seed] = nil
+			bestEdge[seed] = nil
+			toAddCount = toAddCount - 1
+
+			ForEachCandidate(seed, allyNodes, cells, function(j, distSq)
+				if pending[j] then
+					local cur = bestEdge[j]
+					if not cur or distSq < cur.distSq then
+						bestEdge[j] = { distSq = distSq, fromUid = seed }
+					end
+				end
+			end)
+		else
+			local fromUid = bestEdge[pickUid].fromUid
+			mst.members[pickUid] = true
+			pending[pickUid] = nil
+			bestEdge[pickUid] = nil
+			toAddCount = toAddCount - 1
+			MstAddEdge(mst, fromUid, pickUid, MakeEdgeInfo(fromUid, pickUid, allyNodes))
+
+			-- Update bestEdge for any pending node whose nearest tree member
+			-- might now be the just-added pickUid.
+			ForEachCandidate(pickUid, allyNodes, cells, function(j, distSq)
+				if pending[j] then
+					local cur = bestEdge[j]
+					if not cur or distSq < cur.distSq then
+						bestEdge[j] = { distSq = distSq, fromUid = pickUid }
+					end
+				end
+			end)
+		end
+	end
+end
+
+-- Remove a batch of nodes from the MST. Cut all incident edges, then
+-- identify the components left behind by BFS over `mst.adj` (seeded by
+-- the surviving neighbours of the removed nodes). Reconnect components
+-- pairwise by cheapest cross-edge until all collapse back into one.
+local function MstRemoveNodes(mst, removeUids, allyNodes, cells)
+	-- Snapshot the set of removed uids and their surviving neighbours.
+	local removedSet = {}
+	local seeds = {}
+	for i = 1, #removeUids do
+		local uid = removeUids[i]
+		if mst.members[uid] then
+			removedSet[uid] = true
+			local nb = mst.adj[uid]
+			if nb then
+				for n in pairs(nb) do seeds[n] = true end
+			end
+		end
+	end
+	if not next(removedSet) then return end
+	-- A removed node's neighbours might also be in removedSet; filter them.
+	for uid in pairs(removedSet) do seeds[uid] = nil end
+
+	-- Cut all edges incident to any removed uid, then drop the removed members.
+	for uid in pairs(removedSet) do
+		local nb = mst.adj[uid]
+		if nb then
+			local toCut = {}
+			for n in pairs(nb) do toCut[#toCut + 1] = n end
+			for k = 1, #toCut do
+				MstRemoveEdge(mst, uid, toCut[k])
+			end
+		end
+		mst.members[uid] = nil
+	end
+
+	if not next(seeds) then return end  -- nothing to reconnect (all removed leaves)
+
+	-- Identify components remaining in the cut graph by BFS over mst.adj
+	-- seeded at each surviving neighbour of a removed node.
+	local componentOf = {}
+	local components = {}    -- [seedUid] = { [memberUid] = true }
+	local compIds = {}
+	for seed in pairs(seeds) do
+		if not componentOf[seed] then
+			local mem = { [seed] = true }
+			componentOf[seed] = seed
+			local stack = { seed }
+			while #stack > 0 do
+				local u = stack[#stack]; stack[#stack] = nil
+				local nb = mst.adj[u]
+				if nb then
+					for n in pairs(nb) do
+						if not mem[n] then
+							mem[n] = true
+							componentOf[n] = seed
+							stack[#stack + 1] = n
+						end
+					end
+				end
+			end
+			components[seed] = mem
+			compIds[#compIds + 1] = seed
+		end
+	end
+
+	if #compIds <= 1 then return end  -- all neighbours converged into one component
+
+	-- Borůvka reconnect: find the globally cheapest cross-edge between any
+	-- two components, add it, merge, repeat until one component remains.
+	while #compIds > 1 do
+		local bestDistSq = math.huge
+		local bestFrom, bestTo, bestFromComp, bestToComp = nil, nil, nil, nil
+		for ci = 1, #compIds do
+			local cid = compIds[ci]
+			local mem = components[cid]
+			for uid in pairs(mem) do
+				ForEachCandidate(uid, allyNodes, cells, function(j, distSq)
+					local jcid = componentOf[j]
+					if jcid and jcid ~= cid and distSq < bestDistSq then
+						bestDistSq = distSq
+						bestFrom, bestTo = uid, j
+						bestFromComp, bestToComp = cid, jcid
+					end
+				end)
+			end
+		end
+		if not bestFrom then break end  -- truly disconnected (engine should split gridID first)
+
+		MstAddEdge(mst, bestFrom, bestTo, MakeEdgeInfo(bestFrom, bestTo, allyNodes))
+
+		-- Merge components: union toComp into fromComp.
+		local fc = components[bestFromComp]
+		local tc = components[bestToComp]
+		for u in pairs(tc) do
+			fc[u] = true
+			componentOf[u] = bestFromComp
+		end
+		components[bestToComp] = nil
+		for i = 1, #compIds do
+			if compIds[i] == bestToComp then
+				table.remove(compIds, i)
+				break
+			end
+		end
+	end
+end
+
+-- Mint a fresh, empty MST record for a grid.
+local function MakeEmptyMst(allyTeamID, gridID)
+	return {
+		ally = allyTeamID, gridID = gridID,
+		members = {}, edges = {}, adj = {},
+	}
+end
+
+-- From-scratch build for grids with no cached MST. Uses inline Prim's over
+-- a per-grid spatial hash (the same algorithm as the original BuildGridMST
+-- before incremental was introduced); fast at large N because the inner
+-- loops avoid closures and table lookups stay tight. MstAddNodes is reserved
+-- for SMALL incremental add batches into an existing tree where the closure
+-- overhead is negligible relative to the savings vs full rebuild.
+local function BuildGridMSTFromScratch(allyTeamID, gridID, allyNodes, allyCells)
+	local perf = cablePerf
+	local tStart = perf and Spring.GetTimer()
+	local mst = MakeEmptyMst(allyTeamID, gridID)
+	if not allyNodes then return mst end
+
+	-- Collect this grid's pylons + per-pylon position+range in arrays.
+	local px, pz, prange, puid = {}, {}, {}, {}
+	for uid, node in pairs(allyNodes) do
+		if lastGridNum[uid] == gridID then
+			local idx = #puid + 1
+			puid[idx] = uid
+			px[idx] = node.x
+			pz[idx] = node.z
+			prange[idx] = node.range
+		end
+	end
+	local n = #puid
+	if n == 0 then return mst end
+	-- Single-member grid: just register the lone pylon, no edges.
+	if n == 1 then mst.members[puid[1]] = true; return mst end
+
+	-- (No per-grid spatial hash needed — pylonNeighbours is the precomputed
+	-- bidirectional global neighbour index, maintained on UnitCreated.)
+	local tHash = perf and Spring.GetTimer()
+
+	-- Per-pylon neighbour list (indices into px/pz/etc) sourced from the
+	-- global pylonNeighbours cache, filtered down to pylons in this grid.
+	-- Replaces an O(N × cellsize) spatial-hash scan with O(sum of degrees).
+	local uidToIdx = {}
+	for i = 1, n do uidToIdx[puid[i]] = i end
+	local neighbors = {}
+	for i = 1, n do
+		local nlist = {}
+		local nb = pylonNeighbours[puid[i]]
+		if nb then
+			for nuid in pairs(nb) do
+				local idx = uidToIdx[nuid]
+				if idx then nlist[#nlist + 1] = idx end
+			end
+		end
+		neighbors[i] = nlist
+	end
+	local tNeigh = perf and Spring.GetTimer()
+
+	-- Pick highest-Pmax pylon as the seed (stable across wind/load).
+	local bestRoot = 1
+	local bestProd = -1
+	for i = 1, n do
+		local prod = GetNodePmax(allyNodes[puid[i]].unitDefID)
+		if prod > bestProd then bestProd = prod; bestRoot = i end
+	end
+
+	-- Prim with a binary min-heap on the frontier. The previous version did
+	-- a linear scan over `bestEdge` per pick → O(N²) overall, which dominated
+	-- runtime once N ≳ 1000. The heap pushes each frontier-update in O(log N)
+	-- and the pick is O(log N), making the whole MST construction O(E log V).
+	-- We use lazy invalidation: when we update a node's bestEdge to a cheaper
+	-- distance, we just push a new heap entry; older entries get skipped on
+	-- pop because they no longer match `bestEdge[pickJ].distSq`.
+	-- Heap is a flat array: entries are integer-packed `distSq * MAX_N + idx`
+	-- to avoid per-entry table allocation. (Lua sin sin sin: math, not tables.)
+	local inTree = { [bestRoot] = true }
+	mst.members[puid[bestRoot]] = true
+	local treeSize = 1
+	local bestEdge = {}    -- [idx] = { distSq, fromIdx }
+	local heapD = {}       -- distSq values; heap[1..#] is the heap
+	local heapI = {}       -- frontier idx, parallel array to heapD
+	local heapN = 0
+
+	local function heapPush(d, i)
+		heapN = heapN + 1
+		heapD[heapN] = d
+		heapI[heapN] = i
+		local ci = heapN
+		while ci > 1 do
+			local p = floor(ci / 2)
+			if heapD[p] > heapD[ci] then
+				heapD[ci], heapD[p] = heapD[p], heapD[ci]
+				heapI[ci], heapI[p] = heapI[p], heapI[ci]
+				ci = p
+			else
+				break
+			end
+		end
+	end
+
+	local function heapPop()
+		if heapN == 0 then return nil, nil end
+		local d, i = heapD[1], heapI[1]
+		heapD[1], heapI[1] = heapD[heapN], heapI[heapN]
+		heapD[heapN], heapI[heapN] = nil, nil
+		heapN = heapN - 1
+		local ci = 1
+		while true do
+			local l = ci * 2
+			local r = l + 1
+			local s = ci
+			if l <= heapN and heapD[l] < heapD[s] then s = l end
+			if r <= heapN and heapD[r] < heapD[s] then s = r end
+			if s == ci then break end
+			heapD[ci], heapD[s] = heapD[s], heapD[ci]
+			heapI[ci], heapI[s] = heapI[s], heapI[ci]
+			ci = s
+		end
+		return d, i
+	end
+
+	do
+		local pxi, pzi = px[bestRoot], pz[bestRoot]
+		for _, j in ipairs(neighbors[bestRoot]) do
+			local dx = pxi - px[j]
+			local dz = pzi - pz[j]
+			local distSq = dx * dx + dz * dz
+			bestEdge[j] = { distSq = distSq, from = bestRoot }
+			heapPush(distSq, j)
+		end
+	end
+
+	while treeSize < n do
+		-- Pop cheapest; skip stale entries (already in tree, or superseded
+		-- by a cheaper bestEdge update since this entry was pushed).
+		local pickD, pickJ
+		while true do
+			pickD, pickJ = heapPop()
+			if not pickJ then break end
+			local be = bestEdge[pickJ]
+			if be and not inTree[pickJ] and be.distSq == pickD then break end
+		end
+		if not pickJ then break end
+		inTree[pickJ] = true
 		treeSize = treeSize + 1
+		local fromIdx = bestEdge[pickJ].from
+		bestEdge[pickJ] = nil
 
-		local parentIdx = bestEdge[bestJ].from
-		bestEdge[bestJ] = nil
+		local fromUid, toUid = puid[fromIdx], puid[pickJ]
+		mst.members[toUid] = true
+		MstAddEdge(mst, fromUid, toUid, {
+			parentID = fromUid, childID = toUid,
+			px = px[fromIdx], pz = pz[fromIdx],
+			cx = px[pickJ],   cz = pz[pickJ],
+		})
 
-		local p, c = pylons[parentIdx], pylons[bestJ]
-		local key = EdgeKey(p.unitID, c.unitID)
-		result[key] = {
-			parentID = p.unitID, childID = c.unitID,
-			px = p.x, pz = p.z, cx = c.x, cz = c.z,
-		}
-
-		-- Update frontier: check neighbors of newly added node
-		for _, j in ipairs(neighbors[bestJ]) do
-			if not inTree[j] then
-				local o = pylons[j]
-				local nj = pylons[bestJ]
-				local dx = nj.x - o.x
-				local dz = nj.z - o.z
+		local pxj, pzj = px[pickJ], pz[pickJ]
+		for _, k in ipairs(neighbors[pickJ]) do
+			if not inTree[k] then
+				local dx = pxj - px[k]
+				local dz = pzj - pz[k]
 				local distSq = dx * dx + dz * dz
-				if not bestEdge[j] or distSq < bestEdge[j].distSq then
-					bestEdge[j] = { distSq = distSq, from = bestJ }
+				local cur = bestEdge[k]
+				if not cur or distSq < cur.distSq then
+					bestEdge[k] = { distSq = distSq, from = pickJ }
+					-- Push the new (cheaper) entry; the old heap slot for k
+					-- will be skipped on pop because its stored distSq won't
+					-- match bestEdge[k].distSq anymore (lazy invalidation).
+					heapPush(distSq, k)
 				end
 			end
 		end
 	end
 
-	return result
+	if perf then
+		local tEnd = Spring.GetTimer()
+		local totalMs  = Spring.DiffTimers(tEnd, tStart) * 1000
+		if totalMs > perfStats.worstRebuildMs then
+			perfStats.worstRebuildMs    = totalMs
+			perfStats.worstRebuildN     = n
+			perfStats.worstRebuildHashMs  = Spring.DiffTimers(tHash, tStart) * 1000
+			perfStats.worstRebuildNeighMs = Spring.DiffTimers(tNeigh, tHash) * 1000
+			perfStats.worstRebuildPrimMs  = Spring.DiffTimers(tEnd, tNeigh) * 1000
+		end
+	end
+
+	return mst
 end
 
 -------------------------------------------------------------------------------------
@@ -403,8 +980,10 @@ end
 -------------------------------------------------------------------------------------
 
 local function SyncWithGrid()
-	-- 1) Drop dead units; mark their last-known grid dirty so its MST is
-	--    rebuilt without them.
+	local perf = cablePerf
+	local t0 = perf and Spring.GetTimer()
+
+	-- 1) Drop dead units; mark their last-known grid as losing the dying uid.
 	for allyTeamID, allyNodes in pairs(nodes) do
 		local toRemove
 		for unitID, _ in pairs(allyNodes) do
@@ -416,43 +995,169 @@ local function SyncWithGrid()
 		if toRemove then
 			for i = 1, #toRemove do
 				local uid = toRemove[i]
-				MarkGridDirty(allyTeamID, lastGridNum[uid])
+				local node = allyNodes[uid]
+				if node then
+					PylonRemoveSpatial(allyTeamID, uid, node.x, node.z)
+				end
+				PylonClearNeighbours(uid)
+				MarkGridRemove(allyTeamID, lastGridNum[uid], uid)
 				allyNodes[uid] = nil
 				lastGridNum[uid] = nil
 				allyOfUnit[uid] = nil
 				nodeDefByUID[uid] = nil
+				consumerNodeIndex[uid] = nil
+				lastConsumerDcur[uid] = nil
+				minWindByUID[uid] = nil
 			end
 		end
 	end
+	local t1 = perf and Spring.GetTimer()
 
 	-- 2) Refresh lastGridNum from rules-params and detect membership changes.
-	--    Any pylon whose effective gridID flipped marks BOTH the old and new
-	--    grid dirty (the old one because it lost a member, the new one
-	--    because it gained one). Inactive pylons map to 0 and drop out.
+	--    Any pylon whose effective gridID flipped is "removed" from the old
+	--    grid AND "added" to the new grid (gridID 0 = inactive, no-op).
+	--    Track each migrating uid's source gridID so step 2.5 can transfer
+	--    the cached MST when a grid is just being renumbered (engine
+	--    reassigns gridIDs on topology shifts → 1000s of pylons going
+	--    gridA→gridB in one tick → without rename detection we'd full-
+	--    rebuild gridB from scratch).
+	local unitFromGrid = {}    -- [uid] = oldG (only for uids that flipped to a non-zero newG)
 	for allyTeamID, allyNodes in pairs(nodes) do
 		for unitID, _ in pairs(allyNodes) do
 			local newG = (IsActiveForGrid(unitID) and (spGetUnitRulesParam(unitID, "gridNumber") or 0)) or 0
 			local oldG = lastGridNum[unitID]
 			if oldG ~= newG then
-				MarkGridDirty(allyTeamID, oldG)
-				MarkGridDirty(allyTeamID, newG)
+				if oldG and oldG > 0 then MarkGridRemove(allyTeamID, oldG, unitID) end
+				if newG > 0 then MarkGridAdd(allyTeamID, newG, unitID) end
 				lastGridNum[unitID] = newG
+				if oldG and oldG > 0 and newG > 0 then
+					unitFromGrid[unitID] = oldG
+				end
 			end
 		end
 	end
 
-	-- 3) Rebuild only dirty grids; everything else stays cached. An empty
-	--    rebuild result (1 or 0 members → no MST edges) drops the grid from
-	--    the cache entirely.
+	-- 2.5) MST transfer when a new grid's add-set substantially overlaps an
+	--      existing cached MST's members (i.e. the engine just renumbered
+	--      most of the grid). Transfer the cache under the new key, then
+	--      derive minimal "effective" remove/add lists so the post-transfer
+	--      tree converges on the actual new membership in O(diff) instead
+	--      of O(N).
+	local renames = 0
+	for newGk, newInfo in pairs(pendingGridDirty) do
+		if not mstByGrid[newGk] and #newInfo.adds > 0 then
+			-- Look up source grid via the migration record of any add.
+			local sampleUid = newInfo.adds[1]
+			local sourceOldG = unitFromGrid[sampleUid]
+			if sourceOldG then
+				local oldGk = GridKey(newInfo.ally, sourceOldG)
+				local oldMst = mstByGrid[oldGk]
+				if oldMst then
+					-- Count overlap between new adds and old MST members.
+					local addsSet = {}
+					for _, u in ipairs(newInfo.adds) do addsSet[u] = true end
+					local oldMemCount = 0
+					local kept = 0
+					for u in pairs(oldMst.members) do
+						oldMemCount = oldMemCount + 1
+						if addsSet[u] then kept = kept + 1 end
+					end
+					-- Worth transferring only if this is a near-rename (≥75%
+					-- retained AND ≤200 cleanup removes). For split scenarios
+					-- (e.g. grid cut in half) the cleanup-remove cost on the
+					-- larger side dominates; full Prim from scratch on each
+					-- piece is cheaper than transfer-then-prune-half.
+					local needRemove = oldMemCount - kept
+					if oldMemCount > 0 and kept * 4 >= oldMemCount * 3 and needRemove <= 200 then
+						oldMst.gridID = newInfo.gridID
+						mstByGrid[newGk] = oldMst
+						mstByGrid[oldGk] = nil
+						-- Build effective remove/add lists relative to the
+						-- transferred MST's current members:
+						--   remove = oldMembers \ adds (dead or migrated elsewhere)
+						--   add    = adds \ oldMembers (genuinely new pylons)
+						local effRemoves = {}
+						for u in pairs(oldMst.members) do
+							if not addsSet[u] then
+								effRemoves[#effRemoves + 1] = u
+							end
+						end
+						local effAdds = {}
+						for _, u in ipairs(newInfo.adds) do
+							if not oldMst.members[u] then
+								effAdds[#effAdds + 1] = u
+							end
+						end
+						newInfo.removes = effRemoves
+						newInfo.adds = effAdds
+						-- Old grid's pending entry is now redundant: its
+						-- removes are either covered by effRemoves above
+						-- (if they're still in oldMst.members) or never
+						-- existed in the MST in the first place.
+						pendingGridDirty[oldGk] = nil
+						renames = renames + 1
+					end
+				end
+			end
+		end
+	end
+	local t2 = perf and Spring.GetTimer()
+
+	-- 3) Apply per-grid changes. Strategy gating:
+	--    a) New grid (no cached MST) → full rebuild via fast Prim's.
+	--    b) Big cached MST → full rebuild on any change. The Borůvka
+	--       reconnect inside MstRemoveNodes scans every member of every
+	--       cut-component looking for cheapest cross-edges; on large dense
+	--       grids that's O(N²) and can blow up to seconds. Full Prim is
+	--       O(N log N) with much tighter inner loops, so above the size
+	--       threshold rebuild is cheaper than incremental.
+	--    c) Small cached MST + small diff → incremental.
+	--    d) Cached MST + big diff (>50 changes) → also rebuild.
+	local INCR_GRID_SIZE_LIMIT = 200  -- skip incremental on grids bigger than this
+	local INCR_DIFF_LIMIT      = 50   -- skip incremental on diffs bigger than this
+	local rebuilds = 0
+	local incrementals = 0
+	local allyHashCache = {}  -- [allyTeamID] = { cells, allyNodes }
+	local function getAllyHash(allyTeamID)
+		local h = allyHashCache[allyTeamID]
+		if not h then
+			local cells, allyNodesRef = BuildAllySpatialHash(allyTeamID)
+			h = { cells = cells, allyNodes = allyNodesRef }
+			allyHashCache[allyTeamID] = h
+		end
+		return h.cells, h.allyNodes
+	end
 	for gk, info in pairs(pendingGridDirty) do
-		local newMst = BuildGridMST(info.ally, info.gridID)
-		if next(newMst) then
-			mstByGrid[gk] = { ally = info.ally, gridID = info.gridID, edges = newMst }
+		local cells, allyNodesRef = getAllyHash(info.ally)
+		local mst = mstByGrid[gk]
+		local memCount = 0
+		if mst then
+			for _ in pairs(mst.members) do memCount = memCount + 1 end
+		end
+		local rebuildFromScratch = (not mst)
+			or memCount > INCR_GRID_SIZE_LIMIT
+			or #info.removes > INCR_DIFF_LIMIT
+			or #info.adds    > INCR_DIFF_LIMIT
+		if rebuildFromScratch then
+			mst = BuildGridMSTFromScratch(info.ally, info.gridID, allyNodesRef, cells)
+			rebuilds = rebuilds + 1
+		else
+			if #info.removes > 0 then
+				MstRemoveNodes(mst, info.removes, allyNodesRef, cells)
+			end
+			if #info.adds > 0 then
+				MstAddNodes(mst, info.adds, allyNodesRef, cells)
+			end
+			incrementals = incrementals + 1
+		end
+		if next(mst.members) then
+			mstByGrid[gk] = mst
 		else
 			mstByGrid[gk] = nil
 		end
 		pendingGridDirty[gk] = nil
 	end
+	local t3 = perf and Spring.GetTimer()
 
 	-- 4) Compose the desired edge set from cached MSTs.
 	local newEdges = {}
@@ -461,6 +1166,7 @@ local function SyncWithGrid()
 			newEdges[ek] = einfo
 		end
 	end
+	local t4 = perf and Spring.GetTimer()
 
 	-- 5) Diff: drop missing, add new. Survivors keep their entry (and
 	--    ComputeMaxPotentials reorientation) untouched. Topology change here
@@ -481,6 +1187,16 @@ local function SyncWithGrid()
 			topologyDirty = true
 			mpCache.valid = false
 		end
+	end
+	if perf then
+		local t5 = Spring.GetTimer()
+		perfStats.dropMs    = Spring.DiffTimers(t1, t0) * 1000
+		perfStats.refreshMs = Spring.DiffTimers(t2, t1) * 1000
+		perfStats.mstMs     = Spring.DiffTimers(t3, t2) * 1000
+		perfStats.mstRebuilds   = rebuilds
+		perfStats.mstIncrements = incrementals
+		perfStats.composeMs = Spring.DiffTimers(t4, t3) * 1000
+		perfStats.diffMs    = Spring.DiffTimers(t5, t4) * 1000
 	end
 end
 
@@ -602,7 +1318,7 @@ local function BuildMpCache()
 		subDmax[u] = did and GetNodeDmax(did) or 0
 		if did and isWindgenByDef[did] then
 			subWindCount[u] = 1
-			subWindBase[u] = spGetUnitRulesParam(u, "minWind") or 0
+			subWindBase[u] = GetCachedMinWind(u)
 			subPmaxNonWind[u] = 0
 		else
 			subWindCount[u] = 0
@@ -641,7 +1357,10 @@ end
 -- consumer set size). Capacities still come from the static cache, and edge
 -- reorientation falls back to capacity direction so the layout stays stable.
 local function ComputeMaxPotentials(flowMode)
+	local perf = cablePerf
+	local tBuild0 = perf and Spring.GetTimer()
 	if not mpCache.valid then BuildMpCache() end
+	local tBuild1 = perf and Spring.GetTimer()
 	local order          = mpCache.order
 	local parentInTree   = mpCache.parentInTree
 	local componentRoot  = mpCache.componentRoot
@@ -763,17 +1482,113 @@ local function ComputeMaxPotentials(flowMode)
 		for i = 1, #debugLog do Spring.Echo(debugLog[i]) end
 	end
 
+	if perf then
+		local tEnd = Spring.GetTimer()
+		perfStats.mpBuildMs   = Spring.DiffTimers(tBuild1, tBuild0) * 1000
+		perfStats.mpComputeMs = Spring.DiffTimers(tEnd, tBuild1) * 1000
+	end
+
 	return capacities, flows
 end
 
 -------------------------------------------------------------------------------------
--- Send state to unsynced. One Full snapshot per ally, only when topology changed.
--- Capacity drift between topology changes is ignored (acceptable: cable colour
--- only updates when the grid actually mutates).
+-- Hand a Full snapshot to the rendering side. One snapshot per ally; the
+-- per-ally batching is preserved because OnCableTreeFull's diff is per-ally.
+-- Capacity drift between topology changes is ignored (acceptable: cable
+-- colour only updates when the grid actually mutates).
 -------------------------------------------------------------------------------------
 
+-- Returns true if newFlow differs enough from oldFlow to warrant a re-send.
+-- Loose absolute floor + a relative threshold above it: small absolute flows
+-- are noisy (mex draw fluctuates by ±0.x E/s as targets move), while large
+-- ones need relative tolerance because bubble speed ∝ sqrt(flow).
+local function flowChanged(newFlow, oldFlow)
+	local d = newFlow - oldFlow
+	if d < 0 then d = -d end
+	if d <= FLOW_ABS_EPSILON then return false end
+	local base = oldFlow
+	if base < 0 then base = -base end
+	if base < FLOW_ABS_EPSILON then return true end  -- big abs change off ~zero
+	return (d / base) > FLOW_REL_EPSILON
+end
+
+-- Cheap pre-check that runs BEFORE ComputeMaxPotentials. The mp.compute
+-- pass is O(N) over every pylon (~4ms at 4000 nodes) — running it just to
+-- discover "nothing changed" is wasted work. Instead, sample only the
+-- consumer-typed nodes (typically ~50 of 4000) plus the wind state; if
+-- nothing has shifted, skip mp + bin + dispatch entirely. The bubble shader
+-- keeps extrapolating from its last bake at the last-sent speed, which is
+-- the correct visual when flows haven't changed.
+local function ConsumersOrWindChanged()
+	for uid, did in pairs(consumerNodeIndex) do
+		local cur = GetNodeDcurrent(uid, did)
+		local last = lastConsumerDcur[uid]
+		if not last or math.abs(cur - last) > 0.5 then
+			return true
+		end
+	end
+	local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
+	local _, _, _, currStrength = Spring.GetWind()
+	currStrength = currStrength or 0
+	local newWindFrac = (windMax > 0) and (currStrength / windMax) or 0
+	if newWindFrac < 0 then newWindFrac = 0 elseif newWindFrac > 1 then newWindFrac = 1 end
+	if math.abs(newWindFrac - lastWindFrac) > 0.05 then return true end
+	return false
+end
+
 local function SendAll()
+	local perf = cablePerf
+
+	-- O(consumers) early-skip BEFORE the expensive O(N) ComputeMaxPotentials.
+	-- Topology changes always force through; FORCE_SEND_TICKS clamps drift.
+	ticksSinceSend = ticksSinceSend + 1
+	if not topologyDirty and ticksSinceSend < FORCE_SEND_TICKS then
+		if not ConsumersOrWindChanged() then
+			if perf then perfStats.skipped = (perfStats.skipped or 0) + 1 end
+			return false
+		end
+	end
+
 	local capacities, flows = ComputeMaxPotentials(cableFlowMode)
+
+	-- Belt-and-suspenders flow-comparison: even after consumer/wind changed,
+	-- the resulting flows may still be within tolerance (binding constraint
+	-- elsewhere). Skip if no edge's flow changed visibly.
+	if not topologyDirty and ticksSinceSend < FORCE_SEND_TICKS then
+		local anyChanged = false
+		for key, _ in pairs(edges) do
+			local newFlow = flows[key] or 0
+			local oldFlow = lastSentFlow[key]
+			if oldFlow == nil or flowChanged(newFlow, oldFlow) then
+				anyChanged = true
+				break
+			end
+		end
+		if not anyChanged then
+			if perf then perfStats.skipped = (perfStats.skipped or 0) + 1 end
+			return false
+		end
+	end
+	ticksSinceSend = 0
+
+	local tBin0 = perf and Spring.GetTimer()
+
+	-- Per-grid efficiency cache. gridefficiency is uniform across a whole
+	-- grid (set on every member by unit_mex_overdrive), so reading it per
+	-- edge does ~2*E rules-param reads where ~G (G = number of distinct
+	-- grids, typically <10) suffices. At 460+ edges this turns ~900 reads
+	-- into ~5. lastGridNum is the SyncWithGrid-maintained gridID per pylon.
+	local effByGrid = {}
+	local function gridEffForUnit(uid)
+		local gid = lastGridNum[uid]
+		if not gid or gid == 0 then return nil end
+		local cached = effByGrid[gid]
+		if cached ~= nil then return cached end
+		local eff = spGetUnitRulesParam(uid, "gridefficiency")
+		if eff and eff < 0 then eff = 0 end
+		effByGrid[gid] = eff or false  -- `false` distinguishes "tried, nil" from "uncached"
+		return eff
+	end
 
 	-- Bin edges by ally, in one pass.
 	local perAlly = {}
@@ -795,40 +1610,60 @@ local function SendAll()
 			pa.cxs[i], pa.czs[i] = edge.cx, edge.cz
 			pa.caps[i]  = capacities[key] or 0
 			pa.flows[i] = flows[key] or 0
-			-- Grid efficiency (E/M ratio) is uniform across a grid; read it from
-			-- the parent end. Negative means "no grid" (sentinel from
-			-- unit_mex_overdrive); we forward 0 in that case → magenta in shader.
-			local eff = spGetUnitRulesParam(edge.parentID, "gridefficiency")
-				or spGetUnitRulesParam(edge.childID, "gridefficiency") or 0
-			if eff < 0 then eff = 0 end
+			-- Cached per-grid lookup; fall back to child end if parent's grid
+			-- is unknown. 0 → magenta in the shader (unit_mex_overdrive's
+			-- "no grid" sentinel).
+			local eff = gridEffForUnit(edge.parentID) or gridEffForUnit(edge.childID) or 0
 			pa.effs[i] = eff
+			-- Snapshot for the next tick's stability check.
+			lastSentFlow[key] = pa.flows[i]
+			lastSentEff[key]  = eff
 		end
 	end
+	local tBin1 = perf and Spring.GetTimer()
 
-	-- Fire one message per ally that currently has edges.
+	-- One snapshot per ally that currently has edges.
 	for ally, pa in pairs(perAlly) do
-		_G.CableTreeFull = {
+		OnCableTreeFull({
 			allyTeamID = ally, edgeCount = pa.n,
 			keys = pa.keys, pxs = pa.pxs, pzs = pa.pzs,
 			cxs = pa.cxs, czs = pa.czs,
 			caps = pa.caps, flows = pa.flows, effs = pa.effs,
-		}
-		SendToUnsynced("CableTreeFull")
+		})
 		alliesWithEdges[ally] = true
 	end
 
 	-- Allies whose last edge just disappeared get one zero-edge snapshot so
-	-- unsynced clears them; then we forget them.
+	-- the renderer clears them; then we forget them.
 	for ally in pairs(alliesWithEdges) do
 		if not perAlly[ally] then
-			_G.CableTreeFull = {
+			OnCableTreeFull({
 				allyTeamID = ally, edgeCount = 0,
 				keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
 				caps = {}, flows = {}, effs = {},
-			}
-			SendToUnsynced("CableTreeFull")
+			})
 			alliesWithEdges[ally] = nil
 		end
+	end
+	-- Update the snapshots ConsumersOrWindChanged() compares against next
+	-- tick. Doing this only on the success path means a skipped tick keeps
+	-- the previous baseline so a stable run continues to skip.
+	for uid, did in pairs(consumerNodeIndex) do
+		lastConsumerDcur[uid] = GetNodeDcurrent(uid, did)
+	end
+	do
+		local windMax = Spring.GetGameRulesParam("WindMax") or 2.5
+		local _, _, _, currStrength = Spring.GetWind()
+		currStrength = currStrength or 0
+		local newWindFrac = (windMax > 0) and (currStrength / windMax) or 0
+		if newWindFrac < 0 then newWindFrac = 0 elseif newWindFrac > 1 then newWindFrac = 1 end
+		lastWindFrac = newWindFrac
+	end
+
+	if perf then
+		local tEnd = Spring.GetTimer()
+		perfStats.binMs      = Spring.DiffTimers(tBin1, tBin0) * 1000
+		perfStats.dispatchMs = Spring.DiffTimers(tEnd, tBin1) * 1000
 	end
 end
 
@@ -837,104 +1672,141 @@ end
 -------------------------------------------------------------------------------------
 
 -- Sends one zero-edge snapshot per ally that currently has cables, so the
--- unsynced side clears its geometry. Used when the visualization is toggled
--- off so no stale cables linger.
+-- renderer clears its geometry. Used when the visualization is toggled off
+-- so no stale cables linger.
 local function ClearAll()
 	for ally in pairs(alliesWithEdges) do
-		_G.CableTreeFull = {
+		OnCableTreeFull({
 			allyTeamID = ally, edgeCount = 0,
 			keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
 			caps = {}, flows = {}, effs = {},
-		}
-		SendToUnsynced("CableTreeFull")
+		})
 	end
 	alliesWithEdges = {}
 	edges = {}
 	topologyDirty = false
+	-- Reset stability snapshots; on next enable, all edges read as new.
+	lastSentFlow = {}
+	lastSentEff  = {}
+	ticksSinceSend = 0
 end
 
-function gadget:GameFrame(n)
+-- Periodic topology refresh + send. Driven by gadget:GameFrame on the
+-- SYNC_PERIOD cadence so the cost is bounded regardless of how often pylons
+-- move/build.
+local function RunSyncTick(n)
 	if not cableEnabled then return end
 	if n % SYNC_PERIOD == 2 then
+		local perf = cablePerf
+		local tStart = perf and Spring.GetTimer()
 		SyncWithGrid()
 		-- Flow mode: always send (flow magnitudes + grid efficiency colour
 		-- change every tick). No-flow mode: only send on topology change —
 		-- there's no per-tick state to refresh, and the per-tick send cost
 		-- (capacity-only ComputeMaxPotentials + per-ally upload) is the
 		-- entire point of the toggle.
+		local sentThisTick = false
 		if cableFlowMode or topologyDirty then
-			SendAll()
+			-- SendAll returns false when its stability check short-circuited.
+			sentThisTick = (SendAll() ~= false)
 			topologyDirty = false
 		end
-		-- Synced has no timing API (Spring.GetTimer is unsynced-only, and the
-		-- sandbox doesn't expose `os`). Just report the edge count from here;
-		-- the real cost numbers come from the unsynced rebuild log, which
-		-- captures the heavier path (geometry + VBO upload).
-		if cablePerf then
+		if perf then
+			local tEnd = Spring.GetTimer()
 			local nEdges = 0
 			for _ in pairs(edges) do nEdges = nEdges + 1 end
-			Spring.Echo(string.format("[CableTree] sync edges=%d", nEdges))
+			local nNodes = 0
+			for _, allyNodes in pairs(nodes) do
+				for _ in pairs(allyNodes) do nNodes = nNodes + 1 end
+			end
+			-- Total wallclock for this tick (sync + send).
+			local totalMs = Spring.DiffTimers(tEnd, tStart) * 1000
+			local rebuildLine = ""
+			if perfStats.worstRebuildMs > 0 then
+				rebuildLine = string.format(
+					" | worstRebuild=%dms[N=%d hash=%.1f neigh=%.1f prim=%.1f]",
+					perfStats.worstRebuildMs, perfStats.worstRebuildN,
+					perfStats.worstRebuildHashMs, perfStats.worstRebuildNeighMs,
+					perfStats.worstRebuildPrimMs)
+			end
+			Spring.Echo(string.format(
+				"[CableTree] tick: nodes=%d edges=%d total=%.2fms | " ..
+				"sync(drop=%.2f refresh=%.2f mst=%.2f[rebuild=%d incr=%d] compose=%.2f diff=%.2f) | " ..
+				"mp(build=%.2f compute=%.2f) | send(bin=%.2f dispatch=%.2f sent=%s flow=%s skipped=%d)%s",
+				nNodes, nEdges, totalMs,
+				perfStats.dropMs, perfStats.refreshMs, perfStats.mstMs,
+				perfStats.mstRebuilds, perfStats.mstIncrements,
+				perfStats.composeMs, perfStats.diffMs,
+				perfStats.mpBuildMs, perfStats.mpComputeMs,
+				perfStats.binMs, perfStats.dispatchMs,
+				tostring(sentThisTick), tostring(cableFlowMode),
+				perfStats.skipped or 0,
+				rebuildLine))
+			-- Reset per-tick stats so the next tick starts clean.
+			perfStats.binMs, perfStats.dispatchMs = 0, 0
+			perfStats.mpBuildMs, perfStats.mpComputeMs = 0, 0
+			perfStats.worstRebuildMs, perfStats.worstRebuildN = 0, 0
+			perfStats.worstRebuildHashMs = 0
+			perfStats.worstRebuildNeighMs = 0
+			perfStats.worstRebuildPrimMs  = 0
 		end
 	end
 end
 
--- Tells unsynced whether to gate the FS bubble pass. Synced is the source of
--- truth (chat command runs here); unsynced mirrors via SendToUnsynced.
-local function PushFlowModeToUnsynced()
-	_G.CableTreeFlowMode = { flowMode = cableFlowMode }
-	SendToUnsynced("CableTreeFlowMode")
+local DETAIL_KEYS = { off = DETAIL_OFF, noflow = DETAIL_NOFLOW, full = DETAIL_FULL }
+local DETAIL_NAMES = { [DETAIL_OFF] = "off", [DETAIL_NOFLOW] = "noflow", [DETAIL_FULL] = "full" }
+
+-- Single point that mutates the visualisation state. Sets cableEnabled +
+-- cableFlowMode atomically so the FS uniform and the topology-loop gating
+-- stay consistent. Persists to Spring config and forces one immediate send
+-- so the new state shows up without waiting for the next tick.
+local function SetDetailLevel(level)
+	if level == cableDetail then return end
+	cableDetail = level
+	cableEnabled  = level ~= DETAIL_OFF
+	cableFlowMode = level == DETAIL_FULL
+	Spring.SetConfigInt("OverdriveCableDetail", level)
+	if level == DETAIL_OFF then
+		ClearAll()
+	else
+		-- Reset stability snapshots so the next SendAll definitely fires
+		-- (toggling between noflow ↔ full needs to push the new flow values
+		-- to the renderer; the FS uniform also needs the new enableFlow).
+		lastSentFlow = {}
+		lastSentEff  = {}
+		ticksSinceSend = FORCE_SEND_TICKS  -- force-send next tick
+		topologyDirty = true
+		SendAll()
+		topologyDirty = false
+	end
 end
 
-local function SetFlowMode(on)
-	if cableFlowMode == on then return end
-	cableFlowMode = on
-	PushFlowModeToUnsynced()
-	-- Force one fresh send so the new mode takes effect immediately rather
-	-- than waiting for the next topology change (which might never come on
-	-- a settled grid).
-	SendAll()
-	topologyDirty = false
-end
-
--- /cabletree              — toggle on/off
--- /cabletree on / off     — explicit
--- /cabletree flow on/off  — toggle bubble animation + per-tick flow reads
---                           (the heavy path at 1500+ pylons)
--- /cabletree perf         — toggle per-cycle timing log
--- /cabletree status       — print current state
+-- /cabletree detail off|noflow|full  — set detail level (the menu widget
+--                                       drives this; can also be typed)
+-- /cabletree perf                    — toggle per-cycle timing log
+-- /cabletree status                  — print current state
 local function CableTreeCmd(cmd, line, words, playerID)
 	local arg = (words and words[1]) or ""
-	if arg == "" or arg == "toggle" then
-		cableEnabled = not cableEnabled
-		if not cableEnabled then ClearAll() end
-		Spring.Echo("[CableTree] " .. (cableEnabled and "ON" or "OFF"))
-	elseif arg == "on" then
-		cableEnabled = true
-		Spring.Echo("[CableTree] ON")
-	elseif arg == "off" then
-		cableEnabled = false
-		ClearAll()
-		Spring.Echo("[CableTree] OFF")
-	elseif arg == "flow" then
-		local sub = (words and words[2]) or ""
-		if sub == "on" then SetFlowMode(true)
-		elseif sub == "off" then SetFlowMode(false)
-		else SetFlowMode(not cableFlowMode) end
-		Spring.Echo("[CableTree] flow animation " .. (cableFlowMode and "ON" or "OFF"))
+	if arg == "detail" then
+		local key = (words and words[2]) or ""
+		local lvl = DETAIL_KEYS[key]
+		if lvl then
+			SetDetailLevel(lvl)
+			Spring.Echo("[CableTree] detail=" .. DETAIL_NAMES[cableDetail])
+		else
+			Spring.Echo("[CableTree] usage: /cabletree detail off|noflow|full")
+		end
 	elseif arg == "perf" then
 		cablePerf = not cablePerf
-		_G.CableTreePerf = { perf = cablePerf }
-		SendToUnsynced("CableTreePerf")
 		Spring.Echo("[CableTree] perf logging " .. (cablePerf and "ON" or "OFF"))
 	elseif arg == "status" then
 		local nEdges = 0
 		for _ in pairs(edges) do nEdges = nEdges + 1 end
 		Spring.Echo(string.format(
-			"[CableTree] enabled=%s flow=%s perf=%s edges=%d",
-			tostring(cableEnabled), tostring(cableFlowMode),
-			tostring(cablePerf), nEdges))
+			"[CableTree] detail=%s perf=%s edges=%d",
+			DETAIL_NAMES[cableDetail], tostring(cablePerf), nEdges))
 	else
-		Spring.Echo("[CableTree] usage: /cabletree [on|off|toggle|flow on/off|perf|status]")
+		Spring.Echo("[CableTree] usage: /cabletree detail off|noflow|full | perf | status")
 	end
 	return true
 end
@@ -954,6 +1826,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	}
 	allyOfUnit[unitID] = allyTeamID
 	nodeDefByUID[unitID] = unitDefID
+	if consumerByDef[unitDefID] then
+		consumerNodeIndex[unitID] = unitDefID
+	end
+	-- Add to global spatial hash + compute neighbours (bidirectional, written
+	-- into both this pylon's and each candidate's pylonNeighbours table).
+	PylonAddSpatial(allyTeamID, unitID, x, z)
+	PylonBuildNeighbours(allyTeamID, unitID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -968,9 +1847,14 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 	local _, _, _, _, _, oldAlly = Spring.GetTeamInfo(oldTeam, false)
 	if not newAlly or not oldAlly then return end
 	if newAlly ~= oldAlly then
-		-- Old ally's grid loses a member: dirty it before we forget which
-		-- grid this unit was in.
-		MarkGridDirty(oldAlly, lastGridNum[unitID])
+		-- Old ally's grid loses this specific pylon: queue an incremental
+		-- remove so SyncWithGrid patches the MST without rebuilding it.
+		MarkGridRemove(oldAlly, lastGridNum[unitID], unitID)
+		local oldNode = nodes[oldAlly] and nodes[oldAlly][unitID]
+		if oldNode then
+			PylonRemoveSpatial(oldAlly, unitID, oldNode.x, oldNode.z)
+		end
+		PylonClearNeighbours(unitID)
 		if nodes[oldAlly] then nodes[oldAlly][unitID] = nil end
 		lastGridNum[unitID] = nil
 		allyOfUnit[unitID] = nil
@@ -984,25 +1868,27 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 			}
 			allyOfUnit[unitID] = newAlly
 			nodeDefByUID[unitID] = unitDefID
+			if consumerByDef[unitDefID] then
+				consumerNodeIndex[unitID] = unitDefID
+			end
+			PylonAddSpatial(newAlly, unitID, x, z)
+			PylonBuildNeighbours(newAlly, unitID)
+		else
+			consumerNodeIndex[unitID] = nil
+			lastConsumerDcur[unitID] = nil
 		end
 	end
 end
 
--- Unsynced bootstraps synced with the player's persisted flow setting via
--- Spring.SendLuaRulesMsg (see unsynced gadget:Initialize). Format:
--- "cabletree:flow:on" / "cabletree:flow:off". We only react to that exact
--- prefix; other messages pass through untouched.
-function gadget:RecvLuaMsg(msg, playerID)
-	if msg == "cabletree:flow:on" then
-		SetFlowMode(true)
-	elseif msg == "cabletree:flow:off" then
-		SetFlowMode(false)
-	end
-end
-
-function gadget:Initialize()
-	GG.CableTree = { nodes = nodes, edges = edges }
+-- Topology setup: registers chat command, scans pre-existing pylons (for
+-- luarules-reload paths). Called from gadget:Initialize below — the rendering
+-- half's Initialize is the one entry point now that there is no synced tier.
+local function InitTopology()
 	gadgetHandler:AddChatAction("cabletree", CableTreeCmd)
+	-- First pass: register every existing pylon in nodes + spatial hash.
+	-- Second pass: build neighbour lists (so each pylon can see the others
+	-- that were also added in pass one).
+	local seenUnits = {}
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID and pylonDefs[unitDefID] then
@@ -1015,19 +1901,22 @@ function gadget:Initialize()
 			}
 			allyOfUnit[unitID] = allyTeamID
 			nodeDefByUID[unitID] = unitDefID
+			if consumerByDef[unitDefID] then
+				consumerNodeIndex[unitID] = unitDefID
+			end
+			PylonAddSpatial(allyTeamID, unitID, x, z)
+			seenUnits[#seenUnits + 1] = { unitID, allyTeamID }
 		end
+	end
+	for i = 1, #seenUnits do
+		PylonBuildNeighbours(seenUnits[i][2], seenUnits[i][1])
 	end
 end
 
 -------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-else -- UNSYNCED
-
--------------------------------------------------------------------------------------
--- UNSYNCED — Shader-based cable rendering via DrawWorldPreUnit
--- Cables are drawn as quad strips projected onto ground height.
--- Fragment shader: procedural organic texture, LOS-gated animation.
+-- Rendering side: shader-based cable drawing via DrawWorldPreUnit. Cables are
+-- drawn as quad strips projected onto ground height; fragment shader provides
+-- procedural organic texture + LOS-gated animation.
 -------------------------------------------------------------------------------------
 
 local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
@@ -1142,11 +2031,8 @@ local geomCache = {
 local cableShader       -- forward shader for cable rendering
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
-local drawPerf = false  -- toggled by the synced /cabletree perf command
--- Mirrors synced cableFlowMode. Drives the FS `enableFlow` uniform; both
--- sides initialise from the same Spring config key so the toggle survives
--- reloads even before the synced side gets a chance to push.
-local flowMode = (Spring.GetConfigInt("OverdriveCableFlow", 1) or 1) ~= 0
+-- (drawPerf collapsed into cablePerf at the top of the file; flowMode
+-- collapsed into cableFlowMode. Both names live in the topology block above.)
 -- Game-second timestamp captured the moment the current VBO's bubblePhase
 -- snapshots were taken. The shader extrapolates each cable's phase forward
 -- from this anchor using `phase = bakedPhase + flowToSpeed(flow) * (gameTime
@@ -1257,966 +2143,15 @@ end
 -- cylinder normal, plus traveling energy pulses gated by LOS ($info).
 -------------------------------------------------------------------------------------
 
--- Pass-through VS: each cable is a single GL_LINES primitive (2 vertices,
--- both carrying the same per-edge attributes). The geometry shader then
--- expands the line into a wiggly noisy ribbon with N segments. All the
--- expensive per-vertex math that used to live on the CPU now lives on the GPU.
-local cableVSSrc = [[
-#version 420
-#extension GL_ARB_uniform_buffer_object : require
-#extension GL_ARB_shading_language_420pack: require
-
-layout (location = 0) in vec2 vertPos;     // (x, z) world coords
-layout (location = 1) in vec3 vertData;    // (capacity, appearTime, witherTime)
-layout (location = 2) in vec4 vertGrid;    // (gridEfficiency, flow, bubblePhase, isOwnAlly)
-
-out gl_PerVertex {
-	vec4 gl_Position;
-};
-
-out DataVS {
-	vec2 vsWorldXZ;
-	vec3 vsCableData;
-	vec4 vsGridData;
-};
-
-void main() {
-	vsWorldXZ   = vertPos;
-	vsCableData = vertData;
-	vsGridData  = vertGrid;
-	gl_Position = vec4(0.0);
-}
-]]
-
--- (dead-code block removed)
-
--- Full GS: takes one GL_LINES primitive (cable endpoints) and emits the cable
--- ribbon. Uses GS invocations: each invocation runs main() with its own
--- max_vertices budget, so we can:
---   invocation 0          → main wiggly ribbon (SEGMENTS+1 boundaries × 2 verts)
---   invocations 1..N-1    → one twig each (4 verts), conditional on a hash
--- This sidesteps the per-program max_vertices limit and keeps the FS body
--- unchanged.
-local cableGSSrc = [[
-#version 330
-#extension GL_ARB_uniform_buffer_object : require
-#extension GL_ARB_shading_language_420pack: require
-#extension GL_ARB_gpu_shader5 : require
-
-layout (lines, invocations = 5) in;
-// 50 verts/invocation comfortably fits min-spec total components budget;
-// invocation 0 uses ~50, twig invocations use 4.
-layout (triangle_strip, max_vertices = 50) out;
-
-uniform sampler2D heightmapTex;
-
-in DataVS {
-	vec2 vsWorldXZ;
-	vec3 vsCableData;
-	vec4 vsGridData;
-} dataIn[];
-
-out DataGS {
-	vec3 worldPos;
-	float capacity;
-	float isBranch;
-	float width;
-	vec2 cableUV;
-	vec2 timeData;
-	vec4 gridData;
-	float spawnAlongMain;  // twig-only: global cableUV.x of the twig's root; 0 for main ribbon. Lets the FS compute twig-local along for sub-wave animation.
-};
-
-//__ENGINEUNIFORMBUFFERDEFS__
-
-vec2 inverseMapSize = 1.0 / mapSize.xy;
-
-float heightAtWorldPos(vec2 w) {
-	const vec2 heightmaptexel = vec2(8.0, 8.0);
-	w += vec2(-8.0, -8.0) * (w * inverseMapSize) + vec2(4.0, 4.0);
-	vec2 uvhm = clamp(w, heightmaptexel, mapSize.xy - heightmaptexel);
-	uvhm = uvhm * inverseMapSize;
-	return textureLod(heightmapTex, uvhm, 0.0).x;
-}
-
-// Terrain normal at a world XZ point via 4-tap finite-difference of the
-// heightmap. Cheap (4 fetches) and good enough for placing twigs into the
-// slope's local tangent plane.
-vec3 terrainNormal(vec2 xz) {
-	const float E = 8.0;
-	float hxR = heightAtWorldPos(xz + vec2( E, 0.0));
-	float hxL = heightAtWorldPos(xz + vec2(-E, 0.0));
-	float hzU = heightAtWorldPos(xz + vec2(0.0,  E));
-	float hzD = heightAtWorldPos(xz + vec2(0.0, -E));
-	return normalize(vec3(hxL - hxR, 2.0 * E, hzD - hzU));
-}
-
-// Mirror of Lua-side Hash() / NoisyPath() so cables look exactly like before.
-float gsHash(float x, float z, float seed) {
-	return fract(sin(x * 12.9898 + z * 78.233 + seed * 43.17) * 43758.5453) * 2.0 - 1.0;
-}
-float gsHashU(float x, float z, float seed) {  // [0,1] variant
-	return (gsHash(x, z, seed) + 1.0) * 0.5;
-}
-float gsNoiseScale(float t) {
-	if (t < 0.1) return t / 0.1;
-	if (t > 0.9) return (1.0 - t) / 0.1;
-	return 1.0;
-}
-
-const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25 boundaries × 2). Cable lengths are bounded by pylon range so this isn't expected to clamp in practice.
-const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
-const float NOISE_AMP_ABS     = 4.0;
-const float WIDTH_FACTOR      = 0.55;
-const float MIN_TRUNK_WIDTH   = 3.0;
-const float MAX_TRUNK_WIDTH   = 12.0;
-const float MAX_CAPACITY_REF  = 100.0;
-
-// Twig parameters mirror the Lua-side BRANCH_* constants.
-const float BRANCH_CHANCE     = 0.78;
-const float BRANCH_LEN_MIN    = 15.0;
-const float BRANCH_LEN_MAX    = 50.0;
-const float BRANCH_ANGLE_MIN  = 0.4;
-const float BRANCH_ANGLE_MAX  = 1.1;
-const float BRANCH_WIDTH      = 0.85;
-
-// Vertical clearance over the heightmap. CENTERLINE_CLEAR is added on top of
-// the max-of-window lift, so it doesn't need a big pad. TWIG_CLEAR is set
-// 0.6 elmos below CENTERLINE_CLEAR so the twig sits just under the trunk's
-// centerline at the junction (avoids z-fighting while staying visually
-// attached). SIDE_CLEAR catches concave cross-slopes where the slope-tangent
-// offset would otherwise place the side vertex below local terrain.
-const float CENTERLINE_CLEAR  = 1.5;
-const float TWIG_CLEAR        = 0.9;
-const float SIDE_CLEAR        = 0.8;
-
-float gOutBranch = 0.0;
-float gOutSpawnAlong = 0.0;  // set by emitTwig per-twig; main ribbon leaves at 0.
-
-void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
-             float w, vec4 grid, vec2 td, float cap) {
-	worldPos = wp;
-	capacity = cap;
-	isBranch = gOutBranch;
-	width = w;
-	cableUV = cuv;
-	timeData = td;
-	gridData = grid;
-	spawnAlongMain = gOutSpawnAlong;
-	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
-	gl_Position = cameraViewProj * vec4(wp, 1.0);
-	EmitVertex();
-}
-
-// Arc-bias parameters: at each point along the cable, probe the heightmap
-// sideways and pull the centerline toward the lower-elevation side. The
-// per-point lateral budget shrinks tent-style toward the endpoints, so the
-// path is anchored at the pylons and free in the middle — worst case the
-// whole cable forms a smooth arc. Adds *on top of* the existing high-frequency
-// wiggle (which gives bark/seam variation), so the result is "arched chord
-// with bark wiggle" rather than either alone.
-const float ARC_PROBE_DIST   = 35.0;   // elmos to each side for the slope probe
-const float ARC_MAX_DEV_FRAC = 0.18;   // midpoint cap = ARC_MAX_DEV_FRAC * lenAB
-const float ARC_DH_SAT       = 6.0;    // probe Δheight (elmos) at which pull saturates to maxDev
-const float ARC_MIN_LEN      = 80.0;   // shorter cables: skip arc bias entirely
-
-// Computes ONE cable-global pull direction by averaging dh probes at 5
-// anchor points along the chord. Computed once per cable in main() and
-// reused for all segments and twigs.
-//
-// Why averaging instead of per-t probing:
-// Probing dh at *each* segment t evaluates a fresh terrain feature at the
-// chord position, so the pull direction can flip between adjacent segments
-// — the cable then 90°-zigzags through the terrain. A single global dh
-// (signed mean across the chord) produces a monotonic arc: the whole cable
-// bends in one direction, magnitude shaped by the tent envelope. Micro
-// wiggles still come from the existing high-frequency noise pass, so the
-// "still perturbed for micro wiggles" property is preserved.
-float cableArcDh(vec2 a, vec2 d, vec2 perpAB, float lenAB) {
-	if (lenAB <= ARC_MIN_LEN) return 0.0;
-	float dhSum = 0.0;
-	for (int j = 0; j < 5; j++) {
-		float tj = (float(j) + 0.5) * (1.0 / 5.0);   // 0.1, 0.3, 0.5, 0.7, 0.9
-		vec2 mj = a + d * tj;
-		float hL = heightAtWorldPos(mj - perpAB * ARC_PROBE_DIST);
-		float hR = heightAtWorldPos(mj + perpAB * ARC_PROBE_DIST);
-		dhSum += (hR - hL);
-	}
-	return dhSum * (1.0 / 5.0);
-}
-
-// Returns the arc-biased centerline point at parameter t along the chord.
-// `dh` is the cable-global signed pull magnitude from cableArcDh().
-//
-// Pull saturation: rather than a linear gain (which left visibly steep
-// terrain only weakly arched, then reverted to chord beyond budget), we
-// smoothstep from 0 to maxDev as |dh| grows from 0 → ARC_DH_SAT. So as
-// soon as there's any meaningful slope, the cable commits to the maximum
-// allowed lateral deviation — it goes "as far around the hill as the
-// arc budget permits" rather than reverting to the steep chord.
-vec2 arcBiasedCenter(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB, float dh) {
-	vec2 base = a + d * t;
-	if (lenAB <= ARC_MIN_LEN) return base;
-	float tent = 4.0 * t * (1.0 - t);
-	float maxDev = lenAB * ARC_MAX_DEV_FRAC * tent;
-	float pull = sign(dh) * maxDev * smoothstep(0.0, ARC_DH_SAT, abs(dh));
-	// dh>0 (right higher) → pull base toward left = -perpAB * |pull|.
-	return base - perpAB * pull;
-}
-
-// Wiggly cable point at chord parameter t — arc-biased centerline plus
-// high-frequency noise. Used by both main ribbon (per-segment) and twig
-// emitter (at spawn) so they sit on the same path.
-vec2 wigglyCablePoint(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB,
-                      float arcDh, float effAmp, float seed) {
-	vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
-	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
-	return base + perpAB * n;
-}
-
-// Lift y to the max heightmap value sampled within ±fullStep along dirH.
-// Linear interpolation between adjacent segment vertices can dip below
-// terrain on convex/rolling slopes — taking the max within a window that
-// covers the next vertex's position guarantees adjacent envelopes overlap
-// at the segment midpoint, so the rendered ribbon stays above any peak in
-// the gap. Used by the main ribbon (centerline lift) and twig emitter
-// (spawn point lift) so they share the same vertical anchor.
-float maxHeightInWindow(vec2 p, vec2 dirH, float fullStep) {
-	float yMax = heightAtWorldPos(p);
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.30)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.30)));
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.55)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.55)));
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.85)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.85)));
-	return yMax;
-}
-
-void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
-                    float halfW, float widthVal, float effAmp, float seed,
-                    vec4 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
-	gOutBranch = 0.0;
-	// `along` is fed into the FS as cableUV.x and drives bubble advection.
-	// It MUST be a 3D arc length, otherwise downslope cables look like the
-	// flow is racing because the same 2D Δalong covers more visible meters.
-	float along = 0.0;
-	vec3  prev3D = vec3(0.0);
-	float lenAB = length(d);
-
-	// Cross-section basis — computed ONCE for the whole cable. Earlier we built
-	// N/T3/B3 per-vertex from `terrainNormal(p)`. That made adjacent vertices
-	// disagree about which way is "+B3" whenever the local terrain normal
-	// rotated between them (rolling terrain, hilltops, cross-slope crossings).
-	// Adjacent vertices' left/right edges then sat at slightly different
-	// rotational positions around the cable axis, so the ribbon physically
-	// twisted between them — visible as a corkscrew. The lighting was already
-	// correct; the geometry was twisted.
-	//
-	// Anchoring the basis to a chord-averaged Navg gives every vertex the SAME
-	// "+B3" direction. Per-vertex slope tilt still happens via the side-clamp
-	// (each side vertex independently lifted to local terrain+clearance), so
-	// the ribbon still appears to follow the slope — it just can't rotate
-	// around its own axis between segments.
-	vec3 Navg;
-	{
-		vec3 nAcc = vec3(0.0);
-		for (int j = 0; j < 5; j++) {
-			float tj = (float(j) + 0.5) * (1.0 / 5.0);
-			nAcc += terrainNormal(a + d * tj);
-		}
-		Navg = normalize(nAcc);
-	}
-	vec3 cableDirH_g = normalize(vec3(d.x, 0.0, d.y));
-	vec3 T3_g = cableDirH_g - dot(cableDirH_g, Navg) * Navg;
-	float T3gL = length(T3_g);
-	T3_g = (T3gL > 1e-4) ? T3_g / T3gL : cableDirH_g;
-	vec3 B3 = normalize(cross(Navg, T3_g));
-	vec3 perpRefH = normalize(vec3(-perpAB.x, 0.0, -perpAB.y));
-	if (dot(B3, perpRefH) < 0.0) B3 = -B3;
-
-	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);   // full segment span
-
-	for (int i = 0; i <= numSeg; i++) {
-		float t = float(i) / float(numSeg);
-		vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
-
-		// Anti-underground (along-cable): see maxHeightInWindow comment.
-		float yC = maxHeightInWindow(p, dirH, fullStep) + CENTERLINE_CLEAR;
-		vec3 center3D = vec3(p.x, yC, p.y);
-
-		// Geometry convention MUST match the twig emitter:
-		//   v = -1  →  vertex at center − B3*halfW  (so outward = −B3)
-		//   v = +1  →  vertex at center + B3*halfW  (so outward = +B3)
-		// The FS reconstructs perp3D ≈ B3, then cylNormal = perp3D * v at the
-		// side, which therefore matches the *actual* outward direction. Prior
-		// version had these swapped, which inverted the lit side relative to
-		// the sun on every cable (and was inconsistent with twigs).
-		vec3 leftPos  = center3D - B3 * halfW;
-		vec3 rightPos = center3D + B3 * halfW;
-
-		// Anti-underground clamp: on terrain that curves up faster than linear
-		// (concave cross-slope), the slope-tangent-plane offset can put L or R
-		// below the actual heightmap at their XZ. Raise to local terrain +
-		// SIDE_CLEAR whenever that happens. On linear terrain the L/R points
-		// already sit at clearance above ground so this is a no-op there.
-		leftPos.y  = max(leftPos.y,  heightAtWorldPos(leftPos.xz)  + SIDE_CLEAR);
-		rightPos.y = max(rightPos.y, heightAtWorldPos(rightPos.xz) + SIDE_CLEAR);
-
-		// Also raise center3D if a clamp lifted the sides above it (preserves the
-		// cylinder appearance — center should never sit below a side vertex).
-		float midY = max(center3D.y, 0.5 * (leftPos.y + rightPos.y));
-		center3D.y = midY;
-
-		// Per-vertex tangent: forward-diff at vertex 0 (chord direction), and
-		// back-diff for subsequent vertices (centerline direction from the
-		// previous vertex). Smoothly interpolated across the triangle strip,
-		// this gives the FS a continuous cable along-direction so the
-		// cylinder normal bends with up/down hills. (Geometry itself is rigid:
-		// adjacent vertices share the same B3 cross-direction, so the ribbon
-		// cannot twist around its axis.)
-		vec3 vtxTangent;
-		if (i == 0) {
-			vtxTangent = cableDirH_g;
-		} else {
-			vtxTangent = center3D - prev3D;
-			float vtL = length(vtxTangent);
-			vtxTangent = (vtL > 1e-4) ? vtxTangent / vtL : cableDirH_g;
-		}
-
-		if (i > 0) along += distance(prev3D, center3D);
-		prev3D = center3D;
-
-		emitVtx(leftPos,  vtxTangent, vec2(along, -1.0), widthVal, gridD, timeD, cap);
-		emitVtx(rightPos, vtxTangent, vec2(along,  1.0), widthVal, gridD, timeD, cap);
-	}
-	EndPrimitive();
-}
-
-// Emit a small lateral twig at parametric position tCenter along the main
-// (wiggly) cable, deterministic on the cable seed + tCenter so the same
-// twigs appear every frame in the same place. Returns silently when the
-// hash says "no twig here" — leaving an empty primitive, which is a no-op.
-void emitTwig(vec2 a, vec2 d, vec2 perpAB,
-              float halfMainW, float widthVal, float effAmp, float seed,
-              vec4 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
-              float spawnAlongMain, int twigIdx, float arcDh, int numSeg) {
-	// Resolve spawn point on the wiggly main path at tCenter so twigs root on
-	// the visible cable.
-	float lenAB = length(d);
-	vec2 spawn = wigglyCablePoint(a, d, perpAB, tCenter, lenAB, arcDh, effAmp, seed);
-
-	float twigSeed = spawn.x * 7.13 + spawn.y * 3.77 + invSeed;
-	float chance = gsHashU(spawn.x, spawn.y, twigSeed);
-	if (chance > BRANCH_CHANCE) return;
-
-	// Side: STRICTLY alternate by twigIdx so neighbouring twigs along the
-	// main cable land on opposite sides. Two same-side adjacent twigs flashing
-	// in lockstep look like a single pulse "bouncing" — alternating sides
-	// breaks that visual coupling. Angle is still hash-randomised below.
-	float side = ((twigIdx & 1) == 0) ? 1.0 : -1.0;
-	float angleOff = BRANCH_ANGLE_MIN +
-		gsHashU(spawn.x, spawn.y, twigSeed + 2.0) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN);
-	float bLen = BRANCH_LEN_MIN +
-		gsHashU(spawn.x, spawn.y, twigSeed + 3.0) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN);
-
-	float twigW    = max(2.5, widthVal * BRANCH_WIDTH);
-	float twigHWr  = min(twigW, widthVal * 0.55) * WIDTH_FACTOR;
-	// Geometric cone taper at 0.45 — visible shape narrows toward the tip
-	// (looks like a branch, not a tube). The WIDTH varying we pass to the FS
-	// stays UNIFORM at `twigW` along the entire twig, so bubble math sees
-	// constant halfWidthE and bubble radius/spacing don't change with along
-	// position. The visible bubble naturally fits the tapered geometry: in v
-	// space the bubble keeps the same cross-axis extent (relative to the
-	// cable's UV cross), which projects to a smaller world-cross at the
-	// thinner tip. At the very end the cable's `t > 0.9` cross discard clips
-	// any bubble that runs off the tip. This decouples "bubble flow looks
-	// uniform" from "twig has cone shape".
-	float twigHWt  = twigHWr * 0.45;
-
-	// Build the twig as a flat ribbon in the slope's local tangent plane at
-	// the spawn point. This way, viewing perpendicular to the slope, the twig
-	// looks exactly like a flat-ground twig — no downhill tilt artefact.
-	//
-	// Basis: N = terrain normal at spawn; T = cable tangent projected into the
-	// slope plane; B = N × T (in-slope perp to cable). Twig direction is
-	// (cos(angleOff)*T + side*sin(angleOff)*B), and twigPerp3D = N × twigDir3D.
-	vec3 N = terrainNormal(spawn);
-	vec3 cableDirH = normalize(vec3(d.x, 0.0, d.y));
-	vec3 T = normalize(cableDirH - dot(cableDirH, N) * N);
-	vec3 B = normalize(cross(N, T));
-
-	float ca = cos(angleOff);
-	float sa = sin(angleOff) * side;
-	vec3 twigDir3D  = ca * T + sa * B;
-	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
-
-	// Anchor spawn to the same max-of-window lift the main ribbon uses, so the
-	// twig roots on the visible trunk. TWIG_CLEAR is slightly less than
-	// CENTERLINE_CLEAR so the junction sits just under the trunk's centerline
-	// (z-fight avoidance, see TWIG_CLEAR comment).
-	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);
-	float spawnYc = maxHeightInWindow(spawn, dirH, fullStep) + TWIG_CLEAR;
-	vec3 spawn3D = vec3(spawn.x, spawnYc, spawn.y);
-
-	// Anchor the root to the spawn-side edge of the cable's in-slope cross
-	// section so the twig pokes out of the side, not the midline.
-	vec3 root3D = spawn3D + B * (halfMainW * 0.45 * side);
-	vec3 tip3D  = root3D + twigDir3D * bLen;
-
-	vec3 rootL = root3D - twigPerp3D * twigHWr;
-	vec3 rootR = root3D + twigPerp3D * twigHWr;
-	vec3 tipL  = tip3D  - twigPerp3D * twigHWt;
-	vec3 tipR  = tip3D  + twigPerp3D * twigHWt;
-
-	// cableUV.x carries the cable-wide along distance so the FS growth gate
-	// hides this twig until the main growth front has reached spawnAlongMain.
-	// vsTangent for twigs is the twigDir3D (the twig's along-direction); the
-	// FS derives perp3D from cross(worldUp, vsTangent) so cylindrical lighting
-	// follows the twig's pointing direction.
-	gOutBranch = 1.0;
-	gOutSpawnAlong = spawnAlongMain;   // shared by all 4 twig vertices; lets FS compute twig-local along
-	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
-	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
-	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridD, timeD, cap);
-	emitVtx(tipR,  twigDir3D, vec2(spawnAlongMain + bLen,  1.0), twigW, gridD, timeD, cap);
-	EndPrimitive();
-	gOutSpawnAlong = 0.0;
-}
-
-void main() {
-	vec2 a = dataIn[0].vsWorldXZ;
-	vec2 b = dataIn[1].vsWorldXZ;
-	vec2 d = b - a;
-	float lenAB = length(d);
-	if (lenAB < 0.5) return;
-	vec2 dirAB  = d / lenAB;
-	vec2 perpAB = vec2(-dirAB.y, dirAB.x);
-
-	float cap   = dataIn[0].vsCableData.x;
-	vec2  timeD = dataIn[0].vsCableData.yz;
-	vec4  gridD = dataIn[0].vsGridData;
-
-	float widthVal = MIN_TRUNK_WIDTH +
-		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
-	float halfW  = widthVal * WIDTH_FACTOR;
-	float effAmp = NOISE_AMP_ABS * (lenAB < 80.0 ? (lenAB / 80.0) : 1.0);
-	float seed   = a.x * 0.137 + a.y * 0.781 + b.x * 0.293 + b.y * 0.461;
-
-	// Coarse 3D length: 6 sub-spans of the straight a→b path, summing the
-	// terrain-aware Euclidean distance between samples. Slopes inflate len3D
-	// versus lenAB, so hilly cables get more turns AND tighter 2D spacing per
-	// segment (because each segment is len3D/numSeg in 3D arc, but spaced
-	// uniformly in 2D parameter t). Noise wiggle is ignored here — keeping the
-	// scan cheap matters more than a few % accuracy on segment count.
-	//
-	// Also tracks slope curvature: if the second derivative of height along
-	// the chord is large (terrain undulates rather than ramps), bump segment
-	// count further so the linear interpolation between vertices doesn't dip
-	// underground between samples.
-	float len3D = 0.0;
-	float curv  = 0.0;
-	{
-		float h0 = heightAtWorldPos(a) + 2.0;
-		vec3 prev3 = vec3(a.x, h0, a.y);
-		float prevDy = 0.0;
-		for (int j = 1; j <= 6; j++) {
-			float tj = float(j) * (1.0 / 6.0);
-			vec2 bj = a + d * tj;
-			float hj = heightAtWorldPos(bj) + 2.0;
-			vec3 p3 = vec3(bj.x, hj, bj.y);
-			len3D += distance(p3, prev3);
-			float dy = hj - prev3.y;
-			if (j > 1) curv += abs(dy - prevDy);  // sum |Δslope| as curvature proxy
-			prevDy = dy;
-			prev3 = p3;
-		}
-	}
-	// Bump segment count by curvature: every 6 elmos of cumulative |Δslope|
-	// adds one extra segment, capped at MAX_SEGMENTS.
-	int baseSeg = int(len3D / SEG_LEN_TARGET + 0.5);
-	int curvSeg = int(curv * (1.0 / 6.0));
-	int numSeg = clamp(baseSeg + curvSeg, 1, MAX_SEGMENTS);
-
-	// One global pull direction per cable: averaged dh across 5 chord anchors.
-	// Per-segment probing was the source of zigzag — see cableArcDh comment.
-	float arcDh = cableArcDh(a, d, perpAB, lenAB);
-
-	if (gl_InvocationID == 0) {
-		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
-	} else {
-		// Twig density scales with 3D arc length: ~one twig per 110 elmos,
-		// capped at 4. Short cables get 0-1 twigs, long ones get the full set.
-		// Surviving twigs are then respread across [0.15, 0.85] so spacing
-		// remains roughly even regardless of twig count.
-		int idx = gl_InvocationID - 1;          // 0..3
-		int expectedTwigs = clamp(int(len3D / 85.0 + 0.5), 0, 4);
-		if (idx >= expectedTwigs) return;
-		float tCenterRaw = 0.15 + (float(idx) + 0.5) * (0.7 / float(expectedTwigs));
-		// Snap to a main-ribbon segment vertex. The cable is rendered as
-		// piecewise-linear chords between samples at t = i/numSeg, so anchoring
-		// the twig at the analytical centerline (which curves between samples)
-		// would leave the root edge floating off the visible cable surface.
-		// Snapping makes the spawn point coincide with an actual rendered
-		// vertex of the main ribbon.
-		float tCenter = clamp(round(tCenterRaw * float(numSeg)), 1.0, float(numSeg) - 1.0)
-		              / float(numSeg);
-		float spawnAlongMain = len3D * tCenter;
-		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx, arcDh, numSeg);
-	}
-}
-]]
-
-local cableFSSrc = [[
-#version 420
-#extension GL_ARB_uniform_buffer_object : require
-#extension GL_ARB_shading_language_420pack: require
-
-uniform sampler2D infoTex;
-uniform float gameTime;
-uniform float bakeTime;
-uniform float enableFlow;   // 1.0 = full bubble pass; 0.0 = static cables (no animation)
-
-in DataGS {
-	vec3 worldPos;
-	float capacity;
-	float isBranch;
-	float width;
-	vec2 cableUV;
-	vec2 timeData;
-	vec4 gridData;
-	float spawnAlongMain;
-};
-
-//__ENGINEUNIFORMBUFFERDEFS__
-
-// =====================================================================
-// VISUAL TUNING — knobs you most likely want to tweak when devving.
-// Pure aesthetic constants; nothing here changes geometry or topology.
-// =====================================================================
-
-// Grow/wither animation rates (elmos/s) — must match unsynced GROWTH_RATE/
-// WITHER_RATE so the CPU-side bubble phase anchor and the FS-side growth
-// front sweep at the same speed.
-const float GROWTH_RATE        = 250.0;
-const float WITHER_RATE        = 400.0;
-
-// Bark / inner colours. Bark = visible outer cable; inner = brighter core
-// shown through the centre line by `innerMix`. capT (capacity / 100) only
-// blends `innerColor` between two grey levels; no hue.
-const vec3  BARK_COLOR         = vec3(0.55);
-const vec3  INNER_COLOR_LO     = vec3(0.65);   // capT = 0
-const vec3  INNER_COLOR_HI     = vec3(0.85);   // capT = 1
-const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
-
-// Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
-// (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
-// synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.25;
-const float SPEC_EXP           = 24.0;
-const float SPEC_MAGNITUDE     = 0.35;
-const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
-
-// LOS / ghost: dim factor remaps losState through this range; fullLOS uses
-// a hard threshold so bubbles only animate inside actual visibility.
-const float DIM_LOS_LO         = 0.3;
-const float DIM_LOS_HI         = 0.8;
-const float DIM_FACTOR_MIN     = 0.3;          // bark brightness at full darkness
-const float FULLLOS_LO         = 0.7;
-const float FULLLOS_HI         = 1.0;
-
-// Enemy ghost (non-own ally outside LOS): flat dim look, no animation.
-const vec3  GHOST_BASE_LO      = vec3(0.30);   // capT = 0
-const vec3  GHOST_BASE_HI      = vec3(0.55);   // capT = 1
-const float GHOST_BRANCH_DAMP  = 0.65;
-const float GHOST_LOS_THRESH   = 0.45;
-const float GHOST_ALPHA_MAX    = 0.55;
-
-// Bubble flow mapping. Must mirror Lua flowToSpeed() exactly for CPU-baked
-// phase anchoring + FS extrapolation to remain continuous across baking.
-const float MAX_SPEED          = 110.0;
-const float FLOW_REF           = 50.0;
-const float MIN_TRUNK_W        = 3.0;
-const float SPACING_A          = 105.0;        // big bubble layer
-const float SPACING_B          = 48.0;         // small bubble layer
-const float BUBBLE_BIG_R       = 7.5;
-const float BUBBLE_SMALL_R     = 4.0;
-
-// Bubble compositing weights.
-const float HALO_WEIGHT        = 0.70;
-const float BODY_WEIGHT        = 1.85;
-const float SPEC_WEIGHT        = 1.10;
-const float GRID_DESAT         = 0.18;         // how much to mute saturated grid hue
-const float BUBBLE_WHITE_MIX   = 0.15;         // mix into pure white for "hot core"
-const float HALO_WEIGHT_LAYER  = 0.55;         // layer-B halo blend
-
-// Twig pulse: a fast wave sweeps along the cable's `along` axis (used to
-// pick which twig fires next, encoding direction-from-root). When the wave
-// passes a twig's root, a slow sub-wave sweeps the twig itself.
-const float CABLE_PROP_SPEED   = 400.0;        // elmos/s — fast inter-twig stagger
-const float CABLE_PROP_PERIOD  = 2800.0;       // elmos → 7s recurrence at 400/s
-const float TWIG_SWEEP_SPEED   = 90.0;         // elmos/s — visible motion within a twig
-const float PULSE_HW           = 5.0;          // Gaussian sigma in elmos
-const float PULSE_INTENSITY    = 0.55;
-const float PULSE_BODY_W       = 1.10;
-const float PULSE_SPEC_W       = 0.55;
-const float PULSE_HALO_W       = 0.50;
-
-out vec4 fragColor;
-
-float hash(vec2 p) {
-	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
-float hash1(float n) {
-	return fract(sin(n * 12.9898) * 43758.5453);
-}
-
-// One layer of advecting bubbles drawn as world-space-round glassy spheroids.
-// Density is fixed per layer (`spacing` constant); only `speed` changes with
-// flow. Each bubble has hash-derived size + cross-axis offset jitter so the
-// cable looks like bubbly fluid rather than a metronome.
-//
-// Crucially, distance is measured in actual world-space elmos in BOTH axes
-// (along + cross), so bubbles are real circles regardless of cable thickness.
-// `halfWidthE` is the cable cross half-extent in elmos at this fragment
-// (= width * 0.5); `radiusE` is each bubble's target radius in elmos and is
-// clamped so big bubbles fit inside thin cables instead of clipping to a
-// stripe.
-//
-// Shading: faint inner glow + Fresnel rim + small offset highlight, all with
-// smoothstep edges to avoid pixelation at oblique camera angles. Returns
-// (body, specular).
-// `phase` is the integrated travel distance baked + extrapolated by the
-// caller (CPU integrates ∫ speed dt, shader extrapolates the last segment
-// with the current speed). Subtracting from `along` advects bubbles smoothly
-// across speed changes.
-//
-// Returns vec3: (body, specular, halo). Caller composites all three with
-// possibly different colour weights for richer look.
-vec3 bubbleLayer(float along, float phase, float spacing,
-                 float radiusMax, float v, float halfWidthE, float layerSeed) {
-	float along2 = along - phase;
-	float idxLow  = floor(along2 / spacing);
-	float coord   = along2 - idxLow * spacing;     // [0, spacing)
-	float idxNear = (coord < spacing * 0.5) ? idxLow : (idxLow + 1.0);
-	float dAlong  = (coord < spacing * 0.5) ? coord : (spacing - coord);
-
-	float h1 = hash1(idxNear + layerSeed);
-	float h2 = hash1(idxNear + layerSeed + 71.3);
-	// Bubble radius in elmos. Random per bubble; clamped so it sits within
-	// the cable cross-section even on thin twigs.
-	float radiusE = radiusMax * (0.7 + 0.3 * h1);
-	radiusE = min(radiusE, halfWidthE * 0.97);
-	if (radiusE < 0.5) return vec3(0.0);
-
-	// Cross-axis offset: in elmos, only as much margin as the cable can
-	// afford. Skinny cables → bubble centred; chunky cables → bubble can
-	// drift a little off-axis.
-	float crossMargin = max(0.0, halfWidthE - radiusE);
-	float yOffsetE    = (h2 - 0.5) * crossMargin * 1.0;
-
-	float dCrossE = v * halfWidthE - yOffsetE;
-	// Use the wider "halo radius" for the early-exit so the halo, which
-	// extends past r=1, isn't truncated.
-	float haloR = radiusE * 1.5;
-	float r2H = (dAlong * dAlong + dCrossE * dCrossE) / (haloR * haloR);
-	if (r2H >= 1.0) return vec3(0.0);
-
-	float r2 = (dAlong * dAlong + dCrossE * dCrossE) / (radiusE * radiusE);
-	float r  = sqrt(r2);
-	float xn = dAlong / radiusE;
-	float yn = dCrossE / radiusE;
-
-	// Screen-space derivative AA. Keeps every smoothstep edge ~1 pixel wide
-	// regardless of zoom; fixes thick-cable staircase pixelation.
-	float aa = clamp(fwidth(r) * 1.4, 0.005, 0.20);
-
-	// HOT CORE — Gaussian-style bright nucleus, peaks at r=0. Reads as
-	// glowing plasma rather than a flat disc.
-	float core = exp(-r2 * 4.5);
-	core *= 1.0 - smoothstep(1.0 - aa, 1.0, r);
-
-	// SHARP RIM — thin meniscus highlight near r ≈ 0.85.
-	float rim = smoothstep(0.55 - aa, 0.85, r)
-	          * (1.0 - smoothstep(0.85, 1.0 - aa * 0.4, r));
-	rim *= 1.4;
-
-	// SPECULAR — small bright dot offset toward the light direction.
-	vec2 hd = vec2(xn + 0.32, yn + 0.42);
-	float hr = length(hd);
-	float spec = 1.0 - smoothstep(0.0, 0.22 + aa, hr);
-	spec *= spec * spec;   // cubed → very sharp
-
-	// HALO — soft additive bloom outside the bubble's hard edge. Extends
-	// from r=0 out to r=1.5 with a gentle Gaussian falloff.
-	float halo = exp(-r2 * 0.9) * 0.45;
-
-	return vec3(core + rim, spec, halo);
-}
-
-// HSL → RGB at S=1, L=0.5 — matches LuaUI/Headers/overdrive.lua's GetGridColor
-// (hue is the same triangle wave used for the panel/grid colour). Hue in [0,1).
-vec3 hueToRgb(float h) {
-	h = fract(h);
-	float r = clamp(abs(h * 6.0 - 3.0) - 1.0, 0.0, 1.0);
-	float g = clamp(2.0 - abs(h * 6.0 - 2.0), 0.0, 1.0);
-	float b = clamp(2.0 - abs(h * 6.0 - 4.0), 0.0, 1.0);
-	return vec3(r, g, b);
-}
-
-// efficiency (energy/metal ratio) → bubble colour, matching the economy
-// panel's grid swatch (LuaUI/Headers/overdrive.lua). The Lua side computes
-// `h = 5760 / (eff+2)^2` (clamped at eff < 3.5 to h = 190) and then feeds
-// `h / 255` into HSLtoRGB — so the hue divisor here is 255, not 360.
-// Result: low-load grids are blue/teal, fully-saturated grids go yellow→red.
-vec3 gridEfficiencyColor(float eff) {
-	if (eff <= 0.0) return vec3(1.0, 0.25, 1.0);
-	float h;
-	if (eff < 3.5) {
-		h = 190.0;
-	} else {
-		h = 5760.0 / ((eff + 2.0) * (eff + 2.0));
-	}
-	return hueToRgb(h / 255.0);
-}
-
-void main() {
-	float v = cableUV.y;
-	float t = abs(v);
-	if (t > 0.90) discard;
-
-	// Visual grow/wither: cableUV.x is distance along cable in elmos.
-	// Growth front advances from u=0 forward.
-	float along = cableUV.x;
-	float visibleFront = (gameTime - timeData.x) * GROWTH_RATE;
-	if (along > visibleFront) discard;
-	// Wither: tail eats forward from u=0 (witherTime > 0 means withering).
-	if (timeData.y > 0.5) {
-		float witherFront = (gameTime - timeData.y) * WITHER_RATE;
-		if (along < witherFront) discard;
-	}
-
-	// Cylinder cross-section normal that respects cable slope, derived from
-	// the smoothly-interpolated cable tangent passed in by the GS.
-	//
-	// `vsTangent` is set per-vertex to the local cable along-direction (back-
-	// diff of adjacent centerline vertices). The triangle-strip rasteriser
-	// linearly interpolates it across triangles → adjacent fragments along the
-	// cable see a continuously rotating tangent, so the cylinder's lit side
-	// bends smoothly with up/down hills instead of stepping per triangle (as
-	// happens when the basis is reconstructed from `dFdx(worldPos)`, which is
-	// flat per triangle).
-	//
-	// Cross-section axis is `cross(worldUp, cableT)` — purely horizontal, which
-	// matches the GS's global B3 (≈ cross(Navg, T_g)) closely enough for any
-	// terrain whose Navg is near +Y. Sign matches: GS emits leftPos at -B3
-	// (cableUV.y = -1), rightPos at +B3 (cableUV.y = +1), and `cross(Y, T)`
-	// gives the same direction as cross(Navg, T) up to a small Y component.
-	// Reconstruct cable tangent from screen-space derivatives of (worldPos, cableUV.x).
-	// This is per-triangle flat (cableUV.x is linearly interpolated, so derivatives
-	// are constant within a triangle), but cheaper than passing a vec3 varying.
-	vec3 dWdx_loc = dFdx(worldPos);
-	vec3 dWdy_loc = dFdy(worldPos);
-	float duDx = dFdx(cableUV.x);
-	float duDy = dFdy(cableUV.x);
-	float duDenom = duDx * duDx + duDy * duDy;
-	vec3 cableT = (duDenom > 1e-6)
-	    ? normalize((dWdx_loc * duDx + dWdy_loc * duDy) / duDenom)
-	    : vec3(1.0, 0.0, 0.0);
-	vec3 perp3D = cross(vec3(0.0, 1.0, 0.0), cableT);
-	float perp3DL = length(perp3D);
-	if (perp3DL > 1e-3) {
-		perp3D /= perp3DL;
-	} else {
-		// Cable nearly vertical — pick an arbitrary horizontal perp.
-		perp3D = vec3(1.0, 0.0, 0.0);
-	}
-
-	vec3 trueUp = cross(cableT, perp3D);
-	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
-	trueUp = normalize(trueUp);
-
-	float up = sqrt(max(0.0, 1.0 - v * v));
-	vec3 cylNormal = normalize(trueUp * up + perp3D * v);
-
-	// Own lighting (forward rendered, no engine lighting applies)
-	float diffuse = max(DIFFUSE_FLOOR, dot(cylNormal, normalize(sunDir.xyz)));
-
-	// Specular
-	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
-	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
-	float spec = pow(max(0.0, dot(cylNormal, halfDir)), SPEC_EXP) * SPEC_MAGNITUDE;
-
-	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
-	float capT = clamp(capacity / 100.0, 0.0, 1.0);
-	vec3 innerColor = mix(INNER_COLOR_LO, INNER_COLOR_HI, capT);
-
-	float innerMix = smoothstep(0.85, 0.15, t);
-	if (isBranch > 0.5) innerMix *= TWIG_INNER_DAMPEN;
-	vec3 baseColor = mix(BARK_COLOR, innerColor, innerMix);
-
-	// Surface noise detail
-	float surfN = hash(worldPos.xz * 0.5) * 0.04;
-	baseColor += vec3(surfN);
-
-	// LOS state (needed first for animation gating)
-	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
-	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb);
-	float losState = clamp(losTexSample * 4.0 - 1.0, 0.0, 1.0);
-	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
-
-	// Enemy cables out of LOS: render as a flat dim ghost reflecting the last
-	// known state (the synced gadget broadcasts every ally team's grid to all
-	// clients, so we already hold the last-received topology even after LOS
-	// is lost). Skip live shading + bubble animation — ghost is static so it
-	// reads as "memory" rather than current activity. Own cables stay live
-	// (they're always visible to the local viewer).
-	//
-	// We early-out here so the bubble layer pass and bark lighting below
-	// don't run for ghosts; they'd be wasted work.
-	float isOwnAlly = gridData.w;
-	if (isOwnAlly < 0.5 && losState < GHOST_LOS_THRESH) {
-		// Neutral grayish ghost — a "remembered" cable, not a live circuit.
-		// Capacity barely tints brightness so thicker grid lines read slightly
-		// brighter without picking up a hue. Branches are a touch dimmer.
-		float capT = clamp(capacity / 100.0, 0.0, 1.0);
-		vec3 ghostBase = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT);
-		if (isBranch > 0.5) ghostBase *= GHOST_BRANCH_DAMP;
-		// Edge falloff so the ribbon edges fade rather than hard-cut, giving
-		// the ghost a softer "remembered impression" look. Drives alpha too,
-		// so the silhouette dissolves smoothly instead of hard-clipping at t=0.9.
-		float edgeFade = 1.0 - smoothstep(0.55, 0.90, t);
-		fragColor = vec4(ghostBase * edgeFade, GHOST_ALPHA_MAX * edgeFade);
-		return;
-	}
-
-	// Apply lighting
-	vec3 color = baseColor * diffuse + SPEC_TINT * spec;
-
-	// Static-cable detail level: skip the entire bubble pass and bark dim.
-	// `enableFlow` is a uniform driven by the synced /cabletree flow toggle,
-	// so the same draw call cheaply shortcuts to a flat-lit cable when the
-	// player has opted out of the animated visual.
-	if (enableFlow < 0.5) {
-		// Still apply LOS-aware bark dim so out-of-LOS cables read as
-		// shadowed; just don't add bubble glow on top.
-		color *= mix(DIM_FACTOR_MIN, 1.0, smoothstep(DIM_LOS_LO, DIM_LOS_HI, losState));
-		fragColor = vec4(color, 1.0);
-		return;
-	}
-
-	// Energy bubbles travelling along the cable, like fluid in a pipe.
-	//
-	// Design:
-	//   - +u is the direction of energy flow (synced reorients edges by
-	//     current flow); all cables share one global phase so we never get
-	//     the optical illusion of "counter motion" inside a single cable.
-	//   - Density (bubbles per elmo) is FIXED: every cable shows the same
-	//     bubbly look regardless of how loaded it is. What changes with
-	//     flow is the SPEED bubbles travel at — zero flow leaves them
-	//     motionless; high flow makes them zip.
-	//   - Two layered streams of bubbles (big + small) with random per-bubble
-	//     size + cross-axis offset, so the cable looks like a real bubbly
-	//     slurry instead of a metronome of identical dots.
-	// Bubble speed/density mapping. MUST match the CPU's flowToSpeed for the
-	// integrated phase anchoring to stay consistent.
-	//
-	// Cable thickness conveys capacity (orthogonal); flow is encoded by speed
-	// and density together. Each scales as sqrt(flow/FLOW_REF) and ramps
-	// monotonically, so they read as one fused "more lively" signal. Their
-	// product = (sqrt(...))² is linear in flow, matching actual throughput.
-	float flow = gridData.y;
-	// Linear thickness divisor: a cable 4× thicker than min gets its flow
-	// signal scaled to 1/4 before the sqrt → ~0.5× visual liveliness. Slight
-	// negative bias for thick cables, matching the CPU's flowToSpeed.
-	float thicknessRatio = max(1.0, width / MIN_TRUNK_W);
-	float effFlow = max(flow, 0.0) / thicknessRatio;
-	float n = sqrt(effFlow / FLOW_REF);
-	float speed = MAX_SPEED * n;
-
-	float halfWidthE = width * 0.5;        // cable cross half-extent in elmos
-
-	// Phase = CPU's baked phase (snapshot at bakeTime) + linear extrapolation
-	// at the current speed. Speed *changes* update the rate of advance from
-	// here — bubbles don't teleport.
-	float phase = gridData.z + speed * (gameTime - bakeTime);
-
-	// Density: spacing inversely scales with the same sqrt factor, floored at
-	// `n=0.3` so a near-zero-flow cable still shows widely-spaced bubbles
-	// rather than nothing or overlapping spam.
-	float spacingMul = max(0.3, n);
-	float spacingA = SPACING_A / spacingMul;
-	float spacingB = SPACING_B / spacingMul;
-
-	// Bubble pass: main ribbon uses two advecting bubble layers; twigs do a
-	// two-stage wave (see CABLE_PROP_SPEED + TWIG_SWEEP_SPEED).
-	float bubbleBody, bubbleSpec, bubbleHalo;
-	if (isBranch > 0.5) {
-		// Two-stage wavefront (decoupled cable-stagger + twig-sweep):
-		//   1. CABLE_PROP_SPEED sweeps a virtual fast wave along the cable's
-		//      `along` axis. Twigs at lower spawnAlongMain get hit earlier,
-		//      so the stagger encodes direction-from-root.
-		//   2. When that wave passes a twig's root, a slower sub-wave starts
-		//      at twig-local 0 and propagates through the twig at
-		//      TWIG_SWEEP_SPEED. Inter-twig stagger feels snappy while motion
-		//      *within* a twig stays comfortable.
-		// `spawnAlongMain` is what lets us decouple these — without it both
-		// speeds would be tied to the same propagation rate.
-		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED - spawnAlongMain, CABLE_PROP_PERIOD);
-		float subwavePos = TWIG_SWEEP_SPEED * (wavePassedElmos / CABLE_PROP_SPEED);
-		float localAlong = along - spawnAlongMain;
-		float d = localAlong - subwavePos;
-		// No wrap correction: when subwavePos overshoots the twig the
-		// Gaussian naturally falls to ~0 for any fragment.
-		float pulse = exp(-(d * d) / (PULSE_HW * PULSE_HW));
-		float crossT = 1.0 - smoothstep(0.7, 1.0, v * v);
-		float intensity = pulse * crossT * PULSE_INTENSITY;
-		bubbleBody = intensity * PULSE_BODY_W;
-		bubbleSpec = intensity * PULSE_SPEC_W;
-		bubbleHalo = intensity * PULSE_HALO_W;
-	} else {
-		vec3 bA = bubbleLayer(along, phase, spacingA, BUBBLE_BIG_R,   v, halfWidthE,  3.7);
-		vec3 bB = bubbleLayer(along, phase, spacingB, BUBBLE_SMALL_R, v, halfWidthE, 19.1);
-		bubbleBody = bA.x + bB.x * 0.85;
-		bubbleSpec = bA.y + bB.y * 0.85;
-		bubbleHalo = bA.z + bB.z * HALO_WEIGHT_LAYER;
-	}
-
-	// Bubble colour: grid-efficiency hue, lightly toned down so it still
-	// glows clearly but isn't neon-saturated.
-	vec3 gridColor   = gridEfficiencyColor(gridData.x);
-	float gridLum    = dot(gridColor, vec3(0.299, 0.587, 0.114));
-	vec3 grayedGrid  = mix(gridColor, vec3(gridLum), GRID_DESAT);
-	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), BUBBLE_WHITE_MIX);
-	vec3 haloColor   = grayedGrid;
-
-	// LOS-aware dimming on the BARK ONLY. Bubbles are plasma — emissive, so
-	// they shouldn't fade in shadow. Composing them after the dim means
-	// glowing balls remain "lights in the dark" rather than disappearing in
-	// LOS-dim regions.
-	float dimFactor = mix(DIM_FACTOR_MIN, 1.0, smoothstep(DIM_LOS_LO, DIM_LOS_HI, losState));
-	color *= dimFactor;
-
-	// Composition order:
-	//   - Halo: additive (soft underglow that should mix with bark colour).
-	//   - Body: max() over current colour, so dark bark can't leak into the
-	//     bubble's true grid hue. Plain additive composition causes hue
-	//     shifts (orange → yellow, magenta → pink) because the bark's green
-	//     channel piles onto the emissive. max() lets the emissive plasma
-	//     show its real colour through the cable in shadow.
-	//   - Spec: additive white sparkle on top.
-	color += haloColor * bubbleHalo * fullLOS * HALO_WEIGHT;
-	vec3 bubbleEmissive = bubbleColor * bubbleBody * fullLOS * BODY_WEIGHT;
-	color = max(color, bubbleEmissive);
-	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
-
-	// FULLY OPAQUE output — like lava. No alpha blending.
-	fragColor = vec4(color, 1.0);
-}
-]]
+-- Cable shader sources live in dedicated .glsl files alongside the gadget
+-- (LuaRules/Gadgets/Shaders/) so they get proper editor syntax highlighting
+-- and the gadget itself stays focused on Lua state. The placeholder
+-- '//__ENGINEUNIFORMBUFFERDEFS__' inside the GS/FS files is substituted at
+-- shader-compile time in gadget:Initialize below.
+local SHADER_DIR = 'LuaRules/Gadgets/Shaders/'
+local cableVSSrc = VFS.LoadFile(SHADER_DIR .. 'gfx_overdrive_cables.vert.glsl')
+local cableGSSrc = VFS.LoadFile(SHADER_DIR .. 'gfx_overdrive_cables.geom.glsl')
+local cableFSSrc = VFS.LoadFile(SHADER_DIR .. 'gfx_overdrive_cables.frag.glsl')
 
 -------------------------------------------------------------------------------------
 -- Receive data from synced
@@ -2246,15 +2181,16 @@ end
 -- In-place diff of the incoming Full snapshot against existing state:
 -- survivors keep their appearFrame (no animation restart), missing edges
 -- get marked withering, new edges get appearFrame = current frame.
-local function OnCableTreeFull()
-	local data = SYNCED.CableTreeFull
+-- Bound to the forward-declared local at the top of the file so the
+-- topology side can call it directly.
+function OnCableTreeFull(data)
 	if not data then return end
 	local ally = data.allyTeamID
 	-- Always accept; the FS gates enemy fragments by LOS so unscouted enemy
 	-- cables are invisible without dropping their data here.
 	local ownAlly = isOwnAlly(ally)
 
-	local tStart = drawPerf and Spring.GetTimer() or nil
+	local tStart = cablePerf and Spring.GetTimer() or nil
 	local frame = Spring.GetGameFrame()
 	local existing = edgesByAllyTeam[ally] or {}
 
@@ -2319,11 +2255,11 @@ local function OnCableTreeFull()
 	end
 
 	edgesByAllyTeam[ally] = existing
-	local tDiff = drawPerf and Spring.GetTimer() or nil
+	local tDiff = cablePerf and Spring.GetTimer() or nil
 	RebuildRenderEdges()
 	needsRebuild = true
 
-	if drawPerf then
+	if cablePerf then
 		local tEnd = Spring.GetTimer()
 		Spring.Echo(string.format(
 			"[CableTree] OnCableTreeFull: diff=%.2f ms  rebuildIdx=%.2f ms  edges=%d",
@@ -2338,7 +2274,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function RebuildVBO()
-	local tStart = drawPerf and Spring.GetTimer() or nil
+	local tStart = cablePerf and Spring.GetTimer() or nil
 
 	-- Snapshot every edge's bubble phase to NOW before geometry generation,
 	-- and re-anchor; the shader will extrapolate from `bubbleBakeTime`.
@@ -2352,7 +2288,7 @@ local function RebuildVBO()
 		end
 	end
 
-	local tGen0 = drawPerf and Spring.GetTimer() or nil
+	local tGen0 = cablePerf and Spring.GetTimer() or nil
 	local verts, vertCount = GenerateOrganicTree()
 	if vertCount == 0 then
 		numCableVerts = 0
@@ -2371,14 +2307,14 @@ local function RebuildVBO()
 		{ id = 1, name = "vertData",  size = 3 },  -- (capacity, appearTime, witherTime)
 		{ id = 2, name = "vertGrid",  size = 4 },  -- (efficiency, flow E/s, bubble phase elmos, isOwnAlly)
 	})
-	local tUp0 = drawPerf and Spring.GetTimer() or nil
+	local tUp0 = cablePerf and Spring.GetTimer() or nil
 	vbo:Upload(verts)
 	cableVAO = gl.GetVAO()
 	if cableVAO then cableVAO:AttachVertexBuffer(vbo) end
 	numCableVerts = vertCount
 	needsRebuild = false
 
-	if drawPerf then
+	if cablePerf then
 		local tEnd = Spring.GetTimer()
 		Spring.Echo(string.format(
 			"[CableTree] draw rebuild: phase=%.2f ms  build=%.2f ms  upload=%.2f ms  verts=%d edges=%d",
@@ -2399,7 +2335,12 @@ end
 local WITHER_HOLD_FRAMES = 8 * GAME_SPEED
 
 function gadget:GameFrame(n)
-	-- Drop fully-withered edges so geometry doesn't grow unboundedly.
+	-- 1) Topology refresh (was previously a synced gadget:GameFrame). Runs
+	--    on the SYNC_PERIOD cadence, may invoke OnCableTreeFull (sets
+	--    needsRebuild) and update edgesByAllyTeam.
+	RunSyncTick(n)
+
+	-- 2) Drop fully-withered edges so geometry doesn't grow unboundedly.
 	local dropped = false
 	for ally, edges in pairs(edgesByAllyTeam) do
 		for k, e in pairs(edges) do
@@ -2415,11 +2356,12 @@ function gadget:GameFrame(n)
 		geomCache.valid = false
 	end
 
-	-- Rebuild immediately when dirty. Throttling caused visible phase jumps:
-	-- between OnCableTreeFull (which mutates per-edge bubbleSpeed) and the
-	-- rebake, the shader still extrapolates with the OLD speed, then snaps to
-	-- the new baked state. The jump magnitude is Δspeed × (bakeTime - nowSec)
-	-- so any latency here directly produces a visible discontinuity.
+	-- 3) Rebuild immediately when dirty. Throttling caused visible phase
+	--    jumps: between OnCableTreeFull (which mutates per-edge bubbleSpeed)
+	--    and the rebake, the shader still extrapolates with the OLD speed,
+	--    then snaps to the new baked state. The jump magnitude is
+	--    Δspeed × (bakeTime - nowSec) so any latency here directly produces
+	--    a visible discontinuity.
 	if needsRebuild then
 		RebuildVBO()
 	end
@@ -2439,7 +2381,7 @@ function gadget:DrawWorldPreUnit()
 	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
 	cableShader:SetUniform("bakeTime", bubbleBakeTime)
-	cableShader:SetUniform("enableFlow", flowMode and 1.0 or 0.0)
+	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
 
 	gl.Texture(0, "$info")
 	gl.Texture(1, "$heightmap")
@@ -2489,7 +2431,7 @@ function gadget:Initialize()
 		uniformFloat = {
 			gameTime = 0,
 			bakeTime = 0,
-			enableFlow = flowMode and 1.0 or 0.0,
+			enableFlow = cableFlowMode and 1.0 or 0.0,
 		},
 	}, "Cable Forward Shader")
 
@@ -2498,36 +2440,12 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget()
 		return
 	end
-	gadgetHandler:AddSyncAction("CableTreeFull", OnCableTreeFull)
-	gadgetHandler:AddSyncAction("CableTreePerf", function()
-		local data = SYNCED.CableTreePerf
-		if data then drawPerf = data.perf and true or false end
-	end)
-	gadgetHandler:AddSyncAction("CableTreeFlowMode", function()
-		local data = SYNCED.CableTreeFlowMode
-		if data then
-			local newMode = data.flowMode and true or false
-			if newMode ~= flowMode then
-				flowMode = newMode
-				-- Persist on this (unsynced) side; synced cannot read config.
-				Spring.SetConfigInt("OverdriveCableFlow", flowMode and 1 or 0)
-			end
-		end
-	end)
-	-- Bootstrap synced with the persisted setting. Synced defaults to ON;
-	-- if the user previously turned flow off, we tell synced to switch.
-	-- (When already ON, this is a no-op on the synced side.)
-	if not flowMode then
-		Spring.SendLuaRulesMsg("cabletree:flow:off")
-	end
+	-- Topology side: register chat command + scan existing pylons.
+	InitTopology()
 end
 
 function gadget:Shutdown()
 	if cableShader then cableShader:Finalize() end
 	cableVAO = nil
-	gadgetHandler:RemoveSyncAction("CableTreeFull")
-	gadgetHandler:RemoveSyncAction("CableTreePerf")
-	gadgetHandler:RemoveSyncAction("CableTreeFlowMode")
 end
 
-end -- UNSYNCED
