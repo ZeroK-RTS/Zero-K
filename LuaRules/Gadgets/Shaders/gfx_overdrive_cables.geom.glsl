@@ -18,6 +18,7 @@ layout (lines, invocations = 5) in;
 layout (triangle_strip, max_vertices = 50) out;
 
 uniform sampler2D heightmapTex;
+uniform sampler2D infoTex;          // $info:los; same texture FS samples
 
 // Per-edge "have I been seen" bitmask. Bit `i` of `.x` is set when segment
 // `i` of this cable is currently in LOS. Persistent across frames; never
@@ -478,13 +479,32 @@ void main() {
 
 	gOutSlot       = dataIn[0].vsSlot;
 	gOutNumSeg     = numSeg;
-	// Approximate the cable's total along-distance with len3D (the GS later
-	// recomputes it precisely as a sum of segment distances; for FS bit
-	// indexing the chord-based len3D is close enough — both ends of the
-	// segment fall in the same bit at LOS-tile resolution).
-	gOutLenPerSeg  = (numSeg > 0) ? (len3D / float(numSeg)) : 1.0;
 
 	if (gl_InvocationID == 0) {
+		// Coverage SSBO update — once per cable per frame, not per fragment.
+		// Live edges (gridData.w >= -0.5) atomicOr bits for segments currently
+		// in LOS; ghost edges (gridData.w < -0.5) atomicAnd to clear bits the
+		// player has re-scouted (confirmed empty). Sampling along the actual
+		// wiggly path keeps reveal accurate even with arc bias on slopes.
+		int slot = dataIn[0].vsSlot;
+		bool isGhost = gridD.w < -0.5;
+		if (slot >= 0) {
+			uint setMask = 0u;
+			uint clrMask = 0u;
+			int n = min(numSeg, 24);
+			for (int i = 0; i < n; i++) {
+				float t = (float(i) + 0.5) / float(numSeg);
+				vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
+				vec2 losUV = clamp(p, vec2(0.0), mapSize.xy) / mapSize.zw;
+				float los = texture(infoTex, losUV).r;
+				if (los >= 0.5) {
+					if (isGhost) clrMask |= (1u << uint(i));
+					else         setMask |= (1u << uint(i));
+				}
+			}
+			if (setMask != 0u) atomicOr (cableCoverage[slot].x,  setMask);
+			if (clrMask != 0u) atomicAnd(cableCoverage[slot].x, ~clrMask);
+		}
 		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
 	} else {
 		// Twig density scales with 3D arc length: ~one twig per 110 elmos,

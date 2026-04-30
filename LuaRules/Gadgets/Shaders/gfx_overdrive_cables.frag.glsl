@@ -309,16 +309,17 @@ void main() {
 	float losState = texture(infoTex, losUV).r;
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
-	// Per-fragment segment index. Without a baked len-per-segment we use a
-	// single bit (bit 0) for the whole cable in slice 1; per-segment
-	// resolution comes when we wire len-per-segment via a uniform/varying.
-	uint segBit = 1u;
-
-	// FS-side coverage update: any fragment that's actually rasterised AND
-	// currently in LOS marks its cable as seen.
-	if (losState >= ENEMY_LOS_CUT && gsSlot >= 0) {
-		atomicOr(cableCoverage[gsSlot].x, segBit);
-	}
+	// Coverage bits are written by the GS once per cable per frame (cheap)
+	// rather than here in the FS (per-fragment = millions of atomics on
+	// thousand-cable matches). The FS only READS the coverage to decide
+	// ghost rendering.
+	//
+	// segBit = "any segment seen". We don't yet pass len-per-segment to
+	// the FS so per-segment fragment-side gating isn't possible — the
+	// whole cable shows as ghost when any of its bits are set, and hides
+	// when all bits clear. GS sets/clears per-segment so re-scout still
+	// dissolves the ghost correctly as the player walks the area.
+	uint segBit = 0xFFFFFFu;
 
 	// Three render classes for the FS:
 	//   isOwnAlly =  1.0 → own ally, always live (existing path below).
@@ -331,16 +332,11 @@ void main() {
 	float isOwnAlly = gridData.w;
 	bool isGhostEdge = isOwnAlly < -0.5;
 
-	// Re-scout clear: when a ghost fragment ends up in LOS the player has
-	// confirmed the area is empty (the live edge is gone). atomicAnd off
-	// this segment's bit and discard so it stops rendering. Per-fragment
-	// granularity, so partial scouts thin the ghost progressively. Only
-	// the ghost VBO does this — live edges set bits via atomicOr below
-	// and never want to clear them.
-	if (isGhostEdge && losState >= ENEMY_LOS_CUT && gsSlot >= 0) {
-		atomicAnd(cableCoverage[gsSlot].x, ~segBit);
-		discard;
-	}
+	// Re-scout clear is handled by the GS (atomicAnd at segment midpoints
+	// when the ghost edge's bits overlap with current LOS). Here in the FS
+	// we just discard the ghost fragment when it's in current LOS — the
+	// player is looking at empty ground, the cable shouldn't show.
+	if (isGhostEdge && losState >= ENEMY_LOS_CUT) discard;
 
 	bool enemyOutOfLOS = (isOwnAlly < 0.5 && isOwnAlly > -0.5 && losState < ENEMY_LOS_CUT);
 	if (isGhostEdge || enemyOutOfLOS) {
