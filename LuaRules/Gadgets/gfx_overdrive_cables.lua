@@ -2423,14 +2423,24 @@ function OnCableTreeFull(data)
 	local frame = Spring.GetGameFrame()
 	local existing = edgesByAllyTeam[ally] or {}
 
-	-- Local viewer's allyTeam — used to decide whether the player witnessed
-	-- an enemy edge being built or destroyed (then we play the live anim) or
-	-- not (then we go straight to ghost/silent removal).
+	-- Local viewer's allyTeam — used to decide whether the player can see
+	-- ANY part of an enemy edge (start, midpoint, or end). Drives:
+	--   - whether wither/grow animations play (witnessed events).
+	--   - whether visible properties (capacity → ribbon width, position)
+	--     refresh from synced. Per "see any segment → infer whole cable
+	--     reflects current state": as soon as one endpoint or the midpoint
+	--     is in LOS we update everything; otherwise the cable holds its
+	--     last-seen values so unobserved builds can't leak thickness/flow
+	--     changes through the fog rendering.
+	-- 3 short-circuited IsPosInLos calls per edge per OnCableTreeFull tick;
+	-- bounded by sync rate (~1 Hz) and engine-side these calls are cheap.
 	local myAlly = spGetMyAllyTeamID()
-	local function midInLOS(px, pz, cx, cz)
+	local function anyInLOS(px, pz, cx, cz)
 		if ownAlly then return true end
+		if Spring.IsPosInLos(px, 0, pz, myAlly) then return true end
 		local mx, mz = (px + cx) * 0.5, (pz + cz) * 0.5
-		return Spring.IsPosInLos(mx, 0, mz, myAlly)
+		if Spring.IsPosInLos(mx, 0, mz, myAlly) then return true end
+		return Spring.IsPosInLos(cx, 0, cz, myAlly)
 	end
 
 	-- Build a fast lookup of incoming keys.
@@ -2456,7 +2466,7 @@ function OnCableTreeFull(data)
 				-- wither animation in-place; the snapshot to ghost happens
 				-- later in GameFrame when wither completes (see WITHER_HOLD
 				-- handler). Out of LOS, snapshot immediately and silently.
-				if midInLOS(e.px, e.pz, e.cx, e.cz) then
+				if anyInLOS(e.px, e.pz, e.cx, e.cz) then
 					e.witherFrame = frame
 				else
 					if cableGhosts and e.slot and e.slot >= 0 then
@@ -2526,7 +2536,7 @@ function OnCableTreeFull(data)
 			-- its ghost render. Bubble phase / flow / eff are also only
 			-- meaningful in LOS (they animate the live render), so refreshing
 			-- them in fog is harmless but we keep the gate uniform.
-			local visible = ownAlly or midInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i])
+			local visible = ownAlly or anyInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i])
 			if visible then
 				e.capacity = data.caps[i]
 				e.flow     = newFlow
@@ -2554,7 +2564,7 @@ function OnCableTreeFull(data)
 			local af
 			if resurrectedKeys and resurrectedKeys[k] then
 				af = 0
-			elseif ownAlly or midInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i]) then
+			elseif ownAlly or anyInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i]) then
 				af = frame
 			else
 				af = 0
