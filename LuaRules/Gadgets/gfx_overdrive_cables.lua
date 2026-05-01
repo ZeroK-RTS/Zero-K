@@ -2431,6 +2431,17 @@ function OnCableTreeFull(data)
 		incoming[data.keys[i]] = i
 	end
 
+	-- Refresh cached own/enemy flag for every edge of this ally before any
+	-- branching below uses it. Without this, a /team or spec view switch
+	-- leaves stale e.isOwnAlly = true on ex-own edges; the disappear loop
+	-- would then take the own-ally branch and play a wither animation in
+	-- fog instead of snapshotting the dead edge to a ghost. The GameFrame
+	-- wither-snapshot path also reads e.isOwnAlly, so the refresh has to
+	-- land on every edge, not just survivors of this tick.
+	for _, e in pairs(existing) do
+		e.isOwnAlly = ownAlly
+	end
+
 	-- Edges that synced no longer reports.
 	-- Own-ally → start withering animation (player knows their grid lost a
 	-- pylon, the visual reflects that).
@@ -2443,7 +2454,7 @@ function OnCableTreeFull(data)
 	-- ghost feature existed.
 	for k, e in pairs(existing) do
 		if not incoming[k] and not e.witherFrame then
-			if not e.isOwnAlly then
+			if not ownAlly then
 				-- If the player can see the midpoint right now, play the
 				-- wither animation in-place; the snapshot to ghost happens
 				-- later in GameFrame when wither completes (see WITHER_HOLD
@@ -2885,6 +2896,41 @@ function gadget:Initialize()
 
 	-- Topology side: register chat command + scan existing pylons.
 	InitTopology()
+end
+
+-- Local viewer changed team / spec state (e.g. /team N, going spec, joining
+-- as player). Re-tag every edge's cached own/enemy flag against the new
+-- viewer, drop ghosts whose ally is now own-side (you can see them live —
+-- a ghost duplicate would render on top), and force a live VBO rebuild so
+-- the per-vert isOwn flag flips this frame instead of waiting for the next
+-- sync tick. Filtered to the local player so other players' team changes
+-- don't trigger the work.
+function gadget:PlayerChanged(playerID)
+	if playerID ~= Spring.GetLocalPlayerID() then return end
+	local touched = false
+	for ally, edges in pairs(edgesByAllyTeam) do
+		local ownAlly = isOwnAlly(ally)
+		for _, e in pairs(edges) do
+			if e.isOwnAlly ~= ownAlly then
+				e.isOwnAlly = ownAlly
+				touched = true
+			end
+		end
+	end
+	-- Ghosts only exist for enemy edges. If a previously-enemy ally is now
+	-- own-side (spec switched into them, or you joined the team), the live
+	-- render is authoritative; drop the stale ghost snapshots.
+	for k, g in pairs(ghostEdges) do
+		local edge = renderEdgesByKey and renderEdgesByKey[k]
+		if edge and edge.isOwnAlly then
+			ghostEdges[k] = nil
+			ghostNeedsRebuild = true
+		end
+	end
+	if touched then
+		geomCache.valid = false
+		needsRebuild = true
+	end
 end
 
 function gadget:Shutdown()
