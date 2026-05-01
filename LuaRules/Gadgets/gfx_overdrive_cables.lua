@@ -2424,6 +2424,16 @@ function OnCableTreeFull(data)
 	local frame = Spring.GetGameFrame()
 	local existing = edgesByAllyTeam[ally] or {}
 
+	-- Local viewer's allyTeam — used to decide whether the player witnessed
+	-- an enemy edge being built or destroyed (then we play the live anim) or
+	-- not (then we go straight to ghost/silent removal).
+	local myAlly = spGetMyAllyTeamID()
+	local function midInLOS(px, pz, cx, cz)
+		if ownAlly then return true end
+		local mx, mz = (px + cx) * 0.5, (pz + cz) * 0.5
+		return Spring.IsPosInLos(mx, 0, mz, myAlly)
+	end
+
 	-- Build a fast lookup of incoming keys.
 	local incoming = {}
 	for i = 1, data.edgeCount do
@@ -2443,16 +2453,24 @@ function OnCableTreeFull(data)
 	for k, e in pairs(existing) do
 		if not incoming[k] and not e.witherFrame then
 			if not e.isOwnAlly then
-				if cableGhosts and e.slot and e.slot >= 0 then
-					ghostEdges[k] = {
-						px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
-						capacity = e.capacity or 0,
-						slot = e.slot,
-						key = k,
-					}
-					ghostNeedsRebuild = true
+				-- If the player can see the midpoint right now, play the
+				-- wither animation in-place; the snapshot to ghost happens
+				-- later in GameFrame when wither completes (see WITHER_HOLD
+				-- handler). Out of LOS, snapshot immediately and silently.
+				if midInLOS(e.px, e.pz, e.cx, e.cz) then
+					e.witherFrame = frame
+				else
+					if cableGhosts and e.slot and e.slot >= 0 then
+						ghostEdges[k] = {
+							px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
+							capacity = e.capacity or 0,
+							slot = e.slot,
+							key = k,
+						}
+						ghostNeedsRebuild = true
+					end
+					existing[k] = nil
 				end
-				existing[k] = nil
 			else
 				e.witherFrame = frame
 			end
@@ -2486,6 +2504,13 @@ function OnCableTreeFull(data)
 	for k, i in pairs(incoming) do
 		local e = existing[k]
 		local newFlow = data.flows and data.flows[i] or 0
+		-- Withering edge that's resurrected by the new snapshot: cancel
+		-- the wither, treat as a survivor (no growth restart). Otherwise
+		-- the cable would finish withering and disappear despite synced
+		-- saying it's back.
+		if e and e.witherFrame then
+			e.witherFrame = nil
+		end
 		if e and not e.witherFrame then
 			-- Catch the phase up to `nowSec` using whatever speed the cable
 			-- was running at since its last anchor.
@@ -2513,14 +2538,19 @@ function OnCableTreeFull(data)
 			-- the edge but with slot = -1 (GS treats as "don't update bits").
 			local slot = AllocSlot(k) or -1
 			-- Growth animation policy:
-			--   own ally → grow (player just built this, the visual feedback
-			--                    is desired).
-			--   enemy    → no growth (you can't know when the enemy built it,
-			--                    so a u=0-outward crop reads as "regrow on
-			--                    every MST reroute" which is wrong).
-			--   resurrected ghost → no growth too (continuity of memory).
-			local af = (ownAlly and not (resurrectedKeys and resurrectedKeys[k]))
-				and frame or 0
+			--   own ally → grow (player just built this).
+			--   enemy in LOS → grow (player witnessed it being built).
+			--   enemy in fog → no growth (player doesn't know about it; growth
+			--                  would crop in from u=0 = misleading).
+			--   resurrected ghost → no growth (continuity of memory).
+			local af
+			if resurrectedKeys and resurrectedKeys[k] then
+				af = 0
+			elseif ownAlly or midInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i]) then
+				af = frame
+			else
+				af = 0
+			end
 			existing[k] = {
 				px = data.pxs[i], pz = data.pzs[i],
 				cx = data.cxs[i], cz = data.czs[i],
@@ -2630,10 +2660,23 @@ function gadget:GameFrame(n)
 	RunSyncTick(n)
 
 	-- 2) Drop fully-withered edges so geometry doesn't grow unboundedly.
+	-- Enemy edges that withered in LOS get snapshotted to ghostEdges here
+	-- (deferred from OnCableTreeFull so the player sees the full wither
+	-- animation first). After the snapshot, the cable seamlessly continues
+	-- to render via the ghost VBO from previously-seen segments.
 	local dropped = false
 	for ally, edges in pairs(edgesByAllyTeam) do
 		for k, e in pairs(edges) do
 			if e.witherFrame and (n - e.witherFrame) >= WITHER_HOLD_FRAMES then
+				if not e.isOwnAlly and cableGhosts and e.slot and e.slot >= 0 then
+					ghostEdges[k] = {
+						px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
+						capacity = e.capacity or 0,
+						slot = e.slot,
+						key = k,
+					}
+					ghostNeedsRebuild = true
+				end
 				edges[k] = nil
 				dropped = true
 			end

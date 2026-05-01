@@ -217,15 +217,13 @@ vec3 gridEfficiencyColor(float eff) {
 	return hueToRgb(h / 255.0);
 }
 
-// Ghost shading constants — translucent, slightly cool, gently shimmering
-// "memory" render. Reads as a wisp rather than a flat painted line.
-const vec3  GHOST_BASE_LO      = vec3(0.32, 0.38, 0.46);   // capT = 0 (cool grey)
-const vec3  GHOST_BASE_HI      = vec3(0.55, 0.66, 0.78);   // capT = 1 (cool brighter)
-const float GHOST_BRANCH_DAMP  = 0.6;
-const float GHOST_ALPHA_BASE   = 0.55;   // baseline opacity at the centerline
-const float GHOST_SHIMMER_AMP  = 0.18;   // ±brightness from a slow sin pulse
-const float GHOST_SHIMMER_HZ   = 0.45;   // pulses/sec
-const float GHOST_EDGE_FADE_LO = 0.30;   // wispier edge falloff than live
+// Ghost shading: simple flat light-gray, alpha-blended over terrain.
+// No lighting, no shimmer, no cylinder normal — reads as a memory trace.
+const vec3  GHOST_COLOR        = vec3(0.72);   // light neutral gray
+const float GHOST_CAP_TINT     = 0.18;         // small capacity-driven brighten
+const float GHOST_BRANCH_DAMP  = 0.85;
+const float GHOST_ALPHA_BASE   = 0.45;         // translucent baseline
+const float GHOST_EDGE_FADE_LO = 0.55;
 const float GHOST_EDGE_FADE_HI = 0.90;
 
 void main() {
@@ -265,23 +263,15 @@ void main() {
 		}
 		if ((cov0 & segBit0) == 0u) discard;
 
+		// Flat ghost shade: light gray, slight capacity-driven brightening,
+		// branches a touch dimmer. Alpha-blend over terrain (depth-write off
+		// in the ghost draw pass) so the ribbon is a translucent overlay
+		// rather than an opaque painted line.
 		float capT0 = clamp(capacity / 100.0, 0.0, 1.0);
-		vec3 ghost0 = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT0);
+		vec3 ghost0 = GHOST_COLOR * (1.0 - GHOST_CAP_TINT + GHOST_CAP_TINT * 2.0 * capT0);
 		if (isBranch > 0.5) ghost0 *= GHOST_BRANCH_DAMP;
-
-		// Slow shimmer keyed off worldPos so neighbouring cables don't pulse
-		// in lockstep. ±18% brightness, ~half-Hz so it's "breathing" not
-		// "flickering".
-		float shim = 1.0 + GHOST_SHIMMER_AMP * sin(
-			gameTime * (6.2831853 * GHOST_SHIMMER_HZ)
-			+ worldPos.x * 0.013 + worldPos.z * 0.017);
-		ghost0 *= shim;
-
-		// Wispy edges: stronger smoothstep + alpha that follows it so the
-		// ribbon dissolves into transparency rather than hard-clipping.
 		float edgeFade0 = 1.0 - smoothstep(GHOST_EDGE_FADE_LO, GHOST_EDGE_FADE_HI, t);
-		float alpha = GHOST_ALPHA_BASE * edgeFade0;
-		fragColor = vec4(ghost0 * edgeFade0, alpha);
+		fragColor = vec4(ghost0, GHOST_ALPHA_BASE * edgeFade0);
 		return;
 	}
 
@@ -392,11 +382,13 @@ void main() {
 		if (ghostsEnabled < 0.5) discard;
 		uint cov = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
 		if ((cov & segBit) == 0u) discard;
+		// Same flat translucent shading as the ghost-VBO fast path so
+		// live-out-of-LOS and orphaned ghosts read identically.
 		float capT2 = clamp(capacity / 100.0, 0.0, 1.0);
-		vec3 ghost = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT2);
+		vec3 ghost = GHOST_COLOR * (1.0 - GHOST_CAP_TINT + GHOST_CAP_TINT * 2.0 * capT2);
 		if (isBranch > 0.5) ghost *= GHOST_BRANCH_DAMP;
-		float edgeFade = 1.0 - smoothstep(0.55, 0.90, t);
-		fragColor = vec4(ghost * edgeFade, 1.0);
+		float edgeFade = 1.0 - smoothstep(GHOST_EDGE_FADE_LO, GHOST_EDGE_FADE_HI, t);
+		fragColor = vec4(ghost, GHOST_ALPHA_BASE * edgeFade);
 		return;
 	}
 
