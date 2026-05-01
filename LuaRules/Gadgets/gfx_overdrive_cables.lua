@@ -356,20 +356,21 @@ local cableDetail = readDetailFromConfig()
 local cableEnabled  = cableDetail ~= DETAIL_OFF
 local cablePerf     = false
 local cableFlowMode = cableDetail == DETAIL_FULL
--- Ghost rendering: when on, the GS samples LOS at each cable segment center
--- and atomicOr's the per-edge coverage SSBO. A separate ghost pass (slice 3)
--- consumes those bits to render last-seen segments of dead/orphaned enemy
--- cables. Slice 1 only fills the SSBO so we can verify the bit accumulation;
--- the live render is unchanged.
+-- Ghost rendering toggle. When on: GS samples LOS at each cable segment and
+-- atomicOr's bits into the per-edge coverage SSBO; FS gates the ghost branch
+-- on those bits; a separate ghost VBO carries orphaned enemy edges as a
+-- translucent overlay. When off: every code path short-circuits, restoring
+-- pre-ghosts perf for live-only rendering.
 local cableGhosts = (Spring.GetConfigInt("OverdriveCableGhosts", 1) or 1) ~= 0
 
 -- ---------------------------------------------------------------------------
--- Per-edge coverage SSBO (slice 1: bits set by GS, not yet consumed)
+-- Per-edge coverage SSBO
 -- ---------------------------------------------------------------------------
 -- Each cable owns one slot in `coverageSSBO`. The GS atomicOr's bit `i`
--- whenever segment `i` is currently in LOS during the live pass. The slot
--- index is allocated CPU-side per edgeKey and freed when the edge has no
--- live presence and no remaining ghost coverage.
+-- whenever segment `i` is currently in LOS during the live pass; for ghost
+-- edges it atomicAnd's the bit off when the player re-scouts. The slot index
+-- is allocated per-edgeKey and freed when the edge has no live presence and
+-- the cleanup pass confirms the area is empty.
 --
 -- Slot numbering is decoupled from edge identity (which is `EdgeKey =
 -- min(uidA,uidB):max(uidA,uidB)`, persistent across topology rerouting):
@@ -384,7 +385,6 @@ local cableGhosts = (Spring.GetConfigInt("OverdriveCableGhosts", 1) or 1) ~= 0
 local COVERAGE_MAX_SLOTS = 4096
 local coverageSSBO       -- gl.GetVBO(GL.SHADER_STORAGE_BUFFER); allocated in Initialize
 local slotByKey      = {}    -- edgeKey -> slot
-local keyBySlot      = {}    -- slot -> edgeKey
 local freeSlots      = {}    -- stack of recycled slot IDs
 local nextSlot       = 0     -- next never-allocated slot
 
@@ -400,7 +400,6 @@ local function AllocSlot(edgeKey)
 		nextSlot = nextSlot + 1
 	end
 	slotByKey[edgeKey] = s
-	keyBySlot[s] = edgeKey
 	-- Recycled slots get zeroed at FreeSlot time, so AllocSlot doesn't need
 	-- to upload here. Initial allocation works too because the SSBO is
 	-- zero-initialised at gadget:Initialize.
@@ -411,14 +410,14 @@ local function FreeSlot(edgeKey)
 	local s = slotByKey[edgeKey]
 	if not s then return end
 	slotByKey[edgeKey] = nil
-	keyBySlot[s] = nil
 	freeSlots[#freeSlots + 1] = s
 	-- Wipe the slot before it can be re-handed-out to a different edge.
-	-- Upload one vec4 of zeros at element offset s. Args: (data, attribIdx,
-	-- elemOffset). attribIdx=0 is our only attribute; elemOffset places the
-	-- single-element write at slot s.
+	-- Upload one vec4 of zeros at element offset s. Spring's Upload signature:
+	-- (data, attribIdx, elemOffset, luaStart, luaFinish). attribIdx=nil =
+	-- "all attribs" (we have one), elemOffset=s, explicit luaStart/luaFinish
+	-- avoid the engine's "too few data" check that fires when those default.
 	if coverageSSBO then
-		coverageSSBO:Upload({0, 0, 0, 0}, 0, s)
+		coverageSSBO:Upload({0, 0, 0, 0}, nil, s, 1, 4)
 	end
 end
 
@@ -2520,13 +2519,22 @@ function OnCableTreeFull(data)
 			e.bubbleAnchorTime = nowSec
 			e.bubbleSpeed = flowToSpeed(newFlow, data.caps[i])
 
-			e.capacity = data.caps[i]
-			e.flow     = newFlow
-			e.eff      = data.effs and data.effs[i] or 0
+			-- Visible properties (capacity drives ribbon width, position drives
+			-- the chord) only refresh when the player can see the edge. For
+			-- enemy edges in fog we keep the last-seen values so a build that
+			-- changes an unobserved cable's thickness doesn't suddenly update
+			-- its ghost render. Bubble phase / flow / eff are also only
+			-- meaningful in LOS (they animate the live render), so refreshing
+			-- them in fog is harmless but we keep the gate uniform.
+			local visible = ownAlly or midInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i])
+			if visible then
+				e.capacity = data.caps[i]
+				e.flow     = newFlow
+				e.eff      = data.effs and data.effs[i] or 0
+				e.px, e.pz = data.pxs[i], data.pzs[i]
+				e.cx, e.cz = data.cxs[i], data.czs[i]
+			end
 			e.isOwnAlly = ownAlly
-			-- positions are stable for unchanged edges; assign anyway in case parent moved
-			e.px, e.pz = data.pxs[i], data.pzs[i]
-			e.cx, e.cz = data.cxs[i], data.czs[i]
 			-- Late-bind a coverage slot if missing (e.g., gadget was reloaded
 			-- after the SSBO was added but with pre-existing edges).
 			if not e.slot then e.slot = AllocSlot(k) or -1 end
@@ -2755,9 +2763,8 @@ function gadget:DrawWorldPreUnit()
 	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
 	cableShader:SetUniform("ghostsEnabled", cableGhosts and 1.0 or 0.0)
 
-	-- Bind the per-edge coverage SSBO at binding=6 for GS atomicOr writes
-	-- and (slice 3) ghost-pass reads. Always bound when shader is active so
-	-- we don't have to manage a separate ghost program.
+	-- Bind the per-edge coverage SSBO at binding=6. Both the live and ghost
+	-- VBO draws use the same shader program so a single binding covers them.
 	if coverageSSBO then
 		local b = coverageSSBO:BindBufferRange(6)
 		if cablePerf and Spring.GetGameFrame() % 30 == 0 then
@@ -2779,20 +2786,21 @@ function gadget:DrawWorldPreUnit()
 	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 	cableVAO:DrawArrays(GL.LINES, numCableVerts)
 
-	-- Ghost pass: orphaned enemy edges, semi-transparent shimmery render.
-	-- Render with DepthMask off so they don't occlude live cables behind
-	-- them, and so re-draws on top of terrain blend correctly without
-	-- writing depth that would clamp later geometry.
+	-- Ghost pass: orphaned enemy edges, semi-transparent flat-gray render.
+	-- DepthMask off so ghosts don't occlude live cables behind them and so
+	-- the alpha-blend composes against terrain without writing depth that
+	-- would clamp later geometry.
 	if cableGhosts and ghostVAO and numGhostVerts > 0 then
 		gl.DepthMask(false)
 		ghostVAO:DrawArrays(GL.LINES, numGhostVerts)
 		gl.DepthMask(true)
 	end
 
-	-- Make GS atomicOr writes visible to subsequent SSBO consumers (slice 3
-	-- ghost pass) and to CPU-side Download. Without this barrier the writes
-	-- live in the shader-store cache and never become coherent with later
-	-- map/read operations on the same buffer.
+	-- Make the GS atomicOr/atomicAnd writes visible to subsequent SSBO
+	-- consumers (the ghost pass on the next frame, plus any Download from
+	-- chat handlers). Without this barrier the writes live in the
+	-- shader-store cache and never become coherent with later map/read
+	-- operations on the same buffer.
 	if gl.MemoryBarrier and GL.SHADER_STORAGE_BARRIER_BIT then
 		gl.MemoryBarrier(GL.SHADER_STORAGE_BARRIER_BIT + GL.BUFFER_UPDATE_BARRIER_BIT)
 	end

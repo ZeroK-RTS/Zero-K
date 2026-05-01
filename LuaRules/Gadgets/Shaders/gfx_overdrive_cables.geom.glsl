@@ -22,9 +22,9 @@ uniform sampler2D infoTex;          // $info:los; same texture FS samples
 uniform float ghostsEnabled;        // 1.0 = run coverage SSBO updates, 0.0 = bypass entirely
 
 // Per-edge "have I been seen" bitmask. Bit `i` of `.x` is set when segment
-// `i` of this cable is currently in LOS. Persistent across frames; never
-// cleared in slice 1 (slice 3 will clear bits during the ghost pass when
-// the player's LOS confirms the area is empty).
+// `i` of the cable in slot s has been in LOS at any point. Persistent across
+// frames. Live edges atomicOr bits in; ghost edges atomicAnd them off when
+// the player re-scouts the area (re-scout-clear pass).
 //
 // Slots are declared as uvec4 because Spring's VBO API requires vec4-aligned
 // attributes; we only use `.x` and ignore `.yzw`.
@@ -204,11 +204,20 @@ vec2 arcBiasedCenter(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB, float dh
 // Wiggly cable point at chord parameter t — arc-biased centerline plus
 // high-frequency noise. Used by both main ribbon (per-segment) and twig
 // emitter (at spawn) so they sit on the same path.
+//
+// `perpCanon` orients the noise offset to a chord-direction-independent
+// half-plane so the wiggle hits the same world position regardless of
+// which endpoint is treated as "a". `arcBiasedCenter` is already
+// direction-symmetric on its own (perpAB and dh both flip together).
 vec2 wigglyCablePoint(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB,
                       float arcDh, float effAmp, float seed) {
 	vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
 	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
-	return base + perpAB * n;
+	vec2 perpCanon = perpAB;
+	if (perpCanon.x < 0.0 || (perpCanon.x == 0.0 && perpCanon.y < 0.0)) {
+		perpCanon = -perpCanon;
+	}
+	return base + perpCanon * n;
 }
 
 // Lift y to the max heightmap value sampled within ±fullStep along dirH.
@@ -423,15 +432,14 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 }
 
 void main() {
+	// IMPORTANT: parent/child orientation is gameplay info — the bubble
+	// advection direction (driven by cableUV.x growing from a to b) signals
+	// power flow, so we MUST keep the synced parent→child order. The wiggle
+	// is made direction-independent below via a symmetric `seed`, which
+	// prevents the live→ghost transition from teleporting the noise pattern
+	// when MST reroutes flip parent/child while preserving the flow visual.
 	vec2 a = dataIn[0].vsWorldXZ;
 	vec2 b = dataIn[1].vsWorldXZ;
-	// Normalize chord direction so parent/child swap (which can happen when
-	// the MST reroutes and re-orients the same edgeKey) doesn't change the
-	// wiggly path — otherwise live → ghost or ghost → live transitions
-	// "teleport" the cable to a different noise seed.
-	if (a.x > b.x || (a.x == b.x && a.y > b.y)) {
-		vec2 tmp = a; a = b; b = tmp;
-	}
 	vec2 d = b - a;
 	float lenAB = length(d);
 	if (lenAB < 0.5) return;
@@ -455,7 +463,12 @@ void main() {
 		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
 	float halfW  = widthVal * WIDTH_FACTOR;
 	float effAmp = NOISE_AMP_ABS * (lenAB < 80.0 ? (lenAB / 80.0) : 1.0);
-	float seed   = a.x * 0.137 + a.y * 0.781 + b.x * 0.293 + b.y * 0.461;
+	// Symmetric seed: same multiplier on both endpoints so reversing (a,b)
+	// gives the same value. Keeps the wiggle stable across MST reroutes
+	// that flip parent/child orientation. Direction-dependent visuals (flow
+	// bubbles) are driven by cableUV.x which still respects the parent→child
+	// order, so flow direction is unaffected.
+	float seed   = (a.x + b.x) * 0.215 + (a.y + b.y) * 0.621;
 
 	// Coarse 3D length: 6 sub-spans of the straight a→b path, summing the
 	// terrain-aware Euclidean distance between samples. Slopes inflate len3D

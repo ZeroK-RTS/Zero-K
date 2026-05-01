@@ -9,7 +9,8 @@ uniform float bakeTime;
 uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no animation)
 uniform float ghostsEnabled;  // 1.0 = ghost branch active; 0.0 = enemy OOL discards immediately
 
-// Same SSBO as the GS — slot 0 is the FS-write probe target (debug only).
+// Same SSBO as the GS — per-edge coverage bitmask, gates per-segment
+// ghost rendering for enemy fragments.
 layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
 	uvec4 cableCoverage[];
 };
@@ -244,7 +245,7 @@ void main() {
 
 	// FAST GHOST PATH — orphaned-enemy edges (gridData.w = -1.0) skip all the
 	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
-	// decide, render translucent shimmery ghost or discard. Nothing else.
+	// decide, render translucent flat ghost or discard. Nothing else.
 	if (gridData.w < -0.5) {
 		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 		float los0 = texture(infoTex, losUV0).r;
