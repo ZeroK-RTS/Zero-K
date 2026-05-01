@@ -6,7 +6,8 @@
 uniform sampler2D infoTex;
 uniform float gameTime;
 uniform float bakeTime;
-uniform float enableFlow;   // 1.0 = full bubble pass; 0.0 = static cables (no animation)
+uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no animation)
+uniform float ghostsEnabled;  // 1.0 = ghost branch active; 0.0 = enemy OOL discards immediately
 
 // Same SSBO as the GS — slot 0 is the FS-write probe target (debug only).
 layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
@@ -21,9 +22,8 @@ in DataGS {
 	vec2 cableUV;
 	vec2 timeData;
 	vec4 gridData;
-	float spawnAlongMain;
+	float spawnAlongMain;   // overloaded: main ribbon → lenPerSeg; twig → twig-along
 	flat int gsSlot;
-	flat int gsNumSeg;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -239,6 +239,26 @@ void main() {
 		if (along < witherFront) discard;
 	}
 
+	// FAST GHOST PATH — orphaned-enemy edges (gridData.w = -1.0) skip all the
+	// cylinder-normal / lighting / bubble math below. Big perf win when the
+	// player has accumulated map-wide ghost coverage. Read LOS + coverage,
+	// decide, render flat ghost or discard. Nothing else.
+	if (gridData.w < -0.5) {
+		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
+		float los0 = texture(infoTex, losUV0).r;
+		// Currently-visible ground beneath a dead cable → discard (player is
+		// looking at empty terrain; the GS already cleared this segment's bit).
+		if (los0 >= ENEMY_LOS_CUT) discard;
+		uint cov0 = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
+		if (cov0 == 0u) discard;
+		float capT0 = clamp(capacity / 100.0, 0.0, 1.0);
+		vec3 ghost0 = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT0);
+		if (isBranch > 0.5) ghost0 *= GHOST_BRANCH_DAMP;
+		float edgeFade0 = 1.0 - smoothstep(0.55, 0.90, t);
+		fragColor = vec4(ghost0 * edgeFade0, 1.0);
+		return;
+	}
+
 	// Cylinder cross-section normal that respects cable slope, derived from
 	// the smoothly-interpolated cable tangent passed in by the GS.
 	//
@@ -309,17 +329,19 @@ void main() {
 	float losState = texture(infoTex, losUV).r;
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
-	// Coverage bits are written by the GS once per cable per frame (cheap)
-	// rather than here in the FS (per-fragment = millions of atomics on
-	// thousand-cable matches). The FS only READS the coverage to decide
-	// ghost rendering.
-	//
-	// segBit = "any segment seen". We don't yet pass len-per-segment to
-	// the FS so per-segment fragment-side gating isn't possible — the
-	// whole cable shows as ghost when any of its bits are set, and hides
-	// when all bits clear. GS sets/clears per-segment so re-scout still
-	// dissolves the ghost correctly as the player walks the area.
-	uint segBit = 0xFFFFFFu;
+	// Coverage bits are written by the GS (per-segment, per cable per frame).
+	// Per-fragment gating: derive segIdx from along-distance + len-per-segment
+	// packed into spawnAlongMain (see DataGS comment). Twigs use bit 0 as a
+	// fallback — they're decorative and only show when the parent has any
+	// coverage anyway.
+	uint segBit;
+	if (isBranch < 0.5) {
+		float lenPerSeg = spawnAlongMain;
+		int segIdx = (lenPerSeg > 0.0) ? clamp(int(cableUV.x / lenPerSeg), 0, 23) : 0;
+		segBit = 1u << uint(segIdx);
+	} else {
+		segBit = 0xFFFFFFu;   // twig: any-bit-set OK
+	}
 
 	// Three render classes for the FS:
 	//   isOwnAlly =  1.0 → own ally, always live (existing path below).
@@ -339,7 +361,9 @@ void main() {
 	if (isGhostEdge && losState >= ENEMY_LOS_CUT) discard;
 
 	bool enemyOutOfLOS = (isOwnAlly < 0.5 && isOwnAlly > -0.5 && losState < ENEMY_LOS_CUT);
-	if (isGhostEdge || enemyOutOfLOS) {
+	if (enemyOutOfLOS) {
+		// Ghosts disabled: no SSBO read, no branch evaluation; just discard.
+		if (ghostsEnabled < 0.5) discard;
 		uint cov = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
 		if ((cov & segBit) == 0u) discard;
 		float capT2 = clamp(capacity / 100.0, 0.0, 1.0);

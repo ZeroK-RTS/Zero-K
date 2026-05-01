@@ -19,6 +19,7 @@ layout (triangle_strip, max_vertices = 50) out;
 
 uniform sampler2D heightmapTex;
 uniform sampler2D infoTex;          // $info:los; same texture FS samples
+uniform float ghostsEnabled;        // 1.0 = run coverage SSBO updates, 0.0 = bypass entirely
 
 // Per-edge "have I been seen" bitmask. Bit `i` of `.x` is set when segment
 // `i` of this cable is currently in LOS. Persistent across frames; never
@@ -39,10 +40,13 @@ in DataVS {
 } dataIn[];
 
 // Block must match `in DataGS` in gfx_overdrive_cables.frag.glsl exactly.
-// gsLenPerSeg packed at the head of `cableUV` to avoid an extra varying:
-// .x = along-elmos (existing), .y = cross [-1,1] (existing).
-// Instead, pack lenPerSeg + slot into spawnAlongMain.zw — but that's vec2.
-// Simpler: keep it as one float and check max-comp budget.
+// PACKING NOTE: `spawnAlongMain` is reused. For twig fragments (isBranch>0.5)
+// it carries the twig's root-along distance (existing semantics, drives twig
+// pulse animation). For main-ribbon fragments (isBranch<0.5) it carries the
+// cable's len-per-segment so the FS can derive a per-segment bit index for
+// the coverage SSBO. We pack rather than add a varying because adding one
+// more component pushes 50 × 21 = 1050 over GL_MAX_GEOMETRY_OUTPUT_COMPONENTS
+// (1024 min-spec); the two semantics are disjoint by isBranch so no conflict.
 out DataGS {
 	vec3 worldPos;
 	float capacity;
@@ -53,7 +57,6 @@ out DataGS {
 	vec4 gridData;
 	float spawnAlongMain;
 	flat int gsSlot;
-	flat int gsNumSeg;
 };
 
 //__ENGINEUNIFORMBUFFERDEFS__
@@ -119,11 +122,12 @@ const float CENTERLINE_CLEAR  = 1.5;
 const float TWIG_CLEAR        = 0.9;
 const float SIDE_CLEAR        = 0.8;
 
-float gOutBranch = 0.0;
-float gOutSpawnAlong = 0.0;  // set by emitTwig per-twig; main ribbon leaves at 0.
-int   gOutSlot       = -1;   // SSBO slot for this cable; carried into every emitVtx.
-int   gOutNumSeg     = 0;    // segment count for this cable.
-float gOutLenPerSeg  = 0.0;  // along-elmos per segment; FS divides cableUV.x by this to get segIdx.
+float gOutBranch    = 0.0;
+// gOutSpawnAlong is overloaded (see DataGS comment): for main-ribbon emits
+// (gOutBranch=0) it carries len-per-segment; for twig emits (gOutBranch=1)
+// it carries the twig's root-along distance.
+float gOutSpawnAlong = 0.0;
+int   gOutSlot       = -1;
 
 void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
              float w, vec4 grid, vec2 td, float cap) {
@@ -136,7 +140,6 @@ void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
 	gridData = grid;
 	spawnAlongMain = gOutSpawnAlong;
 	gsSlot = gOutSlot;
-	gsNumSeg = gOutNumSeg;
 	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
 	gl_Position = cameraViewProj * vec4(wp, 1.0);
 	EmitVertex();
@@ -432,6 +435,15 @@ void main() {
 	vec2  timeD = dataIn[0].vsCableData.yz;
 	vec4  gridD = dataIn[0].vsGridData;
 
+	// Ghost edges (gridData.w = -1.0) emit only the main ribbon (no twigs),
+	// using the SAME wiggly path as live so the live→ghost transition has
+	// no visual snap. Ghost FS path is fast (no lighting/bubble math), and
+	// the GS still skips 4 of 5 invocations (twigs). Coverage updates use
+	// the live atomicAnd path with the wiggly samples → consistent with
+	// what the player visually sees.
+	bool isGhostEdge = gridD.w < -0.5;
+	if (isGhostEdge && gl_InvocationID > 0) return;
+
 	float widthVal = MIN_TRUNK_WIDTH +
 		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
 	float halfW  = widthVal * WIDTH_FACTOR;
@@ -462,7 +474,7 @@ void main() {
 			vec3 p3 = vec3(bj.x, hj, bj.y);
 			len3D += distance(p3, prev3);
 			float dy = hj - prev3.y;
-			if (j > 1) curv += abs(dy - prevDy);  // sum |Δslope| as curvature proxy
+			if (j > 1) curv += abs(dy - prevDy);
 			prevDy = dy;
 			prev3 = p3;
 		}
@@ -475,38 +487,61 @@ void main() {
 
 	// One global pull direction per cable: averaged dh across 5 chord anchors.
 	// Per-segment probing was the source of zigzag — see cableArcDh comment.
-	float arcDh = cableArcDh(a, d, perpAB, lenAB);
+	// Skipped for ghosts (10 heightmap probes) — they don't arc, so 0 is fine.
+	float arcDh = isGhostEdge ? 0.0 : cableArcDh(a, d, perpAB, lenAB);
 
 	gOutSlot       = dataIn[0].vsSlot;
-	gOutNumSeg     = numSeg;
+	// Pack lenPerSeg into gOutSpawnAlong for the main-ribbon emit (twigs reset
+	// it to their own value inside emitTwig). See DataGS comment for packing.
+	gOutSpawnAlong = (numSeg > 0) ? (len3D / float(numSeg)) : 1.0;
+
+	// Ghost and live cables emit the same ribbon shape so live→ghost has no
+	// visual snap. Twig invocations already skipped above, and the FS takes
+	// a fast path for ghost fragments (no lighting/bubble math), so cost is
+	// bounded.
 
 	if (gl_InvocationID == 0) {
 		// Coverage SSBO update — once per cable per frame, not per fragment.
 		// Live edges (gridData.w >= -0.5) atomicOr bits for segments currently
 		// in LOS; ghost edges (gridData.w < -0.5) atomicAnd to clear bits the
-		// player has re-scouted (confirmed empty). Sampling along the actual
-		// wiggly path keeps reveal accurate even with arc bias on slopes.
+		// player has re-scouted. Sampling along the actual wiggly path keeps
+		// reveal accurate even with arc bias on slopes.
+		//
+		// Saturation skip: read once and bail out when there's nothing to do.
+		// Live edges with all bits set will never get more bits → skip the
+		// LOS scan entirely. Ghost edges with all bits clear have nothing
+		// left to clear → skip too. Massive savings on long-running matches
+		// where most live cables hit saturation quickly.
 		int slot = dataIn[0].vsSlot;
 		bool isGhost = gridD.w < -0.5;
-		if (slot >= 0) {
-			uint setMask = 0u;
-			uint clrMask = 0u;
+		// Hard gate on the user-facing ghosts toggle — skip ALL coverage
+		// bookkeeping (the n-tap LOS scan, atomic ops, even the SSBO read)
+		// when ghosts are off. Restores live-only perf parity with pre-slice-1.
+		if (slot >= 0 && ghostsEnabled >= 0.5) {
 			int n = min(numSeg, 24);
-			for (int i = 0; i < n; i++) {
-				float t = (float(i) + 0.5) / float(numSeg);
-				vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
-				vec2 losUV = clamp(p, vec2(0.0), mapSize.xy) / mapSize.zw;
-				float los = texture(infoTex, losUV).r;
-				if (los >= 0.5) {
-					if (isGhost) clrMask |= (1u << uint(i));
-					else         setMask |= (1u << uint(i));
+			uint fullMask = (n >= 32) ? 0xFFFFFFFFu : ((1u << uint(n)) - 1u);
+			uint cur = cableCoverage[slot].x;
+			bool skip = isGhost ? (cur == 0u) : ((cur & fullMask) == fullMask);
+			if (!skip) {
+				uint setMask = 0u;
+				uint clrMask = 0u;
+				for (int i = 0; i < n; i++) {
+					float t = (float(i) + 0.5) / float(numSeg);
+					vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
+					vec2 losUV = clamp(p, vec2(0.0), mapSize.xy) / mapSize.zw;
+					float los = texture(infoTex, losUV).r;
+					if (los >= 0.5) {
+						if (isGhost) clrMask |= (1u << uint(i));
+						else         setMask |= (1u << uint(i));
+					}
 				}
+				if (setMask != 0u) atomicOr (cableCoverage[slot].x,  setMask);
+				if (clrMask != 0u) atomicAnd(cableCoverage[slot].x, ~clrMask);
 			}
-			if (setMask != 0u) atomicOr (cableCoverage[slot].x,  setMask);
-			if (clrMask != 0u) atomicAnd(cableCoverage[slot].x, ~clrMask);
 		}
 		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
 	} else {
+		if (isGhostEdge) return;   // ghosts skip twig invocations entirely
 		// Twig density scales with 3D arc length: ~one twig per 110 elmos,
 		// capped at 4. Short cables get 0-1 twigs, long ones get the full set.
 		// Surviving twigs are then respread across [0.15, 0.85] so spacing

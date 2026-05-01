@@ -1893,6 +1893,17 @@ local function CableTreeCmd(cmd, line, words, playerID)
 		if sub == "on" or sub == "off" then
 			cableGhosts = (sub == "on")
 			Spring.SetConfigInt("OverdriveCableGhosts", cableGhosts and 1 or 0)
+			-- Toggling OFF: drop every snapshotted ghost edge and free its slot
+			-- so the next time it toggles on the user starts from a clean slate.
+			-- Otherwise the ghostEdges table would persist and the next ON would
+			-- revive every dead enemy edge from this match.
+			if not cableGhosts then
+				for k in pairs(ghostEdges) do
+					ghostEdges[k] = nil
+					FreeSlot(k)
+				end
+				ghostNeedsRebuild = true
+			end
 			Spring.Echo("[CableTree] ghosts " .. (cableGhosts and "ON" or "OFF"))
 		elseif sub == "dump" then
 			local slot = tonumber(words and words[3] or "")
@@ -2411,10 +2422,13 @@ function OnCableTreeFull(data)
 	-- player doesn't know the cable died, so it should keep rendering as a
 	-- ghost at the last-seen segments until they re-scout. Wither animation
 	-- is skipped because that would leak the death event.
+	-- When cableGhosts is OFF, enemy edges that disappear are simply removed
+	-- (no ghost snapshot, no rendering cost) — same behaviour as before the
+	-- ghost feature existed.
 	for k, e in pairs(existing) do
 		if not incoming[k] and not e.witherFrame then
 			if not e.isOwnAlly then
-				if e.slot and e.slot >= 0 then
+				if cableGhosts and e.slot and e.slot >= 0 then
 					ghostEdges[k] = {
 						px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
 						capacity = e.capacity or 0,
@@ -2432,12 +2446,19 @@ function OnCableTreeFull(data)
 	end
 
 	-- If a fresh edge resurrects an old ghost (enemy rebuilt the same pylon
-	-- pair), drop the ghost — live takes over. The slot stays bound to the
-	-- live edge via slotByKey; bits accumulated under the ghost get inherited.
+	-- pair, or MST rerouted back through it), drop the ghost — live takes
+	-- over. PRESERVE the SSBO bits so the player keeps seeing the same
+	-- segments as memory; mark the resurrection so the fresh-edge branch
+	-- below skips the growth animation (otherwise the seen segments would
+	-- play a "ghost regrow" cropping from u=0 — visually wrong because the
+	-- player has already seen those segments).
+	local resurrectedKeys
 	for k in pairs(incoming) do
 		if ghostEdges[k] then
 			ghostEdges[k] = nil
 			ghostNeedsRebuild = true
+			resurrectedKeys = resurrectedKeys or {}
+			resurrectedKeys[k] = true
 		end
 	end
 
@@ -2476,6 +2497,15 @@ function OnCableTreeFull(data)
 			-- exhausted (4096 simultaneous tracked edges); we still create
 			-- the edge but with slot = -1 (GS treats as "don't update bits").
 			local slot = AllocSlot(k) or -1
+			-- Growth animation policy:
+			--   own ally → grow (player just built this, the visual feedback
+			--                    is desired).
+			--   enemy    → no growth (you can't know when the enemy built it,
+			--                    so a u=0-outward crop reads as "regrow on
+			--                    every MST reroute" which is wrong).
+			--   resurrected ghost → no growth too (continuity of memory).
+			local af = (ownAlly and not (resurrectedKeys and resurrectedKeys[k]))
+				and frame or 0
 			existing[k] = {
 				px = data.pxs[i], pz = data.pzs[i],
 				cx = data.cxs[i], cz = data.czs[i],
@@ -2483,7 +2513,7 @@ function OnCableTreeFull(data)
 				flow     = newFlow,
 				eff      = data.effs and data.effs[i] or 0,
 				isOwnAlly = ownAlly,
-				appearFrame = frame,
+				appearFrame = af,
 				witherFrame = nil,
 				key      = k,
 				slot     = slot,
@@ -2615,6 +2645,38 @@ function gadget:GameFrame(n)
 	if ghostNeedsRebuild then
 		RebuildGhostVBO()
 	end
+
+	-- 5) Ghost cleanup pass — once every ~30 frames (~1Hz) walk the ghost
+	--    table and drop entries the local viewer has confirmed empty by
+	--    re-scouting. Without this, ghosts pile up forever and every dead
+	--    enemy cable still costs a GS+FS draw cycle even though all bits
+	--    have been cleared by the GS atomicAnd.
+	--
+	--    Heuristic: 3-point LOS test (start, mid, end) for the local ally.
+	--    If all three points are currently in LOS, the player has clearly
+	--    swept the area and the cable is confirmed gone — free the slot.
+	--    Misses partial scouts (where only one endpoint is visible) but
+	--    keeps the test cheap.
+	if cableGhosts and (n % 30) == 0 and next(ghostEdges) then
+		local ally = spGetMyAllyTeamID()
+		local spec, fullView = spGetSpectatingState()
+		if not (spec or fullView) then
+			local removed = false
+			for k, e in pairs(ghostEdges) do
+				local mx, mz = (e.px + e.cx) * 0.5, (e.pz + e.cz) * 0.5
+				local px, pz = e.px, e.pz
+				local cx, cz = e.cx, e.cz
+				if Spring.IsPosInLos(px, 0, pz, ally)
+				   and Spring.IsPosInLos(mx, 0, mz, ally)
+				   and Spring.IsPosInLos(cx, 0, cz, ally) then
+					ghostEdges[k] = nil
+					FreeSlot(k)
+					removed = true
+				end
+			end
+			if removed then ghostNeedsRebuild = true end
+		end
+	end
 end
 
 function gadget:DrawWorldPreUnit()
@@ -2632,6 +2694,7 @@ function gadget:DrawWorldPreUnit()
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
 	cableShader:SetUniform("bakeTime", bubbleBakeTime)
 	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
+	cableShader:SetUniform("ghostsEnabled", cableGhosts and 1.0 or 0.0)
 
 	-- Bind the per-edge coverage SSBO at binding=6 for GS atomicOr writes
 	-- and (slice 3) ghost-pass reads. Always bound when shader is active so
@@ -2663,7 +2726,9 @@ function gadget:DrawWorldPreUnit()
 
 	-- Ghost pass: orphaned enemy edges. Same shader, same SSBO; the FS uses
 	-- gridData.w=-1.0 sentinel to force the ghost branch regardless of LOS.
-	if ghostVAO and numGhostVerts > 0 then
+	-- Hard-gated on cableGhosts so flipping the menu toggle off eliminates
+	-- the GS expansion + atomic ops + FS rasterisation cost entirely.
+	if cableGhosts and ghostVAO and numGhostVerts > 0 then
 		ghostVAO:DrawArrays(GL.LINES, numGhostVerts)
 	end
 
@@ -2711,6 +2776,7 @@ function gadget:Initialize()
 			gameTime = 0,
 			bakeTime = 0,
 			enableFlow = cableFlowMode and 1.0 or 0.0,
+			ghostsEnabled = cableGhosts and 1.0 or 0.0,
 		},
 	}, "Cable Forward Shader")
 
