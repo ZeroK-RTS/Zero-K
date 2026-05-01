@@ -363,6 +363,17 @@ local cableFlowMode = cableDetail == DETAIL_FULL
 -- pre-ghosts perf for live-only rendering.
 local cableGhosts = (Spring.GetConfigInt("OverdriveCableGhosts", 1) or 1) ~= 0
 
+-- Forward-declared ghost state. The actual table lives further down with the
+-- rest of the orphaned-enemy snapshotting code, but CableTreeCmd (defined
+-- above that block at line ~1879) needs to clear ghostEdges + flip
+-- ghostNeedsRebuild when the user toggles ghosts off. Declaring `local` only
+-- at the later definition site would shadow these as globals from the
+-- function's POV — which is what caused the
+-- "bad argument #1 to '(for generator)' (table expected, got nil)" errors
+-- in callin=GotChatMsg when toggling /cabletree ghosts off.
+local ghostEdges = {}
+local ghostNeedsRebuild = false
+
 -- ---------------------------------------------------------------------------
 -- Per-edge coverage SSBO
 -- ---------------------------------------------------------------------------
@@ -2163,12 +2174,12 @@ local needsRebuild = false
 -- ghostEdges[edgeKey] = { px, pz, cx, cz, capacity, slot, key }
 -- The slot reference keeps the SSBO entry alive (we don't FreeSlot until the
 -- ghost itself retires after a re-scout-clear pass).
-local ghostEdges = {}
+-- (ghostEdges and ghostNeedsRebuild are forward-declared near the top of
+-- the file so CableTreeCmd can reach them.)
 local ghostVAO
 local ghostVBO              -- reused across RebuildGhostVBO calls; capacity grows as needed
 local ghostVBOCapacity = 0  -- elements the current ghostVBO was last Defined for
 local numGhostVerts = 0
-local ghostNeedsRebuild = false
 
 -- Rolling cleanup cursor: each tick we scan a small slice of ghostEdges
 -- (3-point IsPosInLos) instead of scanning all of them every 30 frames.
