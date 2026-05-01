@@ -2166,8 +2166,16 @@ local needsRebuild = false
 -- ghost itself retires after a re-scout-clear pass).
 local ghostEdges = {}
 local ghostVAO
+local ghostVBO              -- reused across RebuildGhostVBO calls; capacity grows as needed
+local ghostVBOCapacity = 0  -- elements the current ghostVBO was last Defined for
 local numGhostVerts = 0
 local ghostNeedsRebuild = false
+
+-- Rolling cleanup cursor: each tick we scan a small slice of ghostEdges
+-- (3-point IsPosInLos) instead of scanning all of them every 30 frames.
+-- Keeps per-frame cost flat and predictable regardless of ghost count.
+local ghostCleanupCursor = nil   -- next key to start at; nil = restart from head
+local GHOST_CLEANUP_PER_FRAME = 32
 
 -- Geometry cache. Topology-stable rebuilds reuse `allPaths` (the noisy paths,
 -- twigs and cluster stems). Per-call, we walk the prov objects (one per
@@ -2328,23 +2336,30 @@ end
 local function RebuildGhostVBO()
 	ghostNeedsRebuild = false
 	local verts, vertCount = GenerateGhostTree()
-	if vertCount == 0 then
-		ghostVAO = nil
-		numGhostVerts = 0
-		return
-	end
-	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
-	if not vbo then return end
-	vbo:Define(vertCount, {
-		{ id = 0, name = "vertPos",   size = 2 },
-		{ id = 1, name = "vertData",  size = 3 },
-		{ id = 2, name = "vertGrid",  size = 4 },
-		{ id = 3, name = "vertSlot",  size = 1 },
-	})
-	vbo:Upload(verts)
-	ghostVAO = gl.GetVAO()
-	if ghostVAO then ghostVAO:AttachVertexBuffer(vbo) end
 	numGhostVerts = vertCount
+	if vertCount == 0 then return end
+
+	-- Reuse the existing VBO/VAO across rebuilds. Only re-Define when the
+	-- current capacity isn't enough; grow with headroom so small churn
+	-- (a couple of ghosts dying or resurrecting) doesn't trigger a Define
+	-- on every event.
+	if not ghostVBO then
+		ghostVBO = gl.GetVBO(GL.ARRAY_BUFFER, true)   -- freqUpdated = true
+		if not ghostVBO then return end
+	end
+	if ghostVBOCapacity < vertCount then
+		local newCap = math.max(vertCount, ghostVBOCapacity * 2, 64)
+		ghostVBO:Define(newCap, {
+			{ id = 0, name = "vertPos",   size = 2 },
+			{ id = 1, name = "vertData",  size = 3 },
+			{ id = 2, name = "vertGrid",  size = 4 },
+			{ id = 3, name = "vertSlot",  size = 1 },
+		})
+		ghostVBOCapacity = newCap
+		ghostVAO = gl.GetVAO()
+		if ghostVAO then ghostVAO:AttachVertexBuffer(ghostVBO) end
+	end
+	ghostVBO:Upload(verts)
 end
 
 -- Old generic angle clustering — kept commented as a reference for when we
@@ -2646,34 +2661,35 @@ function gadget:GameFrame(n)
 		RebuildGhostVBO()
 	end
 
-	-- 5) Ghost cleanup pass — once every ~30 frames (~1Hz) walk the ghost
-	--    table and drop entries the local viewer has confirmed empty by
-	--    re-scouting. Without this, ghosts pile up forever and every dead
-	--    enemy cable still costs a GS+FS draw cycle even though all bits
-	--    have been cleared by the GS atomicAnd.
-	--
-	--    Heuristic: 3-point LOS test (start, mid, end) for the local ally.
-	--    If all three points are currently in LOS, the player has clearly
-	--    swept the area and the cable is confirmed gone — free the slot.
-	--    Misses partial scouts (where only one endpoint is visible) but
-	--    keeps the test cheap.
-	if cableGhosts and (n % 30) == 0 and next(ghostEdges) then
-		local ally = spGetMyAllyTeamID()
+	-- 5) Ghost cleanup — rolling, amortised. Every frame we scan up to
+	--    GHOST_CLEANUP_PER_FRAME entries via a cursor that advances through
+	--    the table, wrapping back to the start when it falls off the end.
+	--    Net: every ghost gets checked roughly every (count/perFrame) frames
+	--    regardless of total count, with bounded per-frame engine-call cost
+	--    (3 × IsPosInLos per scanned entry). Replaces the prior
+	--    "iterate everything every 30 frames" stutter.
+	if cableGhosts and next(ghostEdges) then
 		local spec, fullView = spGetSpectatingState()
 		if not (spec or fullView) then
+			local ally = spGetMyAllyTeamID()
 			local removed = false
-			for k, e in pairs(ghostEdges) do
+			local checked = 0
+			local k = ghostCleanupCursor and ghostEdges[ghostCleanupCursor] and ghostCleanupCursor
+			while checked < GHOST_CLEANUP_PER_FRAME do
+				k = next(ghostEdges, k)
+				if k == nil then break end           -- end of table; cursor wraps next tick
+				local e = ghostEdges[k]
 				local mx, mz = (e.px + e.cx) * 0.5, (e.pz + e.cz) * 0.5
-				local px, pz = e.px, e.pz
-				local cx, cz = e.cx, e.cz
-				if Spring.IsPosInLos(px, 0, pz, ally)
+				if Spring.IsPosInLos(e.px, 0, e.pz, ally)
 				   and Spring.IsPosInLos(mx, 0, mz, ally)
-				   and Spring.IsPosInLos(cx, 0, cz, ally) then
+				   and Spring.IsPosInLos(e.cx, 0, e.cz, ally) then
 					ghostEdges[k] = nil
 					FreeSlot(k)
 					removed = true
 				end
+				checked = checked + 1
 			end
+			ghostCleanupCursor = k                   -- nil = restart; otherwise resume here
 			if removed then ghostNeedsRebuild = true end
 		end
 	end
@@ -2715,21 +2731,19 @@ function gadget:DrawWorldPreUnit()
 	gl.Culling(false)
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(true)
-	-- Fully opaque output — every path writes alpha=1.0 (enemy ghost branch
-	-- is gone; out-of-LOS enemy fragments are discarded). Disable blending
-	-- so depth-tested cables compose cleanly against the world.
-	gl.Blending(false)
-
-	-- GL_LINES: every 2 verts form one cable; the geometry shader expands
-	-- them into a triangle_strip ribbon.
+	-- Live cable pass: opaque (FS writes alpha=1.0). Blending enabled
+	-- globally is harmless here since src=1, dst=0 → identity.
+	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 	cableVAO:DrawArrays(GL.LINES, numCableVerts)
 
-	-- Ghost pass: orphaned enemy edges. Same shader, same SSBO; the FS uses
-	-- gridData.w=-1.0 sentinel to force the ghost branch regardless of LOS.
-	-- Hard-gated on cableGhosts so flipping the menu toggle off eliminates
-	-- the GS expansion + atomic ops + FS rasterisation cost entirely.
+	-- Ghost pass: orphaned enemy edges, semi-transparent shimmery render.
+	-- Render with DepthMask off so they don't occlude live cables behind
+	-- them, and so re-draws on top of terrain blend correctly without
+	-- writing depth that would clamp later geometry.
 	if cableGhosts and ghostVAO and numGhostVerts > 0 then
+		gl.DepthMask(false)
 		ghostVAO:DrawArrays(GL.LINES, numGhostVerts)
+		gl.DepthMask(true)
 	end
 
 	-- Make GS atomicOr writes visible to subsequent SSBO consumers (slice 3

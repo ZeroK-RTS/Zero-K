@@ -425,6 +425,13 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 void main() {
 	vec2 a = dataIn[0].vsWorldXZ;
 	vec2 b = dataIn[1].vsWorldXZ;
+	// Normalize chord direction so parent/child swap (which can happen when
+	// the MST reroutes and re-orients the same edgeKey) doesn't change the
+	// wiggly path — otherwise live → ghost or ghost → live transitions
+	// "teleport" the cable to a different noise seed.
+	if (a.x > b.x || (a.x == b.x && a.y > b.y)) {
+		vec2 tmp = a; a = b; b = tmp;
+	}
 	vec2 d = b - a;
 	float lenAB = length(d);
 	if (lenAB < 0.5) return;

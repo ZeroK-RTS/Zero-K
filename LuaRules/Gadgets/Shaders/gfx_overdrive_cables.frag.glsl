@@ -217,11 +217,16 @@ vec3 gridEfficiencyColor(float eff) {
 	return hueToRgb(h / 255.0);
 }
 
-// Ghost shading constants — flat memory render for unscouted enemy fragments
-// that fall inside the seen-segment range.
-const vec3  GHOST_BASE_LO      = vec3(0.30);   // capT = 0
-const vec3  GHOST_BASE_HI      = vec3(0.55);   // capT = 1
-const float GHOST_BRANCH_DAMP  = 0.65;
+// Ghost shading constants — translucent, slightly cool, gently shimmering
+// "memory" render. Reads as a wisp rather than a flat painted line.
+const vec3  GHOST_BASE_LO      = vec3(0.32, 0.38, 0.46);   // capT = 0 (cool grey)
+const vec3  GHOST_BASE_HI      = vec3(0.55, 0.66, 0.78);   // capT = 1 (cool brighter)
+const float GHOST_BRANCH_DAMP  = 0.6;
+const float GHOST_ALPHA_BASE   = 0.55;   // baseline opacity at the centerline
+const float GHOST_SHIMMER_AMP  = 0.18;   // ±brightness from a slow sin pulse
+const float GHOST_SHIMMER_HZ   = 0.45;   // pulses/sec
+const float GHOST_EDGE_FADE_LO = 0.30;   // wispier edge falloff than live
+const float GHOST_EDGE_FADE_HI = 0.90;
 
 void main() {
 	float v = cableUV.y;
@@ -240,22 +245,43 @@ void main() {
 	}
 
 	// FAST GHOST PATH — orphaned-enemy edges (gridData.w = -1.0) skip all the
-	// cylinder-normal / lighting / bubble math below. Big perf win when the
-	// player has accumulated map-wide ghost coverage. Read LOS + coverage,
-	// decide, render flat ghost or discard. Nothing else.
+	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
+	// decide, render translucent shimmery ghost or discard. Nothing else.
 	if (gridData.w < -0.5) {
 		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 		float los0 = texture(infoTex, losUV0).r;
-		// Currently-visible ground beneath a dead cable → discard (player is
-		// looking at empty terrain; the GS already cleared this segment's bit).
 		if (los0 >= ENEMY_LOS_CUT) discard;
 		uint cov0 = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
-		if (cov0 == 0u) discard;
+		// Per-segment ghost gating, mirroring the calc done lower in the FS
+		// for live fragments. spawnAlongMain carries lenPerSeg for main
+		// ribbons, twigs use any-bit fallback.
+		uint segBit0;
+		if (isBranch < 0.5) {
+			float lenPerSeg0 = spawnAlongMain;
+			int segIdx0 = (lenPerSeg0 > 0.0) ? clamp(int(cableUV.x / lenPerSeg0), 0, 23) : 0;
+			segBit0 = 1u << uint(segIdx0);
+		} else {
+			segBit0 = 0xFFFFFFu;
+		}
+		if ((cov0 & segBit0) == 0u) discard;
+
 		float capT0 = clamp(capacity / 100.0, 0.0, 1.0);
 		vec3 ghost0 = mix(GHOST_BASE_LO, GHOST_BASE_HI, capT0);
 		if (isBranch > 0.5) ghost0 *= GHOST_BRANCH_DAMP;
-		float edgeFade0 = 1.0 - smoothstep(0.55, 0.90, t);
-		fragColor = vec4(ghost0 * edgeFade0, 1.0);
+
+		// Slow shimmer keyed off worldPos so neighbouring cables don't pulse
+		// in lockstep. ±18% brightness, ~half-Hz so it's "breathing" not
+		// "flickering".
+		float shim = 1.0 + GHOST_SHIMMER_AMP * sin(
+			gameTime * (6.2831853 * GHOST_SHIMMER_HZ)
+			+ worldPos.x * 0.013 + worldPos.z * 0.017);
+		ghost0 *= shim;
+
+		// Wispy edges: stronger smoothstep + alpha that follows it so the
+		// ribbon dissolves into transparency rather than hard-clipping.
+		float edgeFade0 = 1.0 - smoothstep(GHOST_EDGE_FADE_LO, GHOST_EDGE_FADE_HI, t);
+		float alpha = GHOST_ALPHA_BASE * edgeFade0;
+		fragColor = vec4(ghost0 * edgeFade0, alpha);
 		return;
 	}
 
