@@ -2336,28 +2336,10 @@ local function RebuildGhostVBO()
 	ghostNeedsRebuild = false
 	local verts, vertCount = GenerateGhostTree()
 	numGhostVerts = vertCount
-	if vertCount == 0 then return end
-
-	-- Reuse the existing VBO/VAO across rebuilds. Only re-Define when the
-	-- current capacity isn't enough; grow with headroom so small churn
-	-- (a couple of ghosts dying or resurrecting) doesn't trigger a Define
-	-- on every event.
-	if not ghostVBO then
-		ghostVBO = gl.GetVBO(GL.ARRAY_BUFFER, true)   -- freqUpdated = true
-		if not ghostVBO then return end
-	end
-	if ghostVBOCapacity < vertCount then
-		local newCap = math.max(vertCount, ghostVBOCapacity * 2, 64)
-		ghostVBO:Define(newCap, {
-			{ id = 0, name = "vertPos",   size = 2 },
-			{ id = 1, name = "vertData",  size = 3 },
-			{ id = 2, name = "vertGrid",  size = 4 },
-			{ id = 3, name = "vertSlot",  size = 1 },
-		})
-		ghostVBOCapacity = newCap
-		ghostVAO = gl.GetVAO()
-		if ghostVAO then ghostVAO:AttachVertexBuffer(ghostVBO) end
-	end
+	if vertCount == 0 or not ghostVBO then return end
+	-- VBO is pre-Defined to COVERAGE_MAX_SLOTS*2 verts in gadget:Initialize
+	-- (Spring's Define is immutable so we can't grow it later). Just stream
+	-- the current vert payload in.
 	ghostVBO:Upload(verts)
 end
 
@@ -2757,6 +2739,10 @@ function gadget:GameFrame(n)
 end
 
 function gadget:DrawWorldPreUnit()
+	-- Honour the menu toggle immediately, even while paused (RebuildVBO
+	-- only fires from GameFrame, which doesn't tick during pause; without
+	-- this gate the cables would linger on screen until unpause).
+	if not cableEnabled then return end
 	if not cableVAO or numCableVerts == 0 or not cableShader then return end
 
 	cableShader:Activate()
@@ -2879,6 +2865,22 @@ function gadget:Initialize()
 	else
 		Spring.Echo("[CableTree] SSBO unsupported; ghosting disabled")
 		cableGhosts = false
+	end
+
+	-- Pre-allocate the ghost VBO at max plausible capacity (2 verts per
+	-- ghost edge, capped at COVERAGE_MAX_SLOTS edges). Spring's VBO Define
+	-- is immutable — call it once here, then RebuildGhostVBO only Uploads.
+	ghostVBO = gl.GetVBO(GL.ARRAY_BUFFER, true)
+	if ghostVBO then
+		ghostVBOCapacity = COVERAGE_MAX_SLOTS * 2
+		ghostVBO:Define(ghostVBOCapacity, {
+			{ id = 0, name = "vertPos",   size = 2 },
+			{ id = 1, name = "vertData",  size = 3 },
+			{ id = 2, name = "vertGrid",  size = 4 },
+			{ id = 3, name = "vertSlot",  size = 1 },
+		})
+		ghostVAO = gl.GetVAO()
+		if ghostVAO then ghostVAO:AttachVertexBuffer(ghostVBO) end
 	end
 
 	-- Topology side: register chat command + scan existing pylons.
