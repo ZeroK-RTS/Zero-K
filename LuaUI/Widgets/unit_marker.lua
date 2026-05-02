@@ -48,9 +48,44 @@ else
 	unitList = VFS.Include("LuaUI/Configs/unit_marker.lua")
 end
 
+local categories = {"Cloaking", "Heavies", "Striders", "Structures", "Superweapons", "Factories", "Planetwars", "Chicken"}
+
+local function GetUnitCategory(ud)
+	if ud.customParams.planetwars_structure then
+		return "Planetwars"
+	end
+	if ud.customParams.factorytab then
+		return "Factories"
+	end
+	if string.find(ud.humanName, "Chicken") or string.find(ud.tooltip, "Chicken") then
+		return "Chicken"
+	end
+	if (ud.cloakCost or 0) > 0 or ud.customParams.area_cloak then
+		return "Cloaking"
+	end
+	if (ud.metalCost or 0) > 4000 and not ud.canMove then
+		return "Superweapons"
+	end
+	if not ud.canMove then
+		return "Structures"
+	end
+	if (ud.metalCost or 0) > 2300 and ud.canMove then
+		return "Striders"
+	end
+	return "Heavies"
+end
+
+local unitCategory = {}
+for unitDefID in pairs(unitList) do
+	local ud = unitDefID and UnitDefs[unitDefID]
+	if ud and ud.name then
+		unitCategory[unitDefID] = GetUnitCategory(ud)
+	end
+end
+
 options_path = 'Settings/Interface/Unit Marker'
 
-options_order = { 'enableAll', 'disableAll', 'unitslabel'}
+options_order = { 'enableAll', 'disableAll'}
 options = {
 	enableAll = {
 		type='button',
@@ -102,26 +137,92 @@ options = {
 		end,
 		noHotkey = true,
 	},
-	unitslabel = {name = "unitslabel", type = 'label', value = "Individual Toggles", path = options_path},
 }
 
-for unitDefID in pairs(unitList) do
-	local ud = UnitDefs[unitDefID]
-	options[ud.name .. "_mark"] = {
-		name = "  " .. sputGetHumanName(ud) or "",
-		type = 'bool',
-		value = false,
-		OnChange = function (self)
-			activeDefID[unitDefID] = self.value
-			if self.value and not markingActive then
+for i = 1, #categories do
+	local category = categories[i]
+	options['enable' .. category] = {
+		type='button',
+		name= "Enable " .. category,
+		desc = "Marks " .. category .. ".",
+		path = options_path .. "/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_mark")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud and unitCategory[ud.id] == category then
+					options[opt].value = true
+				end
+			end
+			for unitDefID in pairs(unitList) do
+				if unitCategory[unitDefID] == category then
+					activeDefID[unitDefID] = true
+				end
+			end
+			if not markingActive then
 				widgetHandler:UpdateCallIn('UnitEnteredLos')
 				markingActive = true
 			end
 		end,
 		noHotkey = true,
 	}
-	options_order[#options_order+1] = ud.name .. "_mark"
+	options['disable' .. category] = {
+		type='button',
+		name= "Disable All",
+		name= "Disable " .. category,
+		desc = "Removes " .. category .. ".",
+		path = options_path .. "/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_mark")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud and unitCategory[ud.id] == category then
+					options[opt].value = false
+				end
+			end
+			for unitDefID,_ in pairs(unitList) do
+				if unitCategory[unitDefID] == category then
+					activeDefID[unitDefID] = false
+				end
+			end
+			if markingActive then
+				widgetHandler:RemoveCallIn('UnitEnteredLos')
+				markingActive = false
+			end
+		end,
+		noHotkey = true,
+	}
+	options_order[#options_order + 1] = 'enable' .. category
+	options_order[#options_order + 1] = 'disable' .. category
+	
+	options['label' .. category] = {name = "label" .. category, type = 'label', value = category, path = options_path}
+	options_order[#options_order + 1] = 'label' .. category
+	
+	for unitDefID in pairs(unitList) do
+		if unitCategory[unitDefID] == category then
+			local ud = UnitDefs[unitDefID]
+			options[ud.name .. "_mark"] = {
+				name = "  " .. sputGetHumanName(ud) or "",
+				type = 'bool',
+				value = false,
+				OnChange = function (self)
+					activeDefID[unitDefID] = self.value
+					if self.value and not markingActive then
+						widgetHandler:UpdateCallIn('UnitEnteredLos')
+						markingActive = true
+					end
+				end,
+				noHotkey = true,
+			}
+			options_order[#options_order+1] = ud.name .. "_mark"
+		end
+	end
 end
+
 
 local function refreshCallin()
 	if not markingActive then
