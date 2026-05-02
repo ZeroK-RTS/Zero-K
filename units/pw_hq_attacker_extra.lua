@@ -3,7 +3,7 @@ local unitDef = included.pw_hq_attacker
 
 unitDef.name = "Attacker Extra Command"
 unitDef.health = 6000
-unitDef.metalCost = 100
+unitDef.metalCost = 250
 unitDef.buildPic = [[pw_hq_extra.png]]
 unitDef.objectName = [[pw_hq_small.s3o]]
 unitDef.iconType = [[pw_assault_small]]

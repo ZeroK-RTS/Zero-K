@@ -56,6 +56,7 @@ local BATTLE_TIME_LIMIT = 30*60*60*2 -- Defenders win after 2 hours
 local teleportChargeNeededMult = false
 
 local STRUCTURE_SPACING = 192
+local HQ_SPAWN_SPACING = 1200
 
 local allyTeamRole = {
 	[0] = "attacker",
@@ -100,6 +101,7 @@ local evacStructureCount = 0
 
 local wormholeList = {}
 local planetwarsBoxes = {}
+local planetwarsHqBoxes = {}
 
 local vector = Spring.Utilities.Vector
 
@@ -408,6 +410,17 @@ local function GetRandomPosition(rectangle)
 	return position[1], position[2]
 end
 
+local function DrawRectangle(rectangle)
+	local topLeft = rectangle[1]
+	local topRight = vector.Add(rectangle[1], rectangle[2])
+	local botRight = vector.Add(rectangle[1], vector.Add(rectangle[2], rectangle[3]))
+	local botLeft = vector.Add(rectangle[1], rectangle[3])
+	Spring.MarkerAddLine(topLeft[1], 0,topLeft[2], topRight[1], 0, topRight[2])
+	Spring.MarkerAddLine(topRight[1], 0, topRight[2], botRight[1], 0, botRight[2])
+	Spring.MarkerAddLine(botRight[1], 0, botRight[2], botLeft[1], 0, botLeft[2])
+	Spring.MarkerAddLine(botLeft[1], 0, botLeft[2], topLeft[1], 0,topLeft[2])
+end
+
 local function FlattenFunc(left, top, right, bottom, height)
 	-- top and bottom
 	for x = left + 8, right - 8, 8 do
@@ -530,6 +543,7 @@ local function SpawnStructure(info, teamID, boxData)
 end
 
 local function SpawnStructuresInBox(boxData, teamID)
+	--DrawRectangle(boxData)
 	teamID = teamID or gaiaTeamID
 	for _,info in pairs(structureSpawnData) do
 		SpawnStructure(info, teamID, boxData)
@@ -539,6 +553,7 @@ end
 local function SpawnHQ(teamID, allyTeamID, boxData, hqDefID)
 	teamID = teamID or gaiaTeamID
 	
+	--DrawRectangle(boxData)
 	local x, z = GetRandomPosition(boxData)
 	local direction = math.floor(math.random()*4)
 	
@@ -584,7 +599,7 @@ local function SpawnHQ(teamID, allyTeamID, boxData, hqDefID)
 	planetwarsStructureCount = planetwarsStructureCount + 1
 	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
 	
-	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
+	AddNoGoZone(x, z, math.max(sX, sZ) + HQ_SPAWN_SPACING)
 	
 	local unitID = Spring.CreateUnit(hqDefID, x, y, z, direction, teamID)
 	hqUnitAllyTeam[unitID] = allyTeamID
@@ -718,7 +733,7 @@ function gadget:GamePreload()
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
 		for j = 1, #hqDefIDs[allyTeamID] do
-			SpawnHQ(teamID, allyTeamID, planetwarsBoxes[allyTeamRole[allyTeamID]], hqDefIDs[allyTeamID][j])
+			SpawnHQ(teamID, allyTeamID, planetwarsHqBoxes[allyTeamRole[allyTeamID]], hqDefIDs[allyTeamID][j])
 		end
 	end
 	
@@ -796,6 +811,7 @@ function gadget:Initialize()
 
 	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
 	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
+	planetwarsHqBoxes = GG.GetPlanetwarsBoxes(0.3, 0.15, 0.3, edgePadding)
 	if not planetwarsBoxes then
 		gadgetHandler:RemoveGadget()
 		return
