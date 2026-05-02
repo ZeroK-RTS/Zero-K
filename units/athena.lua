@@ -12,7 +12,7 @@ return { athena = {
     [[staticcon]],
     [[staticradar]],
     [[staticheavyradar]],
-    [[commander_egg]],
+    --[[commander_egg]]
     [[staticjammer]],
     [[cloakcon]],
     [[spiderscout]],
