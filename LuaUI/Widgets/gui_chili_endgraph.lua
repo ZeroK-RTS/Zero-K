@@ -85,7 +85,13 @@ local hiddenStats = {
 }
 
 local function GetLogOddsLabel(value)
+	if Spring.Utilities.IsNanOrInf(value) then
+		return "?"
+	end
 	value = math.exp(value)
+	if Spring.Utilities.IsNanOrInf(value) then
+		return "??"
+	end
 	return string.format("%.2f", value)
 end
 
@@ -465,14 +471,16 @@ local function GetAttritionMetric(teams, dealtStat, takenStat, usingAllyteams, g
 	local range = ToLogOdds(3.13)
 	for i = 1, #teams do
 		local teamID = teams[i]
-		local effectiveTeam = usingAllyteams and select(6, Spring.GetTeamInfo(teamID, false)) or teamID
-		if teamID and not output[effectiveTeam] then
-			output[effectiveTeam] = {}
-			for b = 1, graphLength do
-				if dealt[effectiveTeam][b] <= 0 or taken[effectiveTeam][b] <= 0 then
-					output[effectiveTeam][b] = 0
-				else
-					output[effectiveTeam][b] = ToLogOdds(dealt[effectiveTeam][b] / taken[effectiveTeam][b])
+		if Spring.GetTeamStatsHistory(teamID, 0, graphLength) then
+			local effectiveTeam = usingAllyteams and select(6, Spring.GetTeamInfo(teamID, false)) or teamID
+			if teamID and not output[effectiveTeam] then
+				output[effectiveTeam] = {}
+				for b = 1, graphLength do
+					if dealt[effectiveTeam][b] <= 0 or taken[effectiveTeam][b] <= 0 then
+						output[effectiveTeam][b] = 0
+					else
+						output[effectiveTeam][b] = ToLogOdds(dealt[effectiveTeam][b] / taken[effectiveTeam][b])
+					end
 				end
 			end
 		end
@@ -481,16 +489,10 @@ local function GetAttritionMetric(teams, dealtStat, takenStat, usingAllyteams, g
 end
 
 function functionStats.attrition_kill(teams, statistic, usingAllyteams, graphLength)
-	if hiddenStats[statistic] and (gameOver or (spectating and specFullView)) then
-		return GetTeamStats(teams, 'damage_dealt', usingAllyteams, graphLength)
-	end
 	return GetAttritionMetric(teams, 'unit_value_killed', 'unit_value_lost', usingAllyteams, graphLength)
 end
 
 function functionStats.attrition_damage(teams, statistic, usingAllyteams, graphLength)
-	if hiddenStats[statistic] and (gameOver or (spectating and specFullView)) then
-		return GetTeamStats(teams, 'damage_dealt', usingAllyteams, graphLength)
-	end
 	return GetAttritionMetric(teams, 'damage_dealt', 'damage_received', usingAllyteams, graphLength)
 end
 
@@ -512,7 +514,7 @@ getEngineArrays = function(statNameData, labelCaption)
 		labelCaption = statNameData[statIndex][2]
 	end
 	
-		curGraph.caption = labelCaption
+	curGraph.caption = labelCaption
 	graphLabel:SetCaption(labelCaption)
 	graphTime:SetCaption("Total Time: " .. formatTime(totalTime))
 	-- If there's not at least two data points then don't draw the graph, labels, intervals, or players
