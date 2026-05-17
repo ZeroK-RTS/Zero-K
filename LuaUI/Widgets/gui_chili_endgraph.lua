@@ -399,7 +399,7 @@ local function drawGraph(graphArray, graphMin, graphMax, teamID, team_num, isHig
 		end
 	}
 	
-	return graph
+	return graph, label1
 end
 
 getEngineArrays = function(statNameData, labelCaption)
@@ -502,9 +502,12 @@ getEngineArrays = function(statNameData, labelCaption)
 		end
 	end
 	if highlightID then
-		local graph = drawGraph(teamScores[highlightID], graphMin, graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
+		local graph, label = drawGraph(teamScores[highlightID], graphMin, graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
 		if graph then
 			graph:BringToFront()
+		end
+		if label then
+			label:BringToFront()
 		end
 	end
 
