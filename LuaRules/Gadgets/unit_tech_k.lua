@@ -106,15 +106,6 @@ local function GetFactory(unitDefID)
 	return (hasFactory[unitDefID] >= 0) and hasFactory[unitDefID]
 end
 
-local isComm = {}
-local function IsComm(unitDefID)
-	if not isComm[unitDefID] then
-		local ud = UnitDefs[unitDefID]
-		isComm[unitDefID] = (ud.customParams.dynamic_comm or ud.customParams.commtype) and 1 or 0
-	end
-	return isComm[unitDefID] == 1
-end
-
 local isBuilder = {}
 local function IsBuilder(unitDefID)
 	if not isBuilder[unitDefID] then
@@ -240,7 +231,7 @@ local function CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
 		return false
 	end
 	local targetUnitDef = Spring.GetUnitDefID(targetID)
-	if not IsBuilding(targetUnitDef) and not (commUpgraders[unitDefID] and IsComm(targetUnitDef)) then
+	if not IsBuilding(targetUnitDef) and not (commUpgraders[unitDefID] and Spring.Utilities.isComm(targetUnitDef)) then
 		return false
 	end
 	local builderLevel = (unitLevel[unitID] or 1)

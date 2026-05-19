@@ -125,10 +125,17 @@ end
 -- GG Morph hooks (called by unit_morph.lua)
 --------------------------------------------------------------------------------
 
+local function IsEggMorph(unitID, targetDefID)
+	if not Spring.Utilities.isComm(targetDefID) then
+		return false
+	end
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	return unitDefID == eggDefID
+end
+
 function GG.MorphPreCheck(unitID, targetDefID, teamID)
-	local targetDef = UnitDefs[targetDefID]
-	if not (targetDef and targetDef.customParams and targetDef.customParams.dynamic_comm) then
-		return true -- not a commander morph, allow
+	if not IsEggMorph(unitID, targetDefID) then
+		return true
 	end
 
 	local hatchForTeam = FindTeamNeedingCommander(teamID, unitID)
@@ -142,7 +149,7 @@ end
 
 function GG.MorphStarted(unitID, targetDefID, teamID)
 	local targetDef = UnitDefs[targetDefID]
-	if not (targetDef and targetDef.customParams and targetDef.customParams.dynamic_comm) then
+	if not IsEggMorph(unitID, targetDefID) then
 		return
 	end
 
@@ -168,6 +175,13 @@ function GG.MorphCompleted(oldUnitID, newUnitID, teamID)
 	end
 
 	local hatchForTeam = Spring.GetUnitRulesParam(oldUnitID, "egg_morph_owner_team")
+	local ownerTeam = Spring.GetUnitRulesParam(oldUnitID, "egg_morph_owner_team") or Spring.GetUnitRulesParam(oldUnitID, "commander_owner_team")
+	-- tag the new commander
+	Spring.SetUnitRulesParam(newUnitID, "commander_owner_team", ownerTeam, {inlos = true})
+	if GG.ShareMode_RegisterUnit then
+		GG.ShareMode_RegisterUnit(newUnitID, ownerTeam)
+	end
+	
 	if not hatchForTeam then
 		return true -- not from an egg, allow
 	end
@@ -179,19 +193,13 @@ function GG.MorphCompleted(oldUnitID, newUnitID, teamID)
 	for i = 1, #allUnits do
 		if allUnits[i] ~= oldUnitID and allUnits[i] ~= newUnitID then
 			if Spring.GetUnitRulesParam(allUnits[i], "commander_owner_team") == hatchForTeam
-			   and Spring.GetUnitRulesParam(allUnits[i], "comm_level") then
+					and Spring.GetUnitRulesParam(allUnits[i], "comm_level") then
 				current = current + 1
 			end
 		end
 	end
 	if current >= maxComms then
 		return false -- abort morph, too many commanders
-	end
-
-	-- tag the new commander
-	Spring.SetUnitRulesParam(newUnitID, "commander_owner_team", hatchForTeam, {inlos = true})
-	if GG.ShareMode_RegisterUnit then
-		GG.ShareMode_RegisterUnit(newUnitID, hatchForTeam)
 	end
 
 	UpdateEggMorphButtons()
@@ -227,6 +235,10 @@ local cmdsToRemove = {CMD.MOVE, CMD.PATROL, CMD.FIGHT, CMD.GUARD, CMD.MOVE_STATE
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if unitDefID == eggDefID then
 		pendingEggUpdate = true
+	end
+	if Spring.Utilities.isComm(unitDefID) then
+		-- Set here because this gadget handles commander_owner_team, but will be overriden in MorphCompleted for morphed commanders
+		Spring.SetUnitRulesParam(unitID, "commander_owner_team", teamID, {inlos = true})
 	end
 end
 
