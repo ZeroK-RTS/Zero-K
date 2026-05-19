@@ -125,6 +125,7 @@ local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 
 local TEAM_WRAP = 20
+local ATTRITION_METRIC_EXTENT = 4.6
 
 local teamToPosition = {}
 do
@@ -468,7 +469,7 @@ local function GetAttritionMetric(teams, dealtStat, takenStat, usingAllyteams, g
 	local dealt = GetTeamStats(teams, dealtStat, usingAllyteams, graphLength)
 	local taken = GetTeamStats(teams, takenStat, usingAllyteams, graphLength)
 	local output = {}
-	local range = ToLogOdds(3.13)
+	local range = ToLogOdds(ATTRITION_METRIC_EXTENT)
 	for i = 1, #teams do
 		local teamID = teams[i]
 		if Spring.GetTeamStatsHistory(teamID, 0, graphLength) then
