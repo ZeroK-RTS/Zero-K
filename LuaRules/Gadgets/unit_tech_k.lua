@@ -53,6 +53,8 @@ local reclaimToRemoveUnit = {}
 local aiAllyTeamInfo = autoAiTech and {}
 local aiTeamAlly = autoAiTech and {}
 
+GG.TechUnitCostMult = {}
+
 local tintCycle = {
 	{1, 0.6, 0.9},
 	{1, 0.75, 0.6},
@@ -156,6 +158,7 @@ local function SetUnitTechLevel(unitID, level)
 	end
 	
 	local simpleDoubling = math.pow(2, level - 1)
+	GG.TechUnitCostMult[unitID] = simpleDoubling
 	GG.Attributes.AddEffect(unitID, "tech", {
 		projectiles = projectiles,
 		--move =  math.pow(0.95, level - 1),
@@ -601,6 +604,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	hasTechCommand[unitID] = nil
+	GG.TechUnitCostMult[unitID] = nil
 	if (unitLevel[unitID] or 1) <= 1 then
 		return
 	end

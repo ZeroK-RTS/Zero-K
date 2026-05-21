@@ -255,7 +255,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		end
 	end
 
-	local costMult = (GG.att_CostMult[unitID] or 1)
+	local costMult = GG.TechUnitCostMult and GG.TechUnitCostMult[unitID] or 1
 	morphUnits[unitID] = {
 		def = morphDef,
 		costMult = costMult,
