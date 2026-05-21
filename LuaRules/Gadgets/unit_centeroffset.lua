@@ -26,13 +26,16 @@ local spValidUnitID            = Spring.ValidUnitID
 local spSetUnitCollisionVolumeData = Spring.SetUnitCollisionVolumeData
 local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 
+local max = math.max
 local min = math.min
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local FULL_GROW = 0.4
+local FULL_GROW = 0.5
 local UPDATE_FREQUENCY = 25
+local NON_BLOCK_BUILD_FRAMES = 40
+local MIN_METAL_FOR_GROW = 15
 
 local growUnit = {}
 local completeGrowUnit = {}
@@ -42,6 +45,8 @@ local noGrowUnitDefs = {}
 local unitScales = {}
 local origColvolCache = {}
 local origColvolOverride = {}
+local recentBuilderTimeout = {}
+local nonBlockingUnit = {}
 
 local postCompleteGrowDefs = {}
 for i = 1, #UnitDefs do
@@ -106,6 +111,10 @@ end
 -- Unit Handling
 
 local function UpdateUnitGrow(unitID, data, growScale)
+	if nonBlockingUnit[unitID] and growScale > 0 then
+		nonBlockingUnit[unitID] = nil
+		Spring.SetUnitBlocking(unitID, true, true)
+	end
 	growScale = 1 - growScale
 	
 	if data.isSphere then
@@ -137,6 +146,15 @@ local function GetOrigColvolData(unitID, unitDefID)
 	end
 	local cache = origColvolOverride[unitID] or origColvolCache[unitDefID]
 	return cache
+end
+
+local function GetUnitGrowth(unitID, unitDefID, buildProgress)
+	if noGrowUnitDefs[unitDefID] then
+		return 1
+	end
+	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)
+	local growScale = max(0, min(1, (buildProgress*cost - MIN_METAL_FOR_GROW)/(cost * FULL_GROW)))
+	return growScale
 end
 
 local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
@@ -224,12 +242,7 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	-- Spheres poke more above the ground to give them more vulnerabilty.
 	-- Otherwise only the tip would show. Other volumes show the entire surface area because they are prisms.
 	local scaleOff = scaleY - volumeBelow - ((isSphere and 8) or 2)
-	
-	local growScale = min(1, buildProgress/FULL_GROW)
-	if noGrowUnitDefs[unitDefID] then
-		growScale = 1
-	end
-	
+	local growScale = GetUnitGrowth(unitID, unitDefID, buildProgress)
 	
 	growUnit[unitID] = {
 		mid = mid,
@@ -244,6 +257,7 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 		primaryAxis = primaryAxis,
 		prevGrowth = growScale,
 		dynamicColvol = postCompleteGrowDefs[unitDefID],
+		unitDefID = unitDefID,
 	}
 	
 	local luaSelectionScale = ud.customParams.lua_selection_scale
@@ -257,7 +271,20 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	UpdateUnitGrow(unitID, growUnit[unitID], growScale)
 end
 
-function gadget:UnitCreated(unitID, unitDefID, teamID)
+local function CheckRecentBuilderTimeout(unitID, builderID)
+	if  not builderID then
+		return
+	end
+	local frame = Spring.GetGameFrame()
+	if recentBuilderTimeout[builderID] and recentBuilderTimeout[builderID] > frame then
+		Spring.SetUnitBlocking(unitID, true, false)
+		nonBlockingUnit[unitID] = true
+	end
+	recentBuilderTimeout[builderID] = frame + NON_BLOCK_BUILD_FRAMES
+end
+
+function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	CheckRecentBuilderTimeout(unitID, builderID)
 	UpdateUnitCollisionData(unitID, unitDefID)
 end
 
@@ -297,6 +324,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		growUnit[unitID] = nil
 	end
 	unitScales[unitID] = nil
+	recentBuilderTimeout[unitID] = nil
+	nonBlockingUnit[unitID] = nil
 	if origColvolOverride[unitID] then
 		origColvolOverride[unitID] = nil
 	end
@@ -308,7 +337,7 @@ function gadget:GameFrame(f)
 			if spValidUnitID(unitID) then
 				local buildProgress = select(5, spGetUnitHealth(unitID))
 				if buildProgress <= FULL_GROW then
-					local growScale = min(1, buildProgress/FULL_GROW)
+					local growScale = GetUnitGrowth(unitID, growUnit[unitID].unitDefID, buildProgress)
 					if growScale ~= data.prevGrowth then
 						UpdateUnitGrow(unitID, growUnit[unitID], growScale)
 						data.prevGrowth = growScale
