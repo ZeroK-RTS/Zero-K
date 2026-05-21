@@ -141,7 +141,7 @@ local function UpdateWindStrengthAndDir()
 	local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
 	
 	GG.WindHeading = windHeading
-	GG.WindStrength = (strength - windMin)/windRange
+	GG.WindStrength = windRange > 0 and (strength - windMin)/windRange or strength
 	Spring.SetGameRulesParam("WindHeading", GG.WindHeading)
 	Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
 	
