@@ -6,6 +6,8 @@ for i = 1, #UnitDefs do
 	if cp.commtype or cp.dynamic_comm then
 		local name = UnitDefs[i].name
 		
+		-- This light is invisible. It is here to work around the bug where projectile lights are not shown until
+		-- a static light is created.
 		unitLights[name] = {
 			static = {
 				{
