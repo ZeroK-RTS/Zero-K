@@ -43,17 +43,18 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
-const vec3  BARK_COLOR         = vec3(0.55);
-const vec3  INNER_COLOR_LO     = vec3(0.65);   // capT = 0
-const vec3  INNER_COLOR_HI     = vec3(0.85);   // capT = 1
+const vec3  BARK_COLOR         = vec3(0.4);
+const vec3  INNER_COLOR_LO     = vec3(0.3);   // capT = 0
+const vec3  INNER_COLOR_HI     = vec3(0.45);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
+const float GRID_INNER_MIX     = 0.15; // Mix grid colour into the inner tube
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.35;
+const float DIFFUSE_FLOOR      = 0.5;
 const float SPEC_EXP           = 24.0;
-const float SPEC_MAGNITUDE     = 0.35;
+const float SPEC_MAGNITUDE     = 0.55;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
 
 // LOS / ghost: dim factor remaps losState through this range; fullLOS uses
@@ -71,14 +72,14 @@ const float ENEMY_LOS_CUT      = 0.1;
 
 // Bubble flow mapping. Must mirror Lua flowToSpeed() exactly for CPU-baked
 // phase anchoring + FS extrapolation to remain continuous across baking.
-const float MAX_SPEED          = 110.0;
+const float MAX_SPEED          = 100.0;
 const float FLOW_REF           = 50.0;
 const float MIN_TRUNK_W        = 3.0;
-const float SPACING_A          = 105.0;        // big bubble layer
-const float SPACING_B          = 48.0;         // small bubble layer
+const float SPACING_A          = 67.0;        // big bubble layer
+const float SPACING_B          = 42.0;         // small bubble layer
 const float BUBBLE_BIG_R       = 7.5;
 const float BUBBLE_SMALL_R     = 4.0;
-const float HALO_SIZE          = 3.0;
+const float HALO_SIZE          = 3.5;
 
 // Bubble compositing weights.
 const float HALO_WEIGHT        = 0.95;
@@ -321,6 +322,7 @@ void main() {
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v);
 
 	// Own lighting (forward rendered, no engine lighting applies)
+	vec3 gridColor   = gridEfficiencyColor(gridData.x);
 	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * dot(cylNormal, normalize(sunDir.xyz))));
 
 	// Specular
@@ -332,6 +334,7 @@ void main() {
 	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
 	vec3 innerColor = mix(INNER_COLOR_LO, INNER_COLOR_HI, capT);
+	innerColor = mix(innerColor, gridColor, GRID_INNER_MIX);
 
 	float innerMix = smoothstep(0.85, 0.15, t);
 	if (isBranch > 0.5) innerMix *= TWIG_INNER_DAMPEN;
@@ -492,12 +495,11 @@ void main() {
 		vec3 bBh = bubbleLayer(along, phase, spacingB, BUBBLE_SMALL_R, v, halfWidthE * HALO_SIZE, 19.1);
 		bubbleBody = bA.x + bB.x * 0.85;
 		bubbleSpec = bA.y + bB.y * 0.85;
-		bubbleHalo = (bAh.z + bBh.z * HALO_WEIGHT_LAYER);
+		bubbleHalo = (bAh.z + bBh.z) * HALO_WEIGHT_LAYER;
 	}
 
 	// Bubble colour: grid-efficiency hue, lightly toned down so it still
 	// glows clearly but isn't neon-saturated.
-	vec3 gridColor   = gridEfficiencyColor(gridData.x);
 	float gridLum    = dot(gridColor, vec3(0.299, 0.587, 0.114));
 	vec3 grayedGrid  = mix(gridColor, vec3(gridLum), GRID_DESAT);
 	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), BUBBLE_WHITE_MIX);
@@ -525,5 +527,5 @@ void main() {
 
 	//color = color*0.0 + diffuse;
 	//alpha = 1.0;
-	fragColor = vec4(color, alpha);
+	fragColor = vec4(color, alpha * 0.97); // Mix in some of the underlying terrain
 }
