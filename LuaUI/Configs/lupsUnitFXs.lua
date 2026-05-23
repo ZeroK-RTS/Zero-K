@@ -100,9 +100,9 @@ effectUnitDefs = {
 	},
 
 	--// ENERGY STORAGE //--------------------
-	energypylon = {
-		{class='GroundFlash', options=groundFlashenergypylon},
-	},
+	--energypylon = { -- Lights draw it now
+	--	{class='GroundFlash', options=groundFlashenergypylon},
+	--},
 
 	--// FACTORIES //----------------------------
 	factoryship = {
