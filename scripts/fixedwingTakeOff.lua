@@ -3,17 +3,17 @@ if GG.TakeOffFuncs then
 end
 GG.TakeOffFuncs = {}
 
-function GG.TakeOffFuncs.NotTakingOff()
+function GG.TakeOffFuncs.NotTakingOff(unitID)
 	local state = Spring.GetUnitMoveTypeData(unitID)
 	return state and (state.aircraftState ~= "takeoff")
 end
 
-function GG.TakeOffFuncs.TakeOffThread(height, signal)
+function GG.TakeOffFuncs.TakeOffThread(unitID, height, signal)
 	local FUDGE_FACTOR = 1.5
 	
 	Signal(signal)
 	SetSignalMask(signal)
-	while GG.TakeOffFuncs.NotTakingOff() do
+	while GG.TakeOffFuncs.NotTakingOff(unitID) do
 		Sleep(1000)
 	end
 	for i = 1, 5 do
