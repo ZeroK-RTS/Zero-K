@@ -51,7 +51,7 @@ const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.25;
+const float DIFFUSE_FLOOR      = 0.4;
 const float SPEC_EXP           = 24.0;
 const float SPEC_MAGNITUDE     = 0.35;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
@@ -61,13 +61,13 @@ const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
 const float DIM_LOS_LO         = 0.3;
 const float DIM_LOS_HI         = 0.8;
 const float DIM_FACTOR_MIN     = 0.3;          // bark brightness at full darkness
-const float FULLLOS_LO         = 0.7;
+const float FULLLOS_LO         = 0.1;
 const float FULLLOS_HI         = 1.0;
 
 // Enemy LOS gating: below this losState, enemy fragments are hidden entirely
 // (no ghost). Own-ally fragments ignore this threshold — they fade via
 // dimFactor instead but always render.
-const float ENEMY_LOS_CUT      = 0.5;
+const float ENEMY_LOS_CUT      = 0.1;
 
 // Bubble flow mapping. Must mirror Lua flowToSpeed() exactly for CPU-baked
 // phase anchoring + FS extrapolation to remain continuous across baking.
@@ -99,6 +99,15 @@ const float PULSE_INTENSITY    = 0.55;
 const float PULSE_BODY_W       = 1.10;
 const float PULSE_SPEC_W       = 0.55;
 const float PULSE_HALO_W       = 0.50;
+
+// Ghost shading: simple flat light-gray, alpha-blended over terrain.
+// No lighting, no shimmer, no cylinder normal — reads as a memory trace.
+const vec3  GHOST_COLOR        = vec3(0.5);   // light neutral gray
+const float GHOST_CAP_TINT     = 0.02;         // small capacity-driven brighten
+const float GHOST_BRANCH_DAMP  = 0.85;
+const float GHOST_ALPHA_BASE   = 0.45;         // translucent baseline
+const float GHOST_EDGE_FADE_LO = 0.55;
+const float GHOST_EDGE_FADE_HI = 0.90;
 
 out vec4 fragColor;
 
@@ -219,15 +228,6 @@ vec3 gridEfficiencyColor(float eff) {
 	return hueToRgb(h / 255.0);
 }
 
-// Ghost shading: simple flat light-gray, alpha-blended over terrain.
-// No lighting, no shimmer, no cylinder normal — reads as a memory trace.
-const vec3  GHOST_COLOR        = vec3(0.72);   // light neutral gray
-const float GHOST_CAP_TINT     = 0.18;         // small capacity-driven brighten
-const float GHOST_BRANCH_DAMP  = 0.85;
-const float GHOST_ALPHA_BASE   = 0.45;         // translucent baseline
-const float GHOST_EDGE_FADE_LO = 0.55;
-const float GHOST_EDGE_FADE_HI = 0.90;
-
 void main() {
 	float v = cableUV.y;
 	float t = abs(v);
@@ -312,7 +312,6 @@ void main() {
 		// Cable nearly vertical — pick an arbitrary horizontal perp.
 		perp3D = vec3(1.0, 0.0, 0.0);
 	}
-	float alpha = 1.0 - 2.0*v*v*v*v*v*v*v*v*v*v;
 
 	vec3 trueUp = cross(cableT, perp3D);
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
@@ -326,6 +325,7 @@ void main() {
 
 	// Specular
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
+	float cameraDist = length(cameraViewInv[3].xyz - worldPos);
 	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
 	float spec = pow(max(0.0, dot(cylNormal, halfDir)), SPEC_EXP) * SPEC_MAGNITUDE;
 
@@ -340,7 +340,7 @@ void main() {
 	// Surface noise detail
 	float surfN = hash(worldPos.xz * 0.5) * 0.04;
 	baseColor += vec3(surfN);
-
+	
 	// LOS state — sampled from $info:los (single-channel red), the engine's
 	// actual game-logic LOS texture. Independent of the user's overlay toggle:
 	// 0.0 = unscouted, 1.0 = currently in LOS.
@@ -348,6 +348,12 @@ void main() {
 	float losState = texture(infoTex, losUV).r;
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
+	// Fade out edges and with camera distance
+	float distScale = clamp(450.0 / cameraDist, 0.0, 1.0);
+	float alpha = 1.0 - 10.0*pow(t, 20.0 * distScale);
+	alpha = alpha * max(0.3, losState);
+	spec = spec * distScale; // Specular causes beating when zoomed out
+	
 	// Coverage bits are written by the GS (per-segment, per cable per frame).
 	// Per-fragment gating: derive segIdx from along-distance + len-per-segment
 	// packed into spawnAlongMain (see DataGS comment). Twigs use bit 0 as a
@@ -519,6 +525,5 @@ void main() {
 
 	//color = color*0.0 + losState;
 	//alpha = 1.0;
-	// FULLY OPAQUE output — like lava. No alpha blending.
 	fragColor = vec4(color, alpha);
 }
