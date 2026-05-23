@@ -332,6 +332,8 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 
 		if (i > 0) along += distance(prev3D, center3D);
 		prev3D = center3D;
+		leftPos.y = max(leftPos.y, rightPos.y);
+		rightPos.y = leftPos.y;
 
 		emitVtx(leftPos,  vtxTangent, vec2(along, -1.0), widthVal, gridD, timeD, cap);
 		emitVtx(rightPos, vtxTangent, vec2(along,  1.0), widthVal, gridD, timeD, cap);
