@@ -133,7 +133,7 @@ return { mahlazer = {
       craterMult              = 0,
 
       customParams              = {
-        stats_damage = 18000,
+        stats_damage = 24000,
         stats_hide_shield_damage = 1,
         light_radius = 0,
         lups_noshockwave = [[1]],
@@ -186,7 +186,7 @@ return { mahlazer = {
       },
 
       damage                  = {
-        default = 150,
+        default = 4501/30,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
