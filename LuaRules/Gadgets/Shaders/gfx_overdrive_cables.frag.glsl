@@ -327,7 +327,7 @@ void main() {
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
 	float cameraDist = length(cameraViewInv[3].xyz - worldPos);
 	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
-	float spec = pow(max(0.0, dot(cylNormal, halfDir)), SPEC_EXP) * SPEC_MAGNITUDE;
+	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 0.9), SPEC_EXP) * SPEC_MAGNITUDE;
 
 	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
