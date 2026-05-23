@@ -105,9 +105,9 @@ const float MAX_TRUNK_WIDTH   = 12.0;
 const float MAX_CAPACITY_REF  = 225.0; // one singu (energysingu.energyMake)
 
 // Twig parameters mirror the Lua-side BRANCH_* constants.
-const float BRANCH_CHANCE     = 0.78;
-const float BRANCH_LEN_MIN    = 15.0;
-const float BRANCH_LEN_MAX    = 50.0;
+const float BRANCH_CHANCE     = 0.85;
+const float BRANCH_LEN_MIN    = 8.0;
+const float BRANCH_LEN_MAX    = 15.0;
 const float BRANCH_ANGLE_MIN  = 0.4;
 const float BRANCH_ANGLE_MAX  = 1.1;
 const float BRANCH_WIDTH      = 0.85;

@@ -78,10 +78,11 @@ const float SPACING_A          = 105.0;        // big bubble layer
 const float SPACING_B          = 48.0;         // small bubble layer
 const float BUBBLE_BIG_R       = 7.5;
 const float BUBBLE_SMALL_R     = 4.0;
+const float HALO_SIZE          = 3.0;
 
 // Bubble compositing weights.
-const float HALO_WEIGHT        = 0.70;
-const float BODY_WEIGHT        = 1.85;
+const float HALO_WEIGHT        = 0.95;
+const float BODY_WEIGHT        = 0.15;
 const float SPEC_WEIGHT        = 1.10;
 const float GRID_DESAT         = 0.18;         // how much to mute saturated grid hue
 const float BUBBLE_WHITE_MIX   = 0.15;         // mix into pure white for "hot core"
@@ -481,9 +482,11 @@ void main() {
 	} else {
 		vec3 bA = bubbleLayer(along, phase, spacingA, BUBBLE_BIG_R,   v, halfWidthE,  3.7);
 		vec3 bB = bubbleLayer(along, phase, spacingB, BUBBLE_SMALL_R, v, halfWidthE, 19.1);
+		vec3 bAh = bubbleLayer(along, phase, spacingA, BUBBLE_BIG_R,   v, halfWidthE * HALO_SIZE,  3.7);
+		vec3 bBh = bubbleLayer(along, phase, spacingB, BUBBLE_SMALL_R, v, halfWidthE * HALO_SIZE, 19.1);
 		bubbleBody = bA.x + bB.x * 0.85;
 		bubbleSpec = bA.y + bB.y * 0.85;
-		bubbleHalo = bA.z + bB.z * HALO_WEIGHT_LAYER;
+		bubbleHalo = (bAh.z + bBh.z * HALO_WEIGHT_LAYER);
 	}
 
 	// Bubble colour: grid-efficiency hue, lightly toned down so it still
