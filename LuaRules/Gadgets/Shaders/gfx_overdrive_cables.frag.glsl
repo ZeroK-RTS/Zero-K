@@ -344,7 +344,7 @@ void main() {
 	// LOS state — sampled from $info:los (single-channel red), the engine's
 	// actual game-logic LOS texture. Independent of the user's overlay toggle:
 	// 0.0 = unscouted, 1.0 = currently in LOS.
-	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
+	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
 	float losState = texture(infoTex, losUV).r;
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
@@ -517,6 +517,8 @@ void main() {
 	color = max(color, bubbleEmissive);
 	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
 
+	//color = color*0.0 + losState;
+	//alpha = 1.0;
 	// FULLY OPAQUE output — like lava. No alpha blending.
 	fragColor = vec4(color, alpha);
 }
