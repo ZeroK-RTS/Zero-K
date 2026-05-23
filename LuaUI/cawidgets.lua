@@ -36,6 +36,7 @@ Spring.Utilities.json = vfsInclude("LuaRules/Utilities/json.lua"          , nil,
 
 vfsInclude("LuaRules/Utilities/globals.lua"          , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/stringFunctions.lua"  , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/debugFunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
