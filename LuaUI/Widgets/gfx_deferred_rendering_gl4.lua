@@ -1764,7 +1764,10 @@ function widget:Initialize()
 		return
 	end
 
-	if initGL4() == false then return end
+	if initGL4() == false then
+		widgetHandler:RemoveWidget()
+		return
+	end
 
 	local success, mapinfo = pcall(VFS.Include,"mapinfo.lua") -- load mapinfo.lua confs
 

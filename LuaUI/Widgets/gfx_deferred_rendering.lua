@@ -418,6 +418,11 @@ function InitialiseShaders()
 end
 
 function widget:Initialize()
+	if WG['lightsgl4'] then
+		Spring.Echo('Removing GL3 deferred rendering because GL4 is supported.')
+		widgetHandler:RemoveWidget()
+		return
+	end
 	if (glCreateShader == nil) then
 		Spring.Echo('Deferred Rendering requires shader support!')
 		widgetHandler:RemoveWidget()

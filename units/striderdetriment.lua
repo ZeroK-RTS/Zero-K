@@ -201,6 +201,8 @@ return { striderdetriment = {
       customParams              = {
         isaa = [[1]],
         reaim_time = 1,
+        light_radius = 50,
+        light_alpha = 0.02,
       },
 
       damage                  = {

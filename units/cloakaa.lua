@@ -87,8 +87,8 @@ return { cloakaa = {
 
       customParams              = {
         isaa = [[1]],
-        light_color = [[0.2 1.2 1.2]],
-        light_radius = 120,
+        light_radius = 50,
+        light_alpha = 0.02,
       },
 
       damage                  = {

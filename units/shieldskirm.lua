@@ -78,6 +78,7 @@ return { shieldskirm = {
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1800,
+        light_radius = 80,
       },
       
       damage                  = {
