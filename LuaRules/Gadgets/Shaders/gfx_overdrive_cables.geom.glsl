@@ -108,7 +108,7 @@ const float MAX_CAPACITY_REF  = 400.0;
 const float BRANCH_CHANCE     = 0.85;
 const float BRANCH_LEN_MIN    = 8.0;
 const float BRANCH_LEN_MAX    = 15.0;
-const float BRANCH_ANGLE_MIN  = 0.4;
+const float BRANCH_ANGLE_MIN  = 0.8;
 const float BRANCH_ANGLE_MAX  = 1.1;
 const float BRANCH_WIDTH      = 0.85;
 

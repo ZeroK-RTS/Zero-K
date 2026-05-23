@@ -51,7 +51,7 @@ const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.4;
+const float DIFFUSE_FLOOR      = 0.35;
 const float SPEC_EXP           = 24.0;
 const float SPEC_MAGNITUDE     = 0.35;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
@@ -321,7 +321,7 @@ void main() {
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v);
 
 	// Own lighting (forward rendered, no engine lighting applies)
-	float diffuse = min(0.45, max(DIFFUSE_FLOOR, dot(cylNormal, normalize(sunDir.xyz))));
+	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * dot(cylNormal, normalize(sunDir.xyz))));
 
 	// Specular
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
@@ -523,7 +523,7 @@ void main() {
 	color = max(color, bubbleEmissive);
 	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
 
-	//color = color*0.0 + losState;
+	//color = color*0.0 + diffuse;
 	//alpha = 1.0;
 	fragColor = vec4(color, alpha);
 }
