@@ -311,6 +311,7 @@ void main() {
 		// Cable nearly vertical — pick an arbitrary horizontal perp.
 		perp3D = vec3(1.0, 0.0, 0.0);
 	}
+	float alpha = 1.0 - 2.0*v*v*v*v*v*v*v*v*v*v;
 
 	vec3 trueUp = cross(cableT, perp3D);
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
@@ -514,5 +515,5 @@ void main() {
 	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
 
 	// FULLY OPAQUE output — like lava. No alpha blending.
-	fragColor = vec4(color, 1.0);
+	fragColor = vec4(color, alpha);
 }
