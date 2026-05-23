@@ -18,6 +18,7 @@ return { commander_egg = {
     instantselfd = [[1]],
     midposoffset = [[0 15 0]],
     modelradius = [[15]],
+    stats_show_death_explosion = 1,
 
     morphto_1    = [[dynstrike0]],
     morphtime_1  = 60,
@@ -68,7 +69,7 @@ return { commander_egg = {
       },
 
       damage                  = {
-        default = 20001.6,
+        default = 20000.6,
       },
 
       edgeEffectiveness       = 1,
