@@ -158,6 +158,8 @@ return { gunshipheavytrans = {
       
       customParams        = {
         combatrange = 100,
+        light_radius = 80,
+        light_alpha = 0.08,
       },
 
       damage                  = {

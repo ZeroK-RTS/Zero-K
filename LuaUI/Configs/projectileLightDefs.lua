@@ -104,7 +104,7 @@ for weaponDefID = 1, #WeaponDefs do
 	weaponData.r = weaponData.r * BASE_STR_MULT
 	weaponData.g = weaponData.g * BASE_STR_MULT
 	weaponData.b = weaponData.b * BASE_STR_MULT
-	weaponData.a = (tonumber(customParams.light_alpha) or 1) * 0.11
+	weaponData.a = tonumber(customParams.light_alpha) or 0.11
 	
 	if weaponData.radius > 0 and not customParams.fake_weapon then
 		plighttable[weaponDefID] = weaponData

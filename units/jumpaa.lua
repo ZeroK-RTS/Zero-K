@@ -129,8 +129,8 @@ return { jumpaa = {
 
       customParams              = {
         isaa = [[1]],
-        light_radius = 50,
-        light_alpha = 0.02,
+        light_radius = 80,
+        light_alpha = 0.08,
       },
 
       damage                  = {
