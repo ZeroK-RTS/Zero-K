@@ -320,7 +320,7 @@ void main() {
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v);
 
 	// Own lighting (forward rendered, no engine lighting applies)
-	float diffuse = max(DIFFUSE_FLOOR, dot(cylNormal, normalize(sunDir.xyz)));
+	float diffuse = min(0.45, max(DIFFUSE_FLOOR, dot(cylNormal, normalize(sunDir.xyz))));
 
 	// Specular
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
