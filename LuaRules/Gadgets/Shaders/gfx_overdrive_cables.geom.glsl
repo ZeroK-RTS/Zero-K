@@ -99,8 +99,8 @@ float gsNoiseScale(float t) {
 const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25 boundaries × 2). Cable lengths are bounded by pylon range so this isn't expected to clamp in practice.
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
-const float WIDTH_FACTOR      = 0.55;
-const float MIN_TRUNK_WIDTH   = 3.0;
+const float WIDTH_FACTOR      = 0.45;
+const float MIN_TRUNK_WIDTH   = 4.2;
 const float MAX_TRUNK_WIDTH   = 12.0;
 const float MAX_CAPACITY_REF  = 225.0; // one singu (energysingu.energyMake)
 
