@@ -43,22 +43,22 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
-const vec3  BARK_COLOR         = vec3(0.4);
+const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.3);   // capT = 0
-const vec3  INNER_COLOR_HI     = vec3(0.45);   // capT = 1
+const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
 const float GRID_INNER_MIX     = 0.2; // Mix grid colour into the inner tube
 
 // Cables are semi-transparent glass tubes
-const float BASE_ALPHA         = 0.76;
+const float BASE_ALPHA         = 0.65;
 const float INNER_ALPHA        = 0.98;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.45;
+const float DIFFUSE_FLOOR      = 0.46;
 const float SPEC_EXP           = 24.0;
-const float SPEC_MAGNITUDE     = 0.55;
+const float SPEC_MAGNITUDE     = 0.25;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
 
 // LOS / ghost: dim factor remaps losState through this range; fullLOS uses
@@ -362,7 +362,7 @@ void main() {
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
 	float cameraDist = length(cameraViewInv[3].xyz - worldPos);
 	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
-	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 0.9), SPEC_EXP) * SPEC_MAGNITUDE;
+	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 1.0), SPEC_EXP) * SPEC_MAGNITUDE;
 
 	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
@@ -382,7 +382,6 @@ void main() {
 	float alpha = BASE_ALPHA * (1.0 - 10.0*pow(t, 20.0 * distScale));
 	alpha = mix(alpha, INNER_ALPHA, innerMix);
 	alpha = alpha * max(0.3, losState);
-	spec = spec * distScale; // Specular causes beating when zoomed out
 	
 	// Coverage bits are written by the GS (per-segment, per cable per frame).
 	// Per-fragment gating: derive segIdx from along-distance + len-per-segment
