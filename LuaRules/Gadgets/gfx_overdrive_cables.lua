@@ -2384,7 +2384,9 @@ local cableFSSrc = VFS.LoadFile(SHADER_DIR .. 'gfx_overdrive_cables.frag.glsl')
 -- inside actual LOS). Specs and full-view see everything as own.
 local function isOwnAlly(allyTeamID)
 	local spec, fullview = spGetSpectatingState()
-	if (spec or fullview) then return true end
+	if fullview then
+		return true
+	end
 	return allyTeamID == spGetMyAllyTeamID()
 end
 
@@ -2735,7 +2737,7 @@ function gadget:GameFrame(n)
 	--    "iterate everything every 30 frames" stutter.
 	if cableGhosts and next(ghostEdges) then
 		local spec, fullView = spGetSpectatingState()
-		if not (spec or fullView) then
+		if not fullView then
 			local ally = spGetMyAllyTeamID()
 			local removed = false
 			local checked = 0

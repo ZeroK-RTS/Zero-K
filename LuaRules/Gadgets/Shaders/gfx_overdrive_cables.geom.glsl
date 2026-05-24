@@ -95,6 +95,9 @@ float gsNoiseScale(float t) {
 	if (t > 0.9) return (1.0 - t) / 0.1;
 	return 1.0;
 }
+float hash1(float n) {
+	return fract(sin(n * 12.9898) * 43758.5453);
+}
 
 const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25 boundaries × 2). Cable lengths are bounded by pylon range so this isn't expected to clamp in practice.
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
@@ -332,6 +335,7 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 
 		if (i > 0) along += distance(prev3D, center3D);
 		prev3D = center3D;
+		leftPos.y += hash1(seed)*0.1; // z-fighting
 		leftPos.y = max(leftPos.y, rightPos.y);
 		rightPos.y = leftPos.y;
 
