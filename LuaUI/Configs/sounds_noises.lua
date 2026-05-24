@@ -1348,6 +1348,14 @@ local sounds = {
 			[1] = "radar_select",
 		},
 	},
+	commander_egg = {
+		ok = {
+			[1] = "turret_move",
+		},
+		select = {
+			[1] = "building_select2",
+		},
+	},
 	staticheavyradar = {
 		ok = {
 			[1] = "turret_move",
