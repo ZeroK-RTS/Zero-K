@@ -26,7 +26,7 @@ local icontypes = {
 -- commander egg
   commander_egg = {
     bitmap='icons/commander_egg_icon.dds',
-    size=2.5,
+    size=1.9,
   },
 
 -- commanders
