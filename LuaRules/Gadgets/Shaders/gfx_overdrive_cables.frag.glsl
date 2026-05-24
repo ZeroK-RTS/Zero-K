@@ -43,16 +43,17 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
+const vec3  EDGE_COLOR         = vec3(0.4);
 const vec3  BARK_COLOR         = vec3(0.45);
-const vec3  INNER_COLOR_LO     = vec3(0.3);   // capT = 0
+const vec3  INNER_COLOR_LO     = vec3(0.45);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
 const float GRID_INNER_MIX     = 0.27; // Mix grid colour into the inner tube
 
 // Cables are semi-transparent glass tubes
-const float EDGE_EXTRA_ALPHA   = 5.0;
-const float BASE_ALPHA         = 0.4;
-const float INNER_ALPHA        = 0.98;
+const float EDGE_ALPHA         = 0.56;
+const float BASE_ALPHA         = 0.42;
+const float INNER_ALPHA        = 0.97;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
@@ -72,8 +73,8 @@ const float FULLLOS_HI         = 1.0;
 
 // Bubbles change speed and size depending on flow rate
 // These changes come in 4 steps to deal with bubble teleportation.
-const float BUBBLE_FREQ_BASE = 0.3;
-const float BUBBLE_FREQ_FACTOR = 0.65;
+const float BUBBLE_FREQ_BASE = 0.45;
+const float BUBBLE_FREQ_FACTOR = 0.5;
 const float SPEED_1 = 0.2;
 const float SPEED_2 = 0.45;
 const float SPEED_3 = 0.8;
@@ -370,18 +371,21 @@ void main() {
 	vec3 innerColor = mix(INNER_COLOR_LO, INNER_COLOR_HI, capT);
 	innerColor = mix(innerColor, gridColor, GRID_INNER_MIX);
 
-	float innerMix = smoothstep(0.85, 0.15, t / EDGE_BUFFER);
+	// Wire walls (innerMix2) are less pronounce with camera distance.
+	float distScale = clamp(450.0 / cameraDist, 0.0, 1.0);
+	float innerMix = smoothstep(0.85, 0.15, clamp(t / EDGE_BUFFER, 0.0, 1.0));
+	float innerMix2 = smoothstep(0.85, 0.15, clamp(t*t / (EDGE_BUFFER*EDGE_BUFFER), 0.0, 1.0)) * distScale;
 	if (isBranch > 0.5) innerMix *= TWIG_INNER_DAMPEN;
-	vec3 baseColor = mix(BARK_COLOR, innerColor, innerMix);
+	vec3 edgeColor = mix(EDGE_COLOR, BARK_COLOR, innerMix2);
+	vec3 baseColor = mix(edgeColor, innerColor, innerMix);
 
 	// Surface noise detail
 	float surfN = hash(worldPos.xz * 0.5) * 0.04;
 	baseColor += vec3(surfN);
 
 	// Fade out edges and with camera distance
-	float distScale = clamp(450.0 / cameraDist, 0.0, 1.0);
-	float alpha = mix(BASE_ALPHA, INNER_ALPHA, innerMix) * (1.0 - 10.0*pow(t, 20.0));
-	alpha += EDGE_EXTRA_ALPHA * (t * EDGE_BUFFER) * (t * EDGE_BUFFER); // Thicker around the edges
+	float baseAlpha = mix(EDGE_ALPHA, BASE_ALPHA, innerMix2);
+	float alpha = mix(baseAlpha, INNER_ALPHA, innerMix) * (1.0 - 10.0*pow(t, 20.0));
 	alpha = alpha * max(0.85, losState);
 	
 	// Coverage bits are written by the GS (per-segment, per cable per frame).
@@ -505,7 +509,7 @@ void main() {
 		vec3 bubbleType;
 		if (flowFactor < 0.4) {
 			speed = MAX_SPEED * gameTime * SPEED_1;
-			flowAlpha = clamp((0.4 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.05)/0.05, 0.0, 1.0);
+			flowAlpha = sqrt(clamp((0.4 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.05)/0.05, 0.0, 1.0));
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_1, BUBBLE_BIG_R * SIZE_1,   v, halfWidthE * HALO_SIZE,  3.7);
 			bubbleHalo += bubbleType.z * flowAlpha;
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_1, BUBBLE_SMALL_R * SIZE_1,   v, halfWidthE * HALO_SIZE,  3.7);
@@ -513,7 +517,7 @@ void main() {
 		}
 		if (flowFactor > 0.2 && flowFactor < 0.6) {
 			speed = MAX_SPEED * gameTime * SPEED_2;
-			flowAlpha = clamp((0.6 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.2)/0.2, 0.0, 1.0);
+			flowAlpha = sqrt(clamp((0.6 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.2)/0.2, 0.0, 1.0));
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_2, BUBBLE_BIG_R * SIZE_2,   v, halfWidthE * HALO_SIZE,  3.7);
 			bubbleHalo += bubbleType.z * flowAlpha;
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_2, BUBBLE_SMALL_R * SIZE_2,   v, halfWidthE * HALO_SIZE,  3.7);
@@ -521,7 +525,7 @@ void main() {
 		}
 		if (flowFactor > 0.4 && flowFactor < 0.8) {
 			speed = MAX_SPEED * gameTime * SPEED_3;
-			flowAlpha = clamp((0.8 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.4)/0.2, 0.0, 1.0);
+			flowAlpha = sqrt(clamp((0.8 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.4)/0.2, 0.0, 1.0));
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_3, BUBBLE_BIG_R * SIZE_3,   v, halfWidthE * HALO_SIZE,  3.7);
 			bubbleHalo += bubbleType.z * flowAlpha;
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_3, BUBBLE_SMALL_R * SIZE_3,   v, halfWidthE * HALO_SIZE,  3.7);
@@ -529,7 +533,7 @@ void main() {
 		}
 		if (flowFactor > 0.6) {
 			speed = MAX_SPEED * gameTime * SPEED_4;
-			flowAlpha = clamp((flowFactor - 0.6)/0.2, 0.0, 1.0);
+			flowAlpha = sqrt(clamp((flowFactor - 0.6)/0.2, 0.0, 1.0));
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_4, BUBBLE_BIG_R * SIZE_4,   v, halfWidthE * HALO_SIZE,  3.7);
 			bubbleHalo += bubbleType.z * flowAlpha;
 			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_4, BUBBLE_SMALL_R * SIZE_4,   v, halfWidthE * HALO_SIZE,  3.7);
