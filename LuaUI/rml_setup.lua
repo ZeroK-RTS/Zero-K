@@ -1,4 +1,4 @@
---  file:    rml.lua
+--  file:    rml_setup.lua
 --  brief:   RmlUi Setup
 --  author:  lov + ChrisFloofyKitsune
 --
