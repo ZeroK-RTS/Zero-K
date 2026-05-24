@@ -126,10 +126,10 @@ const float PULSE_HALO_W       = 0.50;
 
 // Ghost shading: simple flat light-gray, alpha-blended over terrain.
 // No lighting, no shimmer, no cylinder normal — reads as a memory trace.
-const vec3  GHOST_COLOR        = vec3(0.5);   // light neutral gray
+const vec3  GHOST_COLOR        = vec3(0.4);   // light neutral gray
 const float GHOST_CAP_TINT     = 0.02;         // small capacity-driven brighten
 const float GHOST_BRANCH_DAMP  = 0.85;
-const float GHOST_ALPHA_BASE   = 0.45;         // translucent baseline
+const float GHOST_ALPHA_BASE   = 0.35;         // translucent baseline
 const float GHOST_EDGE_FADE_LO = 0.55;
 const float GHOST_EDGE_FADE_HI = 0.90;
 
