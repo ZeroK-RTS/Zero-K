@@ -524,8 +524,10 @@ end
 
 -- Static draw: mex = effectively infinite (any flow saturates it),
 -- voltage units contribute their neededlink threshold.
-local function GetNodeDmax(unitDefID)
-	if mexDefs[unitDefID] then return INF_DRAW end
+local function GetNodeDmax(unitID, unitDefID)
+	if mexDefs[unitDefID] then
+		return spGetUnitRulesParam(unitID, "max_energy_drain") or INF_DRAW
+	end
 	return voltageByDef[unitDefID] or 0
 end
 
@@ -1396,7 +1398,7 @@ local function BuildMpCache()
 		local u = order[i]
 		local did = nodeDefByUID[u]
 		subPmax[u] = did and GetNodePmax(did) or 0
-		subDmax[u] = did and GetNodeDmax(did) or 0
+		subDmax[u] = did and GetNodeDmax(u, did) or 0
 		if did and isWindgenByDef[did] then
 			subWindCount[u] = 1
 			subWindBase[u] = GetCachedMinWind(u)

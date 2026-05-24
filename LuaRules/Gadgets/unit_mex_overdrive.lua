@@ -890,6 +890,12 @@ end
 -------------------------------------------------------------------------------------
 -- Overdrive and resource handling
 
+local function UpdateMaxMexDrain(unitID, myProp, gridCapactiy)
+	-- How much energy would the mex drain if the grid were maxxed.
+	local maxE = myProp * gridCapactiy
+	spSetUnitRulesParam(unitID, "max_energy_drain", maxE, alliedTrueTable)
+end
+
 local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacity)
 	local summedMetalProduction = 0
 	local summedBaseMetal = 0
@@ -941,9 +947,11 @@ local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacit
 					local myMetalIncome = curMexIncomes[unitID]
 					local mexE = 0
 					if (allyMetalSquared > 0) then -- divide energy in ratio given by squared metal from mex
-						mexE = allyE * (myMetalIncome * myMetalIncome) / allyMetalSquared --the fraction of E to be consumed with respect to all other Mex
+						local myProp = (myMetalIncome * myMetalIncome) / allyMetalSquared
+						mexE = allyE * myProp --the fraction of E to be consumed with respect to all other Mex
 						energyWasted = energyWasted - mexE -- leftover E minus Mex usage
 						gridEnergySpent[i] = gridEnergySpent[i] + mexE
+						UpdateMaxMexDrain(unitID, myProp, maxGridCapacity[i])
 						-- if a grid is being too overdriven it has become maxed.
 						-- the grid's mexSqauredSum is used for best distribution
 						if gridEnergySpent[i] > maxGridCapacity[i] then --final Mex to be looped since we are out of E to OD the rest of the Mex
@@ -968,7 +976,9 @@ local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacit
 							energyWasted = allyE
 							for unitID_inner, _ in pairs(allyTeamMexes[i]) do --re-distribute the grid energy to Mex (again! except taking account the limited energy of the grid)
 								myMetalIncome = curMexIncomes[unitID_inner]
-								mexE = gridE*(myMetalIncome * myMetalIncome) / gridMetalSquared
+								myProp = (myMetalIncome * myMetalIncome) / gridMetalSquared
+								mexE = gridE * myProp
+								UpdateMaxMexDrain(unitID_inner, myProp, maxGridCapacity[i]) -- Do it here too because we are going to break out of the outer loop
 								local metalMult = energyToExtraM(mexE)
 								local thisMexM = myMetalIncome + myMetalIncome * metalMult
 
