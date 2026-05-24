@@ -47,10 +47,11 @@ const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.3);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.22; // Mix grid colour into the inner tube
+const float GRID_INNER_MIX     = 0.27; // Mix grid colour into the inner tube
 
 // Cables are semi-transparent glass tubes
-const float BASE_ALPHA         = 0.65;
+const float EDGE_EXTRA_ALPHA   = 5.0;
+const float BASE_ALPHA         = 0.4;
 const float INNER_ALPHA        = 0.98;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
@@ -380,6 +381,7 @@ void main() {
 	// Fade out edges and with camera distance
 	float distScale = clamp(450.0 / cameraDist, 0.0, 1.0);
 	float alpha = mix(BASE_ALPHA, INNER_ALPHA, innerMix) * (1.0 - 10.0*pow(t, 20.0));
+	alpha += EDGE_EXTRA_ALPHA * (t * EDGE_BUFFER) * (t * EDGE_BUFFER); // Thicker around the edges
 	alpha = alpha * max(0.85, losState);
 	
 	// Coverage bits are written by the GS (per-segment, per cable per frame).
