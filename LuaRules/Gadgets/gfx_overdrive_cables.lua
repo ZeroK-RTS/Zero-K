@@ -2777,7 +2777,7 @@ function gadget:DrawWorldPreUnit()
 	-- between sim ticks on all game speeds.
 	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
-	cableShader:SetUniform("bakeTime", bubbleBakeTime)
+	--cableShader:SetUniform("bakeTime", bubbleBakeTime)
 	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
 	cableShader:SetUniform("ghostsEnabled", cableGhosts and 1.0 or 0.0)
 
@@ -2857,7 +2857,7 @@ function gadget:Initialize()
 		},
 		uniformFloat = {
 			gameTime = 0,
-			bakeTime = 0,
+			--bakeTime = 0, 
 			enableFlow = cableFlowMode and 1.0 or 0.0,
 			ghostsEnabled = cableGhosts and 1.0 or 0.0,
 		},

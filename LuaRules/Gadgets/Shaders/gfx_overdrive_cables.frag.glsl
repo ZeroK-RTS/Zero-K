@@ -56,7 +56,7 @@ const float INNER_ALPHA        = 0.98;
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.55;
+const float DIFFUSE_FLOOR      = 0.45;
 const float SPEC_EXP           = 24.0;
 const float SPEC_MAGNITUDE     = 0.55;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
@@ -69,6 +69,25 @@ const float DIM_FACTOR_MIN     = 0.3;          // bark brightness at full darkne
 const float FULLLOS_LO         = 0.1;
 const float FULLLOS_HI         = 1.0;
 
+// Bubbles change speed and size depending on flow rate
+// These changes come in 4 steps to deal with bubble teleportation.
+const float BUBBLE_FREQ_BASE = 0.3;
+const float BUBBLE_FREQ_FACTOR = 0.65;
+const float SPEED_1 = 0.2;
+const float SPEED_2 = 0.45;
+const float SPEED_3 = 0.8;
+const float SPEED_4 = 1.0;
+
+const float SPACING_1 = 1.8;
+const float SPACING_2 = 1.5;
+const float SPACING_3 = 1.2;
+const float SPACING_4 = 1.0;
+
+const float SIZE_1 = 1.0;
+const float SIZE_2 = 1.15;
+const float SIZE_3 = 1.25;
+const float SIZE_4 = 1.32;
+
 // Enemy LOS gating: below this losState, enemy fragments are hidden entirely
 // (no ghost). Own-ally fragments ignore this threshold — they fade via
 // dimFactor instead but always render.
@@ -76,11 +95,11 @@ const float ENEMY_LOS_CUT      = 0.1;
 
 // Bubble flow mapping. Must mirror Lua flowToSpeed() exactly for CPU-baked
 // phase anchoring + FS extrapolation to remain continuous across baking.
-const float MAX_SPEED          = 100.0;
-const float FLOW_REF           = 50.0;
+const float MAX_SPEED          = 130.0;
+const float MAX_DENSITY_FLOW   = 100.0;
 const float MIN_TRUNK_W        = 3.0;
-const float SPACING_A          = 67.0;        // big bubble layer
-const float SPACING_B          = 42.0;         // small bubble layer
+const float SPACING_A          = 47.0;        // big bubble layer
+const float SPACING_B          = 29.0;         // small bubble layer
 const float BUBBLE_BIG_R       = 7.5;
 const float BUBBLE_SMALL_R     = 4.0;
 const float HALO_SIZE          = 3.5;
@@ -148,7 +167,7 @@ float hash1(float n) {
 //
 // Returns vec3: (body, specular, halo). Caller composites all three with
 // possibly different colour weights for richer look.
-vec3 bubbleLayer(float along, float phase, float spacing,
+vec3 bubbleLayer(float along, float phase, float density, float spacing,
                  float radiusMax, float v, float halfWidthE, float layerSeed) {
 	float along2 = along - phase;
 	float idxLow  = floor(along2 / spacing);
@@ -158,6 +177,8 @@ vec3 bubbleLayer(float along, float phase, float spacing,
 
 	float h1 = hash1(idxNear + layerSeed);
 	float h2 = hash1(idxNear + layerSeed + 71.3);
+	float h3 = hash1(idxNear + layerSeed + 186.3);
+	float alpha = smoothstep(h3*0.8, h3, density); // More bubbles appear 
 	// Bubble radius in elmos. Random per bubble; clamped so it sits within
 	// the cable cross-section even on thin twigs.
 	float radiusE = radiusMax * (0.7 + 0.3 * h1);
@@ -205,8 +226,7 @@ vec3 bubbleLayer(float along, float phase, float spacing,
 	// HALO — soft additive bloom outside the bubble's hard edge. Extends
 	// from r=0 out to r=1.5 with a gentle Gaussian falloff.
 	float halo = exp(-r2 * 0.9) * 0.45;
-
-	return vec3(core + rim, spec, halo);
+	return vec3(core + rim, spec, halo) * alpha;
 }
 
 // HSL → RGB at S=1, L=0.5 — matches LuaUI/Headers/overdrive.lua's GetGridColor
@@ -432,42 +452,26 @@ void main() {
 	//   - +u is the direction of energy flow (synced reorients edges by
 	//     current flow); all cables share one global phase so we never get
 	//     the optical illusion of "counter motion" inside a single cable.
-	//   - Density (bubbles per elmo) is FIXED: every cable shows the same
-	//     bubbly look regardless of how loaded it is. What changes with
-	//     flow is the SPEED bubbles travel at — zero flow leaves them
-	//     motionless; high flow makes them zip.
+	//   - Density (bubbles per elmo) is determined by flow rate on the cable.
+	//   - Speed is roughly determined by flow rate as follows. There are
+	//     multiple speed layers on the cable that fade in and out as speed
+	//     changes. This prevents bubble teleportation due to subtle shifts in
+	//     flow rate.
 	//   - Two layered streams of bubbles (big + small) with random per-bubble
 	//     size + cross-axis offset, so the cable looks like a real bubbly
 	//     slurry instead of a metronome of identical dots.
 	// Bubble speed/density mapping. MUST match the CPU's flowToSpeed for the
 	// integrated phase anchoring to stay consistent.
 	//
-	// Cable thickness conveys capacity (orthogonal); flow is encoded by speed
-	// and density together. Each scales as sqrt(flow/FLOW_REF) and ramps
-	// monotonically, so they read as one fused "more lively" signal. Their
-	// product = (sqrt(...))² is linear in flow, matching actual throughput.
+	// Cable thickness conveys capacity (orthogonal);
 	float flow = gridData.y;
 	// Linear thickness divisor: a cable 4× thicker than min gets its flow
 	// signal scaled to 1/4 before the sqrt → ~0.5× visual liveliness. Slight
 	// negative bias for thick cables, matching the CPU's flowToSpeed.
 	float thicknessRatio = max(1.0, width / MIN_TRUNK_W);
 	float effFlow = max(flow, 0.0) / thicknessRatio;
-	float n = sqrt(effFlow / FLOW_REF);
-	float speed = MAX_SPEED * n;
-
+	float flowFactor = min(1.0, sqrt(effFlow / MAX_DENSITY_FLOW));
 	float halfWidthE = width * 0.5 / EDGE_BUFFER;        // cable cross half-extent in elmos
-
-	// Phase = CPU's baked phase (snapshot at bakeTime) + linear extrapolation
-	// at the current speed. Speed *changes* update the rate of advance from
-	// here — bubbles don't teleport.
-	float phase = gridData.z + speed * (gameTime - bakeTime);
-
-	// Density: spacing inversely scales with the same sqrt factor, floored at
-	// `n=0.3` so a near-zero-flow cable still shows widely-spaced bubbles
-	// rather than nothing or overlapping spam.
-	float spacingMul = max(0.3, n);
-	float spacingA = SPACING_A / spacingMul;
-	float spacingB = SPACING_B / spacingMul;
 
 	// Bubble pass: main ribbon uses two advecting bubble layers; twigs do a
 	// two-stage wave (see CABLE_PROP_SPEED + TWIG_SWEEP_SPEED).
@@ -496,18 +500,47 @@ void main() {
 		bubbleSpec = intensity * PULSE_SPEC_W;
 		bubbleHalo = intensity * PULSE_HALO_W;
 	} else {
-		vec3 bA = bubbleLayer(along, phase, spacingA, BUBBLE_BIG_R,   v, halfWidthE,  3.7);
-		vec3 bB = bubbleLayer(along, phase, spacingB, BUBBLE_SMALL_R, v, halfWidthE, 19.1);
-		vec3 bAh = bubbleLayer(along, phase, spacingA, BUBBLE_BIG_R,   v, halfWidthE * HALO_SIZE,  3.7);
-		vec3 bBh = bubbleLayer(along, phase, spacingB, BUBBLE_SMALL_R, v, halfWidthE * HALO_SIZE, 19.1);
-		bubbleBody = bA.x + bB.x * 0.85;
-		bubbleSpec = bA.y + bB.y * 0.85;
-		bubbleHalo = (bAh.z + bBh.z) * HALO_WEIGHT_LAYER;
+		float speed, flowAlpha;
+		float bubbleChance = BUBBLE_FREQ_BASE + flowFactor * BUBBLE_FREQ_FACTOR;
+		vec3 bubbleType;
+		if (flowFactor < 0.4) {
+			speed = MAX_SPEED * gameTime * SPEED_1;
+			flowAlpha = clamp((0.4 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.05)/0.05, 0.0, 1.0);
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_1, BUBBLE_BIG_R * SIZE_1,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_1, BUBBLE_SMALL_R * SIZE_1,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		if (flowFactor > 0.2 && flowFactor < 0.6) {
+			speed = MAX_SPEED * gameTime * SPEED_2;
+			flowAlpha = clamp((0.6 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.2)/0.2, 0.0, 1.0);
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_2, BUBBLE_BIG_R * SIZE_2,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_2, BUBBLE_SMALL_R * SIZE_2,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		if (flowFactor > 0.4 && flowFactor < 0.8) {
+			speed = MAX_SPEED * gameTime * SPEED_3;
+			flowAlpha = clamp((0.8 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.4)/0.2, 0.0, 1.0);
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_3, BUBBLE_BIG_R * SIZE_3,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_3, BUBBLE_SMALL_R * SIZE_3,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		if (flowFactor > 0.6) {
+			speed = MAX_SPEED * gameTime * SPEED_4;
+			flowAlpha = clamp((flowFactor - 0.6)/0.2, 0.0, 1.0);
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_4, BUBBLE_BIG_R * SIZE_4,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_4, BUBBLE_SMALL_R * SIZE_4,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		bubbleHalo *= HALO_WEIGHT_LAYER;
 	}
 
 	// Bubble colour: grid-efficiency hue, lightly toned down so it still
 	// glows clearly but isn't neon-saturated.
-	float gridLum    = dot(gridColor, vec3(0.299, 0.587, 0.114));
+	float gridLum    = dot(gridColor, vec3(0.299, 0.587, 0.214));
 	vec3 grayedGrid  = mix(gridColor, vec3(gridLum), GRID_DESAT);
 	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), BUBBLE_WHITE_MIX);
 	vec3 haloColor   = grayedGrid;
@@ -532,7 +565,7 @@ void main() {
 	color = max(color, bubbleEmissive);
 	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
 
-	//color = color*0.0 + diffuse;
+	//color = color*0.0 + flowFactor;
 	//alpha = 1.0;
 	fragColor = vec4(color, alpha); // Mix in some of the underlying terrain
 }
