@@ -12,7 +12,7 @@
 --------------------------------------------------------------------------------
 
 if (System == nil) then
-
+	
 	System = {
 		--
 		--  Custom LuaUI variables
@@ -44,7 +44,7 @@ if (System == nil) then
 		FeatureDefNames = FeatureDefNames,
 		WeaponDefs      = WeaponDefs,
 		WeaponDefNames  = WeaponDefNames,
-
+		
 		--
 		--  Standard libraries
 		--
@@ -59,50 +59,50 @@ if (System == nil) then
 
 		-- luasocket
 		socket          = socket,
-
+		
 		--
 		--  Standard functions and variables
 		--
 		assert         = assert,
 		error          = error,
-
+		
 		print          = print,
-
+		
 		next           = next,
 		pairs          = pairs,
 		ipairs         = ipairs,
-
+		
 		tonumber       = tonumber,
 		tostring       = tostring,
 		type           = type,
-
+		
 		collectgarbage = collectgarbage,
 		gcinfo         = gcinfo,
-
+		
 		unpack         = unpack,
 		select         = select,
 		newproxy       = newproxy,
-
+		
 		dofile         = dofile,
 		loadfile       = loadfile,
 		loadlib        = loadlib,
 		loadstring     = loadstring,
 		require        = require,
-
+		
 		getmetatable   = getmetatable,
 		setmetatable   = setmetatable,
-
+		
 		rawequal       = rawequal,
 		rawget         = rawget,
 		rawset         = rawset,
-
+		
 		getfenv        = getfenv,
 		setfenv        = setfenv,
-
+		
 		pcall          = pcall,
 		xpcall         = xpcall,
-
+		
 		_VERSION       = _VERSION
 	}
-
+	
 end

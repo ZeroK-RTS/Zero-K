@@ -62,11 +62,11 @@ function Update()
 		forceLayout = false
 	end
 	activePage = currentPage
-
+	
 	fontHandler.Update()
-
+	
 	widgetHandler:Update()
-
+	
 	return
 end
 
