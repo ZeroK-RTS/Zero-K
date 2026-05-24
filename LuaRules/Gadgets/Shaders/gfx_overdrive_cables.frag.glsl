@@ -47,12 +47,16 @@ const vec3  BARK_COLOR         = vec3(0.4);
 const vec3  INNER_COLOR_LO     = vec3(0.3);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.45);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.15; // Mix grid colour into the inner tube
+const float GRID_INNER_MIX     = 0.2; // Mix grid colour into the inner tube
+
+// Cables are semi-transparent glass tubes
+const float BASE_ALPHA         = 0.76;
+const float INNER_ALPHA        = 0.98;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.5;
+const float DIFFUSE_FLOOR      = 0.55;
 const float SPEC_EXP           = 24.0;
 const float SPEC_MAGNITUDE     = 0.55;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
@@ -327,6 +331,13 @@ void main() {
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
 	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * dot(cylNormal, normalize(sunDir.xyz))));
 
+	// LOS state — sampled from $info:los (single-channel red), the engine's
+	// actual game-logic LOS texture. Independent of the user's overlay toggle:
+	// 0.0 = unscouted, 1.0 = currently in LOS.
+	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+	float losState = texture(infoTex, losUV).r;
+	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
+
 	// Specular
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
 	float cameraDist = length(cameraViewInv[3].xyz - worldPos);
@@ -336,26 +347,20 @@ void main() {
 	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
 	vec3 innerColor = mix(INNER_COLOR_LO, INNER_COLOR_HI, capT);
-	innerColor = mix(innerColor, gridColor, GRID_INNER_MIX);
+	innerColor = mix(innerColor, gridColor * losState, GRID_INNER_MIX);
 
-	float innerMix = smoothstep(0.85, 0.15, t);
+	float innerMix = smoothstep(0.85, 0.15, t / EDGE_BUFFER);
 	if (isBranch > 0.5) innerMix *= TWIG_INNER_DAMPEN;
 	vec3 baseColor = mix(BARK_COLOR, innerColor, innerMix);
 
 	// Surface noise detail
 	float surfN = hash(worldPos.xz * 0.5) * 0.04;
 	baseColor += vec3(surfN);
-	
-	// LOS state — sampled from $info:los (single-channel red), the engine's
-	// actual game-logic LOS texture. Independent of the user's overlay toggle:
-	// 0.0 = unscouted, 1.0 = currently in LOS.
-	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
-	float losState = texture(infoTex, losUV).r;
-	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
 	// Fade out edges and with camera distance
 	float distScale = clamp(450.0 / cameraDist, 0.0, 1.0);
-	float alpha = 1.0 - 10.0*pow(t, 20.0 * distScale);
+	float alpha = BASE_ALPHA * (1.0 - 10.0*pow(t, 20.0 * distScale));
+	alpha = mix(alpha, INNER_ALPHA, innerMix);
 	alpha = alpha * max(0.3, losState);
 	spec = spec * distScale; // Specular causes beating when zoomed out
 	
@@ -450,7 +455,7 @@ void main() {
 	float n = sqrt(effFlow / FLOW_REF);
 	float speed = MAX_SPEED * n;
 
-	float halfWidthE = width * 0.5;        // cable cross half-extent in elmos
+	float halfWidthE = width * 0.5 / EDGE_BUFFER;        // cable cross half-extent in elmos
 
 	// Phase = CPU's baked phase (snapshot at bakeTime) + linear extrapolation
 	// at the current speed. Speed *changes* update the rate of advance from
@@ -529,5 +534,5 @@ void main() {
 
 	//color = color*0.0 + diffuse;
 	//alpha = 1.0;
-	fragColor = vec4(color, alpha * 0.97); // Mix in some of the underlying terrain
+	fragColor = vec4(color, alpha); // Mix in some of the underlying terrain
 }
