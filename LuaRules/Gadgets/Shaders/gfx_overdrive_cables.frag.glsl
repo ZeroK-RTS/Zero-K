@@ -131,7 +131,7 @@ const float PULSE_HALO_W       = 0.50;
 const vec3  GHOST_COLOR        = vec3(0.25);   // light neutral gray
 const float GHOST_CAP_TINT     = 0.02;         // small capacity-driven brighten
 const float GHOST_BRANCH_DAMP  = 0.85;
-const float GHOST_ALPHA_BASE   = 0.3;         // translucent baseline
+const float GHOST_ALPHA_BASE   = 0.48;         // translucent baseline
 const float GHOST_EDGE_FADE_LO = 0.55;
 const float GHOST_EDGE_FADE_HI = 0.90;
 
@@ -306,6 +306,17 @@ void main() {
 		return;
 	}
 
+	// Three render classes for the FS:
+	//   isOwnAlly =  2.0 → always live and skip fog of war darkening.
+	//   isOwnAlly =  1.0 → own ally, always live (existing path below).
+	//   isOwnAlly =  0.0 → live enemy edge: render live in LOS, ghost in fog
+	//                       (gated by segment bit), discard if never seen.
+	//   isOwnAlly = -1.0 → orphaned ghost (synced removed it; we kept a
+	//                       snapshot). Always render ghost gated by segment
+	//                       bit; never live, regardless of LOS. This is the
+	//                       "you don't know it died" persistence.
+	float isOwnAlly = gridData.w;
+
 	// Cylinder cross-section normal that respects cable slope, derived from
 	// the smoothly-interpolated cable tangent passed in by the GS.
 	//
@@ -357,7 +368,7 @@ void main() {
 	// actual game-logic LOS texture. Independent of the user's overlay toggle:
 	// 0.0 = unscouted, 1.0 = currently in LOS.
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
-	float losState = texture(infoTex, losUV).r;
+	float losState = max(texture(infoTex, losUV).r, isOwnAlly - 1.0);
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
 	// Specular
@@ -402,21 +413,11 @@ void main() {
 		segBit = 0xFFFFFFu;   // twig: any-bit-set OK
 	}
 
-	// Three render classes for the FS:
-	//   isOwnAlly =  1.0 → own ally, always live (existing path below).
-	//   isOwnAlly =  0.0 → live enemy edge: render live in LOS, ghost in fog
-	//                       (gated by segment bit), discard if never seen.
-	//   isOwnAlly = -1.0 → orphaned ghost (synced removed it; we kept a
-	//                       snapshot). Always render ghost gated by segment
-	//                       bit; never live, regardless of LOS. This is the
-	//                       "you don't know it died" persistence.
-	float isOwnAlly = gridData.w;
-	bool isGhostEdge = isOwnAlly < -0.5;
-
 	// Re-scout clear is handled by the GS (atomicAnd at segment midpoints
 	// when the ghost edge's bits overlap with current LOS). Here in the FS
 	// we just discard the ghost fragment when it's in current LOS — the
 	// player is looking at empty ground, the cable shouldn't show.
+	bool isGhostEdge = isOwnAlly < -0.5;
 	if (isGhostEdge && losState >= ENEMY_LOS_CUT) discard;
 
 	bool enemyOutOfLOS = (isOwnAlly < 0.5 && isOwnAlly > -0.5 && losState < ENEMY_LOS_CUT);

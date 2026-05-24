@@ -2279,6 +2279,7 @@ end
 -- reintroduced as either CPU-emitted phantom edges (stems) or GS-side branches
 -- (twigs) once the basic pipeline is verified.
 local function GenerateOrganicTree()
+	local _, fullview = spGetSpectatingState()
 	local n = #renderEdges
 	if n == 0 then return {}, 0 end
 
@@ -2292,7 +2293,7 @@ local function GenerateOrganicTree()
 		local eff = e.eff or 0
 		local flow = e.flow or 0
 		local phase = e.bubblePhase or 0
-		local isOwn = e.isOwnAlly and 1 or 0
+		local isOwn = (fullview and 2) or (e.isOwnAlly and 1) or 0
 		-- Coverage SSBO slot index, or -1 to disable bit updates / lookups
 		-- on the GS side. Stored as float here for VBO layout simplicity;
 		-- VS casts to int for the GS to consume. Negative values fit fine
