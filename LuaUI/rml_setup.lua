@@ -78,6 +78,7 @@ function initializeOnce()
 		return
 	end
 	initialized = true
+
 	-- Load fonts
 	RmlUi.LoadFontFace("fonts/FreeSansBold.otf", true)
 	local font_files = VFS.DirList("LuaUI/fonts", "*.ttf")
@@ -86,20 +87,17 @@ function initializeOnce()
 		RmlUi.LoadFontFace(file, true)
 	end
 
-	--RmlUi.LoadFontFace("fonts/fallbacks/SourceHanSans-Regular.ttc", true)
-	--RmlUi.LoadFontFace("fonts/monospaced/SourceCodePro-Medium.otf")
-
 	-- Mouse Cursor Aliases
 	--[[
 	These let standard CSS cursor names be used when doing styling.
 	If a cursor set via RCSS does not have an alias, it is unchanged.
 	CSS cursor list: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 	RmlUi documentation: https://mikke89.github.io/RmlUiDoc/pages/rcss/user_interface.html#cursor
-]]
+	]]
 
 	-- when "cursor: normal" is set via RCSS, "cursornormal" will be sent to the engine... and so on for the rest
 	RmlUi.SetMouseCursorAlias("default", "cursornormal")
-	RmlUi.SetMouseCursorAlias("pointer", "Move") -- command cursors use the command name. TODO: replace with actual pointer cursor?
+	RmlUi.SetMouseCursorAlias("pointer", "Move")
 	RmlUi.SetMouseCursorAlias("move", "uimove")
 	RmlUi.SetMouseCursorAlias("nesw-resize", "uiresized2")
 	RmlUi.SetMouseCursorAlias("nwse-resize", "uiresized1")
