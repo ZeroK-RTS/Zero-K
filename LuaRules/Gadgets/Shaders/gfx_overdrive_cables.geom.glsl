@@ -380,7 +380,7 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// thinner tip. At the very end the cable's `t > 0.9` cross discard clips
 	// any bubble that runs off the tip. This decouples "bubble flow looks
 	// uniform" from "twig has cone shape".
-	float twigHWt  = twigHWr * 0.45;
+	float twigHWt  = twigHWr * 0.05;
 
 	// Build the twig as a flat ribbon in the slope's local tangent plane at
 	// the spawn point. This way, viewing perpendicular to the slope, the twig

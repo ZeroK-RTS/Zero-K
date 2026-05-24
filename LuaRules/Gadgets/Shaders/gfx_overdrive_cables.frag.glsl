@@ -110,6 +110,8 @@ const float GHOST_ALPHA_BASE   = 0.45;         // translucent baseline
 const float GHOST_EDGE_FADE_LO = 0.55;
 const float GHOST_EDGE_FADE_HI = 0.90;
 
+const float EDGE_BUFFER = 0.5; // Avoid rasterisation issues on the edge of the cable
+
 out vec4 fragColor;
 
 float hash(vec2 p) {
@@ -230,7 +232,7 @@ vec3 gridEfficiencyColor(float eff) {
 }
 
 void main() {
-	float v = cableUV.y;
+	float v = cableUV.y * EDGE_BUFFER;
 	float t = abs(v);
 	if (t > 0.90) discard;
 
@@ -318,8 +320,8 @@ void main() {
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
 	trueUp = normalize(trueUp);
 
-	float up = sqrt(max(0.0, 1.0 - v * v));
-	vec3 cylNormal = normalize(trueUp * up + perp3D * v);
+	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER)));
+	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER);
 
 	// Own lighting (forward rendered, no engine lighting applies)
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
