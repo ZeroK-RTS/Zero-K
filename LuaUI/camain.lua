@@ -24,6 +24,7 @@ vfsInclude("LuaUI/utils.lua"    , nil, vfsGame)
 vfsInclude("LuaUI/setupdefs.lua", nil, vfsGame)
 vfsInclude("LuaUI/savetable.lua", nil, vfsGame)
 vfsInclude("LuaUI/modfonts.lua" , nil, vfsGame)
+vfsInclude("LuaUI/rml_setup.lua", nil, vfsGame)
 vfsInclude("LuaUI/layout.lua"   , nil, vfsGame)   -- contains a simple LayoutButtons()
 vfsInclude("LuaUI/bar_modules.lua"    , nil, vfsGame)
 vfsInclude("LuaUI/cawidgets.lua", nil, vfsGame)  -- the widget handler
@@ -61,11 +62,11 @@ function Update()
 		forceLayout = false
 	end
 	activePage = currentPage
-	
+
 	fontHandler.Update()
-	
+
 	widgetHandler:Update()
-	
+
 	return
 end
 
