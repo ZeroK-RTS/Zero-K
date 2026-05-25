@@ -43,16 +43,16 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
-const vec3  EDGE_COLOR         = vec3(0.4);
+const vec3  EDGE_COLOR         = vec3(0.2);
 const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.45);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.27; // Mix grid colour into the inner tube
+const float GRID_INNER_MIX     = 0.22; // Mix grid colour into the inner tube
 
 // Cables are semi-transparent glass tubes
-const float EDGE_ALPHA         = 0.56;
-const float BASE_ALPHA         = 0.42;
+const float EDGE_ALPHA         = 0.6;
+const float BASE_ALPHA         = 0.4;
 const float INNER_ALPHA        = 0.97;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
