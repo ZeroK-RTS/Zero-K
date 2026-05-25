@@ -103,17 +103,19 @@ const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
 const float WIDTH_FACTOR      = 0.6;
-const float MIN_TRUNK_WIDTH   = 4.0;
-const float MAX_TRUNK_WIDTH   = 7.4;
+const float MIN_TRUNK_WIDTH   = 2.0;
+const float MAX_TRUNK_WIDTH   = 4.3;
 const float MAX_CAPACITY_REF  = 400.0;
 
 // Twig parameters mirror the Lua-side BRANCH_* constants.
-const float BRANCH_CHANCE     = 0.85;
-const float BRANCH_LEN_MIN    = 8.0;
-const float BRANCH_LEN_MAX    = 15.0;
-const float BRANCH_ANGLE_MIN  = 0.8;
-const float BRANCH_ANGLE_MAX  = 1.1;
-const float BRANCH_WIDTH      = 0.85;
+const float BRANCH_CHANCE     = 0.8;
+const float BRANCH_LEN_MIN    = 4.0;
+const float BRANCH_LEN_MAX    = 8.0;
+const float BRANCH_ANGLE_MIN  = 1.2;
+const float BRANCH_ANGLE_MAX  = 1.5;
+const float BRANCH_WIDTH      = 1.1;
+const float CONE_TIP_WIDTH    = 0.0;
+const float BRANCH_WIDTH_TWIG_LENGTH_FACTOR = 2.0;
 
 // Vertical clearance over the heightmap. CENTERLINE_CLEAR is added on top of
 // the max-of-window lift, so it doesn't need a big pad. TWIG_CLEAR is set
@@ -369,11 +371,11 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	float side = ((twigIdx & 1) == 0) ? 1.0 : -1.0;
 	float angleOff = BRANCH_ANGLE_MIN +
 		gsHashU(spawn.x, spawn.y, twigSeed + 2.0) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN);
-	float bLen = BRANCH_LEN_MIN +
+	float bLen = BRANCH_LEN_MIN + widthVal*BRANCH_WIDTH_TWIG_LENGTH_FACTOR +
 		gsHashU(spawn.x, spawn.y, twigSeed + 3.0) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN);
 
 	float twigW    = max(2.5, widthVal * BRANCH_WIDTH);
-	float twigHWr  = min(twigW, widthVal * 0.55) * WIDTH_FACTOR;
+	float twigHWr  = min(twigW, widthVal * 0.55) * BRANCH_WIDTH;
 	// Geometric cone taper at 0.45 — visible shape narrows toward the tip
 	// (looks like a branch, not a tube). The WIDTH varying we pass to the FS
 	// stays UNIFORM at `twigW` along the entire twig, so bubble math sees
@@ -384,7 +386,7 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// thinner tip. At the very end the cable's `t > 0.9` cross discard clips
 	// any bubble that runs off the tip. This decouples "bubble flow looks
 	// uniform" from "twig has cone shape".
-	float twigHWt  = twigHWr * 0.05;
+	float twigHWt  = twigHWr * CONE_TIP_WIDTH;
 
 	// Build the twig as a flat ribbon in the slope's local tangent plane at
 	// the spawn point. This way, viewing perpendicular to the slope, the twig
@@ -414,7 +416,7 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 
 	// Anchor the root to the spawn-side edge of the cable's in-slope cross
 	// section so the twig pokes out of the side, not the midline.
-	vec3 root3D = spawn3D + B * (halfMainW * 0.45 * side);
+	vec3 root3D = spawn3D + B * (halfMainW * 0.2 * side);
 	vec3 tip3D  = root3D + twigDir3D * bLen;
 
 	vec3 rootL = root3D - twigPerp3D * twigHWr;
@@ -432,7 +434,6 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
 	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
 	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridD, timeD, cap);
-	emitVtx(tipR,  twigDir3D, vec2(spawnAlongMain + bLen,  1.0), twigW, gridD, timeD, cap);
 	EndPrimitive();
 	gOutSpawnAlong = 0.0;
 }

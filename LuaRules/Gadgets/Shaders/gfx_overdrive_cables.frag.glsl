@@ -43,15 +43,15 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
-const vec3  EDGE_COLOR         = vec3(0.2);
+const vec3  EDGE_COLOR         = vec3(0.3);
 const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.55);   // capT = 0
-const vec3  INNER_COLOR_HI     = vec3(0.7);   // capT = 1
-const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.22; // Mix grid colour into the inner tube
+const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
+const float TWIG_INNER_DAMPEN  = 1.1;          // twigs read more uniformly than trunks
+const float GRID_INNER_MIX     = 0.25; // Mix grid colour into the inner tube
 
 // Cables are semi-transparent glass tubes
-const float EDGE_ALPHA         = 0.65;
+const float EDGE_ALPHA         = 0.88;
 const float BASE_ALPHA         = 0.5;
 const float INNER_ALPHA        = 0.97;
 
@@ -60,14 +60,14 @@ const float INNER_ALPHA        = 0.97;
 // synthetic cylinder normal.
 const float DIFFUSE_FLOOR      = 0.46;
 const float SPEC_EXP           = 24.0;
-const float SPEC_MAGNITUDE     = 0.22;
+const float SPEC_MAGNITUDE     = 0.4;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
 
 // LOS / ghost: dim factor remaps losState through this range; fullLOS uses
 // a hard threshold so bubbles only animate inside actual visibility.
-const float DIM_LOS_LO         = 0.3;
-const float DIM_LOS_HI         = 0.8;
-const float DIM_FACTOR_MIN     = 0.6;          // bark brightness at full darkness
+const float DIM_LOS_LO         = 0.2;
+const float DIM_LOS_HI         = 0.6;
+const float DIM_FACTOR_MIN     = 0.5;          // bark brightness at full darkness
 const float FULLLOS_LO         = 0.5;
 const float FULLLOS_HI         = 1.0;
 
@@ -380,13 +380,14 @@ void main() {
 	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
 	vec3 innerColor = mix(INNER_COLOR_LO, INNER_COLOR_HI, capT);
-	innerColor = mix(innerColor, gridColor, GRID_INNER_MIX);
+	innerColor = mix(innerColor, gridColor, GRID_INNER_MIX * (1.0 - isBranch));
 
-	// Wire walls (innerMix2) are less pronounce with camera distance.
-	float distScale = clamp(450.0 / cameraDist, 0.0, 1.0);
-	float innerMix = smoothstep(0.85, 0.15, clamp(t / EDGE_BUFFER, 0.0, 1.0));
-	float innerMix2 = smoothstep(0.85, 0.15, clamp(t*t / (EDGE_BUFFER*EDGE_BUFFER), 0.0, 1.0)) * distScale;
-	if (isBranch > 0.5) innerMix *= TWIG_INNER_DAMPEN;
+	// Wire walls and transparent interior
+	float innerMix = smoothstep(0.85, 0.12, clamp(t / EDGE_BUFFER, 0.0, 1.0));
+	float innerMix2 = smoothstep(0.85, 0.15, clamp(t*t / (EDGE_BUFFER*EDGE_BUFFER), 0.0, 1.0));
+	if (isBranch > 0.5) {
+		innerMix *= TWIG_INNER_DAMPEN;
+	}
 	vec3 edgeColor = mix(EDGE_COLOR, BARK_COLOR, innerMix2);
 	vec3 baseColor = mix(edgeColor, innerColor, innerMix);
 
@@ -437,7 +438,8 @@ void main() {
 	}
 
 	// Apply lighting - Specular glint stands out too much when zoomed out
-	vec3 color = baseColor * diffuse + SPEC_TINT * spec * smoothstep(1.0, 0.0, clamp((cameraDist - 2000.0) / 2500.0, 0.0, 1.0));
+	float distScale = clamp(800.0 / cameraDist, 0.0, 1.0);
+	vec3 color = baseColor * diffuse + SPEC_TINT * spec * distScale;
 
 	// Static-cable detail level: skip the entire bubble pass and bark dim.
 	// `enableFlow` is a uniform driven by the synced /cabletree flow toggle,
@@ -565,10 +567,16 @@ void main() {
 	//     channel piles onto the emissive. max() lets the emissive plasma
 	//     show its real colour through the cable in shadow.
 	//   - Spec: additive white sparkle on top.
+	
+	// Tone down distinctive features when zoomed out to cut down on pixelation.
+	color = mix(BARK_COLOR, color, distScale);
+	alpha = alpha * clamp(distScale + 1.0, 0.0, 1.0);
+	
 	color += haloColor * bubbleHalo * HALO_WEIGHT;
 	vec3 bubbleEmissive = bubbleColor * bubbleBody * BODY_WEIGHT;
 	color = max(color, bubbleEmissive);
 	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
+	
 
 	//color = color*0.0 + flowFactor;
 	//alpha = 1.0;
