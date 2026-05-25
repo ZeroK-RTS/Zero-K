@@ -43,24 +43,24 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
-const vec3  EDGE_COLOR         = vec3(0.55);
-const vec3  BARK_COLOR         = vec3(0.55);
+const vec3  EDGE_COLOR         = vec3(0.2);
+const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.55);   // capT = 0
-const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
+const vec3  INNER_COLOR_HI     = vec3(0.7);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 0.7;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.0022; // Mix grid colour into the inner tube
+const float GRID_INNER_MIX     = 0.22; // Mix grid colour into the inner tube
 
 // Cables are semi-transparent glass tubes
-const float EDGE_ALPHA         = 1.6;
-const float BASE_ALPHA         = 1.4;
-const float INNER_ALPHA        = 1.97;
+const float EDGE_ALPHA         = 0.65;
+const float BASE_ALPHA         = 0.5;
+const float INNER_ALPHA        = 0.97;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
 const float DIFFUSE_FLOOR      = 0.46;
 const float SPEC_EXP           = 24.0;
-const float SPEC_MAGNITUDE     = 0.35;
+const float SPEC_MAGNITUDE     = 0.22;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
 
 // LOS / ghost: dim factor remaps losState through this range; fullLOS uses
