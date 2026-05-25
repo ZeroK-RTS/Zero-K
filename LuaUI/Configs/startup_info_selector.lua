@@ -43,7 +43,11 @@ local chassisImages = {
 	knight = "LuaUI/Images/startup_info_selector/chassis_cremcom.png"
 }
 
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+
+for key, value in pairs(chassisDefs) do
+	chassisImages[value.name] = value.chassisImage or chassisImages[value.name]
+end
 
 local colorWeapon = "\255\255\32\32"
 local colorConversion = "\255\255\96\0"

@@ -1,0 +1,25 @@
+
+local humanName=""
+local description= ""
+
+return {
+    moduledef={
+        modulename={
+            name=humanName,
+    		description=description,
+        }
+        
+    },
+    dynamic_comm_def=function (shared)
+		shared=ModularCommDefsShared or shared
+		local moduleImagePath=shared.moduleImagePath
+		local COST_MULT=shared.COST_MULT
+		local HP_MULT=shared.HP_MULT
+		return {
+            {
+                humanName = humanName,
+                description = description,
+            }
+        }
+    end
+}

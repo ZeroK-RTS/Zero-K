@@ -140,7 +140,7 @@ local function LoadCommData()
 	
 	-- Convert chassis to correct names.
 	for profileID, profile in pairs(newCommProfilesByProfileID) do
-		profile.chassis = legacyToDyncommChassisMap[profile.chassis]
+		profile.chassis = legacyToDyncommChassisMap[profile.chassis] or profile.chassis
 	end
 	
 	for i = 1, #UnitDefs do

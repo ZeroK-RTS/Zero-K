@@ -1,5 +1,5 @@
 function gadget:GetInfo()
-  return {
+	return {
     name      = "Commander Upgrade",
     desc      = "",
     author    = "Google Frog",
@@ -7,7 +7,7 @@ function gadget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 1,
     enabled   = true  --  loaded by default?
-  }
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ end
 
 --SYNCED
 if (not gadgetHandler:IsSyncedCode()) then
-   return
+	return
 end
 
 include("LuaRules/Configs/constants.lua")
@@ -83,8 +83,8 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 		end
 	end
 	
-	weapon1 = weapon1 or "commweapon_beamlaser"
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+	weapon1 = weapon1 or (chassis and chassisDefs[chassis] and chassisDefs[chassis].initWeapon) or "commweapon_beamlaser"
 	
 	if chassis and chassisDefs[chassis] and chassisDefs[chassis].secondPeashooter and (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then
 		weapon2 = "commweapon_beamlaser"
@@ -162,6 +162,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome, true)
 	end
 	
+	---@type false|number
 	local newHealth = false
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
@@ -418,7 +419,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
 	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
 	if not chassisDefID then
-		Spring.Echo("Incorrect dynamic comm chassis", commProfileInfo.chassis)
+		
+		Spring.Echo("Incorrect dynamic comm chassis", commProfileInfo.chassis, "dyncommID: " .. dyncommID)
 		return false
 	end
 	
