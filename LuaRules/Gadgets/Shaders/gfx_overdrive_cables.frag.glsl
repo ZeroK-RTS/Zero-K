@@ -4,6 +4,7 @@
 #extension GL_ARB_shader_storage_buffer_object : require
 
 uniform sampler2D infoTex;
+uniform sampler2D cableTex;
 uniform float gameTime;
 uniform float bakeTime;
 uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no animation)
@@ -48,19 +49,19 @@ const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.55);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 1.1;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.25; // Mix grid colour into the inner tube
+const float GRID_INNER_MIX     = 0.00025; // Mix grid colour into the inner tube
 
-// Cables are semi-transparent glass tubes
-const float EDGE_ALPHA         = 0.88;
-const float BASE_ALPHA         = 0.5;
-const float INNER_ALPHA        = 0.97;
+// Opaque wires
+const float EDGE_ALPHA         = 1.0;
+const float BASE_ALPHA         = 1.0;
+const float INNER_ALPHA        = 1.0;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.46;
-const float SPEC_EXP           = 24.0;
-const float SPEC_MAGNITUDE     = 0.4;
+const float DIFFUSE_FLOOR      = 0.22;
+const float SPEC_EXP           = 16.0;
+const float SPEC_MAGNITUDE     = 0.35;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
 
 // LOS / ghost: dim factor remaps losState through this range; fullLOS uses
@@ -135,7 +136,7 @@ const float GHOST_ALPHA_BASE   = 0.48;         // translucent baseline
 const float GHOST_EDGE_FADE_LO = 0.55;
 const float GHOST_EDGE_FADE_HI = 0.90;
 
-const float EDGE_BUFFER = 0.5; // Avoid rasterisation issues on the edge of the cable
+const float EDGE_BUFFER = 0.55; // Avoid rasterisation issues on the edge of the cable
 
 out vec4 fragColor;
 
@@ -357,7 +358,7 @@ void main() {
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
 	trueUp = normalize(trueUp);
 
-	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER)));
+	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER))) * 0.8;
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER);
 
 	// Own lighting (forward rendered, no engine lighting applies)
@@ -388,8 +389,8 @@ void main() {
 	if (isBranch > 0.5) {
 		innerMix *= TWIG_INNER_DAMPEN;
 	}
-	vec3 edgeColor = mix(EDGE_COLOR, BARK_COLOR, innerMix2);
-	vec3 baseColor = mix(edgeColor, innerColor, innerMix);
+	vec3 edgeColor = mix(EDGE_COLOR, texture(cableTex, vec2(cableUV.x * 0.04, cableUV.y*0.28 + 0.5)).xyz, innerMix2);
+	vec3 baseColor = edgeColor;
 
 	// Surface noise detail
 	float surfN = hash(worldPos.xz * 0.5) * 0.04;
@@ -578,7 +579,7 @@ void main() {
 	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
 	
 
-	//color = color*0.0 + flowFactor;
+	//color = color*0.0 + texture(cableTex, cableUV.xy * 0.05 + vec2(0, 0.5)).xyz;
 	//alpha = 1.0;
 	fragColor = vec4(color, alpha); // Mix in some of the underlying terrain
 }

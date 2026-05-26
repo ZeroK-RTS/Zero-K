@@ -80,6 +80,8 @@ local DEBUG_FLOW        = false -- echo per-edge capacity table on every Send (c
 --                trunk-sharing opportunities.
 local MST_MODE          = "realistic"
 
+local CABLE_TEXTURE = "Luarules/Images/cables/cableTexture.png"
+
 -------------------------------------------------------------------------------------
 -- Unit definitions
 -------------------------------------------------------------------------------------
@@ -2801,6 +2803,7 @@ function gadget:DrawWorldPreUnit()
 	-- LOS gating done against it).
 	gl.Texture(0, "$info:los")
 	gl.Texture(1, "$heightmap")
+	gl.Texture(2, CABLE_TEXTURE)
 	gl.Culling(false)
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(true)
@@ -2831,6 +2834,7 @@ function gadget:DrawWorldPreUnit()
 	cableShader:Deactivate()
 	gl.Texture(0, false)
 	gl.Texture(1, false)
+	gl.Texture(2, false)
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 	gl.Culling(GL.BACK)
@@ -2859,6 +2863,7 @@ function gadget:Initialize()
 		uniformInt = {
 			infoTex = 0,
 			heightmapTex = 1,
+			cableTex = 2,
 		},
 		uniformFloat = {
 			gameTime = 0,

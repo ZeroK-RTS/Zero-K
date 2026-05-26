@@ -103,8 +103,8 @@ const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
 const float WIDTH_FACTOR      = 0.6;
-const float MIN_TRUNK_WIDTH   = 2.0;
-const float MAX_TRUNK_WIDTH   = 4.3;
+const float MIN_TRUNK_WIDTH   = 2.8;
+const float MAX_TRUNK_WIDTH   = 4.5;
 const float MAX_CAPACITY_REF  = 400.0;
 
 // Twig parameters mirror the Lua-side BRANCH_* constants.
@@ -125,7 +125,7 @@ const float BRANCH_WIDTH_TWIG_LENGTH_FACTOR = 2.0;
 // offset would otherwise place the side vertex below local terrain.
 const float CENTERLINE_CLEAR  = 1.5;
 const float TWIG_CLEAR        = 0.9;
-const float SIDE_CLEAR        = 0.8;
+const float SIDE_CLEAR        = 0.4;
 
 float gOutBranch    = 0.0;
 // gOutSpawnAlong is overloaded (see DataGS comment): for main-ribbon emits
