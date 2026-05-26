@@ -360,7 +360,7 @@ void main() {
 
 	float cylinderFactor = 0.95;
 	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER))) * cylinderFactor;
-	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER);
+	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER * (1.0 - 0.7*isBranch));
 
 	// Own lighting (forward rendered, no engine lighting applies)
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
@@ -390,7 +390,7 @@ void main() {
 	if (isBranch > 0.5) {
 		innerMix *= TWIG_INNER_DAMPEN;
 	}
-	float texX = cableUV.x * 0.04 * (1.0 + 0.7 * isBranch);
+	float texX = cableUV.x * 0.04 * (1.0 + 0.9 * isBranch);
 	float texY = cableUV.y*0.07 * (1.0 + 2.5 * isBranch) + 0.25 + isBranch*0.5;
 	vec4 cableSample = texture(cableTex, vec2(texX, texY));
 	vec3 baseColor = mix(EDGE_COLOR, cableSample.xyz, max(innerMix2, isBranch*0.85));
