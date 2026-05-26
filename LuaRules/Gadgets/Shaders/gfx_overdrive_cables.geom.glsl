@@ -565,7 +565,12 @@ void main() {
 		// LOS scan entirely. Ghost edges with all bits clear have nothing
 		// left to clear → skip too. Massive savings on long-running matches
 		// where most live cables hit saturation quickly.
-#ifndef SHADOW_PASS
+		//
+		// Excluded from BOTH the shadow and deferred passes: the forward pass
+		// owns coverage. The deferred draw binds nothing at binding=6, so a
+		// stray atomicOr/atomicAnd there would hit an unbound buffer; and a
+		// second per-frame update would risk double-clearing ghost bits.
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		int slot = dataIn[0].vsSlot;
 		bool isGhost = gridD.w < -0.5;
 		// Hard gate on the user-facing ghosts toggle — skip ALL coverage

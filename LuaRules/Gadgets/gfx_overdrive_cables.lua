@@ -2205,8 +2205,9 @@ local geomCache = {
 	provs = nil,          -- [provObj] (distinct, one per emitNoisyPath call)
 }
 
-local cableShader       -- forward shader for cable rendering
-local cableShadowShader -- depth-only SHADOW_PASS variant, drawn in the shadow map pass
+local cableShader         -- forward shader for cable rendering
+local cableShadowShader   -- depth-only SHADOW_PASS variant, drawn in the shadow map pass
+local cableDeferredShader -- model-gbuffer DEFERRED_PASS variant, drawn in DrawOpaqueUnitsLua
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
 -- (drawPerf collapsed into cablePerf at the top of the file; flowMode
@@ -2879,6 +2880,55 @@ function gadget:DrawShadowUnitsLua()
 end
 
 -------------------------------------------------------------------------------------
+-- Deferred lighting. DrawOpaqueUnitsLua fires once per opaque-unit pass; the
+-- engine passes deferredPass=true on the invocation that fills the *model
+-- gbuffer* (the same MRT cus_gl4 writes for units). We re-draw the live cable
+-- VAO through the DEFERRED_PASS variant: identical tent geometry via
+-- cameraViewProj, but the FS writes normal/diffuse into the gbuffer instead of
+-- a lit colour. This makes deferred projectile lights shade the cable's own
+-- cylinder normal rather than bleeding the terrain underneath through it.
+--
+-- The forward visible cable still comes from DrawWorldPreUnit (FS unchanged,
+-- bubbles intact) — the gbuffer is purely auxiliary geometry for the light
+-- pass, exactly as it is for units (which also draw forward AND deferred). So
+-- this should NOT double-light the cable; if it ever looks double-bright, the
+-- assumption that the gbuffer isn't separately resolved would be wrong.
+-------------------------------------------------------------------------------------
+function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
+	-- Only the genuine deferred gbuffer fill. The forward-opaque invocation is
+	-- already covered by DrawWorldPreUnit; reflection/refraction don't need
+	-- cables in the gbuffer.
+	if not deferredPass or drawReflection or drawRefraction then return end
+	if not cableEnabled then return end
+	if not cableDeferredShader or not cableVAO or numCableVerts == 0 then return end
+
+	cableDeferredShader:Activate()
+	-- Match the forward pass's smooth game-time so the gbuffer silhouette tracks
+	-- the growing/withering visible extent (FS shares the grow/wither discards).
+	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
+	cableDeferredShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
+
+	-- $info:los gates enemy cables to LOS (matching their forward visibility);
+	-- $heightmap places the GS vertices.
+	gl.Texture(0, "$info:los")
+	gl.Texture(1, "$heightmap")
+	-- Thin tent → both faces contribute. Opaque replace into the MRT (no blend),
+	-- depth-test against units already in the gbuffer, and write our own depth so
+	-- the light pass reconstructs the cable surface and occludes correctly.
+	gl.Culling(false)
+	gl.Blending(false)
+	gl.DepthTest(GL.LEQUAL)
+	gl.DepthMask(true)
+	cableVAO:DrawArrays(GL.LINES, numCableVerts)
+
+	gl.Texture(0, false)
+	gl.Texture(1, false)
+	gl.Blending(true)
+	gl.Culling(GL.BACK)
+	cableDeferredShader:Deactivate()
+end
+
+-------------------------------------------------------------------------------------
 -- Lifecycle
 -------------------------------------------------------------------------------------
 
@@ -2923,19 +2973,38 @@ function gadget:Initialize()
 	-- depth only (no lighting). Drawn from gadget:DrawShadowUnitsLua so the
 	-- cables drop shadows in the same shadow-map pass as units. If it fails to
 	-- compile we just skip shadow casting (the forward pass is unaffected).
-	local function injectShadowDefine(src)
-		return (src:gsub("(#version%s+%d+)", "%1\n#define SHADOW_PASS 1", 1))
+	local function injectDefine(src, define)
+		return (src:gsub("(#version%s+%d+)", "%1\n#define " .. define .. " 1", 1))
 	end
 	cableShadowShader = LuaShader({
 		vertex   = vsSrc,
-		geometry = injectShadowDefine(gsSrc),
-		fragment = injectShadowDefine(fsSrc),
+		geometry = injectDefine(gsSrc, "SHADOW_PASS"),
+		fragment = injectDefine(fsSrc, "SHADOW_PASS"),
 		uniformInt   = { heightmapTex = 1, infoTex = 0 },
 		uniformFloat = { gameTime = 0 },
 	}, "Cable Shadow Shader")
 	if not cableShadowShader:Initialize() then
 		Spring.Echo("[CableTree] Shadow shader compile failed; shadow casting disabled")
 		cableShadowShader = nil
+	end
+
+	-- Deferred-lighting variant: same VS/GS/FS compiled with DEFERRED_PASS. The
+	-- GS uses the normal cameraViewProj path (not shadow) and skips the coverage
+	-- SSBO update (the forward pass owns it); the FS writes cus_gl4's model
+	-- gbuffer MRT (normal/diffuse) instead of a lit colour, so deferred
+	-- projectile lights illuminate the cable's own cylinder surface instead of
+	-- the terrain underneath. Drawn from gadget:DrawOpaqueUnitsLua's deferred
+	-- pass. Compile failure just disables the integration (forward unaffected).
+	cableDeferredShader = LuaShader({
+		vertex   = vsSrc,
+		geometry = injectDefine(gsSrc, "DEFERRED_PASS"),
+		fragment = injectDefine(fsSrc, "DEFERRED_PASS"),
+		uniformInt   = { heightmapTex = 1, infoTex = 0 },
+		uniformFloat = { gameTime = 0 },
+	}, "Cable Deferred Shader")
+	if not cableDeferredShader:Initialize() then
+		Spring.Echo("[CableTree] Deferred shader compile failed; deferred lighting integration disabled")
+		cableDeferredShader = nil
 	end
 
 	-- Per-edge coverage SSBO. Spring's VBO API requires vec4-aligned attribs,
@@ -3016,6 +3085,7 @@ end
 function gadget:Shutdown()
 	if cableShader then cableShader:Finalize() end
 	if cableShadowShader then cableShadowShader:Finalize() end
+	if cableDeferredShader then cableDeferredShader:Finalize() end
 	cableVAO = nil
 end
 

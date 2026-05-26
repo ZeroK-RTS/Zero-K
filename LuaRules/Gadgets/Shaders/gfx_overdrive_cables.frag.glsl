@@ -138,7 +138,16 @@ const float GHOST_EDGE_FADE_HI = 0.90;
 
 const float EDGE_BUFFER = 0.55; // Avoid rasterisation issues on the edge of the cable
 
+#ifdef DEFERRED_PASS
+// Deferred (model-gbuffer) variant writes cus_gl4's RENDERING_MODE==1 MRT
+// layout instead of a single lit colour. `fragColor` is aliased onto one of
+// the targets so the forward write statements still compile — they are dead
+// code in this variant (the DEFERRED_PASS block in main() returns first).
+out vec4 fragData[5];
+#define fragColor fragData[1]
+#else
 out vec4 fragColor;
+#endif
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -291,6 +300,20 @@ void main() {
 	return;
 #endif
 
+#ifdef DEFERRED_PASS
+	// Only LIVE cable fragments feed the model gbuffer (same gating the shadow
+	// pass uses): ghosts are translucent memory traces, not solid lit geometry,
+	// and enemy cables contribute only where they are in LOS — so a projectile
+	// light can never illuminate a cable the forward pass wouldn't have drawn.
+	// Falls through to the shared cylinder-normal math below; the gbuffer MRT
+	// write + return sit right after cylNormal is computed.
+	if (gridData.w < -0.5) discard;
+	if (gridData.w < 0.5) {
+		vec2 losUVd = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+		if (texture(infoTex, losUVd).r < ENEMY_LOS_CUT) discard;
+	}
+#endif
+
 	// FAST GHOST PATH — orphaned-enemy edges (gridData.w = -1.0) skip all the
 	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
 	// decide, render translucent flat ghost or discard. Nothing else.
@@ -378,6 +401,23 @@ void main() {
 	float cylinderFactor = 0.95;
 	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER))) * cylinderFactor;
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER * (1.0 - 0.7*isBranch));
+
+#ifdef DEFERRED_PASS
+	// Feed cus_gl4's model gbuffer (normtex/difftex/...) so deferred projectile
+	// lights shade the cable's own cylinder normal rather than letting whatever
+	// terrain sits underneath bleed through. The animated bubble glow is NOT
+	// written here — it stays a forward-only overlay (DrawWorldPreUnit), so the
+	// light pass can neither dim nor re-light it. Depth is written by the draw
+	// (DepthMask on) so the light reconstructs the cable surface and occludes.
+	float capTd = clamp(capacity / 100.0, 0.0, 1.0);
+	vec3 gbDiff = mix(INNER_COLOR_LO, INNER_COLOR_HI, capTd);
+	fragData[0] = vec4(cylNormal * 0.5 + 0.5, 1.0);   // GBUFFER_NORMTEX (SNORM2NORM)
+	fragData[1] = vec4(gbDiff, 1.0);                  // GBUFFER_DIFFTEX (albedo)
+	fragData[2] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_SPECTEX
+	fragData[3] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_EMITTEX (no bloom yet)
+	fragData[4] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_MISCTEX
+	return;
+#endif
 
 	// Own lighting (forward rendered, no engine lighting applies)
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
