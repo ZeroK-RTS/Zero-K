@@ -9,6 +9,8 @@ uniform float gameTime;
 uniform float bakeTime;
 uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no animation)
 uniform float ghostsEnabled;  // 1.0 = ghost branch active; 0.0 = enemy OOL discards immediately
+uniform sampler2DShadow shadowTex;  // engine shadow map ($shadow); sampled for shadow reception
+uniform float shadowsEnabled; // 1.0 = sample the shadow map; 0.0 = treat everything as fully lit
 
 // Same SSBO as the GS — per-edge coverage bitmask, gates per-segment
 // ghost rendering for enemy fragments.
@@ -267,6 +269,19 @@ vec3 gridEfficiencyColor(float eff) {
 	return hueToRgb(h / 255.0);
 }
 
+// Shadow reception. Returns 1.0 in full sun, → 0.0 fully shadowed. Mirrors the
+// engine's receive-side convention (cus_gl4.vert.glsl / map_lava.lua): transform
+// world pos by `shadowView` (from the engine UBO), recenter xy by +0.5, then a
+// projective compare against the depth map. NO `shadowProj` here — that's the
+// cast-side transform only; `shadowView` already maps into the sampling space.
+// shadowsEnabled gates the whole thing so we never sample a stale/absent map.
+float getShadowCoeff(vec3 wp) {
+	if (shadowsEnabled < 0.5) return 1.0;
+	vec4 sp = shadowView * vec4(wp, 1.0);
+	sp.xy += vec2(0.5);
+	return clamp(textureProj(shadowTex, sp), 0.0, 1.0);
+}
+
 void main() {
 	float v = cableUV.y * EDGE_BUFFER;
 	float t = abs(v);
@@ -419,9 +434,14 @@ void main() {
 	return;
 #endif
 
-	// Own lighting (forward rendered, no engine lighting applies)
+	// Own lighting (forward rendered; the engine doesn't light cables, so we
+	// sample the shadow map ourselves). Shadow darkens only the SUN term, never
+	// the ambient floor — a cable in shadow falls to DIFFUSE_FLOOR, not black.
+	// Bubbles are composited later and stay emissive (lights in the dark).
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
-	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * dot(cylNormal, normalize(sunDir.xyz))));
+	float shadowCoeff = getShadowCoeff(worldPos);
+	float sunNdotL = dot(cylNormal, normalize(sunDir.xyz)) * shadowCoeff;
+	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * sunNdotL));
 
 	// LOS state — sampled from $info:los (single-channel red), the engine's
 	// actual game-logic LOS texture. Independent of the user's overlay toggle:
@@ -434,7 +454,7 @@ void main() {
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
 	float cameraDist = length(cameraViewInv[3].xyz - worldPos);
 	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
-	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 1.0), SPEC_EXP) * SPEC_MAGNITUDE;
+	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 1.0), SPEC_EXP) * SPEC_MAGNITUDE * shadowCoeff;
 
 	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);

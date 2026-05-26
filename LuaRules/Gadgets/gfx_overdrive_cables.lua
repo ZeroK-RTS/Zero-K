@@ -2789,6 +2789,11 @@ function gadget:DrawWorldPreUnit()
 	--cableShader:SetUniform("bakeTime", bubbleBakeTime)
 	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
 	cableShader:SetUniform("ghostsEnabled", cableGhosts and 1.0 or 0.0)
+	-- Shadow reception: only sample the shadow map when the engine actually has
+	-- one this frame, so the FS never reads a stale/absent $shadow (it returns
+	-- "fully lit" when disabled). The texture is bound below at unit 3.
+	local haveShadows = (Spring.HaveShadows and Spring.HaveShadows()) or false
+	cableShader:SetUniform("shadowsEnabled", haveShadows and 1.0 or 0.0)
 
 	-- Bind the per-edge coverage SSBO at binding=6. Both the live and ghost
 	-- VBO draws use the same shader program so a single binding covers them.
@@ -2806,6 +2811,7 @@ function gadget:DrawWorldPreUnit()
 	gl.Texture(0, "$info:los")
 	gl.Texture(1, "$heightmap")
 	gl.Texture(2, CABLE_TEXTURE)
+	if haveShadows then gl.Texture(3, "$shadow") end
 	gl.Culling(false)
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(true)
@@ -2837,6 +2843,7 @@ function gadget:DrawWorldPreUnit()
 	gl.Texture(0, false)
 	gl.Texture(1, false)
 	gl.Texture(2, false)
+	if haveShadows then gl.Texture(3, false) end
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 	gl.Culling(GL.BACK)
@@ -2952,12 +2959,14 @@ function gadget:Initialize()
 			infoTex = 0,
 			heightmapTex = 1,
 			cableTex = 2,
+			shadowTex = 3,
 		},
 		uniformFloat = {
 			gameTime = 0,
-			--bakeTime = 0, 
+			--bakeTime = 0,
 			enableFlow = cableFlowMode and 1.0 or 0.0,
 			ghostsEnabled = cableGhosts and 1.0 or 0.0,
+			shadowsEnabled = 0,
 		},
 	}, "Cable Forward Shader")
 
