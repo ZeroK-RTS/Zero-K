@@ -275,12 +275,18 @@ void main() {
 	}
 
 #ifdef SHADOW_PASS
-	// Shadow caster: only own/spectator cables drop shadows for now (gridData.w
-	// >= 1.0). Enemy live (0.0) and ghost (-1.0) are skipped so the shadow pass
-	// can't leak un-scouted enemy grid. The grow/wither discards above already
-	// trimmed the silhouette to the visible cable; depth is all the shadow map
-	// needs, so skip lighting/bubbles entirely.
-	if (gridData.w < 0.5) discard;
+	// Cast a shadow wherever the forward pass would render the LIVE cable, so
+	// the shadow never reveals more than the visible cable already does:
+	//   own / spectator (gridData.w >= 1.0) → always rendered    → always cast.
+	//   enemy live      (gridData.w == 0.0) → rendered only in LOS → LOS-gate.
+	//   ghost           (gridData.w <  -0.5) → memory trace, not in this VAO → never.
+	// The grow/wither discards above already trimmed the silhouette to the
+	// visible extent; depth is all the shadow map needs, so skip lighting.
+	if (gridData.w < -0.5) discard;
+	if (gridData.w < 0.5) {
+		vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+		if (texture(infoTex, losUV).r < ENEMY_LOS_CUT) discard;
+	}
 	fragColor = vec4(0.0);
 	return;
 #endif

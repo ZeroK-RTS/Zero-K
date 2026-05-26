@@ -2860,7 +2860,9 @@ function gadget:DrawShadowUnitsLua()
 	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
 	cableShadowShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
 
-	-- GS samples the heightmap to place vertices; same binding as the forward pass.
+	-- $info:los gates enemy cables to LOS so their shadow matches their in-LOS
+	-- visibility; the GS samples the heightmap to place vertices.
+	gl.Texture(0, "$info:los")
 	gl.Texture(1, "$heightmap")
 	-- Thin tent → let both faces cast (mirror the forward pass's Culling(false)).
 	gl.Culling(false)
@@ -2870,6 +2872,7 @@ function gadget:DrawShadowUnitsLua()
 	gl.DepthMask(true)
 	cableVAO:DrawArrays(GL.LINES, numCableVerts)
 
+	gl.Texture(0, false)
 	gl.Texture(1, false)
 	gl.Culling(GL.BACK)   -- restore engine default for subsequent shadow draws
 	cableShadowShader:Deactivate()
@@ -2927,7 +2930,7 @@ function gadget:Initialize()
 		vertex   = vsSrc,
 		geometry = injectShadowDefine(gsSrc),
 		fragment = injectShadowDefine(fsSrc),
-		uniformInt   = { heightmapTex = 1 },
+		uniformInt   = { heightmapTex = 1, infoTex = 0 },
 		uniformFloat = { gameTime = 0 },
 	}, "Cable Shadow Shader")
 	if not cableShadowShader:Initialize() then
