@@ -44,7 +44,7 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
-const vec3  EDGE_COLOR         = vec3(0.3);
+const vec3  EDGE_COLOR         = vec3(0.35);
 const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.55);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
@@ -59,7 +59,7 @@ const float INNER_ALPHA        = 1.0;
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.28;
+const float DIFFUSE_FLOOR      = 0.4;
 const float SPEC_EXP           = 15.0;
 const float SPEC_MAGNITUDE     = 0.42;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
@@ -386,7 +386,7 @@ void main() {
 
 	// Wire walls and transparent interior
 	float innerMix = smoothstep(0.85, 0.12, clamp(t / EDGE_BUFFER, 0.0, 1.0));
-	float innerMix2 = smoothstep(0.85, 0.15, clamp(t*t / (EDGE_BUFFER*EDGE_BUFFER), 0.0, 1.0));
+	float innerMix2 = smoothstep(0.95, 0.15, clamp(t*t / (EDGE_BUFFER*EDGE_BUFFER), 0.0, 1.0));
 	if (isBranch > 0.5) {
 		innerMix *= TWIG_INNER_DAMPEN;
 	}
