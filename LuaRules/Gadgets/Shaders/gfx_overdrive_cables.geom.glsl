@@ -113,7 +113,7 @@ const float BRANCH_LEN_MIN    = 2.0;
 const float BRANCH_LEN_MAX    = 5.5;
 const float BRANCH_ANGLE_MIN  = 1.2;
 const float BRANCH_ANGLE_MAX  = 1.5;
-const float BRANCH_WIDTH      = 1.1;
+const float BRANCH_WIDTH      = 1.3;
 const float CONE_TIP_WIDTH    = 0.0;
 const float BRANCH_WIDTH_TWIG_LENGTH_FACTOR = 2.0;
 
