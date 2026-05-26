@@ -2206,6 +2206,7 @@ local geomCache = {
 }
 
 local cableShader       -- forward shader for cable rendering
+local cableShadowShader -- depth-only SHADOW_PASS variant, drawn in the shadow map pass
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
 -- (drawPerf collapsed into cablePerf at the top of the file; flowMode
@@ -2841,6 +2842,40 @@ function gadget:DrawWorldPreUnit()
 end
 
 -------------------------------------------------------------------------------------
+-- Shadow casting. DrawShadowUnitsLua fires inside the engine's unit shadow-map
+-- pass (same callin cus_gl4 uses to shadow units), once per gadget. We re-draw
+-- the live cable VAO through the SHADOW_PASS shader variant: identical tent
+-- geometry, but positions go through shadowViewProj and the FS writes depth
+-- only. The engine has the shadow FBO + depth state bound around this call, so
+-- we touch as little GL state as possible. Ghosts (separate VAO) are not drawn,
+-- so they don't cast shadows.
+-------------------------------------------------------------------------------------
+function gadget:DrawShadowUnitsLua()
+	if not cableEnabled then return end
+	if not cableShadowShader or not cableVAO or numCableVerts == 0 then return end
+
+	cableShadowShader:Activate()
+	-- Match the forward pass's smooth game-time so a growing/withering cable
+	-- casts a shadow trimmed to exactly the visible extent (FS reads gameTime).
+	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
+	cableShadowShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
+
+	-- GS samples the heightmap to place vertices; same binding as the forward pass.
+	gl.Texture(1, "$heightmap")
+	-- Thin tent → let both faces cast (mirror the forward pass's Culling(false)).
+	gl.Culling(false)
+	-- Force depth write — the whole point of the shadow pass is populating the
+	-- shadow depth map; don't assume the engine left DepthMask on for us.
+	gl.DepthTest(true)
+	gl.DepthMask(true)
+	cableVAO:DrawArrays(GL.LINES, numCableVerts)
+
+	gl.Texture(1, false)
+	gl.Culling(GL.BACK)   -- restore engine default for subsequent shadow draws
+	cableShadowShader:Deactivate()
+end
+
+-------------------------------------------------------------------------------------
 -- Lifecycle
 -------------------------------------------------------------------------------------
 
@@ -2877,6 +2912,27 @@ function gadget:Initialize()
 		Spring.Echo("[CableTree] Shader compile failed")
 		gadgetHandler:RemoveGadget()
 		return
+	end
+
+	-- Shadow-caster variant: the same VS/GS/FS compiled with SHADOW_PASS
+	-- defined. The GS swaps cameraViewProj -> shadowViewProj and skips the
+	-- coverage SSBO update; the FS trims to own/spectator cables and writes
+	-- depth only (no lighting). Drawn from gadget:DrawShadowUnitsLua so the
+	-- cables drop shadows in the same shadow-map pass as units. If it fails to
+	-- compile we just skip shadow casting (the forward pass is unaffected).
+	local function injectShadowDefine(src)
+		return (src:gsub("(#version%s+%d+)", "%1\n#define SHADOW_PASS 1", 1))
+	end
+	cableShadowShader = LuaShader({
+		vertex   = vsSrc,
+		geometry = injectShadowDefine(gsSrc),
+		fragment = injectShadowDefine(fsSrc),
+		uniformInt   = { heightmapTex = 1 },
+		uniformFloat = { gameTime = 0 },
+	}, "Cable Shadow Shader")
+	if not cableShadowShader:Initialize() then
+		Spring.Echo("[CableTree] Shadow shader compile failed; shadow casting disabled")
+		cableShadowShader = nil
 	end
 
 	-- Per-edge coverage SSBO. Spring's VBO API requires vec4-aligned attribs,
@@ -2956,6 +3012,7 @@ end
 
 function gadget:Shutdown()
 	if cableShader then cableShader:Finalize() end
+	if cableShadowShader then cableShadowShader:Finalize() end
 	cableVAO = nil
 end
 

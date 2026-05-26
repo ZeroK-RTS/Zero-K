@@ -155,7 +155,18 @@ void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
 	spawnAlongMain = gOutSpawnAlong;
 	gsSlot = gOutSlot;
 	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
+#ifdef SHADOW_PASS
+	// Recoil shadow-map convention (mirrors cus_gl4.vert.glsl's shadow pass):
+	// it is NOT shadowViewProj * world. shadowView maps to a recentred space
+	// that needs +0.5 on XY before shadowProj; the precombined shadowViewProj
+	// omits that offset, which shoved the cable out of the shadow frustum.
+	vec4 lightVertexPos = shadowView * vec4(wp, 1.0);
+	lightVertexPos.xy += vec2(0.5);
+	lightVertexPos.z += 5e-5;            // small constant depth bias (acne)
+	gl_Position = shadowProj * lightVertexPos;
+#else
 	gl_Position = cameraViewProj * vec4(wp, 1.0);
+#endif
 	EmitVertex();
 }
 
@@ -554,6 +565,7 @@ void main() {
 		// LOS scan entirely. Ghost edges with all bits clear have nothing
 		// left to clear → skip too. Massive savings on long-running matches
 		// where most live cables hit saturation quickly.
+#ifndef SHADOW_PASS
 		int slot = dataIn[0].vsSlot;
 		bool isGhost = gridD.w < -0.5;
 		// Hard gate on the user-facing ghosts toggle — skip ALL coverage
@@ -581,6 +593,7 @@ void main() {
 				if (clrMask != 0u) atomicAnd(cableCoverage[slot].x, ~clrMask);
 			}
 		}
+#endif
 		emitTentHalf(-1.0, a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
 	} else if (gl_InvocationID == 1) {
 		// Right slope of the tent — its own invocation, hence its own

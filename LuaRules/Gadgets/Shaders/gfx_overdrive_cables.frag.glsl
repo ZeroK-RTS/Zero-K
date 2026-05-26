@@ -274,6 +274,17 @@ void main() {
 		if (along < witherFront) discard;
 	}
 
+#ifdef SHADOW_PASS
+	// Shadow caster: only own/spectator cables drop shadows for now (gridData.w
+	// >= 1.0). Enemy live (0.0) and ghost (-1.0) are skipped so the shadow pass
+	// can't leak un-scouted enemy grid. The grow/wither discards above already
+	// trimmed the silhouette to the visible cable; depth is all the shadow map
+	// needs, so skip lighting/bubbles entirely.
+	if (gridData.w < 0.5) discard;
+	fragColor = vec4(0.0);
+	return;
+#endif
+
 	// FAST GHOST PATH — orphaned-enemy edges (gridData.w = -1.0) skip all the
 	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
 	// decide, render translucent flat ghost or discard. Nothing else.
