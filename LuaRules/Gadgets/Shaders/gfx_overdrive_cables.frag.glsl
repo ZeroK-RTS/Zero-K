@@ -44,22 +44,22 @@ const float WITHER_RATE        = 400.0;
 // Bark / inner colours. Bark = visible outer cable; inner = brighter core
 // shown through the centre line by `innerMix`. capT (capacity / 100) only
 // blends `innerColor` between two grey levels; no hue.
-const vec3  EDGE_COLOR         = vec3(0.3);
+const vec3  EDGE_COLOR         = vec3(0.35);
 const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.55);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 1.1;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.00025; // Mix grid colour into the inner tube
+const float GRID_INNER_MIX     = 0.25; // Mix grid colour into the inner tube
 
 // Opaque wires
 const float EDGE_ALPHA         = 1.0;
-const float BASE_ALPHA         = 1.0;
-const float INNER_ALPHA        = 1.0;
+const float BASE_ALPHA         = 0.5;
+const float INNER_ALPHA        = 0.97;
 
 // Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
 // (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
 // synthetic cylinder normal.
-const float DIFFUSE_FLOOR      = 0.22;
+const float DIFFUSE_FLOOR      = 0.32;
 const float SPEC_EXP           = 16.0;
 const float SPEC_MAGNITUDE     = 0.35;
 const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
@@ -358,7 +358,7 @@ void main() {
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
 	trueUp = normalize(trueUp);
 
-	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER))) * 0.8;
+	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER))) * 0.95;
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER);
 
 	// Own lighting (forward rendered, no engine lighting applies)
@@ -389,7 +389,8 @@ void main() {
 	if (isBranch > 0.5) {
 		innerMix *= TWIG_INNER_DAMPEN;
 	}
-	vec3 edgeColor = mix(EDGE_COLOR, texture(cableTex, vec2(cableUV.x * 0.04, cableUV.y*0.28 + 0.5)).xyz, innerMix2);
+	vec4 cableTexValue = texture(cableTex, vec2(cableUV.x * 0.044, cableUV.y*0.5 + 0.5));
+	vec3 edgeColor = mix(EDGE_COLOR, cableTexValue.xyz, innerMix2);
 	vec3 baseColor = edgeColor;
 
 	// Surface noise detail
@@ -398,8 +399,9 @@ void main() {
 
 	// Fade out edges and with camera distance
 	float baseAlpha = mix(EDGE_ALPHA, BASE_ALPHA, innerMix2);
-	float alpha = mix(baseAlpha, INNER_ALPHA, innerMix) * (1.0 - 10.0*pow(t, 20.0));
-	alpha = alpha * max(0.85, losState);
+	float alpha = mix(baseAlpha, INNER_ALPHA, innerMix) * (1.0 - 10.0*pow(t, 2.0));
+	baseColor = mix(mix(vec3(0.0), innerColor, alpha), baseColor, cableTexValue.a);
+	alpha = 1.0;
 	
 	// Coverage bits are written by the GS (per-segment, per cable per frame).
 	// Per-fragment gating: derive segIdx from along-distance + len-per-segment
@@ -573,10 +575,10 @@ void main() {
 	color = mix(BARK_COLOR, color, distScale);
 	alpha = alpha * clamp(distScale + 1.0, 0.0, 1.0);
 	
-	color += haloColor * bubbleHalo * HALO_WEIGHT;
-	vec3 bubbleEmissive = bubbleColor * bubbleBody * BODY_WEIGHT;
+	color += haloColor * bubbleHalo * HALO_WEIGHT * (1.0 - cableTexValue.a);
+	vec3 bubbleEmissive = bubbleColor * bubbleBody * BODY_WEIGHT * (1.0 - cableTexValue.a);
 	color = max(color, bubbleEmissive);
-	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
+	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT * (1.0 - cableTexValue.a);
 	
 
 	//color = color*0.0 + texture(cableTex, cableUV.xy * 0.05 + vec2(0, 0.5)).xyz;
