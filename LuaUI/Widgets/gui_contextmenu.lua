@@ -518,6 +518,7 @@ local function weapons2Table(cells, ws, unitID)
 		local damc = 0
 
 		local stun_time = 0
+		local overslow = 0
 
 		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
 		local baseDamage = tonumber(cp.stats_damage) or wd.customParams.shield_damage or 0
@@ -535,6 +536,9 @@ local function weapons2Table(cells, ws, unitID)
 			dams = val * (cp.timeslow_damagefactor or 1)
 			if (cp.timeslow_onlyslow == "1") then
 				val = 0
+			end
+			if cp.timeslow_overslow_frames then
+				overslow = tonumber(wd.customParams.timeslow_overslow_frames) / 30
 			end
 		end
 
@@ -733,6 +737,11 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - Max stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time) .. 's\008'
 		end
+		if overslow > 0 then
+			cells[#cells+1] = ' - Overslow time:'
+			cells[#cells+1] = color2incolor(colorPurple) .. numformat(overslow) .. 's\008'
+		end
+		
 		if tonumber(cp.overstun_time) or 0 > 0 then
 			cells[#cells+1] = ' - Overstun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(tonumber(cp.overstun_time)) .. 's\008'
@@ -1789,23 +1798,47 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		if (weaponStats.paralyzer) then
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue) .. " (P)", textColor = colorCyan, }
-			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(wepCp.emp_paratime) .. "s", textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = 'Max stun time: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(wepCp.emp_paratime) .. "s", textColor = colorCyan, }
 		else
 			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
 			local damageText
+			local slowTimer = 0
+			local disarmTimer = 0
 			if damageSlow > 0 then
 				if wepCp.timeslow_onlyslow == "1" then
-					 damageText = color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
+					damageText = color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
 				else
 					damageText = numformat(damageValue) .. " + " .. color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
+				end
+				if wepCp.timeslow_overslow_frames then
+					slowTimer = tonumber(wepCp.timeslow_overslow_frames) / 30
 				end
 			else
 				damageText = numformat(damageValue)
 			end
+			if wepCp.disarmdamagemult then
+				local damageDisarm = tonumber(wepCp.disarmdamagemult)*damageValue
+				damageText = (damageText and (damageText .. " + ") or "") .. color2incolor(colorDisarm) .. numformat(damageDisarm) .. " (D)\008"
+				disarmTimer = tonumber(wepCp.disarmtimer)
+			end
 			statschildren[#statschildren+1] = Label:New{ caption = damageText, textColor = color.stats_fg, }
+			
+			if slowTimer > 0 then
+				statschildren[#statschildren+1] = Label:New{ caption = 'Overslow time:', textColor = color.stats_fg, }
+				statschildren[#statschildren+1] = Label:New{ caption = numformat(slowTimer) .. 's\008', textColor = colorPurple, }
+			end
+			if disarmTimer > 0 then
+				statschildren[#statschildren+1] = Label:New{ caption = 'Max disarm time:', textColor = color.stats_fg, }
+				statschildren[#statschildren+1] = Label:New{ caption = numformat(disarmTimer) .. 's\008', textColor = colorDisarm, }
+			end
+		end
+		if tonumber(wepCp.overstun_time) or 0 > 0 then
+			cells[#cells+1] = Label:New{ caption = 'Overstun time:', textColor = color.stats_fg, }
+			cells[#cells+1] = Label:New{ caption = numformat(tonumber(wepCp.overstun_time)) .. 's\008', textColor = weaponStats.paralyzer and colorCyan or colorDisarm, }
 		end
 
+		
 		local radius = weaponStats.damageAreaOfEffect
 		if expMult > 1 then
 			local maxRadius = radius

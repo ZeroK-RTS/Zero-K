@@ -166,6 +166,36 @@ return {
     },
   },
 
+  ["purple_lightning_bomb_bolts"] = {
+    bluebolts = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.95,
+        colormap           = [[1 0.2 1 0.01  1 0.2 1 0.01 0.5 0.5 0.5 0.01  1 0.2 1 0.01   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 180,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 5,
+        particlelife       = 2,
+        particlelifespread = 5,
+        particlesize       = 40,
+        particlesizespread = 0,
+        particlespeed      = 2,
+        particlespeedspread = 0,
+        pos                = [[0, 1.0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[whitelightb]],
+      },
+    },
+  },
+
   ["yellow_lightning_bomb"] = {
     bluebolts = {
       air                = true,

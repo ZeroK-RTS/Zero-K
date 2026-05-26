@@ -57,7 +57,7 @@ return { commander_egg = {
 
   weaponDefs          = {
     COMMANDER_EGG_EMP = {
-      name                    = [[EMP Egg Explosion]],
+      name                    = [[Egg Explosion]],
       areaOfEffect            = 280,
       craterBoost             = 0,
       craterMult              = 0,
@@ -66,6 +66,11 @@ return { commander_egg = {
         burst = Shared.BURST_RELIABLE,
         light_color = [[1.35 1.35 0.36]],
         light_radius = 450,
+        disarmDamageMult = 1,
+        disarmTimer      = 25, -- seconds
+        timeslow_damagefactor = 1,
+        timeslow_overslow_frames = 12.5*30, -- Slow runs out at the same time as disarm.
+        timeslow_onlyslow = 1,
       },
 
       damage                  = {
@@ -73,13 +78,12 @@ return { commander_egg = {
       },
 
       edgeEffectiveness       = 1,
-      explosionGenerator      = [[custom:EMPMISSILE_EXPLOSION]],
-      explosionSpeed          = 4.5,
+      explosionGenerator      = [[custom:SLOW_DISARM_EXPLOSION]],
+      explosionSpeed          = 7.5,
       impulseBoost            = 0,
       impulseFactor           = 0,
-      paralyzer               = true,
-      paralyzeTime            = 25,
-      soundHit                = [[weapon/missile/emp_missile_hit]],
+      soundHit                = [[weapon/missile/slow_disarm_missile_hit]],
+	  soundHitVolume          = 10,
     },
   },
 
