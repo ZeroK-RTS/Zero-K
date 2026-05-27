@@ -26,7 +26,8 @@ in DataGS {
 	float width;
 	vec2 cableUV;
 	vec2 timeData;
-	vec4 gridData;
+	vec3 gridData;          // was vec4; .z was unused, dropped to fund cableTangent (see GS BUDGET NOTE). Old .w (isOwnAlly / ghost flag) is now .z.
+	vec3 cableTangent;      // smooth per-vertex cable along-direction; interpolated → drives the lit frame below
 	float spawnAlongMain;   // overloaded: main ribbon → lenPerSeg; twig → twig-along
 	flat int gsSlot;
 };
@@ -314,13 +315,13 @@ void main() {
 #ifdef SHADOW_PASS
 	// Cast a shadow wherever the forward pass would render the LIVE cable, so
 	// the shadow never reveals more than the visible cable already does:
-	//   own / spectator (gridData.w >= 1.0) → always rendered    → always cast.
-	//   enemy live      (gridData.w == 0.0) → rendered only in LOS → LOS-gate.
-	//   ghost           (gridData.w <  -0.5) → memory trace, not in this VAO → never.
+	//   own / spectator (gridData.z >= 1.0) → always rendered    → always cast.
+	//   enemy live      (gridData.z == 0.0) → rendered only in LOS → LOS-gate.
+	//   ghost           (gridData.z <  -0.5) → memory trace, not in this VAO → never.
 	// The grow/wither discards above already trimmed the silhouette to the
 	// visible extent; depth is all the shadow map needs, so skip lighting.
-	if (gridData.w < -0.5) discard;
-	if (gridData.w < 0.5) {
+	if (gridData.z < -0.5) discard;
+	if (gridData.z < 0.5) {
 		vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
 		if (texture(infoTex, losUV).r < ENEMY_LOS_CUT) discard;
 	}
@@ -335,17 +336,17 @@ void main() {
 	// light can never illuminate a cable the forward pass wouldn't have drawn.
 	// Falls through to the shared cylinder-normal math below; the gbuffer MRT
 	// write + return sit right after cylNormal is computed.
-	if (gridData.w < -0.5) discard;
-	if (gridData.w < 0.5) {
+	if (gridData.z < -0.5) discard;
+	if (gridData.z < 0.5) {
 		vec2 losUVd = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
 		if (texture(infoTex, losUVd).r < ENEMY_LOS_CUT) discard;
 	}
 #endif
 
-	// FAST GHOST PATH — orphaned-enemy edges (gridData.w = -1.0) skip all the
+	// FAST GHOST PATH — orphaned-enemy edges (gridData.z = -1.0) skip all the
 	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
 	// decide, render translucent flat ghost or discard. Nothing else.
-	if (gridData.w < -0.5) {
+	if (gridData.z < -0.5) {
 		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 		float los0 = texture(infoTex, losUV0).r;
 		if (los0 >= ENEMY_LOS_CUT) discard;
@@ -384,35 +385,28 @@ void main() {
 	//                       snapshot). Always render ghost gated by segment
 	//                       bit; never live, regardless of LOS. This is the
 	//                       "you don't know it died" persistence.
-	float isOwnAlly = gridData.w;
+	float isOwnAlly = gridData.z;
 
 	// Cylinder cross-section normal that respects cable slope, derived from
 	// the smoothly-interpolated cable tangent passed in by the GS.
 	//
-	// `vsTangent` is set per-vertex to the local cable along-direction (back-
-	// diff of adjacent centerline vertices). The triangle-strip rasteriser
-	// linearly interpolates it across triangles → adjacent fragments along the
-	// cable see a continuously rotating tangent, so the cylinder's lit side
-	// bends smoothly with up/down hills instead of stepping per triangle (as
-	// happens when the basis is reconstructed from `dFdx(worldPos)`, which is
-	// flat per triangle).
+	// `cableTangent` is set per-vertex by the GS to the local cable along-
+	// direction (back-diff of adjacent centerline vertices). The triangle-strip
+	// rasteriser linearly interpolates it across triangles → adjacent fragments
+	// along the cable see a continuously rotating tangent, so the cylinder's lit
+	// side bends smoothly with up/down hills instead of stepping per triangle
+	// (the flat-shaded faceting the old `dFdx(worldPos)` reconstruction caused,
+	// since screen-space derivatives are constant within a triangle). It is
+	// constant across each cross-section (apex+outer emit the same value), so it
+	// reorients only along the cable, never around its axis.
 	//
 	// Cross-section axis is `cross(worldUp, cableT)` — purely horizontal, which
 	// matches the GS's global B3 (≈ cross(Navg, T_g)) closely enough for any
 	// terrain whose Navg is near +Y. Sign matches: GS emits leftPos at -B3
 	// (cableUV.y = -1), rightPos at +B3 (cableUV.y = +1), and `cross(Y, T)`
 	// gives the same direction as cross(Navg, T) up to a small Y component.
-	// Reconstruct cable tangent from screen-space derivatives of (worldPos, cableUV.x).
-	// This is per-triangle flat (cableUV.x is linearly interpolated, so derivatives
-	// are constant within a triangle), but cheaper than passing a vec3 varying.
-	vec3 dWdx_loc = dFdx(worldPos);
-	vec3 dWdy_loc = dFdy(worldPos);
-	float duDx = dFdx(cableUV.x);
-	float duDy = dFdy(cableUV.x);
-	float duDenom = duDx * duDx + duDy * duDy;
-	vec3 cableT = (duDenom > 1e-6)
-	    ? normalize((dWdx_loc * duDx + dWdy_loc * duDy) / duDenom)
-	    : vec3(1.0, 0.0, 0.0);
+	float cableTL = length(cableTangent);
+	vec3 cableT = (cableTL > 1e-4) ? cableTangent / cableTL : vec3(1.0, 0.0, 0.0);
 	vec3 perp3D = cross(vec3(0.0, 1.0, 0.0), cableT);
 	float perp3DL = length(perp3D);
 	if (perp3DL > 1e-3) {

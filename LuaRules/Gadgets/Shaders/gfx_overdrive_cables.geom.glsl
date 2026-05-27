@@ -18,9 +18,11 @@
 // unchanged.
 
 layout (lines, invocations = 5) in;
-// 50 verts/invocation comfortably fits min-spec total components budget;
-// invocation 0 uses ~50, twig invocations use 4.
-layout (triangle_strip, max_vertices = 50) out;
+// 46 verts/invocation fits the min-spec total-components budget once the
+// per-vertex cableTangent varying is included (46 × 22 = 1012 ≤ 1024). The
+// tent-slope invocations use the full 46 (= 23 boundaries × 2); twig
+// invocations use 4.
+layout (triangle_strip, max_vertices = 46) out;
 
 uniform sampler2D heightmapTex;
 uniform sampler2D infoTex;          // $info:los; same texture FS samples
@@ -49,9 +51,12 @@ in DataVS {
 // it carries the twig's root-along distance (existing semantics, drives twig
 // pulse animation). For main-ribbon fragments (isBranch<0.5) it carries the
 // cable's len-per-segment so the FS can derive a per-segment bit index for
-// the coverage SSBO. We pack rather than add a varying because adding one
-// more component pushes 50 × 21 = 1050 over GL_MAX_GEOMETRY_OUTPUT_COMPONENTS
-// (1024 min-spec); the two semantics are disjoint by isBranch so no conflict.
+// the coverage SSBO. The two semantics are disjoint by isBranch so no conflict.
+// BUDGET NOTE: `gridData` is a vec3 (was vec4 — the .z component was never read
+// by the FS). Shrinking it reclaimed one component so `cableTangent` could be
+// added without busting GL_MAX_GEOMETRY_OUTPUT_COMPONENTS' total budget: with
+// the tangent the per-vertex count is 22 (incl. gl_Position), so max_vertices
+// drops 50→46 to keep 46 × 22 = 1012 ≤ 1024 (min-spec).
 out DataGS {
 	vec3 worldPos;
 	float capacity;
@@ -59,7 +64,13 @@ out DataGS {
 	float width;
 	vec2 cableUV;
 	vec2 timeData;
-	vec4 gridData;
+	vec3 gridData;
+	// Smooth per-vertex cable along-direction (3D). Linearly interpolated by
+	// the rasteriser so the FS frame (perp3D/trueUp → cylinder normal) rotates
+	// continuously across segment seams instead of stepping per-triangle (the
+	// flat-shaded look the old dFdx reconstruction produced). Constant across
+	// each cross-section (apex+outer share it) so it can't twist the tube.
+	vec3 cableTangent;
 	float spawnAlongMain;
 	flat int gsSlot;
 };
@@ -104,14 +115,17 @@ float hash1(float n) {
 	return fract(sin(n * 12.9898) * 43758.5453);
 }
 
-const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25 boundaries × 2). Cable lengths are bounded by pylon range so this isn't expected to clamp in practice.
+const int   MAX_SEGMENTS      = 22;   // hardware budget (max_vertices=46 → 23 boundaries × 2; lowered from 24 to make room for the cableTangent varying). Cable lengths are bounded by pylon range (longest ≈ energypylon's 500 elmo); at SEG_LEN_TARGET this wants ~23, so the very longest backbone cables lose ~1-2 segments — far outweighed by the tangent killing the per-segment faceting.
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
 const float WIDTH_FACTOR      = 0.6;
-// Tent cross-section: lift the centerline ridge by this fraction of halfW
-// (the cross "radius"). The two slopes meet at the ridge; 0.0 reproduces the
-// old flat ribbon, ~0.9 gives a roughly semicircular tube.
-const float TENT_HEIGHT_FACTOR = 0.9;
+// Tent cross-section: ridge height above the two ground edges, as a fraction of
+// halfW (the cross "radius"). The two slopes meet at the ridge. This is now the
+// DIRECT visible ridge height (built from the edge midpoint, not the buried
+// belly), so the knob is linear: 0.0 collapses to a flat ribbon, 1.0 ≈ a full
+// semicircular tube. ~0.7 reproduces the apparent tube height of the old
+// belly-based formula (which lost ~SIDE_CLEAR to the edge-vs-belly offset).
+const float TENT_HEIGHT_FACTOR = 0.7;
 const float MIN_TRUNK_WIDTH   = 2.8;
 const float MAX_TRUNK_WIDTH   = 4.5;
 const float MAX_CAPACITY_REF  = 400.0;
@@ -167,10 +181,10 @@ void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
 	width = w;
 	cableUV = cuv;
 	timeData = td;
-	gridData = grid;
+	gridData = grid.xyw;          // .z dropped (unused by FS); see DataGS BUDGET NOTE
+	cableTangent = tangent3D;     // smooth along-dir → FS interpolates the lit frame
 	spawnAlongMain = gOutSpawnAlong;
 	gsSlot = gOutSlot;
-	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
 #ifdef SHADOW_PASS
 	// Recoil shadow-map convention (mirrors cus_gl4.vert.glsl's shadow pass):
 	// it is NOT shadowViewProj * world. shadowView maps to a recentred space
@@ -399,20 +413,31 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		outerR.y = max(outerR.y, heightAtWorldPos(outerR.xz) + SIDE_CLEAR);
 		vec3 outerPos = (side < 0.0) ? outerL : outerR;
 
-		// Ridge apex: lift the centerline along Navg — the SAME chord-averaged
-		// normal that B3 is built from. Because B3 = cross(Navg, T3) is ⊥ Navg,
-		// the base axis (B3) is exactly orthogonal to the apex lift (Navg), so
-		// the cross-section area = halfW * tentHeight is slope-invariant: the
-		// triangle's height is the full tentHeight rather than its vertical
-		// projection. Lifting along the LOCAL per-vertex normal instead rehangs
-		// the apex off-axis from the base, which both skews the tent and scales
-		// its area by cos(angle(Navg,Nloc)) — the leaning-tent artefact this
-		// shares with the old flat-xz base. Using Navg also keeps the apex on
-		// the same frame as the base, so it inherits the corkscrew protection.
-		vec3 apexPos = center3D + Navg * tentHeight;
-		// Guard uses BOTH outer edges (not the side-specific one) so the apex is
-		// identical in the left and right invocations → watertight ridge.
-		apexPos.y = max(apexPos.y, max(outerL.y, outerR.y) + 0.1);
+		// Ridge apex: lift along Navg from the MIDPOINT of the two ground edges,
+		// NOT from center3D. center3D sits on the windowed terrain max (the belly)
+		// while the outer edges are independently held SIDE_CLEAR above local
+		// terrain, so the pre-tent cross-section is a shallow valley — the edges
+		// sit ~SIDE_CLEAR above the belly. Lifting from center3D meant FACTOR first
+		// had to climb out of that valley before any ridge showed: the visible
+		// ridge was max(tentHeight - SIDE_CLEAR, 0.1), so 0.0 still bulged (the
+		// +0.1 floor never collapsed to flat ribbons) and the low end was squashed
+		// (0.2 ≈ 0.4, both pinned near the floor). Building from the edge midpoint
+		// makes the visible ridge exactly tentHeight = halfW * FACTOR: 0.0 is flat
+		// and the knob reads linearly. (At equal FACTOR the tube is now ~SIDE_CLEAR
+		// taller than before, so the TENT_HEIGHT_FACTOR default is retuned to match.)
+		//
+		// Lift is along Navg (the chord-averaged normal B3 is built from). Since
+		// B3 = cross(Navg, T3) ⊥ Navg, the base axis (B3) is orthogonal to the
+		// lift, so the cross-section area = halfW * tentHeight stays slope-
+		// invariant and the apex shares the base frame (inherits corkscrew
+		// protection). edgeMid uses BOTH outer edges (identical in the left and
+		// right invocations → watertight ridge) and its xz is the centerline.
+		vec3 edgeMid = 0.5 * (outerL + outerR);
+		vec3 apexPos = edgeMid + Navg * tentHeight;
+		// Anti-inversion only (no added floor, so FACTOR=0 stays flat): a concave
+		// cross-slope can clamp one edge above edgeMid + lift, folding that half
+		// under. max() pins the apex to the higher edge there instead of inverting.
+		apexPos.y = max(apexPos.y, max(outerL.y, outerR.y));
 
 		// Per-vertex tangent: forward-diff at vertex 0 (chord direction), and
 		// back-diff for subsequent vertices (centerline direction from the
