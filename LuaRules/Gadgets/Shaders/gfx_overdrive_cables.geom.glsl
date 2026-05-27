@@ -293,6 +293,83 @@ float maxHeightInWindow(vec2 p, vec2 dirH, float fullStep) {
 	return yMax;
 }
 
+// Adaptive vertex placement, factored out so the twig emitter can replay the
+// EXACT vertex set the ribbon renders and root onto it. Scans the max-filtered
+// centerline profile on a grid PLACEMENT_OVERSAMPLE× denser than the emit
+// budget, then curvature-clusters a numSeg+1 subset (dense at slope kinks,
+// sparse on ramps). Reports each emitted vertex's grid index, base terrain
+// height, and accumulated 3D along-distance; returns the grid resolution G.
+//
+// CRUCIAL: both emitTentHalf and the twig dispatch call this, so a twig snaps to
+// a vertex the ribbon ACTUALLY emits. The old twig code snapped to the raw scan
+// grid, but the ribbon only renders a clustered SUBSET of that grid — so on
+// smooth-but-wiggly stretches (where clustering pulls vertices away to spend on
+// kinks) the twig rooted on the analytical wiggle while the ribbon drew a coarse
+// chord beneath it, leaving the root floating up to a full wiggle amplitude
+// (~NOISE_AMP_ABS elmos) off the rendered surface.
+int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
+                        float effAmp, float seed, int numSeg,
+                        out int   idxArr[MAX_SEGMENTS + 1],
+                        out float yBaseArr[MAX_SEGMENTS + 1],
+                        out float alongArr[MAX_SEGMENTS + 1]) {
+	vec2  dirH     = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
+	float fullStep = lenAB / float(numSeg);   // max-filter window ~ avg emit span
+	int   G        = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
+
+	// Profile scan: max-filtered terrain height along the cable path. Its second
+	// difference (below) is the along-cable curvature — directional by
+	// construction (crossing a ridge spikes it, running along a crest does not).
+	float yCgrid[MAX_GRID + 1];
+	for (int i = 0; i <= G; i++) {
+		float tg = float(i) / float(G);
+		vec2 pg = wigglyCablePoint(a, d, perpAB, tg, lenAB, arcDh, effAmp, seed);
+		yCgrid[i] = maxHeightInWindow(pg, dirH, fullStep);   // base terrain profile
+	}
+
+	// Per-cell importance = uniform floor (1.0, keeps flats at equal arc spacing)
+	// + KINK_GAIN × |Δslope| averaged over the cell's endpoints. cum[] is the
+	// prefix sum, so equal cumulative-weight steps cluster vertices at kinks.
+	float cum[MAX_GRID + 1];
+	cum[0] = 0.0;
+	for (int i = 0; i < G; i++) {
+		float sdL = (i   >= 1 && i   <= G - 1) ? abs(yCgrid[i-1] - 2.0*yCgrid[i]   + yCgrid[i+1]) : 0.0;
+		float sdR = (i+1 >= 1 && i+1 <= G - 1) ? abs(yCgrid[i]   - 2.0*yCgrid[i+1] + yCgrid[i+2]) : 0.0;
+		cum[i+1] = cum[i] + 1.0 + KINK_GAIN * 0.5 * (sdL + sdR);
+	}
+	float wStep = cum[G] / float(numSeg);
+
+	int   gi       = 0;
+	int   prevIdx  = -1;
+	float along    = 0.0;
+	vec3  prevBase = vec3(0.0);
+	for (int k = 0; k <= numSeg; k++) {
+		// Pick the grid index whose cumulative weight is nearest k·wStep. gi and k
+		// both advance monotonically → one linear sweep. The max(prevIdx+1) guard
+		// forces strictly increasing indices so a single very sharp cell can't
+		// swallow two targets into a degenerate vertex.
+		float target = float(k) * wStep;
+		while (gi < G && cum[gi+1] < target) gi++;
+		int idx = gi;
+		if (gi < G && (target - cum[gi]) > (cum[gi+1] - target)) idx = gi + 1;
+		idx = min(max(idx, prevIdx + 1), G);
+		prevIdx = idx;
+
+		// Accumulate 3D arc length over the emitted vertices. The clearance pad is
+		// a uniform per-cable Navg shift, so it cancels in consecutive distances —
+		// accumulating over the bare (xz, yBase) points matches emitTentHalf's
+		// center3D-based accumulation exactly.
+		vec2 p    = wigglyCablePoint(a, d, perpAB, float(idx) / float(G), lenAB, arcDh, effAmp, seed);
+		vec3 base = vec3(p.x, yCgrid[idx], p.y);
+		if (k > 0) along += distance(prevBase, base);
+		prevBase = base;
+
+		idxArr[k]   = idx;
+		yBaseArr[k] = yCgrid[idx];
+		alongArr[k] = along;
+	}
+	return G;
+}
+
 // Emit ONE slope of the cable's raised "tent" cross-section as a single
 // triangle strip: from the outer ground edge (cableUV.y = side) up to the
 // shared ridge apex at the centerline (cableUV.y = 0). `side` = -1 → left
@@ -343,65 +420,26 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 	// whose local tangent degenerates: horizontal, perpendicular to the chord.
 	vec3 B_fallback = normalize(cross(vec3(0.0, 1.0, 0.0), cableDirH_g));
 
-	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);   // max-filter window ~ avg emit span
+	// Adaptive vertex placement, shared with the twig emitter (see
+	// placeRibbonVertices) so twigs root on a vertex this ribbon actually emits.
+	// Returns the emitted grid index, base height and 3D along-distance per
+	// vertex; the loop below builds the cross-section frame from them.
+	int   idxArr[MAX_SEGMENTS + 1];
+	float yBaseArr[MAX_SEGMENTS + 1];
+	float alongArr[MAX_SEGMENTS + 1];
+	int   G = placeRibbonVertices(a, d, perpAB, lenAB, arcDh, effAmp, seed, numSeg,
+	                              idxArr, yBaseArr, alongArr);
 
-	// --- Adaptive placement -------------------------------------------------
-	// Scan the rendered centerline profile (max-filtered height) on a grid
-	// PLACEMENT_OVERSAMPLE× denser than the emit budget, cache it, then emit a
-	// curvature-clustered SUBSET of those samples. Because we sample along the
-	// cable path, the second difference of yCgrid below is the curvature *along
-	// the cable* — directional by construction: crossing a ridge spikes it,
-	// running along a crest does not. Vertices then cluster on the spike, so
-	// sharp slope transitions get resolution without raising the vertex count.
-	// Caching yCgrid means emit reuses the (expensive) maxHeightInWindow taps, so
-	// the only added cost over the old uniform loop is the denser scan.
-	int G = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
-	float yCgrid[MAX_GRID + 1];
-	for (int i = 0; i <= G; i++) {
-		float tg = float(i) / float(G);
-		vec2 pg = wigglyCablePoint(a, d, perpAB, tg, lenAB, arcDh, effAmp, seed);
-		yCgrid[i] = maxHeightInWindow(pg, dirH, fullStep);   // base terrain profile; clearance pad added along Navg at emit time
-	}
-
-	// Per-cell importance = uniform floor (1.0, keeps flats at equal arc
-	// spacing) + KINK_GAIN × |Δslope| averaged over the cell's endpoints.
-	// cum[] is the prefix sum, so equal cumulative-weight increments place
-	// vertices densely where curvature is high — the reparameterisation that
-	// warps t. Endpoints have zero curvature (no neighbour on one side).
-	float cum[MAX_GRID + 1];
-	cum[0] = 0.0;
-	for (int i = 0; i < G; i++) {
-		float sdL = (i   >= 1 && i   <= G - 1) ? abs(yCgrid[i-1] - 2.0*yCgrid[i]   + yCgrid[i+1]) : 0.0;
-		float sdR = (i+1 >= 1 && i+1 <= G - 1) ? abs(yCgrid[i]   - 2.0*yCgrid[i+1] + yCgrid[i+2]) : 0.0;
-		cum[i+1] = cum[i] + 1.0 + KINK_GAIN * 0.5 * (sdL + sdR);
-	}
-	float wStep = cum[G] / float(numSeg);
-
-	int gi = 0;
-	int prevIdx = -1;
 	for (int k = 0; k <= numSeg; k++) {
-		// Pick the grid index whose cumulative weight is nearest k·wStep.
-		// gi and k both advance monotonically → one linear sweep. The
-		// max(prevIdx+1) guard forces strictly increasing indices so a single
-		// very sharp cell can't swallow two targets into a degenerate vertex;
-		// G = PLACEMENT_OVERSAMPLE·numSeg guarantees enough distinct points.
-		float target = float(k) * wStep;
-		while (gi < G && cum[gi+1] < target) gi++;
-		int idx = gi;
-		if (gi < G && (target - cum[gi]) > (cum[gi+1] - target)) idx = gi + 1;
-		idx = min(max(idx, prevIdx + 1), G);
-		prevIdx = idx;
-
-		float t = float(idx) / float(G);
-		vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
-		float yBase = yCgrid[idx];              // cached base terrain profile sample
+		float t = float(idxArr[k]) / float(G);
+		vec2  p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
+		along   = alongArr[k];                  // 3D arc length from placeRibbonVertices
 		// Clearance pad along Navg (chord-averaged surface normal, the same axis the
 		// tent apex uses) instead of global +Y, so on a slope the gap stays
 		// perpendicular to the surface and the cable hugs the incline. Navg is
 		// constant per-cable → a uniform offset that leaves the curvature-based
-		// tessellation (cum[] above) and the apex/outer frame relationships intact.
-		vec3 center3D = vec3(p.x, yBase, p.y) + Navg * CENTERLINE_CLEAR;
+		// tessellation and the apex/outer frame relationships intact.
+		vec3 center3D = vec3(p.x, yBaseArr[k], p.y) + Navg * CENTERLINE_CLEAR;
 
 		// Per-vertex cable along-direction: chord at the first vertex, back-diff of
 		// adjacent centerline points after. This single tangent is BOTH the
@@ -467,7 +505,8 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		// giving the FS a continuous along-direction so the cylinder normal bends
 		// with up/down hills. The ribbon itself can't twist around its axis: both
 		// cross-section vertices share one B_v, which has no roll component.
-		if (k > 0) along += distance(prev3D, center3D);
+		// `along` is supplied per-vertex by placeRibbonVertices (same arc-length
+		// integration), so the twig emitter can match it exactly at the junction.
 		prev3D = center3D;
 		// Strip order: apex (v=0, ridge — FS points the cylinder normal up) then
 		// outer (v=side, ground — FS leans the normal fully sideways). The faked
@@ -717,23 +756,38 @@ void main() {
 	} else {
 		if (isGhostEdge) return;   // ghosts skip twig invocations entirely
 		// Twig density scales with 3D arc length: ~one twig per 85 elmos. Twigs
-		// now live on invocations 2..4 (3 slots; invocation 1 was reassigned to
-		// the second tent slope), so cap to 3 and reindex from gl_InvocationID-2.
-		int idx = gl_InvocationID - 2;          // 0..2
+		// live on invocations 2..4 (3 slots; invocation 1 is the second tent
+		// slope), so cap to 3 and reindex from gl_InvocationID-2.
+		int twigIdx = gl_InvocationID - 2;          // 0..2
 		int expectedTwigs = clamp(int(len3D / 85.0 + 0.5), 0, 3);
-		if (idx >= expectedTwigs) return;
-		float tCenterRaw = 0.15 + (float(idx) + 0.5) * (0.7 / float(expectedTwigs));
-		// Snap to the placement grid. The main ribbon's vertices are a
-		// curvature-clustered subset of this same grid (see emitTentHalf), and
-		// each grid point is where the profile height was actually measured, so
-		// rooting the twig here keeps it on the rendered surface instead of the
-		// analytical centerline (which curves between samples). G must match the
-		// emitTentHalf scan resolution.
-		int   G = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
-		float tCenter = clamp(round(tCenterRaw * float(G)), 1.0, float(G) - 1.0)
-		              / float(G);
-		float spawnAlongMain = len3D * tCenter;
+		if (twigIdx >= expectedTwigs) return;
+		float tCenterRaw = 0.15 + (float(twigIdx) + 0.5) * (0.7 / float(expectedTwigs));
+
+		// Root the twig on a vertex the ribbon ACTUALLY emits. Replay the same
+		// adaptive placement (placeRibbonVertices) and pick the emitted INTERIOR
+		// vertex nearest tCenterRaw, then take ITS t (→ spawn position) and its
+		// accumulated along (→ cableUV.x, matching the trunk exactly at the
+		// junction). The old code snapped tCenter to the raw scan grid, but the
+		// ribbon renders only a curvature-clustered SUBSET of that grid — so the
+		// twig rooted on the analytical wiggle at a point the ribbon skipped,
+		// leaving it floating up to a full wiggle amplitude off the chord surface.
+		int   idxArr[MAX_SEGMENTS + 1];
+		float yBaseArr[MAX_SEGMENTS + 1];
+		float alongArr[MAX_SEGMENTS + 1];
+		int   G = placeRibbonVertices(a, d, perpAB, lenAB, arcDh, effAmp, seed, numSeg,
+		                              idxArr, yBaseArr, alongArr);
+		// Skip the two endpoints (k = 0, numSeg) so a twig never roots at the
+		// cable's start/end. expectedTwigs >= 1 implies numSeg >= 2, so there is
+		// always at least one interior vertex to choose.
+		int   bestK   = 1;
+		float bestErr = 1e9;
+		for (int k = 1; k <= numSeg - 1; k++) {
+			float err = abs(float(idxArr[k]) / float(G) - tCenterRaw);
+			if (err < bestErr) { bestErr = err; bestK = k; }
+		}
+		float tCenter        = float(idxArr[bestK]) / float(G);
+		float spawnAlongMain = alongArr[bestK];
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx, arcDh, numSeg);
+		         gridD, timeD, cap, tCenter, float(twigIdx) * 13.7, spawnAlongMain, twigIdx, arcDh, numSeg);
 	}
 }
