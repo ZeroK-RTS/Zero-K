@@ -125,7 +125,7 @@ const float WIDTH_FACTOR      = 0.6;
 // belly), so the knob is linear: 0.0 collapses to a flat ribbon, 1.0 ≈ a full
 // semicircular tube. ~0.7 reproduces the apparent tube height of the old
 // belly-based formula (which lost ~SIDE_CLEAR to the edge-vs-belly offset).
-const float TENT_HEIGHT_FACTOR = 0.7;
+const float TENT_HEIGHT_FACTOR = 0.45;
 const float MIN_TRUNK_WIDTH   = 2.8;
 const float MAX_TRUNK_WIDTH   = 4.5;
 const float MAX_CAPACITY_REF  = 400.0;

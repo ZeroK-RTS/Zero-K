@@ -420,8 +420,7 @@ void main() {
 	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
 	trueUp = normalize(trueUp);
 
-	float cylinderFactor = 0.95;
-	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER))) * cylinderFactor;
+	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER)));
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER * (1.0 - 0.7*isBranch));
 
 #ifdef DEFERRED_PASS
