@@ -275,10 +275,22 @@ vec3 gridEfficiencyColor(float eff) {
 // projective compare against the depth map. NO `shadowProj` here — that's the
 // cast-side transform only; `shadowView` already maps into the sampling space.
 // shadowsEnabled gates the whole thing so we never sample a stale/absent map.
-float getShadowCoeff(vec3 wp) {
+//
+// Slope-scaled depth bias — the bias the receive pass was missing, which let the
+// cable self-shadow into moiré on the tent's grazing-lit slopes. Mirrors the
+// hard-shadow path in cus_gl4.frag.glsl exactly: nudge the compare depth toward
+// the light by tan(acos(NdotL)) texels, so only near-grazing fragments (small
+// NdotL, where acne shows) get the push while head-on fragments (NdotL→1) stay
+// crisp at ~0 bias. Same `0.5/texSize` magnitude and 5-texel clamp as the engine,
+// and the same space: sp is shadowView*world (sp.w == 1, so sp.z is the raw
+// compare depth), which is what cus_gl4 biases too.
+float getShadowCoeff(vec3 wp, float NdotL) {
 	if (shadowsEnabled < 0.5) return 1.0;
 	vec4 sp = shadowView * vec4(wp, 1.0);
 	sp.xy += vec2(0.5);
+	float texelInv = 0.5 / float(textureSize(shadowTex, 0).x);
+	float bias = clamp(texelInv * tan(acos(clamp(NdotL, 0.0, 1.0))), 0.0, 5.0 * texelInv);
+	sp.z -= bias;
 	return clamp(textureProj(shadowTex, sp), 0.0, 1.0);
 }
 
@@ -439,8 +451,9 @@ void main() {
 	// the ambient floor — a cable in shadow falls to DIFFUSE_FLOOR, not black.
 	// Bubbles are composited later and stay emissive (lights in the dark).
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
-	float shadowCoeff = getShadowCoeff(worldPos);
-	float sunNdotL = dot(cylNormal, normalize(sunDir.xyz)) * shadowCoeff;
+	float rawNdotL = dot(cylNormal, normalize(sunDir.xyz));
+	float shadowCoeff = getShadowCoeff(worldPos, rawNdotL);
+	float sunNdotL = rawNdotL * shadowCoeff;
 	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * sunNdotL));
 
 	// LOS state — sampled from $info:los (single-channel red), the engine's
