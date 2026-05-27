@@ -2117,6 +2117,21 @@ local BRANCH_WIDTH     = 0.5
 local MERGE_ANGLE    = 0.8
 local STEM_FRACTION  = 0.35
 
+-- Depth bias that pulls the drawn cable toward the camera so it wins the
+-- z-fight against terrain. NOT to mask a geometry bug: the cable hugs the
+-- full-resolution heightmap, but the ROAM terrain renderer simplifies its mesh
+-- by camera distance, and the simplified surface can rise (imperceptibly) above
+-- the full-res heightmap and "eat" the cable. That deviation is small, so a
+-- bounded camera-ward polygon offset wins it while genuine foreground hills (a
+-- large depth delta) still occlude the cable correctly, and units (drawn after,
+-- depth-tested against the biased cable) still occlude it. Polygon offset scales
+-- with depth precision (distance), which roughly tracks how ROAM error grows
+-- with zoom-out. Negative = toward camera (the repo's draw-on-top convention,
+-- cf. unit_glow/unit_tint at -2,-2). Keep UNITS as small as still stops the
+-- eating: too large and cables bleed through low hills genuinely in front.
+local CABLE_DEPTH_BIAS_FACTOR = -1.0   -- slope-scaled term (cables are near-flat, so this stays small)
+local CABLE_DEPTH_BIAS_UNITS  = -4.0   -- constant term in min-resolvable-depth units
+
 -- Visual grow/wither animation rates (elmos/sec); fragment shader trims geometry.
 local GROWTH_RATE = 250
 local WITHER_RATE = 400
@@ -2821,6 +2836,11 @@ function gadget:DrawWorldPreUnit()
 	gl.Culling(false)
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(true)
+	-- Pull cables toward the camera so they win the z-fight against ROAM-
+	-- simplified terrain (see CABLE_DEPTH_BIAS_* notes). Covers both the live
+	-- and ghost draws below; disabled in the cleanup block. Applies to the GS's
+	-- emitted triangles (fill primitives), not the GL.LINES input.
+	gl.PolygonOffset(CABLE_DEPTH_BIAS_FACTOR, CABLE_DEPTH_BIAS_UNITS)
 	-- Live cable pass: opaque (FS writes alpha=1.0). Blending enabled
 	-- globally is harmless here since src=1, dst=0 → identity.
 	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
@@ -2850,6 +2870,7 @@ function gadget:DrawWorldPreUnit()
 	gl.Texture(1, false)
 	gl.Texture(2, false)
 	if haveShadows then gl.Texture(3, false) end
+	gl.PolygonOffset(false)
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 	gl.Culling(GL.BACK)
@@ -2932,8 +2953,13 @@ function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
 	gl.Blending(false)
 	gl.DepthTest(GL.LEQUAL)
 	gl.DepthMask(true)
+	-- Same camera-ward bias as the forward pass so the gbuffer depth/normals the
+	-- light pass reconstructs match the visible cable surface — otherwise ROAM
+	-- poke-through would shade the terrain under the cable instead of the cable.
+	gl.PolygonOffset(CABLE_DEPTH_BIAS_FACTOR, CABLE_DEPTH_BIAS_UNITS)
 	cableVAO:DrawArrays(GL.LINES, numCableVerts)
 
+	gl.PolygonOffset(false)
 	gl.Texture(0, false)
 	gl.Texture(1, false)
 	gl.Blending(true)
