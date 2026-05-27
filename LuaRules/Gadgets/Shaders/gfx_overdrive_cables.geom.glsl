@@ -136,14 +136,20 @@ const float BRANCH_WIDTH      = 1.3;
 const float CONE_TIP_WIDTH    = 0.0;
 const float BRANCH_WIDTH_TWIG_LENGTH_FACTOR = 2.0;
 
-// Vertical clearance over the heightmap. CENTERLINE_CLEAR is added on top of
-// the max-of-window lift, so it doesn't need a big pad. TWIG_CLEAR is set
-// 0.6 elmos below CENTERLINE_CLEAR so the twig sits just under the trunk's
-// centerline at the junction (avoids z-fighting while staying visually
-// attached). SIDE_CLEAR catches concave cross-slopes where the slope-tangent
+// Clearance over the heightmap, applied along the cable's chord-averaged surface
+// normal Navg (the same axis the tent apex uses) rather than global +Y, so on a
+// slope it's measured perpendicular to the surface and the cable hugs the incline
+// instead of being shunted out along +Y. The old Y-only push made the off-ground
+// gap read much larger on slopes than the nominal pad.
+// CENTERLINE_CLEAR is added on top of the max-of-window lift along Navg. At 0.0
+// the centerline sits exactly on the windowed terrain max, so the belly is held
+// off the ground solely by SIDE_CLEAR (the outer-edge anti-underground clamp) —
+// ~0.4 on flat ground, and the only margin left on slopes. TWIG_CLEAR keeps the
+// twig root just under that lifted belly so the junction stays seated without
+// z-fighting. SIDE_CLEAR catches concave cross-slopes where the slope-tangent
 // offset would otherwise place the side vertex below local terrain.
-const float CENTERLINE_CLEAR  = 1.5;
-const float TWIG_CLEAR        = 0.9;
+const float CENTERLINE_CLEAR  = 0.0;
+const float TWIG_CLEAR        = 0.3;
 const float SIDE_CLEAR        = 0.4;
 
 float gOutBranch    = 0.0;
@@ -333,14 +339,14 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 	// the cable* — directional by construction: crossing a ridge spikes it,
 	// running along a crest does not. Vertices then cluster on the spike, so
 	// sharp slope transitions get resolution without raising the vertex count.
-	// Caching yC means emit reuses the (expensive) maxHeightInWindow taps, so
+	// Caching yCgrid means emit reuses the (expensive) maxHeightInWindow taps, so
 	// the only added cost over the old uniform loop is the denser scan.
 	int G = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
 	float yCgrid[MAX_GRID + 1];
 	for (int i = 0; i <= G; i++) {
 		float tg = float(i) / float(G);
 		vec2 pg = wigglyCablePoint(a, d, perpAB, tg, lenAB, arcDh, effAmp, seed);
-		yCgrid[i] = maxHeightInWindow(pg, dirH, fullStep) + CENTERLINE_CLEAR;
+		yCgrid[i] = maxHeightInWindow(pg, dirH, fullStep);   // base terrain profile; clearance pad added along Navg at emit time
 	}
 
 	// Per-cell importance = uniform floor (1.0, keeps flats at equal arc
@@ -374,8 +380,13 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 
 		float t = float(idx) / float(G);
 		vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
-		float yC = yCgrid[idx];                 // reuse the cached profile sample
-		vec3 center3D = vec3(p.x, yC, p.y);
+		float yBase = yCgrid[idx];              // cached base terrain profile sample
+		// Clearance pad along Navg (chord-averaged surface normal, the same axis the
+		// tent apex uses) instead of global +Y, so on a slope the gap stays
+		// perpendicular to the surface and the cable hugs the incline. Navg is
+		// constant per-cable → a uniform offset that leaves the curvature-based
+		// tessellation (cum[] above) and the apex/outer frame relationships intact.
+		vec3 center3D = vec3(p.x, yBase, p.y) + Navg * CENTERLINE_CLEAR;
 
 		// Tent cross-section. Both ground edges along the stable chord-averaged
 		// cross basis B3; we emit only the one on `side` this invocation, but
@@ -388,13 +399,17 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		outerR.y = max(outerR.y, heightAtWorldPos(outerR.xz) + SIDE_CLEAR);
 		vec3 outerPos = (side < 0.0) ? outerL : outerR;
 
-		// Ridge apex: lift the centerline along the LOCAL terrain normal so on a
-		// slope/cliff the tube banks into the surface (the terrain supplies a
-		// cross frame that stays ~perpendicular to the cable tangent). The lift
-		// is bounded by tentHeight, so the per-vertex normal variation that
-		// corkscrewed the old per-vertex basis is here capped to a small roll.
-		vec3 Nloc = terrainNormal(p);
-		vec3 apexPos = center3D + Nloc * tentHeight;
+		// Ridge apex: lift the centerline along Navg — the SAME chord-averaged
+		// normal that B3 is built from. Because B3 = cross(Navg, T3) is ⊥ Navg,
+		// the base axis (B3) is exactly orthogonal to the apex lift (Navg), so
+		// the cross-section area = halfW * tentHeight is slope-invariant: the
+		// triangle's height is the full tentHeight rather than its vertical
+		// projection. Lifting along the LOCAL per-vertex normal instead rehangs
+		// the apex off-axis from the base, which both skews the tent and scales
+		// its area by cos(angle(Navg,Nloc)) — the leaning-tent artefact this
+		// shares with the old flat-xz base. Using Navg also keeps the apex on
+		// the same frame as the base, so it inherits the corkscrew protection.
+		vec3 apexPos = center3D + Navg * tentHeight;
 		// Guard uses BOTH outer edges (not the side-specific one) so the apex is
 		// identical in the left and right invocations → watertight ridge.
 		apexPos.y = max(apexPos.y, max(outerL.y, outerR.y) + 0.1);
@@ -485,14 +500,16 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	vec3 twigDir3D  = ca * T + sa * B;
 	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
 
-	// Anchor spawn to the same max-of-window lift the main ribbon uses, so the
-	// twig roots on the visible trunk. TWIG_CLEAR is slightly less than
+	// Anchor spawn to the same max-of-window lift the main ribbon uses, offset
+	// along the local normal N — at this 0.3 magnitude N tracks the trunk's
+	// chord-averaged Navg pad closely enough to keep the junction seated, and N
+	// is already the twig's own basis. TWIG_CLEAR is slightly less than
 	// CENTERLINE_CLEAR so the junction sits just under the trunk's centerline
 	// (z-fight avoidance, see TWIG_CLEAR comment).
 	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
 	float fullStep = lenAB / float(numSeg);
-	float spawnYc = maxHeightInWindow(spawn, dirH, fullStep) + TWIG_CLEAR;
-	vec3 spawn3D = vec3(spawn.x, spawnYc, spawn.y);
+	float spawnYbase = maxHeightInWindow(spawn, dirH, fullStep);
+	vec3 spawn3D = vec3(spawn.x, spawnYbase, spawn.y) + N * TWIG_CLEAR;
 
 	// Anchor the root to the spawn-side edge of the cable's in-slope cross
 	// section so the twig pokes out of the side, not the midline.
