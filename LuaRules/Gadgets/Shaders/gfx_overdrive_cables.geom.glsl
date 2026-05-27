@@ -7,8 +7,13 @@
 // Full GS: takes one GL_LINES primitive (cable endpoints) and emits the cable
 // ribbon. Uses GS invocations: each invocation runs main() with its own
 // max_vertices budget, so we can:
-//   invocation 0          → main wiggly ribbon (SEGMENTS+1 boundaries × 2 verts)
-//   invocations 1..N-1    → one twig each (4 verts), conditional on a hash
+//   invocation 0          → left tent slope  (ridge→ground, SEGMENTS+1 × 2 verts)
+//   invocation 1          → right tent slope (ridge→ground, SEGMENTS+1 × 2 verts)
+//   invocations 2..N-1    → one twig each (4 verts), conditional on a hash
+// Splitting the cross-section into two single-sheet slopes (one per invocation)
+// is what lets the full raised-ridge tent fit: each slope gets its own
+// GL_MAX_GEOMETRY_OUTPUT_COMPONENTS budget, so neither busts the 1024 ceiling a
+// single combined sheet (~100 verts) would.
 // This sidesteps the per-program max_vertices limit and keeps the FS body
 // unchanged.
 
@@ -103,6 +108,10 @@ const int   MAX_SEGMENTS      = 24;   // hardware budget (max_vertices=50 → 25
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
 const float WIDTH_FACTOR      = 0.6;
+// Tent cross-section: lift the centerline ridge by this fraction of halfW
+// (the cross "radius"). The two slopes meet at the ridge; 0.0 reproduces the
+// old flat ribbon, ~0.9 gives a roughly semicircular tube.
+const float TENT_HEIGHT_FACTOR = 0.9;
 const float MIN_TRUNK_WIDTH   = 2.8;
 const float MAX_TRUNK_WIDTH   = 4.5;
 const float MAX_CAPACITY_REF  = 400.0;
@@ -146,7 +155,18 @@ void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
 	spawnAlongMain = gOutSpawnAlong;
 	gsSlot = gOutSlot;
 	// (vsTangent varying disabled — exceeded GS output budget on this hardware)
+#ifdef SHADOW_PASS
+	// Recoil shadow-map convention (mirrors cus_gl4.vert.glsl's shadow pass):
+	// it is NOT shadowViewProj * world. shadowView maps to a recentred space
+	// that needs +0.5 on XY before shadowProj; the precombined shadowViewProj
+	// omits that offset, which shoved the cable out of the shadow frustum.
+	vec4 lightVertexPos = shadowView * vec4(wp, 1.0);
+	lightVertexPos.xy += vec2(0.5);
+	lightVertexPos.z += 5e-5;            // small constant depth bias (acne)
+	gl_Position = shadowProj * lightVertexPos;
+#else
 	gl_Position = cameraViewProj * vec4(wp, 1.0);
+#endif
 	EmitVertex();
 }
 
@@ -243,10 +263,17 @@ float maxHeightInWindow(vec2 p, vec2 dirH, float fullStep) {
 	return yMax;
 }
 
-void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
-                    float halfW, float widthVal, float effAmp, float seed,
-                    vec4 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
+// Emit ONE slope of the cable's raised "tent" cross-section as a single
+// triangle strip: from the outer ground edge (cableUV.y = side) up to the
+// shared ridge apex at the centerline (cableUV.y = 0). `side` = -1 → left
+// slope, +1 → right; the two are dispatched to separate GS invocations and
+// meet watertight at the ridge. Per-slope cost == the old flat ribbon (2
+// verts/boundary), so the full tent only costs one extra invocation.
+void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
+                  float halfW, float widthVal, float effAmp, float seed,
+                  vec4 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
 	gOutBranch = 0.0;
+	float tentHeight = halfW * TENT_HEIGHT_FACTOR;
 	// `along` is fed into the FS as cableUV.x and drives bubble advection.
 	// It MUST be a 3D arc length, otherwise downslope cables look like the
 	// flow is racing because the same 2D Δalong covers more visible meters.
@@ -296,28 +323,27 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 		float yC = maxHeightInWindow(p, dirH, fullStep) + CENTERLINE_CLEAR;
 		vec3 center3D = vec3(p.x, yC, p.y);
 
-		// Geometry convention MUST match the twig emitter:
-		//   v = -1  →  vertex at center − B3*halfW  (so outward = −B3)
-		//   v = +1  →  vertex at center + B3*halfW  (so outward = +B3)
-		// The FS reconstructs perp3D ≈ B3, then cylNormal = perp3D * v at the
-		// side, which therefore matches the *actual* outward direction. Prior
-		// version had these swapped, which inverted the lit side relative to
-		// the sun on every cable (and was inconsistent with twigs).
-		vec3 leftPos  = center3D - B3 * halfW;
-		vec3 rightPos = center3D + B3 * halfW;
+		// Tent cross-section. Both ground edges along the stable chord-averaged
+		// cross basis B3; we emit only the one on `side` this invocation, but
+		// compute both so the ridge guard below is identical in both slopes.
+		// Anti-underground clamp (concave cross-slope can push an edge below the
+		// heightmap) is unchanged from the flat ribbon.
+		vec3 outerL = center3D - B3 * halfW;
+		outerL.y = max(outerL.y, heightAtWorldPos(outerL.xz) + SIDE_CLEAR);
+		vec3 outerR = center3D + B3 * halfW;
+		outerR.y = max(outerR.y, heightAtWorldPos(outerR.xz) + SIDE_CLEAR);
+		vec3 outerPos = (side < 0.0) ? outerL : outerR;
 
-		// Anti-underground clamp: on terrain that curves up faster than linear
-		// (concave cross-slope), the slope-tangent-plane offset can put L or R
-		// below the actual heightmap at their XZ. Raise to local terrain +
-		// SIDE_CLEAR whenever that happens. On linear terrain the L/R points
-		// already sit at clearance above ground so this is a no-op there.
-		leftPos.y  = max(leftPos.y,  heightAtWorldPos(leftPos.xz)  + SIDE_CLEAR);
-		rightPos.y = max(rightPos.y, heightAtWorldPos(rightPos.xz) + SIDE_CLEAR);
-
-		// Also raise center3D if a clamp lifted the sides above it (preserves the
-		// cylinder appearance — center should never sit below a side vertex).
-		float midY = max(center3D.y, 0.5 * (leftPos.y + rightPos.y));
-		center3D.y = midY;
+		// Ridge apex: lift the centerline along the LOCAL terrain normal so on a
+		// slope/cliff the tube banks into the surface (the terrain supplies a
+		// cross frame that stays ~perpendicular to the cable tangent). The lift
+		// is bounded by tentHeight, so the per-vertex normal variation that
+		// corkscrewed the old per-vertex basis is here capped to a small roll.
+		vec3 Nloc = terrainNormal(p);
+		vec3 apexPos = center3D + Nloc * tentHeight;
+		// Guard uses BOTH outer edges (not the side-specific one) so the apex is
+		// identical in the left and right invocations → watertight ridge.
+		apexPos.y = max(apexPos.y, max(outerL.y, outerR.y) + 0.1);
 
 		// Per-vertex tangent: forward-diff at vertex 0 (chord direction), and
 		// back-diff for subsequent vertices (centerline direction from the
@@ -337,12 +363,12 @@ void emitMainRibbon(vec2 a, vec2 d, vec2 perpAB,
 
 		if (i > 0) along += distance(prev3D, center3D);
 		prev3D = center3D;
-		leftPos.y += hash1(seed)*0.1; // z-fighting
-		leftPos.y = max(leftPos.y, rightPos.y);
-		rightPos.y = leftPos.y;
-
-		emitVtx(leftPos,  vtxTangent, vec2(along, -1.0), widthVal, gridD, timeD, cap);
-		emitVtx(rightPos, vtxTangent, vec2(along,  1.0), widthVal, gridD, timeD, cap);
+		// Strip order: apex (v=0, ridge — FS points the cylinder normal up) then
+		// outer (v=side, ground — FS leans the normal fully sideways). The faked
+		// cylinder normal now matches the real raised ridge instead of fighting a
+		// flat strip, and both slopes share the apex line so they form one tube.
+		emitVtx(apexPos,  vtxTangent, vec2(along, 0.0),  widthVal, gridD, timeD, cap);
+		emitVtx(outerPos, vtxTangent, vec2(along, side), widthVal, gridD, timeD, cap);
 	}
 	EndPrimitive();
 }
@@ -457,14 +483,14 @@ void main() {
 	vec2  timeD = dataIn[0].vsCableData.yz;
 	vec4  gridD = dataIn[0].vsGridData;
 
-	// Ghost edges (gridData.w = -1.0) emit only the main ribbon (no twigs),
-	// using the SAME wiggly path as live so the live→ghost transition has
-	// no visual snap. Ghost FS path is fast (no lighting/bubble math), and
-	// the GS still skips 4 of 5 invocations (twigs). Coverage updates use
-	// the live atomicAnd path with the wiggly samples → consistent with
-	// what the player visually sees.
+	// Ghost edges (gridData.w = -1.0) emit the same two tent slopes as live
+	// (no twigs), using the SAME wiggly path so the live→ghost transition has
+	// no visual snap. Ghost FS path is fast (no lighting/bubble math), and the
+	// GS still skips the 3 twig invocations. Coverage updates use the live
+	// atomicAnd path with the wiggly samples → consistent with what the player
+	// visually sees.
 	bool isGhostEdge = gridD.w < -0.5;
-	if (isGhostEdge && gl_InvocationID > 0) return;
+	if (isGhostEdge && gl_InvocationID > 1) return;
 
 	float widthVal = MIN_TRUNK_WIDTH +
 		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
@@ -539,6 +565,12 @@ void main() {
 		// LOS scan entirely. Ghost edges with all bits clear have nothing
 		// left to clear → skip too. Massive savings on long-running matches
 		// where most live cables hit saturation quickly.
+		//
+		// Excluded from BOTH the shadow and deferred passes: the forward pass
+		// owns coverage. The deferred draw binds nothing at binding=6, so a
+		// stray atomicOr/atomicAnd there would hit an unbound buffer; and a
+		// second per-frame update would risk double-clearing ghost bits.
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		int slot = dataIn[0].vsSlot;
 		bool isGhost = gridD.w < -0.5;
 		// Hard gate on the user-facing ghosts toggle — skip ALL coverage
@@ -566,15 +598,21 @@ void main() {
 				if (clrMask != 0u) atomicAnd(cableCoverage[slot].x, ~clrMask);
 			}
 		}
-		emitMainRibbon(a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
+#endif
+		emitTentHalf(-1.0, a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
+	} else if (gl_InvocationID == 1) {
+		// Right slope of the tent — its own invocation, hence its own
+		// GL_MAX_GEOMETRY_OUTPUT_COMPONENTS budget. This is what lets the full
+		// raised-ridge tent fit: one combined sheet (~100 verts) would bust the
+		// 1024 ceiling, two single-sheet slopes (~50 each) don't.
+		emitTentHalf(1.0, a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
 	} else {
 		if (isGhostEdge) return;   // ghosts skip twig invocations entirely
-		// Twig density scales with 3D arc length: ~one twig per 110 elmos,
-		// capped at 4. Short cables get 0-1 twigs, long ones get the full set.
-		// Surviving twigs are then respread across [0.15, 0.85] so spacing
-		// remains roughly even regardless of twig count.
-		int idx = gl_InvocationID - 1;          // 0..3
-		int expectedTwigs = clamp(int(len3D / 85.0 + 0.5), 0, 4);
+		// Twig density scales with 3D arc length: ~one twig per 85 elmos. Twigs
+		// now live on invocations 2..4 (3 slots; invocation 1 was reassigned to
+		// the second tent slope), so cap to 3 and reindex from gl_InvocationID-2.
+		int idx = gl_InvocationID - 2;          // 0..2
+		int expectedTwigs = clamp(int(len3D / 85.0 + 0.5), 0, 3);
 		if (idx >= expectedTwigs) return;
 		float tCenterRaw = 0.15 + (float(idx) + 0.5) * (0.7 / float(expectedTwigs));
 		// Snap to a main-ribbon segment vertex. The cable is rendered as

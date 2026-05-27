@@ -9,6 +9,8 @@ uniform float gameTime;
 uniform float bakeTime;
 uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no animation)
 uniform float ghostsEnabled;  // 1.0 = ghost branch active; 0.0 = enemy OOL discards immediately
+uniform sampler2DShadow shadowTex;  // engine shadow map ($shadow); sampled for shadow reception
+uniform float shadowsEnabled; // 1.0 = sample the shadow map; 0.0 = treat everything as fully lit
 
 // Same SSBO as the GS — per-edge coverage bitmask, gates per-segment
 // ghost rendering for enemy fragments.
@@ -138,7 +140,16 @@ const float GHOST_EDGE_FADE_HI = 0.90;
 
 const float EDGE_BUFFER = 0.55; // Avoid rasterisation issues on the edge of the cable
 
+#ifdef DEFERRED_PASS
+// Deferred (model-gbuffer) variant writes cus_gl4's RENDERING_MODE==1 MRT
+// layout instead of a single lit colour. `fragColor` is aliased onto one of
+// the targets so the forward write statements still compile — they are dead
+// code in this variant (the DEFERRED_PASS block in main() returns first).
+out vec4 fragData[5];
+#define fragColor fragData[1]
+#else
 out vec4 fragColor;
+#endif
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -258,6 +269,19 @@ vec3 gridEfficiencyColor(float eff) {
 	return hueToRgb(h / 255.0);
 }
 
+// Shadow reception. Returns 1.0 in full sun, → 0.0 fully shadowed. Mirrors the
+// engine's receive-side convention (cus_gl4.vert.glsl / map_lava.lua): transform
+// world pos by `shadowView` (from the engine UBO), recenter xy by +0.5, then a
+// projective compare against the depth map. NO `shadowProj` here — that's the
+// cast-side transform only; `shadowView` already maps into the sampling space.
+// shadowsEnabled gates the whole thing so we never sample a stale/absent map.
+float getShadowCoeff(vec3 wp) {
+	if (shadowsEnabled < 0.5) return 1.0;
+	vec4 sp = shadowView * vec4(wp, 1.0);
+	sp.xy += vec2(0.5);
+	return clamp(textureProj(shadowTex, sp), 0.0, 1.0);
+}
+
 void main() {
 	float v = cableUV.y * EDGE_BUFFER;
 	float t = abs(v);
@@ -273,6 +297,37 @@ void main() {
 		float witherFront = (gameTime - timeData.y) * WITHER_RATE;
 		if (along < witherFront) discard;
 	}
+
+#ifdef SHADOW_PASS
+	// Cast a shadow wherever the forward pass would render the LIVE cable, so
+	// the shadow never reveals more than the visible cable already does:
+	//   own / spectator (gridData.w >= 1.0) → always rendered    → always cast.
+	//   enemy live      (gridData.w == 0.0) → rendered only in LOS → LOS-gate.
+	//   ghost           (gridData.w <  -0.5) → memory trace, not in this VAO → never.
+	// The grow/wither discards above already trimmed the silhouette to the
+	// visible extent; depth is all the shadow map needs, so skip lighting.
+	if (gridData.w < -0.5) discard;
+	if (gridData.w < 0.5) {
+		vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+		if (texture(infoTex, losUV).r < ENEMY_LOS_CUT) discard;
+	}
+	fragColor = vec4(0.0);
+	return;
+#endif
+
+#ifdef DEFERRED_PASS
+	// Only LIVE cable fragments feed the model gbuffer (same gating the shadow
+	// pass uses): ghosts are translucent memory traces, not solid lit geometry,
+	// and enemy cables contribute only where they are in LOS — so a projectile
+	// light can never illuminate a cable the forward pass wouldn't have drawn.
+	// Falls through to the shared cylinder-normal math below; the gbuffer MRT
+	// write + return sit right after cylNormal is computed.
+	if (gridData.w < -0.5) discard;
+	if (gridData.w < 0.5) {
+		vec2 losUVd = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+		if (texture(infoTex, losUVd).r < ENEMY_LOS_CUT) discard;
+	}
+#endif
 
 	// FAST GHOST PATH — orphaned-enemy edges (gridData.w = -1.0) skip all the
 	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
@@ -362,9 +417,31 @@ void main() {
 	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER))) * cylinderFactor;
 	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER * (1.0 - 0.7*isBranch));
 
-	// Own lighting (forward rendered, no engine lighting applies)
+#ifdef DEFERRED_PASS
+	// Feed cus_gl4's model gbuffer (normtex/difftex/...) so deferred projectile
+	// lights shade the cable's own cylinder normal rather than letting whatever
+	// terrain sits underneath bleed through. The animated bubble glow is NOT
+	// written here — it stays a forward-only overlay (DrawWorldPreUnit), so the
+	// light pass can neither dim nor re-light it. Depth is written by the draw
+	// (DepthMask on) so the light reconstructs the cable surface and occludes.
+	float capTd = clamp(capacity / 100.0, 0.0, 1.0);
+	vec3 gbDiff = mix(INNER_COLOR_LO, INNER_COLOR_HI, capTd);
+	fragData[0] = vec4(cylNormal * 0.5 + 0.5, 1.0);   // GBUFFER_NORMTEX (SNORM2NORM)
+	fragData[1] = vec4(gbDiff, 1.0);                  // GBUFFER_DIFFTEX (albedo)
+	fragData[2] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_SPECTEX
+	fragData[3] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_EMITTEX (no bloom yet)
+	fragData[4] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_MISCTEX
+	return;
+#endif
+
+	// Own lighting (forward rendered; the engine doesn't light cables, so we
+	// sample the shadow map ourselves). Shadow darkens only the SUN term, never
+	// the ambient floor — a cable in shadow falls to DIFFUSE_FLOOR, not black.
+	// Bubbles are composited later and stay emissive (lights in the dark).
 	vec3 gridColor   = gridEfficiencyColor(gridData.x);
-	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * dot(cylNormal, normalize(sunDir.xyz))));
+	float shadowCoeff = getShadowCoeff(worldPos);
+	float sunNdotL = dot(cylNormal, normalize(sunDir.xyz)) * shadowCoeff;
+	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * sunNdotL));
 
 	// LOS state — sampled from $info:los (single-channel red), the engine's
 	// actual game-logic LOS texture. Independent of the user's overlay toggle:
@@ -377,7 +454,7 @@ void main() {
 	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
 	float cameraDist = length(cameraViewInv[3].xyz - worldPos);
 	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
-	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 1.0), SPEC_EXP) * SPEC_MAGNITUDE;
+	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 1.0), SPEC_EXP) * SPEC_MAGNITUDE * shadowCoeff;
 
 	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
 	float capT = clamp(capacity / 100.0, 0.0, 1.0);
