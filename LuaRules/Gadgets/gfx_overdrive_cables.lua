@@ -2794,6 +2794,12 @@ function gadget:DrawWorldPreUnit()
 	-- "fully lit" when disabled). The texture is bound below at unit 3.
 	local haveShadows = (Spring.HaveShadows and Spring.HaveShadows()) or false
 	cableShader:SetUniform("shadowsEnabled", haveShadows and 1.0 or 0.0)
+	-- LOS-overlay state: out-of-LOS dimming on own/ally cables is a LOS-view
+	-- affordance. With the overlay off (normal view) it reads as a stray shadow
+	-- on the player's own grid, so the FS lifts those cables to full brightness
+	-- when this is 0. Drives only the bark dim; enemy cables are unaffected.
+	local losView = (Spring.GetMapDrawMode and Spring.GetMapDrawMode() == "los") or false
+	cableShader:SetUniform("losViewEnabled", losView and 1.0 or 0.0)
 
 	-- Bind the per-edge coverage SSBO at binding=6. Both the live and ghost
 	-- VBO draws use the same shader program so a single binding covers them.
@@ -2967,6 +2973,7 @@ function gadget:Initialize()
 			enableFlow = cableFlowMode and 1.0 or 0.0,
 			ghostsEnabled = cableGhosts and 1.0 or 0.0,
 			shadowsEnabled = 0,
+			losViewEnabled = 0,
 		},
 	}, "Cable Forward Shader")
 

@@ -11,6 +11,7 @@ uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no
 uniform float ghostsEnabled;  // 1.0 = ghost branch active; 0.0 = enemy OOL discards immediately
 uniform sampler2DShadow shadowTex;  // engine shadow map ($shadow); sampled for shadow reception
 uniform float shadowsEnabled; // 1.0 = sample the shadow map; 0.0 = treat everything as fully lit
+uniform float losViewEnabled; // 1.0 = LOS overlay is on (GetMapDrawMode=="los"); 0.0 = normal view
 
 // Same SSBO as the GS — per-edge coverage bitmask, gates per-segment
 // ghost rendering for enemy fragments.
@@ -457,10 +458,17 @@ void main() {
 	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * sunNdotL));
 
 	// LOS state — sampled from $info:los (single-channel red), the engine's
-	// actual game-logic LOS texture. Independent of the user's overlay toggle:
-	// 0.0 = unscouted, 1.0 = currently in LOS.
+	// actual game-logic LOS texture: 0.0 = unscouted, 1.0 = currently in LOS.
+	// The floor `isOwnAlly - 1.0` already lifts spectators (isOwnAlly == 2.0) to
+	// full LOS so they never see fog-of-war dim. We extend that floor to own/ally
+	// cables (isOwnAlly >= 0.5) whenever the LOS overlay is OFF: the bark dim is
+	// a LOS-view affordance, and persisting it in normal view reads as a stray
+	// shadow on the player's own grid. Enemy cables (isOwnAlly < 0.5) are
+	// untouched — they only render in LOS at all, so the floor never lifts them.
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
-	float losState = max(texture(infoTex, losUV).r, isOwnAlly - 1.0);
+	float losFloor = isOwnAlly - 1.0;
+	if (losViewEnabled < 0.5 && isOwnAlly >= 0.5) losFloor = 1.0;
+	float losState = max(texture(infoTex, losUV).r, losFloor);
 	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
 
 	// Specular
