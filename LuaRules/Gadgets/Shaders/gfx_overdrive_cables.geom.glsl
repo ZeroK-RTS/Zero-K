@@ -311,20 +311,24 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 	vec3  prev3D = vec3(0.0);
 	float lenAB = length(d);
 
-	// Cross-section basis — computed ONCE for the whole cable. Earlier we built
-	// N/T3/B3 per-vertex from `terrainNormal(p)`. That made adjacent vertices
-	// disagree about which way is "+B3" whenever the local terrain normal
-	// rotated between them (rolling terrain, hilltops, cross-slope crossings).
-	// Adjacent vertices' left/right edges then sat at slightly different
-	// rotational positions around the cable axis, so the ribbon physically
-	// twisted between them — visible as a corkscrew. The lighting was already
-	// correct; the geometry was twisted.
+	// Cross-section frame. The VERTICAL part — the apex lift and the clearance
+	// pad — rides the chord-averaged surface normal Navg (computed once per
+	// cable) so the tent hugs the slope and can't roll around its own axis
+	// between segments. Navg is deliberately NOT per-vertex: building it from
+	// terrainNormal(p) at each vertex made adjacent vertices disagree about
+	// "up", twisting the ribbon into a corkscrew (the lighting was fine, the
+	// geometry rolled).
 	//
-	// Anchoring the basis to a chord-averaged Navg gives every vertex the SAME
-	// "+B3" direction. Per-vertex slope tilt still happens via the side-clamp
-	// (each side vertex independently lifted to local terrain+clearance), so
-	// the ribbon still appears to follow the slope — it just can't rotate
-	// around its own axis between segments.
+	// The TRANSVERSE (width) axis is per-vertex instead — see B_v in the loop.
+	// It's the horizontal perpendicular of the LOCAL cable tangent, so the
+	// cross-sections fan around the curve and the texture's transverse grain
+	// follows the arc rather than staying welded to the straight chord (the old
+	// global-B3 behaviour laid every row perpendicular to a→b, so an arced cable
+	// just sheared the texture). This is NOT the old corkscrew source — that was
+	// vertical ROLL from the terrain normal; cross(worldUp, tangent) has no roll
+	// (worldUp is fixed), it only yaws to track the bend. It also matches the FS
+	// lighting frame, which already derives perp3D = cross(worldUp, cableTangent),
+	// so geometry and shading agree.
 	vec3 Navg;
 	{
 		vec3 nAcc = vec3(0.0);
@@ -335,12 +339,9 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		Navg = normalize(nAcc);
 	}
 	vec3 cableDirH_g = normalize(vec3(d.x, 0.0, d.y));
-	vec3 T3_g = cableDirH_g - dot(cableDirH_g, Navg) * Navg;
-	float T3gL = length(T3_g);
-	T3_g = (T3gL > 1e-4) ? T3_g / T3gL : cableDirH_g;
-	vec3 B3 = normalize(cross(Navg, T3_g));
-	vec3 perpRefH = normalize(vec3(-perpAB.x, 0.0, -perpAB.y));
-	if (dot(B3, perpRefH) < 0.0) B3 = -B3;
+	// Fallback width axis for the first vertex (chord tangent) and any vertex
+	// whose local tangent degenerates: horizontal, perpendicular to the chord.
+	vec3 B_fallback = normalize(cross(vec3(0.0, 1.0, 0.0), cableDirH_g));
 
 	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
 	float fullStep = lenAB / float(numSeg);   // max-filter window ~ avg emit span
@@ -402,14 +403,36 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		// tessellation (cum[] above) and the apex/outer frame relationships intact.
 		vec3 center3D = vec3(p.x, yBase, p.y) + Navg * CENTERLINE_CLEAR;
 
-		// Tent cross-section. Both ground edges along the stable chord-averaged
-		// cross basis B3; we emit only the one on `side` this invocation, but
-		// compute both so the ridge guard below is identical in both slopes.
-		// Anti-underground clamp (concave cross-slope can push an edge below the
-		// heightmap) is unchanged from the flat ribbon.
-		vec3 outerL = center3D - B3 * halfW;
+		// Per-vertex cable along-direction: chord at the first vertex, back-diff of
+		// adjacent centerline points after. This single tangent is BOTH the
+		// lighting tangent handed to the FS (emitted below) AND the axis the
+		// cross-section is built on, so width, texture and shading all agree.
+		vec3 vtxTangent;
+		if (k == 0) {
+			vtxTangent = cableDirH_g;
+		} else {
+			vtxTangent = center3D - prev3D;
+			float vtL = length(vtxTangent);
+			vtxTangent = (vtL > 1e-4) ? vtxTangent / vtL : cableDirH_g;
+		}
+
+		// Transverse (width) axis: horizontal perpendicular of the LOCAL tangent,
+		// so cross-sections fan around the curve instead of staying chord-locked.
+		// cross(worldUp, tangent) drops the tangent's vertical part → purely
+		// horizontal, and is the SAME vector the FS lights with (perp3D). Both
+		// tent invocations compute it identically from the shared path, so the
+		// ridge stays watertight.
+		vec3 B_v = cross(vec3(0.0, 1.0, 0.0), vtxTangent);
+		float bvL = length(B_v);
+		B_v = (bvL > 1e-3) ? B_v / bvL : B_fallback;
+
+		// Tent cross-section. Both ground edges along B_v; we emit only the one on
+		// `side` this invocation, but compute both so the ridge guard below is
+		// identical in both slopes. Anti-underground clamp (concave cross-slope can
+		// push an edge below the heightmap) is unchanged from the flat ribbon.
+		vec3 outerL = center3D - B_v * halfW;
 		outerL.y = max(outerL.y, heightAtWorldPos(outerL.xz) + SIDE_CLEAR);
-		vec3 outerR = center3D + B3 * halfW;
+		vec3 outerR = center3D + B_v * halfW;
 		outerR.y = max(outerR.y, heightAtWorldPos(outerR.xz) + SIDE_CLEAR);
 		vec3 outerPos = (side < 0.0) ? outerL : outerR;
 
@@ -426,12 +449,13 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		// and the knob reads linearly. (At equal FACTOR the tube is now ~SIDE_CLEAR
 		// taller than before, so the TENT_HEIGHT_FACTOR default is retuned to match.)
 		//
-		// Lift is along Navg (the chord-averaged normal B3 is built from). Since
-		// B3 = cross(Navg, T3) ⊥ Navg, the base axis (B3) is orthogonal to the
-		// lift, so the cross-section area = halfW * tentHeight stays slope-
-		// invariant and the apex shares the base frame (inherits corkscrew
-		// protection). edgeMid uses BOTH outer edges (identical in the left and
-		// right invocations → watertight ridge) and its xz is the centerline.
+		// Lift is along Navg (the chord-averaged surface normal). The base axis B_v
+		// is horizontal, so on a slope it isn't exactly orthogonal to Navg and the
+		// cross-section area is only approximately slope-invariant — a negligible
+		// shear at realistic cable inclines, and the apex still shares Navg with the
+		// lift so it can't roll. edgeMid uses BOTH outer edges (identical in the
+		// left and right invocations → watertight ridge) and its xz is the
+		// centerline.
 		vec3 edgeMid = 0.5 * (outerL + outerR);
 		vec3 apexPos = edgeMid + Navg * tentHeight;
 		// Anti-inversion only (no added floor, so FACTOR=0 stays flat): a concave
@@ -439,22 +463,10 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		// under. max() pins the apex to the higher edge there instead of inverting.
 		apexPos.y = max(apexPos.y, max(outerL.y, outerR.y));
 
-		// Per-vertex tangent: forward-diff at vertex 0 (chord direction), and
-		// back-diff for subsequent vertices (centerline direction from the
-		// previous vertex). Smoothly interpolated across the triangle strip,
-		// this gives the FS a continuous cable along-direction so the
-		// cylinder normal bends with up/down hills. (Geometry itself is rigid:
-		// adjacent vertices share the same B3 cross-direction, so the ribbon
-		// cannot twist around its axis.)
-		vec3 vtxTangent;
-		if (k == 0) {
-			vtxTangent = cableDirH_g;
-		} else {
-			vtxTangent = center3D - prev3D;
-			float vtL = length(vtxTangent);
-			vtxTangent = (vtL > 1e-4) ? vtxTangent / vtL : cableDirH_g;
-		}
-
+		// vtxTangent (computed above) is interpolated across the triangle strip,
+		// giving the FS a continuous along-direction so the cylinder normal bends
+		// with up/down hills. The ribbon itself can't twist around its axis: both
+		// cross-section vertices share one B_v, which has no roll component.
 		if (k > 0) along += distance(prev3D, center3D);
 		prev3D = center3D;
 		// Strip order: apex (v=0, ridge — FS points the cylinder normal up) then

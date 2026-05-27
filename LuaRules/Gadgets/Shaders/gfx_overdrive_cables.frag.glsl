@@ -400,11 +400,13 @@ void main() {
 	// constant across each cross-section (apex+outer emit the same value), so it
 	// reorients only along the cable, never around its axis.
 	//
-	// Cross-section axis is `cross(worldUp, cableT)` — purely horizontal, which
-	// matches the GS's global B3 (≈ cross(Navg, T_g)) closely enough for any
-	// terrain whose Navg is near +Y. Sign matches: GS emits leftPos at -B3
-	// (cableUV.y = -1), rightPos at +B3 (cableUV.y = +1), and `cross(Y, T)`
-	// gives the same direction as cross(Navg, T) up to a small Y component.
+	// Cross-section axis is `cross(worldUp, cableT)` — purely horizontal. This is
+	// now EXACTLY the axis the GS builds the cross-section width on (per-vertex
+	// B_v = cross(worldUp, vtxTangent)), so geometry and lighting share one frame
+	// and the texture's transverse grain follows the same curve the normal does.
+	// Sign matches by construction: the GS emits the -B_v edge at cableUV.y = -1
+	// and the +B_v edge at +1, and the FS leans the normal toward +perp3D (= +B_v)
+	// as v → +1.
 	float cableTL = length(cableTangent);
 	vec3 cableT = (cableTL > 1e-4) ? cableTangent / cableTL : vec3(1.0, 0.0, 0.0);
 	vec3 perp3D = cross(vec3(0.0, 1.0, 0.0), cableT);
