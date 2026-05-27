@@ -116,6 +116,16 @@ const float MIN_TRUNK_WIDTH   = 2.8;
 const float MAX_TRUNK_WIDTH   = 4.5;
 const float MAX_CAPACITY_REF  = 400.0;
 
+// Adaptive vertex placement (slope-aware tessellation). We oversample the
+// rendered centerline profile this many times the emit budget, then EMIT a
+// curvature-clustered subset of those samples — so the same numSeg vertices
+// land densely where the cable bends and sparsely where it ramps, instead of
+// uniformly. KINK_GAIN is the weight added to a grid cell per elmo of |Δslope|
+// (second difference of the profile); higher = tighter clustering at kinks.
+const int   PLACEMENT_OVERSAMPLE = 2;
+const int   MAX_GRID             = MAX_SEGMENTS * 2;   // local-array bound for the scan
+const float KINK_GAIN            = 0.15;
+
 // Twig parameters mirror the Lua-side BRANCH_* constants.
 const float BRANCH_CHANCE     = 0.8;
 const float BRANCH_LEN_MIN    = 2.0;
@@ -313,14 +323,58 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 	if (dot(B3, perpRefH) < 0.0) B3 = -B3;
 
 	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);   // full segment span
+	float fullStep = lenAB / float(numSeg);   // max-filter window ~ avg emit span
 
-	for (int i = 0; i <= numSeg; i++) {
-		float t = float(i) / float(numSeg);
+	// --- Adaptive placement -------------------------------------------------
+	// Scan the rendered centerline profile (max-filtered height) on a grid
+	// PLACEMENT_OVERSAMPLE× denser than the emit budget, cache it, then emit a
+	// curvature-clustered SUBSET of those samples. Because we sample along the
+	// cable path, the second difference of yCgrid below is the curvature *along
+	// the cable* — directional by construction: crossing a ridge spikes it,
+	// running along a crest does not. Vertices then cluster on the spike, so
+	// sharp slope transitions get resolution without raising the vertex count.
+	// Caching yC means emit reuses the (expensive) maxHeightInWindow taps, so
+	// the only added cost over the old uniform loop is the denser scan.
+	int G = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
+	float yCgrid[MAX_GRID + 1];
+	for (int i = 0; i <= G; i++) {
+		float tg = float(i) / float(G);
+		vec2 pg = wigglyCablePoint(a, d, perpAB, tg, lenAB, arcDh, effAmp, seed);
+		yCgrid[i] = maxHeightInWindow(pg, dirH, fullStep) + CENTERLINE_CLEAR;
+	}
+
+	// Per-cell importance = uniform floor (1.0, keeps flats at equal arc
+	// spacing) + KINK_GAIN × |Δslope| averaged over the cell's endpoints.
+	// cum[] is the prefix sum, so equal cumulative-weight increments place
+	// vertices densely where curvature is high — the reparameterisation that
+	// warps t. Endpoints have zero curvature (no neighbour on one side).
+	float cum[MAX_GRID + 1];
+	cum[0] = 0.0;
+	for (int i = 0; i < G; i++) {
+		float sdL = (i   >= 1 && i   <= G - 1) ? abs(yCgrid[i-1] - 2.0*yCgrid[i]   + yCgrid[i+1]) : 0.0;
+		float sdR = (i+1 >= 1 && i+1 <= G - 1) ? abs(yCgrid[i]   - 2.0*yCgrid[i+1] + yCgrid[i+2]) : 0.0;
+		cum[i+1] = cum[i] + 1.0 + KINK_GAIN * 0.5 * (sdL + sdR);
+	}
+	float wStep = cum[G] / float(numSeg);
+
+	int gi = 0;
+	int prevIdx = -1;
+	for (int k = 0; k <= numSeg; k++) {
+		// Pick the grid index whose cumulative weight is nearest k·wStep.
+		// gi and k both advance monotonically → one linear sweep. The
+		// max(prevIdx+1) guard forces strictly increasing indices so a single
+		// very sharp cell can't swallow two targets into a degenerate vertex;
+		// G = PLACEMENT_OVERSAMPLE·numSeg guarantees enough distinct points.
+		float target = float(k) * wStep;
+		while (gi < G && cum[gi+1] < target) gi++;
+		int idx = gi;
+		if (gi < G && (target - cum[gi]) > (cum[gi+1] - target)) idx = gi + 1;
+		idx = min(max(idx, prevIdx + 1), G);
+		prevIdx = idx;
+
+		float t = float(idx) / float(G);
 		vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
-
-		// Anti-underground (along-cable): see maxHeightInWindow comment.
-		float yC = maxHeightInWindow(p, dirH, fullStep) + CENTERLINE_CLEAR;
+		float yC = yCgrid[idx];                 // reuse the cached profile sample
 		vec3 center3D = vec3(p.x, yC, p.y);
 
 		// Tent cross-section. Both ground edges along the stable chord-averaged
@@ -353,7 +407,7 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 		// adjacent vertices share the same B3 cross-direction, so the ribbon
 		// cannot twist around its axis.)
 		vec3 vtxTangent;
-		if (i == 0) {
+		if (k == 0) {
 			vtxTangent = cableDirH_g;
 		} else {
 			vtxTangent = center3D - prev3D;
@@ -361,7 +415,7 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 			vtxTangent = (vtL > 1e-4) ? vtxTangent / vtL : cableDirH_g;
 		}
 
-		if (i > 0) along += distance(prev3D, center3D);
+		if (k > 0) along += distance(prev3D, center3D);
 		prev3D = center3D;
 		// Strip order: apex (v=0, ridge — FS points the cylinder normal up) then
 		// outer (v=side, ground — FS leans the normal fully sideways). The faked
@@ -615,14 +669,15 @@ void main() {
 		int expectedTwigs = clamp(int(len3D / 85.0 + 0.5), 0, 3);
 		if (idx >= expectedTwigs) return;
 		float tCenterRaw = 0.15 + (float(idx) + 0.5) * (0.7 / float(expectedTwigs));
-		// Snap to a main-ribbon segment vertex. The cable is rendered as
-		// piecewise-linear chords between samples at t = i/numSeg, so anchoring
-		// the twig at the analytical centerline (which curves between samples)
-		// would leave the root edge floating off the visible cable surface.
-		// Snapping makes the spawn point coincide with an actual rendered
-		// vertex of the main ribbon.
-		float tCenter = clamp(round(tCenterRaw * float(numSeg)), 1.0, float(numSeg) - 1.0)
-		              / float(numSeg);
+		// Snap to the placement grid. The main ribbon's vertices are a
+		// curvature-clustered subset of this same grid (see emitTentHalf), and
+		// each grid point is where the profile height was actually measured, so
+		// rooting the twig here keeps it on the rendered surface instead of the
+		// analytical centerline (which curves between samples). G must match the
+		// emitTentHalf scan resolution.
+		int   G = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
+		float tCenter = clamp(round(tCenterRaw * float(G)), 1.0, float(G) - 1.0)
+		              / float(G);
 		float spawnAlongMain = len3D * tCenter;
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
 		         gridD, timeD, cap, tCenter, float(idx) * 13.7, spawnAlongMain, idx, arcDh, numSeg);
