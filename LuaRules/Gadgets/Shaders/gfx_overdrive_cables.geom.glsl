@@ -540,7 +540,13 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// in lockstep look like a single pulse "bouncing" — alternating sides
 	// breaks that visual coupling. Angle is still hash-randomised below.
 	// Multiply by perpAB parity to keep side stable when flow is reversed.
-	float side = (((twigIdx & 1) == 0) ? 1.0 : -1.0) * (perpAB.y > 0.0 ? 1.0 : -1.0);
+	float segParity = (((numSeg & 1) == 0) ? 1.0 : -1.0);
+	float parity = (perpAB.y > 0.0 ? 1.0 : -1.0);
+	if (segParity < 0.0 && parity < 0.0) {
+		// There are an odd number of segments so we need to shift the index half the time
+		twigIdx += 1;
+	}
+	float side = (((twigIdx & 1) == 0) ? 1.0 : -1.0) * parity * (chance > BRANCH_CHANCE*0.5 ? -1.0 : 1.0);
 	
 	float angleOff = BRANCH_ANGLE_MIN +
 		gsHashU(spawn.x, spawn.y, twigSeed + 2.0) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN);
