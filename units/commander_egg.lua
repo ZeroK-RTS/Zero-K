@@ -1,6 +1,6 @@
 return { commander_egg = {
   name                = [[Commander Egg]],
-  description         = [[Morphs into a Commander. EMP explosion on death.]],
+  description         = [[Morphs into a Commander. Disarm and slow explosion on death.]],
   builder             = false,
   buildPic            = [[commander_egg.png]],
   canMove             = true,
