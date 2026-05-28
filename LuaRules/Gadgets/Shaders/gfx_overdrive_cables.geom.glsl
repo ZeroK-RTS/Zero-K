@@ -127,7 +127,7 @@ const float WIDTH_FACTOR      = 0.6;
 // belly-based formula (which lost ~SIDE_CLEAR to the edge-vs-belly offset).
 const float TENT_HEIGHT_FACTOR = 0.45;
 const float MIN_TRUNK_WIDTH   = 2.2;
-const float MAX_TRUNK_WIDTH   = 4.0;
+const float MAX_TRUNK_WIDTH   = 4.2;
 const float MAX_CAPACITY_REF  = 200.0;
 
 // Adaptive vertex placement (slope-aware tessellation). We oversample the
@@ -143,7 +143,7 @@ const float KINK_GAIN            = 0.15;
 // Twig parameters mirror the Lua-side BRANCH_* constants.
 const float BRANCH_CHANCE     = 0.85;
 const float BRANCH_LEN_MIN    = 6.0;
-const float BRANCH_LEN_MAX    = 8.5;
+const float BRANCH_LEN_MAX    = 8.0;
 const float BRANCH_ANGLE_MIN  = 1.2;
 const float BRANCH_ANGLE_MAX  = 1.5;
 const float BRANCH_WIDTH      = 2.1;
@@ -524,14 +524,14 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 // hash says "no twig here" — leaving an empty primitive, which is a no-op.
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
-              vec4 gridD, vec2 timeD, float cap, float tCenter, float invSeed,
+              vec4 gridD, vec2 timeD, float cap, float tCenter,
               float spawnAlongMain, int twigIdx, float arcDh, int numSeg) {
 	// Resolve spawn point on the wiggly main path at tCenter so twigs root on
 	// the visible cable.
 	float lenAB = length(d);
 	vec2 spawn = wigglyCablePoint(a, d, perpAB, tCenter, lenAB, arcDh, effAmp, seed);
 
-	float twigSeed = spawn.x * 7.13 + spawn.y * 3.77 + invSeed;
+	float twigSeed = spawn.x * 7.13 + spawn.y * 3.77;
 	float chance = gsHashU(spawn.x, spawn.y, twigSeed);
 	if (chance > BRANCH_CHANCE) return;
 
@@ -539,7 +539,9 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// main cable land on opposite sides. Two same-side adjacent twigs flashing
 	// in lockstep look like a single pulse "bouncing" — alternating sides
 	// breaks that visual coupling. Angle is still hash-randomised below.
-	float side = ((twigIdx & 1) == 0) ? 1.0 : -1.0;
+	// Multiply by perpAB parity to keep side stable when flow is reversed.
+	float side = (((twigIdx & 1) == 0) ? 1.0 : -1.0) * (perpAB.y > 0.0 ? 1.0 : -1.0);
+	
 	float angleOff = BRANCH_ANGLE_MIN +
 		gsHashU(spawn.x, spawn.y, twigSeed + 2.0) * (BRANCH_ANGLE_MAX - BRANCH_ANGLE_MIN);
 	float bLen = BRANCH_LEN_MIN + widthVal*BRANCH_WIDTH_TWIG_LENGTH_FACTOR +
@@ -788,6 +790,6 @@ void main() {
 		float tCenter        = float(idxArr[bestK]) / float(G);
 		float spawnAlongMain = alongArr[bestK];
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, float(twigIdx) * 13.7, spawnAlongMain, twigIdx, arcDh, numSeg);
+		         gridD, timeD, cap, tCenter, spawnAlongMain, twigIdx, arcDh, numSeg);
 	}
 }
