@@ -53,7 +53,7 @@ const vec3  BARK_COLOR         = vec3(0.45);
 const vec3  INNER_COLOR_LO     = vec3(0.55);   // capT = 0
 const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
 const float TWIG_INNER_DAMPEN  = 1.1;          // twigs read more uniformly than trunks
-const float GRID_INNER_MIX     = 0.00025; // Mix grid colour into the inner tube
+const float GRID_INNER_MIX     = 0.0025; // Mix grid colour into the inner tube
 
 // Opaque wires
 const float EDGE_ALPHA         = 1.0;
@@ -122,11 +122,11 @@ const float HALO_WEIGHT_LAYER  = 0.55;         // layer-B halo blend
 // Twig pulse: a fast wave sweeps along the cable's `along` axis (used to
 // pick which twig fires next, encoding direction-from-root). When the wave
 // passes a twig's root, a slow sub-wave sweeps the twig itself.
-const float CABLE_PROP_SPEED   = 400.0;        // elmos/s — fast inter-twig stagger
-const float CABLE_PROP_PERIOD  = 2800.0;       // elmos → 7s recurrence at 400/s
-const float TWIG_SWEEP_SPEED   = 90.0;         // elmos/s — visible motion within a twig
-const float PULSE_HW           = 5.0;          // Gaussian sigma in elmos
-const float PULSE_INTENSITY    = 0.55;
+const float CABLE_PROP_SPEED   = 220.0;        // elmos/s — fast inter-twig stagger
+const float CABLE_PROP_PERIOD  = 500.0;        // elmos → 7s recurrence at 400/s
+const float TWIG_SWEEP_SPEED   = 60.0;         // elmos/s — visible motion within a twig
+const float PULSE_HW           = 3.0;          // Gaussian sigma in elmos
+const float PULSE_INTENSITY    = 0.9;
 const float PULSE_BODY_W       = 1.10;
 const float PULSE_SPEC_W       = 0.55;
 const float PULSE_HALO_W       = 0.50;
@@ -446,7 +446,8 @@ void main() {
 	// sample the shadow map ourselves). Shadow darkens only the SUN term, never
 	// the ambient floor — a cable in shadow falls to DIFFUSE_FLOOR, not black.
 	// Bubbles are composited later and stay emissive (lights in the dark).
-	vec3 gridColor   = gridEfficiencyColor(gridData.x);
+	vec3 gridColor   = gridEfficiencyColor(abs(gridData.x));
+	float maxxed = (gridData.x < -0.5 ? 1.0 : 0.0);
 	float rawNdotL = dot(cylNormal, normalize(sunDir.xyz));
 	float shadowCoeff = getShadowCoeff(worldPos, rawNdotL);
 	float sunNdotL = rawNdotL * shadowCoeff;
@@ -483,7 +484,7 @@ void main() {
 	if (isBranch > 0.5) {
 		innerMix *= TWIG_INNER_DAMPEN;
 	}
-	float texX = cableUV.x * 0.04 * (1.0 + 0.9 * isBranch);
+	float texX = cableUV.x * 0.08 * (1.0 + 0.9 * isBranch) / sqrt(width);
 	float texY = cableUV.y*0.07 * (1.0 + 2.5 * isBranch) + 0.25 + isBranch*0.5;
 	vec4 cableSample = texture(cableTex, vec2(texX, texY));
 	vec3 baseColor = mix(EDGE_COLOR, cableSample.xyz, max(innerMix2, isBranch*0.85));
@@ -591,18 +592,20 @@ void main() {
 		//      *within* a twig stays comfortable.
 		// `spawnAlongMain` is what lets us decouple these — without it both
 		// speeds would be tied to the same propagation rate.
-		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED - spawnAlongMain, CABLE_PROP_PERIOD);
+		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED * (1.0 + 1.2 * maxxed) - spawnAlongMain, CABLE_PROP_PERIOD / (1.0 + 0.5 * maxxed));
 		float subwavePos = TWIG_SWEEP_SPEED * (wavePassedElmos / CABLE_PROP_SPEED);
 		float localAlong = along - spawnAlongMain;
 		float d = localAlong - subwavePos;
 		// No wrap correction: when subwavePos overshoots the twig the
 		// Gaussian naturally falls to ~0 for any fragment.
-		float pulse = exp(-(d * d) / (PULSE_HW * PULSE_HW));
+		float pulse = exp(-(d * d) / (PULSE_HW * PULSE_HW * (1.0 + 20.0 * maxxed)));
 		float crossT = 1.0 - smoothstep(0.7, 1.0, v * v);
-		float intensity = pulse * crossT * PULSE_INTENSITY;
+		float intensity = pulse * crossT * PULSE_INTENSITY * cableSample.a * max(0.5, maxxed);
 		bubbleBody = intensity * PULSE_BODY_W;
 		bubbleSpec = intensity * PULSE_SPEC_W;
 		bubbleHalo = intensity * PULSE_HALO_W;
+		color = mix(color, vec3(1.0), 0.1);
+		color = mix(color, gridColor, (0.4 + 0.2*maxxed)*cableSample.a);
 	} else {
 		float speed, flowAlpha;
 		float bubbleChance = BUBBLE_FREQ_BASE + flowFactor * BUBBLE_FREQ_FACTOR;
@@ -674,7 +677,6 @@ void main() {
 	color = max(color, bubbleEmissive);
 	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
 	
-
 	//color = color*0.0 + texture(cableTex, cableUV.xy * 0.05 + vec2(0, 0.5)).xyz;
 	//alpha = 1.0;
 	fragColor = vec4(color, alpha); // Mix in some of the underlying terrain

@@ -126,9 +126,9 @@ const float WIDTH_FACTOR      = 0.6;
 // semicircular tube. ~0.7 reproduces the apparent tube height of the old
 // belly-based formula (which lost ~SIDE_CLEAR to the edge-vs-belly offset).
 const float TENT_HEIGHT_FACTOR = 0.45;
-const float MIN_TRUNK_WIDTH   = 2.8;
-const float MAX_TRUNK_WIDTH   = 4.5;
-const float MAX_CAPACITY_REF  = 400.0;
+const float MIN_TRUNK_WIDTH   = 2.2;
+const float MAX_TRUNK_WIDTH   = 4.0;
+const float MAX_CAPACITY_REF  = 200.0;
 
 // Adaptive vertex placement (slope-aware tessellation). We oversample the
 // rendered centerline profile this many times the emit budget, then EMIT a
@@ -141,12 +141,12 @@ const int   MAX_GRID             = MAX_SEGMENTS * 2;   // local-array bound for 
 const float KINK_GAIN            = 0.15;
 
 // Twig parameters mirror the Lua-side BRANCH_* constants.
-const float BRANCH_CHANCE     = 0.8;
-const float BRANCH_LEN_MIN    = 2.0;
-const float BRANCH_LEN_MAX    = 5.5;
+const float BRANCH_CHANCE     = 0.85;
+const float BRANCH_LEN_MIN    = 6.0;
+const float BRANCH_LEN_MAX    = 8.5;
 const float BRANCH_ANGLE_MIN  = 1.2;
 const float BRANCH_ANGLE_MAX  = 1.5;
-const float BRANCH_WIDTH      = 1.3;
+const float BRANCH_WIDTH      = 2.1;
 const float CONE_TIP_WIDTH    = 0.0;
 const float BRANCH_WIDTH_TWIG_LENGTH_FACTOR = 2.0;
 

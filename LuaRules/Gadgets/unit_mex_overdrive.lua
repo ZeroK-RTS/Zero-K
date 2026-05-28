@@ -1467,8 +1467,10 @@ function gadget:GameFrame(n)
 						else
 							if not pylonDefs[unitDefID].keeptooltip then
 								if grid ~= 0 then
+									local maxxed = (maxGridCapacity[grid] > 0 and gridEnergySpent[grid] >= maxGridCapacity[grid])
 									spSetUnitRulesParam(unitID, "OD_gridCurrent", gridEnergySpent[grid], alliedTrueTable)
 									spSetUnitRulesParam(unitID, "OD_gridMaximum", maxGridCapacity[grid], alliedTrueTable)
+									spSetUnitRulesParam(unitID, "OD_gridMaxxed", maxxed and 1 or 0, alliedTrueTable)
 									spSetUnitRulesParam(unitID, "OD_gridMetal", gridMetalGain[grid], alliedTrueTable)
 								else
 									spSetUnitRulesParam(unitID, "OD_gridCurrent", -1, alliedTrueTable)

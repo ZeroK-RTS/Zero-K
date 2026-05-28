@@ -1680,7 +1680,7 @@ local function SendAll()
 			if not pa then
 				pa = {
 					keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
-					caps = {}, flows = {}, effs = {}, n = 0,
+					caps = {}, maxxed = {}, flows = {}, effs = {}, n = 0,
 				}
 				perAlly[ally] = pa
 			end
@@ -1690,6 +1690,7 @@ local function SendAll()
 			pa.pxs[i], pa.pzs[i] = edge.px, edge.pz
 			pa.cxs[i], pa.czs[i] = edge.cx, edge.cz
 			pa.caps[i]  = capacities[key] or 0
+			pa.maxxed[i]  = (spGetUnitRulesParam(edge.parentID, "OD_gridMaxxed") or spGetUnitRulesParam(edge.childID, "OD_gridMaxxed")) == 1
 			pa.flows[i] = flows[key] or 0
 			-- Cached per-grid lookup; fall back to child end if parent's grid
 			-- is unknown. 0 → magenta in the shader (unit_mex_overdrive's
@@ -1709,7 +1710,7 @@ local function SendAll()
 			allyTeamID = ally, edgeCount = pa.n,
 			keys = pa.keys, pxs = pa.pxs, pzs = pa.pzs,
 			cxs = pa.cxs, czs = pa.czs,
-			caps = pa.caps, flows = pa.flows, effs = pa.effs,
+			caps = pa.caps, maxxed = pa.maxxed, flows = pa.flows, effs = pa.effs,
 		})
 		alliesWithEdges[ally] = true
 	end
@@ -1721,7 +1722,7 @@ local function SendAll()
 			OnCableTreeFull({
 				allyTeamID = ally, edgeCount = 0,
 				keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
-				caps = {}, flows = {}, effs = {},
+				caps = {}, maxxed = {}, flows = {}, effs = {},
 			})
 			alliesWithEdges[ally] = nil
 		end
@@ -1753,7 +1754,7 @@ local function ClearAll()
 		OnCableTreeFull({
 			allyTeamID = ally, edgeCount = 0,
 			keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
-			caps = {}, flows = {}, effs = {},
+			caps = {}, maxxed = {}, flows = {}, effs = {},
 		})
 	end
 	alliesWithEdges = {}
@@ -2306,10 +2307,10 @@ local function GenerateOrganicTree()
 	local k = 0
 	for i = 1, n do
 		local e = renderEdges[i]
-		local cap = max(1, e.capacity or 1)
+		local cap = max(1, e.capacity or 1) 
 		local appearTime = (e.appearFrame or 0) / GAME_SPEED
 		local witherTime = e.witherFrame and (e.witherFrame / GAME_SPEED) or 0
-		local eff = e.eff or 0
+		local eff = (e.eff or 0) * (e.maxxed and -1 or 1)
 		local flow = e.flow or 0
 		local phase = e.bubblePhase or 0
 		local isOwn = (fullview and 2) or (e.isOwnAlly and 1) or 0
@@ -2342,7 +2343,7 @@ local function GenerateGhostTree()
 	local k = 0
 	local count = 0
 	for _, e in pairs(ghostEdges) do
-		local cap   = max(1, e.capacity or 1)
+		local cap = max(1, e.capacity or 1) * (e.maxxed and -1 or 1)
 		local slot  = e.slot or -1
 		-- Ghost edges have no temporal animation: appear=0, wither=0, no flow,
 		-- no bubble phase. gridData.w = -1.0 tells the FS "always ghost".
@@ -2567,6 +2568,7 @@ function OnCableTreeFull(data)
 			local visible = ownAlly or anyInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i])
 			if visible then
 				e.capacity = data.caps[i]
+				e.maxxed   = data.maxxed[i]
 				e.flow     = newFlow
 				e.eff      = data.effs and data.effs[i] or 0
 				e.px, e.pz = data.pxs[i], data.pzs[i]
@@ -2601,6 +2603,7 @@ function OnCableTreeFull(data)
 				px = data.pxs[i], pz = data.pzs[i],
 				cx = data.cxs[i], cz = data.czs[i],
 				capacity = data.caps[i],
+				maxxed   = data.maxxed[i],
 				flow     = newFlow,
 				eff      = data.effs and data.effs[i] or 0,
 				isOwnAlly = ownAlly,
