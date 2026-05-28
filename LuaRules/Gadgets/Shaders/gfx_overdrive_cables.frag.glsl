@@ -537,6 +537,7 @@ void main() {
 
 	// Apply lighting - Specular glint stands out too much when zoomed out
 	float distScale = clamp(800.0 / cameraDist, 0.0, 1.0);
+	baseColor = mix(baseColor, vec3(1.0), 0.12 * isBranch); // Brighten branch texture
 	vec3 color = baseColor * max(diffuse, isBranch) + SPEC_TINT * spec * distScale;
 
 	// Static-cable detail level: skip the entire bubble pass and bark dim.
@@ -604,7 +605,6 @@ void main() {
 		bubbleBody = intensity * PULSE_BODY_W;
 		bubbleSpec = intensity * PULSE_SPEC_W;
 		bubbleHalo = intensity * PULSE_HALO_W;
-		color = mix(color, vec3(1.0), 0.1);
 		color = mix(color, gridColor, (0.4 + 0.2*maxxed)*cableSample.a);
 	} else {
 		float speed, flowAlpha;
