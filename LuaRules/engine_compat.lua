@@ -632,6 +632,23 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 	end
 end
 
+if not Spring.GetAllyTeamRulesParam then 
+	local spGetGameRulesParam = Spring.GetGameRulesParam
+	Spring.GetAllyTeamRulesParam = function (allyTeamID, key)
+		return spGetGameRulesParam("allyTeamRulesParam_" .. allyTeamID .. "_" .. key)
+	end
+
+	Spring.GetAllyTeamRulesParams = RET_TABLE
+
+	-- Set technically added in BAR 105-1803, but useless without the matching Get
+	if Script.GetSynced() then
+		local spSetGameRulesParam = Spring.SetGameRulesParam
+		Spring.SetAllyTeamRulesParam = function (allyTeamID, key, value)
+			return spSetGameRulesParam("allyTeamRulesParam_" .. allyTeamID .. "_" .. key, value)
+		end
+	end
+end
+
 if not Script.IsEngineMinVersion(105, 0, 1856) then
 	local knownBoolsT = {}
 	local originalSTRP = Spring.SetTeamRulesParam
