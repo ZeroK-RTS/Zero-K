@@ -429,6 +429,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		
 		teamResourceShare[teamID] = resourceShare
 		teamCommanderShare[teamID] = commanderShare
+		Spring.SetTeamRulesParam(teamID, "lagmonitor_commander_allocation", commanderShare)
 	end
 	
 	if debugAllyTeam and debugAllyTeam[allyTeamID] then
@@ -470,6 +471,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
 	allyTeamCommanderShares[allyTeamID] = totalCommanderShares
+	Spring.SetAllyTeamRulesParam(allyTeamID, "lagmonitor_commander_allocation", totalCommanderShares)
 end
 
 local function InitializeAiTeamRulesParams()
@@ -563,15 +565,9 @@ function externalFunctions.GetResourceShares()
 end
 
 function externalFunctions.GetTeamCommanderShare(teamID)
-	local share = teamID and teamCommanderShare[teamID]
-	if not share then
-		return false
-	end
 	local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
-	local totalShare = allyTeamCommanderShares[allyTeamID]
-	if (totalShare or 0) <= 0 then
-		return false
-	end
+	local share = Spring.GetTeamRulesParam(teamID, "lagmonitor_commander_allocation", commanderShare) or Spring.GetTeamRulesParam(teamID, "initial_commanders")
+	local totalShare = Spring.GetAllyTeamRulesParam(allyTeamID, "lagmonitor_commander_allocation", totalCommanderShares) or Spring.GetAllyTeamRulesParam(allyTeamID, "initial_commanders")
 	return share, totalShare
 end
 
