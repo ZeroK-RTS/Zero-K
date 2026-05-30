@@ -90,7 +90,7 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeBoost, dam
 		weapon2 = "commweapon_beamlaser"
 	end
 	
-	rangeBoost = rangeBoost or Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 1
+	rangeBoost = rangeBoost or Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0
 	Spring.SetUnitRulesParam(unitID, "comm_range_boost", rangeBoost,  INLOS)
 	damageMult = damageMult or Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)

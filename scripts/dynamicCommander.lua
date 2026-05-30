@@ -333,7 +333,7 @@ local function RangeUpdate(mult, weaponMult) -- TODO, handle weaponMult?
 		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
 		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
 		Spring.GetUnitRulesParam(unitID, "comm_shield_name"),
-		Spring.GetUnitRulesParam(unitID, ("comm_range_mult") or 1) * mult,
+		(Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0) * mult,
 		Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	)
 end
