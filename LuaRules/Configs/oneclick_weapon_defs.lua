@@ -54,7 +54,7 @@ local oneClickWepDefNames = {
 	--	{ functionToCall = "Cloak", reloadTime = 600, name = "Temp Cloak", tooltip = "Cloaks for 5 seconds", useSpecialReloadFrame = true},
 	--},
 	commander_egg = {
-		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: EMP explosion.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Disarm and slow explosion.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	gunshipheavytrans = {
 		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject Cargo: Drop the unit in the transport.", useSpecialReloadFrame = true,},
