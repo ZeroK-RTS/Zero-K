@@ -302,7 +302,7 @@ local function SetupUnit(unitDef, unitID)
 		return
 	end
 
-	local weapon1, weapon2, rangeMult
+	local weapon1, weapon2, rangeMult, rangeBoost
 	local manualfireWeapon = unitDef.customParams.air_manual_fire_weapon and tonumber(unitDef.customParams.air_manual_fire_weapon)
 	if unitID then
 		weapon1 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
@@ -315,8 +315,8 @@ local function SetupUnit(unitDef, unitID)
 		elseif manual2 then
 			manualfireWeapon = weapon2
 		end
-		
-		rangeMult = Spring.GetUnitRulesParam(unitID, "comm_range_mult")
+		rangeBoost = Spring.GetUnitRulesParam(unitID, "comm_range_boost")
+		rangeMult = Spring.GetUnitRulesParam(unitID, "rangeMult")
 	end
 	
 	local retDgunInfo
@@ -343,6 +343,9 @@ local function SetupUnit(unitDef, unitID)
 						if weaponDef.customParams.gui_draw_leashed_to_range then
 							retDgunInfo.drawLeashedToRange = true
 						end
+						if rangeBoost then
+							retDgunInfo.range = retDgunInfo.range + rangeBoost
+						end
 						if rangeMult then
 							retDgunInfo.range = retDgunInfo.range * rangeMult
 						end
@@ -366,6 +369,9 @@ local function SetupUnit(unitDef, unitID)
 		end
 		if maxWeaponDef.customParams.gui_draw_leashed_to_range then
 			retAoeInfo.drawLeashedToRange = true
+		end
+		if retAoeInfo.range and rangeBoost then
+			retAoeInfo.range = retAoeInfo.range + rangeBoost
 		end
 		if retAoeInfo.range and rangeMult then
 			retAoeInfo.range = retAoeInfo.range * rangeMult

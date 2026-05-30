@@ -73,7 +73,7 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	end
 end
 
-local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
+local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeBoost, damageMult)
 	if (not weapon2) and weapon1 then
 		local weaponName = "0_" .. weapon1
 		local wd = WeaponDefNames[weaponName]
@@ -90,13 +90,13 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 		weapon2 = "commweapon_beamlaser"
 	end
 	
-	rangeMult = rangeMult or Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
-	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
+	rangeBoost = rangeBoost or Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 1
+	Spring.SetUnitRulesParam(unitID, "comm_range_boost", rangeBoost,  INLOS)
 	damageMult = damageMult or Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult, damageMult)
+	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeBoost, damageMult)
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
@@ -197,7 +197,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	end
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
-	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
+	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeBoost, data.damageMult)
 	
 	if newAttributesEffect then
 		newAttributesEffect.static = true
@@ -528,20 +528,11 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	
 	if chassisDefByBaseDef[unitDefID] then
 		-- Fallback for dynamic comms created outside the normal spawn path (e.g. hatched from commander egg).
-		-- Base modules must match Upgrades_CreateStarterDyncomm above.
 		local chassisDefID = chassisDefByBaseDef[unitDefID]
 		local chassisData = chassisDefs[chassisDefID]
 		local chassisModuleDefs = moduleDefNames[chassisData.name] or {}
 		local moduleList = {}
 		local moduleCost = 0
-		if chassisModuleDefs.econ then
-			moduleList[#moduleList + 1] = chassisModuleDefs.econ
-			moduleCost = moduleCost + moduleDefs[chassisModuleDefs.econ].cost
-		end
-		if chassisModuleDefs.module_radarnet then
-			moduleList[#moduleList + 1] = chassisModuleDefs.module_radarnet
-			moduleCost = moduleCost + moduleDefs[chassisModuleDefs.module_radarnet].cost
-		end
 
 		InitializeDynamicCommander(
 			unitID,

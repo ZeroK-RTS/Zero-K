@@ -82,6 +82,7 @@ local cmdStopFirezone = {
 
 local bombUnitDefIDs = {
 	[UnitDefNames["jumpscout"].id] = true,
+	[UnitDefNames["commander_egg"].id] = true,
 }
 local jumpUnitDefIDs = {}
 

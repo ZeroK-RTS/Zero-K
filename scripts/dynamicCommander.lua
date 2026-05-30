@@ -166,7 +166,7 @@ local function UpdateWeaponProjectileSpeed(unitID, weaponNum, wd, range)
 	Spring.SetUnitWeaponState(unitID, weaponNum, "projectileSpeed", wantedSpeed)
 end
 
-local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, damageMult)
+local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeBoost, damageMult)
 	local weaponDef1 = weaponName1 and unitWeaponNames[weaponName1]
 	local weaponDef2 = weaponName2 and unitWeaponNames[weaponName2]
 	local shieldDef = shieldName and unitWeaponNames[shieldName]
@@ -224,7 +224,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	local otherRange = false
 	if weapon1 then
 		isManual[weapon1] = weaponDef1.manualFire
-		local range = tonumber(WeaponDefs[weaponDef1.weaponDefID].range)*rangeMult
+		local range = tonumber(WeaponDefs[weaponDef1.weaponDefID].range) + rangeBoost
 		if weaponDef1.manualFire then
 			otherRange = range
 		else
@@ -244,7 +244,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	
 	if weapon2 then
 		isManual[weapon2] = weaponDef2.manualFire
-		local range = tonumber(WeaponDefs[weaponDef2.weaponDefID].range)*rangeMult
+		local range = tonumber(WeaponDefs[weaponDef2.weaponDefID].range) + rangeBoost
 		if maxRange then
 			if weaponDef2.manualFire then
 				otherRange = range
