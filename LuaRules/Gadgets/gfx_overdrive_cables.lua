@@ -1893,6 +1893,9 @@ local function FormatCoverage(slot)
 end
 
 local function CableTreeCmd(cmd, line, words, playerID)
+	if (playerID ~= Spring.GetMyPlayerID()) then
+		return
+	end
 	local arg = (words and words[1]) or ""
 	if arg == "detail" then
 		local key = (words and words[2]) or ""
