@@ -1396,11 +1396,15 @@ local function BuildMpCache()
 	local subPmaxNonWind = {}
 	local subWindCount = {}
 	local subWindBase = {}
+	local totalProduce = 0
+	local totalDrain = 0
 	for i = 1, #order do
 		local u = order[i]
 		local did = nodeDefByUID[u]
 		subPmax[u] = did and GetNodePmax(did) or 0
 		subDmax[u] = did and GetNodeDmax(u, did) or 0
+		totalProduce = totalProduce + subPmax[u]
+		totalDrain = totalDrain + subDmax[u]
 		if did and isWindgenByDef[did] then
 			subWindCount[u] = 1
 			subWindBase[u] = GetCachedMinWind(u)
@@ -1410,6 +1414,11 @@ local function BuildMpCache()
 			subWindBase[u] = 0
 			subPmaxNonWind[u] = (did and pmaxByDef[did]) or 0
 		end
+	end
+	local drainCorrection = totalProduce > 0 and totalProduce/totalDrain or 1
+	for i = 1, #order do
+		local u = order[i]
+		subDmax[u] = subDmax[u] * drainCorrection
 	end
 	for i = #order, 1, -1 do
 		local u = order[i]
