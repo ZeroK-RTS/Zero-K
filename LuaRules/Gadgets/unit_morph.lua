@@ -258,6 +258,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	local costMult = GG.TechUnitCostMult and GG.TechUnitCostMult[unitID] or 1
 	morphUnits[unitID] = {
 		def = morphDef,
+		costResources = (morphDef.metal > 0),
 		costMult = costMult,
 		progress = 0.0,
 		increment = morphDef.increment,
@@ -279,7 +280,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
 	
 	local newMorphRate = GetMorphRate(unitID)
-	if morphDef.metal > 0 then
+	if morphUnits[unitID].costResources then
 		--is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
 		GG.StartMiscPriorityResourcing(unitID, (newMorphRate*costMult*morphDef.metal/morphDef.time), nil, MISC_PRIO_KEY)
 	end
@@ -614,7 +615,7 @@ local function UpdateMorph(unitID, morphData)
 		local newMorphRate = GetMorphRate(unitID)
 		
 		if (morphData.morphRate ~= newMorphRate) then
-			if morphData.def.metal > 0 then
+			if morphData.costResources then
 				--GG.StopMiscPriorityResourcing(unitID, 2) not necessary
 				--is using unit_priority.lua gadget to handle morph priority. Modifies resource drain if slowness has changed.
 				GG.StartMiscPriorityResourcing(unitID, (newMorphRate*morphData.costMult*morphData.def.metal/morphData.def.time), nil, 2)
@@ -622,7 +623,7 @@ local function UpdateMorph(unitID, morphData)
 			morphData.morphRate = newMorphRate
 		end
 		local allow, resourceUse = false, false
-		if morphData.def.metal > 0 then
+		if morphData.costResources then
 			resourceUse = {
 				m = (morphData.def.resTable.m * morphData.costMult * morphData.morphRate),
 				e = (morphData.def.resTable.e * morphData.costMult * morphData.morphRate),
