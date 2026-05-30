@@ -102,7 +102,7 @@ local presets = {
 }
 
 options_path = 'Settings/Graphics/Ambient Occlusion'
-options_order = {'force_enable', 'quality_preset', 'strength', 'radius'}
+options_order = {'quality_preset', 'strength', 'radius'}
 options = {
 	quality_preset = {
 		name = 'Quality',
@@ -282,7 +282,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	if WG.SSAO_RequireDeferredRendering and WG.WidgetEnabledAndActive and not WG.WidgetEnabledAndActive("Deferred rendering") then
+	if WG.SSAO_RequireDeferredRendering and WG.WidgetEnabledAndActive and not (WG.WidgetEnabledAndActive("Deferred rendering") or WG.WidgetEnabledAndActive("Deferred rendering GL4")) then
 		Spring.Echo("SSAO: Deferred rendering not found, disabling.")
 		widgetHandler:RemoveWidget()
 		return
