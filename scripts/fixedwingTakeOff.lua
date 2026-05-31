@@ -20,7 +20,7 @@ function GG.TakeOffFuncs.TakeOffThread(unitID, height, signal)
 	Signal(signal)
 	SetSignalMask(signal)
 	local giveUp = 20
-	while GG.TakeOffFuncs.NotTakingOff(unitID) do
+	while Spring.MoveCtrl.GetTag(unitID) or GG.TakeOffFuncs.NotTakingOff(unitID) do
 		Sleep(100)
 		giveUp = giveUp - 1
 		if giveUp <= 0 then
