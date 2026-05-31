@@ -7,8 +7,9 @@ function gadget:GetInfo()
 	return {
 		name      = "Commander Egg",
 		desc      = "Manages commander egg hatching limits and morph button state",
-		author    = "Orlicek, Licho",
+		author    = "Orlicek, Licho, GoogleFrog",
 		license   = "GNU GPL, v2 or later",
+		date      = "May, 2026",
 		layer     = -1,
 		enabled   = true,
 	}
@@ -184,35 +185,16 @@ function GG.MorphCompleted(oldUnitID, newUnitID, teamID)
 end
 
 --------------------------------------------------------------------------------
--- Block move commands on eggs (egg has speed for blocking but should not move)
---------------------------------------------------------------------------------
-
-local blockedCmds = {
-	[CMD.MOVE] = true,
-	[CMD.FIGHT] = true,
-	[CMD.PATROL] = true,
-	[CMD.GUARD] = true,
-	[SUC.RAW_MOVE] = true,
-}
-
-function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if unitDefID == eggDefID and blockedCmds[cmdID] then
-		return false
-	end
-	return true
-end
-
---------------------------------------------------------------------------------
 -- Event handlers for button greying
 --------------------------------------------------------------------------------
 
 local pendingEggUpdate = false
-local cmdsToRemove = {CMD.MOVE, CMD.PATROL, CMD.FIGHT, CMD.GUARD, CMD.MOVE_STATE, CMD.FIRE_STATE, Spring.Utilities.CMD.RAW_MOVE}
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if unitDefID == eggDefID then
 		IterableMap.Add(eggs, unitID)
 		pendingEggUpdate = true
+		GG.Attributes.AddEffect(unitID, "no_move", {move = 0})
 	end
 	if Spring.Utilities.isComm(unitDefID) then
 		IterableMap.Add(commanders, unitID)
@@ -225,14 +207,6 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if unitDefID == eggDefID then
-		-- remove movement-related command buttons
-		for _, cmdID in ipairs(cmdsToRemove) do
-			local cmdDescID = Spring.FindUnitCmdDesc(unitID, cmdID)
-			if cmdDescID then
-				Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
-			end
-		end
-		Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 		UpdateEggMorphButtons()
 	end
 end
@@ -252,8 +226,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 end
 
-function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
-	if Spring.Utilities.isComm(unitDefID) then
+function gadget:UnitGiven(unitID, unitDefID, oldTeamID, teamID)
+	if Spring.Utilities.isComm(unitDefID) or unitDefID == eggDefID then
 		UpdateEggMorphButtons()
 	end
 end

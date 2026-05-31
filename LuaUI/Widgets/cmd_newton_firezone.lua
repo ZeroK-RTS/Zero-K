@@ -174,8 +174,8 @@ options = {
 		name = "Drop prediction speed threshold",
 		desc = "Draw prediction for transports above this speed.",
 		type = 'number',
-		min = 0, max = 8, step = 0.2,
-		value = 5,
+		min = 0, max = 8, step = 0.1,
+		value = 4,
 		OnChange = function(self)
 			transportPredictionSpeedSq = self.value^2
 		end,
