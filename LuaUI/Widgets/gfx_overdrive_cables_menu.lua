@@ -56,7 +56,6 @@ options = {
 		OnChange = function(self)
 			Spring.SendCommands("luarules cabletree detail " .. self.value)
 		end,
-		noHotkey = true,
 	},
 	cabletree_ghosts = {
 		name  = 'Show cable ghosts in fog',
@@ -66,7 +65,6 @@ options = {
 		OnChange = function(self)
 			Spring.SendCommands("luarules cabletree ghosts " .. (self.value and "on" or "off"))
 		end,
-		noHotkey = true,
 	},
 }
 
