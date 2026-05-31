@@ -65,7 +65,7 @@ return { spiderskirm = {
       customParams        = {
         light_camera_height = 2500,
         light_color = [[0.90 0.65 0.30]],
-        light_radius = 250,
+        light_radius = 180,
       },
 
       damage                  = {

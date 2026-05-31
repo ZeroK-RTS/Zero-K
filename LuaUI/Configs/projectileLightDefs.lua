@@ -48,7 +48,7 @@ for weaponDefID = 1, #WeaponDefs do
 		weaponData.radius = math.min(weaponDef.range, 250)
 		weaponData.beam = true
 	elseif (weaponDef.type == 'BeamLaser') then
-		weaponData.radius = math.min(weaponDef.range, 150)
+		weaponData.radius = math.min(weaponDef.range, 135)
 		weaponData.beam = true
 		if weaponDef.beamTTL > 2 then
 			weaponData.fadeTime = weaponDef.beamTTL
