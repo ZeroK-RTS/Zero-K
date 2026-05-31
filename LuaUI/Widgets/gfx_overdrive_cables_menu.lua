@@ -15,7 +15,7 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Overdrive Cables Settings",
+		name      = "Energy Grid Wire Settings",
 		desc      = "Settings menu entry for the overdrive cable visualization.",
 		author    = "Licho",
 		date      = "2026",
@@ -40,18 +40,17 @@ local function readCurrentGhosts()
 	return (Spring.GetConfigInt(GHOSTS_KEY, 1) or 1) ~= 0
 end
 
-options_path = 'Settings/Graphics/Overdrive Cables'
+options_path = 'Settings/Graphics/Energy Grid Cables'
 options_order = { 'cabletree_detail', 'cabletree_ghosts' }
 
 options = {
 	cabletree_detail = {
-		name  = 'Overdrive cable visualization',
-		desc  = 'Off: no cables drawn. Static: gray pipes only (cheapest). Full: animated bubbles indicating flow (default).',
+		name  = 'Energy grid cables',
 		type  = 'radioButton',
 		items = {
-			{ key = 'full',   name = 'Full (animated bubbles)',         desc = 'Default. Bubbles indicate flow direction and rate.' },
-			{ key = 'noflow', name = 'Static (no flow animation)',      desc = 'Cheaper: gray pipes only, no per-tick flow reads or shader bubble pass.' },
-			{ key = 'off',    name = 'Off (no cables)',                  desc = 'Hide the overdrive grid entirely.' },
+			{ key = 'full',   name = 'Full (animated flows)',  desc = 'Show overdrive energy flowing through the grid (default).' },
+			{ key = 'noflow', name = 'Static (no flows)',      desc = 'Cheaper: gray pipes only, no per-tick flow reads or shader bubble pass.' },
+			{ key = 'off',    name = 'Off (no cables)',        desc = 'Hide the cables/wires entirely.' },
 		},
 		value = 'full',
 		OnChange = function(self)
