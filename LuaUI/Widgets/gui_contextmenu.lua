@@ -755,8 +755,8 @@ local function weapons2Table(cells, ws, unitID)
 
 		if show_range then
 			local range = cp.truerange or wd.range
-			local mult = unitID and (Spring.GetUnitRulesParam(unitID, "rangeMult") or 1)
-			local boost = unitID and (Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0)
+			local mult = unitID and Spring.GetUnitRulesParam(unitID, "rangeMult") or 1
+			local boost = unitID and Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0
 			cells[#cells+1] = ' - Range:'
 			cells[#cells+1] = numformat((range + boost) * mult) .. " elmo"
 		end
