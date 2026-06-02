@@ -1528,17 +1528,15 @@ local function ComputeMaxPotentials(flowMode)
 
 		local flow, flowSrcSubtree
 		if flowMode then
-			local totalPcur, totalDcur = subPcur[r], subDcur[r]
-			local sPc, sDc = subPcur[cid], subDcur[cid]
-			local oPc, oDc = totalPcur - sPc, totalDcur - sDc
-			local flowAB = (sPc < oDc) and sPc or oDc
-			local flowBA = (oPc < sDc) and oPc or sDc
-			if flowAB >= flowBA then
-				flow, flowSrcSubtree = flowAB, true
+			-- Realized flow across a tree edge is defined by conservation.
+			-- The grids are MSTs, so each edge is the only path between its subtree S (cid side) and the rest
+			-- Power that physically crosses it equals S's net export flow = | subPcur[S] - subDcur[S] |
+			local net = subPcur[cid] - subDcur[cid]
+			if net >= 0 then
+				flow, flowSrcSubtree = net, true       -- subtree exports → cid is source
 			else
-				flow, flowSrcSubtree = flowBA, false
+				flow, flowSrcSubtree = -net, false     -- subtree imports → parent is source
 			end
-			if flow < 0 then flow = 0 end
 			if flow <= 0 then flowSrcSubtree = potentialSrcSubtree end
 		else
 			flow, flowSrcSubtree = 0, potentialSrcSubtree
@@ -2319,7 +2317,7 @@ local function GenerateOrganicTree()
 	local k = 0
 	for i = 1, n do
 		local e = renderEdges[i]
-		local cap = max(1, e.capacity or 1) 
+		local cap = max(1, e.capacity or 1)
 		local appearTime = (e.appearFrame or 0) / GAME_SPEED
 		local witherTime = e.witherFrame and (e.witherFrame / GAME_SPEED) or 0
 		local eff = (e.eff or 0) * (e.maxxed and -1 or 1)
