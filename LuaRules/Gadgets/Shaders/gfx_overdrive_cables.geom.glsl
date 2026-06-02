@@ -115,6 +115,28 @@ float hash1(float n) {
 	return fract(sin(n * 12.9898) * 43758.5453);
 }
 
+// Band-limited 2D value noise in [-1,1] over WORLD space. Replaces the raw
+// per-vertex gsHash() wiggle, which was white noise: at high vertex density
+// (cliff oversampling raises numSeg, see curvSeg in main) adjacent vertices
+// got fully-independent ±effAmp kicks, producing a tight full-amplitude
+// zigzag. Quantizing to NOISE_CELL-sized cells and smoothstep-interpolating
+// the four corner hashes gives a fixed feature wavelength: denser sampling
+// converges on the same smooth curve instead of aliasing into noise. Keyed on
+// world position (not arc-length t), so it stays direction-independent — a
+// parent/child MST flip doesn't teleport the pattern.
+const float NOISE_CELL = 16.0;   // elmos per noise cell (feature wavelength)
+float gsValueNoise2(vec2 w, float seed) {
+	vec2 q  = w * (1.0 / NOISE_CELL);
+	vec2 i0 = floor(q);
+	vec2 f  = q - i0;
+	vec2 u  = f * f * (3.0 - 2.0 * f);   // smoothstep weights
+	float n00 = gsHash(i0.x,       i0.y,       seed);
+	float n10 = gsHash(i0.x + 1.0, i0.y,       seed);
+	float n01 = gsHash(i0.x,       i0.y + 1.0, seed);
+	float n11 = gsHash(i0.x + 1.0, i0.y + 1.0, seed);
+	return mix(mix(n00, n10, u.x), mix(n01, n11, u.x), u.y);
+}
+
 const int   MAX_SEGMENTS      = 22;   // hardware budget (max_vertices=46 → 23 boundaries × 2; lowered from 24 to make room for the cableTangent varying). Cable lengths are bounded by pylon range (longest ≈ energypylon's 500 elmo); at SEG_LEN_TARGET this wants ~23, so the very longest backbone cables lose ~1-2 segments — far outweighed by the tangent killing the per-segment faceting.
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
@@ -267,7 +289,7 @@ vec2 arcBiasedCenter(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB, float dh
 vec2 wigglyCablePoint(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB,
                       float arcDh, float effAmp, float seed) {
 	vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
-	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
+	float n = gsValueNoise2(base, seed) * effAmp * gsNoiseScale(t);
 	vec2 perpCanon = perpAB;
 	if (perpCanon.x < 0.0 || (perpCanon.x == 0.0 && perpCanon.y < 0.0)) {
 		perpCanon = -perpCanon;
