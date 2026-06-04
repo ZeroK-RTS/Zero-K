@@ -37,6 +37,7 @@ return { athena = {
   buildRange3D        = false,
   canFly              = true,
   canGuard            = true,
+  canManualFire       = true,
   canMove             = true,
   canPatrol           = true,
   canResurrect        = true,
@@ -69,6 +70,7 @@ return { athena = {
   },
 
   explodeAs           = [[GUNSHIPEX]],
+  fireState           = 0,
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
@@ -94,6 +96,111 @@ return { athena = {
   turnRate            = 148,
   workerTime          = 15,
 
+ weapons                = {
+    {
+      def                = [[NANO_PLAGUE_CANISTER_MISSILE]],
+      badTargetCategory  = [[GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
+    },
+    {
+      def                = [[NANO_PLAGUE_DART_MISSILE]],
+      badTargetCategory  = [[GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
+    },
+ },
+  
+ weaponDefs          = {
+    NANO_PLAGUE_CANISTER_MISSILE = {
+      name                    = [[Nanoplague Canister Missile]],
+      areaOfEffect            = 500,
+      avoidFeature            = false,
+      burnblow                = true,
+      cegTag                  = [[seismictrail]],
+      craterBoost             = 1,
+      craterMult              = 1.4,
+      
+      customParams        = {
+        apply_nano_plague       = "1",
+        plague_rez_build_power  = 50,
+      },
+      
+      damage                  = {
+        default = 20,
+      },
+      
+      edgeEffectiveness       = 1,
+      explosionGenerator      = [[custom:bull_fade]],
+      fireStarter             = 70,
+      flightTime              = 4,
+      impulseBoost            = 0.75,
+      impulseFactor           = 0.3,
+      interceptedByShieldType = 2,
+      leadlimit               = 0,
+      model                   = [[wep_merl.s3o]],
+      range                   = 440,
+      reloadtime              = 30,
+      smokeTrail              = true,
+      soundHit                = [[weapon/aoe_aura2]],
+      soundHitVolume          = 15,
+      soundStart              = [[weapon/missile/rapid_rocket_fire2]],
+      soundStartVolume        = 7,
+      startVelocity           = 230,
+      texture2                = [[lightsmoketrail]],
+      trajectoryHeight        = 0.3,
+      turnRate                = 21000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 230,
+    },
+    
+    NANO_PLAGUE_DART_MISSILE = {
+      name                    = [[Nanoplague Dart]],
+      areaOfEffect            = 80,
+      avoidFeature            = false,
+      burnblow                = true,
+      cegTag                  = [[seismictrail]],
+      commandfire             = true,
+      craterBoost             = 1,
+      craterMult              = 1.4,
+      
+      customParams        = {
+        apply_nano_plague       = "1",
+        plague_rez_build_power  = 150,
+      },
+      
+      damage                  = {
+        default = 20,
+      },
+      
+      edgeEffectiveness       = 1,
+      explosionGenerator      = [[custom:greencannonimpact]],
+      fireStarter             = 70,
+      flightTime              = 1,
+      impulseBoost            = 0.75,
+      impulseFactor           = 0.3,
+      interceptedByShieldType = 2,
+      leadlimit               = 0,
+      model                   = [[wep_t_barracuda.s3o]],
+      range                   = 500,
+      reloadtime              = 30,
+      smokeTrail              = true,
+      soundHit                = [[weapon/aoe_aura2]],
+      soundHitVolume          = 15,
+      soundStart              = [[weapon/gauss_fire]],
+      soundStartVolume        = 7,
+      startVelocity           = 1000,
+      texture2                = [[lightsmoketrail]],
+      trajectoryHeight        = 0.1,
+      turnRate                = 21000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 1000,
+    },
+  
+  },
+  
   featureDefs         = {
 
     DEAD  = {

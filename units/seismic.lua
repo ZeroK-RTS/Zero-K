@@ -1,6 +1,6 @@
 return { seismic = {
   name                          = [[Quake]],
-  description                   = [[Seismic Missile]],
+  description                   = [[Seismic and Nanoplague Missile]],
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 3,
@@ -72,6 +72,9 @@ return { seismic = {
         smoothmult   = [[1]],
         smoothexponent = [[0.45]],
         movestructures = [[1]],
+        
+        apply_nano_plague = "1",
+        plague_rez_build_power  = 50,
 
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
