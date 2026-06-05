@@ -64,6 +64,8 @@ out DataGS {
 	float width;
 	vec2 cableUV;
 	vec2 timeData;
+	// (gridEfficiency, flow, isOwnAlly). For twigs (isBranch>0.5) .y is overloaded
+	// to the twig root's distance-from-root (flow is unused there) → pulse stagger.
 	vec3 gridData;
 	// Smooth per-vertex cable along-direction (3D). Linearly interpolated by
 	// the rasteriser so the FS frame (perp3D/trueUp → cylinder normal) rotates
@@ -181,7 +183,7 @@ void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
 	width = w;
 	cableUV = cuv;
 	timeData = td;
-	gridData = grid.xyw;          // .z dropped (unused by FS); see DataGS BUDGET NOTE
+	gridData = grid.xyw;          // .z (per-end rootDist) used in main() for twig globalRoot, not forwarded; see DataGS BUDGET NOTE
 	cableTangent = tangent3D;     // smooth along-dir → FS interpolates the lit frame
 	spawnAlongMain = gOutSpawnAlong;
 	gsSlot = gOutSlot;
@@ -525,7 +527,12 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
               vec4 gridD, vec2 timeD, float cap, float tCenter,
-              float spawnAlongMain, int twigIdx, float arcDh, int numSeg) {
+              float spawnAlongMain, int twigIdx, float arcDh, int numSeg,
+              float globalRoot) {
+	// Pack this twig's distance-from-root into gridData.y (flow, unused by twigs)
+	// for the FS pulse stagger — see the DataGS gridData note.
+	vec4 gridTwig = gridD;
+	gridTwig.y = globalRoot;
 	// Resolve spawn point on the wiggly main path at tCenter so twigs root on
 	// the visible cable.
 	float lenAB = length(d);
@@ -612,9 +619,9 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// follows the twig's pointing direction.
 	gOutBranch = 1.0;
 	gOutSpawnAlong = spawnAlongMain;   // shared by all 4 twig vertices; lets FS compute twig-local along
-	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
-	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
-	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridD, timeD, cap);
+	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridTwig, timeD, cap);
+	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridTwig, timeD, cap);
+	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridTwig, timeD, cap);
 	EndPrimitive();
 	gOutSpawnAlong = 0.0;
 }
@@ -795,7 +802,16 @@ void main() {
 		}
 		float tCenter        = float(idxArr[bestK]) / float(G);
 		float spawnAlongMain = alongArr[bestK];
+		// This twig root's distance-from-root: lerp the two ends' values (gridData.z,
+		// rootA on v0 / rootB on v1) by its fractional arc position, so it stays
+		// continuous with both pylons regardless of which end is nearer the root.
+		// totalArc > 0 always here (a twig only emits when len3D >= ~42).
+		float rootFrac   = spawnAlongMain / alongArr[numSeg];
+		float baseRootA  = gridD.z;
+		float baseRootB  = dataIn[1].vsGridData.z;
+		float globalRoot = baseRootA + (baseRootB - baseRootA) * rootFrac;
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, spawnAlongMain, twigIdx, arcDh, numSeg);
+		         gridD, timeD, cap, tCenter, spawnAlongMain, twigIdx, arcDh, numSeg,
+		         globalRoot);
 	}
 }

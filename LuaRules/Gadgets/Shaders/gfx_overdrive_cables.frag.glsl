@@ -591,9 +591,12 @@ void main() {
 		//      at twig-local 0 and propagates through the twig at
 		//      TWIG_SWEEP_SPEED. Inter-twig stagger feels snappy while motion
 		//      *within* a twig stays comfortable.
-		// `spawnAlongMain` is what lets us decouple these — without it both
-		// speeds would be tied to the same propagation rate.
-		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED * (1.0 + 1.2 * maxxed) - spawnAlongMain, CABLE_PROP_PERIOD / (1.0 + 0.5 * maxxed));
+		// Stagger by the twig root's distance-from-root (packed into gridData.y by
+		// the GS), not the per-edge along — so the wave is one wavefront radiating
+		// from the grid root, chaining across joints instead of restarting per
+		// edge. The within-twig sweep below still uses edge-local spawnAlongMain.
+		float globalRoot = gridData.y;
+		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED * (1.0 + 1.2 * maxxed) - globalRoot, CABLE_PROP_PERIOD / (1.0 + 0.5 * maxxed));
 		float subwavePos = TWIG_SWEEP_SPEED * (wavePassedElmos / CABLE_PROP_SPEED);
 		float localAlong = along - spawnAlongMain;
 		float d = localAlong - subwavePos;

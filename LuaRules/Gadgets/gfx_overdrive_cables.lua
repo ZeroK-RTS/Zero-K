@@ -1390,6 +1390,23 @@ local function BuildMpCache()
 		end
 	end
 
+	-- Per-node tree-path distance from the component root. Forward pass: parent
+	-- precedes child in `order`, so the parent's distance is already final.
+	-- Topology-stable, so free to accumulate here. Drives the twig-pulse stagger
+	-- so thorn pulses chain across edges instead of restarting per cable.
+	local distFromRoot = {}
+	for i = 1, #order do
+		local u = order[i]
+		local pi = parentInTree[u]
+		if not pi then
+			distFromRoot[u] = 0
+		else
+			local e = edges[pi.key]
+			local dx, dz = e.px - e.cx, e.pz - e.cz
+			distFromRoot[u] = distFromRoot[pi.parent] + sqrt(dx * dx + dz * dz)
+		end
+	end
+
 	-- Static per-subtree aggregates (post-order over `order`).
 	local subPmax = {}
 	local subDmax = {}
@@ -1442,6 +1459,7 @@ local function BuildMpCache()
 	mpCache.subPmaxNonWind = subPmaxNonWind
 	mpCache.subWindCount   = subWindCount
 	mpCache.subWindBase    = subWindBase
+	mpCache.distFromRoot   = distFromRoot
 	mpCache.valid          = true
 end
 
@@ -1679,6 +1697,7 @@ local function SendAll()
 	end
 
 	-- Bin edges by ally, in one pass.
+	local distFromRoot = mpCache.distFromRoot
 	local perAlly = {}
 	for key, edge in pairs(edges) do
 		local ally = allyOfUnit[edge.parentID] or allyOfUnit[edge.childID]
@@ -1687,7 +1706,8 @@ local function SendAll()
 			if not pa then
 				pa = {
 					keys = {}, pxs = {}, pzs = {}, cxs = {}, czs = {},
-					caps = {}, maxxed = {}, flows = {}, effs = {}, n = 0,
+					caps = {}, maxxed = {}, flows = {}, effs = {},
+					rootAs = {}, rootBs = {}, n = 0,
 				}
 				perAlly[ally] = pa
 			end
@@ -1699,6 +1719,10 @@ local function SendAll()
 			pa.caps[i]  = capacities[key] or 0
 			pa.maxxed[i]  = (spGetUnitRulesParam(edge.parentID, "OD_gridMaxxed") or spGetUnitRulesParam(edge.childID, "OD_gridMaxxed")) == 1
 			pa.flows[i] = flows[key] or 0
+			-- Per-end distance-from-root for the twig pulse. v0 = parent end,
+			-- v1 = child end; keyed by node so flow reorientation just swaps them.
+			pa.rootAs[i] = distFromRoot[edge.parentID] or 0
+			pa.rootBs[i] = distFromRoot[edge.childID] or 0
 			-- Cached per-grid lookup; fall back to child end if parent's grid
 			-- is unknown. 0 → magenta in the shader (unit_mex_overdrive's
 			-- "no grid" sentinel).
@@ -1718,6 +1742,7 @@ local function SendAll()
 			keys = pa.keys, pxs = pa.pxs, pzs = pa.pzs,
 			cxs = pa.cxs, czs = pa.czs,
 			caps = pa.caps, maxxed = pa.maxxed, flows = pa.flows, effs = pa.effs,
+			rootAs = pa.rootAs, rootBs = pa.rootBs,
 		})
 		alliesWithEdges[ally] = true
 	end
@@ -2322,7 +2347,11 @@ local function GenerateOrganicTree()
 		local witherTime = e.witherFrame and (e.witherFrame / GAME_SPEED) or 0
 		local eff = (e.eff or 0) * (e.maxxed and -1 or 1)
 		local flow = e.flow or 0
-		local phase = e.bubblePhase or 0
+		-- vertGrid.z (ex-bubblePhase, now dead — GS drops gridData.z) carries each
+		-- end's distance-from-root: v0 = rootA, v1 = rootB. GS lerps it to twig
+		-- roots to chain pulses across edges.
+		local rootA = e.rootA or 0
+		local rootB = e.rootB or 0
 		local isOwn = (fullview and 2) or (e.isOwnAlly and 1) or 0
 		-- Coverage SSBO slot index, or -1 to disable bit updates / lookups
 		-- on the GS side. Stored as float here for VBO layout simplicity;
@@ -2333,12 +2362,12 @@ local function GenerateOrganicTree()
 		-- Vertex 0: parent end (10 floats: pos2 + data3 + grid4 + slot)
 		verts[k+1] = e.px;          verts[k+2] = e.pz
 		verts[k+3] = cap;           verts[k+4] = appearTime;  verts[k+5] = witherTime
-		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = phase;       verts[k+9] = isOwn
+		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = rootA;       verts[k+9] = isOwn
 		verts[k+10] = slot
-		-- Vertex 1: child end (same per-edge payload)
+		-- Vertex 1: child end (same per-edge payload, except rootB for its end)
 		verts[k+11] = e.cx;         verts[k+12] = e.cz
 		verts[k+13] = cap;          verts[k+14] = appearTime; verts[k+15] = witherTime
-		verts[k+16] = eff;          verts[k+17] = flow;       verts[k+18] = phase;      verts[k+19] = isOwn
+		verts[k+16] = eff;          verts[k+17] = flow;       verts[k+18] = rootB;      verts[k+19] = isOwn
 		verts[k+20] = slot
 		k = k + 20
 	end
@@ -2583,6 +2612,10 @@ function OnCableTreeFull(data)
 				e.eff      = data.effs and data.effs[i] or 0
 				e.px, e.pz = data.pxs[i], data.pzs[i]
 				e.cx, e.cz = data.cxs[i], data.czs[i]
+				-- Refresh with px/cx so the per-end root distances track the
+				-- current parent/child orientation.
+				e.rootA = data.rootAs and data.rootAs[i] or 0
+				e.rootB = data.rootBs and data.rootBs[i] or 0
 			end
 			e.isOwnAlly = ownAlly
 			-- Late-bind a coverage slot if missing (e.g., gadget was reloaded
@@ -2616,6 +2649,8 @@ function OnCableTreeFull(data)
 				maxxed   = data.maxxed[i],
 				flow     = newFlow,
 				eff      = data.effs and data.effs[i] or 0,
+				rootA    = data.rootAs and data.rootAs[i] or 0,
+				rootB    = data.rootBs and data.rootBs[i] or 0,
 				isOwnAlly = ownAlly,
 				appearFrame = af,
 				witherFrame = nil,
