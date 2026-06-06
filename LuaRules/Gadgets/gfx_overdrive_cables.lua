@@ -60,6 +60,7 @@ end
 
 local sqrt  = math.sqrt
 local max   = math.max
+local min   = math.min
 local floor = math.floor
 
 -------------------------------------------------------------------------------------
@@ -1535,24 +1536,31 @@ local function ComputeMaxPotentials(flowMode)
 		local totalP, totalD = subPmax[r], subDmax[r]
 		local sP, sD = subPmax[cid], subDmax[cid]
 		local oP, oD = totalP - sP, totalD - sD
-		local capAB = (sP < oD) and sP or oD
-		local capBA = (oP < sD) and oP or sD
-		local cap = (capAB > capBA) and capAB or capBA
+		local capAB = min(sP, oD)
+		local capBA = min(oP, sD)
+		local cap = max(capAB, capBA)
 		capacities[key] = cap
 		local potentialSrcSubtree = capAB > capBA
 
 		local flow, flowSrcSubtree
 		if flowMode then
-			-- Realized flow across a tree edge is defined by conservation.
-			-- The grids are MSTs, so each edge is the only path between its subtree S (cid side) and the rest
-			-- Power that physically crosses it equals S's net export flow = | subPcur[S] - subDcur[S] |
-			local net = subPcur[cid] - subDcur[cid]
-			if net >= 0 then
-				flow, flowSrcSubtree = net, true       -- subtree exports → cid is source
-			else
-				flow, flowSrcSubtree = -net, false     -- subtree imports → parent is source
+			-- Realized flow across a tree edge = one side's surplus capped by the
+			-- other side's deficit (the power that actually has to cross to serve
+			-- consumption). Net export alone overcounts: two producers with no sink
+			-- each look like a surplus, but nothing crosses — neither side needs the
+			-- other's power, so it exits to global storage at its own node.
+			--   netS = subtree (cid) net,  netR = rest-of-grid net.
+			local netS = subPcur[cid] - subDcur[cid]
+			local netR = (subPcur[r] - subDcur[r]) - netS
+			if netS > 0 and netR < 0 then          -- S surplus feeds R deficit
+				flow = min(netS, -netR)            -- surplus S capped by deficit R
+				flowSrcSubtree = true              -- cid is source
+			elseif netR > 0 and netS < 0 then      -- R surplus feeds S deficit
+				flow = min(netR, -netS)            -- surplus R capped by deficit S
+				flowSrcSubtree = false             -- parent is source
+			else                                   -- both surplus or both deficit → nothing crosses
+				flow, flowSrcSubtree = 0, potentialSrcSubtree
 			end
-			if flow <= 0 then flowSrcSubtree = potentialSrcSubtree end
 		else
 			flow, flowSrcSubtree = 0, potentialSrcSubtree
 		end
