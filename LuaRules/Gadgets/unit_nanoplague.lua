@@ -73,6 +73,7 @@ local reclaimed_data = {} -- holds initial gameframe, initial time in seconds, %
 local zombies_to_spawn = {}
 local zombiesToSpawnList = {}
 local zombiesToSpawnMap = {}
+local zombiesWeaponDefId = {} -- keeps track of which weaponID zombified the zombie
 local zombiesToSpawnCount = 0
 local zombies = {}
 
@@ -92,19 +93,21 @@ local NonZombies = {
 local defaultplagueRezMin 			= 10    -- minimum rez time
 local defaultplagueRezSpeed 		= 30	-- Speed in bp for rez
 local defaultplagueRezDelay 		= 0		-- extra flat delay to rez
-local defaultplagueRezChance 		= false -- chance an effected feature resurects
-local defaultplagueCanRezZombies	= false -- if this weapon can rez zombies wrecks.
+local defaultplaguInfectChance 		= 1 	-- chance an effected feature contracts nanoplague
+local defaultplagueCanRezZombies	= true -- if this weapon can rez zombies wrecks.
+local defaultplagueRezChanceOffset  = 0.5  	-- flat offset on revive chance which is based on reclaim left in wrecks
 
 local nanoPlagueWeaponDefs = {}
 for i = 1, #WeaponDefs do
 	local wcp = WeaponDefs[i].customParams
 	if wcp and wcp.apply_nano_plague then
 		nanoPlagueWeaponDefs[i] = { 
-			plagueRezMin 		= tonumber(wcp.plague_rez_min) or defaultplagueRezMin,
-			plagueRezBuildPower = tonumber(wcp.plague_rez_build_power) or tonumber(wcp.plague_rez_speed) or defaultplagueRezSpeed,
-			plagueRezDelay 		= tonumber(wcp.plague_rez_delay) or defaultplagueRezDelay,	
-			plagueRezChance 	= tonumber(wcp.plague_rez_chance) or defaultplagueRezChance, 
-			plagueCanRezZombies = wcp.plague_can_rez_zombies or defaultplagueCanRezZombies,			
+			plagueRezMin 			= tonumber(wcp.plague_rez_min) or defaultplagueRezMin,
+			plagueRezBuildPower 	= tonumber(wcp.plague_rez_build_power) or tonumber(wcp.plague_rez_speed) or defaultplagueRezSpeed,
+			plagueRezDelay 			= tonumber(wcp.plague_rez_delay) or defaultplagueRezDelay,	
+			plagueInfectChance 		= tonumber(wcp.plague_infect_chance) or defaultplaguInfectChance, 
+			plagueCanRezZombies 	= wcp.plague_can_rez_zombies or defaultplagueCanRezZombies,			
+			plagueRezChanceOffset 	= tonumber(wcp.plague_rez_chance_offset) or defaultplagueRezChanceOffset,
 			-- Lots of extra options possible. Could have zombies/lose health after a while etc.
 		}
 	end
@@ -112,7 +115,7 @@ end
 
 local WARNING_TIME_CEG 		= 30 -- seconds to start being scary before actual reanimation event
 local WARNING_TIME_SOUND 	= 5
-local ZOMBIES_PERMA_SLOW 	= -0.3 -- -0.5 is the base value, made them a lil speedier. Innitially wanted per weapon stuff but its a lil iffy
+local ZOMBIES_PERMA_SLOW 	= -0.3 -- -0.5 is the base value, made them a lil speedier. Initially wanted per weapon stuff but its a lil iffy
 local ZOMBIES_PARTIAL_RECLAIM = true
 
 
@@ -148,6 +151,7 @@ local function RemoveZombieToSpawn(featureID)
 	
 	zombiesToSpawnList[zombiesToSpawnCount] = nil
 	zombiesToSpawnMap[featureID] = nil
+	zombiesWeaponDefId[featureID] = nil
 	zombiesToSpawnCount = zombiesToSpawnCount - 1
 	
 	return true
@@ -193,7 +197,7 @@ end
 
 -- reclaiming zombies 'causes delay in rez, basically you have to have about ZOMBIES_REZ_SPEED/2 or bigger BP to reclaim faster than it resurrects...
 -- TODO do more math to figure out how to perform it better?
--- This might break when I try to overwrite reztime 
+-- Stiofan: This might break when I try to overwrite reztime? 
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
 	if (zombies_to_spawn[featureID]) then
 		local base_time = reclaimed_data[featureID]
@@ -278,6 +282,7 @@ function gadget:GameFrame(f)
 			local x, y, z = spGetFeaturePosition(featureID)
 
 			if time_to_spawn <= f then
+				zombieWeaponDef = nanoPlagueWeaponDefs[zombiesWeaponDefId[featureID]]
 				if not RemoveZombieToSpawn(featureID) then
 					index = index + 1
 				end
@@ -290,17 +295,25 @@ function gadget:GameFrame(f)
 					end
 				end
 				spDestroyFeature(featureID)
-				local unitID = spCreateUnit(resName, x, y, z, face, GaiaTeamID)
+			
+				--Stiofan: Resurection chance based on % of metal left in wreck + an offset set by weapon param
+				if(math.random() < partialReclaim + zombieWeaponDef.plagueRezChanceOffset)then
+					local unitID = spCreateUnit(resName, x, y, z, face, GaiaTeamID)	
+				else
+					--Stiofan: Disolved/non rezzed units still add to gaia funds
+					spAddTeamResource(GaiaTeamID, "m", UnitDefNames[resName].metalCost/3)
+					spAddTeamResource(GaiaTeamID, "e", UnitDefNames[resName].metalCost*3) 
+				end
+				
 				if (unitID) then
 					gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
 					local size = UnitDefNames[resName].xsize
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
 					GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
-					-- Each unit revived adds funds to Gaia
-					-- Farming Gaia becomes possible, but is gated by resurrecting units.
-					spAddTeamResource(GaiaTeamID, "m", UnitDefNames[resName].metalCost/2) 
-					spAddTeamResource(GaiaTeamID, "e", UnitDefNames[resName].metalCost*2) 
+					-- Stiofan: Each unit revived adds funds to Gaia
+					spAddTeamResource(GaiaTeamID, "m", UnitDefNames[resName].metalCost/3) 
+					spAddTeamResource(GaiaTeamID, "e", UnitDefNames[resName].metalCost*3) 
 					if partialReclaim ~= 1 then
 						local health = Spring.GetUnitHealth(unitID)
 						if health then
@@ -333,8 +346,8 @@ function gadget:GameFrame(f)
 	if f == 1 then
 		spSetTeamResource(GaiaTeamID, "ms", 50000)
 		spSetTeamResource(GaiaTeamID, "es", 50000)
-		spSetTeamResource(GaiaTeamID, "metal", 5000) -- some starting metal for gaia
-		spSetTeamResource(GaiaTeamID, "energy", 20000) -- starting energy for gaia for units with upkeep
+		spSetTeamResource(GaiaTeamID, "metal", 5000) -- Stiofan: some starting metal for gaia
+		spSetTeamResource(GaiaTeamID, "energy", 20000) -- Stiofan: starting energy for gaia for units with upkeep
 		
 	end
 end
@@ -377,14 +390,13 @@ function gadget:FeatureDamaged(featureID, featureDefID, featureTeam, damage, wea
 		return
 	end
 
+	-- Check to to see if neutrals should be revivable
 	if featureTeam == GaiaTeamID and thisWeaponDef.plagueCanRezZombies ==false then
 		return
 	end
 		
-	if thisWeaponDef.plagueRezChance then
-		if math.random > thisWeaponDef.plagueRezChance then
-			return
-		end
+	if (math.random() > thisWeaponDef.plagueInfectChance) then
+		return
 	end
 	
 	local resName, face = myGetFeatureRessurect(featureID)
@@ -409,6 +421,7 @@ function gadget:FeatureDamaged(featureID, featureDefID, featureTeam, damage, wea
 				zombiesToSpawnCount = zombiesToSpawnCount + 1
 				zombiesToSpawnList[zombiesToSpawnCount] = featureID
 				zombiesToSpawnMap[featureID] = zombiesToSpawnCount
+				zombiesWeaponDefId[featureID] = weaponDefID
 			end
 		end
 	end
