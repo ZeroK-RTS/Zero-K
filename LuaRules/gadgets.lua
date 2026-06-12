@@ -140,9 +140,6 @@ local callInLists = {
 	"FeatureDestroyed",
 	"FeaturePreDamaged",
 	"FeatureDamaged",
-	--[[ FeatureDamaged and FeaturePreDamaged missing on purpose. Basic damage control
-	     can be achieved via armordefs (use the "default" class, make sure to populate
-	     the others including "else" explicitly) so this way we avoid the perf cost. ]]
 
 	-- Projectile CallIns
 	"ProjectileCreated",
@@ -2040,14 +2037,8 @@ local FeaturePreDamaged_GadgetMap = {}
 local FeaturePreDamaged_first = true
 local allWeaponDefs = {}
 
-do
-	for i=-7,#WeaponDefs do
-		allWeaponDefs[#allWeaponDefs+1] = i
-	end
-end
-
 function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
-	damage, paralyzer, weaponDefID,
+	damage, weaponDefID,
 	projectileID, attackerID, attackerDefID, attackerTeam)
 	tracy.ZoneBeginN("G:FeaturePreDamaged")
 
@@ -2057,9 +2048,9 @@ function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
 			local weaponDefs = (g.FeaturePreDamaged_GetWantedWeaponDef and g:FeatureDamaged_GetWantedWeaponDef()) or allWeaponDefs
 			tracy.ZoneEnd()
 			for _,wdid in ipairs(weaponDefs) do
-				if FeatureDamaged_GadgetMap[wdid] then
-					FeatureDamaged_GadgetMap[wdid].count = FeaturePreDamaged_GadgetMap[wdid].count + 1
-					FeatureDamaged_GadgetMap[wdid].data[FeatureDamaged_GadgetMap[wdid].count] = g
+				if FeaturePreDamaged_GadgetMap[wdid] then
+					FeaturePreDamaged_GadgetMap[wdid].count = FeaturePreDamaged_GadgetMap[wdid].count + 1
+					FeaturePreDamaged_GadgetMap[wdid].data[FeaturePreDamaged_GadgetMap[wdid].count] = g
 				else
 					FeaturePreDamaged_GadgetMap[wdid] = {
 						count = 1,
@@ -2076,16 +2067,13 @@ function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
 
 	local gadgets = FeaturePreDamaged_GadgetMap[weaponDefID]
 	if gadgets then
-		if gadgetHandler.GG._AddUnitDamage_teamID then
-			attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
-		end
 		local data = gadgets.data
 		local g
 		for i = 1, gadgets.count do
 			g = data[i]
 			tracy.ZoneBeginN("G:FeaturePreDamaged:" .. g.ghInfo.name)
 			local dam, imp = g:FeaturePreDamaged(featureID, featureDefID, featureTeam,
-				rDam, paralyzer, weaponDefID,
+				rDam, weaponDefID,
 				attackerID, attackerDefID, attackerTeam,
 				projectileID)
 			tracy.ZoneEnd()
