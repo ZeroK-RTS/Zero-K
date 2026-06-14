@@ -43,21 +43,25 @@ void main(void)
     vec2 r0 = vec2(g_rect.x + g_corner_radius, g_rect.y + g_corner_radius);
 
     if (loc.x < r0.x && loc.y < r0.y) {
-//discard;
+//straight corners
 /*
         if (loc.x - g_rect.x + (loc.y - g_rect.y) < g_corner_radius) {
            discard;
         }
 */
 
+//rounded corners
         if (distance(loc, r0) > g_corner_radius) {
             discard;
         }
     }
-
+/*
 	vec4 texcolor = vec4(1.0);
 	texcolor = texture(healthbartexture, g_uv.xy);
 	texcolor.a *= g_color.a;
 	fragColor.rgba = mix(g_color, texcolor, g_uv.z);
+	if (fragColor.a < 0.05) discard;
+*/
+	fragColor.rgba = g_color * texture(healthbartexture, g_uv.xy);
 	if (fragColor.a < 0.05) discard;
 }

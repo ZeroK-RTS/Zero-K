@@ -54,7 +54,6 @@ float duration = -1;
 #define BITSHOWGLYPH 2u
 #define BITPERCENTAGE 4u
 #define BITTIMELEFT 8u
-#define BITINTEGERNUMBER 16u
 #define BITGETPROGRESS 32u
 #define BITFRAMETIME 64u
 #define BITCOLORCORRECT 128u
@@ -123,13 +122,6 @@ void main(){
 	// STOCKPILE BAR:  128*numStockpileQued + numStockpiled + stockpileBuild
 	uint numStockpiled = 0u;
 	uint numStockpileQueued = 0u;
-	if ((BARTYPE & BITINTEGERNUMBER) > 0u){
-		float oldhealth = health;
-		health = fract(oldhealth);
-		oldhealth = floor(oldhealth);
-		numStockpiled = uint(floor( mod (oldhealth, 128)));
-		numStockpileQueued = uint(floor(oldhealth/128));
-	}
 
 	depthbuffermod = 0.001;
 	float extraColor = 0.0;
@@ -142,7 +134,11 @@ void main(){
 		vec4(-BARWIDTH, 0, BARWIDTH * 2, BARHEIGHT),
 		BARCORNER,
 		0.0,
-		vec4(1.0, 1.0, 1.0, 1.0),
+		vec4(
+			768.0 / 2048.0,
+			16 / 1024.0,
+			576.0 / 2048.0,
+			64.0 / 1024.0),
 		BGTOPCOLOR + extraColor,
 		BGBOTTOMCOLOR + extraColor
 	);
@@ -152,7 +148,8 @@ void main(){
 
 	vec4 topcolor = BGTOPCOLOR;
 	vec4 botcolor = BGBOTTOMCOLOR;
-	vec4 truecolor = mix(dataIn[0].v_mincolor, dataIn[0].v_maxcolor, health);
+	vec4 healthcolor = mix(dataIn[0].v_mincolor, dataIn[0].v_maxcolor, health);
+	vec4 truecolor = healthcolor;
 
 	truecolor.a = 0.2;
 	topcolor = truecolor;
@@ -165,7 +162,11 @@ void main(){
 		vec4(-BARWIDTH + BARCORNER, BARCORNER, (BARWIDTH - BARCORNER) * 2, BARHEIGHT - 2 * BARCORNER),
 		SMALLERCORNER,
 		0.0,
-		vec4(1.0, 1.0, 1.0, 1.0),
+		vec4(
+			768.0 / 2048.0,
+			16 / 1024.0,
+			576.0 / 2048.0,
+			64.0 / 1024.0),
 		truecolor,
 		topcolor
 	);
@@ -177,14 +178,14 @@ void main(){
 		vec4(-BARWIDTH + BARCORNER, BARCORNER, (BARWIDTH - BARCORNER) * 2 * health, BARHEIGHT - 2 * BARCORNER ),
 		vec4(-BARWIDTH + BARCORNER, BARCORNER, (BARWIDTH - BARCORNER) * 2, BARHEIGHT - 2 * BARCORNER),
 		SMALLERCORNER,
-		1.0,
+		0.0,
 		vec4(
 			(672.0 * floor(mod(UVOFFSET, 3)) + 96) / 2048.0,
 			(96.0 + floor(UVOFFSET / 3) * 80) / 1024.0,
 			576.0 / 2048.0 * health,
 			64.0 / 1024.0),
-		vec4(1,1,1,1),
-		topcolor
+		healthcolor,
+		healthcolor * BOTTOMDARKENFACTOR
 	);
 
 	// EMIT GLYPH

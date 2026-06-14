@@ -43,6 +43,10 @@ local currentUnit = 1
 
 local unitUniform = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 function updateUnit(unitID, unitDefID)
+	if not Spring.ValidUnitID(unitID) then
+		return
+	end
+
 	local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
 	paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage or 0
 
@@ -111,7 +115,6 @@ function updateUnit(unitID, unitDefID)
 		unitUniform[unitShieldChannel] = 1 - ((shieldPower or 0) / (unitDefHasShield[(unitDefID)]))
 	end
 
-
 	glSetUnitBufferUniforms(unitID, unitUniform , 1)
 end
 
@@ -176,6 +179,7 @@ end
 function widget:VisibleUnitRemoved(unitID)
 	removeUnit(unitID)
 end
+
 function widget:PlayerChanged(playerID)
 	resetUnits()
 end
