@@ -19,8 +19,12 @@ local function TiltWings()
 	while true do
 		local vx,_,vz = spGetUnitVelocity(unitID)
 		local speed = vx*vx + vz*vz
-		Turn (rjet, x_axis, math.rad(2) * speed, math.rad(60))
-		Turn (ljet, x_axis, math.rad(2) * speed, math.rad(60))
+		local turnTarget = math.rad(2) * speed
+		if turnTarget > math.rad(90) then
+			turnTarget = math.rad(90)
+		end
+		Turn (rjet, x_axis, turnTarget, math.rad(60))
+		Turn (ljet, x_axis, turnTarget, math.rad(60))
 		Sleep(100)
 	end
 end

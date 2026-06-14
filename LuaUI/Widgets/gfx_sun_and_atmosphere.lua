@@ -69,6 +69,21 @@ end
 
 local sunDir = 0
 local sunPitch = math.pi*0.8
+local forceUpdateTable = {
+	["unitAmbientColor"] = {0, 0, 0},
+	["unitDiffuseColor"] = {0, 0, 0},
+	["unitSpecularColor"] = {0, 0, 0},
+}
+
+local function FullSunUpdate()
+	local sunData = {}
+	for i = 1, #sunSettingsList do
+		local name = sunSettingsList[i]
+		sunData[name] = options[name].value
+	end
+	Spring.SetSunLighting(forceUpdateTable) -- Unit colours don't always update when only one key changes.
+	Spring.SetSunLighting(sunData)
+end
 
 local function SunDirectionFunc(newDir, newPitch)
 	directionSettingsChanged = true
@@ -80,6 +95,11 @@ local function SunDirectionFunc(newDir, newPitch)
 	local sunZ = math.cos(sunPitch)*math.sin(sunDir)
 	
 	Spring.SetSunDirection(sunX, sunY, sunZ)
+	FullSunUpdate()
+end
+
+local function ResetSunDirection()
+	SunDirectionFunc(options.sunDir.value, options.sunPitch.value)
 end
 
 local function GetSunDirection()
@@ -94,14 +114,7 @@ local function GetSunDirection()
 	return pitch, dir
 end
 
-local function FullSunUpdate()
-	local sunData = {}
-	for i = 1, #sunSettingsList do
-		local name = sunSettingsList[i]
-		sunData[name] = options[name].value
-	end
-	Spring.SetSunLighting(sunData)
-end
+sunPitch, sunDir = GetSunDirection() -- Initialise defaults so they can be reset to.
 
 local function UpdateSunValue(name, value)
 	Spring.SetSunLighting({[name] = value}) -- For specularExponent, which isn't in sunSettingsList
@@ -165,11 +178,13 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		fixDefaultWater = options.override_water_with_default.value,
-		sun             = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
-		direction       = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
-		fog             = fogSettingsChanged       and GetOptionsTable(fogPath),
-		water           = waterSettingsChanged     and GetOptionsTable(waterpath),
+		fixDefaultWater      = options.override_water_with_default.value,
+		defaultSunDir        = options.override_sun_direction.value,
+		skipShadowDensityFix = options.skip_override_shadow_density.value,
+		sun                  = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
+		direction            = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
+		fog                  = fogSettingsChanged       and GetOptionsTable(fogPath),
+		water                = waterSettingsChanged     and GetOptionsTable(waterpath),
 	}
 	if OVERRIDE_CONFIG and OVERRIDE_CONFIG.forceIsland ~= nil then
 		writeTable.forceIsland = OVERRIDE_CONFIG.forceIsland
@@ -180,18 +195,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local function SaveDefaultWaterFix()
-	options.override_water_with_default.value = true
-	local writeTable = {
-		fixDefaultWater = true,
-		sun       = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
-		direction = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
-		fog       = fogSettingsChanged       and GetOptionsTable(fogPath),
-	}
-	
-	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
-end
 
 local function ResetWaterDefault()
 	if options.override_water_with_default.value then
@@ -214,6 +217,38 @@ local function ToggleDefaultWater(self)
 	end
 end
 
+local function ApplyDefaultSunDir()
+	options.override_sun_direction.value = true
+	SunDirectionFunc(5.5, 0.75)
+end
+
+local function ToggleDefaultSunDir(self)
+	if self.value then
+		ApplyDefaultSunDir()
+	else
+		ResetSunDirection()
+	end
+end
+
+local function AdpplyShadowDensityAdjustment()
+	options.skip_override_shadow_density.value = false
+	local ground = options.groundShadowDensity.default or 1
+	local unit = options.modelShadowDensity.default or 1
+	ground = math.min(ground, 0.75)
+	unit = math.min(ground, unit)
+	options.groundShadowDensity.value = ground
+	options.modelShadowDensity.value = unit
+	options.groundShadowDensity.OnChange(options.groundShadowDensity)
+	options.modelShadowDensity.OnChange(options.modelShadowDensity)
+end
+
+local function ToggleShadowDensityAdjustment(self)
+	if self.value then
+		FullSunUpdate()
+	else
+		AdpplyShadowDensityAdjustment()
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -277,9 +312,14 @@ local function LoadSunAndFogSettings()
 		ResetWater()
 	end
 	
-	if override.fixDefaultWater ~= nil then
-		fixDefaultWater = override.fixDefaultWater
+	if override.fixDefaultWater then
 		ApplyDefaultWaterFix()
+	end
+	if override.defaultSunDir then
+		ApplyDefaultSunDir()
+	end
+	if not override.skipShadowDensityFix then
+		AdpplyShadowDensityAdjustment()
 	end
 end
 
@@ -475,8 +515,27 @@ local function GetOptions()
 		type = 'bool',
 		desc = "Overrides all the water settings with a decent default.",
 		developmentOnly = true,
+		value = false,
 		noSave = true,
 		OnChange = ToggleDefaultWater,
+	})
+	AddOption("override_sun_direction", {
+		name = 'Default Sun Direction',
+		type = 'bool',
+		desc = "Puts the sun over your left shoulder.",
+		developmentOnly = true,
+		value = false,
+		noSave = true,
+		OnChange = ToggleDefaultSunDir,
+	})
+	AddOption("skip_override_shadow_density", {
+		name = 'Unbounded Shadow Density',
+		type = 'bool',
+		desc = "Enable to set high shadow densities, and to set unit shadow density > map shadow density.",
+		developmentOnly = true,
+		value = false,
+		noSave = true,
+		OnChange = ToggleShadowDensityAdjustment,
 	})
 	AddOption("save_map_settings", {
 		name = 'Save Settings',

@@ -382,21 +382,33 @@ end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 
+local prevMult, prevWeaponMult
+local function RangeUpdate(mult, weaponMult)
+	mult = mult or prevMult or 1
+	weaponMult = weaponMult or prevWeaponMult
+	prevMult, prevWeaponMult = mult, weaponMult
+	
+	local mainRange = weaponRange * mult * (weaponMult and weaponMult[1] or 1)
+	Spring.SetUnitWeaponState(unitID, 1, "range", mainRange)
+	local height = select(2, Spring.GetUnitPosition(unitID))
+	if height < -20 then
+		Spring.SetUnitWeaponState(unitID, 2, "range", mainRange - 50 - height)
+		Spring.SetUnitMaxRange(unitID, mainRange -50 - height)
+	else
+		Spring.SetUnitWeaponState(unitID, 2, "range", mainRange)
+		Spring.SetUnitMaxRange(unitID, mainRange)
+	end
+end
+
 local function WeaponRangeUpdate()
 	while true do
-		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -20 then
-			Spring.SetUnitWeaponState(unitID, 2, {range = weaponRange - 50 - height})
-			Spring.SetUnitMaxRange(unitID, weaponRange -50 - height)
-		else
-			Spring.SetUnitWeaponState(unitID, 2, {range = weaponRange})
-			Spring.SetUnitMaxRange(unitID, weaponRange)
-		end
+		RangeUpdate()
 		Sleep(500)
 	end
 end
 
 function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	Turn(head_gimbal, x_axis, math.rad(10))
 	Turn(raxel, x_axis, math.rad(-10))
 	Turn(laxel, x_axis, math.rad(-10))

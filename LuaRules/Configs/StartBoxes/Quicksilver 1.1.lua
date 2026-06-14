@@ -1,5 +1,5 @@
 local layout = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{833, 4640},
@@ -186,7 +186,7 @@ local layout = {
 		nameLong = "South-West",
 		nameShort = "SW",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{4354, 1596},
@@ -331,10 +331,10 @@ local layout = {
 }
 
 if (#Spring.GetTeamList(0) == 1 and #Spring.GetTeamList(1) == 1) then -- for duels use only the high ground, for teams also the natural
-	layout[0].boxes[2] = nil
 	layout[1].boxes[2] = nil
-	layout[0].startpoints[2] = nil
+	layout[2].boxes[2] = nil
 	layout[1].startpoints[2] = nil
+	layout[2].startpoints[2] = nil
 end
 
 return layout, {2}

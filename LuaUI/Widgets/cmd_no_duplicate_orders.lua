@@ -28,7 +28,7 @@ end
 --------------------------------------------------------------------------------
 
 local GetSelectedUnits = Spring.GetSelectedUnits
-local GetCommandQueue  = Spring.GetCommandQueue
+local GetUnitCommands  = Spring.GetUnitCommands
 local GetUnitPosition  = Spring.GetUnitPosition
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
 local GetUnitHealth    = Spring.GetUnitHealth
@@ -115,7 +115,7 @@ function widget:CommandNotify(id, params, options)
 				if not blockUnits[unitID] then
 					GiveOrderToUnit(unitID, id, params, options)
 				elseif not shiftMode then
-					local cQueue = GetCommandQueue(unitID, -1)
+					local cQueue = GetUnitCommands(unitID, -1)
 					for j = 1, #cQueue do
 						local v = cQueue[j]
 						if (v.tag ~= cQueue[1].tag) and ((not (keepSecond[unitID] and cQueue[2])) or (v.tag ~= cQueue[2].tag)) then
@@ -146,7 +146,7 @@ function widget:CommandNotify(id, params, options)
 				if not blockUnits[unitID] then
 					GiveOrderToUnit(unitID, id, params, options)
 				else
-					local cQueue = GetCommandQueue(unitID, -1)
+					local cQueue = GetUnitCommands(unitID, -1)
 					for j = 1, #cQueue do
 						local v = cQueue[j]
 						if (v.tag ~= cQueue[1].tag) then

@@ -15,6 +15,7 @@ return { tankassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 140,
     bait_level_default = 0,
     aimposoffset      = [[0 0 0]],
     midposoffset      = [[0 0 0]],
@@ -64,6 +65,7 @@ return { tankassault = {
 
     {
       def                = [[COR_REAP]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -78,8 +80,13 @@ return { tankassault = {
       areaOfEffect            = 32,
       burst                   = 2,
       burstRate               = 0.2,
+      cegTag                  = [[medium_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
         default = 320.1,

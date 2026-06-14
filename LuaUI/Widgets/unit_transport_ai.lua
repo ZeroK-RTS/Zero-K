@@ -50,7 +50,7 @@ local spGetUnitPosition       = Spring.GetUnitPosition
 local spGetUnitDefID          = Spring.GetUnitDefID
 local spEcho                  = Spring.Echo
 local spGetPlayerInfo         = Spring.GetPlayerInfo
-local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitCommands       = Spring.GetUnitCommands
 local spGetUnitSeparation     = Spring.GetUnitSeparation
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 local spGetUnitDefDimensions  = Spring.GetUnitDefDimensions
@@ -71,15 +71,6 @@ local autoCallTransportCmdDesc = {
 	action  = 'autocalltransport',
 	params  = {0, 'off', 'on'},
 	pos = {CMD.ONOFF, CMD.REPEAT, CMD.MOVE_STATE, CMD.FIRE_STATE, CMD_RETREAT},
-}
-
-local unitAICmdDesc = {
-	id      = CMD_UNIT_AI,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Unit AI',
-	action  = 'unitai',
-	tooltip	= 'Toggles smart unit AI for the unit',
-	params 	= {0, 'AI Off','AI On'}
 }
 
 options_path = 'Settings/Unit Behaviour/Transport AI'
@@ -574,17 +565,6 @@ function widget:CommandsChanged()
 			table.insert(customCommands, autoCallTransportCmdDesc)
 			searchCall = false
 		end
-
-		if searchTransport and transportDef[unitDefID] then
-			local customCommands = widgetHandler.customCommands
-			local order = 0
-			if activeTransports[units[1]] then
-				order = 1
-			end
-			unitAICmdDesc.params[1] = order
-			table.insert(customCommands, unitAICmdDesc)
-			searchTransport = false
-		end
 	end
 end
 
@@ -677,7 +657,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 		return
 	end
 
-	local queue = spGetCommandQueue(unitID, -1);
+	local queue = spGetUnitCommands(unitID, -1);
 	if (queue == nil) then
 		return
 	end
@@ -941,7 +921,7 @@ function GetPathLength(unitID)
 	if (h > maxi) then maxi = h end
 
 	local d = 0
-	local queue = spGetCommandQueue(unitID, -1);
+	local queue = spGetUnitCommands(unitID, -1);
 	local udid = spGetUnitDefID(unitID)
 	local moveID = UnitDefs[udid].moveDef.id
 	if (queue == nil) then return 0 end
@@ -990,7 +970,10 @@ function GetPathLength(unitID)
 end
 
 --This function process result of Spring.PathRequest() to say whether target is reachable or not
-function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
+function IsTargetReachable(moveID, ox,oy,oz,tx,ty,tz,radius)
+	if WG.Disable_RequestPath then
+		return "reach"
+	end
 	local result,lastcoordinate, waypoints
 	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
 	if path then
@@ -1053,7 +1036,7 @@ function taiEmbark(unitID, teamID, embark, shift, internal) -- called by gadget
 	end
 
 	if not internal then
-		local queue = spGetCommandQueue(unitID, -1)
+		local queue = spGetUnitCommands(unitID, -1)
 		if (not queue or #queue == 0) and (not shift) then --unit has no command at all and not queueing embark/disembark command
 			return false
 		else

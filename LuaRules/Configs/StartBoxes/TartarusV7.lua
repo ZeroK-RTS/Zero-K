@@ -1,5 +1,5 @@
 local ret = {
-	[0] = {
+	{
 		nameLong = "Northeast",
 		nameShort = "NE",
 		startpoints = {
@@ -14,7 +14,7 @@ local ret = {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "Southwest",
 		nameShort = "SW",
 		startpoints = {
@@ -35,7 +35,7 @@ if Spring.Utilities.GetTeamCount() == 2 then
 	return ret
 end
 
-ret[2] = {
+ret[3] = {
 	nameLong = "Northwest",
 	nameShort = "NW",
 	startpoints = {
@@ -50,7 +50,7 @@ ret[2] = {
 		},
 	},
 }
-ret[3] = {
+ret[4] = {
 	nameLong = "Southeast",
 	nameShort = "SE",
 	startpoints = {

@@ -49,10 +49,13 @@ local buttongroups = {
 		{"unit_lost_tally" , "Units Lost", "Total number of units lost. Includes crawling bombs and nanoframes. Does not include drones, units spawned by projectiles, or silo missiles."},
 		{"damage_dealt"    , "Damage Dealt", "Cumulative damage inflicted measured by the cost of the damaged unit in proportion to damage dealt."},
 		{"damage_received" , "Damage Received", "Cumulative damage received measured by the cost of the damaged unit in proportion to damage dealt."},
+		{"attrition_kill"    , "Attrition Kills", "Cumulative value killed divided by value lost."},
+		{"attrition_damage" , "Attrition Damage", "Cumulative value damaged divided by value damage received."},
 		},
 	},
 }
 
+local functionStats = {}
 local rulesParamStats = {
 	metal_excess = true,
 	metal_shared = true,
@@ -77,6 +80,24 @@ local rulesParamStats = {
 local hiddenStats = {
 	damage_dealt = true,
 	unit_value_killed = true,
+	attrition_kill = true,
+	attrition_damage = true,
+}
+
+local function GetLogOddsLabel(value)
+	if Spring.Utilities.IsNanOrInf(value) then
+		return "?"
+	end
+	value = math.exp(value)
+	if Spring.Utilities.IsNanOrInf(value) then
+		return "??"
+	end
+	return string.format("%.2f", value)
+end
+
+local labelScaleFunc = {
+	attrition_kill = GetLogOddsLabel,
+	attrition_damage = GetLogOddsLabel,
 }
 
 local gameOver = false
@@ -104,6 +125,7 @@ local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 
 local TEAM_WRAP = 20
+local ATTRITION_METRIC_EXTENT = 4.6
 
 local teamToPosition = {}
 do
@@ -182,7 +204,7 @@ local function formatTime(seconds)
 	return hours .. ":" .. minutes .. ":" .. seconds
 end
 
-local function drawIntervals(graphMin, graphMax)
+local function drawIntervals(statistic, graphMin, graphMax)
 	for i = 1, 4 do
 		local line = Chili.Line:New{
 			parent = graphPanel,
@@ -192,14 +214,21 @@ local function drawIntervals(graphMin, graphMax)
 			width = "100%",
 		}
 		if graphMin and graphMax then
+			local value = ((graphMax - graphMin)*i)/5 + graphMin
+			if statistic and labelScaleFunc[statistic] then
+				value = labelScaleFunc[statistic](value)
+			else
+				value = numFormat(value)
+			end
 			local label = Chili.Label:New{
 				parent = graphPanel,
 				x = 5,
 				bottom = (i/5*100 + 1) .. "%",
 				width = "100%",
-				caption = numFormat(((graphMax - graphMin)*i)/5 + graphMin),
+				caption = value,
 				objectOverrideFont = WG.GetFont(),
 			}
+			label:BringToFront()
 		end
 	end
 	if graphMin and graphMin < 0 then
@@ -296,7 +325,7 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, graphMin, graphMax, teamID, team_num, isHighlighted)
+local function drawGraph(graphArray, statistic, graphMin, graphMax, teamID, team_num, isHighlighted)
 	if #graphArray == 0 then
 		return
 	end
@@ -308,19 +337,14 @@ local function drawGraph(graphArray, graphMin, graphMax, teamID, team_num, isHig
 	)
 	local teamColor = {r,g,b,a}
 	local teamColorDark = {r*0.32,g*0.32,b*0.32,a}
-	local lineLabel = numFormat(graphArray[#graphArray])
+	local endValue = graphArray[#graphArray]
+	local lineLabel = labelScaleFunc[statistic] and labelScaleFunc[statistic](endValue) or numFormat(endValue)
 
 	local name = ""
 	if usingAllyteams then
 		name = Spring.GetGameRulesParam("allyteam_long_name_" .. teamID)
 	else
 		name = teamNames[teamID] or "???"
-	end
-
-	for i = 1, #graphArray do
-		if (graphMax < graphArray[i]) then
-			graphMax = graphArray[i]
-		end
 	end
 
 	--gets vertex's from array and plots them
@@ -332,11 +356,10 @@ local function drawGraph(graphArray, graphMin, graphMax, teamID, team_num, isHig
 	end
 
 	--adds value to end of graph
-	local labelOffBottom = ((graphArray[#graphArray] - graphMin)/(graphMax - graphMin) > 0.025)
 	local label1 = Chili.Label:New{
 		parent = lineLabels,
-		y = labelOffBottom and ((1 - (graphArray[#graphArray] - graphMin)/(graphMax - graphMin)) * 100 - 1 .. "%"),
-		bottom = (not labelOffBottom) and 1,
+		y = (math.min(99, math.max(2, (1 - (graphArray[#graphArray] - graphMin)/(graphMax - graphMin)) * 100, 2)) - 1 .. "%"),
+		bottom = 1,
 		width = "100%",
 		caption = lineLabel,
 		font = {color = (isHighlighted and teamColor) or teamColorDark},
@@ -399,63 +422,16 @@ local function drawGraph(graphArray, graphMin, graphMax, teamID, team_num, isHig
 		end
 	}
 	
-	return graph
+	return graph, label1
 end
 
-getEngineArrays = function(statNameData, labelCaption)
+local function GetTeamStats(teams, statistic, usingAllyteams, graphLength)
+	local graphMax, graphMin = 0, 0
 	local teamScores = {}
-	local teams = Spring.GetTeamList()
-	local spectating, specFullView = Spring.GetSpectatingState()
-	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
-	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
-	local totalTime = Spring.GetGameRulesParam("gameover_second")
-		or (generalHistory and generalHistory[graphLength] and generalHistory[graphLength]["time"])
-		or 0
-
-	--Applies label of the selected graph at bottom of window
-	local statistic = statNameData
-	curGraph.statNameData = statNameData
-	if type(statNameData) ~= "string" then
-		local statIndex = usingAllyteams and 1 or 2
-		statistic = statNameData[statIndex][1]
-		labelCaption = statNameData[statIndex][2]
-	end
-	
-		curGraph.caption = labelCaption
-	graphLabel:SetCaption(labelCaption)
-	graphTime:SetCaption("Total Time: " .. formatTime(totalTime))
-	-- If there's not at least two data points then don't draw the graph, labels, intervals, or players
-	if graphLength < 2 then
-		Chili.Label:New{
-			parent = graphPanel,
-			x = "10%",
-			y = "30%",
-			width = "80%",
-			height = "100%",
-			caption = "No Data",
-			align = "center",
-			textColor = {1,1,0,1},
-			objectOverrideFont = WG.GetFont(fontsize),
-		}
-		return
-	end
-
-	--finds highest stat out all the player stats, i.e. the highest point of the graph
-	local teamScores = {}
-	local graphMax = 0
-	local graphMin = 0
-	local gaia = usingAllyteams
-		and select(6, Spring.GetTeamInfo(gaiaTeamID, false))
-		or gaiaTeamID
-
 	for i = 1, #teams do
 		local teamID = teams[i]
 		if Spring.GetTeamStatsHistory(teamID, 0, graphLength) then
-
-			local effectiveTeam = usingAllyteams
-				and select(6, Spring.GetTeamInfo(teamID, false))
-				or teamID
-
+			local effectiveTeam = usingAllyteams and select(6, Spring.GetTeamInfo(teamID, false)) or teamID
 			teamScores[effectiveTeam] = teamScores[effectiveTeam] or {}
 			local stats
 			if rulesParamStats[statistic] then
@@ -482,12 +458,98 @@ getEngineArrays = function(statNameData, labelCaption)
 			end
 		end
 	end
+	return teamScores, graphMax, graphMin
+end
 
-	if graphMax < 5 then
-		graphMax = 5
+local function ToLogOdds(value)
+	return math.log(value)
+end
+
+local function GetAttritionMetric(teams, dealtStat, takenStat, usingAllyteams, graphLength)
+	local dealt = GetTeamStats(teams, dealtStat, usingAllyteams, graphLength)
+	local taken = GetTeamStats(teams, takenStat, usingAllyteams, graphLength)
+	local output = {}
+	local range = ToLogOdds(ATTRITION_METRIC_EXTENT)
+	for i = 1, #teams do
+		local teamID = teams[i]
+		if Spring.GetTeamStatsHistory(teamID, 0, graphLength) then
+			local effectiveTeam = usingAllyteams and select(6, Spring.GetTeamInfo(teamID, false)) or teamID
+			if teamID and not output[effectiveTeam] then
+				output[effectiveTeam] = {}
+				for b = 1, graphLength do
+					if dealt[effectiveTeam][b] <= 0 or taken[effectiveTeam][b] <= 0 then
+						output[effectiveTeam][b] = 0
+					else
+						output[effectiveTeam][b] = ToLogOdds(dealt[effectiveTeam][b] / taken[effectiveTeam][b])
+					end
+				end
+			end
+		end
 	end
-	if graphMin > 0 then
-		graphMin = 0
+	return output, range, -range
+end
+
+function functionStats.attrition_kill(teams, statistic, usingAllyteams, graphLength)
+	return GetAttritionMetric(teams, 'unit_value_killed', 'unit_value_lost', usingAllyteams, graphLength)
+end
+
+function functionStats.attrition_damage(teams, statistic, usingAllyteams, graphLength)
+	return GetAttritionMetric(teams, 'damage_dealt', 'damage_received', usingAllyteams, graphLength)
+end
+
+getEngineArrays = function(statNameData, labelCaption)
+	local teams = Spring.GetTeamList()
+	local spectating, specFullView = Spring.GetSpectatingState()
+	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
+	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
+	local totalTime = Spring.GetGameRulesParam("gameover_second")
+		or (generalHistory and generalHistory[graphLength] and generalHistory[graphLength]["time"])
+		or 0
+
+	--Applies label of the selected graph at bottom of window
+	local statistic = statNameData
+	curGraph.statNameData = statNameData
+	if type(statNameData) ~= "string" then
+		local statIndex = usingAllyteams and 1 or 2
+		statistic = statNameData[statIndex][1]
+		labelCaption = statNameData[statIndex][2]
+	end
+	
+	curGraph.caption = labelCaption
+	graphLabel:SetCaption(labelCaption)
+	graphTime:SetCaption("Total Time: " .. formatTime(totalTime))
+	-- If there's not at least two data points then don't draw the graph, labels, intervals, or players
+	if graphLength < 2 then
+		Chili.Label:New{
+			parent = graphPanel,
+			x = "10%",
+			y = "30%",
+			width = "80%",
+			height = "100%",
+			caption = "No Data",
+			align = "center",
+			textColor = {1,1,0,1},
+			objectOverrideFont = WG.GetFont(fontsize),
+		}
+		return
+	end
+
+	--finds highest stat out all the player stats, i.e. the highest point of the graph
+	local gaia = usingAllyteams
+		and select(6, Spring.GetTeamInfo(gaiaTeamID, false))
+		or gaiaTeamID
+
+	local teamScores, graphMax, graphMin
+	if functionStats[statistic] then
+		teamScores, graphMax, graphMin = functionStats[statistic](teams, statistic, usingAllyteams, graphLength)
+	else
+		teamScores, graphMax, graphMin = GetTeamStats(teams, statistic, usingAllyteams, graphLength)
+		if graphMax < 5 then
+			graphMax = 5
+		end
+		if graphMin > 0 then
+			graphMin = 0
+		end
 	end
 	
 	local highlightID = (usingAllyteams and highlightedAllyTeamId)
@@ -498,13 +560,16 @@ getEngineArrays = function(statNameData, labelCaption)
 	local team_i = 1
 	for teamID, v in pairs(teamScores) do
 		if teamID ~= gaia and teamID ~= highlightID then
-			drawGraph(v, graphMin, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID)
+			drawGraph(v, statistic, graphMin, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID)
 		end
 	end
 	if highlightID then
-		local graph = drawGraph(teamScores[highlightID], graphMin, graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
+		local graph, label = drawGraph(teamScores[highlightID], statistic, graphMin, graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
 		if graph then
 			graph:BringToFront()
+		end
+		if label then
+			label:BringToFront()
 		end
 	end
 
@@ -513,7 +578,7 @@ getEngineArrays = function(statNameData, labelCaption)
 
 	graphPanel:Invalidate()
 	graphPanel:UpdateClientArea()
-	drawIntervals(graphMin, graphMax)
+	drawIntervals(statistic, graphMin, graphMax)
 end
 
 --------------------------------------------------------------------------------

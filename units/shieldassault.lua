@@ -15,10 +15,12 @@ return { shieldassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 120,
     bait_level_default = 0,
     shield_emit_height = 17,
     cus_noflashlight   = 1,
     selection_scale    = 0.82,
+    normaltex = [[unittextures/Thug_normals.dds]],
 
     outline_x = 80,
     outline_y = 80,
@@ -65,6 +67,7 @@ return { shieldassault = {
 
     {
       def                = [[THUD_WEAPON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -104,6 +107,7 @@ return { shieldassault = {
     THUD_WEAPON = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 36,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -111,11 +115,12 @@ return { shieldassault = {
         light_camera_height = 1400,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 200,
+        burst = Shared.BURST_RELIABLE,
       },
 
       damage                  = {
-        default = 170,
-        planes  = 170,
+        default = 180,
+        planes  = 180,
       },
 
       explosionGenerator      = [[custom:MARY_SUE]],
@@ -123,12 +128,12 @@ return { shieldassault = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       range                   = 280,
-      reloadtime              = 4,
+      reloadtime              = 3.9,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire5]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 210,
+      weaponVelocity          = 215,
     },
 
   },

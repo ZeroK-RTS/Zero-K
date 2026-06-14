@@ -43,6 +43,7 @@ return { factorycloak = {
     shared_energy_gen   = 1,
     parent_of_plate     = [[platecloak]],
     buggeroff_offset    = 35,
+    normaltex = [[unittextures/cremfactory_normals.dds]],
 
     stats_show_death_explosion = 1,
 
@@ -77,7 +78,7 @@ return { factorycloak = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy",
+  yardMap                       = "ooooooo ooooooo ooooooo oeeeeeo oeeeeeo oeeeeeo oeeeeeo uuuuuuu uuuuuuu uuuuuuu",
 
   featureDefs                   = {
 

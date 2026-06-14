@@ -62,6 +62,7 @@ return { staticheavyarty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 3,
       badTargetCategory  = [[GUNSHIP LAND SHIP HOVER SWIM]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
@@ -75,7 +76,6 @@ return { staticheavyarty = {
       accuracy                = 500,
       areaOfEffect            = 176,
       avoidFeature            = false,
-      avoidGround             = false,
       cegTag                  = [[vulcanfx]],
       craterBoost             = 0.25,
       craterMult              = 0.5,
@@ -85,6 +85,7 @@ return { staticheavyarty = {
         smoothradius     = [[120]],
         smoothmult       = [[0.5]],
         movestructures   = [[0.25]],
+        force_ignore_ground = "1",
         
         light_color = [[2.4 1.5 0.6]],
       },

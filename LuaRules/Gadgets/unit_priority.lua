@@ -451,8 +451,7 @@ function gadget:GameFrame(n)
 			
 			-- Take away the constant income which was gained this frame (innate, reclaim)
 			-- This is to ensure that level + total income is exactly what will be gained in the next second (if nothing is spent).
-			local lumpIncome = (spGetTeamRulesParam(teamID, "OD_metalBase") or 0) +
-				(spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0) + (spGetTeamRulesParam(teamID, "OD_metalMisc") or 0)
+			local lumpIncome = (GG.Overdrive_priorityMetalIncome and GG.Overdrive_priorityMetalIncome[teamID]) or 0
 			level = level - (income - lumpIncome)/30
 			
 			-- Make sure the misc resoucing is constantly pulling the same value regardless of whether resources are spent

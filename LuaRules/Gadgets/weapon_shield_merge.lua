@@ -326,9 +326,9 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	if not weaponDefID then
 		return true
 	end
-
-	local damage = shieldDamages[weaponDefID]
-	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, defaultShielDamages[weaponDefID], hackyProID or proID)
+	local damageMult = Spring.ValidUnitID(proOwnerID) and Spring.GetUnitRulesParam(proOwnerID, "comm_damage_mult") or 1
+	local damage = shieldDamages[weaponDefID] * damageMult
+	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, defaultShielDamages[weaponDefID] * damageMult, hackyProID or proID)
 	return projectilePasses
 end
 

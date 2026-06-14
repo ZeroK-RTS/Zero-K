@@ -90,7 +90,6 @@ local commandDisplayConfig = {
 	[CMD_EMBARK] = {texture = imageDir .. 'Bold/embark.png'},
 	[CMD_DISEMBARK] = {texture = imageDir .. 'Bold/disembark.png'},
 
-	[CMD_ONECLICK_WEAPON] = {},--texture = imageDir .. 'Bold/action.png'},
 	[CMD_UNIT_SET_TARGET_CIRCLE] = {texture = imageDir .. 'Bold/settarget.png'},
 	[CMD_UNIT_CANCEL_TARGET] = {texture = imageDir .. 'Bold/canceltarget.png'},
 
@@ -102,7 +101,13 @@ local commandDisplayConfig = {
 	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
 
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
-
+	
+	[CMD_MORPH_STOP] = {
+		DynamicDisplayFunc = function (cmdID, command)
+			return {texture = imageDir .. 'Bold/cancel.png', tex2 = command.texture}
+		end
+	},
+	
 	-- states
 	[CMD_WANT_ONOFF] = {
 		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
@@ -266,13 +271,15 @@ local commandDisplayConfig = {
 			imageDir .. 'states/overkill_off.png',
 			imageDir .. 'states/overkill_auto_target.png',
 			imageDir .. 'states/overkill_fire_at_will.png',
-			imageDir .. 'states/overkill_on.png'
+			imageDir .. 'states/overkill_on_except_single.png',
+			imageDir .. 'states/overkill_on.png',
 		},
 		stateTooltip = {
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Disabled"),
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled for automatic targeting"),
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled when set to Fire At Will"),
-			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Always")
+			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled except for single attack command"),
+			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Always"),
 		}
 	},
 	[CMD.TRAJECTORY] = {
@@ -641,7 +648,12 @@ end
 local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
 for i = 1, #modCommands do
 	local cmd = modCommands[i]
-	commandDisplayConfig[cmd.cmdID] = {tooltip = cmd.tooltip, texture = cmd.image, stateTooltip = cmd.stateTooltip}
+	commandDisplayConfig[cmd.cmdID] = {
+		tooltip = cmd.tooltip,
+		texture = cmd.image,
+		stateTooltip = cmd.stateTooltip,
+		DynamicDisplayFunc = cmd.DynamicDisplayFunc,
+	}
 end
 
 --------------------------------------------------------------------------------

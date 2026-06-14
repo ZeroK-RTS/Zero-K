@@ -23,6 +23,7 @@ return { vehcon = {
     modelradius    = [[20]],
     selection_scale = 1.2,
     cus_noflashlight = 1,
+    normaltex = [[unittextures/corcv_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

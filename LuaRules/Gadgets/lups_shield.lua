@@ -159,7 +159,7 @@ local function AddUnit(unitID, unitDefID)
 	local unitData = {
 		unitDefID   = unitDefID,
 		search      = def.search,
-		capacity    = def.damageMultShieldCapacity,
+		capacity    = math.max(1, def.damageMultShieldCapacity),
 		decayFactor = def.decayFactor,
 		radius      = def.shieldRadius,
 		fxTable     = fxTable,
@@ -193,6 +193,9 @@ local PI = math.pi
 
 local function cart2spherical(dx, dy, dz)
 	local r = math.sqrt(dx*dx + dy*dy + dz*dz)
+	if r == 0 then
+		return 0, 0, 0
+	end
 	local theta = math.acos(dz / r)
 	local phi = math.atan2(dy, dx)
 	return r, theta, phi

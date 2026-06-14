@@ -10,7 +10,7 @@ local tex
 local cameraUniform,lightUniform
 local isS3oUniform, lifeUniform
 
-local USE_SPECULAR = Spring.Utilities.IsCurrentVersionNewerThan(105, 1000)
+local USE_SPECULAR = Script.IsEngineMinVersion(105, 0, 1000)
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------

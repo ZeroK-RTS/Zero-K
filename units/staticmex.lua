@@ -14,7 +14,7 @@ return { staticmex = {
   customParams           = {
     occupationStrength = 1,
     pylonrange         = 50,
-    ismex              = 1, -- obsolete, but needed for CircuitAI
+    ismex              = 1,
     metal_extractor_mult = 1,
     aimposoffset       = [[0 11 0]],
     midposoffset       = [[0 0 0]],
@@ -22,6 +22,7 @@ return { staticmex = {
     removewait         = 1,
     removestop     = 1,
     selectionscalemult = 1.4,
+    normaltex = [[unittextures/ametalextractorlvl1_normals.dds]],
 
     outline_x = 75,
     outline_y = 75,

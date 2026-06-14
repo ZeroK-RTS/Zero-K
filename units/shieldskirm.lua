@@ -14,7 +14,7 @@ return { shieldskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aim_lookahead  = 80,
+    aim_lookahead  = 120,
     aimposoffset   = [[0 5 0]],
     midposoffset   = [[0 5 0]],
     modelradius    = [[14]],
@@ -29,7 +29,7 @@ return { shieldskirm = {
   leaveTracks            = true,
   maxSlope               = 36,
   maxWaterDepth          = 22,
-  metalCost              = 130,
+  metalCost              = 125,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[storm.s3o]],
@@ -59,6 +59,7 @@ return { shieldskirm = {
 
     {
       def                = [[STORM_ROCKET]],
+      accurateLeading    = 1,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -77,6 +78,7 @@ return { shieldskirm = {
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1800,
+        light_radius = 80,
       },
       
       damage                  = {
@@ -99,7 +101,7 @@ return { shieldskirm = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile2_fire_bass]],
       soundStartVolume        = 7,
-      startVelocity           = 185,
+      startVelocity           = 190,
       tracks                  = false,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,

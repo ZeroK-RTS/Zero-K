@@ -14,6 +14,7 @@ return { spidercrabe = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead  = 160,
     bait_level_default = 0,
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -10 0]],
@@ -30,7 +31,7 @@ return { spidercrabe = {
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 4,
   footprintZ             = 4,
-  health                 = 4200,
+  health                 = 4800,
   iconType               = [[spidersupport]],
   leaveTracks            = true,
   maxSlope               = 36,
@@ -68,6 +69,7 @@ return { spidercrabe = {
 
     {
       def                = [[ARM_CRABE_GAUSS]],
+      accurateLeading    = 2,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
@@ -79,6 +81,7 @@ return { spidercrabe = {
     ARM_CRABE_GAUSS = {
       name                    = [[Heavy Plasma Cannon]],
       areaOfEffect            = 200,
+      cegTag                  = [[crab_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0.5,
 

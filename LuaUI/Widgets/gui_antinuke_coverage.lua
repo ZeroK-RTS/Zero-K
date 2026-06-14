@@ -339,15 +339,24 @@ local function GetMouseTargetPosition()
 		return {target[1], target[2], target[3]}
 	elseif targetType == "unit" then
 		-- Target coordinate is the center of target unit.
-		return {spGetUnitPosition(target)}
+		local ux, uy, uz = spGetUnitPosition(target)
+		if uz then
+			return {ux, uy, uz}
+		else
+			Spring.Echo("gui_antinuke_coverage_error missing position for unit", target)
+		end
 	elseif targetType == "feature" then
 		-- Target is the exact point where the mouse-ray hits the feature's colvol.
 		-- FIXME But TraceScreenRay doesn't tell us that point, so we have to approximate.
 		rangeFudgeMargin = FeatureDefs[spGetFeatureDefID(target)].radius
-		return {spGetFeaturePosition(target)}
-	else
-		return nil
+		local fx, fy, fz = spGetFeaturePosition(target)
+		if fz then
+			return {fx, fy, fz}
+		else
+			Spring.Echo("gui_antinuke_coverage_error missing position for feature", target)
+		end
 	end
+	return false
 end
 
 local function DrawNukeOnMouse(cmdID)
@@ -396,9 +405,9 @@ local glVertex              = gl.Vertex
 local glPopMatrix           = gl.PopMatrix
 local glPushMatrix          = gl.PushMatrix
 local glTranslate           = gl.Translate
-local glScale				= gl.Scale
-local glRotate				= gl.Rotate
-local glLoadIdentity		= gl.LoadIdentity
+local glScale               = gl.Scale
+local glRotate              = gl.Rotate
+local glLoadIdentity        = gl.LoadIdentity
 local glLighting            = gl.Lighting
 
 local GL_LINES              = GL.LINES
@@ -415,12 +424,15 @@ end
 local function DrawEnemyInterceptors(inMinimap)
 	local px, pz = drawNuke.pos[1], drawNuke.pos[3]
 	local mx, mz = drawNuke.mouse[1], drawNuke.mouse[3]
+	if not (mx and mz) then
+		Spring.Echo("gui_antinuke_coverage_error nil mouse positions", mx, mz)
+		return
+	end
 
 	local intercepted = 0
 	glLineWidth(3)
 	
 	for unitID, def in pairs(enemyInt) do
-
 		local ux, uz
 		if def.static then
 			ux, uz = def.x, def.z

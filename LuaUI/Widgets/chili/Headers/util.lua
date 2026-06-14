@@ -92,7 +92,6 @@ function IsObject(v)
 	return ((type(v) == "metatable") or (type(v) == "userdata")) and (v.classname)
 end
 
-
 function IsNumber(v)
 	return (type(v) == "number")
 end
@@ -336,10 +335,14 @@ function table:shallowcopy()
 	return newTable
 end
 
-function table:arrayshallowcopy()
-	local newArray = {}
-	for i = 1, #self do
-		newArray[i] = self[i]
+function table:deepcopy()
+	local newTable = {}
+	for k, v in pairs(self) do
+		if type(v) == 'table' then
+			newTable[k] = table.deepcopy(v)
+		else
+			newTable[k] = v
+		end
 	end
 	return newTable
 end
@@ -347,12 +350,6 @@ end
 function table:arrayappend(t)
 	for i = 1, #t do
 		self[#self + 1] = t[i]
-	end
-end
-
-function table:arraymap(fun)
-	for i = 1, #self do
-		newTable[i] = fun(self[i])
 	end
 end
 
@@ -399,14 +396,13 @@ end
 
 function table:merge(table2)
 	for i, v in pairs(table2) do
-		if (type(v) == 'table') then
-			local sv = type(self[i])
-			if (sv == 'table') or (sv == 'nil') then
-				if (sv == 'nil') then self[i] = {} end
-				table.merge(self[i], v)
-			end
-		elseif (self[i] == nil) then
-			self[i] = v
+		local sv = self[i]
+		if type(v) ~= 'table' or (sv and type(sv) ~= 'table') then
+			self[i] = sv or v
+		elseif sv then
+			table.merge(sv, v)
+		else
+			self[i] = table.deepcopy(v)
 		end
 	end
 	return self
@@ -499,16 +495,29 @@ function mixColors(c1, c2, a)
 	}
 end
 
-function color2incolor(r, g, b, a)
-	if type(r) == 'table' then
-		r, g, b, a = unpack4(r)
+if false then --Script.IsEngineMinVersion(2025, 6, 10) then
+	function color2incolor(r,g,b)
+		if type(r) == 'table' then
+			r,g,b = unpack4(r)
+		end
+		if r then
+			return string.char(17, r*255, g*255, b*255)
+		else
+			return '\017\255\255\255'
+		end
 	end
+else
+	function color2incolor(r,g,b)
+		if type(r) == 'table' then
+			r,g,b = unpack4(r)
+		end
 
-	local inColor = '\255\255\255\255'
-	if r then
-		inColor = string.char(255, r*255, g*255, b*255)
+		if r then
+			return string.char(255, r*255, g*255, b*255)
+		else
+			return '\255\255\255\255'
+		end
 	end
-	return inColor
 end
 
 function incolor2color(inColor)

@@ -132,6 +132,20 @@ local optionGenerationTable = {
 		path = "Settings/Graphics",
 	},
 	{
+		optionWidget = "Energy Grid Wire Settings",
+		optionPath = "Settings/Graphics/Energy Grid Cables",
+		optionName = "cabletree_detail",
+		name = "Energy grid cables",
+		items = {
+			{ key = 'full',   name = 'Full (animated flows)',  desc = 'Show overdrive energy flowing through the grid (default).' },
+			{ key = 'noflow', name = 'Static (no flows)',      desc = 'Cheaper: gray pipes only, no per-tick flow reads or shader bubble pass.' },
+			{ key = 'off',    name = 'Off (no cables)',        desc = 'Hide the cables/wires entirely.' },
+		},
+		value = 'full',
+		type  = 'radioButton',
+		path = "Settings/Graphics",
+	},
+	{
 		optionName = "moreOptions",
 		name = "More Options",
 		value = "More graphics settings are available in the main menu under Settings -> Graphics. These settings require a restart to take effect.",
@@ -148,7 +162,7 @@ local optionGenerationTable = {
 	{
 		optionName = "scrollSpeed",
 		chobbyName = "CameraPanSpeed",
-		name = "Scroll Speed",
+		name = "Pan Speed",
 		min = 1,
 		max = 200,
 		default = 50,

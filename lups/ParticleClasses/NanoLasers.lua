@@ -131,6 +131,14 @@ function NanoLasers:Draw()
 	local color = self.color
 	local startPos = self.pos
 	local endPos   = self.targetpos
+
+	-- last needed Recoil 2025.04.10
+	if Spring.Utilities.IsNanOrInf(unpack(endPos)) or Spring.Utilities.IsNanOrInf(unpack(self.normdir)) or Spring.Utilities.IsNanOrInf(self.scane_mult) then
+		Spring.Echo("div0 detected", "self.scane_mult", self.scane_mult)
+		Spring.Utilities.TableEcho(startPos, "startPos")
+		Spring.Utilities.TableEcho(endPos, "endPos")
+		Spring.Utilities.TableEcho(self.normdir, "self.normdir")
+	end
 	
 	glColor(color[1],color[2],color[3],0.0003)
 	glMultiTexCoord(0,endPos[1] - self.normdir[3] * self.scane_mult ,endPos[2],endPos[3] + self.normdir[1] * self.scane_mult,1)

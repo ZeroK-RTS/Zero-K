@@ -53,7 +53,7 @@ local DEFAULT_VERSION = "#version 150 compatibility"
 
 local USE_OBJECT_DAMAGE = false
 
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+local BAR_COMPAT = Script.IsEngineMinVersion(105, 0, 500)
 
 -----------------------------------------------------------------
 -- Includes and classes loading

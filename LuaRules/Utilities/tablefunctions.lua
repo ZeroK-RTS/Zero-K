@@ -189,7 +189,7 @@ function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
 	if not dataRaw then
 		return
 	end
-	if not type(dataRaw) == 'string' then
+	if type(dataRaw) ~= 'string' then
 		Spring.Echo("Customkey data error! type == " .. type(dataRaw))
 	else
 		dataRaw = string.gsub(dataRaw, '_', '=')
@@ -211,4 +211,11 @@ function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
 	if collectgarbage then
 		collectgarbage("collect")
 	end
+end
+
+function Spring.Utilities.UsefulTableToCustomKey(inputTable)
+	if not inputTable then
+		return
+	end
+	return Spring.Utilities.Base64Encode(Spring.Utilities.TableToString(inputTable))
 end

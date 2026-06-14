@@ -11,9 +11,11 @@ return { spideraa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 150,
     bait_level_default = 0,
     cus_noflashlight = 1,
-    okp_damage = 265.1,
+    okp_damage = 305.1,
+    normaltex = [[unittextures/tarantula_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -69,8 +71,8 @@ return { spideraa = {
       },
 
       damage                  = {
-        default = 27,
-        planes  = 270.01,
+        default = 31,
+        planes  = 310.01,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -80,6 +82,7 @@ return { spideraa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 1000,

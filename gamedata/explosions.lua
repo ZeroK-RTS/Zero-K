@@ -14,6 +14,9 @@ ExplosionDefs = explosionDefs
 local shared = {} -- shared amongst the lua explosiondef enviroments
 Shared = shared
 
+-- engine compat
+math.tau = math.tau or (2 * math.pi)
+
 local files = vfsDirList("effects", "*.lua")
 suCopyTable(vfsDirList("gamedata/explosions", "*.lua", VFS.MAP), false, files)
 

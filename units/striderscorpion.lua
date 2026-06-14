@@ -25,6 +25,7 @@ return { striderscorpion = {
     aimposoffset          = [[0 10 0]],
     decloak_footprint     = 5,
     selection_scale = 1.16,
+    normaltex = [[unittextures/scorpion_normals.dds]],
 
     outline_x = 145,
     outline_y = 145,
@@ -210,6 +211,7 @@ return { striderscorpion = {
       cylinderTargeting      = 0,
 
       customParams            = {
+        burst = Shared.BURST_UNRELIABLE,
         light_color = [[0.7 0.7 0.2]],
         light_radius = 320,
         gui_draw_range = 450,
@@ -217,7 +219,7 @@ return { striderscorpion = {
       },
 
       damage                  = {
-        default        = 1001,
+        default        = 1000.01,
       },
 
       duration                = 8,

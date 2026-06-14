@@ -145,7 +145,8 @@ function UpdateCustomParamResourceData()
 	cp.metalBase       = spGetTeamRulesParam(teamID, "OD_metalBase") or 0
 	cp.metalOverdrive  = spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0
 	cp.metalMisc       = spGetTeamRulesParam(teamID, "OD_metalMisc") or 0
-    
+	cp.metalSkim       = spGetTeamRulesParam(teamID, "OD_metalSkim") or 0
+	
 	cp.energyIncome    = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
 	cp.energyOverdrive = spGetTeamRulesParam(teamID, "OD_energyOverdrive") or 0
 	cp.energyChange    = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
@@ -361,7 +362,7 @@ function widget:GameFrame(n)
 	local metalOverdrive = Format(cp.metalOverdrive)
 	local metalReclaim = Format(math.max(0, mInco - cp.metalOverdrive - cp.metalBase - cp.metalMisc - mReci))
 	local metalConstructor = Format(cp.metalMisc)
-	local metalShare = Format(mReci - mSent)
+	local metalShare = Format(mReci - mSent - cp.metalSkim)
 	local metalConstuction = Format(-mExpe)
 	
 	local team_metalTotalIncome = Format(teamMInco)

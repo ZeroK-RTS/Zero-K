@@ -23,6 +23,12 @@ local icontypes = {
     radiusadjust=0,
   },
   
+-- commander egg
+  commander_egg = {
+    bitmap='icons/commander_egg_icon.dds',
+    size=1.9,
+  },
+
 -- commanders
   commander0 = {
     bitmap='icons/armcommander.dds',
@@ -1298,6 +1304,11 @@ local icontypes = {
     bitmap='icons/pw_assault.png',
 	distance = 1.3,
     size = 3.0,
+  },
+  pw_assault_small = {
+    bitmap='icons/pw_assault.png',
+	distance = 1.3,
+    size = 2.1,
   },
   pw_bomberfac = {
     bitmap='icons/pw_bomberfac.png',

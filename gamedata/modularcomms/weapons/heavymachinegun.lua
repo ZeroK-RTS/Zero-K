@@ -5,6 +5,7 @@ local weaponDef = {
 	alphaDecay              = 0.7,
 	areaOfEffect            = 96,
 	burnblow                = true,
+	cegTag                  = [[hmg_trail]],
 	craterBoost             = 0.15,
 	craterMult              = 0.3,
 

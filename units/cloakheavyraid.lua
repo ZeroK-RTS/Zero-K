@@ -89,6 +89,7 @@ return { cloakheavyraid = {
         light_radius = 120,
         light_beam_start = 0.25,
         
+        burst = Shared.BURST_RELIABLE,
         combatrange = 50,
       },
       

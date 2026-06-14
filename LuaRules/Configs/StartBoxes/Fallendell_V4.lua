@@ -1,5 +1,5 @@
 local tiny = {
-	[0] = {
+	{
 		startpoints = {
 			{250,2200},
 		},
@@ -14,7 +14,7 @@ local tiny = {
 		nameLong = "West",
 		nameShort = "W",
 	},
-	[1] = {
+	{
 		startpoints = {
 			{6144-250,5120-2200},
 		},
@@ -32,7 +32,7 @@ local tiny = {
 }
 
 local small = {
-	[0] = {
+	{
 		startpoints = {
 			{250,2200},
 		},
@@ -47,7 +47,7 @@ local small = {
 		nameLong = "West",
 		nameShort = "W",
 	},
-	[1] = {
+	{
 		startpoints = {
 			{6144-250,5120-2200},
 		},
@@ -65,7 +65,7 @@ local small = {
 }
 
 local large = {
-	[0] = {
+	{
 		startpoints = {
 			{1500,3150},
 		},
@@ -80,7 +80,7 @@ local large = {
 		nameLong = "West",
 		nameShort = "W",
 	},
-	[1] = {
+	{
 		startpoints = {
 			{6144-3150,5120-1500},
 		},

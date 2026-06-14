@@ -67,9 +67,9 @@ end
 function script.FireWeapon(num)
 	local px, py, pz = spGetUnitPosition(unitID)
 	if waterFire then
-		spPlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
+		spPlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz, "battle")
 	else
-		spPlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
+		spPlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz, "battle")
 	end
 end
 

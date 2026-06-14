@@ -94,6 +94,16 @@ local factoryDefIDs = {}
 local fieldBuildOpts = {}
 do
 	local alreadyAdded = {}
+
+	-- FIXME: assumes all constructors have the same buildlists
+	local buildableDirectly = VFS.Include("gamedata/buildoptions.lua")
+	for i = 1, #buildableDirectly do
+		local ud = UnitDefNames[buildableDirectly[i]]
+		if ud then
+			alreadyAdded[ud.id] = true
+		end
+	end
+
 	for i = 1, #factories do
 		local factoryName = factories[i]
 		local ud = UnitDefNames[factoryName]
@@ -103,7 +113,7 @@ do
 			for j = 1, #buildList do
 				local buildDefID = buildList[j]
 				if not alreadyAdded[buildDefID] then
-					fieldBuildOpts[#fieldBuildOpts + 1] = buildDefID
+					fieldBuildOpts[buildDefID] = true
 					alreadyAdded[buildDefID] = true
 				end
 			end
@@ -271,8 +281,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	end
 	isFieldFac[unitID] = true
 	local previousUnit = Spring.GetUnitRulesParam(unitID, "fieldFactoryUnit")
-	for i = 1, #fieldBuildOpts do
-		RemoveUnit(unitID, fieldBuildOpts[i])
+	for unitDefID in pairs(fieldBuildOpts) do
+		RemoveUnit(unitID, unitDefID)
 	end
 	if previousUnit then
 		AddUnit(unitID, previousUnit)

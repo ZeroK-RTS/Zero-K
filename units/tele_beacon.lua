@@ -8,6 +8,7 @@ return { tele_beacon = {
   customParams                  = {
       dontcount = [[1]],
       teleporter_is_beacon = true,
+      normaltex = [[unittextures/b_spy_jammer_radar_termite_normals.dds]],
   },
 
   explodeAs                     = [[TINY_BUILDINGEX]],

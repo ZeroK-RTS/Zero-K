@@ -47,7 +47,7 @@
 	"ctrl" : "Ctrl",
 	"alt" : "Alt",
 	"health" : "生命",
-	"shields" : "护盾",
+	"shield" : "护盾",
 	"value" : "价值",
 	"special" : "特殊",
 	"ready" : "就绪",

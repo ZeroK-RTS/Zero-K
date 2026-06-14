@@ -24,6 +24,7 @@ return { zenith = {
 
     neededlink     = 400,
     pylonrange     = 150,
+    normaltex = [[unittextures/Core_normals.dds]],
   },
   
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -147,12 +148,14 @@ return { zenith = {
       range                   = 8800,
       reloadtime              = 1.2,
       smokeTrail              = true,
+      smokePeriod             = 10,
+      smokeSize               = 80,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
 
       textures                = {
         [[null]],
-        [[null]],
+        [[largedarksmoketrail]],
         [[null]],
       },
 

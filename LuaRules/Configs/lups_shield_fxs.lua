@@ -154,7 +154,7 @@ for unitDefID = 1, #UnitDefs do
 		end
 
 		local isChicken = false
-		if string.find(ud.name, "chicken_") then
+		if string.find(ud.name, "chicken_") or cp.shield_fxs_type=="chicken" then
 			isChicken = true
 			myShield.colormap1 = {{0.3, 0.9, 0.2, 0.6}, {0.6, 0.4, 0.1, 0.6}}
 			myShield.hitResposeMult = 0.5

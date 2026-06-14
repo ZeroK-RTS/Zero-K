@@ -15,7 +15,8 @@ return { turretriot = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    bait_level_target = 4,
+    aim_lookahead      = 60,
+    bait_level_target  = 4,
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 4 0]],
     aim_lookahead  = 50,
@@ -74,6 +75,7 @@ return { turretriot = {
       areaOfEffect            = 96,
       avoidFeature            = false,
       burnblow                = true,
+      cegTag                  = [[hmg_trail]],
       craterBoost             = 0.15,
       craterMult              = 0.3,
 

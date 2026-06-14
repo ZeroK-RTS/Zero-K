@@ -19,6 +19,7 @@ return { jumpscout = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 160,
     bait_level_default = 1,
     modelradius    = [[10]],
     
@@ -102,6 +103,7 @@ return { jumpscout = {
       flightTime              = 0.8,
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
+      leadlimit               = 0,
       interceptedByShieldType = 2,
       model                   = [[puppymissile.s3o]],
       noSelfDamage            = true,

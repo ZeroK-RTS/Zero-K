@@ -359,6 +359,11 @@ local function DrawWorldFunc()
 	glDepthMask(false)
 end
 
+local function clearUnitIcons()
+	renderOrders = { {}, {}, {} }
+	unitDefsToRender = {}
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Event Call-ins
@@ -370,7 +375,10 @@ function widget:Initialize()
 	kp_timer = nil
 	current_mode = "Dynamic"
 	UpdateDynamic()
+	widget:addUnitIconsForAllUnits()
+end
 
+function widget:addUnitIconsForAllUnits()
 	local allUnits = spGetAllUnits()
 	for _,unitID in pairs (allUnits) do
 		local unitDefID = spGetUnitDefID(unitID)
@@ -425,6 +433,11 @@ end
 
 function widget:UnitCreated(unitID, unitDefID)
 	addUnitIcon(unitID, unitDefID)
+end
+
+function widget:TeamColorsChanged()
+	clearUnitIcons()
+	widget:addUnitIconsForAllUnits()
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)

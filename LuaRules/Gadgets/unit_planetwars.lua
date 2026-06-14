@@ -34,7 +34,7 @@ local evacuateCmdDesc = {
 	action  = "evacuate",
 	cursor  = 'Repair',
 	type    = CMDTYPE.ICON,
-	tooltip = "Evacuates the structure from the battle via wormhole teleportation.",
+	tooltip = "Save the structure by teleporting it away. Shares a global cooldown.",
 }
 
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -56,6 +56,7 @@ local BATTLE_TIME_LIMIT = 30*60*60*2 -- Defenders win after 2 hours
 local teleportChargeNeededMult = false
 
 local STRUCTURE_SPACING = 192
+local HQ_SPAWN_SPACING = 1200
 
 local allyTeamRole = {
 	[0] = "attacker",
@@ -63,8 +64,8 @@ local allyTeamRole = {
 }
 
 local hqDefIDs = {
-	[0] = UnitDefNames["pw_hq_attacker"].id,
-	[1] = UnitDefNames["pw_hq_defender"].id,
+	[0] = {UnitDefNames["pw_hq_attacker"].id, UnitDefNames["pw_hq_attacker_extra"].id,},
+	[1] = {UnitDefNames["pw_hq_defender"].id, UnitDefNames["pw_hq_defender_extra"].id,},
 }
 
 if DEBUG_MODE then
@@ -85,7 +86,8 @@ end
 
 local structureSpawnData = {}
 local unitsByID = {}
-local hqs = {}
+local hqUnitAllyTeam = {}
+local allyTeamHqCount = {}
 local hqsDestroyed = {}
 local destroyedStructures = {data = {}, count = 0}
 local evacuateStructureString = false
@@ -99,6 +101,7 @@ local evacStructureCount = 0
 
 local wormholeList = {}
 local planetwarsBoxes = {}
+local planetwarsHqBoxes = {}
 
 local vector = Spring.Utilities.Vector
 
@@ -113,7 +116,6 @@ local EVAC_STATE = {
 
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
-GG.PlanetWars.hqs = hqs
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -408,6 +410,17 @@ local function GetRandomPosition(rectangle)
 	return position[1], position[2]
 end
 
+local function DrawRectangle(rectangle)
+	local topLeft = rectangle[1]
+	local topRight = vector.Add(rectangle[1], rectangle[2])
+	local botRight = vector.Add(rectangle[1], vector.Add(rectangle[2], rectangle[3]))
+	local botLeft = vector.Add(rectangle[1], rectangle[3])
+	Spring.MarkerAddLine(topLeft[1], 0,topLeft[2], topRight[1], 0, topRight[2])
+	Spring.MarkerAddLine(topRight[1], 0, topRight[2], botRight[1], 0, botRight[2])
+	Spring.MarkerAddLine(botRight[1], 0, botRight[2], botLeft[1], 0, botLeft[2])
+	Spring.MarkerAddLine(botLeft[1], 0, botLeft[2], topLeft[1], 0,topLeft[2])
+end
+
 local function FlattenFunc(left, top, right, bottom, height)
 	-- top and bottom
 	for x = left + 8, right - 8, 8 do
@@ -530,15 +543,17 @@ local function SpawnStructure(info, teamID, boxData)
 end
 
 local function SpawnStructuresInBox(boxData, teamID)
+	--DrawRectangle(boxData)
 	teamID = teamID or gaiaTeamID
 	for _,info in pairs(structureSpawnData) do
 		SpawnStructure(info, teamID, boxData)
 	end
 end
 
-local function SpawnHQ(teamID, boxData, hqDefID)
+local function SpawnHQ(teamID, allyTeamID, boxData, hqDefID)
 	teamID = teamID or gaiaTeamID
 	
+	--DrawRectangle(boxData)
 	local x, z = GetRandomPosition(boxData)
 	local direction = math.floor(math.random()*4)
 	
@@ -555,9 +570,9 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 	
 	local giveUp = 0
 	while (Spring.TestBuildOrder(hqDefID, x, 0 ,z, direction) == 0 or
-		  (lava and Spring.GetGroundHeight(x,z) <= 0) or
-		  CheckOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
-		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
+			(lava and Spring.GetGroundHeight(x,z) <= 0) or
+			CheckOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+			(startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
 		x, z = GetRandomPosition(boxData)
 		giveUp = giveUp + 1
 		if giveUp > 80 then
@@ -584,10 +599,11 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 	planetwarsStructureCount = planetwarsStructureCount + 1
 	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
 	
-	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
+	AddNoGoZone(x, z, math.max(sX, sZ) + HQ_SPAWN_SPACING)
 	
 	local unitID = Spring.CreateUnit(hqDefID, x, y, z, direction, teamID)
-	hqs[unitID] = true
+	hqUnitAllyTeam[unitID] = allyTeamID
+	allyTeamHqCount[allyTeamID] = (allyTeamHqCount[allyTeamID] or 0) + 1
 	
 	--Spring.SetUnitNeutral(unitID,true) -- Makes structures not auto-attacked.
 end
@@ -610,7 +626,7 @@ end
 local function TeleportOut(unitID)
 	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
 	Spring.SpawnCEG("gate", x, y, z)
-	Spring.PlaySoundFile("sounds/misc/teleport_alt.wav", 20, x, y, z)
+	Spring.PlaySoundFile("sounds/misc/teleport_alt.wav", 20, x, y, z, "battle")
 	removingTeleportingUnit = true
 	Spring.DestroyUnit(unitID, false, true)
 	removingTeleportingUnit = false
@@ -656,7 +672,7 @@ function gadget:GameFrame(frame)
 				Spring.SpawnCEG("teleport_out", x, y, z)
 			end
 			if frame % 45 == 0 then
-				Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2, x, y, z)
+				Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2, x, y, z, "battle")
 			end
 		end
 	end
@@ -690,14 +706,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		UpdateEvacState()
 		CheckRemoveWormhole(unitID, unitDefID)
 	end
-	if hqs[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam, false))
-		hqsDestroyed[#hqsDestroyed+1] = allyTeam
-		
+	if hqUnitAllyTeam[unitID] then
+		local allyTeamID = hqUnitAllyTeam[unitID]
+		allyTeamHqCount[allyTeamID] = (allyTeamHqCount[allyTeamID] or 0) - 1
+		if allyTeamHqCount[allyTeamID] <= 0 then
+			hqsDestroyed[#hqsDestroyed+1] = allyTeamID
+		end
+		hqUnitAllyTeam[unitID] = nil
 		destroyedStructureCount = destroyedStructureCount + 1
 		Spring.SetGameRulesParam("pw_structureDestroyed_" .. destroyedStructureCount, UnitDefs[unitDefID].name)
-		
-		hqs[unitID] = nil
 	end
 	if unitID == teleportingUnit then
 		teleportingUnit = nil
@@ -711,11 +728,13 @@ function gadget:GamePreload()
 	end
 	
 	-- spawn field command centers
-	for i = 0, 1 do
-		local teamList = Spring.GetTeamList(i) or {0}
+	for allyTeamID = 0, 1 do
+		local teamList = Spring.GetTeamList(allyTeamID) or {0}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
-		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefIDs[i])
+		for j = 1, #hqDefIDs[allyTeamID] do
+			SpawnHQ(teamID, allyTeamID, planetwarsHqBoxes[allyTeamRole[allyTeamID]], hqDefIDs[allyTeamID][j])
+		end
 	end
 	
 	Spring.SetGameRulesParam("pw_structureList_count", planetwarsStructureCount)
@@ -792,6 +811,7 @@ function gadget:Initialize()
 
 	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
 	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
+	planetwarsHqBoxes = GG.GetPlanetwarsBoxes(0.3, 0.15, 0.3, edgePadding)
 	if not planetwarsBoxes then
 		gadgetHandler:RemoveGadget()
 		return
@@ -860,13 +880,18 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:GameOver()
+	Spring.Echo("== PLANETWARS STATE ==")
 	for i = 1, destroyedStructures.count do
 		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled," .. destroyedStructures.data[i])
+		Spring.Echo("structurekilled", destroyedStructures.data[i])
 	end
 	if evacuateStructureString then
 		Spring.SendCommands("wbynum 255 SPRINGIE:pwEvacuate " .. evacuateStructureString)
+		Spring.Echo("evacuateStructureString", evacuateStructureString)
 	end
 	for i = 1, #hqsDestroyed do
 		Spring.SendCommands("wbynum 255 SPRINGIE:hqkilled,".. hqsDestroyed[i])
+		Spring.Echo("hqkilled", hqsDestroyed[i])
 	end
+	Spring.Echo("== END STATE ==")
 end

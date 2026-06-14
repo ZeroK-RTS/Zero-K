@@ -53,7 +53,7 @@ local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spGetUnitIsStunned   = Spring.GetUnitIsStunned
-local spGetCommandQueue    = Spring.GetCommandQueue
+local spGetUnitCommands    = Spring.GetUnitCommands
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
 local spSetUnitVelocity    = Spring.SetUnitVelocity
 local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
@@ -597,7 +597,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local reload  = jumpDef.reload or 0
 
 	if (distSqr < (range*range)) then
-		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
+		local cmdTag = spGetUnitCommands(unitID,1)[1].tag
 		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) and Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1 then
 			local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag, cmdParams)
 			if not didJump then

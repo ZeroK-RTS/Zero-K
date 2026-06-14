@@ -26,6 +26,7 @@ include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 
 local PERIOD = 30
+local MISC_PRIO_KEY = 3
 
 local INLOS_ACCESS = {inlos = true}
 
@@ -140,7 +141,7 @@ function gadget:GameFrame(n)
 				local newUpkeep, upkeepPerUpdate = GetUnitUpkeep(unitID, def)
 				
 				if newUpkeep ~= data.oldUpkeep then
-					GG.StartMiscPriorityResourcing(unitID, newUpkeep, true, 3)
+					GG.StartMiscPriorityResourcing(unitID, newUpkeep, true, MISC_PRIO_KEY)
 					
 					data.oldUpkeep = newUpkeep
 					data.resTable.e = upkeepPerUpdate
@@ -157,9 +158,9 @@ function gadget:GameFrame(n)
 					ScriptUpdate(unitID, data.env, enabled)
 				end
 			else
-				if data.oldUpkeep ~= 0 then
-					GG.StopMiscPriorityResourcing(unitID, 3)
-					data.oldUpkeep = 0
+				if data.oldUpkeep then
+					GG.StopMiscPriorityResourcing(unitID, MISC_PRIO_KEY)
+					data.oldUpkeep = false
 				end
 				if data.oldEnabled then
 					ScriptUpdate(unitID, data.env, false)
