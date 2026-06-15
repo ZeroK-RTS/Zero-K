@@ -10,7 +10,7 @@
 
 layout (location = 0) in vec2 vertPos;     // (x, z) world coords
 layout (location = 1) in vec3 vertData;    // (capacity, appearTime, witherTime)
-layout (location = 2) in vec4 vertGrid;    // (gridEfficiency, flow, flowPhase, isOwnAlly); .z = per-end flow phase (ex-bubblePhase)
+layout (location = 2) in vec4 vertGrid;    // (gridEfficiency, flow, bubblePhase, isOwnAlly)
 layout (location = 3) in float vertSlot;   // coverage SSBO slot (-1 = disabled)
 
 out gl_PerVertex {
