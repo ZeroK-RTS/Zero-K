@@ -15,9 +15,11 @@ uniform float losViewEnabled; // 1.0 = LOS overlay is on (GetMapDrawMode=="los")
 
 // Same SSBO as the GS — per-edge coverage bitmask, gates per-segment
 // ghost rendering for enemy fragments.
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
 	uvec4 cableCoverage[];
 };
+#endif
 
 in DataGS {
 	vec3 worldPos;
@@ -350,6 +352,7 @@ void main() {
 		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 		float los0 = texture(infoTex, losUV0).r;
 		if (los0 >= ENEMY_LOS_CUT) discard;
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		uint cov0 = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
 		// Per-segment ghost gating, mirroring the calc done lower in the FS
 		// for live fragments. spawnAlongMain carries lenPerSeg for main
@@ -363,6 +366,7 @@ void main() {
 			segBit0 = 0xFFFFFFu;
 		}
 		if ((cov0 & segBit0) == 0u) discard;
+#endif
 
 		// Flat ghost shade: light gray, slight capacity-driven brightening,
 		// branches a touch dimmer. Alpha-blend over terrain (depth-write off
@@ -523,8 +527,10 @@ void main() {
 	if (enemyOutOfLOS) {
 		// Ghosts disabled: no SSBO read, no branch evaluation; just discard.
 		if (ghostsEnabled < 0.5) discard;
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		uint cov = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
 		if ((cov & segBit) == 0u) discard;
+#endif
 		// Same flat translucent shading as the ghost-VBO fast path so
 		// live-out-of-LOS and orphaned ghosts read identically.
 		float capT2 = clamp(capacity / 100.0, 0.0, 1.0);
@@ -681,5 +687,3 @@ void main() {
 	//alpha = 1.0;
 	fragColor = vec4(color, alpha); // Mix in some of the underlying terrain
 }
-#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
-#endif
