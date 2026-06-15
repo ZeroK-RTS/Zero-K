@@ -681,3 +681,5 @@ void main() {
 	//alpha = 1.0;
 	fragColor = vec4(color, alpha); // Mix in some of the underlying terrain
 }
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
+#endif

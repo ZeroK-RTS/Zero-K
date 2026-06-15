@@ -799,3 +799,5 @@ void main() {
 		         gridD, timeD, cap, tCenter, spawnAlongMain, twigIdx, arcDh, numSeg);
 	}
 }
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
+#endif
