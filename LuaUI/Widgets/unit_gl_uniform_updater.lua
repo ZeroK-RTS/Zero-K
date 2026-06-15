@@ -40,13 +40,11 @@ local unitsCount = 0
 local unitPosition = {}
 local currentUnit = 1
 
--- Written as two blocks to preserve channel 10 (morph), managed by gui_healthbars_gl4
-local unitUniformLow    = {0, 0, 0, 0, 0, 0, 0, 0, 0} -- channels 1-9
-local unitUniformHealth = {0}                           -- channel 11
+local unitUniform = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} -- channels 1-11
+local unitMorphProgress = {}
 
 function updateUnit(unitID, unitDefID)
-	for i = 1, 9 do unitUniformLow[i] = 0 end
-	unitUniformHealth[1] = 0
+	for i = 1, 11 do unitUniform[i] = 0 end
 
 	local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
 	paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage or 0
@@ -58,11 +56,11 @@ function updateUnit(unitID, unitDefID)
 	local emp = paralyzeDamage / empHP
 	local hp = (health or 0) / maxHealth
 
-	--// HEALTH (channel 11)
-	unitUniformHealth[1] = 1 - hp
+	--// HEALTH
+	unitUniform[unitHealthChannel] = 1 - hp
 
 	--// BUILD
-	unitUniformLow[unitBuildChannel] = 1 - build
+	unitUniform[unitBuildChannel] = 1 - build
 
 	--// PARALYZE
 	local stunned = GetUnitIsStunned(unitID)
@@ -72,10 +70,10 @@ function updateUnit(unitID, unitDefID)
 	elseif emp > 1 then
 		emp = 1
 	end
-	unitUniformLow[unitParalyzeChannel] = emp
+	unitUniform[unitParalyzeChannel] = emp
 
 	--// CAPTURE
-	unitUniformLow[unitCaptureChannel] = capture or 0
+	unitUniform[unitCaptureChannel] = capture or 0
 
 	--// DISARM
 	local gameFrame = Spring.GetGameFrame()
@@ -84,67 +82,69 @@ function updateUnit(unitID, unitDefID)
 		local disarmProp = (disarmFrame - gameFrame) / 1200
 		if disarmProp < 1 then
 			if disarmProp > emp + 0.014 then -- 16 gameframes of emp buffer
-				unitUniformLow[unitDisarmChannel] = disarmProp
+				unitUniform[unitDisarmChannel] = disarmProp
 			end
 		else
-			unitUniformLow[unitDisarmChannel] = (disarmFrame - gameFrame - 1200) / gameSpeed + 1
+			unitUniform[unitDisarmChannel] = (disarmFrame - gameFrame - 1200) / gameSpeed + 1
 		end
 	end
 
 	--// SLOW
-	unitUniformLow[unitSlowChannel] = GetUnitRulesParam(unitID, "slowState") or 0
+	unitUniform[unitSlowChannel] = GetUnitRulesParam(unitID, "slowState") or 0
 
 	--// RELOAD (primary weapon or script reload, mutually exclusive per unit)
 	if unitDefPrimaryWeapon[unitDefID] then
 		local _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID])
-		unitUniformLow[unitReloadChannel] = -(reloadFrame or 0)
+		unitUniform[unitReloadChannel] = -(reloadFrame or 0)
 	elseif unitDefScriptReload[unitDefID] then
-		unitUniformLow[unitReloadChannel] = -(GetUnitRulesParam(unitID, "scriptReloadFrame") or 0)
+		unitUniform[unitReloadChannel] = -(GetUnitRulesParam(unitID, "scriptReloadFrame") or 0)
 	end
 
 	--// DGUN
 	if unitDefDgun[unitDefID] then
 		local _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefDgun[unitDefID])
-		unitUniformLow[unitDgunChannel] = -(reloadFrame or 0)
+		unitUniform[unitDgunChannel] = -(reloadFrame or 0)
 	end
 
 	--// CHANNEL 7: ability/teleport/heat/speed/reammo/goo/jump/captureReload (mutually exclusive per unit)
 	if unitDefHasAbility[unitDefID] then
-		unitUniformLow[unitAbilityChannel] = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+		unitUniform[unitAbilityChannel] = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
 	elseif unitDefHasTeleport[unitDefID] then
 		local teleportEnd  = GetUnitRulesParam(unitID, "teleportend") or 0
 		local teleportCost = GetUnitRulesParam(unitID, "teleportcost") or 1
-		unitUniformLow[unitTeleportChannel] = 1 - (teleportEnd - gameFrame) / teleportCost
+		unitUniform[unitTeleportChannel] = 1 - (teleportEnd - gameFrame) / teleportCost
 	elseif unitDefHasHeat[unitDefID] then
-		unitUniformLow[unitHeatChannel] = GetUnitRulesParam(unitID, "heat_bar") or 0
+		unitUniform[unitHeatChannel] = GetUnitRulesParam(unitID, "heat_bar") or 0
 	elseif unitDefHasSpeed[unitDefID] then
-		unitUniformLow[unitSpeedChannel] = GetUnitRulesParam(unitID, "speed_bar") or 0
+		unitUniform[unitSpeedChannel] = GetUnitRulesParam(unitID, "speed_bar") or 0
 	elseif unitDefHasReammo[unitDefID] then
-		unitUniformLow[unitReammoChannel] = GetUnitRulesParam(unitID, "reammoProgress") or 0
+		unitUniform[unitReammoChannel] = GetUnitRulesParam(unitID, "reammoProgress") or 0
 	elseif unitDefHasGoo[unitDefID] then
-		unitUniformLow[unitGooChannel] = GetUnitRulesParam(unitID, "gooState") or 0
+		unitUniform[unitGooChannel] = GetUnitRulesParam(unitID, "gooState") or 0
 	elseif unitDefHasJump[unitDefID] then
-		unitUniformLow[unitJumpChannel] = GetUnitRulesParam(unitID, "jumpReload") or 0
+		unitUniform[unitJumpChannel] = GetUnitRulesParam(unitID, "jumpReload") or 0
 	elseif unitDefHasCaptureReload[unitDefID] then
-		unitUniformLow[unitCaptureReloadChannel] = -(GetUnitRulesParam(unitID, "captureRechargeFrame") or 0)
+		unitUniform[unitCaptureReloadChannel] = -(GetUnitRulesParam(unitID, "captureRechargeFrame") or 0)
 	end
 
 	--// CHANNEL 8: shield or stockpile (mutually exclusive per unit)
 	if unitDefHasShield[unitDefID] then
 		local shieldOn, shieldPower = GetUnitShieldState(unitID)
 		if shieldOn == false then shieldPower = 0.0 end
-		unitUniformLow[unitShieldChannel] = 1 - ((shieldPower or 0) / unitDefHasShield[unitDefID])
+		unitUniform[unitShieldChannel] = 1 - ((shieldPower or 0) / unitDefHasShield[unitDefID])
 	elseif unitDefCanStockpile[unitDefID] then
 		local _, _, stockpileBuild = GetUnitStockpile(unitID)
 		local unitDef = UnitDefs[unitDefID]
 		if unitDef.customParams and unitDef.customParams.stockpiletime then
 			stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
 		end
-		unitUniformLow[unitStockpileProgressChannel] = stockpileBuild or 0
+		unitUniform[unitStockpileProgressChannel] = stockpileBuild or 0
 	end
 
-	glSetUnitBufferUniforms(unitID, unitUniformLow, 1)
-	glSetUnitBufferUniforms(unitID, unitUniformHealth, unitHealthChannel)
+	--// MORPH
+	unitUniform[unitMorphChannel] = unitMorphProgress[unitID] or 0
+
+	glSetUnitBufferUniforms(unitID, unitUniform, 1)
 end
 
 function updateUnits()
@@ -188,6 +188,7 @@ function resetUnits()
 	unitsCount = 0
 	unitPosition = {}
 	currentUnit = 1
+	unitMorphProgress = {}
 
 	local spec, fullview = Spring.GetSpectatingState()
 	local allUnits = Spring.GetAllUnits()
@@ -308,8 +309,26 @@ end
 function widget:Initialize()
 	WG.GlUnionUpdaterAddFeatureCallbacks = WG.GlUnionUpdaterAddFeatureCallbacks or {}
 	WG.GlUnionUpdaterRemoveFeatureCallbacks = WG.GlUnionUpdaterRemoveFeatureCallbacks or {}
+
+	WG.MorphUpdateCallbacks = WG.MorphUpdateCallbacks or {}
+	WG.MorphStartCallbacks  = WG.MorphStartCallbacks  or {}
+	WG.MorphStopCallbacks   = WG.MorphStopCallbacks   or {}
+
+	local widgetName = widget:GetInfo().name
+	WG.MorphUpdateCallbacks[widgetName] = function(morphTable)
+		for unitID, morph in pairs(morphTable) do
+			unitMorphProgress[unitID] = morph.progress
+		end
+	end
+	WG.MorphStopCallbacks[widgetName] = function(unitID)
+		unitMorphProgress[unitID] = nil
+	end
+
 	initUnits()
 end
 
 function widget:Shutdown()
+	local widgetName = widget:GetInfo().name
+	WG.MorphUpdateCallbacks[widgetName] = nil
+	WG.MorphStopCallbacks[widgetName]   = nil
 end

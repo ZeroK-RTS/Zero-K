@@ -433,7 +433,6 @@ local gameSpeed = Game.gameSpeed
 
 local chobbyInterface
 
-local unitMorphWatch = {}
 
 local featureDefHeights = {} -- maps FeatureDefs to height
 
@@ -702,7 +701,6 @@ local function removeBarsFromUnit(unitID, reason)
 	for barname, v in pairs(barTypeMap) do
 		removeBarFromUnit(unitID, barname, reason)
 	end
-	unitMorphWatch[unitID] = nil
 end
 
 local function addBarToFeature(featureID, barname)
@@ -743,7 +741,6 @@ end
 
 local function init()
 	clearInstanceTable(healthBarVBO)
-	unitMorphWatch = {}
 
 	for i, unitID in ipairs(Spring.GetAllUnits()) do -- gets radar blips too!
 		-- probably shouldnt be adding non-visible units
@@ -855,27 +852,27 @@ end
 
 function MorphUpdate(morphTable)
 	for unitID, morph in pairs(morphTable) do
-		local oldMorph = unitMorphWatch[unitID]
-		if not oldMorph then 
-			addBarForUnit(unitID, unitDefID, "morph", "MorphUpdate")
-			oldMorph = -1.0
+		if not healthBarVBO.instanceIDtoIndex[unitID .. "_morph"] then
+			addBarForUnit(unitID, nil, "morph", "MorphUpdate")
 		end
-		if oldMorph and morph and morph.progress ~= UnitMorphs then
-			unitMorphWatch[unitID] = morph.progress
-			uniformcache[1] = morph.progress
-			gl.SetUnitBufferUniforms(unitID, uniformcache, morphChannel)
-		end
+	end
+	for _, callback in pairs(WG.MorphUpdateCallbacks) do
+		callback(morphTable)
 	end
 end
 
 function MorphStart(unitID, morphDef)
-	addBarForUnit(unitID, unitDefID, "morph", "MorphStart")
-	unitMorphWatch[unitID] = -1.0
+	addBarForUnit(unitID, nil, "morph", "MorphStart")
+	for _, callback in pairs(WG.MorphStartCallbacks) do
+		callback(unitID, morphDef)
+	end
 end
 
 function MorphStopOrFinished(unitID)
 	removeBarFromUnit(unitID, "morph", "MorphStopOrFinished")
-	unitMorphWatch[unitID] = nil
+	for _, callback in pairs(WG.MorphStopCallbacks) do
+		callback(unitID)
+	end
 end
 
 function widget:Initialize()
@@ -917,6 +914,10 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal("UnitCaptureStartedHealthbars", UnitCaptureStartedHealthbars )
 	widgetHandler:RegisterGlobal("UnitParalyzeDamageHealthbars", UnitParalyzeDamageHealthbars )
 	widgetHandler:RegisterGlobal("ProjectileCreatedReloadHB", ProjectileCreatedReloadHB )
+
+	WG.MorphUpdateCallbacks = WG.MorphUpdateCallbacks or {}
+	WG.MorphStartCallbacks  = WG.MorphStartCallbacks  or {}
+	WG.MorphStopCallbacks   = WG.MorphStopCallbacks   or {}
 
 	--// link morph callins
 	widgetHandler:RegisterGlobal('MorphUpdate', MorphUpdate)
@@ -1006,7 +1007,6 @@ function widget:VisibleUnitRemoved(unitID)
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
-	unitMorphWatch = {}
 	spec, fullview = Spring.GetSpectatingState()
 	myTeamID = Spring.GetMyTeamID()
 	myAllyTeamID = Spring.GetMyAllyTeamID()
