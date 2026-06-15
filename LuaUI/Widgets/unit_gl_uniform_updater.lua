@@ -1,7 +1,7 @@
 function widget:GetInfo()
    return {
       name      = "Unit gl uniform updater",
-      desc      = "Maintains sl unit and feature uniforms",
+      desc      = "Maintains unit and feature GL uniforms",
       author    = "Amnykon",
       date      = "Jan 2025",
       license   = "GNU GPL v2 or later",
@@ -11,7 +11,6 @@ function widget:GetInfo()
 end
 
 local ceil = math.ceil
-
 local updateCount = 0
 
 -----------------------------------------------------------------
@@ -19,21 +18,21 @@ local updateCount = 0
 -----------------------------------------------------------------
 
 local empDecline = 1 / Game.paralyzeDeclineRate
+local gameSpeed = Game.gameSpeed
+local paralyzeOnMaxHealth = Game.paralyzeOnMaxHealth
+local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 local includeDir = "LuaUI/Widgets/Include/"
 VFS.Include(includeDir.."gl_uniform_channels.lua")
 
-local GetVisibleUnits = Spring.GetVisibleUnits
-local GetUnitDefID = Spring.GetUnitDefID
-
-local GetUnitIsStunned     = Spring.GetUnitIsStunned
-local GetUnitHealth        = Spring.GetUnitHealth
+local GetUnitDefID            = Spring.GetUnitDefID
+local GetUnitIsStunned        = Spring.GetUnitIsStunned
+local GetUnitHealth           = Spring.GetUnitHealth
+local GetUnitWeaponState      = Spring.GetUnitWeaponState
+local GetUnitShieldState      = Spring.GetUnitShieldState
+local GetUnitStockpile        = Spring.GetUnitStockpile
+local GetUnitRulesParam       = Spring.GetUnitRulesParam
 local glSetUnitBufferUniforms = gl.SetUnitBufferUniforms
-local GetUnitRulesParam    = Spring.GetUnitRulesParam
-local GetVisibleUnits      = Spring.GetVisibleUnits
-local GetUnitShieldState   = Spring.GetUnitShieldState
-local GetUnitRulesParam    = Spring.GetUnitRulesParam
-local GetUnitStockpile     = Spring.GetUnitStockpile
 
 local unitUpdateRate = 10
 local units = {}
@@ -41,81 +40,111 @@ local unitsCount = 0
 local unitPosition = {}
 local currentUnit = 1
 
-local unitUniform = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+-- Written as two blocks to preserve channel 10 (morph), managed by gui_healthbars_gl4
+local unitUniformLow    = {0, 0, 0, 0, 0, 0, 0, 0, 0} -- channels 1-9
+local unitUniformHealth = {0}                           -- channel 11
+
 function updateUnit(unitID, unitDefID)
-	if not Spring.ValidUnitID(unitID) then
-		return
-	end
+	for i = 1, 9 do unitUniformLow[i] = 0 end
+	unitUniformHealth[1] = 0
 
 	local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
 	paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage or 0
 
-	if (not maxHealth)or(maxHealth < 1) then
-		maxHealth = 1
-	end
-
-	if (not build) then
-		build = 1
-	end
+	if (not maxHealth) or (maxHealth < 1) then maxHealth = 1 end
+	if not build then build = 1 end
 
 	local empHP = (not paralyzeOnMaxHealth) and health or maxHealth
-	local emp = paralyzeDamage/empHP
-	local hp  = (health or 0)/maxHealth
+	local emp = paralyzeDamage / empHP
+	local hp = (health or 0) / maxHealth
 
-	--// HEALTH
-	unitUniform[unitHealthChannel] = 1 - hp
+	--// HEALTH (channel 11)
+	unitUniformHealth[1] = 1 - hp
 
 	--// BUILD
-	unitUniform[unitBuildChannel] = 1 - build
+	unitUniformLow[unitBuildChannel] = 1 - build
 
 	--// PARALYZE
-	local paraTime = false
 	local stunned = GetUnitIsStunned(unitID)
 	stunned = stunned and paralyzeDamage >= empHP
-	if (stunned) then
-		emp = (paralyzeDamage-empHP)/(maxHealth*empDecline) + 1
-	else
-		if (emp > 1) then
-			emp = 1
-		end
+	if stunned then
+		emp = (paralyzeDamage - empHP) / (maxHealth * empDecline) + 1
+	elseif emp > 1 then
+		emp = 1
 	end
-	unitUniform[unitParalyzeChannel] = emp
+	unitUniformLow[unitParalyzeChannel] = emp
 
 	--// CAPTURE
-	capture = capture or 0
-	unitUniform[unitCaptureChannel] = capture
+	unitUniformLow[unitCaptureChannel] = capture or 0
 
 	--// DISARM
+	local gameFrame = Spring.GetGameFrame()
 	local disarmFrame = GetUnitRulesParam(unitID, "disarmframe")
 	if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
-		local disarm
-		local disarmProp = (disarmFrame - gameFrame)/1200
+		local disarmProp = (disarmFrame - gameFrame) / 1200
 		if disarmProp < 1 then
-			if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
-				disarm = disarmProp
+			if disarmProp > emp + 0.014 then -- 16 gameframes of emp buffer
+				unitUniformLow[unitDisarmChannel] = disarmProp
 			end
 		else
-			local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
-			if (not paraTime) or disarmTime > paraTime + 0.5 then
-				disarm = disarmTime + 1
-			end
+			unitUniformLow[unitDisarmChannel] = (disarmFrame - gameFrame - 1200) / gameSpeed + 1
 		end
-		unitUniform[unitDisarmChannel] = disarm
 	end
 
 	--// SLOW
-	-- for unitID, oldSlow in pairs(unitSlowWatch) do
-	local slow = GetUnitRulesParam(unitID, "slowState") or 0
-	unitUniform[unitSlowChannel] = slow
+	unitUniformLow[unitSlowChannel] = GetUnitRulesParam(unitID, "slowState") or 0
 
-	--// SHIELD
-	if unitDefHasShield[unitDefID] then -- TODO: may need to look at unitID if commander
-		local shieldOn, shieldPower = GetUnitShieldState(unitID)
-		if shieldOn == false then shieldPower = 0.0 end
-		unitUniform[unitShieldChannel] = 1 - ((shieldPower or 0) / (unitDefHasShield[(unitDefID)]))
+	--// RELOAD (primary weapon or script reload, mutually exclusive per unit)
+	if unitDefPrimaryWeapon[unitDefID] then
+		local _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID])
+		unitUniformLow[unitReloadChannel] = -(reloadFrame or 0)
+	elseif unitDefScriptReload[unitDefID] then
+		unitUniformLow[unitReloadChannel] = -(GetUnitRulesParam(unitID, "scriptReloadFrame") or 0)
 	end
 
-	glSetUnitBufferUniforms(unitID, unitUniform , 1)
+	--// DGUN
+	if unitDefDgun[unitDefID] then
+		local _, _, reloadFrame = GetUnitWeaponState(unitID, unitDefDgun[unitDefID])
+		unitUniformLow[unitDgunChannel] = -(reloadFrame or 0)
+	end
+
+	--// CHANNEL 7: ability/teleport/heat/speed/reammo/goo/jump/captureReload (mutually exclusive per unit)
+	if unitDefHasAbility[unitDefID] then
+		unitUniformLow[unitAbilityChannel] = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+	elseif unitDefHasTeleport[unitDefID] then
+		local teleportEnd  = GetUnitRulesParam(unitID, "teleportend") or 0
+		local teleportCost = GetUnitRulesParam(unitID, "teleportcost") or 1
+		unitUniformLow[unitTeleportChannel] = 1 - (teleportEnd - gameFrame) / teleportCost
+	elseif unitDefHasHeat[unitDefID] then
+		unitUniformLow[unitHeatChannel] = GetUnitRulesParam(unitID, "heat_bar") or 0
+	elseif unitDefHasSpeed[unitDefID] then
+		unitUniformLow[unitSpeedChannel] = GetUnitRulesParam(unitID, "speed_bar") or 0
+	elseif unitDefHasReammo[unitDefID] then
+		unitUniformLow[unitReammoChannel] = GetUnitRulesParam(unitID, "reammoProgress") or 0
+	elseif unitDefHasGoo[unitDefID] then
+		unitUniformLow[unitGooChannel] = GetUnitRulesParam(unitID, "gooState") or 0
+	elseif unitDefHasJump[unitDefID] then
+		unitUniformLow[unitJumpChannel] = GetUnitRulesParam(unitID, "jumpReload") or 0
+	elseif unitDefHasCaptureReload[unitDefID] then
+		unitUniformLow[unitCaptureReloadChannel] = -(GetUnitRulesParam(unitID, "captureRechargeFrame") or 0)
+	end
+
+	--// CHANNEL 8: shield or stockpile (mutually exclusive per unit)
+	if unitDefHasShield[unitDefID] then
+		local shieldOn, shieldPower = GetUnitShieldState(unitID)
+		if shieldOn == false then shieldPower = 0.0 end
+		unitUniformLow[unitShieldChannel] = 1 - ((shieldPower or 0) / unitDefHasShield[unitDefID])
+	elseif unitDefCanStockpile[unitDefID] then
+		local _, _, stockpileBuild = GetUnitStockpile(unitID)
+		local unitDef = UnitDefs[unitDefID]
+		if unitDef.customParams and unitDef.customParams.stockpiletime then
+			stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
+		end
+		unitUniformLow[unitStockpileProgressChannel] = stockpileBuild or 0
+	end
+
+	glSetUnitBufferUniforms(unitID, unitUniformLow, 1)
+	glSetUnitBufferUniforms(unitID, unitUniformHealth, unitHealthChannel)
 end
 
 function updateUnits()
@@ -125,7 +154,9 @@ function updateUnits()
 	end
 	for i = currentUnit, nextBlock do
 		local unitID = units[i]
-		updateUnit(unitID, GetUnitDefID(unitID))
+		if Spring.ValidUnitID(unitID) then
+			updateUnit(unitID, GetUnitDefID(unitID))
+		end
 	end
 	currentUnit = nextBlock + 1
 	if currentUnit > unitsCount then
@@ -146,7 +177,7 @@ function removeUnit(unitID)
 	if position == nil then return end
 	local lastUnit = units[unitsCount]
 	units[position] = lastUnit
-	unitPosition[lastUnit] = postion
+	unitPosition[lastUnit] = position
 	units[unitsCount] = nil
 	unitPosition[unitID] = nil
 	unitsCount = unitsCount - 1
@@ -159,15 +190,12 @@ function resetUnits()
 	currentUnit = 1
 
 	local spec, fullview = Spring.GetSpectatingState()
-
 	local allUnits = Spring.GetAllUnits()
-	local unitID, unitDefID
 	for i = 1, #allUnits do
-		unitID = allUnits[i]
+		local unitID = allUnits[i]
 		if fullview or Spring.GetUnitLosState(unitID, myAllyTeamID).los then
 			addUnit(unitID, GetUnitDefID(unitID))
 		end
-
 	end
 end
 
@@ -175,12 +203,12 @@ function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 	addUnit(unitID, unitDefID)
 end
 
-
 function widget:VisibleUnitRemoved(unitID)
 	removeUnit(unitID)
 end
 
 function widget:PlayerChanged(playerID)
+	myAllyTeamID = Spring.GetMyAllyTeamID()
 	resetUnits()
 end
 
@@ -195,15 +223,11 @@ end
 -----------------------------------------------------------------
 -- Features
 -----------------------------------------------------------------
-local featureHealthChannel = 1
-local featureResurrectChannel = 2
-local featureReclaimChannel = 3
 
-local GetVisibleFeatures   = Spring.GetVisibleFeatures
-local GetFeatureDefID      = Spring.GetFeatureDefID
-local GetFeatureHealth     = Spring.GetFeatureHealth
-local GetFeaturePosition   = Spring.GetFeaturePosition
-local GetFeatureResources  = Spring.GetFeatureResources
+local GetVisibleFeatures        = Spring.GetVisibleFeatures
+local GetFeatureDefID           = Spring.GetFeatureDefID
+local GetFeatureHealth          = Spring.GetFeatureHealth
+local GetFeatureResources       = Spring.GetFeatureResources
 local glSetFeatureBufferUniforms = gl.SetFeatureBufferUniforms
 
 local trackedFeatures = {}
@@ -212,24 +236,21 @@ for i = 1, #FeatureDefs do
 end
 
 local features = {}
-
 local featureUpdateRate = 200.0
 
 local featureUniform = {0, 0, 0}
 function updateFeature(featureID)
-	local health, maxHealth, resurrect, reclaim
-	health, maxHealth, resurrect = GetFeatureHealth(featureID)
-	_, _, _, _, reclaim = GetFeatureResources(featureID)
-	featureUniform[featureHealthChannel] = (health or 0)/(maxHealth or 1)
-	featureUniform[featureResurrectChannel] = resurrect
-	featureUniform[featureReclaimChannel] = reclaim
+	local health, maxHealth, resurrect = GetFeatureHealth(featureID)
+	local _, _, _, _, reclaim = GetFeatureResources(featureID)
+	featureUniform[featureHealthChannel]    = (health or 0) / (maxHealth or 1)
+	featureUniform[featureResurrectChannel] = resurrect or 0
+	featureUniform[featureReclaimChannel]   = reclaim or 0
 	glSetFeatureBufferUniforms(featureID, featureUniform, 1)
 end
 
 function addFeature(featureID, defID)
 	features[featureID] = defID
 	updateFeature(featureID)
-
 	for _, callback in pairs(WG.GlUnionUpdaterAddFeatureCallbacks) do
 		callback(featureID)
 	end
@@ -237,7 +258,6 @@ end
 
 function removeFeature(featureID)
 	features[featureID] = nil
-
 	for _, callback in pairs(WG.GlUnionUpdaterRemoveFeatureCallbacks) do
 		callback(featureID)
 	end
@@ -254,11 +274,11 @@ function updateFeatures()
 
 	local cnt = #visibleFeatures
 	for i = 1, cnt do
-		featureID = visibleFeatures[i]
-		featureDefID = GetFeatureDefID(featureID) or -1
+		local featureID = visibleFeatures[i]
+		local featureDefID = GetFeatureDefID(featureID) or -1
 		if trackedFeatures[featureDefID] then
 			if removedFeatures[featureID] then
-				if (updateCount + featureID) % updatePercent == 0 then
+				if updatePercent < 2 or (updateCount + featureID) % updatePercent == 0 then
 					updateFeature(featureID)
 				end
 				removedFeatures[featureID] = nil
@@ -269,7 +289,7 @@ function updateFeatures()
 	end
 
 	for featureID, val in pairs(removedFeatures) do
-		if val ~= nil then
+		if val then
 			removeFeature(featureID)
 		end
 	end

@@ -28,6 +28,14 @@ unitCaptureChannel = 9
 unitMorphChannel = 10
 unitHealthChannel = 11 -- if its =20, then its health/maxhealth
 
+-----------------------------------------------------------------
+-- Features
+-----------------------------------------------------------------
+
+featureHealthChannel = 1
+featureResurrectChannel = 2
+featureReclaimChannel = 3
+
 unitDefIgnore = {} -- commanders!
 unitDefHasShield = {} -- value is shield max power
 unitDefCanStockpile = {} -- 0/1?

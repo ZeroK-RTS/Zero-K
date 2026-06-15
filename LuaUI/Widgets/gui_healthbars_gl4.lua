@@ -346,9 +346,9 @@ local barTypeMap = {
 	stockpile = {
 		mincolor = {0.1, 0.1, 0.1, 1.0},
 		maxcolor = {0.1, 0.1, 0.1, 1.0},
-		bartype = bitShowGlyph + bitUseOverlay + bitPercentage, --bitIntegerNumber,
+		bartype = bitShowGlyph + bitUseOverlay + bitPercentage,
 		hidethreshold = 1.99,
-		uniformindex = unitStockpileChannel,
+		uniformindex = unitStockpileProgressChannel,
 		uvoffset = 8,
 	},
 	shield = {
@@ -372,7 +372,7 @@ local barTypeMap = {
 		maxcolor = {0.65, 0.65, 0.65, 1.0},
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = unitHealthChannel,
+		uniformindex = featureHealthChannel,
 		uvoffset = 18,
 	},
 	featurereclaim = {
@@ -380,7 +380,7 @@ local barTypeMap = {
 		maxcolor = {0.85, 1.00, 0.85, 1.0},
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = reclaimChannel,
+		uniformindex = featureReclaimChannel,
 		uvoffset = 4,
 	},
 	featureresurrect = {
@@ -388,7 +388,7 @@ local barTypeMap = {
 		maxcolor = {1.0, 0.2, 1.0, 1.0},
 		bartype = bitShowGlyph + bitPercentage,
 		hidethreshold = 0.99,
-		uniformindex = resurrectChannel,
+		uniformindex = featureResurrectChannel,
 		uvoffset = 5,
 	},
 }
@@ -423,13 +423,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local GetUnitIsStunned     = Spring.GetUnitIsStunned
-local GetUnitHealth        = Spring.GetUnitHealth
-local GetUnitWeaponState   = Spring.GetUnitWeaponState
-local GetUnitShieldState   = Spring.GetUnitShieldState
---local GetUnitViewPosition  = Spring.GetUnitViewPosition
-local GetUnitStockpile     = Spring.GetUnitStockpile
-local GetUnitRulesParam    = Spring.GetUnitRulesParam
 
 
 local spec, fullview = Spring.GetSpectatingState()
@@ -440,31 +433,10 @@ local gameSpeed = Game.gameSpeed
 
 local chobbyInterface
 
-local unitHealthWatch = {}
-local unitBuildWatch = {}
 local unitMorphWatch = {}
-local unitParalyzeWatch = {}
-local unitDisarmWatch = {}
-local unitSlowWatch = {}
-local unitReloadWatch = {}
-local unitDgunWatch = {}
-local unitTeleportWatch = {}
-local unitHeatWatch = {}
-local unitSpeedWatch = {}
-local unitReammoWatch = {}
-local unitScriptReloadWatch = {}
-local unitGooWatch = {}
-local unitJumpWatch = {}
-local unitCaptureReloadWatch = {}
-local unitAbilityWatch = {}
-local unitStockpileWatch = {}
-local unitShieldWatch = {} -- works
-local unitCaptureWatch = {}
 
 local featureDefHeights = {} -- maps FeatureDefs to height
 
-local empDecline = 1 / Game.paralyzeDeclineRate
-local minReloadTime = 4 -- weapons reloading slower than this willget bars
 
 local featureVBO
 
@@ -679,133 +651,58 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 	unitAllyTeam = unitAllyTeam or Spring.GetUnitAllyTeam(unitID)
 
 	addBarForUnit(unitID, unitDefID, "health", reason)
-	unitHealthWatch[unitID] = -1
-
 	addBarForUnit(unitID, unitDefID, "build", reason)
-	unitBuildWatch[unitID] = -1
-
 	addBarForUnit(unitID, unitDefID, "paralyze", reason)
-	unitParalyzeWatch[unitID] = -1
-
 	addBarForUnit(unitID, unitDefID, "disarm", reason)
-	unitDisarmWatch[unitID] = -1
-
 	addBarForUnit(unitID, unitDefID, "slow", reason)
-	unitSlowWatch[unitID] = -1
+	addBarForUnit(unitID, unitDefID, "capture", reason)
 
 	if unitDefDgun[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "dgun", reason, unitDefDgunReload[unitDefID] * gameSpeed)
-		unitDgunWatch[unitID] = -1
 	end
-
-	--[[
-	addBarForUnit(unitID, unitDefID, "teleport", reason)
-	unitTeleportWatch[unitID] = -1
-
-	addBarForUnit(unitID, unitDefID, "ability", reason)
-	unitAbilityWatch[unitID] = -1
-
-	addBarForUnit(unitID, unitDefID, "stockpile", reason)
-	unitStockpileWatch[unitID] = -1
-	]]--
-
 	if unitDefHasShield[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "shield", reason)
-		unitShieldWatch[unitID] = -1.0
 	end
-
 	if unitDefPrimaryWeapon[unitDefID] then
-	        local reloadTime = unitDefPrimaryReload[unitDefID]
-		addBarForUnit(unitID, unitDefID, "reload", reason, reloadTime * gameSpeed)
-		unitReloadWatch[unitID] = -1.0
+		addBarForUnit(unitID, unitDefID, "reload", reason, unitDefPrimaryReload[unitDefID] * gameSpeed)
 	end
---[[
-	local unitDef = UnitDefs[unitDefID]
-	if unitDef.customParams and unitDef.customParams.dynamic_comm then
-		addBarForUnit(unitID, unitDefID, "reload", reason)
-		unitReloadWatch[unitID] = -1.0
-	end
-	--]]
-
 	if unitDefHasAbility[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "ability", reason)
-		unitAbilityWatch[unitID] = -1.0
 	end
-	
 	if unitDefScriptReload[unitDefID] then
-		local reloadTime = unitDefScriptReload[unitDefID]
-		addBarForUnit(unitID, unitDefID, "reload", reason, reloadTime)
-		unitScriptReloadWatch[unitID] = -1.0
+		addBarForUnit(unitID, unitDefID, "reload", reason, unitDefScriptReload[unitDefID])
 	end
-	
 	if unitDefHasGoo[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "goo", reason)
-		unitGooWatch[unitID] = -1.0
 	end
-
 	if unitDefHasJump[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "jump", reason)
-		unitJumpWatch[unitID] = -1.0
 	end
-
 	if unitDefHasHeat[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "heat", reason)
-		unitHeatWatch[unitID] = -1.0
 	end
-
 	if unitDefHasSpeed[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "speed", reason)
-		unitSpeedWatch[unitID] = -1.0
 	end
-
 	if unitDefHasReammo[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "reammo", reason)
-		unitReammoWatch[unitID] = -1.0
 	end
-
 	if unitDefCanStockpile[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "stockpile", reason)
-		unitStockpileWatch[unitID] = -1.0
 	end
-
 	if unitDefHasCaptureReload[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "captureReload", reason, unitDefHasCaptureReload[unitDefID])
-		unitCaptureReloadWatch[unitID] = -1.0
 	end
-
 	if unitDefHasTeleport[unitDefID] then
 		addBarForUnit(unitID, unitDefID, "teleport", reason)
-		unitTeleportWatch[unitID] = -1.0
 	end
-
-	addBarForUnit(unitID, unitDefID, "capture", reason)
-	unitCaptureWatch[unitID] = -1
 end
 
 local function removeBarsFromUnit(unitID, reason)
-	for barname,v in pairs(barTypeMap) do
+	for barname, v in pairs(barTypeMap) do
 		removeBarFromUnit(unitID, barname, reason)
 	end
-	unitHealthWatch[unitID] = nil
-	unitBuildWatch[unitID] = nil
 	unitMorphWatch[unitID] = nil
-	unitParalyzeWatch[unitID] = nil
-	unitDisarmWatch[unitID] = nil
-	unitSlowWatch[unitID] = nil
-	unitReloadWatch[unitID] = nil
-	unitDgunWatch[unitID] = nil
-	unitTeleportWatch[unitID] = nil
-	unitHeatWatch[unitID] = nil
-	unitSpeedWatch[unitID] = nil
-	unitReammoWatch[unitID] = nil
-	unitScriptReloadWatch[unitID] = nil
-	unitGooWatch[unitID] = nil
-	unitJumpWatch[unitID] = nil
-	unitCaptureReloadWatch[unitID] = nil
-	unitAbilityWatch[unitID] = nil
-	unitStockpileWatch[unitID] = nil
-	unitShieldWatch[unitID] = nil
-	unitCaptureWatch[unitID] = nil
 end
 
 local function addBarToFeature(featureID, barname)
@@ -846,26 +743,7 @@ end
 
 local function init()
 	clearInstanceTable(healthBarVBO)
-	unitHealthWatch = {}
-	unitBuildWatch = {}
 	unitMorphWatch = {}
-	unitParalyzeWatch = {}
-	unitDisarmWatch = {}
-	unitSlowWatch = {}
-	unitReloadWatch = {}
-	unitDgunWatch = {}
-	unitTeleportWatch = {}
-	unitHeatWatch = {}
-	unitSpeedWatch = {}
-	unitReammoWatch = {}
-	unitScriptReloadWatch = {}
-	unitGooWatch = {}
-	unitJumpWatch = {}
-	unitCaptureReloadWatch = {}
-	unitAbilityWatch = {}
-	unitStockpileWatch = {}
-	unitShieldWatch = {}
-	unitCaptureWatch = {}
 
 	for i, unitID in ipairs(Spring.GetAllUnits()) do -- gets radar blips too!
 		-- probably shouldnt be adding non-visible units
@@ -1057,10 +935,10 @@ function widget:Shutdown()
 	widgetHandler:DeregisterGlobal("ProjectileCreatedReloadHB" )
 	Spring.Echo("Healthbars GL4 unloaded hooks")
 
-        widgetHandler:DeregisterGlobal('MorphUpdate', MorphUpdate)
-        widgetHandler:DeregisterGlobal('MorphFinished', MorphFinished)
-        widgetHandler:DeregisterGlobal('MorphStart', MorphStart)
-        widgetHandler:DeregisterGlobal('MorphStop', MorphStop)
+        widgetHandler:DeregisterGlobal('MorphUpdate')
+        widgetHandler:DeregisterGlobal('MorphFinished')
+        widgetHandler:DeregisterGlobal('MorphStart')
+        widgetHandler:DeregisterGlobal('MorphStop')
 
         widgetHandler:DeregisterGlobal('MorphDrawProgress')
 
@@ -1128,28 +1006,7 @@ function widget:VisibleUnitRemoved(unitID)
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
-	clearInstanceTable(healthBarVBO)
-	unitHealthWatch = {}
-	unitBuildWatch = {}
 	unitMorphWatch = {}
-	unitParalyzeWatch = {}
-	unitDisarmWatch = {}
-	unitSlowWatch = {}
-	unitReloadWatch = {}
-	unitDgunWatch = {}
-	unitTeleportWatch = {}
-	unitHeatWatch = {}
-	unitSpeedWatch = {}
-	unitReammoWatch = {}
-	unitScriptReloadWatch = {}
-	unitGooWatch = {}
-	unitJumpWatch = {}
-	unitCaptureReloadWatch = {}
-	unitAbilityWatch = {}
-	unitStockpileWatch = {}
-	unitShieldWatch = {}
-	unitCaptureWatch = {}
-
 	spec, fullview = Spring.GetSpectatingState()
 	myTeamID = Spring.GetMyTeamID()
 	myAllyTeamID = Spring.GetMyAllyTeamID()
@@ -1193,277 +1050,9 @@ function widget:PlayerChanged(playerID)
 	--if reinit then init() end
 end
 
-local paralyzeOnMaxHealth = Game.paralyzeOnMaxHealth
-
 function widget:GameFrame(gameFrame)
-
 	if debugmode then
 		locateInvalidUnits(healthBarVBO)
-	end
-	--[[ TODO:
-        unitMorphWatch[unitID] = nil
-        unitReloadWatch[unitID] = nil
-        unitDgunWatch[unitID] = nil
-        unitTeleportWatch[unitID] = nil
-        unitAbilityWatch[unitID] = nil
-        unitStockpileWatch[unitID] = nil
-	--]]
-	if gameFrame % 3 == 5 then -- TODO: move this to unit_gl_updater
-		for unitID, oldHealthPower in pairs(unitHealthWatch) do
-			local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
-			paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage or 0
-
-			if (not maxHealth)or(maxHealth < 1) then
-				maxHealth = 1
-			end
-
-			if (not build) then
-				build = 1
-			end
-
-			local empHP = (not paralyzeOnMaxHealth) and health or maxHealth
-			local emp = paralyzeDamage/empHP
-			local hp  = (health or 0)/maxHealth
-			
-			--// HEALTH
-			unitHealthWatch[unitID] = hp
-			-- Health is passed to shaders using health/maxHealth
-
-			--// BUILD
-			if unitBuildWatch[unitID] ~= build then
-				unitBuildWatch[unitID] = build
-				uniformcache[1] = 1-build
-				gl.SetUnitBufferUniforms(unitID, uniformcache, buildChannel)
-			end
-
-			--// PARALYZE
-			local paraTime = false
-			local stunned = GetUnitIsStunned(unitID)
-			stunned = stunned and paralyzeDamage >= empHP
-			if (stunned) then
-				emp = (paralyzeDamage-empHP)/(maxHealth*empDecline) + 1
-			else
-				if (emp > 1) then
-					emp = 1
-				end
-			end
-
-			if unitParalyzeWatch[unitID] ~= emp then
-				unitParalyzeWatch[unitID] = emp
-				uniformcache[1] = emp
-				gl.SetUnitBufferUniforms(unitID, uniformcache, paralyzeChannel)
-			end
-
-			--// CAPTURE
-			capture = capture or 0
-			if unitCaptureWatch[unitID] ~= capture then
-				unitCaptureWatch[unitID] = capture
-				uniformcache[1] = capture
-				gl.SetUnitBufferUniforms(unitID, uniformcache, captureChannel)
-			end
-
-			--// DISARM
-			local disarmFrame = GetUnitRulesParam(unitID, "disarmframe")
-			if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
-				local disarm
-				local disarmProp = (disarmFrame - gameFrame)/1200
-				if disarmProp < 1 then
-					if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
-						disarm = disarmProp
-					end
-				else
-					local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
-					if (not paraTime) or disarmTime > paraTime + 0.5 then
-						disarm = disarmTime + 1
-					end
-				end
-				if unitDisarmWatch[unitID] ~= disarm then
-					unitDisarmWatch[unitID] = disarm
-					uniformcache[1] = disarm
-					gl.SetUnitBufferUniforms(unitID, uniformcache, disarmChannel)
-				end
-			end
-
-			--// SLOW
-		-- for unitID, oldSlow in pairs(unitSlowWatch) do
-			local slow = GetUnitRulesParam(unitID, "slowState") or 0
-			if unitSlowWatch[unitID] ~= slow then
-				unitSlowWatch[unitID] = slow
-				uniformcache[1] = slow * 2
-				gl.SetUnitBufferUniforms(unitID, uniformcache, slowChannel)
-			end
-		-- end
-
-		end
-	end
-
-	if gameFrame % 3 == 1 then
-		--// SHIELD
-		for unitID, oldshieldPower in pairs(unitShieldWatch) do
-			local shieldOn, shieldPower = GetUnitShieldState(unitID)
-			if shieldOn == false then shieldPower = 0.0 end
-			if oldshieldPower ~= shieldPower then
-				if shieldPower == nil then
-					removeBarFromUnit(unitID, "shield", "unitShieldWatch")
-				else
-					uniformcache[1] = shieldPower / (unitDefHasShield[Spring.GetUnitDefID(unitID)])
-					gl.SetUnitBufferUniforms(unitID, uniformcache, shieldChannel)
-				end
-				unitShieldWatch[unitID] = shieldPower
-			end
-		end
-
-	-- RELOAD
-		for unitID, oldReload in pairs(unitReloadWatch) do
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			local reload 
-                        _, _, reload = GetUnitWeaponState(unitID, unitDefPrimaryWeapon[unitDefID])
-			reload = reload or 0
-
-			if oldReload ~= reload then
-				unitReloadWatch[unitID] = reload
-				uniformcache[1] = -reload 
-				gl.SetUnitBufferUniforms(unitID, uniformcache, reloadChannel)
-			end
-		end
-
-	-- DGUN
-		for unitID, oldReload in pairs(unitDgunWatch) do
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			local reload 
-                        _, _, reload = GetUnitWeaponState(unitID, unitDefDgun[unitDefID])
-
-			reload = reload or 0
-
-			if oldReload ~= reload then
-				unitDgunWatch[unitID] = reload
-				uniformcache[1] = -reload 
-				gl.SetUnitBufferUniforms(unitID, uniformcache, dgunChannel)
-			end
-		end
-
-		-- ABILITY
-		for unitID, oldAbility in pairs(unitAbilityWatch) do
-			local ability = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
-			if oldAbility ~= ability then
-				unitAbilityWatch[unitID] = ability
-				uniformcache[1] = ability 
-				gl.SetUnitBufferUniforms(unitID, uniformcache, abilityChannel)
-			end
-		end
-
-		-- SCRIPT RELOAD
-		for unitID, oldReload in pairs(unitScriptReloadWatch) do
-                        local reload = GetUnitRulesParam(unitID, "scriptReloadFrame") or 0
-
-			if oldReload ~= reload then
-				unitScriptReloadWatch[unitID] = reload
-				uniformcache[1] = -reload 
-				gl.SetUnitBufferUniforms(unitID, uniformcache, reloadChannel)
-			end
-                end
-	end
-
-	if gameFrame % 3 == 2 then
-		--// GOO
-		for unitID, oldGoo in pairs(unitGooWatch) do
-			local goo = GetUnitRulesParam(unitID, "gooState") or 0
-			if oldGoo ~= goo then
-				unitGooWatch[unitID] = goo
-				uniformcache[1] = goo
-				gl.SetUnitBufferUniforms(unitID, uniformcache, gooChannel)
-			end
-		end
-
-		--// JUMP
-		for unitID, oldJump in pairs(unitJumpWatch) do
-			local jump = GetUnitRulesParam(unitID, "jumpReload") or 0
-			if oldJump ~= jump then
-				unitJumpWatch[unitID] = jump
-				uniformcache[1] = jump
-				gl.SetUnitBufferUniforms(unitID, uniformcache, jumpChannel)
-			end
-		 end
-
-		--// HEAT
-		for unitID, oldHeat in pairs(unitHeatWatch) do
-			local heat = GetUnitRulesParam(unitID, "heat_bar")
-			if oldHeat ~= heat then
-				unitHeatWatch[unitID] = heat
-				uniformcache[1] = heat
-				gl.SetUnitBufferUniforms(unitID, uniformcache, heatChannel)
-			end
-		end
-
-		--// SPEED
-		for unitID, oldSpeed in pairs(unitSpeedWatch) do
-			local speed = GetUnitRulesParam(unitID, "speed_bar") or 0
-			if oldSpeed ~= speed then
-				unitSpeedWatch[unitID] = speed
-				uniformcache[1] = speed
-				gl.SetUnitBufferUniforms(unitID, uniformcache, speedChannel)
-			end
-		end
-
-		--// REAMMO
-		for unitID, oldReammo in pairs(unitReammoWatch) do
-			local reammo = GetUnitRulesParam(unitID, "reammoProgress") or 0
-			if oldReammo ~= reammo then
-				unitReammoWatch[unitID] = reammo
-				uniformcache[1] = reammo
-				gl.SetUnitBufferUniforms(unitID, uniformcache, reammoChannel)
-			end
-		end
-
-		--// STOCKPILE
-		for unitID, oldStockpile in pairs(unitStockpileWatch) do
-			local numStockpiled
-			local numStockpileQued
-			local stockpileBuild 
-			numStockpiled, numStockpileQued, stockpileBuild = GetUnitStockpile(unitID)
-
-	                local unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
-                        local unitDef = UnitDefs[unitDefID]
-			if unitDef.customParams and unitDef.customParams.stockpiletime then
-                                stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
-                        end
-
-			if oldStockpile ~= stockpileBuild then
-				unitStockpileWatch[unitID] = stockpileBuild 
-				uniformcache[1] = stockpileBuild
-				gl.SetUnitBufferUniforms(unitID, uniformcache, stockpileChannel)
-			end
-		end
-
-		--// CAPTURE RELOAD
-		for unitID, oldCaptureReload in pairs(unitCaptureReloadWatch) do
-			if oldCaptureReload <= gameFrame then 
-				local captureReload = GetUnitRulesParam(unitID, "captureRechargeFrame") or 0
-
-				if oldCaptureReload ~= captureReload then
-					unitCaptureReloadWatch[unitID] = captureReload
-					uniformcache[1] = -captureReload
-					gl.SetUnitBufferUniforms(unitID, uniformcache, captureReloadChannel)
-				end
-			end
-		end
-
-		--// TELEPORT
-		for unitID, oldTeleport in pairs(unitTeleportWatch) do
-			local TeleportEnd = GetUnitRulesParam(unitID, "teleportend") or 0
-			local TeleportCost = GetUnitRulesParam(unitID, "teleportcost") or 1
-			local teleport = 1 - (TeleportEnd - gameFrame)/TeleportCost
-
-			if teleport > 1 then
-				teleport = 1
-			end
-
-			if oldTeleport ~= teleport then
-				unitTeleportWatch[unitID] = teleport 
-				uniformcache[1] = teleport
-				gl.SetUnitBufferUniforms(unitID, uniformcache, teleportChannel)
-			end
-		end
 	end
 end
 
