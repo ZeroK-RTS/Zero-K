@@ -15,7 +15,7 @@ function widget:GetInfo()
 		handler   = true,
 	}
 end
-Spring.Echo('test')
+
 include("keysym.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------
