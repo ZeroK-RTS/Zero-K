@@ -138,6 +138,7 @@ local callInLists = {
 	-- Feature CallIns
 	"FeatureCreated",
 	"FeatureDestroyed",
+	"FeatureDamaged",
 	--[[ FeatureDamaged and FeaturePreDamaged missing on purpose. Basic damage control
 	     can be achieved via armordefs (use the "default" class, make sure to populate
 	     the others including "else" explicitly) so this way we avoid the perf cost. ]]
@@ -2028,6 +2029,38 @@ function gadgetHandler:FeatureCreated(featureID, allyTeam)
 	for _,g in r_ipairs(self.FeatureCreatedList) do
 		tracy.ZoneBeginN("G:FeatureCreated:" .. g.ghInfo.name)
 		g:FeatureCreated(featureID, allyTeam)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+	return
+end
+
+local FeatureDamaged_first = true
+local FeatureDamaged_count = 0
+local FeatureDamaged_gadgets = {}
+
+function gadgetHandler:FeatureDamaged(featureID, featureDefID, featureTeam, damage, weaponDefID,
+	projectileID, attackerID, attackerDefID, attackerTeam)
+	tracy.ZoneBeginN("G:FeatureDamaged")
+
+	if FeatureDamaged_first then
+		for _,g in r_ipairs(self.FeatureDamagedList) do
+			FeatureDamaged_count = FeatureDamaged_count + 1
+			FeatureDamaged_gadgets[FeatureDamaged_count] = g
+		end
+		FeatureDamaged_first = false
+	end
+
+	if gadgetHandler.GG._AddUnitDamage_teamID then
+		attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
+	end
+
+	local g
+	for i = 1, FeatureDamaged_count do
+		g = FeatureDamaged_gadgets[i]
+		tracy.ZoneBeginN("G:FeatureDamaged:" .. g.ghInfo.name)
+		g:FeatureDamaged(featureID, featureDefID, featureTeam, damage, weaponDefID,
+		projectileID, attackerID, attackerDefID, attackerTeam)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()

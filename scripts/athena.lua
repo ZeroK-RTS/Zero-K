@@ -87,6 +87,32 @@ function script.StopBuilding()
 	Turn(jaw2, x_axis, 0, math.rad(100))
 end
 
+function script.QueryWeapon(num)
+	return head
+end
+
+function script.AimFromWeapon(num)
+	return head
+end
+
+function script.AimWeapon(num, heading, pitch)
+	return true
+end
+
+function script.FireWeapon(num)
+	if num == 2 then --dgun also activates reload of main weapon
+		Spring.SetUnitWeaponState(unitID, 1, 'reloadState', Spring.GetGameFrame()+30*30) --30 second reload
+		GG.UpdateUnitAttributes(unitID)
+	end
+end
+
+function script.BlockShot(num, targetID)
+	-- Can't fire at all if main weapon isnt reloaded
+	local reloadState = Spring.GetUnitWeaponState(unitID, 1, 'reloadState')
+	return not (reloadState and (reloadState < 0 or reloadState < Spring.GetGameFrame()))
+end
+
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
