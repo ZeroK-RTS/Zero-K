@@ -28,6 +28,8 @@ local SIG_TAKEOFF = 2
 local takeoffHeight = UnitDefNames["bomberheavy"].cruiseAltitude
 
 local function ShowBall()
+	Move(ball, y_axis, 0)
+	Move(ball, z_axis, 0)
 	Show(ball)
 	
 	Move(radiator_L, z_axis, 0, 2)
