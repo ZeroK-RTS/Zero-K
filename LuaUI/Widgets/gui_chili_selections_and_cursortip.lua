@@ -1284,7 +1284,39 @@ local function GetImage(parentControl, name, initY, imageFile, iconSize, xOffset
 	return Update
 end
 
-local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
+local function UpdatePanelWidthsIfNeeded(caption, parentPanel, otherPanel)
+	if parentPanel.name ~= "leftPanel" or caption == nil then
+		return
+	end
+	local isTooltipVersion = parentPanel.parent.name == "tooltipWindow"
+	local n = string.len(caption)
+	local nMax = nil
+	if isTooltipVersion then
+		nMax = nMaxCaptionCharactersForTooltip
+	else
+		nMax = nMaxCaptionCharactersForSelection
+	end
+	if nMax ~= nil and n <= nMax then
+		return
+	end
+	if isTooltipVersion then
+		nMaxCaptionCharactersForTooltip = n
+	else
+		nMaxCaptionCharactersForSelection = n
+	end
+	local w = LEFT_WIDTH
+	if n > 10 then
+		-- icon, characters minus the color tags (HACK this assumes that the string has color tags)
+		w = ICON_SIZE + n * 5 - 4
+	end
+	if w ~= parentPanel.minWidth then
+		parentPanel.minWidth = w
+		parentPanel:Resize(w, parentPanel.height)
+		otherPanel:SetPos(w, 0)
+	end
+end
+
+local function GetImageWithText(parentControl, otherPanel, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
 	fontSize = fontSize or IMAGE_FONT
 	iconSize = iconSize or ICON_SIZE
 	xOffset = xOffset or 0
@@ -1322,6 +1354,7 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 			label:SetPos(nil, yPos + textOffset, nil, nil, nil, true)
 		end
 		label:SetCaption(newCaption)
+		UpdatePanelWidthsIfNeeded(newCaption, parentControl, otherPanel)
 		if newImage ~= imageFile then
 			if imageFile == nil then
 				label:SetPos(iconSize + 2, nil, nil, nil, nil, true)
@@ -2021,6 +2054,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		width = LEFT_WIDTH,
 		minWidth = LEFT_WIDTH,
 		autosize = true,
+		resizable = true,
 		padding = {0,2,0,2},
 		parent = parentControl,
 	}
@@ -2040,9 +2074,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		name = "unitImage",
 		x = 0,
 		y = 0,
-		right = 0,
+		left = 0,
 		height = PIC_HEIGHT,
-		keepAspect = false,
+		keepAspect = true,
 		file = imageFile,
 		parent = leftPanel,
 	}
@@ -2065,7 +2099,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 	
-	local unitNameUpdate = GetImageWithText(rightPanel, "unitNameUpdate", 1, nil, nil, NAME_FONT, nil, 2, 1)
+	local unitNameUpdate = GetImageWithText(rightPanel, leftPanel, "unitNameUpdate", 1, nil, nil, NAME_FONT, nil, 2, 1)
 	
 	local unitDesc = Chili.TextBox:New{
 		name = "unitDesc",
@@ -2077,12 +2111,12 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = rightPanel,
 	}
 	
-	local costInfoUpdate = GetImageWithText(leftPanel, "costInfoUpdate", PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 4)
-	local metalInfoUpdate = GetImageWithText(leftPanel, "metalInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 4)
-	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 4)
-	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
+	local costInfoUpdate = GetImageWithText(leftPanel, rightPanel, "costInfoUpdate", PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 4)
+	local metalInfoUpdate = GetImageWithText(leftPanel, rightPanel, "metalInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 4)
+	local energyInfoUpdate = GetImageWithText(leftPanel, rightPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 4)
+	local maxHealthLabel = GetImageWithText(rightPanel, leftPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
 	
-	local minWindLabel = GetImageWithText(leftPanel, "minWindLabel", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.WIND_SPEED, nil, nil, ICON_SIZE, 4)
+	local minWindLabel = GetImageWithText(leftPanel, rightPanel, "minWindLabel", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.WIND_SPEED, nil, nil, ICON_SIZE, 4)
 	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
 	local unitpicBadgeUpdate = GetImage(unitImage, "costInfoUpdate", 4, IMAGE.NO_AMMO, ICON_SIZE, 4)
 	
@@ -2452,6 +2486,15 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		rightPanel:SetVisibility(newVisible)
 	end
 	
+	function externalFunctions.ResetPanelWidths()
+		local w = LEFT_WIDTH
+		if leftPanel.minWidth ~= w then 
+			leftPanel.minWidth = w
+			leftPanel:Resize(w, leftPanel.height)
+			rightPanel:SetPos(w, 0)
+		end
+	end
+	
 	return externalFunctions
 end
 
@@ -2730,6 +2773,8 @@ local function UpdateTooltip(dt, requiredOnly)
 	tooltipWindow.SetVisible(visible)
 	if visible then
 		tooltipWindow.SetPosition(mx + 20/(WG.uiScale or 1), my - 20/(WG.uiScale or 1))
+	else
+		nMaxCaptionCharactersForTooltip = 0
 	end
 end
 
@@ -2805,6 +2850,8 @@ local function GetSelectionWindow()
 
 	function externalFunctions.ShowSingleUnit(unitID, unitDefID)
 		singleUnitID, singleUnitDefID = unitID, unitDefID or spGetUnitDefID(unitID)
+		nMaxCaptionCharactersForSelection = 0
+		singleUnitDisplay.ResetPanelWidths()
 		singleUnitDisplay.SetDisplay(unitID, singleUnitDefID)
 		singleUnitDisplay.SetVisible(true)
 		multiUnitDisplay.SetUnitDisplay()
@@ -2940,6 +2987,9 @@ local function InitializeWindParameters()
 	tidalHeight = Spring.GetGameRulesParam("tidalHeight")
 	econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
 end
+
+local nMaxCaptionCharactersForTooltip = 0
+local nMaxCaptionCharactersForSelection = 0
 
 local updateTimer = 0
 function widget:Update(dt)
