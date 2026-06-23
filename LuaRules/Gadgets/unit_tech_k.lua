@@ -26,6 +26,7 @@ local autoAiTech = Spring.GetModOptions().aiusetechk ~= "0"
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local modCommands, modCmdMap = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
 local CMD_TECH_UP = Spring.Utilities.CMD.TECH_UP
+
 local techCommandData = modCmdMap[CMD_TECH_UP]
 
 if not gadgetHandler:IsSyncedCode() then
