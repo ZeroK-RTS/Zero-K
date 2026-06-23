@@ -2035,7 +2035,6 @@ end
 
 local FeaturePreDamaged_GadgetMap = {}
 local FeaturePreDamaged_first = true
-local allWeaponDefs = {}
 
 function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
 	damage, weaponDefID,
@@ -2045,7 +2044,7 @@ function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
 	if FeaturePreDamaged_first then
 		for _,g in r_ipairs(self.FeaturePreDamagedList) do
 			tracy.ZoneBeginN("G:FeaturePreDamaged_GetWantedWeaponDef :" .. g.ghInfo.name)
-			local weaponDefs = (g.FeaturePreDamaged_GetWantedWeaponDef and g:FeatureDamaged_GetWantedWeaponDef()) or allWeaponDefs
+			local weaponDefs = (g.FeaturePreDamaged_GetWantedWeaponDef and g:FeaturePreDamaged_GetWantedWeaponDef()) or allWeaponDefs
 			tracy.ZoneEnd()
 			for _,wdid in ipairs(weaponDefs) do
 				if FeaturePreDamaged_GadgetMap[wdid] then
