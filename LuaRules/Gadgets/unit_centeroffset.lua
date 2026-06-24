@@ -114,6 +114,8 @@ local function UpdateUnitGrow(unitID, data, growScale)
 	if nonBlockingUnit[unitID] and growScale > 0 then
 		nonBlockingUnit[unitID] = nil
 		Spring.SetUnitBlocking(unitID, true, true)
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		Spring.SetUnitPosition(unitID, x, y, z)
 	end
 	growScale = 1 - growScale
 	
