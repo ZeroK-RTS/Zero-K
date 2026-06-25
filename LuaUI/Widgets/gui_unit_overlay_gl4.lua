@@ -15,7 +15,7 @@ options_path = 'Settings/Interface/Unit Overlay'
 local layout_path = options_path .. '/Size & Layout'
 options_order = {
 	-- General
-	'showGlyphsNumbers', 'drawFeatureHealth', 'ignoreDepth', 'fadeDistance', 'trackDarken', 'reloadThreshold',
+	'showGlyphsNumbers', 'drawFeatureHealth', 'fadeDistance', 'trackDarken', 'reloadThreshold',
 	'debugDrawAtlas',
 	-- Size & Layout (nested)
 	'overallScale',
@@ -45,13 +45,6 @@ options = {
 		OnChange = function()
 			initfeaturebars()
 		end
-	},
-	ignoreDepth = {
-		name = 'Draw on top of everything',
-		type = 'bool',
-		value = false,
-		noHotkey = true,
-		desc = 'Always draw bars in front of terrain and units, even when hidden behind them.',
 	},
 	fadeDistance = {
 		name = 'Fade-out distance',
@@ -2317,7 +2310,7 @@ function widget:DrawWorld()
 	gl.Texture(1, iconAtlasTexture)
 	healthBarShader:Activate()
 	healthBarShader:SetUniform("iconDistance",disticon)
-	healthBarShader:SetUniform("overlayDepthBand", options.ignoreDepth.value and 0.05 or 0.0)
+	healthBarShader:SetUniform("overlayDepthBand", 0.05)
 	if not debugmode then
 		local fd = options.fadeDistance.value
 		healthBarShader:SetUniform("cameraDistanceMult", fd > 0 and (shaderConfig.BARFADESTART / fd) or 0.0)
