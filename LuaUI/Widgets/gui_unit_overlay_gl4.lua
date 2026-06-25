@@ -15,7 +15,7 @@ options_path = 'Settings/Interface/Unit Overlay'
 local layout_path = options_path .. '/Size & Layout'
 options_order = {
 	-- General
-	'showGlyphsNumbers', 'drawFeatureHealth', 'fadeDistance', 'trackDarken', 'reloadThreshold',
+	'showGlyphsNumbers', 'drawFeatureHealth', 'fadeDistance', 'statusFadeDistance', 'iconHideDistance', 'trackDarken', 'reloadThreshold',
 	'debugDrawAtlas',
 	-- Size & Layout (nested)
 	'overallScale',
@@ -51,6 +51,18 @@ options = {
 		type = 'number', value = 3200, min = 0, max = 20000, step = 100,
 		noHotkey = true,
 		desc = 'Camera distance at which bars start fading out. 0 = never fade.',
+	},
+	statusFadeDistance = {
+		name = 'Status icons hide distance',
+		type = 'number', value = 0, min = 0, max = 20000, step = 100,
+		noHotkey = true,
+		desc = 'Camera distance beyond which status/state icons above bars are hidden. 0 = never hide.',
+	},
+	iconHideDistance = {
+		name = 'Unit icon hide distance',
+		type = 'number', value = 0, min = 0, max = 2000, step = 50,
+		noHotkey = true,
+		desc = 'Camera distance below which the center unit type icon is hidden. 0 = never hide.',
 	},
 	trackDarken = {
 		name = 'Empty bar brightness',
@@ -2315,6 +2327,9 @@ function widget:DrawWorld()
 		local fd = options.fadeDistance.value
 		healthBarShader:SetUniform("cameraDistanceMult", fd > 0 and (shaderConfig.BARFADESTART / fd) or 0.0)
 	end
+	local sfd = options.statusFadeDistance.value
+	healthBarShader:SetUniform("statusFadeDistance", sfd)
+	healthBarShader:SetUniform("iconHideDistance", options.iconHideDistance.value)
 	healthBarShader:SetUniform("cameraDistanceMultGlyph", glphydistmult)
 	healthBarShader:SetUniform("skipGlyphsNumbers",skipGlyphsNumbers)  --0.0 is everything,  1.0 means only numbers, 2.0 means only bars,
 	healthBarShader:SetUniform("vbarUserX",  options.weaponBarOffset.value)

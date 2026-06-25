@@ -366,6 +366,12 @@ void main()
 	v_mincolor = mincolor;
 	v_maxcolor = maxcolor;
 
+	// Center unit icon: show white when the unit is selected (bit 23 of userDefined[0][2]).
+	if ((BARTYPE & BITICON) != 0u && (BARTYPE & BITICONROW) == 0u) {
+		float isSelected = mod(floor(UNITUNIFORMS.userDefined[0][2] / 8388608.0), 2.0);
+		if (isSelected > 0.5) v_mincolor.rgb = vec3(1.0);
+	}
+
 	// The row above the bars (hovering-icon row + top-band status badges) needs to clear the whole
 	// bar stack, so those instances carry the above-bar count; everyone else ignores it.
 	v_aboveBars = 0.0;
