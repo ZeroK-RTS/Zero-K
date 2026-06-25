@@ -94,6 +94,8 @@ return { jumpblackhole = {
       craterMult              = 2,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         falldamageimmunity = [[120]],
 
         area_damage = 1,

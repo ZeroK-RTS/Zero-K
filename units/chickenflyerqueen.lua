@@ -128,6 +128,8 @@ return { chickenflyerqueen = {
       craterMult              = 2,
       
       customparams            = {
+          weapon_class = "explosive",
+          icon = [[unitpics/commweapon_missilelauncher.png]],
           spawns_name = "chickenc",
           spawns_expire = 0,
       },
@@ -170,6 +172,8 @@ return { chickenflyerqueen = {
       craterMult              = 0,
       
       customparams            = {
+          weapon_class = "explosive",
+          icon = [[unitpics/commweapon_missilelauncher.png]],
           spawns_name = "chicken_dodo",
           spawns_expire = 30,
       },
@@ -211,6 +215,8 @@ return { chickenflyerqueen = {
       craterMult              = 0,
             
             customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
             
@@ -252,6 +258,8 @@ return { chickenflyerqueen = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
 
@@ -305,6 +313,8 @@ return { chickenflyerqueen = {
       craterMult              = 2,
       
       customparams            = {
+          weapon_class = "explosive",
+          icon = [[unitpics/commweapon_missilelauncher.png]],
           spawns_name = "chicken_tiamat",
           spawns_expire = 0,
       },

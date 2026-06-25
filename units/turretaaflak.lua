@@ -73,6 +73,8 @@ return { turretaaflak = {
       cylinderTargeting       = 1,
 
       customParams              = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         isaa = [[1]],
         light_radius = 0,
       },

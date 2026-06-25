@@ -89,6 +89,8 @@ return { jumpskirm = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 4,

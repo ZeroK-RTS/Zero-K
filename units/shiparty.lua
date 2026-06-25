@@ -77,6 +77,8 @@ return { shiparty = {
       craterMult              = 2,
 
       customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         burst = Shared.BURST_RELIABLE,
       },
 

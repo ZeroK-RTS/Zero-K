@@ -90,6 +90,8 @@ return { tankraid = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         setunitsonfire = "1",
         burnchance     = "1",
         burntime       = 30,

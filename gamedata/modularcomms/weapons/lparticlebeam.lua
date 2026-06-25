@@ -9,6 +9,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "energy",
+		icon = [[unitpics/commweapon_lparticlebeam.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 

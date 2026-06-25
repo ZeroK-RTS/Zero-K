@@ -10,6 +10,8 @@ local weaponDef = {
 	craterMult              = 0.3,
 
 	customParams            = {
+		weapon_class = "kinetic",
+		icon = [[unitpics/commweapon_heavymachinegun.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectShot = [[custom:WARMUZZLE]],

@@ -83,6 +83,8 @@ return { hoverriot = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         stats_hide_damage = 1, -- continuous laser
         stats_hide_reload = 1,
         

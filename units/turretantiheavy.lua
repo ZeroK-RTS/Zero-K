@@ -75,6 +75,8 @@ return { turretantiheavy = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_color = [[1.6 1.05 2.25]],

@@ -64,6 +64,8 @@ return { missileslow = {
       collideFriendly         = false,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_onlyslow = 1,
         
         light_color = [[0.6 0.22 0.8]],

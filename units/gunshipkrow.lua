@@ -101,6 +101,8 @@ return { gunshipkrow = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         burst = Shared.BURST_UNRELIABLE,
         light_color = [[0.4 0.85 1]],
         light_radius = 110,
@@ -172,6 +174,10 @@ return { gunshipkrow = {
       soundStartVolume        = 2,
       sprayangle              = 13500,
       turret                  = true,
+      customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },

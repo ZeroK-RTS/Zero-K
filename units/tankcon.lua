@@ -90,6 +90,8 @@ return { tankcon = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 1200,
         light_radius = 120,
       },

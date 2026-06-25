@@ -92,6 +92,8 @@ return { amphassault = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         burst = Shared.BURST_UNRELIABLE,
 
         light_color = [[0.5 0.5 1.5]],
@@ -146,6 +148,8 @@ return { amphassault = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         bogus = 1,
       },
 

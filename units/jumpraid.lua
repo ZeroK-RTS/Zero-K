@@ -93,6 +93,8 @@ return { jumpraid = {
       cegTag                  = [[flamer_240_range]],
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         flamethrower = [[1]],
         setunitsonfire = "1",
         burnchance = "0.4", -- Per-impact

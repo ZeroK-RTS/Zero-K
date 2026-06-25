@@ -625,8 +625,7 @@ function widget:GameFrame(n)
 							val = val + 2.01 + 0.1 * disarmed
 						end
 						val = val + ((fire and 8) or 0)
-						uniformcache[1] = val
-						gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+						if WG.SetUnitParalyzeFX then WG.SetUnitParalyzeFX(unitID, val) end -- updater folds into float 4
 						uniformSet[unitID] = true
 					end
 				else
@@ -649,9 +648,8 @@ function widget:UnitCreated(unitID, unitDefID)
 	-- Enemy units might die offscreen
 	empLinger[unitID] = nil
 	disarmLinger[unitID] = nil
-	uniformcache[1] = 0
-	if not uniformSet[unitID] then
-		gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+	if not uniformSet[unitID] and WG.SetUnitParalyzeFX then
+		WG.SetUnitParalyzeFX(unitID, 0)
 	end
 	local stunned = utGetIsUnitEmped(unitID)
 	local disarmed = spGetUnitRulesParam(unitID, "disarmed")
@@ -694,7 +692,7 @@ function widget:Initialize()
 	if TESTMODE then
 		for i, unitID in ipairs(Spring.GetAllUnits()) do
 			widget:UnitCreated(unitID)
-			gl.SetUnitBufferUniforms(unitID, {1.01}, 4)
+			if WG.SetUnitParalyzeFX then WG.SetUnitParalyzeFX(unitID, 1.01) end
 		end
 	end
 	WG['DrawParalyzedUnitGL4'] = DrawParalyzedUnitGL4

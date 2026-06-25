@@ -81,6 +81,8 @@ return { veharty = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         damage_vs_shield = [[190]],
         damage_vs_feature = [[190]],
         force_ignore_ground = [[1]],

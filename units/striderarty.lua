@@ -73,6 +73,8 @@ return { striderarty = {
       craterMult              = 2,
       
       customParams              = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         force_ignore_ground = [[1]],
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],

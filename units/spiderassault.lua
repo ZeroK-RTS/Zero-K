@@ -77,6 +77,8 @@ return { spiderassault = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_camera_height = 1800,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 200,

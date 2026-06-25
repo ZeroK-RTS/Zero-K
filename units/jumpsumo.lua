@@ -129,6 +129,8 @@ return { jumpsumo = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         bogus = 1,
       },
 
@@ -176,6 +178,8 @@ return { jumpsumo = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         impulse = [[-150]],
 
         light_color = [[0.33 0.33 1.28]],
@@ -221,6 +225,8 @@ return { jumpsumo = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         impulse = [[150]],
 
         light_color = [[0.85 0.2 0.2]],
@@ -284,6 +290,8 @@ return { jumpsumo = {
       weaponVelocity          = 5,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         hidden = true
       }
     },

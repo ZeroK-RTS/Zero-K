@@ -68,6 +68,8 @@ return { shieldarty = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         burst = Shared.BURST_RELIABLE,
 
         disarmDamageMult = 1,

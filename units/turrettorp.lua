@@ -63,6 +63,8 @@ return { turrettorp = {
       cegTag                  = [[torpedo_trail]],
 
       customparams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         stays_underwater = 1,
       },
 

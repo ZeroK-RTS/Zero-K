@@ -9,6 +9,8 @@ local weaponDef = {
 	cylinderTargeting       = 1,
 
 	customParams            = {
+		weapon_class = "explosive",
+		icon = [[unitpics/commweapon_missilelauncher.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire   = [[custom:CRASHMUZZLE]],

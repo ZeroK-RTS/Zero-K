@@ -70,6 +70,8 @@ return { gunshipassault = {
       craterMult              = 0.246,
 
       customparams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         burst = Shared.BURST_UNRELIABLE,
 
         light_camera_height = 2500,

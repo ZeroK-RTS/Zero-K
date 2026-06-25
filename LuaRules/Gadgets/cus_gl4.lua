@@ -2080,7 +2080,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 		unitDefModelMaxY[unitDefID] = (ud.customParams.build_effect_sweep_height and tonumber(ud.customParams.build_effect_sweep_height) or ud.model.maxy or 10)
 	end
 	uniformCache[1] = unitDefModelMaxY[unitDefID]
-	gl.SetUnitBufferUniforms(unitID, uniformCache, 11) -- set unit height
+	gl.SetUnitBufferUniforms(unitID, uniformCache, 15) -- set unit height (moved off slot 11 -> ability slot; 15 is outside the updater block write 1-11, so not clobbered)
 	uniformCache[1] = 0
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 12) -- clear cloak effect
 	gl.SetUnitBufferUniforms(unitID, uniformCache, 6) -- clear selectedness effect

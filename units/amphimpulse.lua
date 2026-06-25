@@ -81,6 +81,8 @@ return { amphimpulse = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         force_ignore_ground = [[1]],
         lups_explodelife = 1.0,
         lups_explodespeed = 0.4,

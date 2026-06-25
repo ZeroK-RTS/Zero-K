@@ -90,6 +90,8 @@ return { turretheavy = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 2000,
         light_color = [[0.9 0.4 0.12]],
         light_radius = 180,
@@ -142,6 +144,8 @@ return { turretheavy = {
       craterMult              = 1.2,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_color = [[2.2 1.6 0.9]],
         light_radius = 550,
       },

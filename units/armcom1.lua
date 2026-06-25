@@ -106,6 +106,8 @@ return { armcom1 = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         bogus = 1,
       },
 
@@ -177,6 +179,10 @@ return { armcom1 = {
       thickness               = 3,
       tolerance               = 10000,
       turret                  = true,
+      customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
+      },
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },

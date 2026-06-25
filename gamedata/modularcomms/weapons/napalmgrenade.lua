@@ -9,6 +9,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "kinetic",
+		icon = [[unitpics/commweapon_napalmgrenade.png]],
 		is_unit_weapon = 1,
 		slot = [[3]],
 		setunitsonfire = "1",

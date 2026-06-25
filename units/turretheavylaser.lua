@@ -75,6 +75,8 @@ return { turretheavylaser = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         burst = Shared.BURST_UNRELIABLE,
         prevent_overshoot_fudge = 15,
 

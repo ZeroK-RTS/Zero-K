@@ -80,6 +80,8 @@ return { staticjammer = {
       commandfire             = true,
 
       customParams        = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         gui_draw_range  = 200,
         gui_draw_leashed_to_range  = 1,
         attack_aoe_circle_mode = "cloaker"

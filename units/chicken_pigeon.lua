@@ -85,6 +85,8 @@ return { chicken_pigeon = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         bogus = 1,
       },
 
@@ -115,6 +117,8 @@ return { chicken_pigeon = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         light_radius = 0,
       },
       

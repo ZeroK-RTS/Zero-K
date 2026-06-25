@@ -11,6 +11,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "explosive",
+		icon = [[unitpics/commweapon_torpedo.png]],
 		is_unit_weapon = 1,
 		badTargetCategory  = [[FIXEDWING]],
 		onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],

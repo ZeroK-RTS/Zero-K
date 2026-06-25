@@ -70,6 +70,8 @@ return { turretsunlance = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_damage = [[2500]],
       },
     

@@ -91,6 +91,8 @@ return { jumpscout = {
       craterMult              = 2,
 
             customParams = {
+                weapon_class = "explosive",
+                icon = [[unitpics/commweapon_missilelauncher.png]],
                 burst = Shared.BURST_RELIABLE,
             },
 

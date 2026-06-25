@@ -92,6 +92,8 @@ return { amphriot = {
       cegTag                  = [[torpedo_trail]],
 
       customparams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         stays_underwater = 1,
       },
 
@@ -138,6 +140,8 @@ return { amphriot = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_camera_height = 2000,
         light_color = [[0.3 0.3 0.05]],
         light_radius = 50,

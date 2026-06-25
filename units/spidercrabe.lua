@@ -86,6 +86,8 @@ return { spidercrabe = {
       craterMult              = 0.5,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         force_ignore_ground = [[1]],
         light_color = [[1.5 1.13 0.6]],
         light_radius = 450,

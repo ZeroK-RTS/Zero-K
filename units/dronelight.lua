@@ -78,6 +78,8 @@ return { dronelight = {
       cylinderTargeting       = 1,
   
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 1800,
         light_color = [[0.25 1 0.25]],
         light_radius = 130,

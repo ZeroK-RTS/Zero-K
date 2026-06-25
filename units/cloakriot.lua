@@ -91,6 +91,8 @@ return { cloakriot = {
       craterMult              = 0.3,
 
       customParams        = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         reaim_time = 1, -- noticeable twitching otherwise due to huge turnrates
         light_camera_height = 1600,
         light_color = [[0.8 0.76 0.38]],

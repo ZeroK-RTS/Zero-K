@@ -113,6 +113,8 @@ return { gunshipheavytrans = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         combatrange = 60,
         light_camera_height = 1200,
         light_radius = 160,
@@ -157,6 +159,8 @@ return { gunshipheavytrans = {
       cylinderTargeting      = 1,
       
       customParams        = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         combatrange = 100,
         light_radius = 80,
         light_alpha = 0.08,

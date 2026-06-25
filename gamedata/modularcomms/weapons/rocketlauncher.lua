@@ -7,6 +7,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "explosive",
+		icon = [[unitpics/commweapon_rocketlauncher.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:STORMMUZZLE]],

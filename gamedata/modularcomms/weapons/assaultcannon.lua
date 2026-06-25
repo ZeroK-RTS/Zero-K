@@ -7,6 +7,8 @@ local weaponDef = {
 	craterMult              = 3,
 
 	customParams            = {
+		weapon_class = "kinetic",
+		icon = [[unitpics/commweapon_assaultcannon.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],

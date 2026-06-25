@@ -1660,6 +1660,17 @@ local function GetUnitGroupIconButton(parentControl)
 		unitImage:Invalidate()
 	end
 
+	function externalStuff.GetUnitID()
+		return unitID
+	end
+
+	function externalStuff.GetScreenPos()
+		if not externalStuff.visible then return nil end
+		local sx, sy = holder:UnscaledLocalToScreen(0, 0)
+		local scale = WG.uiScale or 1
+		return sx * scale, sy * scale
+	end
+
 	return externalStuff
 end
 
@@ -2004,6 +2015,24 @@ local function GetMultiUnitInfoPanel(parentControl)
 		end
 	end
 
+	function externalFunctions.GetBarPositions()
+		local positions = {}
+		for i = 1, #displayButtons do
+			local btn = displayButtons[i]
+			if btn.visible then
+				local uid = btn.GetUnitID()
+				if uid then
+					local sx, sy = btn.GetScreenPos()
+					if sx then
+						-- Center X on icon, bar at 85% down the icon height.
+						positions[#positions + 1] = {uid, "health", sx + iconSize * 0.5, sy + iconSize * 0.85, 0}
+					end
+				end
+			end
+		end
+		return positions
+	end
+
 	return externalFunctions
 end
 
@@ -2117,6 +2146,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	end
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevVisible, prevMorphTime, prevMorphCost, prevMousePlace
+	local currentHealthPos = PIC_HEIGHT + 4
 	local externalFunctions = {}
 		
 	local function UpdateReloadTime(unitID, unitDefID)
@@ -2185,7 +2215,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		unitpicBadgeUpdate(GetUnitNeedRearm(unitID, unitDefID), IMAGE.NO_AMMO)
 		UpdateReloadTime(unitID, unitDefID)
-		
+		if healthPos then currentHealthPos = healthPos end
+
 		return showMetalInfo
 	end
 	
@@ -2451,7 +2482,16 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		leftPanel:SetVisibility(newVisible)
 		rightPanel:SetVisibility(newVisible)
 	end
-	
+
+	function externalFunctions.GetBarPositions()
+		if not selectedUnitID then return {} end
+		local barCenterX = ICON_SIZE + 3 + (RIGHT_WIDTH - ICON_SIZE - 3) * 0.5
+		local barCenterY = currentHealthPos + BAR_SIZE * 0.5
+		local sx, sy = rightPanel:UnscaledLocalToScreen(barCenterX, barCenterY)
+		local scale = WG.uiScale or 1
+		return {{selectedUnitID, "health", sx * scale, sy * scale, 0}}
+	end
+
 	return externalFunctions
 end
 
@@ -2809,17 +2849,20 @@ local function GetSelectionWindow()
 		singleUnitDisplay.SetVisible(true)
 		multiUnitDisplay.SetUnitDisplay()
 		selectionStatsDisplay.ChangeSelection({unitID})
+		WG.SelectionsBarPositions = {}  -- positions unavailable until next UpdateSelectionWindow
 	end
-	
+
 	function externalFunctions.ShowMultiUnit(newSelection)
 		singleUnitID = nil
 		multiUnitDisplay.SetUnitDisplay(newSelection)
 		singleUnitDisplay.SetVisible(false)
 		selectionStatsDisplay.ChangeSelection(newSelection)
+		WG.SelectionsBarPositions = {}
 	end
 	
 	function externalFunctions.UpdateSelectionWindow()
 		if not visible then
+			WG.SelectionsBarPositions = {}
 			return
 		end
 		if singleUnitID then
@@ -2828,11 +2871,18 @@ local function GetSelectionWindow()
 			multiUnitDisplay.UpdateUnitDisplay()
 		end
 		selectionStatsDisplay.UpdateStats()
+		-- Export icon screen positions for the GL4 screen-space bars widget.
+		if singleUnitID then
+			WG.SelectionsBarPositions = singleUnitDisplay.GetBarPositions()
+		else
+			WG.SelectionsBarPositions = multiUnitDisplay.GetBarPositions()
+		end
 	end
-	
+
 	function externalFunctions.SetVisible(newVisible)
 		if not newVisible then
 			singleUnitID = nil
+			WG.SelectionsBarPositions = {}
 		end
 		visible = newVisible
 		mainPanel:SetVisibility(newVisible)
@@ -2996,6 +3046,7 @@ function widget:Initialize()
 		drawHotkeyBytes[drawHotkeyBytesCount] = v:byte(-1)
 	end
 	
+	WG.SelectionsBarPositions = {}
 	selectionWindow = GetSelectionWindow()
 	tooltipWindow = (WG.Modding_TooltipOverride and WG.Modding_TooltipOverride()) or GetTooltipWindow()
 	InitializeWindParameters()

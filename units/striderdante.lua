@@ -104,6 +104,8 @@ return { striderdante = {
       cegTag                  = [[flamer_320_range]],
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         flamethrower = [[1]],
         setunitsonfire = "1",
         burnchance = "0.4", -- Per-impact
@@ -157,6 +159,8 @@ return { striderdante = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 1500,
         light_color = [[0.9 0.4 0.12]],
         light_radius = 90,
@@ -209,6 +213,8 @@ return { striderdante = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         area_damage = 1,
         area_damage_radius = 78,
         area_damage_dps = 17,
@@ -267,6 +273,8 @@ return { striderdante = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         area_damage = 1,
         area_damage_radius = 78,
         area_damage_dps = 17,

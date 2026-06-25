@@ -83,6 +83,8 @@ return { shipskirm = {
       craterMult              = 2,
 
       customParams        = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         force_ignore_ground = [[1]],
         light_camera_height = 1800,
       },

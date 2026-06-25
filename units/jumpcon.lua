@@ -87,6 +87,8 @@ return { jumpcon = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_damagefactor = 12,
         timeslow_smartretarget = 0.33,
         timeslow_smartretargethealth = 50,

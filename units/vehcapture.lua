@@ -75,6 +75,8 @@ return { vehcapture = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         capture_scaling = 1,
         is_capture = 1,
         post_capture_reload = 360,

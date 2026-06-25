@@ -98,6 +98,8 @@ return { shipaa = {
       cylinderTargeting       = 1,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         isaa = [[1]],
         
         light_camera_height = 2600,
@@ -144,6 +146,8 @@ return { shipaa = {
       cylinderTargeting       = 1,
 
       customParams              = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         burst = Shared.BURST_RELIABLE,
 
         isaa = [[1]],

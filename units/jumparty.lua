@@ -82,6 +82,8 @@ return { jumparty = {
       cegTag                  = [[flamer_cartoon]],
 
       customParams              = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         setunitsonfire = "1",
         burntime = 60,
         force_ignore_ground = [[1]],

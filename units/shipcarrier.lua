@@ -93,6 +93,8 @@ return { shipcarrier = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         burst = Shared.BURST_RELIABLE,
 
         combatrange = 950,
@@ -168,6 +170,10 @@ return { shipcarrier = {
       turret                  = true,
       weaponAcceleration      = 20000,
       weaponTimer             = 0.5,
+      customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
+      },
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 20000,
     },

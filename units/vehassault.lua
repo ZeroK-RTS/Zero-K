@@ -83,6 +83,8 @@ return { vehassault = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_camera_height = 1500,
         burst = Shared.BURST_RELIABLE,
       },

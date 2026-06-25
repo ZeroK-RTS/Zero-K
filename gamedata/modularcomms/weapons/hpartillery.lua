@@ -8,6 +8,8 @@ local weaponDef = {
 	craterMult              = 2,
 
 	customParams            = {
+		weapon_class = "explosive",
+		icon = [[unitpics/commweapon_hpartillery.png]],
 		is_unit_weapon = 1,
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		miscEffectFire = [[custom:RIOT_SHELL_H]],

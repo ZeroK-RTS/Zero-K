@@ -106,6 +106,8 @@ return { corcom1 = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         bogus = 1,
       },
 
@@ -169,6 +171,10 @@ return { corcom1 = {
       soundStart              = [[weapon/cannon/outlaw_gun]],
       soundStartVolume        = 3,
       turret                  = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 750,
     },

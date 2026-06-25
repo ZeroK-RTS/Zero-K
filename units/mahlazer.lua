@@ -90,6 +90,8 @@ return { mahlazer = {
       coreThickness           = 0.5,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_radius = 0,
       },
 
@@ -133,6 +135,8 @@ return { mahlazer = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         stats_damage = 24000,
         stats_hide_shield_damage = 1,
         light_radius = 0,
@@ -180,6 +184,8 @@ return { mahlazer = {
       craterMult              = 4,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_radius = 0,
         stats_hide_damage = 1,
         stats_hide_reload = 1,

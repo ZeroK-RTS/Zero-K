@@ -84,6 +84,8 @@ return { cloakheavyraid = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 500,
         light_color = [[1 1 0.7]],
         light_radius = 120,

@@ -108,6 +108,10 @@ return { dronefighter = {
       thickness               = 2,
       tolerance               = 8192,
       turret                  = true,
+      customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
+      },
       weaponType              = [[BeamLaser]],
     },
   },

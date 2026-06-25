@@ -73,6 +73,8 @@ return { wolverine_mine = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
 

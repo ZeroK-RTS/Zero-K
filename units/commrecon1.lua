@@ -113,6 +113,8 @@ return { commrecon1 = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         bogus = 1,
       },
 
@@ -154,6 +156,8 @@ return { commrecon1 = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
       },

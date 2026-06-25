@@ -91,6 +91,8 @@ return { planeheavyfighter = {
       cylinderTargeting       = 1,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         isaa = [[1]],
         light_radius = 80,
         light_alpha = 0.08,

@@ -77,6 +77,8 @@ return { chicken_spidermonkey = {
       accuracy                = 800,
       
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         impulse = [[-100]],
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,

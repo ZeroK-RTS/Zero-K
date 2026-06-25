@@ -7,6 +7,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "energy",
+		icon = [[unitpics/commweapon_lightninggun.png]],
 		is_unit_weapon = 1,
 		extra_damage = 550,
 		slot = [[5]],

@@ -150,6 +150,8 @@ return { striderdetriment = {
       craterMult              = 0,
       
       customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         single_hit_multi = true,
         reaim_time = 1,
       },
@@ -199,6 +201,8 @@ return { striderdetriment = {
       cylinderTargeting       = 1,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         isaa = [[1]],
         reaim_time = 1,
         light_radius = 80,
@@ -239,6 +243,8 @@ return { striderdetriment = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_color = [[0.2 0.8 0.2]],
         reaim_time = 1,
       },
@@ -295,6 +301,8 @@ return { striderdetriment = {
       commandFire             = true,
 
       customparams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 380,
         light_color = [[0.5 0.95 0]],
         gatherradius = [[192]],
@@ -367,6 +375,8 @@ return { striderdetriment = {
       weaponVelocity          = 5,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         hidden = true
       }
     },
@@ -427,6 +437,8 @@ return { striderdetriment = {
       weaponVelocity          = 5,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         hidden = true
       }
     },

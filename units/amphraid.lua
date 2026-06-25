@@ -75,6 +75,8 @@ return { amphraid = {
       craterMult              = 2,
 
       customparams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_color = [[1 0.6 0.2]],
@@ -124,6 +126,8 @@ return { amphraid = {
       cegTag                  = [[torpedo_trail]],
 
       customparams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         radar_homing_distance = 200,
         stays_underwater = 1,
       },

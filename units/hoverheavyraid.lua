@@ -75,6 +75,8 @@ return { hoverheavyraid = {
       craterMult              = 0,
   
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_damagefactor = 1.667,
         light_camera_height   = 2000,
         light_color           = [[0.85 0.33 1]],
