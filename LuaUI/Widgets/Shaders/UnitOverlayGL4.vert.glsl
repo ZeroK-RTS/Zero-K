@@ -374,9 +374,15 @@ void main()
 		if (isSelected > 0.5) v_mincolor.rgb = vec3(1.0);
 		// Status-effect magnitudes for tinting the center icon, mirroring the on-model effects
 		// (cus + gfx_paralyze). Carried to the FS through v_uvoffsets (unused by the icon otherwise):
-		// x = slow, y = disarm, z = paralyze (each 0..1; status >1 = locked-at-max, clamped here),
-		// w = build progress (0 = none/finished, else 0.02..1 while under construction).
-		v_uvoffsets = vec4(min(1.0, readField(3u)), min(1.0, readField(2u)), min(1.0, readField(1u)), readField(7u));
+		// x = slow, y = disarm, z = paralyze, w = build progress (0 = none, else 0.02..1 building).
+		// Slow ramps with magnitude -- a partially slowed unit really is slowed. Paralyze and disarm are
+		// binary: the unit is only disabled at/over 100% (below that it's charging but fully functional),
+		// so gate those to the locked encoding (value > 1), matching gfx_paralyze on the model.
+		v_uvoffsets = vec4(
+			min(1.0, readField(3u)),            // slow: continuous magnitude
+			(readField(2u) > 1.0) ? 1.0 : 0.0,  // disarm: only once locked (>= 100%)
+			(readField(1u) > 1.0) ? 1.0 : 0.0,  // paralyze: only once stunned (>= 100%)
+			readField(7u));                     // build progress
 
 		// CLOAK: cloakTime is written into the shared per-unit uniform by the CUS gadget (userDefined[3].x,
 		// same slot the model shader reads). Replicate the cus cloakedness ramp so the icon fades like the
