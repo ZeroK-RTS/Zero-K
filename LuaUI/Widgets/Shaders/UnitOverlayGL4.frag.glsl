@@ -205,6 +205,19 @@ void main(void)
 		col.rgb = mix(col.rgb, tinted, effectAmt);
 	}
 
+	// CONSTRUCTION: while a unit builds, its nanoframe rises up the model; echo that on the icon as a fill
+	// rising bottom-to-top by build progress. g_effect.w is the progress fraction in (0,1) while under
+	// construction, 0 otherwise. Legibility-first: the not-yet-built (upper) part is only dimmed -- never
+	// erased -- and a bright team-coloured line marks the build front. Static (no time term) since the
+	// fragment stage can't be relied on to carry timeInfo.
+	float buildP = g_effect.w;
+	if (buildP > 0.001) {
+		vec2 fq = (g_loc - g_rect.xy) / g_rect.zw;          // [0,1] across the icon quad, y up
+		if (fq.y > buildP) col.rgb *= 0.4;                  // not yet built: dimmed, still visible
+		float line = 1.0 - clamp(abs(fq.y - buildP) * 12.0, 0.0, 1.0); // bright front at the build height
+		col.rgb = mix(col.rgb, g_color.rgb * 1.4, line);    // team-coloured build line
+	}
+
 	// CLOAK (own/allied only -- enemies are gated out in the VS): fade the icon like the model fades when
 	// cloaked. Floored at 0.45 alpha so your own cloaked units stay locatable rather than vanishing.
 	if (g_cloak > 0.001) {
