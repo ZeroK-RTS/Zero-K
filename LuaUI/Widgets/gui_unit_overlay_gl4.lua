@@ -2243,6 +2243,15 @@ end
 
 function widget:VisibleUnitRemoved(unitID)
 	removeBarsFromUnit(unitID, 'VisibleUnitRemoved')
+	-- Pop the icon-cluster VBO instances immediately so a recycled unitID doesn't
+	-- inherit a stale icon from the previous occupant. Clear all per-unit state and
+	-- cancel any pending relayout so the old ID is fully gone before the engine may
+	-- reuse it for a new unit.
+	onUnitIconHolderReset(unitID)
+	wgUnitIcons[unitID] = nil
+	wgUnitGroup[unitID] = nil
+	wgUnitCommand[unitID] = nil
+	wgDirtyUnits[unitID] = nil
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
