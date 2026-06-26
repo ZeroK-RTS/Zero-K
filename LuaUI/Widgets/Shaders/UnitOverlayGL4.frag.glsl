@@ -22,6 +22,7 @@ in DataGS {
 	vec4 g_cluster;    // icon cluster: xy = rank cell origin, zw = group cell origin (<0 = absent)
 	vec4 g_clusterCol; // rgb = rank tint
 	vec4 g_effect;     // center-icon status effects: x = slow, y = disarm, z = paralyze, w = build (0 elsewhere)
+	float g_cloak;     // center-icon cloak fraction 0..1 (own/allied only); fades the icon alpha
 };
 
 uniform sampler2D iconAtlasTex;
@@ -202,6 +203,12 @@ void main(void)
 		float lum = dot(col.rgb, vec3(0.299, 0.587, 0.114));
 		vec3 tinted = effectColor * (0.35 + lum); // effect hue, icon's own brightness -> silhouette survives
 		col.rgb = mix(col.rgb, tinted, effectAmt);
+	}
+
+	// CLOAK (own/allied only -- enemies are gated out in the VS): fade the icon like the model fades when
+	// cloaked. Floored at 0.45 alpha so your own cloaked units stay locatable rather than vanishing.
+	if (g_cloak > 0.001) {
+		col.a *= mix(1.0, 0.45, clamp(g_cloak, 0.0, 1.0));
 	}
 
 	fragColor = col;

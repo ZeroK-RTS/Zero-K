@@ -60,6 +60,7 @@ in DataVS { // I recall the sane limit for cache coherence is like 48 floats per
 	float v_range;
 	float v_aboveBars;  // count of visible "above" bars (for placing the row above the top bar)
 	float v_rowSlot;    // combined centered slot in the row above the bars (states + status badges)
+	float v_iconCloak;  // center-icon cloak fraction 0..1 (own/allied only); fades the icon alpha
 	uvec4 v_bartype_index_ssboloc;
 } dataIn[];
 
@@ -80,6 +81,7 @@ out DataGS {
         // Status-effect magnitudes for the center unit icon (barmode 0): x = slow, y = disarm,
         // z = paralyze, w = build progress. Zero for every other quad (only the icon VS fills it).
         vec4 g_effect;
+        float g_cloak; // center-icon cloak fraction 0..1 (own/allied only); fades the icon alpha
 };
 
 mat3 rotY;
@@ -196,6 +198,7 @@ void emitRectangleVertex(vec2 pos, vec4 corners, float corner_radius, float useT
        g_cluster = vec4(clusterCells, 0.0);
        g_clusterCol = vec4(clusterRankColor, 0.0);
        g_effect = dataIn[0].v_uvoffsets; // status-effect magnitudes (icon only; 0 elsewhere)
+       g_cloak = dataIn[0].v_iconCloak;  // cloak fade (icon only; 0 elsewhere)
 
        EmitVertex();
 }
@@ -226,6 +229,7 @@ void emitBarVertex(vec2 pos, vec4 rect, float corner_radius, float barmode, floa
        g_cluster = vec4(-1.0);       // bars never composite an icon cluster
        g_clusterCol = vec4(1.0);
        g_effect = vec4(0.0);         // bars are not the center icon
+       g_cloak = 0.0;
 
        EmitVertex();
 }
@@ -264,6 +268,7 @@ void emitRadialVertex(vec2 pos, vec4 rect, float sides, float litFrac, vec4 colo
        g_cluster = vec4(-1.0);       // radial badges never composite an icon cluster
        g_clusterCol = vec4(1.0);
        g_effect = vec4(0.0);         // radial badges are not the center icon
+       g_cloak = 0.0;
        EmitVertex();
 }
 

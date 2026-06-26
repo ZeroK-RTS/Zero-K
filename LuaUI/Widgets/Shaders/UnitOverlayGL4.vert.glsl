@@ -60,6 +60,7 @@ out DataVS {
 	float v_range;
 	float v_aboveBars;  // count of visible "above" bars, so the row instances sit above the top bar
 	float v_rowSlot;    // combined centered slot in the row above the bars (states + status badges)
+	float v_iconCloak;  // center-icon cloak fraction 0..1 (own/allied only); fades the icon alpha
 	uvec4 v_bartype_index_ssboloc;
 };
 
@@ -353,6 +354,7 @@ void main()
 	}
 
 	v_uvoffsets = vec4(0.0);
+	v_iconCloak = 0.0;
 	if (UNIFORMLOC == 20u) {
 		float rawParalyze = valueForChannel(1u);
 		float rawDisarm   = valueForChannel(2u);
@@ -375,6 +377,18 @@ void main()
 		// x = slow, y = disarm, z = paralyze (each 0..1; status >1 = locked-at-max, clamped here),
 		// w = build progress (0 = none/finished, else 0.02..1 while under construction).
 		v_uvoffsets = vec4(min(1.0, readField(3u)), min(1.0, readField(2u)), min(1.0, readField(1u)), readField(7u));
+
+		// CLOAK: cloakTime is written into the shared per-unit uniform by the CUS gadget (userDefined[3].x,
+		// same slot the model shader reads). Replicate the cus cloakedness ramp so the icon fades like the
+		// model does. The cus flags enemies as abs(cloakTime) > 1e6, so excluding that range gives the
+		// own/allied-only gate for free: an enemy's cloaked icon is never faded.
+		float cloakTime = UNITUNIFORMS.userDefined[3].x;
+		if (abs(cloakTime) > 0.5 && abs(cloakTime) < 1000000.0) {
+			if (cloakTime > 0.0)
+				v_iconCloak = clamp((timeInfo.x - cloakTime) / 9.0, 0.0, 1.0);   // cloaking in
+			else
+				v_iconCloak = 1.0 - clamp((timeInfo.x + cloakTime) / 15.0, 0.0, 1.0); // decloaking
+		}
 	}
 
 	// The row above the bars (hovering-icon row + top-band status badges) needs to clear the whole
