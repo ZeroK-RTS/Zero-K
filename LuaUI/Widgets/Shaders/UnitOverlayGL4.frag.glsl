@@ -190,6 +190,14 @@ void main(void)
 		col.rgb = mix(col.rgb, slowColor, clamp(sqrt(slowAmt) * 0.6, 0.0, 0.6));
 	}
 
+	// DISARM: a desaturated khaki/tan wash (cf. gfx_paralyze_effect disarm wholeunitbasecolor). Disarm is
+	// closer to a binary state than slow, so drive the tint roughly linearly with the magnitude.
+	float disarmAmt = g_effect.y;
+	if (disarmAmt > 0.001) {
+		vec3 disarmColor = vec3(0.7, 0.7, 0.55);
+		col.rgb = mix(col.rgb, disarmColor, clamp(disarmAmt * 0.6, 0.0, 0.6));
+	}
+
 	fragColor = col;
 	if (fragColor.a < 0.05) discard;
 }
