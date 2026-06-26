@@ -198,6 +198,14 @@ void main(void)
 		col.rgb = mix(col.rgb, disarmColor, clamp(disarmAmt * 0.6, 0.0, 0.6));
 	}
 
+	// PARALYZE (EMP): a light-blue wash (cf. gfx_paralyze_effect emp wholeunitbasecolor). Strongest of the
+	// three since a stunned unit is fully disabled; tinted a bit harder so it reads as the dominant state.
+	float paraAmt = g_effect.z;
+	if (paraAmt > 0.001) {
+		vec3 paraColor = vec3(0.49, 0.5, 1.0);
+		col.rgb = mix(col.rgb, paraColor, clamp(paraAmt * 0.7, 0.0, 0.7));
+	}
+
 	fragColor = col;
 	if (fragColor.a < 0.05) discard;
 }
