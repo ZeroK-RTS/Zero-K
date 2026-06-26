@@ -21,6 +21,8 @@ in DataGS {
 	float g_extracolor;
 	vec4 g_cluster;    // icon cluster: xy = rank cell origin, zw = group cell origin (<0 = absent)
 	vec4 g_clusterCol; // rgb = rank tint
+	vec4 g_effect;     // center-icon status effects: x = slow, y = disarm, z = paralyze, w = build (0 elsewhere)
+	float g_cloak;     // center-icon cloak fraction 0..1 (own/allied only); fades the icon alpha
 };
 
 uniform sampler2D iconAtlasTex;
@@ -178,6 +180,50 @@ void main(void)
 			col = mix(col, c, c.a);
 		}
 	}
+
+	// Status-effect tint on the center unit icon, echoing the on-model effects. The bars/badges already
+	// show the precise states; this is only a secondary at-a-glance cue for radar range (icon-only), so
+	// keep the icon legible: (a) show only the DOMINANT effect rather than stacking washes into mud, and
+	// (b) tint hue-only -- the effect colour is scaled by the icon's own luminance, so the silhouette and
+	// relative brightness (hence team shade) read through. g_effect is non-zero only for the center icon.
+	// Colours mirror gfx_paralyze_effect; priority paralyze > disarm > slow (most disabling first).
+	vec3 effectColor = vec3(0.0);
+	float effectAmt = 0.0;
+	if (g_effect.z > 0.001) {        // paralyze (EMP): light blue
+		effectColor = vec3(0.49, 0.5, 1.0);
+		effectAmt = clamp(g_effect.z * 0.55, 0.0, 0.55);
+	} else if (g_effect.y > 0.001) { // disarm: desaturated khaki/tan
+		effectColor = vec3(0.7, 0.7, 0.55);
+		effectAmt = clamp(g_effect.y * 0.5, 0.0, 0.5);
+	} else if (g_effect.x > 0.001) { // slow: magenta
+		effectColor = vec3(1.0, 0.1, 1.0);
+		effectAmt = clamp(sqrt(g_effect.x) * 0.5, 0.0, 0.5);
+	}
+	if (effectAmt > 0.0) {
+		float lum = dot(col.rgb, vec3(0.299, 0.587, 0.114));
+		vec3 tinted = effectColor * (0.35 + lum); // effect hue, icon's own brightness -> silhouette survives
+		col.rgb = mix(col.rgb, tinted, effectAmt);
+	}
+
+	// CONSTRUCTION: while a unit builds, its nanoframe rises up the model; echo that on the icon as a fill
+	// rising bottom-to-top by build progress. g_effect.w is the progress fraction in (0,1) while under
+	// construction, 0 otherwise. Legibility-first: the not-yet-built (upper) part is only dimmed -- never
+	// erased -- and a bright team-coloured line marks the build front. Static (no time term) since the
+	// fragment stage can't be relied on to carry timeInfo.
+	float buildP = g_effect.w;
+	if (buildP > 0.001) {
+		vec2 fq = (g_loc - g_rect.xy) / g_rect.zw;          // [0,1] across the icon quad, y up
+		if (fq.y > buildP) col.rgb *= 0.4;                  // not yet built: dimmed, still visible
+		float line = 1.0 - clamp(abs(fq.y - buildP) * 12.0, 0.0, 1.0); // bright front at the build height
+		col.rgb = mix(col.rgb, g_color.rgb * 1.4, line);    // team-coloured build line
+	}
+
+	// CLOAK (own/allied only -- enemies are gated out in the VS): fade the icon like the model fades when
+	// cloaked. Floored at 0.45 alpha so your own cloaked units stay locatable rather than vanishing.
+	if (g_cloak > 0.001) {
+		col.a *= mix(1.0, 0.45, clamp(g_cloak, 0.0, 1.0));
+	}
+
 	fragColor = col;
 	if (fragColor.a < 0.05) discard;
 }
