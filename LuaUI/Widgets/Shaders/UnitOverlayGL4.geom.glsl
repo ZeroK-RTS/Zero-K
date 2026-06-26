@@ -77,6 +77,9 @@ out DataGS {
         // cell origin; an origin < 0 means "absent". g_clusterCol.rgb = rank tint.
         vec4 g_cluster;
         vec4 g_clusterCol;
+        // Status-effect magnitudes for the center unit icon (barmode 0): x = slow, y = disarm,
+        // z = paralyze, w = build progress. Zero for every other quad (only the icon VS fills it).
+        vec4 g_effect;
 };
 
 mat3 rotY;
@@ -192,6 +195,7 @@ void emitRectangleVertex(vec2 pos, vec4 corners, float corner_radius, float useT
        g_extracolor = 0.0;
        g_cluster = vec4(clusterCells, 0.0);
        g_clusterCol = vec4(clusterRankColor, 0.0);
+       g_effect = dataIn[0].v_uvoffsets; // status-effect magnitudes (icon only; 0 elsewhere)
 
        EmitVertex();
 }
@@ -221,6 +225,7 @@ void emitBarVertex(vec2 pos, vec4 rect, float corner_radius, float barmode, floa
        g_extracolor = extracolor;
        g_cluster = vec4(-1.0);       // bars never composite an icon cluster
        g_clusterCol = vec4(1.0);
+       g_effect = vec4(0.0);         // bars are not the center icon
 
        EmitVertex();
 }
@@ -258,6 +263,7 @@ void emitRadialVertex(vec2 pos, vec4 rect, float sides, float litFrac, vec4 colo
        g_extracolor = 0.0;
        g_cluster = vec4(-1.0);       // radial badges never composite an icon cluster
        g_clusterCol = vec4(1.0);
+       g_effect = vec4(0.0);         // radial badges are not the center icon
        EmitVertex();
 }
 

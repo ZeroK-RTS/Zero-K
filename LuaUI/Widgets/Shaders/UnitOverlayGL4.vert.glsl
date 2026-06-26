@@ -370,6 +370,11 @@ void main()
 	if ((BARTYPE & BITICON) != 0u && (BARTYPE & BITICONROW) == 0u) {
 		float isSelected = mod(floor(UNITUNIFORMS.userDefined[0][2] / 8388608.0), 2.0);
 		if (isSelected > 0.5) v_mincolor.rgb = vec3(1.0);
+		// Status-effect magnitudes for tinting the center icon, mirroring the on-model effects
+		// (cus + gfx_paralyze). Carried to the FS through v_uvoffsets (unused by the icon otherwise):
+		// x = slow, y = disarm, z = paralyze (each 0..1; status >1 = locked-at-max, clamped here),
+		// w = build progress (0 = none/finished, else 0.02..1 while under construction).
+		v_uvoffsets = vec4(min(1.0, readField(3u)), min(1.0, readField(2u)), min(1.0, readField(1u)), readField(7u));
 	}
 
 	// The row above the bars (hovering-icon row + top-band status badges) needs to clear the whole

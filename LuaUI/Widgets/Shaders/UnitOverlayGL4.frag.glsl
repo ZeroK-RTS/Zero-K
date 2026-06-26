@@ -21,6 +21,7 @@ in DataGS {
 	float g_extracolor;
 	vec4 g_cluster;    // icon cluster: xy = rank cell origin, zw = group cell origin (<0 = absent)
 	vec4 g_clusterCol; // rgb = rank tint
+	vec4 g_effect;     // center-icon status effects: x = slow, y = disarm, z = paralyze, w = build (0 elsewhere)
 };
 
 uniform sampler2D iconAtlasTex;
@@ -178,6 +179,17 @@ void main(void)
 			col = mix(col, c, c.a);
 		}
 	}
+
+	// Status-effect tints on the center unit icon, echoing the on-model effects (the bars/badges
+	// already show these; this carries the cue onto the icon itself, which is all that's drawn at
+	// radar range). g_effect is non-zero only for the center icon.
+	// SLOW: a magenta wash whose strength tracks the slow magnitude (cf. gfx_paralyze_effect slowcolor).
+	float slowAmt = g_effect.x;
+	if (slowAmt > 0.001) {
+		vec3 slowColor = vec3(1.0, 0.1, 1.0);
+		col.rgb = mix(col.rgb, slowColor, clamp(sqrt(slowAmt) * 0.6, 0.0, 0.6));
+	}
+
 	fragColor = col;
 	if (fragColor.a < 0.05) discard;
 }
