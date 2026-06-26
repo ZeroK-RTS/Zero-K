@@ -93,7 +93,6 @@ float zoffset;
 float yoffset; // camera-forward (billboard Z) offset
 float xoffset;
 float depthbuffermod;
-float duration = -1;
 mat4 overlayXform;     // shared world transform: unit anchor (centerpos) · billboard · (BARSCALE·overallScale·unitSize)
 float posScale = 1.0;  // per-component sub-scale, applied to local coords only (g_loc/g_rect stay raw for the FS)
 // Icon-cluster composite (set only in the center-icon branch; default = absent for everything else):
@@ -354,21 +353,13 @@ void main(){
 	uvoffsets = dataIn[0].v_uvoffsets; // if an atlas is used, then use this, otherwise dont
 
 	float health = min(1, dataIn[0].v_parameters.x);
-        // Status-bar seconds readout. Locked status (value >= 100) now stores the effect-END frame
-        // (value-101 = endFrame mod 3895, matching the updater), so decode it to smooth seconds; other
-        // >1.5 values keep the plain value-1 meaning. (Radial badges ignore `duration`.)
-        if (dataIn[0].v_parameters.x >= 100.0) duration = floor(mod((dataIn[0].v_parameters.x - 101.0) - timeInfo.x, 3895.0) / 30.0);
-        else if (dataIn[0].v_parameters.x > 1.5) duration = floor(dataIn[0].v_parameters.x - 1.0);
 	if (BARALPHA < MINALPHA) return; // Dont draw below 50% transparency
 
 	// All the early bail conditions to not draw full/empty bars
 	if (dataIn[0].v_numvertices == 0u) return; // for hiding the build bar when full health
 
 	depthbuffermod = 0.001;
-	float extraColor = 0.0;
-	if ((duration != -1) && (mod(timeInfo.x, 10.0) > 4.0)){
-		extraColor = 0.5;
-	}
+	float extraColor = 0.0; // (status bars no longer flash)
 
 	float camDist = length(cameraViewInv[3].xyz - centerpos.xyz);
 
@@ -667,21 +658,12 @@ void main(){
 			// cell digitAtlasStart = 's', +1 = '%', then digits 9..0 (so digit d is at +(11-d)).
 
 			if (skipGlyphsNumbers < 1.5) {
-				float ones;
-				float tens;
-				float hundrends;
-				float unitGlyph; // 0 = 's' (seconds), 1 = '%' (percent)
-				if (duration != -1){ //display time
-					ones = abs(floor(mod(duration, 10.0)));
-					tens = abs(floor(mod(duration*0.1, 10.0)));
-					hundrends = abs(floor(mod(duration*0.01, 10.0)));
-					unitGlyph = 0.0; // seconds
-				} else {
-					ones = floor(mod(health*100.0, 10.0));
-					tens = floor(mod(health*10.0, 10.0));
-					hundrends = floor(mod(health, 10.0));
-					unitGlyph = 1.0; // percent
-				}
+				// Always a percentage readout. health = min(1, value), so a status locked at max
+				// (value > 1) reads as 100%; the old seconds-left countdown and its 's' glyph are gone.
+				float ones = floor(mod(health*100.0, 10.0));
+				float tens = floor(mod(health*10.0, 10.0));
+				float hundrends = floor(mod(health, 10.0));
+				float unitGlyph = 1.0; // percent
 
 				emitGlyphCell(drawPos - BARHEIGHT, digitAtlasStart + unitGlyph);
 				drawPos -= BARHEIGHT * 0.8;
