@@ -42,6 +42,8 @@ uniform float belowBadgeHeight; // below-zone ability badges (jump/morph/telepor
 uniform float overlayDepthBand; // >0 squeezes the overlay into a near-plane sliver so the world never
                                 // occludes it (the engine ignores depth-buffer clears in DrawWorld);
                                 // overlays still depth-write so they sort among themselves. 0 = normal depth.
+uniform float statusFadeDistance; // camera distance beyond which status/state row icons are hidden (0 = never)
+uniform float iconHideDistance;   // camera distance below which the center unit icon is hidden (0 = never)
 #ifdef SCREENSPACE
 uniform float screenWidth;
 uniform float screenHeight;
@@ -357,6 +359,8 @@ void main(){
 		extraColor = 0.5;
 	}
 
+	float camDist = length(cameraViewInv[3].xyz - centerpos.xyz);
+
 	if ((BARTYPE & BITICON) != 0u) {
 		iconAtlasFlag = 1.0;
 		float iconHalf;
@@ -364,6 +368,8 @@ void main(){
 		xoffset = 0.0;
 		zoffset = 0.0;
 		if ((BARTYPE & BITICONROW) != 0u) {
+			// Status/state icons: hide when camera is farther than statusFadeDistance (0 = never hide).
+			if (statusFadeDistance > 0.0 && camDist > statusFadeDistance) return;
 			// Hovering-icon row (WG.icons): shares the bars' baseline (cache[1]) and rides one row
 			// above the topmost bar; icons sit left-to-right by their centered slot index (v_range).
 			// Pulse icons fade by the shared pulseAlpha. rowSize/rowSpacing/rowOffset also drive the
@@ -372,14 +378,18 @@ void main(){
 			// Rise by one bar's pitch (BAR_PITCH, in BARHEIGHT·barSpacing·barSize units to match the bar
 			// stack -- the row carries barSize itself since posScale doesn't apply to it) for every visible
 			// bar, then clear the top bar by the row's own half-height + the user offset.
-			zoffset = -(BAR_PITCH * BARHEIGHT * barSpacing * barSize * dataIn[0].v_aboveBars + iconHalf * (1.0 + ROW_GAP) + rowOffset);
+			// When no bars are visible, omit the ROW_GAP so the row sits tight to the unit icon.
+			float rowGapFactor = (dataIn[0].v_aboveBars > 0.5) ? (1.0 + ROW_GAP) : 1.0;
+			zoffset = -(BAR_PITCH * BARHEIGHT * barSpacing * barSize * dataIn[0].v_aboveBars + iconHalf * rowGapFactor + rowOffset);
 			xoffset = dataIn[0].v_rowSlot * (iconHalf * BADGE_PITCH * rowSpacing); // centered slot across states + statuses
 			depthbuffermod = -0.001; // same plane as the status badges (the default 0.001 sits them behind)
 			if ((BARTYPE & BITPULSE) != 0u) iconAlpha = pulseAlpha;
 		} else {
-			// CENTER unit icon. Composite rank (top-left), group number (bottom-right) and current
-			// command (bottom-left) onto THIS one quad (one primitive, one depth -- no z-fight, and
-			// nothing can sort between them). Cell indices ride the instance: v_range = rank (<0 = none);
+			// CENTER unit icon. Hide when camera is closer than iconHideDistance (0 = never hide).
+			if (iconHideDistance > 0.0 && camDist < iconHideDistance) return;
+			// Composite rank (top-left), group number (bottom-right) and current command (bottom-left)
+			// onto THIS one quad (one primitive, one depth -- no z-fight, and nothing can sort between
+			// them). Cell indices ride the instance: v_range = rank (<0 = none);
 			// bartype_index .w = group, .z = command (uint, >=60000u = none). FS turns each into an origin.
 			iconHalf = BARWIDTH * iconSize;
 			clusterCells.x = dataIn[0].v_range;                              // rank cell (<0 = none)
@@ -555,13 +565,17 @@ void main(){
 		float gap = bsize * BADGE_PITCH * rowSpacing; // ONE badge pitch for every zone (row, columns, below)
 		float colX = BARWIDTH * iconSize + bsize * 1.6 + vbarUserX; // column distance from icon center
 		if ((BARTYPE & (BITTIMELEFT | BITCONSTRUCTION)) != 0u) {
-			// TOP band: the same row as the hovering-icon states, riding above the topmost bar.
+			// TOP band: hide when camera is farther than statusFadeDistance (0 = never hide).
+			if (statusFadeDistance > 0.0 && camDist > statusFadeDistance) return;
+			// The same row as the hovering-icon states, riding above the topmost bar.
 			// Features keep a fixed slot layout (their channel meanings differ); units share the centered
 			// run with the states via v_rowSlot. Both use the one shared badge pitch (gap).
 			xoffset = (isFeature > 0.5) ? (slot * gap) : (dataIn[0].v_rowSlot * gap);
 			// per-bar rise matches the bar stack (BAR_PITCH, in barSize units), then clear by half a badge
 			// plus ROW_GAP so the row isn't glued to the top bar; rowOffset is the user fine-tune on top.
-			zoffset = -(BAR_PITCH * BARHEIGHT * barSpacing * barSize * dataIn[0].v_aboveBars + bsize * (1.0 + ROW_GAP) + rowOffset);
+			// When no bars are visible, omit the ROW_GAP so the row sits tight to the unit.
+			float statusGapFactor = (dataIn[0].v_aboveBars > 0.5) ? (1.0 + ROW_GAP) : 1.0;
+			zoffset = -(BAR_PITCH * BARHEIGHT * barSpacing * barSize * dataIn[0].v_aboveBars + bsize * statusGapFactor + rowOffset);
 		} else if ((BARTYPE & BITLEFT) != 0u) {
 			xoffset = -colX;                              // left weapon column, stacked down from icon level
 			zoffset = slot * gap;

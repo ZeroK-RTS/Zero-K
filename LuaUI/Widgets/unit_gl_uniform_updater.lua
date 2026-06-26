@@ -167,7 +167,9 @@ local function encodeAbility(entry, unitID, unitDefID, gameFrame)
 		if i <= scriptLoaded then return 100 end
 		if i == scriptLoaded + 1 then
 			local rf = GetUnitRulesParam(unitID, "scriptReloadFrame") or 0
-			return pct100(1 - rf / (unitDefScriptReload[unitDefID] or 1))
+			if rf <= 0 then return 0 end
+			local remaining = math.max(0, rf - gameFrame)
+			return pct100(1.0 - remaining / (unitDefScriptReload[unitDefID] or 1))
 		end
 		return 0
 	elseif kind == "shield" then
