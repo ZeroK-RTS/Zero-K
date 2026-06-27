@@ -497,10 +497,6 @@ end
 local paralyzeOnMaxHealth = Game.paralyzeOnMaxHealth
 local empDecline = 1 / Game.paralyzeDeclineRate
 
--- Spent silo missiles set paralyze to a huge sentinel (99999999, see scripts/cruisemissile.lua)
--- to freeze the now-hidden unit. Real units never come close to this, so suppress their bar/overlay.
-local maxRealPara = 1e7
-
 local spGetGroundHeight = Spring.GetGroundHeight
 local function IsCameraBelowMaxHeight()
 	local cs = Spring.GetCameraState()
@@ -837,7 +833,7 @@ do
 
 		--// PARALYZE
 		local stunned, _, inbuild = GetUnitIsStunned(unitID)
-		if (emp > 0) and ((not morph) or morph.combatMorph) and (emp < 1e8) and (paralyzeDamage < maxRealPara) and (paralyzeDamage >= empHP) then
+		if (emp > 0) and ((not morph) or morph.combatMorph) and (emp < 1e8) and (paralyzeDamage >= empHP) then
 			if (stunned) then
 				paraUnits[#paraUnits+1] = unitID
 			end
@@ -984,7 +980,7 @@ do
 		--// PARALYZE
 		local paraTime = false
 		local stunned = GetUnitIsStunned(unitID)
-		if (emp > 0) and(emp < 1e8) and (paralyzeDamage < maxRealPara) then
+		if (emp > 0) and(emp < 1e8) then
 			stunned = stunned and paralyzeDamage >= empHP
 			if (stunned) then
 				paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
