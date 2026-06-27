@@ -20,6 +20,10 @@ local updateCount = 0
 local empDecline = 1 / Game.paralyzeDeclineRate
 local gameSpeed = Game.gameSpeed
 local paralyzeOnMaxHealth = Game.paralyzeOnMaxHealth
+
+-- Spent silo missiles set paralyze to a 99999999 sentinel (scripts/cruisemissile.lua) to freeze the
+-- now-hidden, off-map unit. Real units never approach this, so treat it as "no bar" rather than max EMP.
+local maxRealPara = 1e7
 local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 -- Slow: MAX_SLOW_FACTOR (the 50% cap) is published by unit_timeslow.lua as a game rules param.
@@ -251,7 +255,9 @@ function updateUnit(unitID, unitDefID)
 	--// PARALYZE (ch1)
 	local stunned = GetUnitIsStunned(unitID)
 	stunned = stunned and paralyzeDamage >= empHP
-	if stunned then
+	if paralyzeDamage >= maxRealPara then
+		emp = 0 -- spent silo missile sentinel, not real paralyze
+	elseif stunned then
 		emp = (paralyzeDamage - empHP) / (maxHealth * empDecline) + 1
 	elseif emp > 1 then
 		emp = 1
