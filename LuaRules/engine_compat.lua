@@ -262,6 +262,11 @@ if not Spring.SetUnitAlwaysUpdateMatrix then -- BAR 105-571
 	end
 end
 
+if gl and not gl.SetUnitBufferUniforms then -- BAR 105-631
+	gl.SetUnitBufferUniforms    = RET_ZERO
+	gl.SetFeatureBufferUniforms = RET_ZERO
+end
+
 if not Spring.GetUnitsInScreenRectangle and not Script.GetSynced() then -- BAR 105-637
 	Spring.GetUnitsInScreenRectangle = RET_TABLE
 end
