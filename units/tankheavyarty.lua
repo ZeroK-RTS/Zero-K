@@ -86,7 +86,7 @@ return { tankheavyarty = {
       
       customParams            = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_hpartillery.png]],
         reaim_time = 15, -- Some sort of bug prevents firing.
         
         gatherradius     = [[240]],

@@ -82,7 +82,7 @@ return { cloakarty = {
 
       customParams        = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_assaultcannon.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1400,

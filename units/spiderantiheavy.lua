@@ -70,7 +70,7 @@ return { spiderantiheavy = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lightninggun.png]],
         burst = Shared.BURST_RELIABLE,
         light_color = [[1.85 1.85 0.45]],
         light_radius = 300,

@@ -76,7 +76,7 @@ return { shieldskirm = {
 
       customParams        = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_rocketlauncher.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1800,

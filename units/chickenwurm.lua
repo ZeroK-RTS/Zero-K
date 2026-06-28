@@ -95,7 +95,7 @@ return { chickenwurm = {
       
       customParams              = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_napalmgrenade.png]],
         setunitsonfire = "1",
         burntime = 180,
 
@@ -138,7 +138,7 @@ return { chickenwurm = {
       
       customParams              = {
       weapon_class = "kinetic",
-      icon = [[unitpics/commweapon_gaussrifle.png]],
+      icon = [[unitpics/commweapon_shotgun.png]],
       },
 
       damage                  = {

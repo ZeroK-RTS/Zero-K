@@ -151,7 +151,7 @@ return { striderdetriment = {
       
       customParams = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         single_hit_multi = true,
         reaim_time = 1,
       },

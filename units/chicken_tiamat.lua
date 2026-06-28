@@ -116,7 +116,7 @@ return { chicken_tiamat = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_flamethrower.png]],
         flamethrower = [[1]],
         setunitsonfire = "1",
         burntime = [[450]],

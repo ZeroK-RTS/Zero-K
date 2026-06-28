@@ -304,7 +304,7 @@ return { raveparty = {
 
       customParams = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_shockrifle.png]],
         script_reload = [[4]],
         reaim_time = 1,
       },

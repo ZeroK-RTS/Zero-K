@@ -64,7 +64,7 @@ return { turrettorp = {
 
       customparams = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_torpedo.png]],
         stays_underwater = 1,
       },
 

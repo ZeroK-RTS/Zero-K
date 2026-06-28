@@ -179,7 +179,7 @@ return { jumpsumo = {
 
       customParams            = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_beamlaser.png]],
         impulse = [[-150]],
 
         light_color = [[0.33 0.33 1.28]],
@@ -226,7 +226,7 @@ return { jumpsumo = {
 
       customParams            = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_beamlaser.png]],
         impulse = [[150]],
 
         light_color = [[0.85 0.2 0.2]],

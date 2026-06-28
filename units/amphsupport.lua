@@ -94,7 +94,7 @@ return { amphsupport = {
 
       customParams        = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
         light_camera_height = 1400,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 230,
@@ -132,7 +132,7 @@ return { amphsupport = {
 
       customparams = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
         bogus = 1,
       },
 

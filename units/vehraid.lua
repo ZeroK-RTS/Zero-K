@@ -82,7 +82,7 @@ return { vehraid = {
 
       customParams        = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_heatray.png]],
         light_camera_height = 1500,
         light_color = [[0.9 0.4 0.12]],
         light_radius = 120,

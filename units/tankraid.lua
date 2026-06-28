@@ -91,7 +91,7 @@ return { tankraid = {
 
       customParams              = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_flamethrower.png]],
         setunitsonfire = "1",
         burnchance     = "1",
         burntime       = 30,

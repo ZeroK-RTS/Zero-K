@@ -87,7 +87,7 @@ return { striderantiheavy = {
 
       customparams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_disintegrator.png]],
         noexplode_speed_damage = 1,
         burst = Shared.BURST_UNRELIABLE,
         stats_burst_damage  = 18000,

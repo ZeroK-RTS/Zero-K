@@ -75,7 +75,7 @@ return { tankarty = {
 
       customParams            = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_hpartillery.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_color = [[1.4 0.8 0.3]],

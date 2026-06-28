@@ -98,7 +98,7 @@ return { shipassault = {
 
         customParams            = {
             weapon_class = "explosive",
-            icon = [[unitpics/commweapon_missilelauncher.png]],
+            icon = [[unitpics/commweapon_sonicgun.png]],
             force_ignore_ground = [[1]],
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],

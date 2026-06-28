@@ -89,7 +89,7 @@ return { hoverdepthcharge = {
 
       customParams = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_torpedo.png]],
         burst = Shared.BURST_UNRELIABLE,
       },
 

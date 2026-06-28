@@ -77,7 +77,7 @@ return { spideremp = {
       
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lightninggun.png]],
         extra_damage = 400,
         force_ignore_ground = [[1]],
         overstun_time = 0.3,

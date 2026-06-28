@@ -83,7 +83,7 @@ return { subraider = {
 
       customparams = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_slowbeam.png]],
+        icon = [[unitpics/commweapon_torpedo.png]],
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 2,
@@ -136,7 +136,7 @@ return { subraider = {
 
       customParams            = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_torpedo.png]],
         bogus = 1,
       },
 

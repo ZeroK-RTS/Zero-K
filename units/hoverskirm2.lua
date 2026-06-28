@@ -92,7 +92,7 @@ return { hoverskirm2 = {
       turret                  = true,
       customParams = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_shotgun.png]],
       },
       weaponType              = [[BeamLaser]],
     },

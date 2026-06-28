@@ -84,7 +84,7 @@ return { shipskirm = {
 
       customParams        = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_rocketlauncher.png]],
         force_ignore_ground = [[1]],
         light_camera_height = 1800,
       },

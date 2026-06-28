@@ -64,7 +64,7 @@ return { spiderskirm = {
 
       customParams        = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_rocketlauncher.png]],
         light_camera_height = 2500,
         light_color = [[0.90 0.65 0.30]],
         light_radius = 180,

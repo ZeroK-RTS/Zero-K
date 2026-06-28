@@ -84,7 +84,7 @@ return { chickenr = {
             
             customParams            = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
             

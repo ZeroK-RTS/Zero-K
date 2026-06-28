@@ -93,7 +93,7 @@ return { amphriot = {
 
       customparams = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_torpedo.png]],
         stays_underwater = 1,
       },
 

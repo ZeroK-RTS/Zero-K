@@ -68,7 +68,7 @@ return { spiderriot = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lparticlebeam.png]],
         light_color = [[0.9 0.22 0.22]],
         light_radius = 80,
       },

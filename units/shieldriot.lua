@@ -97,7 +97,7 @@ return { shieldriot = {
 
       customParams           = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_slowbeam.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
         light_radius = 0,
         lups_explodespeed = 1,
         lups_explodelife = 0.6,

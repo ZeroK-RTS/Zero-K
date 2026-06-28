@@ -86,7 +86,7 @@ return { gunshipheavyskirm = {
 
       customparams = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_heavymachinegun.png]],
         combatrange = 630,
         light_camera_height = 2000,
         light_color = [[0.9 0.84 0.45]],

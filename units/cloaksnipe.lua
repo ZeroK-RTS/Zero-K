@@ -91,7 +91,7 @@ return { cloaksnipe = {
 
       customParams              = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_shockrifle.png]],
         reaim_time = 1, -- Keep aiming at target to prevent sideways gun, which can lead to teamkill.
         burst = Shared.BURST_RELIABLE,
         light_radius = 0,

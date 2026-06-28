@@ -165,7 +165,7 @@ return { striderscorpion = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lightninggun.png]],
         extra_damage = 1080,
         
         light_camera_height = 1600,
@@ -216,7 +216,7 @@ return { striderscorpion = {
 
       customParams            = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_multistunner.png]],
         burst = Shared.BURST_UNRELIABLE,
         light_color = [[0.7 0.7 0.2]],
         light_radius = 320,
@@ -264,7 +264,7 @@ return { striderscorpion = {
       
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lparticlebeam.png]],
         light_color = [[0.9 0.22 0.22]],
         light_radius = 80,
         reaim_time = 1,

@@ -1091,7 +1091,7 @@ function gadget:Update()
 					function()
 						for unitID, morphData in pairs(morphUnitsSynced) do
 							if (unitID and morphData)and(IsUnitVisible(unitID)) then
-								morphTable[unitID] = {progress = morphData.progress, into = morphData.def.into, combatMorph = morphData.combatMorph}
+								morphTable[unitID] = {progress = morphData.progress, increment = morphData.def.increment, into = morphData.def.into, combatMorph = morphData.combatMorph}
 							end
 						end
 					end

@@ -392,12 +392,12 @@ local bitIcon = 4096      -- draw unit icon billboard
 local bitAlwaysShow = 8192 -- radial badge: always render (commanders), showing "ready" when below the reload threshold
 local bitIconRow = 16384  -- hovering-icon row (WG.icons): billboard icon placed by centered slot index
 local bitPulse = 32768    -- hovering icon flashes (alpha oscillates via pulseAlpha)
-local bitConstruction = 65536 -- radial badge driven by the build channel's duration encoding (building/reclaiming/constant)
+local bitConstruction = 65536 -- radial badge driven by a duration-band encoding (building/reclaiming ETA); shares the decode with bitRateETA. Currently unused by any bar (bitRateETA covers the live badges).
 local bitGauge = 131072   -- radial badge that fills to a 0..1 magnitude (heat/speed/charge), not a countdown
 local bitIconCorner = 262144 -- icon billboard pinned to a corner of the unit icon (rank TL / group number BR)
 local bitModular = 524288 -- ability-slot duration bar: value is target-frame mod 4096, GPU-decremented
 local bitJumpCharge = 1048576 -- below-zone gauge whose value is a reconstructed jumpReload; each badge shows one charge
-local bitRateETA = 2097152 -- below-zone radial ETA badge: build-style band decode (0 hidden/1 paused/2+secs) but NOT top-band
+local bitRateETA = 2097152 -- below-zone radial ETA badge: build-style band decode (0 hidden / 2+secs building / frozen-static when starved) but NOT top-band
 
 -- Columns in the vertical (weapon bar) glyph atlas. Distinct from the horizontal
 -- glyph atlas's uvoffset numbering -- these bar types are always BITVERTICAL, so
@@ -450,7 +450,7 @@ local barAtlasIndex = {}
 -- Status-duration badge icons (the Bold command icons), keyed by status name -> atlas cell.
 local statusIconImage = { paralyze = "disable", disarm = "disarm", slow = "slow", build = "build", resurrect = "resurrect",
 	morph = "upgrade", stockpile = "missile", teleport = "drop_beacon", ability = "sprint",
-	rearm = "rearm", goo = "reclaim" }
+	rearm = "rearm", goo = "reclaim", captureReload = "captureReload" }
 local statusIconIndex = {}
 -- Jump-charge gauge badges composite this command icon (atlas cell fed to the shader as jumpIconCell).
 local jumpIconPath = "LuaUI/Images/commands/Bold/jump.png"
@@ -583,22 +583,22 @@ local barTypeMap = {
 	-- Added dynamically up to burstCount; value 0.0 hides naturally via isVarForChannelVisible.
 	bustreload1 = { -- burst weapons are "related": all in the left column, stacked
 		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
-		bartype = bitPercentage + bitColorCorrect + bitLeft + bitVertical,
+		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitPrimaryReloadChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 0,
 	},
 	bustreload2 = {
 		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
-		bartype = bitPercentage + bitColorCorrect + bitLeft + bitVertical,
+		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitPrimaryCountChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 1,
 	},
 	bustreload3 = {
 		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
-		bartype = bitPercentage + bitColorCorrect + bitLeft + bitVertical,
+		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitSecondaryReloadChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 2,
 	},
 	bustreload4 = {
 		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
-		bartype = bitPercentage + bitColorCorrect + bitLeft + bitVertical,
+		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitSecondaryCountChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 3,
 	},
 	dgun = {
@@ -682,13 +682,15 @@ local barTypeMap = {
 		uniformindex = unitMovementChannel,
 		uvoffset = 0,
 	},
-	captureReload = {
-		mincolor = {0.0, 0.0, 0.0, 0.0},
-		maxcolor = {0.0, 0.0, 0.0, 0.0},
+	captureReload = { -- post-capture cooldown countdown (Dominatrix). Green capture symbol; hidden until a
+		-- capture happens, then counts the recharge down and vanishes when ready.
+		mincolor = {0.3, 0.8, 0.4, 1.0},
+		maxcolor = {0.3, 0.8, 0.4, 1.0},
 		bartype = bitPercentage + bitModular + bitInverse + bitLeft + bitVertical,
 		hidethreshold = 0.99,
 		uniformindex = unitPrimaryReloadChannel,
 		uvoffset = VBAR_COL_CAPTURERELOAD,
+		statusIcon = "captureReload",
 	},
 	ability = { -- Swift sprint etc.: non-weapon movement ability -> below zone (like jump). gauge fills
 		-- as it recharges (specialReloadRemaining counts down, so bitInverse turns it into a charge level).
@@ -917,6 +919,7 @@ local shaderSourceCache = {
 		uniformFloat = {
 			--addRadius = 1,
 			jumpIconCell = 0,
+			effectTime = 0.0, -- seconds, advanced each frame -> animates the paralyze/disarm icon lightning crackle
 			iconDistance = 27,
 			cameraDistanceMult = 1.0,
 			cameraDistanceMultGlyph = 4.0,
@@ -1367,10 +1370,13 @@ function stateCtl.refreshShift()
 	end
 end
 
--- Called from UnitDestroyed (which UnitFinished also reuses). Pop the unit's icon instances and mark
--- it dirty: relayout next frame re-pushes them if the unit is still alive (UnitFinished case) or
--- clears the stale state if it's really gone (relayout's ValidUnitID check).
-local function onUnitIconHolderReset(unitID)
+-- Pop a unit's pushed WG.icon instances (the centre icon-cluster quad + state-row quads) out of the
+-- VBO and forget which names were pushed. Leaves the preserved per-unit icon state (wgUnitIcons)
+-- intact so the icons reappear from it if the unit re-enters view. Must run on every removal: an
+-- orphaned icon quad keeps its VBO slot and, once the engine recycles that unit's GPU buffer slot for
+-- a new unit (e.g. a drone spawned right after a commander upgrade/morph frees the slot), it renders
+-- on top of the new unit -- the "two stacked radar icons" bug.
+local function popUnitIconInstances(unitID)
 	local pushed = wgUnitPushedNames[unitID]
 	if pushed and healthBarVBO then
 		for name in pairs(pushed) do
@@ -1379,6 +1385,13 @@ local function onUnitIconHolderReset(unitID)
 		end
 		wgUnitPushedNames[unitID] = nil
 	end
+end
+
+-- Called from UnitDestroyed (which UnitFinished also reuses). Pop the unit's icon instances and mark
+-- it dirty: relayout next frame re-pushes them if the unit is still alive (UnitFinished case) or
+-- clears the stale state if it's really gone (relayout's ValidUnitID check).
+local function onUnitIconHolderReset(unitID)
+	popUnitIconInstances(unitID)
 	if wgUnitIcons[unitID] then wgDirtyUnits[unitID] = true end
 end
 
@@ -1826,7 +1839,9 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 					if show then addBarForUnit(unitID, unitDefID, cfg, reason, range, slotCh) end
 				end
 			elseif kind == "burst" then
-				addBarForUnit(unitID, unitDefID, "bustreload" .. ab.index, reason, 100, slotCh)
+				-- range = reload frames so the badge's magnitude tier reflects the real reload (the value is
+				-- a modular completion frame, like the multi-weapon reload badges), not a 0-100 percent scale.
+				addBarForUnit(unitID, unitDefID, "bustreload" .. ab.index, reason, unitDefScriptReload[unitDefID] or 100, slotCh)
 			elseif kind == "dgun" or kind == "moveDgun" then
 				addBarForUnit(unitID, unitDefID, "dgun", reason, ab.reload and (ab.reload * gameSpeed), slotCh)
 			elseif kind == "captureReload" then
@@ -1892,6 +1907,11 @@ local function removeBarsFromUnit(unitID, reason)
 	for barname, v in pairs(barTypeMap) do
 		removeBarFromUnit(unitID, barname, reason)
 	end
+	-- Also drop the WG.icon cluster/state-row quads. This widget is driven by VisibleUnitRemoved (the
+	-- UnitDestroyed callin that used to call onUnitIconHolderReset is commented out below), so without
+	-- this the centre icon quad outlives the unit and gets re-attached to whatever next reuses its GPU
+	-- slot -- e.g. a drone spawned just after a commander upgrade showing a stale commander icon too.
+	popUnitIconInstances(unitID)
 end
 
 local function addBarToFeature(featureID, barname)
@@ -2349,6 +2369,7 @@ function widget:DrawWorld()
 	healthBarShader:SetUniform("reloadThreshold", options.reloadThreshold.value)
 	healthBarShader:SetUniform("digitAtlasStart", digitAtlasStartIndex)
 	healthBarShader:SetUniform("jumpIconCell", jumpIconAtlasIndex)
+	healthBarShader:SetUniform("effectTime", os.clock()) -- drives the animated paralyze/disarm icon lightning
 	healthBarShader:SetUniform("rowOffset", options.statusHeight.value)
 	healthBarShader:SetUniform("rowSize", options.statusSize.value)
 	healthBarShader:SetUniform("rowSpacing", options.statusSpacing.value)

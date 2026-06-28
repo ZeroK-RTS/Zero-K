@@ -272,7 +272,7 @@ return { chickenlandqueen = {
       
       customParams            = {
     weapon_class = "burst",
-    icon = [[unitpics/commweapon_shotgun.png]],
+    icon = [[unitpics/commweapon_napalmgrenade.png]],
     light_radius = 500,
       },
       

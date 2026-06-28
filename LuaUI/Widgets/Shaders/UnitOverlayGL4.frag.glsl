@@ -28,6 +28,38 @@ in DataGS {
 uniform sampler2D iconAtlasTex;
 uniform float barBorderWidth;
 uniform float trackDarken; // brightness of the empty/remaining portion of a bar relative to the filled part (1.0 = same, lower = darker)
+uniform float effectTime;  // seconds, advanced each frame -> drives the animated paralyze/disarm lightning crackle
+
+// Animated electric lightning, mirroring the unit-model paralyze shader (gfx_paralyze_effect.lua): a few
+// octaves of 3D value noise whose 3rd axis is time (so the field MORPHS in place rather than panning),
+// ridged into thin bright arcs by electricity = pow(1 - |2*noise-1|, sharpness). The baked disable.png /
+// disarm.png bar fills are just a single frozen frame of this same idea; here we run it live on the icon.
+float boltHash(vec3 p) {
+	p = fract(p * 0.1031);
+	p += dot(p, p.zyx + 31.32);
+	return fract((p.x + p.y) * p.z);
+}
+float boltNoise(vec3 p) {
+	vec3 i = floor(p), f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(mix(boltHash(i + vec3(0,0,0)), boltHash(i + vec3(1,0,0)), f.x),
+	               mix(boltHash(i + vec3(0,1,0)), boltHash(i + vec3(1,1,0)), f.x), f.y),
+	           mix(mix(boltHash(i + vec3(0,0,1)), boltHash(i + vec3(1,0,1)), f.x),
+	               mix(boltHash(i + vec3(0,1,1)), boltHash(i + vec3(1,1,1)), f.x), f.y), f.z);
+}
+// fq = [0,1] across the icon quad; tint = the effect's lightning colour. Returns additive RGB (dark where
+// there's no arc, bright tinted filaments where there is) so it glows on top of the icon silhouette.
+vec3 boltElectric(vec2 fq, vec3 tint) {
+	vec3 p = vec3(fq * 6.0, effectTime * 1.6); // z = time -> the arcs writhe in place
+	float n = 0.5   * boltNoise(p)
+	        + 0.25  * boltNoise(p * 2.03 + 7.0)
+	        + 0.125 * boltNoise(p * 4.01 + 13.0);
+	n /= 0.875;                                          // back to ~[0,1]
+	float e = clamp(1.0 - abs(2.0 * n - 1.0) * 3.0, 0.0, 1.0); // ridge: thin filaments along the noise's mid-level
+	e = pow(e, 6.0);                                     // sharpen into crisp bolts
+	return tint * e;
+}
+
 out vec4 fragColor;
 
 // Signed distance from p to a rounded box of the given half-size and corner radius, centered
@@ -181,28 +213,29 @@ void main(void)
 		}
 	}
 
-	// Status-effect tint on the center unit icon, echoing the on-model effects. The bars/badges already
-	// show the precise states; this is only a secondary at-a-glance cue for radar range (icon-only), so
-	// keep the icon legible: (a) show only the DOMINANT effect rather than stacking washes into mud, and
-	// (b) tint hue-only -- the effect colour is scaled by the icon's own luminance, so the silhouette and
-	// relative brightness (hence team shade) read through. g_effect is non-zero only for the center icon.
-	// Colours mirror gfx_paralyze_effect; priority paralyze > disarm > slow (most disabling first).
-	vec3 effectColor = vec3(0.0);
-	float effectAmt = 0.0;
-	if (g_effect.z > 0.001) {        // paralyze (EMP): light blue
-		effectColor = vec3(0.49, 0.5, 1.0);
-		effectAmt = clamp(g_effect.z * 0.55, 0.0, 0.55);
-	} else if (g_effect.y > 0.001) { // disarm: desaturated khaki/tan
-		effectColor = vec3(0.7, 0.7, 0.55);
-		effectAmt = clamp(g_effect.y * 0.5, 0.0, 0.5);
-	} else if (g_effect.x > 0.001) { // slow: magenta
-		effectColor = vec3(1.0, 0.1, 1.0);
-		effectAmt = clamp(sqrt(g_effect.x) * 0.5, 0.0, 0.5);
-	}
-	if (effectAmt > 0.0) {
+	// Status-effect overlay on the center unit icon, echoing the on-model effects. The bars/badges already
+	// show the precise states; this is a secondary at-a-glance cue for radar range (icon-only). Only the
+	// DOMINANT effect draws (priority paralyze > disarm > slow), so washes don't stack into mud.
+	// Paralyze and disarm are electrical, so they get the SAME animated lightning the unit model shows --
+	// procedural crackle (boltElectric) tinted blue / gold, added over the icon so the live arcs glow on the
+	// silhouette. Slow is the model's other character: a soft magenta wash from SMOOTH (un-ridged) noise --
+	// it modulates a luminance-scaled tint (not additive, which would flatten the icon), so it breathes
+	// without crisp arcs and the team shade still reads through.
+	vec2 effq = (g_loc - g_rect.xy) / g_rect.zw;     // [0,1] across the icon quad (y up)
+	if (g_effect.z > 0.001) {        // paralyze (EMP): pale-blue lightning (disable.png tint #aab4ff)
+		col.rgb += boltElectric(effq, vec3(0.667, 0.706, 1.0)) * clamp(g_effect.z, 0.0, 1.0);
+	} else if (g_effect.y > 0.001) { // disarm: white-gold lightning (disarm.png tint #ece6b4)
+		col.rgb += boltElectric(effq, vec3(0.925, 0.902, 0.706)) * clamp(g_effect.y, 0.0, 1.0);
+	} else if (g_effect.x > 0.001) { // slow: animated magenta wash (smooth noise, NO ridge -- mirrors the
+		// model's slowed branch / gen_slow.sh, which is plain tinted plasma, not crisp lightning).
+		vec3 p = vec3(effq * 4.0, -effectTime * 0.7);          // slower + reversed time, distinct from the bolts
+		float wash = 0.5 * boltNoise(p) + 0.5 * boltNoise(p * 1.9 + 5.0); // smooth, soft (no ridge/sharpen)
+		// Magenta fills the noise's DARK hollows and fades to FULLY transparent in its bright crests
+		// (1 - wash, so wash == 1 -> amt 0), reading as breathing magenta smoke with see-through gaps.
+		float amt = clamp(sqrt(g_effect.x) * 1.1 * (1.0 - wash), 0.0, 0.85);
 		float lum = dot(col.rgb, vec3(0.299, 0.587, 0.114));
-		vec3 tinted = effectColor * (0.35 + lum); // effect hue, icon's own brightness -> silhouette survives
-		col.rgb = mix(col.rgb, tinted, effectAmt);
+		vec3 tinted = vec3(1.0, 0.1, 1.0) * (0.35 + lum);      // effect hue, icon's own brightness -> silhouette survives
+		col.rgb = mix(col.rgb, tinted, amt);
 	}
 
 	// CONSTRUCTION: while a unit builds, its nanoframe rises up the model; echo that on the icon as a fill

@@ -68,7 +68,7 @@ return { napalmmissile = {
 
       customParams            = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_napalmgrenade.png]],
         setunitsonfire = "1",
         burntime = 90,
 

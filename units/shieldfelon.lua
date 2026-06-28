@@ -103,7 +103,7 @@ return { shieldfelon = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lightninggun.png]],
         shield_drain = 78,
         
         light_camera_height = 2500,

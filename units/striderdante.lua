@@ -105,7 +105,7 @@ return { striderdante = {
 
       customParams              = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_flamethrower.png]],
         flamethrower = [[1]],
         setunitsonfire = "1",
         burnchance = "0.4", -- Per-impact
@@ -160,7 +160,7 @@ return { striderdante = {
 
       customParams              = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_heatray.png]],
         light_camera_height = 1500,
         light_color = [[0.9 0.4 0.12]],
         light_radius = 90,
@@ -214,7 +214,7 @@ return { striderdante = {
 
       customParams              = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_napalmgrenade.png]],
         area_damage = 1,
         area_damage_radius = 78,
         area_damage_dps = 17,
@@ -274,7 +274,7 @@ return { striderdante = {
 
       customParams              = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_napalmgrenade.png]],
         area_damage = 1,
         area_damage_radius = 78,
         area_damage_dps = 17,

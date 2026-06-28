@@ -110,7 +110,7 @@ return { dronefighter = {
       turret                  = true,
       customParams = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lparticlebeam.png]],
       },
       weaponType              = [[BeamLaser]],
     },

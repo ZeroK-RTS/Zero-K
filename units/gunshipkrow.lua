@@ -176,7 +176,7 @@ return { gunshipkrow = {
       turret                  = true,
       customParams = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_concussion.png]],
       },
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,

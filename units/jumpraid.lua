@@ -94,7 +94,7 @@ return { jumpraid = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_flamethrower.png]],
         flamethrower = [[1]],
         setunitsonfire = "1",
         burnchance = "0.4", -- Per-impact

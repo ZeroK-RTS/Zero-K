@@ -80,7 +80,7 @@ return { tankheavyraid = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lightninggun.png]],
         burst = Shared.BURST_RELIABLE,
         extra_damage = 500,
         light_camera_height = 1600,

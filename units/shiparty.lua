@@ -78,7 +78,7 @@ return { shiparty = {
 
       customParams = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
         burst = Shared.BURST_RELIABLE,
       },
 

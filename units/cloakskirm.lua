@@ -79,7 +79,7 @@ return { cloakskirm = {
 
       customParams        = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_rocketlauncher.png]],
         reaim_time = 1, -- Keep aiming at target to prevent sideways gun, which can lead to teamkill.
         burst = Shared.BURST_RELIABLE,
 

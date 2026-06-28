@@ -84,6 +84,32 @@ local JUMP_FRAME_SCALE = 8
 local RATE_ETA_MAX_SECS = 256
 local morphRateLast, reammoRateLast, stockRateLast, gooRateLast = {}, {}, {}, {}
 
+-- Burst reload (Picket etc.): the unit script only exposes scriptLoaded (how many charges are loaded)
+-- and a single scriptReloadFrame (the SOONEST charge's completion) -- but the charges reload in PARALLEL
+-- (staggered), so showing only that one frame animates a single gauge and pops the next one in near-full.
+-- Reconstruct a completion frame per reloading charge by observing the load count change over time: when
+-- a charge starts (count drops) it just began -> completes ~last (gameFrame + full reload); when one loads
+-- (count rises) drop the soonest. The soonest tracked frame is then snapped to the exact scriptReloadFrame.
+-- Per-unit { gf = last reconcile frame, loaded = scriptLoaded, frames = {asc completion frames} }.
+local burstState = {}
+
+local function reconcileBurst(unitID, unitDefID, gameFrame)
+	local count = unitDefBurstCount[unitDefID] or 1
+	local reload = unitDefScriptReload[unitDefID] or 1
+	local loaded = mfloor(GetUnitRulesParam(unitID, "scriptLoaded") or count)
+	if loaded < 0 then loaded = 0 elseif loaded > count then loaded = count end
+	local soonest = GetUnitRulesParam(unitID, "scriptReloadFrame")
+	local reloading = count - loaded
+	local st = burstState[unitID]
+	local frames = (st and st.frames) or {}
+	while #frames > reloading do table.remove(frames, 1) end          -- a charge loaded -> drop the soonest
+	while #frames < reloading do frames[#frames + 1] = gameFrame + reload end -- a charge just started -> completes last
+	if soonest and soonest > 0 and #frames > 0 then frames[1] = soonest end  -- anchor the soonest to the exact shared frame
+	st = { gf = gameFrame, loaded = loaded, frames = frames }
+	burstState[unitID] = st
+	return st
+end
+
 -- Pausable ETA (morph / reammo / stockpile / goo): SMOOTH while advancing, truly FROZEN (no creep) when stopped.
 -- While progress is advancing it stores an absolute completion frame (>= PAUSE_FRAME_BASE) so the shader
 -- counts it down smoothly at the observed (metal-fed) rate; while stopped it stores a STATIC seconds band
@@ -102,50 +128,38 @@ local function staticBand(remFrames)
 	return 2 + secs
 end
 
--- nominalFrames: full-rate frames to complete (e.g. goo's cost/drain) = count "as if it had metal". The
--- needle ONLY moves while progress is actually advancing (a grace window bridges the source's update
--- steps and the overlay's round-robin); the first visit never counts (it could be a just-out-of-ammo
--- bomber). When stopped (flying back, disabled/unpowered pad, out of resources) the remaining is held
--- static, captured once so it doesn't creep. When omitted, the rate is inferred from progress deltas.
--- forceShow: show the badge even at prog == 0 (caller already gated visibility, e.g. bomber needs rearm).
+-- nominalFrames: full-rate frames to complete (e.g. goo's cost/drain) = count "as if fully resourced",
+-- so the only thing the displayed duration reflects is build power, never the live (resource-limited)
+-- rate. The needle ONLY moves while progress is actually advancing (a grace window bridges the source's
+-- update steps and the overlay's round-robin); the first visit never counts (it could be a just-out-of-
+-- ammo bomber). When stopped (flying back, disabled/unpowered pad, out of resources / build power) the
+-- remaining is held static, captured once so it doesn't creep -- the countdown simply pauses rather than
+-- collapsing to an ambiguous "constant" state. forceShow: show the badge even at prog == 0 (caller
+-- already gated visibility, e.g. bomber needs rearm). All callers supply nominalFrames; a missing/zero
+-- value is clamped so a real ETA is always shown.
 local function pausableETABand(store, unitID, prog, gameFrame, nominalFrames, forceShow)
 	if prog >= 1 then store[unitID] = nil; return 0 end -- complete -> hidden
 	if not forceShow and prog <= 0 then store[unitID] = nil; return 0 end -- inactive -> hidden
+	if not nominalFrames or nominalFrames <= 0 then nominalFrames = 1 end
 	local last = store[unitID]
-	if nominalFrames then
-		local completion, progFrame
-		if last and prog > last.prog then -- real, observed progress -> (re)anchor and mark working
-			completion = gameFrame + (1 - prog) * nominalFrames
-			progFrame = gameFrame
-		elseif last then -- no progress this visit: keep the anchor and the last-progress timestamp
-			completion = last.completion
-			progFrame = last.progFrame
-		else -- first visit: anchor, but DON'T mark progress (so a just-stopped/idle badge stays frozen)
-			completion = gameFrame + (1 - prog) * nominalFrames
-		end
-		if progFrame and (gameFrame - progFrame <= PAUSE_GRACE) then -- recently advancing -> gauge moves
-			store[unitID] = { prog = prog, completion = completion, progFrame = progFrame }
-			return frameModeBand(completion)
-		end
-		-- stopped: hold the remaining it had reached (captured once so it doesn't creep down)
-		local frozenVal = (last and last.frozenVal) or staticBand(completion - gameFrame)
-		store[unitID] = { prog = prog, completion = completion, progFrame = progFrame, frozenVal = frozenVal }
-		return frozenVal
+	local completion, progFrame
+	if last and prog > last.prog then -- real, observed progress -> (re)anchor and mark working
+		completion = gameFrame + (1 - prog) * nominalFrames
+		progFrame = gameFrame
+	elseif last then -- no progress this visit: keep the anchor and the last-progress timestamp
+		completion = last.completion or (gameFrame + (1 - prog) * nominalFrames) -- `or` guards a store from before this anchor existed
+		progFrame = last.progFrame
+	else -- first visit: anchor, but DON'T mark progress (so a just-stopped/idle badge stays frozen)
+		completion = gameFrame + (1 - prog) * nominalFrames
 	end
-	-- Inferred-rate path (morph / stockpile): no known nominal time.
-	local rate = (last and last.rate) or 0
-	local advancing = last and prog > last.prog
-	if advancing then
-		local inst = (prog - last.prog) / (gameFrame - last.frame)
-		rate = (rate > 0) and (rate * 0.7 + inst * 0.3) or inst -- don't EMA up from a zero seed
+	if progFrame and (gameFrame - progFrame <= PAUSE_GRACE) then -- recently advancing -> gauge moves
+		store[unitID] = { prog = prog, completion = completion, progFrame = progFrame }
+		return frameModeBand(completion)
 	end
-	store[unitID] = { prog = prog, frame = gameFrame, rate = rate }
-	if rate <= 1e-7 then return 1 end -- no rate known yet -> grey constant (brief)
-	local framesLeft = (1 - prog) / rate
-	if advancing and framesLeft < PAUSE_FRAME_BASE * PAUSE_FRAME_SCALE then
-		return frameModeBand(gameFrame + framesLeft)
-	end
-	return staticBand(framesLeft)
+	-- stopped: hold the remaining it had reached (captured once so it doesn't creep down)
+	local frozenVal = (last and last.frozenVal) or staticBand(completion - gameFrame)
+	store[unitID] = { prog = prog, completion = completion, progFrame = progFrame, frozenVal = frozenVal }
+	return frozenVal
 end
 
 local function encodeAbility(entry, unitID, unitDefID, gameFrame)
@@ -166,16 +180,15 @@ local function encodeAbility(entry, unitID, unitDefID, gameFrame)
 	elseif kind == "captureReload" then
 		return modFrame(GetUnitRulesParam(unitID, "captureRechargeFrame"), gameFrame)
 	elseif kind == "burst" then
-		local scriptLoaded = mfloor(GetUnitRulesParam(unitID, "scriptLoaded") or unitDefBurstCount[unitDefID])
+		-- One badge per charge, encoded like a modular reload (target-frame mod 4096): each reloading charge
+		-- counts down to its own reconstructed completion frame (so all in-flight reloads animate in parallel,
+		-- with the magnitude tier matching the real reload), and a loaded charge reads 0 = "ready" (a full
+		-- circle, kept visible via bitAlwaysShow). Reconcile once per unit per frame; later charges reuse it.
+		local st = burstState[unitID]
+		if not st or st.gf ~= gameFrame then st = reconcileBurst(unitID, unitDefID, gameFrame) end
 		local i = entry.index
-		if i <= scriptLoaded then return 100 end
-		if i == scriptLoaded + 1 then
-			local rf = GetUnitRulesParam(unitID, "scriptReloadFrame") or 0
-			if rf <= 0 then return 0 end
-			local remaining = math.max(0, rf - gameFrame)
-			return pct100(1.0 - remaining / (unitDefScriptReload[unitDefID] or 1))
-		end
-		return 0
+		if i <= st.loaded then return 0 end -- loaded -> ready (full)
+		return modFrame(st.frames[i - st.loaded], gameFrame)
 	elseif kind == "shield" then
 		local on, power = GetUnitShieldState(unitID)
 		if on == false then power = 0 end
@@ -200,7 +213,7 @@ local function encodeAbility(entry, unitID, unitDefID, gameFrame)
 		local _, _, sb = GetUnitStockpile(unitID)
 		local ud = UnitDefs[unitDefID]
 		if ud.customParams and ud.customParams.stockpiletime then sb = GetUnitRulesParam(unitID, "gadgetStockpile") end
-		return pausableETABand(stockRateLast, unitID, sb or 0, gameFrame)
+		return pausableETABand(stockRateLast, unitID, sb or 0, gameFrame, unitDefStockpileFrames[unitDefID])
 	elseif kind == "stockCnt" then
 		return mmin(GetUnitStockpile(unitID) or 0, 4095)
 	elseif kind == "jump" then
@@ -225,6 +238,7 @@ end
 local unitUniform = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} -- channels 1-14
 local writeBuf11 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} -- block write covers floats 1-11 only: float 12 is gadget cloak (must not clobber), floats 13-14 are unread (their channels map to floats 2/11)
 local unitMorphProgress = {}
+local unitMorphIncrement = {} -- per-frame progress increment at full rate (1/increment = nominal morph frames)
 local unitHighlight = {} -- per-unit highlight/selectedness value (slot 6), pushed via WG.SetUnitHighlight
 local unitParalyzeFX = {} -- gfx_paralyze fullscreen-effect value (float 4), pushed via WG.SetUnitParalyzeFX
 local unitStateCount = {} -- centered-state count (float 2, bits 19-22)
@@ -312,7 +326,8 @@ function updateUnit(unitID, unitDefID)
 	unitUniform[10] = s3 + s4 * 4096
 	unitUniform[11] = s5
 	unitUniform[5]  = 0
-	unitUniform[8]  = pausableETABand(morphRateLast, unitID, unitMorphProgress[unitID] or 0, gameFrame)  -- morph pausable-ETA band on float 8
+	local morphInc = unitMorphIncrement[unitID]
+	unitUniform[8]  = pausableETABand(morphRateLast, unitID, unitMorphProgress[unitID] or 0, gameFrame, (morphInc and morphInc > 0) and (1 / morphInc) or nil)  -- morph pausable-ETA band on float 8 (nominal frames = 1/increment)
 	-- float 12 = gadget cloak (not written here), float 14 unread (channel 14 -> float 11): both outside the 1-11 block write
 
 	-- Pack paralyze+disarm into float 1, slow+capture into float 2 (frees floats 3, 13).
@@ -372,6 +387,7 @@ function removeUnit(unitID)
 	unitSelected[unitID] = nil
 	unitFloat2Base[unitID] = nil
 	unitParalyzeFX[unitID] = nil
+	burstState[unitID] = nil
 end
 
 function resetUnits()
@@ -380,6 +396,8 @@ function resetUnits()
 	unitPosition = {}
 	currentUnit = 1
 	unitMorphProgress = {}
+	unitMorphIncrement = {}
+	burstState = {}
 	unitHighlight = {}
 	unitStateCount = {}
 	unitSelected = {}
@@ -599,10 +617,12 @@ function widget:Initialize()
 	WG.MorphUpdateCallbacks[widgetName] = function(morphTable)
 		for unitID, morph in pairs(morphTable) do
 			unitMorphProgress[unitID] = morph.progress
+			unitMorphIncrement[unitID] = morph.increment
 		end
 	end
 	WG.MorphStopCallbacks[widgetName] = function(unitID)
 		unitMorphProgress[unitID] = nil
+		unitMorphIncrement[unitID] = nil
 	end
 
 	initUnits()

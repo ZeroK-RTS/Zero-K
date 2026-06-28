@@ -91,7 +91,7 @@ return { turretheavy = {
 
       customParams              = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_heatray.png]],
         light_camera_height = 2000,
         light_color = [[0.9 0.4 0.12]],
         light_radius = 180,
@@ -145,7 +145,7 @@ return { turretheavy = {
 
       customParams            = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
         light_color = [[2.2 1.6 0.9]],
         light_radius = 550,
       },

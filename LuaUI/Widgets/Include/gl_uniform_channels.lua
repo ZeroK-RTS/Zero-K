@@ -93,6 +93,7 @@ unitDefHasReammo = {}
 unitDefReammoFrames = {} -- nominal rearm time (frames) for the reammo gauge's smooth on-pad countdown
 unitDefHasCaptureReload = {}
 unitDefHasTeleport = {}
+unitDefStockpileFrames = {} -- nominal (full-rate) frames to build one stockpiled missile, for the stockpile gauge's smooth countdown
 unitDefWeaponIcon = {}  -- primary weapon's reload-badge icon (customParams.icon image path; nil = none drawn)
 unitDefWeaponColor = {} -- {r,g,b} beam/projectile color of the classified weapon, for tinting its reload bar
 unitDefIsComm = {} -- true for dynamic commanders (weapons assigned at runtime, not in the unitDef)
@@ -219,9 +220,14 @@ for udefID, unitDef in pairs(UnitDefs) do
                         unitDefReammoFrames[udefID] = (tonumber(unitDef.customParams.reammoseconds) or 1) * 30
                 end
 
-                -- STOCKPILE
+                -- STOCKPILE. Nominal (full-rate) frames to build one missile = stockpiletime * 30, so the
+                -- overlay counts the gauge down "as if fully resourced" (the only limiter being build power)
+                -- instead of inferring a jumpy rate; the needle freezes when actually resource-starved.
                 if unitDef.canStockpile then
                         unitDefCanStockpile[udefID] = unitDef.canStockpile
+                        if unitDef.customParams and unitDef.customParams.stockpiletime then
+                                unitDefStockpileFrames[udefID] = tonumber(unitDef.customParams.stockpiletime) * gameSpeed
+                        end
                 end
 
                 -- TELEPORT

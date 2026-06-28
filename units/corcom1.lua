@@ -173,7 +173,7 @@ return { corcom1 = {
       turret                  = true,
       customParams = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
       },
       weaponType              = [[Cannon]],
       weaponVelocity          = 750,

@@ -78,7 +78,7 @@ return { spiderassault = {
 
       customParams        = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
         light_camera_height = 1800,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 200,

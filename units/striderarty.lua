@@ -74,7 +74,7 @@ return { striderarty = {
       
       customParams              = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_rocketlauncher.png]],
         force_ignore_ground = [[1]],
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],

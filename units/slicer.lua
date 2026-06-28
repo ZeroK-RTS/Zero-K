@@ -82,7 +82,7 @@ return { slicer = {
 
       customParams = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_hparticlebeam.png]],
         nofriendlyfire = 1,
       },
 

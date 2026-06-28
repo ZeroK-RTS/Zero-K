@@ -82,7 +82,7 @@ return { staticheavyarty = {
 
       customParams            = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_riotcannon.png]],
         gatherradius     = [[240]],
         smoothradius     = [[120]],
         smoothmult       = [[0.5]],

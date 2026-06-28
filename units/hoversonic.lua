@@ -68,7 +68,7 @@ return { hoversonic = {
 
         customParams            = {
             weapon_class = "energy",
-            icon = [[unitpics/commweapon_beamlaser.png]],
+            icon = [[unitpics/commweapon_sonicgun.png]],
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
             miscEffectFire   = [[custom:RIOT_SHELL_L]],

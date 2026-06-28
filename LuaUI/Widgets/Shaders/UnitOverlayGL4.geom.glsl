@@ -485,22 +485,35 @@ void main(){
 		//   - weapon reload: derived from the reload fraction (v_parameters.x) and v_range.
 		float sides, litFrac;
 		if ((BARTYPE & BITGAUGE) != 0u) {
-			// Gauge (heat / speed / charge / teleport): the badge fills to the channel's 0..1 magnitude
-			// -- a level meter, not a countdown. Always a circle; color from the bartype (v_maxcolor).
-			// Jump charges share one value (reconstructed jumpReload, 0..charges): badge N subtracts its
-			// charge index (low nibble of UVOFFSET) so each fills as jumpReload passes it -- full when ready.
-			float chargeIdx = ((BARTYPE & BITJUMPCHARGE) != 0u) ? mod(UVOFFSET, 16.0) : 0.0;
-			litFrac = clamp(dataIn[0].v_parameters.x - chargeIdx, 0.0, 1.0);
-			sides = 1.0;
-			healthcolor = vec4(dataIn[0].v_maxcolor.rgb, 1.0);
+			if ((BARTYPE & BITJUMPCHARGE) != 0u) {
+				// Jump charges: v_parameters.x is the shared reconstructed jumpReload (0..charges); this
+				// badge's own fill is (jumpReload - chargeIndex), clamped 0..1. It is a COUNTDOWN, not a
+				// level meter, so shape it with the same base-4 magnitude tiers + clockwise fill as the
+				// weapon-reload / status / construction badges. Otherwise a long jump reload (e.g. a recon
+				// comm's ~22s) draws as a flat circle that reads like a few seconds. secs-until-ready =
+				// (1 - frac) * reload, where reload = v_range / 30 (v_range carries the jump reloadFrames).
+				float frac = clamp(dataIn[0].v_parameters.x - mod(UVOFFSET, 16.0), 0.0, 1.0);
+				float secs = (1.0 - frac) * (dataIn[0].v_range / 30.0);
+				float tier = (secs < 4.0) ? 0.0 : (secs < 16.0) ? 1.0 : (secs < 64.0) ? 2.0 : (secs < 256.0) ? 3.0 : 4.0;
+				sides = (tier < 0.5) ? 1.0 : (7.0 - tier);
+				float hi = pow(4.0, tier + 1.0);
+				litFrac = 1.0 - clamp(secs / hi, 0.0, 1.0); // fills clockwise as the charge nears ready
+			} else {
+				// Gauge (heat / speed / charge / teleport): the badge fills to the channel's 0..1 magnitude
+				// -- a level meter, not a countdown. Always a circle.
+				litFrac = clamp(dataIn[0].v_parameters.x, 0.0, 1.0);
+				sides = 1.0;
+			}
+			healthcolor = vec4(dataIn[0].v_maxcolor.rgb, 1.0); // color from the bartype (v_maxcolor)
 		} else if ((BARTYPE & (BITCONSTRUCTION | BITRATEETA)) != 0u) {
-			// Build channel encoding (must match the updater): [1000,..)=reclaiming (secs=v-1000),
-			// [2,..)=building (secs=v-2), (0,2)=constant (rate ~0). v==0 is culled before here.
+			// Build channel encoding (must match the updater): [2048,..)=pausable-ETA frame mode,
+			// [1000,2048)=reclaiming (secs=v-1000), [2,1000)=building (secs=v-2). The updater always
+			// emits a real ETA (nominal "fully resourced" remaining, frozen when starved), so there is
+			// no "constant" band -- a stalled badge just holds its last duration. v==0 is culled before here.
 			float v = dataIn[0].v_parameters.x;
 			float secs;
-			bool isConstant = false;
 			if (v >= 2048.0) {
-				// Pausable ETA frame mode (goo advancing): v-2048 = completion frame /2 (mod 2048), counted
+				// Pausable ETA frame mode (advancing): v-2048 = completion frame /2 (mod 2048), counted
 				// down smoothly here. The /2 scale must match PAUSE_FRAME_SCALE in the updater. When the
 				// updater stops advancing it switches to the static (2+secs) band below, so the needle holds.
 				float rem = mod((v - 2048.0) - floor(timeInfo.x / 2.0), 2048.0) * 2.0;
@@ -509,21 +522,14 @@ void main(){
 			} else if (v >= 1000.0) {
 				secs = v - 1000.0;
 				healthcolor = vec4(1.0, 0.35, 0.2, 1.0);           // reclaiming -> red/orange (construction only)
-			} else if (v >= 2.0) {
-				secs = v - 2.0;
+			} else {
+				secs = v - 2.0;                                    // building / frozen-static band [2,1000)
 				healthcolor = vec4(dataIn[0].v_maxcolor.rgb, 1.0); // forward progress -> bartype color (green build / magenta raise)
-			} else {
-				isConstant = true;
-				healthcolor = vec4(0.7, 0.7, 0.7, 1.0);            // constant (working, no estimate) -> grey
 			}
-			if (isConstant) {
-				sides = 1.0; litFrac = 1.0; // static full circle
-			} else {
-				float tier = (secs < 4.0) ? 0.0 : (secs < 16.0) ? 1.0 : (secs < 64.0) ? 2.0 : (secs < 256.0) ? 3.0 : 4.0;
-				sides = (tier < 0.5) ? 1.0 : (7.0 - tier);
-				float hi = pow(4.0, tier + 1.0);
-				litFrac = 1.0 - clamp(secs / hi, 0.0, 1.0); // fills clockwise as it nears completion
-			}
+			float tier = (secs < 4.0) ? 0.0 : (secs < 16.0) ? 1.0 : (secs < 64.0) ? 2.0 : (secs < 256.0) ? 3.0 : 4.0;
+			sides = (tier < 0.5) ? 1.0 : (7.0 - tier);
+			float hi = pow(4.0, tier + 1.0);
+			litFrac = 1.0 - clamp(secs / hi, 0.0, 1.0); // fills clockwise as it nears completion
 		} else if ((BARTYPE & BITTIMELEFT) != 0u) {
 			// Status duration (paralyze/disarm/slow): when locked the channel stores the effect-END frame
 			// (value-101 = endFrame mod 3895, must match STATUS_LOCK_BASE/MOD in the updater) so the badge

@@ -100,7 +100,7 @@ return { striderbantha = {
       
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_hparticlebeam.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_color = [[1.25 0.8 1.75]],
@@ -153,7 +153,7 @@ return { striderbantha = {
       
       customParams            = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         combatrange = 900,
         light_color = [[0.65 0.65 0.18]],
         light_radius = 380,
@@ -204,7 +204,7 @@ return { striderbantha = {
 
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lightninggun.png]],
         extra_damage = 960,
         
         light_camera_height = 2200,

@@ -79,7 +79,7 @@ return { dronelight = {
   
       customParams            = {
         weapon_class = "energy",
-        icon = [[unitpics/commweapon_beamlaser.png]],
+        icon = [[unitpics/commweapon_lparticlebeam.png]],
         light_camera_height = 1800,
         light_color = [[0.25 1 0.25]],
         light_radius = 130,

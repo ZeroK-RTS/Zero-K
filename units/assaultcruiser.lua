@@ -183,7 +183,7 @@ return { assaultcruiser = {
       waterbounce             = 1,
       customParams = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_gaussrifle.png]],
       },
       weaponType              = [[Cannon]],
       weaponVelocity          = 2400,
@@ -227,7 +227,7 @@ return { assaultcruiser = {
       weaponAcceleration      = 300,
       customParams = {
         weapon_class = "burst",
-        icon = [[unitpics/commweapon_shotgun.png]],
+        icon = [[unitpics/commweapon_missilelauncher.png]],
       },
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 600,

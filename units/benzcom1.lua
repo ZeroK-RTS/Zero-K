@@ -160,7 +160,7 @@ return { benzcom1 = {
       turret                  = true,
       customParams = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_assaultcannon.png]],
       },
       weaponType              = [[Cannon]],
       weaponVelocity          = 300,

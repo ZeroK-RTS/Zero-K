@@ -83,7 +83,7 @@ return { jumpaa = {
 
       customParams              = {
         weapon_class = "kinetic",
-        icon = [[unitpics/commweapon_gaussrifle.png]],
+        icon = [[unitpics/commweapon_heavymachinegun.png]],
         isaa = [[1]],
         
         light_camera_height = 1600,

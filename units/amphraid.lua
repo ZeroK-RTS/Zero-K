@@ -76,7 +76,7 @@ return { amphraid = {
 
       customparams = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_torpedo.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_color = [[1 0.6 0.2]],
@@ -127,7 +127,7 @@ return { amphraid = {
 
       customparams = {
         weapon_class = "explosive",
-        icon = [[unitpics/commweapon_missilelauncher.png]],
+        icon = [[unitpics/commweapon_torpedo.png]],
         radar_homing_distance = 200,
         stays_underwater = 1,
       },
