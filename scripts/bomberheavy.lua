@@ -29,6 +29,8 @@ local takeoffHeight = UnitDefNames["bomberheavy"].cruiseAltitude
 
 local function ShowBall()
 	Show(ball)
+	Move(ball, y_axis, 0)
+	Move(ball, z_axis, 0)
 	
 	Move(radiator_L, z_axis, 0, 2)
 	Move(radiator_R, z_axis, 0, 2)
@@ -38,14 +40,8 @@ local function ShowBall()
 	Turn(hatch_R, y_axis, math.rad(0), 1)
 	Spin(ball_emit, y_axis, math.rad(30))
 	
-	local spSetUnitPieceMatrix = Spring.SetUnitPieceMatrix
-	local newTable = {1, 0, 0, 0,    0, 1, 0, 0,     0, 0, 1, 0,      0, 0, 0, 1}
 	for i = 1, 15 do
-		local scale = math.sin(i / 15 * 1.602)
-		newTable[1] = scale
-		newTable[6] = scale
-		newTable[11] = scale
-		spSetUnitPieceMatrix(unitID, ball, newTable)
+		Scale(ball, math.sin(i / 15 * 1.602))
 		Sleep(33)
 	end
 	
@@ -57,9 +53,11 @@ end
 
 local function HideBall()
 	Hide(ball)
-	Spring.SetUnitPieceMatrix(unitID, ball, {0, 0, 0})
+	Scale(ball, 0)
 	Turn(ball_emit, y_axis, 0)
 	Spin(ball_emit, y_axis, 0)
+
+	-- apparently to hide the LUPS glow
 	Move(ball, y_axis, 27)
 	Move(ball, z_axis, 1)
 	
