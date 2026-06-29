@@ -47,6 +47,7 @@ StaticParticles.Default = {
 	size        = 0,
 	sizeSpread  = 0,
 	sizeGrowth  = 0,
+	-- sizeScaleParam= unset, overrides sizeGrowth property if set.
 	colormap    = { {0, 0, 0, 0} }, --//max 12 entries
 	srcBlend    = GL.ONE,
 	dstBlend    = GL.ONE_MINUS_SRC_ALPHA,
@@ -74,6 +75,7 @@ local spGetPositionLosState = Spring.GetPositionLosState
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spIsSphereInView      = Spring.IsSphereInView
 local spGetUnitRadius       = Spring.GetUnitRadius
+local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spGetProjectilePosition = Spring.GetProjectilePosition
 
 local glTexture     = gl.Texture
@@ -246,7 +248,11 @@ end
 
 function StaticParticles:Update(n)
 	self.frame  = self.frame + n
-	self.usize  = self.usize + n*self.sizeGrowth
+	if self.sizeScaleParam then
+		self.usize = spGetUnitRulesParam(self.unit, self.sizeScaleParam)  * self.size
+	else
+		self.usize  = self.usize + n*self.sizeGrowth -- overridden if self.sizeScaleParam
+	end
 end
 
 -- used if repeatEffect=true;
