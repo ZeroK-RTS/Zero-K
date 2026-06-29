@@ -66,9 +66,10 @@ end
 
 local function Anim()
 	local spGetUnitIsStunned = Spring.GetUnitIsStunned
+	local spGetUnitRulesParam = Spring.GetUnitRulesParam
 	local was_stunned = true
 	while true do
-		is_stunned = spGetUnitIsStunned(unitID)
+		is_stunned = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		if is_stunned ~= was_stunned then
 			was_stunned = is_stunned
 			if is_stunned then
