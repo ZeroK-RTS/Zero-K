@@ -35,9 +35,11 @@ uniform float ghostsEnabled;        // 1.0 = run coverage SSBO updates, 0.0 = by
 //
 // Slots are declared as uvec4 because Spring's VBO API requires vec4-aligned
 // attributes; we only use `.x` and ignore `.yzw`.
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
 	uvec4 cableCoverage[];
 };
+#endif
 
 in DataVS {
 	vec2 vsWorldXZ;
