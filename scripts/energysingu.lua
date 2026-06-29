@@ -15,6 +15,7 @@ local smokePiece = { piece "base", piece "arm1", piece "arm2", piece "arm3" }
 
 local ballSize = 0
 local is_stunned = true
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 local function SizeControl()
 	local mag = math.random() + 1
@@ -30,10 +31,12 @@ local function SizeControl()
 			else
 				ballSize = 1
 				Hide(energyball)
+				spSetUnitRulesParam(unitID, "ballShow", 0, INLOS) -- hide halo
 			end
 		else
 			if ballSize == 1 then
 				Show(energyball)
+				spSetUnitRulesParam(unitID, "ballShow", 1, INLOS) -- show halo
 			end
 			if ballSize < 100 then
 				ballSize = ballSize + 1
@@ -41,6 +44,7 @@ local function SizeControl()
 		end
 
 		local ballSwellFactor = 1.13^(sin(t/period)*mag) * (ballSize^2 / 11000)
+		spSetUnitRulesParam(unitID, "ballSwell", 1.15*ballSwellFactor - 0.1, INLOS)
 		Scale(energyball, ballSwellFactor)
 
 		t = t + 1
@@ -85,6 +89,8 @@ end
 
 function script.Create()
 	Hide(energyball)
+	spSetUnitRulesParam(unitID, "ballShow", 0, INLOS) -- hide halo
+	spSetUnitRulesParam(unitID, "ballSwell", 0, INLOS) -- halo size
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(Anim)
