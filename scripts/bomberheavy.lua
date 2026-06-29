@@ -2,6 +2,7 @@ include "constants.lua"
 include "bombers.lua"
 include "fixedwingTakeOff.lua"
 
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 local base       = piece 'base'
 local wing_L     = piece 'wing_L'
@@ -29,8 +30,7 @@ local takeoffHeight = UnitDefNames["bomberheavy"].cruiseAltitude
 
 local function ShowBall()
 	Show(ball)
-	Move(ball, y_axis, 0)
-	Move(ball, z_axis, 0)
+	spSetUnitRulesParam(unitID, "ballHalo", 1, INLOS) -- show halo
 	
 	Move(radiator_L, z_axis, 0, 2)
 	Move(radiator_R, z_axis, 0, 2)
@@ -53,13 +53,10 @@ end
 
 local function HideBall()
 	Hide(ball)
+	spSetUnitRulesParam(unitID, "ballHalo", 0, INLOS) -- hide halo
 	Scale(ball, 0)
 	Turn(ball_emit, y_axis, 0)
 	Spin(ball_emit, y_axis, 0)
-
-	-- apparently to hide the LUPS glow
-	Move(ball, y_axis, 27)
-	Move(ball, z_axis, 1)
 	
 	Show(radiator_L)
 	Show(radiator_R)
@@ -197,6 +194,7 @@ function script.Create()
 
 	WingStart()
 	Hide(ball)
+	spSetUnitRulesParam(unitID, "ballHalo", 0, INLOS) -- hide halo
 	Hide(radiator_L)
 	Hide(radiator_R)
 

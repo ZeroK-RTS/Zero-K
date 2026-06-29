@@ -206,7 +206,7 @@ effectUnitDefs = {
 
 		-- portable singularity
 		{class='Bursts', options=MergeTable(energysinguBursts,{piece="ball", noIconDraw = true, size=5, pos={0,0,0}})},
-		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", noIconDraw = true, size=18, pos={0,0,0}})},
+		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", onUnitRulesParam="ballHalo", noIconDraw = true, size=18})},
 
 		-- blinky lights
 		{class='StaticParticles', options=MergeTable(blinkyLightRed,   {piece="extra_L"}) },
