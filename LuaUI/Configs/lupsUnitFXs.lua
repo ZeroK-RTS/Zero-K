@@ -55,7 +55,7 @@ effectUnitDefs = {
 	--// FUSIONS //--------------------------
 	energysingu = {
 		{class='Bursts', options=energysinguBursts},
-		{class='StaticParticles', options=MergeTable(energysinguCorona, {onUnitRulesParam = "ballShow", piece="energyball", sizeScaleParam="ballSwell"})},
+		{class='StaticParticles', options=MergeTable(energysinguCorona, {piece="energyball", sizeScaleParam="ballSwell"})},
 		--{class='ShieldSphere', options=energysinguShieldSphere},
 		--{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
 		{class='GroundFlash', options=groundFlashOrange},

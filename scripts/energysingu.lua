@@ -31,12 +31,10 @@ local function SizeControl()
 			else
 				ballSize = 1
 				Hide(energyball)
-				spSetUnitRulesParam(unitID, "ballShow", 0, INLOS) -- hide halo
 			end
 		else
 			if ballSize == 1 then
 				Show(energyball)
-				spSetUnitRulesParam(unitID, "ballShow", 1, INLOS) -- show halo
 			end
 			if ballSize < 100 then
 				ballSize = ballSize + 1
@@ -89,7 +87,6 @@ end
 
 function script.Create()
 	Hide(energyball)
-	spSetUnitRulesParam(unitID, "ballShow", 0, INLOS) -- hide halo
 	spSetUnitRulesParam(unitID, "ballSwell", 0, INLOS) -- halo size
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
