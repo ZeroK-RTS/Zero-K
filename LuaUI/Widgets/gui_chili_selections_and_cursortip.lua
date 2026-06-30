@@ -170,8 +170,13 @@ local DRAWING_TOOLTIP =
 local SPECIAL_WEAPON_RELOAD_PARAM = "specialReloadRemaining"
 local JUMP_RELOAD_PARAM = "jumpReload"
 
-local reloadBarColor = {013, 245, 243, 1}
-local fullHealthBarColor = {0, 255, 0, 1}
+-- Bar colors mirror the GL4 unit overlay's barTypeMap (its maxcolor = the "full" appearance), as
+-- 0-1 floats like the rest of the Chili bars (GetHealthColor etc.). Shield additionally ramps by value.
+local reloadBarColor = {0.05, 0.6, 0.6, 1} -- overlay weapon-reload teal
+local jumpBarColor = {0.4, 0.9, 0.5, 1}    -- overlay jump/movement green
+local fullHealthBarColor = {0, 1, 0, 1}    -- overlay full-health green
+local fullShieldBarColor = {0.1, 0.1, 1.0, 1} -- overlay full-shield blue
+local buildBarColor = {0.8, 0.8, 0.2, 1}   -- amber, matching the overlay's build.png fill art
 
 local econStructureDefs = {}
 for i = 1, #UnitDefs do
@@ -612,6 +617,12 @@ local function GetHealthColor(fraction, returnString)
 		return string.char(255, math.floor(255*r), math.floor(255*g), 0)
 	end
 	return {r, g, 0, 1}
+end
+
+local function GetShieldColor(fraction)
+	-- Match the GL4 unit overlay's shield bar: a linear red(empty) -> blue(full) ramp,
+	-- mix({1,0.1,0.1}, {0.1,0.1,1}, fraction).
+	return {1 - fraction*0.9, 0.1, 0.1 + fraction*0.9, 1}
 end
 
 local function SetPanelSkin(targetPanel, className)
@@ -1449,7 +1460,7 @@ local function GetCostInfoPanel(parentControl, yPos)
 	return Update
 end
 
-local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, charges, onLeft)
+local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, charges, onLeft, barColor)
 	charges = charges or 1
 	if not reloadBar then
 		reloadBar = Chili.Progressbar:New {
@@ -1461,7 +1472,7 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 			max = 1,
 			caption = false,
 			noFont = true,
-			color = reloadBarColor,
+			color = barColor or reloadBarColor,
 			skinName = 'default',
 			orientation = "vertical",
 			reverse = true,
@@ -1578,7 +1589,7 @@ local function GetUnitGroupIconButton(parentControl)
 			end
 			local jumpCharges = GetJumpCharges(unitID, unitDefID)
 			if jumpCharges then
-				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
+				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, jumpBarColor)
 			elseif jumpBar then
 				jumpBar:SetVisibility(false)
 			end
@@ -2170,8 +2181,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		}
 		costInfoPanel = GetCostInfoPanel(rightPanel, PIC_HEIGHT + 4)
 	else
-		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
-		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
+		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, fullShieldBarColor, GetShieldColor)
+		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, buildBarColor)
 	end
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevVisible, prevMorphTime, prevMorphCost, prevMousePlace
@@ -2188,7 +2199,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		local jumpCharges = GetJumpCharges(unitID, unitDefID)
 		if jumpCharges then
-			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
+			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, jumpBarColor)
 		elseif jumpBar then
 			jumpBar:SetVisibility(false)
 		end
