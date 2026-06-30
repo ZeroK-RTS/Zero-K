@@ -957,8 +957,18 @@ for fdefID, featureDef in pairs(FeatureDefs) do
 	featureDefHeights[fdefID] = featureDef.height or 32
 end
 
+-- When this GL4 overlay can't run (no shader support, or shader/VBO init failure) we fall back to the
+-- legacy non-shader "HealthBars" widget (unit_healthbars.lua) so units still get world-space health
+-- bars, mirroring the Outline shader/no-shader widget pair. On a successful GL4 init we disable it
+-- again from the first widget:Update tick (which only runs if the widget wasn't removed).
+local FALLBACK_WIDGET = "HealthBars"
+local function enableNoShaderFallback()
+  Spring.SendCommands{"luaui enablewidget " .. FALLBACK_WIDGET}
+end
+
 local function goodbye(reason)
   Spring.Echo("Unit Overlay GL4 widget exiting with reason: "..reason)
+  enableNoShaderFallback()
   widgetHandler:RemoveWidget()
 end
 
@@ -2114,7 +2124,8 @@ function MorphStopOrFinished(unitID)
 end
 
 function widget:Initialize()
-	if not gl.CreateShader then -- no shader support, so just remove the widget itself, especially for headless
+	if not gl.CreateShader then -- no shader support: hand off to the non-shader fallback and remove ourselves
+		enableNoShaderFallback()
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -2167,6 +2178,17 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal('MorphDrawProgress', function() return true end)
 
 	stateCtl.applyAll() -- push initial state-icon visibility (single source of truth)
+end
+
+-- GL4 init succeeded (this widget wasn't removed), so the non-shader fallback isn't needed; turn it
+-- off once, on the first frame after all widgets have loaded. The failure paths remove this widget
+-- before any Update runs, so this never undoes a fallback hand-off.
+local fallbackResolved = false
+function widget:Update()
+	if not fallbackResolved then
+		fallbackResolved = true
+		Spring.SendCommands{"luaui disablewidget " .. FALLBACK_WIDGET}
+	end
 end
 
 -- Track Shift for the Shift-gated state icons. Return nil so the key still propagates.
