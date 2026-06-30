@@ -1229,69 +1229,6 @@ local function processDirtyIcons()
 	wgDirtyUnits = {}
 end
 
--- Orphan reaper. Every VBO instance (bar or icon) is bound to a unitID; its instData holds that unit's
--- engine matrix-buffer slot. When a unit dies without our removal path catching it (VisibleUnitRemoved
--- misses some -- the leak), its instance lingers, and the engine then recycles that matrix slot to a
--- DIFFERENT new unit (e.g. a Fencer reusing a dead Claw's slot) -- so the stale instance renders its old
--- icon/bars on the new unit. We must NOT pop on UnitDestroyed (the engine also recycles unitIDs, so the id
--- may already belong to a live unit whose instance we'd clobber); instead reap only instances whose bound
--- unit is now INVALID. A reused unitID stays valid, so it is left untouched for relayout to overwrite.
--- Amortized: scan a bounded slice of the buffer per frame (covers every element type), so per-frame cost is
--- independent of total unit count -- not a full walk every draw. One full pass completes within REAP_WINDOW.
-local REAP_WINDOW = 30      -- frames to spread one full pass over (~1s)
-local REAP_MIN_BUDGET = 64  -- always scan at least this many slots per frame
--- Safety net: pop instances bound to dead units. With the relayoutUnitIcons tracker gate fixing the
--- wolverine_mine leak at its source, this should now find ~nothing -- it stays as a backstop for any other
--- path that might orphan an instance. The [OverlayReap] log dropping to ~0 confirms the root-cause fix.
-local REAP_POP = true
-local reapPos = 1
-local function reapOrphanInstances()
-	local vbo = healthBarVBO
-	if not vbo or not vbo.indextoUnitID then return end
-	local used = vbo.usedElements or 0
-	if used == 0 then return end
-	if reapPos > used then reapPos = 1 end
-	local idx2uid = vbo.indextoUnitID
-	local idx2iid = vbo.indextoInstanceID
-	local budget = math.max(REAP_MIN_BUDGET, math.ceil(used / REAP_WINDOW))
-	local dead
-	while budget > 0 and reapPos <= used do
-		local uid = idx2uid[reapPos]
-		if uid and not Spring.ValidUnitID(uid) then
-			dead = dead or {}
-			dead[#dead + 1] = idx2iid[reapPos]
-		end
-		reapPos = reapPos + 1
-		budget = budget - 1
-	end
-	if dead then
-		-- DEBUG: these are instances the death path never cleaned (the probe at UnitDestroyed sees nothing,
-		-- so they go invalid without an overlay UnitDestroyed -- out-of-LOS deaths / radar-only / WG.icons-only
-		-- units). Log a compact breakdown of which element types leak, plus a per-unit profile so we can tell
-		-- an icon-only leak (radar/WG.icons push, never a tracked unit) from a full bar+icon set (the tracker
-		-- added it via VisibleUnitAdded but VisibleUnitRemoved never fired). One summary line per reap batch.
-		local icons, bars, perUnit = 0, 0, {}
-		for j = 1, #dead do
-			local uid, suffix = dead[j]:match("^(%d+)_(.+)$")
-			if uid then perUnit[uid] = (perUnit[uid] or 0) + 1 end
-			if suffix == "wgicon_icon" then icons = icons + 1 else bars = bars + 1 end
-		end
-		local nUnits, iconOnly, withBars = 0, 0, 0
-		for _, n in pairs(perUnit) do
-			nUnits = nUnits + 1
-			if n == 1 then iconOnly = iconOnly + 1 else withBars = withBars + 1 end
-		end
-		Spring.Echo(string.format("[OverlayReap] frame=%d %s=%d (icons=%d bars=%d) deadUnits=%d singleInstance=%d multiInstance=%d sample=%s",
-			Spring.GetGameFrame(), REAP_POP and "reaped" or "DETECTED", #dead, icons, bars, nUnits, iconOnly, withBars, tostring(dead[1])))
-		if REAP_POP then
-			for j = 1, #dead do
-				local key = dead[j]
-				if key and vbo.instanceIDtoIndex[key] then popElementInstance(vbo, key) end
-			end
-		end
-	end
-end
-
 -- Control-group numbers (bottom-right corner badge). The overlay is the single renderer; it polls the
 -- engine's control groups and diffs membership so units that join/leave a group are relaid out.
 local lastPolledGroup = {} -- unitID -> group last seen by the poll (for clear-on-leave)
@@ -2364,24 +2301,7 @@ end
 -- slot and renders on top of the new unit -- the "2nd (wrong) icon attached" bug. Popping here, on the
 -- authoritative sim death, closes the window. Idempotent (pops guard on existence), so it's safe alongside
 -- VisibleUnitRemoved, which still handles units that merely leave view without dying.
-local LEAK_PROBE = true -- DEBUG: find units whose instances survive past VisibleUnitRemoved (the real leak)
 function widget:UnitDestroyed(unitID)
-	-- ROOT-CAUSE PROBE: the tracker (layer -8288888) runs before us (layer -10), so its UnitDestroyed has
-	-- already fired VisibleUnitRemoved and cleaned this unit by now. So any instance STILL in the VBO here
-	-- is a genuine leak. healthbar=true means the unit had bars (the tracker DID add it via VisibleUnitAdded,
-	-- yet VisibleUnitRemoved never cleaned it) -> tracker-side miss. icon-only means it got a centre icon via
-	-- the external WG.icons API without ever being a tracked visible unit -> never had a removal path at all.
-	if LEAK_PROBE and healthBarVBO then
-		local hasIcon = healthBarVBO.instanceIDtoIndex[unitID .. "_wgicon_icon"] ~= nil
-		local hasBar  = healthBarVBO.instanceIDtoIndex[unitID .. "_health"] ~= nil
-		if hasIcon or hasBar then
-			local udid = Spring.GetUnitDefID(unitID)
-			Spring.Echo(string.format("[OverlayLeak] frame=%d unit=%s def=%s leaked icon=%s healthbar=%s",
-				Spring.GetGameFrame(), tostring(unitID),
-				tostring(udid and UnitDefs[udid] and UnitDefs[udid].name or "?"),
-				tostring(hasIcon), tostring(hasBar)))
-		end
-	end
 	-- Don't pop VBO instances here: the engine may have already recycled this unitID for a new unit
 	-- within the same sim frame, so removeBarsFromUnit/popUnitIconInstances would clobber the new
 	-- unit's bars and icon. The new unit's addBarForUnit already overwrites old bar data via
@@ -2459,7 +2379,6 @@ function widget:DrawWorld()
 
 	renderIconAtlas()
 	flushPendingIcons()  -- blit any newly-registered WG.icons textures into the atlas
-	reapOrphanInstances() -- pop instances bound to dead units before their matrix slot aliases onto a new unit
 	processDirtyIcons()  -- (re)push hovering-icon instances for units whose icons changed
 	local disticon = Spring.GetConfigInt("UnitIconDistance", 200) * 27.5 -- iconLength = unitIconDist * unitIconDist * 750.0f;
 	-- "Draw on top" can't use a depth-buffer clear (the engine ignores it in DrawWorld), so instead the
