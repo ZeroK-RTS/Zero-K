@@ -962,6 +962,9 @@ end
 -- bars, mirroring the Outline shader/no-shader widget pair. On a successful GL4 init we disable it
 -- again from the first widget:Update tick (which only runs if the widget wasn't removed).
 local FALLBACK_WIDGET = "HealthBars"
+-- TEMP (remove before merge): flip to true to simulate unsupported GL/shaders and exercise the
+-- no-shader fallback hand-off without needing old hardware. Triggers the same path as gl.CreateShader == nil.
+local DEBUG_FORCE_NOSHADER = false
 local function enableNoShaderFallback()
   Spring.SendCommands{"luaui enablewidget " .. FALLBACK_WIDGET}
 end
@@ -2124,7 +2127,7 @@ function MorphStopOrFinished(unitID)
 end
 
 function widget:Initialize()
-	if not gl.CreateShader then -- no shader support: hand off to the non-shader fallback and remove ourselves
+	if DEBUG_FORCE_NOSHADER or not gl.CreateShader then -- no shader support (or forced via debug var): hand off to the non-shader fallback and remove ourselves
 		enableNoShaderFallback()
 		widgetHandler:RemoveWidget()
 		return
