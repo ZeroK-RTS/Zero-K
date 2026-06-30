@@ -2283,8 +2283,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 		end
 		unitDesc:Invalidate()
-		local health = getunithea
-		
+
 		if econStructureDefs[unitDefID].isWind then
 			local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
 			maxHealthLabel(true, health, IMAGE.HEALTH)
