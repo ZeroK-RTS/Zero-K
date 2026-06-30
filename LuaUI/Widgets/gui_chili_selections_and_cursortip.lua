@@ -170,8 +170,13 @@ local DRAWING_TOOLTIP =
 local SPECIAL_WEAPON_RELOAD_PARAM = "specialReloadRemaining"
 local JUMP_RELOAD_PARAM = "jumpReload"
 
-local reloadBarColor = {013, 245, 243, 1}
-local fullHealthBarColor = {0, 255, 0, 1}
+-- Bar colors mirror the GL4 unit overlay's barTypeMap (its maxcolor = the "full" appearance), as
+-- 0-1 floats like the rest of the Chili bars (GetHealthColor etc.). Shield additionally ramps by value.
+local reloadBarColor = {0.05, 0.6, 0.6, 1} -- overlay weapon-reload teal
+local jumpBarColor = {0.4, 0.9, 0.5, 1}    -- overlay jump/movement green
+local fullHealthBarColor = {0, 1, 0, 1}    -- overlay full-health green
+local fullShieldBarColor = {0.1, 0.1, 1.0, 1} -- overlay full-shield blue
+local buildBarColor = {0.8, 0.8, 0.2, 1}   -- amber, matching the overlay's build.png fill art
 
 local econStructureDefs = {}
 for i = 1, #UnitDefs do
@@ -275,6 +280,13 @@ local sameObjectIDTime = 0
 local selectedUnitsList = {}
 local commanderManualFireReload = {}
 
+-- Radar (strategic) icons vs 3D unit pictures in the selection/cursortip panels. Bumping
+-- iconModeGeneration on toggle busts the per-button/per-display "same unitDefID -> skip" caches so the
+-- already-shown icons re-resolve their image file (see UpdateUnitDefID and SetDisplay).
+local useRadarIcons = false
+local iconModeGeneration = 0
+local UpdateSelection -- forward declaration; defined near the bottom, referenced by the option OnChange
+
 local ctrlFilterUnitList = false
 local ctrlFilterUnitIncluded = false
 
@@ -293,7 +305,7 @@ options_order = {
 	
 	--selected units
 	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'sortByHealth',
-	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar',
+	'uniticon_size', 'useRadarIcons', 'manualWeaponReloadBar', 'jumpReloadBar',
 	'fancySkinning', 'leftPadding',
 }
 
@@ -442,6 +454,21 @@ options = {
 			end
 		end,
 	},
+	useRadarIcons = {
+		name = 'Use radar icons',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'Show units as their radar/strategic icon instead of the 3D unit picture in the selection and tooltip panels.',
+		path = selPath,
+		OnChange = function(self)
+			useRadarIcons = self.value
+			iconModeGeneration = iconModeGeneration + 1 -- bust the icon caches so shown units re-resolve
+			if selectionWindow and selectedUnitsList and #selectedUnitsList > 0 then
+				UpdateSelection(selectedUnitsList) -- re-apply icons to the current selection immediately
+			end
+		end,
+	},
 	manualWeaponReloadBar = {
 		name="Show Unit's Special Weapon Status",
 		type='bool',
@@ -581,19 +608,21 @@ local function IsGroupingRequired(selectedUnits, selectionSortOrder, selectionSp
 end
 
 local function GetHealthColor(fraction, returnString)
-	local midpt = (fraction > 0.5)
-	local r, g
-	if midpt then
-		r = (1 - fraction)*2
-		g = 1
-	else
-		r = 1
-		g = fraction*2
-	end
+	-- Match the GL4 unit overlay's health bar: a straight linear red(0) -> green(1) ramp,
+	-- i.e. mix({1,0,0}, {0,1,0}, fraction). (The overlay's BITCOLORCORRECT bit is defined but
+	-- unused in its shader, so its health color is exactly this linear interpolation.)
+	local r = 1 - fraction
+	local g = fraction
 	if returnString then
 		return string.char(255, math.floor(255*r), math.floor(255*g), 0)
 	end
 	return {r, g, 0, 1}
+end
+
+local function GetShieldColor(fraction)
+	-- Match the GL4 unit overlay's shield bar: a linear red(empty) -> blue(full) ramp,
+	-- mix({1,0.1,0.1}, {0.1,0.1,1}, fraction).
+	return {1 - fraction*0.9, 0.1, 0.1 + fraction*0.9, 1}
 end
 
 local function SetPanelSkin(targetPanel, className)
@@ -626,6 +655,15 @@ local function GetUnitIcon(unitDefID)
 	end
 	iconTypeCache[unitDefID] = icontypes[(ud and ud.iconType or "default")].bitmap or 'icons/' .. ud.iconType .. iconFormat
 	return iconTypeCache[unitDefID]
+end
+
+-- Image file for a unit's panel icon: the radar/strategic icon when that option is on, otherwise the
+-- usual 3D build picture ("#unitDefID"). Falls back to the build picture if no radar icon is found.
+local function GetUnitImageFile(unitDefID)
+	if useRadarIcons then
+		return GetUnitIcon(unitDefID) or ("#" .. unitDefID)
+	end
+	return "#" .. unitDefID
 end
 
 local function GetCurrentBuildSpeed(unitID, buildSpeed)
@@ -1422,7 +1460,7 @@ local function GetCostInfoPanel(parentControl, yPos)
 	return Update
 end
 
-local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, charges, onLeft)
+local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, charges, onLeft, barColor)
 	charges = charges or 1
 	if not reloadBar then
 		reloadBar = Chili.Progressbar:New {
@@ -1434,7 +1472,7 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 			max = 1,
 			caption = false,
 			noFont = true,
-			color = reloadBarColor,
+			color = barColor or reloadBarColor,
 			skinName = 'default',
 			orientation = "vertical",
 			reverse = true,
@@ -1551,7 +1589,7 @@ local function GetUnitGroupIconButton(parentControl)
 			end
 			local jumpCharges = GetJumpCharges(unitID, unitDefID)
 			if jumpCharges then
-				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
+				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, jumpBarColor)
 			elseif jumpBar then
 				jumpBar:SetVisibility(false)
 			end
@@ -1591,20 +1629,22 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 	end
 	
+	local appliedIconGeneration -- last iconModeGeneration whose image file was applied to unitImage
 	local function UpdateUnitDefID(newUnitDefID)
-		if newUnitDefID == unitDefID then
+		if newUnitDefID == unitDefID and appliedIconGeneration == iconModeGeneration then
 			return
 		end
+		appliedIconGeneration = iconModeGeneration
 		unitDefID = newUnitDefID
-		
+
 		local ud = UnitDefs[unitDefID]
 		if not ud then
 			return
 		end
-		
+
 		unitImage.tooltip = GetUnitSelectionTooltip(ud, unitDefID, unitID)
-		unitImage.file = "#" .. unitDefID
-		unitImage.file2 = GetUnitBorder(unitDefID)
+		unitImage.file = GetUnitImageFile(unitDefID)
+		unitImage.file2 = (not useRadarIcons) and GetUnitBorder(unitDefID) or nil
 		unitImage:Invalidate()
 	end
 	
@@ -2141,11 +2181,12 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		}
 		costInfoPanel = GetCostInfoPanel(rightPanel, PIC_HEIGHT + 4)
 	else
-		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
-		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
+		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, fullShieldBarColor, GetShieldColor)
+		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, buildBarColor)
 	end
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevVisible, prevMorphTime, prevMorphCost, prevMousePlace
+	local prevIconGeneration -- last iconModeGeneration whose image file was applied (radar vs unit pic)
 	local currentHealthPos = PIC_HEIGHT + 4
 	local externalFunctions = {}
 		
@@ -2158,7 +2199,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		local jumpCharges = GetJumpCharges(unitID, unitDefID)
 		if jumpCharges then
-			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true)
+			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, jumpBarColor)
 		elseif jumpBar then
 			jumpBar:SetVisibility(false)
 		end
@@ -2242,8 +2283,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitDesc:SetText((featureID and GetDescriptionForWreck or GetDescription)(ud, unitID))
 		end
 		unitDesc:Invalidate()
-		local health = getunithea
-		
+
 		if econStructureDefs[unitDefID].isWind then
 			local health = Spring.Utilities.GetUnitMaxHealth and Spring.Utilities.GetUnitMaxHealth(unitID, unitDefID, healthOverride) or healthOverride or ud.health
 			maxHealthLabel(true, health, IMAGE.HEALTH)
@@ -2286,7 +2326,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local visible = IsUnitInLos(unitID)
 		
 		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and
-				prevVisible == visible and prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
+				prevVisible == visible and prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) and
+				prevIconGeneration == iconModeGeneration then
 			
 			if not requiredOnly then
 				if unitID and unitDefID and visible then
@@ -2340,8 +2381,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				unitImage.tooltip = GetSingleUnitSelectionTooltip(ud, unitDefID)
 			end
 
-			unitImage.file = "#" .. unitDefID
-			unitImage.file2 = GetUnitBorder(unitDefID)
+			unitImage.file = GetUnitImageFile(unitDefID)
+			unitImage.file2 = (not useRadarIcons) and GetUnitBorder(unitDefID) or nil
 			unitImage:Invalidate()
 
 			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0)
@@ -2451,6 +2492,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID = unitID, unitDefID, featureID, featureDefID
 		prevVisible = visible
 		prevMorphTime, prevMorphCost, prevMousePlace = morphTime, morphCost, ((mousePlaceX and true) or false)
+		prevIconGeneration = iconModeGeneration
 	end
 
 	function externalFunctions.LanguageChange()
@@ -2928,7 +2970,7 @@ end
 --------------------------------------------------------------------------------
 -- Selection update
 
-local function UpdateSelection(newSelection)
+function UpdateSelection(newSelection)
 	-- Check if selection is 0, hide window. Return
 	-- Check if selection is 1, get unit tooltip
 	-- Check if selection is many, get unit list tooltip
@@ -3046,6 +3088,8 @@ function widget:Initialize()
 		drawHotkeyBytes[drawHotkeyBytesCount] = v:byte(-1)
 	end
 	
+	useRadarIcons = options.useRadarIcons.value -- sync flag with the restored option value on load
+
 	WG.SelectionsBarPositions = {}
 	selectionWindow = GetSelectionWindow()
 	tooltipWindow = (WG.Modding_TooltipOverride and WG.Modding_TooltipOverride()) or GetTooltipWindow()

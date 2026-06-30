@@ -957,9 +957,19 @@ for fdefID, featureDef in pairs(FeatureDefs) do
 	featureDefHeights[fdefID] = featureDef.height or 32
 end
 
-local function goodbye(reason)
-  Spring.Echo("Unit Overlay GL4 widget exiting with reason: "..reason)
-  widgetHandler:RemoveWidget()
+-- When this GL4 overlay can't run (no shader support, or shader/VBO init failure) it switches into a
+-- non-shader fallback instead of removing itself: it skips all GL4 setup and draws simple flat
+-- health/shield/build bars with immediate-mode GL (DrawNoShaderBars), driven by the same overlay
+-- options as the GL4 path. noShaderMode gates every GL4-only callin/init so they never touch the
+-- uninitialised VBOs/atlas.
+local noShaderMode = false
+-- TEMP test affordance (remove before merge): flip to true to simulate unsupported GL/shaders and
+-- exercise the non-shader fallback on capable hardware (same path as gl.CreateShader == nil).
+local DEBUG_FORCE_NOSHADER = false
+local function enterNoShaderMode()
+  if noShaderMode then return end
+  noShaderMode = true
+  Spring.Echo("Unit Overlay GL4: no shader support -- drawing non-shader fallback bars")
 end
 
 local function initializeInstanceVBOTable(myName, usesFeatures)
@@ -976,7 +986,7 @@ local function initializeInstanceVBOTable(myName, usesFeatures)
 		myName, -- name
 		4 -- unitIDattribID (instData)
 	)
-	if newVBOTable == nil then goodbye("Failed to create " .. myName) end
+	if newVBOTable == nil then return nil end
 
 	local newVAO = gl.GetVAO()
 	newVAO:AttachVertexBuffer(newVBOTable.instanceVBO)
@@ -1614,10 +1624,11 @@ end
 local function initGL4()
 	healthBarShader =  LuaShader.CheckShaderUpdates(shaderSourceCache)
 
-	if not healthBarShader then goodbye("Failed to compile Unit Overlay GL4") end
+	if not healthBarShader then enterNoShaderMode(); return end
 
 	healthBarVBO = initializeInstanceVBOTable("healthBarVBO", false)
 	featureVBO = initializeInstanceVBOTable("featureVBO", true)
+	if not healthBarVBO or not featureVBO then enterNoShaderMode(); return end
 	-- The shared instancevbotable defaults debugZombies = true: whenever a pop swaps a dead-unit instance
 	-- down from the tail it logs a Spring.Debug.TraceFullEcho -- tens of thousands of log lines plus real
 	-- per-frame cost when units churn. Such transient dead-unit instances are expected here: the engine
@@ -1972,6 +1983,7 @@ local function removeBarFromFeature(featureID, barname)
 end
 
 function init() -- assigns the forward-declared upvalue (see top of file)
+	if noShaderMode then return end -- no GL4 VBOs in the non-shader fallback
 	clearInstanceTable(healthBarVBO)
 	requeueAllIcons()
 
@@ -2016,6 +2028,7 @@ local GetVisibleFeatures   = Spring.GetVisibleFeatures
 local GetFeatureDefID      = Spring.GetFeatureDefID
 
 function initfeaturebars()
+	if noShaderMode then return end -- no GL4 VBOs in the non-shader fallback
 	clearInstanceTable(featureVBO)
 
 	local currentWidget = widget:GetInfo().name
@@ -2114,8 +2127,8 @@ function MorphStopOrFinished(unitID)
 end
 
 function widget:Initialize()
-	if not gl.CreateShader then -- no shader support, so just remove the widget itself, especially for headless
-		widgetHandler:RemoveWidget()
+	if DEBUG_FORCE_NOSHADER or not gl.CreateShader then -- no shader support (or forced via debug var): use the non-shader fallback renderer
+		enterNoShaderMode()
 		return
 	end
 	WG['unitoverlay'] = {}
@@ -2143,6 +2156,7 @@ function widget:Initialize()
 	end
 
 	initGL4()
+	if noShaderMode then return end -- GL4 init failed (shader/VBO); fall back to non-shader bars
 
 	-- TODO: dont even bother drawing health bars for features that were present on frame 0 - no point in doing so
 	-- This is stuff like trees and map features, and scenario features
@@ -2279,10 +2293,12 @@ end
 ]]--
 
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
+	if noShaderMode then return end
 	addBarsForUnit(unitID, unitDefID, unitTeam, nil, 'VisibleUnitAdded')
 end
 
 function widget:VisibleUnitRemoved(unitID)
+	if noShaderMode then return end
 	removeBarsFromUnit(unitID, 'VisibleUnitRemoved')
 	-- Pop the icon-cluster VBO instances immediately so a recycled unitID doesn't
 	-- inherit a stale icon from the previous occupant. Clear all per-unit state and
@@ -2315,6 +2331,7 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
+	if noShaderMode then return end
 	spec, fullview = Spring.GetSpectatingState()
 	myTeamID = Spring.GetMyTeamID()
 	myAllyTeamID = Spring.GetMyAllyTeamID()
@@ -2361,6 +2378,7 @@ end
 
 
 function widget:GameFrame(gameFrame)
+	if noShaderMode then return end
 	if gameFrame % 15 == 0 then
 		refreshGroupNumbers() -- poll control-group membership for the bottom-right corner badge
 	end
@@ -2372,8 +2390,94 @@ function widget:GameFrame(gameFrame)
 	end
 end
 
+--------------------------------------------------------------------------------
+-- Non-shader fallback renderer (noShaderMode). Flat health/shield/build bars billboarded above each
+-- visible unit, drawn with immediate-mode GL. Honors the shared overlay options where they map
+-- (overall scale, bar size, height above unit, fade distance, empty-bar brightness) and reuses the
+-- barTypeMap colors. Glyphs, status badges, weapon/jump/morph gauges and unit icons are shader/atlas
+-- only and intentionally omitted -- this is a deliberately-degraded fallback, not a reproduction.
+-- World-elmo sizes for the billboarded bars (the shader's BARWIDTH is a normalized value scaled in the
+-- GPU, not world units, so it can't be reused here). These mirror the legacy jK widget's bar dimensions.
+local NOSHADER_BARWIDTH = 12 -- half-width: ~24 elmos wide
+local NOSHADER_BARHEIGHT = 3
+local NOSHADER_BARGAP = 1.5
+local NOSHADER_ALPHA = 0.9
+
+local function drawNoShaderBar(yOff, frac, r, g, b, scale, track)
+	if frac < 0 then frac = 0 elseif frac > 1 then frac = 1 end
+	local w = NOSHADER_BARWIDTH * scale
+	local h = NOSHADER_BARHEIGHT * scale
+	local fillX = -w + 2 * w * frac
+	if frac < 1 then -- darkened, opaque remainder (matches the GL4 trackDarken)
+		gl.Color(r * track, g * track, b * track, NOSHADER_ALPHA)
+		gl.Rect(fillX, yOff, w, yOff + h)
+	end
+	gl.Color(r, g, b, NOSHADER_ALPHA)
+	gl.Rect(-w, yOff, fillX, yOff + h)
+	return yOff + (NOSHADER_BARHEIGHT + NOSHADER_BARGAP) * scale
+end
+
+local function drawNoShaderUnit(unitID, unitDefID, cx, cy, cz, scale, fadeSq, track, baseY)
+	local ux, uy, uz = Spring.GetUnitViewPosition(unitID)
+	if not ux then return end
+	if fadeSq then
+		local dx, dy, dz = ux - cx, uy - cy, uz - cz
+		if dx * dx + dy * dy + dz * dz > fadeSq then return end
+	end
+	local health, maxHealth, _, _, buildProgress = Spring.GetUnitHealth(unitID)
+	if not health or not maxHealth or maxHealth <= 0 then return end
+	local hp = health / maxHealth
+
+	local ud = UnitDefs[unitDefID]
+	local heightOff = (ud and ud.height or 0) + additionalheightaboveunit
+	gl.PushMatrix()
+	gl.Translate(ux, uy + heightOff + baseY, uz)
+	gl.Billboard()
+
+	local y = 0
+	if hp < 0.99 then -- hidden at full, matching the overlay's health hidethreshold
+		y = drawNoShaderBar(y, hp, 1 - hp, hp, 0, scale, track) -- linear red->green (barTypeMap.health)
+	end
+	if ud and (ud.shieldPower or 0) > 0 then
+		local _, shieldPower = Spring.GetUnitShieldState(unitID, -1)
+		if shieldPower and ud.shieldPower > 0 then
+			local s = shieldPower / ud.shieldPower
+			if s < 0.99 then
+				y = drawNoShaderBar(y, s, 1 - s * 0.9, 0.1, 0.1 + s * 0.9, scale, track) -- red->blue (barTypeMap.shield)
+			end
+		end
+	end
+	if buildProgress and buildProgress < 1 then
+		drawNoShaderBar(y, buildProgress, 0.8, 0.8, 0.2, scale, track) -- amber (matches the build fill art)
+	end
+	gl.PopMatrix()
+end
+
+local function DrawNoShaderBars()
+	if chobbyInterface then return end
+	if not drawWhenGuiHidden and Spring.IsGUIHidden() then return end
+	local units = Spring.GetVisibleUnits(-1, nil, false)
+	if not units or #units == 0 then return end
+	local cx, cy, cz = Spring.GetCameraPosition()
+	local scale = options.overallScale.value * options.barSize.value
+	local baseY = options.barHeightAboveUnit.value
+	local track = options.trackDarken.value
+	local fadeDist = options.fadeDistance.value
+	local fadeSq = (fadeDist and fadeDist > 0) and (fadeDist * fadeDist) or nil
+
+	gl.Texture(false)
+	gl.DepthTest(false)
+	for i = 1, #units do
+		local unitID = units[i]
+		drawNoShaderUnit(unitID, Spring.GetUnitDefID(unitID), cx, cy, cz, scale, fadeSq, track, baseY)
+	end
+	gl.Color(1, 1, 1, 1)
+	gl.DepthTest(true) -- restore the world-draw default for subsequent DrawWorld widgets
+end
+
 function widget:DrawWorld()
 	--Spring.Echo(Engine.versionFull )
+	if noShaderMode then DrawNoShaderBars(); return end
 	if chobbyInterface then return end
 	if not drawWhenGuiHidden and Spring.IsGUIHidden() then return end
 
