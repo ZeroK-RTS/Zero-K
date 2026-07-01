@@ -2604,6 +2604,7 @@ function widget:Update()
 		end
 
 		-- Update tab visibility for panels with dynamic visibility
+		--[[
 		if panelData.name == "missiles" and panelData.tabButton and panelData.tabButton.button then
 			local hasCommands = false
 			local customCommands = widgetHandler.customCommands
@@ -2615,6 +2616,7 @@ function widget:Update()
 			end
 			panelData.tabButton.button:SetVisibility(hasCommands)
 		end
+		--]]
 	end
 end
 
