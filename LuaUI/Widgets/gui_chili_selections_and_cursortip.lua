@@ -2068,8 +2068,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		local healthPos
 		if shieldBarUpdate then
-			if ud and (ud.shieldPower > 0 or ud.level) then
-				local shieldPower = (spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
+			if ud and ((ud.shieldPower or 0) > 0 or ud.level) then
+				local shieldPower = (spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower or 0) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1)
 				local _, shieldCurrentPower = spGetUnitShieldState(unitID, -1)
 				if shieldCurrentPower and shieldPower then
 					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))

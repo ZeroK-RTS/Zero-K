@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     handler   = true,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -21,7 +21,86 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-VFS.Include(LUAUI_DIRNAME.."Widgets/Utilities/engine_blast_radius.lua")
+local glVertex      = gl.Vertex
+local glPushAttrib  = gl.PushAttrib
+local glLineStipple = gl.LineStipple
+local glDepthTest   = gl.DepthTest
+local glLineWidth   = gl.LineWidth
+local glColor       = gl.Color
+local glBeginEnd    = gl.BeginEnd
+local glPopAttrib   = gl.PopAttrib
+local glPopMatrix   = gl.PopMatrix
+local glPushMatrix  = gl.PushMatrix
+local glScale       = gl.Scale
+local glTranslate   = gl.Translate
+local GL_LINE_LOOP  = GL.LINE_LOOP
+
+local circleDivs           = 64
+
+local PI                     = math.pi
+local cos                    = math.cos
+local sin                    = math.sin
+
+local aoeLineWidthMult     = 64
+local numAoECircles        = 9
+local aoeColor             = {1, 0, 0, 1}
+local mouseDistance = 1000
+local floor                  = math.floor
+
+local pulse_timmer = Spring.GetTimer()
+local function getPulse()
+  local time = Spring.DiffTimers(Spring.GetTimer(), pulse_timmer)
+  return 1 - (time - floor(time))
+end
+
+local function UnitCircleVertices()
+  for i = 1, circleDivs do
+    local theta = 2 * PI * i / circleDivs
+    glVertex(cos(theta), 0, sin(theta))
+  end
+end
+
+local function DrawCircle(x, y, z, radius)
+  glPushMatrix()
+  glTranslate(x, y, z)
+  glScale(radius, radius, radius)
+  glBeginEnd(GL_LINE_LOOP, UnitCircleVertices)
+  glPopMatrix()
+end
+
+local function drawBlastRadius(tx, ty, tz, weaponDef)
+  local aoe = weaponDef.damageAreaOfEffect
+  local ee = weaponDef.edgeEffectiveness
+
+  glLineWidth(math.max(0.05, aoeLineWidthMult * aoe / mouseDistance))
+
+  for i = 1, numAoECircles do
+    local proportion = i / (numAoECircles + 1)
+    local radius = aoe * proportion
+    local alpha = aoeColor[4] * (1 - proportion) / (1 - proportion * ee) * getPulse()
+    glColor(aoeColor[1], aoeColor[2], aoeColor[3], alpha)
+    DrawCircle(tx, ty, tz, radius)
+  end
+
+  glColor(1,1,1,1)
+  glLineWidth(1)
+end
+
+local function drawLine(x1, y1, z1, x2, y2, z2)
+  glPushAttrib(GL.LINE_BITS)
+  glLineStipple("springdefault")
+  glDepthTest(false)
+  glLineWidth(1)
+  glColor(1, 0, 0, 1)
+  glBeginEnd(GL.LINES, function()
+    glVertex(x1, y1, z1)
+    glVertex(x2, y2, z2)
+  end)
+
+  glColor(1, 1, 1, 1)
+  glLineStipple(false)
+  glPopAttrib()
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -123,9 +202,17 @@ local function missle_class()
       if not Spring.GetUnitIsDead(unitID) then
         local unitDefID = Spring.GetUnitDefID(unitID)
         if unitDefID and self.launchableTypes[unitDefID] then
+          -- Silo-built missiles exist as nanoframes while under construction.
           local _, _, _, _, buildProgress = Spring.GetUnitHealth(unitID)
           if buildProgress and buildProgress < 1 then
             maxProgress = math.max(maxProgress, buildProgress)
+          else
+            -- Stockpiling weapons (Trinity, Reef, subtac) report progress toward
+            -- the next missile via the stockpile build percentage.
+            local _, _, stockpileProgress = Spring.GetUnitStockpile(unitID)
+            if stockpileProgress and stockpileProgress > 0 and stockpileProgress < 1 then
+              maxProgress = math.max(maxProgress, stockpileProgress)
+            end
           end
         end
       end
@@ -237,10 +324,13 @@ local function missle_class()
     local customCommands = widgetHandler.customCommands
 
     customCommands[#customCommands+1] = {
-      id      = self.cmd,
-      type    = self.cmdType,
-      hidden  = true,
-      cursor  = 'Attack',
+      id       = self.cmd,
+      type     = self.cmdType,
+      cursor   = 'Attack',
+      action   = "missile_" .. self.name,
+      name     = self.displayName,
+      disabled = self.disabled,
+      params   = {},
     }
   end
 
@@ -532,42 +622,6 @@ local commands = {
 
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
-local buttonCache = {}
-
-local missileCommandIDs = {
-  [39610] = true,
-  [39611] = true,
-  [39612] = true,
-  [39613] = true,
-  [39614] = true,
-  [39615] = true,
-  [39616] = true,
-}
-
-local function findButtonsByCommand()
-  local screen = WG.Chili.Screen0
-  if not screen then return end
-
-  local function searchChildren(control)
-    if not control then return end
-
-    if control.cmdID and missileCommandIDs[control.cmdID] then
-      buttonCache[control.cmdID] = control
-    end
-
-    if control.children then
-      for _, child in ipairs(control.children) do
-        searchChildren(child)
-      end
-    end
-  end
-
-  if screen.children then
-    for _, child in ipairs(screen.children) do
-      searchChildren(child)
-    end
-  end
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -585,48 +639,44 @@ function widget:Update(dt)
   end
   timer = 0
 
-  findButtonsByCommand()
-
   local totalMissileCount = 0
+  local changed = false
 
   for _, command in pairs(commands) do
     local count = command:getCount()
     local buildProgress = command:getMaxBuildProgress()
-    local customCommands = widgetHandler.customCommands
 
     totalMissileCount = totalMissileCount + count
 
-    for i = 1, #customCommands do
-      if customCommands[i].id == command.cmd then
-        local displayName = ""
-        if count > 0 then
-          displayName = "x" .. count
-        end
-        if buildProgress > 0 then
-          local progressPercent = math.floor(buildProgress * 100)
-          if displayName ~= "" then
-            displayName = displayName .. " (" .. progressPercent .. "%)"
-          else
-            displayName = progressPercent .. "%"
-          end
-        end
-        customCommands[i].name = displayName
+    -- Count string shown on the button (e.g. "x3"), empty when none stockpiled.
+    -- This is drawn by the integral menu via the command's name field (see
+    -- DRAW_NAME_COMMANDS / commandDisplayConfig.drawName).
+    local displayName = ""
+    if count > 0 then
+      displayName = "x" .. count
+    end
 
-        -- Disable button if no missiles available
-        customCommands[i].disabled = (count == 0)
+    -- Factory-style build progress bar on the button.
+    if WG.IntegralMenu and WG.IntegralMenu.SetCommandProgress then
+      WG.IntegralMenu.SetCommandProgress(command.cmd, buildProgress)
+    end
 
-        -- Update visual progress bar on button
-        local button = buttonCache[command.cmd]
-        if button and button.SetProgressBar then
-          button:SetProgressBar(buildProgress)
-        end
-        break
-      end
+    local disabled = (count == 0)
+    if command.displayName ~= displayName or command.disabled ~= disabled then
+      command.displayName = displayName
+      command.disabled = disabled
+      changed = true
     end
   end
 
   -- Export total count for tab badge
   WG.missileTotalCount = totalMissileCount
+
+  -- The integral menu only re-reads custom commands on CommandsChanged, so force
+  -- a layout update when the displayed count / progress actually changed.
+  if changed then
+    Spring.ForceLayoutUpdate()
+  end
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)

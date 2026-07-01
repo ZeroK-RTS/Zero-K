@@ -122,6 +122,13 @@ end
 
 local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef = include("Configs/integral_menu_config.lua")
 
+-- Commands whose displayConfig requests it draw their command.name (count / progress string) like stockpile.
+for cmdID, displayConfig in pairs(commandDisplayConfig) do
+	if displayConfig.drawName then
+		DRAW_NAME_COMMANDS[cmdID] = true
+	end
+end
+
 local statePanel = {}
 local tabPanel
 local selectionIndex = 0
@@ -553,6 +560,7 @@ AddCommandCullOptions()
 local buttonsByCommand = {}
 local alreadyRemovedTag = {}
 local lastRemovedTagResetFrame = false
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -2551,6 +2559,17 @@ options.fancySkinning.OnChange = UpdateBackgroundSkin
 local externalFunctions = {} -- Appear unused in repo but are used by missions.
 local initialized = false
 
+-- Lets other widgets show a factory-style build progress bar on a command button
+-- (e.g. the missile command center showing stockpile build progress).
+function externalFunctions.SetCommandProgress(cmdID, progress)
+	local button = buttonsByCommand[cmdID]
+	if button then
+		button.SetProgressBar(progress or 0)
+		return true
+	end
+	return false
+end
+
 function externalFunctions.GetCommandButtonPosition(cmdID)
 	if not buttonsByCommand[cmdID] then
 		return
@@ -2593,7 +2612,8 @@ function widget:Update()
 	UpdateButtonSelection(cmdID)
 	UpdateReturnToOrders(cmdID)
 
-	-- Update tab badges and visibility
+	-- Update tab badges. Tab presence/visibility is handled by the
+	-- commandCount + SetTabs machinery, driven by each panel's inclusionFunction.
 	for i = 1, #commandPanels do
 		local panelData = commandPanels[i]
 
@@ -2601,19 +2621,6 @@ function widget:Update()
 		if panelData.badgeCountWG and panelData.tabButton and panelData.tabButton.UpdateBadgeCount then
 			local count = WG[panelData.badgeCountWG] or 0
 			panelData.tabButton:UpdateBadgeCount(count)
-		end
-
-		-- Update tab visibility for panels with dynamic visibility
-		if panelData.name == "missiles" and panelData.tabButton and panelData.tabButton.button then
-			local hasCommands = false
-			local customCommands = widgetHandler.customCommands
-			for j = 1, #customCommands do
-				if panelData.inclusionFunction(customCommands[j].id) then
-					hasCommands = true
-					break
-				end
-			end
-			panelData.tabButton.button:SetVisibility(hasCommands)
 		end
 	end
 end

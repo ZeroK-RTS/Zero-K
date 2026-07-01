@@ -1,20 +1,25 @@
 local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
+-- Row 1: Trinity and Reef (standalone, not silo missiles).
+-- Row 2: the missile silo's missiles, in the silo's buildoptions order
+-- (tacnuke, seismic, empmissile, napalmmissile, missileslow).
 local missileCmds = {
-	{id = 39610, name = "EOS", icon = "tacnuke", tooltip = "Launch EOS (Tactical Nuke)\nTactical nuclear missile with high damage."},
-	{id = 39611, name = "Seismic", icon = "seismic", tooltip = "Launch Seismic\nArea denial seismic missile, slows units."},
-	{id = 39612, name = "Shockley", icon = "empmissile", tooltip = "Launch Shockley (EMP)\nElectromagnetic pulse missile disables units."},
-	{id = 39613, name = "Inferno", icon = "napalmmissile", tooltip = "Launch Inferno (Napalm)\nNapalm missile with persistent damage."},
-	{id = 39614, name = "Reef Missile", icon = "shipcarrier", tooltip = "Launch Disarm Missile\nDisables units temporarily."},
-	{id = 39615, name = "Trinity", icon = "staticnuke", tooltip = "Launch Trinity (Strategic Nuke)\nLong-range nuclear missile."},
-	{id = 39616, name = "Zeno", icon = "missileslow", tooltip = "Launch Zeno (Slow Missile)\nSlow homing missile with lingering damage."},
+	{id = 39615, name = "Trinity", icon = "staticnuke", col = 1, row = 1, tooltip = "Launch Trinity (Strategic Nuke)\nLong-range nuclear missile."},
+	{id = 39614, name = "Reef Missile", icon = "shipcarrier", col = 2, row = 1, tooltip = "Launch Disarm Missile\nDisables units temporarily."},
+	{id = 39610, name = "EOS", icon = "tacnuke", col = 1, row = 2, tooltip = "Launch EOS (Tactical Nuke)\nTactical nuclear missile with high damage."},
+	{id = 39611, name = "Seismic", icon = "seismic", col = 2, row = 2, tooltip = "Launch Seismic\nArea denial seismic missile, slows units."},
+	{id = 39612, name = "Shockley", icon = "empmissile", col = 3, row = 2, tooltip = "Launch Shockley (EMP)\nElectromagnetic pulse missile disables units."},
+	{id = 39613, name = "Inferno", icon = "napalmmissile", col = 4, row = 2, tooltip = "Launch Inferno (Napalm)\nNapalm missile with persistent damage."},
+	{id = 39616, name = "Zeno", icon = "missileslow", col = 5, row = 2, tooltip = "Launch Zeno (Slow Missile)\nSlow homing missile with lingering damage."},
 }
 
+local missileCmdPos = {}
+for _, missile in ipairs(missileCmds) do
+	missileCmdPos[missile.id] = {col = missile.col, row = missile.row}
+end
+
 local function isMissileCommand(cmdID)
-	for _, missile in ipairs(missileCmds) do
-		if cmdID == missile.id then return true end
-	end
-	return false
+	return missileCmdPos[cmdID] ~= nil
 end
 
 --------------------------------------------------------------------------------
@@ -498,7 +503,8 @@ for _, missile in ipairs(missileCmds) do
 	local icon = unitDef and ("#" .. unitDef.id) or (imageDir .. 'Bold/attack.png')
 	commandDisplayConfig[missile.id] = {
 		texture = icon,
-		tooltip = missile.tooltip
+		tooltip = missile.tooltip,
+		drawName = true, -- show the stockpile count / build progress string (set by the missile widget)
 	}
 end
 
@@ -533,7 +539,8 @@ local commandPanels = {
 		name = "missiles",
 		inclusionFunction = function(cmdID)
 			if not hasMissileUnits() then return false end
-			return isMissileCommand(cmdID)
+			local pos = missileCmdPos[cmdID]
+			return pos ~= nil, pos
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
