@@ -111,6 +111,24 @@ local function missle_class()
     return count
   end
 
+  function self:getMaxBuildProgress()
+    local maxProgress = 0
+    local allUnits = Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}
+
+    for _, unitID in ipairs(allUnits) do
+      if not Spring.GetUnitIsDead(unitID) then
+        local unitDefID = Spring.GetUnitDefID(unitID)
+        if unitDefID and self.launchableTypes[unitDefID] then
+          local _, _, _, _, buildProgress = Spring.GetUnitHealth(unitID)
+          if buildProgress and buildProgress < 1 then
+            maxProgress = math.max(maxProgress, buildProgress)
+          end
+        end
+      end
+    end
+    return maxProgress
+  end
+
   function self:canGiveOrder(unit)
     local _, _, _, _, build = Spring.GetUnitHealth(unit)
     local type = self.launchableTypes[Spring.GetUnitDefID(unit)]
@@ -521,15 +539,24 @@ function widget:Update(dt)
 
   for _, command in pairs(commands) do
     local count = command:getCount()
+    local buildProgress = command:getMaxBuildProgress()
     local customCommands = widgetHandler.customCommands
 
     for i = 1, #customCommands do
       if customCommands[i].id == command.cmd then
+        local displayName = ""
         if count > 0 then
-          customCommands[i].name = "x" .. count
-        else
-          customCommands[i].name = ""
+          displayName = "x" .. count
         end
+        if buildProgress > 0 then
+          local progressPercent = math.floor(buildProgress * 100)
+          if displayName ~= "" then
+            displayName = displayName .. " (" .. progressPercent .. "%)"
+          else
+            displayName = progressPercent .. "%"
+          end
+        end
+        customCommands[i].name = displayName
         break
       end
     end
