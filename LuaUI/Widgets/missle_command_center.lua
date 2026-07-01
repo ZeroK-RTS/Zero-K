@@ -500,12 +500,39 @@ local commands = {
   trinityMissile = trinity_missile_controller_class(),
 }
 
+local UPDATE_FREQUENCY = 0.25
+local timer = UPDATE_FREQUENCY + 1
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:CommandsChanged()
   for _, command in pairs(commands) do
     command:commandsChanged()
+  end
+end
+
+function widget:Update(dt)
+  timer = timer + dt
+  if timer < UPDATE_FREQUENCY then
+    return
+  end
+  timer = 0
+
+  for _, command in pairs(commands) do
+    local count = command:getCount()
+    local customCommands = widgetHandler.customCommands
+
+    for i = 1, #customCommands do
+      if customCommands[i].id == command.cmd then
+        if count > 0 then
+          customCommands[i].name = "x" .. count
+        else
+          customCommands[i].name = ""
+        end
+        break
+      end
+    end
   end
 end
 
