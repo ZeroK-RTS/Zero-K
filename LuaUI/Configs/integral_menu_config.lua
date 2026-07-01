@@ -477,13 +477,13 @@ local factoryButtonLayoutOverride = {
 }
 
 -- Missile command display configurations
-commandDisplayConfig[39610] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch EOS: Tactical nuclear missile."}
-commandDisplayConfig[39611] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Seismic: Area denial seismic missile."}
-commandDisplayConfig[39612] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Shockley: EMP missile."}
-commandDisplayConfig[39613] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Inferno: Napalm missile."}
-commandDisplayConfig[39614] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Reef Missile: Naval missile."}
-commandDisplayConfig[39615] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Trinity: Long-range nuclear missile."}
-commandDisplayConfig[39616] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Zeno: Slow homing missile."}
+commandDisplayConfig[39610] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch EOS (Tactical Nuke)\nTactical nuclear missile with high damage."}
+commandDisplayConfig[39611] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Seismic\nArea denial seismic missile, slows units."}
+commandDisplayConfig[39612] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Shockley (EMP)\nElectromagnetic pulse missile disables units."}
+commandDisplayConfig[39613] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Inferno (Napalm)\nNapalm missile with persistent damage."}
+commandDisplayConfig[39614] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Disarm Missile\nDisables units temporarily."}
+commandDisplayConfig[39615] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Trinity (Strategic Nuke)\nLong-range nuclear missile."}
+commandDisplayConfig[39616] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Zeno (Slow Missile)\nSlow homing missile with lingering damage."}
 
 local function hasMissileUnits()
 	local teamUnits = Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}
@@ -523,6 +523,8 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.command,
 		badgeUnitName = "tacnuke",
 		badgeCountWG = "missileTotalCount",
+		gridHotkeys = true,
+		returnOnClick = "orders",
 	},
 	{
 		humanName = "Orders",

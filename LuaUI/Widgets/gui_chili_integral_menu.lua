@@ -2593,12 +2593,27 @@ function widget:Update()
 	UpdateButtonSelection(cmdID)
 	UpdateReturnToOrders(cmdID)
 
-	-- Update tab badges
+	-- Update tab badges and visibility
 	for i = 1, #commandPanels do
 		local panelData = commandPanels[i]
+
+		-- Update badge count
 		if panelData.badgeCountWG and panelData.tabButton and panelData.tabButton.UpdateBadgeCount then
 			local count = WG[panelData.badgeCountWG] or 0
 			panelData.tabButton:UpdateBadgeCount(count)
+		end
+
+		-- Update tab visibility for panels with dynamic visibility
+		if panelData.name == "missiles" and panelData.tabButton then
+			local hasCommands = false
+			local customCommands = widgetHandler.customCommands
+			for j = 1, #customCommands do
+				if panelData.inclusionFunction(customCommands[j].id) then
+					hasCommands = true
+					break
+				end
+			end
+			panelData.tabButton.button:SetVisibility(hasCommands)
 		end
 	end
 end

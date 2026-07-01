@@ -600,6 +600,9 @@ function widget:Update(dt)
         end
         customCommands[i].name = displayName
 
+        -- Disable button if no missiles available
+        customCommands[i].disabled = (count == 0)
+
         -- Update visual progress bar on button
         local button = buttonCache[command.cmd]
         if button and button.SetProgressBar then
