@@ -1,5 +1,22 @@
 local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
+local missileCmds = {
+	{id = 39610, name = "EOS", icon = "tacnuke", tooltip = "Launch EOS (Tactical Nuke)\nTactical nuclear missile with high damage."},
+	{id = 39611, name = "Seismic", icon = "seismic", tooltip = "Launch Seismic\nArea denial seismic missile, slows units."},
+	{id = 39612, name = "Shockley", icon = "empmissile", tooltip = "Launch Shockley (EMP)\nElectromagnetic pulse missile disables units."},
+	{id = 39613, name = "Inferno", icon = "napalmmissile", tooltip = "Launch Inferno (Napalm)\nNapalm missile with persistent damage."},
+	{id = 39614, name = "Reef Missile", icon = "shipcarrier", tooltip = "Launch Disarm Missile\nDisables units temporarily."},
+	{id = 39615, name = "Trinity", icon = "staticnuke", tooltip = "Launch Trinity (Strategic Nuke)\nLong-range nuclear missile."},
+	{id = 39616, name = "Zeno", icon = "missileslow", tooltip = "Launch Zeno (Slow Missile)\nSlow homing missile with lingering damage."},
+}
+
+local function isMissileCommand(cmdID)
+	for _, missile in ipairs(missileCmds) do
+		if cmdID == missile.id then return true end
+	end
+	return false
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Tooltips
@@ -483,7 +500,55 @@ local factoryButtonLayoutOverride = {
 	}
 }
 
+for _, missile in ipairs(missileCmds) do
+	local unitDef = UnitDefNames[missile.icon]
+	local icon = unitDef and ("#" .. unitDef.id) or (imageDir .. 'Bold/attack.png')
+	commandDisplayConfig[missile.id] = {
+		texture = icon,
+		tooltip = missile.tooltip
+	}
+end
+
+local function hasMissileUnits()
+	local teamUnits = Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}
+	local missileUnitNames = {
+		["tacnuke"] = true,
+		["subtacmissile"] = true,
+		["seismic"] = true,
+		["empmissile"] = true,
+		["napalmmissile"] = true,
+		["missileslow"] = true,
+		["shipcarrier"] = true,
+		["staticnuke"] = true,
+		["staticmissilesilo"] = true,
+	}
+	for _, unitID in ipairs(teamUnits) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if unitDefID then
+			local unitDef = UnitDefs[unitDefID]
+			if unitDef and missileUnitNames[unitDef.name] then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 local commandPanels = {
+	{
+		humanName = "Missiles",
+		name = "missiles",
+		inclusionFunction = function(cmdID)
+			if not hasMissileUnits() then return false end
+			return isMissileCommand(cmdID)
+		end,
+		loiterable = true,
+		buttonLayoutConfig = buttonLayoutConfig.command,
+		badgeUnitName = "tacnuke",
+		badgeCountWG = "missileTotalCount",
+		gridHotkeys = true,
+		returnOnClick = "orders",
+	},
 	{
 		humanName = "Orders",
 		name = "orders",
@@ -491,7 +556,8 @@ local commandPanels = {
 			return ((cmdID >= 0 or unitMobilePanelSize == 1) and
 				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
 				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
-				not plateCommandID[cmdID])
+				not plateCommandID[cmdID] and
+				not isMissileCommand(cmdID))
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
