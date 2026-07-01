@@ -66,6 +66,8 @@ return { seismic = {
       craterMult              = 1,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         gatherradius = [[416]],
         smoothradius = [[320]],
         detachmentradius = [[320]],

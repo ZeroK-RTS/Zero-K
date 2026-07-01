@@ -73,6 +73,8 @@ return { gunshipemp = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_lightninggun.png]],
         combatrange = 70,
         light_camera_height = 1000,
         light_color = [[1 1 0.4]],

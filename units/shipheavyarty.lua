@@ -124,6 +124,10 @@ return { shipheavyarty = {
       sprayAngle              = 768,
       tolerance               = 4096,
       turret                  = true,
+      customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_hpartillery.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 475,
     },

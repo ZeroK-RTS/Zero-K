@@ -11,6 +11,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "energy",
+		icon = [[unitpics/commweapon_flamethrower.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],

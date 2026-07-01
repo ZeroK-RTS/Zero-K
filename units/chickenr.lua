@@ -83,6 +83,8 @@ return { chickenr = {
       craterMult              = 0,
             
             customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
             

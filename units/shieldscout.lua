@@ -78,6 +78,8 @@ return { shieldscout = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_radius = 0,
         combatrange = 5,
       },

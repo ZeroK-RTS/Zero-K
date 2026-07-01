@@ -1,4 +1,5 @@
 local _, def = VFS.Include("gamedata/modularcomms/weapons/heavymachinegun.lua")
+def.customParams.icon = [[unitpics/commweapon_slowbeam.png]] -- slow weapon
 
 def.name = "Disruptor " .. def.name
 def.customParams.timeslow_damagefactor = 2

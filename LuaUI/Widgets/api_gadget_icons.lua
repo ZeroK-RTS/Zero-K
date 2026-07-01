@@ -326,7 +326,8 @@ end
 function widget:Initialize()
 	WG.icons.SetOrder('lowpower', 2)
 	WG.icons.SetOrder('retreat', 5)
-	WG.icons.SetDisplay('retreat', true)
+	-- Visibility is owned by the Unit Overlay GL4 "Unit States" options (single source of truth);
+	-- this widget only pushes icon data. Pulse/order are presentation, so they stay here.
 	WG.icons.SetPulse('retreat', true)
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

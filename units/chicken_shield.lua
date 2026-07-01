@@ -98,6 +98,8 @@ return { chicken_shield = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
       
@@ -165,6 +167,10 @@ return { chicken_shield = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = false,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },

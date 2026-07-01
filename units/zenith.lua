@@ -74,6 +74,8 @@ return { zenith = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_radius = 0,
       },
 
@@ -119,6 +121,8 @@ return { zenith = {
       craterMult              = 6,
 
       customParams              = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_color = [[2.4 1.5 0.6]],
         light_radius = 600,
 
@@ -181,6 +185,8 @@ return { zenith = {
       craterMult              = 6,
 
       customParams              = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_radius = 0,
 
         spawns_name = "asteroid_dead",
@@ -241,6 +247,8 @@ return { zenith = {
       craterMult              = 6,
 
       customParams              = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_radius = 0,
 
         spawns_name = "asteroid_dead",
@@ -302,6 +310,8 @@ return { zenith = {
       craterMult              = 6,
 
       customParams              = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_color = [[2.4 1.5 0.6]],
         light_radius = 600,
 

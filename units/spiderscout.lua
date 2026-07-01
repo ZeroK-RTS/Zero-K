@@ -81,6 +81,8 @@ return { spiderscout = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_color = [[0.8 0.8 0]],
         light_radius = 50,
       },

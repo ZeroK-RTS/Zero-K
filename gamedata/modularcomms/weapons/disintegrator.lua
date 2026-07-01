@@ -11,6 +11,8 @@ local weaponDef = {
 	craterMult              = 6,
 
 	customParams            = {
+		weapon_class = "energy",
+		icon = [[unitpics/commweapon_disintegrator.png]],
 		is_unit_weapon = 1,
 		muzzleEffectShot = [[custom:ataalaser]],
 		slot = [[3]],

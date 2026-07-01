@@ -59,6 +59,8 @@ return { statictele = {
       commandfire             = true,
 
       customParams        = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         attack_aoe_circle_mode = "cloaker"
       },
       

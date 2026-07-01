@@ -63,6 +63,10 @@ return { pw_hq_attacker = {
       reloadtime              = 1,
       tolerance               = 5000,
       turret                  = true,
+      customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
+      },
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 500,
     },

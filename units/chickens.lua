@@ -88,6 +88,8 @@ return { chickens = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         light_radius = 0,
       },
       

@@ -70,6 +70,8 @@ return { hoverminer = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         spawns_name = "wolverine_mine",
         spawns_expire = 60,
       },

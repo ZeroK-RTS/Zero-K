@@ -64,6 +64,8 @@ return { turretaaheavy = {
       cylinderTargeting       = 3.2,
 
       customParams              = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         isaa = [[1]],
         radar_homing_distance = 1800,
 

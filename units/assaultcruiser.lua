@@ -137,6 +137,10 @@ return { assaultcruiser = {
       texture4                = [[smallflare]],
       thickness               = 5,
       turret                  = true,
+      customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
+      },
       weaponType              = [[BeamLaser]],
     },
     
@@ -177,6 +181,10 @@ return { assaultcruiser = {
       stages                  = 32,
       turret                  = true,
       waterbounce             = 1,
+      customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 2400,
     },
@@ -217,6 +225,10 @@ return { assaultcruiser = {
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 300,
+      customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
+      },
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 600,
     },

@@ -9,6 +9,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "kinetic",
+		icon = [[unitpics/commweapon_disruptorbomb.png]],
 		is_unit_weapon = 1,
 		slot = [[3]],
 		timeslow_damagefactor = [[10]],

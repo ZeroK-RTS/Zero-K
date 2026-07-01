@@ -85,6 +85,8 @@ return { amphlaunch = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         ui_manual_fire = 1,
         lups_noshockwave = [[1]],
         thower_weapon    = 1,
@@ -125,6 +127,8 @@ return { amphlaunch = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         lups_noshockwave = [[1]],
         thower_weapon    = 1,
         bogus = 1,

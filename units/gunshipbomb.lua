@@ -96,6 +96,8 @@ return { gunshipbomb = {
       craterMult         = 3.5,
 
       customParams          = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         setunitsonfire = "1",
         burnchance     = "1",
         burntime = 720,
@@ -136,6 +138,8 @@ return { gunshipbomb = {
       craterMult         = 3.5,
 
       customParams          = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         setunitsonfire = "1",
         burnchance     = "1",
         burntime = 360,

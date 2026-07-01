@@ -81,6 +81,8 @@ return { slicer = {
       craterMult              = 0,
 
       customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_hparticlebeam.png]],
         nofriendlyfire = 1,
       },
 
@@ -140,6 +142,10 @@ return { slicer = {
       turret                  = true,
       waterWeapon             = true,
       weaponTimer             = 0.1,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },

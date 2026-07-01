@@ -97,6 +97,10 @@ return { spideranarchid = {
       thickness               = 2,
       tolerance               = 5000,
       turret                  = true,
+      customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
+      },
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },

@@ -97,6 +97,10 @@ return { chickena = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 1000,
     },

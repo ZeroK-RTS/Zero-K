@@ -12,6 +12,8 @@ local weaponDef = {
 	cylinderTargeting       = 1,
 
 	customParams            = {
+		weapon_class = "energy",
+		icon = [[unitpics/commweapon_beamlaser.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 

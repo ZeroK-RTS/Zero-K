@@ -80,6 +80,8 @@ return { chickenspire = {
       craterMult              = 2,
             
             customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
 

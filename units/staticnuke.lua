@@ -65,6 +65,8 @@ return { staticnuke = {
       craterMult              = 6,
 
       customParams              = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         light_color = [[2.92 2.64 1.76]],
         light_radius = 3000,
       },

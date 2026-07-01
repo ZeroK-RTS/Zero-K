@@ -102,6 +102,8 @@ return { benzcom1 = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         bogus = 1,
       },
 
@@ -156,6 +158,10 @@ return { benzcom1 = {
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/medplasma_fire]],
       turret                  = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_assaultcannon.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 300,
     },

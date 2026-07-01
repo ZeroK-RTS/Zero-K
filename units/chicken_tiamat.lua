@@ -115,6 +115,8 @@ return { chicken_tiamat = {
       cegTag                  = [[flamer_240_range]],
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_flamethrower.png]],
         flamethrower = [[1]],
         setunitsonfire = "1",
         burntime = [[450]],
@@ -181,6 +183,10 @@ return { chicken_tiamat = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },
@@ -228,6 +234,8 @@ return { chicken_tiamat = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
       

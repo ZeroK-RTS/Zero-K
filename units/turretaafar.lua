@@ -75,6 +75,8 @@ return { turretaafar = {
       cylinderTargeting       = 1,
 
       customParams              = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         isaa = [[1]],
         light_color = [[0.6 0.7 0.7]],
         light_radius = 420,

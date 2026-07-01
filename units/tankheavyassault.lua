@@ -84,6 +84,8 @@ return { tankheavyassault = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         burst = Shared.BURST_RELIABLE,
         gatherradius = [[105]],
         smoothradius = [[70]],
@@ -123,6 +125,8 @@ return { tankheavyassault = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
         

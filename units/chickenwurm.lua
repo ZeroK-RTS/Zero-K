@@ -94,6 +94,8 @@ return { chickenwurm = {
       craterMult              = 0,
       
       customParams              = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_napalmgrenade.png]],
         setunitsonfire = "1",
         burntime = 180,
 
@@ -135,6 +137,8 @@ return { chickenwurm = {
       craterMult              = 0,
       
       customParams              = {
+      weapon_class = "kinetic",
+      icon = [[unitpics/commweapon_shotgun.png]],
       },
 
       damage                  = {

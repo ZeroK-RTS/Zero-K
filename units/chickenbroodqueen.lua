@@ -146,6 +146,10 @@ return { chickenbroodqueen = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },
@@ -162,6 +166,8 @@ return { chickenbroodqueen = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
       

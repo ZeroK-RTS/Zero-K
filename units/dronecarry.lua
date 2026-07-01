@@ -83,6 +83,8 @@ return { dronecarry = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         capture_scaling = 1,
         is_capture = 1,
         capture_to_drone_controller = 1,

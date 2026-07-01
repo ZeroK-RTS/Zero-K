@@ -97,6 +97,8 @@ return { shipassault = {
         craterMult              = 0,
 
         customParams            = {
+            weapon_class = "explosive",
+            icon = [[unitpics/commweapon_sonicgun.png]],
             force_ignore_ground = [[1]],
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
@@ -148,6 +150,8 @@ return { shipassault = {
       craterBoost             = 1,
       craterMult              = 2,
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         combatRange = 265,
       },
       damage                  = {

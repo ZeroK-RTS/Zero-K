@@ -11,6 +11,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "burst",
+		icon = [[unitpics/commweapon_shotgun.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],

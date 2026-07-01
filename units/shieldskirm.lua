@@ -75,6 +75,8 @@ return { shieldskirm = {
       craterMult              = 2,
 
       customParams        = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_rocketlauncher.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1800,

@@ -125,6 +125,8 @@ return { chicken_dragon = {
       craterMult              = 0,
             
             customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
 
@@ -176,6 +178,10 @@ return { chicken_dragon = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
     },
@@ -207,6 +213,10 @@ return { chicken_dragon = {
       thickness               = 1,
       tolerance               = 100,
       turret                  = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 0.8,
     },
@@ -223,6 +233,8 @@ return { chicken_dragon = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
 

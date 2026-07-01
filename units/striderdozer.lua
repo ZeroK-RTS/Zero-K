@@ -81,6 +81,8 @@ return { striderdozer = {
       burstrate               = 0.2,
       
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         gatherradius = [[180]],
         smoothradius = [[200]],
         detachmentradius = [[200]],

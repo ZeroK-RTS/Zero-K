@@ -79,6 +79,8 @@ return { shiptorpraider = {
       cegTag                  = [[torpedo_trail]],
 
       customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_torpedo.png]],
         burst = Shared.BURST_RELIABLE,
 
         stays_underwater = 1,

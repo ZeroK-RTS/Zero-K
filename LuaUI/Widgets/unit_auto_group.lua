@@ -33,7 +33,7 @@ end
 local hotkeyPath = 'Hotkeys/Selection/Control Groups'
 
 i18nPrefix = 'autogroup_'
-options_order = { 'mainlabel', 'text_hotkey', 'cleargroups', 'removefromgroup', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
+options_order = { 'mainlabel', 'text_hotkey', 'cleargroups', 'removefromgroup', 'loadgroups', 'addall', 'verbose', 'immediate', }
 options_path = 'Settings/Interface/Control Groups'
 options = {
 	mainlabel = {name='Auto Group', type='label'},
@@ -63,12 +63,10 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
-	groupnumbers = { -- FIXME why is this handled by autogroups? it's standalone functionality
-		type = 'bool',
-		value = true,
-		noHotkey = true,
-	},
-	
+	-- Group-number drawing is now owned by the Unit Overlay GL4 widget (the "Control group number"
+	-- toggle under Settings/Interface/Unit Overlay/Unit States), which draws it as a corner badge on
+	-- the unit icon. The old standalone gl.Text drawing here has been removed.
+
 	text_hotkey = {
 		type = 'text',
 		path = hotkeyPath,
@@ -168,28 +166,6 @@ function widget:Initialize()
 	end
 	HotkeyChangeNotification()
 	myTeam = team
-end
-
-function widget:DrawWorld()
-	if not IsGuiHidden() then
-		local existingGroups = GetGroupList()
-		if options.groupnumbers.value then
-			for inGroup, _ in pairs(existingGroups) do
-				local units = GetGroupUnits(inGroup)
-				for _, unit in ipairs(units) do
-					if Spring.IsUnitInView(unit) then
-						local ux, uy, uz = Spring.GetUnitViewPosition(unit)
-						gl.PushMatrix()
-						gl.Translate(ux, uy, uz)
-						gl.Billboard()
-						gl.Color(textColor)--unused anyway when gl.Text have option 's' (and b & w)
-						gl.Text("" .. inGroup, 30.0, -10.0, textSize, "cns")
-						gl.PopMatrix()
-					end
-				end
-			end
-		end
-	end
 end
 
 local function SetGroupFromAuto(unitID, unitDefID)
