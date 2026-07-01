@@ -476,7 +476,26 @@ local factoryButtonLayoutOverride = {
 	}
 }
 
+-- Missile command display configurations
+commandDisplayConfig[39610] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch EOS: Tactical nuclear missile."}
+commandDisplayConfig[39611] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Seismic: Area denial seismic missile."}
+commandDisplayConfig[39612] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Shockley: EMP missile."}
+commandDisplayConfig[39613] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Inferno: Napalm missile."}
+commandDisplayConfig[39614] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Reef Missile: Naval missile."}
+commandDisplayConfig[39615] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Trinity: Long-range nuclear missile."}
+commandDisplayConfig[39616] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Zeno: Slow homing missile."}
+
 local commandPanels = {
+	{
+		humanName = "Missiles",
+		name = "missiles",
+		inclusionFunction = function(cmdID)
+			return (cmdID == 39610 or cmdID == 39611 or cmdID == 39612 or
+					cmdID == 39613 or cmdID == 39614 or cmdID == 39615 or cmdID == 39616)
+		end,
+		loiterable = true,
+		buttonLayoutConfig = buttonLayoutConfig.command,
+	},
 	{
 		humanName = "Orders",
 		name = "orders",
@@ -484,7 +503,9 @@ local commandPanels = {
 			return ((cmdID >= 0 or unitMobilePanelSize == 1) and
 				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
 				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
-				not plateCommandID[cmdID])
+				not plateCommandID[cmdID] and
+				not (cmdID == 39610 or cmdID == 39611 or cmdID == 39612 or
+					cmdID == 39613 or cmdID == 39614 or cmdID == 39615 or cmdID == 39616))
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
