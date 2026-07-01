@@ -258,10 +258,6 @@ local function missle_class()
       if not unit then return true end
       local unitType = self.launchableTypes[Spring.GetUnitDefID(unit)]
 
-      if self.markerMessage then
-        Spring.MarkerAddPoint (x, y, z , self.markerMessage, false)
-      end
-
       Spring.GiveOrderToUnit(unit, CMD.INSERT, {0, unitType.launchCmd, CMD.OPT_SHIFT, unpack(cmdParams)}, CMD.OPT_ALT)
       return true
     end
@@ -312,7 +308,6 @@ local function EOS_controller_class()
   self.y = 38
   self.name = "tacnuke"
   self.cmd = 39610
-  self.markerMessage = "Launching EOS"
 
   self.launchableTypes = {
     [UnitDefNames["tacnuke"].id] = {
@@ -376,7 +371,6 @@ local function shockley_controller_class()
   self.y = 38
   self.name = "empmissile"
   self.cmd = 39612
-  self.markerMessage = "Launching Shockley"
 
   self.launchableTypes = {
     [UnitDefNames["empmissile"].id] = {
@@ -405,7 +399,6 @@ local function inferno_controller_class()
   self.y = 38
   self.name = "napalmmissile"
   self.cmd = 39613
-  self.markerMessage = "Launching Inferno"
 
   self.launchableTypes = {
     [UnitDefNames["napalmmissile"].id] = {
@@ -435,7 +428,6 @@ local function reef_missile_controller_class()
   self.name = "shipcarrier"
   self.cmd = 39614
   self.cmdType = CMDTYPE.ICON_UNIT_OR_MAP
-  self.markerMessage = "Launching reef missile"
 
   self.launchableTypes = {
     [UnitDefNames["shipcarrier"].id] = {
@@ -456,7 +448,6 @@ local function trinity_missile_controller_class()
   self.y = 38
   self.name = "staticnuke"
   self.cmd = 39615
-  self.markerMessage = "Launching trinity missile"
 
   self.launchableTypes = {
     [UnitDefNames["staticnuke"].id] = {
