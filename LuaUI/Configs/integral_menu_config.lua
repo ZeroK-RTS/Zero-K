@@ -521,6 +521,8 @@ local commandPanels = {
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
+		badgeUnitName = "tacnuke",
+		badgeCountWG = "missileTotalCount",
 	},
 	{
 		humanName = "Orders",

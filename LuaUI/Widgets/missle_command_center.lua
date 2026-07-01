@@ -575,10 +575,14 @@ function widget:Update(dt)
 
   findButtonsByCommand()
 
+  local totalMissileCount = 0
+
   for _, command in pairs(commands) do
     local count = command:getCount()
     local buildProgress = command:getMaxBuildProgress()
     local customCommands = widgetHandler.customCommands
+
+    totalMissileCount = totalMissileCount + count
 
     for i = 1, #customCommands do
       if customCommands[i].id == command.cmd then
@@ -605,6 +609,9 @@ function widget:Update(dt)
       end
     end
   end
+
+  -- Export total count for tab badge
+  WG.missileTotalCount = totalMissileCount
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)

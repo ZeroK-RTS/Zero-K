@@ -1819,9 +1819,9 @@ end
 --------------------------------------------------------------------------------
 -- Tab Panel
 
-local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
+local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect, badgeConfig)
 	local disabled = disabledTabs[name]
-	
+
 	local function DoClick(mouse)
 		if disabled or TabClickFunction(mouse) then
 			return
@@ -1832,7 +1832,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 			OnSelect()
 		end
 	end
-	
+
 	local button = Button:New {
 		classname = "button_tab",
 		caption = humanName,
@@ -1846,23 +1846,65 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		},
 	}
 	button.backgroundColor[4] = 0.4
-	
+
 	if disabled then
 		button.font = WG.GetSpecialFont(14, "integral_grey", {outlineColor = {0, 0, 0, 1}, color = {0.6, 0.6, 0.6, 1}})
 		button.supressButtonReaction = true
 	end
-	
+
 	local hideHotkey = loiterable
-	
+
 	if hotkey and (not hideHotkey) and (not disabled) then
 		button:SetCaption(humanName .. " (" .. GetGreenStr(hotkey) .. ")")
 	end
-	
+
 	local externalFunctionsAndData = {
 		button = button,
 		name = name,
 		DoClick = DoClick,
+		badgePanel = nil,
 	}
+
+	-- Create badge if configured
+	if badgeConfig and badgeConfig.unitName then
+		local unitDef = UnitDefNames[badgeConfig.unitName]
+		if unitDef then
+			externalFunctionsAndData.badgePanel = Panel:New {
+				x = "100%-30",
+				y = 0,
+				width = 30,
+				height = 30,
+				parent = button,
+			}
+
+			Image:New {
+				x = 0,
+				y = 0,
+				width = 20,
+				height = 20,
+				file = "#" .. unitDef.id,
+				parent = externalFunctionsAndData.badgePanel,
+			}
+
+			externalFunctionsAndData.badgeLabel = Label:New {
+				x = 20,
+				y = 0,
+				width = 10,
+				height = 20,
+				caption = "0",
+				align = "left",
+				valign = "center",
+				fontSize = 10,
+				parent = externalFunctionsAndData.badgePanel,
+			}
+
+			function externalFunctionsAndData.UpdateBadgeCount(count)
+				if externalFunctionsAndData.badgeLabel then
+					externalFunctionsAndData.badgeLabel:SetCaption(tostring(count))
+				end
+			end
+		end
+	end
 		
 	function externalFunctionsAndData.IsTabSelected()
 		return contentControl.visible
@@ -2345,7 +2387,7 @@ local function InitializeControls()
 			end
 		end
 		
-		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
+		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect, {unitName = data.badgeUnitName, countWG = data.badgeCountWG})
 	
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
@@ -2550,6 +2592,15 @@ function widget:Update()
 	local _,cmdID = spGetActiveCommand()
 	UpdateButtonSelection(cmdID)
 	UpdateReturnToOrders(cmdID)
+
+	-- Update tab badges
+	for i = 1, #commandPanels do
+		local panelData = commandPanels[i]
+		if panelData.badgeCountWG and panelData.tabButton and panelData.tabButton.UpdateBadgeCount then
+			local count = WG[panelData.badgeCountWG] or 0
+			panelData.tabButton:UpdateBadgeCount(count)
+		end
+	end
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
