@@ -485,11 +485,37 @@ commandDisplayConfig[39614] = { texture = imageDir .. 'Bold/attack.png', tooltip
 commandDisplayConfig[39615] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Trinity: Long-range nuclear missile."}
 commandDisplayConfig[39616] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Zeno: Slow homing missile."}
 
+local function hasMissileUnits()
+	local teamUnits = Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}
+	local missileUnitNames = {
+		["tacnuke"] = true,
+		["subtacmissile"] = true,
+		["seismic"] = true,
+		["empmissile"] = true,
+		["napalmmissile"] = true,
+		["missileslow"] = true,
+		["shipcarrier"] = true,
+		["staticnuke"] = true,
+		["staticmissilesilo"] = true,
+	}
+	for _, unitID in ipairs(teamUnits) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if unitDefID then
+			local unitDef = UnitDefs[unitDefID]
+			if unitDef and missileUnitNames[unitDef.name] then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 local commandPanels = {
 	{
 		humanName = "Missiles",
 		name = "missiles",
 		inclusionFunction = function(cmdID)
+			if not hasMissileUnits() then return false end
 			return (cmdID == 39610 or cmdID == 39611 or cmdID == 39612 or
 					cmdID == 39613 or cmdID == 39614 or cmdID == 39615 or cmdID == 39616)
 		end,
