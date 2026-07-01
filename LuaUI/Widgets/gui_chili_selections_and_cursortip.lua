@@ -109,6 +109,10 @@ local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.ZIP)
 local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.ZIP)
 
+-- Shared bar palette mirrored from the GL4 unit overlay, so the panel's Chili bars match it. Single
+-- upvalue carrying every bar color/ramp keeps this file's largest functions under Lua's 60-upvalue cap.
+local overlayBarStyle = VFS.Include("LuaUI/Widgets/Include/unit_overlay_bar_style.lua")
+
 local terraformGeneralTip =
 	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
 	green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
@@ -169,14 +173,6 @@ local DRAWING_TOOLTIP =
 
 local SPECIAL_WEAPON_RELOAD_PARAM = "specialReloadRemaining"
 local JUMP_RELOAD_PARAM = "jumpReload"
-
--- Bar colors mirror the GL4 unit overlay's barTypeMap (its maxcolor = the "full" appearance), as
--- 0-1 floats like the rest of the Chili bars (GetHealthColor etc.). Shield additionally ramps by value.
-local reloadBarColor = {0.05, 0.6, 0.6, 1} -- overlay weapon-reload teal
-local jumpBarColor = {0.4, 0.9, 0.5, 1}    -- overlay jump/movement green
-local fullHealthBarColor = {0, 1, 0, 1}    -- overlay full-health green
-local fullShieldBarColor = {0.1, 0.1, 1.0, 1} -- overlay full-shield blue
-local buildBarColor = {0.8, 0.8, 0.2, 1}   -- amber, matching the overlay's build.png fill art
 
 local econStructureDefs = {}
 for i = 1, #UnitDefs do
@@ -605,24 +601,6 @@ local function IsGroupingRequired(selectedUnits, selectionSortOrder, selectionSp
 	else
 		return true
 	end
-end
-
-local function GetHealthColor(fraction, returnString)
-	-- Match the GL4 unit overlay's health bar: a straight linear red(0) -> green(1) ramp,
-	-- i.e. mix({1,0,0}, {0,1,0}, fraction). (The overlay's BITCOLORCORRECT bit is defined but
-	-- unused in its shader, so its health color is exactly this linear interpolation.)
-	local r = 1 - fraction
-	local g = fraction
-	if returnString then
-		return string.char(255, math.floor(255*r), math.floor(255*g), 0)
-	end
-	return {r, g, 0, 1}
-end
-
-local function GetShieldColor(fraction)
-	-- Match the GL4 unit overlay's shield bar: a linear red(empty) -> blue(full) ramp,
-	-- mix({1,0.1,0.1}, {0.1,0.1,1}, fraction).
-	return {1 - fraction*0.9, 0.1, 0.1 + fraction*0.9, 1}
 end
 
 local function SetPanelSkin(targetPanel, className)
@@ -1472,7 +1450,7 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 			max = 1,
 			caption = false,
 			noFont = true,
-			color = barColor or reloadBarColor,
+			color = barColor or overlayBarStyle.reload.full,
 			skinName = 'default',
 			orientation = "vertical",
 			reverse = true,
@@ -1543,7 +1521,7 @@ local function GetUnitGroupIconButton(parentControl)
 		max = 1,
 		caption = false,
 		noFont = true,
-		color = fullHealthBarColor,
+		color = overlayBarStyle.health.full,
 		parent = holder
 	}
 	
@@ -1578,7 +1556,7 @@ local function GetUnitGroupIconButton(parentControl)
 			local health, maxhealth = spGetUnitHealth(unitID)
 			if health then
 				healthProp = health/maxhealth
-				healthBar.color = GetHealthColor(healthProp)
+				healthBar.color = overlayBarStyle.GetHealthColor(healthProp)
 				healthBar:SetValue(healthProp)
 			end
 			local reloadTime, weaponNum, rulesParam = GetManualFireReload(unitID, unitDefID)
@@ -1589,7 +1567,7 @@ local function GetUnitGroupIconButton(parentControl)
 			end
 			local jumpCharges = GetJumpCharges(unitID, unitDefID)
 			if jumpCharges then
-				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, jumpBarColor)
+				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, overlayBarStyle.jump)
 			elseif jumpBar then
 				jumpBar:SetVisibility(false)
 			end
@@ -1624,7 +1602,7 @@ local function GetUnitGroupIconButton(parentControl)
 		
 		if totalMax > 0 then
 			healthProp = totalHealth/totalMax
-			healthBar.color = GetHealthColor(healthProp)
+			healthBar.color = overlayBarStyle.GetHealthColor(healthProp)
 			healthBar:SetValue(healthProp)
 		end
 	end
@@ -2152,7 +2130,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
 	
 	local minWindLabel = GetImageWithText(leftPanel, "minWindLabel", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.WIND_SPEED, nil, nil, ICON_SIZE, 4)
-	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
+	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, overlayBarStyle.health.full, overlayBarStyle.GetHealthColor)
 	local unitpicBadgeUpdate = GetImage(unitImage, "costInfoUpdate", 4, IMAGE.NO_AMMO, ICON_SIZE, 4)
 	
 	local metalInfo
@@ -2181,8 +2159,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		}
 		costInfoPanel = GetCostInfoPanel(rightPanel, PIC_HEIGHT + 4)
 	else
-		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, fullShieldBarColor, GetShieldColor)
-		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, buildBarColor)
+		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, overlayBarStyle.shield.full, overlayBarStyle.GetShieldColor)
+		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, overlayBarStyle.build)
 	end
 
 	local prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID, prevVisible, prevMorphTime, prevMorphCost, prevMousePlace
@@ -2199,7 +2177,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		local jumpCharges = GetJumpCharges(unitID, unitDefID)
 		if jumpCharges then
-			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, jumpBarColor)
+			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, false, jumpCharges, true, overlayBarStyle.jump)
 		elseif jumpBar then
 			jumpBar:SetVisibility(false)
 		end

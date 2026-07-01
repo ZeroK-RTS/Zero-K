@@ -429,6 +429,11 @@ local weaponClassVbarColumn = {
 local includeDir = "LuaUI/Widgets/Include/"
 VFS.Include(includeDir.."gl_uniform_channels.lua")
 
+-- Bar palette shared with 2D consumers (e.g. the selection/cursortip panel) so their bars match
+-- this overlay. barTypeMap below references these colors; they are read-only here (uploaded to the
+-- GPU), so entries that share a color safely share its table instance.
+local overlayBarStyle = VFS.Include(includeDir.."unit_overlay_bar_style.lua")
+
 local icontypes = VFS.FileExists(LUAUI_DIRNAME .. "Configs/icontypes.lua") and VFS.Include(LUAUI_DIRNAME .. "Configs/icontypes.lua") or {}
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua", nil, VFS.ZIP)
 iconFormat = iconFormat or ".dds"
@@ -463,8 +468,8 @@ local iconAtlasCellSize = 64
 
 local barTypeMap = {
 	health = {
-		mincolor = {1.0, 0.0, 0.0, 1.0},
-		maxcolor = {0.0, 1.0, 0.0, 1.0},
+		mincolor = overlayBarStyle.health.empty,
+		maxcolor = overlayBarStyle.health.full,
 		bartype = bitPercentage + bitColorCorrect + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = unitHealthChannel,
@@ -549,31 +554,31 @@ local barTypeMap = {
 	-- Weapon cooldown badges flank the icon in 2 columns: primary(1)/tertiary(3) left, secondary(2)/
 	-- quaternary(4) right, higher priority on top (layoutSlot = row within the column).
 	reload = { -- weapon 1: left, top
-		mincolor = {0.03, 0.4, 0.4, 1.0},
-		maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty,
+		maxcolor = overlayBarStyle.reload.full,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitModular + bitInverse + bitLeft + bitVertical,
 		hidethreshold = 0.99,
 		uniformindex = unitPrimaryReloadChannel,
 		uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 0, -- overridden per-unit by weapon_class in addBarForUnit
 	},
 	reload2 = { -- weapon 2: right, top
-		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty, maxcolor = overlayBarStyle.reload.full,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitModular + bitInverse + bitRight + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitPrimaryCountChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 0,
 	},
 	reload3 = { -- weapon 3: left, second row
-		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty, maxcolor = overlayBarStyle.reload.full,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitModular + bitInverse + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitSecondaryReloadChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 1,
 	},
 	reload4 = { -- weapon 4: right, second row
-		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty, maxcolor = overlayBarStyle.reload.full,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitModular + bitInverse + bitRight + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitSecondaryCountChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 1,
 	},
 	primarycount = {
-		mincolor = {0.03, 0.4, 0.4, 1.0},
-		maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty,
+		maxcolor = overlayBarStyle.reload.full,
 		bartype = bitShowGlyph + bitUseOverlay + bitIntegerNumber + bitLeft + bitVertical,
 		hidethreshold = 0.99,
 		uniformindex = unitPrimaryCountChannel,
@@ -582,22 +587,22 @@ local barTypeMap = {
 	-- Individual burst reload bars (ch9-12, sorted most-loaded first).
 	-- Added dynamically up to burstCount; value 0.0 hides naturally via isVarForChannelVisible.
 	bustreload1 = { -- burst weapons are "related": all in the left column, stacked
-		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty, maxcolor = overlayBarStyle.reload.full,
 		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitPrimaryReloadChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 0,
 	},
 	bustreload2 = {
-		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty, maxcolor = overlayBarStyle.reload.full,
 		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitPrimaryCountChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 1,
 	},
 	bustreload3 = {
-		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty, maxcolor = overlayBarStyle.reload.full,
 		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitSecondaryReloadChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 2,
 	},
 	bustreload4 = {
-		mincolor = {0.03, 0.4, 0.4, 1.0}, maxcolor = {0.05, 0.6, 0.6, 1.0},
+		mincolor = overlayBarStyle.reload.empty, maxcolor = overlayBarStyle.reload.full,
 		bartype = bitPercentage + bitColorCorrect + bitModular + bitInverse + bitAlwaysShow + bitLeft + bitVertical,
 		hidethreshold = 0.99, uniformindex = unitSecondaryCountChannel, uvoffset = VBAR_COL_GENERIC_RELOAD, layoutSlot = 3,
 	},
@@ -659,24 +664,24 @@ local barTypeMap = {
 	-- full once jumpReload passes N. Per-instance: uvoffset = chargeIndex + charges*16, range = reload
 	-- frames, layoutSlot = packed (index, below-count). Separate barTypeMap names so removal iterates them.
 	jump = { -- movement ability -> below zone. gauge per jump charge.
-		mincolor = {0.4, 0.9, 0.5, 1.0},
-		maxcolor = {0.4, 0.9, 0.5, 1.0}, -- green (movement/jump)
+		mincolor = overlayBarStyle.jump,
+		maxcolor = overlayBarStyle.jump, -- green (movement/jump)
 		bartype = bitVertical + bitGauge + bitJumpCharge,
 		hidethreshold = 0.99,
 		uniformindex = unitMovementChannel,
 		uvoffset = 0,
 	},
 	jump2 = {
-		mincolor = {0.4, 0.9, 0.5, 1.0},
-		maxcolor = {0.4, 0.9, 0.5, 1.0},
+		mincolor = overlayBarStyle.jump,
+		maxcolor = overlayBarStyle.jump,
 		bartype = bitVertical + bitGauge + bitJumpCharge,
 		hidethreshold = 0.99,
 		uniformindex = unitMovementChannel,
 		uvoffset = 0,
 	},
 	jump3 = {
-		mincolor = {0.4, 0.9, 0.5, 1.0},
-		maxcolor = {0.4, 0.9, 0.5, 1.0},
+		mincolor = overlayBarStyle.jump,
+		maxcolor = overlayBarStyle.jump,
 		bartype = bitVertical + bitGauge + bitJumpCharge,
 		hidethreshold = 0.99,
 		uniformindex = unitMovementChannel,
@@ -694,8 +699,8 @@ local barTypeMap = {
 	},
 	ability = { -- Swift sprint etc.: non-weapon movement ability -> below zone (like jump). gauge fills
 		-- as it recharges (specialReloadRemaining counts down, so bitInverse turns it into a charge level).
-		mincolor = {0.4, 0.9, 0.5, 1.0},
-		maxcolor = {0.4, 0.9, 0.5, 1.0}, -- green (movement ability, matches jump)
+		mincolor = overlayBarStyle.jump,
+		maxcolor = overlayBarStyle.jump, -- green (movement ability, matches jump)
 		bartype = bitVertical + bitModular + bitInverse, -- frame-based cooldown; fills as it recharges
 		hidethreshold = 0.99,
 		uniformindex = unitMovementChannel,
@@ -724,8 +729,8 @@ local barTypeMap = {
 		layoutSlot = 0, -- same slot as the stockpile gauge so the number overlays it
 	},
 	shield = {
-		maxcolor = {0.1, 0.1, 1.0, 1.0},
-		mincolor = {1.0, 0.1, 0.1, 1.0},
+		maxcolor = overlayBarStyle.shield.full,
+		mincolor = overlayBarStyle.shield.empty,
 		bartype = bitShowGlyph + bitUseOverlay + bitPercentage + bitInverse,
 		hidethreshold = 0.99,
 		uniformindex = unitShieldChannel,
