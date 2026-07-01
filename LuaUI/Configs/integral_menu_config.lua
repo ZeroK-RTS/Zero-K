@@ -543,6 +543,7 @@ local commandPanels = {
 			return pos ~= nil, pos
 		end,
 		loiterable = true,
+		alwaysShowTab = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
 		badgeUnitName = "tacnuke",
 		badgeCountWG = "missileTotalCount",

@@ -605,7 +605,9 @@ end
 
 local function UpdateReturnToOrders(cmdID)
 	if returnToOrdersCommand and returnToOrdersCommand ~= cmdID then
-		commandPanelMap.orders.tabButton.DoClick()
+		if commandPanelMap.orders.tabButton.IsTabPresent() then
+			commandPanelMap.orders.tabButton.DoClick()
+		end
 		returnToOrdersCommand = false
 	end
 	
@@ -2232,10 +2234,14 @@ local function ProcessAllCommands(commands, customCommands)
 	end
 	
 	-- Determine which tabs to display and which to select
+	local forceShowTabs = false
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		if data.commandCount ~= 0 then
 			tabsToShow[#tabsToShow + 1] = data.tabButton
+			if data.alwaysShowTab then
+				forceShowTabs = true
+			end
 			data.buttons.ClearOldButtons(selectionIndex)
 			if data.queue then
 				data.queue.ClearOldButtons(selectionIndex)
@@ -2254,15 +2260,28 @@ local function ProcessAllCommands(commands, customCommands)
 	if not tabToSelect then
 		tabToSelect = "orders"
 	end
-	
+
 	if #tabsToShow == 0 then
 		tabPanel.ClearTabs()
 		lastTabSelected = false
 	else
-		tabPanel.SetTabs(tabsToShow, #tabsToShow > 1, not factoryUnitDefID, tabToSelect)
+		-- Fall back to the first shown tab if the intended one is not present
+		-- (e.g. only the missiles tab is available while nothing is selected,
+		-- so the default "orders" tab does not exist to be selected).
+		local tabToSelectPresent = false
+		for i = 1, #tabsToShow do
+			if tabsToShow[i].name == tabToSelect then
+				tabToSelectPresent = true
+				break
+			end
+		end
+		if not tabToSelectPresent then
+			tabToSelect = tabsToShow[1].name
+		end
+		tabPanel.SetTabs(tabsToShow, (#tabsToShow > 1) or forceShowTabs, not factoryUnitDefID, tabToSelect)
 		lastTabSelected = tabToSelect
 	end
-	
+
 	-- Keeps main window for tweak mode.SetIntegralVisibility(visible)
 	SetIntegralVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
 end
@@ -2340,7 +2359,9 @@ local function InitializeControls()
 	
 	local function ReturnToOrders(cmdID)
 		if options.selectionClosesTabOnSelect.value then
-			if commandPanelMap.orders then
+			-- Only return to orders if it is actually present; otherwise (e.g.
+			-- missiles tab with nothing selected) stay on the current tab.
+			if commandPanelMap.orders and commandPanelMap.orders.tabButton.IsTabPresent() then
 				commandPanelMap.orders.tabButton.DoClick()
 			end
 		elseif options.selectionClosesTab.value and cmdID then

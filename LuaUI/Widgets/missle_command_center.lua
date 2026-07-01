@@ -624,6 +624,7 @@ local commands = {
 
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
+local wasEmptySelection = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -674,11 +675,15 @@ function widget:Update(dt)
   -- Export total count for tab badge
   WG.missileTotalCount = totalMissileCount
 
-  -- The integral menu only re-reads custom commands on CommandsChanged, so force
-  -- a layout update when the displayed count / progress actually changed.
-  if changed then
+  -- The integral menu only re-reads custom commands on CommandsChanged, which
+  -- the command menu pipeline does not run on its own while nothing is selected.
+  -- Force a rebuild when the shown count/progress changed, or once when the
+  -- selection first becomes empty, so the missiles tab stays available.
+  local emptySelection = (Spring.GetSelectedUnitsCount() == 0)
+  if changed or (emptySelection and not wasEmptySelection) then
     Spring.ForceLayoutUpdate()
   end
+  wasEmptySelection = emptySelection
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
