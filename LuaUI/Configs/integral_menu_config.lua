@@ -1,18 +1,18 @@
 local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 local missileCmdIDs = {
-	39610, -- EOS
-	39611, -- Seismic
-	39612, -- Shockley
-	39613, -- Inferno
-	39614, -- Reef Missile
-	39615, -- Trinity
-	39616, -- Zeno
+	{id = 39610, name = "EOS", icon = "tacnuke"},
+	{id = 39611, name = "Seismic", icon = "seismic"},
+	{id = 39612, name = "Shockley", icon = "empmissile"},
+	{id = 39613, name = "Inferno", icon = "napalmmissile"},
+	{id = 39614, name = "Reef Missile", icon = "shipcarrier"},
+	{id = 39615, name = "Trinity", icon = "staticnuke"},
+	{id = 39616, name = "Zeno", icon = "missileslow"},
 }
 
 local function isMissileCommand(cmdID)
-	for _, id in ipairs(missileCmdIDs) do
-		if cmdID == id then return true end
+	for _, missile in ipairs(missileCmdIDs) do
+		if cmdID == missile.id then return true end
 	end
 	return false
 end
@@ -494,13 +494,24 @@ local factoryButtonLayoutOverride = {
 }
 
 -- Missile command display configurations
-commandDisplayConfig[39610] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch EOS (Tactical Nuke)\nTactical nuclear missile with high damage."}
-commandDisplayConfig[39611] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Seismic\nArea denial seismic missile, slows units."}
-commandDisplayConfig[39612] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Shockley (EMP)\nElectromagnetic pulse missile disables units."}
-commandDisplayConfig[39613] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Inferno (Napalm)\nNapalm missile with persistent damage."}
-commandDisplayConfig[39614] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Disarm Missile\nDisables units temporarily."}
-commandDisplayConfig[39615] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Trinity (Strategic Nuke)\nLong-range nuclear missile."}
-commandDisplayConfig[39616] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Launch Zeno (Slow Missile)\nSlow homing missile with lingering damage."}
+local missileTooltips = {
+	[39610] = "Launch EOS (Tactical Nuke)\nTactical nuclear missile with high damage.",
+	[39611] = "Launch Seismic\nArea denial seismic missile, slows units.",
+	[39612] = "Launch Shockley (EMP)\nElectromagnetic pulse missile disables units.",
+	[39613] = "Launch Inferno (Napalm)\nNapalm missile with persistent damage.",
+	[39614] = "Launch Disarm Missile\nDisables units temporarily.",
+	[39615] = "Launch Trinity (Strategic Nuke)\nLong-range nuclear missile.",
+	[39616] = "Launch Zeno (Slow Missile)\nSlow homing missile with lingering damage.",
+}
+
+for _, missile in ipairs(missileCmdIDs) do
+	local unitDef = UnitDefNames[missile.icon]
+	local icon = unitDef and ("#" .. unitDef.id) or (imageDir .. 'Bold/attack.png')
+	commandDisplayConfig[missile.id] = {
+		texture = icon,
+		tooltip = missileTooltips[missile.id]
+	}
+end
 
 local function hasMissileUnits()
 	local teamUnits = Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}
