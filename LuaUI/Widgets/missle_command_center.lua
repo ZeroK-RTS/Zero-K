@@ -208,8 +208,10 @@ local function missle_class()
             maxProgress = math.max(maxProgress, buildProgress)
           else
             -- Stockpiling weapons (Trinity, Reef, subtac) report progress toward
-            -- the next missile via the stockpile build percentage.
-            local _, _, stockpileProgress = Spring.GetUnitStockpile(unitID)
+            -- the next missile via the "gadgetStockpile" rules param. Zero-K
+            -- reimplements stockpiling in a gadget, so the engine's
+            -- GetUnitStockpile build percent is pinned to 1 and unusable here.
+            local stockpileProgress = Spring.GetUnitRulesParam(unitID, "gadgetStockpile")
             if stockpileProgress and stockpileProgress > 0 and stockpileProgress < 1 then
               maxProgress = math.max(maxProgress, stockpileProgress)
             end
