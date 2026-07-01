@@ -1,5 +1,22 @@
 local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
+local missileCmdIDs = {
+	39610, -- EOS
+	39611, -- Seismic
+	39612, -- Shockley
+	39613, -- Inferno
+	39614, -- Reef Missile
+	39615, -- Trinity
+	39616, -- Zeno
+}
+
+local function isMissileCommand(cmdID)
+	for _, id in ipairs(missileCmdIDs) do
+		if cmdID == id then return true end
+	end
+	return false
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Tooltips
@@ -516,8 +533,7 @@ local commandPanels = {
 		name = "missiles",
 		inclusionFunction = function(cmdID)
 			if not hasMissileUnits() then return false end
-			return (cmdID == 39610 or cmdID == 39611 or cmdID == 39612 or
-					cmdID == 39613 or cmdID == 39614 or cmdID == 39615 or cmdID == 39616)
+			return isMissileCommand(cmdID)
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
@@ -534,8 +550,7 @@ local commandPanels = {
 				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
 				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
 				not plateCommandID[cmdID] and
-				not (cmdID == 39610 or cmdID == 39611 or cmdID == 39612 or
-					cmdID == 39613 or cmdID == 39614 or cmdID == 39615 or cmdID == 39616))
+				not isMissileCommand(cmdID))
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
