@@ -17,7 +17,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-VFS.Include(LUAUI_DIRNAME.."Widgets/lib/floatingCommand.lua")
 VFS.Include(LUAUI_DIRNAME.."Widgets/Utilities/engine_blast_radius.lua")
 
 --------------------------------------------------------------------------------
@@ -41,11 +40,6 @@ local function getMouseTargetPosition()
   else
     return nil
   end
-end
-
-local function assign(table, field, value)
-  table[field] = value
-  return value
 end
 
 local function distance3(x1, y1, z1, x2, y2, z2)
@@ -181,40 +175,6 @@ local function missle_class()
     return unit1
   end
 
-  function self:initialize()
-    floatingCommand{
-      name = "launch " .. self.name,
-      x = self.x,
-      y = self.y,
-      action = function()
-        self:action()
-      end,
-      contents = {
-         assign(self, "bottomLabel",
-            WG.Chili.Label:New {
-              x = 0,
-              y = 0,
-              right = 5,
-              bottom = 5,
-              align = "right",
-              valign = "bottom",
-              caption = caption,
-              fontSize = 16,
-              autosize = false,
-              fontShadow = true,
-            }
-          ),
-        WG.Chili.Image:New {
-          x = "5%",
-          y = "5%",
-          right = "5%",
-          bottom = "5%",
-          file = "#" .. UnitDefNames[self.name].id,
-          keepAspect = false,
-        },
-      },
-    }
-  end
 
   function self:getPerferedUnit(params)
     local units = self:getOrderableUnits()
@@ -295,9 +255,6 @@ local function missle_class()
     drawLine(ux, uy, uz, mx, my, mz)
   end
 
-  function self:update()
-    self.bottomLabel:SetCaption(self:getCount())
-  end
 
   return self
 end
@@ -515,11 +472,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
   end
 end
 
-function widget:Initialize()
-  for _, command in pairs(commands) do
-    command:initialize()
-  end
-end
 
 function widget:DrawWorld()
   for _, command in pairs(commands) do
@@ -527,16 +479,3 @@ function widget:DrawWorld()
   end
 end
 
-local UPDATE_FREQUENCY = 0.25
-local timer = UPDATE_FREQUENCY + 1
-function widget:Update(dt)
-  timer = timer + dt
-  if timer < UPDATE_FREQUENCY then
-    return
-  end
-  timer = 0
-
-  for _, command in pairs(commands) do
-    command:update()
-  end
-end
