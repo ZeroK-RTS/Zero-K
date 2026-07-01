@@ -520,6 +520,42 @@ local commands = {
 
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
+local buttonCache = {}
+
+local missileCommandIDs = {
+  [39610] = true,
+  [39611] = true,
+  [39612] = true,
+  [39613] = true,
+  [39614] = true,
+  [39615] = true,
+  [39616] = true,
+}
+
+local function findButtonsByCommand()
+  local screen = WG.Chili.Screen0
+  if not screen then return end
+
+  local function searchChildren(control)
+    if not control then return end
+
+    if control.cmdID and missileCommandIDs[control.cmdID] then
+      buttonCache[control.cmdID] = control
+    end
+
+    if control.children then
+      for _, child in ipairs(control.children) do
+        searchChildren(child)
+      end
+    end
+  end
+
+  if screen.children then
+    for _, child in ipairs(screen.children) do
+      searchChildren(child)
+    end
+  end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -537,15 +573,12 @@ function widget:Update(dt)
   end
   timer = 0
 
-  WG.missileProgress = WG.missileProgress or {}
+  findButtonsByCommand()
 
   for _, command in pairs(commands) do
     local count = command:getCount()
     local buildProgress = command:getMaxBuildProgress()
     local customCommands = widgetHandler.customCommands
-
-    -- Export progress for other widgets
-    WG.missileProgress[command.cmd] = buildProgress
 
     for i = 1, #customCommands do
       if customCommands[i].id == command.cmd then
@@ -562,6 +595,12 @@ function widget:Update(dt)
           end
         end
         customCommands[i].name = displayName
+
+        -- Update visual progress bar on button
+        local button = buttonCache[command.cmd]
+        if button and button.SetProgressBar then
+          button:SetProgressBar(buildProgress)
+        end
         break
       end
     end
