@@ -3,8 +3,8 @@
 
 function widget:GetInfo()
   return {
-    name      = "command center: missle",
-    desc      = "Add missle commands to command center",
+    name      = "command center: missiles",
+    desc      = "Add missile commands to command center",
     author    = "Amnykon",
     date      = "2021-07-30",
     license   = "GNU GPL, v2 or later",
