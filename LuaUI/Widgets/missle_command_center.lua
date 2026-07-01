@@ -72,18 +72,23 @@ local function missle_class()
    end
 
   function self:getNumberOfQueueLaunches(unit)
-    local unitType = self.launchableTypes[Spring.GetUnitDefID(unit)]
+    local unitDefID = Spring.GetUnitDefID(unit)
+    if not unitDefID then return 0 end
+
+    local unitType = self.launchableTypes[unitDefID]
+    if not unitType then return 0 end
+
     local numStockpiled = unitType.getStockpile(unit)
+    if not numStockpiled or numStockpiled == 0 then return 0 end
+
+    local cmdQueue = Spring.GetUnitCommands(unit, numStockpiled)
+    if not cmdQueue then return 0 end
 
     local numQueued = 0
-    if (numStockpiled or 0) ~= 0 then
-      local cmdQueue = Spring.GetUnitCommands(unit, numStockpiled);
-
-      for _, cmd in ipairs(cmdQueue) do
-        if cmd.id == unitType.launchCmd then numQueued = numQueued + 1 end
-      end
-
+    for _, cmd in ipairs(cmdQueue) do
+      if cmd and cmd.id == unitType.launchCmd then numQueued = numQueued + 1 end
     end
+
     return numQueued
   end
 
@@ -91,11 +96,15 @@ local function missle_class()
     local count = 0
     for _, unit in ipairs(self:getOrderableUnits()) do
       if not Spring.GetUnitIsDead(unit) then
-        local type = self.launchableTypes[Spring.GetUnitDefID(unit)]
-        if type then
-          count = count
-            + type.getStockpile(unit)
-            - self:getNumberOfQueueLaunches(unit)
+        local unitDefID = Spring.GetUnitDefID(unit)
+        if unitDefID then
+          local type = self.launchableTypes[unitDefID]
+          if type then
+            local stockpile = type.getStockpile(unit)
+            if stockpile then
+              count = count + stockpile - self:getNumberOfQueueLaunches(unit)
+            end
+          end
         end
       end
     end
@@ -242,12 +251,26 @@ local function missle_class()
     if not mx or not mz then return end
     local unit = self:getPerferedUnit{x = mx, z = mz}
     if not unit then return end
+
     local ux, uy, uz = Spring.GetUnitPosition(unit)
+    if not ux then return end
+
+    local unitDefID = Spring.GetUnitDefID(unit)
+    if not unitDefID then return end
+
+    local unitType = self.launchableTypes[unitDefID]
+    if not unitType then return end
+
+    local unitDef = UnitDefs[unitDefID]
+    if not unitDef or not unitDef.weapons then return end
+
+    local weapon = unitDef.weapons[unitType.weaponId]
+    if not weapon then return end
+
+    local weaponDef = WeaponDefs[weapon.weaponDef]
+    if not weaponDef then return end
+
     local dist = distance(mx, mz, ux, uz)
-
-    local weaponDefId = self.launchableTypes[Spring.GetUnitDefID(unit)].weaponId
-    local weaponDef = WeaponDefs[UnitDefs[Spring.GetUnitDefID(unit)].weapons[weaponDefId].weaponDef]
-
     local range = weaponDef.range
     if dist > range * range then return end
 
@@ -271,11 +294,15 @@ local function EOS_controller_class()
        launchCmd = CMD.ATTACK,
        weaponId = 1,
        getStockpile = function(unit)
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
          if Spring.GetUnitIsDead(unit) then return 0 end
+
+         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
+         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
 
          local x1, y1, z1 = Spring.GetUnitPosition(silo)
          local x2, y2, z2 = Spring.GetUnitPosition(unit)
+
+         if not x1 or not x2 then return 0 end
 
          if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
 
@@ -306,11 +333,15 @@ local function seismic_controller_class()
        launchCmd = CMD.ATTACK,
        weaponId = 1,
        getStockpile = function(unit)
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
          if Spring.GetUnitIsDead(unit) then return 0 end
+
+         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
+         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
 
          local x1, y1, z1 = Spring.GetUnitPosition(silo)
          local x2, y2, z2 = Spring.GetUnitPosition(unit)
+
+         if not x1 or not x2 then return 0 end
 
          if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
 
@@ -334,11 +365,15 @@ local function shockley_controller_class()
        launchCmd = CMD.ATTACK,
        weaponId = 1,
        getStockpile = function(unit)
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
          if Spring.GetUnitIsDead(unit) then return 0 end
+
+         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
+         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
 
          local x1, y1, z1 = Spring.GetUnitPosition(silo)
          local x2, y2, z2 = Spring.GetUnitPosition(unit)
+
+         if not x1 or not x2 then return 0 end
 
          if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
 
@@ -362,11 +397,15 @@ local function inferno_controller_class()
        launchCmd = CMD.ATTACK,
        weaponId = 1,
        getStockpile = function(unit)
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
          if Spring.GetUnitIsDead(unit) then return 0 end
+
+         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
+         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
 
          local x1, y1, z1 = Spring.GetUnitPosition(silo)
          local x2, y2, z2 = Spring.GetUnitPosition(unit)
+
+         if not x1 or not x2 then return 0 end
 
          if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
 
@@ -390,11 +429,15 @@ local function slow_missile_controller_class()
        launchCmd = CMD.ATTACK,
        weaponId = 1,
        getStockpile = function(unit)
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
          if Spring.GetUnitIsDead(unit) then return 0 end
+
+         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
+         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
 
          local x1, y1, z1 = Spring.GetUnitPosition(silo)
          local x2, y2, z2 = Spring.GetUnitPosition(unit)
+
+         if not x1 or not x2 then return 0 end
 
          if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
 
