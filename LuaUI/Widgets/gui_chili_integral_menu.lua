@@ -2604,7 +2604,7 @@ function widget:Update()
 		end
 
 		-- Update tab visibility for panels with dynamic visibility
-		if panelData.name == "missiles" and panelData.tabButton then
+		if panelData.name == "missiles" and panelData.tabButton and panelData.tabButton.button then
 			local hasCommands = false
 			local customCommands = widgetHandler.customCommands
 			for j = 1, #customCommands do

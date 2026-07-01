@@ -14,6 +14,10 @@ function widget:GetInfo()
   }
 end
 
+function widget:Initialize()
+  WG.missileTotalCount = 0
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -81,7 +85,7 @@ local function missle_class()
     local numStockpiled = unitType.getStockpile(unit)
     if not numStockpiled or numStockpiled == 0 then return 0 end
 
-    local cmdQueue = Spring.GetUnitCommands(unit, numStockpiled)
+    local cmdQueue = Spring.GetUnitCommands(unit, 100)
     if not cmdQueue then return 0 end
 
     local numQueued = 0
@@ -142,10 +146,14 @@ local function missle_class()
 
   function self:perferedUnit(unit1, unit2, params)
     local unit2x, _, unit2z = Spring.GetUnitPosition(unit2)
-    local unit2Dist = distance(params.x, params.z, unit2x, unit2z)
+    if not unit2x then return unit1 end
 
     local type2 = self.launchableTypes[Spring.GetUnitDefID(unit2)]
+    if not type2 then return unit1 end
+
+    local unit2Dist = distance(params.x, params.z, unit2x, unit2z)
     local weaponDef2 = WeaponDefs[UnitDefs[Spring.GetUnitDefID(unit2)].weapons[type2.weaponId].weaponDef]
+    if not weaponDef2 then return unit1 end
 
     local range = weaponDef2.range
 
@@ -154,7 +162,10 @@ local function missle_class()
     if not unit1 then return unit2 end
 
     local type1 = self.launchableTypes[Spring.GetUnitDefID(unit1)]
+    if not type1 then return unit2 end
+
     local weaponDef1 = WeaponDefs[UnitDefs[Spring.GetUnitDefID(unit1)].weapons[type1.weaponId].weaponDef]
+    if not weaponDef1 then return unit2 end
 
     local unit1Silo = Spring.GetUnitRulesParam(unit1, "missile_parentSilo")
     local unit1Selected = params.selectedUnits[unit1] or (unit1Silo and params.selectedUnits[unit1Silo])
@@ -244,6 +255,7 @@ local function missle_class()
       local unit = self:getPerferedUnit{x = x, z = z}
       if not unit then return true end
       local unitType = self.launchableTypes[Spring.GetUnitDefID(unit)]
+      if not unitType then return true end
 
       Spring.GiveOrderToUnit(unit, CMD.INSERT, {0, unitType.launchCmd, CMD.OPT_SHIFT, unpack(cmdParams)}, CMD.OPT_ALT)
       return true
