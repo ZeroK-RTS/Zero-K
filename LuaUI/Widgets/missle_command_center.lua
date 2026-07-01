@@ -537,10 +537,15 @@ function widget:Update(dt)
   end
   timer = 0
 
+  WG.missileProgress = WG.missileProgress or {}
+
   for _, command in pairs(commands) do
     local count = command:getCount()
     local buildProgress = command:getMaxBuildProgress()
     local customCommands = widgetHandler.customCommands
+
+    -- Export progress data for other widgets
+    WG.missileProgress[command.cmd] = buildProgress
 
     for i = 1, #customCommands do
       if customCommands[i].id == command.cmd then
