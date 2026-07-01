@@ -537,12 +537,15 @@ function widget:Update(dt)
   end
   timer = 0
 
-  local integralMenu = widgetHandler:FindWidget("Chili Integral Menu")
+  WG.missileProgress = WG.missileProgress or {}
 
   for _, command in pairs(commands) do
     local count = command:getCount()
     local buildProgress = command:getMaxBuildProgress()
     local customCommands = widgetHandler.customCommands
+
+    -- Export progress for other widgets
+    WG.missileProgress[command.cmd] = buildProgress
 
     for i = 1, #customCommands do
       if customCommands[i].id == command.cmd then
@@ -559,11 +562,6 @@ function widget:Update(dt)
           end
         end
         customCommands[i].name = displayName
-
-        -- Update visual progress bar on integral menu button if available
-        if integralMenu and integralMenu.SetCmdButtonProgress and buildProgress > 0 then
-          integralMenu:SetCmdButtonProgress(command.cmd, buildProgress)
-        end
         break
       end
     end
