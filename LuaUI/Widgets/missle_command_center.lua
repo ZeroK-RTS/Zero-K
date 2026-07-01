@@ -421,6 +421,34 @@ local function inferno_controller_class()
   return self
 end
 
+local function slow_missile_controller_class()
+  local self = missle_class()
+  self.x = 614
+  self.y = 38
+  self.name = "missileslow"
+  self.cmd = 39616
+
+  self.launchableTypes = {
+    [UnitDefNames["missileslow"].id] = {
+       launchCmd = CMD.ATTACK,
+       weaponId = 1,
+       getStockpile = function(unit)
+         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
+         if Spring.GetUnitIsDead(unit) then return 0 end
+
+         local x1, y1, z1 = Spring.GetUnitPosition(silo)
+         local x2, y2, z2 = Spring.GetUnitPosition(unit)
+
+         if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
+
+         return 1
+       end
+    },
+  }
+
+  return self
+end
+
 local function reef_missile_controller_class()
   local self = missle_class()
   self.x = 394
@@ -467,6 +495,7 @@ local commands = {
   seismic = seismic_controller_class(),
   shockley = shockley_controller_class(),
   inferno = inferno_controller_class(),
+  slowMissile = slow_missile_controller_class(),
   reefMissile = reef_missile_controller_class(),
   trinityMissile = trinity_missile_controller_class(),
 }
