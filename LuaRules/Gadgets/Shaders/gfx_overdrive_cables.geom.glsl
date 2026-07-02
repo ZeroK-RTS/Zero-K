@@ -315,6 +315,20 @@ float maxHeightInWindow(vec2 p, vec2 dirH, float fullStep) {
 	return yMax;
 }
 
+// Chord-averaged surface normal — the cable's shared "up", sampled at 5 anchor
+// points along the chord (same anchors as cableArcDh). Factored out so the twig
+// emitter lifts its root along the SAME axis the tent apex and clearance pad
+// ride, instead of a local per-point normal that diverges from the trunk frame
+// on uneven ground (which let the root dangle off the tube on slopes).
+vec3 cableNavg(vec2 a, vec2 d) {
+	vec3 nAcc = vec3(0.0);
+	for (int j = 0; j < 5; j++) {
+		float tj = (float(j) + 0.5) * (1.0 / 5.0);
+		nAcc += terrainNormal(a + d * tj);
+	}
+	return normalize(nAcc);
+}
+
 // Adaptive vertex placement, factored out so the twig emitter can replay the
 // EXACT vertex set the ribbon renders and root onto it. Scans the max-filtered
 // centerline profile on a grid PLACEMENT_OVERSAMPLE× denser than the emit
@@ -427,16 +441,9 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 	// vertical ROLL from the terrain normal; cross(worldUp, tangent) has no roll
 	// (worldUp is fixed), it only yaws to track the bend. It also matches the FS
 	// lighting frame, which already derives perp3D = cross(worldUp, cableTangent),
-	// so geometry and shading agree.
-	vec3 Navg;
-	{
-		vec3 nAcc = vec3(0.0);
-		for (int j = 0; j < 5; j++) {
-			float tj = (float(j) + 0.5) * (1.0 / 5.0);
-			nAcc += terrainNormal(a + d * tj);
-		}
-		Navg = normalize(nAcc);
-	}
+	// so geometry and shading agree. cableNavg is shared with the twig emitter so
+	// twig roots ride the same axis.
+	vec3 Navg = cableNavg(a, d);
 	vec3 cableDirH_g = normalize(vec3(d.x, 0.0, d.y));
 	// Fallback width axis for the first vertex (chord tangent) and any vertex
 	// whose local tangent degenerates: horizontal, perpendicular to the chord.
@@ -547,7 +554,8 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
               vec4 gridD, vec2 timeD, float cap, float tCenter,
-              float spawnAlongMain, int twigIdx, float arcDh, int numSeg) {
+              float spawnAlongMain, int twigIdx, float arcDh, int numSeg,
+              vec3 railPrev, vec3 railCenter) {
 	// Resolve spawn point on the wiggly main path at tCenter so twigs root on
 	// the visible cable.
 	float lenAB = length(d);
@@ -601,25 +609,41 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	vec3 T = normalize(cableDirH - dot(cableDirH, N) * N);
 	vec3 B = normalize(cross(N, T));
 
+	// Rail frame at the emitted vertex the twig roots on: tangent = back-diff
+	// of adjacent emitted centerline points (exactly emitTentHalf's vtxTangent
+	// at this vertex), width axis B_v = its horizontal perpendicular (exactly
+	// the axis the tent rails are laid on).
+	vec3 railTangent = railCenter - railPrev;
+	float rtL = length(railTangent);
+	railTangent = (rtL > 1e-4) ? railTangent / rtL : cableDirH;
+	vec3 B_v = cross(vec3(0.0, 1.0, 0.0), railTangent);
+	float bvL = length(B_v);
+	B_v = (bvL > 1e-3) ? B_v / bvL : normalize(cross(vec3(0.0, 1.0, 0.0), cableDirH));
+	// Local N gives B an arbitrary sign that can disagree with the rail axis on
+	// broken ground. Align them so the twig grows AWAY from the tube on the
+	// SAME side its root is placed (+B_v*halfMainW*side below) instead of
+	// doubling back across the trunk.
+	if (dot(B, B_v) < 0.0) B = -B;
+
 	float ca = cos(angleOff);
 	float sa = sin(angleOff) * side;
 	vec3 twigDir3D  = ca * T + sa * B;
 	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
 
-	// Anchor spawn to the same max-of-window lift the main ribbon uses, offset
-	// along the local normal N — at this 0.3 magnitude N tracks the trunk's
-	// chord-averaged Navg pad closely enough to keep the junction seated, and N
-	// is already the twig's own basis. TWIG_CLEAR is slightly less than
-	// CENTERLINE_CLEAR so the junction sits just under the trunk's centerline
-	// (z-fight avoidance, see TWIG_CLEAR comment).
-	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);
-	float spawnYbase = maxHeightInWindow(spawn, dirH, fullStep);
-	vec3 spawn3D = vec3(spawn.x, spawnYbase, spawn.y) + N * TWIG_CLEAR;
-
-	// Anchor the root to the spawn-side edge of the cable's in-slope cross
-	// section so the twig pokes out of the side, not the midline.
-	vec3 root3D = spawn3D + B * (halfMainW * 0.2 * side);
+	// Root anchor: reproduce the trunk's spawn-side OUTER rail vertex — the
+	// same center ± B_v*halfW the tent slopes emit, with the same SIDE_CLEAR
+	// anti-underground clamp — so the junction is welded to a vertex the
+	// ribbon actually renders. The old code offset by 0.2*halfW along the
+	// LOCAL-normal B from a max-of-window spawn at the belly; on slopes that
+	// both diverged from the trunk frame and dangled below the visible tube,
+	// detaching the twig. A small lift along the trunk's shared Navg
+	// (TWIG_CLEAR) tucks the junction just proud of the rail to avoid
+	// z-fighting.
+	vec3 Navg = cableNavg(a, d);
+	vec3 center3D = railCenter + Navg * CENTERLINE_CLEAR;
+	vec3 root3D = center3D + B_v * (halfMainW * side);
+	root3D.y = max(root3D.y, heightAtWorldPos(root3D.xz) + SIDE_CLEAR);
+	root3D += Navg * TWIG_CLEAR;
 	vec3 tip3D  = root3D + twigDir3D * bLen;
 
 	vec3 rootL = root3D - twigPerp3D * twigHWr;
@@ -817,7 +841,17 @@ void main() {
 		}
 		float tCenter        = float(idxArr[bestK]) / float(G);
 		float spawnAlongMain = alongArr[bestK];
+		// Rebuild the rooted vertex and its predecessor exactly as emitTentHalf
+		// does (same wigglyCablePoint xz, same base height) so emitTwig can
+		// reconstruct the local rail frame at the junction. bestK >= 1 always,
+		// so bestK-1 is a valid emitted vertex.
+		float tPrev = float(idxArr[bestK - 1]) / float(G);
+		vec2 pC = wigglyCablePoint(a, d, perpAB, tCenter, lenAB, arcDh, effAmp, seed);
+		vec2 pP = wigglyCablePoint(a, d, perpAB, tPrev,   lenAB, arcDh, effAmp, seed);
+		vec3 railCenter = vec3(pC.x, yBaseArr[bestK],     pC.y);
+		vec3 railPrev   = vec3(pP.x, yBaseArr[bestK - 1], pP.y);
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
-		         gridD, timeD, cap, tCenter, spawnAlongMain, twigIdx, arcDh, numSeg);
+		         gridD, timeD, cap, tCenter, spawnAlongMain, twigIdx, arcDh, numSeg,
+		         railPrev, railCenter);
 	}
 }
