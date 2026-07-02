@@ -58,7 +58,6 @@ local function IsActiveForGrid(unitID)
 	return true
 end
 
-local sqrt  = math.sqrt
 local max   = math.max
 local floor = math.floor
 
@@ -88,7 +87,6 @@ local CABLE_TEXTURE = "Luarules/Images/cables/cableTexture.png"
 
 local pylonDefs = {}
 local mexDefs = {}
-local generatorDefs = {}
 local pmaxByDef = {}      -- [defID] = nameplate production for non-wind generators
 local isWindgenByDef = {} -- [defID] = true (production resolved via WindMax at runtime)
 local voltageByDef = {}   -- [defID] = neededlink value (counts as static Dmax)
@@ -111,9 +109,6 @@ for i = 1, #UnitDefs do
 	end
 	local energyIncome = tonumber(cp.income_energy) or 0
 	local isWind = (cp.windgen and true) or false
-	if energyIncome > 0 or isWind then
-		generatorDefs[i] = true
-	end
 	if energyIncome > 0 then
 		pmaxByDef[i] = energyIncome
 	end
@@ -456,16 +451,15 @@ local perfStats = {
 -- when nothing meaningfully changed. Quiet ticks (settled grid, no draw
 -- spikes) become near-zero on the topology side.
 local lastSentFlow = {}   -- [edgeKey] = flow (E/s)
-local lastSentEff  = {}   -- [edgeKey] = grid efficiency
--- A send is forced if max relative flow change exceeds this OR any eff
--- changed by more than EFF_EPSILON. The thresholds are loose because
--- visual-flow only needs ballpark accuracy: bubble speed ∝ sqrt(flow), so
--- a 10% flow change is ~5% bubble-speed change — well below perception.
+-- A send is forced if max relative flow change exceeds this. The threshold is
+-- loose because visual-flow only needs ballpark accuracy: bubble speed ∝
+-- sqrt(flow), so a 10% flow change is ~5% bubble-speed change — well below
+-- perception. Eff changes alone do NOT force a send; the eff hue refreshes on
+-- the FORCE_SEND_TICKS cadence below.
 local FLOW_REL_EPSILON = 0.10
 local FLOW_ABS_EPSILON = 0.5    -- E/s, for tiny flows where relative is noisy
-local EFF_EPSILON      = 0.02
--- Force a refresh at least this often even when stable, so any drift in
--- the FS phase extrapolation doesn't accumulate without bound.
+-- Force a refresh at least this often even when stable, so slow-moving state
+-- (eff hue, small flow drift under the epsilons) still reaches the renderer.
 local FORCE_SEND_TICKS = 5      -- ~5 seconds at SYNC_PERIOD=30 / 30fps
 local ticksSinceSend   = 0
 
@@ -511,13 +505,6 @@ local function MarkGridRemove(ally, gridID, uid)
 	if entry then entry.removes[#entry.removes + 1] = uid end
 end
 
--- Backward-compat for callers (UnitGiven) that just want to flag a grid as
--- needing reconsideration without naming a specific unit (e.g. when a whole
--- pylon's affiliation changes).
-local function MarkGridDirty(ally, gridID)
-	GetPendingEntry(ally, gridID)
-end
-
 -- Stable nameplate production: solar/fusion/sing fixed; windgen = current WindMax.
 local function GetNodePmax(unitDefID)
 	if isWindgenByDef[unitDefID] then return GetWindMax() end
@@ -531,13 +518,6 @@ local function GetNodeDmax(unitID, unitDefID)
 		return spGetUnitRulesParam(unitID, "max_energy_drain") or INF_DRAW
 	end
 	return voltageByDef[unitDefID] or 0
-end
-
--- Current real production: any generator publishes "current_energyIncome"
--- (windgens, solar, fusion, singu — all set by unit_mex_overdrive each tick).
-local function GetNodePcurrent(unitID, unitDefID)
-	if not generatorDefs[unitDefID] then return 0 end
-	return spGetUnitRulesParam(unitID, "current_energyIncome") or 0
 end
 
 -- Current real draw. Mexes consume via the overdrive system, which the
@@ -886,15 +866,14 @@ local function BuildGridMSTFromScratch(allyTeamID, gridID, allyNodes, allyCells)
 	local mst = MakeEmptyMst(allyTeamID, gridID)
 	if not allyNodes then return mst end
 
-	-- Collect this grid's pylons + per-pylon position+range in arrays.
-	local px, pz, prange, puid = {}, {}, {}, {}
+	-- Collect this grid's pylons + per-pylon positions in arrays.
+	local px, pz, puid = {}, {}, {}
 	for uid, node in pairs(allyNodes) do
 		if lastGridNum[uid] == gridID then
 			local idx = #puid + 1
 			puid[idx] = uid
 			px[idx] = node.x
 			pz[idx] = node.z
-			prange[idx] = node.range
 		end
 	end
 	local n = #puid
@@ -1708,7 +1687,6 @@ local function SendAll()
 			pa.effs[i] = eff
 			-- Snapshot for the next tick's stability check.
 			lastSentFlow[key] = pa.flows[i]
-			lastSentEff[key]  = eff
 		end
 	end
 	local tBin1 = perf and Spring.GetTimer()
@@ -1771,7 +1749,6 @@ local function ClearAll()
 	topologyDirty = false
 	-- Reset stability snapshots; on next enable, all edges read as new.
 	lastSentFlow = {}
-	lastSentEff  = {}
 	ticksSinceSend = 0
 end
 
@@ -1857,7 +1834,6 @@ local function SetDetailLevel(level)
 		-- (toggling between noflow ↔ full needs to push the new flow values
 		-- to the renderer; the FS uniform also needs the new enableFlow).
 		lastSentFlow = {}
-		lastSentEff  = {}
 		ticksSinceSend = FORCE_SEND_TICKS  -- force-send next tick
 		topologyDirty = true
 		SendAll()
@@ -2086,20 +2062,6 @@ end
 
 local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
 local spGetSpectatingState = Spring.GetSpectatingState
-local spGetGroundHeight    = Spring.GetGroundHeight
-
-local floor = math.floor
-local sqrt  = math.sqrt
-local max   = math.max
-local min   = math.min
-local abs   = math.abs
-local PI    = math.pi
-local cos   = math.cos
-local sin   = math.sin
-local atan2 = math.atan2
-
-local MAP_WIDTH  = Game.mapSizeX
-local MAP_HEIGHT = Game.mapSizeZ
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir .. "LuaShader.lua")
@@ -2108,27 +2070,6 @@ VFS.Include(luaShaderDir .. "instancevbotable.lua")
 -------------------------------------------------------------------------------------
 -- Config
 -------------------------------------------------------------------------------------
-
-local MIN_TRUNK_WIDTH  = 3
-local MAX_TRUNK_WIDTH  = 12
--- One singu's output (energysingu.energyMake = 225) saturates the cable to
--- max thickness. Below that, thickness scales linearly with capacity.
-local MAX_CAPACITY_REF = 225
-
-local SEG_LENGTH       = 10    -- shorter = smoother curves
--- Noise amplitude is in absolute elmos (not a fraction of cable width). Tying
--- it to width made thick trunks visibly more wobbly than thin twigs, which is
--- the opposite of the intended look (a thick trunk should read as "stable").
-local NOISE_AMP_ABS    = 1.0
-local BRANCH_CHANCE    = 0.25
-local BRANCH_LEN_MIN   = 15
-local BRANCH_LEN_MAX   = 50
-local BRANCH_ANGLE_MIN = 0.4
-local BRANCH_ANGLE_MAX = 1.1
-local BRANCH_WIDTH     = 0.5
-
-local MERGE_ANGLE    = 0.8
-local STEM_FRACTION  = 0.35
 
 -- Depth bias that pulls the drawn cable toward the camera so it wins the
 -- z-fight against terrain. NOT to mask a geometry bug: the cable hugs the
@@ -2145,46 +2086,10 @@ local STEM_FRACTION  = 0.35
 local CABLE_DEPTH_BIAS_FACTOR = -1.0   -- slope-scaled term (cables are near-flat, so this stays small)
 local CABLE_DEPTH_BIAS_UNITS  = -4.0   -- constant term in min-resolvable-depth units
 
--- Visual grow/wither animation rates (elmos/sec); fragment shader trims geometry.
-local GROWTH_RATE = 250
-local WITHER_RATE = 400
+-- Wither hold pacing (see WITHER_HOLD_FRAMES). The actual grow/wither sweep
+-- rates live in the fragment shader (GROWTH_RATE/WITHER_RATE, elmos/sec);
+-- the CPU only supplies the appear/wither timestamps.
 local GAME_SPEED  = Game.gameSpeed or 30
-
--- Bubble speed mapping — must mirror the formula in the fragment shader. We
--- integrate phase = ∫ speed(t) dt CPU-side per edge, so speed changes don't
--- jump bubbles across the cable; the shader just extrapolates from the last
--- anchor with the current speed.
---
--- Cable-thickness/capacity is treated as orthogonal identity (it's the cable's
--- "how big a pipe" reading, NOT a flow signal). Flow itself is encoded by
--- speed + density only. Each scales as sqrt(flow / FLOW_REF) and they grow
--- together, so the product (= perceived flow ≈ density × speed) is linear in
--- flow. One unified "more lively" gestalt instead of three integrated dials.
-local BUBBLE_MAX_SPEED      = 110
-local BUBBLE_FLOW_REF       = 50.0   -- flow at which n=1 (reference speed/density)
-local BUBBLE_TRUNK_W_MIN    = 3.0    -- mirror of GLSL MIN_TRUNK_WIDTH
-local BUBBLE_TRUNK_W_MAX    = 12.0   -- mirror of GLSL MAX_TRUNK_WIDTH
-local BUBBLE_CAP_REF        = MAX_CAPACITY_REF
-
-local function widthOfCapacity(cap)
-	local t = (cap or 0) / BUBBLE_CAP_REF
-	if t < 0 then t = 0 elseif t > 1 then t = 1 end
-	return BUBBLE_TRUNK_W_MIN + t * (BUBBLE_TRUNK_W_MAX - BUBBLE_TRUNK_W_MIN)
-end
-
--- Slight negative bias for thicker cables: divide flow by (width/minWidth).
--- A max-thickness cable (4× minWidth) sees its flow signal scaled to 1/4
--- before the sqrt, yielding ~0.5× visual liveliness vs a thin cable at the
--- same actual flow. Conveys "this thick cable is wide so the same flow looks
--- relatively calmer through it" without the heavier 2.5-power weighting we
--- tried before.
-local function flowToSpeed(flow, capacity)
-	if not flow or flow <= 0 then return 0 end
-	local widthVal = widthOfCapacity(capacity)
-	local thicknessRatio = widthVal / BUBBLE_TRUNK_W_MIN
-	local effFlow = flow / thicknessRatio
-	return BUBBLE_MAX_SPEED * math.sqrt(effFlow / BUBBLE_FLOW_REF)
-end
 
 -------------------------------------------------------------------------------------
 -- State
@@ -2219,20 +2124,6 @@ local numGhostVerts = 0
 local ghostCleanupCursor = nil   -- next key to start at; nil = restart from head
 local GHOST_CLEANUP_PER_FRAME = 32
 
--- Geometry cache. Topology-stable rebuilds reuse `allPaths` (the noisy paths,
--- twigs and cluster stems). Per-call, we walk the prov objects (one per
--- emitNoisyPath invocation) and refresh just the dynamic fields (flow, eff,
--- bubblePhase, appearFrame, witherFrame) from the current renderEdges.
--- Vert emission then re-reads from prov.
---
--- Invalidated by: new edge in OnCableTreeFull, edge marked withering,
--- withering edge dropped in GameFrame, cluster sign-flip during refresh.
-local geomCache = {
-	valid = false,
-	allPaths = nil,       -- [{ points, widths, capacity, isBranch, prov }]
-	provs = nil,          -- [provObj] (distinct, one per emitNoisyPath call)
-}
-
 local cableShader         -- forward shader for cable rendering
 local cableShadowShader   -- depth-only SHADOW_PASS variant, drawn in the shadow map pass
 local cableDeferredShader -- model-gbuffer DEFERRED_PASS variant, drawn in DrawOpaqueUnitsLua
@@ -2240,76 +2131,14 @@ local cableVAO          -- live cable geometry
 local numCableVerts = 0
 -- (drawPerf collapsed into cablePerf at the top of the file; flowMode
 -- collapsed into cableFlowMode. Both names live in the topology block above.)
--- Game-second timestamp captured the moment the current VBO's bubblePhase
--- snapshots were taken. The shader extrapolates each cable's phase forward
--- from this anchor using `phase = bakedPhase + flowToSpeed(flow) * (gameTime
--- - bakeTime)`, which means flow changes update the rate of advance without
--- ever teleporting the bubbles.
-local bubbleBakeTime = 0
 
 -------------------------------------------------------------------------------------
--- Deterministic noise
+-- Per-edge VBO build
 -------------------------------------------------------------------------------------
 
-local function Hash(x, z, seed)
-	local h = sin(x * 12.9898 + z * 78.233 + (seed or 0) * 43.17) * 43758.5453
-	return (h - floor(h)) * 2 - 1
-end
-
-local function HashUnit(x, z, seed)
-	return (Hash(x, z, seed) + 1) * 0.5
-end
-
-local function GetTrunkWidth(capacity)
-	local t = min(1, capacity / MAX_CAPACITY_REF)
-	return MIN_TRUNK_WIDTH + t * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH)
-end
-
-local function NoisyPath(x1, z1, x2, z2, amplitude, seed)
-	local dx = x2 - x1
-	local dz = z2 - z1
-	local len = sqrt(dx * dx + dz * dz)
-	if len < 2 then
-		return { {x = x1, z = z1}, {x = x2, z = z2} }
-	end
-	local steps = max(2, floor(len / SEG_LENGTH))
-	local nx = -dz / len
-	local nz =  dx / len
-	local points = {}
-	-- Cap effective amplitude by a fraction of the segment length: very short
-	-- cables shouldn't get the same wiggle as long ones.
-	local effAmp = amplitude
-	if len < 80 then effAmp = amplitude * (len / 80) end
-	for i = 0, steps do
-		local t = i / steps
-		local px = x1 + t * dx
-		local pz = z1 + t * dz
-		local noiseScale = 1
-		if t < 0.1 then noiseScale = t / 0.1
-		elseif t > 0.9 then noiseScale = (1 - t) / 0.1 end
-		local n = Hash(px * 0.1, pz * 0.1, seed) * effAmp * noiseScale
-		points[#points + 1] = { x = px + nx * n, z = pz + nz * n }
-	end
-	return points
-end
-
--------------------------------------------------------------------------------------
--- Organic tree router (same logic, outputs vertex data for VBO)
--------------------------------------------------------------------------------------
-
-local function normalizeAngle(a)
-	while a > PI do a = a - PI * 2 end
-	while a < -PI do a = a + PI * 2 end
-	return a
-end
-
--- Per-edge VBO build: emit two vertices per cable (the two endpoints), each
--- carrying the same per-edge payload. The geometry shader expands each line
--- into the noisy wiggly ribbon. CPU work shrinks from "build full triangle
--- soup" (lots of NoisyPath / clustering / twig generation) to "iterate edges".
--- Cluster stems and twigs are deliberately gone in this first GS pass — to be
--- reintroduced as either CPU-emitted phantom edges (stems) or GS-side branches
--- (twigs) once the basic pipeline is verified.
+-- Emit two vertices per cable (the two endpoints), each carrying the same
+-- per-edge payload. The geometry shader expands each line into the wiggly
+-- ribbon and its twigs at draw time; the CPU side just iterates edges.
 local function GenerateOrganicTree()
 	local _, fullview = spGetSpectatingState()
 	local n = #renderEdges
@@ -2319,12 +2148,11 @@ local function GenerateOrganicTree()
 	local k = 0
 	for i = 1, n do
 		local e = renderEdges[i]
-		local cap = max(1, e.capacity or 1) 
+		local cap = max(1, e.capacity or 1)
 		local appearTime = (e.appearFrame or 0) / GAME_SPEED
 		local witherTime = e.witherFrame and (e.witherFrame / GAME_SPEED) or 0
 		local eff = (e.eff or 0) * (e.maxxed and -1 or 1)
 		local flow = e.flow or 0
-		local phase = e.bubblePhase or 0
 		local isOwn = (fullview and 2) or (e.isOwnAlly and 1) or 0
 		-- Coverage SSBO slot index, or -1 to disable bit updates / lookups
 		-- on the GS side. Stored as float here for VBO layout simplicity;
@@ -2332,24 +2160,24 @@ local function GenerateOrganicTree()
 		-- through the float<-int round-trip for any reasonable slot count.
 		local slot = e.slot or -1
 
-		-- Vertex 0: parent end (10 floats: pos2 + data3 + grid4 + slot)
+		-- Vertex 0: parent end (9 floats: pos2 + data3 + grid3 + slot)
 		verts[k+1] = e.px;          verts[k+2] = e.pz
 		verts[k+3] = cap;           verts[k+4] = appearTime;  verts[k+5] = witherTime
-		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = phase;       verts[k+9] = isOwn
-		verts[k+10] = slot
+		verts[k+6] = eff;           verts[k+7] = flow;        verts[k+8] = isOwn
+		verts[k+9] = slot
 		-- Vertex 1: child end (same per-edge payload)
-		verts[k+11] = e.cx;         verts[k+12] = e.cz
-		verts[k+13] = cap;          verts[k+14] = appearTime; verts[k+15] = witherTime
-		verts[k+16] = eff;          verts[k+17] = flow;       verts[k+18] = phase;      verts[k+19] = isOwn
-		verts[k+20] = slot
-		k = k + 20
+		verts[k+10] = e.cx;         verts[k+11] = e.cz
+		verts[k+12] = cap;          verts[k+13] = appearTime; verts[k+14] = witherTime
+		verts[k+15] = eff;          verts[k+16] = flow;       verts[k+17] = isOwn
+		verts[k+18] = slot
+		k = k + 18
 	end
 	return verts, n * 2
 end
 
 -- Build verts for the ghost VBO from `ghostEdges`. Same per-vertex layout as
--- the live pass (10 floats), so the same VS/GS/FS chain handles both. The FS
--- distinguishes ghosts via gridData.w = -1.0 (sentinel; live edges send 0/1).
+-- the live pass (9 floats), so the same VS/GS/FS chain handles both. The FS
+-- distinguishes ghosts via gridData.z = -1.0 (sentinel; live edges send 0/1/2).
 local function GenerateGhostTree()
 	local verts = {}
 	local k = 0
@@ -2357,22 +2185,21 @@ local function GenerateGhostTree()
 	for _, e in pairs(ghostEdges) do
 		local cap = max(1, e.capacity or 1) * (e.maxxed and -1 or 1)
 		local slot  = e.slot or -1
-		-- Ghost edges have no temporal animation: appear=0, wither=0, no flow,
-		-- no bubble phase. gridData.w = -1.0 tells the FS "always ghost".
+		-- Ghost edges have no temporal animation: appear=0, wither=0, no flow.
+		-- gridData.z = -1.0 tells the FS "always ghost".
 		local apT, wiT  = 0.0, 0.0
 		local eff, flow = 0.0, 0.0
-		local phase     = 0.0
 		local ghostFlag = -1.0
 
 		verts[k+1]  = e.px;  verts[k+2]  = e.pz
 		verts[k+3]  = cap;   verts[k+4]  = apT;       verts[k+5]  = wiT
-		verts[k+6]  = eff;   verts[k+7]  = flow;      verts[k+8]  = phase;     verts[k+9]  = ghostFlag
-		verts[k+10] = slot
-		verts[k+11] = e.cx;  verts[k+12] = e.cz
-		verts[k+13] = cap;   verts[k+14] = apT;       verts[k+15] = wiT
-		verts[k+16] = eff;   verts[k+17] = flow;      verts[k+18] = phase;     verts[k+19] = ghostFlag
-		verts[k+20] = slot
-		k = k + 20
+		verts[k+6]  = eff;   verts[k+7]  = flow;      verts[k+8]  = ghostFlag
+		verts[k+9]  = slot
+		verts[k+10] = e.cx;  verts[k+11] = e.cz
+		verts[k+12] = cap;   verts[k+13] = apT;       verts[k+14] = wiT
+		verts[k+15] = eff;   verts[k+16] = flow;      verts[k+17] = ghostFlag
+		verts[k+18] = slot
+		k = k + 18
 		count = count + 1
 	end
 	return verts, count * 2
@@ -2388,10 +2215,6 @@ local function RebuildGhostVBO()
 	-- the current vert payload in.
 	ghostVBO:Upload(verts)
 end
-
--- Old generic angle clustering — kept commented as a reference for when we
--- reintroduce CPU-side stem merging (cluster decomposition is a graph
--- operation that doesn't fit cleanly in a geometry shader).
 
 -------------------------------------------------------------------------------------
 -- Forward cable rendering via DrawWorldPreUnit.
@@ -2418,7 +2241,7 @@ local cableFSSrc = VFS.LoadFile(SHADER_DIR .. 'gfx_overdrive_cables.frag.glsl')
 -- (always visible, optionally ghosted out of LOS) vs "enemy" (only visible
 -- inside actual LOS). Specs and full-view see everything as own.
 local function isOwnAlly(allyTeamID)
-	local spec, fullview = spGetSpectatingState()
+	local _, fullview = spGetSpectatingState()
 	if fullview then
 		return true
 	end
@@ -2523,9 +2346,7 @@ function OnCableTreeFull(data)
 				end
 			else
 				e.witherFrame = frame
-			end
-			geomCache.valid = false   -- topology change → full geometry rebuild
-		end
+			end		end
 	end
 
 	-- If a fresh edge resurrects an old ghost (enemy rebuilt the same pylon
@@ -2546,11 +2367,6 @@ function OnCableTreeFull(data)
 	end
 
 	-- Add new, refresh capacity / flow / efficiency on survivors.
-	-- For each surviving edge, we integrate its bubble phase up to NOW with
-	-- the *old* speed before swapping in the new one. That way, when flow
-	-- (and hence speed) changes, the bubble position remains continuous —
-	-- it just starts evolving at a different rate from this moment on.
-	local nowSec = Spring.GetGameSeconds()
 	for k, i in pairs(incoming) do
 		local e = existing[k]
 		local newFlow = data.flows and data.flows[i] or 0
@@ -2562,21 +2378,13 @@ function OnCableTreeFull(data)
 			e.witherFrame = nil
 		end
 		if e and not e.witherFrame then
-			-- Catch the phase up to `nowSec` using whatever speed the cable
-			-- was running at since its last anchor.
-			local oldSpeed = e.bubbleSpeed or 0
-			local oldAnchor = e.bubbleAnchorTime or nowSec
-			e.bubblePhase = (e.bubblePhase or 0) + oldSpeed * (nowSec - oldAnchor)
-			e.bubbleAnchorTime = nowSec
-			e.bubbleSpeed = flowToSpeed(newFlow, data.caps[i])
-
 			-- Visible properties (capacity drives ribbon width, position drives
 			-- the chord) only refresh when the player can see the edge. For
 			-- enemy edges in fog we keep the last-seen values so a build that
 			-- changes an unobserved cable's thickness doesn't suddenly update
-			-- its ghost render. Bubble phase / flow / eff are also only
-			-- meaningful in LOS (they animate the live render), so refreshing
-			-- them in fog is harmless but we keep the gate uniform.
+			-- its ghost render. Flow / eff are also only meaningful in LOS
+			-- (they animate the live render), so refreshing them in fog is
+			-- harmless but we keep the gate uniform.
 			local visible = ownAlly or anyInLOS(data.pxs[i], data.pzs[i], data.cxs[i], data.czs[i])
 			if visible then
 				e.capacity = data.caps[i]
@@ -2623,14 +2431,7 @@ function OnCableTreeFull(data)
 				witherFrame = nil,
 				key      = k,
 				slot     = slot,
-				-- Fresh edge starts with zero phase; speed is set so the
-				-- shader can extrapolate forward from this anchor.
-				bubblePhase      = 0,
-				bubbleAnchorTime = nowSec,
-				bubbleSpeed      = flowToSpeed(newFlow, data.caps[i]),
-			}
-			geomCache.valid = false   -- topology change → full geometry rebuild
-		end
+			}		end
 	end
 
 	edgesByAllyTeam[ally] = existing
@@ -2654,20 +2455,6 @@ end
 
 local function RebuildVBO()
 	local tStart = cablePerf and Spring.GetTimer() or nil
-
-	-- Snapshot every edge's bubble phase to NOW before geometry generation,
-	-- and re-anchor; the shader will extrapolate from `bubbleBakeTime`.
-	bubbleBakeTime = Spring.GetGameSeconds()
-	for _, edges in pairs(edgesByAllyTeam) do
-		for _, e in pairs(edges) do
-			local oldSpeed = e.bubbleSpeed or 0
-			local oldAnchor = e.bubbleAnchorTime or bubbleBakeTime
-			e.bubblePhase = (e.bubblePhase or 0) + oldSpeed * (bubbleBakeTime - oldAnchor)
-			e.bubbleAnchorTime = bubbleBakeTime
-		end
-	end
-
-	local tGen0 = cablePerf and Spring.GetTimer() or nil
 	local verts, vertCount = GenerateOrganicTree()
 	if vertCount == 0 then
 		numCableVerts = 0
@@ -2678,13 +2465,13 @@ local function RebuildVBO()
 	cableVAO = nil
 	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	if not vbo then return end
-	-- Per-vertex layout (10 floats): vertPos(2) + vertData(3) + vertGrid(4)
+	-- Per-vertex layout (9 floats): vertPos(2) + vertData(3) + vertGrid(3)
 	-- + vertSlot(1). Two vertices per cable form one GL_LINES primitive; the
 	-- geometry shader expands each line into a wiggly ribbon at draw time.
 	vbo:Define(vertCount, {
 		{ id = 0, name = "vertPos",   size = 2 },
 		{ id = 1, name = "vertData",  size = 3 },  -- (capacity, appearTime, witherTime)
-		{ id = 2, name = "vertGrid",  size = 4 },  -- (efficiency, flow E/s, bubble phase elmos, isOwnAlly)
+		{ id = 2, name = "vertGrid",  size = 3 },  -- (efficiency, flow E/s, isOwnAlly / ghost flag)
 		{ id = 3, name = "vertSlot",  size = 1 },  -- coverage SSBO slot, or -1
 	})
 	local tUp0 = cablePerf and Spring.GetTimer() or nil
@@ -2697,10 +2484,9 @@ local function RebuildVBO()
 	if cablePerf then
 		local tEnd = Spring.GetTimer()
 		Spring.Echo(string.format(
-			"[CableTree] draw rebuild: phase=%.2f ms  build=%.2f ms  upload=%.2f ms  verts=%d edges=%d",
-			Spring.DiffTimers(tGen0, tStart) * 1000,
-			Spring.DiffTimers(tUp0,  tGen0)  * 1000,
-			Spring.DiffTimers(tEnd,  tUp0)   * 1000,
+			"[CableTree] draw rebuild: build=%.2f ms  upload=%.2f ms  verts=%d edges=%d",
+			Spring.DiffTimers(tUp0, tStart) * 1000,
+			Spring.DiffTimers(tEnd, tUp0)   * 1000,
 			vertCount, vertCount / 2))
 	end
 end
@@ -2745,16 +2531,10 @@ function gadget:GameFrame(n)
 	end
 	if dropped then
 		RebuildRenderEdges()
-		needsRebuild = true
-		geomCache.valid = false
-	end
+		needsRebuild = true	end
 
-	-- 3) Rebuild immediately when dirty. Throttling caused visible phase
-	--    jumps: between OnCableTreeFull (which mutates per-edge bubbleSpeed)
-	--    and the rebake, the shader still extrapolates with the OLD speed,
-	--    then snaps to the new baked state. The jump magnitude is
-	--    Δspeed × (bakeTime - nowSec) so any latency here directly produces
-	--    a visible discontinuity.
+	-- 3) Rebuild immediately when dirty, so topology changes (new/withered
+	--    edges, refreshed flow/eff) reach the GPU without visible latency.
 	if needsRebuild then
 		RebuildVBO()
 	end
@@ -2773,7 +2553,7 @@ function gadget:GameFrame(n)
 	--    (3 × IsPosInLos per scanned entry). Replaces the prior
 	--    "iterate everything every 30 frames" stutter.
 	if cableGhosts and next(ghostEdges) then
-		local spec, fullView = spGetSpectatingState()
+		local _, fullView = spGetSpectatingState()
 		if not fullView then
 			local ally = spGetMyAllyTeamID()
 			local removed = false
@@ -2816,7 +2596,6 @@ function gadget:DrawWorldPreUnit()
 	-- between sim ticks on all game speeds.
 	local frameOff = Spring.GetFrameTimeOffset and Spring.GetFrameTimeOffset() or 0
 	cableShader:SetUniform("gameTime", Spring.GetGameSeconds() + frameOff / GAME_SPEED)
-	--cableShader:SetUniform("bakeTime", bubbleBakeTime)
 	cableShader:SetUniform("enableFlow", cableFlowMode and 1.0 or 0.0)
 	cableShader:SetUniform("ghostsEnabled", cableGhosts and 1.0 or 0.0)
 	-- Shadow reception: only sample the shadow map when the engine actually has
@@ -3010,7 +2789,6 @@ function gadget:Initialize()
 		},
 		uniformFloat = {
 			gameTime = 0,
-			--bakeTime = 0,
 			enableFlow = cableFlowMode and 1.0 or 0.0,
 			ghostsEnabled = cableGhosts and 1.0 or 0.0,
 			shadowsEnabled = 0,
@@ -3093,7 +2871,7 @@ function gadget:Initialize()
 		ghostVBO:Define(ghostVBOCapacity, {
 			{ id = 0, name = "vertPos",   size = 2 },
 			{ id = 1, name = "vertData",  size = 3 },
-			{ id = 2, name = "vertGrid",  size = 4 },
+			{ id = 2, name = "vertGrid",  size = 3 },
 			{ id = 3, name = "vertSlot",  size = 1 },
 		})
 		ghostVAO = gl.GetVAO()
@@ -3133,9 +2911,7 @@ function gadget:PlayerChanged(playerID)
 			ghostNeedsRebuild = true
 		end
 	end
-	if touched then
-		geomCache.valid = false
-		needsRebuild = true
+	if touched then		needsRebuild = true
 	end
 end
 

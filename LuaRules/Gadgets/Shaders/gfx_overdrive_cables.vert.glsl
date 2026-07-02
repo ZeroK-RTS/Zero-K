@@ -10,7 +10,7 @@
 
 layout (location = 0) in vec2 vertPos;     // (x, z) world coords
 layout (location = 1) in vec3 vertData;    // (capacity, appearTime, witherTime)
-layout (location = 2) in vec4 vertGrid;    // (gridEfficiency, flow, bubblePhase, isOwnAlly)
+layout (location = 2) in vec3 vertGrid;    // (gridEfficiency, flow, isOwnAlly / ghost flag)
 layout (location = 3) in float vertSlot;   // coverage SSBO slot (-1 = disabled)
 
 out gl_PerVertex {
@@ -20,7 +20,7 @@ out gl_PerVertex {
 out DataVS {
 	vec2 vsWorldXZ;
 	vec3 vsCableData;
-	vec4 vsGridData;
+	vec3 vsGridData;
 	flat int vsSlot;
 };
 

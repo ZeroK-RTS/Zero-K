@@ -9,7 +9,7 @@
 // max_vertices budget, so we can:
 //   invocation 0          → left tent slope  (ridge→ground, SEGMENTS+1 × 2 verts)
 //   invocation 1          → right tent slope (ridge→ground, SEGMENTS+1 × 2 verts)
-//   invocations 2..N-1    → one twig each (4 verts), conditional on a hash
+//   invocations 2..N-1    → one twig each (3 verts), conditional on a hash
 // Splitting the cross-section into two single-sheet slopes (one per invocation)
 // is what lets the full raised-ridge tent fit: each slope gets its own
 // GL_MAX_GEOMETRY_OUTPUT_COMPONENTS budget, so neither busts the 1024 ceiling a
@@ -21,7 +21,7 @@ layout (lines, invocations = 5) in;
 // 46 verts/invocation fits the min-spec total-components budget once the
 // per-vertex cableTangent varying is included (46 × 22 = 1012 ≤ 1024). The
 // tent-slope invocations use the full 46 (= 23 boundaries × 2); twig
-// invocations use 4.
+// invocations use 3.
 layout (triangle_strip, max_vertices = 46) out;
 
 uniform sampler2D heightmapTex;
@@ -42,7 +42,7 @@ layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
 in DataVS {
 	vec2 vsWorldXZ;
 	vec3 vsCableData;
-	vec4 vsGridData;
+	vec3 vsGridData;
 	flat int vsSlot;
 } dataIn[];
 
@@ -52,11 +52,12 @@ in DataVS {
 // pulse animation). For main-ribbon fragments (isBranch<0.5) it carries the
 // cable's len-per-segment so the FS can derive a per-segment bit index for
 // the coverage SSBO. The two semantics are disjoint by isBranch so no conflict.
-// BUDGET NOTE: `gridData` is a vec3 (was vec4 — the .z component was never read
-// by the FS). Shrinking it reclaimed one component so `cableTangent` could be
-// added without busting GL_MAX_GEOMETRY_OUTPUT_COMPONENTS' total budget: with
-// the tangent the per-vertex count is 22 (incl. gl_Position), so max_vertices
-// drops 50→46 to keep 46 × 22 = 1012 ≤ 1024 (min-spec).
+// BUDGET NOTE: `gridData` is a vec3 (eff, flow, isOwnAlly/ghost flag). It was a
+// vec4 whose .z carried a CPU-integrated bubble phase the FS never read;
+// dropping that float (now removed end-to-end — the CPU sends 3 floats)
+// reclaimed the component that funds `cableTangent`: with the tangent the
+// per-vertex count is 22 (incl. gl_Position), so max_vertices is 46 to keep
+// 46 × 22 = 1012 ≤ 1024 (min-spec GL_MAX_GEOMETRY_OUTPUT_COMPONENTS).
 out DataGS {
 	vec3 worldPos;
 	float capacity;
@@ -162,14 +163,13 @@ const int   PLACEMENT_OVERSAMPLE = 2;
 const int   MAX_GRID             = MAX_SEGMENTS * 2;   // local-array bound for the scan
 const float KINK_GAIN            = 0.15;
 
-// Twig parameters mirror the Lua-side BRANCH_* constants.
+// Twig parameters (chance/geometry of the small side branches).
 const float BRANCH_CHANCE     = 0.85;
 const float BRANCH_LEN_MIN    = 6.0;
 const float BRANCH_LEN_MAX    = 8.0;
 const float BRANCH_ANGLE_MIN  = 1.2;
 const float BRANCH_ANGLE_MAX  = 1.5;
 const float BRANCH_WIDTH      = 2.1;
-const float CONE_TIP_WIDTH    = 0.0;
 const float BRANCH_WIDTH_TWIG_LENGTH_FACTOR = 2.0;
 
 // Clearance over the heightmap, applied along the cable's chord-averaged surface
@@ -196,14 +196,14 @@ float gOutSpawnAlong = 0.0;
 int   gOutSlot       = -1;
 
 void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
-             float w, vec4 grid, vec2 td, float cap) {
+             float w, vec3 grid, vec2 td, float cap) {
 	worldPos = wp;
 	capacity = cap;
 	isBranch = gOutBranch;
 	width = w;
 	cableUV = cuv;
 	timeData = td;
-	gridData = grid.xyw;          // .z dropped (unused by FS); see DataGS BUDGET NOTE
+	gridData = grid;
 	cableTangent = tangent3D;     // smooth along-dir → FS interpolates the lit frame
 	spawnAlongMain = gOutSpawnAlong;
 	gsSlot = gOutSlot;
@@ -455,7 +455,7 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
 // verts/boundary), so the full tent only costs one extra invocation.
 void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
                   float halfW, float widthVal, float effAmp, float seed,
-                  vec4 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
+                  vec3 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
 	gOutBranch = 0.0;
 	float tentHeight = halfW * TENT_HEIGHT_FACTOR;
 	// `along` is fed into the FS as cableUV.x and drives bubble advection.
@@ -594,7 +594,7 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 // hash says "no twig here" — leaving an empty primitive, which is a no-op.
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
-              vec4 gridD, vec2 timeD, float cap, float tCenter,
+              vec3 gridD, vec2 timeD, float cap, float tCenter,
               float spawnAlongMain, int twigIdx, float arcDh, int numSeg,
               vec3 railPrev, vec3 railCenter) {
 	// Resolve spawn point on the wiggly main path at tCenter so twigs root on
@@ -624,19 +624,14 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	float bLen = BRANCH_LEN_MIN + widthVal*BRANCH_WIDTH_TWIG_LENGTH_FACTOR +
 		gsHashU(spawn.x, spawn.y, twigSeed + 3.0) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN);
 
+	// The twig is a 3-vertex triangle: a full-width root edge tapering to a
+	// point at tip3D. The WIDTH varying passed to the FS stays UNIFORM at
+	// `twigW` along the whole twig, so bubble math sees constant halfWidthE
+	// and bubble radius/spacing don't change with along position; the visible
+	// bubble simply projects smaller near the point. This decouples "bubble
+	// flow looks uniform" from "twig has a cone shape".
 	float twigW    = max(2.5, widthVal * BRANCH_WIDTH);
 	float twigHWr  = min(twigW, widthVal * 0.55) * BRANCH_WIDTH;
-	// Geometric cone taper at 0.45 — visible shape narrows toward the tip
-	// (looks like a branch, not a tube). The WIDTH varying we pass to the FS
-	// stays UNIFORM at `twigW` along the entire twig, so bubble math sees
-	// constant halfWidthE and bubble radius/spacing don't change with along
-	// position. The visible bubble naturally fits the tapered geometry: in v
-	// space the bubble keeps the same cross-axis extent (relative to the
-	// cable's UV cross), which projects to a smaller world-cross at the
-	// thinner tip. At the very end the cable's `t > 0.9` cross discard clips
-	// any bubble that runs off the tip. This decouples "bubble flow looks
-	// uniform" from "twig has cone shape".
-	float twigHWt  = twigHWr * CONE_TIP_WIDTH;
 
 	// Build the twig as a flat ribbon in the slope's local tangent plane at
 	// the spawn point. This way, viewing perpendicular to the slope, the twig
@@ -689,8 +684,6 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 
 	vec3 rootL = root3D - twigPerp3D * twigHWr;
 	vec3 rootR = root3D + twigPerp3D * twigHWr;
-	vec3 tipL  = tip3D  - twigPerp3D * twigHWt;
-	vec3 tipR  = tip3D  + twigPerp3D * twigHWt;
 
 	// cableUV.x carries the cable-wide along distance so the FS growth gate
 	// hides this twig until the main growth front has reached spawnAlongMain.
@@ -698,10 +691,10 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// FS derives perp3D from cross(worldUp, vsTangent) so cylindrical lighting
 	// follows the twig's pointing direction.
 	gOutBranch = 1.0;
-	gOutSpawnAlong = spawnAlongMain;   // shared by all 4 twig vertices; lets FS compute twig-local along
-	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridD, timeD, cap);
-	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridD, timeD, cap);
-	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridD, timeD, cap);
+	gOutSpawnAlong = spawnAlongMain;   // shared by all 3 twig vertices; lets FS compute twig-local along
+	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW, gridD, timeD, cap);
+	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW, gridD, timeD, cap);
+	emitVtx(tip3D, twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridD, timeD, cap);
 	EndPrimitive();
 	gOutSpawnAlong = 0.0;
 }
@@ -723,15 +716,15 @@ void main() {
 
 	float cap   = dataIn[0].vsCableData.x;
 	vec2  timeD = dataIn[0].vsCableData.yz;
-	vec4  gridD = dataIn[0].vsGridData;
+	vec3  gridD = dataIn[0].vsGridData;
 
-	// Ghost edges (gridData.w = -1.0) emit the same two tent slopes as live
+	// Ghost edges (gridData.z = -1.0) emit the same two tent slopes as live
 	// (no twigs), using the SAME wiggly path so the live→ghost transition has
 	// no visual snap. Ghost FS path is fast (no lighting/bubble math), and the
 	// GS still skips the 3 twig invocations. Coverage updates use the live
 	// atomicAnd path with the wiggly samples → consistent with what the player
 	// visually sees.
-	bool isGhostEdge = gridD.w < -0.5;
+	bool isGhostEdge = gridD.z < -0.5;
 	if (isGhostEdge && gl_InvocationID > 1) return;
 
 	float widthVal = MIN_TRUNK_WIDTH +
@@ -797,8 +790,8 @@ void main() {
 
 	if (gl_InvocationID == 0) {
 		// Coverage SSBO update — once per cable per frame, not per fragment.
-		// Live edges (gridData.w >= -0.5) atomicOr bits for segments currently
-		// in LOS; ghost edges (gridData.w < -0.5) atomicAnd to clear bits the
+		// Live edges (gridData.z >= -0.5) atomicOr bits for segments currently
+		// in LOS; ghost edges (gridData.z < -0.5) atomicAnd to clear bits the
 		// player has re-scouted. Sampling along the actual wiggly path keeps
 		// reveal accurate even with arc bias on slopes.
 		//
@@ -814,7 +807,7 @@ void main() {
 		// second per-frame update would risk double-clearing ghost bits.
 #if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		int slot = dataIn[0].vsSlot;
-		bool isGhost = gridD.w < -0.5;
+		bool isGhost = gridD.z < -0.5;
 		// Hard gate on the user-facing ghosts toggle — skip ALL coverage
 		// bookkeeping (the n-tap LOS scan, atomic ops, even the SSBO read)
 		// when ghosts are off. Restores live-only perf parity with pre-slice-1.
