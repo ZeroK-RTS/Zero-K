@@ -544,6 +544,7 @@ local commandPanels = {
 		end,
 		loiterable = true,
 		alwaysShowTab = true,
+		topRow = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
 		badgeUnitName = "tacnuke",
 		badgeCountWG = "missileTotalCount",
