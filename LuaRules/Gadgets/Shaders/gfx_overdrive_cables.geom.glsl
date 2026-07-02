@@ -297,21 +297,29 @@ vec2 wigglyCablePoint(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB,
 	return base + perpCanon * n;
 }
 
-// Lift y to the max heightmap value sampled within ±fullStep along dirH.
-// Linear interpolation between adjacent segment vertices can dip below
-// terrain on convex/rolling slopes — taking the max within a window that
-// covers the next vertex's position guarantees adjacent envelopes overlap
-// at the segment midpoint, so the rendered ribbon stays above any peak in
-// the gap. Used by the main ribbon (centerline lift) and twig emitter
-// (spawn point lift) so they share the same vertical anchor.
-float maxHeightInWindow(vec2 p, vec2 dirH, float fullStep) {
+// Lift y to the max heightmap value sampled within ±window along dirH.
+// Linear interpolation between adjacent samples can dip below terrain on
+// convex/rolling slopes — taking the max within a window that reaches most of
+// the way to the neighbouring sample makes adjacent envelopes overlap, so the
+// profile built from the samples stays above any sub-sample terrain peak.
+//
+// A max-filter along the path is a morphological DILATION of the terrain
+// profile: on a monotone slope every sample takes the height ~0.85·window
+// uphill of it, i.e. the whole profile shifts horizontally downhill by a
+// constant amount. Size `window` to the SMALLEST span that still catches
+// sub-sample terrain — an oversized window reads as the cable overshooting
+// cliff lips like it had inertia. placeRibbonVertices passes the scan-grid
+// cell span (not the emitted-vertex span) for exactly this reason; the
+// per-EMITTED-vertex anti-clip is handled there with windows sized to the
+// local clustered gap.
+float maxHeightInWindow(vec2 p, vec2 dirH, float window) {
 	float yMax = heightAtWorldPos(p);
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.30)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.30)));
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.55)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.55)));
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.85)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.85)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (window * 0.30)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (window * 0.30)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (window * 0.55)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (window * 0.55)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (window * 0.85)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (window * 0.85)));
 	return yMax;
 }
 
@@ -349,17 +357,26 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
                         out float yBaseArr[MAX_SEGMENTS + 1],
                         out float alongArr[MAX_SEGMENTS + 1]) {
 	vec2  dirH     = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);   // max-filter window ~ avg emit span
 	int   G        = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
+	float gridStep = lenAB / float(G);   // scan-cell span
 
-	// Profile scan: max-filtered terrain height along the cable path. Its second
+	// Profile scan: terrain height along the cable path, max-filtered only over
+	// ONE scan cell — just enough to catch terrain between scan samples, NOT the
+	// old ±0.85·(lenAB/numSeg) window. That global-average window dilated the
+	// profile by ~19 elmos along the cable, which on any monotone slope is a
+	// constant horizontal shift downhill: cables carried cliff-top height well
+	// past the lip before dropping, as if they had inertia. The anti-clip duty
+	// the wide window used to carry moved to the per-emitted-vertex pass below,
+	// where the window is sized to the LOCAL clustered gap. The profile's second
 	// difference (below) is the along-cable curvature — directional by
-	// construction (crossing a ridge spikes it, running along a crest does not).
+	// construction (crossing a ridge spikes it, running along a crest does not);
+	// the narrower filter also stops smearing kinks across two cells, so
+	// clustering lands harder exactly on the lip.
 	float yCgrid[MAX_GRID + 1];
 	for (int i = 0; i <= G; i++) {
 		float tg = float(i) / float(G);
 		vec2 pg = wigglyCablePoint(a, d, perpAB, tg, lenAB, arcDh, effAmp, seed);
-		yCgrid[i] = maxHeightInWindow(pg, dirH, fullStep);   // base terrain profile
+		yCgrid[i] = maxHeightInWindow(pg, dirH, gridStep);   // base terrain profile
 	}
 
 	// Per-cell importance = uniform floor (1.0, keeps flats at equal arc spacing)
@@ -374,10 +391,8 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
 	}
 	float wStep = cum[G] / float(numSeg);
 
-	int   gi       = 0;
-	int   prevIdx  = -1;
-	float along    = 0.0;
-	vec3  prevBase = vec3(0.0);
+	int   gi      = 0;
+	int   prevIdx = -1;
 	for (int k = 0; k <= numSeg; k++) {
 		// Pick the grid index whose cumulative weight is nearest k·wStep. gi and k
 		// both advance monotonically → one linear sweep. The max(prevIdx+1) guard
@@ -389,18 +404,44 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
 		if (gi < G && (target - cum[gi]) > (cum[gi+1] - target)) idx = gi + 1;
 		idx = min(max(idx, prevIdx + 1), G);
 		prevIdx = idx;
+		idxArr[k] = idx;
+	}
+
+	// Per-vertex anti-clip lift, sized to the LOCAL emitted gaps: each vertex
+	// takes the max of the scan profile over ~0.55 of the gap to each emitted
+	// neighbour, so the two endpoints of every gap jointly cover all its scan
+	// samples with overlap at the midpoint (0.55 + 0.55 > 1) — the same
+	// envelope guarantee the old global-average window gave, but the dilation
+	// radius now shrinks with clustering: at a cliff lip, where curvature
+	// packs vertices into adjacent scan cells, the lift degenerates to the
+	// vertex's own (one-cell-filtered) sample and the "inertia" overshoot is
+	// bounded by one scan cell instead of ±0.85·(lenAB/numSeg). On sparse
+	// stretches the window grows with the gap — but sparse means flat, where
+	// the max is invisible. int() truncation keeps the reach strictly inside
+	// the gap for adjacent-cell neighbours (nothing to cover between them).
+	float along    = 0.0;
+	vec3  prevBase = vec3(0.0);
+	for (int k = 0; k <= numSeg; k++) {
+		int iC = idxArr[k];
+		int iL = (k > 0)      ? idxArr[k-1] : iC;
+		int iR = (k < numSeg) ? idxArr[k+1] : iC;
+		int lo = max(iC - int(float(iC - iL) * 0.55), 0);
+		int hi = min(iC + int(float(iR - iC) * 0.55), G);
+		float yB = yCgrid[iC];
+		for (int i = lo; i <= hi; i++) {
+			yB = max(yB, yCgrid[i]);
+		}
 
 		// Accumulate 3D arc length over the emitted vertices. The clearance pad is
 		// a uniform per-cable Navg shift, so it cancels in consecutive distances —
 		// accumulating over the bare (xz, yBase) points matches emitTentHalf's
 		// center3D-based accumulation exactly.
-		vec2 p    = wigglyCablePoint(a, d, perpAB, float(idx) / float(G), lenAB, arcDh, effAmp, seed);
-		vec3 base = vec3(p.x, yCgrid[idx], p.y);
+		vec2 p    = wigglyCablePoint(a, d, perpAB, float(iC) / float(G), lenAB, arcDh, effAmp, seed);
+		vec3 base = vec3(p.x, yB, p.y);
 		if (k > 0) along += distance(prevBase, base);
 		prevBase = base;
 
-		idxArr[k]   = idx;
-		yBaseArr[k] = yCgrid[idx];
+		yBaseArr[k] = yB;
 		alongArr[k] = along;
 	}
 	return G;
