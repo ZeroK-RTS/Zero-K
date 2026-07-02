@@ -15,7 +15,7 @@ function widget:GetInfo()
 end
 
 function widget:Initialize()
-  WG.missileTotalCount = 0
+  WG.missileActiveIcons = {}
 end
 
 --------------------------------------------------------------------------------
@@ -641,6 +641,21 @@ local commands = {
   trinityMissile = trinity_missile_controller_class(),
 }
 
+-- Stable order for the tab badge icons: Trinity, Reef, then the silo missiles.
+local orderedCommands = {
+  commands.trinityMissile,
+  commands.reefMissile,
+  commands.EOS,
+  commands.seismic,
+  commands.shockley,
+  commands.inferno,
+  commands.slowMissile,
+}
+for _, command in ipairs(orderedCommands) do
+  local unitDef = UnitDefNames[command.name]
+  command.iconTexture = unitDef and ("#" .. unitDef.id) or nil
+end
+
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
 local wasEmptySelection = false
@@ -661,14 +676,18 @@ function widget:Update(dt)
   end
   timer = 0
 
-  local totalMissileCount = 0
   local changed = false
+  local activeIcons = {}
 
-  for _, command in pairs(commands) do
+  for _, command in ipairs(orderedCommands) do
     local count = command:getCount()
     local buildProgress = command:getMaxBuildProgress()
 
-    totalMissileCount = totalMissileCount + count
+    -- Tab badge: an icon + count + build progress per missile type stockpiled
+    -- or building.
+    if command.iconTexture and (count >= 1 or buildProgress > 0) then
+      activeIcons[#activeIcons + 1] = {icon = command.iconTexture, count = count, progress = buildProgress}
+    end
 
     -- Count string shown on the button (e.g. "x3"), empty when none stockpiled.
     -- This is drawn by the integral menu via the command's name field (see
@@ -691,8 +710,8 @@ function widget:Update(dt)
     end
   end
 
-  -- Export total count for tab badge
-  WG.missileTotalCount = totalMissileCount
+  -- Export active-missile icons for the tab badge.
+  WG.missileActiveIcons = activeIcons
 
   -- The integral menu only re-reads custom commands on CommandsChanged, which
   -- the command menu pipeline does not run on its own while nothing is selected.

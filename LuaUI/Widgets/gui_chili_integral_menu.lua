@@ -132,6 +132,7 @@ end
 local statePanel = {}
 local tabPanel
 local selectionIndex = 0
+local lastSelectionSignature = false -- to detect selection changes for tab defaulting
 local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
@@ -1873,45 +1874,99 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		button = button,
 		name = name,
 		DoClick = DoClick,
-		badgePanel = nil,
 	}
 
-	-- Create badge if configured
-	if badgeConfig and badgeConfig.unitName then
-		local unitDef = UnitDefNames[badgeConfig.unitName]
-		if unitDef then
-			externalFunctionsAndData.badgePanel = Panel:New {
-				x = "100%-30",
-				y = 0,
-				width = 30,
-				height = 30,
-				parent = button,
-			}
+	-- Create a badge showing a row of icons after the label (one per active
+	-- missile type). The icon list is supplied each update via UpdateBadgeIcons.
+	if badgeConfig and badgeConfig.iconsWG then
+		local BADGE_ICON_SIZE = 18
+		local BADGE_COUNT_WIDTH = 14
+		local BADGE_ENTRY_WIDTH = BADGE_ICON_SIZE + BADGE_COUNT_WIDTH
+		local badgeIcons = {}
+		local badgeLabels = {}
+		local badgeBars = {}
+		local lastBadgeKey = false
+		local lastBadgeWidth = false
 
-			Image:New {
-				x = 0,
-				y = 0,
-				width = 20,
-				height = 20,
-				file = "#" .. unitDef.id,
-				parent = externalFunctionsAndData.badgePanel,
-			}
+		-- Each entry (icon + count) is parented directly to the button (no
+		-- covering panel) so the tab stays clickable; the row is right-aligned so
+		-- it follows the label.
+		function externalFunctionsAndData.UpdateBadgeIcons(list)
+			list = list or {}
+			local width = button.width or 0
+			local keyParts = {}
+			for i = 1, #list do
+				keyParts[i] = list[i].icon .. ":" .. list[i].count .. ":" .. math.floor((list[i].progress or 0) * 100)
+			end
+			local key = table.concat(keyParts, ",")
+			if key == lastBadgeKey and width == lastBadgeWidth then
+				return
+			end
+			lastBadgeKey = key
+			lastBadgeWidth = width
 
-			externalFunctionsAndData.badgeLabel = Label:New {
-				x = 20,
-				y = 0,
-				width = 10,
-				height = 20,
-				caption = "0",
-				align = "left",
-				valign = "center",
-				fontSize = 10,
-				parent = externalFunctionsAndData.badgePanel,
-			}
+			local n = #list
+			local startX = width - 2 - n * BADGE_ENTRY_WIDTH
+			local y = math.max(0, ((button.height or BADGE_ICON_SIZE) - BADGE_ICON_SIZE) / 2)
+			for i = 1, math.max(n, #badgeIcons) do
+				if i <= n then
+					local entryX = startX + (i - 1) * BADGE_ENTRY_WIDTH
+					if not badgeIcons[i] then
+						badgeIcons[i] = Image:New {
+							width = BADGE_ICON_SIZE,
+							height = BADGE_ICON_SIZE,
+							file = list[i].icon,
+							parent = button,
+						}
+						-- Build progress bar overlaying the icon (like command buttons).
+						badgeBars[i] = Progressbar:New {
+							x = "5%",
+							y = "5%",
+							right = "5%",
+							bottom = "5%",
+							value = 0,
+							max = 1,
+							caption = false,
+							noFont = true,
+							color           = {0.7, 0.7, 0.4, 0.6},
+							backgroundColor = {1, 1, 1, 0.01},
+							parent = badgeIcons[i],
+							skin = nil,
+							skinName = 'default',
+						}
+						badgeLabels[i] = Label:New {
+							width = BADGE_COUNT_WIDTH,
+							height = BADGE_ICON_SIZE,
+							align = "left",
+							valign = "center",
+							fontSize = 10,
+							parent = button,
+						}
+					end
+					badgeIcons[i].file = list[i].icon
+					badgeIcons[i]:SetPos(entryX, y)
+					badgeIcons[i]:SetVisibility(true)
+					badgeIcons[i]:Invalidate()
 
-			function externalFunctionsAndData.UpdateBadgeCount(count)
-				if externalFunctionsAndData.badgeLabel then
-					externalFunctionsAndData.badgeLabel:SetCaption(tostring(count))
+					local progress = list[i].progress or 0
+					if progress > 0 then
+						badgeBars[i]:SetValue(progress)
+						badgeBars[i]:SetVisibility(true)
+					else
+						badgeBars[i]:SetVisibility(false)
+					end
+
+					badgeLabels[i]:SetCaption((list[i].count > 0) and tostring(list[i].count) or "")
+					badgeLabels[i]:SetPos(entryX + BADGE_ICON_SIZE, y)
+					badgeLabels[i]:SetVisibility(true)
+					badgeLabels[i]:Invalidate()
+				else
+					if badgeIcons[i] then
+						badgeIcons[i]:SetVisibility(false)
+					end
+					if badgeLabels[i] then
+						badgeLabels[i]:SetVisibility(false)
+					end
 				end
 			end
 		end
@@ -2243,6 +2298,12 @@ local function ProcessAllCommands(commands, customCommands)
 	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
 	local unitMobilePanelSize = GetUnitMobilePanelSize(commands, factoryUnitDefID)
 
+	-- Detect an actual selection change (vs a command-only refresh) so that
+	-- selecting a unit while on a global tab (missiles) switches to its default.
+	local selectionSignature = table.concat(spGetSelectedUnits(), ",")
+	local selectionChanged = (selectionSignature ~= lastSelectionSignature)
+	lastSelectionSignature = selectionSignature
+
 	selectionIndex = selectionIndex + 1
 	
 	for i = 1, #commandPanels do
@@ -2317,7 +2378,11 @@ local function ProcessAllCommands(commands, customCommands)
 				data.queue.ClearOldButtons(selectionIndex)
 			end
 			if (not tabToSelect) and data.tabButton.name == lastTabSelected then
-				tabToSelect = lastTabSelected
+				-- When a unit is (re)selected, do not loiter on a global top-row
+				-- tab (missiles); fall through to the unit's default tab instead.
+				if not (selectionChanged and selectedUnitCount > 0 and data.topRow) then
+					tabToSelect = lastTabSelected
+				end
 			end
 		end
 	end
@@ -2491,7 +2556,7 @@ local function InitializeControls()
 			end
 		end
 		
-		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect, {unitName = data.badgeUnitName, countWG = data.badgeCountWG})
+		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect, {iconsWG = data.badgeIconsWG})
 		data.tabButton.topRow = data.topRow
 
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
@@ -2714,10 +2779,9 @@ function widget:Update()
 	for i = 1, #commandPanels do
 		local panelData = commandPanels[i]
 
-		-- Update badge count
-		if panelData.badgeCountWG and panelData.tabButton and panelData.tabButton.UpdateBadgeCount then
-			local count = WG[panelData.badgeCountWG] or 0
-			panelData.tabButton:UpdateBadgeCount(count)
+		-- Update badge icons (one per active missile type)
+		if panelData.badgeIconsWG and panelData.tabButton and panelData.tabButton.UpdateBadgeIcons then
+			panelData.tabButton.UpdateBadgeIcons(WG[panelData.badgeIconsWG])
 		end
 	end
 end
