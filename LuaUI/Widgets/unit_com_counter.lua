@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "ComCounter",
-    desc      = "Nofifies how many Commanders are remaining",
+    desc      = "Notifies how many Commanders are remaining",
     author    = "TheFatController",
     date      = "Apr 28, 2008",
     license   = "GNU GPL, v2 or later",
