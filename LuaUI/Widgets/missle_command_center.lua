@@ -325,13 +325,18 @@ local function missle_class()
   function self:commandsChanged()
     local customCommands = widgetHandler.customCommands
 
+    -- All fields must be present and valid, or the engine logs
+    -- "GetLuaCmdDescList() bad entry" for the descriptor. name is also used by
+    -- the integral menu to draw the stockpile count.
     customCommands[#customCommands+1] = {
       id       = self.cmd,
       type     = self.cmdType,
+      name     = self.displayName or "",
       cursor   = 'Attack',
       action   = "missile_" .. self.name,
-      name     = self.displayName,
-      disabled = self.disabled,
+      texture  = "LuaUI/Images/commands/Bold/missile.png",
+      tooltip  = "Launch missile.",
+      disabled = self.disabled or false,
       params   = {},
     }
   end
@@ -349,7 +354,21 @@ local function missle_class()
       local unitType = self.launchableTypes[Spring.GetUnitDefID(unit)]
       if not unitType then return true end
 
-      Spring.GiveOrderToUnit(unit, CMD.INSERT, {0, unitType.launchCmd, CMD.OPT_SHIFT, unpack(cmdParams)}, CMD.OPT_ALT)
+      -- Insert after any launches already queued but before other orders (e.g.
+      -- moves), so multiple shift-clicks fire in click order and still launch
+      -- before the unit moves away.
+      local insertPos = 0
+      local cmdQueue = Spring.GetUnitCommands(unit, 100)
+      if cmdQueue then
+        for i = 1, #cmdQueue do
+          if cmdQueue[i].id == unitType.launchCmd then
+            insertPos = i
+          else
+            break
+          end
+        end
+      end
+      Spring.GiveOrderToUnit(unit, CMD.INSERT, {insertPos, unitType.launchCmd, CMD.OPT_SHIFT, unpack(cmdParams)}, CMD.OPT_ALT)
       return true
     end
   end
