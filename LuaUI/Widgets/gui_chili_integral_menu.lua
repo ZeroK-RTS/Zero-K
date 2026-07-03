@@ -95,7 +95,6 @@ local NO_TEXT = ""
 local NO_TOOLTIP = "NONE"
 
 EPIC_NAME = "epic_chili_integral_menu_"
-EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 
 local modOptions = Spring.GetModOptions()
 local disabledTabs = {}
@@ -2521,11 +2520,12 @@ local function InitializeControls()
 		}
 		commandHolder:SetVisibility(false)
 		
+		-- Only tabs with their own optionName get a hotkey label. Tabs without one
+		-- (missiles, orders, units_factory) previously borrowed the Units hotkey and
+		-- displayed "(N)", but N is the hold-fire key and never switches to them.
 		local hotkey
 		if data.optionName then
 			hotkey = GetActionHotkey(EPIC_NAME .. data.optionName)
-		else
-			hotkey = GetActionHotkey(EPIC_NAME_UNITS)
 		end
 
 		if data.returnOnClick then
