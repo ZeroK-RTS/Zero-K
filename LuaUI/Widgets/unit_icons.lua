@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "Unit Icons",
-    desc      = "v0.033 Shows icons above units",
-    author    = "CarRepairer and GoogleFrog",
-    date      = "2012-01-28",
-    license   = "GNU GPL, v2 or later",
-    layer     = -12, -- above gui_name_tags
-    enabled   = true,  -- loaded by default?
+	name      = "Unit Icons",
+	desc      = "v0.033 Shows icons above units",
+	author    = "CarRepairer and GoogleFrog",
+	date      = "2012-01-28",
+	license   = "GNU GPL, v2 or later",
+	layer     = -13, -- above gui_name_tags
+	enabled   = true,  -- loaded by default?
   }
 end
 
@@ -39,7 +39,7 @@ local GL_GREATER = GL.GREATER
 local min   = math.min
 local max   = math.max
 local floor = math.floor
-local abs 	= math.abs
+local abs   = math.abs
 
 local iconsize = 5
 local forRadarIcons = true
@@ -230,7 +230,7 @@ function WG.icons.SetUnitIcon(unitID, data)
 			unitHeights[unitID] = nil
 		else
 			--unitHeights[unitID] = Spring.Utilities.GetUnitHeight(ud) + iconoffset
-			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset
+			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset + (tonumber(ud.customParams.health_bar_height) or 0)
 		end
 	end
 
@@ -259,7 +259,7 @@ local function DrawFuncAtUnitIcon2(unitID, xshift, yshift)
 	glPopMatrix()
 end
 
-local function DrawUnitFunc(xshift, yshift)
+local function DrawUnitFunc(unitID, xshift, yshift)
 	local heightMult = Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1
 	glTranslate(0,yshift*heightMult,0)
 	glBillboard()
@@ -299,7 +299,7 @@ local function DrawWorldFunc()
 					if forRadarIcons then
 						DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
 					else
-						glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID])
+						glDrawFuncAtUnit(unitID, false, DrawUnitFunc, unitID, xshift,unitHeights[unitID])
 					end
 				end
 				
@@ -383,4 +383,3 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-

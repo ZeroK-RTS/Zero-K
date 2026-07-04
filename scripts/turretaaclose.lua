@@ -45,6 +45,9 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
+	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do
+		Sleep(1000)
+	end
 	Turn(launcher1, x_axis, math.rad(-30), math.rad(50))
 	Turn(launcher2, x_axis, math.rad(-30), math.rad(50))
 	aiming = false

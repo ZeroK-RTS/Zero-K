@@ -30,6 +30,7 @@ Image = Button:Inherit{
 	crop = false;
 	
 	checkFileExists = false;
+	keepCheckingForImage = false;
 	fallbackFile = false;
 	imageLoadTime = 3.5; -- Seconds
 
@@ -89,6 +90,10 @@ local function _DrawTextureCrop(x, y, w, h , tw, th, flipy)
 	end
 end
 
+function Image:ResetImageLoadTimer()
+	self._loadTimer = nil
+end
+
 function Image:DrawControl()
 	local file = self.file
 	local file2 = self.file2
@@ -100,6 +105,22 @@ function Image:DrawControl()
 		if self._loadTimer then
 			if Spring.DiffTimers(Spring.GetTimer(), self._loadTimer) > self.imageLoadTime then
 				self.checkFileExists = false
+				if self.keepCheckingForImage then
+					if file then
+						local data = gl.TextureInfo(file)
+						if (not data) or data.ysize == -1 then
+							self.checkFileExists = true
+							self._loadTimer = Spring.GetTimer()
+						end
+					end
+					if file2 then
+						local data = gl.TextureInfo(file2)
+						if (not data) or data.ysize == -1 then
+							self.checkFileExists = true
+							self._loadTimer = Spring.GetTimer()
+						end
+					end
+				end
 			end
 		elseif ((not file) or VFS.FileExists(file)) and ((not file2) or VFS.FileExists(file2)) then
 			self._loadTimer = Spring.GetTimer()

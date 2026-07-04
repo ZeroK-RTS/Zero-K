@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		boxes = {
 			{
 				{5777, 10072},
@@ -165,7 +165,7 @@ return {
 		nameLong = "Defenders",
 		nameShort = "D",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{8192, 1193},

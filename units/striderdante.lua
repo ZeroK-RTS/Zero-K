@@ -13,14 +13,15 @@ return { striderdante = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    decloak_footprint     = 5,
-    manualfire_desc = [[Fire Special Weapon: Fire a napalm rocket salvo.]]
+    aim_lookahead      = 120,
+    decloak_footprint  = 5,
+    manualfire_desc    = [[Fire Special Weapon: Fire a napalm rocket salvo.]]
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
   footprintX          = 4,
   footprintZ          = 4,
-  health              = 11000,
+  health              = 15000,
   iconType            = [[t3riot]],
   leaveTracks         = true,
   maxSlope            = 36,
@@ -43,7 +44,7 @@ return { striderdante = {
   },
   sightEmitHeight     = 50,
   sightDistance       = 600,
-  speed               = 52.5,
+  speed               = 57,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1.66,
@@ -57,6 +58,7 @@ return { striderdante = {
 
     {
       def                = [[NAPALM_ROCKETS]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -64,6 +66,7 @@ return { striderdante = {
 
     {
       def                = [[HEATRAY]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -77,6 +80,7 @@ return { striderdante = {
 
     {
       def                = [[DANTE_FLAMER]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIREPROOF]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
@@ -103,12 +107,12 @@ return { striderdante = {
         flamethrower = [[1]],
         setunitsonfire = "1",
         burnchance = "0.4", -- Per-impact
-        burntime = [[450]],
+        burntime = 1125, -- 37.5s
 
         light_camera_height = 1800,
         light_color = [[0.6 0.39 0.18]],
-        light_radius = 260,
-        light_fade_time = 13,
+        light_radius = 200,
+        light_fade_time = 8,
         light_beam_mult_frames = 5,
         light_beam_mult = 5,
         reaim_time = 1,
@@ -147,15 +151,16 @@ return { striderdante = {
       name                    = [[Heat Ray]],
       accuracy                = 512,
       areaOfEffect            = 20,
+      avoidFeature            = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams              = {
-        light_camera_height = 2000,
+        light_camera_height = 1500,
         light_color = [[0.9 0.4 0.12]],
-        light_radius = 180,
-        light_fade_time = 35,
+        light_radius = 90,
+        light_fade_time = 25,
         light_fade_offset = 10,
         light_beam_mult_frames = 9,
         light_beam_mult = 8,
@@ -196,7 +201,7 @@ return { striderdante = {
 
     NAPALM_ROCKETS       = {
       name                    = [[Napalm Rockets]],
-      areaOfEffect            = 228,
+      areaOfEffect            = 168,
       burst                   = 2,
       burstrate               = 0.1,
       cegTag                  = [[missiletrailredsmall]],
@@ -204,47 +209,53 @@ return { striderdante = {
       craterMult              = 0,
 
       customParams              = {
+        area_damage = 1,
+        area_damage_radius = 78,
+        area_damage_dps = 17,
+        area_damage_duration = 15,
+        
         setunitsonfire = "1",
         burnchance = "1",
-        burntime = 1125, -- 37.5s
+        burntime = [[150]],
         reaim_time = 1,
         force_ignore_ground = [[1]],
       },
       
       damage                  = {
-        default = 120.8,
+        default = 150.01,
       },
 
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:napalm_phoenix]],
+      edgeEffectiveness       = 0.4,
+      explosionGenerator      = [[custom:napalm_dante_small]],
       fireStarter             = 250,
       fixedlauncher           = true,
-      flightTime              = 1.8,
+      flightTime              = 0.1,
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 2,
+      leadLimit               = 200,
       model                   = [[wep_m_hailstorm.s3o]],
-      range                   = 460,
+      range                   = 420,
       reloadtime              = 2,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rapid_rocket_hit]],
       soundStart              = [[weapon/missile/rapid_rocket_fire]],
-      sprayAngle              = 1000,
-      startVelocity           = 150,
+      sprayAngle              = 2000,
+      startVelocity           = 350,
       tolerance               = 6500,
       tracks                  = false,
-      turnRate                = 8000,
+      trajectoryHeight        = 0.3,
+      turnRate                = 0,
       turret                  = true,
-      weaponAcceleration      = 100,
+      weaponAcceleration      = 0,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 800,
-      wobble                  = 10000,
+      weaponVelocity          = 200,
     },
 
 
     NAPALM_ROCKETS_SALVO = {
       name                    = [[Napalm Rocket Salvo]],
-      areaOfEffect            = 228,
+      areaOfEffect            = 168,
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidNeutral            = false,
@@ -256,9 +267,14 @@ return { striderdante = {
       craterMult              = 0,
 
       customParams              = {
+        area_damage = 1,
+        area_damage_radius = 78,
+        area_damage_dps = 17,
+        area_damage_duration = 15,
+        
         setunitsonfire = "1",
         burnchance = "1",
-        burntime = 1125, -- 37.5s
+        burntime = [[150]],
         
         light_color = [[0.8 0.4 0.1]],
         light_radius = 320,
@@ -266,36 +282,39 @@ return { striderdante = {
       },
       
       damage                  = {
-        default = 120.8,
+        default = 150.01,
       },
 
-      dance                   = 15,
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:napalm_phoenix]],
+      dance                   = 25,
+      edgeEffectiveness       = 0.4,
+      explosionGenerator      = [[custom:napalm_dante_small]],
       fireStarter             = 250,
       fixedlauncher           = true,
-      flightTime              = 1.8,
+      flightTime              = 0.1,
+      groundbounce            = 1,
+      waterbounce             = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 2,
       model                   = [[wep_m_hailstorm.s3o]],
+      numBounce               = 2,
       projectiles             = 2,
-      range                   = 460,
+      range                   = 420,
       reloadtime              = 20,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rapid_rocket_hit]],
       soundStart              = [[weapon/missile/rapid_rocket_fire]],
-      sprayAngle              = 8000,
-      startVelocity           = 200,
+      sprayAngle              = 9000,
+      startVelocity           = 350,
       tolerance               = 6500,
       tracks                  = false,
-      trajectoryHeight        = 0.18,
+      trajectoryHeight        = 0.3,
       turnRate                = 3000,
       turret                  = true,
-      weaponAcceleration      = 100,
+      weaponAcceleration      = 0,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 800,
-      wobble                  = 8000,
+      weaponVelocity          = 200,
+      wobble                  = 0,
     },
 
   },

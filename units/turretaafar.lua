@@ -14,10 +14,12 @@ return { turretaafar = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    aim_lookahead      = 20,
     bait_level_default = 0,
-    aimposoffset   = [[0 10 0]],
-    modelradius    = [[19]],
-    okp_damage = 200.1,
+    aimposoffset       = [[0 10 0]],
+    modelradius        = [[19]],
+    okp_damage         = 200.1,
+    normaltex          = [[unittextures/armcir_normals.dds]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -90,6 +92,7 @@ return { turretaafar = {
       impulseBoost            = 0.123,
       impulseFactor           = 0.0492,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 1800,

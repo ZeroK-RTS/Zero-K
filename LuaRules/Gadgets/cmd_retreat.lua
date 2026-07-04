@@ -50,7 +50,7 @@ if gadgetHandler:IsSyncedCode() then -- SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spGetCommandQueue 	= Spring.GetCommandQueue
+local spGetUnitCommands 	= Spring.GetUnitCommands
 local spGetUnitTeam 		= Spring.GetUnitTeam
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGiveOrderToUnit 	= Spring.GiveOrderToUnit
@@ -186,7 +186,7 @@ GG.Retreat_ToggleHaven = ToggleHaven
 ----------------------------
 
 local function FixQueue(unitID) -- this gets rid of internally generated commands by tactical ai and keeps user commands.
-	local queue = spGetCommandQueue(unitID, 3)
+	local queue = spGetUnitCommands(unitID, 3)
 	for i = 1, #queue do
 		local command = queue[i]
 		local cmdID = command.id
@@ -209,7 +209,7 @@ end
 
 local function StopRetreating(unitID)
 	SendToUnsynced("StopRetreat", unitID)
-	local cmds = Spring.GetCommandQueue(unitID, -1)
+	local cmds = Spring.GetUnitCommands(unitID, -1)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
 			if cmd.id == CMD_REARM then

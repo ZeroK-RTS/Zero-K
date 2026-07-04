@@ -52,7 +52,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local damagedUnits = {}
+local damagedUnitFrame = {}
 GG.unitRepairRate = {}
 
 --------------------------------------------------------------------------------
@@ -67,25 +67,21 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		return
 	end
 
-	if damagedUnits[unitID] then
-		damagedUnits[unitID].frames = REPAIR_PENALTY_TIME
+	if damagedUnitFrame[unitID] then
+		damagedUnitFrame[unitID] = REPAIR_PENALTY_TIME
 	else
-		local bt = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-		damagedUnits[unitID] = {
-			bt = bt,
-			frames = REPAIR_PENALTY_TIME,
-		}
+		damagedUnitFrame[unitID] = REPAIR_PENALTY_TIME
 		local _, _, inbuild = spGetUnitIsStunned(unitID)
 		if not inbuild then
-			spSetUnitCosts(unitID, {buildTime = bt*REPAIR_PENALTY})
+			spSetUnitCosts(unitID, {buildTime =  Spring.Utilities.GetUnitCost(unitID)*REPAIR_PENALTY})
 			GG.unitRepairRate[unitID] = 1/REPAIR_PENALTY
 		end
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if damagedUnits[unitID] then
-		spSetUnitCosts(unitID, {buildTime = damagedUnits[unitID].bt*REPAIR_PENALTY})
+	if damagedUnitFrame[unitID] then
+		spSetUnitCosts(unitID, {buildTime = Spring.Utilities.GetUnitCost(unitID, unitDefID) * REPAIR_PENALTY})
 		GG.unitRepairRate[unitID] = 1/REPAIR_PENALTY
 	else
 		GG.unitRepairRate[unitID] = 1
@@ -94,30 +90,30 @@ end
 
 function gadget:GameFrame(n)
 	if n%UPDATE_FREQUENCY == 20 then
-		for unitID, data in pairs(damagedUnits) do
-			data.frames = data.frames - UPDATE_FREQUENCY
-			if data.frames <= 0 then
+		for unitID, _ in pairs(damagedUnitFrame) do
+			damagedUnitFrame[unitID] = damagedUnitFrame[unitID] - UPDATE_FREQUENCY
+			if damagedUnitFrame[unitID] <= 0 then
 				if spValidUnitID(unitID) then
-					spSetUnitCosts(unitID, {buildTime = data.bt})
+					spSetUnitCosts(unitID, {buildTime = Spring.Utilities.GetUnitCost(unitID)})
 					GG.unitRepairRate[unitID] = 1
 					local _, _, inbuild = spGetUnitIsStunned(unitID)
 					if inbuild then
 						GG.unitRepairRate[unitID] = nil
 					end
 				end
-				damagedUnits[unitID] = nil
+				damagedUnitFrame[unitID] = nil
 			end
 		end
 	end
 end
 
 function GG.HasCombatRepairPenalty(unitID)
-	return (damagedUnits[unitID] and true) or false
+	return (damagedUnitFrame[unitID] and true) or false
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if damagedUnits[unitID] then
-		damagedUnits[unitID] = nil
+	if damagedUnitFrame[unitID] then
+		damagedUnitFrame[unitID] = nil
 	end
 end
 

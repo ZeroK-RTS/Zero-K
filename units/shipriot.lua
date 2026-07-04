@@ -16,7 +16,7 @@ return { shipriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aim_lookahead      = 60,
+    aim_lookahead      = 100,
     turnatfullspeed = [[1]],
     --extradrawrange = 420,
     selection_scale   = 1.05,

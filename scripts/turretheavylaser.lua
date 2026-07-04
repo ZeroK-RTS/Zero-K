@@ -18,6 +18,9 @@ local SPINDLE_TURN_SPEED = math.rad(120) / 0.8
 local firing = false
 local index = 2
 
+local AIM_LOW = 56
+local AIM_HIGH = 62
+
 local stuns = {false, false, false}
 local disarmed = false
 
@@ -43,9 +46,9 @@ function script.Create()
 	local midTable = ud.model
 	
 	local midpos = {midTable.midx, midTable.midy,      midTable.midz}
-	local aimpos = {midTable.midx, midTable.midy + 15, midTable.midz}
+	local aimpos = {midTable.midx, midTable.midy + AIM_LOW, midTable.midz}
 
-	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + AIM_LOW, midTable.midy + AIM_HIGH, 15, 48)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end

@@ -45,6 +45,9 @@ local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 local cullingSettingsList, commandCulling =  include("Configs/integral_menu_culling.lua")
 local transkey = include("Configs/transkey.lua")
 
+local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+
 -- Chili classes
 local Chili
 local Button
@@ -142,10 +145,26 @@ local mainWindow, baseWindowHeight, buttonAreaHeight -- Required for growing the
 --------------------------------------------------------------------------------
 -- Widget Options
 
+local radarIconSize = nil
+local function UpdateRadarIconSizeString(size)
+	size = tonumber(size) 
+	if size then
+		radarIconSize = string.format('%d%%', size)
+	end
+end
+
+local function UpdateRadarIcons(size)
+	UpdateRadarIconSizeString(size)
+	for i = 1, #commandPanels do
+		local buttons = commandPanels[i].buttons
+		buttons.UpdateRadarIcons()
+	end
+end
+
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
-	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -221,6 +240,38 @@ options = {
 			background:Invalidate()
 		end,
 	},
+	allowclickthrough = {
+		name = 'Allow clicking through',
+		type='bool',
+		value=false,
+		desc = 'Mouse clicks through empty parts of the panel act on whatever is underneath.',
+		OnChange = function(self)
+			if background then
+				background.noClickThrough = not self.value
+				background:Invalidate()
+			end
+		end,
+	},
+	show_radar_icons = {
+		name = 'Show Radar Icons',
+		type='bool',
+		value=false,
+		update_on_the_fly=true,
+		desc = 'Displays the unit radar icons in the top-right corner of their build button in the command panel.',
+		OnChange = function(self)
+			UpdateRadarIcons(self.value)
+		end,
+	},
+	radar_icon_size = {
+		name = "Radar Icon Size",
+		type = "number",
+		value = 50, min = 1, max = 100, step = 1,
+		update_on_the_fly=true,
+		desc = 'Determines the size of the unit radar icons in the command panel.',
+		OnChange = function(self)
+			UpdateRadarIcons(self.value)
+		end,
+	},
 	keyboardType2 = {
 		type='radioButton',
 		name='Grid Keyboard Layout',
@@ -228,7 +279,9 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'Colemak (standard)', key = 'colemak', hotkey = nil},
 			{name = 'Dvorak (standard)', key = 'dvorak', hotkey = nil},
+			{name = 'Workman (standard)', key = 'workman', hotkey = nil},
 			{name = 'Configure in "Custom" (below)', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
@@ -286,7 +339,7 @@ options = {
 	label_apply = {
 		type = 'text',
 		name = 'Note: Click above to refresh',
-		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convinence.',
+		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convenience.',
 		path = customGridPath
 	},
 	label_tab = {
@@ -866,10 +919,16 @@ local function GetCmdPosParameters(cmdID)
 	return 1, 100
 end
 
-local function GetDisplayConfig(cmdID)
+local function GetDisplayConfig(cmdID, command)
 	local displayConfig = commandDisplayConfig[cmdID]
+	if cmdID >= CMD_MORPH_STOP and cmdID < CMD_MORPH_STOP + 1000 then
+		displayConfig = commandDisplayConfig[CMD_MORPH_STOP]
+	end
 	if not displayConfig then
 		return
+	end
+	if displayConfig.DynamicDisplayFunc then
+		displayConfig = displayConfig.DynamicDisplayFunc(cmdID, command)
 	end
 	if displayConfig.useAltConfig then
 		return displayConfig.altConfig
@@ -1091,6 +1150,18 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Button Panel
+local iconTypeCache = {}
+local function GetUnitIcon(unitDefID)
+	if unitDefID and iconTypeCache[unitDefID] then
+		return iconTypeCache[unitDefID]
+	end
+	local ud = UnitDefs[unitDefID]
+	if not ud then
+		return
+	end
+	iconTypeCache[unitDefID] = icontypes[ud.iconType].bitmap or ('icons/' .. ud.iconType .. iconFormat)
+	return iconTypeCache[unitDefID]
+end
 
 local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
@@ -1175,10 +1246,11 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	end
 	
 	local image
+	local image_icon
 	local buildProgress
 	local textBoxes = {}
 	
-	local function SetImage(texture1, texture2)
+	local function SetImageTexture(texture1, texture2)
 		if not image then
 			image = Image:New {
 				name = name .. "_image",
@@ -1206,6 +1278,45 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image.file = texture1
 		image.file2 = texture2
 		image:Invalidate()
+	end
+	
+	local function ApplyRadarIconTexture(texture1)
+		if not image_icon then
+			image_icon = Image:New {
+				name = name .. "_image_radar_icon",
+				top = 0,
+				right = 0,
+				width=radarIconSize,
+				height=radarIconSize,
+				keepAspect = true,
+				resizable = true,
+				file = texture1,
+				parent = image,
+			}
+			return
+		end
+		image_icon:SetVisibility(true)
+		image_icon.file = texture1
+		image_icon:Resize(radarIconSize, radarIconSize)
+		image_icon:Invalidate()
+	end
+	
+	local function RemoveRadarIconTexture()
+		if image_icon then
+			image_icon:SetVisibility(false)
+		end
+	end
+	
+	local function SetImageFromConfig(displayConfig, command, state)
+		if state and displayConfig then
+			SetImageTexture(displayConfig.texture[state])
+		elseif displayConfig then
+			SetImageTexture(displayConfig.texture or (command and command.texture), displayConfig.tex2)
+		elseif command then
+			SetImageTexture(command.texture)
+		else
+			spEcho("Error, missing command displayConfig and command")
+		end
 	end
 	
 	local function SetText(textPosition, text)
@@ -1240,6 +1351,9 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			return
 		end
 		textBoxes[textPosition]:SetVisibility(newVisible)
+		if newVisible then
+			textBoxes[textPosition]:BringToFront()
+		end
 		
 		if (not newVisible) or (text == textBoxes[textPosition].caption) then
 			return
@@ -1260,7 +1374,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		isDisabled = newDisabled
 		
 		if not image then
-			SetImage("")
+			SetImageTexture("")
 		end
 		if isDisabled then
 			button.backgroundColor = BUTTON_DISABLE_COLOR
@@ -1282,6 +1396,17 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image:Invalidate()
 	end
 	
+	function externalFunctionsAndData.ApplyRadarIcon()
+		local ud = UnitDefs[-cmdID]
+		if ud ~= nil then
+			ApplyRadarIconTexture(GetUnitIcon(ud.id))
+		end
+	end
+	
+	function externalFunctionsAndData.RemoveRadarIcon()
+		RemoveRadarIconTexture()
+	end
+	
 	function externalFunctionsAndData.SetProgressBar(proportion)
 		if buildProgress then
 			buildProgress:SetValue(proportion or 0)
@@ -1289,7 +1414,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 		
 		if not image then
-			SetImage("")
+			SetImageTexture("")
 		end
 		
 		buildProgress = Progressbar:New{
@@ -1385,7 +1510,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				for _,textBox in pairs(textBoxes) do
 					textBox:SetCaption(NO_TEXT)
 				end
-				SetImage()
+				SetImageTexture()
 				
 				if not onMouseOverFun then
 					onMouseOverFun = function ()
@@ -1454,21 +1579,19 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		if cmdID == newCmdID then
 			if isStateCommand then
-				local displayConfig = GetDisplayConfig(cmdID)
+				local displayConfig = GetDisplayConfig(cmdID, command)
 				if displayConfig then
-					local texture = displayConfig.texture[state]
 					if displayConfig.stateTooltip then
 						button.tooltip = GetButtonTooltip(displayConfig, command, state)
 					end
-					SetImage(texture)
+					SetImageFromConfig(displayConfig, command, state)
 				end
 			elseif newCmdID and DYNAMIC_COMMANDS[newCmdID] then
 				-- Reset potentially stale special weapon iamge and tooltip.
 				-- Action is the same so hotkey does not require a reset.
-				local displayConfig = GetDisplayConfig(cmdID)
+				local displayConfig = GetDisplayConfig(cmdID, command)
 				button.tooltip = GetButtonTooltip(displayConfig, command, state)
-				local texture = (displayConfig and displayConfig.texture) or command.texture
-				SetImage(texture)
+				SetImageFromConfig(displayConfig, command)
 			end
 			if not notGlobal then
 				buttonsByCommand[cmdID] = externalFunctionsAndData
@@ -1505,7 +1628,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			SetDisabled(command.disabled)
 		end
 		
-		local displayConfig = GetDisplayConfig(cmdID)
+		local displayConfig = GetDisplayConfig(cmdID, command)
 		
 		if isBuild then
 			local ud = UnitDefs[-cmdID]
@@ -1515,7 +1638,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
-			SetImage("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
+			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
 				if cost >= 100000000 then
@@ -1544,15 +1667,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		if isStateCommand then
 			if displayConfig then
-				local texture = displayConfig.texture[state]
-				SetImage(texture)
+				SetImageFromConfig(displayConfig, command, state)
 			else
 				spEcho("Error, missing command config", cmdID)
 			end
 		else
 			if not isBuild then
-				local texture = (displayConfig and displayConfig.texture) or command.texture
-				SetImage(texture)
+				SetImageFromConfig(displayConfig, command)
 			end
 			-- Remove stockpile progress
 			if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
@@ -1595,6 +1716,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 	local gridMap, override
 	local gridEnabled = true
 	local gridUpdatedSinceVisible = false
+	local radarIconsEnabled = false
 	
 	local externalFunctions = {}
 	
@@ -1699,6 +1821,20 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		return
 	end
 	
+	function externalFunctions.UpdateRadarIcons()
+		if options.show_radar_icons.value then
+			radarIconsEnabled = true
+			for i = 1, #buttonList do
+				buttonList[i].ApplyRadarIcon()
+			end
+		elseif radarIconsEnabled then
+			radarIconsEnabled = false
+			for i = 1, #buttonList do
+				buttonList[i].RemoveRadarIcon()
+			end
+		end
+	end
+	
 	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride, updateNonVisible)
 		gridMap = newGridMap or gridMap
 		override = newOverride or override
@@ -1728,6 +1864,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		for i = 1, #buttonList do
 			buttonList[i].OnVisibleGridKeyUpdate()
 		end
+		externalFunctions.UpdateRadarIcons()
 		gridUpdatedSinceVisible = false
 	end
 	
@@ -2437,6 +2574,8 @@ local function InitializeControls()
 	-- baseHeight/7, matching the original 100/7% tab strip.
 	buttonAreaHeight = height * 6/7
 
+	UpdateRadarIconSizeString(options.radar_icon_size.value)
+
 	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType2.value)
 
 	mainWindow = Window:New{
@@ -2490,7 +2629,7 @@ local function InitializeControls()
 		noFont = true,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
-		noClickThrough = true,
+		noClickThrough = not options.allowclickthrough.value,
 		parent = mainWindow,
 	}
 	

@@ -6,7 +6,8 @@ return { tele_beacon = {
   category                      = [[SINK UNARMED]],
 
   customParams                  = {
-      dontcount = [[1]],
+    dontcount = [[1]],
+    normaltex = [[unittextures/b_spy_jammer_radar_termite_normals.dds]],
   },
 
   explodeAs                     = [[TINY_BUILDINGEX]],

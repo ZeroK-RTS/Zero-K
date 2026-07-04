@@ -29,11 +29,15 @@ local pi2    = math.pi*2
 local random = math.random
 local abs    = math.abs
 
+local MAP_X = Game.mapX*512
+local MAP_Z = Game.mapY*512
+
 local CMD_STOP   = CMD.STOP
 local CMD_WAIT   = CMD.WAIT
 local CMD_MOVE   = CMD.MOVE
 local CMD_REMOVE = CMD.REMOVE
 local privateTable = {private = true}
+local sightTable = {inlos = true}
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitPosition      = Spring.GetUnitPosition
@@ -59,17 +63,20 @@ local mcSetRotation          = MoveCtrl.SetRotation
 local mcDisable              = MoveCtrl.Disable
 local mcEnable               = MoveCtrl.Enable
 
-local SetLeaveTracks = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
+local SetLeaveTracks         = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
+local utRandomPointInCircle  = Spring.Utilities.Vector.RandomPointInCircle
 
 local emptyTable = {}
 
 local coroutines = {}
 local lastJumpPosition = {}
-local landBoxSize = 60
+local landBoxSize = 40
+local OFF_MAP_LEEWAY = 1
 local jumps = {}
 local jumping = {}
 local goalSet = {}
 local jumpReloadMod = {}
+local uniqueCoroutineCounter = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -206,11 +213,95 @@ end
 
 local function StartScript(fn)
 	local co = coroutine.create(fn)
+	coroutine.resume(co)
 	coroutines[#coroutines + 1] = co
 end
 
+local function ContinueCoroutine(unitID, coroutineID)
+	if (not Spring.ValidUnitID(unitID)) or Spring.GetUnitIsDead(unitID) then
+		return false
+	end
+	return coroutineID == uniqueCoroutineCounter[unitID]
+end
+
+local function FinishJump(unitID)
+	jumping[unitID] = nil
+	SetLeaveTracks(unitID, true)
+	Spring.SetUnitRulesParam(unitID, "is_jumping", 0)
+	mcDisable(unitID)
+end
+
+local function DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
+	spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+
+	Sleep()
+	if not Spring.ValidUnitID(unitID) then
+		return
+	end
+	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if morphedTo then
+		lastJumpPosition[morphedTo] = lastJumpPosition[unitID]
+		lastJumpPosition[unitID] = nil
+		uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
+		unitID = morphedTo
+		env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+	end
+
+	if not ContinueCoroutine(unitID, coroutineID) then
+		return
+	end
+
+	Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
+
+	local reloadSpeed = 1/reloadTime
+	local reloadAmount = (spGetUnitRulesParam(unitID, "jumpReload") or 0) + reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
+
+	local walkFixTimer = env.unmoonwalkFunc and 15
+	local callTimer = env.jumpReloadProgress and 0
+	while reloadAmount < jumpCharges do
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+		morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+		if morphedTo then
+			uniqueCoroutineCounter[morphedTo] = uniqueCoroutineCounter[unitID]
+			unitID = morphedTo
+			env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
+		end
+		if not ContinueCoroutine(unitID, coroutineID) then
+			return
+		end
+
+		local stunnedOrInbuild = spGetUnitIsStunned(unitID)
+		local reloadFactor = (stunnedOrInbuild and 0) or GG.att_ReloadChange[unitID] or 1
+		reloadAmount = reloadAmount + reloadSpeed*reloadFactor
+		spSetUnitRulesParam(unitID, "jumpReload", reloadAmount, publicReload and sightTable or privateTable)
+		if callTimer then
+			callTimer = callTimer + 1
+			if callTimer >= 10 or reloadAmount >= jumpCharges then
+				CallAsUnitIfExists(unitID, env.jumpReloadProgress, reloadAmount)
+				callTimer = 0
+			end
+		end
+		if walkFixTimer then
+			walkFixTimer = walkFixTimer - 1
+			if walkFixTimer <= 0 then
+				CallAsUnitIfExists(unitID, env.unmoonwalkFunc)
+				walkFixTimer = false
+			end
+		end
+		Sleep()
+	end
+end
+
 local function Jump(unitID, goal, origCmdParams, mustJump)
-	goal[2]                = spGetGroundHeight(goal[1],goal[3])
+	goal[1] = math.max(OFF_MAP_LEEWAY, math.min(MAP_X - OFF_MAP_LEEWAY, goal[1]))
+	goal[3] = math.max(OFF_MAP_LEEWAY, math.min(MAP_Z - OFF_MAP_LEEWAY, goal[3]))
+	goal[2]                = spGetGroundHeight(goal[1], goal[3])
 	local start            = {spGetUnitPosition(unitID)}
 
 	local startHeight      = spGetGroundHeight(start[1],start[3])
@@ -224,6 +315,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local height           = jumpDef.height * (GG.att_JumpRangeChange[unitID] or 1)
 	local cannotJumpMidair = jumpDef.cannotJumpMidair
 	local reloadTime       = ((jumpDef.reload or 0) + (jumpReloadMod[unitID] or 0)) * 30
+	local jumpCharges      = jumpDef.charges or 1
+	local publicReload     = jumpDef.publicReload
 	local teamID           = spGetUnitTeam(unitID)
 	
 	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (start[2] < -UnitDefs[unitDefID].maxWaterDepth)) then
@@ -304,22 +397,45 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	else
 		CallAsUnitIfExists(unitID,env.preJump,turn,lineDist,flightDist,duration)
 	end
-	spSetUnitRulesParam(unitID,"jumpReload",0)
-
+	if jumpCharges > 1 then
+		spSetUnitRulesParam(unitID, "jumpReload", (spGetUnitRulesParam(unitID, "jumpReload") or 1) - 1, publicReload and sightTable or privateTable)
+	else
+		spSetUnitRulesParam(unitID, "jumpReload", 0, publicReload and sightTable or privateTable)
+	end
+	
 	local function JumpLoop()
+		uniqueCoroutineCounter[unitID] = (uniqueCoroutineCounter[unitID] or 0) + 1
+		local coroutineID = uniqueCoroutineCounter[unitID]
+		
+		Sleep() -- Script runs immediately when created, so don't do anything game mechanical yet.
+		if not ContinueCoroutine(unitID, coroutineID) then
+			return
+		end
+		
 		if delay > 0 then
-			for i = delay, 1, -1 do
+			while delay > 0 do
+				local stunned = Spring.GetUnitIsStunned(unitID)
+				if not stunned then
+					delay = delay - (GG.att_ReloadChange[unitID] or 1) -- Disarm or slow
+				end
+				local attachedTransport = Spring.GetUnitTransporter(unitID)
+				if attachedTransport then
+					FinishJump(unitID)
+					-- Transport cancels jump
+					CallAsUnitIfExists(unitID, env.cancelJump)
+					DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
+					return
+				end
 				Sleep()
+				if not ContinueCoroutine(unitID, coroutineID) then
+					return
+				end
 			end
 			
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
-				return
-			end
 			CallAsUnitIfExists(unitID,env.beginJump)
 			if PLAY_SOUND and (not cannotJumpMidair) then	-- don't make sound if we jump with legs instead of jets
 				GG.PlayFogHiddenSound("Jump", UnitDefs[unitDefID].mass/10, start[1], start[2], start[3])
 			end
-
 			if rotateMidAir then
 				mcSetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
 				mcSetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)
@@ -339,7 +455,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		local lastX, lastY, lastZ = start[1], start[2], start[3]
 		local i = 0
 		while i < 1 do
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
+			if not ContinueCoroutine(unitID, coroutineID) then
 				return
 			end
 
@@ -358,7 +474,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			CallAsUnitIfExists(unitID, env.jumping, i * 100)
 		
 			if (not halfJump and i > 0.5) then
-				CallAsUnitIfExists(unitID,env.halfJump)
+				CallAsUnitIfExists(unitID, env.halfJump)
 				halfJump = true
 				
 				-- Do structure collision here to prevent early collision (perhaps a rejump onto the same structure?)
@@ -387,11 +503,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		end
 		local jumpEndTime = spGetGameSeconds()
 		lastJumpPosition[unitID] = origCmdParams
-		jumping[unitID] = nil
-		SetLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
-		Spring.SetUnitRulesParam(unitID, "is_jumping", 0)
-		mcDisable(unitID)
+		FinishJump(unitID)
 
 		if hitStructure then
 			-- Add unstick impulse to make the jumper bound on the structure.
@@ -403,58 +516,13 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		end
 
 		if reloadTime <= 1 then
-			spSetUnitRulesParam(unitID, "jumpReload", 1)
+			spSetUnitRulesParam(unitID, "jumpReload", jumpCharges, publicReload and sightTable or privateTable)
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 			return
 		end
 
-		spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
-		spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
-
-		Sleep()
-
-		if not Spring.ValidUnitID(unitID) then
-			return
-		end
-
-		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-		if morphedTo then
-			lastJumpPosition[morphedTo] = lastJumpPosition[unitID]
-			lastJumpPosition[unitID] = nil
-			unitID = morphedTo
-			if not Spring.ValidUnitID(unitID) then
-				return
-			end
-		end
-
-		if Spring.GetUnitIsDead(unitID) then
-			return
-		end
-
-		Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
-
-		local reloadSpeed = 1/reloadTime
-		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
-
-		while reloadAmount < 1 do
-			if not Spring.ValidUnitID(unitID) then
-				return
-			end
-			morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-			if morphedTo then
-				unitID = morphedTo
-			end
-			if Spring.GetUnitIsDead(unitID) then
-				return
-			end
-
-			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
-			local reloadFactor = (stunnedOrInbuild and 0) or spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
-			spSetUnitRulesParam(unitID,"jumpReload",reloadAmount)
-			Sleep()
-		end
+		DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
 	end
 
 	StartScript(JumpLoop)
@@ -477,35 +545,28 @@ local function UpdateCoroutines()
 	end
 end
 
-function gadget:Initialize()
-	Spring.SetGameRulesParam("jumpJets", 1)
-	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 0.7})
-	Spring.AssignMouseCursor("Jump", "cursorJump", true, true)
-	gadgetHandler:RegisterCMDID(CMD_JUMP)
-	for _, unitID in pairs(Spring.GetAllUnits()) do
-		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
+local function ValidJumpLocation(unitDefID, pos)
+	if spTestMoveOrderX(unitDefID, pos[1], pos[2], pos[3]) then
+		return true
 	end
-end
-
-function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if (not jumpDefs[unitDefID]) then
-		return
+	-- Check whether the terrain is the source of the blockage. If it is not then
+	-- conclude that the blockage is a structure.
+	-- Jumping into water is allowed.
+	
+	local normal = select(2, spGetGroundNormal(pos[1],pos[3]))
+	-- Most of the time the normal will be close to 1 because structures are built on
+	-- flat ground. This check captures high slope tolerance things such as Windgens and
+	-- small turrets.
+	if normal < 0.6 then
+		-- Ground is too steep for bots to walk on.
+		return false
 	end
-	Spring.SetUnitRulesParam(unitID, "jumpReload", 1)
-	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
-end
-
-function gadget:UnitDestroyed(oldUnitID, unitDefID)
-	if jumping[oldUnitID] then
-		jumping[oldUnitID] = nil -- empty old unit's data
-	end
-	if jumpReloadMod[unitID] then
-		jumpReloadMod[unitID] = nil
-	end
+	
+	-- Ground is fine, must contain a blocking structure.
+	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-
 	if cmdID == CMD.INSERT and cmdParams[2] == CMD_JUMP then
 		return gadget:AllowCommand(unitID, unitDefID, teamID, CMD_JUMP, {cmdParams[4], cmdParams[5], cmdParams[6]}, cmdParams[3])
 	end
@@ -522,25 +583,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 	
 	if cmdID == CMD_JUMP and cmdParams[3] then
-		if spTestMoveOrderX(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3]) then
-			return true
-		else
-			-- Check whether the terrain is the source of the blockage. If it is not then
-			-- conclude that the blockage is a structure.
-			-- Jumping into water is allowed.
-			
-			local normal = select(2, spGetGroundNormal(cmdParams[1],cmdParams[3]))
-			-- Most of the time the normal will be close to 1 because structures are built on
-			-- flat ground. This check captures high slope tolerance things such as Windgens and
-			-- small turrets.
-			if normal < 0.6 then
-				-- Ground is too steep for bots to walk on.
-				return false
-			end
-			
-			-- Ground is fine, must contain a blocking structure.
-			return true
-		end
+		return ValidJumpLocation(unitDefID, cmdParams)
 	end
 	if goalSet[unitID] then
 		goalSet[unitID] = nil
@@ -548,37 +591,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return true -- allowed
 end
 
-function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
-	if (not jumpDefs[unitDefID]) then
-		return false
-	end
-
-	if (jumpDefs[unitDefID].noJumpHandling) then
-		return true, false
-	end
-	
-	if (cmdID ~= CMD_JUMP) then
-		return false
-	end
-
-	if (not Spring.ValidUnitID(unitID)) or (not cmdParams[3]) then
-		return true, true
-	end
-
-	if ((Spring.GetUnitRulesParam(unitID, "orbitalDrop") or 0) == 1) then
-		return true, false
-	end
-
-	if Spring.GetUnitIsStunned(unitID) then
-		-- these normally don't receive CommandFallback,
-		-- but can be reached via CMD.INSERT (engine bug?)
-		return true, false
-	end
-
-	if (jumping[unitID]) then
-		return true, false -- command was used but don't remove it (unit is still jumping)
-	end
-
+local function AttemptJump(unitID, unitDefID, cmdID, cmdParams)
 	if lastJumpPosition[unitID] then
 		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and
 				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
@@ -610,11 +623,24 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				jumps[coords] = {1, currFrame} --memorize coordinate so that next unit can choose different landing site
 				return true, false -- command was used but don't remove it (unit have not finish jump yet)
 			else
-				local r = landBoxSize*jumps[coords][1]^0.5/2
-				local randpos = {
-					cmdParams[1] + random(-r, r),
-					cmdParams[2],
-					cmdParams[3] + random(-r, r)}
+				local radius = landBoxSize*jumps[coords][1]^0.5/2
+				local tries = 3
+				local randpos = {0, cmdParams[2], 0}
+				while tries > 0 do
+					local offset = utRandomPointInCircle(radius)
+					randpos[1] = cmdParams[1] + offset[1]
+					randpos[3] = cmdParams[3] + offset[2]
+					if ValidJumpLocation(unitDefID, randpos) then
+						tries = 0
+					elseif tries == 1 then
+						tries = 0
+						randpos[1] = cmdParams[1]
+						randpos[3] = cmdParams[3]
+					else
+						tries = tries - 1
+						radius = radius * 0.8
+					end
+				end
 				local didJump, removeCommand = Jump(unitID, randpos, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
@@ -631,6 +657,75 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 
 	return true, false -- command was used but don't remove it
+end
+
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
+	if (cmdID ~= CMD_JUMP) then
+		return false
+	end
+
+	if (not jumpDefs[unitDefID]) then
+		return false
+	end
+
+	if (jumpDefs[unitDefID].noJumpHandling) then
+		return true, false
+	end
+
+	if (not Spring.ValidUnitID(unitID)) or (not cmdParams[3]) then
+		return true, true
+	end
+
+	if ((Spring.GetUnitRulesParam(unitID, "orbitalDrop") or 0) == 1) then
+		return true, false
+	end
+
+	if Spring.GetUnitIsStunned(unitID) then
+		-- these normally don't receive CommandFallback,
+		-- but can be reached via CMD.INSERT (engine bug?)
+		return true, false
+	end
+
+	if (jumping[unitID]) then
+		return true, false -- command was used but don't remove it (unit is still jumping)
+	end
+	
+	local cmdUsed, cmdRemove = AttemptJump(unitID, unitDefID, cmdID, cmdParams)
+	return cmdUsed, cmdRemove
+end
+
+local function CheckUnstunJump(unitID, unitDefID)
+	local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+	if (cmdID ~= CMD_JUMP) or (not cp_3) then
+		return
+	end
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return
+	end
+	if (not jumpDefs[unitDefID]) or (jumpDefs[unitDefID].noJumpHandling) then
+		return
+	end
+	if (not Spring.ValidUnitID(unitID)) then
+		return
+	end
+	if ((Spring.GetUnitRulesParam(unitID, "orbitalDrop") or 0) == 1) then
+		return
+	end
+	local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+	if stunnedOrInbuild or Spring.GetUnitRulesParam(unitID,"disarmed") == 1 then
+		return
+	end
+	if (jumping[unitID]) then
+		return
+	end
+	AttemptJump(unitID, unitDefID, cmdID, {cp_1, cp_2, cp_3})
+end
+
+function gadget:UnitStunned(unitID, unitDefID, unitTeam, isStunned)
+	if not isStunned then
+		CheckUnstunJump(unitID, unitDefID)
+	end
 end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
@@ -652,6 +747,38 @@ function gadget:GameFrame(currFrame)
 		if currFrame-queue_n_age[2] > 300 then
 			jumps[coords] = nil
 		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if (not jumpDefs[unitDefID]) then
+		return
+	end
+	Spring.SetUnitRulesParam(unitID, "jumpReload", jumpDefs[unitDefID].charges or 1)
+	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
+end
+
+function gadget:UnitDestroyed(oldUnitID, unitDefID)
+	if jumping[oldUnitID] then
+		jumping[oldUnitID] = nil -- empty old unit's data
+		uniqueCoroutineCounter[oldUnitID] = nil
+	end
+	if jumpReloadMod[unitID] then
+		jumpReloadMod[unitID] = nil
+	end
+end
+
+function gadget:Initialize()
+	Spring.SetGameRulesParam("jumpJets", 1)
+	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 0.7})
+	Spring.AssignMouseCursor("Jump", "cursorJump", true, true)
+	gadgetHandler:RegisterCMDID(CMD_JUMP)
+	GG.JumpNotifyDisarmRemoved = CheckUnstunJump
+	for _, unitID in pairs(Spring.GetAllUnits()) do
+		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
 end
 

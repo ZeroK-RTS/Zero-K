@@ -67,7 +67,7 @@ end
 function script.Create()
 	spSetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	for i = 1, #fakes do Hide (fakes[i]) end
-	Move (base, y_axis, -90000)
+	Move (base, y_axis, -89999)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(base, y_axis, math.rad(45))
 end

@@ -21,6 +21,7 @@ return { cloakjammer = {
     
     priority_misc = 1,
     cus_noflashlight = 1,
+    normaltex = [[unittextures/spherebot_normals.dds]],
   },
 
   energyUpkeep           = 1.5,

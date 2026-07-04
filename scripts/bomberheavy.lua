@@ -2,6 +2,7 @@ include "constants.lua"
 include "bombers.lua"
 include "fixedwingTakeOff.lua"
 
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 local base       = piece 'base'
 local wing_L     = piece 'wing_L'
@@ -29,6 +30,7 @@ local takeoffHeight = UnitDefNames["bomberheavy"].cruiseAltitude
 
 local function ShowBall()
 	Show(ball)
+	spSetUnitRulesParam(unitID, "ballHalo", 1, INLOS) -- show halo
 	
 	Move(radiator_L, z_axis, 0, 2)
 	Move(radiator_R, z_axis, 0, 2)
@@ -38,14 +40,8 @@ local function ShowBall()
 	Turn(hatch_R, y_axis, math.rad(0), 1)
 	Spin(ball_emit, y_axis, math.rad(30))
 	
-	local spSetUnitPieceMatrix = Spring.SetUnitPieceMatrix
-	local newTable = {1, 0, 0, 0,    0, 1, 0, 0,     0, 0, 1, 0,      0, 0, 0, 1}
 	for i = 1, 15 do
-		local scale = math.sin(i / 15 * 1.602)
-		newTable[1] = scale
-		newTable[6] = scale
-		newTable[11] = scale
-		spSetUnitPieceMatrix(unitID, ball, newTable)
+		Scale(ball, math.sin(i / 15 * 1.602))
 		Sleep(33)
 	end
 	
@@ -57,11 +53,10 @@ end
 
 local function HideBall()
 	Hide(ball)
-	Spring.SetUnitPieceMatrix(unitID, ball, {0, 0, 0})
+	spSetUnitRulesParam(unitID, "ballHalo", 0, INLOS) -- hide halo
+	Scale(ball, 0)
 	Turn(ball_emit, y_axis, 0)
 	Spin(ball_emit, y_axis, 0)
-	Move(ball, y_axis, 27)
-	Move(ball, z_axis, 1)
 	
 	Show(radiator_L)
 	Show(radiator_R)
@@ -171,7 +166,7 @@ end
 
 function script.StopMoving()
 	StartThread(Stopping)
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 end
 
 local function ShowBallWhenConstructionFinished()
@@ -199,11 +194,12 @@ function script.Create()
 
 	WingStart()
 	Hide(ball)
+	spSetUnitRulesParam(unitID, "ballHalo", 0, INLOS) -- hide halo
 	Hide(radiator_L)
 	Hide(radiator_R)
 
 	SetInitialBomberSettings()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 
 	StartThread(ShowBallWhenConstructionFinished)

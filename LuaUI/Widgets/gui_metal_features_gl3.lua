@@ -32,7 +32,7 @@ local spGetActiveCommand = Spring.GetActiveCommand
 local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 local spGetGameFrame = Spring.GetGameFrame
 
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+local BAR_COMPAT = Script.IsEngineMinVersion(105, 0, 500)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

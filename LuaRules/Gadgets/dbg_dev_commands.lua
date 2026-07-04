@@ -1,15 +1,15 @@
 
 function gadget:GetInfo()
-  return {
-    name      = "Dev Commands",
-    desc      = "Adds useful commands.",
-    author    = "Google Frog",
-    date      = "12 Sep 2011",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true,  --  loaded by default?
-	handler   = true,
-  }
+	return {
+		name      = "Dev Commands",
+		desc      = "Adds useful commands.",
+		author    = "Google Frog",
+		date      = "12 Sep 2011",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true,  --  loaded by default?
+		handler   = true,
+	}
 end
 
 
@@ -337,6 +337,7 @@ local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
 
 local creationUnitList, creationIndex
+local lastSpawnedUnitID
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -439,6 +440,56 @@ local function RotateUnit(cmd, line, words, player)
 	Spring.CreateUnit(unitDefID, x, y, z, facing, teamID)
 end
 
+local function SpawnNthUnit(cmd, line, words, player)
+	if not (spIsCheatingEnabled() and #words >= 3) then
+		return
+	end
+	local unitIndex = tonumber(words[1])
+	local x = tonumber(words[2])
+	local z = tonumber(words[3])
+	
+	if not (unitIndex and x and z) or unitIndex < 1 then
+		return
+	end
+	local y = Spring.GetGroundHeight(x, z)
+	if lastSpawnedUnitID then
+		Spring.DestroyUnit(lastSpawnedUnitID, false, true)
+		lastSpawnedUnitID = nil
+	end
+	
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
+		local ud = UnitDefs[udid]
+		if not ud.customParams.child_of_factory then
+			unitIndex = unitIndex - 1
+			if unitIndex <= 0 then
+				lastSpawnedUnitID = Spring.CreateUnit(udid, x, y, z, 1, 0)
+				return
+			end
+			if ud.buildOptions and #ud.buildOptions > 0 then
+				local sublist = ud.buildOptions
+				if ud.customParams.parent_of_plate then
+					unitIndex = unitIndex - 1
+					if unitIndex <= 0 then
+						local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
+						lastSpawnedUnitID = Spring.CreateUnit(subUdid, x, y, z, 1, 0)
+						return
+					end
+				end
+				for j = 1, #sublist do
+					unitIndex = unitIndex - 1
+					if unitIndex <= 0 then
+						local subUdid = sublist[j]
+						lastSpawnedUnitID = Spring.CreateUnit(subUdid,  x, y, z, 1, 0)
+						return
+					end
+				end
+			end
+		end
+	end
+end
+
 local function SetupNanoUnit(unitID, nanoAmount)
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
 	Spring.SetUnitHealth(unitID, {build = nanoAmount, health = maxHealth})
@@ -455,13 +506,14 @@ local function give(cmd,line,words,player)
 	local buildlist = UnitDefNames["armcom1"].buildOptions
 	local INCREMENT = 128
 	local orderUnit = {}
+	local baseOffX, baseOffZ = 200, 200
 	local zOffset = 0
 	for i = 1, #buildlist do
 		local udid = buildlist[i]
 		local ud = UnitDefs[udid]
 		if not ud.customParams.child_of_factory then
 			zOffset = zOffset + 1
-			local x, z = INCREMENT, zOffset*INCREMENT
+			local x, z = INCREMENT + baseOffX, zOffset*INCREMENT + baseOffZ
 			local y = Spring.GetGroundHeight(x,z)
 			local unitID = Spring.CreateUnit(udid, x, y, z, 0, 0, build)
 			if build then
@@ -472,7 +524,7 @@ local function give(cmd,line,words,player)
 				local offset = 1
 				if ud.customParams.parent_of_plate then
 					local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
-					local x2, z2 = (1 + offset)*INCREMENT, zOffset*INCREMENT
+					local x2, z2 = (1 + offset)*INCREMENT + baseOffX, zOffset*INCREMENT + baseOffZ
 					local y2 = Spring.GetGroundHeight(x2,z2)
 					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2, 0, 0, build)
 					if build then
@@ -483,7 +535,7 @@ local function give(cmd,line,words,player)
 				end
 				for j = 1, #sublist do
 					local subUdid = sublist[j]
-					local x2, z2 = (j+offset)*INCREMENT, zOffset*INCREMENT
+					local x2, z2 = (j+offset)*INCREMENT + baseOffX, zOffset*INCREMENT + baseOffZ
 					local y2 = Spring.GetGroundHeight(x2,z2)
 					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
 					--local ud = UnitDefs[subUdid]
@@ -649,6 +701,17 @@ local function damage(cmd,line,words,player)
 		for i=1, #units do
 			local unitID = units[i]
 			Spring.SetUnitHealth(unitID,1)
+		end
+	end
+end
+
+local function lightDamage(cmd,line,words,player)
+	if spIsCheatingEnabled() then
+		local units = Spring.GetAllUnits()
+		for i=1, #units do
+			local unitID = units[i]
+			local health, maxHealth = Spring.GetUnitHealth(unitID)
+			Spring.SetUnitHealth(unitID, health  - maxHealth * 0.1)
 		end
 	end
 end
@@ -869,6 +932,15 @@ local function PlaceBattle(cmd, line, words, player)
 	end
 end
 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+function gadget:UnitDestroyed(unitID)
+	if lastSpawnedUnitID == unitID then
+		lastSpawnedUnitID = nil
+	end
+end
+
 function gadget:GameFrame(n)
 	if not spIsCheatingEnabled() then
 		return
@@ -907,6 +979,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "moveunit",  MoveUnit,  "Moves a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "destroyunit",  DestroyUnit,  "Destroys a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "rotateunit",  RotateUnit,  "Rotates a unit.")
+	gadgetHandler.actionHandler.AddChatAction(self, "spawnnthunit",  SpawnNthUnit,  "Spawns a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "give", give, "Like give all but without all the crap.")
 	gadgetHandler.actionHandler.AddChatAction(self, "givesort", givesort, "Gives mobiles sorted by cost.")
 	gadgetHandler.actionHandler.AddChatAction(self, "pw", PlanetwarsGive, "Spawns all planetwars structures.")
@@ -914,6 +987,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "nf", nanoFrame, "Sets nanoframe values.")
 	gadgetHandler.actionHandler.AddChatAction(self, "rez", rezAll, "Resurrects wrecks for former owners.")
 	gadgetHandler.actionHandler.AddChatAction(self, "damage", damage, "Damages everything.")
+	gadgetHandler.actionHandler.AddChatAction(self, "ld", lightDamage, "Damages everything by 10%.")
 	gadgetHandler.actionHandler.AddChatAction(self, "color", ColorTest, "Spawns units for color test.")
 	gadgetHandler.actionHandler.AddChatAction(self, "clear", clear, "Clears all units and wreckage.")
 	gadgetHandler.actionHandler.AddChatAction(self, "uclear", uclear, "Clears all units.")

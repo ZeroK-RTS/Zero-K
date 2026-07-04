@@ -1062,6 +1062,13 @@ local function snapToHeight(heightArray, snapHeight, arrayCount)
 end
 
 function widget:MousePress(mx, my, button)
+	if button == 3 then  -- RMB cancels out of any operation
+		if drawingLasso or setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle or placingRectangle then
+			completelyStopCommand()
+			return true  -- we don't want to subscribe, but we don't want another widget responding to the right click
+		end
+	end
+	if button ~= 1 then return end  -- Only LMB is of interest to this widget
 	local screen0 = WG.Chili.Screen0
 	if screen0 and screen0.hoveredControl then
 		local classname = screen0.hoveredControl.classname
@@ -1069,7 +1076,7 @@ function widget:MousePress(mx, my, button)
 			return
 		end
 	end
-	if button == 1 and placingRectangle and placingRectangle.legalPos then
+	if placingRectangle and placingRectangle.legalPos then
 		local activeCmdIndex, activeid = spGetActiveCommand()
 		local index = Spring.GetCmdDescIndex(CMD_LEVEL)
 		if not index then
@@ -1133,113 +1140,95 @@ function widget:MousePress(mx, my, button)
 	if ((activeid == CMD_LEVEL) or (activeid == CMD_RAISE) or (activeid == CMD_SMOOTH) or (activeid == CMD_RESTORE) or (activeid == CMD_BUMPY))
 			and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or simpleDrawingRamp or placingRectangle) then
 
-		if button == 1 then
-			if not spIsAboveMiniMap(mx, my) then
-		
-				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
-				if legalPos(pos) then
-					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
-					orHeight = spGetGroundHeight(pos[1],pos[3])
-					
-					local a,c,m,s = spGetModKeyState()
-					local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
-					if c and ty == "unit" and c then
-						local ud = UnitDefs[spGetUnitDefID(id)]
-						--if ud.isImmobile then
-						mouseUnit = {id = id, ud = ud}
-						drawingRectangle = true
-						point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
-						point[2] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
-						point[3] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
-						--end
-					elseif a then
-						drawingRectangle = true
-						point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
-						point[2] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
-						point[3] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
-					else
-						drawingLasso = true
-						points = 1
-						point[1] = {x = pos[1], y = orHeight, z = pos[3]}
-					end
-					
-					if (activeid == CMD_LEVEL) then
-						terraform_type = 1
-						terraformHeight = point[1].y
-						storedHeight = orHeight
-					elseif (activeid == CMD_RAISE) then
-						terraform_type = 2
-						terraformHeight = 0
-						storedHeight = 0
-					elseif (activeid == CMD_SMOOTH) then
-						terraform_type = 3
-					elseif (activeid == CMD_RESTORE) then
-						terraform_type = 5
-					elseif (activeid == CMD_BUMPY) then
-						terraform_type = 6
-					end
-					
-					currentlyActiveCommand = activeid
-					
-					return true
+		if not spIsAboveMiniMap(mx, my) then
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
+			if legalPos(pos) then
+				widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
+				orHeight = spGetGroundHeight(pos[1],pos[3])
+
+				local a,c,m,s = spGetModKeyState()
+				local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
+				if c and ty == "unit" and c then
+					local ud = UnitDefs[spGetUnitDefID(id)]
+					--if ud.isImmobile then
+					mouseUnit = {id = id, ud = ud}
+					drawingRectangle = true
+					point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+					point[2] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+					point[3] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+					--end
+				elseif a then
+					drawingRectangle = true
+					point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+					point[2] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+					point[3] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+				else
+					drawingLasso = true
+					points = 1
+					point[1] = {x = pos[1], y = orHeight, z = pos[3]}
 				end
-			end
-		else
-			spSetActiveCommand(nil)
-			originalCommandGiven = false
-			return true
-		end
-		
-	elseif (activeid == CMD_RAMP) and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or simpleDrawingRamp or placingRectangle) then
-		if button == 1 then
-			if not spIsAboveMiniMap(mx, my) then
-				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
-				if legalPos(pos) then
-					local a,c,m,s = spGetModKeyState()
-					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
-					orHeight = spGetGroundHeight(pos[1],pos[3])
-					
-					point[1] = {x = pos[1], y = orHeight, z = pos[3], ground = orHeight}
-					point[2] = {x = pos[1], y = point[1].y, z = pos[3], ground = point[1]}
+
+				if (activeid == CMD_LEVEL) then
+					terraform_type = 1
+					terraformHeight = point[1].y
 					storedHeight = orHeight
-					points = 2
-					if c or a then
-						drawingRamp = 1
-					else
-						simpleDrawingRamp = 1
-					end
-					terraform_type = 4
-					terraformHeight = startRampWidth -- width
-					mouseX = mx
-					mouseY = my
-					return true
+				elseif (activeid == CMD_RAISE) then
+					terraform_type = 2
+					terraformHeight = 0
+					storedHeight = 0
+				elseif (activeid == CMD_SMOOTH) then
+					terraform_type = 3
+				elseif (activeid == CMD_RESTORE) then
+					terraform_type = 5
+				elseif (activeid == CMD_BUMPY) then
+					terraform_type = 6
 				end
+
+				currentlyActiveCommand = activeid
+
+				return true
 			end
 		end
-		
+	elseif (activeid == CMD_RAMP) and not (setHeight or drawingRectangle or drawingLasso or drawingRamp or simpleDrawingRamp or placingRectangle) then
+		if not spIsAboveMiniMap(mx, my) then
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
+			if legalPos(pos) then
+				local a,c,m,s = spGetModKeyState()
+				widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
+				orHeight = spGetGroundHeight(pos[1],pos[3])
+
+				point[1] = {x = pos[1], y = orHeight, z = pos[3], ground = orHeight}
+				point[2] = {x = pos[1], y = point[1].y, z = pos[3], ground = point[1]}
+				storedHeight = orHeight
+				points = 2
+				if c or a then
+					drawingRamp = 1
+				else
+					simpleDrawingRamp = 1
+				end
+				terraform_type = 4
+				terraformHeight = startRampWidth -- width
+				mouseX = mx
+				mouseY = my
+				return true
+			end
+		end
 	end
 	
-	if setHeight and button == 1 then
+	if setHeight then
 		SendCommand()
 		local a,c,m,s = spGetModKeyState()
 		stopCommand(s)
 		return true
 	end
 	
-	if drawingRamp == 2 and button == 1 then
+	if drawingRamp == 2 then
 		mouseX = mx
 		mouseY = my
 		drawingRamp = 3
 		return true
 	end
 
-	if drawingLasso or setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle or placingRectangle then
-		if button == 3 then
-			completelyStopCommand()
-			return true
-		end
-	end
-	
 	return false
 end
 

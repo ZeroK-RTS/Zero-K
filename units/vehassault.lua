@@ -15,6 +15,7 @@ return { vehassault = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead     = 120,
     bait_level_default = 0,
     aimposoffset   = [[0 8 0]],
     midposoffset   = [[0 3 0]],
@@ -64,6 +65,7 @@ return { vehassault = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -76,11 +78,13 @@ return { vehassault = {
     PLASMA = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 32,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams        = {
         light_camera_height = 1500,
+        burst = Shared.BURST_RELIABLE,
       },
 
       damage                  = {

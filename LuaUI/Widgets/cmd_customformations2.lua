@@ -247,7 +247,7 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGiveOrder = Spring.GiveOrder
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCommands = Spring.GetUnitCommands
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetFeaturePosition = Spring.GetFeaturePosition
@@ -315,7 +315,7 @@ local function GetUnitFinalPosition(uID)
 
 	local ux, uy, uz = spGetUnitPosition(uID)
 
-	local cmds = spGetCommandQueue(uID, -1)
+	local cmds = spGetUnitCommands(uID, -1)
 	if not cmds then
 		return 0, 0, 0
 	end

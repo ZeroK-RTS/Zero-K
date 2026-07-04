@@ -206,7 +206,6 @@ options_order = {
 	
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
 	'error_opengl_source',
-	'filter_luaHandleCheckStack',
 	
 	--'pointButtonOpacity',
 	
@@ -290,16 +289,6 @@ options = {
 		path = filter_path ,
 		advanced = true,
 	},
-	filter_luaHandleCheckStack = {
-		name = "Filter out \'LuaHandle::CheckStack\' error",
-		type = 'bool',
-		value = true,
-		desc = "This filters out a message that appears usesless, and started being spammed in 105.1.1-2511.",
-		path = filter_path ,
-		advanced = true,
-	},
-	
-	
 	enableConsole = {
 		name = "Enable the debug console",
 		type = 'bool',
@@ -923,6 +912,10 @@ local function detectHighlight(msg)
 	end
 end
 
+local function SanitizeNick(name)
+	return name:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+end
+
 local function formatMessage(msg)
 	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
 
@@ -941,7 +934,8 @@ local function formatMessage(msg)
 		-- we get all the usernames by iterating it and just ignoring the #[aehos] control codes
 		for name, colour in pairs(incolors) do
 			if name:sub(1,1) ~= '#' then
-				local pattern = '([^%w_])(' .. name .. ')([^%w_])'
+				local sanitized = SanitizeNick(name)
+				local pattern = '([^%w_])(' .. sanitized .. ')([^%w_])'
 				local sub = '%1'..colour..'%2'..message_colour..'%3'
 				formatted_arg, _ = formatted_arg:gsub(pattern, sub)
 			end
@@ -1066,7 +1060,7 @@ local function AddMessage(msg, target, remake)
 		autoObeyLineHeight=true,
 		--]]
 		objectOverrideFont = WG.GetSpecialFont(size, "proconsole", {
-			outlineWidth = 3,
+			outlineWidth = 2,
 			outlineWeight = 10,
 			outline = true,
 		})
@@ -1496,10 +1490,6 @@ function widget:AddConsoleMessage(msg)
 		if options.error_opengl_source.value and (msg.argument):find('Error: OpenGL: source') then
 			return
 		end
-		if options.filter_luaHandleCheckStack.value and (msg.argument):find("Warning: [LuaHandle::CheckStack] LuaRules stack-top", 0, true) then
-			return
-		end
-		
 		if (msg.argument):find('added point') then
 			return
 		end
@@ -1618,7 +1608,7 @@ function widget:Update(s)
 			SwapBacklog()
 		end
 		firstUpdate = false
-		SetInputFontSize(15)
+		SetInputFontSize(18)
 		if missionMode then
 			SetHidden(true)
 		end
@@ -1841,7 +1831,7 @@ function widget:Shutdown()
 	if (window_chat) then
 		window_chat:Dispose()
 	end
-	SetInputFontSize(20)
+	SetInputFontSize(18)
 	Spring.SendCommands({"console 1", "inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
 	

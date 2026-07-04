@@ -73,7 +73,7 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	end
 end
 
-local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
+local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeBoost, damageMult)
 	if (not weapon2) and weapon1 then
 		local weaponName = "0_" .. weapon1
 		local wd = WeaponDefNames[weaponName]
@@ -90,18 +90,19 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 		weapon2 = "commweapon_beamlaser"
 	end
 	
-	rangeMult = rangeMult or Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
-	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
+	rangeBoost = rangeBoost or Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0
+	Spring.SetUnitRulesParam(unitID, "comm_range_boost", rangeBoost,  INLOS)
 	damageMult = damageMult or Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult, damageMult)
+	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeBoost, damageMult)
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-	local newAttributesEffect = false
+	local newAttributesEffect = {}
+	newAttributesEffect.cost = totalCost / ud.metalCost
 	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
 	if data.speedMultPost or data.speedMod then
@@ -152,7 +153,6 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if buildPowerMult ~= 1 then
 		-- Needs to use the new system so static can be set, to display properly on the UI.
-		newAttributesEffect = newAttributesEffect or {}
 		newAttributesEffect.build = buildPowerMult
 	end
 	
@@ -166,7 +166,6 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
 		newHealth = math.max(health + data.healthBonus, 1)
-		newAttributesEffect = newAttributesEffect or {}
 		newAttributesEffect.healthAdd = data.healthBonus
 	end
 	
@@ -198,10 +197,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	end
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
-	local effectiveMass = (((totalCost/2) + (maxHealth/8))^0.6)*6.5
-	Spring.SetUnitRulesParam(unitID, "massOverride", effectiveMass, INLOS)
-	
-	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
+	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeBoost, data.damageMult)
 	
 	if newAttributesEffect then
 		newAttributesEffect.static = true
@@ -283,7 +279,6 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	Spring.SetUnitRulesParam(unitID, "comm_level",         level, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis",       chassis, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_name",          name, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_cost",          totalCost, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
@@ -295,12 +290,6 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	if staticLevel then -- unmorphable
 		Spring.SetUnitRulesParam(unitID, "comm_staticLevel",   staticLevel, INLOS)
 	end
-	
-	Spring.SetUnitCosts(unitID, {
-		buildTime = totalCost,
-		metalCost = totalCost,
-		energyCost = totalCost
-	})
 	
 	-- Set module unitRulesParams
 	-- Decorations are kept seperate from other module types.
@@ -442,6 +431,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
 	local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
+	-- Base modules for all starting commanders. Keep in sync with fallback in chassisDefByBaseDef block below.
 	local moduleList = {chassisModuleDefs.econ, chassisModuleDefs.module_radarnet}
 	local moduleCost = 0
 	for i = 1, #moduleList do
@@ -537,19 +527,24 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 	
 	if chassisDefByBaseDef[unitDefID] then
-		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
-		
+		-- Fallback for dynamic comms created outside the normal spawn path (e.g. hatched from commander egg).
+		local chassisDefID = chassisDefByBaseDef[unitDefID]
+		local chassisData = chassisDefs[chassisDefID]
+		local chassisModuleDefs = moduleDefNames[chassisData.name] or {}
+		local moduleList = {}
+		local moduleCost = 0
+
 		InitializeDynamicCommander(
 			unitID,
 			0,
-			chassisDefByBaseDef[unitDefID],
-			UnitDefs[unitDefID].metalCost,
-			"Guinea Pig",
+			chassisDefID,
+			UnitDefs[unitDefID].metalCost + moduleCost,
+			"Hatched Commander",
 			unitDefID,
 			chassisData.baseWreckID,
 			chassisData.baseHeapID,
-			{},
-			{}
+			moduleList,
+			false
 		)
 		return
 	end

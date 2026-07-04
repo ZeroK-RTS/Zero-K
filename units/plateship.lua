@@ -40,6 +40,7 @@ return { plateship = {
     cus_noflashlight       = 1,
     child_of_factory       = [[factoryship]],
     buggeroff_offset       = 0,
+    normaltex = [[unittextures/seafac_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,
@@ -62,7 +63,7 @@ return { plateship = {
   sightDistance                 = 273,
   waterline                     = 0,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy]],
+  yardMap                       = [[oouuuu oouuuu oouuuu oouuuu oouuuu oouuuu oouuuu oouuuu]],
 
   featureDefs            = {
 

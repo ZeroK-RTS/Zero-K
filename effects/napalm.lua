@@ -392,6 +392,44 @@ local cegs = {
     },
   },
 
+  ["napalm_dante_small"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 95,
+      ttl                = 520,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom_low = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i2]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_45_long]],
+        pos                = [[-10 r10, 25, -10 r10]],
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i10]],
+        explosiongenerator = [[custom:napalmfireball_firewalker_small]],
+        pos                = [[-20 r40, 5 r10, -20 r40]],
+      },
+    },
+  },
+
   ["napalm_gunshipbomb"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -658,6 +696,25 @@ local altforms = {
         particlespeed      = 0.4,
         particlespeedspread = 0.2,
         sizegrowth         = 0.45,
+        colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+        },
+      },
+    },
+  },
+  napalmfireball_45_long = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+      properties = {
+        emitrot            = 90,
+        emitrotspread      = 90,
+        particlelife       = 430,
+        particlelifespread = 20,
+        particlesize       = 58,
+        particlesizespread = 15,
+        particlespeed      = 0.4,
+        particlespeedspread = 0.2,
+        sizegrowth         = 0.02,
         colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
         },
       },

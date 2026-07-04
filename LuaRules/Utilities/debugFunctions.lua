@@ -19,6 +19,16 @@ for cmdName, cmdID in pairs(VFS.Include("LuaRules/Configs/customcmds.lua", nil, 
 	cmdNames[cmdID] = cmdName
 end
 
+function Spring.Utilities.IsNanOrInf(...)
+	local myargs = {...}
+	for i = 1, #myargs do
+		local x = myargs[i]
+		if x ~= x or x == math.huge or x == -math.huge then
+			return true
+		end
+	end
+end
+
 function Spring.Utilities.CommandNameByID(cmdID) -- returns a human-parsable string
 	local ret
 	if type(cmdID) ~= "number" then

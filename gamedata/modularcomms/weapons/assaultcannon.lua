@@ -2,6 +2,7 @@ local name = "commweapon_assaultcannon"
 local weaponDef = {
 	name                    = [[Assault Cannon]],
 	areaOfEffect            = 32,
+	cegTag                  = [[light_plasma_trail]],
 	craterBoost             = 1,
 	craterMult              = 3,
 

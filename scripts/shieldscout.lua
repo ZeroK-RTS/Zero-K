@@ -127,37 +127,38 @@ end
 -- Walking low detail
 
 local function Step(front, back)
-	Turn(front.thigh, x_axis, math.rad(70), math.rad(230))
-	Turn(front.calf, x_axis, math.rad(20), math.rad(270))
+	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
+	Turn(front.thigh, x_axis, math.rad(70), math.rad(230) * speed)
+	Turn(front.calf, x_axis, math.rad(20), math.rad(270) * speed)
 	--Turn(front.foot, x_axis, math.rad(-100), math.rad(420))
 	
-	Turn(back.thigh, x_axis, math.rad(-20), math.rad(420))
-	Turn(back.calf, x_axis, math.rad(50), math.rad(420))
+	Turn(back.thigh, x_axis, math.rad(-20), math.rad(420) * speed)
+	Turn(back.calf, x_axis, math.rad(50), math.rad(420) * speed)
 	--Turn(back.foot, x_axis, math.rad(30), math.rad(420))
 	
 	--Turn(pelvis, z_axis, math.rad(-5), math.rad(40))
-	Turn(front.thigh, z_axis, math.rad(5), math.rad(40))
-	Turn(front.thigh, z_axis, math.rad(5), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(5), math.rad(40) * speed)
+	Turn(front.thigh, z_axis, math.rad(5), math.rad(40) * speed)
 	--Move(pelvis, y_axis, 0.7, 8000)
 	
 	--WaitForTurn(front.thigh, x_axis)
-	Sleep(166)
+	Sleep(166 / math.max(0.5, speed))
 	
-	Turn(front.thigh, x_axis, math.rad(-10), math.rad(320))
-	Turn(front.calf, x_axis, math.rad(-60), math.rad(500))
+	Turn(front.thigh, x_axis, math.rad(-10), math.rad(320) * speed)
+	Turn(front.calf, x_axis, math.rad(-60), math.rad(500) * speed)
 	--Turn(front.foot, x_axis, math.rad(70), math.rad(270))
 	
-	Turn(back.thigh, x_axis, math.rad(40), math.rad(270))
-	Turn(back.calf, x_axis, math.rad(-40), math.rad(270))
+	Turn(back.thigh, x_axis, math.rad(40), math.rad(270) * speed)
+	Turn(back.calf, x_axis, math.rad(-40), math.rad(270) * speed)
 	--Turn(back.foot, x_axis, 0, math.rad(270))
 	
 	--Move(pelvis, y_axis, 0, 8000)
-	Turn(box, x_axis, math.rad(10), math.rad(40))
+	Turn(box, x_axis, math.rad(10), math.rad(40) * speed)
 	
 	--WaitForTurn(front.calf, x_axis)
-	Sleep(166)
+	Sleep(166 / math.max(0.5, speed))
 	
-	Turn(box, x_axis, math.rad(-10), math.rad(40))
+	Turn(box, x_axis, math.rad(-10), math.rad(40) * speed)
 end
 
 local function WalkLowDetail()

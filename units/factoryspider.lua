@@ -51,6 +51,7 @@ return { factoryspider = {
     outline_x = 250,
     outline_y = 250,
     outline_yoff = 5,
+    normaltex = [[unittextures/corvrad_normals.dds]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

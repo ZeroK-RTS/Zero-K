@@ -36,6 +36,7 @@ Spring.Utilities.json = vfsInclude("LuaRules/Utilities/json.lua"          , nil,
 
 vfsInclude("LuaRules/Utilities/globals.lua"          , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/stringFunctions.lua"  , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/debugFunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
@@ -173,6 +174,8 @@ widgetHandler = {
 	tweakMode = false,
 }
 
+VFS.Include('LuaRules/engine_compat_post.lua', nil, vfsGame)
+
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
 local flexCallIns = {
@@ -243,6 +246,7 @@ local flexCallIns = {
 	'DrawShadowFeaturesLua',
 	'RecvSkirmishAIMessage',
 	'SelectionChanged',
+	'TeamColorsChanged',
 	'AddConsoleMessage',
 	'Save',
 	'Load',
@@ -1682,6 +1686,16 @@ function widgetHandler:CommandsChanged()
 end
 
 
+function widgetHandler:TeamColorsChanged()
+	tracy.ZoneBeginN("W:TeamColorsChanged")
+	for _, w in r_ipairs(self.TeamColorsChangedList) do
+		tracy.ZoneBeginN("W:TeamColorsChanged:" .. w.whInfo.name)
+		w:TeamColorsChanged();
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
 --------------------------------------------------------------------------------
 --
 --  Drawing call-ins
@@ -2559,22 +2573,22 @@ end
 --  Unit call-ins
 --
 
-function widgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function widgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("W:UnitCreated")
 	for _, w in r_ipairs(self.UnitCreatedList) do
 		tracy.ZoneBeginN("W:UnitCreated:" .. w.whInfo.name)
-		w:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+		w:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
 end
 
 -- NB: called via Lua at the moment, not engine
-function widgetHandler:UnitResurrected(unitID, unitDefID, unitTeam, builderID)
+function widgetHandler:UnitResurrected(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("W:UnitResurrected")
 	for _, w in r_ipairs(self.UnitResurrectedList) do
 		tracy.ZoneBeginN("W:UnitResurrected:" .. w.whInfo.name)
-		w:UnitResurrected(unitID, unitDefID, unitTeam, builderID)
+		w:UnitResurrected(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
@@ -2690,11 +2704,11 @@ end
 
 if Script.IsEngineMinVersion(104, 0, 1431) then
 
-	function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua) -- cmdOpts is a bitmask
+	function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua) -- cmdOpts is a bitmask -- Is it? Seems to be a table.
 		tracy.ZoneBeginN("W:UnitCommand")
 		for _, w in r_ipairs(self.UnitCommandList) do
 			tracy.ZoneBeginN("W:UnitCommand:" .. w.whInfo.name)
-			w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
+			w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
 			tracy.ZoneEnd()
 		end
 		tracy.ZoneEnd()

@@ -35,6 +35,7 @@ return { cloakcon = {
     area_cloak_shrink_rate = 1400,
     area_cloak_move_mult = 0.666,
     area_cloak_recloak_rate = 600,
+    normaltex = [[unittextures/spherebot_normals.dds]],
 
     priority_misc = 2, -- High
   },

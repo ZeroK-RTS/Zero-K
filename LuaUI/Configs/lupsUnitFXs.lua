@@ -55,7 +55,7 @@ effectUnitDefs = {
 	--// FUSIONS //--------------------------
 	energysingu = {
 		{class='Bursts', options=energysinguBursts},
-		{class='StaticParticles', options=energysinguCorona},
+		{class='StaticParticles', options=MergeTable(energysinguCorona, {piece="energyball", sizeScaleParam="ballSwell"})},
 		--{class='ShieldSphere', options=energysinguShieldSphere},
 		--{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
 		{class='GroundFlash', options=groundFlashOrange},
@@ -100,9 +100,9 @@ effectUnitDefs = {
 	},
 
 	--// ENERGY STORAGE //--------------------
-	energypylon = {
-		{class='GroundFlash', options=groundFlashenergypylon},
-	},
+	--energypylon = { -- Lights draw it now
+	--	{class='GroundFlash', options=groundFlashenergypylon},
+	--},
 
 	--// FACTORIES //----------------------------
 	factoryship = {
@@ -206,7 +206,7 @@ effectUnitDefs = {
 
 		-- portable singularity
 		{class='Bursts', options=MergeTable(energysinguBursts,{piece="ball", noIconDraw = true, size=5, pos={0,0,0}})},
-		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", noIconDraw = true, size=18, pos={0,0,0}})},
+		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", onUnitRulesParam="ballHalo", noIconDraw = true, size=18})},
 
 		-- blinky lights
 		{class='StaticParticles', options=MergeTable(blinkyLightRed,   {piece="extra_L"}) },

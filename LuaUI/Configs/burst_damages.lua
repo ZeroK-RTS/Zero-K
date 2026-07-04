@@ -6,11 +6,7 @@
 local NORMAL = 1
 local AA = 2
 local EMP_OR_DISARM = 3
-
-local burstDefs = {}
-Shared = burstDefs -- unitdefs_pre expects it as a global
-VFS.Include("gamedata/unitdefs_pre.lua", nil, VFS.GAME)
-Shared = nil
+local SHARED = VFS.Include("gamedata/unitdefs_pre.lua", nil, VFS.GAME)
 
 local function processWeapon(weaponDef, targetCats)
 	local cp = weaponDef.customParams
@@ -22,7 +18,7 @@ local function processWeapon(weaponDef, targetCats)
 	local rawDamage = cp.stats_damage * projectiles
 	local burstDef = {
 		damage = tonumber(cp.stats_burst_damage) or math.floor(rawDamage + 0.5), -- units often do extra .1 damage which would result in ugliness for 10+ units
-		unreliable = (cp.burst == burstDefs.BURST_UNRELIABLE),
+		unreliable = (cp.burst == SHARED.BURST_UNRELIABLE),
 		class = (weaponDef.paralyzer or cp.disarmdamagemult) and EMP_OR_DISARM or NORMAL,
 	}
 

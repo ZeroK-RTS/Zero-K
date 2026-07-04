@@ -15,6 +15,7 @@ local smokePiece = { piece "base", piece "arm1", piece "arm2", piece "arm3" }
 
 local ballSize = 0
 local is_stunned = true
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 local function SizeControl()
 	local mag = math.random() + 1
@@ -22,8 +23,6 @@ local function SizeControl()
 	local t = 0
 
 	local sin = math.sin
-	local spSetUnitPieceMatrix = Spring.SetUnitPieceMatrix
-	local pieceTable = {Spring.GetUnitPieceMatrix(unitID, energyball)}
 
 	while true do
 		if is_stunned then
@@ -43,10 +42,8 @@ local function SizeControl()
 		end
 
 		local ballSwellFactor = 1.13^(sin(t/period)*mag) * (ballSize^2 / 11000)
-		pieceTable[ 1] = ballSwellFactor
-		pieceTable[ 6] = ballSwellFactor
-		pieceTable[11] = ballSwellFactor
-		spSetUnitPieceMatrix(unitID, energyball, pieceTable)
+		spSetUnitRulesParam(unitID, "ballSwell", 1.15*ballSwellFactor - 0.1, INLOS)
+		Scale(energyball, ballSwellFactor)
 
 		t = t + 1
 		Sleep(33)
@@ -71,9 +68,10 @@ end
 
 local function Anim()
 	local spGetUnitIsStunned = Spring.GetUnitIsStunned
+	local spGetUnitRulesParam = Spring.GetUnitRulesParam
 	local was_stunned = true
 	while true do
-		is_stunned = spGetUnitIsStunned(unitID)
+		is_stunned = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		if is_stunned ~= was_stunned then
 			was_stunned = is_stunned
 			if is_stunned then
@@ -89,6 +87,7 @@ end
 
 function script.Create()
 	Hide(energyball)
+	spSetUnitRulesParam(unitID, "ballSwell", 0, INLOS) -- halo size
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(Anim)

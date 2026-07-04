@@ -142,7 +142,7 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	end
 	
 	local alreadyGuarding = {}
-	local cmdQueue = Spring.GetCommandQueue(unitID, -1);
+	local cmdQueue = Spring.GetUnitCommands(unitID, -1);
 	for _,cmd in ipairs(cmdQueue) do
 		if cmd.id == CMD.GUARD and #cmd.params == 1 then
 			alreadyGuarding[ cmd.params[1] ] = true

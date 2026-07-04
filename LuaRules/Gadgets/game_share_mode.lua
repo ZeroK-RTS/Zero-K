@@ -126,6 +126,14 @@ local firstError = true
 local playerstates = {} -- keeps track of player states so that we can remerge them if necessary.
 local invites = {} -- the invites people have out.
 local originalUnits = {} -- contains which units are owned by a team that has commshared.
+
+-- Register a unit as belonging to a specific original team (for correct unmerge routing).
+-- Used by egg hatching to ensure hatched commanders return to the right team on unmerge.
+local function RegisterUnitToTeam(unitID, teamID)
+	if originalUnits[teamID] then
+		originalUnits[teamID][#originalUnits[teamID] + 1] = unitID
+	end
+end
 local updateplayers = {}
 local updateplayercount = 0
 
@@ -750,4 +758,5 @@ end
 function gadget:Initialize()
 	gadgetHandler:AddChatAction("debugcommshare", ToggleDebug, "Toggles Commshare debugMode echos.")
 	GG.UnmergePlayerFromCommshare = UnmergePlayer
+	GG.ShareMode_RegisterUnit = RegisterUnitToTeam
 end

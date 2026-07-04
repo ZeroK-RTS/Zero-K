@@ -269,7 +269,7 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 			local unitID = currentSelection[i]
 			local unitDefID = spGetUnitDefID(unitID)
 			if unitDefID and isBuilder[unitDefID] then
-				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
+				local cmdQueue = Spring.GetUnitCommands(unitID, -1)
 				if cmdQueue then
 					for i = 1, #cmdQueue do
 						local cmd = cmdQueue[i]

@@ -151,11 +151,41 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Nicer missile trails https://github.com/beyond-all-reason/RecoilEngine/pull/2736/files
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.smoketrail and not weaponDef.smokeperiod then
+		weaponDef.smokeperiod = 1
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Set lenient fire tolerance
 
 for _, weaponDef in pairs(WeaponDefs) do
 	if not weaponDef.firetolerance then
 		weaponDef.firetolerance = 32768 -- Full 180 degrees on either side.
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Allow one more second of stun so that gadgets can handle fractional seconds
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.customparams.disarmdamagemult or weaponDef.paralyzetime then
+		weaponDef.customparams.overstun_time = weaponDef.customparams.overstun_time or 1
+	end
+	if weaponDef.paralyzetime then
+		if not weaponDef.paralyzer then
+			weaponDef.customparams.extra_paratime = weaponDef.paralyzetime
+		end
+		weaponDef.customparams.emp_paratime = weaponDef.paralyzetime
+		weaponDef.paralyzetime = weaponDef.paralyzetime + math.ceil(weaponDef.customparams.overstun_time)
 	end
 end
 
@@ -201,6 +231,18 @@ end
 for _, weaponDef in pairs(WeaponDefs) do
 	if weaponDef.weapontype == "LaserCannon" then
 		weaponDef.burnblow = false
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Apply implicit default StarburstLauncher turn rate (for lua).
+-- See https://github.com/beyond-all-reason/RecoilEngine/issues/2762
+
+for name, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "StarburstLauncher" and (weaponDef.turnrate or 0) == 0 then
+		weaponDef.turnrate = 18775
 	end
 end
 
@@ -316,8 +358,10 @@ for name, wd in pairs (WeaponDefs) do
 		if not cp.area_damage_radius then cp.area_damage_radius = area_damage_defaults.radius end
 		if not cp.area_damage_duration then cp.area_damage_duration = area_damage_defaults.duration end
 		if not cp.area_damage_plateau_radius then cp.area_damage_plateau_radius = area_damage_defaults.plateau_radius end
+		if not cp.area_damage_plateau_fall then cp.area_damage_plateau_fall = area_damage_defaults.plateau_fall end
 
 		if not cp.area_damage_is_impulse then cp.area_damage_is_impulse = area_damage_defaults.is_impulse end
+		if not cp.area_damage_drag_factor then cp.area_damage_drag_factor = area_damage_defaults.drag_factor end
 		if not cp.area_damage_range_falloff then cp.area_damage_range_falloff = area_damage_defaults.range_falloff end
 		if not cp.area_damage_time_falloff then cp.area_damage_time_falloff = area_damage_defaults.time_falloff end
 	end
@@ -400,9 +444,6 @@ end
 -- ???
 
 for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.paralyzetime and not weaponDef.paralyzer then
-		weaponDef.customparams.extra_paratime = weaponDef.paralyzetime
-	end
 	if not weaponDef.predictboost then
 		weaponDef.predictboost = 1
 	end

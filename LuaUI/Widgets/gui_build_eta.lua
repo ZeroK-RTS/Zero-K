@@ -89,7 +89,7 @@ local function MakeETA(unitID,unitDefID)
 		rate     = nil,
 		lastNewTime = nil,
 		timeLeft = nil,
-		yoffset  = Spring.Utilities.GetUnitHeight(ud) + 14,
+		yoffset  = Spring.Utilities.GetUnitHeight(ud) + 14 + (tonumber(ud.customParams.health_bar_height) or 0),
 	}
 end
 

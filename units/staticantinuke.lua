@@ -27,6 +27,7 @@ return { staticantinuke = {
     outline_x = 185,
     outline_y = 185,
     outline_yoff = 25,
+    normaltex = [[unittextures/antinuke_normals.dds]],
 
     construction_rebate = 0.5,
     construction_rebate_decrement = 0.1,

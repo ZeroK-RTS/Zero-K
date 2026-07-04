@@ -115,6 +115,7 @@ return { shipcarrier = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadlimit               = 0,
       model                   = [[wep_empmissile.s3o]],
       noSelfDamage            = true,
       range                   = 3000,

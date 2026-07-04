@@ -35,10 +35,12 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
+local DEFAULT_IDLE_OPACITY = 0.45
 local BUTTON_COLOR = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_FACTORY = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_WARNING = {1, 0.2, 0.1, 1}
 local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
+local buttonColorHighlight = {0.8, 0.8, 0.2, DEFAULT_IDLE_OPACITY}
 local IMAGE_COLOR_DISABLED = {0.3, 0.3, 0.3, 1}
 
 local stateCommands = {	-- FIXME: is there a better way of doing this?
@@ -80,6 +82,10 @@ local oldButtonList
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
+local idleTransports = {} -- [unitID] = true
+local consCarriedByEnemyTransports = {} -- [unitID] = true
+local fromConIDToCarryingTransportID = {}
+local fromTransportIDToCarriedConID = {}
 
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
@@ -102,6 +108,7 @@ local BUILD_ICON_DISABLED = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
 
 local UPDATE_FREQUENCY = 0.25
 local COMM_WARNING_TIME	= 2
+local IDLE_CONS_HIGHLIGHT_TIME = 0.5
 
 local CONSTRUCTOR_ORDER = 1
 local COMMANDER_ORDER = 2
@@ -121,6 +128,15 @@ for name in pairs(exceptionList) do
 	end
 end
 
+local function SetButtonColorHighlight(opacity)
+	buttonColorHighlight[4] = opacity
+end
+
+local function CanBeAnIdleCons(ud)
+	return (ud.buildSpeed > 0) and (not exceptionArray[ud.id]) and (not ud.isFactory)
+		and (options.monitoridlecomms.value or not ud.customParams.dynamic_comm)
+		and (options.monitoridlenano.value or ud.canMove)
+end
 local function CheckHide(forceUpdate)
 	local spec = Spring.GetSpectatingState()
 	local showButtons, showBackground
@@ -189,7 +205,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'highlightidleconsincopacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -228,6 +244,32 @@ options = {
 				OptionsUpdateLayout()
 			end
 		end
+	},
+	allowclickthrough = {
+		name = 'Allow clicking through',
+		type='bool',
+		value=false,
+		desc = 'Mouse clicks through empty parts of the panel act on whatever is underneath.',
+		OnChange = function(self)
+			if mainBackground then
+				mainBackground.SetAllowClickThrough(self.value)
+			end
+		end,
+	},
+	highlightidleconsinc = {
+		name = 'Highlight idle constructors increases',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	highlightidleconsincopacity = {
+		name = 'Highlight opacity',
+		type = 'number',
+		value = DEFAULT_IDLE_OPACITY,
+		min = 0.1, max = 1.0, step = 0.05,
+		OnChange = function(self)
+			SetButtonColorHighlight(self.value)
+		end,
 	},
 	monitoridlecomms = {
 		name = 'Track idle commanders',
@@ -361,9 +403,41 @@ options = {
 
 local standardFactoryTooltip =  "\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) .. "\n\255\0\255\0" .. WG.Translate("interface", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) .. "\n\255\0\255\0" .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "append_to_current_selection") .. "\008"
 
+--[[ local function debugIdleConsState()
+	echo("idleCons:")	
+	for uid in pairs(idleCons) do
+		echo(uid)
+	end
+	echo("idleTransports:")
+	for uid in pairs(idleTransports) do
+		echo(uid)
+	end
+	echo("consCarriedByEnemyTransports:")
+	for uid in pairs(consCarriedByEnemyTransports) do
+		echo(uid)
+	end
+	echo("fromConIDToCarryingTransportID:")
+	for uida, uidb in pairs(fromConIDToCarryingTransportID) do
+		echo(uida, uidb)
+	end
+	echo("fromTransportIDToCarriedConID: ")
+	for uida, uidb in pairs(fromTransportIDToCarriedConID) do
+		echo(uida, uidb)
+	end
+end ]]
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Selection Functions
+
+local function ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
+	local transportID = fromConIDToCarryingTransportID[unitID]
+	return transportID or unitID
+end
+
+local function IsConNotCarriedByEnemyTransport(unitID)
+	return not consCarriedByEnemyTransports[unitID]
+end
 
 -- comm selection functionality
 local commIndex = 1
@@ -395,6 +469,7 @@ local function SelectComm()
 	end
 	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	unitID = ConvertConIDToTransportIdCarryingItIfNeeded(unitID)
 	Spring.SelectUnit(unitID, shift)
 	if not shift then
 		local x, y, z = Spring.GetUnitPosition(unitID)
@@ -446,7 +521,19 @@ local function SelectPrecBomber()
 end
 
 local function SelectIdleCon_all()
-	Spring.SelectUnitMap(idleCons, select(4, Spring.GetModKeyState()))
+	local consToSelect = {}
+	for uid in pairs(idleCons) do
+		if uid and uid ~= "count" then
+			if IsConNotCarriedByEnemyTransport(uid) then
+				consToSelect[ConvertConIDToTransportIdCarryingItIfNeeded(uid)] = true
+			end
+		end
+	end
+	if WG.SelectMapIgnoringRank then
+		WG.SelectMapIgnoringRank(consToSelect, select(4, Spring.GetModKeyState()))
+	else
+		Spring.SelectUnitMap(consToSelect, select(4, Spring.GetModKeyState()))
+	end
 end
 
 local conIndex = 1
@@ -460,6 +547,7 @@ local function SelectIdleCon()
 
 		for uid, v in pairs(idleCons) do
 			if uid ~= "count" then
+				uid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
 				if (not Spring.IsUnitSelected(uid)) then
 					local x,_,z = spGetUnitPosition(uid)
 					dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
@@ -481,6 +569,7 @@ local function SelectIdleCon()
 			for uid, v in pairs(idleCons) do
 				if uid ~= "count" then
 					if i == conIndex then
+						uid = ConvertConIDToTransportIdCarryingItIfNeeded(uid)
 						Spring.SelectUnit(uid)
 						local x, y, z = Spring.GetUnitPosition(uid)
 						SetCameraTarget(x, y, z)
@@ -570,7 +659,7 @@ local function GetBackground(parent)
 		draggable = false,
 		resizable = false,
 		backgroundColor = {1, 1, 1, opacity},
-		noClickThrough = true,
+		noClickThrough = not options.allowclickthrough.value,
 		parent = parent,
 	}
 	
@@ -578,6 +667,10 @@ local function GetBackground(parent)
 	
 	function externalFunctions.GetButtonsHolder()
 		return buttonsPanel
+	end
+	
+	function externalFunctions.SetAllowClickThrough(allowClickThrough)
+		backgroundPanel.noClickThrough = not allowClickThrough
 	end
 	
 	function externalFunctions.SetSkin(className)
@@ -1225,6 +1318,8 @@ local function GetConstructorButton(parent)
 	end
 	
 	local active = true
+	local highlightTime = false
+	local highlightPhase = true
 	
 	local button = GetNewButton(
 		parent,
@@ -1255,15 +1350,36 @@ local function GetConstructorButton(parent)
 	}
 	
 	local oldTotal
-	function externalFunctions.UpdateButton()
+	function externalFunctions.UpdateButton(dt)
+		if options.highlightidleconsinc.value and highlightTime then
+			highlightTime = highlightTime - dt
+			if highlightTime <= 0 then
+				highlightTime = false
+				highlightPhase = false
+			else
+				highlightPhase = not highlightPhase
+			end
+			
+			button.SetBackgroundColor((highlightPhase and buttonColorHighlight) or BUTTON_COLOR)
+		end
+		
 		local total = 0
 		for unitID in pairs(idleCons) do
-			total = total + 1
+			local transportID = fromConIDToCarryingTransportID[unitID]
+			-- only count idle constructors that aren't being carried by busy transports
+			if not (transportID and (not idleTransports[transportID])) then
+				total = total + 1
+			end
 		end
 		idleConCount = total
 		
 		if total == oldTotal then
 			return true
+		end
+		if options.highlightidleconsinc.value and oldTotal ~= nil and oldTotal < total then
+			highlightTime = IDLE_CONS_HIGHLIGHT_TIME
+		else
+			highlightTime = false
 		end
 		oldTotal = total
 		
@@ -1292,7 +1408,7 @@ local function GetConstructorButton(parent)
 		button = nil
 	end
 	
-	externalFunctions.UpdateButton()
+	externalFunctions.UpdateButton(dt)
 	externalFunctions.UpdateHotkey()
 	
 	return externalFunctions
@@ -1520,7 +1636,7 @@ end
 local function isAttackQueued(unitID)
 	local cmdsLen = Spring.GetUnitCommandCount(unitID)
 	if cmdsLen and (cmdsLen > 0) then
-		local cmds = Spring.GetCommandQueue(unitID,-1)
+		local cmds = Spring.GetUnitCommands(unitID,-1)
 		for i = 1,cmdsLen do
 			if cmds and cmds[i] and ((cmds[i].id == CMD.ATTACK) or (cmds[i].id == CMD.AREA_ATTACK)) then
 				return true
@@ -1565,7 +1681,6 @@ local function InitializeControls()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
-	
 	local windowY = bottom - BUTTON_HEIGHT
 	
 	mainWindow = Window:New{
@@ -1616,6 +1731,10 @@ local function ClearData()
 	factoryList = {}
 	commanderList = {}
 	idleCons = {}
+	idleTransports = {}
+	fromTransportIDToCarriedConID = {}
+	fromConIDToCarryingTransportID = {}
+	consCarriedByEnemyTransports = {}
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
 	
@@ -1646,13 +1765,41 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		AddFac(unitID, unitDefID)
 	elseif ud.customParams.level then
 		AddComm(unitID, unitDefID)
-	elseif options.monitorInbuiltCons.value and (
-			(ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not ud.isFactory) and
-			(options.monitoridlecomms.value or not ud.customParams.dynamic_comm) and
-			(options.monitoridlenano.value or ud.canMove)
-		) then
+	elseif options.monitorInbuiltCons.value and CanBeAnIdleCons(ud) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
+	end
+end
+
+function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	if CanBeAnIdleCons(UnitDefs[unitDefID]) and GetUnitCanBuild(unitID, unitDefID) then
+		if myTeamID == unitTeam then
+			if unitTeam == transportTeam then
+				idleCons[unitID] = true
+				fromConIDToCarryingTransportID[unitID] = transportID
+				fromTransportIDToCarriedConID[transportID] = unitID
+				wantUpdateCons = true
+			else
+				consCarriedByEnemyTransports[unitID] = true
+				widget:UnitTaken(unitID, unitDefID, unitTeam)
+			end
+		end
+	end
+end
+
+function widget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	if consCarriedByEnemyTransports[unitID] then 
+		consCarriedByEnemyTransports[unitID] = nil
+		wantUpdateCons = true
+	end
+	if myTeamID == unitTeam and GetUnitCanBuild(unitID, unitDefID) then
+		if fromConIDToCarryingTransportID[unitID] then
+			fromConIDToCarryingTransportID[unitID] = nil
+			fromTransportIDToCarriedConID[transportID] = nil
+			wantUpdateCons = true
+		else
+			widget:UnitGiven(unitID, unitDefID, unitTeam, nil)
+		end
 	end
 end
 
@@ -1661,10 +1808,16 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 	local ud = UnitDefs[unitDefID]
-	if GetUnitCanBuild(unitID, unitDefID) then  --- can build
+	if fromTransportIDToCarriedConID[unitID] then
+		local cQueue = Spring.GetUnitCommandCount(unitID)
+		if cQueue == 0 then -- no commands
+			widget:UnitIdle(unitID, unitDefID, myTeamID)
+		end
+	end
+	-- don't consider cons units loaded onto enemy transports as idle
+	if GetUnitCanBuild(unitID, unitDefID) and IsConNotCarriedByEnemyTransport(unitID) then  --- can build
 		local bQueue = spGetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
-			local _, _, _, _, buildProg = spGetUnitHealth(unitID)
 			if not ud.isFactory then
 				local cQueue = Spring.GetUnitCommandCount(unitID)
 				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
@@ -1690,6 +1843,22 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
+	-- constructor carried by a transport?
+	if fromConIDToCarryingTransportID[unitID] then
+		local transportID = fromConIDToCarryingTransportID[unitID]
+		fromConIDToCarryingTransportID[unitID] = nil
+		fromTransportIDToCarriedConID[transportID] = nil
+		idleTransports[transportID] = nil
+		wantUpdateCons = true
+	end
+	-- transport carrying a constructor?
+	if fromTransportIDToCarriedConID[unitID] then
+		local conID = fromConIDToCarryingTransportID[unitID]
+		fromConIDToCarryingTransportID[conID] = nil
+		fromTransportIDToCarriedConID[unitID] = nil
+		idleTransports[unitID] = nil
+		wantUpdateCons = true
+	end
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
@@ -1714,10 +1883,12 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (unitTeam ~= myTeamID) then
 		return
 	end
+	if fromTransportIDToCarriedConID[unitID] then
+		idleTransports[unitID] = true
+		wantUpdateCons = true
+	end
 	local ud = UnitDefs[unitDefID]
-	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
-	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.dynamic_comm)
-	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
+	if CanBeAnIdleCons(ud) and IsConNotCarriedByEnemyTransport(unitID) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
@@ -1740,6 +1911,11 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 	if HasDoubleCommand(unitID,cmdID) then
 		widget:UnitIdle(unitID,unitDefID,unitTeam)
 		return
+	end
+	
+	if idleTransports[unitID] then
+		idleTransports[unitID] = nil
+		wantUpdateCons = true
 	end
 	
 	if idleCons[unitID] then
@@ -1770,8 +1946,9 @@ function widget:Update(dt)
 	end
 	
 	if wantUpdateCons then
-		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton()
+		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton(dt)
 		wantUpdateCons = false
+		--debugIdleConsState()
 	end
 
 	timer = timer + dt

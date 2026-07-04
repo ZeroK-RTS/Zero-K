@@ -59,6 +59,7 @@ end
 
 local DEFAULT_DECLOAK_TIME = 240
 local PERSONAL_DECLOAK_TIME = 90
+local BUILD_DECLOAK_TIME = 30
 
 local DEFAULT_PROXIMITY_DECLOAK_TIME = 90
 local PERSONAL_PROXIMITY_DECLOAK_TIME = 45
@@ -287,6 +288,11 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 end
 
 function gadget:AllowUnitDecloak(unitID, objectID, weaponID)
+	local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
+	if inbuild then
+		recloakFrame[unitID] = math.max(recloakFrame[unitID] or 0, currentFrame + BUILD_DECLOAK_TIME)
+		return true
+	end
 	recloakFrame[unitID] = currentFrame + GetActionDecloakTime(unitID)
 	return true
 end

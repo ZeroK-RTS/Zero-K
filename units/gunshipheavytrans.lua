@@ -106,6 +106,7 @@ return { gunshipheavytrans = {
       name                    = [[Light Laser Blaster]],
       areaOfEffect            = 8,
       avoidFeature            = false,
+      cegTag                  = [[laser_cannon_trail]],
       collideFriendly         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -157,6 +158,8 @@ return { gunshipheavytrans = {
       
       customParams        = {
         combatrange = 100,
+        light_radius = 80,
+        light_alpha = 0.08,
       },
 
       damage                  = {

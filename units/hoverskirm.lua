@@ -17,6 +17,7 @@ return { hoverskirm = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead    = 100,
     bait_level_default = 1,
     modelradius    = [[25]],
     turnatfullspeed_hover = [[1]],
@@ -52,9 +53,9 @@ return { hoverskirm = {
 
   sightDistance       = 484,
   sonarDistance       = 484,
-  speed               = 63,
+  speed               = 66,
   turninplace         = 0,
-  turnRate            = 563,
+  turnRate            = 577,
   workerTime          = 0,
   
   weapons             = {

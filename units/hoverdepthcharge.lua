@@ -16,6 +16,7 @@ return { hoverdepthcharge = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead    = 20,
     bait_level_default = 0,
     modelradius    = [[25]],
     turnatfullspeed_hover = [[1]],
@@ -66,6 +67,7 @@ return { hoverdepthcharge = {
 
     {
       def                = [[FAKE_DEPTHCHARGE]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
     },
@@ -115,7 +117,7 @@ return { hoverdepthcharge = {
       soundStartVolume        = 8.5,
       soundHitVolume          = 11,
       startVelocity           = 5,
-      tolerance               = 1000000,
+      tolerance               = 2000000,
       tracks                  = true,
       turnRate                = 60000,
       waterWeapon             = true,

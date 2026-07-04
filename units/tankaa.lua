@@ -15,6 +15,7 @@ return { tankaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 150,
     bait_level_default = 0,
     modelradius    = [[19]],
   },
@@ -60,6 +61,7 @@ return { tankaa = {
 
     {
       def                = [[FLAK]],
+      accurateLeading    = 1,
       --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },

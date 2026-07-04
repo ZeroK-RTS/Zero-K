@@ -20,6 +20,7 @@ return { spiderantiheavy = {
     bait_level_default = 2,
     dontfireatradarcommand = '1',
     cus_noflashlight = 1,
+    normaltex = [[unittextures/Infiltrator_normals.dds]],
   },
 
   explodeAs             = [[BIG_UNITEX]],

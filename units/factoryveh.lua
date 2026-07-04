@@ -72,7 +72,7 @@ return { factoryveh = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = "oooooooo oooooooo oooooooo yccccccy yccccccy yccccccy yccccccy yccccccy",
+  yardMap                       = "oooooooo oooooooo oooooooo uccccccu uccccccu uccccccu uccccccu uccccccu",
 
   featureDefs                   = {
 

@@ -15,6 +15,7 @@ return { chicken_spidermonkey = {
     outline_x = 145,
     outline_y = 145,
     outline_yoff = 30,
+    normaltex = [[unittextures/chicken_normals.dds]],
   },
 
   explodeAs           = [[NOWEAPON]],

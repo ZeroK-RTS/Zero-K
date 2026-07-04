@@ -84,17 +84,23 @@ local dirtfling = 1024
 local muzzle_flash = 1025
 local crater = 4101
 
+local thigh_lf = 0
+local thigh_rf = 0
+local thigh_lb = 0
+local thigh_rb = 0
+
 --variables
 
 local jumpActive = false
 
 --signals
-local walk = 2
+local SIG_WALK = 2
 local SIG_Aim = { [2] = 4, [3] = 8, [4] = 16, [5] = 32 }
+local SIG_MOONWALK = 64
 
 local function Walk()
-	Signal(walk)
-	SetSignalMask(walk)
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
 	local zeroSpeedCount = 0
 	
 	Turn(lf_pump, x_axis, -p_angle, 1.4)
@@ -259,7 +265,7 @@ function preJump(turn,distance)
 	Turn(b_dome, x_axis, disFactor*x/3, math.abs(x)/2)
 	Turn(b_dome, z_axis, disFactor*z/3, math.abs(z)/2)
 	
-	Signal(walk)
+	Signal(SIG_WALK)
 	Move(t_dome, y_axis, 0, 10)
 	Move(b_dome, y_axis, 0, 20)
 
@@ -268,10 +274,15 @@ function preJump(turn,distance)
 	Turn(lb_ball, y_axis, math.rad(-45), sp1)
 	Turn(rb_ball, y_axis, math.rad(45), sp1)
 	
-	Turn(lf_thigh, x_axis, math.rad(30)*lf_Factor+math.rad(5), th_speed)
-	Turn(rf_thigh, x_axis, math.rad(30)*rf_Factor+math.rad(5), th_speed)
-	Turn(lb_thigh, x_axis, math.rad(-30)*lb_Factor+math.rad(-5), th_speed)
-	Turn(rb_thigh, x_axis, math.rad(-30)*rb_Factor+math.rad(-5), th_speed)
+	thigh_lf = math.rad(30)*lf_Factor+math.rad(5)
+	thigh_rf = math.rad(30)*rf_Factor+math.rad(5)
+	thigh_lb = math.rad(-30)*lb_Factor+math.rad(-5)
+	thigh_rb = math.rad(-30)*rb_Factor+math.rad(-5)
+	
+	Turn(lf_thigh, x_axis, thigh_lf, th_speed)
+	Turn(rf_thigh, x_axis, thigh_rf, th_speed)
+	Turn(lb_thigh, x_axis, thigh_lb, th_speed)
+	Turn(rb_thigh, x_axis, thigh_rb, th_speed)
 		
 	Move(lf_shin, y_axis, 0, 10)
 	Move(rf_shin, y_axis, 0, 10)
@@ -301,32 +312,45 @@ function preJump(turn,distance)
 	Turn(rb_foot, y_axis, 0, sp1)
 end
 
-function beginJump()
-	script.StopMoving()
-	
+local function BeginJumpThread()
 	Turn(b_dome, x_axis, 0, 0.2)
 	Turn(b_dome, z_axis, 0, 0.2)
 
-	Turn(lf_thigh, x_axis, math.rad(80), 7)
-	Turn(rf_thigh, x_axis, math.rad(80), 7)
-	Turn(lb_thigh, x_axis, math.rad(-80), 7)
-	Turn(rb_thigh, x_axis, math.rad(-80), 7)
+	Turn(lf_thigh, x_axis, math.rad(85), math.abs(math.rad(85) - thigh_lf + math.random()*0.05)*6)
+	Turn(rf_thigh, x_axis, math.rad(85), math.abs(math.rad(85) - thigh_rf + math.random()*0.05)*6)
+	Turn(lb_thigh, x_axis, math.rad(-85), math.abs(math.rad(-85) - thigh_lb + math.random()*0.05)*6)
+	Turn(rb_thigh, x_axis, math.rad(-85), math.abs(math.rad(-85) - thigh_rb + math.random()*0.05)*6)
 	
-	Turn(lf_shin, x_axis, math.rad(-70), 7.8)
-	Turn(rf_shin, x_axis, math.rad(-70), 7.8)
-	Turn(lb_shin, x_axis, math.rad(70), 7.8)
-	Turn(rb_shin, x_axis, math.rad(70), 7.8)
+	Turn(lf_shin, x_axis, math.rad(-70), math.rad(620))
+	Turn(rf_shin, x_axis, math.rad(-70), math.rad(620))
+	Turn(lb_shin, x_axis, math.rad(70), math.rad(620))
+	Turn(rb_shin, x_axis, math.rad(70), math.rad(620))
 	
-	Turn(lf_pump, x_axis, math.rad(40), 7)
-	Turn(rf_pump, x_axis, math.rad(40), 7)
-	Turn(lb_pump, x_axis, math.rad(-40), 7)
-	Turn(rb_pump, x_axis, math.rad(-40), 7)
+	Turn(lf_pump, x_axis, math.rad(40), 15)
+	Turn(rf_pump, x_axis, math.rad(40), 15)
+	Turn(lb_pump, x_axis, math.rad(-40), 15)
+	Turn(rb_pump, x_axis, math.rad(-40), 15)
 	
 	Turn(lf_foot, x_axis, 0, 7)
 	Turn(rf_foot, x_axis, 0, 7)
 	Turn(lb_foot, x_axis, 0, 7)
 	Turn(rb_foot, x_axis, 0, 7)
+	
+	Sleep(167)
+	Turn(lf_thigh, x_axis, math.rad(85), math.abs(math.rad(85) - thigh_lf + math.random()*0.05)*3.5)
+	Turn(rf_thigh, x_axis, math.rad(85), math.abs(math.rad(85) - thigh_rf + math.random()*0.05)*3.5)
+	Turn(lb_thigh, x_axis, math.rad(-85), math.abs(math.rad(-85) - thigh_lb + math.random()*0.05)*3.5)
+	Turn(rb_thigh, x_axis, math.rad(-85), math.abs(math.rad(-85) - thigh_rb + math.random()*0.05)*3.5)
+	
+	Turn(lf_shin, x_axis, math.rad(-70), math.rad(300))
+	Turn(rf_shin, x_axis, math.rad(-70), math.rad(300))
+	Turn(lb_shin, x_axis, math.rad(70), math.rad(300))
+	Turn(rb_shin, x_axis, math.rad(70), math.rad(300))
+end
 
+function beginJump()
+	script.StopMoving()
+	StartThread(BeginJumpThread)
 end
 
 function halfJump()
@@ -344,9 +368,7 @@ function halfJump()
 	Turn(rf_pump, x_axis, 0, 1.4)
 	Turn(lb_pump, x_axis, 0, 1.4)
 	Turn(rb_pump, x_axis, 0, 1.4)
-
 end
-
 
 function endJump()
 	jumpActive = false
@@ -369,6 +391,12 @@ function endJump()
 	EmitSfx(lb_foot, dirtfling)
 end
 
+function cancelJump()
+	jumpActive = false
+	Turn(b_dome, x_axis, 0, 0.2)
+	Turn(b_dome, z_axis, 0, 0.2)
+end
+
 -- Other stuff
 
 function script.Create()
@@ -383,8 +411,8 @@ function script.Create()
 end
 
 local function Stopping()
-	Signal(walk)
-	SetSignalMask(walk)
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
 	
 	Move(t_dome, y_axis, 0, 10)
 	Move(b_dome, y_axis, 0, 20)
@@ -425,6 +453,30 @@ local function Stopping()
 	Turn(rf_foot, x_axis, 0, sp1)
 	Turn(lb_foot, x_axis, 0, sp1)
 	Turn(rb_foot, x_axis, 0, sp1)
+end
+
+local function MoonwalkThread()
+	Signal(SIG_MOONWALK)
+	SetSignalMask(SIG_MOONWALK)
+	while true do
+		local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+		if speed < 0.4 then
+			StartThread(Stopping)
+		else
+			StartThread(Walk)
+		end
+		
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local h = Spring.GetGroundHeight(x, z)
+		if math.abs(h - y) < 0.01 then
+			return
+		end
+		Sleep(800)
+	end
+end
+
+function unmoonwalkFunc()
+	StartThread(MoonwalkThread)
 end
 
 function script.StartMoving()

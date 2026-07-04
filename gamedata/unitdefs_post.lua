@@ -112,6 +112,30 @@ do
 	end
 end
 
+-- New units
+
+
+do
+	local append = false
+	local modoptName = "extraunits"
+	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
+		local units = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
+		if type(tweaks) == "table" then
+			Spring.Echo("Loading extraunits modoption", append or 0)
+			for name, ud in pairs(units) do
+				Spring.Echo("Loading extraunit " .. name)
+				local ud = lowerkeys(ud)
+				if ud.customparams.base_def then
+					Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(UnitDefs[ud.customparams.base_def]), true)
+				end
+				UnitDefs[name] = ud
+			end
+		end
+		append = (append or 0) + 1
+		modoptName = "extraunits" .. append
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -132,7 +156,6 @@ end]]
 
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
-local Utilities = VFS.Include('gamedata/utilities.lua')
 
 -- Handle obsolete keys in mods gracefully while they migrate
 for name, ud in pairs(UnitDefs) do
@@ -468,6 +491,7 @@ local TURNRATE_MULT_BOT = 1
 local TURNRATE_MULT_VEH = 1
 local ACCEL_MULT_BOT = 1
 local ACCEL_MULT_VEH = 1
+local TURN_ACCEL_FACTOR = 1
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
@@ -485,6 +509,7 @@ for name, ud in pairs(UnitDefs) do
 			ud.brakerate = ud.brakerate * ACCEL_MULT_BOT
 			ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor or 1.2
 		end
+		ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor * TURN_ACCEL_FACTOR
 	end
 end
 
@@ -684,6 +709,16 @@ for name, ud in pairs(UnitDefs) do
 	ud.mass = (((ud.buildtime/2) + (ud.health/8))^0.6)*6.5
 	if ud.customparams.massmult then
 		ud.mass = ud.mass*ud.customparams.massmult
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Commanders cannot be reclaimed
+--
+for name, ud in pairs(UnitDefs) do
+	if ud.customparams and (ud.customparams.dynamic_comm or ud.customparams.commtype) then
+		ud.reclaimable = false
 	end
 end
 
@@ -928,7 +963,7 @@ end]]
 --
 
 for name, ud in pairs(UnitDefs) do
-	if ud.customparams.ploppable or name == "striderhub" then
+	if (ud.customparams.ploppable or name == "striderhub") and ud.buildoptions then
 		for i = 1, #ud.buildoptions do
 			local unit = ud.buildoptions[i]
 			UnitDefs[unit].customparams.from_factory = name
@@ -1015,7 +1050,7 @@ end
 -- Remove engine transport limits
 --
 
-if Utilities.IsCurrentVersionNewerThan(104, 600) then
+if Script then -- 104-600, but Script.IsEngineMinVersion wasn't available back then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
 		local buildCost = ud.metalcost and tonumber(ud.metalcost)
