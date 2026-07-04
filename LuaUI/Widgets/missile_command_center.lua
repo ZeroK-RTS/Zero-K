@@ -46,27 +46,6 @@ local numAoECircles        = 9
 local aoeColor             = {1, 0, 0, 1}
 local mouseDistance = 1000
 local floor                  = math.floor
-local sqrt                   = math.sqrt
-local min                    = math.min
-
-local spGetGroundHeight      = Spring.GetGroundHeight
-local spGetProjectilePosition = Spring.GetProjectilePosition
-
--- Terrain-block prediction (starburst silo missiles only). A starburst goes
--- straight up, turns, then dives in a straight line to the target. We model the
--- dive as a line from the crest (apex height, part-way toward the target) down
--- to the target, and sample terrain under it. Both the crest height and its
--- horizontal distance from the launcher are learned from real shots, so the
--- dive angle matches what the missile actually flies.
-local SAMPLE_STEP  = 24   -- elmos between terrain samples along the dive line
-local BLOCK_EPSILON = 12  -- ground must exceed the line by this much to block
-local TARGET_SKIP  = 0.92 -- ignore the last bit of the dive; it comes down steeply
-local APEX_SAFETY  = 0.9  -- fraction of the observed crest height used by the model
-
--- weaponDefID -> {h = crest height above launch ground, d = crest distance from launcher}
-local learnedApex = {}
-local launchWeaponDefs = {}  -- weaponDefID -> true (starburst launch weapons to learn from)
-local flightTrack = {}       -- proID -> {wdid, baseX, baseZ, baseY, peak, peakDist}
 
 local pulse_timmer = Spring.GetTimer()
 local function getPulse()
@@ -161,50 +140,6 @@ end
 
 local function distance(x1,z1,x2,z2)
   return (x1-x2)*(x1-x2)+(z1-z2)*(z1-z2)
-end
-
--- Crest geometry (height above launch ground, horizontal distance from launcher)
--- of the modelled trajectory. Learned from real shots once seen; until then a
--- rough scale from range (missiles with more range lob higher and further).
-local function getApexGeom(weaponDefID, weaponDef)
-  local learned = learnedApex[weaponDefID]
-  if learned then
-    return learned.h, learned.d
-  end
-  local range = weaponDef.range or 3000
-  return range * 0.3, range * 0.12
-end
-
--- Walk the dive line from the crest (part-way toward the target, at crest
--- height) down to the target, sampling terrain. Returns the first point where
--- ground rises into the path (impactX, impactY, impactZ, true), or the target
--- and false if it stays clear.
-local function predictImpact(sx, sz, tx, ty, tz, apexH, crestDist)
-  local apexY = spGetGroundHeight(sx, sz) + apexH
-  local dx, dz = tx - sx, tz - sz
-  local dist = sqrt(dx*dx + dz*dz)
-  if dist < 1 then return tx, ty, tz, false end
-  -- The dive starts where the missile crests: crestDist toward the target, but
-  -- never past the near half of a short shot.
-  local dEff = min(crestDist, dist * 0.6)
-  local nx, nz = dx / dist, dz / dist
-  local startX, startZ = sx + nx * dEff, sz + nz * dEff
-  local diveDX, diveDZ = tx - startX, tz - startZ
-  local diveDist = sqrt(diveDX*diveDX + diveDZ*diveDZ)
-  if diveDist < 1 then return tx, ty, tz, false end
-  local steps = floor(diveDist / SAMPLE_STEP)
-  for i = 1, steps do
-    local f = i / steps
-    if f > TARGET_SKIP then break end
-    local px = startX + diveDX * f
-    local pz = startZ + diveDZ * f
-    local lineY = apexY + (ty - apexY) * f
-    local groundY = spGetGroundHeight(px, pz)
-    if groundY > lineY + BLOCK_EPSILON then
-      return px, groundY, pz, true
-    end
-  end
-  return tx, ty, tz, false
 end
 
 --------------------------------------------------------------------------------
@@ -467,9 +402,6 @@ local function missile_class()
     local unit = self:getPreferredUnit{x = mx, z = mz}
     if not unit then return end
 
-    local ux, uy, uz = Spring.GetUnitPosition(unit)
-    if not ux then return end
-
     local unitDefID = Spring.GetUnitDefID(unit)
     if not unitDefID then return end
 
@@ -478,6 +410,14 @@ local function missile_class()
 
     local unitDef = UnitDefs[unitDefID]
     if not unitDef or not unitDef.weapons then return end
+
+    -- Fire origin computed the same way as the Attack AoE widget (aim midpoint,
+    -- plus unit radius for immobile launchers) so both previews agree.
+    local _, _, _, ux, uy, uz = Spring.GetUnitPosition(unit, true)
+    if not ux then return end
+    if unitDef.isImmobile then
+      uy = uy + Spring.GetUnitRadius(unit)
+    end
 
     local weapon = unitDef.weapons[unitType.weaponId]
     if not weapon then return end
@@ -489,13 +429,16 @@ local function missile_class()
     local range = weaponDef.range
     if dist > range * range then return end
 
-    -- For lobbed (starburst) missiles, relocate the impact to any terrain that
-    -- blocks the descent so the ring lands where the missile actually would.
+    -- Relocate the impact to any terrain that blocks the shot, using the same
+    -- trajectory model the Attack AoE widget uses when the missile is selected
+    -- directly, so the two previews always agree.
     local ix, iy, iz = mx, my, mz
     local blocked = false
-    if weaponDef.type == "StarburstLauncher" then
-      local apexH, crestDist = getApexGeom(weapon.weaponDef, weaponDef)
-      ix, iy, iz, blocked = predictImpact(ux, uz, mx, my, mz, apexH, crestDist)
+    if WG.AttackAoE and WG.AttackAoE.GetVlaunchImpact then
+      local hx, hy, hz = WG.AttackAoE.GetVlaunchImpact(weapon.weaponDef, ux, uy, uz, mx, my, mz)
+      if hx then
+        ix, iy, iz, blocked = hx, hy, hz, true
+      end
     end
 
     if blocked then
@@ -691,17 +634,6 @@ for _, command in ipairs(orderedCommands) do
   command.iconTexture = unitDef and ("#" .. unitDef.id) or nil
 end
 
--- Collect the launch weapons whose real trajectory we calibrate apex from.
-for _, command in pairs(commands) do
-  for unitDefID, launchType in pairs(command.launchableTypes) do
-    local ud = UnitDefs[unitDefID]
-    local weapon = ud and ud.weapons and ud.weapons[launchType.weaponId]
-    if weapon and weapon.weaponDef and WeaponDefs[weapon.weaponDef].type == "StarburstLauncher" then
-      launchWeaponDefs[weapon.weaponDef] = true
-    end
-  end
-end
-
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
 local wasEmptySelection = false
@@ -781,46 +713,5 @@ function widget:DrawWorld()
   for _, command in pairs(commands) do
     command:drawWorld()
   end
-end
-
---------------------------------------------------------------------------------
--- Calibration: learn each starburst missile's real apex height from live shots.
---------------------------------------------------------------------------------
-
-function widget:ProjectileCreated(proID, proOwnerID, weaponDefID)
-  if not launchWeaponDefs[weaponDefID] then return end
-  local x, y, z = spGetProjectilePosition(proID)
-  if not x then return end
-  flightTrack[proID] = {
-    wdid = weaponDefID, baseX = x, baseZ = z, baseY = spGetGroundHeight(x, z),
-    peak = y, peakDist = 0,
-  }
-end
-
-function widget:GameFrame()
-  if not next(flightTrack) then return end
-  for proID, data in pairs(flightTrack) do
-    local x, y, z = spGetProjectilePosition(proID)
-    if y then
-      if y > data.peak then
-        data.peak = y
-        local ddx, ddz = x - data.baseX, z - data.baseZ
-        data.peakDist = sqrt(ddx*ddx + ddz*ddz)
-      elseif y < data.peak - 40 then
-        -- Past the crest: record its height and horizontal distance, then stop.
-        local h = (data.peak - data.baseY) * APEX_SAFETY
-        if h > 0 then
-          learnedApex[data.wdid] = {h = h, d = data.peakDist}
-        end
-        flightTrack[proID] = nil
-      end
-    else
-      flightTrack[proID] = nil
-    end
-  end
-end
-
-function widget:ProjectileDestroyed(proID)
-  flightTrack[proID] = nil
 end
 

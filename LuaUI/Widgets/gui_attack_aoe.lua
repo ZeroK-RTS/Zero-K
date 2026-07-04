@@ -215,6 +215,25 @@ end
 --initialization
 --------------------------------------------------------------------------------
 
+-- Vlaunch (starburst) flight parameters, derived purely from the weapon def.
+-- Used by the AoE preview here and exposed via WG for the missile launch preview,
+-- so both compute impact points from an identical trajectory model.
+local function BuildVlaunch(weaponDef)
+	if (weaponDef.uptime or 0) <= 0 then
+		return nil
+	end
+	-- In the first frame the projectile moves startVelocity + 2*Acceleration
+	local startSpeed = math.min(weaponDef.startvelocity + weaponDef.weaponAcceleration, weaponDef.projectilespeed)
+	return {
+		upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 2,
+		accel = weaponDef.weaponAcceleration,
+		turnRate = weaponDef.turnRate,
+		startSpeed = startSpeed,
+		startHeight = startHeights[weaponDef.name] or 0,
+		endSpeed = weaponDef.projectilespeed,
+	}
+end
+
 local function getWeaponInfo(weaponDef, unitDef)
 	local retData
 
@@ -277,18 +296,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 	else
 		retData.aoe = 0
 	end
-	if (weaponDef.uptime or 0) > 0 then
-		-- In the first frame the projectile moves startVelocity + 2*Acceleration
-		local startSpeed = math.min(weaponDef.startvelocity + weaponDef.weaponAcceleration, weaponDef.projectilespeed)
-		retData.vlaunch = {
-			upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 2,
-			accel = weaponDef.weaponAcceleration,
-			turnRate = weaponDef.turnRate,
-			startSpeed = startSpeed,
-			startHeight = startHeights[weaponDef.name] or 0,
-			endSpeed = weaponDef.projectilespeed,
-		}
-	end
+	retData.vlaunch = BuildVlaunch(weaponDef)
 	retData.cost = cost
 	retData.mobile = not unitDef.isImmobile
 	retData.waterWeapon = waterWeapon
@@ -940,6 +948,33 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 end
 
 --------------------------------------------------------------------------------
+-- Shared vlaunch impact query (used by the missile launch preview widget)
+--------------------------------------------------------------------------------
+
+local vlaunchInfoCache = {}
+
+-- Returns the terrain impact point (x, y, z) of a vlaunch (starburst) shot fired
+-- from (fx, fy, fz) at (tx, ty, tz), or nil if it reaches the target
+-- unobstructed or the weapon is not a vlaunch weapon.
+local function GetVlaunchImpact(weaponDefID, fx, fy, fz, tx, ty, tz)
+	local info = vlaunchInfoCache[weaponDefID]
+	if info == nil then
+		local wd = WeaponDefs[weaponDefID]
+		local vlaunch = wd and BuildVlaunch(wd)
+		info = (vlaunch and {vlaunch = vlaunch, range = wd.range}) or false
+		vlaunchInfoCache[weaponDefID] = info
+	end
+	if not info then
+		return nil
+	end
+	local hx, hy, hz = CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
+	if hx then
+		return hx, hy, hz
+	end
+	return nil
+end
+
+--------------------------------------------------------------------------------
 --Main draw
 --------------------------------------------------------------------------------
 
@@ -1027,10 +1062,12 @@ function widget:Initialize()
 		aoeDefInfo[unitDefID], dgunInfo[unitDefID], extraDrawRangeDefInfo[unitDefID] = SetupUnit(unitDef)
 	end
 	SetupDisplayLists()
+	WG.AttackAoE = {GetVlaunchImpact = GetVlaunchImpact}
 end
 
 function widget:Shutdown()
 	DeleteDisplayLists()
+	WG.AttackAoE = nil
 end
 
 function widget:DrawWorld()
