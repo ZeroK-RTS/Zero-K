@@ -3,8 +3,8 @@
 
 function widget:GetInfo()
   return {
-    name      = "command center: missiles",
-    desc      = "Add missile commands to command center",
+    name      = "Missile Command Center",
+    desc      = "Adds missile launch commands and previews where each shot will land, marking terrain that blocks it.",
     author    = "Amnykon",
     date      = "2021-07-30",
     license   = "GNU GPL, v2 or later",
@@ -210,7 +210,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function missle_class()
+local function missile_class()
   local self = {}
 
   self.cmdType = CMDTYPE.ICON_MAP
@@ -307,7 +307,7 @@ local function missle_class()
     return build == 1 and count ~= 0
   end
 
-  function self:perferedUnit(unit1, unit2, params)
+  function self:preferredUnit(unit1, unit2, params)
     local unit2x, _, unit2z = Spring.GetUnitPosition(unit2)
     if not unit2x then return unit1 end
 
@@ -377,7 +377,7 @@ local function missle_class()
   end
 
 
-  function self:getPerferedUnit(params)
+  function self:getPreferredUnit(params)
     local units = self:getOrderableUnits()
 
     params.selectedUnits = {}
@@ -385,15 +385,15 @@ local function missle_class()
       params.selectedUnits[unit] = true
     end
 
-    local perferedUnit
+    local preferredUnit
 
     for _, unitID in ipairs(units) do
       if self:canGiveOrder(unitID) then
-         perferedUnit = self:perferedUnit(perferedUnit, unitID, params)
+         preferredUnit = self:preferredUnit(preferredUnit, unitID, params)
       end
     end
 
-    return perferedUnit
+    return preferredUnit
   end
 
   function self:commandsChanged()
@@ -423,7 +423,7 @@ local function missle_class()
       else
         x,y,z = cmdParams[1], cmdParams[2], cmdParams[3]
       end
-      local unit = self:getPerferedUnit{x = x, z = z}
+      local unit = self:getPreferredUnit{x = x, z = z}
       if not unit then return true end
       local unitType = self.launchableTypes[Spring.GetUnitDefID(unit)]
       if not unitType then return true end
@@ -448,7 +448,7 @@ local function missle_class()
   end
 
   function self:action(x, y, mouse)
-    if self:getCount() == 0 then return else end
+    if self:getCount() == 0 then return end
 
     local cmdIndex = Spring.GetCmdDescIndex(self.cmd)
     if not cmdIndex then return end
@@ -464,7 +464,7 @@ local function missle_class()
 
     local mx, my, mz = getMouseTargetPosition()
     if not mx or not mz then return end
-    local unit = self:getPerferedUnit{x = mx, z = mz}
+    local unit = self:getPreferredUnit{x = mx, z = mz}
     if not unit then return end
 
     local ux, uy, uz = Spring.GetUnitPosition(unit)
@@ -509,8 +509,27 @@ local function missle_class()
   return self
 end
 
+-- Silo-launched missiles (tacnuke, seismic, empmissile, napalmmissile,
+-- missileslow) sit as a unit parked on their silo pad; one counts as stockpiled
+-- while it exists and is still next to its silo.
+local function siloMissileStockpile(unit)
+  if Spring.GetUnitIsDead(unit) then return 0 end
+
+  local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
+  if not silo or Spring.GetUnitIsDead(silo) then return 0 end
+
+  local x1, y1, z1 = Spring.GetUnitPosition(silo)
+  local x2, y2, z2 = Spring.GetUnitPosition(unit)
+
+  if not x1 or not x2 then return 0 end
+
+  if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
+
+  return 1
+end
+
 local function EOS_controller_class()
-  local self = missle_class()
+  local self = missile_class()
   self.x = 438
   self.y = 38
   self.name = "tacnuke"
@@ -520,21 +539,7 @@ local function EOS_controller_class()
     [UnitDefNames["tacnuke"].id] = {
        launchCmd = CMD.ATTACK,
        weaponId = 1,
-       getStockpile = function(unit)
-         if Spring.GetUnitIsDead(unit) then return 0 end
-
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
-         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
-
-         local x1, y1, z1 = Spring.GetUnitPosition(silo)
-         local x2, y2, z2 = Spring.GetUnitPosition(unit)
-
-         if not x1 or not x2 then return 0 end
-
-         if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
-
-         return 1
-       end
+       getStockpile = siloMissileStockpile
     },
     [UnitDefNames["subtacmissile"].id] = {
        launchCmd = CMD.ATTACK,
@@ -549,7 +554,7 @@ local function EOS_controller_class()
 end
 
 local function seismic_controller_class()
-  local self = missle_class()
+  local self = missile_class()
   self.x = 482
   self.y = 38
   self.name = "seismic"
@@ -559,21 +564,7 @@ local function seismic_controller_class()
     [UnitDefNames["seismic"].id] = {
        launchCmd = CMD.ATTACK,
        weaponId = 1,
-       getStockpile = function(unit)
-         if Spring.GetUnitIsDead(unit) then return 0 end
-
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
-         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
-
-         local x1, y1, z1 = Spring.GetUnitPosition(silo)
-         local x2, y2, z2 = Spring.GetUnitPosition(unit)
-
-         if not x1 or not x2 then return 0 end
-
-         if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
-
-         return 1
-       end
+       getStockpile = siloMissileStockpile
     },
   }
 
@@ -581,7 +572,7 @@ local function seismic_controller_class()
 end
 
 local function shockley_controller_class()
-  local self = missle_class()
+  local self = missile_class()
   self.x = 526
   self.y = 38
   self.name = "empmissile"
@@ -591,21 +582,7 @@ local function shockley_controller_class()
     [UnitDefNames["empmissile"].id] = {
        launchCmd = CMD.ATTACK,
        weaponId = 1,
-       getStockpile = function(unit)
-         if Spring.GetUnitIsDead(unit) then return 0 end
-
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
-         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
-
-         local x1, y1, z1 = Spring.GetUnitPosition(silo)
-         local x2, y2, z2 = Spring.GetUnitPosition(unit)
-
-         if not x1 or not x2 then return 0 end
-
-         if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
-
-         return 1
-       end
+       getStockpile = siloMissileStockpile
     },
   }
 
@@ -613,7 +590,7 @@ local function shockley_controller_class()
 end
 
 local function inferno_controller_class()
-  local self = missle_class()
+  local self = missile_class()
   self.x = 570
   self.y = 38
   self.name = "napalmmissile"
@@ -623,21 +600,7 @@ local function inferno_controller_class()
     [UnitDefNames["napalmmissile"].id] = {
        launchCmd = CMD.ATTACK,
        weaponId = 1,
-       getStockpile = function(unit)
-         if Spring.GetUnitIsDead(unit) then return 0 end
-
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
-         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
-
-         local x1, y1, z1 = Spring.GetUnitPosition(silo)
-         local x2, y2, z2 = Spring.GetUnitPosition(unit)
-
-         if not x1 or not x2 then return 0 end
-
-         if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
-
-         return 1
-       end
+       getStockpile = siloMissileStockpile
     },
   }
 
@@ -645,7 +608,7 @@ local function inferno_controller_class()
 end
 
 local function slow_missile_controller_class()
-  local self = missle_class()
+  local self = missile_class()
   self.x = 614
   self.y = 38
   self.name = "missileslow"
@@ -655,21 +618,7 @@ local function slow_missile_controller_class()
     [UnitDefNames["missileslow"].id] = {
        launchCmd = CMD.ATTACK,
        weaponId = 1,
-       getStockpile = function(unit)
-         if Spring.GetUnitIsDead(unit) then return 0 end
-
-         local silo = Spring.GetUnitRulesParam(unit, "missile_parentSilo")
-         if not silo or Spring.GetUnitIsDead(silo) then return 0 end
-
-         local x1, y1, z1 = Spring.GetUnitPosition(silo)
-         local x2, y2, z2 = Spring.GetUnitPosition(unit)
-
-         if not x1 or not x2 then return 0 end
-
-         if distance3(x1, y1, z1, x2, y2, z2) > 600 then return 0 end
-
-         return 1
-       end
+       getStockpile = siloMissileStockpile
     },
   }
 
@@ -677,7 +626,7 @@ local function slow_missile_controller_class()
 end
 
 local function reef_missile_controller_class()
-  local self = missle_class()
+  local self = missile_class()
   self.x = 394
   self.y = 38
   self.name = "shipcarrier"
@@ -698,7 +647,7 @@ local function reef_missile_controller_class()
 end
 
 local function trinity_missile_controller_class()
-  local self = missle_class()
+  local self = missile_class()
   self.x = 350
   self.y = 38
   self.name = "staticnuke"

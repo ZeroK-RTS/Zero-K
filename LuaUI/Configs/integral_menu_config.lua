@@ -535,7 +535,7 @@ end
 
 local commandPanels = {
 	{
-		humanName = "Missiles",
+		humanName = "Launch",
 		name = "missiles",
 		inclusionFunction = function(cmdID)
 			if not hasMissileUnits() then return false end
