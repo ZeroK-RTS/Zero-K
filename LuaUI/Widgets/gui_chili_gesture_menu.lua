@@ -226,14 +226,24 @@ local function CanInitialQueue()
 end
 
 
-function widget:Update(t)
+function widget:MouseMove(mx, my)
 	if not menu or KEYBOARD_ONLY or mouselessOpen then return end
-	local mx, my = Spring.GetMouseState()
 	ProcessMove(mx,my)
 	if hold_pos then
 		local dx = mx - hold_pos[1]
 		local dy = my - hold_pos[2]
 		if dx*dx + dy*dy > MOVE_THRESHOLD_SQUARED or osclock() - menu_start > IDLE_THRESHOLD then
+			menu_invisible = false
+			hold_pos = nil
+		end
+	end
+end
+
+
+function widget:Update(t)
+	if not menu or KEYBOARD_ONLY or mouselessOpen then return end
+	if hold_pos then
+		if osclock() - menu_start > IDLE_THRESHOLD then
 			menu_invisible = false
 			hold_pos = nil
 		end
@@ -391,10 +401,10 @@ function EndMenu(ok)
 				level = level + 1  -- save level
 				levels[level] = {menu_selected, menu_selected.angle+180}
 			end
-			if osclock() - menu_start > level * 0.25 then	-- if speed was slower than 250ms per level, flash the gesture
+			if osclock() - menu_start > level * 0.25 then   -- if speed was slower than 250ms per level, flash the gesture
 				menu_flash = {origin[1], origin[2], osclock()}
 			end
-			Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)	-- FIXME set only when you close menu
+			Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
 		end
 	end
 	origin = nil
@@ -619,7 +629,7 @@ local function DrawMenuItem(item, x,y, size, alpha, displayLabel, angle, cmdDesc
 	if displayLabel == nil then displayLabel = true end
 	if item then
 		local ud = UnitDefNames[item.unit]
-		if (ud)	then
+		if (ud) then
 			if (displayLabel and item.label) then
 				glColor(1,1,1,alpha)
 				local wid = glGetTextWidth(item.label)*12
