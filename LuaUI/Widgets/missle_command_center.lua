@@ -46,6 +46,23 @@ local numAoECircles        = 9
 local aoeColor             = {1, 0, 0, 1}
 local mouseDistance = 1000
 local floor                  = math.floor
+local sqrt                   = math.sqrt
+
+local spGetGroundHeight      = Spring.GetGroundHeight
+local spGetProjectilePosition = Spring.GetProjectilePosition
+
+-- Terrain-block prediction (starburst silo missiles only). The descent is
+-- modelled as a straight line from an apex directly above the launcher down to
+-- the target; the apex is kept below the real (higher, curved) trajectory so the
+-- check errs toward "blocked", never a false "clear". See notes at predictImpact.
+local SAMPLE_STEP  = 24   -- elmos between terrain samples along the descent line
+local BLOCK_EPSILON = 12  -- ground must exceed the line by this much to block
+local TARGET_SKIP  = 0.92 -- ignore the near-target dive; it comes down steeply
+local APEX_SAFETY  = 0.85 -- fraction of the observed peak used as the model apex
+
+local learnedApex = {}       -- weaponDefID -> apex height above launch ground
+local launchWeaponDefs = {}  -- weaponDefID -> true (starburst launch weapons to learn from)
+local flightTrack = {}       -- proID -> {wdid, baseY, peak}
 
 local pulse_timmer = Spring.GetTimer()
 local function getPulse()
@@ -84,6 +101,15 @@ local function drawBlastRadius(tx, ty, tz, weaponDef)
 
   glColor(1,1,1,1)
   glLineWidth(1)
+end
+
+-- Faint ring at the intended target, drawn when the shot is blocked so it is
+-- clear the impact ring has been relocated short of where the player aimed.
+local function drawGhostTarget(tx, ty, tz, weaponDef)
+  glLineWidth(1)
+  glColor(1, 1, 1, 0.25)
+  DrawCircle(tx, ty, tz, weaponDef.damageAreaOfEffect)
+  glColor(1, 1, 1, 1)
 end
 
 local function drawLine(x1, y1, z1, x2, y2, z2)
@@ -131,6 +157,35 @@ end
 
 local function distance(x1,z1,x2,z2)
   return (x1-x2)*(x1-x2)+(z1-z2)*(z1-z2)
+end
+
+-- Modelled apex height above the launcher. Learned from real shots once seen;
+-- until then a rough scale from range (missiles with more range lob higher).
+local function getApex(weaponDefID, weaponDef)
+  return learnedApex[weaponDefID] or (weaponDef.range or 3000) * 0.3
+end
+
+-- Walk the straight descent line from apex-above-launcher to the target,
+-- sampling terrain. Returns the first point where ground rises into the path
+-- (impactX, impactY, impactZ, true), or the target and false if it stays clear.
+local function predictImpact(sx, sz, tx, ty, tz, apex)
+  local apexY = spGetGroundHeight(sx, sz) + apex
+  local dx, dz = tx - sx, tz - sz
+  local dist = sqrt(dx*dx + dz*dz)
+  if dist < 1 then return tx, ty, tz, false end
+  local steps = floor(dist / SAMPLE_STEP)
+  for i = 1, steps do
+    local f = i / steps
+    if f > TARGET_SKIP then break end
+    local px = sx + dx * f
+    local pz = sz + dz * f
+    local lineY = apexY + (ty - apexY) * f
+    local groundY = spGetGroundHeight(px, pz)
+    if groundY > lineY + BLOCK_EPSILON then
+      return px, groundY, pz, true
+    end
+  end
+  return tx, ty, tz, false
 end
 
 --------------------------------------------------------------------------------
@@ -415,8 +470,20 @@ local function missle_class()
     local range = weaponDef.range
     if dist > range * range then return end
 
-    drawBlastRadius(mx, my, mz, weaponDef)
-    drawLine(ux, uy, uz, mx, my, mz)
+    -- For lobbed (starburst) missiles, relocate the impact to any terrain that
+    -- blocks the descent so the ring lands where the missile actually would.
+    local ix, iy, iz = mx, my, mz
+    local blocked = false
+    if weaponDef.type == "StarburstLauncher" then
+      local apex = getApex(weapon.weaponDef, weaponDef)
+      ix, iy, iz, blocked = predictImpact(ux, uz, mx, my, mz, apex)
+    end
+
+    if blocked then
+      drawGhostTarget(mx, my, mz, weaponDef)
+    end
+    drawBlastRadius(ix, iy, iz, weaponDef)
+    drawLine(ux, uy, uz, ix, iy, iz)
   end
 
 
@@ -656,6 +723,17 @@ for _, command in ipairs(orderedCommands) do
   command.iconTexture = unitDef and ("#" .. unitDef.id) or nil
 end
 
+-- Collect the launch weapons whose real trajectory we calibrate apex from.
+for _, command in pairs(commands) do
+  for unitDefID, launchType in pairs(command.launchableTypes) do
+    local ud = UnitDefs[unitDefID]
+    local weapon = ud and ud.weapons and ud.weapons[launchType.weaponId]
+    if weapon and weapon.weaponDef and WeaponDefs[weapon.weaponDef].type == "StarburstLauncher" then
+      launchWeaponDefs[weapon.weaponDef] = true
+    end
+  end
+end
+
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
 local wasEmptySelection = false
@@ -735,5 +813,39 @@ function widget:DrawWorld()
   for _, command in pairs(commands) do
     command:drawWorld()
   end
+end
+
+--------------------------------------------------------------------------------
+-- Calibration: learn each starburst missile's real apex height from live shots.
+--------------------------------------------------------------------------------
+
+function widget:ProjectileCreated(proID, proOwnerID, weaponDefID)
+  if not launchWeaponDefs[weaponDefID] then return end
+  local x, y, z = spGetProjectilePosition(proID)
+  if not x then return end
+  flightTrack[proID] = {wdid = weaponDefID, baseY = spGetGroundHeight(x, z), peak = y}
+end
+
+function widget:GameFrame()
+  if not next(flightTrack) then return end
+  for proID, data in pairs(flightTrack) do
+    local _, y = spGetProjectilePosition(proID)
+    if y then
+      if y > data.peak then
+        data.peak = y
+      elseif y < data.peak - 40 then
+        -- Past the apex: record height gained above launch ground and stop.
+        local apex = (data.peak - data.baseY) * APEX_SAFETY
+        if apex > 0 then learnedApex[data.wdid] = apex end
+        flightTrack[proID] = nil
+      end
+    else
+      flightTrack[proID] = nil
+    end
+  end
+end
+
+function widget:ProjectileDestroyed(proID)
+  flightTrack[proID] = nil
 end
 
