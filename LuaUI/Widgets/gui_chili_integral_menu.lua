@@ -139,6 +139,11 @@ local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
 
+-- Name of a hiddenTab panel (e.g. the missiles Launch tab) to reveal this cycle,
+-- or false when no hidden tab is open. Hidden tabs are kept out of the tab strip
+-- until something calls WG.IntegralMenu.OpenTab; selecting any other tab clears it.
+local revealHiddenTab = false
+
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 local mainWindow, baseWindowHeight, buttonAreaHeight -- Required for growing the menu for a second tab row
 --------------------------------------------------------------------------------
@@ -2241,6 +2246,11 @@ local function GetTabPanel(parent, rows, columns)
 		if not tabList then
 			return
 		end
+		-- Selecting any other tab closes an open hidden tab (the missiles Launch
+		-- tab), so clicking a tab dismisses it as expected.
+		if revealHiddenTab and name ~= revealHiddenTab then
+			revealHiddenTab = false
+		end
 		currentTab = name
 		for i = 1, #tabList do
 			local data = tabList[i]
@@ -2504,7 +2514,10 @@ local function ProcessAllCommands(commands, customCommands)
 	local forceShowTabs = false
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		if data.commandCount ~= 0 then
+		-- A hiddenTab (the missiles Launch tab) stays out of the tab strip until it
+		-- is explicitly opened via WG.IntegralMenu.OpenTab, which sets revealHiddenTab.
+		local hidden = data.hiddenTab and (data.name ~= revealHiddenTab)
+		if data.commandCount ~= 0 and not hidden then
 			tabsToShow[#tabsToShow + 1] = data.tabButton
 			if data.alwaysShowTab then
 				forceShowTabs = true
@@ -2520,6 +2533,25 @@ local function ProcessAllCommands(commands, customCommands)
 					tabToSelect = lastTabSelected
 				end
 			end
+		end
+	end
+
+	-- A freshly opened hidden tab takes selection priority and forces the strip
+	-- visible. If it is no longer available (e.g. all missile units were lost),
+	-- clear the open state so it does not get stuck.
+	if revealHiddenTab then
+		local revealPresent = false
+		for i = 1, #tabsToShow do
+			if tabsToShow[i].name == revealHiddenTab then
+				revealPresent = true
+				break
+			end
+		end
+		if revealPresent then
+			tabToSelect = revealHiddenTab
+			forceShowTabs = true
+		else
+			revealHiddenTab = false
 		end
 	end
 	
@@ -2902,6 +2934,32 @@ function externalFunctions.UpdateCommands()
 	local commands = widgetHandler.commands
 	local customCommands = widgetHandler.customCommands
 	ProcessAllCommands(commands, customCommands)
+end
+
+-- Reveal a hiddenTab panel (e.g. the missiles "Launch" tab) and select it. The
+-- tab is otherwise kept out of the tab strip; opening it forces the strip
+-- visible. Selecting any other tab closes it again (see SwitchToTab).
+function externalFunctions.OpenTab(tabName)
+	if not initialized then
+		return
+	end
+	revealHiddenTab = tabName
+	externalFunctions.UpdateCommands()
+end
+
+function externalFunctions.CloseHiddenTab()
+	if not revealHiddenTab then
+		return
+	end
+	revealHiddenTab = false
+	externalFunctions.UpdateCommands()
+end
+
+function externalFunctions.IsHiddenTabOpen(tabName)
+	if tabName then
+		return revealHiddenTab == tabName
+	end
+	return revealHiddenTab ~= false
 end
 
 --------------------------------------------------------------------------------
