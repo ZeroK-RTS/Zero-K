@@ -551,7 +551,6 @@ local commandPanels = {
 		end,
 		loiterable = true,
 		alwaysShowTab = true,
-		topRow = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
 		badgeIconsWG = "missileActiveIcons",
 		gridHotkeys = true,
