@@ -115,7 +115,6 @@ local spTraceScreenRay      = Spring.TraceScreenRay
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetMyAllyTeamID     = Spring.GetMyAllyTeamID
-local spGetCameraPosition   = Spring.GetCameraPosition
 
 local glColor            = gl.Color
 local glLineWidth        = gl.LineWidth
@@ -123,18 +122,10 @@ local glLineStipple      = gl.LineStipple
 local glDrawGroundCircle = gl.DrawGroundCircle
 local glDepthTest        = gl.DepthTest
 
--- AoE-preview look, mirrored from the stock "Attack AoE" widget (gui_attack_aoe.lua):
--- concentric rings whose alpha decays toward the edge by edgeEffectiveness, so the
--- preview conveys how the blast's strength falls off with distance from the epicentre.
-local NUM_AOE_CIRCLES   = 9
-local AOE_LINE_WIDTH_MULT = 64   -- ring width scales with aoe/cameraDistance (screen-space)
-
 local CMD_ATTACK    = CMD.ATTACK
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
 local floor = math.floor
-local sqrt  = math.sqrt
-local max   = math.max
 local schar = string.char
 
 -- Chili colour escape for a caption ("\255rgb").
@@ -275,10 +266,8 @@ end
 -- Targeting helpers
 --------------------------------------------------------------------------------
 
-local function Dist2(ax, az, bx, bz)
-	local dx, dz = ax - bx, az - bz
-	return dx * dx + dz * dz
-end
+-- Squared XZ distance -- shared engine utility (Spring.Utilities.Vector), not hand-rolled.
+local Dist2 = Spring.Utilities.Vector.DistSq
 
 -- Fire one ready missile of `t` from the nearest in-range silo to (tx,tz).
 local function FireType(t, tx, tz, targetUnitID)
@@ -528,33 +517,6 @@ end
 -- World-space range/AoE preview (immediate-mode; Chili can't draw on the map)
 --------------------------------------------------------------------------------
 
--- Draw the blast footprint at (cx,cz) as nested rings whose alpha falls off toward
--- the edge, exactly like the stock force-fire AoE indicator (gui_attack_aoe.lua):
---   alpha(r) = baseAlpha * (1 - p) / (1 - p*ee),  p = ring proportion of the radius.
--- ee == 1 (e.g. EMP) => flat alpha (uniform damage to the edge); ee < 1 => brighter
--- centre fading out, conveying reduced damage with distance from the epicentre.
-local function DrawAoEFalloff(cx, cz, t)
-	local aoe = t.aoe
-	if not aoe or aoe <= 0 then return end
-	local ee = t.ee or 1
-
-	-- Match native screen-space ring thickness: scale by aoe / cameraDistance.
-	local camx, camy, camz = spGetCameraPosition()
-	local cy = spGetGroundHeight(cx, cz) or 0
-	local dx, dy, dz = camx - cx, camy - cy, camz - cz
-	local camDist = sqrt(dx * dx + dy * dy + dz * dz)
-	if camDist < 1 then camDist = 1 end
-	glLineWidth(max(0.5, AOE_LINE_WIDTH_MULT * aoe / camDist))
-
-	local r, g, b = t.color[1], t.color[2], t.color[3]
-	for i = 1, NUM_AOE_CIRCLES do
-		local p = i / (NUM_AOE_CIRCLES + 1)
-		local alpha = 0.9 * (1 - p) / (1 - p * ee)
-		glColor(r, g, b, alpha)
-		glDrawGroundCircle(cx, 0, cz, aoe * p, 48)
-	end
-end
-
 function widget:DrawWorld()
 	if not haveSilos or not uiBuilt then return end
 
@@ -593,11 +555,13 @@ function widget:DrawWorld()
 	-- AoE preview at the cursor while armed. Zeno is homing but still lays down a slow
 	-- FIELD, so it has a real AoE too -- show it exactly like force-firing via selection
 	-- (gui_attack_aoe draws Zeno's gui_aoe at the target). Gated only on aoe > 0.
-	if activeT == t and t.aoe and t.aoe > 0 then
+	-- Reuse the stock Attack AoE falloff renderer (exposed via WG) rather than
+	-- duplicating it; the missile's colour makes the preview read as its type.
+	if activeT == t and t.aoe and t.aoe > 0 and WG.DrawAoEPreview then
 		local mx, my = spGetMouseState()
 		local _, coords = spTraceScreenRay(mx, my, true)
 		if coords then
-			DrawAoEFalloff(coords[1], coords[3], t)
+			WG.DrawAoEPreview(coords[1], coords[2], coords[3], t.aoe, t.ee, t.color)
 		end
 	end
 
