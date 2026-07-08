@@ -634,6 +634,19 @@ for _, command in ipairs(orderedCommands) do
   command.iconTexture = unitDef and ("#" .. unitDef.id) or nil
 end
 
+-- Unit defs whose creation/completion/destruction can change the launchable set
+-- (the silo missiles and the units that hold them). Used to refresh immediately
+-- on the relevant unit events instead of waiting for the next poll, so the
+-- launch button appears promptly when a missile starts building.
+local relevantUnitDefs = {}
+for _, command in ipairs(orderedCommands) do
+  if command.launchableTypes then
+    for unitDefID in pairs(command.launchableTypes) do
+      relevantUnitDefs[unitDefID] = true
+    end
+  end
+end
+
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
 local wasEmptySelection = false
@@ -700,6 +713,30 @@ function widget:Update(dt)
     Spring.ForceLayoutUpdate()
   end
   wasEmptySelection = emptySelection
+end
+
+-- Run the next Update on the following frame rather than waiting out the poll
+-- interval, so unit changes are reflected right away.
+local function refreshSoon()
+  timer = UPDATE_FREQUENCY
+end
+
+function widget:UnitCreated(unitID, unitDefID, unitTeam)
+  if unitTeam == Spring.GetMyTeamID() and relevantUnitDefs[unitDefID] then
+    refreshSoon()
+  end
+end
+
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+  if unitTeam == Spring.GetMyTeamID() and relevantUnitDefs[unitDefID] then
+    refreshSoon()
+  end
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+  if unitTeam == Spring.GetMyTeamID() and relevantUnitDefs[unitDefID] then
+    refreshSoon()
+  end
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)

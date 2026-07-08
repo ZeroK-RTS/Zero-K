@@ -2179,18 +2179,21 @@ function widget:Update(dt)
 		--debugIdleConsState()
 	end
 
+	-- Add the launch button as soon as there are missiles to launch, every frame
+	-- rather than only in the throttled block below, so it appears promptly when
+	-- a missile starts building. Populate it at once so it is not shown empty.
+	if WG.missileActiveIcons and #WG.missileActiveIcons > 0 and not buttonList.GetButton(LAUNCH_BUTTON_ID) then
+		local launchButton = GetLaunchButton(buttonHolder)
+		buttonList.AddButton(LAUNCH_BUTTON_ID, launchButton)
+		launchButton.UpdateButton(dt)
+	end
+
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
 		return
 	end
-	
-	buttonList.UpdateButtons(timer)
 
-	-- Show a single launch button while there are missiles to launch. It removes
-	-- itself (UpdateButton returns false) once there are none.
-	if WG.missileActiveIcons and #WG.missileActiveIcons > 0 and not buttonList.GetButton(LAUNCH_BUTTON_ID) then
-		buttonList.AddButton(LAUNCH_BUTTON_ID, GetLaunchButton(buttonHolder))
-	end
+	buttonList.UpdateButtons(timer)
 
 	-- The launch button was removed (no missiles left): shrink the panel and
 	-- relayout. Growth while the button exists is handled inline in UpdateButton.
