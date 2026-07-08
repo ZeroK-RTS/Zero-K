@@ -1454,6 +1454,9 @@ end
 
 local LAUNCH_COLUMNS = 2
 local LAUNCH_ROWS_MIN = 2
+-- Count label font size for a standard (2-column) cell; it scales up with the
+-- cell when there are fewer columns (a single missile fills the whole button).
+local LAUNCH_LABEL_FONT = 12
 
 local function GetLaunchButton(parent)
 	local function OnClick(mouse)
@@ -1473,7 +1476,7 @@ local function GetLaunchButton(parent)
 	button.SetImageVisible(false) -- the missile grid replaces the single icon
 
 	local cells = {}
-	local lastKey = false
+	local lastLayoutKey = false
 
 	-- Cells are display only (icon + count + build progress); they are parented
 	-- directly to the button and do not handle clicks, so the whole button stays
@@ -1495,10 +1498,15 @@ local function GetLaunchButton(parent)
 			color = {0.7, 0.7, 0.4, 0.6},
 			backgroundColor = {1, 1, 1, 0.01},
 		}
+		-- Parented to the image (not the button) so the count always draws on top
+		-- of the icon and its progress bar. A small right/bottom inset keeps the
+		-- digits inside the cell instead of spilling over the corner.
 		cell.label = Label:New {
-			parent = buttonControl,
+			parent = cell.image,
+			x = 0, y = 0, right = 3, bottom = 4,
+			autosize = false,
 			align = "right", valign = "bottom",
-			objectOverrideFont = WG.GetFont(12),
+			objectOverrideFont = WG.GetFont(LAUNCH_LABEL_FONT),
 			caption = "",
 		}
 		cells[i] = cell
@@ -1566,46 +1574,58 @@ local function GetLaunchButton(parent)
 			height = buttonControl.height or 0
 		end
 
-		-- Rebuild only when the missile set, counts, progress or button size change.
-		local keyParts = {}
-		for i = 1, n do
-			keyParts[i] = icons[i].icon .. ":" .. icons[i].count .. ":" .. math.floor((icons[i].progress or 0) * 100)
-		end
-		local key = table.concat(keyParts, ",") .. "|" .. width .. "x" .. height
-		if key == lastKey then
-			return true
-		end
-		lastKey = key
-
 		-- With two or more missiles, divide by the minimum grid (2x2) so a single
 		-- row keeps its half-button height instead of stretching. A single missile
 		-- (cols == 1) fills the whole button.
 		local cw = width / cols
 		local ch = height / (singleCell and 1 or math.max(LAUNCH_ROWS_MIN, rows))
 
+		-- Reposition cells only when the missile set or grid size changes, not on
+		-- every count/progress tick. Re-running SetPos each frame re-lays out the
+		-- cell labels and makes the count jitter vertically while a missile builds.
+		local iconParts = {}
 		for i = 1, n do
-			local cell = GetCell(i)
+			iconParts[i] = icons[i].icon
+		end
+		local layoutKey = table.concat(iconParts, ",") .. "|" .. cols .. "|" .. width .. "x" .. height
+		if layoutKey ~= lastLayoutKey then
+			lastLayoutKey = layoutKey
+			-- Scale the count font with the cell: the base size fits a standard
+			-- 2-column cell, so a wider cell (fewer columns) gets a bigger number.
+			local baseCellWidth = width / LAUNCH_COLUMNS
+			local labelFont = WG.GetFont(math.max(1, math.floor(LAUNCH_LABEL_FONT * cw / baseCellWidth + 0.5)))
+			for i = 1, n do
+				local cell = GetCell(i)
+				local col = (i - 1) % cols
+				local row = math.floor((i - 1) / cols)
+				local cx, cy = col * cw, row * ch
+				cell.image:SetPos(cx, cy, cw, ch)
+				cell.image:SetVisibility(true)
+				cell.image.file = icons[i].icon
+				cell.image:Invalidate()
+				cell.label.font = labelFont
+				cell.label.objectOverrideFont = labelFont
+				cell.label:Invalidate()
+				cell.label:SetVisibility(true)
+			end
+			for i = n + 1, #cells do
+				cells[i].image:SetVisibility(false)
+				cells[i].label:SetVisibility(false)
+			end
+		end
+
+		-- Update the dynamic per-cell values every frame; these change the progress
+		-- bar fill and the count text in place without moving any cell.
+		for i = 1, n do
+			local cell = cells[i]
 			local data = icons[i]
-			local col = (i - 1) % cols
-			local row = math.floor((i - 1) / cols)
-			local cx, cy = col * cw, row * ch
-			cell.image:SetPos(cx, cy, cw, ch)
-			cell.image:SetVisibility(true)
-			cell.image.file = data.icon
-			cell.image:Invalidate()
 			if (data.progress or 0) > 0 then
 				cell.bar:SetValue(data.progress)
 				cell.bar:SetVisibility(true)
 			else
 				cell.bar:SetVisibility(false)
 			end
-			cell.label:SetPos(cx, cy, cw, ch)
-			cell.label:SetVisibility(true)
 			cell.label:SetCaption((data.count > 0) and tostring(data.count) or "")
-		end
-		for i = n + 1, #cells do
-			cells[i].image:SetVisibility(false)
-			cells[i].label:SetVisibility(false)
 		end
 		return true
 	end
