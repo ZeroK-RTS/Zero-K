@@ -98,6 +98,12 @@ local myTeamID = Spring.GetMyTeamID()
 local buttonSizeShort = 4
 local buttonCountLimit = 7
 
+-- Extra long-axis size (beyond one normal button) that the launch button needs
+-- for its grid rows, and a flag to relayout when it changes. The launch button
+-- is the last button, so its growth only has to enlarge the background panel.
+local launchButtonExtraLong = 0
+local wantLaunchRelayout = false
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
@@ -702,6 +708,8 @@ local function GetBackground(parent)
 		local buttons = math.min(buttonCountLimit, math.max(buttonCount, options.minButtonSpaces.value))
 		
 		local size = buttons*options.buttonSizeLong.value + (buttons - 1)*options.buttonSpacing.value
+		-- Extra room for the launch button, which grows past one normal button.
+		size = size + launchButtonExtraLong
 		if options.vertical.value then
 			size = size + 2*options.vertPadding.value
 		else
@@ -800,7 +808,11 @@ end
 --------------------------------------------------------------------------------
 -- Button Handling
 
-local function GetNewButton(parent, onClick, category, index, backgroundColor, imageFile, imageFile2)
+-- getLongSize (optional): returns the button's extent along the long axis. Only
+-- affects this button's own size, not the offset of following buttons, so it is
+-- only safe to grow the last button (the launch button). Defaults to the normal
+-- button size.
+local function GetNewButton(parent, onClick, category, index, backgroundColor, imageFile, imageFile2, getLongSize)
 	local position = 1
 	
 	local hotkeyLabel, buildProgress, repeatImage, healthBar, hotkeyText, bottomLabel
@@ -985,6 +997,9 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		local vPad = (options.vertical.value and options.buttonSpacing.value) or 0
 		
 		local index = position - 1
+		-- Offset uses the normal button size (all preceding buttons are normal);
+		-- only this button's own extent may be larger, via getLongSize.
+		local longSize = (getLongSize and getLongSize()) or options.buttonSizeLong.value
 		if options.vertical.value then
 			button._relativeBounds.left = options.horPaddingLeft.value
 			button._relativeBounds.right = options.horPaddingRight.value
@@ -993,7 +1008,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 			button._relativeBounds.bottom = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.vertPadding.value
 			button._relativeBounds.width = nil
 			button._givenBounds.width = nil
-			button._relativeBounds.height = options.buttonSizeLong.value
+			button._relativeBounds.height = longSize
 			button:UpdateClientArea()
 		else
 			button._relativeBounds.left = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.horPaddingLeft.value
@@ -1002,7 +1017,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 			button._relativeBounds.top = options.vertPadding.value
 			button._givenBounds.top = options.vertPadding.value
 			button._relativeBounds.bottom = options.vertPadding.value
-			button._relativeBounds.width = options.buttonSizeLong.value
+			button._relativeBounds.width = longSize
 			button._relativeBounds.height = nil
 			button._givenBounds.height = nil
 			button:UpdateClientArea()
@@ -1447,7 +1462,11 @@ local function GetLaunchButton(parent)
 		end
 	end
 
-	local button = GetNewButton(parent, OnClick, LAUNCH_ORDER, 0, BUTTON_COLOR)
+	local function GetLongSize()
+		return options.buttonSizeLong.value + launchButtonExtraLong
+	end
+
+	local button = GetNewButton(parent, OnClick, LAUNCH_ORDER, 0, BUTTON_COLOR, nil, nil, GetLongSize)
 	local buttonControl = button.GetButtonControl()
 	button.SetImageVisible(false) -- the missile grid replaces the single icon
 
@@ -1500,8 +1519,25 @@ local function GetLaunchButton(parent)
 		local icons = WG.missileActiveIcons or {}
 		local n = #icons
 		if n == 0 then
-			-- No missiles: report inactive so the list handler removes the button.
+			-- No missiles: reset any growth and report inactive so the list handler
+			-- removes the button.
+			if launchButtonExtraLong ~= 0 then
+				launchButtonExtraLong = 0
+				wantLaunchRelayout = true
+			end
 			return false
+		end
+
+		local cols = LAUNCH_COLUMNS
+		local rows = math.max(1, math.ceil(n / cols))
+
+		-- A normal button holds two rows (two columns); each further row adds half
+		-- a button length. Grow the button, and the panel, past two rows.
+		local desiredLong = math.max(options.buttonSizeLong.value, rows * options.buttonSizeLong.value / 2)
+		local extra = desiredLong - options.buttonSizeLong.value
+		if extra ~= launchButtonExtraLong then
+			launchButtonExtraLong = extra
+			wantLaunchRelayout = true
 		end
 
 		local width = buttonControl.width or 0
@@ -1518,8 +1554,6 @@ local function GetLaunchButton(parent)
 		end
 		lastKey = key
 
-		local cols = LAUNCH_COLUMNS
-		local rows = math.max(1, math.ceil(n / cols))
 		local cw = width / cols
 		local ch = height / rows
 
@@ -2110,6 +2144,15 @@ function widget:Update(dt)
 	-- itself (UpdateButton returns false) once there are none.
 	if WG.missileActiveIcons and #WG.missileActiveIcons > 0 and not buttonList.GetButton(LAUNCH_BUTTON_ID) then
 		buttonList.AddButton(LAUNCH_BUTTON_ID, GetLaunchButton(buttonHolder))
+	end
+
+	-- The launch button changed its row count: resize the panel and relayout.
+	if wantLaunchRelayout then
+		wantLaunchRelayout = false
+		if mainBackground then
+			mainBackground.UpdateSize()
+		end
+		buttonList.UpdateLayout()
 	end
 
 	timer = 0
