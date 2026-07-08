@@ -128,6 +128,19 @@ for name in pairs(exceptionList) do
 	end
 end
 
+-- Factory-type launchers whose core-selector button opens the missiles "Launch"
+-- tab (in the integral menu) on selection, instead of only selecting the unit.
+-- Add other launcher structures here to give them the same behaviour.
+local missileLauncherFactories = {
+	staticmissilesilo = true,
+}
+local missileLauncherFactoryDefs = {}
+for name in pairs(missileLauncherFactories) do
+	if UnitDefNames[name] then
+		missileLauncherFactoryDefs[UnitDefNames[name].id] = true
+	end
+end
+
 local function SetButtonColorHighlight(opacity)
 	buttonColorHighlight[4] = opacity
 end
@@ -1057,6 +1070,11 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 			local x, y, z = Spring.GetUnitPosition(unitID)
 			SetCameraTarget(x, y, z)
+		end
+		-- Selecting a missile silo also opens the "Launch" tab so its launch
+		-- commands are immediately available.
+		if missileLauncherFactoryDefs[unitDefID] and WG.IntegralMenu and WG.IntegralMenu.OpenTab then
+			WG.IntegralMenu.OpenTab("missiles")
 		end
 	end
 	
