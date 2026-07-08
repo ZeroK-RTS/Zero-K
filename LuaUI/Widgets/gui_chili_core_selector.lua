@@ -113,8 +113,10 @@ local IDLE_CONS_HIGHLIGHT_TIME = 0.5
 local CONSTRUCTOR_ORDER = 1
 local COMMANDER_ORDER = 2
 local FACTORY_ORDER = 3
+local LAUNCH_ORDER = 4
 
 local CONSTRUCTOR_BUTTON_ID = "cons"
+local LAUNCH_BUTTON_ID = "launch"
 
 local exceptionList = {
 	staticrearm = true,
@@ -125,19 +127,6 @@ local exceptionArray = {}
 for name in pairs(exceptionList) do
 	if UnitDefNames[name] then
 		exceptionArray[UnitDefNames[name].id] = true
-	end
-end
-
--- Factory-type launchers whose core-selector button opens the missiles "Launch"
--- tab (in the integral menu) on selection, instead of only selecting the unit.
--- Add other launcher structures here to give them the same behaviour.
-local missileLauncherFactories = {
-	staticmissilesilo = true,
-}
-local missileLauncherFactoryDefs = {}
-for name in pairs(missileLauncherFactories) do
-	if UnitDefNames[name] then
-		missileLauncherFactoryDefs[UnitDefNames[name].id] = true
 	end
 end
 
@@ -851,7 +840,13 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	}
 	
 	local externalFunctions = {}
-	
+
+	-- Exposes the button control and its image so specialised buttons (e.g. the
+	-- launch button) can parent extra content onto them.
+	function externalFunctions.GetButtonControl()
+		return button, image
+	end
+
 	-- Update attributes
 	function externalFunctions.SetImage(newImageFile)
 		image.file = newImageFile
@@ -1071,11 +1066,6 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 			local x, y, z = Spring.GetUnitPosition(unitID)
 			SetCameraTarget(x, y, z)
 		end
-		-- Selecting a missile silo also opens the "Launch" tab so its launch
-		-- commands are immediately available.
-		if missileLauncherFactoryDefs[unitDefID] and WG.IntegralMenu and WG.IntegralMenu.OpenTab then
-			WG.IntegralMenu.OpenTab("missiles")
-		end
 	end
 	
 	local constructionDefID
@@ -1171,21 +1161,6 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		end
 
 		UpdateTooltip(constructionCount)
-
-		-- Missile silos show the stockpiled missile count on the button; the build
-		-- progress bar above is already driven by the silo's current construction
-		-- (the missile it is building).
-		if missileLauncherFactoryDefs[unitDefID] then
-			local count = 0
-			local icons = WG.missileActiveIcons
-			if icons then
-				for i = 1, #icons do
-					count = count + (icons[i].count or 0)
-				end
-			end
-			button.SetBottomLabel((count > 0) and tostring(count) or "")
-		end
-
 		return true
 	end
 	
@@ -1443,7 +1418,154 @@ local function GetConstructorButton(parent)
 	
 	externalFunctions.UpdateButton(dt)
 	externalFunctions.UpdateHotkey()
-	
+
+	return externalFunctions
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Launch button
+--
+-- A single aggregate button that shows every stockpiled or building missile
+-- type in a 2-column grid. Each cell arms that missile's launch command via the
+-- missile widget. Added while missiles exist and self-removes (UpdateButton
+-- returns false) once there are none.
+--
+-- NOTE: the button currently keeps the standard button size, so cells shrink as
+-- more missile types appear. Growing the button height past two rows needs
+-- integration with the button-layout sizing (UpdatePosition) and is not done
+-- here yet.
+
+local LAUNCH_COLUMNS = 2
+
+local function GetLaunchButton(parent)
+	local function OnClick(mouse)
+		-- Clicking the button background (not a cell) does nothing; the cells
+		-- issue the launch commands.
+	end
+
+	local button = GetNewButton(parent, OnClick, LAUNCH_ORDER, 0, BUTTON_COLOR)
+	local buttonControl = button.GetButtonControl()
+	button.SetImageVisible(false) -- the missile grid replaces the single icon
+
+	local cells = {}
+	local lastKey = false
+
+	local function GetCell(i)
+		if cells[i] then
+			return cells[i]
+		end
+		local cell = {}
+		cell.button = Button:New {
+			parent = buttonControl,
+			caption = "",
+			padding = {0, 0, 0, 0},
+			noFont = true,
+			backgroundColor = {1, 1, 1, 0},
+			OnClick = {
+				function ()
+					if cell.cmd and WG.MissileCommandCenter then
+						WG.MissileCommandCenter.SetActiveLaunch(cell.cmd)
+					end
+				end
+			},
+		}
+		cell.image = Image:New {
+			parent = cell.button,
+			x = "5%", y = "5%", right = "5%", bottom = "5%",
+			keepAspect = false,
+			file = "",
+		}
+		cell.bar = Progressbar:New {
+			parent = cell.image,
+			x = "5%", y = "5%", right = "5%", bottom = "5%",
+			value = 0, max = 1, caption = false, noFont = true,
+			color = {0.7, 0.7, 0.4, 0.6},
+			backgroundColor = {1, 1, 1, 0.01},
+		}
+		cell.label = Label:New {
+			parent = cell.button,
+			right = 2, bottom = 0,
+			align = "right", valign = "bottom",
+			objectOverrideFont = WG.GetFont(12),
+			caption = "",
+		}
+		cells[i] = cell
+		return cell
+	end
+
+	local externalFunctions = {
+		SetPosition = button.SetPosition,
+		MoveUp = button.MoveUp,
+		MoveDown = button.MoveDown,
+		GetOrder = button.GetOrder,
+		UpdatePosition = button.UpdatePosition,
+	}
+
+	-- Keep the single base icon hidden; the grid is drawn from cell controls.
+	function externalFunctions.SetImageVisible()
+	end
+
+	function externalFunctions.UpdateButton(dt)
+		local icons = WG.missileActiveIcons or {}
+		local n = #icons
+		if n == 0 then
+			-- No missiles: report inactive so the list handler removes the button.
+			return false
+		end
+
+		local width = buttonControl.width or 0
+		local height = buttonControl.height or 0
+
+		-- Rebuild only when the missile set, counts, progress or button size change.
+		local keyParts = {}
+		for i = 1, n do
+			keyParts[i] = icons[i].icon .. ":" .. icons[i].count .. ":" .. math.floor((icons[i].progress or 0) * 100)
+		end
+		local key = table.concat(keyParts, ",") .. "|" .. width .. "x" .. height
+		if key == lastKey then
+			return true
+		end
+		lastKey = key
+
+		local cols = LAUNCH_COLUMNS
+		local rows = math.max(1, math.ceil(n / cols))
+		local cw = width / cols
+		local ch = height / rows
+
+		for i = 1, n do
+			local cell = GetCell(i)
+			local data = icons[i]
+			local col = (i - 1) % cols
+			local row = math.floor((i - 1) / cols)
+			cell.button:SetPos(col * cw, row * ch, cw, ch)
+			cell.button:SetVisibility(true)
+			cell.cmd = data.cmd
+			cell.image.file = data.icon
+			cell.image:Invalidate()
+			if (data.progress or 0) > 0 then
+				cell.bar:SetValue(data.progress)
+				cell.bar:SetVisibility(true)
+			else
+				cell.bar:SetVisibility(false)
+			end
+			cell.label:SetCaption((data.count > 0) and tostring(data.count) or "")
+		end
+		for i = n + 1, #cells do
+			cells[i].button:SetVisibility(false)
+		end
+		return true
+	end
+
+	function externalFunctions.UpdateHotkey()
+	end
+
+	function externalFunctions.Destroy()
+		button.Destroy()
+		button = nil
+	end
+
+	externalFunctions.UpdateButton(0)
 	return externalFunctions
 end
 
@@ -1990,6 +2112,13 @@ function widget:Update(dt)
 	end
 	
 	buttonList.UpdateButtons(timer)
+
+	-- Show a single launch button while there are missiles to launch. It removes
+	-- itself (UpdateButton returns false) once there are none.
+	if WG.missileActiveIcons and #WG.missileActiveIcons > 0 and not buttonList.GetButton(LAUNCH_BUTTON_ID) then
+		buttonList.AddButton(LAUNCH_BUTTON_ID, GetLaunchButton(buttonHolder))
+	end
+
 	timer = 0
 end
 

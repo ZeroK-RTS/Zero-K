@@ -634,6 +634,22 @@ for _, command in ipairs(orderedCommands) do
   command.iconTexture = unitDef and ("#" .. unitDef.id) or nil
 end
 
+local commandByCmdID = {}
+for _, command in pairs(commands) do
+  commandByCmdID[command.cmd] = command
+end
+
+-- Exposed for the core selector launch button: arm a missile launch command by
+-- its command id. Does nothing if none of that missile type are available.
+WG.MissileCommandCenter = {
+  SetActiveLaunch = function(cmdID)
+    local command = commandByCmdID[cmdID]
+    if command then
+      command:action()
+    end
+  end,
+}
+
 local UPDATE_FREQUENCY = 0.25
 local timer = UPDATE_FREQUENCY + 1
 local wasEmptySelection = false
@@ -664,7 +680,7 @@ function widget:Update(dt)
     -- Tab badge: an icon + count + build progress per missile type stockpiled
     -- or building.
     if command.iconTexture and (count >= 1 or buildProgress > 0) then
-      activeIcons[#activeIcons + 1] = {icon = command.iconTexture, count = count, progress = buildProgress}
+      activeIcons[#activeIcons + 1] = {icon = command.iconTexture, count = count, progress = buildProgress, cmd = command.cmd}
     end
 
     -- Count string shown on the button (e.g. "x3"), empty when none stockpiled.
