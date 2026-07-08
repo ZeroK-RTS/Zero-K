@@ -975,6 +975,39 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 end
 
 --------------------------------------------------------------------------------
+-- Shared terrain-impact test, exposed via WG for the missile silo launch UI. Given a
+-- firing unit (a vlaunch missile sitting on its pad) and a target point, returns the
+-- terrain impact point (hx, hy, hz) if that unit's vlaunch trajectory is projected to
+-- strike the ground before reaching the target (a hill in the way), or nil if it
+-- reaches the target -- or has no vlaunch data, so the caller simply doesn't filter.
+-- Uses exactly the same CalculateVlaunchImpact path this widget draws (the depth line
+-- shown when force-firing), so the silo UI's "which silo can actually hit here" filter
+-- matches what a player sees.
+--------------------------------------------------------------------------------
+local function GetVlaunchTerrainImpact(unitID, tx, ty, tz)
+	local unitDefID = spGetUnitDefID(unitID)
+	local info = unitDefID and aoeDefInfo[unitDefID]
+	if not (info and info.vlaunch) or info.circleMode == "cloaker" then
+		return nil
+	end
+	local _,_,_,fx, fy, fz = GetUnitPosition(unitID, true)
+	if not fx then
+		return nil
+	end
+	if not info.mobile then
+		fy = fy + GetUnitRadius(unitID)
+	end
+	if not info.waterWeapon then
+		ty = max(0, ty)
+	end
+	local hx, hy, hz = CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
+	if hx then
+		return hx, hy, hz
+	end
+	return nil
+end
+
+--------------------------------------------------------------------------------
 --Main draw
 --------------------------------------------------------------------------------
 
@@ -1063,11 +1096,13 @@ function widget:Initialize()
 	end
 	SetupDisplayLists()
 	WG.DrawAoEPreview = DrawAoEPreview
+	WG.GetVlaunchTerrainImpact = GetVlaunchTerrainImpact
 end
 
 function widget:Shutdown()
 	DeleteDisplayLists()
 	WG.DrawAoEPreview = nil
+	WG.GetVlaunchTerrainImpact = nil
 end
 
 function widget:DrawWorld()

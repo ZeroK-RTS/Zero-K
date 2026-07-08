@@ -18,6 +18,31 @@ end
 local MARKER = "[Missile Silo UX]"
 
 --------------------------------------------------------------------------------
+-- Settings (Settings/HUD Panels/Missile Silo). Both are plain bool options, so
+-- epicMenu makes them hotkeyable by default (no noHotkey on either).
+local SyncPanelVisibility  -- forward decl; defined in the visibility section below
+
+options_path = 'Settings/HUD Panels/Missile Silo'
+options_order = {'autoShow', 'showPanel'}
+options = {
+	autoShow = {
+		name = 'Auto-show when a silo is built',
+		type = 'bool',
+		value = true,
+		desc = 'Automatically show the panel the first time you own a missile silo.',
+	},
+	showPanel = {
+		name = 'Show panel',
+		type = 'bool',
+		value = true,
+		desc = 'Show or hide the missile silo panel. Also toggled by the top-left command bar button.',
+		OnChange = function()
+			if SyncPanelVisibility then SyncPanelVisibility() end
+		end,
+	},
+}
+
+--------------------------------------------------------------------------------
 -- Missile types (data from zk-repo/units/*.lua weaponDefs).
 --   range/aoe in elmos, cost in metal. `homing` (Zeno) tracks a clicked unit; like
 --   force-fire, every type can also be fired at a ground point.
@@ -53,6 +78,7 @@ local window
 local typeButtons = {}         -- [i] = { button=, prog=, count=, ready= }
 local slotsBar, slotsLabel
 local uiBuilt = false
+local globalButtonRegistered = false
 
 -- Factory-queue palette (from gui_chili_facpanel.lua).
 local buttonColor = {0, 0, 0, 0.4}
@@ -85,6 +111,7 @@ local myTeamID = Spring.GetMyTeamID()
 
 local silos = {}               -- set: [siloUnitID] = true (owned silos)
 local haveSilos = false
+local prevHaveSilos = false          -- for the auto-show rising edge (no silos -> owns a silo)
 
 -- Fire-mode is now a real engine command: one hidden custom command per missile type.
 -- The engine's guihandler owns "which command is active" (mutual exclusion) and map/UI
@@ -269,30 +296,57 @@ end
 -- Squared XZ distance -- shared engine utility (Spring.Utilities.Vector), not hand-rolled.
 local Dist2 = Spring.Utilities.Vector.DistSq
 
--- Fire one ready missile of `t` from the nearest in-range silo to (tx,tz).
+-- Fire one ready missile of `t` from the nearest in-range silo to (tx,tz), preferring a
+-- silo whose shot actually reaches the target over one whose vlaunch arc would slam into
+-- terrain on the way (a hill between silo and target). The terrain-impact projection is
+-- owned by the Attack AoE widget (WG.GetVlaunchTerrainImpact), so this filter matches the
+-- depth line a player sees when force-firing the same missile.
 local function FireType(t, tx, tz, targetUnitID)
 	local key = t.key
 	local rangeSq = t.range * t.range
-	local bestSilo, bestMissile, bestD
+	-- Target height for the terrain-impact test: a clicked unit's own height, else the
+	-- ground at the target point.
+	local ty
+	if targetUnitID then
+		ty = select(2, spGetUnitPosition(targetUnitID)) or spGetGroundHeight(tx, tz) or 0
+	else
+		ty = spGetGroundHeight(tx, tz) or 0
+	end
+
+	local getImpact = WG.GetVlaunchTerrainImpact
+	local bestMissile, bestD             -- nearest silo whose shot reaches the target
+	local blockedMissile, blockedD       -- nearest silo whose shot hits terrain (fallback)
 	for siloID, info in pairs(siloInfo) do
 		local lst = info.ready[key]
 		if lst and #lst > 0 then
 			local d = Dist2(info.x, info.z, tx, tz)
-			if d <= rangeSq and (not bestD or d < bestD) then
-				bestD, bestSilo, bestMissile = d, siloID, lst[#lst]
+			if d <= rangeSq then
+				local missile = lst[#lst]
+				-- A ready missile whose trajectory is projected to hit terrain short of the
+				-- target is only a fallback -- prefer any silo that can actually reach here.
+				if getImpact and getImpact(missile, tx, ty, tz) then
+					if not blockedD or d < blockedD then
+						blockedD, blockedMissile = d, missile
+					end
+				elseif not bestD or d < bestD then
+					bestD, bestMissile = d, missile
+				end
 			end
 		end
 	end
-	if not bestMissile then return false end
+	-- Fall back to the nearest terrain-blocked silo when every in-range silo is blocked, so
+	-- a fire click never silently no-ops (the projection is approximate, and a blocked shot
+	-- still matches the old always-fire behaviour).
+	local missile = bestMissile or blockedMissile
+	if not missile then return false end
 	-- Match force-fire (cmd_missile_silo.lua): a unit click tracks that unit; a ground
 	-- click attacks the point. This holds for every type, including the homing Zeno --
 	-- its weapon accepts a ground ATTACK, so ground-firing it is valid (it just lays its
 	-- slow field there). Homing only decides whether a unit click gets unit-tracking.
 	if targetUnitID then
-		spGiveOrderToUnit(bestMissile, CMD_ATTACK, { targetUnitID }, 0)
+		spGiveOrderToUnit(missile, CMD_ATTACK, { targetUnitID }, 0)
 	else
-		local ty = spGetGroundHeight(tx, tz) or 0
-		spGiveOrderToUnit(bestMissile, CMD_ATTACK, { tx, ty, tz }, 0)
+		spGiveOrderToUnit(missile, CMD_ATTACK, { tx, ty, tz }, 0)
 	end
 	return true
 end
@@ -510,7 +564,54 @@ local function BuildUI()
 		children = children,
 	}
 	uiBuilt = true
-	window:SetVisibility(haveSilos)
+	window:SetVisibility(haveSilos and options.showPanel.value)
+end
+
+--------------------------------------------------------------------------------
+-- Top-left command-bar toggle (like the Cheat Sheet button)
+--------------------------------------------------------------------------------
+
+function SyncPanelVisibility()
+	if not uiBuilt then return end
+	local shouldShow = haveSilos and options.showPanel.value
+	if window.visible ~= shouldShow then
+		window:SetVisibility(shouldShow)
+	end
+end
+
+-- Drive the "Show panel" option from code (top-left button / auto-show), keeping the
+-- settings checkbox in sync if the menu happens to be open, then apply visibility.
+local function SetShowPanel(show)
+	if options.showPanel.value ~= show then
+		options.showPanel.value = show
+		local chbox = options.showPanel.epic_reference    -- the Chili checkbox, if the menu is built
+		if chbox then
+			chbox.checked = show
+			chbox:Invalidate()
+		end
+	end
+	SyncPanelVisibility()           -- respond immediately, don't wait for the next GameFrame
+end
+
+local function TogglePanel()
+	SetShowPanel(not options.showPanel.value)
+end
+
+-- Register a toggle button in the top-left GlobalCommandBar once the player owns a silo.
+-- The bar has no remove function, so (like gui_chili_cheats.lua) we cache the button in a
+-- WG field and reuse it across widget reloads instead of adding a duplicate.
+local function EnsureGlobalButton()
+	if globalButtonRegistered or not (WG and WG.GlobalCommandBar) then return end
+	if WG.MissileSiloUX_global_button then          -- reload: reuse the existing slot
+		WG.MissileSiloUX_global_button.OnClick = { function() TogglePanel() end }
+		WG.MissileSiloUX_global_button:Show()
+	else
+		WG.MissileSiloUX_global_button = WG.GlobalCommandBar.AddCommand(
+			"unitpics/tacnuke.png",      -- Eos build icon (auto-scaled to the ~25px button)
+			"Missile Silos\n\nShow or hide the missile silo panel.",
+			TogglePanel)
+	end
+	globalButtonRegistered = true
 end
 
 --------------------------------------------------------------------------------
@@ -641,12 +742,17 @@ function widget:GameFrame(n)
 		if WG and WG.Chili then BuildUI() else return end
 	end
 	if haveSilos then
+		EnsureGlobalButton()        -- lazy: WG.GlobalCommandBar may initialize after us
 		Recompute()
 		UpdatePanel()
 	end
-	if window.visible ~= haveSilos then
-		window:SetVisibility(haveSilos)
+	-- Auto-show on the rising edge (didn't own a silo -> now do), if enabled. Only on the
+	-- transition, so a manual hide isn't undone every frame the player still owns a silo.
+	if haveSilos and not prevHaveSilos and options.autoShow.value and not options.showPanel.value then
+		SetShowPanel(true)
 	end
+	prevHaveSilos = haveSilos
+	SyncPanelVisibility()
 end
 
 function widget:ViewResize(x, y)
@@ -689,6 +795,9 @@ function widget:Initialize()
 		AddSilo(unitID, spGetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 	end
 	haveSilos = next(silos) ~= nil
+	-- Seed the rising-edge tracker to the current state so a mid-game widget reload with a
+	-- silo already present doesn't fire a spurious auto-show over a persisted manual hide.
+	prevHaveSilos = haveSilos
 
 	if WG and WG.Chili then BuildUI() end
 	if haveSilos then
@@ -698,6 +807,9 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	-- The GlobalCommandBar has no remove function; hide (not dispose) the cached button
+	-- so a reload reuses the same slot rather than adding a duplicate.
+	if WG.MissileSiloUX_global_button then WG.MissileSiloUX_global_button:Hide() end
 	if window then window:Dispose() end
 end
 
