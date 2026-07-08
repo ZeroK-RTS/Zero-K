@@ -2450,6 +2450,13 @@ local function ProcessAllCommands(commands, customCommands)
 	local selectionChanged = (selectionSignature ~= lastSelectionSignature)
 	lastSelectionSignature = selectionSignature
 
+	-- A selection change dismisses an opened hidden tab (the launch menu), so
+	-- selecting a unit returns to its normal command tabs rather than staying on
+	-- the revealed missiles tab.
+	if selectionChanged and revealHiddenTab then
+		revealHiddenTab = false
+	end
+
 	selectionIndex = selectionIndex + 1
 	
 	for i = 1, #commandPanels do

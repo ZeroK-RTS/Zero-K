@@ -550,7 +550,7 @@ local commandPanels = {
 			return pos ~= nil, pos
 		end,
 		loiterable = true,
-		alwaysShowTab = true,
+		hiddenTab = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
 		badgeIconsWG = "missileActiveIcons",
 		gridHotkeys = true,
