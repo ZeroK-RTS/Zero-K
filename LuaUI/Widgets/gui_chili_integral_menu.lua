@@ -145,7 +145,7 @@ local simpleModeEnabled = true
 local revealHiddenTab = false
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
-local mainWindow, baseWindowHeight, buttonAreaHeight -- Required for growing the menu for a second tab row
+local mainWindow, buttonAreaHeight
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Options
@@ -2177,10 +2177,8 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 end
 
 local function GetTabPanel(parent, rows, columns)
-	-- Two tab rows: the top row is used by panels flagged topRow (the missiles
-	-- tab), the bottom row by everything else. When only one row has tabs it
-	-- fills the whole tab area; when both are used the menu grows taller.
-	local topHolder = StackPanel:New{
+	-- A single horizontal row of tab buttons filling the tab area.
+	local tabHolder = StackPanel:New{
 		x = 0,
 		y = "0%",
 		right = 0,
@@ -2192,48 +2190,6 @@ local function GetTabPanel(parent, rows, columns)
 		resizeItems = true,
 		orientation = "horizontal",
 	}
-	local bottomHolder = StackPanel:New{
-		x = 0,
-		y = "0%",
-		right = 0,
-		height = "100%",
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 1, 0, -1},
-		parent = parent,
-		preserveChildrenOrder = true,
-		resizeItems = true,
-		orientation = "horizontal",
-	}
-
-	local function SetRowGeometry(topActive, bottomActive)
-		local twoRows = topActive and bottomActive
-		if twoRows then
-			topHolder._relativeBounds.top = "0%"
-			topHolder._relativeBounds.height = "50%"
-			bottomHolder._relativeBounds.top = "50%"
-			bottomHolder._relativeBounds.height = "50%"
-		else
-			topHolder._relativeBounds.top = "0%"
-			topHolder._relativeBounds.height = "100%"
-			bottomHolder._relativeBounds.top = "0%"
-			bottomHolder._relativeBounds.height = "100%"
-		end
-		topHolder:UpdateClientArea()
-		bottomHolder:UpdateClientArea()
-
-		-- Grow the window upward by one tab row when both rows are used, keeping
-		-- the window bottom pinned to the screen edge (extend the top upward
-		-- rather than letting the bottom rise). The button area is bottom-anchored
-		-- with a fixed height, so only the tab area changes size.
-		if mainWindow and baseWindowHeight then
-			local newHeight = twoRows and (baseWindowHeight * 8/7) or baseWindowHeight
-			local parentHeight = (mainWindow.parent and mainWindow.parent.height) or (mainWindow.y + mainWindow.height)
-			mainWindow:SetPos(nil, parentHeight - newHeight, nil, newHeight)
-			buildTabHolder:UpdateClientArea()
-			topHolder:UpdateClientArea()
-			bottomHolder:UpdateClientArea()
-		end
-	end
 
 	local currentSelectedIndex
 	local hotkeysActive = true
@@ -2269,31 +2225,14 @@ local function GetTabPanel(parent, rows, columns)
 			tabList[currentSelectedIndex].SetSelected(false)
 		end
 		tabList = newTabList
-		topHolder:ClearChildren()
-		bottomHolder:ClearChildren()
+		tabHolder:ClearChildren()
 
-		-- Only use the top row when there are also bottom-row tabs; otherwise the
-		-- top-row (missiles) tab drops down into the single bottom row.
-		local hasBottom = false
-		if showTabs then
-			for i = 1, #tabList do
-				if not tabList[i].topRow then
-					hasBottom = true
-					break
-				end
-			end
-		end
-
-		local topActive, bottomActive = false, false
 		for i = 1, #tabList do
-			if showTabs then
-				if tabList[i].topRow and hasBottom then
-					topHolder:AddChild(tabList[i].button)
-					topActive = true
-				else
-					bottomHolder:AddChild(tabList[i].button)
-					bottomActive = true
-				end
+			-- A hiddenTab (the missiles Launch tab) is never placed in the tab strip,
+			-- even while it is the selected tab: its content shows but no tab button
+			-- appears. It still gets DoClick below so its panel is displayed.
+			if showTabs and not tabList[i].hiddenTab then
+				tabHolder:AddChild(tabList[i].button)
 				tabList[i].SetHideHotkey(variableHide)
 				tabList[i].SetHotkeyActive(hotkeysActive)
 			end
@@ -2301,7 +2240,6 @@ local function GetTabPanel(parent, rows, columns)
 				tabList[i].DoClick()
 			end
 		end
-		SetRowGeometry(topActive, bottomActive)
 	end
 	
 	function externalFunctions.ClearTabs()
@@ -2309,9 +2247,7 @@ local function GetTabPanel(parent, rows, columns)
 			externalFunctions.SwitchToTab()
 			tabList = false
 			currentSelectedIndex = false
-			topHolder:ClearChildren()
-			bottomHolder:ClearChildren()
-			SetRowGeometry(false, false)
+			tabHolder:ClearChildren()
 		end
 	end
 	
@@ -2534,11 +2470,7 @@ local function ProcessAllCommands(commands, customCommands)
 				data.queue.ClearOldButtons(selectionIndex)
 			end
 			if (not tabToSelect) and data.tabButton.name == lastTabSelected then
-				-- When a unit is (re)selected, do not loiter on a global top-row
-				-- tab (missiles); fall through to the unit's default tab instead.
-				if not (selectionChanged and selectedUnitCount > 0 and data.topRow) then
-					tabToSelect = lastTabSelected
-				end
+				tabToSelect = lastTabSelected
 			end
 		end
 	end
@@ -2607,10 +2539,8 @@ local function InitializeControls()
 	local screenWidth, screenHeight = spGetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
-	baseWindowHeight = height
-	-- The command-button area is bottom-anchored with a fixed height so it never
-	-- moves when the tab area grows/shrinks for a second tab row. One tab row is
-	-- baseHeight/7, matching the original 100/7% tab strip.
+	-- The command-button area is bottom-anchored with a fixed height. The tab
+	-- strip takes the remaining height/7, matching the original 100/7% tab strip.
 	buttonAreaHeight = height * 6/7
 
 	UpdateRadarIconSizeString(options.radar_icon_size.value)
@@ -2735,7 +2665,7 @@ local function InitializeControls()
 		end
 		
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect, {iconsWG = data.badgeIconsWG})
-		data.tabButton.topRow = data.topRow
+		data.tabButton.hiddenTab = data.hiddenTab
 
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
