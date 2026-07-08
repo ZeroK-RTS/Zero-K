@@ -1440,8 +1440,11 @@ local LAUNCH_COLUMNS = 2
 
 local function GetLaunchButton(parent)
 	local function OnClick(mouse)
-		-- Clicking the button background (not a cell) does nothing; the cells
-		-- issue the launch commands.
+		-- Clicking anywhere on the button opens the launcher option menu, where
+		-- the launch buttons are shown at full size.
+		if WG.IntegralMenu and WG.IntegralMenu.OpenTab then
+			WG.IntegralMenu.OpenTab("missiles")
+		end
 	end
 
 	local button = GetNewButton(parent, OnClick, LAUNCH_ORDER, 0, BUTTON_COLOR)
@@ -1451,28 +1454,16 @@ local function GetLaunchButton(parent)
 	local cells = {}
 	local lastKey = false
 
+	-- Cells are display only (icon + count + build progress); they are parented
+	-- directly to the button and do not handle clicks, so the whole button stays
+	-- clickable and opens the launcher menu.
 	local function GetCell(i)
 		if cells[i] then
 			return cells[i]
 		end
 		local cell = {}
-		cell.button = Button:New {
-			parent = buttonControl,
-			caption = "",
-			padding = {0, 0, 0, 0},
-			noFont = true,
-			backgroundColor = {1, 1, 1, 0},
-			OnClick = {
-				function ()
-					if cell.cmd and WG.MissileCommandCenter then
-						WG.MissileCommandCenter.SetActiveLaunch(cell.cmd)
-					end
-				end
-			},
-		}
 		cell.image = Image:New {
-			parent = cell.button,
-			x = "5%", y = "5%", right = "5%", bottom = "5%",
+			parent = buttonControl,
 			keepAspect = false,
 			file = "",
 		}
@@ -1484,8 +1475,7 @@ local function GetLaunchButton(parent)
 			backgroundColor = {1, 1, 1, 0.01},
 		}
 		cell.label = Label:New {
-			parent = cell.button,
-			right = 2, bottom = 0,
+			parent = buttonControl,
 			align = "right", valign = "bottom",
 			objectOverrideFont = WG.GetFont(12),
 			caption = "",
@@ -1538,9 +1528,9 @@ local function GetLaunchButton(parent)
 			local data = icons[i]
 			local col = (i - 1) % cols
 			local row = math.floor((i - 1) / cols)
-			cell.button:SetPos(col * cw, row * ch, cw, ch)
-			cell.button:SetVisibility(true)
-			cell.cmd = data.cmd
+			local cx, cy = col * cw, row * ch
+			cell.image:SetPos(cx, cy, cw, ch)
+			cell.image:SetVisibility(true)
 			cell.image.file = data.icon
 			cell.image:Invalidate()
 			if (data.progress or 0) > 0 then
@@ -1549,10 +1539,13 @@ local function GetLaunchButton(parent)
 			else
 				cell.bar:SetVisibility(false)
 			end
+			cell.label:SetPos(cx, cy, cw, ch)
+			cell.label:SetVisibility(true)
 			cell.label:SetCaption((data.count > 0) and tostring(data.count) or "")
 		end
 		for i = n + 1, #cells do
-			cells[i].button:SetVisibility(false)
+			cells[i].image:SetVisibility(false)
+			cells[i].label:SetVisibility(false)
 		end
 		return true
 	end
