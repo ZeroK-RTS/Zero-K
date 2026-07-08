@@ -99,8 +99,10 @@ local buttonSizeShort = 4
 local buttonCountLimit = 7
 
 -- Extra long-axis size (beyond one normal button) that the launch button needs
--- for its grid rows, and a flag to relayout when it changes. The launch button
--- is the last button, so its growth only has to enlarge the background panel.
+-- for its grid rows. The launch button is the last button, so its growth only
+-- has to enlarge the background panel; while it exists it resizes itself and the
+-- panel inline (see UpdateButton). wantLaunchRelayout defers the shrink for when
+-- the button is removed (no missiles left) and can no longer relayout itself.
 local launchButtonExtraLong = 0
 local wantLaunchRelayout = false
 
@@ -1446,12 +1448,12 @@ end
 -- missile widget. Added while missiles exist and self-removes (UpdateButton
 -- returns false) once there are none.
 --
--- NOTE: the button currently keeps the standard button size, so cells shrink as
--- more missile types appear. Growing the button height past two rows needs
--- integration with the button-layout sizing (UpdatePosition) and is not done
--- here yet.
+-- The button holds a minimum 2x2 grid (one normal button size) and grows along
+-- its long axis past that. A single missile fills the whole button; with two or
+-- more, cells keep a fixed half-button size and are not stretched to fill.
 
 local LAUNCH_COLUMNS = 2
+local LAUNCH_ROWS_MIN = 2
 
 local function GetLaunchButton(parent)
 	local function OnClick(mouse)
@@ -1528,7 +1530,10 @@ local function GetLaunchButton(parent)
 			return false
 		end
 
-		local cols = LAUNCH_COLUMNS
+		-- A single missile fills the whole button (a 1x1 grid over the full 2x2
+		-- space); two or more use the 2-column grid with a 2x2 minimum.
+		local singleCell = (n == 1)
+		local cols = singleCell and 1 or LAUNCH_COLUMNS
 		local rows = math.max(1, math.ceil(n / cols))
 
 		-- A normal button holds two rows (two columns); each further row adds half
@@ -1537,11 +1542,29 @@ local function GetLaunchButton(parent)
 		local extra = desiredLong - options.buttonSizeLong.value
 		if extra ~= launchButtonExtraLong then
 			launchButtonExtraLong = extra
-			wantLaunchRelayout = true
+			-- Resize the button and background panel right here, so the taller
+			-- button and the cell grid below update together in the same pass
+			-- instead of a frame apart (the button is the last one, so growing it
+			-- does not shift any other button's offset).
+			button.UpdatePosition()
+			if mainBackground then
+				mainBackground.UpdateSize()
+			end
 		end
 
-		local width = buttonControl.width or 0
-		local height = buttonControl.height or 0
+		-- The long axis (height when vertical, width when horizontal) was just
+		-- changed via UpdatePosition, but the control's realized width/height only
+		-- catches up on a later Chili pass. Use the computed size for that axis so
+		-- the cells land at their final positions in the same frame the button
+		-- grows, with no lag; the short axis is fixed by padding and safe to read.
+		local width, height
+		if options.vertical.value then
+			width = buttonControl.width or 0
+			height = desiredLong
+		else
+			width = desiredLong
+			height = buttonControl.height or 0
+		end
 
 		-- Rebuild only when the missile set, counts, progress or button size change.
 		local keyParts = {}
@@ -1554,8 +1577,11 @@ local function GetLaunchButton(parent)
 		end
 		lastKey = key
 
+		-- With two or more missiles, divide by the minimum grid (2x2) so a single
+		-- row keeps its half-button height instead of stretching. A single missile
+		-- (cols == 1) fills the whole button.
 		local cw = width / cols
-		local ch = height / rows
+		local ch = height / (singleCell and 1 or math.max(LAUNCH_ROWS_MIN, rows))
 
 		for i = 1, n do
 			local cell = GetCell(i)
@@ -2146,7 +2172,8 @@ function widget:Update(dt)
 		buttonList.AddButton(LAUNCH_BUTTON_ID, GetLaunchButton(buttonHolder))
 	end
 
-	-- The launch button changed its row count: resize the panel and relayout.
+	-- The launch button was removed (no missiles left): shrink the panel and
+	-- relayout. Growth while the button exists is handled inline in UpdateButton.
 	if wantLaunchRelayout then
 		wantLaunchRelayout = false
 		if mainBackground then
