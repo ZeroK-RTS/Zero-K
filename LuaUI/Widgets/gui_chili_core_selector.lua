@@ -1169,8 +1169,23 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 			local udid, num = next(queue[i])
 			constructionCount = constructionCount + num
 		end
-		
+
 		UpdateTooltip(constructionCount)
+
+		-- Missile silos show the stockpiled missile count on the button; the build
+		-- progress bar above is already driven by the silo's current construction
+		-- (the missile it is building).
+		if missileLauncherFactoryDefs[unitDefID] then
+			local count = 0
+			local icons = WG.missileActiveIcons
+			if icons then
+				for i = 1, #icons do
+					count = count + (icons[i].count or 0)
+				end
+			end
+			button.SetBottomLabel((count > 0) and tostring(count) or "")
+		end
+
 		return true
 	end
 	
