@@ -8,6 +8,7 @@ local floatbase = piece 'floatbase'
 local trueaim = piece 'trueaim'
 
 local gun_to_use = 1
+local targetlock = false
 
 local SIG_AIM = 1
 
@@ -29,6 +30,7 @@ end
 local function RestoreAfterDelay()
 	SetSignalMask(SIG_AIM)
 	Sleep(6000)
+	targetlock = false
 	Turn (a1, x_axis, 0, math.rad(20))
 	Turn (a2, x_axis, 0, math.rad(60))
 	Turn (a3, x_axis, 0, math.rad(50))
@@ -68,6 +70,7 @@ function script.AimWeapon(num, heading, pitch)
 
 	Signal (SIG_AIM)
 	SetSignalMask (SIG_AIM)
+	targetlock = true
 
 	while disarmed do
 		Sleep(34)
@@ -95,13 +98,22 @@ function script.AimFromWeapon()
 end
 
 function script.QueryWeapon()
-	return flare[gun_to_use]
+	if targetlock then
+		return flare[gun_to_use] -- return this when firing
+	else
+		return trueaim -- only return this when not aiming
+	end
 end
 
 function script.FireWeapon()
 	Move(barrel[gun_to_use], z_axis, -15)
 	EmitSfx(flare[gun_to_use], 1024)
 	Move(barrel[gun_to_use], z_axis, 0, 40)
+	StartThread(gunswap) -- do this the frame AFTER firing not before
+end
+
+local function gunswap()
+	Sleep(33)
 	gun_to_use = 3 - gun_to_use
 end
 
