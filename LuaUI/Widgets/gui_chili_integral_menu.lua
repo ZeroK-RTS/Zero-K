@@ -146,7 +146,6 @@ local simpleModeEnabled = true
 local revealHiddenTab = false
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
-local mainWindow, buttonAreaHeight
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Options
@@ -620,7 +619,6 @@ AddCommandCullOptions()
 local buttonsByCommand = {}
 local alreadyRemovedTag = {}
 local lastRemovedTagResetFrame = false
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
