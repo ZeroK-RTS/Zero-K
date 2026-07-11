@@ -22,11 +22,22 @@ local waterpath = 'Settings/Graphics/Sun, Fog & Water/Water'
 
 local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
 local MAP_FILE        = (Game.mapName or "") .. ".lua"
-local MAPSIDE_FILE = "mapconfig/extraMapSettings.lua"
+local OVERRIDE_CONFIG
 
-local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
-local OVERRIDE_CONFIG = VFS.FileExists(OVERRIDE_FILE) and VFS.Include(OVERRIDE_FILE) or false
+local today = os.date("*t")
+if today.month == 10 and today.day == 31 then
+	local SPOOKY_DIR = OVERRIDE_DIR .. "spooky/"
+	local SPOOKY_FILE = SPOOKY_DIR .. MAP_FILE
+	OVERRIDE_CONFIG = VFS.FileExists(SPOOKY_FILE) and VFS.Include(SPOOKY_FILE) or false
+end
+
+local OVERRIDE_FILE = OVERRIDE_DIR .. MAP_FILE
 if not OVERRIDE_CONFIG then
+	OVERRIDE_CONFIG = VFS.FileExists(OVERRIDE_FILE) and VFS.Include(OVERRIDE_FILE) or false
+end
+
+if not OVERRIDE_CONFIG then
+	local MAPSIDE_FILE = "mapconfig/extraMapSettings.lua"
 	OVERRIDE_CONFIG = VFS.FileExists(MAPSIDE_FILE) and VFS.Include(MAPSIDE_FILE) or false
 end
 
