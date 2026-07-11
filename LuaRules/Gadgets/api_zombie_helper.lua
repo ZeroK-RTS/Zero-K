@@ -3,8 +3,8 @@
 
 function gadget:GetInfo()
 	return {
-		name        = "Zombie handler api",
-		desc        = "The place to handle your zombie unit needs!",
+		name        = "Zombie helper api",
+		desc        = "The place to handle your zombie esque needs!",
 		author      = "Stiofan",
 		date        = "June 2026",
 		license     = "GPL v2 or later",
