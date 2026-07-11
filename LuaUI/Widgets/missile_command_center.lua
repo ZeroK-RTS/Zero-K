@@ -696,6 +696,7 @@ for _, command in pairs(commands) do
 end
 local wasShift = false
 local prevActiveMissileCommand = false
+local wasTabOpen = false -- launcher tab open state, to deselect the command when it closes
 
 -- Tracks the Combine Eos and Scylla option so launchableTypes and the Scylla button's
 -- visibility are rebuilt only when it changes (see refreshCombine in Update).
@@ -758,14 +759,12 @@ WG.SelectDefaultMissile = function()
 	return false
 end
 
--- True while launch mode is active: a launch command is armed, or the launcher tab is
--- open. The core selector uses this to keep the launch button highlighted after firing
--- (the command stays armed via the sticky re-arm even once the tab has closed).
+-- True while the launcher is open (its hidden tab is revealed). The core selector uses
+-- this to highlight the launch button. The tab stays open through firing (no
+-- returnOnClick) and closes when the launcher is dismissed -- switching tabs, selecting
+-- a unit, right-click, or toggling the button -- so this alone tracks "launcher active"
+-- without falsely staying true when an armed command lingers after a dismissal.
 WG.IsLaunchActive = function()
-	local _, activeCmd = Spring.GetActiveCommand()
-	if activeCmd and commandByCmd[activeCmd] then
-		return true
-	end
 	return (WG.IntegralMenu and WG.IntegralMenu.IsHiddenTabOpen and WG.IntegralMenu.IsHiddenTabOpen("missiles")) or false
 end
 
@@ -954,6 +953,19 @@ function widget:Update(dt)
 	end
 	prevActiveMissileCommand = activeMissileCommand
 	wasShift = shift
+
+	-- When the launcher tab closes (switching tabs, selecting a unit, right-click,
+	-- toggling the button), deselect any armed launch command too, so launch mode does
+	-- not linger with the launcher shut. Catches every close path in one place.
+	local tabOpen = (WG.IntegralMenu and WG.IntegralMenu.IsHiddenTabOpen
+		and WG.IntegralMenu.IsHiddenTabOpen("missiles")) or false
+	if wasTabOpen and not tabOpen then
+		reArmCmd = false
+		if activeMissileCommand then
+			Spring.SetActiveCommand(nil)
+		end
+	end
+	wasTabOpen = tabOpen
 
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then

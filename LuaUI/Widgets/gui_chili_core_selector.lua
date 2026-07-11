@@ -1554,15 +1554,17 @@ local function GetLaunchButton(parent)
 			color = {0.7, 0.7, 0.4, 0.6},
 			backgroundColor = {1, 1, 1, 0.01},
 		}
-		-- Parented to the image (not the button) so the count always draws on top
-		-- of the icon and its progress bar. A small right/bottom inset keeps the
-		-- digits inside the cell instead of spilling over the corner.
+		-- Parented to the image (not the button) so the count always draws on top of
+		-- the icon and its progress bar. Position and shadow match the standard bottom
+		-- count label (SetBottomLabel, used by the idle-con/factory buttons) so a single
+		-- missile's count reads identically.
 		cell.label = Label:New {
 			parent = cell.image,
-			x = 0, y = 0, right = 3, bottom = 7,
+			x = 0, y = 0, right = 5, bottom = 5,
 			autosize = false,
 			align = "right", valign = "bottom",
 			objectOverrideFont = WG.GetFont(LAUNCH_LABEL_FONT),
+			fontShadow = true,
 			caption = "",
 		}
 		cells[i] = cell
@@ -1656,16 +1658,25 @@ local function GetLaunchButton(parent)
 		local layoutKey = table.concat(iconParts, ",") .. "|" .. cols .. "|" .. width .. "x" .. height
 		if layoutKey ~= lastLayoutKey then
 			lastLayoutKey = layoutKey
-			-- Scale the count font with the cell: the base size fits a standard
-			-- 2-column cell, so a wider cell (fewer columns) gets a bigger number.
+			-- Count font: a single cell fills the whole button, so use the standard
+			-- idle-con / factory count size (14) rather than scaling up. Multiple cells
+			-- keep the per-cell scaled size (a wider cell gets a bigger number).
 			local baseCellWidth = width / LAUNCH_COLUMNS
-			local labelFont = WG.GetFont(math.max(1, math.floor(LAUNCH_LABEL_FONT * cw / baseCellWidth + 0.5)))
+			local labelFont = WG.GetFont(singleCell and 14
+				or math.max(1, math.floor(LAUNCH_LABEL_FONT * cw / baseCellWidth + 0.5)))
 			for i = 1, n do
 				local cell = GetCell(i)
 				local col = (i - 1) % cols
 				local row = math.floor((i - 1) / cols)
 				local cx, cy = col * cw, row * ch
-				cell.image:SetPos(cx, cy, cw, ch)
+				if icons[i].isSilo then
+					-- Inset the silo placeholder to match the factory buttons' icon +
+					-- construction border (5% inset), so the border is not oversized.
+					local ix, iy = cw * 0.05, ch * 0.05
+					cell.image:SetPos(cx + ix, cy + iy, cw - 2 * ix, ch - 2 * iy)
+				else
+					cell.image:SetPos(cx, cy, cw, ch)
+				end
 				cell.image:SetVisibility(true)
 				cell.image.file = icons[i].icon
 				-- Silo placeholder (no missiles yet) gets the factory construction
