@@ -737,21 +737,42 @@ local function getMyTeamSilos()
 	return silos
 end
 
--- Missiles physically occupying a silo's pads (built + building); capacity minus this
--- is how many builds it can start at once.
-local function siloUsedSlots(siloID, sx, sz)
-	local used = 0
+-- Missiles that have finished building on this silo's pads (build progress complete).
+-- These occupy a pad and are not in the build queue any more.
+local function siloFinishedCount(siloID, sx, sz)
+	local finished = 0
 	for _, mID in ipairs(Spring.GetUnitsInRectangle(sx - SILO_SEARCH, sz - SILO_SEARCH, sx + SILO_SEARCH, sz + SILO_SEARCH) or {}) do
 		if Spring.GetUnitRulesParam(mID, "missile_parentSilo") == siloID then
-			used = used + 1
+			local _, _, _, _, buildProgress = Spring.GetUnitHealth(mID)
+			if buildProgress and buildProgress >= 1 then
+				finished = finished + 1
+			end
 		end
 	end
-	return used
+	return finished
 end
 
--- Pick the silo that will build the next missile of this type: a silo with a free pad
--- nearest the reference point (the Alt-click, else the screen centre) so it starts
--- building at once, else the shortest build queue. Returns siloID, sx, sz (or nil).
+-- Total missiles queued at a silo (the currently building one plus anything waiting).
+local function siloBuildQueueLength(siloID)
+	local queue = Spring.GetFullBuildQueue(siloID)
+	local n = 0
+	if queue then
+		for i = 1, #queue do
+			local block = queue[i]
+			if type(block) == "table" then
+				for _, count in pairs(block) do
+					n = n + count
+				end
+			end
+		end
+	end
+	return n
+end
+
+-- Pick the nearest silo (to the Alt-click, else the screen centre) that still has spare
+-- capacity: finished missiles on pads plus everything queued must be below the silo's
+-- capacity. Returns siloID, sx, sz, or nil when every silo is full -- so a build is never
+-- queued past capacity (which would produce a stuck, unusable missile).
 local function chooseBuildSilo(refX, refZ)
 	local cx, cz = refX, refZ
 	if not cx then
@@ -760,28 +781,20 @@ local function chooseBuildSilo(refX, refZ)
 		cx, cz = coords and coords[1], coords and coords[3]
 	end
 
-	local bestFree, bestFreeD, bestFreeX, bestFreeZ
-	local bestQueue, bestQueueLen, bestQueueX, bestQueueZ
+	local bestSilo, bestD, bestX, bestZ
 	for _, siloID in ipairs(getMyTeamSilos()) do
 		local sx, _, sz = Spring.GetUnitPosition(siloID)
 		if sx then
-			local free = SILO_CAPACITY - siloUsedSlots(siloID, sx, sz)
-			local d = cx and ((sx - cx) * (sx - cx) + (sz - cz) * (sz - cz)) or 0
-			if free > 0 and (not bestFreeD or d < bestFreeD) then
-				bestFree, bestFreeD, bestFreeX, bestFreeZ = siloID, d, sx, sz
-			end
-			local queue = Spring.GetFullBuildQueue(siloID)
-			local qlen = queue and #queue or 0
-			if not bestQueueLen or qlen < bestQueueLen then
-				bestQueue, bestQueueLen, bestQueueX, bestQueueZ = siloID, qlen, sx, sz
+			local committed = siloFinishedCount(siloID, sx, sz) + siloBuildQueueLength(siloID)
+			if committed < SILO_CAPACITY then
+				local d = cx and ((sx - cx) * (sx - cx) + (sz - cz) * (sz - cz)) or 0
+				if not bestD or d < bestD then
+					bestSilo, bestD, bestX, bestZ = siloID, d, sx, sz
+				end
 			end
 		end
 	end
-
-	if bestFree then
-		return bestFree, bestFreeX, bestFreeZ
-	end
-	return bestQueue, bestQueueX, bestQueueZ
+	return bestSilo, bestX, bestZ
 end
 
 -- Build one missile of this type at a silo near (refX, refZ) -- the Alt-click point,
@@ -1042,16 +1055,27 @@ function widget:SelectionChanged(selectedUnits)
 	end
 end
 
--- Right-click closes the launcher (the revealed missiles tab): stop the sticky re-arm
--- and close the tab. Not consumed, so right-click still deselects any armed command and
--- behaves normally otherwise.
+-- Fully close the launcher: stop the sticky re-arm, drop any armed launch command,
+-- and close the tab. Exposed so the core-selector launch button can toggle it closed.
+local function dismissLauncher()
+	reArmCmd = false
+	local _, activeCmd = Spring.GetActiveCommand()
+	if activeCmd and commandByCmd[activeCmd] then
+		Spring.SetActiveCommand(nil)
+	end
+	if WG.IntegralMenu and WG.IntegralMenu.CloseHiddenTab then
+		WG.IntegralMenu.CloseHiddenTab()
+	end
+end
+WG.DismissLauncher = dismissLauncher
+
+-- Right-click while the launcher is open closes it (and consumes the click, so it acts
+-- purely as "close the launcher" rather than also issuing an order).
 function widget:MousePress(mx, my, button)
 	if button == 3 and WG.IntegralMenu and WG.IntegralMenu.IsHiddenTabOpen
 			and WG.IntegralMenu.IsHiddenTabOpen("missiles") then
-		reArmCmd = false
-		if WG.IntegralMenu.CloseHiddenTab then
-			WG.IntegralMenu.CloseHiddenTab()
-		end
+		dismissLauncher()
+		return true
 	end
 	return false
 end

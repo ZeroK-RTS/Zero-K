@@ -637,6 +637,44 @@ for i = 1, 16 do
 	}
 end
 
+-- Missile launcher hotkey, registered like the factory-selection hotkeys above.
+-- Opens the launcher (same as clicking the Launch button in the selection bar).
+local LAUNCH_HOTKEY_ACTION = "epic_chili_core_selector_launch"
+-- Orange highlight matching the integral menu's selected-command colour, so the launch
+-- button reads as "active" while the launcher is open, like an armed command button.
+local LAUNCH_SELECTED_COLOR = {0.98, 0.48, 0.26, 0.85}
+
+-- Toggle the launcher: if it is already open, close it; otherwise open it and arm the
+-- default missile. Shared by the launch button click and the launch hotkey.
+local function OpenLauncher()
+	if not (WG.IntegralMenu and WG.IntegralMenu.OpenTab) then
+		return
+	end
+	if WG.IntegralMenu.IsHiddenTabOpen and WG.IntegralMenu.IsHiddenTabOpen("missiles") then
+		if WG.DismissLauncher then
+			WG.DismissLauncher()
+		elseif WG.IntegralMenu.CloseHiddenTab then
+			WG.IntegralMenu.CloseHiddenTab()
+		end
+		return
+	end
+	WG.IntegralMenu.OpenTab("missiles")
+	-- Arm a launch by default so the player can immediately click a target;
+	-- SelectDefaultMissile only picks a type that has a missile ready to fire.
+	if WG.SelectDefaultMissile then
+		WG.SelectDefaultMissile()
+	end
+end
+options_order[#options_order + 1] = "launch"
+options["launch"] = {
+	name = "Open missile launcher",
+	desc = "Opens the missile launcher, same as clicking the Launch button in the selection bar.",
+	type = 'button',
+	hotkey = {key = 'L', mod = 'alt+'},
+	path = 'Hotkeys/Selection',
+	OnChange = OpenLauncher,
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Helper Functions
@@ -1477,17 +1515,9 @@ local LAUNCH_ROWS_MIN = 2
 local LAUNCH_LABEL_FONT = 12
 
 local function GetLaunchButton(parent)
+	-- Clicking anywhere on the button opens the launcher (shared with the launch hotkey).
 	local function OnClick(mouse)
-		-- Clicking anywhere on the button opens the launcher option menu, where
-		-- the launch buttons are shown at full size.
-		if WG.IntegralMenu and WG.IntegralMenu.OpenTab then
-			WG.IntegralMenu.OpenTab("missiles")
-		end
-		-- Arm a launch by default so the player can immediately click a target.
-		-- SelectDefaultMissile only picks a type that has a missile ready to fire.
-		if WG.SelectDefaultMissile then
-			WG.SelectDefaultMissile()
-		end
+		OpenLauncher()
 	end
 
 	local function GetLongSize()
@@ -1496,10 +1526,13 @@ local function GetLaunchButton(parent)
 
 	local button = GetNewButton(parent, OnClick, LAUNCH_ORDER, 0, BUTTON_COLOR, nil, nil, GetLongSize)
 	local buttonControl = button.GetButtonControl()
+	local defaultFocusColor = buttonControl.focusColor -- restore this when not highlighted
 	button.SetImageVisible(false) -- the missile grid replaces the single icon
 
 	local cells = {}
 	local lastLayoutKey = false
+	local lastHotkey = false      -- last hotkey string pushed to the label/tooltip
+	local lastLauncherOpen = nil  -- last launcher-open state pushed to the background
 
 	-- Cells are display only (icon + count + build progress); they are parented
 	-- directly to the button and do not handle clicks, so the whole button stays
@@ -1561,9 +1594,31 @@ local function GetLaunchButton(parent)
 			return false
 		end
 
+		-- Highlight the button while the launcher (missiles tab) is open, matching the
+		-- integral menu's selected-command colour, so it reads as active.
+		local launcherOpen = (WG.IntegralMenu and WG.IntegralMenu.IsHiddenTabOpen
+			and WG.IntegralMenu.IsHiddenTabOpen("missiles")) or false
+		if launcherOpen ~= lastLauncherOpen then
+			lastLauncherOpen = launcherOpen
+			-- Set the focus (hover) colour too, or hovering the selected button paints
+			-- its default hover colour over the orange and hides the highlight.
+			buttonControl.focusColor = launcherOpen and LAUNCH_SELECTED_COLOR or defaultFocusColor
+			button.SetBackgroundColor(launcherOpen and LAUNCH_SELECTED_COLOR or BUTTON_COLOR)
+		end
+
 		-- A single missile fills the whole button (a 1x1 grid over the full 2x2
 		-- space); two or more use the 2-column grid with a 2x2 minimum.
 		local singleCell = (n == 1)
+
+		-- Show the hotkey in the corner only when a single cell leaves room for it
+		-- (one missile, or the silo placeholder); with a full grid it would cover a
+		-- cell, so it lives in the tooltip instead. The tooltip always carries it.
+		local hk = (WG.crude and WG.crude.GetHotkey(LAUNCH_HOTKEY_ACTION)) or ''
+		if hk ~= lastHotkey then
+			lastHotkey = hk
+			button.SetTooltip("Missile launcher" .. ((hk ~= '') and (" (" .. hk .. ")") or ""))
+		end
+		button.SetHotkey(singleCell and hk or '')
 		local cols = singleCell and 1 or LAUNCH_COLUMNS
 		local rows = math.max(1, math.ceil(n / cols))
 
