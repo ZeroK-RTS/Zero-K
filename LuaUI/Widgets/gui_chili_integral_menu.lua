@@ -139,8 +139,13 @@ local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
 
+-- Name of a hiddenTab panel (e.g. the missiles Launch tab) to reveal this cycle,
+-- or false when no hidden tab is open. Hidden tabs are kept out of the tab strip
+-- until something calls WG.IntegralMenu.OpenTab; selecting any other tab clears it.
+local revealHiddenTab = false
+
 local buildTabHolder, buttonsHolder -- Required for padding update setting
-local mainWindow, baseWindowHeight, buttonAreaHeight -- Required for growing the menu for a second tab row
+local mainWindow, buttonAreaHeight
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Options
@@ -1967,7 +1972,7 @@ end
 --------------------------------------------------------------------------------
 -- Tab Panel
 
-local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect, badgeConfig)
+local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
 	local disabled = disabledTabs[name]
 
 	local function DoClick(mouse)
@@ -2012,101 +2017,6 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		DoClick = DoClick,
 	}
 
-	-- Create a badge showing a row of icons after the label (one per active
-	-- missile type). The icon list is supplied each update via UpdateBadgeIcons.
-	if badgeConfig and badgeConfig.iconsWG then
-		local BADGE_ICON_SIZE = 18
-		local BADGE_COUNT_WIDTH = 14
-		local BADGE_ENTRY_WIDTH = BADGE_ICON_SIZE + BADGE_COUNT_WIDTH
-		local badgeIcons = {}
-		local badgeLabels = {}
-		local badgeBars = {}
-		local lastBadgeKey = false
-		local lastBadgeWidth = false
-
-		-- Each entry (icon + count) is parented directly to the button (no
-		-- covering panel) so the tab stays clickable; the row is right-aligned so
-		-- it follows the label.
-		function externalFunctionsAndData.UpdateBadgeIcons(list)
-			list = list or {}
-			local width = button.width or 0
-			local keyParts = {}
-			for i = 1, #list do
-				keyParts[i] = list[i].icon .. ":" .. list[i].count .. ":" .. math.floor((list[i].progress or 0) * 100)
-			end
-			local key = table.concat(keyParts, ",")
-			if key == lastBadgeKey and width == lastBadgeWidth then
-				return
-			end
-			lastBadgeKey = key
-			lastBadgeWidth = width
-
-			local n = #list
-			local startX = width - 2 - n * BADGE_ENTRY_WIDTH
-			local y = math.max(0, ((button.height or BADGE_ICON_SIZE) - BADGE_ICON_SIZE) / 2)
-			for i = 1, math.max(n, #badgeIcons) do
-				if i <= n then
-					local entryX = startX + (i - 1) * BADGE_ENTRY_WIDTH
-					if not badgeIcons[i] then
-						badgeIcons[i] = Image:New {
-							width = BADGE_ICON_SIZE,
-							height = BADGE_ICON_SIZE,
-							file = list[i].icon,
-							parent = button,
-						}
-						-- Build progress bar overlaying the icon (like command buttons).
-						badgeBars[i] = Progressbar:New {
-							x = "5%",
-							y = "5%",
-							right = "5%",
-							bottom = "5%",
-							value = 0,
-							max = 1,
-							caption = false,
-							noFont = true,
-							color           = {0.7, 0.7, 0.4, 0.6},
-							backgroundColor = {1, 1, 1, 0.01},
-							parent = badgeIcons[i],
-							skin = nil,
-							skinName = 'default',
-						}
-						badgeLabels[i] = Label:New {
-							width = BADGE_COUNT_WIDTH,
-							height = BADGE_ICON_SIZE,
-							align = "left",
-							valign = "center",
-							fontSize = 10,
-							parent = button,
-						}
-					end
-					badgeIcons[i].file = list[i].icon
-					badgeIcons[i]:SetPos(entryX, y)
-					badgeIcons[i]:SetVisibility(true)
-					badgeIcons[i]:Invalidate()
-
-					local progress = list[i].progress or 0
-					if progress > 0 then
-						badgeBars[i]:SetValue(progress)
-						badgeBars[i]:SetVisibility(true)
-					else
-						badgeBars[i]:SetVisibility(false)
-					end
-
-					badgeLabels[i]:SetCaption((list[i].count > 0) and tostring(list[i].count) or "")
-					badgeLabels[i]:SetPos(entryX + BADGE_ICON_SIZE, y)
-					badgeLabels[i]:SetVisibility(true)
-					badgeLabels[i]:Invalidate()
-				else
-					if badgeIcons[i] then
-						badgeIcons[i]:SetVisibility(false)
-					end
-					if badgeLabels[i] then
-						badgeLabels[i]:SetVisibility(false)
-					end
-				end
-			end
-		end
-	end
 		
 	function externalFunctionsAndData.IsTabSelected()
 		return contentControl.visible
@@ -2172,10 +2082,8 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 end
 
 local function GetTabPanel(parent, rows, columns)
-	-- Two tab rows: the top row is used by panels flagged topRow (the missiles
-	-- tab), the bottom row by everything else. When only one row has tabs it
-	-- fills the whole tab area; when both are used the menu grows taller.
-	local topHolder = StackPanel:New{
+	-- A single horizontal row of tab buttons filling the tab area.
+	local tabHolder = StackPanel:New{
 		x = 0,
 		y = "0%",
 		right = 0,
@@ -2187,48 +2095,6 @@ local function GetTabPanel(parent, rows, columns)
 		resizeItems = true,
 		orientation = "horizontal",
 	}
-	local bottomHolder = StackPanel:New{
-		x = 0,
-		y = "0%",
-		right = 0,
-		height = "100%",
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 1, 0, -1},
-		parent = parent,
-		preserveChildrenOrder = true,
-		resizeItems = true,
-		orientation = "horizontal",
-	}
-
-	local function SetRowGeometry(topActive, bottomActive)
-		local twoRows = topActive and bottomActive
-		if twoRows then
-			topHolder._relativeBounds.top = "0%"
-			topHolder._relativeBounds.height = "50%"
-			bottomHolder._relativeBounds.top = "50%"
-			bottomHolder._relativeBounds.height = "50%"
-		else
-			topHolder._relativeBounds.top = "0%"
-			topHolder._relativeBounds.height = "100%"
-			bottomHolder._relativeBounds.top = "0%"
-			bottomHolder._relativeBounds.height = "100%"
-		end
-		topHolder:UpdateClientArea()
-		bottomHolder:UpdateClientArea()
-
-		-- Grow the window upward by one tab row when both rows are used, keeping
-		-- the window bottom pinned to the screen edge (extend the top upward
-		-- rather than letting the bottom rise). The button area is bottom-anchored
-		-- with a fixed height, so only the tab area changes size.
-		if mainWindow and baseWindowHeight then
-			local newHeight = twoRows and (baseWindowHeight * 8/7) or baseWindowHeight
-			local parentHeight = (mainWindow.parent and mainWindow.parent.height) or (mainWindow.y + mainWindow.height)
-			mainWindow:SetPos(nil, parentHeight - newHeight, nil, newHeight)
-			buildTabHolder:UpdateClientArea()
-			topHolder:UpdateClientArea()
-			bottomHolder:UpdateClientArea()
-		end
-	end
 
 	local currentSelectedIndex
 	local hotkeysActive = true
@@ -2240,6 +2106,11 @@ local function GetTabPanel(parent, rows, columns)
 	function externalFunctions.SwitchToTab(name)
 		if not tabList then
 			return
+		end
+		-- Selecting any other tab closes an open hidden tab (the missiles Launch
+		-- tab), so clicking a tab dismisses it as expected.
+		if revealHiddenTab and name ~= revealHiddenTab then
+			revealHiddenTab = false
 		end
 		currentTab = name
 		for i = 1, #tabList do
@@ -2253,37 +2124,31 @@ local function GetTabPanel(parent, rows, columns)
 		
 	function externalFunctions.SetTabs(newTabList, showTabs, variableHide, tabToSelect)
 		if TabListsAreIdentical(newTabList, tabList) then
+			-- Same tabs, but the requested selection may differ -- e.g. reopening the
+			-- hidden Launch tab after visiting Orders leaves the tab list unchanged.
+			-- Re-select the target so its panel actually shows.
+			if tabToSelect and currentTab ~= tabToSelect then
+				for i = 1, #tabList do
+					if tabList[i].name == tabToSelect then
+						tabList[i].DoClick()
+						break
+					end
+				end
+			end
 			return
 		end
 		if currentSelectedIndex and tabList[currentSelectedIndex] then
 			tabList[currentSelectedIndex].SetSelected(false)
 		end
 		tabList = newTabList
-		topHolder:ClearChildren()
-		bottomHolder:ClearChildren()
+		tabHolder:ClearChildren()
 
-		-- Only use the top row when there are also bottom-row tabs; otherwise the
-		-- top-row (missiles) tab drops down into the single bottom row.
-		local hasBottom = false
-		if showTabs then
-			for i = 1, #tabList do
-				if not tabList[i].topRow then
-					hasBottom = true
-					break
-				end
-			end
-		end
-
-		local topActive, bottomActive = false, false
 		for i = 1, #tabList do
-			if showTabs then
-				if tabList[i].topRow and hasBottom then
-					topHolder:AddChild(tabList[i].button)
-					topActive = true
-				else
-					bottomHolder:AddChild(tabList[i].button)
-					bottomActive = true
-				end
+			-- A hiddenTab (the missiles Launch tab) is never placed in the tab strip,
+			-- even while it is the selected tab: its content shows but no tab button
+			-- appears. It still gets DoClick below so its panel is displayed.
+			if showTabs and not tabList[i].hiddenTab then
+				tabHolder:AddChild(tabList[i].button)
 				tabList[i].SetHideHotkey(variableHide)
 				tabList[i].SetHotkeyActive(hotkeysActive)
 			end
@@ -2291,7 +2156,6 @@ local function GetTabPanel(parent, rows, columns)
 				tabList[i].DoClick()
 			end
 		end
-		SetRowGeometry(topActive, bottomActive)
 	end
 	
 	function externalFunctions.ClearTabs()
@@ -2299,9 +2163,7 @@ local function GetTabPanel(parent, rows, columns)
 			externalFunctions.SwitchToTab()
 			tabList = false
 			currentSelectedIndex = false
-			topHolder:ClearChildren()
-			bottomHolder:ClearChildren()
-			SetRowGeometry(false, false)
+			tabHolder:ClearChildren()
 		end
 	end
 	
@@ -2440,6 +2302,13 @@ local function ProcessAllCommands(commands, customCommands)
 	local selectionChanged = (selectionSignature ~= lastSelectionSignature)
 	lastSelectionSignature = selectionSignature
 
+	-- A selection change dismisses an opened hidden tab (the launch menu), so
+	-- selecting a unit returns to its normal command tabs rather than staying on
+	-- the revealed missiles tab.
+	if selectionChanged and revealHiddenTab then
+		revealHiddenTab = false
+	end
+
 	selectionIndex = selectionIndex + 1
 	
 	for i = 1, #commandPanels do
@@ -2504,7 +2373,10 @@ local function ProcessAllCommands(commands, customCommands)
 	local forceShowTabs = false
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		if data.commandCount ~= 0 then
+		-- A hiddenTab (the missiles Launch tab) stays out of the tab strip until it
+		-- is explicitly opened via WG.IntegralMenu.OpenTab, which sets revealHiddenTab.
+		local hidden = data.hiddenTab and (data.name ~= revealHiddenTab)
+		if data.commandCount ~= 0 and not hidden then
 			tabsToShow[#tabsToShow + 1] = data.tabButton
 			if data.alwaysShowTab then
 				forceShowTabs = true
@@ -2514,12 +2386,27 @@ local function ProcessAllCommands(commands, customCommands)
 				data.queue.ClearOldButtons(selectionIndex)
 			end
 			if (not tabToSelect) and data.tabButton.name == lastTabSelected then
-				-- When a unit is (re)selected, do not loiter on a global top-row
-				-- tab (missiles); fall through to the unit's default tab instead.
-				if not (selectionChanged and selectedUnitCount > 0 and data.topRow) then
-					tabToSelect = lastTabSelected
-				end
+				tabToSelect = lastTabSelected
 			end
+		end
+	end
+
+	-- A freshly opened hidden tab takes selection priority and forces the strip
+	-- visible. If it is no longer available (e.g. all missile units were lost),
+	-- clear the open state so it does not get stuck.
+	if revealHiddenTab then
+		local revealPresent = false
+		for i = 1, #tabsToShow do
+			if tabsToShow[i].name == revealHiddenTab then
+				revealPresent = true
+				break
+			end
+		end
+		if revealPresent then
+			tabToSelect = revealHiddenTab
+			forceShowTabs = true
+		else
+			revealHiddenTab = false
 		end
 	end
 	
@@ -2568,10 +2455,8 @@ local function InitializeControls()
 	local screenWidth, screenHeight = spGetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
-	baseWindowHeight = height
-	-- The command-button area is bottom-anchored with a fixed height so it never
-	-- moves when the tab area grows/shrinks for a second tab row. One tab row is
-	-- baseHeight/7, matching the original 100/7% tab strip.
+	-- The command-button area is bottom-anchored with a fixed height. The tab
+	-- strip takes the remaining height/7, matching the original 100/7% tab strip.
 	buttonAreaHeight = height * 6/7
 
 	UpdateRadarIconSizeString(options.radar_icon_size.value)
@@ -2695,8 +2580,8 @@ local function InitializeControls()
 			end
 		end
 		
-		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect, {iconsWG = data.badgeIconsWG})
-		data.tabButton.topRow = data.topRow
+		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
+		data.tabButton.hiddenTab = data.hiddenTab
 
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
@@ -2904,6 +2789,32 @@ function externalFunctions.UpdateCommands()
 	ProcessAllCommands(commands, customCommands)
 end
 
+-- Reveal a hiddenTab panel (e.g. the missiles "Launch" tab) and select it. The
+-- tab is otherwise kept out of the tab strip; opening it forces the strip
+-- visible. Selecting any other tab closes it again (see SwitchToTab).
+function externalFunctions.OpenTab(tabName)
+	if not initialized then
+		return
+	end
+	revealHiddenTab = tabName
+	externalFunctions.UpdateCommands()
+end
+
+function externalFunctions.CloseHiddenTab()
+	if not revealHiddenTab then
+		return
+	end
+	revealHiddenTab = false
+	externalFunctions.UpdateCommands()
+end
+
+function externalFunctions.IsHiddenTabOpen(tabName)
+	if tabName then
+		return revealHiddenTab == tabName
+	end
+	return revealHiddenTab ~= false
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Interface
@@ -2912,17 +2823,6 @@ function widget:Update()
 	local _,cmdID = spGetActiveCommand()
 	UpdateButtonSelection(cmdID)
 	UpdateReturnToOrders(cmdID)
-
-	-- Update tab badges. Tab presence/visibility is handled by the
-	-- commandCount + SetTabs machinery, driven by each panel's inclusionFunction.
-	for i = 1, #commandPanels do
-		local panelData = commandPanels[i]
-
-		-- Update badge icons (one per active missile type)
-		if panelData.badgeIconsWG and panelData.tabButton and panelData.tabButton.UpdateBadgeIcons then
-			panelData.tabButton.UpdateBadgeIcons(WG[panelData.badgeIconsWG])
-		end
-	end
 end
 
 function widget:KeyPress(key, modifier, isRepeat)

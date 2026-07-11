@@ -1,17 +1,12 @@
 local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
--- Row 1: Trinity and Reef (standalone, not silo missiles).
--- Row 2: the missile silo's missiles, in the silo's buildoptions order
--- (tacnuke, seismic, empmissile, napalmmissile, missileslow).
-local missileCmds = {
-	{id = 39615, name = "Trinity", icon = "staticnuke", col = 1, row = 1, tooltip = "Launch Trinity (Strategic Nuke)\nLong-range nuclear missile."},
-	{id = 39614, name = "Reef Missile", icon = "shipcarrier", col = 2, row = 1, tooltip = "Launch Disarm Missile\nDisables units temporarily."},
-	{id = 39610, name = "EOS", icon = "tacnuke", col = 1, row = 2, tooltip = "Launch EOS (Tactical Nuke)\nTactical nuclear missile with high damage."},
-	{id = 39611, name = "Seismic", icon = "seismic", col = 2, row = 2, tooltip = "Launch Seismic\nArea denial seismic missile, slows units."},
-	{id = 39612, name = "Shockley", icon = "empmissile", col = 3, row = 2, tooltip = "Launch Shockley (EMP)\nElectromagnetic pulse missile disables units."},
-	{id = 39613, name = "Inferno", icon = "napalmmissile", col = 4, row = 2, tooltip = "Launch Inferno (Napalm)\nNapalm missile with persistent damage."},
-	{id = 39616, name = "Zeno", icon = "missileslow", col = 5, row = 2, tooltip = "Launch Zeno (Slow Missile)\nSlow homing missile with lingering damage."},
-}
+-- Launch tab layout, derived from the shared missile config so ids, positions and
+-- tooltips live in one place (Configs/missile_config.lua) alongside the widget behaviour.
+local missileConfig = include("Configs/missile_config.lua", nil, VFS.RAW_FIRST)
+local missileCmds = {}
+for _, m in ipairs(missileConfig) do
+	missileCmds[#missileCmds + 1] = {id = m.cmd, name = m.label, icon = m.unit, col = m.col, row = m.row, tooltip = m.tooltip}
+end
 
 local missileCmdPos = {}
 for _, missile in ipairs(missileCmds) do
@@ -515,19 +510,16 @@ for _, missile in ipairs(missileCmds) do
 	}
 end
 
+-- Owning any launcher-relevant unit (a launcher, its ammo, or a silo) surfaces the tab.
+local missileUnitNames = {["staticmissilesilo"] = true}
+for _, m in ipairs(missileConfig) do
+	for _, l in ipairs(m.launch) do
+		missileUnitNames[l.unit] = true
+	end
+end
+
 local function hasMissileUnits()
 	local teamUnits = Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}
-	local missileUnitNames = {
-		["tacnuke"] = true,
-		["subtacmissile"] = true,
-		["seismic"] = true,
-		["empmissile"] = true,
-		["napalmmissile"] = true,
-		["missileslow"] = true,
-		["shipcarrier"] = true,
-		["staticnuke"] = true,
-		["staticmissilesilo"] = true,
-	}
 	for _, unitID in ipairs(teamUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if unitDefID then
@@ -550,10 +542,8 @@ local commandPanels = {
 			return pos ~= nil, pos
 		end,
 		loiterable = true,
-		alwaysShowTab = true,
-		topRow = true,
+		hiddenTab = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
-		badgeIconsWG = "missileActiveIcons",
 		gridHotkeys = true,
 		returnOnClick = "orders",
 	},

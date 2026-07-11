@@ -495,6 +495,39 @@ local function DrawAoE(tx, ty, tz, aoe, ee, alphaMult, offset, circleMode)
 	glLineWidth(1)
 end
 
+-- Shared blast-radius preview, exposed via WG so other widgets (e.g. the missile
+-- launch UI) draw their AoE footprint with THIS falloff code instead of duplicating
+-- it. Nested rings at (tx,ty,tz) whose alpha decays toward the edge by
+-- edgeEffectiveness `ee`. `color` (optional {r,g,b[,a]}) overrides the ring colour;
+-- `alphaMult` (optional) scales overall opacity (e.g. a pulse). Line width is derived
+-- from the live camera distance, so callers need no per-frame setup of their own.
+local function DrawAoEPreview(tx, ty, tz, aoe, ee, color, alphaMult)
+	if not aoe or aoe <= 0 then
+		return
+	end
+	ee = ee or 1
+	local cx, cy, cz = GetCameraPosition()
+	local dx, dy, dz = cx - tx, cy - ty, cz - tz
+	local camDist = sqrt(dx*dx + dy*dy + dz*dz)
+	if camDist < 1 then
+		camDist = 1
+	end
+	local r = (color and color[1]) or aoeColor[1]
+	local g = (color and color[2]) or aoeColor[2]
+	local b = (color and color[3]) or aoeColor[3]
+	local baseAlpha = ((color and color[4]) or aoeColor[4]) * (alphaMult or 1)
+
+	glLineWidth(math.max(0.05, aoeLineWidthMult * aoe / camDist))
+	for i = 1, numAoECircles do
+		local proportion = i / (numAoECircles + 1)
+		local alpha = baseAlpha * (1 - proportion) / (1 - proportion * ee)
+		glColor(r, g, b, alpha)
+		DrawCircle(tx, ty, tz, aoe * proportion)
+	end
+	glColor(1, 1, 1, 1)
+	glLineWidth(1)
+end
+
 --------------------------------------------------------------------------------
 --dgun/noexplode
 --------------------------------------------------------------------------------
@@ -1062,7 +1095,7 @@ function widget:Initialize()
 		aoeDefInfo[unitDefID], dgunInfo[unitDefID], extraDrawRangeDefInfo[unitDefID] = SetupUnit(unitDef)
 	end
 	SetupDisplayLists()
-	WG.AttackAoE = {GetVlaunchImpact = GetVlaunchImpact}
+	WG.AttackAoE = {GetVlaunchImpact = GetVlaunchImpact, DrawAoEPreview = DrawAoEPreview}
 end
 
 function widget:Shutdown()
