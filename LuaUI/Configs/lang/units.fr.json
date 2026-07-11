@@ -1162,7 +1162,7 @@
 	"dronecarry" : {
 		"name" : "Gull",
 		"description" : "Carrier Drone",
-		"helptext" : "The Gull is a small, aggressive drone armed with an energy MG."
+		"helptext" : "The Gull is a small, aggressive drone armed with a capture ray."
 	},
 	"turretheavylaser" : {
 		"name" : "Stinger",
