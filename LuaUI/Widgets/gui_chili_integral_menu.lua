@@ -2442,6 +2442,14 @@ local function ProcessAllCommands(commands, customCommands)
 
 	-- Keeps main window for tweak mode.SetIntegralVisibility(visible)
 	SetIntegralVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
+
+	-- The buttons were just rebuilt as unselected. UpdateButtonSelection only reacts to
+	-- the active command *changing*, so with the same command still armed (e.g. a sticky
+	-- missile launch after firing) it would leave the rebuilt button unselected. Force
+	-- the active command's button to re-highlight here.
+	lastCmdID = nil
+	local _, activeCmdID = spGetActiveCommand()
+	UpdateButtonSelection(activeCmdID)
 end
 
 --------------------------------------------------------------------------------

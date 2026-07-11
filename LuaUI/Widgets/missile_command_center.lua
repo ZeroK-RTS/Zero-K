@@ -367,6 +367,11 @@ local function missile_class()
 	end
 
 	function self:commandsChanged()
+		-- A hidden controller (Scylla while combined with Eos) is simply not registered,
+		-- so it has no button. Registering a descriptor with a "hidden" field instead
+		-- makes the engine log "GetLuaCmdDescList() bad entry".
+		if self.hidden then return end
+
 		local customCommands = widgetHandler.customCommands
 
 		-- All fields must be present and valid, or the engine logs
@@ -381,7 +386,6 @@ local function missile_class()
 			texture  = "LuaUI/Images/commands/Bold/missile.png",
 			tooltip  = "Launch missile.",
 			disabled = self.disabled or false,
-			hidden   = self.hidden or false,
 			params   = {},
 		}
 	end
@@ -659,20 +663,6 @@ for _, cfg in ipairs(missileConfig) do
 	orderedCommands[#orderedCommands + 1] = controller
 end
 
--- Arm the launch command of the first ready missile type, in badge order (used by
--- the core selector's launch button so a click immediately readies a shot). Only a
--- type with something ready to fire is picked; if nothing is ready, nothing is armed
--- (action() also guards on getCount, so a not-ready type is never selected).
-WG.SelectDefaultMissile = function()
-	for _, command in ipairs(orderedCommands) do
-		if command:getCount() > 0 then
-			command:action()
-			return true
-		end
-	end
-	return false
-end
-
 -- Unit defs whose creation/completion/destruction can change the launchable set
 -- (the silo missiles and the units that hold them). Used to refresh immediately
 -- on the relevant unit events instead of waiting for the next poll, so the
@@ -735,6 +725,48 @@ local function getMyTeamSilos()
 		end
 	end
 	return silos
+end
+
+-- Arm a command as the active launch (bypasses action()'s ready-count guard, so a
+-- silo-built type can be selected with nothing ready yet in order to build).
+local function armCommand(command)
+	local cmdIndex = Spring.GetCmdDescIndex(command.cmd)
+	if cmdIndex then
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		Spring.SetActiveCommand(cmdIndex, 1, true, false, alt, ctrl, meta, shift)
+	end
+end
+
+-- Arm a default missile when the launcher is opened (used by the core selector's launch
+-- button). Prefer the first type with a missile ready; otherwise, if a silo exists, arm
+-- the first silo-built type (Eos) so it is selected by default and ready to build.
+WG.SelectDefaultMissile = function()
+	for _, command in ipairs(orderedCommands) do
+		if command:getCount() > 0 then
+			armCommand(command)
+			return true
+		end
+	end
+	if #getMyTeamSilos() > 0 then
+		for _, command in ipairs(orderedCommands) do
+			if command.siloBuilt then
+				armCommand(command)
+				return true
+			end
+		end
+	end
+	return false
+end
+
+-- True while launch mode is active: a launch command is armed, or the launcher tab is
+-- open. The core selector uses this to keep the launch button highlighted after firing
+-- (the command stays armed via the sticky re-arm even once the tab has closed).
+WG.IsLaunchActive = function()
+	local _, activeCmd = Spring.GetActiveCommand()
+	if activeCmd and commandByCmd[activeCmd] then
+		return true
+	end
+	return (WG.IntegralMenu and WG.IntegralMenu.IsHiddenTabOpen and WG.IntegralMenu.IsHiddenTabOpen("missiles")) or false
 end
 
 -- Missiles that have finished building on this silo's pads (build progress complete).

@@ -1531,8 +1531,8 @@ local function GetLaunchButton(parent)
 
 	local cells = {}
 	local lastLayoutKey = false
-	local lastHotkey = false      -- last hotkey string pushed to the label/tooltip
-	local lastLauncherOpen = nil  -- last launcher-open state pushed to the background
+	local lastHotkey = false       -- last hotkey string pushed to the label/tooltip
+	local lastLauncherActive = nil -- last launch-active state pushed to the focus colour
 
 	-- Cells are display only (icon + count + build progress); they are parented
 	-- directly to the button and do not handle clicks, so the whole button stays
@@ -1592,18 +1592,6 @@ local function GetLaunchButton(parent)
 				wantLaunchRelayout = true
 			end
 			return false
-		end
-
-		-- Highlight the button while the launcher (missiles tab) is open, matching the
-		-- integral menu's selected-command colour, so it reads as active.
-		local launcherOpen = (WG.IntegralMenu and WG.IntegralMenu.IsHiddenTabOpen
-			and WG.IntegralMenu.IsHiddenTabOpen("missiles")) or false
-		if launcherOpen ~= lastLauncherOpen then
-			lastLauncherOpen = launcherOpen
-			-- Set the focus (hover) colour too, or hovering the selected button paints
-			-- its default hover colour over the orange and hides the highlight.
-			buttonControl.focusColor = launcherOpen and LAUNCH_SELECTED_COLOR or defaultFocusColor
-			button.SetBackgroundColor(launcherOpen and LAUNCH_SELECTED_COLOR or BUTTON_COLOR)
 		end
 
 		-- A single missile fills the whole button (a 1x1 grid over the full 2x2
@@ -1708,6 +1696,18 @@ local function GetLaunchButton(parent)
 			end
 			cell.label:SetCaption((data.count > 0) and tostring(data.count) or "")
 		end
+
+		-- Highlight the button (background + focus/hover colour) while launch mode is
+		-- active -- launcher tab open, or a launch command still armed after firing --
+		-- matching the integral menu's selected-command colour. Applied last (after any
+		-- resize/relayout above, which reset the colour) and every update, so the
+		-- highlight is not lost when the missile count changes.
+		local launcherActive = (WG.IsLaunchActive and WG.IsLaunchActive()) or false
+		if launcherActive ~= lastLauncherActive then
+			lastLauncherActive = launcherActive
+			buttonControl.focusColor = launcherActive and LAUNCH_SELECTED_COLOR or defaultFocusColor
+		end
+		button.SetBackgroundColor(launcherActive and LAUNCH_SELECTED_COLOR or BUTTON_COLOR)
 		return true
 	end
 

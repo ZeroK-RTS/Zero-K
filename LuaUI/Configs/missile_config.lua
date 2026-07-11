@@ -73,8 +73,13 @@ local missiles = {
 	},
 }
 
+-- Command ids come from the shared registry (LuaRules/Configs/customcmds.lua) so they
+-- are reserved ZK commands, keyed MISSILE_<KEY>. Fall back to the sequential range if the
+-- registry is not available (both resolve to the same 39610.. block).
+local registeredCmds = Spring.Utilities and Spring.Utilities.CMD
 for i = 1, #missiles do
-	missiles[i].cmd = CMD_BASE + i - 1
+	local m = missiles[i]
+	m.cmd = (registeredCmds and registeredCmds["MISSILE_" .. string.upper(m.key)]) or (CMD_BASE + i - 1)
 end
 
 return missiles

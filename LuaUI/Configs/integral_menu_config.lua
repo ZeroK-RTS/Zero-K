@@ -545,7 +545,9 @@ local commandPanels = {
 		hiddenTab = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
 		gridHotkeys = true,
-		returnOnClick = "orders",
+		-- No returnOnClick: firing should not close the launcher, so multiple missiles
+		-- can be fired in a row. It is dismissed explicitly (right-click / select a
+		-- unit / toggle the launch button).
 	},
 	{
 		humanName = "Orders",
