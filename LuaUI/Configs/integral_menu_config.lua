@@ -210,10 +210,10 @@ local commandDisplayConfig = {
 		},
 		stateTooltip = {
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Enable this to ignore bad targets when not on Force Fire or Attack Move."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid cost under 90, Razor, Sparrow, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid cost under 240, minus Stardust, Raptor, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid cost under 420, unknown radar dots and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag, nanoframes cheaper than 50 and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid targets cheaper than 90, Razor, Sparrow, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid targets cheaper than 240 (except Stardust), Raptor, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid targets cheaper than 420, unknown radar dots and armoured targets."),
 		}
 	},
 	[CMD_RETREAT] = {
