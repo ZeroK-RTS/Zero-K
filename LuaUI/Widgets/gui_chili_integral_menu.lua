@@ -98,6 +98,7 @@ local NO_TEXT = ""
 local NO_TOOLTIP = "NONE"
 
 EPIC_NAME = "epic_chili_integral_menu_"
+EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 
 local modOptions = Spring.GetModOptions()
 local disabledTabs = {}
@@ -1974,7 +1975,7 @@ end
 
 local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
 	local disabled = disabledTabs[name]
-
+	
 	local function DoClick(mouse)
 		if disabled or TabClickFunction(mouse) then
 			return
@@ -1985,7 +1986,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 			OnSelect()
 		end
 	end
-
+	
 	local button = Button:New {
 		classname = "button_tab",
 		caption = humanName,
@@ -1999,24 +2000,23 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		},
 	}
 	button.backgroundColor[4] = 0.4
-
+	
 	if disabled then
 		button.font = WG.GetSpecialFont(14, "integral_grey", {outlineColor = {0, 0, 0, 1}, color = {0.6, 0.6, 0.6, 1}})
 		button.supressButtonReaction = true
 	end
-
+	
 	local hideHotkey = loiterable
-
+	
 	if hotkey and (not hideHotkey) and (not disabled) then
 		button:SetCaption(humanName .. " (" .. GetGreenStr(hotkey) .. ")")
 	end
-
+	
 	local externalFunctionsAndData = {
 		button = button,
 		name = name,
 		DoClick = DoClick,
 	}
-
 		
 	function externalFunctionsAndData.IsTabSelected()
 		return contentControl.visible
@@ -2082,12 +2082,11 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 end
 
 local function GetTabPanel(parent, rows, columns)
-	-- A single horizontal row of tab buttons filling the tab area.
 	local tabHolder = StackPanel:New{
 		x = 0,
-		y = "0%",
+		y = 0,
 		right = 0,
-		height = "100%",
+		bottom = 0,
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 1, 0, -1},
 		parent = parent,
@@ -2095,12 +2094,12 @@ local function GetTabPanel(parent, rows, columns)
 		resizeItems = true,
 		orientation = "horizontal",
 	}
-
+	
 	local currentSelectedIndex
 	local hotkeysActive = true
 	local currentTab
 	local tabList = false
-
+	
 	local externalFunctions = {}
 	
 	function externalFunctions.SwitchToTab(name)
@@ -2142,7 +2141,6 @@ local function GetTabPanel(parent, rows, columns)
 		end
 		tabList = newTabList
 		tabHolder:ClearChildren()
-
 		for i = 1, #tabList do
 			-- A hiddenTab (the missiles Launch tab) is never placed in the tab strip,
 			-- even while it is the selected tab: its content shows but no tab button
@@ -2418,7 +2416,7 @@ local function ProcessAllCommands(commands, customCommands)
 	if not tabToSelect then
 		tabToSelect = "orders"
 	end
-
+	
 	if #tabsToShow == 0 then
 		tabPanel.ClearTabs()
 		lastTabSelected = false
@@ -2439,7 +2437,7 @@ local function ProcessAllCommands(commands, customCommands)
 		tabPanel.SetTabs(tabsToShow, (#tabsToShow > 1) or forceShowTabs, not factoryUnitDefID, tabToSelect)
 		lastTabSelected = tabToSelect
 	end
-
+	
 	-- Keeps main window for tweak mode.SetIntegralVisibility(visible)
 	SetIntegralVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
 end
@@ -2455,15 +2453,11 @@ local function InitializeControls()
 	local screenWidth, screenHeight = spGetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
-	-- The command-button area is bottom-anchored with a fixed height. The tab
-	-- strip takes the remaining height/7, matching the original 100/7% tab strip.
-	buttonAreaHeight = height * 6/7
-
 	UpdateRadarIconSizeString(options.radar_icon_size.value)
-
+	
 	gridKeyMap, gridMap, gridCustomOverrides = GenerateGridKeyMap(options.keyboardType2.value)
-
-	mainWindow = Window:New{
+	
+	local mainWindow = Window:New{
 		name      = 'integralwindow',
 		x         = 0,
 		bottom    = 0,
@@ -2488,27 +2482,27 @@ local function InitializeControls()
 		x = options.leftPadding.value,
 		y = "0%",
 		right = options.rightPadding.value,
-		bottom = buttonAreaHeight,
+		height = "15%",
 		padding = {2, 2, 2, -1},
 		parent = mainWindow,
 	}
-
+	
 	tabPanel = GetTabPanel(buildTabHolder)
-
+	
 	buttonsHolder = Control:New{
 		x = options.leftPadding.value,
-		bottom = 0,
+		y = (100/7) .. "%",
 		right = options.rightPadding.value,
-		height = buttonAreaHeight,
+		bottom = 0,
 		padding = {0, 0, 0, 0},
 		parent = mainWindow,
 	}
-
+	
 	background = Panel:New{
 		x = 0,
-		bottom = 0,
+		y = "15%",
 		right = 0,
-		height = buttonAreaHeight,
+		bottom = 0,
 		draggable = false,
 		resizable = false,
 		noFont = true,
@@ -2550,6 +2544,8 @@ local function InitializeControls()
 		local hotkey
 		if data.optionName then
 			hotkey = GetActionHotkey(EPIC_NAME .. data.optionName)
+		else
+			hotkey = GetActionHotkey(EPIC_NAME_UNITS)
 		end
 
 		if data.returnOnClick then
