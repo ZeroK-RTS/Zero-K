@@ -215,6 +215,29 @@ end
 --initialization
 --------------------------------------------------------------------------------
 
+-- Vlaunch (starburst) flight parameters, derived purely from the weapon def.
+-- Used by the AoE preview here and exposed via WG for the missile launch preview,
+-- so both compute impact points from an identical trajectory model.
+local function BuildVlaunch(weaponDef)
+	if (weaponDef.uptime or 0) <= 0 then
+		return nil
+	end
+	-- In the first frame the projectile moves startVelocity + 2*Acceleration
+	local startSpeed = math.min(weaponDef.startvelocity + weaponDef.weaponAcceleration, weaponDef.projectilespeed)
+	return {
+		upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 2,
+		accel = weaponDef.weaponAcceleration,
+		turnRate = weaponDef.turnRate,
+		startSpeed = startSpeed,
+		startHeight = startHeights[weaponDef.name] or 0,
+		endSpeed = weaponDef.projectilespeed,
+	}
+end
+
+-- unitDef may be nil: the weapon-only fields (type, range, aoe, ee, vlaunch,
+-- scatter) need no unitDef, so other widgets can query a weapon in isolation. The
+-- few unitDef-derived fields (cost, mobile, and the AircraftBomb speed/altitude)
+-- fall back to neutral defaults when it is absent.
 local function getWeaponInfo(weaponDef, unitDef)
 	local retData
 
@@ -222,7 +245,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local spray = (weaponDef.customParams and weaponDef.customParams.gui_sprayangle) or weaponDef.sprayAngle
 	local scatter = weaponDef.accuracy + spray
 	local aoe = tonumber(weaponDef.customParams.gui_aoe) or weaponDef.damageAreaOfEffect
-	local cost = unitDef.metalCost
+	local cost = unitDef and unitDef.metalCost or 0
 	local waterWeapon = weaponDef.waterWeapon
 	local ee = tonumber(weaponDef.customParams.gui_ee) or weaponDef.edgeEffectiveness
 	if (weaponDef.cylinderTargetting >= 100) then
@@ -253,7 +276,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 			retData = {type = "direct", scatter = scatter, range = weaponDef.range}
 		end
 	elseif (weaponType == "AircraftBomb") then
-		retData = {type = "dropped", scatter = scatter, v = unitDef.speed, h = unitDef.cruiseAltitude, salvoSize = weaponDef.salvoSize, salvoDelay = weaponDef.salvoDelay}
+		retData = {type = "dropped", scatter = scatter, v = unitDef and unitDef.speed, h = unitDef and unitDef.cruiseAltitude, salvoSize = weaponDef.salvoSize, salvoDelay = weaponDef.salvoDelay}
 	elseif (weaponType == "StarburstLauncher") then
 		if (weaponDef.tracks) then
 			retData = {type = "tracking", range = weaponDef.range}
@@ -277,20 +300,9 @@ local function getWeaponInfo(weaponDef, unitDef)
 	else
 		retData.aoe = 0
 	end
-	if (weaponDef.uptime or 0) > 0 then
-		-- In the first frame the projectile moves startVelocity + 2*Acceleration
-		local startSpeed = math.min(weaponDef.startvelocity + weaponDef.weaponAcceleration, weaponDef.projectilespeed)
-		retData.vlaunch = {
-			upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 2,
-			accel = weaponDef.weaponAcceleration,
-			turnRate = weaponDef.turnRate,
-			startSpeed = startSpeed,
-			startHeight = startHeights[weaponDef.name] or 0,
-			endSpeed = weaponDef.projectilespeed,
-		}
-	end
+	retData.vlaunch = BuildVlaunch(weaponDef)
 	retData.cost = cost
-	retData.mobile = not unitDef.isImmobile
+	retData.mobile = not (unitDef and unitDef.isImmobile)
 	retData.waterWeapon = waterWeapon
 	retData.ee = ee
 
@@ -462,18 +474,30 @@ end
 --aoe
 --------------------------------------------------------------------------------
 
+-- The nested falloff ring stack shared by the in-widget AoE draw and the exported
+-- preview, so both render an identical footprint (same radii, same edge falloff,
+-- same animated pulse via GetSecondPart). dist is the camera distance used for the
+-- line width; colour is passed component-wise so callers can tint it.
+local function DrawAoERingStack(tx, ty, tz, aoe, ee, alphaMult, offset, dist, r, g, b, a)
+	glLineWidth(math.max(0.05, aoeLineWidthMult * aoe / dist))
+	for i = 1, numAoECircles do
+		local proportion = i / (numAoECircles + 1)
+		local alpha = a * (1 - proportion) / (1 - proportion * ee) * (1 - GetSecondPart(offset or 0)) * (alphaMult or 1)
+		glColor(r, g, b, alpha)
+		DrawCircle(tx, ty, tz, aoe * proportion)
+	end
+	glColor(1, 1, 1, 1)
+	glLineWidth(1)
+end
+
 local function DrawAoE(tx, ty, tz, aoe, ee, alphaMult, offset, circleMode)
-	glLineWidth(math.max(0.05, aoeLineWidthMult * aoe / mouseDistance))
-	
 	if not circleMode then
-		for i = 1, numAoECircles do
-			local proportion = i / (numAoECircles + 1)
-			local radius = aoe * proportion
-			local alpha = aoeColor[4] * (1 - proportion) / (1 - proportion * ee) * (1 - GetSecondPart(offset or 0)) * (alphaMult or 1)
-			glColor(aoeColor[1], aoeColor[2], aoeColor[3], alpha)
-			DrawCircle(tx, ty, tz, radius)
-		end
-	elseif circleMode == "cloaker" then
+		DrawAoERingStack(tx, ty, tz, aoe, ee, alphaMult, offset, mouseDistance, aoeColor[1], aoeColor[2], aoeColor[3], aoeColor[4])
+		return
+	end
+
+	glLineWidth(math.max(0.05, aoeLineWidthMult * aoe / mouseDistance))
+	if circleMode == "cloaker" then
 		for i = 1, 3 do
 			local proportion = (i + 17) / 20
 			local radius = aoe * proportion
@@ -485,6 +509,27 @@ local function DrawAoE(tx, ty, tz, aoe, ee, alphaMult, offset, circleMode)
 
 	glColor(1,1,1,1)
 	glLineWidth(1)
+end
+
+-- Shared blast-radius preview, exposed via WG so other widgets (e.g. the missile
+-- launch UI) draw their AoE footprint with THE SAME ring stack the in-widget draw
+-- uses -- identical radii, edge falloff and animated pulse -- so the launch preview
+-- and the stock force-fire preview match exactly. `color` (optional {r,g,b[,a]})
+-- tints the rings; `alphaMult` (optional) scales overall opacity. The line width is
+-- derived from the live camera distance, so callers need no per-frame setup and it
+-- does not depend on this widget's DrawWorld having run first.
+local function DrawAoEPreview(tx, ty, tz, aoe, ee, color, alphaMult)
+	if not aoe or aoe <= 0 then
+		return
+	end
+	local cx, cy, cz = GetCameraPosition()
+	local dx, dy, dz = cx - tx, cy - ty, cz - tz
+	local camDist = max(1, sqrt(dx*dx + dy*dy + dz*dz))
+	local r = (color and color[1]) or aoeColor[1]
+	local g = (color and color[2]) or aoeColor[2]
+	local b = (color and color[3]) or aoeColor[3]
+	local a = (color and color[4]) or aoeColor[4]
+	DrawAoERingStack(tx, ty, tz, aoe, ee or 1, alphaMult, 0, camDist, r, g, b, a)
 end
 
 --------------------------------------------------------------------------------
@@ -940,6 +985,34 @@ local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
 end
 
 --------------------------------------------------------------------------------
+-- Shared interface (used by the missile launch preview widget)
+--------------------------------------------------------------------------------
+
+local externalFunctions = {}
+
+-- Weapon info by weaponDefID, built from the same getWeaponInfo used for units and
+-- cached here. No unitDef is needed for the fields the launch preview reads
+-- (vlaunch, range, aoe, ee), so other widgets reuse this widget's trajectory and
+-- AoE model instead of maintaining a parallel copy.
+local sharedWeaponInfo = {}
+function externalFunctions.GetWeaponInfo(weaponDefID)
+	local info = sharedWeaponInfo[weaponDefID]
+	if info == nil then
+		local wd = WeaponDefs[weaponDefID]
+		info = (wd and getWeaponInfo(wd, nil)) or false
+		sharedWeaponInfo[weaponDefID] = info
+	end
+	return info or nil
+end
+
+-- Terrain impact point (x, y, z) of a vlaunch (starburst) shot, or false if it
+-- reaches the target unobstructed. Pass info from GetWeaponInfo (only meaningful
+-- when info.vlaunch is set).
+externalFunctions.CalculateVlaunchImpact = CalculateVlaunchImpact
+
+externalFunctions.DrawAoEPreview = DrawAoEPreview
+
+--------------------------------------------------------------------------------
 --Main draw
 --------------------------------------------------------------------------------
 
@@ -1017,6 +1090,36 @@ local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeR
 	end
 end
 
+-- Draw the exact attack preview a selected unit shows for a target -- scatter, AoE,
+-- range leash and vlaunch relocation -- using the same per-unit info the stock
+-- force-fire preview uses. Lets widgets that issue attack-like commands (e.g. the
+-- missile launcher's Zenith meteor barrage) render identically instead of
+-- reimplementing the scatter model. showRange also draws the firing unit's range
+-- ring (in the same style as the dgun/manualfire ring): useful for launcher-style
+-- UIs where the firing unit is not selected, so its reach is otherwise not shown.
+function externalFunctions.DrawUnitAttackPreview(unitID, tx, ty, tz, targetIsGround, showRange)
+	if not unitID then
+		return
+	end
+	local unitDefID = spGetUnitDefID(unitID)
+	local info = unitDefID and aoeDefInfo[unitDefID]
+	if not info then
+		return
+	end
+	if showRange and info.range then
+		local _, _, _, fx, fy, fz = GetUnitPosition(unitID, true)
+		if fx then
+			local rangeMult = (Spring.GetUnitRulesParam(unitID, "rangeMult") or 1)
+			glColor(1, 0.3, 0.3, 0.6)
+			glLineWidth(2)
+			glDrawGroundCircle(fx, fy, fz, info.range * rangeMult, circleDivs)
+			glColor(1, 1, 1, 1)
+			glLineWidth(1)
+		end
+	end
+	drawForUnit(unitID, tx, ty, tz, targetIsGround, CMD_ATTACK, info, false)
+end
+
 --------------------------------------------------------------------------------
 --callins
 --------------------------------------------------------------------------------
@@ -1027,10 +1130,12 @@ function widget:Initialize()
 		aoeDefInfo[unitDefID], dgunInfo[unitDefID], extraDrawRangeDefInfo[unitDefID] = SetupUnit(unitDef)
 	end
 	SetupDisplayLists()
+	WG.AttackAoE = externalFunctions
 end
 
 function widget:Shutdown()
 	DeleteDisplayLists()
+	WG.AttackAoE = nil
 end
 
 function widget:DrawWorld()

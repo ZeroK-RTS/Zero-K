@@ -100,6 +100,17 @@ local commands = {
 	FIELD_FAC_UNIT_TYPE = 38694,
 	FIELD_FAC_QUEUELESS = 38695,
 
+	-- missile launcher (Missile Command Center widget; see Configs/missile_config.lua)
+	MISSILE_ZENITH   = 39610,
+	MISSILE_TRINITY  = 39611,
+	MISSILE_REEF     = 39612,
+	MISSILE_SCYLLA   = 39613,
+	MISSILE_EOS      = 39614,
+	MISSILE_SEISMIC  = 39615,
+	MISSILE_SHOCKLEY = 39616,
+	MISSILE_INFERNO  = 39617,
+	MISSILE_ZENO     = 39618,
+
 	-- terraform
 	RAMP = 39734,
 	LEVEL = 39736,

@@ -79,6 +79,14 @@ local buttonList
 -- is destroyed fully one frame later.
 local oldButtonList
 
+-- Missile silos are factories, so they show up as factory buttons; the
+-- hideMissileSilos option filters them out (the Launch button covers them).
+local MISSILE_SILO_DEFID = UnitDefNames.staticmissilesilo and UnitDefNames.staticmissilesilo.id
+
+-- Forward declaration: the missile option OnChange handlers (defined in the options
+-- table below) rebuild the button list via ClearData, which is defined much later.
+local ClearData
+
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
@@ -98,6 +106,14 @@ local myTeamID = Spring.GetMyTeamID()
 local buttonSizeShort = 4
 local buttonCountLimit = 7
 
+-- Extra long-axis size (beyond one normal button) that the launch button needs
+-- for its grid rows. The launch button is the last button, so its growth only
+-- has to enlarge the background panel; while it exists it resizes itself and the
+-- panel inline (see UpdateButton). wantLaunchRelayout defers the shrink for when
+-- the button is removed (no missiles left) and can no longer relayout itself.
+local launchButtonExtraLong = 0
+local wantLaunchRelayout = false
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
@@ -113,8 +129,10 @@ local IDLE_CONS_HIGHLIGHT_TIME = 0.5
 local CONSTRUCTOR_ORDER = 1
 local COMMANDER_ORDER = 2
 local FACTORY_ORDER = 3
+local LAUNCH_ORDER = 4
 
 local CONSTRUCTOR_BUTTON_ID = "cons"
+local LAUNCH_BUTTON_ID = "launch"
 
 local exceptionList = {
 	staticrearm = true,
@@ -205,7 +223,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'highlightidleconsincopacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'highlightidleconsincopacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'hideMissileSilos', 'showLaunchButton', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -288,6 +306,35 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+	},
+	hideMissileSilos = {
+		name = 'Hide missile silo buttons',
+		desc = 'Hide the individual missile silo selection buttons. The Launch button already aggregates all silos, so the per-silo buttons are usually redundant.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		-- Rebuild the button list so existing silo buttons appear/disappear at once
+		-- (ClearData re-scans owned units; the old list is disposed next Update, same
+		-- as on a team change).
+		OnChange = function()
+			if buttonList then
+				ClearData()
+			end
+		end,
+	},
+	showLaunchButton = {
+		name = 'Show missile launch button',
+		desc = 'Show the aggregated missile Launch button, which opens the launcher to fire and build missiles.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		-- Toggling off should remove an existing button at once (it otherwise only
+		-- self-removes when the last missile is gone); rebuild to apply immediately.
+		OnChange = function()
+			if buttonList then
+				ClearData()
+			end
+		end,
 	},
 	leftMouseCenter = {
 		name = 'Swap Camera Center Button',
@@ -609,6 +656,44 @@ for i = 1, 16 do
 	}
 end
 
+-- Missile launcher hotkey, registered like the factory-selection hotkeys above.
+-- Opens the launcher (same as clicking the Launch button in the selection bar).
+local LAUNCH_HOTKEY_ACTION = "epic_chili_core_selector_launch"
+-- Orange highlight matching the integral menu's selected-command colour, so the launch
+-- button reads as "active" while the launcher is open, like an armed command button.
+local LAUNCH_SELECTED_COLOR = {0.98, 0.48, 0.26, 0.85}
+
+-- Toggle the launcher: if it is already open, close it; otherwise open it and arm the
+-- default missile. Shared by the launch button click and the launch hotkey.
+local function OpenLauncher()
+	if not (WG.IntegralMenu and WG.IntegralMenu.OpenTab) then
+		return
+	end
+	if WG.IntegralMenu.IsHiddenTabOpen and WG.IntegralMenu.IsHiddenTabOpen("missiles") then
+		if WG.DismissLauncher then
+			WG.DismissLauncher()
+		elseif WG.IntegralMenu.CloseHiddenTab then
+			WG.IntegralMenu.CloseHiddenTab()
+		end
+		return
+	end
+	WG.IntegralMenu.OpenTab("missiles")
+	-- Arm a launch by default so the player can immediately click a target;
+	-- SelectDefaultMissile only picks a type that has a missile ready to fire.
+	if WG.SelectDefaultMissile then
+		WG.SelectDefaultMissile()
+	end
+end
+options_order[#options_order + 1] = "launch"
+options["launch"] = {
+	name = "Open missile launcher",
+	desc = "Opens the missile launcher, same as clicking the Launch button in the selection bar.",
+	type = 'button',
+	hotkey = {key = 'L', mod = 'alt+'},
+	path = 'Hotkeys/Selection',
+	OnChange = OpenLauncher,
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Helper Functions
@@ -700,6 +785,8 @@ local function GetBackground(parent)
 		local buttons = math.min(buttonCountLimit, math.max(buttonCount, options.minButtonSpaces.value))
 		
 		local size = buttons*options.buttonSizeLong.value + (buttons - 1)*options.buttonSpacing.value
+		-- Extra room for the launch button, which grows past one normal button.
+		size = size + launchButtonExtraLong
 		if options.vertical.value then
 			size = size + 2*options.vertPadding.value
 		else
@@ -798,7 +885,11 @@ end
 --------------------------------------------------------------------------------
 -- Button Handling
 
-local function GetNewButton(parent, onClick, category, index, backgroundColor, imageFile, imageFile2)
+-- getLongSize (optional): returns the button's extent along the long axis. Only
+-- affects this button's own size, not the offset of following buttons, so it is
+-- only safe to grow the last button (the launch button). Defaults to the normal
+-- button size.
+local function GetNewButton(parent, onClick, category, index, backgroundColor, imageFile, imageFile2, getLongSize)
 	local position = 1
 	
 	local hotkeyLabel, buildProgress, repeatImage, healthBar, hotkeyText, bottomLabel
@@ -838,7 +929,13 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	}
 	
 	local externalFunctions = {}
-	
+
+	-- Exposes the button control and its image so specialised buttons (e.g. the
+	-- launch button) can parent extra content onto them.
+	function externalFunctions.GetButtonControl()
+		return button, image
+	end
+
 	-- Update attributes
 	function externalFunctions.SetImage(newImageFile)
 		image.file = newImageFile
@@ -977,6 +1074,9 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		local vPad = (options.vertical.value and options.buttonSpacing.value) or 0
 		
 		local index = position - 1
+		-- Offset uses the normal button size (all preceding buttons are normal);
+		-- only this button's own extent may be larger, via getLongSize.
+		local longSize = (getLongSize and getLongSize()) or options.buttonSizeLong.value
 		if options.vertical.value then
 			button._relativeBounds.left = options.horPaddingLeft.value
 			button._relativeBounds.right = options.horPaddingRight.value
@@ -985,7 +1085,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 			button._relativeBounds.bottom = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.vertPadding.value
 			button._relativeBounds.width = nil
 			button._givenBounds.width = nil
-			button._relativeBounds.height = options.buttonSizeLong.value
+			button._relativeBounds.height = longSize
 			button:UpdateClientArea()
 		else
 			button._relativeBounds.left = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.horPaddingLeft.value
@@ -994,7 +1094,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 			button._relativeBounds.top = options.vertPadding.value
 			button._givenBounds.top = options.vertPadding.value
 			button._relativeBounds.bottom = options.vertPadding.value
-			button._relativeBounds.width = options.buttonSizeLong.value
+			button._relativeBounds.width = longSize
 			button._relativeBounds.height = nil
 			button._givenBounds.height = nil
 			button:UpdateClientArea()
@@ -1151,7 +1251,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 			local udid, num = next(queue[i])
 			constructionCount = constructionCount + num
 		end
-		
+
 		UpdateTooltip(constructionCount)
 		return true
 	end
@@ -1410,7 +1510,249 @@ local function GetConstructorButton(parent)
 	
 	externalFunctions.UpdateButton(dt)
 	externalFunctions.UpdateHotkey()
-	
+
+	return externalFunctions
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Launch button
+--
+-- A single aggregate button that shows every stockpiled or building missile
+-- type in a 2-column grid. Each cell arms that missile's launch command via the
+-- missile widget. Added while missiles exist and self-removes (UpdateButton
+-- returns false) once there are none.
+--
+-- The button holds a minimum 2x2 grid (one normal button size) and grows along
+-- its long axis past that. A single missile fills the whole button; with two or
+-- more, cells keep a fixed half-button size and are not stretched to fill.
+
+local LAUNCH_COLUMNS = 2
+local LAUNCH_ROWS_MIN = 2
+-- Count label font size for a standard (2-column) cell; it scales up with the
+-- cell when there are fewer columns (a single missile fills the whole button).
+local LAUNCH_LABEL_FONT = 12
+
+local function GetLaunchButton(parent)
+	-- Clicking anywhere on the button opens the launcher (shared with the launch hotkey).
+	local function OnClick(mouse)
+		OpenLauncher()
+	end
+
+	local function GetLongSize()
+		return options.buttonSizeLong.value + launchButtonExtraLong
+	end
+
+	local button = GetNewButton(parent, OnClick, LAUNCH_ORDER, 0, BUTTON_COLOR, nil, nil, GetLongSize)
+	local buttonControl = button.GetButtonControl()
+	local defaultFocusColor = buttonControl.focusColor -- restore this when not highlighted
+	button.SetImageVisible(false) -- the missile grid replaces the single icon
+
+	local cells = {}
+	local lastLayoutKey = false
+	local lastHotkey = false       -- last hotkey string pushed to the label/tooltip
+	local lastLauncherActive = nil -- last launch-active state pushed to the focus colour
+
+	-- Cells are display only (icon + count + build progress); they are parented
+	-- directly to the button and do not handle clicks, so the whole button stays
+	-- clickable and opens the launcher menu.
+	local function GetCell(i)
+		if cells[i] then
+			return cells[i]
+		end
+		local cell = {}
+		cell.image = Image:New {
+			parent = buttonControl,
+			keepAspect = false,
+			file = "",
+		}
+		cell.bar = Progressbar:New {
+			parent = cell.image,
+			x = "5%", y = "5%", right = "5%", bottom = "5%",
+			value = 0, max = 1, caption = false, noFont = true,
+			color = {0.7, 0.7, 0.4, 0.6},
+			backgroundColor = {1, 1, 1, 0.01},
+		}
+		-- Parented to the image (not the button) so the count always draws on top of
+		-- the icon and its progress bar. Position and shadow match the standard bottom
+		-- count label (SetBottomLabel, used by the idle-con/factory buttons) so a single
+		-- missile's count reads identically.
+		cell.label = Label:New {
+			parent = cell.image,
+			x = 0, y = 0, right = 5, bottom = 5,
+			autosize = false,
+			align = "right", valign = "bottom",
+			objectOverrideFont = WG.GetFont(LAUNCH_LABEL_FONT),
+			fontShadow = true,
+			caption = "",
+		}
+		cells[i] = cell
+		return cell
+	end
+
+	local externalFunctions = {
+		SetPosition = button.SetPosition,
+		MoveUp = button.MoveUp,
+		MoveDown = button.MoveDown,
+		GetOrder = button.GetOrder,
+		UpdatePosition = button.UpdatePosition,
+	}
+
+	-- Keep the single base icon hidden; the grid is drawn from cell controls.
+	function externalFunctions.SetImageVisible()
+	end
+
+	function externalFunctions.UpdateButton(dt)
+		local icons = WG.missileActiveIcons or {}
+		local n = #icons
+		if n == 0 then
+			-- No missiles: reset any growth and report inactive so the list handler
+			-- removes the button.
+			if launchButtonExtraLong ~= 0 then
+				launchButtonExtraLong = 0
+				wantLaunchRelayout = true
+			end
+			return false
+		end
+
+		-- A single missile fills the whole button (a 1x1 grid over the full 2x2
+		-- space); two or more use the 2-column grid with a 2x2 minimum.
+		local singleCell = (n == 1)
+
+		-- Show the hotkey in the corner only when a single cell leaves room for it
+		-- (one missile, or the silo placeholder); with a full grid it would cover a
+		-- cell, so it lives in the tooltip instead. The tooltip always carries it.
+		local hk = (WG.crude and WG.crude.GetHotkey(LAUNCH_HOTKEY_ACTION)) or ''
+		if hk ~= lastHotkey then
+			lastHotkey = hk
+			button.SetTooltip("Missile launcher" .. ((hk ~= '') and (" (" .. hk .. ")") or ""))
+		end
+		button.SetHotkey(singleCell and hk or '')
+		local cols = singleCell and 1 or LAUNCH_COLUMNS
+		local rows = math.max(1, math.ceil(n / cols))
+
+		-- A normal button holds two rows (two columns); each further row adds half
+		-- a button length. Grow the button, and the panel, past two rows.
+		local desiredLong = math.max(options.buttonSizeLong.value, rows * options.buttonSizeLong.value / 2)
+		local extra = desiredLong - options.buttonSizeLong.value
+		if extra ~= launchButtonExtraLong then
+			launchButtonExtraLong = extra
+			-- Resize the button and background panel right here, so the taller
+			-- button and the cell grid below update together in the same pass
+			-- instead of a frame apart (the button is the last one, so growing it
+			-- does not shift any other button's offset).
+			button.UpdatePosition()
+			if mainBackground then
+				mainBackground.UpdateSize()
+			end
+		end
+
+		-- The long axis (height when vertical, width when horizontal) was just
+		-- changed via UpdatePosition, but the control's realized width/height only
+		-- catches up on a later Chili pass. Use the computed size for that axis so
+		-- the cells land at their final positions in the same frame the button
+		-- grows, with no lag; the short axis is fixed by padding and safe to read.
+		local width, height
+		if options.vertical.value then
+			width = buttonControl.width or 0
+			height = desiredLong
+		else
+			width = desiredLong
+			height = buttonControl.height or 0
+		end
+
+		-- With two or more missiles, divide by the minimum grid (2x2) so a single
+		-- row keeps its half-button height instead of stretching. A single missile
+		-- (cols == 1) fills the whole button.
+		local cw = width / cols
+		local ch = height / (singleCell and 1 or math.max(LAUNCH_ROWS_MIN, rows))
+
+		-- Reposition cells only when the missile set or grid size changes, not on
+		-- every count/progress tick. Re-running SetPos each frame re-lays out the
+		-- cell labels and makes the count jitter vertically while a missile builds.
+		local iconParts = {}
+		for i = 1, n do
+			iconParts[i] = icons[i].icon
+		end
+		local layoutKey = table.concat(iconParts, ",") .. "|" .. cols .. "|" .. width .. "x" .. height
+		if layoutKey ~= lastLayoutKey then
+			lastLayoutKey = layoutKey
+			-- Count font: a single cell fills the whole button, so use the standard
+			-- idle-con / factory count size (14) rather than scaling up. Multiple cells
+			-- keep the per-cell scaled size (a wider cell gets a bigger number).
+			local baseCellWidth = width / LAUNCH_COLUMNS
+			local labelFont = WG.GetFont(singleCell and 14
+				or math.max(1, math.floor(LAUNCH_LABEL_FONT * cw / baseCellWidth + 0.5)))
+			for i = 1, n do
+				local cell = GetCell(i)
+				local col = (i - 1) % cols
+				local row = math.floor((i - 1) / cols)
+				local cx, cy = col * cw, row * ch
+				-- A single cell (one missile, or the silo placeholder) is inset 5% to
+				-- match the normal buttons' icon padding, so its icon and its count
+				-- label line up exactly with the idle-con / factory buttons (whose image
+				-- is inset 5% inside the button). Grid cells (2+ missiles) stay flush so
+				-- the tiles pack tightly.
+				if singleCell or icons[i].isSilo then
+					local ix, iy = cw * 0.05, ch * 0.05
+					cell.image:SetPos(cx + ix, cy + iy, cw - 2 * ix, ch - 2 * iy)
+				else
+					cell.image:SetPos(cx, cy, cw, ch)
+				end
+				cell.image:SetVisibility(true)
+				cell.image.file = icons[i].icon
+				-- Silo placeholder (no missiles yet) gets the factory construction
+				-- border to read as "build here"; missiles show without it.
+				cell.image.file2 = icons[i].isSilo and FACTORY_FRAME or nil
+				cell.image:Invalidate()
+				cell.label.font = labelFont
+				cell.label.objectOverrideFont = labelFont
+				cell.label:Invalidate()
+				cell.label:SetVisibility(true)
+			end
+			for i = n + 1, #cells do
+				cells[i].image:SetVisibility(false)
+				cells[i].label:SetVisibility(false)
+			end
+		end
+
+		-- Update the dynamic per-cell values every frame; these change the progress
+		-- bar fill and the count text in place without moving any cell.
+		for i = 1, n do
+			local cell = cells[i]
+			local data = icons[i]
+			if (data.progress or 0) > 0 then
+				cell.bar:SetValue(data.progress)
+				cell.bar:SetVisibility(true)
+			else
+				cell.bar:SetVisibility(false)
+			end
+			cell.label:SetCaption((data.count > 0) and tostring(data.count) or "")
+		end
+
+		-- Highlight the button (background + focus/hover colour) while launch mode is
+		-- active -- launcher tab open, or a launch command still armed after firing --
+		-- matching the integral menu's selected-command colour. Applied last (after any
+		-- resize/relayout above, which reset the colour) and every update, so the
+		-- highlight is not lost when the missile count changes.
+		local launcherActive = (WG.IsLaunchActive and WG.IsLaunchActive()) or false
+		if launcherActive ~= lastLauncherActive then
+			lastLauncherActive = launcherActive
+			buttonControl.focusColor = launcherActive and LAUNCH_SELECTED_COLOR or defaultFocusColor
+		end
+		button.SetBackgroundColor(launcherActive and LAUNCH_SELECTED_COLOR or BUTTON_COLOR)
+		return true
+	end
+
+	function externalFunctions.UpdateHotkey()
+	end
+
+	function externalFunctions.Destroy()
+		button.Destroy()
+		button = nil
+	end
+
+	externalFunctions.UpdateButton(0)
 	return externalFunctions
 end
 
@@ -1727,7 +2069,9 @@ local function InitializeControls()
 	CheckHide()
 end
 
-local function ClearData()
+-- Assigns the forward-declared local (see top of file) so the missile option
+-- OnChange handlers can call it.
+function ClearData()
 	factoryList = {}
 	commanderList = {}
 	idleCons = {}
@@ -1747,7 +2091,7 @@ local function ClearData()
 	buttonList = GetButtonListHandler(mainBackground)
 	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
 	InitializeUnits()
-	
+
 	buttonList.SetImagesVisible(false)
 end
 
@@ -1762,7 +2106,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	
 	if ud.isFactory and (not exceptionArray[unitDefID]) then
-		AddFac(unitID, unitDefID)
+		if not (options.hideMissileSilos.value and unitDefID == MISSILE_SILO_DEFID) then
+			AddFac(unitID, unitDefID)
+		end
 	elseif ud.customParams.level then
 		AddComm(unitID, unitDefID)
 	elseif options.monitorInbuiltCons.value and CanBeAnIdleCons(ud) then
@@ -1951,12 +2297,32 @@ function widget:Update(dt)
 		--debugIdleConsState()
 	end
 
+	-- Add the launch button as soon as there are missiles to launch, every frame
+	-- rather than only in the throttled block below, so it appears promptly when
+	-- a missile starts building. Populate it at once so it is not shown empty.
+	if options.showLaunchButton.value and WG.missileActiveIcons and #WG.missileActiveIcons > 0 and not buttonList.GetButton(LAUNCH_BUTTON_ID) then
+		local launchButton = GetLaunchButton(buttonHolder)
+		buttonList.AddButton(LAUNCH_BUTTON_ID, launchButton)
+		launchButton.UpdateButton(dt)
+	end
+
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
 		return
 	end
-	
+
 	buttonList.UpdateButtons(timer)
+
+	-- The launch button was removed (no missiles left): shrink the panel and
+	-- relayout. Growth while the button exists is handled inline in UpdateButton.
+	if wantLaunchRelayout then
+		wantLaunchRelayout = false
+		if mainBackground then
+			mainBackground.UpdateSize()
+		end
+		buttonList.UpdateLayout()
+	end
+
 	timer = 0
 end
 
