@@ -135,7 +135,6 @@ end
 local statePanel = {}
 local tabPanel
 local selectionIndex = 0
-local lastSelectionSignature = false -- to detect selection changes for tab defaulting
 local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
@@ -2292,18 +2291,10 @@ local function ProcessAllCommands(commands, customCommands)
 	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
 	local unitMobilePanelSize = GetUnitMobilePanelSize(commands, factoryUnitDefID)
 
-	-- Detect an actual selection change (vs a command-only refresh) so that
-	-- selecting a unit while on a global tab (missiles) switches to its default.
-	local selectionSignature = table.concat(spGetSelectedUnits(), ",")
-	local selectionChanged = (selectionSignature ~= lastSelectionSignature)
-	lastSelectionSignature = selectionSignature
-
-	-- A selection change dismisses an opened hidden tab (the launch menu), so
-	-- selecting a unit returns to its normal command tabs rather than staying on
-	-- the revealed missiles tab.
-	if selectionChanged and revealHiddenTab then
-		revealHiddenTab = false
-	end
+	-- A hidden tab (the missiles Launch tab) stays open until the user presses a tab
+	-- button or a widget closes it via the API. The integral menu deliberately does
+	-- not react to selection changes or unit deaths here; any such policy belongs to
+	-- the widget that opened the tab (see the missile widget's launcher option).
 
 	selectionIndex = selectionIndex + 1
 	

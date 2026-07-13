@@ -19,11 +19,19 @@ function widget:Initialize()
 end
 
 options_path = 'Settings/HUD Panels/Missile Launcher'
-options_order = {'combineEosScylla'}
+options_order = {'combineEosScylla', 'autoLauncher'}
 options = {
 	combineEosScylla = {
 		name = 'Combine Eos and Scylla',
 		desc = 'Show Eos (silo tactical nuke) and Scylla (submarine tactical nuke) as a single Launch button instead of two.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	autoLauncher = {
+		name = 'Auto-arm and auto-close launcher',
+		desc = 'When enabled, opening the missile launcher immediately arms the default missile, and selecting units closes the launcher (the original behaviour). '
+			.. 'When disabled (default), opening the launcher just shows the Launch tab: it stays open until you switch tabs or close it, and no missile is armed until you pick one.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -55,13 +63,6 @@ local cos                    = math.cos
 local sin                    = math.sin
 
 local aoeColor             = {1, 0, 0, 1}
-local floor                  = math.floor
-
-local pulse_timmer = Spring.GetTimer()
-local function getPulse()
-	local time = Spring.DiffTimers(Spring.GetTimer(), pulse_timmer)
-	return 1 - (time - floor(time))
-end
 
 local function UnitCircleVertices()
 	for i = 1, circleDivs do
@@ -80,10 +81,21 @@ end
 
 -- Blast footprint at the impact point. Reuses the Attack AoE widget's falloff
 -- renderer (via WG) so the launch preview and the stock force-fire preview draw an
--- identical ring stack; the pulse is passed through as an overall-alpha multiplier.
+-- identical ring stack, including the shared animated pulse.
 local function drawBlastRadius(tx, ty, tz, weaponDef)
 	if not (WG.AttackAoE and WG.AttackAoE.DrawAoEPreview) then return end
-	WG.AttackAoE.DrawAoEPreview(tx, ty, tz, weaponDef.damageAreaOfEffect, weaponDef.edgeEffectiveness, aoeColor, getPulse())
+	WG.AttackAoE.DrawAoEPreview(tx, ty, tz, weaponDef.damageAreaOfEffect, weaponDef.edgeEffectiveness, aoeColor)
+end
+
+-- Range ring at the firing unit, matching the Attack AoE widget's dgun/manualfire
+-- ring style. A launcher fires without the unit selected, so its reach is otherwise
+-- not shown; the ring makes it visible.
+local function drawRangeRing(ux, uy, uz, range)
+	glColor(1, 0.3, 0.3, 0.6)
+	glLineWidth(2)
+	glDrawGroundCircle(ux, uy, uz, range, circleDivs)
+	glColor(1, 1, 1, 1)
+	glLineWidth(1)
 end
 
 -- Faint ring at the intended target, drawn when the shot is blocked so it is
@@ -136,6 +148,20 @@ end
 
 -- Squared XZ distance -- shared engine utility rather than a hand-rolled copy.
 local DistSq = Spring.Utilities.Vector.DistSq
+
+-- Terrain impact of a vlaunch shot for weapon `weaponDefID`, fired from (fx,fy,fz)
+-- at (tx,ty,tz), via the Attack AoE widget's shared weapon model. Returns the impact
+-- x,y,z when the shot slams into terrain short of the target, or nil otherwise (clear
+-- shot, non-vlaunch weapon, or the Attack AoE widget not loaded). CalculateVlaunchImpact
+-- returns false for a clear shot, which is nil-ified here.
+local function getVlaunchImpact(weaponDefID, fx, fy, fz, tx, ty, tz)
+	if not (WG.AttackAoE and WG.AttackAoE.GetWeaponInfo) then return nil end
+	local info = WG.AttackAoE.GetWeaponInfo(weaponDefID)
+	if not (info and info.vlaunch) then return nil end
+	local hx, hy, hz = WG.AttackAoE.CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
+	if hx then return hx, hy, hz end
+	return nil
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -242,8 +268,6 @@ local function missile_class()
 	-- widget draws. Non-vlaunch weapons report nil (never blocked), so this is a no-op
 	-- for them. Fire origin is computed like drawWorld/Attack AoE so the three agree.
 	function self:isShotBlocked(unit, params)
-		if not (WG.AttackAoE and WG.AttackAoE.GetVlaunchImpact) then return false end
-
 		local unitDefID = Spring.GetUnitDefID(unit)
 		local type = self.launchableTypes[unitDefID]
 		if not type then return false end
@@ -259,7 +283,7 @@ local function missile_class()
 		end
 
 		local ty = Spring.GetGroundHeight(params.x, params.z) or 0
-		local hx = WG.AttackAoE.GetVlaunchImpact(weapon.weaponDef, ux, uy, uz, params.x, ty, params.z)
+		local hx = getVlaunchImpact(weapon.weaponDef, ux, uy, uz, params.x, ty, params.z)
 		return hx ~= nil
 	end
 
@@ -463,8 +487,12 @@ local function missile_class()
 		local weaponDef = WeaponDefs[weapon.weaponDef]
 		if not weaponDef then return end
 
+		-- Range ring at the launcher, drawn even when aiming past it so the reach is
+		-- clear; the blast/line below are suppressed once out of range.
+		local range = weaponDef.range * (Spring.GetUnitRulesParam(unit, "rangeMult") or 1)
+		drawRangeRing(ux, uy, uz, range)
+
 		local dist = DistSq(mx, mz, ux, uz)
-		local range = weaponDef.range
 		if dist > range * range then return end
 
 		-- Relocate the impact to any terrain that blocks the shot, using the same
@@ -472,11 +500,9 @@ local function missile_class()
 		-- directly, so the two previews always agree.
 		local ix, iy, iz = mx, my, mz
 		local blocked = false
-		if WG.AttackAoE and WG.AttackAoE.GetVlaunchImpact then
-			local hx, hy, hz = WG.AttackAoE.GetVlaunchImpact(weapon.weaponDef, ux, uy, uz, mx, my, mz)
-			if hx then
-				ix, iy, iz, blocked = hx, hy, hz, true
-			end
+		local hx, hy, hz = getVlaunchImpact(weapon.weaponDef, ux, uy, uz, mx, my, mz)
+		if hx then
+			ix, iy, iz, blocked = hx, hy, hz, true
 		end
 
 		if blocked then
@@ -620,7 +646,30 @@ local function applyZenithBehaviour(self)
 		return true
 	end
 
-	function self:drawWorld()   -- no launch-arc preview for the meteor barrage
+	-- Meteor barrage: draw the same preview a selected Zenith shows for an attack --
+	-- the meteors' wide scatter dwarfs each impact's small AoE -- by invoking the
+	-- Attack AoE widget directly rather than reimplementing the scatter model.
+	function self:drawWorld()
+		if not (WG.AttackAoE and WG.AttackAoE.DrawUnitAttackPreview) then return end
+		local mx, my, mz, targetIsGround = getMouseTargetPosition()
+		if not mx or not mz then return end
+
+		local unit = self:getPreferredUnit{x = mx, z = mz}
+		if not unit then return end
+
+		-- showRange: the Zenith is fired from the launcher without being selected, so
+		-- draw its range ring too (a selected unit would show it via other means).
+		WG.AttackAoE.DrawUnitAttackPreview(unit, mx, my, mz, targetIsGround, true)
+
+		-- No launch arc for a single Zenith (meteors rain from above, so a line from the
+		-- unit would be misleading). With multiple Zeniths, draw a line from the one that
+		-- will actually fire so it is clear which barrage is being aimed.
+		if self:getCount() > 1 then
+			local ux, uy, uz = Spring.GetUnitPosition(unit)
+			if ux then
+				drawLine(ux, uy, uz, mx, my, mz)
+			end
+		end
 	end
 end
 
@@ -741,7 +790,12 @@ end
 -- Arm a default missile when the launcher is opened (used by the core selector's launch
 -- button). Prefer the first type with a missile ready; otherwise, if a silo exists, arm
 -- the first silo-built type (Eos) so it is selected by default and ready to build.
+-- Only the opt-in "Auto-arm" behaviour arms on open; by default opening just shows the
+-- Launch tab and nothing is armed until the player picks a missile.
 WG.SelectDefaultMissile = function()
+	if not options.autoLauncher.value then
+		return false
+	end
 	for _, command in ipairs(orderedCommands) do
 		if command:getCount() > 0 then
 			armCommand(command)
@@ -1086,16 +1140,21 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	end
 end
 
--- Selecting units dismisses the launcher: stop the sticky re-arm and drop any armed
--- launch command, so the player's clicks act on their units instead of firing. Pressing
--- the launch selector and firing do not change the selection, so they are unaffected.
+-- Selecting units drops any armed launch command so the player's clicks act on their
+-- units instead of firing (pressing the launch selector and firing do not change the
+-- selection, so they are unaffected). Whether it also closes the launcher tab is opt-in
+-- (autoLauncher); by default the tab stays open until a tab press or explicit close.
 function widget:SelectionChanged(selectedUnits)
-	if selectedUnits and #selectedUnits > 0 then
-		reArmCmd = false
-		local _, activeCmd = Spring.GetActiveCommand()
-		if activeCmd and commandByCmd[activeCmd] then
-			Spring.SetActiveCommand(nil)
-		end
+	if not (selectedUnits and #selectedUnits > 0) then
+		return
+	end
+	reArmCmd = false
+	local _, activeCmd = Spring.GetActiveCommand()
+	if activeCmd and commandByCmd[activeCmd] then
+		Spring.SetActiveCommand(nil)
+	end
+	if options.autoLauncher.value and WG.IntegralMenu and WG.IntegralMenu.CloseHiddenTab then
+		WG.IntegralMenu.CloseHiddenTab()
 	end
 end
 

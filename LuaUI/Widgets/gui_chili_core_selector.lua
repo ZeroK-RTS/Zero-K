@@ -83,6 +83,10 @@ local oldButtonList
 -- hideMissileSilos option filters them out (the Launch button covers them).
 local MISSILE_SILO_DEFID = UnitDefNames.staticmissilesilo and UnitDefNames.staticmissilesilo.id
 
+-- Forward declaration: the missile option OnChange handlers (defined in the options
+-- table below) rebuild the button list via ClearData, which is defined much later.
+local ClearData
+
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
@@ -309,6 +313,14 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
+		-- Rebuild the button list so existing silo buttons appear/disappear at once
+		-- (ClearData re-scans owned units; the old list is disposed next Update, same
+		-- as on a team change).
+		OnChange = function()
+			if buttonList then
+				ClearData()
+			end
+		end,
 	},
 	showLaunchButton = {
 		name = 'Show missile launch button',
@@ -316,6 +328,13 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
+		-- Toggling off should remove an existing button at once (it otherwise only
+		-- self-removes when the last missile is gone); rebuild to apply immediately.
+		OnChange = function()
+			if buttonList then
+				ClearData()
+			end
+		end,
 	},
 	leftMouseCenter = {
 		name = 'Swap Camera Center Button',
@@ -1669,9 +1688,12 @@ local function GetLaunchButton(parent)
 				local col = (i - 1) % cols
 				local row = math.floor((i - 1) / cols)
 				local cx, cy = col * cw, row * ch
-				if icons[i].isSilo then
-					-- Inset the silo placeholder to match the factory buttons' icon +
-					-- construction border (5% inset), so the border is not oversized.
+				-- A single cell (one missile, or the silo placeholder) is inset 5% to
+				-- match the normal buttons' icon padding, so its icon and its count
+				-- label line up exactly with the idle-con / factory buttons (whose image
+				-- is inset 5% inside the button). Grid cells (2+ missiles) stay flush so
+				-- the tiles pack tightly.
+				if singleCell or icons[i].isSilo then
 					local ix, iy = cw * 0.05, ch * 0.05
 					cell.image:SetPos(cx + ix, cy + iy, cw - 2 * ix, ch - 2 * iy)
 				else
@@ -2047,7 +2069,9 @@ local function InitializeControls()
 	CheckHide()
 end
 
-local function ClearData()
+-- Assigns the forward-declared local (see top of file) so the missile option
+-- OnChange handlers can call it.
+function ClearData()
 	factoryList = {}
 	commanderList = {}
 	idleCons = {}
@@ -2069,23 +2093,6 @@ local function ClearData()
 	InitializeUnits()
 
 	buttonList.SetImagesVisible(false)
-end
-
--- Rebuild the button list when the silo-hiding option changes so existing silo
--- buttons appear/disappear immediately (ClearData re-scans owned units; the old
--- list is disposed next Update, same as on a team change).
-options.hideMissileSilos.OnChange = function()
-	if buttonList then
-		ClearData()
-	end
-end
-
--- Toggling the launch button off should remove an existing one at once (it otherwise
--- only self-removes when the last missile is gone); rebuild to apply immediately.
-options.showLaunchButton.OnChange = function()
-	if buttonList then
-		ClearData()
-	end
 end
 
 -------------------------------------------------------------------------------
