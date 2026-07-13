@@ -177,22 +177,6 @@ local function GiveZombiesRandomOrders(unitID)
 	end
 end
 
--- options to assign different behavior depending on xyz. could also just export them
-local function SetZombieBehavior(unitID,behavior)
-  
-  -- Though of setting these in the api gadget, but they only need to be set on create and not on every order change.
-  -- Maybe should be on TurnFeatureIntoUnit?
-  -- Spring.GiveOrderToUnit(unitID, CMD_REPEAT, 1, 0)
-  -- Spring.GiveOrderToUnit(unitID, CMD_MOVE_STATE, 2, 0)
-  
-  if behavior == "luaai" then
-    -- TODO figure out how the built in ai works/how to pass control to it
-  else
-    GiveZombiesRandomOrders(unitID)
-  end
-end
-
-
 function gadget:Initialize()
   
 	mapWidth = Game.mapSizeX
@@ -201,7 +185,7 @@ function gadget:Initialize()
   GG.Zombies = {
     TurnFeatureIntoUnit     = TurnFeatureIntoUnit,
     SetZombieSpeedMult      = SetZombieSpeedMult,
-    SetZombieBehavior       = SetZombieBehavior,
+    SetZombieBehavior       = GiveZombiesRandomOrders,
     GetFeatureResurrectData = GetFeatureResurrectData
   }
 end

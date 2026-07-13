@@ -162,7 +162,7 @@ local function CheckZombieOrders()	-- i can't rely on Idle because if for exampl
 	for unitID, _ in pairs(zombies) do
 		local queueSize = spGetUnitCommandCount(unitID)
 		if not (queueSize) or not (queueSize > 0) then
-			GG.Zombies.SetZombieBehavior(unitID,"randomWander")
+			GG.Zombies.SetZombieBehavior(unitID)
 		end
 	end
 end
@@ -270,7 +270,7 @@ local function ReInit(reinit)
 			if (teamID == GaiaTeamID) and not (zombies[unitID]) then
 				spGiveOrderToUnit(unitID, CMD_REPEAT, 1, 0)
 				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, 2, 0)
-				GG.Zombies.SetZombieBehavior(unitID,"justGoWander")
+				GG.Zombies.SetZombieBehavior(unitID)
 				zombies[unitID] = true
 				if ZOMBIES_PERMA_SLOW then
 					local maxHealth = select(2, spGetUnitHealth(unitID))
