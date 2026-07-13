@@ -60,6 +60,7 @@ local cmdPosDef = {
 	[CMD_EMBARK]                 = {pos = 13, priority = 5},
 	[CMD_DISEMBARK]              = {pos = 13, priority = 6},
 	[CMD_EXCLUDE_PAD]            = {pos = 13, priority = 7},
+	[CMD_IMMEDIATETAKEOFF]       = {pos = 13, priority = 8},
 
 	-- States
 	[CMD.REPEAT]              = {pos = 1, priority = 1},
