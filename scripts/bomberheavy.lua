@@ -21,6 +21,7 @@ local ball       = piece 'ball'
 local thrust_L, thrust_R = piece('thrust_L', 'thrust_R')
 local wingtip_L, wingtip_R = piece('wingtip_L', 'wingtip_R')
 
+local INLOS = {inlos = true}
 local smokePiece = {base, radiator_L, radiator_R}
 
 --Signal
