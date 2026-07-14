@@ -115,6 +115,8 @@ return { raveparty = {
       craterMult              = 3,
 
       customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         script_reload = [[4]],
         reaim_time = 1,
       },
@@ -156,6 +158,8 @@ return { raveparty = {
       craterMult              = 0.5,
       
       customParams              = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         setunitsonfire = "1",
         burntime = 240,
         burnchance = 1,
@@ -207,6 +211,8 @@ return { raveparty = {
       craterMult              = 1,
 
       customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         script_reload = [[4]],
         reaim_time = 1,
       },
@@ -249,6 +255,8 @@ return { raveparty = {
       craterMult              = 1,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         gatherradius = [[540]],
         smoothradius = [[300]],
         smoothmult   = [[0.9]],
@@ -295,6 +303,8 @@ return { raveparty = {
       craterMult              = 0.5,
 
       customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_shockrifle.png]],
         script_reload = [[4]],
         reaim_time = 1,
       },
@@ -342,6 +352,8 @@ return { raveparty = {
       craterMult              = 0.5,
 
       customparams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
         script_reload = [[4]],

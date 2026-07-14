@@ -78,6 +78,8 @@ return { staticantinuke = {
       craterMult              = 2,
       
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         reaim_time = 15,
         nuke_coverage = 2500,
       },

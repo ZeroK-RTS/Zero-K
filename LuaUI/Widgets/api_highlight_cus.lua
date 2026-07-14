@@ -17,9 +17,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local unitBufferUniformCache = {0}
-local SELECTEDNESS_UNIFORM = 6
-
 local highlightPriory = {}
 local unitHighlights = {}
 
@@ -32,9 +29,8 @@ function WG.SetHighlightPriority(name, priority)
 end
 
 local function ApplyUnitHiglight(unitID, value)
-	if Spring.ValidUnitID(unitID) then
-		unitBufferUniformCache[1] = value
-		gl.SetUnitBufferUniforms(unitID, unitBufferUniformCache, SELECTEDNESS_UNIFORM)
+	if WG.SetUnitHighlight then
+		WG.SetUnitHighlight(unitID, value)
 	end
 end
 
@@ -60,9 +56,8 @@ local function HighlightUnitCus(unitID, name, value)
 end
 
 local function HighlightFeatureCus(featureID, value)
-	unitBufferUniformCache[1] = value
-	if Spring.ValidFeatureID(featureID) then
-		gl.SetFeatureBufferUniforms(featureID, unitBufferUniformCache, SELECTEDNESS_UNIFORM)
+	if WG.SetFeatureHighlight then
+		WG.SetFeatureHighlight(featureID, value)
 	end
 end
 

@@ -8,6 +8,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "energy",
+		icon = [[unitpics/commweapon_heavymachinegun.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],

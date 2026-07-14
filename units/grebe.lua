@@ -84,6 +84,10 @@ return { grebe = {
       soundTrigger            = true,
       sprayangle              = 512,
       turret                  = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },

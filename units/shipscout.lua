@@ -73,6 +73,8 @@ return { shipscout = {
       cylinderTargeting       = 1,
 
       customParams        = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         disarmDamageMult = 5.0,
         disarmDamageOnly = 0,
         disarmTimer      = 3, -- seconds

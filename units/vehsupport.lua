@@ -88,6 +88,8 @@ return { vehsupport = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         light_camera_height = 2000,
         light_radius = 200,
       },

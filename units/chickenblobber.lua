@@ -83,6 +83,8 @@ return { chickenblobber = {
       craterMult              = 0,
             
             customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
 

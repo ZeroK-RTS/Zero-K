@@ -79,6 +79,8 @@ return { hoverarty = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_hparticlebeam.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_color = [[1.25 0.8 1.75]],

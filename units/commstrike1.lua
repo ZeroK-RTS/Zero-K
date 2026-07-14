@@ -127,6 +127,10 @@ return { commstrike1 = {
       thickness               = 5.53,
       tolerance               = 10000,
       turret                  = true,
+      customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
+      },
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },
@@ -167,6 +171,10 @@ return { commstrike1 = {
       thickness               = 3,
       tolerance               = 10000,
       turret                  = true,
+      customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
+      },
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },

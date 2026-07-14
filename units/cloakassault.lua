@@ -77,6 +77,8 @@ return { cloakassault = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_lightninggun.png]],
         extra_damage = 720,
         
         light_camera_height = 1600,

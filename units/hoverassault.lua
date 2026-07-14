@@ -76,6 +76,8 @@ return { hoverassault = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 1600,
         light_color = [[0.7 0.7 2.3]],
         light_radius = 160,

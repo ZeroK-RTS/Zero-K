@@ -79,6 +79,8 @@ return { staticarty = {
       craterMult              = 2,
 
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_hpartillery.png]],
         light_color = [[1.4 0.8 0.3]],
       },
 

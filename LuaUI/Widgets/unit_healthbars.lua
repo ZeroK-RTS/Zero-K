@@ -17,8 +17,8 @@ function widget:GetInfo()
 		author    = "jK",
 		date      = "2009", --2013 May 12
 		license   = "GNU GPL, v2 or later",
-		layer     = -11, -- above gui_selectedunits_gl4, below gui_name_tags 
-		enabled   = true  --  loaded by default?
+		layer     = -11, -- above gui_selectedunits_gl4, below gui_name_tags
+		enabled   = false --  loaded by default?
 	}
 end
 

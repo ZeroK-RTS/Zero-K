@@ -73,6 +73,8 @@ return { vehheavyarty = {
       craterMult              = 2,
 
       customParams        = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         burst = Shared.BURST_RELIABLE,
         reaim_time = 15, -- Some script bug. It does not need fast aim updates anyway.
         light_camera_height = 2500,

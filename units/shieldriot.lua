@@ -96,6 +96,8 @@ return { shieldriot = {
       },
 
       customParams           = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_riotcannon.png]],
         light_radius = 0,
         lups_explodespeed = 1,
         lups_explodelife = 0.6,
@@ -151,6 +153,10 @@ return { shieldriot = {
       turret                  = true,
       weaponAcceleration      = 200,
       weaponTimer             = 0.1,
+      customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
+      },
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 200,
     },
@@ -188,6 +194,10 @@ return { shieldriot = {
       turret                  = true,
       weaponAcceleration      = 200,
       weaponTimer             = 0.1,
+      customParams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
+      },
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 200,
     },

@@ -104,6 +104,8 @@ return { commsupport1 = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         bogus = 1,
       },
 
@@ -151,6 +153,8 @@ return { commsupport1 = {
       },
       
       customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         single_hit = true,
       },
 

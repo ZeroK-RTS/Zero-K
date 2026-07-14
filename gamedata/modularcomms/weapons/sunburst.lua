@@ -8,6 +8,8 @@ local weaponDef = {
 	craterMult              = 6,
 
 	customParams            = {
+		weapon_class = "kinetic",
+		icon = [[unitpics/commweapon_sunburst.png]],
 		is_unit_weapon = 1,
 		slot = [[3]],
 		muzzleEffectFire = [[custom:staticheavyarty_FLARE]],

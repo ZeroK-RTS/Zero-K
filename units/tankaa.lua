@@ -83,6 +83,8 @@ return { tankaa = {
       cylinderTargeting       = 1,
 
       customParams              = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         reaim_time = 1, -- looks silly when rotating otherwise (high turret and body turn rates)
         isaa = [[1]],
         light_radius = 0,

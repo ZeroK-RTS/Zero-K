@@ -66,6 +66,8 @@ return { hovershotgun = {
     craterMult              = 0,
     
     customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
         miscEffectFire = [[custom:RIOT_SHELL_L]],
     },

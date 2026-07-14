@@ -82,6 +82,8 @@ return { jumpassault = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 1000,
         light_color = [[1 1 0.7]],
         light_radius = 150,

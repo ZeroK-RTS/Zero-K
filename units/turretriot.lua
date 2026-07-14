@@ -80,6 +80,8 @@ return { turretriot = {
       craterMult              = 0.3,
 
       customparams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_heavymachinegun.png]],
         light_color = [[0.8 0.76 0.38]],
         light_radius = 180,
         proximity_priority = 5, -- Don't use this unless required as it causes O(N^2) seperation checks per slow update.

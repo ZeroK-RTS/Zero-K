@@ -85,6 +85,8 @@ return { vehriot = {
       craterMult              = 0.5,
 
       customParams            = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
         gatherradius = [[90]],
         smoothradius = [[60]],
         smoothmult   = [[0.08]],

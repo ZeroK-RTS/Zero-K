@@ -87,6 +87,8 @@ return { amphfloater = {
       craterMult              = 2,
 
       customparams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 1.667,
@@ -130,6 +132,8 @@ return { amphfloater = {
       craterMult              = 2,
 
       customparams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_damagefactor = 1.7,
         bogus = 1,
       },

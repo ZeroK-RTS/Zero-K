@@ -93,6 +93,8 @@ return { amphsupport = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_riotcannon.png]],
         light_camera_height = 1400,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 230,
@@ -129,6 +131,8 @@ return { amphsupport = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_riotcannon.png]],
         bogus = 1,
       },
 

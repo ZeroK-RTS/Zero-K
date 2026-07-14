@@ -9,6 +9,8 @@ local weaponDef = {
 	commandFire             = true,
 
 	customParams            = {
+		weapon_class = "burst",
+		icon = [[unitpics/commweapon_multistunner.png]],
 		is_unit_weapon = 1,
 		muzzleEffectShot = [[custom:YELLOW_LIGHTNING_MUZZLE]],
 		slot = [[3]],

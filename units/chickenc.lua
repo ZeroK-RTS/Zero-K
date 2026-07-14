@@ -102,6 +102,10 @@ return { chickenc = {
       sprayAngle              = 1024,
       tolerance               = 5000,
       turret                  = true,
+      customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
+      },
       weaponType              = [[Cannon]],
       waterWeapon             = true,
       weaponVelocity          = 400,

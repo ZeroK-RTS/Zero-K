@@ -74,6 +74,8 @@ return { vehscout = {
       craterMult              = 0,
   
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_slowbeam.png]],
         timeslow_damagefactor = 4,
         
         light_camera_height = 2000,

@@ -81,6 +81,8 @@ return { cloakarty = {
       craterMult              = 0,
 
       customParams        = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_assaultcannon.png]],
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1400,

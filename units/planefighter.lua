@@ -108,6 +108,8 @@ return { planefighter = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_camera_height = 1500,
         light_ground_height = 120,
         light_radius = 100,
@@ -152,6 +154,8 @@ return { planefighter = {
       cylinderTargeting       = 6,
 
       customParams              = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         burst = Shared.BURST_RELIABLE,
 
         isaa = [[1]],

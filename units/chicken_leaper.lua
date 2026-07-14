@@ -100,6 +100,10 @@ return { chicken_leaper = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
+      customParams = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
+      },
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 3000,
     },

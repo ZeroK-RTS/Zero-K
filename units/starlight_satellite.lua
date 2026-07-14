@@ -78,6 +78,8 @@ return { starlight_satellite = {
       craterMult              = 14,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_color = [[5 0.3 6]],
         light_radius = 2000,
         light_beam_start = 0.8,
@@ -132,6 +134,8 @@ return { starlight_satellite = {
       craterMult              = 30,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_color = [[3 0.2 4]],
         light_radius = 1200,
         light_beam_start = 0.8,
@@ -178,6 +182,8 @@ return { starlight_satellite = {
       craterMult              = 0,
 
       customParams              = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
         light_color = [[3 0.2 4]],
         light_radius = 1200,
         light_beam_start = 0.8,

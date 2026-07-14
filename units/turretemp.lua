@@ -74,6 +74,8 @@ return { turretemp = {
       cylinderTargeting       = 0,
       
       customParams            = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_lightninggun.png]],
         light_color = [[0.75 0.75 0.56]],
         light_radius = 220,
       },

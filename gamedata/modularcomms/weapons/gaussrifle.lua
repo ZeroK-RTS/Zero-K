@@ -11,6 +11,8 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams            = {
+		weapon_class = "kinetic",
+		icon = [[unitpics/commweapon_gaussrifle.png]],
 		is_unit_weapon = 1,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:flashmuzzle1]],

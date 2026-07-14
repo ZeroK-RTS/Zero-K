@@ -93,6 +93,8 @@ return { chicken_blimpy = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         bogus = 1,
       },
 
@@ -143,6 +145,10 @@ return { chicken_blimpy = {
       thickness               = 0,
       tolerance               = 10000,
       turret                  = true,
+      customParams = {
+        weapon_class = "energy",
+        icon = [[unitpics/commweapon_beamlaser.png]],
+      },
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 100,
     },
@@ -162,6 +168,8 @@ return { chicken_blimpy = {
       craterMult              = 0,
       
       customparams            = {
+          weapon_class = "explosive",
+          icon = [[unitpics/commweapon_missilelauncher.png]],
           spawns_name = "chicken_dodo",
           spawns_expire = 30,
       },

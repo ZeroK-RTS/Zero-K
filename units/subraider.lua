@@ -82,6 +82,8 @@ return { subraider = {
       cegTag                  = [[torptrailpurple]],
 
       customparams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_torpedo.png]],
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 2,
@@ -133,6 +135,8 @@ return { subraider = {
       craterMult              = 0,
 
       customParams            = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_torpedo.png]],
         bogus = 1,
       },
 

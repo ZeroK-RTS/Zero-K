@@ -143,6 +143,8 @@ return { chickenlandqueen = {
       craterMult              = 2,
       
       customparams            = {
+          weapon_class = "explosive",
+          icon = [[unitpics/commweapon_missilelauncher.png]],
           spawns_name = "chickenc",
           spawns_expire = 0,
       },
@@ -185,6 +187,8 @@ return { chickenlandqueen = {
       craterMult              = 0,
       
       customparams            = {
+          weapon_class = "explosive",
+          icon = [[unitpics/commweapon_missilelauncher.png]],
           spawns_name = "chicken_dodo",
           spawns_expire = 30,
       },
@@ -227,6 +231,8 @@ return { chickenlandqueen = {
       craterMult              = 2,
       
       customparams            = {
+          weapon_class = "explosive",
+          icon = [[unitpics/commweapon_missilelauncher.png]],
           spawns_name = "chicken_tiamat",
           spawns_expire = 0,
       },
@@ -265,6 +271,8 @@ return { chickenlandqueen = {
       cegTag                  = [[queen_trail_fire]],
       
       customParams            = {
+    weapon_class = "burst",
+    icon = [[unitpics/commweapon_napalmgrenade.png]],
     light_radius = 500,
       },
       
@@ -323,6 +331,10 @@ return { chickenlandqueen = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
     },
@@ -336,6 +348,8 @@ return { chickenlandqueen = {
       craterMult              = 0.002,
 
       customParams           = {
+    weapon_class = "kinetic",
+    icon = [[unitpics/commweapon_gaussrifle.png]],
     lups_noshockwave = "1",
       },
       
@@ -375,6 +389,8 @@ return { chickenlandqueen = {
       craterMult              = 0,
       
       customParams            = {
+        weapon_class = "burst",
+        icon = [[unitpics/commweapon_shotgun.png]],
         light_radius = 0,
       },
 

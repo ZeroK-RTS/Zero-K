@@ -62,6 +62,8 @@ return { empmissile = {
       craterMult              = 0,
 
       customparams = {
+        weapon_class = "explosive",
+        icon = [[unitpics/commweapon_missilelauncher.png]],
         burst = Shared.BURST_RELIABLE,
 
         stats_hide_dps = 1, -- one use

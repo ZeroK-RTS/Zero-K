@@ -131,6 +131,10 @@ return { nebula = {
       stages                  = 12,
       tolerance               = 5000,
       turret                  = true,
+      customParams = {
+        weapon_class = "kinetic",
+        icon = [[unitpics/commweapon_gaussrifle.png]],
+      },
       weaponType              = [[Cannon]],
       weaponVelocity          = 1200,
     },
