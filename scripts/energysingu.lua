@@ -18,10 +18,8 @@ local spGetUnitHealth = Spring.GetUnitHealth
 local sin = math.sin
 local max = math.max
 local min = math.min
-local abs = math.abs
-local rand = math.random
 
-local SPRING = 0.18    -- Pull toward center
+local CENTER_FORCE = 0.18    -- Pull toward center
 local DAMPING_BASE = 0.4    -- Removes oscillation
 local DAMPING_MIN = 0.03
 local RATTLE_THRESHOLD = 26  -- elmo range threshold
@@ -44,8 +42,8 @@ local function clamp(val, c)
 end
 
 local function SizeControl()
-	local mag = rand() + 1
-	local period = rand()*20 + 15
+	local mag = math.random() + 1
+	local period = math.random()*20 + 15
 	local t = 0
 
 	while true do
@@ -54,32 +52,31 @@ local function SizeControl()
 		if ImpulseUpdate > 0 then
 			-- cap velocity, 2*distance*acceleration
 			-- just ignore the dampening effect the illusion holds
-			local maxv = 2*(RATTLE_THRESHOLD-deltadistance)*SPRING
+			local maxv = 2*(RATTLE_THRESHOLD-deltadistance)*CENTER_FORCE
 			velX = clamp(velX + pendingImpulseX, maxv)
 			velY = clamp(velY + pendingImpulseY, maxv)
 			velZ = clamp(velZ + pendingImpulseZ, maxv)
 			ImpulseUpdate, pendingImpulseX, pendingImpulseY, pendingImpulseZ = 0, 0, 0, 0
 		end
-		if abs(velX) + abs(velY) + abs(velZ) > 0.1 or abs(offsetX) + abs(offsetY) + abs(offsetZ) > 0.1 then
-			local health, maxhealth = spGetUnitHealth(unitID)
-			local rel_hp = health / maxhealth
-			local DAMPING = max((1.22*rel_hp - 0.22) * DAMPING_BASE, DAMPING_MIN)
-			ax = -SPRING * offsetX - DAMPING * velX
-			ay = -SPRING * offsetY - DAMPING * velY
-			az = -SPRING * offsetZ - DAMPING * velZ
 
-			velX = velX + ax
-			velY = velY + ay
-			velZ = velZ + az
+		local health, maxhealth = spGetUnitHealth(unitID)
+		local rel_hp = health / maxhealth
+		local DAMPING = max((1.22*rel_hp - 0.22) * DAMPING_BASE, DAMPING_MIN)
+		ax = -CENTER_FORCE * offsetX - DAMPING * velX
+		ay = -CENTER_FORCE * offsetY - DAMPING * velY
+		az = -CENTER_FORCE * offsetZ - DAMPING * velZ
 
-			offsetX = offsetX + velX
-			offsetY = offsetY + velY
-			offsetZ = offsetZ + velZ
+		velX = velX + ax
+		velY = velY + ay
+		velZ = velZ + az
 
-			MultiMove(	energyball, x_axis, offsetX, ax*30,
-						energyball, y_axis, offsetY, ay*30,
-						energyball, z_axis, offsetZ, az*30)
-		end
+		offsetX = offsetX + velX
+		offsetY = offsetY + velY
+		offsetZ = offsetZ + velZ
+
+		MultiMove(	energyball, x_axis, offsetX, ax*30,
+					energyball, y_axis, offsetY, ay*30,
+					energyball, z_axis, offsetZ, az*30)
 
 		-- shrink ball to fit arms. Considering ballSwellFactor function and size of unit.
 		ballSize = min(ballSize, 1/14*(deltadistance - 2*RATTLE_THRESHOLD)^2)
@@ -149,7 +146,7 @@ function script.HitByWeapon(hitDirx, hitDirz, weaponDefId, inoutDamage)
 	ImpulseUpdate = inoutDamage
     local impulse = inoutDamage^0.6  - 1
     pendingImpulseX = pendingImpulseX + hitDirx * impulse
-	pendingImpulseY = pendingImpulseY + (1.4* rand() - 0.7) * impulse -- fake y impusle
+	pendingImpulseY = pendingImpulseY + (1.4* math.random() - 0.7) * impulse -- fake y impusle
     pendingImpulseZ = pendingImpulseZ - hitDirz * impulse
     return inoutDamage
 end
