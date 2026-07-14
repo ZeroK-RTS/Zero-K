@@ -1546,7 +1546,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
-		QueueState(name, "overkill_prevention", CMD_PREVENT_OVERKILL, orderArray)
+		QueueState(name, "overkill_prevention0", CMD_PREVENT_OVERKILL, orderArray)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
 		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
 		QueueState(name, "activateWhenBuilt", CMD_WANT_ONOFF, orderArray)
