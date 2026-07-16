@@ -368,9 +368,9 @@ end
 local textConfig = {
 	bottomLeft = {
 		name = "bottomLeft",
-		x = "15%",
+		x = "10%",
 		right = 0,
-		bottom = 2,
+		bottom = "10%",
 		height = 12,
 		fontsize = 12,
 	},
@@ -390,8 +390,8 @@ local textConfig = {
 	},
 	queue = {
 		name = "queue",
-		right = "18%",
-		bottom = "14%",
+		right = "15%",
+		bottom = "15%",
 		align = "right",
 		fontsize = 16,
 		height = 16,
@@ -413,10 +413,10 @@ local buttonLayoutConfig = {
 	},
 	build = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 0,
+			height = "100%",
 			keepAspect = false,
 		},
 		tooltipPrefix = "Build",
@@ -424,10 +424,10 @@ local buttonLayoutConfig = {
 	},
 	buildunit = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 0,
+			height = "100%",
 			keepAspect = false,
 		},
 		tooltipPrefix = "BuildUnit",

@@ -1214,6 +1214,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		objectOverrideFont = WG.GetFont(14),
 		padding = {0, 0, 0, 0},
 		parent = parent,
+		classname = buttonLayout.noDraw and "button_hidden" or nil,
 		preserveChildrenOrder = true,
 		OnClick = {DoClick},
 	}
