@@ -18,7 +18,6 @@ end
 
 local CHAT_PADDING = 100
 local DEFAULT_RESOURCE_BAR_HEIGHT = 116
-local USE_SIZE_FACTOR = false
 
 local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
 local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
@@ -189,7 +188,7 @@ end
 local function GetSelectionIconSize(height)
 	local rows = math.floor((height - 25)/50)
 	local size = math.floor((height - 25)/rows)
-	local iconHeight = math.min(53, size) + 4
+	local iconHeight = math.floor((math.min(53, size) + 4) * (options.bottomPanelScale.value or 1) + 0.5)
 	return iconHeight
 end
 
@@ -632,12 +631,7 @@ local function SetupNewWidgets()
 end
 
 local function GetBottomSizes(screenWidth, screenHeight, parity)
-	
-	local SIZE_FACTOR = 1
-	if screenWidth > 3000 and USE_SIZE_FACTOR then
-		SIZE_FACTOR = 2
-	end
-	SIZE_FACTOR = SIZE_FACTOR*(options.bottomPanelScale.value or 1)
+	local SIZE_FACTOR = (options.bottomPanelScale.value or 1)
 	
 	-- Integral Menu
 	local integralWidth = math.max(350 * SIZE_FACTOR, math.min(500 * SIZE_FACTOR, screenWidth*0.45))
@@ -648,6 +642,8 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 	end
 	WG.SetWidgetOption(integralName, integralPath, "buttonFontScale", SIZE_FACTOR)
 	WG.SetWidgetOption(coreName, corePath, "buttonFontScale", SIZE_FACTOR)
+	WG.SetWidgetOption(selName, selPath, "tooltipScale", SIZE_FACTOR)
+	WG.SetWidgetOption(selName, selPath, "selectionScale", SIZE_FACTOR)
 	
 	if integralWidth < 480 then
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
@@ -730,10 +726,6 @@ local function SetupNewUITop()
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.floor(screenHeight)
 	local SIZE_FACTOR = 1
-	if screenWidth > 3000 and USE_SIZE_FACTOR then
-		SIZE_FACTOR = 2
-	end
-	
 	local sideHeight = 38 * SIZE_FACTOR
 	local flushTop = (screenWidth <= 1650)
 	
