@@ -867,13 +867,12 @@ end
 
   local function ProcessJobs()
     --//note: we have a LIFO stack
-    for j=#jobs,1,-1 do
-      if (jobs[j]() ~= false) then
-        jobs[j] = nil;
-      else
-        break;
-      end;
-    end;
+    if #jobs == 0 then
+      return
+    end
+    if (jobs[#jobs]() ~= false) then
+      jobs[#jobs] = nil;
+    end
 
     --if (#jobs == 0) then
       --gadget.DrawGenesis = nil;
@@ -881,10 +880,20 @@ end
     --end;
   end
 
-
+local lastTime
 function gadget:DrawGenesis()
-  ProcessJobs()
+	if not (jobs and jobs[1]) then
+		return
+	end
+	local currentTime = Spring.GetTimer()
+	if lastTime and Spring.DiffTimers(currentTime, lastTime) < 1 then
+		return
+	end
+	lastTime = currentTime
+	ProcessJobs()
 end
+
+
   local function CreateIcon(udid,uid)
     local cfg = unitConfigs[udid]
 
@@ -1008,6 +1017,15 @@ end
 
 local schemes,resolutions,ratios = {},{},{}
 
+local function AddAllUnit(unitDefID)
+	local ud = UnitDefs[unitDefID]
+	if ud.customParams.dynamic_comm or ud.customParams.level then
+		return false
+	end
+	return true
+end
+
+
   local function BuildIcon(cmd, line, words, playerID)
     if (not Spring.IsCheatingEnabled()) then
       Spring.Echo("Cheating must be enabled");
@@ -1022,8 +1040,11 @@ local schemes,resolutions,ratios = {},{},{}
       Spring.Echo("No such unit found");
       return false;
     end
-
-
+    local skipTo = 1
+    if words[1] == "all" and words[2] then
+      skipTo = math.max(1, tonumber(words[2]) or 1)
+    end
+    
     --//note: we have a LIFO stack
     for _,res in pairs(resolutions) do
       for _,_scheme in pairs(schemes) do
@@ -1036,8 +1057,10 @@ local schemes,resolutions,ratios = {},{},{}
           if (words[1] and words[1]~="all") then
             AddJob( function () AddUnitJob(UnitDefNames[ words[1] ].id); end);
           else
-            for udid=#UnitDefs,1,-1 do
-              AddJob( function () AddUnitJob(udid); end);
+            for udid=#UnitDefs,skipTo,-1 do
+              if AddAllUnit(udid) then
+                AddJob( function () AddUnitJob(udid); end);
+              end
             end;
           end;
 

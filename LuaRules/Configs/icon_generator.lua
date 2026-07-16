@@ -7,8 +7,8 @@
 
 --// Info
 if (info) then
-  local ratios      = {["5to4"]=(4/5)} --{["16to10"]=(10/16), ["1to1"]=(1/1), ["5to4"]=(4/5)} --, ["4to3"]=(3/4)}
-  local resolutions = {{64,64}} --{{128,128},{64,64}}
+  local ratios      = {["9to8"]=(8/9)} --{["16to10"]=(10/16), ["1to1"]=(1/1), ["5to4"]=(4/5)} --, ["4to3"]=(3/4)}
+  local resolutions = {{96,96}} --{{128,128},{64,64}}
   local schemes     = {""}
 
   return schemes,resolutions,ratios
@@ -162,7 +162,7 @@ unitConfigs = {
   },
   [UnitDefNames.staticheavyradar.id] = {
     unfold = true,
-    wait   = 225,
+    wait   = 545,
   },
   [UnitDefNames.energysolar.id] = {
     unfold = true,
@@ -270,6 +270,10 @@ unitConfigs = {
     wait = 60,
   },
   [UnitDefNames.amphsupport.id] = {
+    unfold = true,
+    wait   = 120,
+  },
+  [UnitDefNames.gunshipskirm.id] = {
     unfold = true,
     wait   = 120,
   },
