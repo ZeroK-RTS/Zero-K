@@ -159,7 +159,7 @@ options_order = {
 	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
-	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
+	'tabFontSize', 'buttonFontScale', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
 	'helpwindow', 'commands_reset_default', 'commands_enable_all', 'commands_disable_all', 'states_enable_all', 'states_disable_all',
 }
 
@@ -173,6 +173,23 @@ local function UpdateHolderSizes()
 			statePanel.buttons.SetDimensions(bigStateWidth, bigStateHeight, true)
 		else
 			statePanel.buttons.SetDimensions(smallStateWidth, smallStateHeight, true)
+		end
+	end
+end
+
+local function DeleteAllButtons()
+	if statePanel.buttons then
+		statePanel.buttons.DeleteButtons()
+	end
+	if commandPanels then
+		for i = 1, #commandPanels do
+			local data = commandPanels[i]
+			if data.buttons then
+				data.buttons.DeleteButtons()
+			end
+			if data.queue then
+				data.queue.DeleteButtons()
+			end
 		end
 	end
 end
@@ -380,6 +397,12 @@ options = {
 		name = "Tab Font Size",
 		type = "number",
 		value = 14, min = 8, max = 30, step = 1,
+	},
+	buttonFontScale = {
+		name = "Button Font Scale",
+		type = "number",
+		value = 1, min = 1, max = 3, step = 0.01,
+		OnChange = DeleteAllButtons,
 	},
 	rightPadding = {
 		name = 'Right Padding',
@@ -1317,6 +1340,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				return
 			end
 			local config = textConfig[textPosition]
+			local fontSize = math.floor(config.fontsize*options.buttonFontScale.value + 0.5)
 			textBoxes[textPosition] = Label:New {
 				name = name .. "_text_" .. config.name,
 				x = config.x,
@@ -1325,8 +1349,8 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				bottom = config.bottom,
 				height = config.height,
 				align = config.align,
-				fontsize = config.fontsize,
-				objectOverrideFont = WG.GetFont(config.fontsize),
+				fontsize = fontSize,
+				objectOverrideFont = WG.GetFont(fontSize),
 				caption = text,
 				parent = button,
 			}
@@ -1384,6 +1408,15 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		button:Invalidate()
 		image:Invalidate()
 	end
+	
+	--function externalFunctionsAndData.UpdateFontSize()
+	--	for textPosition, textControl in pairs(textBoxes) do
+	--		local config = textConfig[textPosition]
+	--		textControl.font.size = math.floor(config.fontsize*options.buttonFontScale.value)
+	--		textControl:Invalidate()
+	--	end
+	--end
+	
 	
 	function externalFunctionsAndData.ApplyRadarIcon()
 		local ud = UnitDefs[-cmdID]
@@ -1893,6 +1926,10 @@ local function GetQueuePanel(parent, columns)
 		buttons.ClearOldButtons(selectionIndex)
 	end
 	
+	function externalFunctions.DeleteButtons()
+		buttons.DeleteButtons()
+	end
+
 	function externalFunctions.UpdateBuildProgress()
 		if not factoryUnitID then
 			return
@@ -2044,7 +2081,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	function externalFunctionsAndData.SetFontSize(newSize)
-		button.font.size = newSize
+		button.font = WG.GetFont(newSize)
 		button:Invalidate()
 	end
 	

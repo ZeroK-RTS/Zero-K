@@ -637,18 +637,22 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 	if screenWidth > 3000 and USE_SIZE_FACTOR then
 		SIZE_FACTOR = 2
 	end
+	SIZE_FACTOR = SIZE_FACTOR*(options.bottomPanelScale.value or 1)
 	
 	-- Integral Menu
-	local integralWidth = math.max(350 * SIZE_FACTOR, math.min(500 * SIZE_FACTOR, screenWidth*0.4))
-	local integralHeight = 7*math.floor((math.min(screenHeight/4.5, 200*integralWidth/450))/7)
+	local integralWidth = math.max(350 * SIZE_FACTOR, math.min(500 * SIZE_FACTOR, screenWidth*0.45))
+	local integralHeight = 7*math.floor((math.min(screenHeight/3.5, 200*integralWidth/450))/7)
 	
 	if integralWidth/integralHeight > 2.5 then
 		integralWidth = integralHeight*2.5
 	end
+	WG.SetWidgetOption(integralName, integralPath, "buttonFontScale", SIZE_FACTOR)
+	WG.SetWidgetOption(coreName, corePath, "buttonFontScale", SIZE_FACTOR)
 	
 	if integralWidth < 480 then
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480) * SIZE_FACTOR)
+		
 	else
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14 * SIZE_FACTOR)
@@ -1439,7 +1443,7 @@ end
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'minimapScreenSpace', 'interfacePreset'}
+options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'minimapScreenSpace', 'bottomPanelScale', 'interfacePreset'}
 options = {
 	updateNewDefaults = {
 		name  = "Stay up to date",
@@ -1467,6 +1471,15 @@ options = {
 		name = "Minimap Size",
 		type = "number",
 		value = 0.19, min = 0.05, max = 0.4, step = 0.01,
+		--desc = "Controls minimap size for the New UI presets.", -- supresses value tooltip
+		OnChange = function(self)
+			UpdateInterfacePreset(options.interfacePreset)
+		end,
+	},
+	bottomPanelScale = {
+		name = "Bottom Panel Scale",
+		type = "number",
+		value = 1, min = 1, max = 1.4, step = 0.01,
 		--desc = "Controls minimap size for the New UI presets.", -- supresses value tooltip
 		OnChange = function(self)
 			UpdateInterfacePreset(options.interfacePreset)

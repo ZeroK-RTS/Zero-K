@@ -43,8 +43,11 @@ local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
 local buttonColorHighlight = {0.8, 0.8, 0.2, DEFAULT_IDLE_OPACITY}
 local IMAGE_COLOR_DISABLED = {0.3, 0.3, 0.3, 1}
 
-local stateCommands = {	-- FIXME: is there a better way of doing this?
-  [CMD_WANT_CLOAK] = true,	-- this is the only one that's really needed, since it can occur without user input (when a temporarily decloaked unit recloaks)
+local HOTKEY_FONT_SIZE = 12
+local BOTTOM_RIGHT_FONT_SIZE = 14
+
+local stateCommands = { -- FIXME: is there a better way of doing this?
+  [CMD_WANT_CLOAK] = true, -- this is the only one that's really needed, since it can occur without user input (when a temporarily decloaked unit recloaks)
   [CMD.FIRE_STATE] = true,
   [CMD.MOVE_STATE] = true,
   [CMD_WANT_ONOFF] = true,
@@ -205,7 +208,7 @@ local defaultFacHotkeys = {
 }
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'highlightidleconsincopacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'buttonFontScale', 'background_opacity', 'allowclickthrough', 'highlightidleconsinc', 'highlightidleconsincopacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning', 'leftsideofscreen'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -233,6 +236,16 @@ options = {
 		value = 58,
 		min = 10, max = 200, step = 1,
 		OnChange = OptionsUpdateLayout,
+	},
+	buttonFontScale = {
+		name = "Button Font Scale",
+		type = "number",
+		value = 1, min = 1, max = 3, step = 0.01,
+		OnChange = function ()
+			if buttonList then
+				buttonList.UpdateFontSizes()
+			end
+		end,
 	},
 	background_opacity = {
 		name = "Opacity",
@@ -937,7 +950,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				align = "left",
 				valign = "top",
 				caption = '\255\0\255\0' .. hotkeyText,
-				objectOverrideFont = WG.GetFont(12),
+				objectOverrideFont = WG.GetFont(math.floor(HOTKEY_FONT_SIZE*options.buttonFontScale.value + 0.5)),
 				fontShadow = true,
 				parent = button
 			}
@@ -956,7 +969,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				align = "right",
 				valign = "bottom",
 				caption = caption,
-				objectOverrideFont = WG.GetFont(14),
+				objectOverrideFont = WG.GetFont(math.floor(BOTTOM_RIGHT_FONT_SIZE*options.buttonFontScale.value + 0.5)),
 				autosize = false,
 				fontShadow = true,
 				parent = image,
@@ -1008,6 +1021,17 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	
 	function externalFunctions.GetPosition()
 		return position
+	end
+	
+	function externalFunctions.UpdateFontSize()
+		if hotkeyLabel then
+			hotkeyLabel.font = WG.GetFont(math.floor(HOTKEY_FONT_SIZE*options.buttonFontScale.value + 0.5))
+			hotkeyLabel:Invalidate()
+		end
+		if bottomLabel then
+			bottomLabel.font = WG.GetFont(math.floor(BOTTOM_RIGHT_FONT_SIZE*options.buttonFontScale.value + 0.5)),
+			bottomLabel:Invalidate()
+		end
 	end
 	
 	function externalFunctions.MoveUp(compCategory, compIndex)
@@ -1122,6 +1146,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
 		SetImageVisible = button.SetImageVisible,
+		UpdateFontSize = button.UpdateFontSize,
 	}
 	
 	function externalFunctions.UpdateButton()
@@ -1255,6 +1280,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
 		SetImageVisible = button.SetImageVisible,
+		UpdateFontSize = button.UpdateFontSize,
 	}
 	
 	function externalFunctions.UpdateButton(dt)
@@ -1347,6 +1373,7 @@ local function GetConstructorButton(parent)
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
 		SetImageVisible = button.SetImageVisible,
+		UpdateFontSize = button.UpdateFontSize,
 	}
 	
 	local oldTotal
@@ -1500,6 +1527,13 @@ local function GetButtonListHandler(buttonBackground)
 			button.UpdatePosition()
 		end
 		buttonBackground.UpdateSize(buttonCount)
+	end
+	
+	function externalFunctions.UpdateFontSizes()
+		for i = 1, buttonCount do
+			local button = buttons[buttonList[i]]
+			button.UpdateFontSize()
+		end
 	end
 	
 	function externalFunctions.DeleteButtons()
