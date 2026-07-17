@@ -303,7 +303,7 @@ options_order = {
 	
 	--selected units
 	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'sortByHealth',
-	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar', 'selectionScale',
+	'uniticon_size', 'matchIconSizes', 'manualWeaponReloadBar', 'jumpReloadBar', 'selectionScale',
 	'fancySkinning', 'leftPadding',
 }
 
@@ -456,7 +456,16 @@ options = {
 			if selectionWindow then
 				selectionWindow.SetSelectionIconSize(self.value)
 			end
+			ResetWindows()
 		end,
+	},
+	matchIconSizes = {
+		name="Match Icon Sizes",
+		type='bool',
+		value= true,
+		desc = "Match single selection and tooltip icon size to multi-selection icon size.",
+		path = selPath,
+		OnChange = ResetWindows
 	},
 	manualWeaponReloadBar = {
 		name="Show Unit's Special Weapon Status",
@@ -1502,15 +1511,19 @@ end
 --------------------------------------------------------------------------------
 -- Group buttons window
 
+local function GetMultiIconScale()
+	local width = options.uniticon_size.value - 2 -- Parent padding
+	local height = math.floor(options.uniticon_size.value * 0.79 + 0.5)
+	return width, height
+end
+
 local function GetUnitGroupIconButton(parentControl)
-	
 	local unitDefID
 	local unitID
 	local unitList
 	local unitCount
 	local unitpicBadgeUpdate
 	local healthProp
-	
 	local size = options.uniticon_size.value
 	
 	local holder = Chili.Control:New{
@@ -1535,12 +1548,13 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = holder
 	}
 	
+	local imageWidth, imageHeight = GetMultiIconScale()
 	local unitImage = Chili.Image:New{
 		keepAspect = false,
 		x = 0,
 		y = 0,
-		right = 0,
-		bottom = "20%",
+		width = imageWidth,
+		height = imageHeight,
 		padding = {0,0,0,0},
 		parent = holder,
 		OnClick = {
@@ -2040,7 +2054,7 @@ end
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local selectedUnitID
 	local scale = isTooltipVersion and options.tooltipScale.value or options.selectionScale.value
-	local leftWidth = math.floor(LEFT_WIDTH * scale + 0.5)
+	local leftWidth = math.floor((LEFT_WIDTH - 2) * scale + 2 + 0.5)
 	local rightWidth = math.floor(RIGHT_WIDTH * scale + 0.5)
 	local picHeight = math.floor(PIC_HEIGHT * scale + 0.5)
 	local fontSize = math.floor(IMAGE_FONT * scale + 0.5)
@@ -2049,6 +2063,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local iconSize = math.floor(ICON_SIZE * scale + 0.5)
 	local barSpacing = math.floor(BAR_SPACING * scale + 0.5)
 	local leftSpacing = math.floor(LEFT_SPACE * scale + 0.5)
+	
+	if options.matchIconSizes.value then
+		leftWidth, picHeight = GetMultiIconScale()
+	end
 	
 	local leftPanel = Chili.Control:New{
 		name = "leftPanel",
@@ -2844,7 +2862,6 @@ local function GetSelectionWindow()
 		noClickThrough = not options.allowclickthrough.value,
 		parent = holderWindow
 	}
-	mainPanel.padding[1] = mainPanel.padding[1] + options.leftPadding.value
 	mainPanel:Hide()
 	
 	local singleUnitDisplay = GetSingleUnitInfoPanel(mainPanel, false)
@@ -2913,6 +2930,8 @@ local function GetSelectionWindow()
 	
 	function externalFunctions.SetSkin(className)
 		SetPanelSkin(mainPanel, className)
+		mainPanel.padding[2] = 14
+		mainPanel:Invalidate()
 	end
 	
 	function externalFunctions.SetLeftPadding(padding)

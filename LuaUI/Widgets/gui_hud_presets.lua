@@ -188,7 +188,8 @@ end
 local function GetSelectionIconSize(height)
 	local rows = math.floor((height - 25)/50)
 	local size = math.floor((height - 25)/rows)
-	local iconHeight = math.floor((math.min(53, size) + 4) * (options.bottomPanelScale.value or 1) + 0.5)
+	local scale = (options.bottomPanelScale.value or 1)
+	local iconHeight = math.floor((math.min(53, size) + 4) * scale + (scale - 1)*10 + 0.5)
 	return iconHeight
 end
 
