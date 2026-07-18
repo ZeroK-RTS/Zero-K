@@ -40,6 +40,18 @@ local function readCurrentGhosts()
 	return (Spring.GetConfigInt(GHOSTS_KEY, 1) or 1) ~= 0
 end
 
+local function SendDetail()
+	local detail = options.cabletree_detail.value
+	if detail == "auto" then
+		if Platform.gpuVendor == "ATI" and Platform.osFamily == "Linux" then
+			detail = "off"
+		else
+			detail = "full"
+		end
+	end
+	Spring.SendCommands("luarules cabletree detail " .. detail)
+end
+
 options_path = 'Settings/Graphics/Energy Grid Cables'
 options_order = { 'cabletree_detail', 'cabletree_ghosts' }
 
@@ -54,9 +66,7 @@ options = {
 			{ key = 'off',    name = 'Off (no cables)',        desc = 'Hide the cables/wires entirely.' },
 		},
 		value = 'auto',
-		OnChange = function(self)
-			Spring.SendCommands("luarules cabletree detail " .. self.value)
-		end,
+		OnChange = SendDetail,
 	},
 	cabletree_ghosts = {
 		name  = 'Show cable ghosts in fog',
@@ -78,14 +88,5 @@ function widget:Initialize()
 	options.cabletree_ghosts.value = readCurrentGhosts()
 	-- And ensure the gadget agrees with whatever was saved (idempotent —
 	-- the gadget's setters return early if state is unchanged).
-	local detail = options.cabletree_detail.value
-	if detail == "auto" then
-		if Platform.gpuVendor == "ATI" and Platform.osFamily == "Linux" then
-			detail = "off"
-		else
-			detail = "full"
-		end
-	end
-	Spring.SendCommands("luarules cabletree detail " .. detail)
 	Spring.SendCommands("luarules cabletree ghosts " .. (options.cabletree_ghosts.value and "on" or "off"))
 end
