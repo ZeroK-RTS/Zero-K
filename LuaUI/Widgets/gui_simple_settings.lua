@@ -149,11 +149,12 @@ local optionGenerationTable = {
 		optionName = "cabletree_detail",
 		name = "Energy grid cables",
 		items = {
+			{ key = 'auto',   name = 'Autodetect',             desc = 'Show cables unless you are on Linux with ATI graphics because someone with this combination has yet to take on a simple investigation of graphics bugs.' },
 			{ key = 'full',   name = 'Full (animated flows)',  desc = 'Show overdrive energy flowing through the grid (default).' },
 			{ key = 'noflow', name = 'Static (no flows)',      desc = 'Cheaper: gray pipes only, no per-tick flow reads or shader bubble pass.' },
 			{ key = 'off',    name = 'Off (no cables)',        desc = 'Hide the cables/wires entirely.' },
 		},
-		value = 'full',
+		value = 'auto',
 		type  = 'radioButton',
 		path = "Settings/Graphics",
 	},

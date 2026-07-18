@@ -48,11 +48,12 @@ options = {
 		name  = 'Energy grid cables',
 		type  = 'radioButton',
 		items = {
+			{ key = 'auto',   name = 'Autodetect',             desc = 'Show cables unless you are on Linux with ATI graphics because someone with this combination has yet to take on a simple investigation of graphics bugs.' },
 			{ key = 'full',   name = 'Full (animated flows)',  desc = 'Show overdrive energy flowing through the grid (default).' },
 			{ key = 'noflow', name = 'Static (no flows)',      desc = 'Cheaper: gray pipes only, no per-tick flow reads or shader bubble pass.' },
 			{ key = 'off',    name = 'Off (no cables)',        desc = 'Hide the cables/wires entirely.' },
 		},
-		value = 'full',
+		value = 'auto',
 		OnChange = function(self)
 			Spring.SendCommands("luarules cabletree detail " .. self.value)
 		end,
@@ -77,26 +78,14 @@ function widget:Initialize()
 	options.cabletree_ghosts.value = readCurrentGhosts()
 	-- And ensure the gadget agrees with whatever was saved (idempotent —
 	-- the gadget's setters return early if state is unchanged).
-	Spring.SendCommands("luarules cabletree detail " .. options.cabletree_detail.value)
+	local detail = options.cabletree_detail.value
+	if detail == "auto" then
+		if Platform.gpuVendor == "ATI" and Platform.osFamily == "Linux" then
+			detail = "off"
+		else
+			detail = "full"
+		end
+	end
+	Spring.SendCommands("luarules cabletree detail " .. detail)
 	Spring.SendCommands("luarules cabletree ghosts " .. (options.cabletree_ghosts.value and "on" or "off"))
-end
-
--- Persistence: the gadget owns the truth via Spring.GetConfigInt. We let the
--- widget framework's per-widget config (ZK_data.lua) hold a redundant copy
--- of the value so the radio button shows correctly the moment the menu opens
--- — but on Initialize we override it with the gadget's actual value.
-function widget:GetConfigData()
-	return {
-		value  = options.cabletree_detail.value,
-		ghosts = options.cabletree_ghosts.value,
-	}
-end
-
-function widget:SetConfigData(data)
-	if data and data.value and LEVEL_BY_KEY[data.value] then
-		options.cabletree_detail.value = data.value
-	end
-	if data and type(data.ghosts) == "boolean" then
-		options.cabletree_ghosts.value = data.ghosts
-	end
 end
