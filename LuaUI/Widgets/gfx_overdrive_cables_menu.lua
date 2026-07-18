@@ -44,7 +44,7 @@ local function SendDetail()
 	local detail = options.cabletree_detail.value
 	if detail == "auto" then
 		Spring.Echo("Cable autodetect:", Platform.osFamily, Platform.gpuVendor, Platform.glVendor, Platform.glVersion)
-		if Platform.gpuVendor == "ATI" and Platform.osFamily == "Linux" then
+		if (Platform.gpuVendor == "ATI" or Platform.gpuVendor == "AMD") and Platform.osFamily == "Linux" then
 			detail = "off"
 		else
 			detail = "full"
