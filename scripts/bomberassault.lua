@@ -28,6 +28,19 @@ include "constants.lua"
 local manualTarget_p1 = false
 local manualTarget_p2 = false
 local manualTarget_p3 = false
+local rangeChanged = false
+local THERMITE_BOMB_ID
+local FAKE_WEAPON_ID
+for i = 1, #UnitDefs[unitDefID].weapons do
+	local weaponName = WeaponDefs[UnitDefs[unitDefID].weapons[i].weaponDef].name
+	if weaponName == "bomberassault_thermite_bomb" then
+		THERMITE_BOMB_ID = i
+	end
+	if weaponName == "bomberassault_zeppelin_bomb" then
+		FAKE_WEAPON_ID = i
+	end
+end
+local THERMITE_BOMB_RANGE = Spring.GetUnitWeaponState(unitID, FAKE_WEAPON_ID, "range")
 
 function ReammoComplete()
 	Show(bomb)
@@ -129,10 +142,23 @@ function script.FireWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 1 or (num == manualfireWeapon and not IsManualFireTargetValid()) then
+	if num == 1 or
+		(num == manualfireWeapon and not IsManualFireTargetValid()) or
+		(GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot() then
 		return true
 	end
-	return (GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot()
+	if num == THERMITE_BOMB_ID then
+		rangeChanged = true
+		Spring.SetUnitWeaponState(unitID, THERMITE_BOMB_ID, "range", 9001) -- large so noExplode doesn't remove projectile due to vertical drop distance
+	end
+	return false
+end
+
+function script.EndBurst()
+	if rangeChanged then
+		rangeChanged = false
+		Spring.SetUnitWeaponState(unitID, THERMITE_BOMB_ID, "range", THERMITE_BOMB_RANGE)
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)
