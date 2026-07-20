@@ -66,8 +66,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 local setTargetUnitDefIDs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ((not (ud.canFly and ((ud.isBomber or ud.isBomberAirUnit) and not ud.customParams.can_set_target))) and
-			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
+	if (ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		setTargetUnitDefIDs[i] = true
 	end
 end
