@@ -921,7 +921,7 @@ local function GameFrame(_,n)
 	CleanInvalidUnitFX()
 
 	--// update FXs
-	framesToUpdate = thisGameFrame - lastGameFrame
+	local framesToUpdate = thisGameFrame - lastGameFrame
 	for _,partFx in pairs(particles) do
 		if (n>=partFx.dieGameFrame) then
 			--// lifetime ended

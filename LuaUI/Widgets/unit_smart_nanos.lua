@@ -26,23 +26,23 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local GetUnitDefID        = Spring.GetUnitDefID
-local GetAllUnits         = Spring.GetAllUnits
-local GetMyTeamID         = Spring.GetMyTeamID
-local GetUnitNearestEnemy = Spring.GetUnitNearestEnemy
-local GiveOrderToUnit     = Spring.GiveOrderToUnit
-local GetUnitHealth       = Spring.GetUnitHealth
-local GetUnitsInCylinder  = Spring.GetUnitsInCylinder
-local GetUnitPosition     = Spring.GetUnitPosition
-local GetUnitCommandCount = Spring.GetUnitCommandCount
-local GetFeatureDefID     = Spring.GetFeatureDefID
-local GetFeatureResources = Spring.GetFeatureResources
-local AreTeamsAllied      = Spring.AreTeamsAllied
-local GetFeaturePosition  = Spring.GetFeaturePosition
-local GetGameSeconds      = Spring.GetGameSeconds
-local GetSelectedUnits    = Spring.GetSelectedUnits
-local GetUnitTeam         = Spring.GetUnitTeam
-local GetTeamResources    = Spring.GetTeamResources
+local GetUnitDefID            = Spring.GetUnitDefID
+local GetAllUnits             = Spring.GetAllUnits
+local GetMyTeamID             = Spring.GetMyTeamID
+local GetUnitNearestEnemy     = Spring.GetUnitNearestEnemy
+local GiveOrderToUnit         = Spring.GiveOrderToUnit
+local GetUnitHealth           = Spring.GetUnitHealth
+local GetUnitsInCylinder      = Spring.GetUnitsInCylinder
+local GetUnitPosition         = Spring.GetUnitPosition
+local GetUnitCommandCount     = Spring.GetUnitCommandCount
+local GetFeatureDefID         = Spring.GetFeatureDefID
+local GetFeatureResources     = Spring.GetFeatureResources
+local AreTeamsAllied          = Spring.AreTeamsAllied
+local GetFeaturePosition      = Spring.GetFeaturePosition
+local GetGameSeconds          = Spring.GetGameSeconds
+local GetSelectedUnits        = Spring.GetSelectedUnits
+local GetUnitTeam             = Spring.GetUnitTeam
+local GetTeamResources        = Spring.GetTeamResources
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ function widget:CommandNotify(id, params, options)
 	end
 	
 	if (id == CMD.RECLAIM) then
-		targetUnit = params[1]
+		local targetUnit = params[1]
 		teamUnits[targetUnit] = nil
 		for unitID,unitDefs in pairs(nanoTurrets) do
 			local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
@@ -170,7 +170,7 @@ function widget:CommandNotify(id, params, options)
 	end
 	
 	if (id == CMD.REPAIR) then
-		targetUnit = params[1]
+		local targetUnit = params[1]
 		if (not teamUnits[targetUnit]) and (not allyUnits[targetUnit]) and (not nanoTurrets[targetUnit])
 				and (not buildUnits[targetUnit]) and (GetUnitTeam(targetUnit) == myTeamID) then
 			widget:UnitFinished(targetUnit, GetUnitDefID(targetUnit), myTeamID)
