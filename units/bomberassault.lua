@@ -124,6 +124,7 @@ return { bomberassault = {
         stats_hide_damage     = 1,
         damage_vs_feature     = 20, -- Doesn't ramp for technical reasons, so this is here to deal some reasonable damage.
         truerange             = 180,
+        fakerange             = 9001, -- range extention to not disappear past trueraange (noExplode interaction)
 
         thermite_frames       = 900,
         thermite_dps_start    = 0,
@@ -152,7 +153,7 @@ return { bomberassault = {
       myGravity               = 0.08,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 180, -- dynamically updated in LUS so noExplode doesn't remove projectile due to vertical drop distance
+      range                   = 180, -- overridden by customparams.truerange
       reloadtime              = 2,
       size                    = 0.01,
       soundStart              = [[explosion/ex_large9]],
