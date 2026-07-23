@@ -28,6 +28,19 @@ include "constants.lua"
 local manualTarget_p1 = false
 local manualTarget_p2 = false
 local manualTarget_p3 = false
+local rangeChanged = false
+local THERMITE_NUM, FAKE_GUN_NUM, THERMITE_TRUERANGE, THERMITE_ALT_RANGE
+for i = 1, #UnitDefs[unitDefID].weapons do
+	local weapondef = WeaponDefs[UnitDefs[unitDefID].weapons[i].weaponDef]
+	if weapondef == WeaponDefNames["bomberassault_thermite_bomb"] then
+		THERMITE_NUM = i
+		THERMITE_TRUERANGE = weapondef.customParams.truerange
+		THERMITE_ALT_RANGE = weapondef.customParams.fakerange
+	end
+	if weapondef == WeaponDefNames["bomberassault_zeppelin_bomb"] then
+		FAKE_GUN_NUM = i
+	end
+end
 
 function ReammoComplete()
 	Show(bomb)
@@ -129,10 +142,24 @@ function script.FireWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 1 or (num == manualfireWeapon and not IsManualFireTargetValid()) then
+	if num == FAKE_GUN_NUM or
+		(num == manualfireWeapon and not IsManualFireTargetValid()) or
+		(GetUnitValue(COB.CRASHING) == 1) or
+		RearmBlockShot() then
 		return true
 	end
-	return (GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot()
+	if num == THERMITE_NUM then
+		rangeChanged = true
+		Spring.SetUnitWeaponState(unitID, THERMITE_NUM, "range", THERMITE_ALT_RANGE)
+	end
+	return false
+end
+
+function script.EndBurst()
+	if rangeChanged then
+		rangeChanged = false
+		Spring.SetUnitWeaponState(unitID, THERMITE_NUM, "range", THERMITE_TRUERANGE)
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)
