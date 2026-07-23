@@ -26,23 +26,24 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local GetUnitDefID        = Spring.GetUnitDefID
-local GetAllUnits         = Spring.GetAllUnits
-local GetMyTeamID         = Spring.GetMyTeamID
-local GetUnitNearestEnemy = Spring.GetUnitNearestEnemy
-local GiveOrderToUnit     = Spring.GiveOrderToUnit
-local GetUnitHealth       = Spring.GetUnitHealth
-local GetUnitsInCylinder  = Spring.GetUnitsInCylinder
-local GetUnitPosition     = Spring.GetUnitPosition
-local GetUnitCommandCount = Spring.GetUnitCommandCount
-local GetFeatureDefID     = Spring.GetFeatureDefID
-local GetFeatureResources = Spring.GetFeatureResources
-local AreTeamsAllied      = Spring.AreTeamsAllied
-local GetFeaturePosition  = Spring.GetFeaturePosition
-local GetGameSeconds      = Spring.GetGameSeconds
-local GetSelectedUnits    = Spring.GetSelectedUnits
-local GetUnitTeam         = Spring.GetUnitTeam
-local GetTeamResources    = Spring.GetTeamResources
+local GetUnitDefID            = Spring.GetUnitDefID
+local GetAllUnits             = Spring.GetAllUnits
+local GetMyTeamID             = Spring.GetMyTeamID
+local GetUnitNearestEnemy     = Spring.GetUnitNearestEnemy
+local GiveOrderToUnit         = Spring.GiveOrderToUnit
+local GetUnitHealth           = Spring.GetUnitHealth
+local GetUnitsInCylinder      = Spring.GetUnitsInCylinder
+local GetUnitPosition         = Spring.GetUnitPosition
+local GetUnitCommandCount     = Spring.GetUnitCommandCount
+local GetFeatureDefID         = Spring.GetFeatureDefID
+local GetFeatureResources     = Spring.GetFeatureResources
+local AreTeamsAllied          = Spring.AreTeamsAllied
+local GetFeaturePosition      = Spring.GetFeaturePosition
+local GetGameSeconds          = Spring.GetGameSeconds
+local GetSelectedUnits        = Spring.GetSelectedUnits
+local GetUnitTeam             = Spring.GetUnitTeam
+local GetTeamResources        = Spring.GetTeamResources
+local spGetFeaturesInCylinder = Spring.GetFeaturesInCylinder
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -155,7 +156,7 @@ function widget:CommandNotify(id, params, options)
 	end
 	
 	if (id == CMD.RECLAIM) then
-		targetUnit = params[1]
+		local targetUnit = params[1]
 		teamUnits[targetUnit] = nil
 		for unitID,unitDefs in pairs(nanoTurrets) do
 			local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
@@ -170,7 +171,7 @@ function widget:CommandNotify(id, params, options)
 	end
 	
 	if (id == CMD.REPAIR) then
-		targetUnit = params[1]
+		local targetUnit = params[1]
 		if (not teamUnits[targetUnit]) and (not allyUnits[targetUnit]) and (not nanoTurrets[targetUnit])
 				and (not buildUnits[targetUnit]) and (GetUnitTeam(targetUnit) == myTeamID) then
 			widget:UnitFinished(targetUnit, GetUnitDefID(targetUnit), myTeamID)
@@ -303,40 +304,20 @@ function widget:Update(deltaTime)
 					nanoTurrets[unitID].damaged = false
 				end
 				
-				local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
+				local prevCommand, _, _, prevUnit = Spring.GetUnitCurrentCommand(unitID) -- CMDID, _,_, Commandparam
 				local cQueueCount = GetUnitCommandCount(unitID)
-		 
+
 				local commandMe = false
-			
-				local prevCommand = nil
-				local prevUnit = nil
-			
+
 				if (cQueueCount == 0) then
 					commandMe = true
 					nanoTurrets[unitID].auto = false
+				elseif (prevCommand == CMD.PATROL) and (cQueueCount <= 4) then
+					commandMe = true
+					nanoTurrets[unitID].auto = false
 				else
-					if (cmdID == CMD.PATROL) and (cQueueCount <= 4) then
-						commandMe = true
-						nanoTurrets[unitID].auto = false
-					end
-					
-					if nanoTurrets[unitID].auto then
-						if (cmdID == CMD.RECLAIM) then
-							prevCommand = CMD.RECLAIM
-							prevUnit = cmdParam
-							if prevUnit < Game.maxUnits then
-								local targetDefID = GetUnitDefID(prevUnit)
-								if (targetDefID ~= nil) and UnitDefs[targetDefID].canMove then
-									local uX, _, uZ = GetUnitPosition(prevUnit)
-									if (getDistance(unitDefs.posX, unitDefs.posZ, uX, uZ) > unitDefs.buildDistanceSqr) then
-										commandMe = true
-									end
-								end
-							end
-						end
-						if (cmdID == CMD.REPAIR) then
-							prevCommand = CMD.REPAIR
-							prevUnit = cmdParam
+					if (prevCommand == CMD.RECLAIM) then
+						if prevUnit < Game.maxUnits then
 							local targetDefID = GetUnitDefID(prevUnit)
 							if (targetDefID ~= nil) and UnitDefs[targetDefID].canMove then
 								local uX, _, uZ = GetUnitPosition(prevUnit)
@@ -345,10 +326,19 @@ function widget:Update(deltaTime)
 								end
 							end
 						end
-					
-						if ((unitDefs.timeCounter + UPDATE_TICK) < GetGameSeconds()) then
-							commandMe = true
+					end
+					if (prevCommand == CMD.REPAIR) then
+						local targetDefID = GetUnitDefID(prevUnit)
+						if (targetDefID ~= nil) and UnitDefs[targetDefID].canMove then
+							local uX, _, uZ = GetUnitPosition(prevUnit)
+							if (getDistance(unitDefs.posX, unitDefs.posZ, uX, uZ) > unitDefs.buildDistanceSqr) then
+								commandMe = true
+							end
 						end
+					end
+
+					if ((unitDefs.timeCounter + UPDATE_TICK) < GetGameSeconds()) then
+						commandMe = true
 					end
 				end
 				
@@ -358,16 +348,13 @@ function widget:Update(deltaTime)
 					local ordered = false
 					
 					local nearUnits = GetUnitsInCylinder(unitDefs.posX,unitDefs.posZ,unitDefs.buildDistance)
-					local nearFeatures = Spring.GetFeaturesInRectangle(
-						unitDefs.posX - (unitDefs.buildDistance+75), unitDefs.posZ - (unitDefs.buildDistance+75),
-						unitDefs.posX + (unitDefs.buildDistance+75), unitDefs.posZ + (unitDefs.buildDistance+75)
-					)
+					local nearFeatures = spGetFeaturesInCylinder(unitDefs.posX, unitDefs.posZ, unitDefs.buildDistance)
 					
 					if (nearUnits ~= nil) and (nearFeatures ~= nil) then
 					
 						for _,nearUnitID in pairs(nearUnits) do
 							if nanoTurrets[nearUnitID] and nanoTurrets[nearUnitID].damaged and (unitID ~= nearUnitID) then
-								if (prevCommand ~= CMD.REPAIR) or (prevUnit ~= bestUnit) then
+								if (prevCommand ~= CMD.REPAIR) then
 									orderQueue[unitID] = {1, CMD.REPAIR, nearUnitID}
 								end
 								ordered = true
@@ -381,9 +368,9 @@ function widget:Update(deltaTime)
 							local nextUnit = nil
 							for _,nearUnitID in pairs(nearUnits) do
 								if (teamUnits[nearUnitID] and teamUnits[nearUnitID].damaged) then
-									if (nextUnit == nil) then nextUnit = nearUnitID end
-										if (#UnitDefs[GetUnitDefID(nearUnitID)].weapons > 0) then
-											if (teamUnits[nearUnitID].rHealth < bestStat) then
+									nextUnit = nextUnit or nearUnitID
+									if (#UnitDefs[GetUnitDefID(nearUnitID)].weapons > 0) then
+										if (teamUnits[nearUnitID].rHealth < bestStat) then
 											bestUnit = nearUnitID
 											bestStat = teamUnits[nearUnitID].rHealth
 										end
@@ -469,8 +456,8 @@ function widget:Update(deltaTime)
 					end
 					
 					if (nanoTurrets[unitID].auto) and (not ordered) and (cQueueCount > 0) and
-							((cmdID == CMD.REPAIR) or (cmdID == CMD.RECLAIM)) then
-						orderQueue[unitID] = {0, cmdID, cmdParam}
+							((prevCommand == CMD.REPAIR) or (prevCommand == CMD.RECLAIM)) then
+						orderQueue[unitID] = {0, prevCommand, prevUnit}
 					elseif ordered then
 						nanoTurrets[unitID].auto = true
 					end
