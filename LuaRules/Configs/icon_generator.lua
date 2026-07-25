@@ -36,7 +36,7 @@ RATE_LIMIT = 0.035
 --// render options textured
 textured = (scheme~="bw")
 lightAmbient = {1,1,1}
-lightDiffuse = {0.35,0.35,0.35}
+lightDiffuse = {0.42,0.42,0.42}
 lightPos     = {-0.2,0.4,0.5}
 
 --// Ambient Occlusion & Outline settings
@@ -123,7 +123,7 @@ unitConfigs = {
   },
   [UnitDefNames.energywind.id] = {
     clamp = 0,
-	rot = 180,
+	rot = 240
   },
   [UnitDefNames.turretaafar.id] = {
     clamp = 0,
