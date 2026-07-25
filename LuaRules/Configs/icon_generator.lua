@@ -7,7 +7,10 @@
 
 --// Info
 if (info) then
-  local ratios      = {["9to8"]=(8/9)} --{["16to10"]=(10/16), ["1to1"]=(1/1), ["5to4"]=(4/5)} --, ["4to3"]=(3/4)}
+  local ratios      = {
+		["square"]=(0.95),
+		["11to9"]=(9/11),
+	} --{["16to10"]=(10/16), ["1to1"]=(1/1), ["5to4"]=(4/5)} --, ["4to3"]=(3/4)}
   local resolutions = {{96,96}} --{{128,128},{64,64}}
   local schemes     = {""}
 
@@ -21,27 +24,27 @@ end
 imageExt = ".png"
 
 --// render into a fbo in 4x size
-renderScale = 3
+renderScale = 4
 
 teamColor = {0.05, 0.96, 0.95}
 
-RATE_LIMIT = 0.4
+RATE_LIMIT = 0.035
 
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
 --// render options textured
 textured = (scheme~="bw")
-lightAmbient = {1.2,1.2,1.2}
-lightDiffuse = {0.37,0.37,0.37}
+lightAmbient = {1,1,1}
+lightDiffuse = {0.35,0.35,0.35}
 lightPos     = {-0.2,0.4,0.5}
 
 --// Ambient Occlusion & Outline settings
-aoPower     = ((scheme=="bw") and 1.5) or 1.5
-aoContrast  = ((scheme=="bw") and 2.5) or 2.4
-aoTolerance = 0
-olContrast  = ((scheme=="bw") and 5) or 15
-olTolerance = 0
+aoPower     = ((scheme=="bw") and 1.5) or 1.6
+aoContrast  = ((scheme=="bw") and 2.5) or 3.1
+aoTolerance = 0.01
+olContrast  = ((scheme=="bw") and 5) or 17
+olTolerance = 0.06
 
 --// halo (white)
 halo  = false --(scheme~="bw")
@@ -65,8 +68,10 @@ halo  = false --(scheme~="bw")
 --//border := free space around the final icon (in percent/100)
 --//empty  := empty model (used for fake units in CA)
 --//attempts := number of tries to scale the model to fit in the icon
+--//inBatch := commanders are excluded from "buildicons all" by default. This includes them.
+--//saveNames : A list of file names to save the icon to, instead of the default file name.
 
-defaults = {border=0.053, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
+defaults = {border=0.06, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
 
 
 -----------------------------------------------------------------------
@@ -115,6 +120,16 @@ unitConfigs = {
   },
   [UnitDefNames.spiderscout.id] = {
     border = 0.125,
+  },
+  [UnitDefNames.energywind.id] = {
+    clamp = 0,
+	rot = 150,
+  },
+  [UnitDefNames.turretaafar.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.turretaaflak.id] = {
+    clamp = 0,
   },
 
 
@@ -168,6 +183,7 @@ unitConfigs = {
   },
   [UnitDefNames.energysolar.id] = {
     unfold = true,
+    dimensionOverride = {maxy = 100},
   },
   [UnitDefNames.cloaksnipe.id] = {
 --    unfold = true,
@@ -277,8 +293,61 @@ unitConfigs = {
   },
   [UnitDefNames.gunshipskirm.id] = {
     unfold = true,
-    wait   = 120,
+    move   = true,
+    wait   = 150,
   },
+  [UnitDefNames.planeheavyfighter.id] = {
+    unfold = true,
+    move   = true,
+    wait   = 150,
+  },
+  [UnitDefNames.dynassault1.id] = {
+    inBatch = true,
+    saveNames = {"commassault", "benzcom", "guardian"},
+  },
+  [UnitDefNames.dynknight1.id] = {
+    inBatch = true,
+    saveNames = {"cremcom"},
+  },
+  [UnitDefNames.dynrecon1.id] = {
+    inBatch = true,
+    saveNames = {"commrecon", "recon"},
+  },
+  [UnitDefNames.dynstrike1.id] = {
+    inBatch = true,
+    saveNames = {"commstrike", "strike"},
+  },
+  [UnitDefNames.dynsupport1.id] = {
+    inBatch = true,
+    saveNames = {"commsupport", "engineer"},
+  },
+  [UnitDefNames.corcom1.id] = {
+    inBatch = true,
+    saveNames = {"corcom", "commbattle"},
+  },
+  [UnitDefNames.armcom1.id] = {
+    inBatch = true,
+    saveNames = {"armcom"},
+  },
+  [UnitDefNames.pw_hq_attacker.id] = {
+    saveNames = {"pw_hq"},
+  },
+  [UnitDefNames.pw_hq_defender_extra.id] = {
+    saveNames = {"pw_hq_extra"},
+  },
+  [UnitDefNames.pw_estorage2.id] = {
+    saveNames = {"pw_estorage2", "pw_wormhole2_old"},
+  },
+  [UnitDefNames.starlight_satellite.id] = {
+    saveNames = {"satellite"},
+  },
+  [UnitDefNames.roost.id] = {
+    saveNames = {"roost", "nest"},
+  },
+  [UnitDefNames.pw_bomberfac.id] = {
+    saveNames = {"pw_bombercontrol", "pw_dropdepot"},
+  },
+  
 }
 
 for i=1,#UnitDefs do

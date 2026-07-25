@@ -71,6 +71,9 @@ local function CanTeamSpawnCommander(teamID, commsByTeam, commsByAllyTeam)
 	if not myShare then
 		return false
 	end
+	if ((not totalTeamShare) or 0) == 0 or ((not allyTeamLimit) or 0) == 0 then
+		return false
+	end
 	myShare = myShare * allyTeamLimit / totalTeamShare
 	-- myShare can be fractional if there are resigns, so it is first-come first served
 	--Spring.Echo("myShare", myShare, (commsByAllyTeam[allyTeamID] or 0), "allyTeamLimit", allyTeamLimit)
