@@ -157,7 +157,7 @@ options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
 	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
-	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
+	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'small_icons', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'buttonFontScale', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
 	'helpwindow', 'commands_reset_default', 'commands_enable_all', 'commands_disable_all', 'states_enable_all', 'states_disable_all',
@@ -174,6 +174,47 @@ local function UpdateHolderSizes()
 		else
 			statePanel.buttons.SetDimensions(smallStateWidth, smallStateHeight, true)
 		end
+	end
+end
+
+local function SetSmallIcons(wantSmall)
+	-- This function uses a bunch of pass by reference
+	if wantSmall then
+		textConfig.bottomLeft.x = "15%"
+		textConfig.bottomLeft.bottom = 2
+		buttonLayoutConfig.build.image = {
+			x = "5%",
+			y = "4%",
+			right = "5%",
+			bottom = 12,
+			keepAspect = false,
+			rectangleAspect = true,
+		}
+		buttonLayoutConfig.buildunit.image = {
+			x = "5%",
+			y = "4%",
+			right = "5%",
+			bottom = 12,
+			keepAspect = false,
+			rectangleAspect = true,
+		}
+	else
+		textConfig.bottomLeft.x = "10%"
+		textConfig.bottomLeft.bottom = "10%"
+		buttonLayoutConfig.build.image = {
+			x = 0,
+			y = 0,
+			right = 0,
+			height = "100%",
+			keepAspect = false,
+		}
+		buttonLayoutConfig.buildunit.image = {
+			x = 0,
+			y = 0,
+			right = 0,
+			height = "100%",
+			keepAspect = false,
+		}
 	end
 end
 
@@ -339,6 +380,15 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+	},
+	small_icons = {
+		name = 'Small construction icons',
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetSmallIcons(self.value)
+			DeleteAllButtons()
+		end
 	},
 	applyCustomGrid = {
 		name = "Apply Changes",
@@ -1661,7 +1711,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
-			local texture = WG.GetSquareBuildTexture(ud) or ("#" .. -cmdID)
+			local texture = ((not buttonLayout.image.rectangleAspect) and WG.GetSquareBuildTexture(ud)) or ("#" .. -cmdID)
 			SetImageTexture(texture, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(ud))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
