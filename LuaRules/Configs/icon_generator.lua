@@ -123,12 +123,15 @@ unitConfigs = {
   },
   [UnitDefNames.energywind.id] = {
     clamp = 0,
-	rot = 150,
+	rot = 180,
   },
   [UnitDefNames.turretaafar.id] = {
     clamp = 0,
   },
   [UnitDefNames.turretaaflak.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.turretlaser.id] = {
     clamp = 0,
   },
 
