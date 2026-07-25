@@ -21,24 +21,26 @@ end
 imageExt = ".png"
 
 --// render into a fbo in 4x size
-renderScale = 4
+renderScale = 3
 
 teamColor = {0.05, 0.96, 0.95}
+
+RATE_LIMIT = 0.4
 
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
 --// render options textured
 textured = (scheme~="bw")
-lightAmbient = {1.1,1.1,1.1}
-lightDiffuse = {0.4,0.4,0.4}
+lightAmbient = {1.2,1.2,1.2}
+lightDiffuse = {0.37,0.37,0.37}
 lightPos     = {-0.2,0.4,0.5}
 
 --// Ambient Occlusion & Outline settings
-aoPower     = ((scheme=="bw") and 1.5) or 1
-aoContrast  = ((scheme=="bw") and 2.5) or 1
+aoPower     = ((scheme=="bw") and 1.5) or 1.5
+aoContrast  = ((scheme=="bw") and 2.5) or 2.4
 aoTolerance = 0
-olContrast  = ((scheme=="bw") and 5) or 10
+olContrast  = ((scheme=="bw") and 5) or 15
 olTolerance = 0
 
 --// halo (white)
@@ -64,7 +66,7 @@ halo  = false --(scheme~="bw")
 --//empty  := empty model (used for fake units in CA)
 --//attempts := number of tries to scale the model to fit in the icon
 
-defaults = {border=0.05, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
+defaults = {border=0.053, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
 
 
 -----------------------------------------------------------------------

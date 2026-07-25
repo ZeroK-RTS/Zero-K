@@ -866,6 +866,11 @@ end
   local jobsInSynced = 0
 
   local function ProcessJobs()
+	local currentTime = Spring.GetTimer()
+	if lastTime and Spring.DiffTimers(currentTime, lastTime) < 0.5 then
+		return
+	end
+	lastTime = currentTime
     --//note: we have a LIFO stack
     if #jobs == 0 then
       return
@@ -885,11 +890,6 @@ function gadget:DrawGenesis()
 	if not (jobs and jobs[1]) then
 		return
 	end
-	local currentTime = Spring.GetTimer()
-	if lastTime and Spring.DiffTimers(currentTime, lastTime) < 1 then
-		return
-	end
-	lastTime = currentTime
 	ProcessJobs()
 end
 
