@@ -139,6 +139,14 @@ unitConfigs = {
   [UnitDefNames.plategunship.id] = {
     clamp = 0,
   },
+  [UnitDefNames.factorycloak.id] = {
+    clamp = 0,
+    unfold = true,
+    wait   = 120,
+  },
+  [UnitDefNames.platecloak.id] = {
+    clamp = 0,
+  },
 
 
   [UnitDefNames.bomberheavy.id] = {
