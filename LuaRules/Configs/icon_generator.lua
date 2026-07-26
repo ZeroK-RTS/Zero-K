@@ -35,13 +35,13 @@ RATE_LIMIT = 0.035
 --// render options textured
 textured = (scheme~="bw")
 lightAmbient = {1,1,1}
-lightDiffuse = {0.42,0.42,0.42}
+lightDiffuse = {0.4,0.4,0.4}
 lightPos     = {-0.2,0.4,0.5}
 
 --// Ambient Occlusion & Outline settings
 aoPower     = ((scheme=="bw") and 1.5) or 1.6
-aoContrast  = ((scheme=="bw") and 2.5) or 3.1
-aoTolerance = 0.01
+aoContrast  = ((scheme=="bw") and 2.5) or 3.15
+aoTolerance = 0.011
 olContrast  = ((scheme=="bw") and 5) or 15
 olTolerance = 0.06
 
@@ -216,7 +216,7 @@ unitConfigs = {
   [UnitDefNames.staticmex.id] = {
     clamp  = 0,
     unfold = true,
-    wait   = 600,
+    wait   = 100,
   },
   [UnitDefNames.turretheavy.id] = {
     unfold = true,
