@@ -67,13 +67,14 @@ function Image:DrawControl()
       _DrawTextureAspect(self.x,self.y,self.width,self.height, tw,th, self.flip)
     end
   else
+    local x1, y1, x2, y2 = math.floor(self.x), math.floor(self.y), math.ceil(self.x+self.width), math.ceil(self.y+self.height)
     if (self.file2) then
       TextureHandler.LoadTexture(0,self.file2,self)
-      gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip2)
+      gl.TexRect(x1,y1,x2,y2,false,self.flip2)
     end
     if (self.file) then
       TextureHandler.LoadTexture(0,self.file,self)
-      gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip)
+      gl.TexRect(x1,y1,x2,y2,false,self.flip)
     end
   end
   gl.Texture(0,false)

@@ -8,10 +8,10 @@
 --// Info
 if (info) then
   local ratios      = {
-		["square"]=(1),
+		--["square"]=(1),
 		["11to9"]=(9/11),
-	} --{["16to10"]=(10/16), ["1to1"]=(1/1), ["5to4"]=(4/5)} --, ["4to3"]=(3/4)}
-  local resolutions = {{96,96}} --{{128,128},{64,64}}
+	}
+  local resolutions = {{96, 96}}
   local schemes     = {""}
 
   return schemes,resolutions,ratios
@@ -25,7 +25,6 @@ imageExt = ".png"
 
 --// render into a fbo in 4x size
 renderScale = 4
-
 teamColor = {0.05, 0.96, 0.95}
 
 RATE_LIMIT = 0.035

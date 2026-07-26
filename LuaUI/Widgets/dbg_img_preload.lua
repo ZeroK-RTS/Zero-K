@@ -40,8 +40,8 @@ end
 
 function widget:Initialize()
 	if Spring.GetGameFrame() > 0 then
-	      Spring.Log(widget:GetInfo().name, LOG.INFO, "Game has started. Widget removed.")
-	      widgetHandler:RemoveWidget()
+		Spring.Log(widget:GetInfo().name, LOG.INFO, "Game has started. Widget removed.")
+		widgetHandler:RemoveWidget()
 	end
 end
 
@@ -49,7 +49,7 @@ function widget:DrawGenesis()
 	if files == nil then
 		files = {}
 		AddDir("LuaUI/Images/commands/Bold")
-		AddDir("unitpics_square")
+		AddDir("unitpics_9_11")
 		AddDir("LuaUI/Images/commands/states")
 		AddDir("LuaUI/Widgets/chili/Skins/Evolved")
 		AddDir("icons")
