@@ -8,7 +8,7 @@
 --// Info
 if (info) then
   local ratios      = {
-		--["square"]=(1),
+		["square"]=(1),
 		["11to9"]=(9/11),
 	}
   local resolutions = {{96, 96}}
@@ -173,6 +173,11 @@ unitConfigs = {
     unfold = true,
     attack = true,
     wait   = 120,
+   },
+  [UnitDefNames.jumpskirm.id] = {
+    unfold = true,
+    attack = true,
+    wait   = 20,
    },
   [UnitDefNames.turretgauss.id] = {
     unfold = true,
