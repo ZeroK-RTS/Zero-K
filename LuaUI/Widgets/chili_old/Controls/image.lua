@@ -45,7 +45,7 @@ local function _DrawTextureAspect(x,y,w,h ,tw,th, flipy)
   local bottom = math.ceil(y+h)
   x = math.ceil(x)
   y = math.ceil(y)
-
+  
   gl.TexRect(x,y,right,bottom,false,flipy)
 end
 

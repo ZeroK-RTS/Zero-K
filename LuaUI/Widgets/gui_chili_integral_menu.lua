@@ -1711,7 +1711,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
-			local texture = ((not buttonLayout.image.rectangleAspect) and WG.GetSquareBuildTexture(ud)) or ("#" .. -cmdID)
+			local texture = ((not buttonLayout.image.rectangleAspect) and WG.GetSquareBuildTexture(ud)) or WG.GetRectangleBuildTexture(ud)
 			SetImageTexture(texture, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(ud))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)

@@ -45,10 +45,14 @@ local function GetBuildIconFrame(udef)
 end
 
 local function GetSquareBuildTexture(udef)
+	return ("#" .. udef.id)
+end
+
+local function GetRectangleBuildTexture(udef)
 	if not udef.buildpicname then
 		return false
 	end
-	return "unitpics_square/" .. udef.buildpicname
+	return "unitpics_9_11/" .. udef.buildpicname
 end
 
 --------------------------------------------------------------------------------
@@ -276,8 +280,9 @@ WG.SavePythonOrJSONDict = SavePythonOrJSONDict
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:Initialize()
-  WG.GetBuildIconFrame = GetBuildIconFrame
-  WG.GetSquareBuildTexture = GetSquareBuildTexture
+	WG.GetBuildIconFrame = GetBuildIconFrame
+	WG.GetSquareBuildTexture = GetSquareBuildTexture
+	WG.GetRectangleBuildTexture = GetRectangleBuildTexture
 end
 
 local builderDefs = {}

@@ -8,7 +8,7 @@
 --// Info
 if (info) then
   local ratios      = {
-		["square"]=(0.95),
+		["square"]=(1),
 		["11to9"]=(9/11),
 	} --{["16to10"]=(10/16), ["1to1"]=(1/1), ["5to4"]=(4/5)} --, ["4to3"]=(3/4)}
   local resolutions = {{96,96}} --{{128,128},{64,64}}
@@ -43,7 +43,7 @@ lightPos     = {-0.2,0.4,0.5}
 aoPower     = ((scheme=="bw") and 1.5) or 1.6
 aoContrast  = ((scheme=="bw") and 2.5) or 3.1
 aoTolerance = 0.01
-olContrast  = ((scheme=="bw") and 5) or 17
+olContrast  = ((scheme=="bw") and 5) or 15
 olTolerance = 0.06
 
 --// halo (white)
@@ -132,6 +132,12 @@ unitConfigs = {
     clamp = 0,
   },
   [UnitDefNames.turretlaser.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.factorygunship.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.plategunship.id] = {
     clamp = 0,
   },
 

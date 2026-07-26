@@ -103,7 +103,7 @@ local optionGenerationTable = {
 		type = "number",
 		value = 1,
 		min = 1,
-		max = 1.4,
+		max = 2,
 		step = 0.01,
 		path = "Settings/Interface",
 	},

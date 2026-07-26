@@ -1472,7 +1472,7 @@ options = {
 	bottomPanelScale = {
 		name = "Bottom Panel Scale",
 		type = "number",
-		value = 1, min = 1, max = 1.4, step = 0.01,
+		value = 1, min = 1, max = 2, step = 0.01,
 		--desc = "Controls minimap size for the New UI presets.", -- supresses value tooltip
 		OnChange = function(self)
 			UpdateInterfacePreset(options.interfacePreset)

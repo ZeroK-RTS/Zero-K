@@ -1643,7 +1643,7 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 		
 		unitImage.tooltip = GetUnitSelectionTooltip(ud, unitDefID, unitID)
-		unitImage.file = "#" .. unitDefID
+		unitImage.file = WG.GetRectangleBuildTexture(ud)
 		unitImage.file2 = GetUnitBorder(unitDefID)
 		unitImage:Invalidate()
 	end
@@ -2363,7 +2363,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				unitImage.tooltip = GetSingleUnitSelectionTooltip(ud, unitDefID)
 			end
 
-			unitImage.file = "#" .. unitDefID
+			unitImage.file = WG.GetRectangleBuildTexture(ud)
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
 
