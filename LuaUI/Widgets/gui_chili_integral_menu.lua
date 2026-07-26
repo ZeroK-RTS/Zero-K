@@ -182,6 +182,7 @@ local function SetSmallIcons(wantSmall)
 	if wantSmall then
 		textConfig.bottomLeft.x = "15%"
 		textConfig.bottomLeft.bottom = 2
+		textConfig.bottomLeft.fontsize = 12
 		buttonLayoutConfig.build.image = {
 			x = "5%",
 			y = "4%",
@@ -201,6 +202,7 @@ local function SetSmallIcons(wantSmall)
 	else
 		textConfig.bottomLeft.x = "10%"
 		textConfig.bottomLeft.bottom = "10%"
+		textConfig.bottomLeft.fontsize = 13
 		buttonLayoutConfig.build.image = {
 			x = 0,
 			y = 0,

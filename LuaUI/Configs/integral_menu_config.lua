@@ -372,7 +372,7 @@ local textConfig = {
 		right = 0,
 		bottom = "10%",
 		height = 12,
-		fontsize = 12,
+		fontsize = 13,
 	},
 	topLeft = {
 		name = "topLeft",
