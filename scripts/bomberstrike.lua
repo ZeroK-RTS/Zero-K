@@ -96,7 +96,7 @@ end
 function script.FireWeapon(num)
 	Hide(missiler)
 	Hide(missilel)
-	Sleep(66)
+	Sleep(33)
 	Reload()
 end
 

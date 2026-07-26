@@ -239,8 +239,8 @@ local cegs = {
         length             = -20,
         sidetexture        = [[muzzleside]],
         size               = -6,
-        sizegrowth         = 0.75,
-        ttl                = 1,
+        sizegrowth         = 0.85,
+        ttl                = 1.1,
       },
     },
 
