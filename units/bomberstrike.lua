@@ -88,7 +88,7 @@ return { bomberstrike = {
 
       fireStarter             = 70,
       fixedlauncher           = true,
-      flightTime              = 4.7666,
+      flightTime              = 4.8,
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
       interceptedByShieldType = 2,
@@ -109,7 +109,7 @@ return { bomberstrike = {
       trajectoryHeight        = 0,
       turnRate                = 10000,
       turret                  = true,
-      weaponAcceleration      = 40,
+      weaponAcceleration      = 42,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 270,
     },
