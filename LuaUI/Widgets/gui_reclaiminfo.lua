@@ -36,7 +36,7 @@ local rangeend = {}  --counting radius end point
 local b1was = false  -- cursor was outside the map?
 local vsx, vsy = widgetHandler:GetViewSizes()
 local form = 12 --text format depends on screen size
-local xstart,ystart = 0
+local xstart,ystart = 0, 0
 local cmd,xend,yend,x,y,b1,b2
 local inMinimap = false --mouse cursor in minimap
 

@@ -40,16 +40,6 @@ return {
     },
   },
   blastwing = {
-    groundflash = {
-      flashalpha         = 1,
-      flashsize          = 108,
-      ttl                = 75,
-      color = {
-        [1]  = 0.7,
-        [2]  = 0.3,
-        [3]  = 0.1,
-      },
-    },
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
