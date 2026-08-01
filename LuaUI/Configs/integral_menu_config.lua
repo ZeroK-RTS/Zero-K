@@ -415,22 +415,24 @@ local buttonLayoutConfig = {
 		image = {
 			x = 0,
 			y = 0,
-			right = 0,
-			height = "100%",
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "Build",
+		invisibleButton = true,
 		showCost = true
 	},
 	buildunit = {
 		image = {
 			x = 0,
 			y = 0,
-			right = 0,
-			height = "100%",
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "BuildUnit",
+		invisibleButton = true,
 		showCost = true
 	},
 	queue = {

@@ -34,16 +34,16 @@ RATE_LIMIT = 0.035
 
 --// render options textured
 textured = (scheme~="bw")
-lightAmbient = {1,1,1}
-lightDiffuse = {0.4,0.4,0.4}
+lightAmbient = {0.98,0.98,0.98}
+lightDiffuse = {0.39,0.39,0.39}
 lightPos     = {-0.2,0.4,0.5}
 
 --// Ambient Occlusion & Outline settings
 aoPower     = ((scheme=="bw") and 1.5) or 1.6
 aoContrast  = ((scheme=="bw") and 2.5) or 3.15
 aoTolerance = 0.011
-olContrast  = ((scheme=="bw") and 5) or 15
-olTolerance = 0.06
+olContrast  = ((scheme=="bw") and 5) or 12
+olTolerance = 0.07
 
 --// halo (white)
 halo  = false --(scheme~="bw")
@@ -70,7 +70,7 @@ halo  = false --(scheme~="bw")
 --//inBatch := commanders are excluded from "buildicons all" by default. This includes them.
 --//saveNames : A list of file names to save the icon to, instead of the default file name.
 
-defaults = {border=0.06, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
+defaults = {border=0.072, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
 
 
 -----------------------------------------------------------------------
@@ -190,7 +190,7 @@ unitConfigs = {
   [UnitDefNames.turretgauss.id] = {
     unfold = true,
     attack = true,
-    wait   = 50,
+    wait   = 20,
   },
   [UnitDefNames.spiderantiheavy.id] = {
     unfold = true,
