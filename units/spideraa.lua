@@ -8,6 +8,9 @@ return { spideraa = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[40 30 40]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -95,6 +98,7 @@ return { spideraa = {
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,
+      trajectoryHeight        = 0.3,
       turnRate                = 82000,
       turret                  = true,
       weaponAcceleration      = 200,
