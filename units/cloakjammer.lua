@@ -35,6 +35,7 @@ return { cloakjammer = {
   metalCost              = 600,
   minCloakDistance       = 210,
   movementClass          = [[AKBOT2]],
+  moveState              = 0,
   objectName             = [[spherecloaker.s3o]],
   onoffable              = true,
   pushResistant          = 0,

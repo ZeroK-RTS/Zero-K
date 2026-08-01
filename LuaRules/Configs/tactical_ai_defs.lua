@@ -518,6 +518,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- skirmEverything (defaults to false): Skirms everything (does not skirm radar with this enabled only)
 -- skirmLeeway (defaults to 0): (Weapon range - skirmLeeway) = distance that the unit will try to keep from units while skirming
 -- stoppingDistance (defaults to 0): (skirmLeeway - stoppingDistance) = max distance from target unit that move commands can be given while skirming
+-- skirmRangeOverride (defaults to false): When set, override weapon range detection with this value
 -- skirmRadar (defaults to false): Skirms radar dots
 -- skirmOnlyNearEnemyRange (defaults to false): If true, skirms only when the enemy unit is withing enemyRange + skirmOnlyNearEnemyRange
 -- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
@@ -1800,19 +1801,15 @@ local behaviourConfig = {
 		name = "cloakjammer",
 		--skirms = {},
 		--swarms = {},
-		flees = armedLand,
-		fleeLeeway = 100,
-		fleeDistance = 100,
-		minFleeRange = 400,
+		skirms = allGround,
+		skirmRangeOverride = 400,
 	},
 	{
 		name = "shieldshield",
 		--skirms = {},
 		--swarms = {},
-		flees = armedLand,
-		fleeLeeway = 100,
-		fleeDistance = 100,
-		minFleeRange = 450,
+		skirms = allGround,
+		skirmRangeOverride = 450,
 	},
 	
 	-- mobile AA
@@ -1838,7 +1835,7 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 	},
 	{
 		name = "vehaa",
