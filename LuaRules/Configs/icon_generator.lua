@@ -147,6 +147,22 @@ unitConfigs = {
   [UnitDefNames.platecloak.id] = {
     clamp = 0,
   },
+  
+  [UnitDefNames.missileslow.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.napalmmissile.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.empmissile.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.tacnuke.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.seismic.id] = {
+    backgroundOverride = "bg_air.png",
+  },
 
 
   [UnitDefNames.bomberheavy.id] = {

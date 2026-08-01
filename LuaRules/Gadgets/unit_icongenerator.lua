@@ -742,6 +742,9 @@ end
 
 	local function Background(unitDefID)
 		local ud = UnitDefs[unitDefID]
+		if unitConfigs[unitDefID].backgroundOverride then
+			return unitConfigs[unitDefID].backgroundOverride
+		end
 
 		if ud.isStrafingAirUnit or ud.isHoveringAirUnit then
 			return "bg_air.png"
