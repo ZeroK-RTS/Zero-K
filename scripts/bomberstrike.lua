@@ -50,8 +50,8 @@ function script.Create()
 	Hide(sleever)
 	Hide(barrelr)
 	
-	Move(flaremissilel, y_axis, 18)
-	Move(flaremissiler, y_axis, 18)
+	Move(flaremissilel, y_axis, 13)
+	Move(flaremissiler, y_axis, 13)
 	Move(flaremissilel, z_axis, 1)
 	Move(flaremissiler, z_axis, 1)
 end

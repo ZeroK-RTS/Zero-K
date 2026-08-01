@@ -49,7 +49,7 @@ return { bomberstrike = {
   sfxtypes            = {},
   sightDistance       = 780,
   speed               = 234,
-  turnRadius          = 400,
+  turnRadius          = 100,
   workerTime          = 0,
 
   weapons             = {
@@ -102,16 +102,16 @@ return { bomberstrike = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile_fire9_heavy]],
       soundStartVolume        = 6.5,
-      startVelocity           = 80,
+      startVelocity           = 100,
       texture2                = [[lightsmoketrail]],
       tolerance               = 10000,
       tracks                  = true,
       trajectoryHeight        = 0,
       turnRate                = 10000,
       turret                  = true,
-      weaponAcceleration      = 42,
+      weaponAcceleration      = 60,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 270,
+      weaponVelocity          = 220,
     },
     
   },
