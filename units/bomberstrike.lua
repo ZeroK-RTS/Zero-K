@@ -31,7 +31,7 @@ return { bomberstrike = {
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
-  health              = 500,
+  health              = 420,
   iconType            = [[bomberskirm]],
   maxAcc              = 0.5,
   maxAileron          = 0.025,
@@ -48,7 +48,7 @@ return { bomberstrike = {
 
   sfxtypes            = {},
   sightDistance       = 780,
-  speed               = 234,
+  speed               = 231,
   turnRadius          = 100,
   workerTime          = 0,
 
@@ -95,7 +95,7 @@ return { bomberstrike = {
       leadlimit               = 0,
       model                   = [[wep_m_dragonsfang.s3o]],
       projectiles             = 2,
-      range                   = 670,
+      range                   = 660,
       reloadtime              = 1,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med5]],
