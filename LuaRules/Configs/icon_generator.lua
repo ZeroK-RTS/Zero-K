@@ -142,7 +142,7 @@ unitConfigs = {
   [UnitDefNames.factorycloak.id] = {
     clamp = 0,
     unfold = true,
-    wait   = 120,
+    wait   = 125,
   },
   [UnitDefNames.platecloak.id] = {
     clamp = 0,
@@ -254,6 +254,10 @@ unitConfigs = {
   },
   [UnitDefNames.chicken_pigeon.id] = {
     border = 0.11,
+  },
+  [UnitDefNames.chicken_blimpy.id] = {
+    unfold = true,
+    wait   = 104,
   },
 
   [UnitDefNames.chicken_dodo.id] = {
