@@ -48,7 +48,7 @@ return { bomberstrike = {
 
   sfxtypes            = {},
   sightDistance       = 780,
-  speed               = 231,
+  speed               = 234,
   turnRadius          = 100,
   workerTime          = 0,
 
