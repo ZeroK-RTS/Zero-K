@@ -27,6 +27,10 @@ VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 VFS.Include("LuaRules/Utilities/rulesParam.lua")
 
+--------------------------------------------------------------------------------
+-- Build icons
+--------------------------------------------------------------------------------
+
 local function GetBuildIconFrame(udef)
 	local cp = udef.customParams
 	if udef.isMobileBuilder then
@@ -52,7 +56,7 @@ local function GetRectangleBuildTexture(udef)
 	if not udef.buildpicname then
 		return false
 	end
-	return "unitpics_9_11/" .. udef.buildpicname
+	return ":l:unitpics_9_11/" .. udef.buildpicname
 end
 
 --------------------------------------------------------------------------------
