@@ -914,6 +914,20 @@ local function GiveMexes(cmd, line, words, player)
 	end
 end
 
+local function RoninCircle(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local Vector = Spring.Utilities.Vector
+	local mx, mz = 2840, 1620
+	local radius = 380
+	local count = 32
+	for i = 1, count do
+		local spawn = Vector.Add({mx, mz}, Vector.PolarToCart(radius, i*math.pi*2/count))
+		Spring.CreateUnit("cloakskirm", spawn[1], 0, spawn[2], 0, 1)
+	end
+end
+
 local function PlaceBattle(cmd, line, words, player)
 	if not Spring.IsCheatingEnabled() then
 		return
@@ -998,6 +1012,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "printunits",  PrintUnits, "")
 	gadgetHandler.actionHandler.AddChatAction(self, "battle",  PlaceBattle, "")
 	gadgetHandler.actionHandler.AddChatAction(self, "mexes",  GiveMexes, "")
+	gadgetHandler.actionHandler.AddChatAction(self, "ronincircle", RoninCircle, "")
 
 	gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 end
