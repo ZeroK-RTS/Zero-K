@@ -1011,7 +1011,7 @@ local function addUnit(defName, path)
 	if dontFireAtRadarUnits[unitDefID] ~= nil then
 		options[defName .. "_fire_at_radar"] = {
 			name = "  Fire at radar",
-			desc = "Check box to make these units fire at radar. All other units fire at radar but these have the option not to.",
+			desc = "Fire at radar: Set whether precise units with high reload time fire on uncertain enemy positions within radar",
 			type = 'bool',
 			value = dontFireAtRadarUnits[unitDefID],
 			path = path,
