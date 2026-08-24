@@ -33,9 +33,9 @@ local ConController = {
 		return self
 	end,
 
-	unset = function(self)
+	unset = function(self, isDying)
 		-- Echo("IdleConAssist removed: " .. self.unitID)
-		GiveOrderToUnit(self.unitID,CMD.STOP, {}, {""},1)
+		if not isDying then GiveOrderToUnit(self.unitID,CMD.STOP, {}, {""},1) end
 		return nil
 	end,
 	
@@ -82,7 +82,7 @@ end
 
 function widget:UnitDestroyed(unitID)
 	if not (ConStack[unitID%UPDATE_FRAME][unitID]==nil) then
-		ConStack[unitID%UPDATE_FRAME][unitID]=ConStack[unitID%UPDATE_FRAME][unitID]:unset();
+		ConStack[unitID%UPDATE_FRAME][unitID]=ConStack[unitID%UPDATE_FRAME][unitID]:unset(true);
 	end
 end
 
