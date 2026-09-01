@@ -90,8 +90,19 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, rawDamage, paralyzer
 		local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
 		if health and maxHealth and health > 0 then -- taking no chances.
 			if GG.Awards and GG.Awards.AddAwardPoints then
-				local cost_emped = (rawDamage / maxHealth) * GetUnitCost(unitID)
-				GG.Awards.AddAwardPoints('emp', attackerTeam, cost_emped)
+				local maxStunFraction = paraTime[weaponDefID] / DECAY_SECONDS
+				local maxParaHealth = maxHealth * (1 + maxStunFraction)
+				local remainingParaHealth = maxParaHealth - paralyzeDamage
+
+				-- in theory overstun mult can modify things further,
+				-- but we don't care for similar reasons why the
+				-- mult from low health is ignored as well
+
+				if remainingParaHealth > 0 then -- smaller than 0 if already stunned by a stronger weapon
+					local cappedDamage = math.min(rawDamage, remainingParaHealth)
+					local cost_emped = (cappedDamage / maxHealth) * GetUnitCost(unitID)
+					GG.Awards.AddAwardPoints('emp', attackerTeam, cost_emped)
+				end
 			end
 			local damage = GetStunDamage(weaponDefID, rawDamage, health, maxHealth, paralyzeDamage)
 			if overstunTime[weaponDefID] > 0 then
