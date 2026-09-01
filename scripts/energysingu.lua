@@ -14,18 +14,75 @@ local arm3 = piece "arm3"
 local INLOS = {inlos = true}
 local smokePiece = { piece "base", piece "arm1", piece "arm2", piece "arm3" }
 
-local ballSize = 0
-local is_stunned = true
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spGetUnitHealth = Spring.GetUnitHealth
+local sin = math.sin
+local max = math.max
+local min = math.min
+
+local CENTER_FORCE = 0.18    -- Pull toward center
+local DAMPING_BASE = 0.4    -- Removes oscillation
+local DAMPING_MIN = 0.03
+local RATTLE_THRESHOLD = 26  -- elmo range threshold
+local ballSize = 0
+local ImpulseUpdate = 0
+local pendingImpulseX, pendingImpulseY, pendingImpulseZ = 0, 0, 0
+local velX, velY, velZ = 0, 0, 0
+local ax, ay, az = 0, 0, 0
+local offsetX, offsetY, offsetZ = 0, 0, 0
+local is_stunned = true
+
+local function clamp(val, c)
+	-- c expected to be positive
+	if val > c then
+		val = c
+	elseif val < -c then
+		val = -c
+	end
+	return val
+end
 
 local function SizeControl()
 	local mag = math.random() + 1
 	local period = math.random()*20 + 15
 	local t = 0
 
-	local sin = math.sin
-
 	while true do
+		-- damage rattle
+		local deltadistance = (offsetX^2 + offsetY^2 + offsetZ^2)^0.5 -- ignore fake Y
+		if ImpulseUpdate > 0 then
+			-- cap velocity, 2*distance*acceleration
+			-- just ignore the dampening effect the illusion holds
+			local maxv = 2*(RATTLE_THRESHOLD-deltadistance)*CENTER_FORCE
+			velX = clamp(velX + pendingImpulseX, maxv)
+			velY = clamp(velY + pendingImpulseY, maxv)
+			velZ = clamp(velZ + pendingImpulseZ, maxv)
+			ImpulseUpdate, pendingImpulseX, pendingImpulseY, pendingImpulseZ = 0, 0, 0, 0
+		end
+
+		local health, maxhealth = spGetUnitHealth(unitID)
+		local rel_hp = health / maxhealth
+		local DAMPING = max((1.22*rel_hp - 0.22) * DAMPING_BASE, DAMPING_MIN)
+		ax = -CENTER_FORCE * offsetX - DAMPING * velX
+		ay = -CENTER_FORCE * offsetY - DAMPING * velY
+		az = -CENTER_FORCE * offsetZ - DAMPING * velZ
+
+		velX = velX + ax
+		velY = velY + ay
+		velZ = velZ + az
+
+		offsetX = offsetX + velX
+		offsetY = offsetY + velY
+		offsetZ = offsetZ + velZ
+
+		MultiMove(	energyball, x_axis, offsetX, ax*30,
+					energyball, y_axis, offsetY, ay*30,
+					energyball, z_axis, offsetZ, az*30)
+
+		-- shrink ball to fit arms. Considering ballSwellFactor function and size of unit.
+		ballSize = min(ballSize, 1/14*(deltadistance - 2*RATTLE_THRESHOLD)^2)
+
+		-- grow ball
 		if is_stunned then
 			if ballSize > 3 then
 				ballSize = ballSize - 3
@@ -42,6 +99,7 @@ local function SizeControl()
 			end
 		end
 
+		-- periodic swell
 		local ballSwellFactor = 1.13^(sin(t/period)*mag) * (ballSize^2 / 11000)
 		spSetUnitRulesParam(unitID, "ballSwell", 1.15*ballSwellFactor - 0.1, INLOS)
 		Scale(energyball, ballSwellFactor)
@@ -85,6 +143,14 @@ local function Anim()
 	end
 end
 
+function script.HitByWeapon(hitDirx, hitDirz, weaponDefId, inoutDamage)
+	ImpulseUpdate = inoutDamage
+    local impulse = inoutDamage^0.6  - 1
+    pendingImpulseX = pendingImpulseX + hitDirx * impulse
+	pendingImpulseY = pendingImpulseY + (1.4* math.random() - 0.7) * impulse -- fake y impusle
+    pendingImpulseZ = pendingImpulseZ - hitDirz * impulse
+    return inoutDamage
+end
 
 function script.Create()
 	Hide(energyball)
