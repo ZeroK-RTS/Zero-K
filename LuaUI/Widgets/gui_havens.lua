@@ -98,13 +98,13 @@ local RADIUS = 0
 
 ----------------------------------------------------------------------------------------
 -- functions
-function GetTeamName(teamID)
+local function GetTeamName(teamID)
 	local _, leaderID = spGetTeamInfo(teamID, false)
 	local playerName = spGetPlayerInfo(leaderID, true)
 	return playerName
 end
 
-function GetTeamHavens(teamID)
+local function GetTeamHavens(teamID)
 	local teamHavenCount = spGetTeamRulesParam(teamID, "haven_count")
 	if teamHavenCount then
 		local teamLeaderName = GetTeamName(teamID) or "???"
@@ -124,7 +124,7 @@ function GetTeamHavens(teamID)
 	end
 end
 
-function HavenUpdate()
+local function HavenUpdate()
 	havens = {}
 	local teams = spGetTeamList()
 	for i = 0, #teams-1 do
