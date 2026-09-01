@@ -31,12 +31,14 @@ options = {
 		desc = 'Displays retreat zones of other players',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	drawNames = {
 		name = 'Label Player Names',
 		desc = "Draws the name of other players' retreat zones",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	cancelRetreat = {
 		name = 'Cancel Retreat',
@@ -53,6 +55,7 @@ options = {
 		desc = 'Override player Retreat Circle color',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	RetreatCircleColor = {
 		name = 'Retreat Circle',
