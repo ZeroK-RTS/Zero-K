@@ -20,19 +20,22 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Retreat Zones'
-options_order = {'onlyShowMyZones', 'cancelRetreat'}
+options_order = {'drawAllyZones', 'drawNames', 'cancelRetreat'}
 
 local RETREAT_OFF_TABLE = {0}
 
 options = {
-	onlyShowMyZones = {
-		name = 'Only Show My Zones',
-		desc = 'With this enabled you will only see your retreat zones.',
+	drawAllyZones = {
+		name = 'Show All Player Retreat Zones',
+		desc = 'Displays retreat zones of other players',
 		type = 'bool',
 		value = true,
-		OnChange = function(self)
-			GetHavens()
-		end,
+	},
+	drawNames = {
+		name = 'Label Player Names',
+		desc = "Draws the name of other players' retreat zones",
+		type = 'bool',
+		value = false,
 	},
 	cancelRetreat = {
 		name = 'Cancel Retreat',
@@ -48,9 +51,8 @@ options = {
 
 -- speed-ups
 
-local echo = Spring.Echo
-
 local spGetGameFrame = Spring.GetGameFrame
+local spGetLocalPlayerID = Spring.GetLocalPlayerID
 
 local glDepthTest      = gl.DepthTest
 local glAlphaTest      = gl.AlphaTest
@@ -61,54 +63,52 @@ local glBillboard      = gl.Billboard
 local glColor          = gl.Color
 local GL_GREATER       = GL.GREATER
 
-local min	= math.min
 local max = math.max
-local floor = math.floor
 local abs 	= math.abs
 
 local havens = {}
-local havenCount = 0
 local RADIUS = 0
+local DEFAULT_HAVEN_COLOR = {1, 0.1, 0.1, 0.8}
 
 ----------------------------------------------------------------------------------------
 -- functions
+function GetTeamName(teamID)
+	local _, leaderID = Spring.GetTeamInfo(teamID, false)
+    local playerName = Spring.GetPlayerInfo(leaderID, true)
+	return playerName
+end
 
 function GetTeamHavens(teamID)
-	local start = havenCount
 	local teamHavenCount = Spring.GetTeamRulesParam(teamID, "haven_count")
 	if teamHavenCount then
-		havenCount = havenCount + teamHavenCount
-		if havenCount then
-			for i = 1, teamHavenCount do
-				havens[start + i] = {
-					x = Spring.GetTeamRulesParam(teamID, "haven_x" .. i),
-					z = Spring.GetTeamRulesParam(teamID, "haven_z" .. i)
-				}
-				havens[start + i].y = Spring.GetGroundHeight(havens[start + i].x, havens[start + i].z)
-			end
+		local teamLeaderName = GetTeamName(teamID) or "???"
+		local teamcolor = {Spring.GetTeamColor(teamID)} or DEFAULT_HAVEN_COLOR
+
+		local start = #havens
+		for i = 1, teamHavenCount do
+			havens[start + i] = {
+				x = Spring.GetTeamRulesParam(teamID, "haven_x" .. i),
+				z = Spring.GetTeamRulesParam(teamID, "haven_z" .. i)
+			}
+			havens[start + i].y = Spring.GetGroundHeight(havens[start + i].x, havens[start + i].z)
+			havens[start + i].name = teamLeaderName
+			havens[start + i].color = teamcolor
+			havens[start + i].team = teamID
 		end
 	end
 end
 
 function GetHavens()
 	havens = {}
-	havenCount = 0
-	if options.onlyShowMyZones.value then
-		local spectating = Spring.GetSpectatingState()
-		if not spectating then
-			GetTeamHavens(Spring.GetLocalTeamID())
-		end
-	else
-		local teams = Spring.GetTeamList()
-		for i = 0, #teams-1 do
-			GetTeamHavens(i)
-		end
+	local teams = Spring.GetTeamList()
+	for i = 0, #teams-1 do
+		GetTeamHavens(i)
 	end
 end
 
 function HavenUpdate(teamID, allyTeamID)
 	local spectating = Spring.GetSpectatingState()
-	if (not spectating and Spring.GetLocalTeamID() == teamID) or (not options.onlyShowMyZones.value) then
+	if (not spectating and Spring.GetLocalTeamID() == teamID) or options.drawAllyZones.value then
 		GetHavens()
 	end
 end
@@ -159,37 +159,55 @@ local function DrawWorldFunc()
 	if #havens == 0 or Spring.IsGUIHidden() then
 		return
 	end
-	
+
 	glDepthTest(true)
 	gl.LineWidth(2)
 
-	for i = 1, havenCount do
+	for i = 1, #havens do
 		local havenPosition = havens[i]
-		local x, y, z = havenPosition.x, havenPosition.y, havenPosition.z
+		-- TODO spGetLocalPLayerID interacts poorly when local player is cheating between teams and spectator.
+		-- Change comparison logic to work better in this edge case.
+		if options.drawAllyZones.value or havenPosition.team == spGetLocalPlayerID() then
+			local x, y, z = havenPosition.x, havenPosition.y, havenPosition.z
 
-		gl.LineWidth(4)
-		glColor(1, 1, 1, 0.5)
-		gl.DrawGroundCircle(x, y, z, RADIUS, 32)
+			gl.LineWidth(4)
+			glColor(1, 1, 1, 0.5) --WHITE
+			gl.DrawGroundCircle(x, y, z, RADIUS, 32)
+			gl.LineWidth(2)
+			if havenPosition.team == spGetLocalPlayerID() then
+				glColor(DEFAULT_HAVEN_COLOR)
+			else
+				glColor(havenPosition.color)
+			end
+			gl.DrawGroundCircle(x, y, z, RADIUS, 32)
 
-		gl.LineWidth(2)
-		glColor(1, 0.1, 0.1, 0.8)
-		gl.DrawGroundCircle(x, y, z, RADIUS, 32)
-
+			gl.PushMatrix()
+			glTranslate(x, y, z)
+			glBillboard()
+			if options.drawNames.value then
+				glColor(havenPosition.color)
+				gl.Text(havenPosition.name, 0, -10, 15, 'noc')
+			end
+			gl.PopMatrix()
+		end
 	end --for
+
 	glAlphaTest(GL_GREATER, 0)
 	glColor(1,fade,fade,fade+0.1)
 	glTexture('LuaUI/Images/commands/Bold/retreat.png')
-	
-	for i = 1, havenCount do
+	for i = 1, #havens do
 		local havenPosition = havens[i]
-		local x, y, z = havenPosition.x, max(havenPosition.y, 0.0), havenPosition.z
-		gl.PushMatrix()
-		glTranslate(x, y, z)
-		glBillboard()
-		glTexRect(-10, 0, 10, 20)
-		gl.PopMatrix()
+		if options.drawAllyZones.value or havenPosition.team == spGetLocalPlayerID() then
+			local x, y, z = havenPosition.x, max(havenPosition.y, 0.0), havenPosition.z
+
+			gl.PushMatrix()
+			glTranslate(x, y, z)
+			glBillboard()
+			glTexRect(-10, 0, 10, 20)
+			gl.PopMatrix()
+		end
 	end --for
-	
+
 	glTexture(false)
 	glAlphaTest(false)
 	glDepthTest(false)
