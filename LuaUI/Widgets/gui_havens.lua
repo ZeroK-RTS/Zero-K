@@ -151,6 +151,7 @@ HavenUpdate = function () -- local function
 	-- options.drawSpectatorZones.value
 	-- options.drawAllyZones.value
 	local opt = options.playerZonesRadio.value
+	local localTeamID = spGetLocalTeamID()
 	if spectating and (opt == "player_only" or opt == "los") then
 		-- do not populate havens if option is not spectator option
 		teams = havens -- empty table
@@ -158,7 +159,7 @@ HavenUpdate = function () -- local function
 		if opt == "los" or opt == "los_spectator" or (spectating and opt == "player_only_spectator_los") then
 			teams = spGetTeamList() -- all teams LOS visible
 		else -- opt is "player_only" or "player_only_spectator"
-			teams = {spGetLocalTeamID()} -- just my team
+			teams = {localTeamID} -- just my team
 		end
 	end
 	for x = 1, #teams do
@@ -167,7 +168,7 @@ HavenUpdate = function () -- local function
 		if teamHavenCount then
 			local teamLeaderName = GetTeamName(teamID) or "???"
 			local teamcolor = {spGetTeamColor(teamID)}
-			if teamID == spGetLocalTeamID() and options.customRetreatCircleColor.value then
+			if not spectating and teamID == localTeamID and options.customRetreatCircleColor.value then
 				teamcolor = PLAYER_HAVEN_COLOR
 			end
 
