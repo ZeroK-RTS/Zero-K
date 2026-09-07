@@ -1,0 +1,420 @@
+-- $Id: icon_generator.lua 4354 2009-04-11 14:32:28Z licho $
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+--
+--  Icon Generator Config File
+--
+
+--// Info
+if (info) then
+  local ratios      = {
+		["square"]=(1),
+		["11to9"]=(9/11),
+	}
+  local resolutions = {{96, 96}}
+  local schemes     = {""}
+
+  return schemes,resolutions,ratios
+end
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+--// filename ext
+imageExt = ".png"
+
+--// render into a fbo in 4x size
+renderScale = 4
+teamColor = {0.05, 0.96, 0.95}
+
+RATE_LIMIT = 0.035
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+--// render options textured
+textured = (scheme~="bw")
+lightAmbient = {0.98,0.98,0.98}
+lightDiffuse = {0.39,0.39,0.39}
+lightPos     = {-0.2,0.4,0.5}
+
+--// Ambient Occlusion & Outline settings
+aoPower     = ((scheme=="bw") and 1.5) or 1.6
+aoContrast  = ((scheme=="bw") and 2.5) or 3.15
+aoTolerance = 0.011
+olContrast  = ((scheme=="bw") and 5) or 12
+olTolerance = 0.07
+
+--// halo (white)
+halo  = false --(scheme~="bw")
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+--// default settings for rendering
+--//zoom   := used to make all model icons same in size (DON'T USE, it is just for auto-configuration!)
+--//offset := used to center the model in the fbo (not in the final icon!) (DON'T USE, it is just for auto-configuration!)
+--//rot    := facing direction
+--//angle  := topdown angle of the camera (0 degree = frontal, 90 degree = topdown)
+--//clamp  := clip everything beneath it (hide underground stuff)
+--//scale  := render the model x times as large and then scale down, to replaces missing AA support of FBOs (and fix rendering of very tine structures like antennas etc.))
+--//unfold := unit needs cob to unfolds
+--//move   := send moving cob events (works only with unfold)
+--//attack := send attack cob events (works only with unfold)
+--//shotangle := vertical aiming, useful for arties etc. (works only with unfold+attack)
+--//wait   := wait that time in gameframes before taking the screenshot (default 300) (works only with unfold)
+--//border := free space around the final icon (in percent/100)
+--//empty  := empty model (used for fake units in CA)
+--//attempts := number of tries to scale the model to fit in the icon
+--//inBatch := commanders are excluded from "buildicons all" by default. This includes them.
+--//saveNames : A list of file names to save the icon to, instead of the default file name.
+
+defaults = {border=0.072, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+--// per unitdef settings
+unitConfigs = {
+  
+  [UnitDefNames.comm_campaign_isonade.id] = {
+    teamColor = { 1, 0.75, 0 },
+  },
+  [UnitDefNames.staticradar.id] = {
+    scale = 3,
+    rot   = 200,
+    clamp = 10,
+  },
+  [UnitDefNames.staticjammer.id] = {
+    rot = -45,
+  },
+  [UnitDefNames.staticnuke.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.hoverraid.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.hoverheavyraid.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.turretmissile.id] = {
+    clamp = 2,
+  },
+  [UnitDefNames.turretheavylaser.id] = {
+    clamp = 2,
+  },
+  [UnitDefNames.vehscout.id] = {
+    border = 0.156,
+  },
+  [UnitDefNames.gunshipbomb.id] = {
+    border = 0.156,
+  },
+  [UnitDefNames.gunshipemp.id] = {
+    border = 0.125,
+  },
+  [UnitDefNames.vehraid.id] = {
+    border = 0.125,
+  },
+  [UnitDefNames.spiderscout.id] = {
+    border = 0.125,
+  },
+  [UnitDefNames.energywind.id] = {
+    clamp = 0,
+	rot = 240
+  },
+  [UnitDefNames.turretaafar.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.turretaaflak.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.turretlaser.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.factorygunship.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.plategunship.id] = {
+    clamp = 0,
+  },
+  [UnitDefNames.factorycloak.id] = {
+    clamp = 0,
+    unfold = true,
+    wait   = 125,
+  },
+  [UnitDefNames.platecloak.id] = {
+    clamp = 0,
+  },
+  
+  [UnitDefNames.missileslow.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.napalmmissile.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.empmissile.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.tacnuke.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.seismic.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+
+
+  [UnitDefNames.bomberheavy.id] = {
+    move = true,
+  },
+  [UnitDefNames.jumpsumo.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.jumpraid.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.shieldskirm.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.shieldshield.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.staticshield.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.statictempshield.id] = {
+    unfold = true,
+  },
+  	
+  [UnitDefNames.tankarty.id] = {
+    unfold = true,
+    attack = true,
+    shotangle = 45,
+    wait = 120,
+  },
+  [UnitDefNames.shieldraid.id] = {
+    unfold = true,
+    attack = true,
+    wait   = 120,
+   },
+  [UnitDefNames.jumpskirm.id] = {
+    unfold = true,
+    attack = true,
+    wait   = 20,
+   },
+  [UnitDefNames.turretgauss.id] = {
+    unfold = true,
+    attack = true,
+    wait   = 20,
+  },
+  [UnitDefNames.spiderantiheavy.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.turretantiheavy.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.staticheavyradar.id] = {
+    unfold = true,
+    wait   = 545,
+  },
+  [UnitDefNames.energysolar.id] = {
+    unfold = true,
+    dimensionOverride = {maxy = 100},
+  },
+  [UnitDefNames.cloaksnipe.id] = {
+    unfold = true,
+    attack = true,
+  },
+  [UnitDefNames.cloakassault.id] = {
+    unfold = true,
+    attack = true,
+  },
+  [UnitDefNames.hoverdepthcharge.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.cloakjammer.id] = {
+    unfold = true,
+    wait   = 100,
+  },
+  [UnitDefNames.staticmex.id] = {
+    clamp  = 0,
+    unfold = true,
+    wait   = 100,
+  },
+  [UnitDefNames.turretheavy.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.gunshipkrow.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.chickenf.id] = {
+    unfold = true,
+    wait   = 190,
+  },
+  [UnitDefNames.chicken_pigeon.id] = {
+    border = 0.11,
+  },
+  [UnitDefNames.chicken_blimpy.id] = {
+    unfold = true,
+    wait   = 104,
+  },
+
+  [UnitDefNames.chicken_dodo.id] = {
+    border = defaults.border,
+  },
+
+  [UnitDefNames.chickenbroodqueen.id] = {
+    rot    = 29,
+    angle  = 10,
+    unfold = false,
+  },
+  [UnitDefNames.striderdetriment.id] = {
+    rot    = 20,
+    angle  = 10,
+  },
+  [UnitDefNames.striderbantha.id] = {
+    rot    = 28,
+    angle  = 10,
+    unfold = true,
+  },
+  [UnitDefNames.striderdante.id] = {
+    rot    = 28,
+    angle  = 10,
+  },
+  [UnitDefNames.nebula.id] = {
+    rot    = 28,
+    angle  = 10,
+  },
+  [UnitDefNames.turretaaheavy.id] = {
+    rot    = 30,
+    angle  = 30,
+  },
+  [UnitDefNames.spiderassault.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.amphlaunch.id] = {
+    unfold = true,
+  },
+  [UnitDefNames.spidercon.id] = {
+    scale    = 3,
+    attempts = 10,
+  },
+  [UnitDefNames.commrecon1.id] = {
+    unfold = true,
+    --attack = true,
+    saveNames = {"commrecon"},
+  },
+  [UnitDefNames.commsupport1.id] = {
+	unfold = true,
+    --attack = true,
+    saveNames = {"commsupport"},
+  },
+  [UnitDefNames.zenith.id] = {
+    wait   = 50,
+  },
+  [UnitDefNames.fakeunit.id] = {
+    empty  = true,
+  },
+  [UnitDefNames.fakeunit_aatarget.id] = {
+    empty  = true,
+  },
+  [UnitDefNames.fakeunit_los.id] = {
+    empty  = true,
+  },
+  [UnitDefNames.wolverine_mine.id] = {
+    unfold  = true,
+    wait = 60,
+  },
+  [UnitDefNames.hovercon.id] = {
+    unfold  = true,
+    wait = 60,
+  },
+  [UnitDefNames.amphsupport.id] = {
+    unfold = true,
+    wait   = 120,
+  },
+  [UnitDefNames.gunshipskirm.id] = {
+    unfold = true,
+    move   = true,
+    wait   = 150,
+  },
+  [UnitDefNames.planeheavyfighter.id] = {
+    unfold = true,
+    move   = true,
+    wait   = 150,
+  },
+  [UnitDefNames.dynassault1.id] = {
+    inBatch = true,
+    saveNames = {"commassault", "benzcom", "guardian"},
+  },
+  [UnitDefNames.dynknight1.id] = {
+    inBatch = true,
+    saveNames = {"cremcom"},
+  },
+  [UnitDefNames.dynrecon1.id] = {
+    inBatch = true,
+    unfold = true,
+    saveNames = {"commrecon", "recon"},
+  },
+  [UnitDefNames.dynstrike1.id] = {
+    inBatch = true,
+    saveNames = {"commstrike", "strike"},
+  },
+  [UnitDefNames.dynsupport1.id] = {
+    inBatch = true,
+    unfold = true,
+    saveNames = {"commsupport", "engineer"},
+  },
+  [UnitDefNames.corcom1.id] = {
+    inBatch = true,
+    saveNames = {"corcom", "commbattle"},
+  },
+  [UnitDefNames.armcom1.id] = {
+    inBatch = true,
+    saveNames = {"armcom"},
+  },
+  [UnitDefNames.pw_hq_attacker.id] = {
+    saveNames = {"pw_hq"},
+  },
+  [UnitDefNames.pw_hq_defender_extra.id] = {
+    saveNames = {"pw_hq_extra"},
+  },
+  [UnitDefNames.pw_estorage2.id] = {
+    saveNames = {"pw_estorage2", "pw_wormhole2_old"},
+  },
+  [UnitDefNames.starlight_satellite.id] = {
+    saveNames = {"satellite"},
+  },
+  [UnitDefNames.roost.id] = {
+    saveNames = {"roost", "nest"},
+  },
+  [UnitDefNames.pw_bomberfac.id] = {
+    saveNames = {"pw_bombercontrol", "pw_dropdepot"},
+  },
+  [UnitDefNames.vehsupport.id] = {
+    unfold = true,
+  },
+  
+}
+
+for i=1,#UnitDefs do
+  if (UnitDefs[i].canFly) then
+    if (unitConfigs[i]) then
+      if (unitConfigs[i].unfold ~= false) then
+        unitConfigs[i].unfold = true
+        unitConfigs[i].move   = true
+      end
+    else
+      unitConfigs[i] = {unfold = true, move = true}
+    end
+  elseif (UnitDefs[i].canKamikaze) then
+    if (unitConfigs[i]) then
+      if (not unitConfigs[i].border) then
+        unitConfigs[i].border = 0.156
+      end
+    else
+      unitConfigs[i] = {border = 0.156}
+    end
+  end
+end
