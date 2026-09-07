@@ -369,7 +369,7 @@ local origUnitSpeed = {}
 
 local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFactor, maxAccelerationFactor)
 	if spMoveCtrlGetTag(unitID) ~= nil then
-		return
+		return false
 	end
 	
 	if not origUnitSpeed[unitDefID] then
@@ -476,6 +476,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			spSetUnitCOBValue(unitID, COB.MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
 		end
 	end
+	return true
 end
 
 --------------------------------------------------------------------------------
@@ -794,10 +795,14 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	if moveChanges then
-		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult)
-		currentMove[unitID] = moveMult
-		currentTurn[unitID] = turnMult
-		currentAccel[unitID] = accelMult
+		if UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult) then
+			-- Only update attributes if UpdateMovementSpeed passes
+			currentMove[unitID] = moveMult
+			currentTurn[unitID] = turnMult
+			currentAccel[unitID] = accelMult
+		else
+			hasAttributes = true
+		end
 	end
 	
 	if weaponSpecificMods or weaponChanges then
