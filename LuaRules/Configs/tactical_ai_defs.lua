@@ -59,14 +59,17 @@ end
 ---------------------------------------------------------------------------
 -- these are not strictly required they just help with inputting the units
 
-local longRangeSwarmieeArray = NameToDefID({
+local longerRangeSwarmieeArray = NameToDefID({
 	"tankarty",
 	"jumparty",
-	"spiderskirm",
-	"shieldskirm",
 	"shiparty",
 	"cloakarty",
 	"amphsupport",
+})
+
+local longRangeSwarmieeArray = NameToDefID({
+	"spiderskirm",
+	"shieldskirm",
 })
 
 local medRangeSwarmieeArray = NameToDefID({
@@ -93,6 +96,7 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"cloaksnipe", -- only worth swarming sniper at low range, too accurate otherwise.
 })
 
+longRangeSwarmieeArray = Union(longRangeSwarmieeArray,longerRangeSwarmieeArray)
 medRangeSwarmieeArray = Union(medRangeSwarmieeArray,longRangeSwarmieeArray)
 lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
@@ -312,9 +316,12 @@ local longRangeSkirmieeArray = NameToDefID({
 	"turretemp",
 })
 
-local artyRangeSkirmieeArray = NameToDefID({
+local longerRangeSkirmieeArray = NameToDefID({
 	"spiderskirm",
 	"shieldskirm",
+})
+
+local artyRangeSkirmieeArray = NameToDefID({
 	"vehsupport",
 	"amphassault",
 	"chicken_sporeshooter",
@@ -359,7 +366,8 @@ riotRangeSkirmieeArray        = Union(riotRangeSkirmieeArray,shortToRiotRangeSki
 lowMedRangeSkirmieeArray      = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
 medRangeSkirmieeArray         = Union(medRangeSkirmieeArray, lowMedRangeSkirmieeArray)
 longRangeSkirmieeArray        = Union(longRangeSkirmieeArray, medRangeSkirmieeArray)
-artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
+longerRangeSkirmieeArray      = Union(longerRangeSkirmieeArray, longRangeSkirmieeArray)
+artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longerRangeSkirmieeArray)
 
 -- Don't add this to the higher ranged units.
 local medRangeAndTurretSkirmieeArray = Union(medRangeSkirmieeArray, NameToDefID({"turretriot", "turretlaser"}))
@@ -1555,12 +1563,14 @@ local behaviourConfig = {
 	},
 	{
 		name = "amphassault",
-		skirms = longRangeSkirmieeArray,
-		swarms = longRangeSwarmieeArray,
+		skirms = longerRangeSkirmieeArray,
+		swarms = longerRangeSwarmieeArray,
 		--flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 10,
 		minSwarmLeeway = 130,
+		jinkPeriod = 1.5,
+		jinkTangentLength = 30,
 		skirmLeeway = 20,
 		skirmBlockedApproachFrames = 60,
 	},
