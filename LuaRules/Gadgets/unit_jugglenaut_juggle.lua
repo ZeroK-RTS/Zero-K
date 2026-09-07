@@ -75,7 +75,7 @@ local function removeFlying(unitID)
 	flying[unitID] = nil
 	flyingByID.count = flyingByID.count - 1
 	
-	SendToUnsynced("removeFlying", unitID)
+	SendToUnsynced("removePsychicThrow", unitID)
 end
 
 local function addFlying(unitID, frame, dx, dy, dz, height, parentDis)
@@ -107,7 +107,7 @@ local function addFlying(unitID, frame, dx, dy, dz, height, parentDis)
 			fx = ux, fy = height, fz = uz,
 		}
 		
-		SendToUnsynced("addFlying", unitID, unitDefID)
+		SendToUnsynced("addPsychicThrow", unitID, unitDefID)
 	end
 end
 
@@ -277,8 +277,8 @@ local function removeFlying(_, unitID)
 end
 
 function gadget:Initialize()
-    gadgetHandler:AddSyncAction("addFlying", addFlying)
-	gadgetHandler:AddSyncAction("removeFlying", removeFlying)
+	gadgetHandler:AddSyncAction("addPsychicThrow", addFlying)
+	gadgetHandler:AddSyncAction("removePsychicThrow", removeFlying)
 end
 
 function gadget:Update()
@@ -289,8 +289,8 @@ end
 
 
 function gadget:Shutdown()
-	gadgetHandler.RemoveSyncAction("addFlying")
-    gadgetHandler.RemoveSyncAction("removeFlying")
+	gadgetHandler.RemoveSyncAction("addPsychicThrow")
+	gadgetHandler.RemoveSyncAction("removePsychicThrow")
 end
 
 
