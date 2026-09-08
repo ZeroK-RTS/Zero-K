@@ -191,7 +191,7 @@ unitConfigs = {
     unfold = true,
     attack = true,
     shotangle = 45,
-    wait   = 120,
+    wait = 120,
   },
   [UnitDefNames.shieldraid.id] = {
     unfold = true,
@@ -223,8 +223,8 @@ unitConfigs = {
     dimensionOverride = {maxy = 100},
   },
   [UnitDefNames.cloaksnipe.id] = {
---    unfold = true,
---    attack = true,
+    unfold = true,
+    attack = true,
   },
   [UnitDefNames.cloakassault.id] = {
     unfold = true,
@@ -303,10 +303,12 @@ unitConfigs = {
   [UnitDefNames.commrecon1.id] = {
     unfold = true,
     --attack = true,
+    saveNames = {"commrecon"},
   },
   [UnitDefNames.commsupport1.id] = {
 	unfold = true,
     --attack = true,
+    saveNames = {"commsupport"},
   },
   [UnitDefNames.zenith.id] = {
     wait   = 50,
@@ -352,6 +354,7 @@ unitConfigs = {
   },
   [UnitDefNames.dynrecon1.id] = {
     inBatch = true,
+    unfold = true,
     saveNames = {"commrecon", "recon"},
   },
   [UnitDefNames.dynstrike1.id] = {
@@ -360,6 +363,7 @@ unitConfigs = {
   },
   [UnitDefNames.dynsupport1.id] = {
     inBatch = true,
+    unfold = true,
     saveNames = {"commsupport", "engineer"},
   },
   [UnitDefNames.corcom1.id] = {
@@ -387,6 +391,9 @@ unitConfigs = {
   },
   [UnitDefNames.pw_bomberfac.id] = {
     saveNames = {"pw_bombercontrol", "pw_dropdepot"},
+  },
+  [UnitDefNames.vehsupport.id] = {
+    unfold = true,
   },
   
 }
