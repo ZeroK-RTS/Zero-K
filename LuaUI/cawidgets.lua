@@ -257,6 +257,8 @@ local flexCallIns = {
 	'MissileFired',
 	'MissileDestroyed',
 	"PreGameTimekeeping",
+	"VisibleExplosion",
+	"Barrelfire",
 }
 local flexCallInMap = {}
 for _, ci in ipairs(flexCallIns) do
@@ -630,6 +632,7 @@ local restrictedFunctions = {
 local restrictedWhitelist = {
 	--[[ Other widgets have security holes and there is
 	     no reason for them to have access anyway. ]]
+	['LuaUI/Widgets/gfx_distortion_gl4.lua'] = true,
 	['LuaUI/Widgets/gfx_projectile_lights.lua'] = true,
 	['LuaUI/Widgets/gfx_deferred_rendering_gl4.lua'] = true,
 }
@@ -2535,6 +2538,14 @@ function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
 	return retval
 end
 
+function widgetHandler:ClearMapMarks()
+	tracy.ZoneBeginN("W:ClearMapMarks")
+	for _, w in ipairs(self.ClearMapMarksList) do
+		w:ClearMapMarks()
+	end
+	tracy.ZoneEnd()
+	return
+end
 
 function widgetHandler:GameSetup(state, ready, playerStates)
 	tracy.ZoneBeginN("W:GameSetup")
@@ -3006,6 +3017,29 @@ function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
+end
+
+--------------------------------------------------------------------------------
+--
+--  GFX
+--
+
+function widgetHandler:VisibleExplosion(px, py, pz, weaponID, ownerID)
+	tracy.ZoneBeginN("W:VisibleExplosion")
+	for _, w in ipairs(self.VisibleExplosionList) do
+		w:VisibleExplosion(px, py, pz, weaponID, ownerID)
+	end
+	tracy.ZoneEnd()
+	return
+end
+
+function widgetHandler:Barrelfire(px, py, pz, weaponID, ownerID)
+	tracy.ZoneBeginN("W:Barrelfire")
+	for _, w in ipairs(self.BarrelfireList) do
+		w:Barrelfire(px, py, pz, weaponID, ownerID)
+	end
+	tracy.ZoneEnd()
+	return
 end
 
 function widgetHandler:GameID(gameID)
