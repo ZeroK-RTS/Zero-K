@@ -230,10 +230,17 @@ local function RestoreDGun()
 	Turn(lnanohand, x_axis, 0, ARM_SPEED_PITCH)
 end
 
+local dgunAim = false
+local function PrioritiseDgun()
+	dgunAim = true
+	Sleep(500)
+	dgunAim = false
+end
+
 function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
 
-	if weaponNum == 1 then
+	if weaponNum == 1 and not dgunAim then
 		Signal(SIG_LASER)
 		SetSignalMask(SIG_LASER)
 		isLasering = true
@@ -250,6 +257,9 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreLaser)
 		return true
 	elseif weaponNum == 2 then
+		if dyncomm.IsManualFire(num) and not dgunAim then
+			StartThread(PrioritiseDgun)
+		end
 		if starBLaunchers[num] then
 			pitch = ARM_PERPENDICULAR
 		end
@@ -282,6 +292,7 @@ function script.FireWeapon(num)
 		dyncomm.EmitWeaponFireSfx(rcannon_flare, num)
 	elseif weaponNum == 2 then
 		dyncomm.EmitWeaponFireSfx(lcannon_flare, num)
+		dgunAim = false
 	end
 end
 

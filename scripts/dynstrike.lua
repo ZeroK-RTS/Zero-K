@@ -533,10 +533,17 @@ local function AimArm(heading, pitch, arm, hand, wait)
 	end
 end
 
+local dgunAim = false
+local function PrioritiseDgun()
+	dgunAim = true
+	Sleep(500)
+	dgunAim = false
+end
+
 function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
 	walking = false
-	if weaponNum == 1 then
+	if weaponNum == 1 and not dgunAim then
 		resetRestoreTorso = true
 		resetRestoreLeft = true
 		AimArm(heading, pitch, ArmLeft, Gun, true)
@@ -546,7 +553,8 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_RIGHT)
 		Signal(SIG_RESTORE_RIGHT)
 		resetRestoreTorso = true
-		if dyncomm.IsManualFire(num) then
+		if dyncomm.IsManualFire(num) and not dgunAim then
+			StartThread(PrioritiseDgun)
 			RESTORE_DELAY_RIGHT = RESTORE_DELAY_DGUN
 		else 
 			RESTORE_DELAY_RIGHT = RESTORE_DELAY_NANO
@@ -566,6 +574,7 @@ function script.FireWeapon(num)
 		dyncomm.EmitWeaponFireSfx(Muzzle, num)
 	elseif weaponNum == 2 then
 		dyncomm.EmitWeaponFireSfx(RightMuzzle, num)
+		dgunAim = false
 	end
 end
 
