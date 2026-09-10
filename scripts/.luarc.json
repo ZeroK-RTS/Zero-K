@@ -1,0 +1,51 @@
+{
+    "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+    "diagnostics.globalsRegex": ["CMD_.*"],
+    "diagnostics.globals": [
+        "VFS",
+        "UnitDefs",
+        "UnitDefNames",
+        "FeatureDefs",
+        "ModularCommDefsShared",
+        "piece",
+        "GG",
+        "Script",
+        "WG",
+        "widgetHandler",
+        "widget",
+        "GameData",
+        "Shared",
+        "gadget",
+        "DEFS",
+        "LOG",
+        "FeatureDefNames",
+        "SendToUnsynced",
+        "CMD",
+        "WeaponDefs",
+        "CMDTYPE",
+        "WeaponDefNames",
+        "script"
+        
+        //,{ "name": "script", "include": "scripts/**.lua" }
+    ],
+    "runtime.version": "Lua 5.1",
+    "diagnostics.disable": [
+        "duplicate-set-field",
+        "lowercase-global",
+		"cast-local-type"
+    ],
+    "completion.requireSeparator": "/",
+    "runtime.path": [
+        "?",
+        "?.lua"
+    ],
+    "runtime.special": {
+        "include":"require",
+        "VFS.Include":"require"
+    },
+    "workspace.library": [
+        ".."
+    ],
+    "Lua.workspace.checkThirdParty": false
+    
+}
