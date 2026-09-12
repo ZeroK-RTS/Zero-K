@@ -3945,519 +3945,72 @@ do
 	end
 end
 
--- Effect duplications:
-unitDistortions.armdecom = unitDistortions.armcom
-unitDistortions.corgantuw = unitDistortions.corgant
+local function BigStomp(piece)
+	return {
+		-- Footstep shockwave
+		alwaysVisible = false,
+		distortionType = "point",
+		distortionName = "bigstomp",
+		pieceName = piece,
+		distortionConfig = {
+			posx = 0,
+			posy = -6,
+			posz = 12,
+			radius = 60,
+			noiseStrength = 1.2,
+			noiseScaleSpace = 0.4,
+			distanceFalloff = 0.4,
+			onlyModelMap = 1,
+			effectStrength = 0.7,
+			lifeTime = 15,
+			rampUp = 3,
+			decay = 15,
+			startRadius = 0.3,
+			shockWidth = 5,
+			effectType = "groundShockwave",
+		},
+	}
+end
+
+local function SmallStomp(piece)
+	return {
+		-- Footstep shockwave
+		alwaysVisible = false,
+		distortionType = "point",
+		distortionName = "smallstomp",
+		pieceName = piece,
+		distortionConfig = {
+			posx = 0,
+			posy = -8,
+			posz = 0,
+			radius = 35,
+			noiseStrength = 1.2,
+			noiseScaleSpace = 0.4,
+			distanceFalloff = 0.5,
+			onlyModelMap = 1,
+			effectStrength = 0.5,
+			lifeTime = 12,
+			rampUp = 3,
+			decay = 10,
+			startRadius = 0.3,
+			shockWidth = 3,
+			effectType = "groundShockwave",
+		},
+	}
+end
 
 local unitEventDistortionsNames = {
-	------------------------------------ Put distortions that are slaved to ProjectileCreated here! ---------------------------------
-	-- WeaponBarrelGlow =  {
-	-- 	['corint'] = {
-	-- 		barrelglow1 = {
-	-- 			distortionType = 'point',
-	-- 			pieceName = 'distortion',
-	-- 			distortionConfig = { posx = -7, posy = 8, posz = 5, radius = 30,
-	-- 				color2r = 0, color2g = 0, color2b = 0, colortime = 300,
-	-- 				r = 1, g = 1, b = 1, a = 0.69999999,
-	-- 				modelfactor = 2, specular = 1, scattering = 0, lensflare = 0,
-	-- 				lifeTime = 300, sustain = 1, effectType = 0},
-	-- 		},
-	-- 	},
-	-- 	['corint'] = {
-	-- 		barrelglow2 = {
-	-- 			distortionType = 'point',
-	-- 			pieceName = 'distortion',
-	-- 			distortionConfig = { posx = 7, posy = 8, posz = 5, radius = 30,
-	-- 				color2r = 0, color2g = 0, color2b = 0, colortime = 300,
-	-- 				r = 1, g = 1, b = 1, a = 0.69999999,
-	-- 				modelfactor = 2, specular = 1, scattering = 0, lensflare = 0,
-	-- 				lifeTime = 300, sustain = 1, effectType = 0},
-	-- 		},
-	-- 	},
-	-- },
-	--------------------------------- Put distortions that are spawned from COB/LUS here ! ---------------------------------
-	-- These distortions _must_ be indexed by numbers! As these will be the ones triggered by the
-	-- The COB lua_UnitScriptDistortion(distortionIndex, count) call does this job!
-	-- to make the distortion EXACTLY color2 at the end of the lifeTime, make colortime = 2 * lifeTime
-
-	--corint disabled for now since it has static positioning - now only 'working' when shooting to east:
-
 	UnitScriptDistortions = {
 
-		corkorg = {
-			[1] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "corkorgfootstep",
-				pieceName = "none",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 8,
-					radius = 120,
-					noiseStrength = 1.2,
-					noiseScaleSpace = 0.5,
-					distanceFalloff = 0.4,
-					onlyModelMap = 1,
-					effectStrength = 1.0, --needed for shockwave
-					lifeTime = 25,
-					rampUp = 3,
-					decay = 15,
-					startRadius = 0.3,
-					shockWidth = 5,
-					effectType = "groundShockwave",
-				},
-			},
+		striderdetriment = {
+			leftfoot = BigStomp("lfoot"),
+			rightfoot = BigStomp("rfoot"),
 		},
-
-		corsumo = {
-			[1] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "corsumofootstepfl",
-				pieceName = "footfl",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 20,
-					noiseStrength = 0.35,
-					noiseScaleSpace = 0.9,
-					distanceFalloff = 0.7,
-					onlyModelMap = 1,
-					effectStrength = 0.8,
-					refractiveIndex = -1.02, --needed for shockwave
-					lifeTime = 15,
-					rampUp = 3,
-					decay = 10,
-					startRadius = 0.4,
-					shockWidth = 0.6,
-					effectType = "groundShockwave",
-				},
-			},
-			[2] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "corsumofootstepbr",
-				pieceName = "footbr",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 20,
-					noiseStrength = 0.35,
-					noiseScaleSpace = 0.9,
-					distanceFalloff = 0.7,
-					onlyModelMap = 1,
-					effectStrength = 0.8,
-					refractiveIndex = -1.02, --needed for shockwave
-					lifeTime = 15,
-					rampUp = 3,
-					decay = 10,
-					startRadius = 0.4,
-					shockWidth = 0.6,
-					effectType = "groundShockwave",
-				},
-			},
-			[3] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "corsumofootstepfr",
-				pieceName = "footfr",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 20,
-					noiseStrength = 0.35,
-					noiseScaleSpace = 0.9,
-					distanceFalloff = 0.7,
-					onlyModelMap = 1,
-					effectStrength = 0.8,
-					refractiveIndex = -1.02, --needed for shockwave
-					lifeTime = 15,
-					rampUp = 3,
-					decay = 10,
-					startRadius = 0.4,
-					shockWidth = 0.6,
-					effectType = "groundShockwave",
-				},
-			},
-			[4] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "corsumofootstepbl",
-				pieceName = "footbl",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 20,
-					noiseStrength = 0.35,
-					noiseScaleSpace = 0.9,
-					distanceFalloff = 0.7,
-					onlyModelMap = 1,
-					effectStrength = 0.8,
-					refractiveIndex = -1.02, --needed for shockwave
-					lifeTime = 15,
-					rampUp = 3,
-					decay = 10,
-					startRadius = 0.4,
-					shockWidth = 0.6,
-					effectType = "groundShockwave",
-				},
-			},
-		},
-
-		corjugg = {
-			[1] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "bigassfootstep",
-				pieceName = "lfootstepf",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 60,
-					noiseStrength = 1.1,
-					noiseScaleSpace = 0.6,
-					distanceFalloff = 0.4,
-					onlyModelMap = 1,
-					effectStrength = 1.2, --needed for shockwave
-					lifeTime = 18,
-					rampUp = 10,
-					decay = 10,
-					shockWidth = 1.5,
-					startRadius = 0.1,
-					effectType = "groundShockwave",
-				},
-			},
-			[2] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "bigassfootstep2",
-				pieceName = "rfootstepf",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 60,
-					noiseStrength = 1.1,
-					noiseScaleSpace = 0.6,
-					distanceFalloff = 0.4,
-					onlyModelMap = 1,
-					effectStrength = 1.2, --needed for shockwave
-					lifeTime = 18,
-					rampUp = 10,
-					decay = 10,
-					shockWidth = 1.5,
-					startRadius = 0.1,
-					effectType = "groundShockwave",
-				},
-			},
-			[3] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "bigassfootstep3",
-				pieceName = "lfootstepb",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 52,
-					noiseStrength = 1.1,
-					noiseScaleSpace = 0.6,
-					distanceFalloff = 0.4,
-					onlyModelMap = 1,
-					effectStrength = 1.2, --needed for shockwave
-					lifeTime = 18,
-					rampUp = 10,
-					decay = 10,
-					shockWidth = 1.5,
-					startRadius = 0.1,
-					effectType = "groundShockwave",
-				},
-			},
-			[4] = {
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "bigassfootstep4",
-				pieceName = "rfootstepb",
-				distortionConfig = {
-					posx = 0,
-					posy = 0,
-					posz = 0,
-					radius = 52,
-					noiseStrength = 1.1,
-					noiseScaleSpace = 0.6,
-					distanceFalloff = 0.4,
-					onlyModelMap = 1,
-					effectStrength = 1.2, --needed for shockwave
-					lifeTime = 18,
-					rampUp = 10,
-					decay = 10,
-					shockWidth = 1.5,
-					startRadius = 0.1,
-					effectType = "groundShockwave",
-				},
-			},
-		},
-
-		-- ['armmark'] = {
-		-- 	[1] = {
-		-- 		-- radarwave
-		-- 		alwaysVisible = false,
-		-- 		distortionType = 'point',
-		-- 		distortionName = 'radarwave',
-		-- 		pieceName = 'none',
-		-- 		distortionConfig = { posx = 0, posy = 0, posz = 0, radius = 60,
-		-- 						noiseStrength = 0.2, noiseScaleSpace = 0.8, distanceFalloff = 0.1, onlyModelMap = 1,
-		-- 						effectStrength = -1.5, --needed for shockwave
-		-- 						lifeTime = 60, rampUp = 20, decay = 15,
-		-- 						shockWidth = 0.7, startRadius = 0.1, effectType = 'groundShockwave'},
-
-		-- 	},
-		-- },
-
-		cordemon = {
-			[1] = {
-				-- Barrel Heat
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "flameheat1",
-				pieceName = "lfbarrel2",
-				distortionConfig = {
-					posx = 0,
-					posy = 5,
-					posz = 0,
-					radius = 11,
-					noiseStrength = 0.4,
-					noiseScaleSpace = 1.8,
-					distanceFalloff = 1.1,
-					onlyModelMap = 0,
-					effectStrength = 1.0, --needed for heat
-					riseRate = 1.2,
-					windAffected = 0.3,
-					lifeTime = 250,
-					rampUp = 40,
-					decay = 120,
-					effectType = 0,
-				},
-			},
-			[2] = {
-				-- Barrel Heat
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "flameheat2",
-				pieceName = "rfbarrel2",
-				distortionConfig = {
-					posx = 0,
-					posy = 5,
-					posz = 0,
-					radius = 11,
-					noiseStrength = 0.4,
-					noiseScaleSpace = 1.8,
-					distanceFalloff = 1.1,
-					onlyModelMap = 0,
-					effectStrength = 1.0, --needed for heat
-					riseRate = 1.2,
-					windAffected = 0.3,
-					lifeTime = 250,
-					rampUp = 40,
-					decay = 120,
-					effectType = 0,
-				},
-			},
-			-- [3] = {
-			-- 	-- Flame distort
-			-- 	alwaysVisible = false,
-			-- 	distortionType = 'beam',
-			-- 	distortionName = 'flamedistort',
-			-- 	pieceName = 'rfbarrel2',
-			-- 	distortionConfig = { posx = 0, posy = 5, posz = 25, radius = 35,
-			-- 					pos2x = 0, pos2y = 5, pos2z = 185,
-			-- 					noiseStrength = 4, noiseScaleSpace = -0.3, distanceFalloff = 3.5,
-			-- 					onlyModelMap = 0,
-			-- 					effectStrength = 3.0, --needed for heat
-			-- 					windAffected = 0.1, riseRate = -0.5,
-			-- 					lifeTime = 15, rampUp = 0, decay = 0,
-			-- 					effectType = 0},
-			-- },
-			[3] = {
-				-- Flame distort
-				alwaysVisible = false,
-				distortionType = "cone",
-				distortionName = "flamedistort",
-				pieceName = "rfbarrel2",
-				distortionConfig = {
-					posx = 0,
-					posy = 5,
-					posz = 0,
-					radius = 350,
-					dirx = 0,
-					diry = 0,
-					dirz = 1.0,
-					theta = 0.3,
-					noiseStrength = 4,
-					noiseScaleSpace = -0.2,
-					distanceFalloff = 3.5,
-					onlyModelMap = 0,
-					effectStrength = 3.0, --needed for heat
-					windAffected = 0.1,
-					riseRate = -0.5,
-					lifeTime = 15,
-					rampUp = 25,
-					decay = 0,
-					effectType = 0,
-				},
-			},
-			[4] = {
-				-- Flame distort
-				alwaysVisible = false,
-				distortionType = "cone",
-				distortionName = "flamedistort",
-				pieceName = "lfbarrel2",
-				distortionConfig = {
-					posx = 0,
-					posy = 5,
-					posz = 0,
-					radius = 350,
-					dirx = 0,
-					diry = 0,
-					dirz = 1.0,
-					theta = 0.4,
-					noiseStrength = 4,
-					noiseScaleSpace = 0.12,
-					distanceFalloff = 3.5,
-					onlyModelMap = 0,
-					effectStrength = 2.0, --needed for heat
-					windAffected = 0.1,
-					riseRate = -0.5,
-					lifeTime = 15,
-					rampUp = 25,
-					decay = 0,
-					effectType = 0,
-				},
-			},
-		},
-
-		armraz = {
-			[1] = {
-				-- Barrel Heat
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "barrelheatl",
-				pieceName = "lcannon",
-				distortionConfig = {
-					posx = 0,
-					posy = 5,
-					posz = 23.5,
-					radius = 8,
-					noiseStrength = 0.3,
-					noiseScaleSpace = -1.8,
-					distanceFalloff = 0.8,
-					onlyModelMap = 0,
-					effectStrength = 0.5, --needed for heat
-					lifeTime = 160,
-					rampUp = 25,
-					decay = 25,
-					riseRate = 0.2,
-					windAffected = -0.3,
-					effectType = 0,
-				},
-			},
-			[2] = {
-				-- Barrel Heat
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "barrelheatr",
-				pieceName = "rcannon",
-				distortionConfig = {
-					posx = 0,
-					posy = 5,
-					posz = 23.5,
-					radius = 8,
-					noiseStrength = 0.3,
-					noiseScaleSpace = -1.8,
-					distanceFalloff = 0.8,
-					onlyModelMap = 0,
-					effectStrength = 0.5, --needed for heat
-					lifeTime = 160,
-					rampUp = 25,
-					decay = 25,
-					riseRate = 0.2,
-					windAffected = -0.3,
-					effectType = 0,
-				},
-			},
-		},
-
-		armbrtha = {
-			[1] = {
-				-- Barrel Heat after shot
-				alwaysVisible = false,
-				distortionType = "beam",
-				distortionName = "brthabarrelheat",
-				pieceName = "flare",
-				distortionConfig = {
-					posx = 0,
-					posy = 4,
-					posz = 4,
-					radius = 10,
-					pos2x = 0,
-					pos2y = 4,
-					pos2z = -16,
-					onlyModelMap = 0,
-					riseRate = 0.5,
-					windAffected = -0.5,
-					noiseStrength = 0.3,
-					noiseScaleSpace = 1.0,
-					distanceFalloff = 1.0,
-					rampUp = 5,
-					decay = 200,
-					lifeTime = 240,
-					effectType = 0,
-				},
-			},
-		},
-
-		corint = {
-			[1] = {
-				-- Barrel Heat after shot
-				alwaysVisible = false,
-				distortionType = "beam",
-				distortionName = "corintbarrelheat",
-				pieceName = "heat",
-				distortionConfig = {
-					posx = 0,
-					posy = 4,
-					posz = 4,
-					radius = 10,
-					pos2x = 0,
-					pos2y = 4,
-					pos2z = -16,
-					onlyModelMap = 0,
-					riseRate = 0.5,
-					windAffected = -0.5,
-					noiseStrength = 0.3,
-					noiseScaleSpace = 1.0,
-					distanceFalloff = 1.0,
-					rampUp = 5,
-					decay = 200,
-					lifeTime = 240,
-					effectType = 0,
-				},
-			},
+		jumpsumo = {
+			leftfront = SmallStomp("lf_foot"),
+			rightfront = SmallStomp("rf_foot"),
+			leftback = SmallStomp("lb_foot"),
+			rightback = SmallStomp("rb_foot"),
 		},
 	},
 

@@ -193,6 +193,12 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED * pelvisMult * speed)
 	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED * speed)
 
+	Sleep(800)
+	if impactFoot == lfoot then
+		GG.UnitScriptDistortion(unitID, unitDefID, "leftfoot")
+	else
+		GG.UnitScriptDistortion(unitID, unitDefID, "rightfoot")
+	end
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)

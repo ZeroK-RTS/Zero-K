@@ -259,6 +259,8 @@ local flexCallIns = {
 	"PreGameTimekeeping",
 	"VisibleExplosion",
 	"Barrelfire",
+	"UnitScriptLight",
+	"UnitScriptDistortion",
 }
 local flexCallInMap = {}
 for _, ci in ipairs(flexCallIns) do
@@ -3019,6 +3021,26 @@ function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
 	tracy.ZoneEnd()
 end
 
+function widgetHandler:GameID(gameID)
+	tracy.ZoneBeginN("W:GameID")
+	for _, w in ipairs(self.GameIDList) do
+		tracy.ZoneBeginN("W:GameID:" .. w.whInfo.name)
+		w:GameID(gameID)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
+function widgetHandler:UnitStructureMoved(unitID, unitDefID, newX, newZ)
+	tracy.ZoneBeginN("W:UnitStructureMoved")
+	for _, w in r_ipairs(self.UnitStructureMovedList) do
+		tracy.ZoneBeginN("W:UnitStructureMoved:" .. w.whInfo.name)
+		w:UnitStructureMoved(unitID, unitDefID, newX, newZ)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
 --------------------------------------------------------------------------------
 --
 --  GFX
@@ -3042,24 +3064,22 @@ function widgetHandler:Barrelfire(px, py, pz, weaponID, ownerID)
 	return
 end
 
-function widgetHandler:GameID(gameID)
-	tracy.ZoneBeginN("W:GameID")
-	for _, w in ipairs(self.GameIDList) do
-		tracy.ZoneBeginN("W:GameID:" .. w.whInfo.name)
-		w:GameID(gameID)
-		tracy.ZoneEnd()
+function widgetHandler:UnitScriptLight(unitID, unitDefID, lightIndex, param)
+	tracy.ZoneBeginN("W:UnitScriptLight")
+	for _, w in ipairs(self.UnitScriptLightList) do
+		w:UnitScriptLight(unitID, unitDefID, lightIndex, param)
 	end
 	tracy.ZoneEnd()
+	return
 end
 
-function widgetHandler:UnitStructureMoved(unitID, unitDefID, newX, newZ)
-	tracy.ZoneBeginN("W:UnitStructureMoved")
-	for _, w in r_ipairs(self.UnitStructureMovedList) do
-		tracy.ZoneBeginN("W:UnitStructureMoved:" .. w.whInfo.name)
-		w:UnitStructureMoved(unitID, unitDefID, newX, newZ)
-		tracy.ZoneEnd()
+function widgetHandler:UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
+	tracy.ZoneBeginN("W:UnitScriptDistortion")
+	for _, w in ipairs(self.UnitScriptDistortionList) do
+		w:UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
 	end
 	tracy.ZoneEnd()
+	return
 end
 
 --------------------------------------------------------------------------------

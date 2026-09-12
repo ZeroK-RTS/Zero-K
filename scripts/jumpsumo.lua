@@ -122,6 +122,8 @@ local function Walk()
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(rf_foot, dirtfling)
 			EmitSfx(lb_foot, dirtfling)
+			GG.UnitScriptDistortion(unitID, unitDefID, "rightfront")
+			GG.UnitScriptDistortion(unitID, unitDefID, "leftback")
 		end
 		
 		Turn(lf_ball, y_axis, lf_angle, sp1) -- left front leg forward
@@ -181,6 +183,8 @@ local function Walk()
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(lf_foot, dirtfling)
 			EmitSfx(rb_foot, dirtfling)
+			GG.UnitScriptDistortion(unitID, unitDefID, "leftfront")
+			GG.UnitScriptDistortion(unitID, unitDefID, "rightback")
 		end
 		
 		Turn(lf_ball, y_axis, 1.3, sp2) -- left front leg backward

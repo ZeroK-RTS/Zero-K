@@ -824,7 +824,7 @@ function widget:Barrelfire(px, py, pz, weaponID, ownerID)
 end
 
 local function UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
-	--spEcho("UnitSCriptDistortion", unitID, unitDefID, distortionIndex, param, visibleUnits[unitID] )
+	--Spring.Echo("UnitSCriptDistortion", unitID, unitDefID, distortionIndex, param, visibleUnits[unitID] )
 	if
 		spValidUnitID(unitID)
 		and spGetUnitIsDead(unitID) == false
@@ -846,7 +846,7 @@ local function UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
 			InitializeDistortion(distortionTable, unitID)
 		end
 		local instanceID =
-			stringFormat("%d_%s_UnitScriptDistortion%d_%s", unitID, unitName[unitDefID], distortionIndex, param)
+			stringFormat("%d_%s_UnitScriptDistortion%s_%s", unitID, unitName[unitDefID], tostring(distortionIndex), param)
 		AddDistortion(
 			instanceID,
 			unitID,
