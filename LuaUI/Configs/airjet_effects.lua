@@ -15,6 +15,7 @@ for unitname, effects in pairs(effectUnitDefs) do
 				length = effect.options.length,
 				piece = effect.options.piece,
 				texture2 = effect.options.texture2 or ":c:bitmaps/gpl/lups/jet2.bmp",
+				distortLength = effect.options.distortLength,
 				light = 1,
 			}
 		end

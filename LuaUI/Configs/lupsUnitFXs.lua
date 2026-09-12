@@ -320,8 +320,8 @@ local effectUnitDefs = {
 		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
 	},
 	planefighter = {
-		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", distortLength = 140, onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", distortLength = 140, onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtip1", noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtip2", noIconDraw = true}},
 	},

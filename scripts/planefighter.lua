@@ -137,6 +137,14 @@ function script.StopMoving()
 	deactivate()
 end
 
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
+end
+
 function script.QueryWeapon(num)
 	if num == 1 then
 		return flare[shotCycle]

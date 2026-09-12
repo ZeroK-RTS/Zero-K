@@ -18,6 +18,7 @@ local FIRE_SLOWDOWN = tonumber(UnitDef.customParams.combat_slowdown)
 local FIRE_TURN_INC = 3
 
 --signals
+local SIG_TAKEOFF = 1
 local SIG_RESTORE = 2
 
 ----------------------------------------------------------
@@ -31,15 +32,28 @@ function script.Create()
 	Turn(thrust1, x_axis, math.rad(-90), 1)
 	Turn(thrust2, x_axis, math.rad(-90), 1)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	Hide(thrust1)
+	Hide(thrust2)
+	Hide(thrust3)
 end
 
-function script.StartMoving()
+local function Unfold()
+	Signal(SIG_TAKEOFF)
+	SetSignalMask(SIG_TAKEOFF)
 	Turn(engineL, z_axis, -1.57, 1)
 	Turn(engineR, z_axis, 1.57, 1)
 	Turn(engineL, y_axis, -1.57, 1)
 	Turn(engineR, y_axis, 1.57, 1)
 	Turn(engineL, x_axis, 0, 1)
 	Turn(engineR, x_axis, 0, 1)
+	Show(thrust3)
+	WaitForTurn(engineR, z_axis)
+	Show(thrust1)
+	Show(thrust2)
+end
+
+function script.StartMoving()
+	StartThread(Unfold)
 end
 
 function script.StopMoving()
@@ -49,6 +63,17 @@ function script.StopMoving()
 	Turn(engineR, y_axis, 0, 1)
 	Turn(engineL, x_axis, 0, 1)
 	Turn(engineR, x_axis, 0, 1)
+	Hide(thrust1)
+	Hide(thrust2)
+	Hide(thrust3)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
 end
 
 function script.QueryWeapon(num)

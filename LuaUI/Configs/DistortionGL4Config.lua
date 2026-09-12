@@ -97,9 +97,9 @@ do
 				local airjetConfig = table.copy(longAirJet)
 
 				-- The radius and cone angle are set to be close to the airjet length and width
-				airjetConfig.radius = airjet.length * 2.5
+				airjetConfig.radius = airjet.distortLength or (airjet.length * 2.5)
 				-- We need to set the theta angle (half -angle of the cone in radians) to ensure that the width-length ratio is correct
-				airjetConfig.theta = math.atan(airjet.width / airjet.length) * 1.2
+				airjetConfig.theta = math.atan(airjet.width / airjetConfig.radius * 2.5) * 1.2
 
 				--Spring.Echo("airjetConfig.theta", airjetConfig.theta, airjet.width, airjet.length)
 
