@@ -2762,9 +2762,9 @@ explosionDistortionsNames.armmercury_arm_advsam = {
 projectileDefDistortionsNames.legphoenix_legphtarg = GetDistortionClass("NoEffect", 0)
 
 explosionDistortionsNames.spidercrabe_arm_crabe_gauss = {
-	GetDistortionClass("ExplosionHeatNuke", "Mega"),
-	GetDistortionClass("AirShockWaveNuke", "Cornuke"),
-	GetDistortionClass("GroundShockWaveNuke", "Cornuke"),
+	GetDistortionClass("GroundShockWave", "Small", {
+		shockWidth = 8,
+	}),
 }
 
 explosionDistortionsNames.armliche_arm_pidr = {
