@@ -1,12 +1,17 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
 	return {
 		name        = "Zombie helper api",
 		desc        = "The place to handle your zombie esque needs!",
-		author      = "Stiofan",
-		date        = "June 2026",
+		author      = "TomFyuri, Stiofan",
+		date        = "Mar 2014",
 		license     = "GPL v2 or later",
 		layer       = math.huge,
 		enabled     = true
@@ -59,35 +64,38 @@ local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealth)
   local featureDefName,facing = GetFeatureResurrectData(featureID)
   local x, y, z = Spring.GetFeaturePosition(featureID)
   
-  if reclaimPercentHealth then
-    local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
-    if currentMetal and maxMetal and (maxMetal > 0) then
-      partialReclaim = currentMetal/maxMetal
-    end
-  end
-  
-  Spring.DestroyFeature(featureID)
   local unitID = Spring.CreateUnit(featureDefName, x, y, z, facing, teamID)
-
-  if (unitID) then
-    gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
-    local size = UnitDefNames[featureDefName].xsize
-    Spring.SpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
-    Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
-    GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
-    if partialReclaim ~= 1 then
-      local health = Spring.GetUnitHealth(unitID)
-      if health then
-        Spring.SetUnitHealth(unitID, health*partialReclaim)
-      end
-    end
-  end
   
+  -- Unit and Wreck exist both
+  -- could let there be a function passed to this function, that returns the Unit ID for transfer of values
+
+ 	if (unitID) then
+		gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
+		local size = UnitDefNames[featureDefName].xsize
+		Spring.SpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
+		Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
+		GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
+		
+		if reclaimPercentHealth then
+			local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
+			if currentMetal and maxMetal and (maxMetal > 0) then
+				local health = Spring.GetUnitHealth(unitID)
+				if health then
+					Spring.SetUnitHealth(unitID, health*(currentMetal/maxMetal))
+				end
+			end
+		end
+    end
+	
+  Spring.DestroyFeature(featureID)
   return unitID
 end
 
 -- Works on non zombie units too.
 local function SetZombieSpeedMult(unitID,speedMult)
+	if type(speedMult) ~= 'number' or speedMult < 0 then
+		error("SetZombieSpeedMult: mult must be number >= 0")
+	end
 	Spring.SetUnitRulesParam(unitID, "zombieSpeedMult", speedMult, LOS_ACCESS)
 	GG.UpdateUnitAttributes(unitID)
 end
@@ -96,25 +104,20 @@ end
 -- Zombie commands
 
 local function RandomFactoryOrders(unitID, unitDefID) -- give factory something to do
-	local buildopts = UnitDefs[unitDefID].buildOptions
-	if (not buildopts) or #buildopts <= 0 then
-		return
-	end
-	local orders = {}
-	for i = 1, math.random(10, 30) do
-		orders[#orders + 1] = {-buildopts[math.random(1, #buildopts)], 0, 0 }
-	end
-	if (#orders > 0) then
-		if not Spring.GetUnitIsDead(unitID) then
-			Spring.GiveOrderArrayToUnitArray({unitID}, orders)
+	if not Spring.GetUnitIsDead(unitID) then
+		local buildopts = UnitDefs[unitDefID].buildOptions
+		if (not buildopts) or #buildopts <= 0 then
+			return
+		end
+		local orders = {}
+		for i = 1, math.random(10, 30) do
+			orders[#orders + 1] = {-buildopts[math.random(1, #buildopts)], 0, 0 }
+			Spring.GiveOrderArrayToUnit(unitID, orders)
 		end
 	end
 end
 
 
-local function disSQ(x1, y1, x2, y2)
-	return (x1 - x2)^2 + (y1 - y2)^2
-end
 
 local function GetUnitNearestAlly(unitID, range)
 	local best_ally
@@ -127,7 +130,7 @@ local function GetUnitNearestAlly(unitID, range)
 		local allyDefID = Spring.GetUnitDefID(allyID)
 		if (allyID ~= unitID) and (allyTeam == GaiaTeamID) and (Spring.Utilities.getMovetype(UnitDefs[allyDefID]) ~= false) then
 			local ox, oy, oz = Spring.GetUnitPosition(allyID)
-			local dist = disSQ(x, z, ox ,oz)
+			local dist = math.diag(x, z, ox ,oz)
 			if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
 				best_ally = allyID
 				best_dist = dist
