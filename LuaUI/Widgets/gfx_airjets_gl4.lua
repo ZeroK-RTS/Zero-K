@@ -292,7 +292,7 @@ void main()
 	vec4 speedvector = uni[instData.y].speed;
 
 	vec2 modulatedsize = widthlengthtime.xy * 1.5;
-	modulatedsize.y *= clamp(speedvector.y * 0.5 + 1.0 , 0.66, 2.0); // make the jet shorter/longer based on Y velocity
+	modulatedsize.y *= clamp(speedvector.y * 0.3 + 1.0 , 1.0, 1.5); // make the jet shorter/longer based on Y velocity
 	// modulatedsize += rndVec3.xy * modulatedsize * 0.25; // not very pretty
 	vec4 vertexPos = vec4(position_xy_uv.x * modulatedsize.x * 2.0, 0, position_xy_uv.y*modulatedsize.y * 0.66 ,1.0);
 
@@ -327,7 +327,7 @@ void main()
 	texCoords.q += (timeInfo.x + timeInfo.w) * 0.1;
 
 	jetcolor.rgb = color;
-	jetcolor.a = clamp((timeInfo.x + timeInfo.w - widthlengthtime.z)*0.053, 0.0, 1.0);
+	jetcolor.a = clamp((timeInfo.x + timeInfo.w - widthlengthtime.z)*0.053, 0.0, 1.0)*1.6;
 	if ((uni[instData.y].composite & 0x00000001u) == 0u )  jetcolor = vec4(0.0); // disable if drawflag is set to 0
 
 	if (reflectionPass > 0) {  // when reflecting, dont reflect underwater jets

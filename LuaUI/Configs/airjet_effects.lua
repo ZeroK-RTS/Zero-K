@@ -7,9 +7,10 @@ for unitname, effects in pairs(effectUnitDefs) do
 	for i = 1, #effects do
 		local effect = effects[i]
 		if effect.class == "AirJet" then
+			local col = effect.options.color
 			migratedDefs[unitname] = migratedDefs[unitname] or {}
 			migratedDefs[unitname][#migratedDefs[unitname] + 1] = {
-				color = effect.options.color,
+				color = {col[1]*0.9, col[2]*0.9, col[3]*0.9},
 				width = effect.options.width,
 				length = effect.options.length,
 				piece = effect.options.piece,
@@ -20,4 +21,4 @@ for unitname, effects in pairs(effectUnitDefs) do
 	end
 end
 
-return migratedDefs
+return migratedDefs --or {}

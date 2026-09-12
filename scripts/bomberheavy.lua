@@ -76,6 +76,8 @@ function ReammoComplete()
 end
 
 local function Land()
+	Hide(thrust_L)
+	Hide(thrust_R)
 	Turn(extra_L, z_axis, math.rad(-30), 3)
 	Turn(extra_R, z_axis, math.rad( 30), 3)
 
@@ -105,6 +107,8 @@ local function Stopping()
 end
 
 local function Fly()
+	Show(thrust_L)
+	Show(thrust_R)
 	Move(wing_L, x_axis, 0, 6)
 	Move(wing_R, x_axis, 0, 6)
 	Move(wing_L, y_axis, 0, 8)
@@ -170,6 +174,14 @@ function script.StopMoving()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 end
 
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
+end
+
 local function ShowBallWhenConstructionFinished()
 	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 	while stunned_or_inbuild do
@@ -180,13 +192,15 @@ local function ShowBallWhenConstructionFinished()
 end
 
 function script.Create()
-	Move(thrust_L, y_axis, -5)
-	Move(thrust_R, y_axis, -5)
+	Move(thrust_L, y_axis, -1.5)
+	Move(thrust_R, y_axis, -1.5)
 	Move(wingtip_L, y_axis, 5)
 	Move(wingtip_R, y_axis, 5)
 
 	Turn(thrust_L, x_axis, math.rad(90))
 	Turn(thrust_R, x_axis, math.rad(90))
+	Hide(thrust_L)
+	Hide(thrust_R)
 
 	Turn(rad_L, x_axis, math.rad(180))
 	Turn(rad_R, x_axis, math.rad(180))

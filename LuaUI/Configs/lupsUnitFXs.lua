@@ -225,8 +225,8 @@ local effectUnitDefs = {
 	--// PLANES //----------------------------
 	bomberheavy = {
 		-- jets
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4, length=35, piece="thrust_L", onActive=true, noIconDraw = true, }},
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4, length=35, piece="thrust_R", onActive=true, noIconDraw = true, }},
+		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4 * 1.4, length=35, piece="thrust_L", onActive=true, noIconDraw = true, }},
+		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4 * 1.4, length=35, piece="thrust_R", onActive=true, noIconDraw = true, }},
 
 		-- ribbons
 		{class='Ribbon', options={width=0.5, size=10, piece="wingtip_L", noIconDraw = true}},
