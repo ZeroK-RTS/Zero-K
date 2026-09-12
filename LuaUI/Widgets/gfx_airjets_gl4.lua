@@ -292,7 +292,7 @@ void main()
 	vec4 speedvector = uni[instData.y].speed;
 
 	vec2 modulatedsize = widthlengthtime.xy * 1.5;
-	modulatedsize.y *= clamp(speedvector.y * 0.3 + 1.0 , 1.0, 1.5); // make the jet shorter/longer based on Y velocity
+	modulatedsize.y *= clamp(speedvector.w * 0.2 + 0.8, 0.8, 1.5); // Scale with speed
 	// modulatedsize += rndVec3.xy * modulatedsize * 0.25; // not very pretty
 	vec4 vertexPos = vec4(position_xy_uv.x * modulatedsize.x * 2.0, 0, position_xy_uv.y*modulatedsize.y * 0.66 ,1.0);
 

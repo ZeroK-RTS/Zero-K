@@ -284,6 +284,9 @@ local effectUnitDefs = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="rjet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
 	},
 
+	gunshipbomb = {
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=20, piece="exhaust", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
+	},
 	gunshipraid = {
 		{class='Ribbon', options={width=1, size=10, piece="lfx", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=10, piece="rfx", noIconDraw = true}},
@@ -307,9 +310,9 @@ local effectUnitDefs = {
 		{class='Ribbon', options={width=1, size=10, piece="wingr", noIconDraw = true}},
 	},
 	bomberassault = {
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustLeft", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustRight", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=6, length=60, piece="exhaustTop", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=38, piece="exhaustLeft", distortLength = 150, onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=38, piece="exhaustRight", distortLength = 150, onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=6, length=50, piece="exhaustTop", distortLength = 180, onActive=true, noIconDraw = true}},
 	},
 	bomberprec = {
 		{class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
