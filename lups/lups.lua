@@ -1031,6 +1031,14 @@ local function Initialize()
 	for i,v in pairs(LupsConfig.disablefx or {}) do
 		disableFX[i:lower()]=v;
 	end
+	
+	--// Disable lups class if its replacement successfully loads.
+	for fxName,fxClass in pairs(fxClasses) do
+		local replacement = fxClass.GetInfo().replacement
+		if replacement and GG[replacement] and GG[replacement]() then
+			disableFX[fxName] = true
+		end
+	end
 
 	local linkBackupFXClasses = {}
 

@@ -105,6 +105,8 @@ local WING_DISTANCE = 8
 local function activate()
 	Move(rwing, x_axis, 0, 10)
 	Move(lwing, x_axis, 0, 10)
+	Show(nozzle1)
+	Show(nozzle2)
 end
 
 local function deactivate()
@@ -112,11 +114,15 @@ local function deactivate()
 	Move(lwing, x_axis, -WING_DISTANCE, 10)
 	Turn(rwing, y_axis, 0, math.rad(30))
 	Turn(lwing, y_axis, 0, math.rad(30))
+	Hide(nozzle1)
+	Hide(nozzle2)
 end
 
 function script.Create()
 	Move(rwing, x_axis, WING_DISTANCE)
 	Move(lwing, x_axis, -WING_DISTANCE)
+	Hide(nozzle1)
+	Hide(nozzle2)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end

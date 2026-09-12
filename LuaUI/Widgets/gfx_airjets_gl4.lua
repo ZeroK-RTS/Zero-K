@@ -421,6 +421,9 @@ local jetShaderSourceCache = {
 }
 
 local function initGL4()
+	if jetShader then
+		return
+	end
 	jetShader = LuaShader.CheckShaderUpdates(jetShaderSourceCache)
 	--spEcho(jetShader.shaderParams.vertex)
 	if not jetShader then
@@ -817,6 +820,14 @@ function widget:PlayerChanged(playerID)
 	if reinit then
 		reInitialize()
 	end
+end
+
+function WG.gl4Airjets()
+	if not gl.CreateShader then
+		return false
+	end
+	initGL4()
+	return jetShader and true
 end
 
 function widget:Initialize()

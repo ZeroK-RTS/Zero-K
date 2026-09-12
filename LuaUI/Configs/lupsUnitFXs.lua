@@ -1,5 +1,33 @@
 -- note that the order of the MergeTable args matters for nested tables (such as colormaps)!
 
+function MergeTable(table1,table2)
+	if not table1 then
+		return table2
+	end
+	if not table2 then
+		return table1
+	end
+	local result = {}
+	for i,v in pairs(table2) do
+		if (type(v)=='table') then
+			result[i] = MergeTable(v,{})
+		else
+			result[i] = v
+		end
+	end
+	for i,v in pairs(table1) do
+		if (result[i]==nil) then
+			if (type(v)=='table') then
+				if (type(result[i])~='table') then result[i] = {} end
+				result[i] = MergeTable(v,result[i])
+			else
+				result[i] = v
+			end
+		end
+	end
+	return result
+end
+
 local presets = {
 	commandAuraRed = {
 		{class='StaticParticles', options=commandCoronaRed},
@@ -51,7 +79,7 @@ local presets = {
 	},
 }
 
-effectUnitDefs = {
+local effectUnitDefs = {
 	--// FUSIONS //--------------------------
 	energysingu = {
 		{class='Bursts', options=energysinguBursts},
@@ -288,14 +316,18 @@ effectUnitDefs = {
 		{class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipl", noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipr", noIconDraw = true}},
-	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
-	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
 	},
 	planefighter = {
 		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtip1", noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtip2", noIconDraw = true}},
+	},
+	gunshipskirm = {
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust1", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust2", onActive=true, noIconDraw = true}},
 	},
 	gunshipcon = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardRight", onActive=true, emitVector = {0, 0, -1}, noIconDraw = true}},
@@ -307,11 +339,13 @@ effectUnitDefs = {
 		{class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipl", noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipr", noIconDraw = true}},
-	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
-	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
 	},
 	planeheavyfighter = {
-		-- jets done in gadget
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust1", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust2", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust3", onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtip1", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtip2", noIconDraw = true}},
 	},
@@ -324,6 +358,7 @@ effectUnitDefs = {
 		{class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav3", onActive=true})},
 		{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav4", onActive=true})},
 		{class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav4", onActive=true})},
+		{class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, baseLength = 9, piece="engineEmit", onActive=true, noIconDraw = true}},
 	},
 	gunshiptrans = {
 		{class='AirJet', options={color={0.2,0.4,0.8}, width=3.5, length=22, piece="engineEmit", onActive=true}},
@@ -358,9 +393,9 @@ effectUnitDefs = {
 		{class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rwingengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 	},
 	gunshipkrow = {
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
 	},
 	nebula = {
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=15, length=60, piece="exhaustmain", onActive=true}},
@@ -435,3 +470,5 @@ for i=1,#UnitDefs do
 		end
 	end
 end
+
+return effectUnitDefs

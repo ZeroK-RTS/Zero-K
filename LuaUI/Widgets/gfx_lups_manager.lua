@@ -28,30 +28,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function MergeTable(table1,table2)
-	local result = {}
-	for i,v in pairs(table2) do
-		if (type(v)=='table') then
-			result[i] = MergeTable(v,{})
-		else
-			result[i] = v
-		end
-	end
-	for i,v in pairs(table1) do
-		if (result[i]==nil) then
-			if (type(v)=='table') then
-				if (type(result[i])~='table') then result[i] = {} end
-				result[i] = MergeTable(v,result[i])
-			else
-				result[i] = v
-			end
-		end
-	end
-	return result
-end
-
 include("Configs/lupsFXs.lua")
-include("Configs/lupsUnitFXs.lua")
+local effectUnitDefs = include("Configs/lupsUnitFXs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
