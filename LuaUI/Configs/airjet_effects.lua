@@ -22,4 +22,4 @@ for unitname, effects in pairs(effectUnitDefs) do
 	end
 end
 
-return migratedDefs --or {}
+return migratedDefs

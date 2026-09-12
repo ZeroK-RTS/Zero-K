@@ -4,11 +4,11 @@ function widget:GetInfo()
 	return {
 		name      = "TEK2 Wing Drag GL4",
 		desc      = "GPU-expanded lDrag/rDrag ribbons; Lua only samples wingtip history",
-		author    = "OpenAI / TEK2",
+		author    = "OpenAI / TEK2, GoogleFrog",
 		date      = "2026-08-29",
 		license   = "GPL-2.0-or-later",
 		layer     = 5,
-		enabled   = true,
+		enabled   = false,
 	}
 end
 
@@ -20,7 +20,6 @@ end
 local TRAIL_UPDATE_RATE      = 1 / 20
 local VISIBLE_REFRESH_RATE   = 0.25
 local TRAIL_SAMPLE_RATE      = 0.070
-local DEFAULT_TRAIL_SECONDS  = 0.9
 local MAX_TRAIL_POINTS       = 20
 
 -- GPU input vertices. Each trail segment is only TWO input vertices.
@@ -39,17 +38,7 @@ local TRAIL_MIN_SPEED_RATIO  = 0.42
 local TRAIL_FULL_SPEED_RATIO = 0.85
 local TRAIL_MIN_ALTITUDE     = 16
 
-local COLORS = {
-	TEK = {
-		trail = {0.76, 0.90, 1.00},
-	},
-	IND = {
-		trail = {1.00, 0.83, 0.63},
-	},
-	DEFAULT = {
-		trail = {0.86, 0.93, 1.00},
-	},
-}
+local airDragDefs = VFS.Include("LuaUI/Configs/air_drag_defs.lua")
 
 --------------------------------------------------------------------------------
 -- LOCALS
@@ -98,8 +87,12 @@ local trailVertexCount = 0
 --------------------------------------------------------------------------------
 
 local function Clamp(x, lo, hi)
-	if x < lo then return lo end
-	if x > hi then return hi end
+	if x < lo then
+		return lo
+	end
+	if x > hi then
+		return hi
+	end
 	return x
 end
 
@@ -111,62 +104,14 @@ local function Length3(x, y, z)
 	return mathSqrt(x*x + y*y + z*z)
 end
 
-local function FindPieceCaseInsensitive(pieceMap, wanted)
-	if not pieceMap then return nil end
-
-	if pieceMap[wanted] then
-		return pieceMap[wanted]
-	end
-
-	local target = stringLower(wanted)
-	for name, pieceID in pairs(pieceMap) do
-		if stringLower(name) == target then
-			return pieceID
-		end
-	end
-
-	return nil
-end
-
-local function GetFactionColors(ud)
-	if not ud then return COLORS.DEFAULT end
-
-	local cp = ud.customParams or {}
-	local side = ud.side or cp.side or cp.faction
-
-	if side then
-		side = string.upper(tostring(side))
-		if COLORS[side] then
-			return COLORS[side]
-		end
-	end
-
-	local name = stringLower(ud.name or "")
-	if name:find("^tek") then return COLORS.TEK end
-	if name:find("^ind") then return COLORS.IND end
-
-	return COLORS.DEFAULT
-end
-
-local function CPNumber(cp, key, default)
-	if not cp then return default end
-	local v = tonumber(cp[key])
-	if v == nil then return default end
-	return v
-end
-
-local function CPEnabled(cp, key, default)
-	if not cp or cp[key] == nil then return default end
-	local v = tostring(cp[key]):lower()
-	return not (v == "0" or v == "false" or v == "off" or v == "no")
-end
-
 local function GetPiecePos(unitID, pieceID)
-	if not pieceID then return nil end
-
+	if not pieceID then
+		return
+	end
 	local x, y, z = spGetUnitPiecePosDir(unitID, pieceID)
-	if not x then return nil end
-
+	if not x then
+		return
+	end
 	return x, y, z
 end
 
@@ -174,60 +119,41 @@ end
 -- UNIT REGISTRATION
 --------------------------------------------------------------------------------
 
-local function RegisterAircraft(unitID, unitDefID)
-	local ud = UnitDefs[unitDefID]
-	if not ud or not ud.canFly then
+local function RegisterUnit(unitID, unitDefID)
+	if not (unitDefID and airDragDefs[unitDefID]) then
 		tracked[unitID] = nil
 		return false
 	end
 
-	local cp = ud.customParams or {}
-
-	-- Preserve the old master switch behavior.
-	if not CPEnabled(cp, "airenginefx", true) then
-		tracked[unitID] = nil
-		return false
-	end
-
-	if not CPEnabled(cp, "airdragfx", true) then
-		tracked[unitID] = nil
-		return false
-	end
-
+	Spring.Utilities.UnitEcho(unitID, "tracked")
 	local pieceMap = spGetUnitPieceMap(unitID)
 	if not pieceMap then
 		return false
 	end
 
-	local lDrag = FindPieceCaseInsensitive(pieceMap, "lDrag")
-	local rDrag = FindPieceCaseInsensitive(pieceMap, "rDrag")
-
-	if not lDrag and not rDrag then
-		tracked[unitID] = nil
-		return false
+	local def = airDragDefs[unitDefID]
+	local emitPieces = {}
+	for i = 1, #def.emitPieces do
+		emitPieces[i] = pieceMap[def.emitPieces[i]]
+		Spring.Echo(emitPieces[i])
 	end
 
-	local radius = ud.radius or 24
-	local modelScale = Clamp(radius / 28, 0.65, 2.25)
+	local positions = {}
+	for i = 1, #emitPieces do
+		positions[i] = {}
+	end
 
 	tracked[unitID] = {
 		unitDefID = unitDefID,
-		ud = ud,
-		colors = GetFactionColors(ud),
+		color = def.color,
+		maxSpeed = def.maxSpeed,
+		emitPieces = emitPieces,
 
-		lDrag = lDrag,
-		rDrag = rDrag,
+		trailWidth   = def.trailWidth,
+		trailAlpha   = def.trailAlpha,
+		trailSeconds = def.trailSeconds,
 
-		trailWidth   = CPNumber(cp, "airtrailwidth", 1.0) * modelScale,
-		trailAlpha   = CPNumber(cp, "airtrailalpha", 1.0),
-		trailSeconds = Clamp(
-			CPNumber(cp, "airtrailseconds", DEFAULT_TRAIL_SECONDS),
-			0.25,
-			3.0
-		),
-
-		lTrail = {},
-		rTrail = {},
+		positions = positions,
 		lastTrailSample = -100,
 		lastSeen = -100,
 	}
@@ -244,17 +170,12 @@ local function RefreshVisible(nowGame, nowWall)
 		local unitDefID = spGetUnitDefID(unitID)
 
 		if unitDefID then
-			local ud = UnitDefs[unitDefID]
-
-			if ud and ud.canFly then
-				if not tracked[unitID] or tracked[unitID].unitDefID ~= unitDefID then
-					RegisterAircraft(unitID, unitDefID)
-				end
-
-				if tracked[unitID] then
-					newVisible[unitID] = true
-					tracked[unitID].lastSeen = nowGame
-				end
+			if not tracked[unitID] or tracked[unitID].unitDefID ~= unitDefID then
+				RegisterUnit(unitID, unitDefID)
+			end
+			if tracked[unitID] then
+				newVisible[unitID] = true
+				tracked[unitID].lastSeen = nowGame
 			end
 		end
 	end
@@ -263,8 +184,9 @@ local function RefreshVisible(nowGame, nowWall)
 	-- Prevents stale giant reconnect lines and avoids leaking hidden movement.
 	for unitID, data in pairs(tracked) do
 		if not newVisible[unitID] then
-			data.lTrail = {}
-			data.rTrail = {}
+			for i = 1, #data.positions do
+				data.positions[i] = {}
+			end
 			data.lastTrailSample = -100
 		end
 	end
@@ -355,29 +277,26 @@ end
 
 local function AddTrailHistoryGPU(out, vertexCount, unitData, history, stride)
 	local n = #history
-	if n < 2 then return vertexCount end
-
+	if n < 2 then
+		return vertexCount
+	end
 	stride = stride or 1
 
 	local life = unitData.trailSeconds
 	local baseWidth = 1.20 * unitData.trailWidth
-	local trailColor = unitData.colors.trail
+	local trailColor = unitData.color
 	local trailAlpha = unitData.trailAlpha
 
 	for i = 1, n - 1, stride do
 		if vertexCount + 2 > MAX_INPUT_VERTICES then
 			break
 		end
-
 		local p0 = history[i]
 		local p1 = history[mathMin(i + stride, n)]
-
 		AppendTrailVertex(out, p0, baseWidth, life, trailColor, trailAlpha)
 		AppendTrailVertex(out, p1, baseWidth, life, trailColor, trailAlpha)
-
 		vertexCount = vertexCount + 2
 	end
-
 	return vertexCount
 end
 
@@ -401,10 +320,8 @@ local function BuildTrailPointBuffer(now, nowWall)
 
 	for unitID in pairs(visible) do
 		local data = tracked[unitID]
-
-		if data and (data.lDrag or data.rDrag) then
+		if data then
 			local ux, uy, uz = spGetUnitPosition(unitID)
-
 			if ux then
 				local cdx, cdy, cdz = ux-camX, uy-camY, uz-camZ
 				local distSq = cdx*cdx + cdy*cdy + cdz*cdz
@@ -425,8 +342,7 @@ local function BuildTrailPointBuffer(now, nowWall)
 					vx, vy, vz = vx or 0, vy or 0, vz or 0
 					speed = speed or Length3(vx, vy, vz)
 
-					local maxSpeed = data.ud.speed or 1
-					local speedRatio = Saturate((speed * 30) / mathMax(maxSpeed, 1))
+					local speedRatio = Saturate((speed * 30) / mathMax(data.maxSpeed, 1))
 
 					local groundY = spGetGroundHeight(ux, uz)
 					local altitude = uy - groundY
@@ -443,44 +359,31 @@ local function BuildTrailPointBuffer(now, nowWall)
 					local sampleRate = TRAIL_SAMPLE_RATE * trailSampleMul
 
 					if canTrail and (now - data.lastTrailSample) >= sampleRate then
-						if data.lDrag then
-							local x, y, z = GetPiecePos(unitID, data.lDrag)
-							PushTrailPoint(data.lTrail, now, x, y, z, trailStrength)
+						for i = 1, #data.emitPieces do
+							local x, y, z = GetPiecePos(unitID, data.emitPieces[i])
+							PushTrailPoint(data.positions[i], now, x, y, z, trailStrength)
 						end
-
-						if data.rDrag then
-							local x, y, z = GetPiecePos(unitID, data.rDrag)
-							PushTrailPoint(data.rTrail, now, x, y, z, trailStrength)
-						end
-
 						data.lastTrailSample = now
 					elseif not canTrail then
 						data.lastTrailSample = now
 					end
 
-					PruneTrail(data.lTrail, now, data.trailSeconds)
-					PruneTrail(data.rTrail, now, data.trailSeconds)
-
-					tCount = AddTrailHistoryGPU(
-						trailData,
-						tCount,
-						data,
-						data.lTrail,
-						trailStride
-					)
-
-					tCount = AddTrailHistoryGPU(
-						trailData,
-						tCount,
-						data,
-						data.rTrail,
-						trailStride
-					)
+					for i = 1, #data.positions do
+						PruneTrail(data.positions[i], now, data.trailSeconds)
+						tCount = AddTrailHistoryGPU(
+							trailData,
+							tCount,
+							data,
+							data.positions[i],
+							trailStride
+						)
+					end
 				else
-					if #data.lTrail > 0 or #data.rTrail > 0 then
-						data.lTrail = {}
-						data.rTrail = {}
-						data.lastTrailSample = now
+					for i = 1, #data.positions do
+						if #data.positions[i] > 0 then
+							data.positions[i] = {}
+							data.lastTrailSample = now
+						end
 					end
 				end
 			end
