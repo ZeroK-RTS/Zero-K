@@ -88,11 +88,17 @@ local sound_index = 0
 --------------------------------------------------------------------------------
 
 function script.Activate()
- isLanded = false
+	Show(jetleft)
+	Show(jetright)
+	Show(jetrear)
+	isLanded = false
 end
 
 function script.Deactivate()
- isLanded = true
+	Hide(jetleft)
+	Hide(jetright)
+	Hide(jetrear)
+	isLanded = true
 end
 
 local function IsCrashing()
@@ -205,10 +211,16 @@ function script.Create()
 	end
 	
 	--StartThread(updateAllVectors)
+	Hide(jetleft)
+	Hide(jetright)
+	Hide(jetrear)
 	
-	Turn(jetleft, x_axis, math.rad(90))
-	Turn(jetright, x_axis, math.rad(90))
-	Turn(jetrear, x_axis, math.rad(90))
+	Move(jetleft, y_axis, 7)
+	Move(jetright, y_axis, 7)
+	Move(jetrear, y_axis, 7)
+	Turn(jetleft, x_axis, math.rad(-90))
+	Turn(jetright, x_axis, math.rad(-90))
+	Turn(jetrear, x_axis, math.rad(-90))
 	
 	--Move(LeftTurretSeat,x_axis,-2)
 	--Move(LeftTurretSeat,y_axis,-1.1)

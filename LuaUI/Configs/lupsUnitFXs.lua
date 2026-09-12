@@ -280,23 +280,23 @@ local effectUnitDefs = {
 	gunshipemp = {
 		{class='Ribbon', options={width=1, size=5, piece="ljet", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=5, piece="rjet", noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="ljet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="rjet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="ljet", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="rjet", onActive=true, noIconDraw = true}},
 	},
 
 	gunshipbomb = {
-		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=20, piece="exhaust", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=20, piece="exhaust", onActive=true, noIconDraw = true}},
 	},
 	gunshipraid = {
 		{class='Ribbon', options={width=1, size=10, piece="lfx", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=10, piece="rfx", noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, noIconDraw = true}},
 	},
 	planecon = {
 		{class='Ribbon', options={width=1, size=10, piece="engine1", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=10, piece="engine2", noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="body", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="thrust", onActive=true, noIconDraw = true}},
 	},
 	gunshipaa = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=32, piece="ljet", onActive=true, noIconDraw = true}},
@@ -378,8 +378,8 @@ local effectUnitDefs = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="thrust", onActive=true}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtipl"}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtipr"}},
-	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
-	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
 	},
 	planelightscout = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=1.8, length=15, piece="exhaustl", onActive=true}},
@@ -396,9 +396,9 @@ local effectUnitDefs = {
 		{class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rwingengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 	},
 	gunshipkrow = {
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=40, piece="jetrear", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=40, piece="jetleft", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=40, piece="jetright", onActive=true, noIconDraw = true}},
 	},
 	nebula = {
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=15, length=60, piece="exhaustmain", onActive=true}},
