@@ -161,7 +161,7 @@ return {
       underwater         = true,
       properties = {
         airdrag            = 0.6,
-        useairlos       = false,
+        useairlos          = false,
         colormap           = [[1 1 1 1 0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -183,13 +183,13 @@ return {
     },
     takeoff1 = {
       air                = false,
-      useairlos       = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
       water              = false,
       underwater         = true,
       properties = {
+        useairlos          = false,
         airdrag            = 0.95,
         colormap           = [[0 0 0 0.001 0.04 0.04 0.04 0.2    0 0 0 0.001]],
         emitrot            = 90,
@@ -214,13 +214,13 @@ return {
   ["uw_amphlift"] = {
     takeoff1 = {
       air                = false,
-      useairlos       = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
       water              = false,
       underwater         = true,
       properties = {
+        useairlos       = false,
         airdrag            = 0.95,
         colormap           = [[0 0 0 0.001 0.04 0.04 0.04 0.2    0 0 0 0.001]],
         emitrot            = 90,

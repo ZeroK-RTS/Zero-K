@@ -129,7 +129,7 @@ local function BigStomp(piece)
 			noiseScaleSpace = 0.4,
 			distanceFalloff = 0.4,
 			onlyModelMap = 1,
-			effectStrength = 0.7,
+			effectStrength = 0.9,
 			lifeTime = 15,
 			rampUp = 3,
 			decay = 15,
