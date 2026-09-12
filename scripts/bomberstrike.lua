@@ -9,6 +9,8 @@ local wingtipl = piece 'wingtipl'
 local wingtipr = piece 'wingtipr'
 local enginel = piece 'enginel'
 local enginer = piece 'enginer'
+local exhaustl = piece 'exhaustl'
+local exhaustr = piece 'exhaustr'
 local head = piece 'head'
 local turretbase = piece 'turretbase'
 local turret = piece 'turret'
@@ -49,6 +51,8 @@ function script.Create()
 	Hide(barrell)
 	Hide(sleever)
 	Hide(barrelr)
+	Hide(exhaustl)
+	Hide(exhaustr)
 	
 	Move(flaremissilel, y_axis, 13)
 	Move(flaremissiler, y_axis, 13)
@@ -57,14 +61,26 @@ function script.Create()
 end
 
 function script.StartMoving()
+	Show(exhaustl)
+	Show(exhaustr)
 	Move(wingl, x_axis, 0, 7)
 	Move(wingr, x_axis, 0, 7)
 end
 
 function script.StopMoving()
+	Hide(exhaustl)
+	Hide(exhaustr)
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
 end
 
 function script.AimWeapon(num, heading, pitch)

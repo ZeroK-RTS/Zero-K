@@ -102,6 +102,29 @@ function script.Create()
 	StartThread(AirManualFireThread)
 	Move(bomb, y_axis, -8)
 	Move(bombEmit, y_axis, -6)
+	Hide(exhaustLeft)
+	Hide(exhaustRight)
+	Hide(exhaustTop)
+end
+
+function script.StopMoving()
+	Hide(exhaustLeft)
+	Hide(exhaustRight)
+	Hide(exhaustTop)
+end
+
+function script.StartMoving()
+	Show(exhaustLeft)
+	Show(exhaustRight)
+	Show(exhaustTop)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
 end
 
 function script.QueryWeapon(num)

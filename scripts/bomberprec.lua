@@ -39,6 +39,8 @@ local takeoffHeightInElmos = takeoffHeight*1.5
 local smokePiece = {fuselage, thrustr, thrustl}
 
 function script.StartMoving()
+	Show(thrustl)
+	Show(thrustr)
 	--Turn(fins, z_axis, math.rad(30), math.rad(50))
 	Move(wingr1, x_axis, 0, 50)
 	Move(wingr2, x_axis, 0, 50)
@@ -47,12 +49,22 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	Hide(thrustl)
+	Hide(thrustr)
 	--Turn(fins, z_axis, 0, math.rad(80))
 	Move(wingr1, x_axis, 5, 30)
 	Move(wingr2, x_axis, 5, 30)
 	Move(wingl1, x_axis, -5, 30)
 	Move(wingl2, x_axis, -5, 30)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
 end
 
 local function Lights()
@@ -67,6 +79,8 @@ local function Lights()
 end
 
 function script.Create()
+	Hide(thrustl)
+	Hide(thrustr)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
