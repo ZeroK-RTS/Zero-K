@@ -4,7 +4,7 @@ include "fixedwingTakeOff.lua"
 --------------------------------------------------------------------
 -- constants/vars
 --------------------------------------------------------------------
-local base, nozzle = piece("base", "nozzle")
+local base, nozzle, thrust = piece("base", "nozzle", "thrust")
 -- unused piece: 'thrust'
 local smokePiece = {base}
 
@@ -28,12 +28,25 @@ function Cloak()
 	StartThread(Decloak)
 end
 
+function script.StartMoving()
+	Show(thrust)
+end
+
 function script.StopMoving()
+	Hide(thrust)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 end
 
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
+end
 
 function script.Create()
+	Hide(thrust)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
