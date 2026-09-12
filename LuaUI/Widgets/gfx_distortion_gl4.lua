@@ -824,7 +824,7 @@ function widget:Barrelfire(px, py, pz, weaponID, ownerID)
 end
 
 local function UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
-	--Spring.Echo("UnitSCriptDistortion", unitID, unitDefID, distortionIndex, param, visibleUnits[unitID] )
+	Spring.Echo("UnitSCriptDistortion", unitID, unitDefID, distortionIndex, param, visibleUnits[unitID] )
 	if
 		spValidUnitID(unitID)
 		and spGetUnitIsDead(unitID) == false

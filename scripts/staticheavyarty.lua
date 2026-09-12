@@ -60,6 +60,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
+	GG.UnitScriptDistortion(unitID, unitDefID, "basestomp")
+	GG.UnitScriptDistortion(unitID, unitDefID, "shotheat")
 	EmitSfx(ground, GG.Script.UNIT_SFX1)
 	Move(barrel, z_axis, -24, 500)
 	EmitSfx(barrel_back, GG.Script.UNIT_SFX2)

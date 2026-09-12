@@ -4012,6 +4012,59 @@ local unitEventDistortionsNames = {
 			leftback = SmallStomp("lb_foot"),
 			rightback = SmallStomp("rb_foot"),
 		},
+		
+		staticheavyarty = {
+			basestomp ={
+				-- Footstep shockwave
+				alwaysVisible = false,
+				distortionType = "point",
+				distortionName = "bigstomp",
+				pieceName = "base",
+				distortionConfig = {
+					posx = 0,
+					posy = -6,
+					posz = 0,
+					radius = 180,
+					noiseStrength = 1.5,
+					noiseScaleSpace = 0.5,
+					distanceFalloff = 0.5,
+					onlyModelMap = 1,
+					effectStrength = 0.3,
+					lifeTime = 16,
+					rampUp = 2.5,
+					decay = 16,
+					startRadius = 0.25,
+					shockWidth = 7,
+					effectType = "groundShockwave",
+				},
+			},
+			shotheat = {
+				-- Barrel Heat after shot
+				alwaysVisible = false,
+				distortionType = "beam",
+				distortionName = "brthabarrelheat",
+				pieceName = "sleeve",
+				distortionConfig = {
+					posx = 0,
+					posy = 5,
+					posz = 90,
+					radius = 50,
+					pos2x = 0,
+					pos2y = 5,
+					pos2z = 150,
+					onlyModelMap = 0,
+					riseRate = 0.5,
+					windAffected = -0.5,
+					noiseStrength = 0.3,
+					noiseScaleSpace = 1.0,
+					distanceFalloff = 1.0,
+					rampUp = 20,
+					decay = 200,
+					lifeTime = 240,
+					effectType = 0,
+				},
+			},
+		},
 	},
 
 	------------------------------- Put additional distortions tied to events here! --------------------------------
@@ -4158,52 +4211,6 @@ local function DuplicateDistortions(source, targets)
 	end
 end
 
---duplicate distortions from armcom for Armada Evocom
-local armComTable =
-	{ "armcomlvl2", "armcomlvl4", "armcomlvl5", "armcomlvl6", "armcomlvl7", "armcomlvl8", "armcomlvl9", "armcomlvl10" }
-DuplicateDistortions("armcom", armComTable)
-
---duplicate distortions from corcom for Cortex Evocom
-local corComTable = {
-	"corcomlvl2",
-	"corcomlvl3",
-	"corcomlvl4",
-	"corcomlvl5",
-	"corcomlvl6",
-	"corcomlvl7",
-	"corcomlvl8",
-	"corcomlvl9",
-	"corcomlvl10",
-}
-DuplicateDistortions("corcom", corComTable)
-
---duplicate distortions from legcom for Legion Evocom
-local legComTable = {
-	"legcomlvl2",
-	"legcomlvl3",
-	"legcomlvl4",
-	"legcomlvl5",
-	"legcomlvl6",
-	"legcomlvl7",
-	"legcomlvl8",
-	"legcomlvl9",
-	"legcomlvl10",
-	"legdecomlvl3",
-	"legdecomlvl6",
-	"legdecomlvl10",
-}
-DuplicateDistortions("legcom", legComTable)
-
---duplicate distortions from scavengerbossv4_normal for all scavengerbossv4 variants
-local scavengerBossV4Table = {
-	"scavengerbossv4_veryeasy",
-	"scavengerbossv4_easy",
-	"scavengerbossv4_hard",
-	"scavengerbossv4_veryhard",
-	"scavengerbossv4_epic",
-}
-DuplicateDistortions("scavengerbossv4_normal", scavengerBossV4Table)
-
 --AND THE REST
 ---unitEventDistortionsNames -> unitEventDistortions
 local unitEventDistortions = {}
@@ -4228,38 +4235,9 @@ for unitName, distortions in pairs(unitDistortions) do
 end
 unitDistortions = nil
 
--- oof this should not be a GetConfigInt :/
-if not (Spring.GetConfigInt("headdistortions", 1) == 1) then
-	for unitDefID, distortions in pairs(unitDefDistortions) do
-		for name, params in pairs(distortions) do
-			if string.find(name, "headdistortion") or string.find(name, "searchdistortion") then
-				unitDefDistortions[unitDefID][name] = nil
-			end
-		end
-	end
-end
-
-if not (Spring.GetConfigInt("builddistortions", 1) == 1) then
-	for unitDefID, distortions in pairs(unitDefDistortions) do
-		for name, params in pairs(distortions) do
-			if string.find(name, "builddistortion") then
-				unitDefDistortions[unitDefID][name] = nil
-			end
-		end
-	end
-end
-
--- add scavenger equivalents
-local scavUnitDefDistortions = {}
-for unitDefID, distortions in pairs(unitDefDistortions) do
-	if UnitDefNames[UnitDefs[unitDefID].name .. "_scav"] then
-		scavUnitDefDistortions[UnitDefNames[UnitDefs[unitDefID].name .. "_scav"].id] = distortions
-	end
-end
-scavUnitDefDistortions = nil
-
 local featureDefDistortions = {}
 
+-- Example featureDefDistortion below
 local crystalDistortionBase = {
 	distortionType = "point",
 	distortionConfig = {
@@ -4278,42 +4256,6 @@ local crystalDistortionBase = {
 		effectType = 0,
 	},
 }
-
-local crystalColors = { -- note that the underscores are needed here
-	[""] = { 0.78, 0.46, 0.94, 0.11 }, -- same as violet
-	_violet = { 0.8, 0.5, 0.95, 0.33 },
-	_blue = { 0.1, 0.2, 0.9, 0.33 },
-	_green = { 0.1, 0.8, 0.1, 0.15 },
-	_lime = { 0.4, 1, 0.2, 0.15 },
-	_obsidian = { 0.3, 0.2, 0.2, 0.33 },
-	_quartz = { 0.3, 0.3, 0.5, 0.33 },
-	_orange = { 1, 0.5, 0, 0.11 },
-	_red = { 1, 0.2, 0.2, 0.067 },
-	_teal = { 0, 1, 1, 0.15 },
-	_team = { 1, 1, 1, 0.15 },
-}
-
-for colorname, colorvalues in pairs(crystalColors) do
-	for size = 1, 3 do
-		local crystaldefname = "pilha_crystal" .. colorname .. tostring(size)
-		if FeatureDefNames[crystaldefname] then
-			local crystalDistortion = table.copy(crystalDistortionBase)
-			crystalDistortion.distortionConfig.r = colorvalues[1]
-			crystalDistortion.distortionConfig.g = colorvalues[2]
-			crystalDistortion.distortionConfig.b = colorvalues[3]
-			crystalDistortion.distortionConfig.a = colorvalues[4]
-
-			crystalDistortion.distortionConfig.color2r = colorvalues[1] * 0.6
-			crystalDistortion.distortionConfig.color2g = colorvalues[2] * 0.6
-			crystalDistortion.distortionConfig.color2b = colorvalues[3] * 0.6
-			crystalDistortion.distortionConfig.colortime = 0.002 + 0.01 / size
-
-			crystalDistortion.distortionConfig.radius = (size + 0.2) * (crystalDistortion.distortionConfig.radius * 0.6)
-			crystalDistortion.distortionConfig.posy = (size + 1.5) * crystalDistortion.distortionConfig.posy
-			featureDefDistortions[FeatureDefNames[crystaldefname].id] = { crystalDistortion = crystalDistortion }
-		end
-	end
-end
 
 local allDistortions = {
 	unitEventDistortions = unitEventDistortions,
