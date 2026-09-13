@@ -48,7 +48,6 @@ local spGetAllFeatures            = Spring.GetAllFeatures
 local spGiveOrderToUnit           = Spring.GiveOrderToUnit
 local spGetUnitCommandCount       = Spring.GetUnitCommandCount
 local spDestroyFeature            = Spring.DestroyFeature
-local spGetFeatureResurrect       = Spring.GetFeatureResurrect
 local spGetUnitIsDead             = Spring.GetUnitIsDead
 local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 local spGetUnitsInCylinder        = Spring.GetUnitsInCylinder
@@ -129,11 +128,6 @@ local function disSQ(x1, y1, x2, y2)
 	return (x1 - x2)^2 + (y1 - y2)^2
 end
 
-local function SetZombieSlow(unitID, slowed)
-	spSetUnitRulesParam(unitID, "zombieSpeedMult", (slowed and 0.5) or 1, LOS_ACCESS)
-	GG.UpdateUnitAttributes(unitID)
-end
-
 local function RemoveZombieToSpawn(featureID)
 	if not zombiesToSpawnMap[featureID] then
 		return false
@@ -153,44 +147,6 @@ local function RemoveZombieToSpawn(featureID)
 	return true
 end
 
-local function GetUnitNearestAlly(unitID, range)
-	local best_ally
-	local best_dist
-	local x, y, z = spGetUnitPosition(unitID)
-	local units = spGetUnitsInCylinder(x, z, range)
-	for i = 1, #units do
-		local allyID = units[i]
-		local allyTeam = spGetUnitTeam(allyID)
-		local allyDefID = spGetUnitDefID(allyID)
-		if (allyID ~= unitID) and (allyTeam == GaiaTeamID) and (getMovetype(UnitDefs[allyDefID]) ~= false) then
-			local ox, oy, oz = spGetUnitPosition(allyID)
-			local dist = disSQ(x, z, ox ,oz)
-			if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
-				best_ally = allyID
-				best_dist = dist
-			end
-		end
-	end
-	return best_ally
-end
-
-local function OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
-	local buildopts = UnitDefs[unitDefID].buildOptions
-	if (not buildopts) or #buildopts <= 0 then
-		return
-	end
-	local orders = {}
-	--local x,y,z = spGetUnitPosition(unitID)
-	for i = 1, random(10, 30) do
-		orders[#orders + 1] = {-buildopts[random(1, #buildopts)], 0, 0 }
-	end
-	if (#orders > 0) then
-		if not spGetUnitIsDead(unitID) then
-			spGiveOrderArrayToUnitArray({unitID}, orders)
-		end
-	end
-end
-
 -- reclaiming zombies 'causes delay in rez, basically you have to have about ZOMBIES_REZ_SPEED/2 or bigger BP to reclaim faster than it resurrects...
 -- TODO do more math to figure out how to perform it better?
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
@@ -202,68 +158,13 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 	return true
 end
 
--- in halloween gadget, sometimes giving order to unit would result in crash because unit happened to be dead at the time order was given
--- TODO probably same units in groups could get same orders...
-local function BringingDownTheHeavens(unitID)
-	local unitDefID = (not spGetUnitIsDead(unitID)) and spGetUnitDefID(unitID)
-	if not unitDefID then
-		return
-	end
-	
-	local rx,rz,ry
-	local orders = {}
-	local near_ally
-	if (UnitDefs[unitDefID].canAttack) then
-		near_ally = GetUnitNearestAlly(unitID, 300)
-		if (near_ally) then
-			if Spring.GetUnitCurrentCommand(near_ally) == CMD_GUARD then
-				near_ally = nil -- i dont want chain guards...
-			end
-		end
-	end
-	local x,y,z = spGetUnitPosition(unitID)
-	if (near_ally) and random(0, 5) < 4 then -- 60% chance to guard nearest ally
-		orders[#orders + 1] = {CMD_GUARD, {near_ally}, 0}
-	end
-	for i = 1, random(10, 30) do
-		rx = random(0, mapWidth)
-		rz = random(0, mapHeight)
-		ry = spGetGroundHeight(rx,rz)
-		if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
-			orders[#orders+1] = {CMD_FIGHT, {rx, ry, rz}, CMD_OPT_SHIFT}
-		end
-	end
-	if (#orders > 0) then
-		if not spGetUnitIsDead(unitID) then
-			spGiveOrderArrayToUnitArray({unitID},orders)
-		end
-	end
-	if (UnitDefs[unitDefID].isFactory) then
-		OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
-		zombies[unitID] = nil -- no need to update factory orders anymore
-	end
-end
-
 local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
 		local queueSize = spGetUnitCommandCount(unitID)
-		if not (queueSize) or not (queueSize > 0) then -- oh
-			BringingDownTheHeavens(unitID)
+		if not (queueSize) or not (queueSize > 0) then
+			GG.Zombies.SetZombieBehavior(unitID)
 		end
 	end
-end
-
-local function myGetFeatureRessurect(fId)
-	local resName, face = spGetFeatureResurrect(fId)
-	if resName == "" then
-		local featureDef = FeatureDefs[Spring.GetFeatureDefID(fId)]
-		local featureName = featureDef.name or ""
-		if featureDef.resurrectable == 1 then
-			resName = featureName:gsub('(.*)_.*', '%1') --filter out _dead
-			face = face or 0
-		end
-	end
-	return resName, face
 end
 
 function gadget:GameFrame(f)
@@ -280,33 +181,10 @@ function gadget:GameFrame(f)
 				if not RemoveZombieToSpawn(featureID) then
 					index = index + 1
 				end
-				local resName, face = myGetFeatureRessurect(featureID)
-				local partialReclaim = 1
-				if ZOMBIES_PARTIAL_RECLAIM then
-					local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
-					if currentMetal and maxMetal and (maxMetal > 0) then
-						partialReclaim = currentMetal/maxMetal
-					end
-				end
-				spDestroyFeature(featureID)
-				local unitID = spCreateUnit(resName, x, y, z, face, GaiaTeamID)
-				if (unitID) then
-					gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
-					local size = UnitDefNames[resName].xsize
-					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
-					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
-					GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
-					if partialReclaim ~= 1 then
-						local health = Spring.GetUnitHealth(unitID)
-						if health then
-							Spring.SetUnitHealth(unitID, health*partialReclaim)
-							--spSetUnitRulesParam(unitID, "zombie_partialReclaim", partialReclaim, PRIVATE_ACCESS)
-						end
-					end
-				end
+				GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,true)
 			else
 				local steps_to_spawn = floor((time_to_spawn - f) / 32)
-				local resName, face = myGetFeatureRessurect(featureID)
+				local resName, face = GG.Zombies.GetFeatureResurrectData(featureID)
 				if steps_to_spawn <= WARNING_TIME then
 					local r = Spring.GetFeatureRadius(featureID)
 
@@ -342,7 +220,7 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 		zombies[unitID] = nil
 		-- taking away zombie from zombie team unpermaslows it
 		if ZOMBIES_PERMA_SLOW then
-			SetZombieSlow(unitID, false)
+			GG.Zombies.SetZombieSpeedMult(unitID, 1)
 		end
 	elseif newTeamID == GaiaTeamID then
 		gadget:UnitFinished(unitID, unitDefID, newTeamID)
@@ -360,7 +238,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
-	local resName, face = myGetFeatureRessurect(featureID)
+	local resName, face = GG.Zombies.GetFeatureResurrectData(featureID)
 	if resName and face and not zombies_to_spawn[featureID] then
 		local ud = resName and UnitDefNames[resName]
 		if ud and not NonZombies[resName] then
@@ -392,12 +270,12 @@ local function ReInit(reinit)
 			if (teamID == GaiaTeamID) and not (zombies[unitID]) then
 				spGiveOrderToUnit(unitID, CMD_REPEAT, 1, 0)
 				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, 2, 0)
-				BringingDownTheHeavens(unitID)
+				GG.Zombies.SetZombieBehavior(unitID)
 				zombies[unitID] = true
 				if ZOMBIES_PERMA_SLOW then
 					local maxHealth = select(2, spGetUnitHealth(unitID))
 					if maxHealth then
-						SetZombieSlow(unitID, true)
+						GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 					end
 				end
 			end
