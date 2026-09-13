@@ -206,7 +206,7 @@ local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, re
 		if ud and not NonZombies[resName] then
 			local rezTime = ud.metalCost / buildpower
 			if (rezTime < minRezTime) then
-				  rezTime = minRezTime
+				rezTime = minRezTime
 			end
 			resurrectingFeatures[featureID] = {rezInitFrame = gameframe, rezBaseTime = rezTime, rezFrame = (gameframe + rezTime*32), reclaimPercent = 0, rezFrameCallback = rezFrameCallback, }
 		end
