@@ -83,399 +83,6 @@ local exampleDistortionBeamShockwave = {
 
 --------------------------------General Base Distortion Classes for further usage --------
 local BaseClasses = {
-
-	LaserProjectile = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 100,
-			pos2x = 100,
-			pos2y = 1000,
-			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 0,
-			sustain = 1,
-			effectType = 0,
-		},
-	},
-
-	CannonProjectile = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 125,
-			lifeTime = 0,
-			sustain = 0,
-			effectType = 0,
-		},
-	},
-
-	LaserCannonExplosion = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 125,
-			lifeTime = 0,
-			sustain = 0,
-			effectType = 0,
-		},
-	},
-
-	PlasmaTrailProjectile = {
-		distortionType = "cone",
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 100,
-			dirx = 0,
-			diry = 1,
-			dirz = 1.0,
-			theta = 0.09,
-			noiseStrength = 6,
-			noiseScaleSpace = 0.25,
-			distanceFalloff = 1.5,
-			onlyModelMap = 1,
-			windAffected = -1,
-			riseRate = 0,
-			yoffset = 5,
-			lifeTime = 0,
-			rampUp = 30,
-			decay = 5,
-			effectType = 0,
-		},
-	},
-
-	RailgunTrailProjectile = {
-		distortionType = "point",
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 100,
-			--dirx =  0, diry = 1, dirz = 1.0, theta = 0.12,
-			noiseStrength = 8,
-			noiseScaleSpace = -0.35,
-			distanceFalloff = 0.8,
-			onlyModelMap = 0,
-			refractiveIndex = 1.04,
-			windAffected = -0.5,
-			riseRate = 0.5, --yoffset = -2,
-			lifeTime = 0,
-			rampUp = 0,
-			decay = 0,
-			effectType = 0,
-		},
-	},
-
-	LaserBeamShockWaveProjectile = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 150,
-			pos2x = 100,
-			pos2y = 1000,
-			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 10,
-			sustain = 1,
-			effectType = "groundShockwave",
-		},
-	},
-
-	LaserBeamHeat = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 0.3,
-			noiseScaleSpace = 0.3,
-			effectStrength = 0.5,
-			pos2x = 100,
-			pos2y = 1000,
-			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 0,
-			rampUp = 2,
-			decay = 0,
-			effectType = 0,
-		},
-	},
-
-	HeatRayHeat = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 0.75,
-			noiseScaleSpace = 0.15,
-			distanceFalloff = 1.5,
-			windAffected = -1,
-			riseRate = 0.2,
-			pos2x = 100,
-			pos2y = 1000,
-			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 3,
-			rampUp = 3,
-			decay = 0,
-			effectType = 0,
-		},
-	},
-	HeatRayHeatXL = { --heaviest laserbeam (corkorg)
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 10,
-			pos2x = 0,
-			pos2y = 0,
-			pos2z = 0,
-			radius2 = 1,
-			noiseStrength = 1.2,
-			noiseScaleSpace = 0.022,
-			distanceFalloff = 0.2,
-			effectStrength = 1.0,
-			windAffected = -1,
-			riseRate = 4.2,
-			onlyModelMap = 0,
-			--refractiveIndex = 1.15,
-			lifeTime = 0,
-			rampUp = 0,
-			decay = 0,
-			effectType = 7,
-		},
-	},
-
-
-	LightningBeam = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 20,
-			noiseStrength = 0.7,
-			noiseScaleSpace = 0.05,
-			distanceFalloff = 2.5,
-			effectStrength = 4.0,
-			windAffected = -1,
-			riseRate = -0.6,
-			pos2x = 100,
-			pos2y = 1000,
-			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 0,
-			rampUp = 0,
-			decay = 0,
-			effectType = 0,
-		},
-	},
-
-	EMPBeam = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 1.0,
-			noiseScaleSpace = 0.16,
-			distanceFalloff = 1.0,
-			effectStrength = 2.5,
-			onlyModelMap = -1,
-			--windAffected = 2, riseRate = 2,
-			windAffected = -1,
-			riseRate = -3.2,
-			pos2x = 100,
-			pos2y = 100,
-			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 0,
-			rampUp = 0,
-			decay = 2,
-			effectType = 0,
-		},
-	},
-	EMPBeamXL = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 10,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 1.0,
-			noiseScaleSpace = 0.12,
-			distanceFalloff = 0.5,
-			effectStrength = 3.0,
-			--onlyModelMap = 1,
-			--windAffected = 2, riseRate = 2,
-			windAffected = -1,
-			riseRate = -2.2,
-			pos2x = 100,
-			pos2y = 100,
-			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 0,
-			rampUp = 0,
-			decay = 1,
-			effectType = 0,
-		},
-	},
-
-	AirBombProjectile = {
-		distortionType = "cone",
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 70,
-			dirx = 0,
-			diry = 1,
-			dirz = 1.0,
-			theta = 0.2,
-			startRadius = 0.5,
-			onlyModelMap = 1,
-			noiseStrength = 1.45,
-			noiseScaleSpace = 0.75,
-			distanceFalloff = 1.8,
-			onlyModelMap = 0,
-			yoffset = 8,
-			effectStrength = 2.0,
-			windAffected = -1,
-			riseRate = -0.3,
-			rampUp = 15,
-			lifeTime = 0,
-			sustain = 0,
-			effectType = 0,
-		},
-	},
-
-	MissileProjectile = {
-		distortionType = "cone",
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 100,
-			dirx = 0,
-			diry = 1,
-			dirz = 1.0,
-			theta = 0.1,
-			startRadius = 0.5,
-			onlyModelMap = 1,
-			noiseStrength = 1.45,
-			noiseScaleSpace = 0.75,
-			distanceFalloff = 1.8,
-			onlyModelMap = 0,
-			yoffset = 8,
-			effectStrength = 1.0,
-			windAffected = -1,
-			riseRate = -0.3,
-			rampUp = 15,
-			lifeTime = 0,
-			sustain = 0,
-			effectType = 0,
-		},
-	},
-
-	MissileProjectileXL = {
-		distortionType = "cone",
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 130,
-			startRadius = 0.5,
-			onlyModelMap = 1,
-			dirx = 0,
-			diry = 1,
-			dirz = 1.0,
-			theta = 0.08,
-			noiseStrength = 4,
-			noiseScaleSpace = 0.37,
-			distanceFalloff = 1.8,
-			onlyModelMap = 0,
-			yoffset = 10,
-			effectStrength = 1.2,
-			windAffected = -1,
-			riseRate = -0.3,
-			rampUp = 4,
-			lifeTime = 0,
-			sustain = 0,
-			effectType = 0,
-		},
-	},
-
-	MissileNukeProjectile = {
-		distortionType = "cone",
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 00,
-			radius = 200,
-			dirx = 0,
-			diry = 1,
-			dirz = 1.0,
-			theta = 0.3,
-			noiseStrength = 4,
-			noiseScaleSpace = 0.3,
-			distanceFalloff = 1.0,
-			onlyModelMap = 0,
-			rampUp = 30,
-			yoffset = 8,
-			lifeTime = 0,
-			sustain = 0,
-			effectType = 0,
-		},
-	},
-
-	LaserAimProjectile = {
-		distortionType = "cone", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 500,
-			dirx = 1,
-			diry = 0,
-			dirz = 1,
-			theta = 0.02, -- cone distortions only, specify direction and half-angle in radians
-			lifeTime = 0,
-			sustain = 1,
-			effectType = 0,
-		},
-	},
-
-	GroundShockWaveXS = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 0.6,
-			noiseStrength = 0.35,
-			noiseScaleSpace = 0.8,
-			lifeTime = 12,
-			decay = 8,
-			rampUp = 4,
-			onlyModelMap = 1,
-			effectStrength = 1.2, --needed for shockwaves
-			shockWidth = 1,
-			refractiveIndex = 1.1,
-			startRadius = 0.24,
-			effectType = "groundShockwave",
-		},
-	},
-
 	GroundShockWave = {
 		distortionType = "point", -- or cone or beam
 		alwaysVisible = false,
@@ -498,203 +105,6 @@ local BaseClasses = {
 			effectType = "groundShockwave",
 		},
 	},
-	GroundShockWaveHeat = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		--fraction = 5, --doesn't work
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 0.1,
-			noiseStrength = 0.5,
-			noiseScaleSpace = 0.8,
-			lifeTime = 16,
-			decay = 13,
-			rampUp = 3,
-			onlyModelMap = 1,
-			effectStrength = 0.8, --needed for shockwaves
-			shockWidth = -1.9,
-			refractiveIndex = -2.04,
-			startRadius = 0.24,
-			effectType = "groundShockwave",
-		},
-	},
-	AirShockWaveCommander = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 0.9,
-			noiseStrength = 0.2,
-			onlyModelMap = 0,
-			lifeTime = 13,
-			refractiveIndex = 2.0,
-			decay = 7,
-			rampUp = 5,
-			effectStrength = 4.0,
-			startRadius = 0.24,
-			shockWidth = -0.85, --needed for airshockwaves
-			effectType = "airShockwave",
-		},
-	},
-	GroundShockWaveCommander = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			noiseStrength = 2,
-			noiseScaleSpace = 0.10,
-			effectStrength = 1.5, --needed for shockwaves
-			lifeTime = 20,
-			decay = 10,
-			rampUp = 10,
-			shockWidth = 4,
-			refractiveIndex = -2.1,
-			startRadius = 0.16,
-			effectType = "groundShockwave",
-		},
-	},
-	GroundShockWaveCommanderSlow = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			noiseStrength = 1.5,
-			noiseScaleSpace = 0.30,
-			effectStrength = 0.7, --needed for shockwaves
-			lifeTime = 100,
-			decay = 75,
-			rampUp = 25,
-			shockWidth = 1,
-			refractiveIndex = -10.1,
-			startRadius = 0.15,
-			effectType = "groundShockwave",
-		},
-	},
-
-	GroundShockWaveNuke = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			noiseStrength = 2,
-			noiseScaleSpace = 0.10,
-			effectStrength = 1.0, --needed for shockwaves
-			lifeTime = 100,
-			decay = 25,
-			rampUp = 5,
-			shockWidth = 16,
-			refractiveIndex = -1.1,
-			startRadius = 0.24,
-			effectType = "groundShockwave",
-		},
-	},
-
-	GroundShockWaveFuzzy = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 1.0,
-			onlyModelMap = 0,
-			effectStrength = 1.2, --needed for shockwaves
-			shockWidth = 3,
-			startRadius = 0.24,
-			lifeTime = 25,
-			effectType = "groundShockwave",
-		},
-	},
-
-	GroundAcidExplo = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 0.9,
-			noiseStrength = 0.5,
-			noiseScaleSpace = 0.7,
-			lifeTime = 200,
-			decay = 150,
-			rampUp = 50,
-			effectStrength = 0.75, --needed for shockwaves
-			windAffected = -0.5,
-			riseRate = 6, --used for width of shockwave
-			shockWidth = 6,
-			refractiveIndex = -1.2,
-			startRadius = 0.5,
-			onlyModelMap = 1,
-			effectType = "groundShockwave",
-		},
-	},
-
-	ExploUnitAirShockWave = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 0.15,
-			noiseStrength = 0.3,
-			onlyModelMap = 0,
-			lifeTime = 12,
-			refractiveIndex = 1.04,
-			decay = 5,
-			rampUp = 1,
-			effectStrength = 5.0,
-			startRadius = 0.3,
-			shockWidth = -0.70,
-			effectType = "airShockwave",
-		},
-	},
-
-	AirShockWaveXS = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 1.1,
-			noiseStrength = 0.01,
-			onlyModelMap = 1,
-			lifeTime = 7,
-			refractiveIndex = 1.03,
-			decay = 4,
-			rampUp = 3,
-			effectStrength = 2.0,
-			startRadius = 0.20,
-			shockWidth = -0.60, --needed for all distortions
-			effectType = "airShockwave",
-		},
-	},
-	-- AirShockWaveMG = { --for machineguns
-	-- 	distortionType = 'point', -- or cone or beam
-	-- 	distortionConfig = { posx = 0, posy = 0, posz = 0, radius = 150,
-	-- 		noiseScaleSpace = 1.1, noiseStrength = 0.01, onlyModelMap = 1,
-	-- 		lifeTime = 4, refractiveIndex = 1.03, decay = 2, rampUp = 1,
-	-- 		effectStrength = 1.0, startRadius = 0.10, shockWidth = -0.90, --needed for all distortions
-	-- 		effectType = "airShockwave", },
-	-- },
 	AirShockWave = {
 		distortionType = "point", -- or cone or beam
 		distortionConfig = {
@@ -712,67 +122,6 @@ local BaseClasses = {
 			effectStrength = 2.8,
 			startRadius = 0.25,
 			shockWidth = -0.80,
-			effectType = "airShockwave",
-		},
-	},
-	AirShockWaveDgun = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 0.5,
-			noiseStrength = 1,
-			onlyModelMap = 0,
-			lifeTime = 30,
-			refractiveIndex = -4.0,
-			decay = 5,
-			rampUp = 15,
-			startRadius = 0.24,
-			shockWidth = -0.95,
-			effectStrength = 0.9, --needed for airshockwaves
-			effectType = "airShockwave",
-		},
-	},
-	AirShockWaveNuke = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 0.05,
-			noiseStrength = 0.2,
-			onlyModelMap = 0,
-			lifeTime = 25,
-			refractiveIndex = 1.1,
-			decay = 20,
-			rampUp = 1,
-			effectStrength = 20.0,
-			startRadius = 0.2,
-			shockWidth = -0.70, --needed for airshockwaves
-			effectType = "airShockwave",
-		},
-	},
-	AirShockWaveNukeBlast = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 225,
-			noiseScaleSpace = 0.3,
-			noiseStrength = 0.5,
-			onlyModelMap = 1,
-			lifeTime = 150,
-			refractiveIndex = 1.5,
-			decay = 60,
-			rampUp = 40,
-			effectStrength = 1.0,
-			startRadius = 0.05,
-			shockWidth = 0.25,
-			windAffected = 3,
 			effectType = "airShockwave",
 		},
 	},
@@ -796,8 +145,6 @@ local BaseClasses = {
 			effectType = "airShockwave",
 		},
 	},
-
-	-- ALL CANNON explosion Classes
 
 	ExploShockWaveXS = {
 		distortionType = "point", -- or cone or beam
@@ -900,214 +247,6 @@ local BaseClasses = {
 		},
 	},
 
-	-- ALL UNIT Explosion Classes
-
-	UnitExploShockWaveXS = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 100,
-			noiseScaleSpace = 0.1,
-			noiseStrength = 0.2,
-			onlyModelMap = 0,
-			lifeTime = 5,
-			refractiveIndex = 1.07,
-			decay = 4,
-			rampUp = 1,
-			effectStrength = 4.5,
-			startRadius = 0.45,
-			shockWidth = -0.50,
-			effectType = "airShockwave",
-		},
-	},
-	UnitExploShockWaveS = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 0.1,
-			noiseStrength = 0.2,
-			onlyModelMap = 0,
-			lifeTime = 6,
-			refractiveIndex = 1.05,
-			decay = 4,
-			rampUp = 2,
-			effectStrength = 4.25,
-			startRadius = 0.41,
-			shockWidth = -0.55,
-			effectType = "airShockwave",
-		},
-	},
-	UnitExploShockWaveM = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			noiseScaleSpace = 0.1,
-			noiseStrength = 0.2,
-			onlyModelMap = 0,
-			lifeTime = 9,
-			refractiveIndex = 1.045,
-			decay = 5,
-			rampUp = 2,
-			effectStrength = 4.0,
-			startRadius = 0.38,
-			shockWidth = -0.60,
-			effectType = "airShockwave",
-		},
-	},
-	UnitExploShockWaveL = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 400,
-			noiseScaleSpace = 0.1,
-			noiseStrength = 0.2,
-			onlyModelMap = 0,
-			lifeTime = 11,
-			refractiveIndex = 1.041,
-			decay = 5,
-			rampUp = 3,
-			effectStrength = 4.2,
-			startRadius = 0.33,
-			shockWidth = -0.61,
-			effectType = "airShockwave",
-		},
-	},
-	UnitExploShockWaveXL = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 480,
-			noiseScaleSpace = 0.1,
-			noiseStrength = 0.4,
-			onlyModelMap = 0,
-			lifeTime = 14,
-			refractiveIndex = 1.035,
-			decay = 6,
-			rampUp = 3,
-			effectStrength = 4.5,
-			startRadius = 0.20,
-			shockWidth = -0.36,
-			effectType = "airShockwave",
-		},
-	},
-
-	UnitGroundShockWave = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 0.5,
-			noiseStrength = 0.5,
-			noiseScaleSpace = 0.8,
-			lifeTime = 25,
-			decay = 25,
-			rampUp = 15,
-			effectStrength = 1.5, --needed for shockwaves
-			shockWidth = 3,
-			refractiveIndex = -1.2,
-			startRadius = 0.24,
-			effectType = "groundShockwave",
-		},
-	},
-	UnitGroundShockWaveXL = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 0.5,
-			noiseStrength = 0.5,
-			noiseScaleSpace = 0.8,
-			lifeTime = 25,
-			decay = 25,
-			rampUp = 15,
-			effectStrength = 1.5, --needed for shockwaves
-			shockWidth = 3,
-			refractiveIndex = -1.2,
-			startRadius = 0.24,
-			effectType = "groundShockwave",
-		},
-	},
-
-	BuildingGroundShockWave = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 0.5,
-			noiseStrength = 0.5,
-			noiseScaleSpace = 0.8,
-			lifeTime = 25,
-			decay = 25,
-			rampUp = 15,
-			effectStrength = 1.5, --needed for shockwaves
-			shockWidth = 3,
-			refractiveIndex = -1.2,
-			startRadius = 0.24,
-			effectType = "groundShockwave",
-		},
-	},
-	BuildingGroundShockWaveXL = {
-		distortionType = "point", -- or cone or beam
-		alwaysVisible = false,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			distanceFalloff = 0.5,
-			noiseStrength = 0.5,
-			noiseScaleSpace = 0.8,
-			lifeTime = 25,
-			decay = 25,
-			rampUp = 15,
-			effectStrength = 1.5, --needed for shockwaves
-			shockWidth = 3,
-			refractiveIndex = -1.2,
-			startRadius = 0.24,
-			effectType = "groundShockwave",
-		},
-	},
-	BuildingExploEnergy = {
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 2,
-			noiseScaleSpace = 0.95,
-			distanceFalloff = 1.5,
-			onlyModelMap = 0,
-			startRadius = 0.3,
-			lifeTime = 20,
-			rampUp = 7,
-			decay = 13,
-			effectType = 0,
-		},
-	},
-
 	MuzzleShockWaveXS = {
 		distortionType = "point", -- or cone or beam
 		distortionConfig = {
@@ -1122,7 +261,7 @@ local BaseClasses = {
 			refractiveIndex = 1.03,
 			decay = 3,
 			rampUp = 1,
-			effectStrength = 1.9,
+			effectStrength = 1.5,
 			startRadius = 0.2,
 			shockWidth = -0.80,
 			effectType = "airShockwave",
@@ -1142,7 +281,7 @@ local BaseClasses = {
 			refractiveIndex = 1.03,
 			decay = 6,
 			rampUp = 1,
-			effectStrength = 2.2,
+			effectStrength = 1.8,
 			startRadius = 0.6,
 			shockWidth = -0.80,
 			effectType = "airShockwave",
@@ -1168,147 +307,11 @@ local BaseClasses = {
 			effectType = "airShockwave",
 		},
 	},
-
-	AirShockWaveBeam = {
-		distortionType = "beam", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 0.5,
-			noiseStrength = 1.0,
-			lifeTime = 15,
-			refractiveIndex = 1.05,
-			--
-			effectStrength = 1.0, --needed for irshockwaves
-			effectType = "airShockwave",
-		},
-	},
-
-	TorpedoProjectile = {
-		distortionType = "cone", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 300,
-			dirx = 1,
-			diry = 0,
-			dirz = 1,
-			theta = 0.10, -- cone distortions only, specify direction and half-angle in radians
-			noiseStrength = 2,
-			noiseScaleSpace = 0.90,
-			distanceFalloff = 0.9,
-			onlyModelMap = 0,
-			lifeTime = 0,
-			sustain = 1,
-			effectType = 0,
-		},
-	},
-
-	FlameProjectile = {
-		distortionType = "point", -- or cone or beam
-		fraction = 5, -- only spawn every nth distortion
-		distortionConfig = {
-			posx = 0,
-			posy = 15,
-			posz = 0,
-			radius = 25,
-			noiseStrength = 8,
-			noiseScaleSpace = -0.30,
-			distanceFalloff = 0.9,
-			onlyModelMap = 0,
-			windAffected = 0.2,
-			riseRate = -0.5,
-			lifeTime = 29,
-			rampUp = 15,
-			decay = 10,
-			effectType = 0,
-		},
-	},
-	FlameProjectileXL = {
-		distortionType = "point", -- or cone or beam
-		fraction = 3, -- only spawn every nth distortion (lowered from 8 -- cordemon/corcrwh have long flame ranges and 1-in-8 left visible gaps)
-		distortionConfig = {
-			posx = 0,
-			posy = 45,
-			posz = 0,
-			radius = 25,
-			noiseStrength = 4,
-			noiseScaleSpace = -0.45,
-			distanceFalloff = 1.6,
-			onlyModelMap = 0,
-			windAffected = 0.1,
-			riseRate = -0.5,
-			lifeTime = 40,
-			rampUp = 30,
-			decay = 30,
-			effectType = 0,
-		},
-	},
-	FireHeat = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 1.3,
-			noiseScaleSpace = 0.60,
-			distanceFalloff = 0.5,
-			startRadius = 0.3,
-			onlyModelMap = 0,
-			refractiveIndex = 0.9,
-			windAffected = 1.3,
-			riseRate = 1.5,
-			lifeTime = 20,
-			rampUp = 10,
-			decay = 10,
-			effectType = 0,
-		},
-	},
-
-	ExplosionDistort = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 2,
-			noiseScaleSpace = 0.95,
-			distanceFalloff = 1.5,
-			onlyModelMap = 0,
-			startRadius = 0.3,
-			lifeTime = 20,
-			rampUp = 7,
-			decay = 13,
-			effectType = 0,
-		},
-	},
-
-	ExplosionHeatXS = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 1,
-			noiseScaleSpace = 0.75,
-			distanceFalloff = 0.5,
-			onlyModelMap = 0,
-			lifeTime = 30,
-			rampUp = 15,
-			decay = 20,
-			effectType = 0,
-		},
-	},
-	ExplosionHeat = { -- spawned on explosions
+	
+	
+	
+	-- ZK fiddling
+	FireExplosionHeat = { -- spawned on explosions
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
@@ -1321,294 +324,12 @@ local BaseClasses = {
 			distanceFalloff = 0.5,
 			startRadius = 0.3,
 			onlyModelMap = 0,
-			lifeTime = 20,
-			rampUp = 30,
-			decay = 10,
-			effectType = 0,
-		},
-	},
-	ExplosionHeatNuke = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 75,
-			noiseScaleSpace = 0.034,
-			distanceFalloff = 0.5,
-			onlyModelMap = 0,
-			windAffected = -1,
-			riseRate = 0.3,
-			startRadius = 0.4,
-			lifeTime = 12,
+			lifeTime = 50,
 			rampUp = 2,
 			decay = 10,
 			effectType = 0,
 		},
 	},
-	ExplosionRadiationNuke = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 20,
-			noiseScaleSpace = 0.1,
-			distanceFalloff = 0.5,
-			onlyModelMap = 0,
-			windAffected = -1,
-			riseRate = -0.5,
-			lifeTime = 200,
-			rampUp = 100,
-			decay = 100,
-			effectType = 0,
-		},
-	},
-	ExplosionRadiationDgun = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		fraction = 6,
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 6,
-			noiseScaleSpace = 0.55,
-			distanceFalloff = 1.2,
-			onlyModelMap = 1,
-			windAffected = -1,
-			riseRate = -0.5,
-			lifeTime = 50,
-			rampUp = 20,
-			decay = 25,
-			effectType = 0,
-		},
-	},
-
-	JunoHeat = { -- unused
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 1,
-			noiseScaleSpace = 0.75,
-			distanceFalloff = 0.5,
-			onlyModelMap = 0,
-			lifeTime = 60,
-			rampUp = 30,
-			decay = 30,
-			effectType = 7,
-		},
-	},
-
-	EMPShockWave = { -- Short distortion wave for EMP
-		distortionType = "point",
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			noiseStrength = 2.5,
-			noiseScaleSpace = 0.13,
-			distanceFalloff = 0.1,
-			onlyModelMap = 1,
-			lifeTime = 20,
-			effectStrength = -1.5,
-			startRadius = 0.4,
-			rampUp = 5,
-			decay = 15,
-			shockWidth = 8,
-			effectType = 2,
-		},
-	},
-
-	EMPNoise = { -- Circle area-distortion-effect for EMP
-		distortionType = "point",
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			noiseStrength = 0.85,
-			noiseScaleSpace = 0.1,
-			distanceFalloff = 0.1,
-			onlyModelMap = 1,
-			startRadius = 0.60,
-			shockWidth = 20,
-			refractiveIndex = -1.2,
-			effectStrength = 0.7,
-			windAffected = -0.95,
-			riseRate = -0.95,
-			lifeTime = 80,
-			rampUp = 10,
-			decay = 30,
-			effectType = 13,
-		},
-	},
-	EMPRipples = { -- Circle area-distortion-effect for EMP
-		distortionType = "point",
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 200,
-			noiseStrength = 6.0,
-			noiseScaleSpace = 0.38,
-			distanceFalloff = 0.1,
-			onlyModelMap = -1,
-			startRadius = 0.5,
-			shockWidth = 1.05,
-			refractiveIndex = -1.2,
-			effectStrength = 5,
-			windAffected = -1,
-			riseRate = -1,
-			lifeTime = 59,
-			rampUp = 19,
-			decay = 40,
-			effectType = "groundShockwave",
-		},
-	},
-
-	AirShockWaveEMP = { -- Noised/electric Shockwave ripple on units
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			noiseScaleSpace = 0.15,
-			noiseStrength = 0.8,
-			onlyModelMap = 0,
-			lifeTime = 12,
-			refractiveIndex = 1.03,
-			decay = 4,
-			rampUp = 8,
-			effectStrength = 1.75,
-			shockWidth = -0.30, --needed for airshockwaves
-			effectType = "airShockwave",
-		},
-	},
-
-	JunoShockWave = { -- big distorted shockwave
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 2.5,
-			noiseScaleSpace = 0.13,
-			distanceFalloff = 0.1,
-			onlyModelMap = 1,
-			lifeTime = 40,
-			effectStrength = -11,
-			startRadius = 0.2,
-			rampUp = 10,
-			decay = 30,
-			shockWidth = 14,
-			effectType = 2,
-		},
-	},
-
-	JunoNoise = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 600,
-			noiseStrength = 0.45,
-			noiseScaleSpace = 1.5,
-			distanceFalloff = 0.1,
-			onlyModelMap = 1,
-			startRadius = 0.90,
-			shockWidth = 20,
-			refractiveIndex = -1.2,
-			effectStrength = 0.7,
-			windAffected = -0.5,
-			riseRate = 2,
-			lifeTime = 675,
-			rampUp = 100,
-			decay = 500,
-			effectType = 13,
-		},
-	},
-
-	ProjectileDgun = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = 20,
-			noiseScaleSpace = -0.1,
-			distanceFalloff = 0.5,
-			onlyModelMap = 0,
-			windAffected = -1,
-			riseRate = 0,
-			--magnificationRate = 8.0,
-			lifeTime = 75,
-			rampUp = 50,
-			decay = 25,
-			effectType = 0,
-		},
-	},
-
-	MuzzleFlash = { -- spawned on projectilecreated
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 150,
-			lifeTime = 6,
-			sustain = 0.0035,
-			effectType = 0,
-		},
-	},
-	
-	ProjectileDgun = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
-		yOffset = 0, -- Y offsets are only ever used for explosions!
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
-			radius = 10,
-			noiseStrength = -20,
-			noiseScaleSpace = 0.1,
-			distanceFalloff = 0.5,
-			onlyModelMap = 0,
-			windAffected = -1,
-			riseRate = 0,
-			--magnificationRate = 8.0,
-			lifeTime = 75,
-			rampUp = 50,
-			decay = 25,
-			effectType = 0,
-		},
-	},
-	
-	
-	
-	
-	-- ZK fiddling
-	
 	Implosion = { 
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
@@ -1631,8 +352,93 @@ local BaseClasses = {
 			effectType = "airShockwave",
 		},
 	},
-	
-	TachyonBeam = {
+	DgunImplosion = { 
+		distortionType = "point", -- or cone or beam
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.2,
+			noiseStrength = 0.2,
+			onlyModelMap = 0,
+			lifeTime = 11,
+			distanceFalloff = 1,
+			refractiveIndex = 1.5,
+			decay = 10,
+			rampUp = 4,
+			effectStrength = -2,
+			startRadius = 0.7,
+			shockWidth = -2,
+			effectType = "airShockwave",
+		},
+	},
+	DgunProjectile = { 
+		distortionType = "point", -- or cone or beam
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.2,
+			noiseStrength = 0.2,
+			onlyModelMap = 0,
+			lifeTime = 45,
+			distanceFalloff = 1,
+			refractiveIndex = 1.5,
+			decay = 10,
+			rampUp = 4,
+			effectStrength = -2,
+			startRadius = 0.7,
+			shockWidth = -2,
+			effectType = "airShockwave",
+		},
+	},
+	SlowBeam = {
+		distortionType = "beam", -- or cone or beam
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			noiseStrength = 0.18,
+			noiseScaleSpace = 0.24,
+			onlyModelMap = 0,
+			riseRate = -0.1,
+			pos2x = 100,
+			pos2y = 500,
+			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
+			lifeTime = 22,
+			sustain = 15,
+			rampUp = 0,
+			decay = 10,
+			effectType = 7,
+		},
+	},
+	DisruptorBeam = {
+		distortionType = "beam", -- or cone or beam
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			noiseStrength = 0.4,
+			noiseScaleSpace = 0.03,
+			onlyModelMap = 0,
+			riseRate = -0.1,
+			pos2x = 100,
+			pos2y = 500,
+			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
+			lifeTime = 22,
+			sustain = 15,
+			rampUp = 0,
+			decay = 10,
+			effectType = 7,
+		},
+	},
+	HeavyLaser = {
 		distortionType = "beam", -- or cone or beam
 		distortionConfig = {
 			posx = 0,
@@ -1694,8 +500,8 @@ local BaseClasses = {
 }
 
 local SizeRadius = {
-	Quaco = 2.5,
-	Zetto = 5,
+	Quaco = 4,
+	Zetto = 7,
 	Atto = 10,
 	Banthlaser = 13,
 	Femto = 16,
@@ -1704,7 +510,7 @@ local SizeRadius = {
 	Nano = 34,
 	Micro = 44,
 	DGun = 50,
-	Tiniest = 56,
+	Tiniest = 60,
 	Tiny = 72,
 	Smallest = 90,
 	Smaller = 115,
@@ -1739,7 +545,7 @@ local function GetClosestSizeClass(desiredsize)
 			best = classname
 		end
 	end
-	return best, SizeRadius[best]
+	return best
 end
 
 local distortionClasses = {}
@@ -1857,170 +663,6 @@ local projectileDefDistortions = {
 -- CegTag -> distortion override tables for missile thruster trails
 -- Uses MissileProjectile as base class with per-size overrides (same pattern as manual overrides)
 
-local missileDistortionByCeg = {
-	missiletrailtiny = {
-		radius = 70,
-		theta = 0.07,
-		noiseStrength = 4.0,
-		noiseScaleSpace = 0.85,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 10,
-	},
-	missiletrailsmall = {
-		radius = 75,
-		theta = 0.08,
-		noiseStrength = 4.0,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 12,
-	},
-	["missiletrailsmall-simple"] = {
-		radius = 75,
-		theta = 0.08,
-		noiseStrength = 4.0,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 12,
-	},
-	["missiletrailsmall-red"] = {
-		radius = 75,
-		theta = 0.08,
-		noiseStrength = 4.0,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 12,
-	},
-	["missiletrailsmall-starburst"] = {
-		radius = 75,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 12,
-	},
-	missiletrailfighter = {
-		radius = 75,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 12,
-	},
-	missiletrailaa = {
-		radius = 110,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 16,
-	},
-	missiletrailmedium = {
-		radius = 110,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 16,
-	},
-	["missiletrailmedium-red"] = {
-		radius = 110,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 16,
-	},
-	["missiletrailmedium-starburst"] = {
-		radius = 110,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 16,
-	},
-	missiletrailviper = {
-		radius = 110,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.75,
-		distanceFalloff = 1.4,
-		effectStrength = 2.5,
-		yoffset = 16,
-	},
-	["missiletraillarge-red"] = {
-		radius = 140,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.7,
-		distanceFalloff = 1.4,
-		effectStrength = 3.3,
-		yoffset = 20,
-	},
-	["missiletrailaa-large"] = {
-		radius = 140,
-		theta = 0.08,
-		noiseStrength = 4.5,
-		noiseScaleSpace = 0.7,
-		distanceFalloff = 1.4,
-		effectStrength = 3.3,
-		yoffset = 20,
-	},
-	missiletrailmship = {
-		radius = 140,
-		theta = 0.08,
-		noiseStrength = 5.0,
-		noiseScaleSpace = 0.7,
-		distanceFalloff = 1.4,
-		effectStrength = 3.3,
-		yoffset = 20,
-	},
-	["missiletrail-juno"] = {
-		radius = 140,
-		theta = 0.08,
-		noiseStrength = 5.0,
-		noiseScaleSpace = 0.65,
-		distanceFalloff = 1.2,
-		effectStrength = 3.3,
-		yoffset = 20,
-	},
-	["cruisemissiletrail-tacnuke"] = {
-		radius = 160,
-		theta = 0.08,
-		noiseStrength = 5.0,
-		noiseScaleSpace = 0.65,
-		distanceFalloff = 1.2,
-		effectStrength = 3.3,
-		yoffset = 20,
-	},
-	["cruisemissiletrail-emp"] = {
-		radius = 150,
-		theta = 0.08,
-		noiseStrength = 5.0,
-		noiseScaleSpace = 0.65,
-		distanceFalloff = 1.2,
-		effectStrength = 3.3,
-		yoffset = 20,
-	},
-	nuketrail = {
-		radius = 230,
-		theta = 0.08,
-		noiseStrength = 5.0,
-		noiseScaleSpace = 0.6,
-		distanceFalloff = 1.0,
-		effectStrength = 3.3,
-		yoffset = 20,
-	},
-}
 
 local function AssignDistortionsToAllWeapons()
 	for weaponID = 0, #WeaponDefs do
@@ -2033,6 +675,7 @@ local function AssignDistortionsToAllWeapons()
 				break
 			end
 		end
+		Spring.Echo("Weapon", weaponDef.name)
 
 		-- Start by collecting some common parameters of the weapon
 		damage = (damage / globalDamageMult) + ((damage * (globalDamageMult - 1)) * 0.25)
@@ -2042,231 +685,73 @@ local function AssignDistortionsToAllWeapons()
 		local areaofeffect = weaponDef.damageAreaOfEffect or 0
 		--local weaponImpulse = weaponDef.impulseFactor or 0 (doesn't seem to work)
 		local radius = ((areaofeffect * 0.7) + (areaofeffect * weaponDef.edgeEffectiveness * 1.1))
-		local muzzleflashRadius = radius ^ 0.75 + (weaponRange * 0.015) + (projectileSpeed * 0.045) --for muzzleflashes
 		--local effectiveRangeExplo = ((areaofeffect * 1.2) - ((1 - weaponDef.edgeEffectiveness) * areaofeffect * 0.5)) --+ (weaponImpulse * 1000)
 		local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
 		--local effectiveUnitRangeExplo = areaofeffect * 2
 
 		--local radius = (weaponDef.damageAreaOfEffect * weaponDef.edgeEffectiveness * 1.55)
 
-		local muzzleFlash = true -- by default add muzzleflash to weapon being fired
-		local explosionDistortion = true -- by default, add explosion distortion to weapon on explosion
 		local sizeclass = GetClosestSizeClass(radius)
 		local overrideTable = {}
-		local antiair = string.find(weaponDef.cegTag, "aa") or false
-		local scavenger = string.find(weaponDef.name, "_scav") or false
-		local juno = string.find(weaponDef.name, "juno") or false
-		--local isBuilding =
-		local isUnitExplosion = string.find(weaponDef.name, "explosion") or false
-		local isBuildingExplosion = string.find(weaponDef.name, "buildingexplosion") or false
 
 		-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
-		if weaponDef.type == "LaserCannon" and wcp.burntime then
-			--projectileDefDistortions[weaponID] = GetDistortionClass("FlameProjectile", "Smallish", overrideTable)
-
+		if wcp.lups_noshockwave then
 		elseif weaponDef.type == "BeamLaser" then
-			muzzleFlash = false
-
-			if string.find(weaponDef.name, "heat") then
-				-- Heat rays get their own stronger distortion class
-				local heatRadius = (1.5 * (weaponDef.size * weaponDef.size * weaponDef.size)) + (5 * radius)
-				sizeclass = GetClosestSizeClass(heatRadius * 0.25)
-				projectileDefDistortions[weaponID] = GetDistortionClass("HeatRayHeat", sizeclass, overrideTable)
+			if wcp.timeslow_damagefactor or wcp.timeslow_onlyslow then
+				if damage < 20 then -- Weapon contains real damage by this point, so this catches onlyslow too.
+					projectileDefDistortions[weaponID] = GetDistortionClass("SlowBeam", "Atto")
+				else
+					projectileDefDistortions[weaponID] = GetDistortionClass("DisruptorBeam", "Atto")
+				end
+			elseif damage > 2500 then
+				projectileDefDistortions[weaponID] = GetDistortionClass("HeavyLaser", "Banthlaser")
+			elseif damage > 800 then
+				projectileDefDistortions[weaponID] = GetDistortionClass("HeavyLaser", "Atto")
 			end
-		elseif weaponDef.type == "LaserCannon" then
-			-- take the name in lower-case
-			local lname = weaponDef.name:lower()
-
-			-- if it's a machine-gun or rapid-fire, give it NO distortion
-			if
-				lname:find("mg_weapon")
-				or lname:find("legflak")
-				or lname:find("machinegun")
-				or lname:find("shotgun")
-			then
-				Spring.Echo("LaserCannon no distortion for " .. weaponDef.name)
-				--projectileDefDistortions[weaponID] = GetDistortionClass("NoEffect", sizeclass, overrideTable)
-
-				-- otherwise give it the regular cannon distortion
-			else
-				local sizeclass = GetClosestSizeClass(radius)
-				projectileDefDistortions[weaponID] = GetDistortionClass("CannonProjectile", sizeclass, overrideTable)
-			end
-		elseif weaponDef.type == "DistortionningCannon" then
-			--sizeclass = GetClosestSizeClass(33 + (radius*2.5))
-			projectileDefDistortions[weaponID] = GetDistortionClass("LaserProjectile", sizeclass, overrideTable)
-		elseif weaponDef.type == "MissileLauncher" then
-			local tag = weaponDef.cegTag and weaponDef.cegTag:lower() or ""
-			local thrusterOverrides = missileDistortionByCeg[tag]
-			if thrusterOverrides then
-				--Spring.Echo("[DistortionConfig] MissileLauncher " .. weaponDef.name .. " cegTag=" .. tag .. " radius=" .. thrusterOverrides.radius)
-				projectileDefDistortions[weaponID] =
-					GetDistortionClass("MissileProjectile", sizeclass, thrusterOverrides)
-			else
-				projectileDefDistortions[weaponID] = GetDistortionClass("MissileProjectile", sizeclass, overrideTable)
-			end
-		elseif weaponDef.type == "StarburstLauncher" then
-			local tag = weaponDef.cegTag and weaponDef.cegTag:lower() or ""
-			local thrusterOverrides = missileDistortionByCeg[tag]
-			if thrusterOverrides then
-				--Spring.Echo("[DistortionConfig] StarburstLauncher " .. weaponDef.name .. " cegTag=" .. tag .. " radius=" .. thrusterOverrides.radius)
-				projectileDefDistortions[weaponID] =
-					GetDistortionClass("MissileProjectile", sizeclass, thrusterOverrides)
-			else
-				projectileDefDistortions[weaponID] = GetDistortionClass("MissileProjectile", sizeclass, overrideTable)
-			end
-			sizeclass = GetClosestSizeClass(radius)
-		elseif weaponDef.type == "Cannon" then
-			--muzzleFlash = true
-			sizeclass = GetClosestSizeClass(radius)
-			--projectileDefDistortions[weaponID] = GetDistortionClass("CannonProjectile", sizeclass, overrideTable)
 		elseif weaponDef.type == "DGun" then
-			--muzzleFlash = true --doesnt work
 			sizeclass = "DGun"
-
-			projectileDefDistortions[weaponID] = GetDistortionClass("AirShockWaveDgun", sizeclass, overrideTable)
-			--projectileDefDistortions[weaponID] = GetDistortionClass("CannonProjectile", sizeclass, overrideTable)
-			projectileDefDistortions[weaponID].yOffset = 32
-		elseif weaponDef.type == "TorpedoLauncher" then
-			sizeclass = "Small"
-			projectileDefDistortions[weaponID] = GetDistortionClass("TorpedoProjectile", sizeclass, overrideTable)
-		elseif weaponDef.type == "Shield" then
-			sizeclass = "Large"
-			projectileDefDistortions[weaponID] = GetDistortionClass("CannonProjectile", sizeclass, overrideTable)
-		elseif weaponDef.type == "AircraftBomb" then
-			projectileDefDistortions[weaponID] =
-				GetDistortionClass("AirBombProjectile", "Warm", sizeclass, overrideTable)
+			projectileDefDistortions[weaponID] = GetDistortionClass("DgunProjectile", "Micro")
 		end
 
 		-- Add a muzzle flash if needed:
-		if muzzleFlash then
-			local mymuzzleFlash
-
-			if damage < 100 then
-				--Spring.Echo("Skipping muzzle flash for low damage:", damage)
-			elseif damage < 275 then
-				mymuzzleFlash =
-					GetDistortionClass("MuzzleShockWaveXS", GetClosestSizeClass(muzzleflashRadius * 0.7), overrideTable)
-				--mymuzzleflash.yOffset = 10 --This does not seem to work
-				--mymuzzleflash.distortionConfig.radius = radius * 0.6 --What does this do?
-			elseif damage <= 500 then
-				mymuzzleFlash =
-					GetDistortionClass("MuzzleShockWave", GetClosestSizeClass(muzzleflashRadius), overrideTable)
-			else
-				mymuzzleFlash =
-					GetDistortionClass("MuzzleShockWaveXL", GetClosestSizeClass(muzzleflashRadius * 0.6), overrideTable)
-			end
-			muzzleFlashDistortions[weaponID] = { mymuzzleFlash } -- note that multiple distortions can be added
+		if wcp.lups_noshockwave then
+		elseif areaofeffect > 60 and damage > 500 then
+			local size = weaponRange > 2500 and "Tiniest" or "KorgLaser"
+			local class = weaponRange > 2500 and "MuzzleShockWaveXL" or "MuzzleShockWave"
+			muzzleFlashDistortions[weaponID] = {
+				GetDistortionClass(class, size),
+			}
 		end
 
 		-- Add explosiondistortions if needed:
-		if explosionDistortion then
-			if weaponDef.type == "DGun" then
-			elseif weaponDef.type == "Flame" then
-				explosionDistortions[weaponID] =
-					{ GetDistortionClass("FireHeat", GetClosestSizeClass(radius), overrideTable) }
-
-				-- elseif weaponDef.type == 'LaserCannon' then -- No shockwaves for lasercannons
-				-- 	explosionDistortions[weaponID] = {GetDistortionClass("AirShockWaveMG", GetClosestSizeClass(radius), overrideTable)}
-			elseif weaponDef.type == "TorpedoLauncher" then
-				explosionDistortions[weaponID] =
-					{ GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius), overrideTable) }
-			elseif weaponDef.type == "BeamLaser" then
-				sizeclass = GetClosestSizeClass(radius * 0.15) -- works
-				overrideTable = { lifeTime = 2 } -- doesn't work
-			elseif weaponDef.type == "DistortionningCannon" then
-				sizeclass = GetClosestSizeClass(radius * 1.2)
+		if wcp.lups_noshockwave then
+		elseif weaponDef.type == "DGun" then
+			explosionDistortions[weaponID] = {
+				GetDistortionClass("DgunImplosion", "Micro"),
+			}
+		elseif weaponDef.type == "TorpedoLauncher" then
+			explosionDistortions[weaponID] = {
+				GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius)),
+			}
+		elseif weaponDef.type == "AircraftBomb" then
+			explosionDistortions[weaponID] = {
+				GetDistortionClass("FireExplosionHeat", "SmallMedium"),
+			}
+		elseif effectiveRangeExplo > 10 then
+			if effectiveRangeExplo < 24 then
+				distortionClass = "ExploShockWaveXS"
+			elseif effectiveRangeExplo < 48 then
+				distortionClass = "ExploShockWaveS"
+			elseif effectiveRangeExplo < 92 then
+				distortionClass = "ExploShockWaveM"
+			elseif effectiveRangeExplo < 184 then
+				distortionClass = "ExploShockWaveL"
 			else
-				if weaponDef.type == "AircraftBomb" then
-					if weaponDef.paralyzer then
-					else
-						explosionDistortions[weaponID] =
-							{ GetDistortionClass("AirShockWave", GetClosestSizeClass(radius), overrideTable) }
-						explosionDistortions[weaponID] =
-							{ GetDistortionClass("GroundShockWave", GetClosestSizeClass(radius), overrideTable) }
-						explosionDistortions[weaponID] =
-							{ GetDistortionClass("ExplosionHeat", GetClosestSizeClass(radius), overrideTable) }
-					end
-				end
-
-				-- radius = ((weaponDef.damageAreaOfEffect*1.9) + (weaponDef.damageAreaOfEffect * weaponDef.edgeEffectiveness * 1.35))
-				-- if string.find(weaponDef.name, 'juno') then
-				-- 	radius = 675
-				-- end
-
-				-- UNIT explosions
-				if weaponDef.customParams.unitexplosion then
-					effectiveRangeExplo = effectiveRangeExplo * 2.1
-
-					if string.find(weaponDef.name, "windboom") then
-						effectiveRangeExplo = 40
-						--areaofeffect = areaofeffect * 0.5
-					end
-
-					if string.find(weaponDef.name, "nanoboom") then
-						effectiveRangeExplo = 58
-						--areaofeffect = areaofeffect * 0.5
-					end
-
-					if string.find(weaponDef.name, "energystorage") then
-						effectiveRangeExplo = effectiveRangeExplo * 0.6
-					end
-
-					if string.find(weaponDef.name, "geo") then --currently override
-						effectiveRangeExplo = 100
-					end
-
-					if string.find(weaponDef.name, "building") then
-						effectiveRangeExplo = effectiveRangeExplo * 0.5
-					end
-
-					if string.find(weaponDef.name, "penetrator") then
-						effectiveRangeExplo = effectiveRangeExplo * 0.6
-					end
-
-					if string.find(weaponDef.name, "explosiont3") then
-						effectiveRangeExplo = effectiveRangeExplo * 1.5
-					end
-
-					if effectiveRangeExplo < 24 then
-						distortionClass = "UnitExploShockWaveXS"
-					elseif effectiveRangeExplo < 48 then
-						distortionClass = "UnitExploShockWaveS"
-					elseif effectiveRangeExplo < 92 then
-						distortionClass = "UnitExploShockWaveM"
-					elseif effectiveRangeExplo < 184 then
-						distortionClass = "UnitExploShockWaveL"
-					else --
-						distortionClass = "UnitExploShockWaveXL"
-					end
-				else -- regular CANNON explosions
-					if effectiveRangeExplo < 24 then
-						distortionClass = "ExploShockWaveXS"
-					elseif effectiveRangeExplo < 48 then
-						distortionClass = "ExploShockWaveS"
-					elseif effectiveRangeExplo < 92 then
-						distortionClass = "ExploShockWaveM"
-					elseif effectiveRangeExplo < 184 then
-						distortionClass = "ExploShockWaveL"
-					else --
-						distortionClass = "ExploShockWaveXL"
-					end
-				end
-
-				if string.find(weaponDef.name, "flak") then
-					areaofeffect = 0
-				end
-
-				-- Check weapon distortion class assignment (enter weapon name here)
-				-- if string.find(weaponDef.name, 'cortruck_missile') then
-				-- 	Spring.Echo('-==--===-', weaponDef.customParams.unitexplosion, distortionClass, effectiveRangeExplo, GetClosestSizeClass(effectiveRangeExplo), GetDistortionClass(distortionClass, GetClosestSizeClass(effectiveRangeExplo), overrideTable))
-				-- end
-
-				if not weaponDef.customParams.noexplosionlight and areaofeffect > 15 then --need to add noexplosiondistortion to units - now used same as lights
-					explosionDistortions[weaponID] =
-						{ GetDistortionClass(distortionClass, GetClosestSizeClass(effectiveRangeExplo), overrideTable) }
-				end
+				distortionClass = "ExploShockWaveXL"
 			end
+			explosionDistortions[weaponID] = {
+				GetDistortionClass(distortionClass, GetClosestSizeClass(effectiveRangeExplo))
+			}
 		end
 	end
 	Spring.Echo(Spring.GetGameFrame(), "DLGL4 weapons conf using", usedclasses, "distortion types")
@@ -2277,10 +762,6 @@ AssignDistortionsToAllWeapons() -- disable this if it doesn't work
 local explosionDistortionsNames = {}
 local muzzleFlashDistortionsNames = {}
 local projectileDefDistortionsNames = {}
-
-projectileDefDistortionsNames.hoverarty_ata = GetDistortionClass("TachyonBeam", "Banthlaser")
-projectileDefDistortionsNames.turretantiheavy_ata = GetDistortionClass("TachyonBeam", "Banthlaser")
-projectileDefDistortionsNames.striderbantha_ata = GetDistortionClass("TachyonBeam", "Banthlaser")
 
 explosionDistortionsNames.bomberheavy_arm_pidr = {
 	GetDistortionClass("Implosion", "Medium")
