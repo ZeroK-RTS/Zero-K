@@ -311,6 +311,26 @@ local BaseClasses = {
 	
 	
 	-- ZK fiddling
+	DisruptionPulse = {
+		distortionType = "point", -- or cone or beam
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 480,
+			noiseScaleSpace = 0.1,
+			noiseStrength = 0.2,
+			onlyModelMap = 0,
+			lifeTime = 23,
+			refractiveIndex = 1.015,
+			decay = 4,
+			rampUp = 4,
+			effectStrength = 0.2,
+			startRadius = 0.05,
+			shockWidth = 0.1,
+			effectType = "airShockwave",
+		},
+	},
 	BlackHole = {
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
@@ -748,6 +768,11 @@ local function AssignDistortionsToAllWeapons()
 
 		-- Add explosiondistortions if needed:
 		if wcp.lups_noshockwave then
+		elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and wcp.nofriendlyfire then
+			Spring.Echo("weaponDefweaponDefweaponDef", weaponDef.name)
+			explosionDistortions[weaponID] = {
+				GetDistortionClass("DisruptionPulse", GetClosestSizeClass(effectiveRangeExplo)),
+			}
 		elseif weaponDef.type == "DGun" then
 			explosionDistortions[weaponID] = {
 				GetDistortionClass("DgunImplosion", "Micro"),
@@ -761,6 +786,7 @@ local function AssignDistortionsToAllWeapons()
 				GetDistortionClass("FireExplosionHeat", "SmallMedium"),
 			}
 		elseif effectiveRangeExplo > 10 then
+			local distortionClass
 			if effectiveRangeExplo < 24 then
 				distortionClass = "ExploShockWaveXS"
 			elseif effectiveRangeExplo < 48 then
@@ -772,9 +798,11 @@ local function AssignDistortionsToAllWeapons()
 			else
 				distortionClass = "ExploShockWaveXL"
 			end
-			explosionDistortions[weaponID] = {
-				GetDistortionClass(distortionClass, GetClosestSizeClass(effectiveRangeExplo))
-			}
+			if distortionClass then
+				explosionDistortions[weaponID] = {
+					GetDistortionClass(distortionClass, GetClosestSizeClass(effectiveRangeExplo))
+				}
+			end
 		end
 	end
 	Spring.Echo(Spring.GetGameFrame(), "DLGL4 weapons conf using", usedclasses, "distortion types")
