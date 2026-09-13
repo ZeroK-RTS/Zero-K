@@ -311,6 +311,29 @@ local BaseClasses = {
 	
 	
 	-- ZK fiddling
+	BlackHole = {
+		distortionType = "point", -- or cone or beam
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseStrength = 0.9,
+			noiseScaleSpace = 0.5,
+			onlyModelMap = 0,
+			lifeTime = 330,
+			distanceFalloff = 0.6,
+			refractiveIndex = 1.2,
+			decay = 80,
+			rampUp = 4,
+			effectStrength = -1.5,
+			startRadius = 0.8,
+			shockWidth = -1.7,
+			effectType = "airShockwave",
+		},
+	},
+	
 	FireExplosionHeat = { -- spawned on explosions
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
@@ -762,6 +785,10 @@ AssignDistortionsToAllWeapons() -- disable this if it doesn't work
 local explosionDistortionsNames = {}
 local muzzleFlashDistortionsNames = {}
 local projectileDefDistortionsNames = {}
+
+explosionDistortionsNames.jumpblackhole_black_hole = {
+	GetDistortionClass("BlackHole", "Small")
+}
 
 explosionDistortionsNames.bomberheavy_arm_pidr = {
 	GetDistortionClass("Implosion", "Medium")
