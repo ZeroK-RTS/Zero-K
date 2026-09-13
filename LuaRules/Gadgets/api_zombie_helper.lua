@@ -33,15 +33,6 @@ local mapHeight
 
 local REZ_SOUND = "sounds/misc/resurrect.wav"
 
---unused, may be used depending on how things shake out
-local ZOMBIE_SOUNDS = {
-	"sounds/misc/zombie_1.wav",
-	"sounds/misc/zombie_2.wav",
-	"sounds/misc/zombie_3.wav",
-}
-
-
-
 
 -- Zombie resurrect
 
@@ -104,17 +95,18 @@ end
 -- Zombie commands
 
 local function RandomFactoryOrders(unitID, unitDefID) -- give factory something to do
-	if not Spring.GetUnitIsDead(unitID) then
-		local buildopts = UnitDefs[unitDefID].buildOptions
-		if (not buildopts) or #buildopts <= 0 then
-			return
-		end
-		local orders = {}
-		for i = 1, math.random(10, 30) do
-			orders[#orders + 1] = {-buildopts[math.random(1, #buildopts)], 0, 0 }
-			Spring.GiveOrderArrayToUnit(unitID, orders)
-		end
+	if Spring.GetUnitIsDead(unitID) then
+		return
 	end
+	local buildopts = UnitDefs[unitDefID].buildOptions
+	if (not buildopts) or #buildopts <= 0 then
+		return
+	end
+	local orders = {}
+	for i = 1, math.random(10, 30) do
+		orders[#orders + 1] = {-buildopts[math.random(1, #buildopts)], 0, 0 }
+	end
+	Spring.GiveOrderArrayToUnit(unitID, orders)
 end
 
 
@@ -130,7 +122,7 @@ local function GetUnitNearestAlly(unitID, range)
 		local allyDefID = Spring.GetUnitDefID(allyID)
 		if (allyID ~= unitID) and (allyTeam == GaiaTeamID) and (Spring.Utilities.getMovetype(UnitDefs[allyDefID]) ~= false) then
 			local ox, oy, oz = Spring.GetUnitPosition(allyID)
-			local dist = math.diag(x, z, ox ,oz)
+			local dist = math.diag(x - ox, z - oz)
 			if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
 				best_ally = allyID
 				best_dist = dist
@@ -163,32 +155,29 @@ local function GiveZombiesRandomOrders(unitID)
 		orders[#orders + 1] = {CMD.GUARD, {near_ally}, 0}
 	end
 	for i = 1, math.random(10, 30) do
-		rx = math.random(0, mapWidth)
-		rz = math.random(0, mapHeight)
-		ry = Spring.GetGroundHeight(rx,rz)
+		local rx = math.random(0, mapWidth)
+		local rz = math.random(0, mapHeight)
+		local ry = Spring.GetGroundHeight(rx,rz)
 		if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
 			orders[#orders+1] = {CMD.FIGHT, {rx, ry, rz}, CMD.OPT_SHIFT}
 		end
 	end
-	if (#orders > 0) then
-		if not Spring.GetUnitIsDead(unitID) then
-			Spring.GiveOrderArrayToUnitArray({unitID},orders)
-		end
-	end
+	
+	Spring.GiveOrderArrayToUnit(unitID,orders)
 	if (UnitDefs[unitDefID].isFactory) then
 		RandomFactoryOrders(unitID, unitDefID) -- give factory something to do
 	end
 end
 
 function gadget:Initialize()
-  
+
 	mapWidth = Game.mapSizeX
 	mapHeight = Game.mapSizeZ
 
-  GG.Zombies = {
-    TurnFeatureIntoUnit     = TurnFeatureIntoUnit,
-    SetZombieSpeedMult      = SetZombieSpeedMult,
-    SetZombieBehavior       = GiveZombiesRandomOrders,
-    GetFeatureResurrectData = GetFeatureResurrectData
-  }
+	GG.Zombies = {
+		TurnFeatureIntoUnit     = TurnFeatureIntoUnit,
+		SetZombieSpeedMult      = SetZombieSpeedMult,
+		SetZombieBehavior       = GiveZombiesRandomOrders,
+		GetFeatureResurrectData = GetFeatureResurrectData
+}
 end
