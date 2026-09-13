@@ -73,22 +73,22 @@ end
 -- Turns a feature into a unit if applicable. Has a callback returning featureID and unitID for data transfer. Returns unitID.
 local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealthBool, unitReviveCallback)
   
-  local featureDefName,facing = GetFeatureResurrectData(featureID)
-  local x, y, z = Spring.GetFeaturePosition(featureID)
-  
-  local unitID = Spring.CreateUnit(featureDefName, x, y, z, facing, teamID)
-  
- 	if  not (unitID) then
+	local featureDefName,facing = GetFeatureResurrectData(featureID)
+	local x, y, z = Spring.GetFeaturePosition(featureID)
+
+	local unitID = Spring.CreateUnit(featureDefName, x, y, z, facing, teamID)
+
+	if not (unitID) then
 		return nil
 	end
-	
+
 	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
 	local size = UnitDefNames[featureDefName].xsize
 	Spring.SpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
 	GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
-	
-	if reclaimPercentHealth then
+
+	if reclaimPercentHealthBool then
 		local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
 		if currentMetal and maxMetal and (maxMetal > 0) then
 			local health = Spring.GetUnitHealth(unitID)
@@ -97,14 +97,14 @@ local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealthBool, un
 			end
 		end
 	end
-	
+
 	-- Unit and Wreck exist both for value transfer
 	if (unitReviveCallback) then
 		unitReviveCallback(unitID,featureID)
-    end
-	
-  Spring.DestroyFeature(featureID)
-  return unitID
+	end
+
+	Spring.DestroyFeature(featureID)
+	return unitID
 end
  
 -- Sets the zombie specific speed multiplier. Works on non zombie units too.
