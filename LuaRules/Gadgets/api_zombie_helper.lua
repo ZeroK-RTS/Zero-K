@@ -27,16 +27,35 @@ VFS.Include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
 -- unsure if these are different, differentiating between gaia and "zombie" team somehow may be good?
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
+local random = math.random
+local floor = math.floor
 
 local mapWidth
 local mapHeight
 
+local gameframe = 0
+
+local NonZombies = {
+	["asteroid"] = true,
+}
+
+local CEG_SPAWN = [[zombie]]
 local REZ_SOUND = "sounds/misc/resurrect.wav"
+local ZOMBIE_SOUNDS = {
+	"sounds/misc/zombie_1.wav",
+	"sounds/misc/zombie_2.wav",
+	"sounds/misc/zombie_3.wav",
+}
+
+local WARNING_TIME = 5 -- could be more configurable still but seem 
+
+local resurrectingFeatures = {} -- contains inital gameframe, base rez time, frame rez should complete and a callback function if someone wants to reuse the functionality
 
 
--- Zombie resurrect
 
 -- unsure if necessary, seems like just an extra failsafe
+
+-- Get Feature Defname and facing
 local function GetFeatureResurrectData(featureID)
 	local featureDefName, facing = Spring.GetFeatureResurrect(featureID)
 	if featureDefName == "" then
@@ -50,39 +69,45 @@ local function GetFeatureResurrectData(featureID)
 	return featureDefName, facing
 end
 
-local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealth)
+-- Zombie resurrect
+-- Turns a feature into a unit if applicable. Has a callback returning featureID and unitID for data transfer. Returns unitID.
+local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealthBool, unitReviveCallback)
   
   local featureDefName,facing = GetFeatureResurrectData(featureID)
   local x, y, z = Spring.GetFeaturePosition(featureID)
   
   local unitID = Spring.CreateUnit(featureDefName, x, y, z, facing, teamID)
   
-  -- Unit and Wreck exist both
-  -- could let there be a function passed to this function, that returns the Unit ID for transfer of values
-
- 	if (unitID) then
-		gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
-		local size = UnitDefNames[featureDefName].xsize
-		Spring.SpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
-		Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
-		GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
-		
-		if reclaimPercentHealth then
-			local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
-			if currentMetal and maxMetal and (maxMetal > 0) then
-				local health = Spring.GetUnitHealth(unitID)
-				if health then
-					Spring.SetUnitHealth(unitID, health*(currentMetal/maxMetal))
-				end
+ 	if  not (unitID) then
+		return nil
+	end
+	
+	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
+	local size = UnitDefNames[featureDefName].xsize
+	Spring.SpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
+	GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
+	
+	if reclaimPercentHealth then
+		local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
+		if currentMetal and maxMetal and (maxMetal > 0) then
+			local health = Spring.GetUnitHealth(unitID)
+			if health then
+				Spring.SetUnitHealth(unitID, health*(currentMetal/maxMetal))
 			end
 		end
+	end
+	
+	-- Unit and Wreck exist both for value transfer
+	if (unitReviveCallback) then
+		unitReviveCallback(unitID,featureID)
     end
 	
   Spring.DestroyFeature(featureID)
   return unitID
 end
-
--- Works on non zombie units too.
+ 
+-- Sets the zombie specific speed multiplier. Works on non zombie units too.
 local function SetZombieSpeedMult(unitID,speedMult)
 	if type(speedMult) ~= 'number' or speedMult < 0 then
 		error("SetZombieSpeedMult: mult must be number >= 0")
@@ -103,12 +128,11 @@ local function RandomFactoryOrders(unitID, unitDefID) -- give factory something 
 		return
 	end
 	local orders = {}
-	for i = 1, math.random(10, 30) do
-		orders[#orders + 1] = {-buildopts[math.random(1, #buildopts)], 0, 0 }
+	for i = 1, random(10, 30) do
+		orders[#orders + 1] = {-buildopts[random(1, #buildopts)], 0, 0 }
 	end
 	Spring.GiveOrderArrayToUnit(unitID, orders)
 end
-
 
 
 local function GetUnitNearestAlly(unitID, range)
@@ -132,12 +156,14 @@ local function GetUnitNearestAlly(unitID, range)
 	return best_ally
 end
 
+-- Applies Random Attackmove orders and Factory commands to units.
 local function GiveZombiesRandomOrders(unitID)
 	local unitDefID = (not Spring.GetUnitIsDead(unitID)) and Spring.GetUnitDefID(unitID)
 	if not unitDefID then
 		return
 	end
 	
+	Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, 2, 0)
 	local rx,rz,ry
 	local orders = {}
 	local near_ally
@@ -151,12 +177,12 @@ local function GiveZombiesRandomOrders(unitID)
 		end
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID)
-	if (near_ally) and  math.random(0, 5) < 4 then -- 60% chance to guard nearest ally
+	if (near_ally) and  random(0, 5) < 4 then -- 60% chance to guard nearest ally
 		orders[#orders + 1] = {CMD.GUARD, {near_ally}, 0}
 	end
-	for i = 1, math.random(10, 30) do
-		local rx = math.random(0, mapWidth)
-		local rz = math.random(0, mapHeight)
+	for i = 1, random(10, 30) do
+		local rx = random(0, mapWidth)
+		local rz = random(0, mapHeight)
 		local ry = Spring.GetGroundHeight(rx,rz)
 		if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
 			orders[#orders+1] = {CMD.FIGHT, {rx, ry, rz}, CMD.OPT_SHIFT}
@@ -168,6 +194,87 @@ local function GiveZombiesRandomOrders(unitID)
 		RandomFactoryOrders(unitID, unitDefID) -- give factory something to do
 	end
 end
+	
+-- Adds a wreck into the zombie countdown table.
+-- Use the rezFrameCallback to repurpose the system for other effects or hook into TurnFeatureIntoUnit for a revived unit and ID.
+-- If no callback is provided, resurrects the wreck on countdown completion.
+-- TODO I could add another callback function that returns passes to TurnFeatureIntoUnit for their callback. while thats more straighfroward in application that feels convoluted overall.
+local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, rezFrameCallback)
+	local resName, face = GetFeatureResurrectData(featureID)
+	if resName and face and not resurrectingFeatures[featureID] then
+		local ud = resName and UnitDefNames[resName]
+		if ud and not NonZombies[resName] then
+			local rezTime = ud.metalCost / buildpower
+			if (rezTime < minRezTime) then
+				  rezTime = minRezTime
+			end
+			resurrectingFeatures[featureID] = {rezInitFrame = gameframe, rezBaseTime = rezTime, rezFrame = (gameframe + rezTime*32), reclaimPercent = 0, rezFrameCallback = rezFrameCallback, }
+		end
+	end
+end
+
+-- hm... getter and setter to allow modification of these? could also let it be global, but that feels like bad practice
+-- could just export it under GG.zombies?
+local function GetZombieResurrectData(featureID)
+	if(resurrectingFeatures[featureID]) then
+		return resurrectingFeatures[featureID]
+	end
+	return false
+end
+
+-- The below comments are left from before -Stiofan
+-- reclaiming zombies 'causes delay in rez, basically you have to have about ZOMBIES_REZ_SPEED/2 or bigger BP to reclaim faster than it resurrects...
+-- TODO do more math to figure out how to perform it better?
+function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
+	if (resurrectingFeatures[featureID]) then
+		local reclaimPercent = resurrectingFeatures[featureID].reclaimPercent
+		local rezBaseTime = resurrectingFeatures[featureID].rezBaseTime
+		local rezInitFrame = resurrectingFeatures[featureID].rezInitFrame
+		
+		reclaimPercent = reclaimPercent - part
+		resurrectingFeatures[featureID].rezFrame = rezInitFrame + rezBaseTime * (1 + reclaimPercent) * 32
+		
+		resurrectingFeatures[featureID].reclaimPercent = reclaimPercent
+	end
+	return true
+end
+
+function gadget:FeatureDestroyed(featureID, allyTeam)
+	if (resurrectingFeatures[featureID]) then
+		resurrectingFeatures[featureID] = nil
+	end
+end
+
+function gadget:GameFrame(f)
+	gameframe = f
+	if f%32 ~= 0 then
+		return
+	end
+	local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
+	for featureID in pairs(resurrectingFeatures) do
+		local rezFrame = resurrectingFeatures[featureID].rezFrame
+		if rezFrame <= gameframe then
+			if (resurrectingFeatures[featureID].rezFrameCallback) then
+				Spring.Echo(resurrectingFeatures[featureID].rezFrameCallback)
+				resurrectingFeatures[featureID].rezFrameCallback(featureID)
+			else
+				TurnFeatureIntoUnit(featureID,GaiaTeamID,true,nil)
+			end
+		else
+			local framesTillRezCall = floor((rezFrame - f) / 32)
+			if framesTillRezCall <= WARNING_TIME then
+				local r = Spring.GetFeatureRadius(featureID)
+				local x, y, z = Spring.GetFeaturePosition(featureID)
+				spSpawnCEG(CEG_SPAWN, x, y, z, 0, 0, 0, 10 + r, 10 + r)
+
+				if framesTillRezCall == WARNING_TIME then
+					local z_sound = ZOMBIE_SOUNDS[random(#ZOMBIE_SOUNDS)]
+					GG.PlayFogHiddenSound(z_sound, 4, x, y, z)
+				end
+			end
+		end
+	end
+end
 
 function gadget:Initialize()
 
@@ -175,9 +282,11 @@ function gadget:Initialize()
 	mapHeight = Game.mapSizeZ
 
 	GG.Zombies = {
-		TurnFeatureIntoUnit     = TurnFeatureIntoUnit,
-		SetZombieSpeedMult      = SetZombieSpeedMult,
-		SetZombieBehavior       = GiveZombiesRandomOrders,
-		GetFeatureResurrectData = GetFeatureResurrectData
+		TurnFeatureIntoUnit     	= TurnFeatureIntoUnit,
+		SetZombieSpeedMult      	= SetZombieSpeedMult,
+		SetZombieBehavior       	= GiveZombiesRandomOrders,
+		GetFeatureResurrectData 	= GetFeatureResurrectData,
+		GetZombieResurrectData 		= GetZombieResurrectData, -- I want to expose these for modification from outside if desired
+		AddFeatureToZombieCountdown	= AddFeatureToZombieCountdown
 }
 end

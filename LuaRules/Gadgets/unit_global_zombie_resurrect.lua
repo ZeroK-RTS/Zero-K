@@ -36,10 +36,6 @@ local getMovetype = Spring.Utilities.getMovetype
 VFS.Include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
 -- I'm scared... what exactly did including that file do and how do I use it?
 
-local spGetGroundHeight           = Spring.GetGroundHeight
-local spGetUnitPosition           = Spring.GetUnitPosition
-local spGetFeaturePosition        = Spring.GetFeaturePosition
-local spCreateUnit                = Spring.CreateUnit
 local spGetUnitDefID              = Spring.GetUnitDefID
 local spGetUnitTeam               = Spring.GetUnitTeam
 local spGetAllUnits               = Spring.GetAllUnits
@@ -47,20 +43,13 @@ local spGetGameFrame              = Spring.GetGameFrame
 local spGetAllFeatures            = Spring.GetAllFeatures
 local spGiveOrderToUnit           = Spring.GiveOrderToUnit
 local spGetUnitCommandCount       = Spring.GetUnitCommandCount
-local spDestroyFeature            = Spring.DestroyFeature
-local spGetUnitIsDead             = Spring.GetUnitIsDead
-local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
-local spGetUnitsInCylinder        = Spring.GetUnitsInCylinder
 local spSetTeamResource           = Spring.SetTeamResource
 local spGetUnitHealth             = Spring.GetUnitHealth
-local spSetUnitRulesParam         = Spring.SetUnitRulesParam
 
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
 
 local gameframe = 0
-local LOS_ACCESS = {inlos = true}
-local PRIVATE_ACCESS = {private = true}
 
 local random = math.random
 local floor = math.floor
@@ -68,11 +57,6 @@ local floor = math.floor
 local mapWidth
 local mapHeight
 
-local reclaimed_data = {} -- holds initial gameframe, initial time in seconds, % of feature reclaimed
-local zombies_to_spawn = {}
-local zombiesToSpawnList = {}
-local zombiesToSpawnMap = {}
-local zombiesToSpawnCount = 0
 local zombies = {}
 
 local ZOMBIE_SOUNDS = {
@@ -124,39 +108,6 @@ local CMD_GUARD = CMD.GUARD
 
 local CEG_SPAWN = [[zombie]]
 
-local function disSQ(x1, y1, x2, y2)
-	return (x1 - x2)^2 + (y1 - y2)^2
-end
-
-local function RemoveZombieToSpawn(featureID)
-	if not zombiesToSpawnMap[featureID] then
-		return false
-	end
-	zombies_to_spawn[featureID] = nil
-	reclaimed_data[featureID] = nil
-	
-	local index = zombiesToSpawnMap[featureID]
-	
-	zombiesToSpawnList[index] = zombiesToSpawnList[zombiesToSpawnCount]
-	zombiesToSpawnMap[zombiesToSpawnList[zombiesToSpawnCount]] = index
-	
-	zombiesToSpawnList[zombiesToSpawnCount] = nil
-	zombiesToSpawnMap[featureID] = nil
-	zombiesToSpawnCount = zombiesToSpawnCount - 1
-	
-	return true
-end
-
--- reclaiming zombies 'causes delay in rez, basically you have to have about ZOMBIES_REZ_SPEED/2 or bigger BP to reclaim faster than it resurrects...
--- TODO do more math to figure out how to perform it better?
-function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
-	if (zombies_to_spawn[featureID]) then
-		local base_time = reclaimed_data[featureID]
-		base_time[3] = base_time[3] - part
-		zombies_to_spawn[featureID] = base_time[1] + base_time[2] * (1+base_time[3]) * 32
-	end
-	return true
-end
 
 local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
@@ -169,36 +120,6 @@ end
 
 function gadget:GameFrame(f)
 	gameframe = f
-	if (f%32) == 0 then
-		local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
-		local index = 1
-		while index <= zombiesToSpawnCount do
-			local featureID = zombiesToSpawnList[index]
-			local time_to_spawn = zombies_to_spawn[featureID]
-			local x, y, z = spGetFeaturePosition(featureID)
-
-			if time_to_spawn <= f then
-				if not RemoveZombieToSpawn(featureID) then
-					index = index + 1
-				end
-				GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,true)
-			else
-				local steps_to_spawn = floor((time_to_spawn - f) / 32)
-				local resName, face = GG.Zombies.GetFeatureResurrectData(featureID)
-				if steps_to_spawn <= WARNING_TIME then
-					local r = Spring.GetFeatureRadius(featureID)
-
-					spSpawnCEG(CEG_SPAWN, x, y, z, 0, 0, 0, 10 + r, 10 + r)
-
-					if steps_to_spawn == WARNING_TIME then
-						local z_sound = ZOMBIE_SOUNDS[math.random(#ZOMBIE_SOUNDS)]
-						GG.PlayFogHiddenSound(z_sound, 4, x, y, z)
-					end
-				end
-				index = index + 1
-			end
-		end
-	end
 	if (f%640) == 1 then
 		CheckZombieOrders()
 	end
@@ -223,65 +144,39 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 			GG.Zombies.SetZombieSpeedMult(unitID, 1)
 		end
 	elseif newTeamID == GaiaTeamID then
-		gadget:UnitFinished(unitID, unitDefID, newTeamID)
+		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
+		GG.Zombies.SetZombieBehavior(unitID)
+		zombies[unitID] = true
 	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-	gadget:UnitFinished(unitID, unitDefID, teamID)
+	if (teamID == GaiaTeamID) and (builderID == GaiaTeamID) then
+		GG.Zombies.SetZombieBehavior(unitID)
+		zombies[unitID] = true
+		if ZOMBIES_PERMA_SLOW then
+			local maxHealth = select(2, spGetUnitHealth(unitID)) -- TODO is this check something necessary? or could it be removed
+			if maxHealth then
+				GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
+			end
+		end
+	end
 end
 
-local UnitFinished = function(_,_,_) end
-
-function gadget:UnitFinished(unitID, unitDefID, teamID)
-	UnitFinished(unitID, unitDefID, teamID)
+local function RezFrameCallback(featureID)
+	local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,ZOMBIES_PARTIAL_RECLAIM, nil)
+	zombies[unitID] = true
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
-	local resName, face = GG.Zombies.GetFeatureResurrectData(featureID)
-	if resName and face and not zombies_to_spawn[featureID] then
-		local ud = resName and UnitDefNames[resName]
-		if ud and not NonZombies[resName] then
-			local rez_time = ud.metalCost / ZOMBIES_REZ_SPEED
-			if (rez_time < ZOMBIES_REZ_MIN) then
-				  rez_time = ZOMBIES_REZ_MIN
-			end
-			reclaimed_data[featureID] = {gameframe, rez_time, 0}
-			zombies_to_spawn[featureID] = gameframe + (rez_time*32)
-			
-			zombiesToSpawnCount = zombiesToSpawnCount + 1
-			zombiesToSpawnList[zombiesToSpawnCount] = featureID
-			zombiesToSpawnMap[featureID] = zombiesToSpawnCount
-		end
-	end
+	GG.Zombies.AddFeatureToZombieCountdown(featureID, GaiaTeamID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, RezFrameCallback) 
 end
 
-function gadget:FeatureDestroyed(featureID, allyTeam)
-	if (zombies_to_spawn[featureID]) then
-		RemoveZombieToSpawn(featureID)
-	end
-end
-
+--TODO unsure if this does anything
 local function ReInit(reinit)
 	mapWidth = Game.mapSizeX
 	mapHeight = Game.mapSizeZ
-	if not (defined) then
-		UnitFinished = function(unitID, unitDefID, teamID, builderID)
-			if (teamID == GaiaTeamID) and not (zombies[unitID]) then
-				spGiveOrderToUnit(unitID, CMD_REPEAT, 1, 0)
-				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, 2, 0)
-				GG.Zombies.SetZombieBehavior(unitID)
-				zombies[unitID] = true
-				if ZOMBIES_PERMA_SLOW then
-					local maxHealth = select(2, spGetUnitHealth(unitID))
-					if maxHealth then
-						GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
-					end
-				end
-			end
-		end
-		defined = true
-	end
+
 	if (reinit) then
 		gameframe = spGetGameFrame()
 		local units = spGetAllUnits()
