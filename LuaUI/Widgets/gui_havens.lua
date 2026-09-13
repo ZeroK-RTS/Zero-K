@@ -24,7 +24,7 @@ options_order = {'drawNames', 'playerZonesRadio', 'customRetreatCircleColor', 'r
 
 local RETREAT_OFF_TABLE = {0}
 local PLAYER_HAVEN_COLOR = {1, 0.1, 0.1, 0.8}
-local HavenUpdate
+local HavenUpdate -- local function defined below
 
 options = {
 	playerZonesRadio = {
@@ -98,7 +98,7 @@ options = {
 			PLAYER_HAVEN_COLOR = self.value
 			HavenUpdate()
 		end,
-		advanced = true
+		advanced = true,
 	},
 }
 
@@ -144,14 +144,9 @@ end
 HavenUpdate = function () -- local function
 	havens = {}
 	local spectating = spGetSpectatingState()
-	local teams
-	-- how many states can we be in?
-	-- we can be spectating
-	-- we can be playing
-	-- options.drawSpectatorZones.value
-	-- options.drawAllyZones.value
 	local opt = options.playerZonesRadio.value
 	local localTeamID = spGetLocalTeamID()
+	local teams
 	if spectating and (opt == "player_only" or opt == "los") then
 		-- do not populate havens if option is not spectator option
 		teams = havens -- empty table
@@ -282,10 +277,5 @@ local function DrawWorldFunc()
 	glDepthTest(false)
 end
 
-function widget:DrawWorld()
-	DrawWorldFunc()
-end --DrawWorld
-
-function widget:DrawWorldRefraction()
-	DrawWorldFunc()
-end
+widget.DrawWorld = DrawWorldFunc
+widget.DrawWorldRefraction = DrawWorldFunc
