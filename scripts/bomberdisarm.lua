@@ -17,6 +17,8 @@ function script.Create()
 	SetInitialBomberSettings()
 	Hide(preDrop)
 	Hide(drop)
+	Hide(jet1)
+	Hide(jet2)
 	
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	Turn(Lwing, z_axis, math.rad(90))
@@ -28,6 +30,8 @@ function script.Create()
 end
 
 function script.Activate()
+	Show(jet1)
+	Show(jet2)
 	Turn(Lwing, z_axis, math.rad(90), 2)
 	Turn(Rwing, z_axis, math.rad(-90), 2)
 	Turn(LwingTip, z_axis, math.rad(-165), 2) --160
@@ -35,6 +39,8 @@ function script.Activate()
 end
 
 function script.Deactivate()
+	Hide(jet1)
+	Hide(jet2)
 	Turn(Lwing, z_axis, math.rad(10), 2)
 	Turn(Rwing, z_axis, math.rad(-10), 2)
 	Turn(LwingTip, z_axis, math.rad(-30), 2) -- -30

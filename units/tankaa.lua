@@ -9,9 +9,9 @@ return { tankaa = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[38 52 38]],
-  collisionVolumeType    = [[cylY]],
+  collisionVolumeOffsets = [[0 -10 0]],
+  collisionVolumeScales  = [[38 66 38]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

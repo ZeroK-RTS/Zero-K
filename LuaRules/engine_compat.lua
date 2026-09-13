@@ -262,6 +262,11 @@ if not Spring.SetUnitAlwaysUpdateMatrix then -- BAR 105-571
 	end
 end
 
+if gl and not gl.SetUnitBufferUniforms then -- BAR 105-631
+	gl.SetUnitBufferUniforms    = RET_ZERO
+	gl.SetFeatureBufferUniforms = RET_ZERO
+end
+
 if not Spring.GetUnitsInScreenRectangle and not Script.GetSynced() then -- BAR 105-637
 	Spring.GetUnitsInScreenRectangle = RET_TABLE
 end
@@ -875,4 +880,32 @@ if gl and not gl.ObjectLabel then -- 2025.03, but can be nil anyway due to missi
 	gl.ObjectLabel    = RET_NONE
 	gl.PushDebugGroup = RET_NONE
 	gl.PopDebugGroup  = RET_NONE
+end
+
+if Spring.UnitScript and not Spring.UnitScript.Scale then -- 2025.06
+	Spring.UnitScript.WaitForScale  = RET_FALSE
+	Spring.UnitScript.IsInScale     = RET_FALSE
+
+	local spusGetActiveUnitID = Spring.UnitScript.GetActiveUnitID
+
+	local spGetUnitPieceMatrix = Spring.GetUnitPieceMatrix
+	Spring.UnitScript.GetPieceScale = function (piece)
+		local matrix = {spGetUnitPieceMatrix(spusGetActiveUnitID(), piece)}
+
+		if matrix[1] ~= matrix[ 6]
+		or matrix[1] ~= matrix[11] then
+			error("Stop using spSetUnitPieceMatrix to set per-axis sizes. New engine does not support it")
+		end
+
+		return matrix[1]
+	end
+
+	local spSetUnitPieceMatrix = Spring.SetUnitPieceMatrix
+	Spring.UnitScript.Scale = function (piece, scale)
+		local matrix = {spGetUnitPieceMatrix(spusGetActiveUnitID(), piece)}
+		matrix[ 1] = scale
+		matrix[ 6] = scale
+		matrix[11] = scale
+		return spSetUnitPieceMatrix(spusGetActiveUnitID(), piece, matrix)
+	end
 end

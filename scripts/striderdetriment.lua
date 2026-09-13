@@ -193,6 +193,13 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED * pelvisMult * speed)
 	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED * speed)
 
+	Sleep(800)
+	if impactFoot == lfoot then
+		GG.UnitScriptDistortion(unitID, unitDefID, "leftfoot")
+	else
+		GG.UnitScriptDistortion(unitID, unitDefID, "rightfoot")
+	end
+	EmitSfx(impactFoot, 1024)
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
@@ -204,7 +211,6 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i] * speed)
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i] * speed)
 	end
-	--EmitSfx(impactFoot, dirtfling)
 	--EmitSfx(impactFoot, footcrater)
 	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult * speed)
 	Turn(torso, x_axis, 0, TORSO_TILT_SPEED * speed)

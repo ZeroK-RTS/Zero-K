@@ -295,7 +295,7 @@ elseif gpuMem and gpuMem > 0 and gpuMem < 5000 then
 end
 
 -- the 3d noise texture used for this shader
-local noisetex3dcube =  "LuaUI/images/noisetextures/noise64_cube_3.dds"
+local noisetex3dcube =  "LuaUI/images/noise/noise64_cube_3_seed2026.dds"
 local blueNoise2D =  "LuaUI/images/noisetextures/blue_noise_64.tga"
 
 --[[

@@ -44,7 +44,7 @@ local tauOn16 = math.tau/16
 local tauOn8 = math.tau/8
 
 local function Open()
-	Signal(close) --kill the closing animation if it is in process
+	Signal(close + closeInterrupt) --kill the closing animation if it is in process
 	SetSignalMask(open) --set the signal to kill the opening animation
 	
 	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
@@ -113,7 +113,9 @@ function Close()
 	Signal(closeInterrupt)
 	Signal(open) --kill the opening animation if it is in process
 	SetSignalMask(close) --set the signal to kill the closing animation
-	
+
+	on = false
+
 	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
 		Sleep(500)
 	end
@@ -176,7 +178,6 @@ function script.Activate()
 end
 
 function script.Deactivate()
-	on = false
 	StartThread(Close)
 end
 

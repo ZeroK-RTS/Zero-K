@@ -6,7 +6,6 @@
 uniform sampler2D infoTex;
 uniform sampler2D cableTex;
 uniform float gameTime;
-uniform float bakeTime;
 uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no animation)
 uniform float ghostsEnabled;  // 1.0 = ghost branch active; 0.0 = enemy OOL discards immediately
 uniform sampler2DShadow shadowTex;  // engine shadow map ($shadow); sampled for shadow reception
@@ -15,9 +14,11 @@ uniform float losViewEnabled; // 1.0 = LOS overlay is on (GetMapDrawMode=="los")
 
 // Same SSBO as the GS — per-edge coverage bitmask, gates per-segment
 // ghost rendering for enemy fragments.
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
 	uvec4 cableCoverage[];
 };
+#endif
 
 in DataGS {
 	vec3 worldPos;
@@ -26,7 +27,7 @@ in DataGS {
 	float width;
 	vec2 cableUV;
 	vec2 timeData;
-	vec3 gridData;          // was vec4; .z was unused, dropped to fund cableTangent (see GS BUDGET NOTE). Old .w (isOwnAlly / ghost flag) is now .z.
+	vec3 gridData;          // (gridEfficiency, flow, isOwnAlly / ghost flag); see GS BUDGET NOTE
 	vec3 cableTangent;      // smooth per-vertex cable along-direction; interpolated → drives the lit frame below
 	float spawnAlongMain;   // overloaded: main ribbon → lenPerSeg; twig → twig-along
 	flat int gsSlot;
@@ -39,9 +40,10 @@ in DataGS {
 // Pure aesthetic constants; nothing here changes geometry or topology.
 // =====================================================================
 
-// Grow/wither animation rates (elmos/s) — must match unsynced GROWTH_RATE/
-// WITHER_RATE so the CPU-side bubble phase anchor and the FS-side growth
-// front sweep at the same speed.
+// Grow/wither animation rates (elmos/s). The CPU only supplies appear/wither
+// timestamps (timeData); the fronts sweep entirely FS-side. The unsynced
+// WITHER_HOLD_FRAMES must stay generous relative to worst-case cable length /
+// WITHER_RATE so geometry outlives the animation.
 const float GROWTH_RATE        = 250.0;
 const float WITHER_RATE        = 400.0;
 
@@ -100,8 +102,9 @@ const float SIZE_4 = 1.32;
 // dimFactor instead but always render.
 const float ENEMY_LOS_CUT      = 0.1;
 
-// Bubble flow mapping. Must mirror Lua flowToSpeed() exactly for CPU-baked
-// phase anchoring + FS extrapolation to remain continuous across baking.
+// Bubble flow mapping. Advection is FS-only: phase derives purely from
+// gameTime via the crossfaded speed ladder in main() — nothing is
+// CPU-integrated, so there is no bake to stay continuous across.
 const float MAX_SPEED          = 130.0;
 const float MAX_DENSITY_FLOW   = 100.0;
 const float MIN_TRUNK_W        = 3.0;
@@ -176,10 +179,9 @@ float hash1(float n) {
 // Shading: faint inner glow + Fresnel rim + small offset highlight, all with
 // smoothstep edges to avoid pixelation at oblique camera angles. Returns
 // (body, specular).
-// `phase` is the integrated travel distance baked + extrapolated by the
-// caller (CPU integrates ∫ speed dt, shader extrapolates the last segment
-// with the current speed). Subtracting from `along` advects bubbles smoothly
-// across speed changes.
+// `phase` is the travel distance the caller derives from gameTime (via the
+// crossfaded speed ladder in main(), so subtle flow changes can't teleport
+// bubbles). Subtracting it from `along` advects the bubbles.
 //
 // Returns vec3: (body, specular, halo). Caller composites all three with
 // possibly different colour weights for richer look.
@@ -299,7 +301,6 @@ float getShadowCoeff(vec3 wp, float NdotL) {
 void main() {
 	float v = cableUV.y * EDGE_BUFFER;
 	float t = abs(v);
-	if (t > 0.90) discard;
 
 	// Visual grow/wither: cableUV.x is distance along cable in elmos.
 	// Growth front advances from u=0 forward.
@@ -350,6 +351,7 @@ void main() {
 		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
 		float los0 = texture(infoTex, losUV0).r;
 		if (los0 >= ENEMY_LOS_CUT) discard;
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		uint cov0 = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
 		// Per-segment ghost gating, mirroring the calc done lower in the FS
 		// for live fragments. spawnAlongMain carries lenPerSeg for main
@@ -363,6 +365,7 @@ void main() {
 			segBit0 = 0xFFFFFFu;
 		}
 		if ((cov0 & segBit0) == 0u) discard;
+#endif
 
 		// Flat ghost shade: light gray, slight capacity-driven brightening,
 		// branches a touch dimmer. Alpha-blend over terrain (depth-write off
@@ -523,8 +526,10 @@ void main() {
 	if (enemyOutOfLOS) {
 		// Ghosts disabled: no SSBO read, no branch evaluation; just discard.
 		if (ghostsEnabled < 0.5) discard;
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		uint cov = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
 		if ((cov & segBit) == 0u) discard;
+#endif
 		// Same flat translucent shading as the ghost-VBO fast path so
 		// live-out-of-LOS and orphaned ghosts read identically.
 		float capT2 = clamp(capacity / 100.0, 0.0, 1.0);
@@ -566,14 +571,12 @@ void main() {
 	//   - Two layered streams of bubbles (big + small) with random per-bubble
 	//     size + cross-axis offset, so the cable looks like a real bubbly
 	//     slurry instead of a metronome of identical dots.
-	// Bubble speed/density mapping. MUST match the CPU's flowToSpeed for the
-	// integrated phase anchoring to stay consistent.
 	//
 	// Cable thickness conveys capacity (orthogonal);
 	float flow = gridData.y;
 	// Linear thickness divisor: a cable 4× thicker than min gets its flow
 	// signal scaled to 1/4 before the sqrt → ~0.5× visual liveliness. Slight
-	// negative bias for thick cables, matching the CPU's flowToSpeed.
+	// negative bias for thick cables ("wide pipe, same flow, calmer look").
 	float thicknessRatio = max(1.0, width / MIN_TRUNK_W);
 	float effFlow = max(flow, 0.0) / thicknessRatio;
 	float flowFactor = min(1.0, sqrt(effFlow / MAX_DENSITY_FLOW));
@@ -591,12 +594,9 @@ void main() {
 		//      at twig-local 0 and propagates through the twig at
 		//      TWIG_SWEEP_SPEED. Inter-twig stagger feels snappy while motion
 		//      *within* a twig stays comfortable.
-		// Stagger by the twig root's flow phase (packed into gridData.y by the GS),
-		// not the per-edge along — so the wave follows power flow as one wavefront,
-		// chaining across joints with aligned merges/splits instead of restarting
-		// per edge. The within-twig sweep below still uses edge-local spawnAlongMain.
-		float flowPhase = gridData.y;
-		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED * (1.0 + 1.2 * maxxed) - flowPhase, CABLE_PROP_PERIOD / (1.0 + 0.5 * maxxed));
+		// `spawnAlongMain` is what lets us decouple these — without it both
+		// speeds would be tied to the same propagation rate.
+		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED * (1.0 + 1.2 * maxxed) - spawnAlongMain, CABLE_PROP_PERIOD / (1.0 + 0.5 * maxxed));
 		float subwavePos = TWIG_SWEEP_SPEED * (wavePassedElmos / CABLE_PROP_SPEED);
 		float localAlong = along - spawnAlongMain;
 		float d = localAlong - subwavePos;

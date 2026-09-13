@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local origPieceTable = {}
+local modifiedUnits = {}
 local INLOS_ACCESS = {inlos = true}
 
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
@@ -39,37 +39,25 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local y_axis = 2
 local function SetScale(unitID, base, scale, offset)
 	scale = scale or 1
 	offset = offset or 0
-	
+
+	-- these are for the frankenturret API which probably isn't easily
+	-- doable under the new engine (in that the script can Move and Scale
+	-- and ruin it). See commit 2947da281323d61e6d1ac518db7779a8fca23f5b
 	local currentScale = (Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1)
 	Spring.SetUnitRulesParam(unitID, "currentModelScale", scale, INLOS_ACCESS)
 	local currentOffset = (Spring.GetUnitRulesParam(unitID, "currentModelOffset") or 0)
 	Spring.SetUnitRulesParam(unitID, "currentOffset", offset, INLOS_ACCESS)
-	
-	local pieceTable = suCopyTable(origPieceTable[unitID])
-	--for i = 0, 3 do
-	--	Spring.Echo(pieceTable[i*4 + 1], pieceTable[i*4 + 2], pieceTable[i*4 + 3], pieceTable[i*4 + 4])
-	--end
+	Spring.UnitScript.CallAsUnit(unitID, Spring.UnitScript.Move, base, y_axis, offset)
 
-	pieceTable[1] = pieceTable[1] * scale
-	pieceTable[2] = pieceTable[2] * scale
-	pieceTable[3] = pieceTable[3] * scale
-
-	pieceTable[5] = pieceTable[5] * scale
-	pieceTable[6] = pieceTable[6] * scale
-	pieceTable[7] = pieceTable[7] * scale
-
-	pieceTable[9] = pieceTable[9] * scale
-	pieceTable[10] = pieceTable[10] * scale
-	pieceTable[11] = pieceTable[11] * scale
-
-	pieceTable[13] = pieceTable[13] * scale
-	pieceTable[14] = pieceTable[14] * scale + offset
-	pieceTable[15] = pieceTable[15] * scale
-
-	Spring.SetUnitPieceMatrix(unitID, base, pieceTable)
+	-- technically this one gets ruined by the script doing manual Scale too
+	-- FIXME: this scales relative to the base piece, but this just
+	-- puts bot legs underground. Old method did the correct thing
+	-- of scaling relative to the ground
+	Spring.UnitScript.CallAsUnit(unitID, Spring.UnitScript.Scale, base, scale)
 end
 
 --------------------------------------------------------------------------------
@@ -78,9 +66,7 @@ end
 local function UnitModelRescale(unitID, scale, offset)
 	local base = Spring.GetUnitRootPiece(unitID)
 	if base then
-		if not origPieceTable[unitID] then
-			origPieceTable[unitID] = {Spring.GetUnitPieceMatrix(unitID, base)}
-		end
+		modifiedUnits[unitID] = true
 		local unitDefID = spGetUnitDefID(unitID)
 		scale = scale * (rescaleUnitDefIDs[unitDefID] or 1)
 		SetScale(unitID, base, scale, offset)
@@ -88,11 +74,11 @@ local function UnitModelRescale(unitID, scale, offset)
 end
 
 function gadget:UnitDestroyed(unitID)
-	origPieceTable[unitID] = nil
+	modifiedUnits[unitID] = nil
 end
 
 function gadget:Shutdown()
-	for unitID in pairs(origPieceTable) do
+	for unitID in pairs(modifiedUnits) do
 		UnitModelRescale(unitID, 1, 0)
 	end
 end
