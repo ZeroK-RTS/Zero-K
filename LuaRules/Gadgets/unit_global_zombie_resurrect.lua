@@ -166,10 +166,12 @@ end
 local function RezFrameCallback(featureID)
 	local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,ZOMBIES_PARTIAL_RECLAIM, nil)
 	zombies[unitID] = true
+	GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
+	GG.Zombies.SetZombieBehavior(unitID)
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
-	GG.Zombies.AddFeatureToZombieCountdown(featureID, GaiaTeamID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, RezFrameCallback) 
+	GG.Zombies.AddFeatureToZombieCountdown(featureID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, RezFrameCallback) 
 end
 
 --TODO unsure if this does anything

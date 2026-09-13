@@ -198,7 +198,6 @@ end
 -- Adds a wreck into the zombie countdown table.
 -- Use the rezFrameCallback to repurpose the system for other effects or hook into TurnFeatureIntoUnit for a revived unit and ID.
 -- If no callback is provided, resurrects the wreck on countdown completion.
--- TODO I could add another callback function that returns passes to TurnFeatureIntoUnit for their callback. while thats more straighfroward in application that feels convoluted overall.
 local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, rezFrameCallback)
 	local resName, face = GetFeatureResurrectData(featureID)
 	if resName and face and not resurrectingFeatures[featureID] then
