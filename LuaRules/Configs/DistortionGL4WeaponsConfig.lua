@@ -311,6 +311,90 @@ local BaseClasses = {
 	
 	
 	-- ZK fiddling
+	
+	ExplosionHeatNuke = { -- spawned on explosions
+		distortionType = "point", -- or cone or beam
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			noiseStrength = 5,
+			noiseScaleSpace = 0.034,
+			distanceFalloff = 0.95,
+			onlyModelMap = 0,
+			windAffected = -1,
+			effectStrength = 1.2,
+			riseRate = 1.2,
+			startRadius = 0.7,
+			lifeTime = 700,
+			rampUp = 120,
+			decay = 150,
+			effectType = 0,
+		},
+	},
+	AirShockWaveNuke = {
+		distortionType = "point", -- or cone or beam
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.12,
+			noiseStrength = 0.22,
+			onlyModelMap = 0,
+			lifeTime = 38,
+			refractiveIndex = 1.1,
+			decay = 15,
+			rampUp = 1,
+			effectStrength = 16,
+			startRadius = 0.16,
+			shockWidth = -0.65,
+			effectType = "airShockwave",
+		},
+	},
+	AirShockWaveNukeLater = {
+		distortionType = "point", -- or cone or beam
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.12,
+			noiseStrength = 0.22,
+			onlyModelMap = 0,
+			lifeTime = 150,
+			refractiveIndex = 1.03,
+			decay = 20,
+			rampUp = 1,
+			effectStrength = 50,
+			startRadius = 0.01,
+			shockWidth = 2,
+			effectType = "airShockwave",
+		},
+	},
+	GroundShockWaveNuke = {
+		distortionType = "point", -- or cone or beam
+		alwaysVisible = false,
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 200,
+			noiseStrength = 2,
+			noiseScaleSpace = 0.10,
+			effectStrength = 2.5,
+			lifeTime = 70,
+			decay = 25,
+			rampUp = 5,
+			shockWidth = 16,
+			refractiveIndex = -1.1,
+			startRadius = 0.02,
+			effectType = "groundShockwave",
+		},
+	},
+	
 	DisruptionPulse = {
 		distortionType = "point", -- or cone or beam
 		distortionConfig = {
@@ -570,10 +654,8 @@ local SizeRadius = {
 	Largest = 650,
 	Mega = 800,
 	MegaXL = 1000,
-	Armnuke = 1280,
 	MegaXXL = 1500,
-	Cornuke = 1920,
-	Giga = 2000,
+	Nuke = 2800,
 	Tera = 3500,
 	Planetary = 5000,
 }
@@ -814,6 +896,8 @@ local explosionDistortionsNames = {}
 local muzzleFlashDistortionsNames = {}
 local projectileDefDistortionsNames = {}
 
+projectileDefDistortionsNames.jumpblackhole_black_hole = GetDistortionClass("BlackHole", "Micro")
+
 explosionDistortionsNames.jumpblackhole_black_hole = {
 	GetDistortionClass("BlackHole", "Small")
 }
@@ -838,6 +922,13 @@ explosionDistortionsNames.jumparty_napalm_sprayer = {
 }
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
+}
+
+explosionDistortionsNames.staticnuke_crblmssl = {
+	GetDistortionClass("ExplosionHeatNuke", "MegaXXL"),
+	GetDistortionClass("AirShockWaveNuke", "Nuke"),
+	GetDistortionClass("AirShockWaveNukeLater", "Nuke"),
+	GetDistortionClass("GroundShockWaveNuke", "Nuke"),
 }
 
 -- convert weaponname -> weaponDefID
