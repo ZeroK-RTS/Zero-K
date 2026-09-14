@@ -716,7 +716,7 @@ local function LoadDistortionConfig()
 		end
 		return res
 	end
-	local success, result = pcall(VFS.Include, "luaui/configs/DistortionGL4Config.lua")
+	local success, result = pcall(VFS.Include, "luarules/configs/DistortionGL4Config.lua")
 	--spEcho("Loading GL4 distortion config", success, result)
 	if success then
 		--spEcho("Loaded GL4 distortion config")
@@ -731,7 +731,7 @@ local function LoadDistortionConfig()
 		spEcho("Failed to load GL4 Unit distortion config", success, result)
 	end
 
-	local success2, result2 = pcall(VFS.Include, "luaui/configs/DistortionGL4WeaponsConfig.lua")
+	local success2, result2 = pcall(VFS.Include, "luarules/configs/DistortionGL4WeaponsConfig.lua")
 	--spEcho("Loading GL4 weapon distortion config", success2, result2)
 	if success2 then
 		gibDistortion = result2.gibDistortion
@@ -1440,8 +1440,8 @@ end
 local configCache = { lastUpdate = spGetTimer() }
 local function checkConfigUpdates()
 	if spDiffTimers(spGetTimer(), configCache.lastUpdate) > 0.5 then
-		local newconfa = VFS.LoadFile("luaui/configs/DistortionGL4Config.lua")
-		local newconfb = VFS.LoadFile("luaui/configs/DistortionGL4WeaponsConfig.lua")
+		local newconfa = VFS.LoadFile("luarules/configs/DistortionGL4Config.lua")
+		local newconfb = VFS.LoadFile("luarules/configs/DistortionGL4WeaponsConfig.lua")
 		if newconfa ~= configCache.confa or newconfb ~= configCache.confb then
 			LoadDistortionConfig()
 			if WG.unittrackerapi and WG.unittrackerapi.visibleUnits then

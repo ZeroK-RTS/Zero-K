@@ -2,9 +2,9 @@ local gadget = gadget ---@type Gadget
 
 function gadget:GetInfo()
 	return {
-		name = "Explosion_lights",
-		desc = "",
-		author = "Floris",
+		name = "Explosion and muzzle fire events",
+		desc = "Exposes widget:Barrelfire and widget:VisibleExplosion",
+		author = "Floris, GoogleFrog",
 		date = "April 2017",
 		license = "GNU GPL, v2 or later",
 		layer = 0,
@@ -16,37 +16,40 @@ if gadgetHandler:IsSyncedCode() then
 	local SendToUnsynced = SendToUnsynced
 	local spGetProjectilePosition = Spring.GetProjectilePosition
 
-	local explosionTypes = {
-		Flame = true,
-		Cannon = true,
-		LaserCannon = true,
-		BeamLaser = true,
-		MissileLauncher = true,
-		AircraftBomb = true,
-		StarburstLauncher = true,
-		TorpedoLauncher = true,
-	}
-
-	local cannonWeapons = {}
+	local muzzleProjectiles = {}
 	local watchedExplosions = {}
 	local watchedProjectiles = {}
-
+	
+	local function LoadConfig(path)
+		local success, result = pcall(VFS.Include, path)
+		return success and result
+	end
+	
+	local function ProcessWeapon(wdid, weaponLightConfig, weaponDistortConfig)
+		local watchProjectile = wdid and (
+			weaponLightConfig and (weaponLightConfig.muzzleFlashLights[wdid] or weaponLightConfig.projectileDefLights[wdid]) or
+			weaponDistortConfig and (weaponDistortConfig.muzzleFlashDistortions[wdid] or weaponDistortConfig.muzzleFlashDistortions[wdid])
+		)
+		local watchExplode = wdid and (
+			weaponLightConfig and (weaponLightConfig.explosionLights[wdid] or weaponLightConfig.explosionLights[wdid]) or
+			weaponDistortConfig and (weaponDistortConfig.explosionDistortions[wdid] or weaponDistortConfig.explosionDistortions[wdid])
+		)
+		if watchProjectile then
+			muzzleProjectiles[wdid] = true
+			Script.SetWatchProjectile(wdid, true)
+			watchedProjectiles[wdid] = true
+		end
+		if watchExplode then
+			Script.SetWatchExplosion(wdid, true)
+			watchedExplosions[wdid] = true
+		end
+	end
+	
 	function gadget:Initialize()
-		for wdid, wd in pairs(WeaponDefs) do
-			if explosionTypes[wd.type] then
-				Script.SetWatchExplosion(wdid, true)
-				watchedExplosions[wdid] = true
-			end
-			if wd.type == "Cannon" or wd.type == "LaserCannon" then
-				cannonWeapons[wdid] = true
-			end
-			if wd.type == "Cannon" and wd.damages[0] >= 20 then
-				Script.SetWatchProjectile(wdid, true)
-				watchedProjectiles[wdid] = true
-			elseif wd.type == "LaserCannon" and wd.damages[0] >= 10 then
-				Script.SetWatchProjectile(wdid, true)
-				watchedProjectiles[wdid] = true
-			end
+		local weaponLightConfig = LoadConfig('luarules/configs/DeferredLightsGL4WeaponsConfig.lua')
+		local weaponDistortConfig = LoadConfig('luarules/configs/DistortionGL4WeaponsConfig.lua')
+		for wdid = 1, #WeaponDefs do
+			ProcessWeapon(wdid, weaponLightConfig, weaponDistortConfig)
 		end
 	end
 
@@ -64,7 +67,7 @@ if gadgetHandler:IsSyncedCode() then
 	end
 
 	function gadget:ProjectileCreated(projectileID, ownerID, weaponID)
-		if cannonWeapons[weaponID] then
+		if muzzleProjectiles[weaponID] then
 			local px, py, pz = spGetProjectilePosition(projectileID)
 			SendToUnsynced("barrelfire_light", px, py, pz, weaponID, ownerID)
 		end

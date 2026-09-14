@@ -19,15 +19,17 @@ if (gadgetHandler:IsSyncedCode()) then
 	local wantedList = {}
 
 	--// find napalms
-	for i=1,#WeaponDefs do
-		local wd = WeaponDefs[i]
-		if (wd.description:find("Napalm") or (wd.customParams and (wd.customParams.lups_napalm_fx or wd.customParams.lups_heat_fx))) then
-			napalmWeapons[wd.id] = true
-			wantedList[#wantedList + 1] = wd.id
-			Script.SetWatchExplosion(wd.id, true)
+	function gadget:Initialize()
+		for i=1,#WeaponDefs do
+			local wd = WeaponDefs[i]
+			if (wd.description:find("Napalm") or (wd.customParams and (wd.customParams.lups_napalm_fx or wd.customParams.lups_heat_fx))) then
+				napalmWeapons[wd.id] = true
+				wantedList[#wantedList + 1] = wd.id
+				Script.SetWatchExplosion(wd.id, true)
+			end
 		end
 	end
-
+	
 	local napalmExplosions  = {}
 
 	--// Speed-ups
