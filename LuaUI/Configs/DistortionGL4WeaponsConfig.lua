@@ -323,10 +323,11 @@ local BaseClasses = {
 			onlyModelMap = 0,
 			lifeTime = 23,
 			refractiveIndex = 1.015,
-			decay = 4,
+			distanceFalloff = 0.5,
+			decay = 8,
 			rampUp = 4,
-			effectStrength = 0.2,
-			startRadius = 0.05,
+			effectStrength = 0.4,
+			startRadius = 0.04,
 			shockWidth = 0.1,
 			effectType = "airShockwave",
 		},
@@ -562,7 +563,7 @@ local SizeRadius = {
 	SmallMedium = 190,
 	Medium = 220,
 	Mediumer = 260,
-	MediumLarge = 300,
+	MediumLarge = 320,
 	Large = 400,
 	Juno = 450,
 	Larger = 500,
@@ -718,7 +719,6 @@ local function AssignDistortionsToAllWeapons()
 				break
 			end
 		end
-		Spring.Echo("Weapon", weaponDef.name)
 
 		-- Start by collecting some common parameters of the weapon
 		damage = (damage / globalDamageMult) + ((damage * (globalDamageMult - 1)) * 0.25)
@@ -769,7 +769,7 @@ local function AssignDistortionsToAllWeapons()
 		-- Add explosiondistortions if needed:
 		if wcp.lups_noshockwave then
 		elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and wcp.nofriendlyfire then
-			Spring.Echo("weaponDefweaponDefweaponDef", weaponDef.name)
+			Spring.Echo("weaponDefweaponDefweaponDef", weaponDef.name,  GetClosestSizeClass(effectiveRangeExplo))
 			explosionDistortions[weaponID] = {
 				GetDistortionClass("DisruptionPulse", GetClosestSizeClass(effectiveRangeExplo)),
 			}
@@ -843,10 +843,6 @@ explosionDistortionsNames.napalmmissile_weapon = {
 -- convert weaponname -> weaponDefID
 for name, distortionList in pairs(explosionDistortionsNames) do
 	if WeaponDefNames[name] then
-		Spring.Echo("ADDED", name)
-		Spring.Echo("ADDED", name)
-		Spring.Echo("ADDED", name)
-		Spring.Echo("ADDED", name)
 		explosionDistortions[WeaponDefNames[name].id] = distortionList
 	end
 end
