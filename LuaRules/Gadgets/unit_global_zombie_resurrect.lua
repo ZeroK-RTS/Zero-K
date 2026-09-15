@@ -49,30 +49,8 @@ local spGetUnitHealth             = Spring.GetUnitHealth
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
 
-local gameframe = 0
-
-local random = math.random
-local floor = math.floor
-
-local mapWidth
-local mapHeight
-
 local zombies = {}
 
-local ZOMBIE_SOUNDS = {
-	"sounds/misc/zombie_1.wav",
-	"sounds/misc/zombie_2.wav",
-	"sounds/misc/zombie_3.wav",
-}
-local REZ_SOUND = "sounds/misc/resurrect.wav"
-
-local defined = false -- wordaround, because i meet some kind of racing condition, if any gadget spawns gaia BEFORE this gadget can process all the stuff...
-
-local NonZombies = {
-	["asteroid"] = true,
-}
-
-local WARNING_TIME = 5 -- seconds to start being scary before actual reanimation event
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
 if (tonumber(ZOMBIES_REZ_MIN) == nil) then
 	-- minimum of 10 seconds, max is determined by rez speed
@@ -99,16 +77,6 @@ end
 
 local ZOMBIES_PARTIAL_RECLAIM = (tonumber(modOptions.zombies_partial_reclaim) == 1)
 
-local CMD_REPEAT = CMD.REPEAT
-local CMD_MOVE_STATE = CMD.MOVE_STATE
-local CMD_INSERT = CMD.INSERT
-local CMD_FIGHT = CMD.FIGHT
-local CMD_OPT_SHIFT = CMD.OPT_SHIFT
-local CMD_GUARD = CMD.GUARD
-
-local CEG_SPAWN = [[zombie]]
-
-
 local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
 		local queueSize = spGetUnitCommandCount(unitID)
@@ -119,7 +87,6 @@ local function CheckZombieOrders()	-- i can't rely on Idle because if for exampl
 end
 
 function gadget:GameFrame(f)
-	gameframe = f
 	if (f%640) == 1 then
 		CheckZombieOrders()
 	end
@@ -174,25 +141,20 @@ function gadget:FeatureCreated(featureID, allyTeam)
 	GG.Zombies.AddFeatureToZombieCountdown(featureID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, RezFrameCallback) 
 end
 
---TODO unsure if this does anything
-local function ReInit(reinit)
-	mapWidth = Game.mapSizeX
-	mapHeight = Game.mapSizeZ
-
-	if (reinit) then
-		gameframe = spGetGameFrame()
-		local units = spGetAllUnits()
-		for i = 1, #units do
-			local unitID = units[i]
-			local unitTeam = spGetUnitTeam(unitID)
-			if (unitTeam == GaiaTeamID) then
-				gadget:UnitFinished(unitID, spGetUnitDefID(unitID), unitTeam)
-			end
+local function ReInit()
+	local units = spGetAllUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		local unitTeam = spGetUnitTeam(unitID)
+		if (unitTeam == GaiaTeamID) then
+			zombies[unitID] = true
+			GG.Zombies.SetZombieSpeedMult(unitID,ZOMBIES_PERMA_SLOW)
+			GG.Zombies.SetZombieBehavior(unitID)
 		end
-		local features = spGetAllFeatures()
-		for i = 1, #features do
-			gadget:FeatureCreated(features[i], 1) -- doesnt matter who is owner of feature
-		end
+	end
+	local features = spGetAllFeatures()
+	for i = 1, #features do
+		GG.Zombies.AddFeatureToZombieCountdown(features[i], ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, RezFrameCallback)
 	end
 end
 
@@ -202,10 +164,10 @@ function gadget:Initialize()
 		return
 	end
 	if (spGetGameFrame() > 1) then
-		ReInit(true)
+		ReInit()
 	end
 end
 
 function gadget:GameStart()
-	ReInit(true) -- anything it does doesnt mess with existing zombies
+	ReInit() -- anything it does doesnt mess with existing zombies
 end

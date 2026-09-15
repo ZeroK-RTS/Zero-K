@@ -27,6 +27,7 @@ VFS.Include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
 -- unsure if these are different, differentiating between gaia and "zombie" team somehow may be good?
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
+local WARNING_TIME = 5 -- set to 5 for sounds and such to sync well.
 local random = math.random
 local floor = math.floor
 
@@ -46,8 +47,6 @@ local ZOMBIE_SOUNDS = {
 	"sounds/misc/zombie_2.wav",
 	"sounds/misc/zombie_3.wav",
 }
-
-local WARNING_TIME = 5 -- could be more configurable still but seem 
 
 local resurrectingFeatures = {} -- contains inital gameframe, base rez time, frame rez should complete and a callback function if someone wants to reuse the functionality
 
@@ -72,7 +71,6 @@ end
 -- Zombie resurrect
 -- Turns a feature into a unit if applicable. Has a callback returning featureID and unitID for data transfer. Returns unitID.
 local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealthBool, unitReviveCallback)
-  
 	local featureDefName,facing = GetFeatureResurrectData(featureID)
 	local x, y, z = Spring.GetFeaturePosition(featureID)
 
@@ -157,14 +155,13 @@ local function GetUnitNearestAlly(unitID, range)
 end
 
 -- Applies Random Attackmove orders and Factory commands to units.
-local function GiveZombiesRandomOrders(unitID)
+local function SetZombieBehavior(unitID)
 	local unitDefID = (not Spring.GetUnitIsDead(unitID)) and Spring.GetUnitDefID(unitID)
 	if not unitDefID then
 		return
 	end
 	
 	Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, 2, 0)
-	local rx,rz,ry
 	local orders = {}
 	local near_ally
 	if (UnitDefs[unitDefID].canAttack) then
@@ -195,43 +192,52 @@ local function GiveZombiesRandomOrders(unitID)
 	end
 end
 	
--- Adds a wreck into the zombie countdown table.
--- Use the rezFrameCallback to repurpose the system for other effects or hook into TurnFeatureIntoUnit for a revived unit and ID.
--- If no callback is provided, resurrects the wreck on countdown completion.
+-- Adds a wreck into the zombie countdown table and returns it for further modification.
+-- Use the rezFrameCallback to repurpose the system for other effects or chain into TurnFeatureIntoUnit for a revived unit with ID Callback.
+-- If no callback is provided, revives the wreck as a unslowed zombie unit.
 local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, rezFrameCallback)
 	local resName, face = GetFeatureResurrectData(featureID)
 	if resName and face and not resurrectingFeatures[featureID] then
 		local ud = resName and UnitDefNames[resName]
 		if ud and not NonZombies[resName] then
-			local rezTime = ud.metalCost / buildpower
+			local rezBaseTime = ud.metalCost / buildpower
+			local rezTime = rezBaseTime
+			local _,_,_,_,reclaimPercent,_ = Spring.GetFeatureResources(featureID)
+			
+			rezTime = rezBaseTime + rezBaseTime * (1 - reclaimPercent)
+
 			if (rezTime < minRezTime) then
 				rezTime = minRezTime
 			end
-			resurrectingFeatures[featureID] = {rezInitFrame = gameframe, rezBaseTime = rezTime, rezFrame = (gameframe + rezTime*32), reclaimPercent = 0, rezFrameCallback = rezFrameCallback, }
+			resurrectingFeatures[featureID] = {
+				rezInitFrame = gameframe, 				-- frame Feature was queued
+				rezBaseTime = rezBaseTime, 				-- base resurrect time in seconds
+				rezFrame = gameframe + rezTime * 32,	-- frame the resurrect completes or the callback is fired.
+				rezFrameCallback = rezFrameCallback, 	-- callback function fired on rezFrame
+				rezWarningTime = WARNING_TIME,			-- warning time in seconds for base particles and sfx, set 0 to hide.
+				reclaimPercent = reclaimPercent, 		-- reclaim left in feature in % to compare and adjust reztime
+			}
+			return resurrectingFeatures[featureID]
 		end
 	end
+	return nil
 end
 
--- hm... getter and setter to allow modification of these? could also let it be global, but that feels like bad practice
--- could just export it under GG.zombies?
-local function GetZombieResurrectData(featureID)
-	if(resurrectingFeatures[featureID]) then
-		return resurrectingFeatures[featureID]
-	end
-	return false
+-- Get and modify the table as you wish.
+local function GetZombieResurrectData()
+	return resurrectingFeatures
 end
 
--- The below comments are left from before -Stiofan
--- reclaiming zombies 'causes delay in rez, basically you have to have about ZOMBIES_REZ_SPEED/2 or bigger BP to reclaim faster than it resurrects...
--- TODO do more math to figure out how to perform it better?
+-- Reclaiming the wreck can stretch the revive time up to 2x the base time.
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
 	if (resurrectingFeatures[featureID]) then
-		local reclaimPercent = resurrectingFeatures[featureID].reclaimPercent
-		local rezBaseTime = resurrectingFeatures[featureID].rezBaseTime
 		local rezInitFrame = resurrectingFeatures[featureID].rezInitFrame
+		local rezBaseTime = resurrectingFeatures[featureID].rezBaseTime
+		local reclaimPercent = resurrectingFeatures[featureID].reclaimPercent
 		
-		reclaimPercent = reclaimPercent - part
-		resurrectingFeatures[featureID].rezFrame = rezInitFrame + rezBaseTime * (1 + reclaimPercent) * 32
+		reclaimPercent = reclaimPercent + part
+		local rezTime = rezBaseTime + rezBaseTime * (1 - reclaimPercent)
+		resurrectingFeatures[featureID].rezFrame = rezInitFrame + rezTime * 32
 		
 		resurrectingFeatures[featureID].reclaimPercent = reclaimPercent
 	end
@@ -254,19 +260,21 @@ function gadget:GameFrame(f)
 		local rezFrame = resurrectingFeatures[featureID].rezFrame
 		if rezFrame <= gameframe then
 			if (resurrectingFeatures[featureID].rezFrameCallback) then
-				Spring.Echo(resurrectingFeatures[featureID].rezFrameCallback)
 				resurrectingFeatures[featureID].rezFrameCallback(featureID)
 			else
-				TurnFeatureIntoUnit(featureID,GaiaTeamID,true,nil)
+				local unitID = TurnFeatureIntoUnit(featureID,GaiaTeamID,true,nil)
+				SetZombieBehavior(unitID)
 			end
 		else
-			local framesTillRezCall = floor((rezFrame - f) / 32)
-			if framesTillRezCall <= WARNING_TIME then
+			local secondsTillRezCall = floor((rezFrame - f) / 32)
+			local rezWarningTime = resurrectingFeatures[featureID].rezWarningTime
+			--Spring.Echo("Time left for "..featureID..": "..secondsTillRezCall)
+			if secondsTillRezCall <= rezWarningTime then
 				local r = Spring.GetFeatureRadius(featureID)
 				local x, y, z = Spring.GetFeaturePosition(featureID)
 				spSpawnCEG(CEG_SPAWN, x, y, z, 0, 0, 0, 10 + r, 10 + r)
 
-				if framesTillRezCall == WARNING_TIME then
+				if secondsTillRezCall == rezWarningTime then
 					local z_sound = ZOMBIE_SOUNDS[random(#ZOMBIE_SOUNDS)]
 					GG.PlayFogHiddenSound(z_sound, 4, x, y, z)
 				end
@@ -283,9 +291,9 @@ function gadget:Initialize()
 	GG.Zombies = {
 		TurnFeatureIntoUnit     	= TurnFeatureIntoUnit,
 		SetZombieSpeedMult      	= SetZombieSpeedMult,
-		SetZombieBehavior       	= GiveZombiesRandomOrders,
+		SetZombieBehavior       	= SetZombieBehavior,
 		GetFeatureResurrectData 	= GetFeatureResurrectData,
 		GetZombieResurrectData 		= GetZombieResurrectData, -- I want to expose these for modification from outside if desired
 		AddFeatureToZombieCountdown	= AddFeatureToZombieCountdown
-}
+	}
 end
