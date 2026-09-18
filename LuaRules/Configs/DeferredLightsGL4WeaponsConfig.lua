@@ -14,7 +14,7 @@ local gibLight = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local baseLightDefs = VFS.Include("LuaUI/Configs/projectileLightDefs.lua")
+local baseLightDefs = VFS.Include("LuaRules/Configs/projectileLightDefs.lua")
 local projLights = {}
 local explosionLights = {}
 
@@ -197,6 +197,8 @@ end
 --------------------------------------------------------------------------------
 -- Bespoke explosions
 
+local explosionLightsNames = {}
+
 explosionLightsNames.staticnuke_crblmssl = GetLightClass("Explosion", nil, "Planetary", {
 	r = 2.92,
 	g = 2.64,
@@ -206,13 +208,19 @@ explosionLightsNames.staticnuke_crblmssl = GetLightClass("Explosion", nil, "Plan
 	color2g = 0.6,
 	color2b = 0.18,
 	colortime = 200,
-	sustain = 180,
-	lifetime = 200,
+	sustain = 320,
+	lifetime = 600,
 	modelfactor = 0.1,
 	specular = 0.2,
 	scattering = 0.1,
 	lensflare = 4,
 })
+
+for name, params in pairs(explosionLightsNames) do
+	if WeaponDefNames[name] then
+		explosionLights[WeaponDefNames[name].id] = params
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

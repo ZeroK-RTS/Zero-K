@@ -41,7 +41,7 @@ local gibLight = {
 local unitEventLights = {}
 local unitDefLights = {}
 local muzzleFlashLights = {}
-local lightFiles = VFS.DirList('LuaUI/Configs/UnitLights')
+local lightFiles = VFS.DirList('LuaRules/Configs/UnitLights')
 for i = 1, #lightFiles do
 	local fileData = VFS.Include(lightFiles[i])
 	for unitName, unitLights in pairs(fileData) do
