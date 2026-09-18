@@ -21,7 +21,80 @@ local defs = {
 			}
 		},
 	},
+	energyfusion = {
+		static = {
+			pLeft = {
+				distortionType = "cone",
+				pieceName = "pyramid_tip1",
+				distortionConfig = {
+					posx = 0,
+					posy = 8,
+					posz = 1,
+					dirx = 0,
+					diry = -1,
+					dirz = 0,
+					theta = 0.55,
+					radius = 70,
+					effectStrength = 0.8,
+					noiseStrength = 0.7,
+					noiseScaleSpace = 1.2,
+					distanceFalloff = 0.7,
+					windAffected = -0.2,
+					riseRate = 1.2,
+					lifeTime = 0,
+					effectType = 0,
+				},
+			},
+			pRight = {
+				distortionType = "cone",
+				pieceName = "pyramid_tip2",
+				distortionConfig = {
+					posx = 0,
+					posy = 8,
+					posz = 1,
+					dirx = 0,
+					diry = -1,
+					dirz = 0,
+					theta = 0.55,
+					radius = 70,
+					effectStrength = 0.8,
+					noiseStrength = 0.7,
+					noiseScaleSpace = 1.2,
+					distanceFalloff = 0.7,
+					windAffected = -0.2,
+					riseRate = 1.2,
+					lifeTime = 0,
+					effectType = 0,
+				},
+			}
+		},
+	},
+	energygeo = {
+		static = {
+			heat = {
+				distortionType = "beam",
+				distortionConfig = {
+					posx = 0,
+					posy = 10,
+					posz = 0,
+					pos2x = 0,
+					pos2y = 30,
+					pos2z = -0.01,
+					radius = 36,
+					effectStrength = 0.8,
+					noiseStrength = 0.7,
+					noiseScaleSpace = 1.2,
+					distanceFalloff = 0.9,
+					windAffected = -0.2,
+					riseRate = 1.2,
+					lifeTime = 0,
+					effectType = 0,
+				},
+			}
+		},
+	},
 	staticmex = {
+		-- Mex od[i] pieces are shown and hidden based on overdrive multiplier
 		static = {
 			distortion_1 = {
 				distortionType = "beam",
