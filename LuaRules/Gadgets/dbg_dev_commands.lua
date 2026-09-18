@@ -555,6 +555,73 @@ local function give(cmd,line,words,player)
 	--Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
+local function IncrementPosition(x, z, xMin, xMax, increment)
+	x = x + increment
+	if x > xMax then
+		x = xMin
+		z = z + increment * 3
+	end
+	return x, z
+end
+
+local function giveSpread(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	
+	local nanoAmount = math.max(0.01, math.min(1, tonumber(words[1] or "1") or 1))
+	local build = (nanoAmount < 1)
+	
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	local INCREMENT = 128
+	local orderUnit = {}
+	local baseOffX, baseOffZ, limitX = 200, 2000, 3300
+	local cX, cZ = baseOffX, baseOffZ
+	
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
+		local ud = UnitDefs[udid]
+		if not ud.customParams.child_of_factory then
+			local y = Spring.GetGroundHeight(cX, cZ)
+			local unitID = Spring.CreateUnit(udid, cX, y, cZ, 0, 0, build)
+			cX, cZ = IncrementPosition(cX, cZ, baseOffX, limitX, INCREMENT)
+			if build then
+				SetupNanoUnit(unitID, nanoAmount)
+			end
+			if ud.buildOptions and #ud.buildOptions > 0 then
+				local sublist = ud.buildOptions
+				local offset = 1
+				if ud.customParams.parent_of_plate then
+					local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
+					y = Spring.GetGroundHeight(cX, cZ)
+					local subUnitID = Spring.CreateUnit(subUdid, cX, y, cZ, 0, 0, build)
+					cX, cZ = IncrementPosition(cX, cZ, baseOffX, limitX, INCREMENT)
+					if build then
+						SetupNanoUnit(subUnitID, nanoAmount)
+					end
+					orderUnit[#orderUnit + 1] = subUnitID
+					offset = offset + 1
+				end
+				for j = 1, #sublist do
+					local subUdid = sublist[j]
+					y = Spring.GetGroundHeight(cX, cZ)
+					local subUnitID = Spring.CreateUnit(subUdid, cX, y, cZ, 0, 0, build)
+					cX, cZ = IncrementPosition(cX, cZ, baseOffX, limitX, INCREMENT)
+					--local ud = UnitDefs[subUdid]
+					--Spring.Echo(ud.humanName .. "\t" .. ud.speed .. "\t" .. ud.maxWeaponRange  .. "\t" .. (ud.health / ud.buildTime))
+					if build then
+						SetupNanoUnit(subUnitID, nanoAmount)
+					end
+					orderUnit[#orderUnit + 1] = subUnitID
+					--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
+					--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
+					--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
+				end
+			end
+		end
+	end
+end
+
 local function SortUnits(a, b)
 	return UnitDefs[a].metalCost < UnitDefs[b].metalCost
 end
@@ -995,6 +1062,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "rotateunit",  RotateUnit,  "Rotates a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "spawnnthunit",  SpawnNthUnit,  "Spawns a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "give", give, "Like give all but without all the crap.")
+	gadgetHandler.actionHandler.AddChatAction(self, "gives", giveSpread, "Gives units spread into multiple lines..")
 	gadgetHandler.actionHandler.AddChatAction(self, "givesort", givesort, "Gives mobiles sorted by cost.")
 	gadgetHandler.actionHandler.AddChatAction(self, "pw", PlanetwarsGive, "Spawns all planetwars structures.")
 	gadgetHandler.actionHandler.AddChatAction(self, "gk", gentleKill, "Gently kills everything.")
