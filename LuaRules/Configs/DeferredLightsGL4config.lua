@@ -38,6 +38,16 @@ local gibLight = {
 	},
 }
 
+local function AddToTable(main, toAdd)
+	if not main then
+		return toAdd
+	end
+	for k, v in pairs(toAdd) do
+		main[k] = v
+	end
+	return main
+end
+
 local unitEventLights = {}
 local unitDefLights = {}
 local muzzleFlashLights = {}
@@ -48,9 +58,9 @@ for i = 1, #lightFiles do
 		local ud = UnitDefNames[unitName]
 		if ud then
 			local unitDefID = ud.id
-			unitDefLights[unitDefID] = unitLights.static
-			unitEventLights[unitDefID] = unitLights.event
-			muzzleFlashLights[unitDefID] = unitLights.muzzle
+			unitDefLights[unitDefID] = AddToTable(unitDefLights[unitDefID], unitLights.static)
+			unitEventLights[unitDefID] = AddToTable(unitEventLights[unitDefID], unitLights.event)
+			muzzleFlashLights[unitDefID] = AddToTable(muzzleFlashLights[unitDefID], unitLights.muzzle)
 		end
 	end
 	fileData = nil -- This is just copypasta, I assume it does nearly nothing.

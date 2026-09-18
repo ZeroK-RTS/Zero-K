@@ -33,113 +33,7 @@ local exampleDistortion = {
 
 -- multiple distortions per unitdef/piece are possible, as the distortions are keyed by distortionname
 
-local unitDistortions = {
-	energysingu = {
-		distortion = {
-			distortionType = "point",
-			pieceName = "energyball",
-			distortionConfig = {
-				posx = 0,
-				posy = 0,
-				posz = 0,
-				radius = 55,
-				noiseStrength = 0.9,
-				noiseScaleSpace = 1.2,
-				distanceFalloff = 0.8,
-				windAffected = -0.2,
-				riseRate = 0.6,
-				lifeTime = 0,
-				effectType = 0,
-			},
-		},
-	},
-	staticmex = {
-		distortion_1 = {
-			distortionType = "beam",
-			pieceName = "od1",
-			distortionConfig = {
-				posx = 0,
-				posy = 0,
-				posz = 0,
-				pos2x = 0,
-				pos2y = 14,
-				pos2z = -0.01,
-				radius = 16,
-				effectStrength = 0.65,
-				noiseStrength = 0.9,
-				noiseScaleSpace = 1.2,
-				distanceFalloff = 0.6,
-				windAffected = 0,
-				riseRate = 1.8,
-				lifeTime = 0,
-				effectType = 0,
-			},
-		},
-		distortion_2 = {
-			distortionType = "beam",
-			pieceName = "od2",
-			distortionConfig = {
-				posx = 0,
-				posy = 0,
-				posz = 0,
-				pos2x = 0,
-				pos2y = 18,
-				pos2z = -0.01,
-				radius = 17,
-				effectStrength = 0.2,
-				noiseStrength = 0.9,
-				noiseScaleSpace = 1.2,
-				distanceFalloff = 0.5,
-				windAffected = 0,
-				riseRate = 2,
-				lifeTime = 0,
-				effectType = 0,
-			},
-		},
-		distortion_3 = {
-			distortionType = "beam",
-			pieceName = "od3",
-			distortionConfig = {
-				posx = 0,
-				posy = 0,
-				posz = 0,
-				pos2x = 0,
-				pos2y = 24,
-				pos2z = -0.01,
-				radius = 19,
-				effectStrength = 0.3,
-				noiseStrength = 0.9,
-				noiseScaleSpace = 1.2,
-				distanceFalloff = 0.2,
-				windAffected = 0,
-				riseRate = 3,
-				lifeTime = 0,
-				effectType = 0,
-			},
-		},
-		distortion_4 = {
-			distortionType = "beam",
-			pieceName = "od4",
-			distortionConfig = {
-				posx = 0,
-				posy = 0,
-				posz = 0,
-				pos2x = 0,
-				pos2y = 30,
-				pos2z = -0.01,
-				radius = 22,
-				effectStrength = 0.8,
-				noiseStrength = 0.9,
-				noiseScaleSpace = 1.2,
-				distanceFalloff = 0.8,
-				windAffected = 0,
-				riseRate = 5,
-				lifeTime = 0,
-				effectType = 0,
-			},
-		},
-	},
-}
+local unitDistortions = {}
 
 local airjets_effects = VFS.Include("luaui/configs/airjet_effects.lua")
 
@@ -198,127 +92,8 @@ do
 	end
 end
 
-local function BigStomp(piece)
-	return {
-		-- Footstep shockwave
-		alwaysVisible = false,
-		distortionType = "point",
-		distortionName = "bigstomp",
-		pieceName = piece,
-		distortionConfig = {
-			posx = 0,
-			posy = -6,
-			posz = 12,
-			radius = 60,
-			noiseStrength = 1.2,
-			noiseScaleSpace = 0.4,
-			distanceFalloff = 0.4,
-			onlyModelMap = 1,
-			effectStrength = 0.9,
-			lifeTime = 15,
-			rampUp = 3,
-			decay = 15,
-			startRadius = 0.3,
-			shockWidth = 5,
-			effectType = "groundShockwave",
-		},
-	}
-end
-
-local function SmallStomp(piece)
-	return {
-		-- Footstep shockwave
-		alwaysVisible = false,
-		distortionType = "point",
-		distortionName = "smallstomp",
-		pieceName = piece,
-		distortionConfig = {
-			posx = 0,
-			posy = -8,
-			posz = 0,
-			radius = 35,
-			noiseStrength = 1.2,
-			noiseScaleSpace = 0.4,
-			distanceFalloff = 0.5,
-			onlyModelMap = 1,
-			effectStrength = 0.5,
-			lifeTime = 12,
-			rampUp = 3,
-			decay = 10,
-			startRadius = 0.3,
-			shockWidth = 3,
-			effectType = "groundShockwave",
-		},
-	}
-end
-
 local unitEventDistortionsNames = {
-	UnitScriptDistortions = {
-
-		striderdetriment = {
-			leftfoot = BigStomp("lfoot"),
-			rightfoot = BigStomp("rfoot"),
-		},
-		jumpsumo = {
-			leftfront = SmallStomp("lf_foot"),
-			rightfront = SmallStomp("rf_foot"),
-			leftback = SmallStomp("lb_foot"),
-			rightback = SmallStomp("rb_foot"),
-		},
-		
-		staticheavyarty = {
-			basestomp ={
-				-- Footstep shockwave
-				alwaysVisible = false,
-				distortionType = "point",
-				distortionName = "bigstomp",
-				pieceName = "base",
-				distortionConfig = {
-					posx = 0,
-					posy = -6,
-					posz = 0,
-					radius = 180,
-					noiseStrength = 1.5,
-					noiseScaleSpace = 0.5,
-					distanceFalloff = 0.5,
-					onlyModelMap = 1,
-					effectStrength = 0.3,
-					lifeTime = 16,
-					rampUp = 2.5,
-					decay = 16,
-					startRadius = 0.25,
-					shockWidth = 7,
-					effectType = "groundShockwave",
-				},
-			},
-			shotheat = {
-				-- Barrel Heat after shot
-				alwaysVisible = false,
-				distortionType = "beam",
-				distortionName = "brthabarrelheat",
-				pieceName = "sleeve",
-				distortionConfig = {
-					posx = 0,
-					posy = 5,
-					posz = 90,
-					radius = 50,
-					pos2x = 0,
-					pos2y = 5,
-					pos2z = 150,
-					onlyModelMap = 0,
-					riseRate = 0.5,
-					windAffected = -0.5,
-					noiseStrength = 0.3,
-					noiseScaleSpace = 1.0,
-					distanceFalloff = 1.0,
-					rampUp = 20,
-					decay = 200,
-					lifeTime = 240,
-					effectType = 0,
-				},
-			},
-		},
-	},
+	UnitScriptDistortions = {},
 
 	------------------------------- Put additional distortions tied to events here! --------------------------------
 	UnitIdle = {
@@ -488,6 +263,8 @@ for unitName, distortions in pairs(unitDistortions) do
 end
 unitDistortions = nil
 
+----------------- Features (unused) ---------------
+
 local featureDefDistortions = {}
 
 -- Example featureDefDistortion below
@@ -509,6 +286,36 @@ local crystalDistortionBase = {
 		effectType = 0,
 	},
 }
+
+
+----------------- Load files for modding and sanity ---------------
+
+local function AddToTable(main, toAdd)
+	if not main then
+		return toAdd
+	end
+	for k, v in pairs(toAdd) do
+		main[k] = v
+	end
+	return main
+end
+
+local distortFiles = VFS.DirList('LuaRules/Configs/UnitDistortions')
+for i = 1, #distortFiles do
+	local fileData = VFS.Include(distortFiles[i])
+	for unitName, unitDistort in pairs(fileData) do
+		local ud = UnitDefNames[unitName]
+		if ud then
+			local unitDefID = ud.id
+			unitDefDistortions[unitDefID] = AddToTable(unitDefDistortions[unitDefID], unitDistort.static)
+			unitEventDistortions.UnitScriptDistortions[unitDefID] = AddToTable(unitEventDistortions.UnitScriptDistortions[unitDefID], unitDistort.script)
+			unitEventDistortions.UnitIdle[unitDefID] = AddToTable(unitEventDistortions.UnitIdle[unitDefID], unitDistort.idle)
+			unitEventDistortions.UnitCreated[unitDefID] = AddToTable(unitEventDistortions.UnitCreated[unitDefID], unitDistort.created)
+			unitEventDistortions.UnitDestroyed[unitDefID] = AddToTable(unitEventDistortions.UnitDestroyed[unitDefID], unitDistort.destroyed)
+		end
+	end
+	fileData = nil -- This is just copypasta, I assume it does nearly nothing.
+end
 
 local allDistortions = {
 	unitEventDistortions = unitEventDistortions,
