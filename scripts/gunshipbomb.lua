@@ -17,6 +17,7 @@ local smokePiece = { base, l_wing, r_wing }
 
 local SIG_BURROW = 1
 local SIG_HAXY_HAX = 2
+local newlyCreated = true
 local burrowed = false
 
 local PREDICT_FRAMES = 25
@@ -176,6 +177,14 @@ local function BurrowThread()
 		else
 			GG.SetWantedCloaked(unitID, 0)
 		end
+		if newlyCreated then
+			if burrowed then
+				StartThread(Burrow)
+			else
+				StartThread(UnBurrow)
+			end
+			newlyCreated = nil
+		end
 
 		Sleep(200)
 	end
@@ -186,10 +195,11 @@ function script.Create()
 	Turn(r_fan_mount, z_axis, math.rad(12))
 	GG.Attributes.SetRangeUpdater(unitID, true) -- Do not allow range changes.
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(BurrowThread)
-	if not Spring.GetUnitIsStunned(unitID) then
-		Burrow()
+	Hide(exhaust)
+	while Spring.GetUnitIsStunned(unitID) do
+		Sleep(100)
 	end
+	StartThread(BurrowThread)
 end
 
 function script.StartMoving()
