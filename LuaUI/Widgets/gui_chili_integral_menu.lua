@@ -1725,6 +1725,11 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			local ud = UnitDefs[-cmdID]
 			if buttonLayout.tooltipOverride then
 				button.tooltip = buttonLayout.tooltipOverride
+			elseif command and command.disabled and command.tooltip == "Requires a powered Strider Hub in range" then
+				-- Strider build greyed out because no powered Strider Hub is in range
+				-- (set by unit_strider_hub_access.lua). Matched exactly so other
+				-- disabled builds keep their normal unit-card tooltip.
+				button.tooltip = command.tooltip
 			else
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip

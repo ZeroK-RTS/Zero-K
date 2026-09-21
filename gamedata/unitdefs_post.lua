@@ -265,6 +265,23 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
+-- Strider builders (Caretaker) gain their parent Strider Hub's roster, appended
+-- to whatever build list they already have (the Caretaker is a bare nano tower,
+-- so this becomes its only build menu). Building these is gated to the Hub's
+-- build area by unit_strider_hub_access.lua; here we only expose the buildoptions.
+for name, ud in pairs(UnitDefs) do
+	local hubName = ud.customparams.strider_builder
+	if hubName then
+		local hub = UnitDefs[hubName]
+		if hub and hub.buildoptions then
+			ud.buildoptions = (ud.buildoptions and Spring.Utilities.CopyTable(ud.buildoptions)) or {}
+			for i = 1, #hub.buildoptions do
+				ud.buildoptions[#ud.buildoptions + 1] = hub.buildoptions[i]
+			end
+		end
+	end
+end
+
 local typeNames = {
 	"CONSTRUCTOR",
 	"RAIDER",

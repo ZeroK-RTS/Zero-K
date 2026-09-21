@@ -109,11 +109,47 @@ for i = 1, #UnitDefs do
 	end
 end
 
+--------------------------------------------------------------------------------
+-- Strider Hub build-area drawing: the Caretaker acts as the Strider Hub's plate.
+-- striderHubRange[hubDefID]        = the Hub's build-area radius (green circle)
+-- striderBuildDefID[striderDefID]  = hubDefID (active command is "place a strider")
+-- striderBuilderDef[builderDefID]  = {hubDefID, eligRangeSq} (placing a Caretaker)
+-- striderHubToBuilder[hubDefID]    = {defID = builderDefID, eligRangeSq}
+local striderHubRange    = {}
+local striderBuildDefID  = {}
+local striderBuilderDef  = {}
+local striderHubToBuilder = {}
+
+for i = 1, #UnitDefs do
+	if UnitDefs[i].customParams.strider_hub then
+		striderHubRange[i] = UnitDefs[i].buildDistance
+	end
+end
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	local hubName = ud.customParams.strider_builder
+	if hubName then
+		local hubDef = UnitDefNames[hubName]
+		if hubDef and striderHubRange[hubDef.id] then
+			local eligRange = striderHubRange[hubDef.id] + ud.buildDistance
+			local eligRangeSq = eligRange * eligRange
+			striderBuilderDef[i] = {hubDefID = hubDef.id, eligRangeSq = eligRangeSq}
+			striderHubToBuilder[hubDef.id] = {defID = i, eligRangeSq = eligRangeSq}
+			buildAction[i] = buildAction[i] or ("buildunit_" .. ud.name)
+			local hubBuildOptions = UnitDefs[hubDef.id].buildOptions
+			for j = 1, #hubBuildOptions do
+				striderBuildDefID[hubBuildOptions[j]] = hubDef.id
+			end
+		end
+	end
+end
+
 local myPlayerID = Spring.GetLocalPlayerID()
 local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local factories = IterableMap.New()
+local striderHubs = IterableMap.New()
 
 local buildPlateCommand
 local buildFactoryDefID
@@ -122,6 +158,11 @@ local closestFactoryData
 local activeCmdOverride
 local cmdFactoryDefID
 local cmdPlateDefID
+
+-- Strider Hub build-area draw state (set in Update, consumed in DrawWorld/minimap)
+local striderDrawMode          -- nil | "builder" (placing a Caretaker) | "strider"
+local striderDrawHubDefID
+local striderBuilderEligRangeSq
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -147,6 +188,21 @@ local function GetClosestFactory(x, z, unitDefID)
 	-- otherwise if using CMD_BUILD_PLATE
 	else
 		for unitID, data in IterableMap.Iterator(factories) do
+			local dSq = DistSq(x, z, data.x, data.z)
+			if (not nearDistSq) or (dSq < nearDistSq) then
+				nearID = unitID
+				nearDistSq = dSq
+				nearData = data
+			end
+		end
+	end
+	return nearID, nearDistSq, nearData
+end
+
+local function GetClosestStriderHub(x, z, hubDefID)
+	local nearID, nearDistSq, nearData
+	for unitID, data in IterableMap.Iterator(striderHubs) do
+		if (not hubDefID) or data.unitDefID == hubDefID then
 			local dSq = DistSq(x, z, data.x, data.z)
 			if (not nearDistSq) or (dSq < nearDistSq) then
 				nearID = unitID
@@ -236,6 +292,21 @@ local function MakePlateFromCMD()
 		return
 	end
 
+	-- Strider Hub plate: build a Caretaker when the cursor is near a powered Hub
+	-- and the Hub is at least as close as any in-range plate-factory.
+	local hubID, hubDistSq, hubData = GetClosestStriderHub(mx, mz)
+	if hubID then
+		local builder = striderHubToBuilder[hubData.unitDefID]
+		if builder and hubDistSq <= builder.eligRangeSq then
+			local facID, facDistSq = GetClosestFactory(mx, mz)
+			local factoryCloserInRange = facID and (facDistSq < FACTORY_RANGE_SQ) and (facDistSq < hubDistSq)
+			if (not factoryCloserInRange) and Spring.GetCmdDescIndex(-builder.defID) then
+				Spring.SetActiveCommand(buildAction[builder.defID])
+				return
+			end
+		end
+	end
+
 	local unitID, distSq, factoryData = GetClosestFactory(mx, mz)
 	if not unitID then
 		return
@@ -286,7 +357,21 @@ end
 function widget:Update()
 	local _, cmdID = spGetActiveCommand()
 	buildPlateCommand = cmdID and ((CMD_BUILD_PLATE == cmdID) or (cmdPlateDefID))
-	
+
+	-- Detect placing a Caretaker ("builder") or a strider, to draw Hub build areas.
+	striderDrawMode = nil
+	if cmdID and cmdID < 0 then
+		local defID = -cmdID
+		if striderBuilderDef[defID] then
+			striderDrawMode = "builder"
+			striderDrawHubDefID = striderBuilderDef[defID].hubDefID
+			striderBuilderEligRangeSq = striderBuilderDef[defID].eligRangeSq
+		elseif striderBuildDefID[defID] then
+			striderDrawMode = "strider"
+			striderDrawHubDefID = striderBuildDefID[defID]
+		end
+	end
+
 	if (buildFactoryDefID or cmdFactoryDefID or closestFactoryData) and CMD_BUILD_PLATE ~= cmdID then
 		ResetInterface()
 	end
@@ -357,6 +442,17 @@ end
 --------------------------------------------------------------------------------
 
 function widget:UnitCreated(unitID, unitDefID)
+	-- Track own/allied Strider Hubs (same allyTeam) to draw their build areas.
+	if striderHubRange[unitDefID] and Spring.GetUnitAllyTeam(unitID) == myAllyTeamID then
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		IterableMap.Add(striderHubs, unitID, {
+			unitDefID = unitDefID,
+			x = x,
+			y = y,
+			z = z,
+			range = striderHubRange[unitDefID],
+		})
+	end
 	if not (parentOfPlate[unitDefID] and Spring.GetUnitAllyTeam(unitID) == myAllyTeamID) then
 		return
 	end
@@ -370,6 +466,9 @@ function widget:UnitCreated(unitID, unitDefID)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
+	if striderHubRange[unitDefID] then
+		IterableMap.Remove(striderHubs, unitID)
+	end
 	if not parentOfPlate[unitDefID] then
 		return
 	end
@@ -386,7 +485,8 @@ end
 
 function widget:Initialize()
 	IterableMap.Clear(factories)
-	
+	IterableMap.Clear(striderHubs)
+
 	local units = Spring.GetAllUnits()
 	for i = 1, #units do
 		local unitID = units[i]
@@ -444,6 +544,54 @@ local function DrawFactoryLine(x, y, z, unitDefID, drawDef)
 	glColor(1, 1, 1, 1)
 end
 
+-- Draws the green build-area circle on own/allied Strider Hubs while placing a
+-- strider or a Caretaker, plus a connector line when placing a Caretaker.
+local function DrawStriderBuildAreas()
+	if not striderDrawMode then
+		return
+	end
+
+	local drawn = false
+	gl.DepthTest(false)
+	glLineWidth(inCircle.width)
+	glColor(inCircle.color[1], inCircle.color[2], inCircle.color[3], inCircle.color[4])
+	for unitID, data in IterableMap.Iterator(striderHubs) do
+		if data.unitDefID == striderDrawHubDefID then
+			drawn = true
+			glDrawGroundCircle(data.x, data.y, data.z, data.range, inCircle.circleDivs)
+		end
+	end
+	if drawn then
+		glLineStipple(false)
+		glLineWidth(1)
+		glColor(1, 1, 1, 1)
+	end
+
+	if striderDrawMode ~= "builder" then
+		return
+	end
+
+	-- Placing a Caretaker: line to the nearest Hub, green if the Caretaker will
+	-- reach that Hub's build area (and can therefore build striders there).
+	local mx, mz = GetMousePos(true)
+	if not mx then
+		return
+	end
+	local _, nearDistSq, nearData = GetClosestStriderHub(mx, mz, striderDrawHubDefID)
+	if not nearData then
+		return
+	end
+	local drawDef = (nearDistSq <= striderBuilderEligRangeSq) and inCircle or outCircle
+	local my = spGetGroundHeight(mx, mz)
+	gl.DepthTest(false)
+	glLineWidth(drawDef.width)
+	glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
+	gl.BeginEnd(GL.LINE_STRIP, DoLine, nearData.x, nearData.y, nearData.z, mx, my, mz)
+	glLineStipple(false)
+	glLineWidth(1)
+	glColor(1, 1, 1, 1)
+end
+
 function widget:DrawInMiniMap(minimapX, minimapY)
 	if not (buildFactoryDefID or buildPlateCommand) then
 		return
@@ -490,6 +638,8 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 end
 
 function widget:DrawWorld()
+	DrawStriderBuildAreas()
+
 	if cmdPlateDefID then
 		drawFactoryDefID = cmdFactoryDefID
 		drawPlateDefID = cmdPlateDefID
