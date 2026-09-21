@@ -1010,7 +1010,8 @@ local function AssignDistortionsToAllWeapons()
 		local areaofeffect = weaponDef.damageAreaOfEffect or 0
 		local radius = ((areaofeffect * 0.7) + (areaofeffect * weaponDef.edgeEffectiveness * 1.1))
 		local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
-		local rapidFire = weaponDef.reload < 0.6
+		local burstMult = tonumber(wcp.statsprojectiles) or ((tonumber(wcp.script_burst) or weaponDef.salvoSize) * weaponDef.projectiles)
+		local rapidFire = weaponDef.reload < 0.6 or burstMult > 5
 
 		local sizeclass = GetClosestSizeClass(radius)
 		local overrideTable = {}
@@ -1043,7 +1044,7 @@ local function AssignDistortionsToAllWeapons()
 		-- Add a muzzle flash if needed:
 		if wcp.lups_noshockwave then
 		elseif areaofeffect > 60 and damage > 500 then
-			local size = weaponRange > 2500 and "Tiniest" or "KorgLaser"
+			local size = weaponRange > 2500 and "Tiniest" or "Smallest"
 			local class = weaponRange > 2500 and "MuzzleShockWaveXL" or "MuzzleShockWave"
 			muzzleFlashDistortionsNames[weaponName] = {
 				GetDistortionClass(class, size),
@@ -1128,8 +1129,9 @@ explosionDistortionsNames.shieldbomb_shieldbomb_death[#explosionDistortionsNames
 explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb = explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb or {}
 explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb[#explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb + 1] = GetDistortionClass("FireExplosionHeat", "Small")
 
-explosionDistortionsNames.jumpblackhole_black_hole = explosionDistortionsNames.jumpblackhole_black_hole or {}
+explosionDistortionsNames.jumpblackhole_black_hole = {}
 explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
+
 
 
 explosionDistortionsNames.cloaksnipe_shockrifle = {
