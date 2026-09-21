@@ -98,9 +98,14 @@ local builders = IterableMap.New() -- unitID -> {info, x, z, allyTeamID, access}
 --------------------------------------------------------------------------------
 
 local function IsHubPowered(unitID)
+	-- Powered = built, not EMPed/paralysed (spGetUnitIsStunned), not disarmed or
+	-- morph-disabled, AND its energy grid can supply its neededlink. The last one
+	-- is the "lowpower" param set by unit_mex_overdrive.lua; without it an
+	-- unpowered (but un-EMPed) Hub would wrongly count as operational.
 	return not (spGetUnitIsStunned(unitID)
 		or (spGetUnitRulesParam(unitID, "disarmed") == 1)
-		or (spGetUnitRulesParam(unitID, "morphDisable") == 1))
+		or (spGetUnitRulesParam(unitID, "morphDisable") == 1)
+		or (spGetUnitRulesParam(unitID, "lowpower") == 1))
 end
 
 -- Is there a powered, same-allyTeam hub near (x, z)?
@@ -195,12 +200,11 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if hubDefData[unitDefID] then
 		local x, _, z = spGetUnitPosition(unitID)
-		local _, _, inbuild = spGetUnitIsStunned(unitID)
 		IterableMap.Add(hubs, unitID, {
 			x = x,
 			z = z,
 			allyTeamID = spGetUnitAllyTeam(unitID),
-			powered = not inbuild,
+			powered = IsHubPowered(unitID),
 			rangeSq = hubDefData[unitDefID].rangeSq,
 		})
 		UpdateAllBuilders()
