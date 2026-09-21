@@ -88,8 +88,8 @@ else -- Unsynced
 	end
 
 	local function SpawnExplosion(_, px, py, pz, weaponID, ownerID)
-		if ownerID ~= nil and Script.LuaUI("VisibleExplosion") then
-			if fullView or spGetUnitAllyTeam(ownerID) == myAllyID or spIsPosInLos(px, py, pz, myAllyID) then
+		if Script.LuaUI("VisibleExplosion") then
+			if fullView or (ownerID and spGetUnitAllyTeam(ownerID) == myAllyID) or spIsPosInLos(px, py, pz, myAllyID) then
 				Script.LuaUI.VisibleExplosion(px, py, pz, weaponID, ownerID)
 			end
 		end

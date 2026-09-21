@@ -310,9 +310,6 @@ local BaseClasses = {
 		},
 	},
 	
-	
-	-- ZK fiddling
-	
 	empWobble = {
 		distortionType = "point",
 		yOffset = 0,
@@ -526,10 +523,11 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
+			effectStrength = 1,
 			noiseStrength = 1,
-			noiseScaleSpace = 0.75,
+			noiseScaleSpace = 0.52,
 			distanceFalloff = 0.5,
-			startRadius = 0.3,
+			startRadius = 0.55,
 			onlyModelMap = 0,
 			lifeTime = 50,
 			rampUp = 2,
@@ -556,6 +554,28 @@ local BaseClasses = {
 			effectStrength = -1.5,
 			startRadius = 0.2,
 			shockWidth = -0.64,
+			effectType = "airShockwave",
+		},
+	},
+	SlowDamageImplosion = { 
+		distortionType = "point", -- or cone or beam
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.2,
+			noiseStrength = 0.2,
+			onlyModelMap = 0,
+			lifeTime = 7,
+			distanceFalloff = 0.6,
+			refractiveIndex = 1.045,
+			decay = 2,
+			rampUp = 3,
+			effectStrength = -0.9,
+			startRadius = 0.2,
+			shockWidth = 0.92,
 			effectType = "airShockwave",
 		},
 	},
@@ -793,7 +813,7 @@ local SizeRadius = {
 	Smaller = 115,
 	Small = 140,
 	Smallish = 165,
-	SmallMedium = 190,
+	SmallMedium = 180,
 	Medium = 220,
 	Mediumer = 260,
 	MediumLarge = 320,
@@ -991,18 +1011,19 @@ local function AssignDistortionsToAllWeapons()
 		local radius = ((areaofeffect * 0.7) + (areaofeffect * weaponDef.edgeEffectiveness * 1.1))
 		local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
 		local rapidFire = weaponDef.reload < 0.6
-		Spring.Echo(weaponDef.name, weaponRange)
 
 		local sizeclass = GetClosestSizeClass(radius)
 		local overrideTable = {}
+		local noExplodeEffect = false
 
 		-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
 		if wcp.lups_noshockwave then
 		elseif weaponDef.type == "LightningCannon" then
-		
-			projectileDefDistortionsNames[weaponName] = GetDistortionClass("LightningBeam", "Banthlaser")
+			local lightningWidth = (weaponRange > 200 or stunTime > 5) and "Banthlaser" or "Zetto"
+			projectileDefDistortionsNames[weaponName] = GetDistortionClass("LightningBeam", lightningWidth)
 		elseif weaponDef.type == "BeamLaser" then
 			if wcp.timeslow_damagefactor or wcp.timeslow_onlyslow then
+				noExplodeEffect = true
 				if damage < 20 then -- Weapon contains real damage by this point, so this catches onlyslow too.
 					projectileDefDistortionsNames[weaponName] = GetDistortionClass("SlowBeam", "Atto")
 				else
@@ -1035,6 +1056,10 @@ local function AssignDistortionsToAllWeapons()
 			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("DisruptionPulse", GetClosestSizeClass(effectiveRangeExplo)),
 			}
+		elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and not noExplodeEffect then
+			explosionDistortionsNames[weaponName] = {
+				GetDistortionClass("SlowDamageImplosion", "Femto"),
+			}
 		elseif weaponDef.type == "DGun" then
 			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("DgunImplosion", "Micro"),
@@ -1043,7 +1068,7 @@ local function AssignDistortionsToAllWeapons()
 			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius)),
 			}
-		elseif weaponDef.type == "AircraftBomb" then
+		elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
 			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("FireExplosionHeat", "SmallMedium"),
 			}
@@ -1100,8 +1125,12 @@ projectileDefDistortionsNames.shieldfelon_shieldgun = GetDistortionClass("Shield
 explosionDistortionsNames.shieldbomb_shieldbomb_death = explosionDistortionsNames.shieldbomb_shieldbomb_death or {}
 explosionDistortionsNames.shieldbomb_shieldbomb_death[#explosionDistortionsNames.shieldbomb_shieldbomb_death + 1] = GetDistortionClass("ExplosionHeat", "Medium")
 
+explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb = explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb or {}
+explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb[#explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb + 1] = GetDistortionClass("FireExplosionHeat", "Small")
+
 explosionDistortionsNames.jumpblackhole_black_hole = explosionDistortionsNames.jumpblackhole_black_hole or {}
 explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
+
 
 explosionDistortionsNames.cloaksnipe_shockrifle = {
 	GetDistortionClass("ExploShockWaveM", "Tiny")
