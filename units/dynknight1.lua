@@ -24,4 +24,6 @@ unitDef.sfxtypes = {
     }
 }
 
+unitDef.featureDefs.DEAD.object = [[cremcom_dead.s3o]]
+
 return { dynknight1 = unitDef }

@@ -73,8 +73,8 @@ local rf_angle = math.rad(-25)
 local lb_angle = math.rad(-65)
 local rb_angle = math.rad(65)
 
-local p_angle = -.3
-local th_angle = -.3
+local p_angle = -0.3
+local th_angle = -0.3
 local th_speed = 1.1
 local sh_angle = .4
 local sh_speed = 1
@@ -122,15 +122,17 @@ local function Walk()
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(rf_foot, dirtfling)
 			EmitSfx(lb_foot, dirtfling)
+			GG.UnitScriptDistortion(unitID, unitDefID, "rightfront")
+			GG.UnitScriptDistortion(unitID, unitDefID, "leftback")
 		end
 		
 		Turn(lf_ball, y_axis, lf_angle, sp1) -- left front leg forward
-		Turn(rf_ball, y_axis, -rb_angle, sp2) -- right front leg backward
+		Turn(rf_ball, y_axis, -1.3, sp2) -- right front leg backward
 		Turn(lb_ball, y_axis, -lf_angle, sp2) -- left back leg backward
 		Turn(rb_ball, y_axis, rb_angle, sp1) -- right back leg forward
 		
 		Turn(lf_thigh, x_axis, 0, th_speed)
-		Turn(rf_thigh, x_axis, -th_angle, th_speed)
+		Turn(rf_thigh, x_axis, 0.2, th_speed)
 		Turn(lb_thigh, x_axis, th_angle, th_speed)
 		Turn(rb_thigh, x_axis, 0, th_speed)
 		
@@ -181,14 +183,16 @@ local function Walk()
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(lf_foot, dirtfling)
 			EmitSfx(rb_foot, dirtfling)
+			GG.UnitScriptDistortion(unitID, unitDefID, "leftfront")
+			GG.UnitScriptDistortion(unitID, unitDefID, "rightback")
 		end
 		
-		Turn(lf_ball, y_axis, -lb_angle, sp2) -- left front leg backward
+		Turn(lf_ball, y_axis, 1.3, sp2) -- left front leg backward
 		Turn(rf_ball, y_axis, rf_angle, sp1) -- right front leg forward
 		Turn(lb_ball, y_axis, lb_angle, sp1) -- left front leg forward
 		Turn(rb_ball, y_axis, -rf_angle, sp2) -- right back leg backward
 		
-		Turn(lf_thigh, x_axis, -th_angle, th_speed)
+		Turn(lf_thigh, x_axis, 0.2, th_speed)
 		Turn(rf_thigh, x_axis, 0, th_speed)
 		Turn(lb_thigh, x_axis, 0, th_speed)
 		Turn(rb_thigh, x_axis, th_angle, th_speed)

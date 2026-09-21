@@ -179,6 +179,7 @@ return { hoverdepthcharge = {
 
       customParams            = {
         bogus = 1,
+        lups_noshockwave = 1,
       },
 
       damage                  = {

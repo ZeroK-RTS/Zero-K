@@ -272,12 +272,10 @@ local function CreateResources()
     vertex = [[
       varying vec3 normal;
       varying vec4 pos;
-      varying float clamp;
 
       void main(void) {
         gl_FrontColor = gl_Color;
         gl_TexCoord[0] = gl_MultiTexCoord0;
-        clamp = gl_MultiTexCoord1.x;
         normal = gl_Normal;
 
         pos = gl_ModelViewMatrix * gl_Vertex;
@@ -287,10 +285,10 @@ local function CreateResources()
     ]],
     fragment = [[
       uniform sampler2D unitTex;
+	uniform float clamp;
 
       varying vec3 normal;
       varying vec4 pos;
-      varying float clamp;
 
       void main(void) {
         if (pos.y<clamp) discard;
@@ -301,6 +299,9 @@ local function CreateResources()
         gl_FragData[1]     = vec4(normal,1.0);
       }
     ]],
+	uniformFloat = {
+		clamp = 0,
+	},
     uniformInt = {
       unitTex = 0,
     },
@@ -591,6 +592,11 @@ end
 
 local function GetUnitDefDims(udid)
   local dims = Spring.GetUnitDefDimensions(udid);
+  if unitConfigs and unitConfigs[udid] and unitConfigs[udid].dimensionOverride then
+    for override, value in pairs(unitConfigs[udid].dimensionOverride) do
+	  dims[override] = value
+	end
+  end
   local midx,midy,midz = (dims.maxx+dims.minx)*0.5, (math.max(0,dims.maxy)+math.max(0,dims.miny))*0.5, (dims.maxz+dims.minz)*0.5;
   local ax = math.max(math.abs(dims.maxx-midx), math.abs(dims.minx-midx));
   local ay = math.max(math.abs(dims.maxy-midy), math.abs(dims.miny-midy));
@@ -609,7 +615,7 @@ local function DrawIcon(udid,uid)
   local midx,midy,midz,radius = GetUnitDefDims(udid);
 
   radius = radius * cfg.zoom;
-  gl.MultiTexCoord(1, cfg.clamp);
+  gl.Uniform(0, cfg.clamp);
 
   gl.Blending(false);
   gl.DepthTest(true);
@@ -736,6 +742,9 @@ end
 
 	local function Background(unitDefID)
 		local ud = UnitDefs[unitDefID]
+		if unitConfigs[unitDefID].backgroundOverride then
+			return unitConfigs[unitDefID].backgroundOverride
+		end
 
 		if ud.isStrafingAirUnit or ud.isHoveringAirUnit then
 			return "bg_air.png"
@@ -866,14 +875,18 @@ end
   local jobsInSynced = 0
 
   local function ProcessJobs()
+	local currentTime = Spring.GetTimer()
+	if lastTime and Spring.DiffTimers(currentTime, lastTime) < 0.5 then
+		return
+	end
+	lastTime = currentTime
     --//note: we have a LIFO stack
-    for j=#jobs,1,-1 do
-      if (jobs[j]() ~= false) then
-        jobs[j] = nil;
-      else
-        break;
-      end;
-    end;
+    if #jobs == 0 then
+      return
+    end
+    if (jobs[#jobs]() ~= false) then
+      jobs[#jobs] = nil;
+    end
 
     --if (#jobs == 0) then
       --gadget.DrawGenesis = nil;
@@ -881,10 +894,21 @@ end
     --end;
   end
 
-
+local lastTime
 function gadget:DrawGenesis()
-  ProcessJobs()
+	if not (jobs and jobs[1]) then
+		return
+	end
+	ProcessJobs()
 end
+
+local function SaveToFile(iconX, iconY, outdir, name, imageExt)
+	local outfile = (outdir) .."/".. name .. (imageExt);
+	gl.SaveImage(0,0,iconX,iconY, outfile,{alpha=true});
+	Spring.Echo("saved to", outfile)
+end
+
+
   local function CreateIcon(udid,uid)
     local cfg = unitConfigs[udid]
 
@@ -950,13 +974,16 @@ end
       gl.Blending(false);
       gl.Texture(false);
 
-      local outfile = (outdir) .."/".. (UnitDefs[udid].name) .. (imageExt);
       --if (VFS.FileExists(outfile, VFS.RAW)) then
       --  os.remove(outfile);
       --end;
-
-      gl.SaveImage(0,0,iconX,iconY, outfile,{alpha=true});
-      Spring.Echo("saved to", outfile)
+	  if cfg.saveNames then
+		for i = 1, #cfg.saveNames do
+		 SaveToFile(iconX, iconY, outdir, cfg.saveNames[i], imageExt)
+		end
+	  else
+	    SaveToFile(iconX, iconY, outdir, UnitDefs[udid].name, imageExt)
+	  end
     end);
 
     if (not result and not cfg.empty) then
@@ -1008,6 +1035,18 @@ end
 
 local schemes,resolutions,ratios = {},{},{}
 
+local function AddAllUnit(unitDefID)
+	if unitConfigs[unitDefID] and unitConfigs[unitDefID].inBatch then
+		return true
+	end
+	local ud = UnitDefs[unitDefID]
+	if ud.customParams.dynamic_comm or ud.customParams.level then
+		return false
+	end
+	return true
+end
+
+
   local function BuildIcon(cmd, line, words, playerID)
     if (not Spring.IsCheatingEnabled()) then
       Spring.Echo("Cheating must be enabled");
@@ -1022,13 +1061,16 @@ local schemes,resolutions,ratios = {},{},{}
       Spring.Echo("No such unit found");
       return false;
     end
-
-
+    local skipTo = 1
+    if words[1] == "all" and words[2] then
+      skipTo = math.max(1, tonumber(words[2]) or 1)
+    end
+    
     --//note: we have a LIFO stack
     for _,res in pairs(resolutions) do
       for _,_scheme in pairs(schemes) do
         for _ratio_name,_ratio in pairs(ratios) do
-
+          LoadScheme();
           AddJob( FreeResources );
 
           AddJob( WaitForSyncedJobs );
@@ -1036,8 +1078,10 @@ local schemes,resolutions,ratios = {},{},{}
           if (words[1] and words[1]~="all") then
             AddJob( function () AddUnitJob(UnitDefNames[ words[1] ].id); end);
           else
-            for udid=#UnitDefs,1,-1 do
-              AddJob( function () AddUnitJob(udid); end);
+            for udid=#UnitDefs,skipTo,-1 do
+              if AddAllUnit(udid) then
+                AddJob( function () AddUnitJob(udid); end);
+              end
             end;
           end;
 

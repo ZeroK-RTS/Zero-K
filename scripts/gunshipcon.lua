@@ -160,16 +160,29 @@ function script.Create()
 	Turn(subspine[4], z_axis, math.rad(5))
 	Turn(subspine[5], z_axis, math.rad(-50))
 	Turn(subspine[6], z_axis, math.rad(105))
+	
+	Hide(ExhaustForwardLeft)
+	Hide(ExhaustForwardRight)
+	Hide(ExhaustRearLeft)
+	Hide(ExhaustRearRight)
 end
 
 function script.Activate()
 	StartThread(TiltBody)
 	StopLanded()
+	Show(ExhaustForwardLeft)
+	Show(ExhaustForwardRight)
+	Show(ExhaustRearLeft)
+	Show(ExhaustRearRight)
 end
 
 function script.Deactivate()
 	StartThread(StopBuild)
 	StartThread(StartLanded)
+	Hide(ExhaustForwardLeft)
+	Hide(ExhaustForwardRight)
+	Hide(ExhaustRearLeft)
+	Hide(ExhaustRearRight)
 end
 
 function script.StartBuilding()

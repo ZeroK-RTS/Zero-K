@@ -639,7 +639,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, 250, predictedDist, ux, uz, origEx, origEz)
 	end
 	
-	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
+	local skirmRange = (doHug and behaviour.hugRange) or ((behaviour.skirmRangeOverride or GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
 	skirmRange = skirmRange * (GG.att_RangeChange[unitData.udID] or 1)
 	--Spring.Echo("skirmRange", skirmRange, GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum))
 	local reloadFrames

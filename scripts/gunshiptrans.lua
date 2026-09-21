@@ -2,16 +2,16 @@ local base = piece 'base'
 
 
 --New bits
-local lUpperCl1 	= piece 'lUpperCl1'
-local rUpperCl1 	= piece 'rUpperCl1'
-local lLowerCl1 	= piece 'lLowerCl1'
-local rLowerCl1 	= piece 'rLowerCl1'
-local lUpperCl2 	= piece 'lUpperCl2'
-local rUpperCl2 	= piece 'rUpperCl2'
-local lLowerCl2 	= piece 'lLowerCl2'
-local rLowerCl2 	= piece 'rLowerCl2'
-local engineEmit 	= piece 'engineEmit'
-local link 			= piece 'link'
+local lUpperCl1  = piece 'lUpperCl1'
+local rUpperCl1  = piece 'rUpperCl1'
+local lLowerCl1  = piece 'lLowerCl1'
+local rLowerCl1  = piece 'rLowerCl1'
+local lUpperCl2  = piece 'lUpperCl2'
+local rUpperCl2  = piece 'rUpperCl2'
+local lLowerCl2  = piece 'lLowerCl2'
+local rLowerCl2  = piece 'rLowerCl2'
+local engineEmit = piece 'engineEmit'
+local link       = piece 'link'
 
 local AttachUnit = Spring.UnitScript.AttachUnit
 local DropUnit = Spring.UnitScript.DropUnit
@@ -239,15 +239,18 @@ end
 
 
 function script.Create()
+	Hide(engineEmit)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(PickupAndDropFixer)
 end
 
 function script.Activate()
+	Show(engineEmit)
 end
 
 function script.Deactivate()
 	StartThread(closeDoors)
+	Hide(engineEmit)
 end
 
 

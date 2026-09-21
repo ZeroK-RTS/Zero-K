@@ -178,7 +178,7 @@ local gibParams = {r = 0.5, g = 0.5, b = 0.25, radius = 100}
 -- Light Defs
 
 function GetLightsFromUnitDefs()
-	return VFS.Include("LuaUI/Configs/projectileLightDefs.lua")
+	return VFS.Include("LuaRules/Configs/projectileLightDefs.lua")
 end
 
 --------------------------------------------------------------------------------

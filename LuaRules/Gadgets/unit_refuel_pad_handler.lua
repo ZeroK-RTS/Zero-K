@@ -122,6 +122,17 @@ local unitMovectrled = {}
 
 local coroutines = {}
 
+local function CallScript(unitID, funcName)
+	local func = Spring.UnitScript.GetScriptEnv(unitID)
+	if func then
+		func = func[funcName]
+		if func then
+			return Spring.UnitScript.CallAsUnit(unitID, func)
+		end
+	end
+	return false
+end
+
 local function StartScript(fn)
 	local co = coroutine.create(fn)
 	coroutines[#coroutines + 1] = co
@@ -204,6 +215,7 @@ local function SitOnPad(unitID)
 	
 	-- deactivate unit to cause the lups jets away
 	Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 0)
+	CallScript(unitID, "Pad_StopMoving")
 	
 	local function SitLoop()
 		-- read unitrulesparam for save/load handling
@@ -303,6 +315,7 @@ local function SitOnPad(unitID)
 		
 		-- activate unit and its jets
 		Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
+		CallScript(unitID, "Pad_StartMoving")
 		
 		GG.LandComplete(unitID)
 	end

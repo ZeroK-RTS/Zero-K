@@ -169,9 +169,9 @@ options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
 	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
-	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
+	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'small_icons', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
-	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
+	'tabFontSize', 'buttonFontScale', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
 	'helpwindow', 'commands_reset_default', 'commands_enable_all', 'commands_disable_all', 'states_enable_all', 'states_disable_all',
 }
 
@@ -185,6 +185,68 @@ local function UpdateHolderSizes()
 			statePanel.buttons.SetDimensions(bigStateWidth, bigStateHeight, true)
 		else
 			statePanel.buttons.SetDimensions(smallStateWidth, smallStateHeight, true)
+		end
+	end
+end
+
+local function SetSmallIcons(wantSmall)
+	-- This function uses a bunch of pass by reference
+	if wantSmall then
+		textConfig.bottomLeft.x = "15%"
+		textConfig.bottomLeft.bottom = 2
+		buttonLayoutConfig.build.image = {
+			x = "5%",
+			y = "4%",
+			right = "5%",
+			bottom = 12,
+			keepAspect = false,
+			rectangleAspect = true,
+		}
+		buttonLayoutConfig.build.invisibleButton = false
+		buttonLayoutConfig.buildunit.image = {
+			x = "5%",
+			y = "4%",
+			right = "5%",
+			bottom = 12,
+			keepAspect = false,
+			rectangleAspect = true,
+		}
+		buttonLayoutConfig.buildunit.invisibleButton = false
+	else
+		textConfig.bottomLeft.x = "10%"
+		textConfig.bottomLeft.bottom = "10%"
+		buttonLayoutConfig.build.image = {
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
+			keepAspect = false,
+		}
+		buttonLayoutConfig.build.invisibleButton = true
+		buttonLayoutConfig.buildunit.image = {
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
+			keepAspect = false,
+		}
+		buttonLayoutConfig.buildunit.invisibleButton = true
+	end
+end
+
+local function DeleteAllButtons()
+	if statePanel.buttons then
+		statePanel.buttons.DeleteButtons()
+	end
+	if commandPanels then
+		for i = 1, #commandPanels do
+			local data = commandPanels[i]
+			if data.buttons then
+				data.buttons.DeleteButtons()
+			end
+			if data.queue then
+				data.queue.DeleteButtons()
+			end
 		end
 	end
 end
@@ -335,6 +397,15 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
+	small_icons = {
+		name = 'Small construction icons',
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetSmallIcons(self.value)
+			DeleteAllButtons()
+		end
+	},
 	applyCustomGrid = {
 		name = "Apply Changes",
 		type = 'button',
@@ -392,6 +463,12 @@ options = {
 		name = "Tab Font Size",
 		type = "number",
 		value = 14, min = 8, max = 30, step = 1,
+	},
+	buttonFontScale = {
+		name = "Button Font Scale",
+		type = "number",
+		value = 1, min = 1, max = 3, step = 0.01,
+		OnChange = DeleteAllButtons,
 	},
 	rightPadding = {
 		name = 'Right Padding',
@@ -1205,6 +1282,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		objectOverrideFont = WG.GetFont(14),
 		padding = {0, 0, 0, 0},
 		parent = parent,
+		classname = buttonLayout.noDraw and "button_hidden" or nil,
 		preserveChildrenOrder = true,
 		OnClick = {DoClick},
 	}
@@ -1246,6 +1324,16 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	end
 	if not BUTTON_BORDER_COLOR then
 		BUTTON_BORDER_COLOR = button.borderColor
+	end
+	
+	if buttonLayout.invisibleButton then
+		button.backgroundColor = {0, 0, 0, 0}
+		button.borderColor = {0, 0, 0, 0}
+		button.focusColor = {0, 0, 0, 0}
+	else
+		button.backgroundColor[4] = BUTTON_COLOR[4]
+		button.borderColor[4] = BUTTON_BORDER_COLOR[4]
+		button.focusColor[4] = BUTTON_FOCUS_COLOR[4]
 	end
 	
 	local image
@@ -1331,6 +1419,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				return
 			end
 			local config = textConfig[textPosition]
+			local fontSize = math.floor(config.fontsize*options.buttonFontScale.value + 0.5)
 			textBoxes[textPosition] = Label:New {
 				name = name .. "_text_" .. config.name,
 				x = config.x,
@@ -1339,8 +1428,8 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				bottom = config.bottom,
 				height = config.height,
 				align = config.align,
-				fontsize = config.fontsize,
-				objectOverrideFont = WG.GetFont(config.fontsize),
+				fontsize = fontSize,
+				objectOverrideFont = WG.GetFont(fontSize),
 				caption = text,
 				parent = button,
 			}
@@ -1380,15 +1469,19 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			SetImageTexture("")
 		end
 		if isDisabled then
-			button.backgroundColor = BUTTON_DISABLE_COLOR
-			button.focusColor = BUTTON_DISABLE_FOCUS_COLOR
-			button.borderColor = BUTTON_DISABLE_FOCUS_COLOR
+			if not buttonLayout.invisibleButton then
+				button.backgroundColor = BUTTON_DISABLE_COLOR
+				button.focusColor = BUTTON_DISABLE_FOCUS_COLOR
+				button.borderColor = BUTTON_DISABLE_FOCUS_COLOR
+			end
 			image.color = {0.3, 0.3, 0.3, 1}
 			externalFunctionsAndData.ClearGridHotkey()
 		else
-			button.backgroundColor = BUTTON_COLOR
-			button.focusColor = BUTTON_FOCUS_COLOR
-			button.borderColor = BUTTON_BORDER_COLOR
+			if not buttonLayout.invisibleButton then
+				button.backgroundColor = BUTTON_COLOR
+				button.focusColor = BUTTON_FOCUS_COLOR
+				button.borderColor = BUTTON_BORDER_COLOR
+			end
 			image.color = {1, 1, 1, 1}
 			if hotkeyText then
 				SetText(textConfig.topLeft.name, hotkeyText)
@@ -1398,6 +1491,15 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		button:Invalidate()
 		image:Invalidate()
 	end
+	
+	--function externalFunctionsAndData.UpdateFontSize()
+	--	for textPosition, textControl in pairs(textBoxes) do
+	--		local config = textConfig[textPosition]
+	--		textControl.font.size = math.floor(config.fontsize*options.buttonFontScale.value)
+	--		textControl:Invalidate()
+	--	end
+	--end
+	
 	
 	function externalFunctionsAndData.ApplyRadarIcon()
 		local ud = UnitDefs[-cmdID]
@@ -1641,7 +1743,8 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
-			SetImageTexture("#" .. -cmdID, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(UnitDefs[-cmdID]))
+			local texture = ((not buttonLayout.image.rectangleAspect) and WG.GetSquareBuildTexture(ud)) or WG.GetRectangleBuildTexture(ud)
+			SetImageTexture(texture, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(ud))
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
 				if cost >= 100000000 then
@@ -1907,6 +2010,10 @@ local function GetQueuePanel(parent, columns)
 		buttons.ClearOldButtons(selectionIndex)
 	end
 	
+	function externalFunctions.DeleteButtons()
+		buttons.DeleteButtons()
+	end
+
 	function externalFunctions.UpdateBuildProgress()
 		if not factoryUnitID then
 			return
@@ -2058,7 +2165,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	function externalFunctionsAndData.SetFontSize(newSize)
-		button.font.size = newSize
+		button.font = WG.GetFont(newSize)
 		button:Invalidate()
 	end
 	

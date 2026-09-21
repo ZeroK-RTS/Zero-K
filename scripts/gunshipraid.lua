@@ -37,14 +37,24 @@ local function RestoreAfterDelay ()
 	Turn (gun, x_axis, 0, math.rad(20))
 end
 
+function script.Activate()
+	Show(lfx)
+	Show(rfx)
+end
+
+function script.Deactivate()
+	Hide(lfx)
+	Hide(rfx)
+end
+
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread (TiltWings)
-	Hide (lfx)
-	Hide (rfx)
-	Hide (emit)
-	Turn (rfx, x_axis, math.rad(90))
-	Turn (lfx, x_axis, math.rad(90))
+	Hide(lfx)
+	Hide(rfx)
+	Hide(emit)
+	Turn(rfx, x_axis, math.rad(-90))
+	Turn(lfx, x_axis, math.rad(-90))
 end
 
 function script.QueryWeapon(num)

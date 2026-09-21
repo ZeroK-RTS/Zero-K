@@ -8,8 +8,8 @@ return {
 		["specularExponent"]= 30,
 		["groundSpecularColor"]= {0, 0, 0, 1},
 		["groundShadowDensity"]= 0.75,
-		["unitDiffuseColor"]= {1, 0.75, 0.80000001, 1},
-		["unitAmbientColor"]= {0.61428571, 0.34761906, 0.36190477, 1},
+		["unitDiffuseColor"]= {0.78095239, 0.71428573, 0.7095238, 1},
+		["unitAmbientColor"]= {0.70476192, 0.6047619, 0.59523809, 1},
 	},
 	["fog"]= {
 		["sunColor"]= {0.80000001, 0.80000001, 0.80000001, 1},

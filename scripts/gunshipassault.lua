@@ -35,14 +35,26 @@ function script.Create()
 	StartThread(TiltWings)
 	Turn(Lwingengine, x_axis, math.rad(-90), math.rad(500))
 	Turn(Rwingengine, x_axis, math.rad(-90), math.rad(500))
+	Hide(Rwingengine)
+	Hide(Lwingengine)
+	Hide(Rengine)
+	Hide(Lengine)
 end
 
 function script.Activate()
 	Spin(fan, y_axis, math.rad(700))
+	Show(Rwingengine)
+	Show(Lwingengine)
+	Show(Rengine)
+	Show(Lengine)
 end
 
 function script.Deactivate()
 	StopSpin(fan, y_axis, math.rad(3))
+	Hide(Rwingengine)
+	Hide(Lwingengine)
+	Hide(Rengine)
+	Hide(Lengine)
 end
 
 function script.QueryWeapon(num)

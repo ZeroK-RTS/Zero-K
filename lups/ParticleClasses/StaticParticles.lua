@@ -249,7 +249,7 @@ end
 function StaticParticles:Update(n)
 	self.frame  = self.frame + n
 	if self.sizeScaleParam then
-		self.usize = spGetUnitRulesParam(self.unit, self.sizeScaleParam)  * self.size
+		self.usize = (spGetUnitRulesParam(self.unit, self.sizeScaleParam) or 1) * self.size
 	else
 		self.usize  = self.usize + n*self.sizeGrowth -- overridden if self.sizeScaleParam
 	end
