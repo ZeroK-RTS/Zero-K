@@ -12,6 +12,8 @@
 -- expl_distortion_radius_mult = , -- why?
 -- expl_distortion_life = , life of the expl distortion?
 
+local DEBUG_MODE = false
+
 local exampleDistortion = {
 	distortionType = "point", -- or cone or beam
 	pieceName = nil, -- optional
@@ -152,26 +154,6 @@ local BaseClasses = {
 			posx = 0,
 			posy = 0,
 			posz = 0,
-			radius = 100,
-			noiseScaleSpace = 0.1,
-			noiseStrength = 0.2,
-			onlyModelMap = 0,
-			lifeTime = 4,
-			refractiveIndex = 1.04,
-			decay = 3,
-			rampUp = 1,
-			effectStrength = 3.0,
-			startRadius = 0.4,
-			shockWidth = -1.2,
-			effectType = "airShockwave",
-		},
-	},
-	ExploShockWaveS = {
-		distortionType = "point", -- or cone or beam
-		distortionConfig = {
-			posx = 0,
-			posy = 0,
-			posz = 0,
 			radius = 150,
 			noiseScaleSpace = 0.1,
 			noiseStrength = 0.2,
@@ -183,6 +165,26 @@ local BaseClasses = {
 			effectStrength = 3.0,
 			startRadius = 0.39,
 			shockWidth = -1.1,
+			effectType = "airShockwave",
+		},
+	},
+	ExploShockWaveS = {
+		distortionType = "point", -- or cone or beam
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.2,
+			noiseStrength = 0.2,
+			onlyModelMap = 0,
+			lifeTime = 5,
+			refractiveIndex = 1.06,
+			decay = 3.2,
+			rampUp = 1,
+			effectStrength = 3.2,
+			startRadius = 0.39,
+			shockWidth = -1.03,
 			effectType = "airShockwave",
 		},
 	},
@@ -309,10 +311,34 @@ local BaseClasses = {
 	},
 	
 	
-	
 	-- ZK fiddling
 	
-	ExplosionHeatNuke = { -- spawned on explosions
+	empWobble = {
+		distortionType = "point",
+		yOffset = 0,
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 200,
+			effectStrength = 0.25,
+			noiseStrength = 0.85,
+			noiseScaleSpace = 0.4,
+			distanceFalloff = 0.25,
+			onlyModelMap = 1,
+			startRadius = 0.60,
+			shockWidth = 20,
+			refractiveIndex = -1.2,
+			windAffected = -3.95,
+			riseRate = -4,
+			lifeTime = 25,
+			rampUp = 5,
+			decay = 15,
+			effectType = 0,
+		},
+	},
+	
+	ExplosionHeat = { -- spawned on explosions
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
@@ -320,15 +346,40 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
-			noiseStrength = 5,
-			noiseScaleSpace = 0.034,
-			distanceFalloff = 0.95,
+			noiseStrength = 1.2,
+			noiseScaleSpace = 0.1,
+			distanceFalloff = 0.9,
 			onlyModelMap = 0,
 			windAffected = -1,
-			effectStrength = 1.2,
-			riseRate = 1.2,
+			effectStrength = 0.2,
+			riseRate = 0.6,
 			startRadius = 0.7,
-			lifeTime = 700,
+			lifeTime = 100,
+			rampUp = 20,
+			decay = 20,
+			effectType = 0,
+		},
+	},
+	
+	
+	ExplosionHeatNuke = { -- spawned on explosions
+		distortionType = "point", -- or cone or beam
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		alwaysVisible = true,
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			noiseStrength = 1.2,
+			noiseScaleSpace = 0.05,
+			distanceFalloff = 0.9,
+			onlyModelMap = 0,
+			windAffected = -1,
+			effectStrength = 0.2,
+			riseRate = 0.6,
+			startRadius = 0.7,
+			lifeTime = 450,
 			rampUp = 120,
 			decay = 150,
 			effectType = 0,
@@ -336,6 +387,7 @@ local BaseClasses = {
 	},
 	AirShockWaveNuke = {
 		distortionType = "point", -- or cone or beam
+		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -356,6 +408,7 @@ local BaseClasses = {
 	},
 	AirShockWaveNukeLater = {
 		distortionType = "point", -- or cone or beam
+		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -376,6 +429,7 @@ local BaseClasses = {
 	},
 	GroundShockWaveNuke = {
 		distortionType = "point", -- or cone or beam
+		alwaysVisible = true,
 		alwaysVisible = false,
 		distortionConfig = {
 			posx = 0,
@@ -419,6 +473,7 @@ local BaseClasses = {
 	BlackHole = {
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
+		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -566,6 +621,28 @@ local BaseClasses = {
 			effectType = 7,
 		},
 	},
+	ShieldGunBeam = {
+		distortionType = "beam", -- or cone or beam
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			effectStrength = 0.2,
+			noiseStrength = 1.1,
+			noiseScaleSpace = 0.35,
+			onlyModelMap = 0,
+			riseRate = 2,
+			pos2x = 100,
+			pos2y = 500,
+			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
+			lifeTime = 16,
+			sustain = 5,
+			rampUp = 0,
+			decay = 2,
+			effectType = 7,
+		},
+	},
 	HeavyLaser = {
 		distortionType = "beam", -- or cone or beam
 		distortionConfig = {
@@ -590,6 +667,7 @@ local BaseClasses = {
 	ExplosionHeatFirewalker = { -- spawned on explosions
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
+		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -609,6 +687,7 @@ local BaseClasses = {
 	ExplosionHeatLong = { -- spawned on explosions
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
+		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -628,14 +707,13 @@ local BaseClasses = {
 }
 
 local SizeRadius = {
-	Quaco = 4,
-	Zetto = 7,
-	Atto = 10,
+	Quaco = 6,
+	Zetto = 8,
+	Atto = 11,
 	Banthlaser = 13,
-	Femto = 16,
-	KorgLaser = 19,
-	Pico = 26,
-	Nano = 34,
+	Femto = 28,
+	Pico = 34,
+	Nano = 40,
 	Micro = 44,
 	DGun = 50,
 	Tiniest = 60,
@@ -660,7 +738,7 @@ local SizeRadius = {
 	Planetary = 5000,
 }
 
-local globalDamageMult = Spring.GetModOptions().multiplier_weapondamage or 1
+--------------------------------------------------------------------------------
 
 local function GetClosestSizeClass(desiredsize)
 	local delta = math.huge
@@ -690,6 +768,35 @@ local function deepcopy(orig)
 	end
 	return copy
 end
+
+local currentWeaponDefID -- Evil global, only use for the debug function below
+local function MarkUnits(class, size)
+	if not currentWeaponDefID then
+		return
+	end
+	local wd = WeaponDefs[currentWeaponDefID]
+	local name = wd.name
+	local data = name:split("_")
+	local ud = data and data[1] and UnitDefNames[data[1]]
+	if not ud then
+		return
+	end
+	local units = Spring.GetTeamUnitsSorted(0)
+	Spring.Echo("units", ud.id, #units, units[ud.id])
+	local unitID = false
+	if units[ud.id] then
+		for k, v in pairs(units[ud.id]) do
+			unitID = v
+			break
+		end
+	end
+	if not unitID then
+		return
+	end
+	Spring.Utilities.UnitEcho(unitID, class .. ", " .. size)
+end
+
+
 local usedclasses = 0
 local function GetDistortionClass(baseClassname, sizekey, additionaloverrides)
 	local distortionClassKey = baseClassname .. (sizekey or "")
@@ -698,6 +805,7 @@ local function GetDistortionClass(baseClassname, sizekey, additionaloverrides)
 			distortionClassKey = distortionClassKey .. "_" .. tostring(k) .. "=" .. tostring(v)
 		end
 	end
+	MarkUnits(baseClassname, sizekey)
 
 	if distortionClasses[distortionClassKey] then
 		return distortionClasses[distortionClassKey]
@@ -739,26 +847,6 @@ local gibDistortion = {
 		effectType = 0,
 	},
 }
-
---------------------------------------------------------------------------------
-
-local muzzleFlashDistortions = {}
-local explosionDistortions = {}
-local projectileDefDistortions = {
-	default = {
-		distortionType = "point",
-		distortionConfig = {
-			posx = 0,
-			posy = 16,
-			posz = 0,
-			radius = 420,
-			lifeTime = 50,
-			sustain = 20,
-			effectType = 0,
-		},
-	},
-}
-
 -----------------------------------
 
 -- This function automatically assigns distortions to weapons for their 3 main events:
@@ -789,22 +877,53 @@ local projectileDefDistortions = {
 -- CegTag -> distortion override tables for missile thruster trails
 -- Uses MissileProjectile as base class with per-size overrides (same pattern as manual overrides)
 
+local explosionDistortionsNames = {}
+local muzzleFlashDistortionsNames = {}
+local projectileDefDistortionsNames = {}
+
+--------------------------------------------------------------------------------
+
+local function GetDamageCatIds()
+	local aaDamageCat, defaultDamageCat, shieldDamageCat
+	for cat = 0, #Game.armorTypes do
+		Spring.Echo("Game.armorTypes[cat]", Game.armorTypes[cat])
+		if Game.armorTypes[cat] == "else" then
+			defaultDamageCat = cat
+		elseif Game.armorTypes[cat] == "planes" then
+			aaDamageCat = cat
+		elseif Game.armorTypes[cat] == "shield" then
+			shieldDamageCat = cat
+		end
+	end
+	return aaDamageCat, defaultDamageCat, shieldDamageCat
+end
+
+local function IsWeaponAA(weaponDef, aaDamageCat, defaultDamageCat)
+	local aaDamage = weaponDef.damages[aaDamageCat]
+	local defaultDamage = weaponDef.damages[defaultDamageCat]
+	if not (aaDamage and defaultDamage) then
+		return false
+	end
+	Spring.Echo("defaultDamage", defaultDamage, aaDamage)
+	return (defaultDamage < aaDamage*0.11) and (defaultDamage > aaDamage*0.09)
+end
 
 local function AssignDistortionsToAllWeapons()
+	local aaDamageCat, defaultDamageCat, shieldDamageCat = GetDamageCatIds()
+
 	for weaponID = 0, #WeaponDefs do
+		currentWeaponDefID = DEBUG_MODE and weaponID
 		local weaponDef = WeaponDefs[weaponID]
+		local weaponName = weaponDef.name
 		local wcp = weaponDef.customParams
-		local damage = 100
-		for cat = 0, #weaponDef.damages do
-			if Game.armorTypes[cat] and Game.armorTypes[cat] == "default" then
-				damage = weaponDef.damages[cat]
-				break
-			end
+		local isAA = IsWeaponAA(weaponDef, aaDamageCat, defaultDamageCat)
+		local damage = weaponDef.damages[(isAA and aaDamageCat) or defaultDamageCat]
+		if weaponDef.damages[shieldDamageCat] then
+			damage = weaponDef.damages[shieldDamageCat]
 		end
+		local isStunOrDisarm = wcp.disarmdamagemult or wcp.emp_paratime
 
 		-- Start by collecting some common parameters of the weapon
-		damage = (damage / globalDamageMult) + ((damage * (globalDamageMult - 1)) * 0.25)
-
 		local projectileSpeed = weaponDef.weaponVelocity or 10
 		local weaponRange = weaponDef.range or 0
 		local areaofeffect = weaponDef.damageAreaOfEffect or 0
@@ -824,18 +943,18 @@ local function AssignDistortionsToAllWeapons()
 		elseif weaponDef.type == "BeamLaser" then
 			if wcp.timeslow_damagefactor or wcp.timeslow_onlyslow then
 				if damage < 20 then -- Weapon contains real damage by this point, so this catches onlyslow too.
-					projectileDefDistortions[weaponID] = GetDistortionClass("SlowBeam", "Atto")
+					projectileDefDistortionsNames[weaponName] = GetDistortionClass("SlowBeam", "Atto")
 				else
-					projectileDefDistortions[weaponID] = GetDistortionClass("DisruptorBeam", "Atto")
+					projectileDefDistortionsNames[weaponName] = GetDistortionClass("DisruptorBeam", "Atto")
 				end
 			elseif damage > 2500 then
-				projectileDefDistortions[weaponID] = GetDistortionClass("HeavyLaser", "Banthlaser")
+				projectileDefDistortionsNames[weaponName] = GetDistortionClass("HeavyLaser", "Banthlaser")
 			elseif damage > 800 then
-				projectileDefDistortions[weaponID] = GetDistortionClass("HeavyLaser", "Atto")
+				projectileDefDistortionsNames[weaponName] = GetDistortionClass("HeavyLaser", "Atto")
 			end
 		elseif weaponDef.type == "DGun" then
 			sizeclass = "DGun"
-			projectileDefDistortions[weaponID] = GetDistortionClass("DgunProjectile", "Micro")
+			projectileDefDistortionsNames[weaponName] = GetDistortionClass("DgunProjectile", "Micro")
 		end
 
 		-- Add a muzzle flash if needed:
@@ -843,47 +962,55 @@ local function AssignDistortionsToAllWeapons()
 		elseif areaofeffect > 60 and damage > 500 then
 			local size = weaponRange > 2500 and "Tiniest" or "KorgLaser"
 			local class = weaponRange > 2500 and "MuzzleShockWaveXL" or "MuzzleShockWave"
-			muzzleFlashDistortions[weaponID] = {
+			muzzleFlashDistortionsNames[weaponName] = {
 				GetDistortionClass(class, size),
 			}
 		end
 
-		-- Add explosiondistortions if needed:
+		-- Add explosion distortions if needed:
 		if wcp.lups_noshockwave then
 		elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and wcp.nofriendlyfire then
 			Spring.Echo("weaponDefweaponDefweaponDef", weaponDef.name,  GetClosestSizeClass(effectiveRangeExplo))
-			explosionDistortions[weaponID] = {
+			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("DisruptionPulse", GetClosestSizeClass(effectiveRangeExplo)),
 			}
 		elseif weaponDef.type == "DGun" then
-			explosionDistortions[weaponID] = {
+			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("DgunImplosion", "Micro"),
 			}
 		elseif weaponDef.type == "TorpedoLauncher" then
-			explosionDistortions[weaponID] = {
+			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius)),
 			}
 		elseif weaponDef.type == "AircraftBomb" then
-			explosionDistortions[weaponID] = {
+			explosionDistortionsNames[weaponName] = {
 				GetDistortionClass("FireExplosionHeat", "SmallMedium"),
 			}
-		elseif effectiveRangeExplo > 10 then
+		else
 			local distortionClass
-			if effectiveRangeExplo < 24 then
-				distortionClass = "ExploShockWaveXS"
-			elseif effectiveRangeExplo < 48 then
-				distortionClass = "ExploShockWaveS"
-			elseif effectiveRangeExplo < 92 then
-				distortionClass = "ExploShockWaveM"
-			elseif effectiveRangeExplo < 184 then
-				distortionClass = "ExploShockWaveL"
-			else
+			if effectiveRangeExplo > 184 then
 				distortionClass = "ExploShockWaveXL"
+			elseif effectiveRangeExplo > 92 then
+				distortionClass = "ExploShockWaveL"
+			elseif effectiveRangeExplo > 48 then
+				distortionClass = "ExploShockWaveM"
+			elseif effectiveRangeExplo > 24 then
+				distortionClass = "ExploShockWaveS"
+			elseif effectiveRangeExplo > 10 then
+				distortionClass = "ExploShockWaveXS"
 			end
 			if distortionClass then
-				explosionDistortions[weaponID] = {
-					GetDistortionClass(distortionClass, GetClosestSizeClass(effectiveRangeExplo))
+				local adjRadius = math.max(40, effectiveRangeExplo*1.2)
+				if isAA then
+					adjRadius = adjRadius*0.6
+				end
+				local distorts = {
+					GetDistortionClass(distortionClass, GetClosestSizeClass(adjRadius))
 				}
+				if isStunOrDisarm then
+					distorts[#distorts + 1] = GetDistortionClass("empWobble", GetClosestSizeClass(adjRadius * 1.2))
+				end
+				explosionDistortionsNames[weaponName] = distorts
 			end
 		end
 	end
@@ -892,15 +1019,16 @@ end
 AssignDistortionsToAllWeapons() -- disable this if it doesn't work
 
 -----------------Manual Overrides--------------------
-local explosionDistortionsNames = {}
-local muzzleFlashDistortionsNames = {}
-local projectileDefDistortionsNames = {}
 
 projectileDefDistortionsNames.jumpblackhole_black_hole = GetDistortionClass("BlackHole", "Micro")
 
-explosionDistortionsNames.jumpblackhole_black_hole = {
-	GetDistortionClass("BlackHole", "Small")
-}
+projectileDefDistortionsNames.shieldfelon_shieldgun = GetDistortionClass("ShieldGunBeam", "Atto")
+
+explosionDistortionsNames.shieldbomb_shieldbomb_death = explosionDistortionsNames.shieldbomb_shieldbomb_death or {}
+explosionDistortionsNames.shieldbomb_shieldbomb_death[#explosionDistortionsNames.shieldbomb_shieldbomb_death + 1] = GetDistortionClass("ExplosionHeat", "Medium")
+
+explosionDistortionsNames.jumpblackhole_black_hole = explosionDistortionsNames.jumpblackhole_black_hole or {}
+explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
 
 explosionDistortionsNames.bomberheavy_arm_pidr = {
 	GetDistortionClass("Implosion", "Medium")
@@ -931,6 +1059,26 @@ explosionDistortionsNames.staticnuke_crblmssl = {
 	GetDistortionClass("GroundShockWaveNuke", "Nuke"),
 }
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local muzzleFlashDistortions = {}
+local explosionDistortions = {}
+local projectileDefDistortions = {
+	default = {
+		distortionType = "point",
+		distortionConfig = {
+			posx = 0,
+			posy = 16,
+			posz = 0,
+			radius = 420,
+			lifeTime = 50,
+			sustain = 20,
+			effectType = 0,
+		},
+	},
+}
+
 -- convert weaponname -> weaponDefID
 for name, distortionList in pairs(explosionDistortionsNames) do
 	if WeaponDefNames[name] then
@@ -958,6 +1106,7 @@ projectileDefDistortionsNames = nil
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Projectile Collection
+
 return {
 	muzzleFlashDistortions = muzzleFlashDistortions,
 	projectileDefDistortions = projectileDefDistortions,

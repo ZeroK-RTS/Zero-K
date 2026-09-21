@@ -555,11 +555,11 @@ local function give(cmd,line,words,player)
 	--Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
-local function IncrementPosition(x, z, xMin, xMax, increment)
-	x = x + increment
-	if x > xMax then
-		x = xMin
-		z = z + increment * 3
+local function IncrementPosition(x, z, zMin, zMax, increment)
+	z = z + increment
+	if z > zMax then
+		z = zMin
+		x = x + increment * 3
 	end
 	return x, z
 end
@@ -575,7 +575,7 @@ local function giveSpread(cmd,line,words,player)
 	local buildlist = UnitDefNames["armcom1"].buildOptions
 	local INCREMENT = 128
 	local orderUnit = {}
-	local baseOffX, baseOffZ, limitX = 200, 2000, 3300
+	local baseOffX, baseOffZ, limitZ = 200, 2000, 4800
 	local cX, cZ = baseOffX, baseOffZ
 	
 	for i = 1, #buildlist do
@@ -584,7 +584,7 @@ local function giveSpread(cmd,line,words,player)
 		if not ud.customParams.child_of_factory then
 			local y = Spring.GetGroundHeight(cX, cZ)
 			local unitID = Spring.CreateUnit(udid, cX, y, cZ, 0, 0, build)
-			cX, cZ = IncrementPosition(cX, cZ, baseOffX, limitX, INCREMENT)
+			cX, cZ = IncrementPosition(cX, cZ, baseOffZ, limitZ, INCREMENT)
 			if build then
 				SetupNanoUnit(unitID, nanoAmount)
 			end
@@ -595,7 +595,7 @@ local function giveSpread(cmd,line,words,player)
 					local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
 					y = Spring.GetGroundHeight(cX, cZ)
 					local subUnitID = Spring.CreateUnit(subUdid, cX, y, cZ, 0, 0, build)
-					cX, cZ = IncrementPosition(cX, cZ, baseOffX, limitX, INCREMENT)
+					cX, cZ = IncrementPosition(cX, cZ, baseOffZ, limitZ, INCREMENT)
 					if build then
 						SetupNanoUnit(subUnitID, nanoAmount)
 					end
@@ -606,7 +606,7 @@ local function giveSpread(cmd,line,words,player)
 					local subUdid = sublist[j]
 					y = Spring.GetGroundHeight(cX, cZ)
 					local subUnitID = Spring.CreateUnit(subUdid, cX, y, cZ, 0, 0, build)
-					cX, cZ = IncrementPosition(cX, cZ, baseOffX, limitX, INCREMENT)
+					cX, cZ = IncrementPosition(cX, cZ, baseOffZ, limitZ, INCREMENT)
 					--local ud = UnitDefs[subUdid]
 					--Spring.Echo(ud.humanName .. "\t" .. ud.speed .. "\t" .. ud.maxWeaponRange  .. "\t" .. (ud.health / ud.buildTime))
 					if build then
