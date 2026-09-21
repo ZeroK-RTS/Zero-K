@@ -614,6 +614,7 @@ local BaseClasses = {
 			noiseScaleSpace = 0.24,
 			onlyModelMap = 0,
 			riseRate = -0.1,
+			distanceFalloff = 0.5,
 			pos2x = 100,
 			pos2y = 500,
 			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
@@ -635,6 +636,7 @@ local BaseClasses = {
 			noiseScaleSpace = 0.03,
 			onlyModelMap = 0,
 			riseRate = -0.1,
+			distanceFalloff = 0.5,
 			pos2x = 100,
 			pos2y = 500,
 			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
@@ -655,6 +657,7 @@ local BaseClasses = {
 			effectStrength = 0.2,
 			noiseStrength = 1.1,
 			noiseScaleSpace = 0.35,
+			distanceFalloff = 0.5,
 			onlyModelMap = 0,
 			riseRate = -3.4,
 			pos2x = 100,
@@ -748,6 +751,27 @@ local BaseClasses = {
 			lifeTime = 1350,
 			rampUp = 30,
 			decay = 600,
+			effectType = 0,
+		},
+	},
+	ThermiteHeat = { 
+		distortionType = "point",
+		yOffset = 20,
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			effectStrength = 0.4,
+			noiseStrength = 0.8,
+			noiseScaleSpace = 0.6,
+			distanceFalloff = 0.7,
+			startRadius = 0.3,
+			onlyModelMap = 0,
+			riseRate = 0.8,
+			lifeTime = 2,
+			rampUp = 0,
+			decay = 0,
 			effectType = 0,
 		},
 	},
@@ -967,6 +991,7 @@ local function AssignDistortionsToAllWeapons()
 		local radius = ((areaofeffect * 0.7) + (areaofeffect * weaponDef.edgeEffectiveness * 1.1))
 		local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
 		local rapidFire = weaponDef.reload < 0.6
+		Spring.Echo(weaponDef.name, weaponRange)
 
 		local sizeclass = GetClosestSizeClass(radius)
 		local overrideTable = {}
@@ -981,7 +1006,8 @@ local function AssignDistortionsToAllWeapons()
 				if damage < 20 then -- Weapon contains real damage by this point, so this catches onlyslow too.
 					projectileDefDistortionsNames[weaponName] = GetDistortionClass("SlowBeam", "Atto")
 				else
-					projectileDefDistortionsNames[weaponName] = GetDistortionClass("DisruptorBeam", "Atto")
+					local size = weaponRange > 250 and "Atto" or "Zetto"
+					projectileDefDistortionsNames[weaponName] = GetDistortionClass("DisruptorBeam", size)
 				end
 			elseif damage > 2500 then
 				projectileDefDistortionsNames[weaponName] = GetDistortionClass("HeavyLaser", "Banthlaser")
@@ -1029,7 +1055,7 @@ local function AssignDistortionsToAllWeapons()
 				distortionClass = "ExploShockWaveL"
 			elseif effectiveRangeExplo > 60 then
 				distortionClass = "ExploShockWaveM"
-			elseif effectiveRangeExplo > 24 then
+			elseif effectiveRangeExplo > 24 or wcp.death_explosion then
 				distortionClass = "ExploShockWaveS"
 			elseif effectiveRangeExplo > 10 or weaponDef.type == "Cannon" and weaponRange > 100 then
 				distortionClass = "ExploShockWaveXS"
@@ -1056,6 +1082,7 @@ local function AssignDistortionsToAllWeapons()
 					local empSize = adjRadius * ((stunTime or 0) > 8 and 1 or 1.2)
 					distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(empSize), strength)
 				end
+				Spring.Echo(weaponDef.name, distortionClass, adjRadius)
 				explosionDistortionsNames[weaponName] = distorts
 			end
 		end
@@ -1078,6 +1105,13 @@ explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.ju
 
 explosionDistortionsNames.cloaksnipe_shockrifle = {
 	GetDistortionClass("ExploShockWaveM", "Tiny")
+}
+explosionDistortionsNames.vehheavyarty_cortruck_missile = {
+	GetDistortionClass("ExploShockWaveS", "Nano")
+}
+
+explosionDistortionsNames.bomberassault_thermite_bomb = {
+	GetDistortionClass("ThermiteHeat", "Pico")
 }
 
 explosionDistortionsNames.bomberheavy_arm_pidr = {
