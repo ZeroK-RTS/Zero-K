@@ -158,7 +158,7 @@ local BaseClasses = {
 			distanceFalloff = 0.85,
 			noiseStrength = 0.7,
 			noiseScaleSpace = 0.7,
-			lifeTime = 24,
+			lifeTime = 18,
 			decay = 12,
 			rampUp = 5,
 			onlyModelMap = 1,
@@ -425,7 +425,7 @@ local BaseClasses = {
 			rampUp = 120,
 			decay = 150,
 			effectType = 0,
-		},
+		}, 
 	},
 	AirShockWaveNuke = {
 		distortionType = "point",
@@ -876,10 +876,11 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
+			effectStrength = 1.1,
 			noiseStrength = 1.1,
 			noiseScaleSpace = 0.65,
 			distanceFalloff = 0.5,
-			startRadius = 0.3,
+			startRadius = 0.8,
 			onlyModelMap = 0,
 			lifeTime = 1350,
 			rampUp = 30,
@@ -1200,7 +1201,9 @@ local function AssignWeaponDistortions(weaponID)
 		}
 	else
 		local distortionClass
-		if effectiveRangeExplo > 184 then
+		if effectiveRangeExplo > 600 then
+			distortionClass = "AirShockWaveNuke"
+		elseif effectiveRangeExplo > 184 then
 			distortionClass = "ExploShockWaveXL"
 		elseif effectiveRangeExplo > 92 then
 			distortionClass = "ExploShockWaveL"
@@ -1208,7 +1211,7 @@ local function AssignWeaponDistortions(weaponID)
 			distortionClass = "ExploShockWaveM"
 		elseif effectiveRangeExplo > 24 or wcp.death_explosion then
 			distortionClass = "ExploShockWaveS"
-		elseif effectiveRangeExplo > 10 or weaponDef.type == "Cannon" and weaponRange > 100 then
+		elseif effectiveRangeExplo > 10 or ((weaponDef.type == "Cannon" or weaponDef.type == "MissileLauncher") and weaponRange > 100) then
 			distortionClass = "ExploShockWaveXS"
 		end
 		if distortionClass then
@@ -1227,6 +1230,8 @@ local function AssignWeaponDistortions(weaponID)
 			end
 			if weaponRange > 2200 and weaponDef.type == "StarburstLauncher" then
 				adjRadius = adjRadius*1.7
+			elseif wcp.death_explosion and damage > 1000 then
+				adjRadius = adjRadius*1.5
 			end
 			local distorts = {
 				GetDistortionClass(distortionClass, GetClosestSizeClass(adjRadius), strength)
@@ -1314,9 +1319,12 @@ explosionDistortionsNames.bomberheavy_arm_pidr = {
 	GetDistortionClass("ImplosionBomb", "Medium")
 }
 
-explosionDistortionsNames.spidercrabe_arm_crabe_gauss = {
-	GetDistortionClass("GroundShockWave", "Smallish"),
-}
+explosionDistortionsNames.spidercrabe_arm_crabe_gauss = explosionDistortionsNames.spidercrabe_arm_crabe_gauss or {}
+explosionDistortionsNames.spidercrabe_arm_crabe_gauss[#explosionDistortionsNames.spidercrabe_arm_crabe_gauss + 1] = GetDistortionClass("GroundShockWave", "Smallish")
+
+explosionDistortionsNames.turretheavy_plasma = explosionDistortionsNames.turretheavy_plasma or {}
+explosionDistortionsNames.turretheavy_plasma[#explosionDistortionsNames.turretheavy_plasma + 1] = GetDistortionClass("GroundShockWave", "Small")
+
 explosionDistortionsNames.jumparty_napalm_sprayer = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
 }
@@ -1328,6 +1336,10 @@ explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
 }
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
+}
+explosionDistortionsNames.missileslow_weapon = {
+	GetDistortionClass("SlowDamageImplosion", "Smallest", 5, 3),
+	GetDistortionClass("DisruptionPulse", "Large", 2, 2),
 }
 
 explosionDistortionsNames.staticnuke_crblmssl = {
