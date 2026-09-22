@@ -147,6 +147,27 @@ local BaseClasses = {
 			effectType = "airShockwave",
 		},
 	},
+	GroundShockWaveLanding = {
+		distortionType = "point",
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 200,
+			effectStrength = 1.6,
+			distanceFalloff = 0.85,
+			noiseStrength = 0.7,
+			noiseScaleSpace = 0.7,
+			lifeTime = 24,
+			decay = 12,
+			rampUp = 5,
+			onlyModelMap = 1,
+			shockWidth = 1.3,
+			refractiveIndex = -1.2,
+			startRadius = 0.2,
+			effectType = "groundShockwave",
+		},
+	},
 
 	ExploShockWaveXS = {
 		distortionType = "point",
@@ -326,8 +347,8 @@ local BaseClasses = {
 			startRadius = 0.60,
 			shockWidth = 20,
 			refractiveIndex = -1.2,
-			windAffected = -3.95,
-			riseRate = -4,
+			windAffected = -2.95,
+			riseRate = -2,
 			lifeTime = 30,
 			rampUp = 5,
 			decay = 15,
@@ -343,16 +364,16 @@ local BaseClasses = {
 			posz = 0,
 			radius = 200,
 			effectStrength = 0.25,
-			noiseStrength = 0.85,
-			noiseScaleSpace = 0.1,
+			noiseStrength = 0.95,
+			noiseScaleSpace = 0.11,
 			distanceFalloff = 0.25,
 			onlyModelMap = 1,
 			startRadius = 0.60,
 			shockWidth = 20,
-			refractiveIndex = -1.2,
-			windAffected = -3.95,
-			riseRate = -3.6,
-			lifeTime = 160,
+			refractiveIndex = -1.34,
+			windAffected = -1.8,
+			riseRate = -2,
+			lifeTime = 200,
 			rampUp = 5,
 			decay = 120,
 			effectType = 0,
@@ -535,7 +556,7 @@ local BaseClasses = {
 			effectType = 0,
 		},
 	},
-	Implosion = { 
+	ImplosionBomb = { 
 		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
@@ -546,14 +567,14 @@ local BaseClasses = {
 			noiseScaleSpace = 0.2,
 			noiseStrength = 0.2,
 			onlyModelMap = 0,
-			lifeTime = 13,
-			distanceFalloff = 0.6,
-			refractiveIndex = 1.5,
-			decay = 2,
-			rampUp = 4,
-			effectStrength = -1.5,
+			lifeTime = 14,
+			distanceFalloff = 0.95,
+			refractiveIndex = 1.3,
+			decay = 6,
+			rampUp = 5,
+			effectStrength = -1.4,
 			startRadius = 0.2,
-			shockWidth = -0.64,
+			shockWidth = 0.9,
 			effectType = "airShockwave",
 		},
 	},
@@ -587,17 +608,17 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 150,
-			noiseScaleSpace = 0.2,
-			noiseStrength = 0.2,
+			noiseScaleSpace = 0.8,
+			noiseStrength = 1.2,
 			onlyModelMap = 0,
-			lifeTime = 7,
-			distanceFalloff = 0.6,
+			lifeTime = 11,
+			distanceFalloff = 0.8,
 			refractiveIndex = 1.045,
 			decay = 2,
 			rampUp = 3,
-			effectStrength = -0.9,
-			startRadius = 0.2,
-			shockWidth = 0.92,
+			effectStrength = -0.25,
+			startRadius = 0.6,
+			shockWidth = 0.8,
 			effectType = "airShockwave",
 		},
 	},
@@ -894,6 +915,7 @@ local SizeRadius = {
 	Zetto = 9.5,
 	Atto = 11,
 	Banthlaser = 13,
+	Femtoest = 19,
 	Femto = 28,
 	Pico = 34,
 	Nano = 40,
@@ -906,7 +928,8 @@ local SizeRadius = {
 	Small = 140,
 	Smallish = 165,
 	SmallMedium = 180,
-	Medium = 220,
+	Medium = 215,
+	Mediumish = 235,
 	Mediumer = 260,
 	MediumLarge = 320,
 	Large = 400,
@@ -1100,7 +1123,7 @@ local function AssignWeaponDistortions(weaponID)
 		damage = math.max(damage, weaponDef.damages[shieldDamageCat])
 	end
 	local isStunOrDisarm = wcp.disarmdamagemult or wcp.emp_paratime
-	local stunTime = wcp.emp_paratime and tonumber(wcp.emp_paratime) or wcp.disarmTimer and tonumber(wcp.disarmTimer)
+	local stunTime = wcp.emp_paratime and tonumber(wcp.emp_paratime) or wcp.disarmtimer and tonumber(wcp.disarmtimer)
 
 	-- Start by collecting some common parameters of the weapon
 	local projectileSpeed = weaponDef.weaponVelocity or 10
@@ -1144,9 +1167,9 @@ local function AssignWeaponDistortions(weaponID)
 	end
 
 	-- Add a muzzle flash if needed:
-	if wcp.lups_noshockwave or wcp.no_muzzleshock then
-	elseif areaofeffect > 60 and damage > 500 then
-		local size = weaponRange > 2500 and "Tiniest" or "Smallest"
+	if wcp.lups_noshockwave or wcp.no_muzzleshock or isStunOrDisarm then
+	elseif areaofeffect > 45 and damage > 500 and weaponDef.type == "Cannon" then
+		local size = weaponRange > 2500 and "Tiniest" or "Femtoest"
 		local class = weaponRange > 2500 and "MuzzleShockWaveXL" or "MuzzleShockWave"
 		muzzleFlashDistortionsNames[weaponName] = {
 			GetDistortionClass(class, size),
@@ -1159,17 +1182,17 @@ local function AssignWeaponDistortions(weaponID)
 		explosionDistortionsNames[weaponName] = {
 			GetDistortionClass("DisruptionPulse", GetClosestSizeClass(effectiveRangeExplo)),
 		}
+	elseif weaponDef.type == "TorpedoLauncher" then
+		explosionDistortionsNames[weaponName] = {
+			GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius)),
+		}
 	elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and not noExplodeEffect then
 		explosionDistortionsNames[weaponName] = {
-			GetDistortionClass("SlowDamageImplosion", "Femto"),
+			GetDistortionClass("SlowDamageImplosion", GetClosestSizeClass(math.max(25, effectiveRangeExplo)*1.2)),
 		}
 	elseif weaponDef.type == "DGun" then
 		explosionDistortionsNames[weaponName] = {
 			GetDistortionClass("DgunImplosion", "Micro"),
-		}
-	elseif weaponDef.type == "TorpedoLauncher" then
-		explosionDistortionsNames[weaponName] = {
-			GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius)),
 		}
 	elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
 		explosionDistortionsNames[weaponName] = {
@@ -1202,11 +1225,14 @@ local function AssignWeaponDistortions(weaponID)
 				adjRadius = adjRadius*0.8
 				strength = 0.4
 			end
+			if weaponRange > 2200 and weaponDef.type == "StarburstLauncher" then
+				adjRadius = adjRadius*1.7
+			end
 			local distorts = {
 				GetDistortionClass(distortionClass, GetClosestSizeClass(adjRadius), strength)
 			}
 			if isStunOrDisarm then
-				local empClass = (stunTime or 0) > 8 and "empWobbleLong" or "empWobble"
+				local empClass = ((stunTime or 0) > 8 and burstMult < 10 and "empWobbleLong") or "empWobble"
 				local empSize = adjRadius * ((stunTime or 0) > 8 and 1 or 1.2)
 				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(empSize), strength)
 			end
@@ -1250,7 +1276,7 @@ explosionDistortionsNames.energysingu_singularity = {
 }
 
 explosionDistortionsNames.jumpbomb_jumpbomb_death = {
-	GetDistortionClass("ExploShockWaveL", "Smallish")
+	GetDistortionClass("ExploShockWaveL", "SmallMedium")
 }
 
 explosionDistortionsNames.tankriot_tawf_banisher = {
@@ -1262,6 +1288,12 @@ explosionDistortionsNames.bomberprec_bombsabot = {
 }
 explosionDistortionsNames.tankheavyassault_cor_gol = {
 	GetDistortionClass("ExploShockWaveM", "Tiny", 1.8)
+}
+explosionDistortionsNames.jumpsumo_landing = {
+	GetDistortionClass("GroundShockWaveLanding", "SmallMedium")
+}
+explosionDistortionsNames.striderdetriment_landing = {
+	GetDistortionClass("GroundShockWaveLanding", "Mediumer", 1.8)
 }
 
 explosionDistortionsNames.jumpraid_pyro_death = explosionDistortionsNames.jumpraid_pyro_death or {}
@@ -1279,13 +1311,19 @@ explosionDistortionsNames.bomberassault_thermite_bomb = {
 }
 
 explosionDistortionsNames.bomberheavy_arm_pidr = {
-	GetDistortionClass("Implosion", "Medium")
+	GetDistortionClass("ImplosionBomb", "Medium")
 }
 
 explosionDistortionsNames.spidercrabe_arm_crabe_gauss = {
 	GetDistortionClass("GroundShockWave", "Smallish"),
 }
 explosionDistortionsNames.jumparty_napalm_sprayer = {
+	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
+}
+explosionDistortionsNames.striderdante_napalm_rockets = {
+	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
+}
+explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
 }
 explosionDistortionsNames.napalmmissile_weapon = {
