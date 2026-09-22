@@ -12,7 +12,7 @@
 -- expl_distortion_radius_mult = , -- why?
 -- expl_distortion_life = , life of the expl distortion?
 
-local DEBUG_MODE = false
+local DEBUG_MODE = true
 
 local exampleDistortion = {
 	distortionType = "point", -- or cone or beam
@@ -1075,8 +1075,9 @@ local function GetDamageCatIds()
 	end
 	return aaDamageCat, defaultDamageCat, shieldDamageCat
 end
+local aaDamageCat, defaultDamageCat, shieldDamageCat = GetDamageCatIds()
 
-local function IsWeaponAA(weaponDef, aaDamageCat, defaultDamageCat)
+local function IsWeaponAA(weaponDef)
 	local aaDamage = weaponDef.damages[aaDamageCat]
 	local defaultDamage = weaponDef.damages[defaultDamageCat]
 	if not (aaDamage and defaultDamage) then
@@ -1085,134 +1086,139 @@ local function IsWeaponAA(weaponDef, aaDamageCat, defaultDamageCat)
 	return (defaultDamage < aaDamage*0.11) and (defaultDamage > aaDamage*0.09)
 end
 
+local function AssignWeaponDistortions(weaponID)
+	currentWeaponDefID = DEBUG_MODE and weaponID
+	local weaponDef = WeaponDefs[weaponID]
+	local weaponName = weaponDef.name
+	if string.find(weaponName, "bogus") or string.find(weaponName, "fake") then
+		return
+	end
+	local wcp = weaponDef.customParams
+	local isAA = IsWeaponAA(weaponDef)
+	local damage = weaponDef.damages[(isAA and aaDamageCat) or defaultDamageCat]
+	if weaponDef.damages[shieldDamageCat] then
+		damage = math.max(damage, weaponDef.damages[shieldDamageCat])
+	end
+	local isStunOrDisarm = wcp.disarmdamagemult or wcp.emp_paratime
+	local stunTime = wcp.emp_paratime and tonumber(wcp.emp_paratime) or wcp.disarmTimer and tonumber(wcp.disarmTimer)
+
+	-- Start by collecting some common parameters of the weapon
+	local projectileSpeed = weaponDef.weaponVelocity or 10
+	local weaponRange = weaponDef.range or 0
+	local areaofeffect = weaponDef.damageAreaOfEffect or 0
+	local radius = ((areaofeffect * 0.7) + (areaofeffect * weaponDef.edgeEffectiveness * 1.1))
+	local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
+	local burstMult = tonumber(wcp.statsprojectiles) or ((tonumber(wcp.script_burst) or weaponDef.salvoSize) * weaponDef.projectiles)
+	local rapidFire = weaponDef.reload < 0.6 or (weaponDef.reload < 8 and burstMult > 5)
+
+	local sizeclass = GetClosestSizeClass(radius)
+	local overrideTable = {}
+	local noExplodeEffect = false
+
+	-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
+	if wcp.lups_noshockwave then
+	elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
+		projectileDefDistortionsNames[weaponName] = GetDistortionClass("GaussProjectile", "Pico")
+	elseif wcp.setunitsonfire and weaponDef.type == "LaserCannon" then -- Flamethrower
+		projectileDefDistortionsNames[weaponName] = GetDistortionClass("FlameProjectile", "Smaller")
+	elseif weaponDef.type == "LightningCannon" then
+		local lightningWidth = (weaponRange > 200 or stunTime > 5) and "Banthlaser" or "Quaco"
+		projectileDefDistortionsNames[weaponName] = GetDistortionClass("LightningBeam", lightningWidth)
+	elseif weaponDef.type == "BeamLaser" then
+		if wcp.timeslow_damagefactor or wcp.timeslow_onlyslow then
+			noExplodeEffect = true
+			if damage < 20 then -- Weapon contains real damage by this point, so this catches onlyslow too.
+				projectileDefDistortionsNames[weaponName] = GetDistortionClass("SlowBeam", "Atto")
+			else
+				local size = weaponRange > 250 and "Atto" or "Quaco"
+				projectileDefDistortionsNames[weaponName] = GetDistortionClass("DisruptorBeam", size)
+			end
+		elseif damage > 2500 then
+			projectileDefDistortionsNames[weaponName] = GetDistortionClass("HeavyLaser", "Banthlaser")
+		elseif damage > 700 then
+			projectileDefDistortionsNames[weaponName] = GetDistortionClass("MediumLaser", "Zetto")
+		end
+	elseif weaponDef.type == "DGun" then
+		sizeclass = "DGun"
+		projectileDefDistortionsNames[weaponName] = GetDistortionClass("DgunProjectile", "Micro")
+	end
+
+	-- Add a muzzle flash if needed:
+	if wcp.lups_noshockwave or wcp.no_muzzleshock then
+	elseif areaofeffect > 60 and damage > 500 then
+		local size = weaponRange > 2500 and "Tiniest" or "Smallest"
+		local class = weaponRange > 2500 and "MuzzleShockWaveXL" or "MuzzleShockWave"
+		muzzleFlashDistortionsNames[weaponName] = {
+			GetDistortionClass(class, size),
+		}
+	end
+
+	-- Add explosion distortions if needed:
+	if wcp.lups_noshockwave then
+	elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and wcp.nofriendlyfire then
+		explosionDistortionsNames[weaponName] = {
+			GetDistortionClass("DisruptionPulse", GetClosestSizeClass(effectiveRangeExplo)),
+		}
+	elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and not noExplodeEffect then
+		explosionDistortionsNames[weaponName] = {
+			GetDistortionClass("SlowDamageImplosion", "Femto"),
+		}
+	elseif weaponDef.type == "DGun" then
+		explosionDistortionsNames[weaponName] = {
+			GetDistortionClass("DgunImplosion", "Micro"),
+		}
+	elseif weaponDef.type == "TorpedoLauncher" then
+		explosionDistortionsNames[weaponName] = {
+			GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius)),
+		}
+	elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
+		explosionDistortionsNames[weaponName] = {
+			GetDistortionClass("FireExplosionHeat", "SmallMedium"),
+		}
+	else
+		local distortionClass
+		if effectiveRangeExplo > 184 then
+			distortionClass = "ExploShockWaveXL"
+		elseif effectiveRangeExplo > 92 then
+			distortionClass = "ExploShockWaveL"
+		elseif effectiveRangeExplo > 60 then
+			distortionClass = "ExploShockWaveM"
+		elseif effectiveRangeExplo > 24 or wcp.death_explosion then
+			distortionClass = "ExploShockWaveS"
+		elseif effectiveRangeExplo > 10 or weaponDef.type == "Cannon" and weaponRange > 100 then
+			distortionClass = "ExploShockWaveXS"
+		end
+		if distortionClass then
+			local adjRadius = math.max(36, effectiveRangeExplo + 8)
+			local strength = 1
+			if effectiveRangeExplo < 10 then
+				effectiveRangeExplo = 24
+			end
+			if isAA then
+				adjRadius = adjRadius*0.7
+				strength = 0.9
+			end
+			if rapidFire then
+				adjRadius = adjRadius*0.8
+				strength = 0.4
+			end
+			local distorts = {
+				GetDistortionClass(distortionClass, GetClosestSizeClass(adjRadius), strength)
+			}
+			if isStunOrDisarm then
+				local empClass = (stunTime or 0) > 8 and "empWobbleLong" or "empWobble"
+				local empSize = adjRadius * ((stunTime or 0) > 8 and 1 or 1.2)
+				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(empSize), strength)
+			end
+			Spring.Echo(weaponDef.name, distortionClass, adjRadius)
+			explosionDistortionsNames[weaponName] = distorts
+		end
+	end
+end
+
 local function AssignDistortionsToAllWeapons()
-	local aaDamageCat, defaultDamageCat, shieldDamageCat = GetDamageCatIds()
-
 	for weaponID = 0, #WeaponDefs do
-		currentWeaponDefID = DEBUG_MODE and weaponID
-		local weaponDef = WeaponDefs[weaponID]
-		local weaponName = weaponDef.name
-		local wcp = weaponDef.customParams
-		local isAA = IsWeaponAA(weaponDef, aaDamageCat, defaultDamageCat)
-		local damage = weaponDef.damages[(isAA and aaDamageCat) or defaultDamageCat]
-		if weaponDef.damages[shieldDamageCat] then
-			damage = math.max(damage, weaponDef.damages[shieldDamageCat])
-		end
-		local isStunOrDisarm = wcp.disarmdamagemult or wcp.emp_paratime
-		local stunTime = wcp.emp_paratime and tonumber(wcp.emp_paratime) or wcp.disarmTimer and tonumber(wcp.disarmTimer)
-
-		-- Start by collecting some common parameters of the weapon
-		local projectileSpeed = weaponDef.weaponVelocity or 10
-		local weaponRange = weaponDef.range or 0
-		local areaofeffect = weaponDef.damageAreaOfEffect or 0
-		local radius = ((areaofeffect * 0.7) + (areaofeffect * weaponDef.edgeEffectiveness * 1.1))
-		local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
-		local burstMult = tonumber(wcp.statsprojectiles) or ((tonumber(wcp.script_burst) or weaponDef.salvoSize) * weaponDef.projectiles)
-		local rapidFire = weaponDef.reload < 0.6 or (weaponDef.reload < 8 and burstMult > 5)
-
-		local sizeclass = GetClosestSizeClass(radius)
-		local overrideTable = {}
-		local noExplodeEffect = false
-
-		-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
-		if wcp.lups_noshockwave then
-		elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
-			projectileDefDistortionsNames[weaponName] = GetDistortionClass("GaussProjectile", "Pico")
-		elseif wcp.setunitsonfire and weaponDef.type == "LaserCannon" then -- Flamethrower
-			projectileDefDistortionsNames[weaponName] = GetDistortionClass("FlameProjectile", "Smaller")
-		elseif weaponDef.type == "LightningCannon" then
-			local lightningWidth = (weaponRange > 200 or stunTime > 5) and "Banthlaser" or "Quaco"
-			projectileDefDistortionsNames[weaponName] = GetDistortionClass("LightningBeam", lightningWidth)
-		elseif weaponDef.type == "BeamLaser" then
-			if wcp.timeslow_damagefactor or wcp.timeslow_onlyslow then
-				noExplodeEffect = true
-				if damage < 20 then -- Weapon contains real damage by this point, so this catches onlyslow too.
-					projectileDefDistortionsNames[weaponName] = GetDistortionClass("SlowBeam", "Atto")
-				else
-					local size = weaponRange > 250 and "Atto" or "Quaco"
-					projectileDefDistortionsNames[weaponName] = GetDistortionClass("DisruptorBeam", size)
-				end
-			elseif damage > 2500 then
-				projectileDefDistortionsNames[weaponName] = GetDistortionClass("HeavyLaser", "Banthlaser")
-			elseif damage > 700 then
-				projectileDefDistortionsNames[weaponName] = GetDistortionClass("MediumLaser", "Zetto")
-			end
-		elseif weaponDef.type == "DGun" then
-			sizeclass = "DGun"
-			projectileDefDistortionsNames[weaponName] = GetDistortionClass("DgunProjectile", "Micro")
-		end
-
-		-- Add a muzzle flash if needed:
-		if wcp.lups_noshockwave or wcp.no_muzzleshock then
-		elseif areaofeffect > 60 and damage > 500 then
-			local size = weaponRange > 2500 and "Tiniest" or "Smallest"
-			local class = weaponRange > 2500 and "MuzzleShockWaveXL" or "MuzzleShockWave"
-			muzzleFlashDistortionsNames[weaponName] = {
-				GetDistortionClass(class, size),
-			}
-		end
-
-		-- Add explosion distortions if needed:
-		if wcp.lups_noshockwave then
-		elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and wcp.nofriendlyfire then
-			explosionDistortionsNames[weaponName] = {
-				GetDistortionClass("DisruptionPulse", GetClosestSizeClass(effectiveRangeExplo)),
-			}
-		elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and not noExplodeEffect then
-			explosionDistortionsNames[weaponName] = {
-				GetDistortionClass("SlowDamageImplosion", "Femto"),
-			}
-		elseif weaponDef.type == "DGun" then
-			explosionDistortionsNames[weaponName] = {
-				GetDistortionClass("DgunImplosion", "Micro"),
-			}
-		elseif weaponDef.type == "TorpedoLauncher" then
-			explosionDistortionsNames[weaponName] = {
-				GetDistortionClass("TorpedoShockWave", GetClosestSizeClass(radius)),
-			}
-		elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
-			explosionDistortionsNames[weaponName] = {
-				GetDistortionClass("FireExplosionHeat", "SmallMedium"),
-			}
-		else
-			local distortionClass
-			if effectiveRangeExplo > 184 then
-				distortionClass = "ExploShockWaveXL"
-			elseif effectiveRangeExplo > 92 then
-				distortionClass = "ExploShockWaveL"
-			elseif effectiveRangeExplo > 60 then
-				distortionClass = "ExploShockWaveM"
-			elseif effectiveRangeExplo > 24 or wcp.death_explosion then
-				distortionClass = "ExploShockWaveS"
-			elseif effectiveRangeExplo > 10 or weaponDef.type == "Cannon" and weaponRange > 100 then
-				distortionClass = "ExploShockWaveXS"
-			end
-			if distortionClass then
-				local adjRadius = math.max(36, effectiveRangeExplo + 8)
-				local strength = 1
-				if effectiveRangeExplo < 10 then
-					effectiveRangeExplo = 24
-				end
-				if isAA then
-					adjRadius = adjRadius*0.7
-					strength = 0.9
-				end
-				if rapidFire then
-					adjRadius = adjRadius*0.8
-					strength = 0.4
-				end
-				local distorts = {
-					GetDistortionClass(distortionClass, GetClosestSizeClass(adjRadius), strength)
-				}
-				if isStunOrDisarm then
-					local empClass = (stunTime or 0) > 8 and "empWobbleLong" or "empWobble"
-					local empSize = adjRadius * ((stunTime or 0) > 8 and 1 or 1.2)
-					distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(empSize), strength)
-				end
-				Spring.Echo(weaponDef.name, distortionClass, adjRadius)
-				explosionDistortionsNames[weaponName] = distorts
-			end
-		end
+		AssignWeaponDistortions(weaponID)
 	end
 	Spring.Echo(Spring.GetGameFrame(), "DLGL4 weapons conf using", usedclasses, "distortion types")
 end
@@ -1230,6 +1236,9 @@ explosionDistortionsNames.shieldbomb_shieldbomb_death[#explosionDistortionsNames
 explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb = explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb or {}
 explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb[#explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb + 1] = GetDistortionClass("FireExplosionHeat", "Small")
 
+explosionDistortionsNames.tankraid_napalm_bomblet = explosionDistortionsNames.tankraid_napalm_bomblet or {}
+explosionDistortionsNames.tankraid_napalm_bomblet[#explosionDistortionsNames.tankraid_napalm_bomblet + 1] = GetDistortionClass("FireExplosionHeat", "Smallest")
+
 explosionDistortionsNames.jumpblackhole_black_hole = {}
 explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
 
@@ -1242,6 +1251,17 @@ explosionDistortionsNames.energysingu_singularity = {
 
 explosionDistortionsNames.jumpbomb_jumpbomb_death = {
 	GetDistortionClass("ExploShockWaveL", "Smallish")
+}
+
+explosionDistortionsNames.tankriot_tawf_banisher = {
+	GetDistortionClass("ExploShockWaveM", "Smallest")
+}
+
+explosionDistortionsNames.bomberprec_bombsabot = {
+	GetDistortionClass("ExploShockWaveS", "Tiniest", 1.5)
+}
+explosionDistortionsNames.tankheavyassault_cor_gol = {
+	GetDistortionClass("ExploShockWaveM", "Tiny", 1.8)
 }
 
 explosionDistortionsNames.jumpraid_pyro_death = explosionDistortionsNames.jumpraid_pyro_death or {}
