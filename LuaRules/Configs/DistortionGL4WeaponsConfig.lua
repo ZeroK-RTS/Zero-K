@@ -12,7 +12,7 @@
 -- expl_distortion_radius_mult = , -- why?
 -- expl_distortion_life = , life of the expl distortion?
 
-local DEBUG_MODE = true
+local DEBUG_MODE = false
 
 local exampleDistortion = {
 	distortionType = "point", -- or cone or beam
@@ -671,6 +671,29 @@ local BaseClasses = {
 			effectType = 0,
 		},
 	},
+	FlameProjectile = { 
+		distortionType = "point",
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			effectStrength = 1.2,
+			noiseStrength = 1,
+			noiseScaleSpace = 1.3,
+			onlyModelMap = 0,
+			lifeTime = 8,
+			distanceFalloff = 1,
+			refractiveIndex = 1.06,
+			decay = 2,
+			rampUp = 0,
+			sustain = 4,
+			riseRate = 0.2,
+			startRadius = 0.2,
+			shockWidth = 0,
+			effectType = 0,
+		},
+	},
 	SlowBeam = {
 		distortionType = "beam",
 		distortionConfig = {
@@ -812,8 +835,8 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
-			noiseStrength = 1,
-			noiseScaleSpace = 0.75,
+			noiseStrength = 0.9,
+			noiseScaleSpace = 0.65,
 			distanceFalloff = 0.5,
 			startRadius = 0.3,
 			onlyModelMap = 0,
@@ -930,6 +953,7 @@ local function deepcopy(orig)
 end
 
 local currentWeaponDefID -- Evil global, only use for the debug function below
+local marks = {}
 local function MarkUnits(class, size)
 	if not currentWeaponDefID then
 		return
@@ -953,14 +977,17 @@ local function MarkUnits(class, size)
 	if not unitID then
 		return
 	end
-	Spring.Utilities.UnitEcho(unitID, class .. ", " .. (size or "???"))
+	marks[unitID] = (marks[unitID] or 0) + 1
+	local x, y, z = Spring.GetUnitPosition(unitID)
+	Spring.MarkerAddPoint(x, y, z + 30 * (marks[unitID] - 1), class .. ", " .. (size or "???"))
 end
 
 
 local usedclasses = 0
-local function GetDistortionClass(baseClassname, sizekey, strength)
+local function GetDistortionClass(baseClassname, sizekey, strength, lifeScale)
 	strength = strength or 1
-	local distortionClassKey = baseClassname .. (sizekey or "") .. (strength)
+	lifeScale = lifeScale or 1
+	local distortionClassKey = baseClassname .. (sizekey or "") .. "_" .. (strength) .. "_" .. (lifeScale)
 	MarkUnits(baseClassname, sizekey)
 
 	if distortionClasses[distortionClassKey] then
@@ -974,6 +1001,7 @@ local function GetDistortionClass(baseClassname, sizekey, strength)
 		usedclasses = usedclasses + 1
 		local distortionConfig = distortionClasses[distortionClassKey].distortionConfig or {}
 		distortionConfig.effectStrength = (distortionConfig.effectStrength or 1) * strength
+		distortionConfig.lifetime = (distortionConfig.lifetime or 1) * lifeScale
 		if sizekey and SizeRadius[sizekey] then
 			distortionConfig.radius = SizeRadius[sizekey]
 		else
@@ -1090,6 +1118,8 @@ local function AssignDistortionsToAllWeapons()
 		if wcp.lups_noshockwave then
 		elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
 			projectileDefDistortionsNames[weaponName] = GetDistortionClass("GaussProjectile", "Pico")
+		elseif wcp.setunitsonfire and weaponDef.type == "LaserCannon" then -- Flamethrower
+			projectileDefDistortionsNames[weaponName] = GetDistortionClass("FlameProjectile", "Smaller")
 		elseif weaponDef.type == "LightningCannon" then
 			local lightningWidth = (weaponRange > 200 or stunTime > 5) and "Banthlaser" or "Quaco"
 			projectileDefDistortionsNames[weaponName] = GetDistortionClass("LightningBeam", lightningWidth)
@@ -1209,6 +1239,13 @@ explosionDistortionsNames.shieldscout_clogger_explode[#explosionDistortionsNames
 explosionDistortionsNames.energysingu_singularity = {
 	GetDistortionClass("ImplosionSingu", "Mega")
 }
+
+explosionDistortionsNames.jumpbomb_jumpbomb_death = {
+	GetDistortionClass("ExploShockWaveL", "Smallish")
+}
+
+explosionDistortionsNames.jumpraid_pyro_death = explosionDistortionsNames.jumpraid_pyro_death or {}
+explosionDistortionsNames.jumpraid_pyro_death[#explosionDistortionsNames.jumpraid_pyro_death + 1] = GetDistortionClass("ExplosionHeatFirewalker", "Smallish", false, 0.8)
 
 explosionDistortionsNames.cloaksnipe_shockrifle = {
 	GetDistortionClass("ExploShockWaveM", "Tiny")

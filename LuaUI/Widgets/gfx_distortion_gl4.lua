@@ -809,7 +809,6 @@ function widget:VisibleExplosion(px, py, pz, weaponID, ownerID)
 end
 
 function widget:Barrelfire(px, py, pz, weaponID, ownerID)
-	Spring.MarkerAddPoint(px, py, pz, "")
 	if muzzleFlashDistortions[weaponID] then
 		for i, distortion in pairs(muzzleFlashDistortions[weaponID]) do
 			local distortionParamTable = distortion.distortionParamTable
