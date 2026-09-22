@@ -12,7 +12,7 @@
 -- expl_distortion_radius_mult = , -- why?
 -- expl_distortion_life = , life of the expl distortion?
 
-local DEBUG_MODE = true
+local DEBUG_MODE = false
 
 local exampleDistortion = {
 	distortionType = "point", -- or cone or beam
@@ -1069,7 +1069,7 @@ local function GetDistortionClass(baseClassname, sizekey, strength, lifeScale)
 		usedclasses = usedclasses + 1
 		local distortionConfig = distortionClasses[distortionClassKey].distortionConfig or {}
 		distortionConfig.effectStrength = (distortionConfig.effectStrength or 1) * strength
-		distortionConfig.lifetime = (distortionConfig.lifetime or 1) * lifeScale
+		distortionConfig.lifeTime = (distortionConfig.lifeTime or 1) * lifeScale
 		if sizekey and SizeRadius[sizekey] then
 			distortionConfig.radius = SizeRadius[sizekey]
 		else
@@ -1382,8 +1382,25 @@ explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
 }
 explosionDistortionsNames.missileslow_weapon = {
-	GetDistortionClass("SlowDamageImplosion", "Smallest", 5, 3),
-	GetDistortionClass("DisruptionPulse", "Large", 2, 2),
+	GetDistortionClass("SlowDamageImplosion", "Tiniest", 2, 2),
+	GetDistortionClass("DisruptionPulse", "Large", 2),
+}
+
+explosionDistortionsNames.raveparty_red_killer = {
+	GetDistortionClass("ExploShockWaveL", "SmallMedium"),
+}
+explosionDistortionsNames.raveparty_orange_roaster = {
+	GetDistortionClass("ExplosionHeatFirewalker", "Mega"),
+}
+explosionDistortionsNames.raveparty_green_stamper = {
+	GetDistortionClass("ExploShockWaveXL", "Larger"),
+}
+explosionDistortionsNames.raveparty_blue_shocker = {
+	GetDistortionClass("ExploShockWaveL", "Mediumer"),
+	GetDistortionClass("empWobbleLong", "Mediumer"),
+}
+explosionDistortionsNames.raveparty_violet_slugger = {
+	GetDistortionClass("DisruptionPulse", "Juno", 2, 3.4),
 }
 
 explosionDistortionsNames.staticnuke_crblmssl = {

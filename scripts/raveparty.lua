@@ -21,7 +21,7 @@ end
 
 local hpi = math.pi*0.5
 
-local headingSpeed = math.rad(4)
+local headingSpeed = math.rad(8)
 local pitchSpeed = math.rad(61) -- Float maths makes this exactly one revolution every 6 seconds.
 
 guns[5].y = 11
@@ -113,7 +113,12 @@ local function UpdateSpin(gainSpin, loseSpin)
 			spinMult = minSpinMult
 		end
 	end
-	aimSpeedMult = math.max(0.12, 1 - math.pow((math.max(0.5, spinMult) - 0.55)*1.8, 4/3)*0.7)
+	aimSpeedMult = math.max(0.11, 0.32 / (1 + spinMult * spinMult))
+	if spinMult > 1.3 then
+		local factor = (spinMult - 1.3) * 2 + 1
+		aimSpeedMult = aimSpeedMult / factor
+	end
+	--Spring.Echo("spinMult", spinMult, aimSpeedMult)
 	--for i = 0, 1.6, 0.02 do
 	--	Spring.Echo(i, math.max(0.12, 1 - math.pow((math.max(0.5, i) - 0.55)*1.8, 4/3)*0.7))
 	--end
@@ -172,9 +177,9 @@ function script.AimWeapon(num, heading, pitch)
 	--Spring.Echo(headDiff*180/math.pi)
 
 	if headDiff > 0.9 then
-		targetSpin = 0.74
+		targetSpin = 0.9
 	elseif headDiff > 0.08 then
-		targetSpin = math.min(1.137, 1.17 - 0.45 * (headDiff / 0.9))
+		targetSpin = MAX_SPIN - 0.6 * (headDiff / 0.9)
 	else
 		targetSpin = MAX_SPIN
 	end
@@ -225,6 +230,7 @@ function script.Shot(num)
 end
 
 function script.FireWeapon(num)
+	GG.UnitScriptDistortion(unitID, unitDefID, "basestomp")
 	Sleep(33)
 	if spinMult < MAX_SPIN then
 		UpdateSpin(true)
