@@ -731,13 +731,11 @@ local function footprintHalf(defID, facing)
 	return hx, hz
 end
 
--- True if a defID footprint at (x, z) overlaps something already on a build queue
--- (the initial queue pre-game, or ally constructor queues in-game). TestBuildOrder
--- only sees the live world, so this is what catches not-yet-built queued structures.
-local function queuedClash(defID, x, z, facing)
+-- True if a defID footprint at (x, z) overlaps any entry in a queued-building list.
+local function listClash(list, defID, x, z, facing)
 	local hx, hz = footprintHalf(defID, facing)
-	for i = 1, #queuedBuildings do
-		local q = queuedBuildings[i]
+	for i = 1, #list do
+		local q = list[i]
 		local ohx, ohz = footprintHalf(q.defID, facing)
 		if abs(x - q.x) < hx + ohx + FOOTPRINT_MARGIN
 			and abs(z - q.z) < hz + ohz + FOOTPRINT_MARGIN then
@@ -745,6 +743,13 @@ local function queuedClash(defID, x, z, facing)
 		end
 	end
 	return false
+end
+
+-- True if a defID footprint at (x, z) overlaps something already on a build queue
+-- (the initial queue pre-game, or ally constructor queues in-game). TestBuildOrder
+-- only sees the live world, so this is what catches not-yet-built queued structures.
+local function queuedClash(defID, x, z, facing)
+	return listClash(queuedBuildings, defID, x, z, facing)
 end
 
 -- As queuedClash, but also against structures we've already planned this drag.
@@ -915,24 +920,23 @@ end
 
 -- Co-build grid structures queued by OTHER ally cons: add them as buildable connect
 -- nodes so the current selection builds the same sites (Zero-K allows shared build
--- sites) and the grid routes through them. Mex/geo spots are already handled by the
--- metal/geo passes, so only pure energy/pylon structures are taken here -- adding a
--- mex/geo here as well would double-order that spot.
+-- sites) and the grid routes through them. Mexes and geos are included; spotOwnership
+-- reports their spots as taken so the metal/geo passes don't also order them.
 local function seedQueuedByOthers()
 	for i = 1, #queuedByOthers do
 		local q = queuedByOthers[i]
-		if q.defID ~= mexDefID and q.defID ~= geoDefID then
-			addPylonsToConnect(q.defID, q.x, q.z, q.range, true)
-		end
+		addPylonsToConnect(q.defID, q.x, q.z, q.range, true)
 	end
 end
 
 -- Returns enemyHeld, allyHeld for the spot at (x, z), based on a structure of
 -- defID (a mex or a geo) sitting on it.
 local function spotOwnership(x, z, defID)
-	-- Anything already on a build queue overlapping this spot (pre-game initial queue
-	-- or in-game ally constructor queues) counts as ours, so we don't build over it.
-	if queuedClash(defID, x, z) then
+	-- Anything already on a build queue overlapping this spot (pre-game initial queue,
+	-- the selection's own in-game queue, or another ally con's queue) counts as ours,
+	-- so we don't build over it. Other cons' queued mex/geo are co-built by the seed
+	-- pass instead, so skipping them here just avoids double-ordering the spot.
+	if queuedClash(defID, x, z) or listClash(queuedByOthers, defID, x, z) then
 		return false, true
 	end
 	if pregame then
