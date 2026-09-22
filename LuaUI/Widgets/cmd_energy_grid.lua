@@ -157,6 +157,7 @@ local cmdDist
 local cmdPylonRange
 local planDirty = false  -- recompute the build plan only when the drag changes
 local lastPlanDist = 0   -- cmdDist at the last recompute (drag radius)
+local awaitingShiftRelease = false -- an order was given with shift held; deselect once shift lifts
 
 local function GetDistanceFromCmd(x,z)
 	return sqrt((cmdCenterX-x)*(cmdCenterX-x)+(cmdCenterZ-z)*(cmdCenterZ-z))
@@ -1198,9 +1199,37 @@ function widget:MouseRelease(x, y, button)
 
 	if shift and reselectIndex then
 		Spring.SetActiveCommand(reselectIndex)
+		-- Keep the command armed while shift stays down so the player can queue
+		-- more grids; deselect it as soon as shift is released (see KeyRelease).
+		awaitingShiftRelease = true
 	end
 
 	return true
+end
+
+function widget:KeyRelease(key)
+	if not awaitingShiftRelease then
+		return false
+	end
+	if key ~= KEYSYMS.LSHIFT and key ~= KEYSYMS.RSHIFT then
+		return false
+	end
+	-- Only act once shift is fully released (both shift keys up).
+	local _, _, _, shift = spGetModKeyState()
+	if shift then
+		return false
+	end
+
+	awaitingShiftRelease = false
+
+	-- Deselect only if our re-armed pylon command is still the active one, so we
+	-- don't clobber a different command the player picked in the meantime.
+	local _, activeCmdID = spGetActiveCommand()
+	if activeCmdID and pylons[-activeCmdID] then
+		Spring.SetActiveCommand(nil)
+	end
+
+	return false
 end
 
 ------------------------------------------------------------
