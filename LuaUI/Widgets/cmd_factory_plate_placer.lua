@@ -162,6 +162,7 @@ local closestFactoryData
 local activeCmdOverride
 local cmdFactoryDefID
 local cmdPlateDefID
+local cmdStriderBuilder -- Caretaker defID being placed via the plate button (near a Hub)
 
 -- Strider Hub build-area draw state (set in Update, consumed in DrawWorld/minimap)
 local striderDrawMode          -- nil | "builder" (placing a Caretaker) | "strider"
@@ -306,13 +307,21 @@ local function MakePlateFromCMD()
 			local factoryCloserInRange = facID and (facDistSq < FACTORY_RANGE_SQ) and (facDistSq < hubDistSq)
 			if (not factoryCloserInRange) and Spring.GetCmdDescIndex(-builder.defID) then
 				Spring.SetActiveCommand(buildAction[builder.defID])
-				return
+				-- Returned as cmdStriderBuilder so Update keeps re-evaluating: moving
+				-- the cursor to a nearer factory switches to that factory's plate.
+				return nil, nil, builder.defID
 			end
 		end
 	end
 
 	local unitID, distSq, factoryData = GetClosestFactory(mx, mz)
 	if not unitID then
+		-- No factory to plate. If we were placing a Caretaker via the plate button,
+		-- drop back to the plate cursor rather than staying stuck on the Caretaker.
+		local _, activeCmdID = spGetActiveCommand()
+		if activeCmdID ~= CMD_BUILD_PLATE then
+			Spring.SetActiveCommand("buildplate")
+		end
 		return
 	end
 
@@ -384,13 +393,23 @@ function widget:Update()
 		local unitDefID = -cmdID
 		-- check for cmd plate first, otherwise do previous behaviour
 		if CMD_BUILD_PLATE == cmdID then
-			cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
+			cmdFactoryDefID, cmdPlateDefID, cmdStriderBuilder = MakePlateFromCMD()
 			return
 		elseif cmdPlateDefID then
 			if unitDefID == cmdPlateDefID then
-				cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
+				cmdFactoryDefID, cmdPlateDefID, cmdStriderBuilder = MakePlateFromCMD()
 			else
 				cmdPlateDefID = nil
+				ResetInterface()
+			end
+			return
+		elseif cmdStriderBuilder then
+			-- Placing a Caretaker via the plate button. Keep re-evaluating so the
+			-- cursor can move to a nearer factory (or Hub) and switch target.
+			if unitDefID == cmdStriderBuilder then
+				cmdFactoryDefID, cmdPlateDefID, cmdStriderBuilder = MakePlateFromCMD()
+			else
+				cmdStriderBuilder = nil
 				ResetInterface()
 			end
 			return
