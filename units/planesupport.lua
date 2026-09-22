@@ -30,7 +30,7 @@ return { planesupport = {
   fireState           = 2,
   footprintX          = 3,
   footprintZ          = 3,
-  frontToSpeed        = 0.06,
+  frontToSpeed        = 0.05,
   health              = 850,
   iconType            = [[supportfighter]],
   maxAcc              = 0.55,
@@ -51,7 +51,7 @@ return { planesupport = {
   sightDistance       = 760,
   speed               = 220,
   speedToFront        = 0.35,
-  turnRadius          = 55,
+  turnRadius          = 80,
   workerTime          = 0,
 
   weapons             = {
