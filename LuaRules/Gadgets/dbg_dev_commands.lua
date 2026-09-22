@@ -576,6 +576,10 @@ local function giveSpread(cmd,line,words,player)
 	local INCREMENT = 128
 	local orderUnit = {}
 	local baseOffX, baseOffZ, limitZ = 200, 2000, 4800
+	if Spring.GetGroundHeight(baseOffX, limitZ) < 0 then
+		baseOffZ = baseOffZ - 1100
+		limitZ = limitZ - 1100
+	end
 	local cX, cZ = baseOffX, baseOffZ
 	
 	for i = 1, #buildlist do

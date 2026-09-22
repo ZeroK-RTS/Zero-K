@@ -557,6 +557,28 @@ local BaseClasses = {
 			effectType = "airShockwave",
 		},
 	},
+	ImplosionSingu = { 
+		distortionType = "point", -- or cone or beam
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.4,
+			noiseStrength = 0.1,
+			onlyModelMap = 0,
+			distanceFalloff = 0.98,
+			refractiveIndex = 1.5,
+			lifeTime = 62,
+			decay = 24,
+			rampUp = 6,
+			effectStrength = -5.5,
+			startRadius = 0.9,
+			shockWidth = -0.92,
+			effectType = "airShockwave",
+		},
+	},
 	SlowDamageImplosion = { 
 		distortionType = "point", -- or cone or beam
 		yOffset = 0, -- Y offsets are only ever used for explosions!
@@ -821,7 +843,7 @@ local SizeRadius = {
 	Juno = 450,
 	Larger = 500,
 	Largest = 650,
-	Mega = 800,
+	Mega = 760,
 	MegaXL = 1000,
 	MegaXXL = 1500,
 	Nuke = 2800,
@@ -1011,7 +1033,7 @@ local function AssignDistortionsToAllWeapons()
 		local radius = ((areaofeffect * 0.7) + (areaofeffect * weaponDef.edgeEffectiveness * 1.1))
 		local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
 		local burstMult = tonumber(wcp.statsprojectiles) or ((tonumber(wcp.script_burst) or weaponDef.salvoSize) * weaponDef.projectiles)
-		local rapidFire = weaponDef.reload < 0.6 or burstMult > 5
+		local rapidFire = weaponDef.reload < 0.6 or (weaponDef.reload < 8 and burstMult > 5)
 
 		local sizeclass = GetClosestSizeClass(radius)
 		local overrideTable = {}
@@ -1132,6 +1154,12 @@ explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb[#explosionDistortionsName
 explosionDistortionsNames.jumpblackhole_black_hole = {}
 explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
 
+explosionDistortionsNames.shieldscout_clogger_explode = {}
+explosionDistortionsNames.shieldscout_clogger_explode[#explosionDistortionsNames.shieldscout_clogger_explode + 1] = GetDistortionClass("ExploShockWaveS", "Pico")
+
+explosionDistortionsNames.energysingu_singularity = {
+	GetDistortionClass("ImplosionSingu", "Mega")
+}
 
 
 explosionDistortionsNames.cloaksnipe_shockrifle = {
