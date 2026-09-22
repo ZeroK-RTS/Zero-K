@@ -50,7 +50,7 @@ local exampleDistortion = {
 }
 
 local exampleDistortionBeamShockwave = {
-	distortionType = "point", -- or cone or beam
+	distortionType = "point",
 	pieceName = nil, -- optional
 	distortionConfig = {
 		posx = 0,
@@ -86,7 +86,7 @@ local exampleDistortionBeamShockwave = {
 --------------------------------General Base Distortion Classes for further usage --------
 local BaseClasses = {
 	GroundShockWave = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		alwaysVisible = false,
 		distortionConfig = {
 			posx = 0,
@@ -108,7 +108,7 @@ local BaseClasses = {
 		},
 	},
 	AirShockWave = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -128,7 +128,7 @@ local BaseClasses = {
 		},
 	},
 	TorpedoShockWave = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -149,7 +149,7 @@ local BaseClasses = {
 	},
 
 	ExploShockWaveXS = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -158,7 +158,7 @@ local BaseClasses = {
 			noiseScaleSpace = 0.1,
 			noiseStrength = 0.2,
 			onlyModelMap = 0,
-			lifeTime = 4.5,
+			lifeTime = 5,
 			refractiveIndex = 1.04,
 			decay = 3.5,
 			rampUp = 1,
@@ -169,7 +169,7 @@ local BaseClasses = {
 		},
 	},
 	ExploShockWaveS = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -178,7 +178,7 @@ local BaseClasses = {
 			noiseScaleSpace = 0.2,
 			noiseStrength = 0.2,
 			onlyModelMap = 0,
-			lifeTime = 5,
+			lifeTime = 6,
 			refractiveIndex = 1.06,
 			decay = 3.2,
 			rampUp = 1,
@@ -189,7 +189,7 @@ local BaseClasses = {
 		},
 	},
 	ExploShockWaveM = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -198,7 +198,7 @@ local BaseClasses = {
 			noiseScaleSpace = 0.3,
 			noiseStrength = 0.2,
 			onlyModelMap = 0,
-			lifeTime = 5.5,
+			lifeTime = 7,
 			refractiveIndex = 1.09,
 			decay = 3,
 			rampUp = 1,
@@ -209,7 +209,7 @@ local BaseClasses = {
 		},
 	},
 	ExploShockWaveL = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -229,7 +229,7 @@ local BaseClasses = {
 		},
 	},
 	ExploShockWaveXL = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -250,7 +250,7 @@ local BaseClasses = {
 	},
 
 	MuzzleShockWaveXS = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -270,7 +270,7 @@ local BaseClasses = {
 		},
 	},
 	MuzzleShockWave = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -290,7 +290,7 @@ local BaseClasses = {
 		},
 	},
 	MuzzleShockWaveXL = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -360,7 +360,7 @@ local BaseClasses = {
 	},
 	
 	ExplosionHeat = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
 			posx = 0,
@@ -384,7 +384,7 @@ local BaseClasses = {
 	
 	
 	ExplosionHeatNuke = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		alwaysVisible = true,
 		distortionConfig = {
@@ -407,7 +407,7 @@ local BaseClasses = {
 		},
 	},
 	AirShockWaveNuke = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
@@ -428,7 +428,7 @@ local BaseClasses = {
 		},
 	},
 	AirShockWaveNukeLater = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
@@ -449,7 +449,7 @@ local BaseClasses = {
 		},
 	},
 	GroundShockWaveNuke = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		alwaysVisible = true,
 		alwaysVisible = false,
 		distortionConfig = {
@@ -471,7 +471,7 @@ local BaseClasses = {
 	},
 	
 	DisruptionPulse = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -492,7 +492,7 @@ local BaseClasses = {
 		},
 	},
 	BlackHole = {
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		alwaysVisible = true,
 		distortionConfig = {
@@ -516,7 +516,7 @@ local BaseClasses = {
 	},
 	
 	FireExplosionHeat = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
 			posx = 0,
@@ -536,7 +536,7 @@ local BaseClasses = {
 		},
 	},
 	Implosion = { 
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
 			posx = 0,
@@ -558,7 +558,7 @@ local BaseClasses = {
 		},
 	},
 	ImplosionSingu = { 
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
 			posx = 0,
@@ -580,7 +580,7 @@ local BaseClasses = {
 		},
 	},
 	SlowDamageImplosion = { 
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
 			posx = 0,
@@ -602,7 +602,7 @@ local BaseClasses = {
 		},
 	},
 	DgunImplosion = { 
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
 			posx = 0,
@@ -624,7 +624,7 @@ local BaseClasses = {
 		},
 	},
 	DgunProjectile = { 
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		distortionConfig = {
 			posx = 0,
@@ -645,8 +645,34 @@ local BaseClasses = {
 			effectType = "airShockwave",
 		},
 	},
+	GaussProjectile = { 
+		distortionType = "beam",
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			pos2x = 0,
+			pos2y = -50,
+			pos2z = 0,
+			effectStrength = 1,
+			noiseStrength = 1,
+			noiseScaleSpace = 0.8,
+			onlyModelMap = 0,
+			lifeTime = 18,
+			distanceFalloff = 0.9,
+			refractiveIndex = 1.2,
+			windAffected = -1,
+			decay = 18,
+			rampUp = 4,
+			sustain = 18,
+			startRadius = 0.7,
+			shockWidth = 0,
+			effectType = 0,
+		},
+	},
 	SlowBeam = {
-		distortionType = "beam", -- or cone or beam
+		distortionType = "beam",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -668,7 +694,7 @@ local BaseClasses = {
 		},
 	},
 	DisruptorBeam = {
-		distortionType = "beam", -- or cone or beam
+		distortionType = "beam",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -690,7 +716,7 @@ local BaseClasses = {
 		},
 	},
 	ShieldGunBeam = {
-		distortionType = "beam", -- or cone or beam
+		distortionType = "beam",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -713,7 +739,7 @@ local BaseClasses = {
 		},
 	},
 	LightningBeam = {
-		distortionType = "beam", -- or cone or beam
+		distortionType = "beam",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -736,7 +762,7 @@ local BaseClasses = {
 		},
 	},
 	HeavyLaser = {
-		distortionType = "beam", -- or cone or beam
+		distortionType = "beam",
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
@@ -757,7 +783,7 @@ local BaseClasses = {
 		},
 	},
 	ExplosionHeatFirewalker = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		alwaysVisible = true,
 		distortionConfig = {
@@ -777,7 +803,7 @@ local BaseClasses = {
 		},
 	},
 	ExplosionHeatLong = { -- spawned on explosions
-		distortionType = "point", -- or cone or beam
+		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
 		alwaysVisible = true,
 		distortionConfig = {
@@ -906,7 +932,7 @@ local function MarkUnits(class, size)
 	if not unitID then
 		return
 	end
-	Spring.Utilities.UnitEcho(unitID, class .. ", " .. size)
+	Spring.Utilities.UnitEcho(unitID, class .. ", " .. (size or "???"))
 end
 
 
@@ -939,7 +965,7 @@ end
 --------------------------------------------------------------------------------
 
 local gibDistortion = {
-	distortionType = "point", -- or cone or beam
+	distortionType = "point",
 	pieceName = nil, -- optional
 	distortionConfig = {
 		posx = 0,
@@ -1041,6 +1067,8 @@ local function AssignDistortionsToAllWeapons()
 
 		-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
 		if wcp.lups_noshockwave then
+		elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
+			projectileDefDistortionsNames[weaponName] = GetDistortionClass("GaussProjectile", "Pico")
 		elseif weaponDef.type == "LightningCannon" then
 			local lightningWidth = (weaponRange > 200 or stunTime > 5) and "Banthlaser" or "Zetto"
 			projectileDefDistortionsNames[weaponName] = GetDistortionClass("LightningBeam", lightningWidth)
