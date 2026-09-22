@@ -89,6 +89,7 @@ return { hoverdepthcharge = {
 
       customParams = {
         burst = Shared.BURST_UNRELIABLE,
+        no_muzzleshock = 1,
       },
 
       damage                  = {
@@ -138,6 +139,10 @@ return { hoverdepthcharge = {
       craterBoost             = 1,
       craterMult              = 2,
 
+      customParams            = {
+        no_muzzleshock = 1,
+      },
+
       damage                  = {
         default = 520.1,
       },
@@ -180,6 +185,7 @@ return { hoverdepthcharge = {
       customParams            = {
         bogus = 1,
         lups_noshockwave = 1,
+        no_muzzleshock = 1,
       },
 
       damage                  = {

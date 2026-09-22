@@ -1047,7 +1047,7 @@ local function AssignDistortionsToAllWeapons()
 		local isAA = IsWeaponAA(weaponDef, aaDamageCat, defaultDamageCat)
 		local damage = weaponDef.damages[(isAA and aaDamageCat) or defaultDamageCat]
 		if weaponDef.damages[shieldDamageCat] then
-			damage = weaponDef.damages[shieldDamageCat]
+			damage = math.max(damage, weaponDef.damages[shieldDamageCat])
 		end
 		local isStunOrDisarm = wcp.disarmdamagemult or wcp.emp_paratime
 		local stunTime = wcp.emp_paratime and tonumber(wcp.emp_paratime) or wcp.disarmTimer and tonumber(wcp.disarmTimer)
@@ -1092,7 +1092,7 @@ local function AssignDistortionsToAllWeapons()
 		end
 
 		-- Add a muzzle flash if needed:
-		if wcp.lups_noshockwave then
+		if wcp.lups_noshockwave or wcp.no_muzzleshock then
 		elseif areaofeffect > 60 and damage > 500 then
 			local size = weaponRange > 2500 and "Tiniest" or "Smallest"
 			local class = weaponRange > 2500 and "MuzzleShockWaveXL" or "MuzzleShockWave"
