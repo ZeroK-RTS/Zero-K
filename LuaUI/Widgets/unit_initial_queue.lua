@@ -734,6 +734,9 @@ end
 function widget:Initialize()
 	WG.InitialQueueHandleCommand = InitialQueueHandleCommand
 	WG.InitialQueueGetTail = InitialQueueGetTail
+	WG.InitialQueueGetCount = function() return #buildQueue end
+	WG.InitialQueueMaxCount = MAX_QUEUE
+	WG.InitialQueueGetQueue = function() return buildQueue end -- read-only: {defID, x, y, z, facing}
 
 	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
 		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
