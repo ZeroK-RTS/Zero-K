@@ -35,6 +35,10 @@ local spGetGroundNormal     = Spring.GetGroundNormal
 local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetAllUnits         = Spring.GetAllUnits
 local spGetModKeyState      = Spring.GetModKeyState
+local spGetCameraVectors    = Spring.GetCameraVectors
+local spGetCameraPosition   = Spring.GetCameraPosition
+local spGetCameraFOV        = Spring.GetCameraFOV
+local spGetViewGeometry     = Spring.GetViewGeometry
 
 local glLineWidth        = gl.LineWidth
 local glColor            = gl.Color
@@ -55,6 +59,7 @@ local sqrt  = math.sqrt
 local cos   = math.cos
 local sin   = math.sin
 local atan2 = math.atan2
+local tan   = math.tan
 local pi    = math.pi
 
 
@@ -266,14 +271,55 @@ end
 -- Mouse functions
 ------------------------------------------------------------
 
+-- Project the cursor ray onto a horizontal plane through the drag origin's height.
+-- Used off the map, where TraceScreenRay returns nothing, so the drag keeps growing
+-- past the map edge the way engine area commands do. Returns nil until a drag is
+-- under way (cmdCenter set), so an off-map press still can't start one.
+local function GroundPlaneProject(mouseX, mouseY)
+	if not cmdCenterX then
+		return
+	end
+	local cvs = spGetCameraVectors()
+	local fwd, right, up = cvs and cvs.forward, cvs and cvs.right, cvs and cvs.up
+	if not (fwd and right and up) then
+		return
+	end
+	local vsx, vsy, vpx, vpy = spGetViewGeometry()
+	if not vsx or vsx == 0 or vsy == 0 then
+		return
+	end
+	local fov = spGetCameraFOV()
+	if not fov then
+		return
+	end
+	local t = tan(fov * 0.5 * pi / 180)
+	-- mouse coords are window-relative; shift into this view before normalising.
+	local sx = (((mouseX - (vpx or 0)) / vsx) * 2 - 1) * (vsx / vsy) * t
+	local sy = (((mouseY - (vpy or 0)) / vsy) * 2 - 1) * t
+	local dx = fwd[1] + right[1] * sx + up[1] * sy
+	local dy = fwd[2] + right[2] * sx + up[2] * sy
+	local dz = fwd[3] + right[3] * sx + up[3] * sy
+	if dy >= 0 then
+		return -- ray isn't heading down toward the ground plane
+	end
+	local cx, cy, cz = spGetCameraPosition()
+	local planeY = max(spGetGroundHeight(cmdCenterX, cmdCenterZ), 0)
+	local dist = (planeY - cy) / dy
+	if dist <= 0 then
+		return
+	end
+	return cx + dx * dist, cz + dz * dist
+end
+
 local function GetMousePos()
         local mouseX, mouseY = spGetMouseState()
         local _, mouse = spTraceScreenRay(mouseX, mouseY, true, true, false, not floatOnWater[cmdID])
-        if not mouse then
-                return
+        if mouse then
+                return mouse[1], mouse[3]
         end
 
-        return mouse[1], mouse[3]
+        -- Off the map: fall back to a ground-plane projection so the drag keeps updating.
+        return GroundPlaneProject(mouseX, mouseY)
 end
 
 local function GetMouseDistance() 
