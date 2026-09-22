@@ -66,6 +66,10 @@ if gadgetHandler:IsSyncedCode() then
 		SendToUnsynced("explosion_light", px, py, pz, weaponID, ownerID)
 	end
 
+	function GG.CustomExplosionLight(weaponID, px, py, pz, ownerID, projectileID)
+		SendToUnsynced("explosion_light", px, py, pz, weaponID, ownerID)
+	end
+
 	function gadget:ProjectileCreated(projectileID, ownerID, weaponID)
 		if muzzleProjectiles[weaponID] then
 			local px, py, pz = spGetProjectilePosition(projectileID)

@@ -782,28 +782,19 @@ local adjustfornight = {
 	"groundSpecularColor",
 }
 
-local targetable = {}
-for wdid, wd in pairs(WeaponDefs) do
-	if wd.targetable then
-		targetable[wdid] = true
-	end
-end
-
 function widget:VisibleExplosion(px, py, pz, weaponID, ownerID)
-	if targetable[weaponID] and py - 1000 > Spring.GetGroundHeight(px, pz) then -- dont add distortion to (likely) intercepted explosions (mainly to curb nuke flashes)
+	if (not explosionDistortions[weaponID]) or py - 1000 > Spring.GetGroundHeight(px, pz) then -- dont add distortion to (likely) intercepted explosions (mainly to curb nuke flashes)
 		return
 	end
-	if explosionDistortions[weaponID] then
-		for i, distortion in pairs(explosionDistortions[weaponID]) do
-			local distortionParamTable = distortion.distortionParamTable
-			if distortion.alwaysVisible or spIsSphereInView(px, py, pz, distortionParamTable[4]) then
-				local groundHeight = spGetGroundHeight(px, pz) or 1
-				py = math_max(groundHeight + (distortion.yOffset or 0), py)
-				distortionParamTable[1] = px
-				distortionParamTable[2] = py
-				distortionParamTable[3] = pz
-				AddDistortion(nil, nil, nil, pointDistortionVBO, distortionParamTable) --(instanceID, unitID, pieceIndex, targetVBO, distortionparams, noUpload)
-			end
+	for i, distortion in pairs(explosionDistortions[weaponID]) do
+		local distortionParamTable = distortion.distortionParamTable
+		if distortion.alwaysVisible or spIsSphereInView(px, py, pz, distortionParamTable[4]) then
+			local groundHeight = spGetGroundHeight(px, pz) or 1
+			py = math_max(groundHeight + (distortion.yOffset or 0), py)
+			distortionParamTable[1] = px
+			distortionParamTable[2] = py
+			distortionParamTable[3] = pz
+			AddDistortion(nil, nil, nil, pointDistortionVBO, distortionParamTable) --(instanceID, unitID, pieceIndex, targetVBO, distortionparams, noUpload)
 		end
 	end
 end

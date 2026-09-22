@@ -594,9 +594,53 @@ local BaseClasses = {
 			lifeTime = 62,
 			decay = 24,
 			rampUp = 6,
-			effectStrength = -5.5,
+			effectStrength = -1,
 			startRadius = 0.9,
 			shockWidth = -0.92,
+			effectType = "airShockwave",
+		},
+	},
+	TeleportOut = {
+		distortionType = "point",
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.8,
+			noiseStrength = 1.2,
+			onlyModelMap = 0,
+			lifeTime = 23,
+			distanceFalloff = 0.95,
+			refractiveIndex = 1.045,
+			decay = 2,
+			rampUp = 3,
+			effectStrength = -0.25,
+			startRadius = 0.6,
+			shockWidth = -0.7,
+			effectType = "airShockwave",
+		},
+	},
+	TeleportIn = {
+		distortionType = "point",
+		yOffset = 0, -- Y offsets are only ever used for explosions!
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 150,
+			noiseScaleSpace = 0.8,
+			noiseStrength = 1.2,
+			onlyModelMap = 0,
+			lifeTime = 23,
+			distanceFalloff = 0.95,
+			refractiveIndex = 1.045,
+			decay = 2,
+			rampUp = 3,
+			effectStrength = 0.5,
+			startRadius = 0.6,
+			shockWidth = -0.7,
 			effectType = "airShockwave",
 		},
 	},
@@ -1392,6 +1436,18 @@ for name, params in pairs(projectileDefDistortionsNames) do
 	end
 end
 projectileDefDistortionsNames = nil
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Generic event distortions
+
+explosionDistortions.teleport_out = {
+	GetDistortionClass("TeleportOut", "Smallest")
+}
+explosionDistortions.teleport_in = {
+	GetDistortionClass("TeleportIn", "Smallest")
+}
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
