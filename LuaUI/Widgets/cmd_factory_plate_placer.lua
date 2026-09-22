@@ -115,20 +115,28 @@ end
 -- striderBuildDefID[striderDefID]  = hubDefID (active command is "place a strider")
 -- striderBuilderDef[builderDefID]  = {hubDefID, eligRangeSq} (placing a Caretaker)
 -- striderHubToBuilder[hubDefID]    = {defID = builderDefID, eligRangeSq}
+-- The green build-area circle is drawn for any strider (any builder); the
+-- placement line and the build-plate button are only for the immobile builder
+-- (the Caretaker), since mobile cons/Commander/Athena are not ground-placed.
 local striderHubRange    = {}
 local striderBuildDefID  = {}
 local striderBuilderDef  = {}
 local striderHubToBuilder = {}
 
 for i = 1, #UnitDefs do
-	if UnitDefs[i].customParams.strider_hub then
-		striderHubRange[i] = UnitDefs[i].buildDistance
+	local ud = UnitDefs[i]
+	if ud.customParams.strider_hub then
+		striderHubRange[i] = ud.buildDistance
+		local hubBuildOptions = ud.buildOptions
+		for j = 1, #hubBuildOptions do
+			striderBuildDefID[hubBuildOptions[j]] = i
+		end
 	end
 end
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local hubName = ud.customParams.strider_builder
-	if hubName then
+	if hubName and (ud.speed or 0) == 0 then
 		local hubDef = UnitDefNames[hubName]
 		if hubDef and striderHubRange[hubDef.id] then
 			local eligRange = striderHubRange[hubDef.id] + ud.buildDistance
@@ -136,10 +144,6 @@ for i = 1, #UnitDefs do
 			striderBuilderDef[i] = {hubDefID = hubDef.id, eligRangeSq = eligRangeSq}
 			striderHubToBuilder[hubDef.id] = {defID = i, eligRangeSq = eligRangeSq}
 			buildAction[i] = buildAction[i] or ("buildunit_" .. ud.name)
-			local hubBuildOptions = UnitDefs[hubDef.id].buildOptions
-			for j = 1, #hubBuildOptions do
-				striderBuildDefID[hubBuildOptions[j]] = hubDef.id
-			end
 		end
 	end
 end

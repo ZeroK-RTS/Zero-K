@@ -265,20 +265,44 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
--- Strider builders (Caretaker) gain their parent Strider Hub's roster, appended
--- to whatever build list they already have (the Caretaker is a bare nano tower,
--- so this becomes its only build menu). Building these is gated to the Hub's
--- build area by unit_strider_hub_access.lua; here we only expose the buildoptions.
+-- Tag the builders that may build striders inside a powered Strider Hub's area.
+-- The Caretaker is tagged in its unit file; here we also tag every mobile
+-- constructor, the Commander (commtype) and Athena. unit_strider_hub_access.lua
+-- enforces the Hub range and greys the buttons out of range.
+local striderBuilderExtra = {
+	amphcon = true, cloakcon = true, gunshipcon = true, hovercon = true,
+	jumpcon = true, planecon = true, shieldcon = true, shipcon = true,
+	spidercon = true, tankcon = true, vehcon = true, athena = true,
+}
+for name, ud in pairs(UnitDefs) do
+	if (not ud.customparams.strider_builder) and (striderBuilderExtra[name] or ud.customparams.commtype) then
+		ud.customparams.strider_builder = "striderhub"
+	end
+end
+
+-- Append the Strider Hub roster to each strider builder. Skip striders it can
+-- already build (e.g. Athena's own striderantiheavy) and self-builds, so only
+-- the newly granted striders are recorded in "strider_gated" and Hub-gated;
+-- everything the builder could already make keeps its normal behaviour.
 for name, ud in pairs(UnitDefs) do
 	local hubName = ud.customparams.strider_builder
-	if hubName then
-		local hub = UnitDefs[hubName]
-		if hub and hub.buildoptions then
-			ud.buildoptions = (ud.buildoptions and Spring.Utilities.CopyTable(ud.buildoptions)) or {}
-			for i = 1, #hub.buildoptions do
-				ud.buildoptions[#ud.buildoptions + 1] = hub.buildoptions[i]
+	local hub = hubName and UnitDefs[hubName]
+	if hub and hub.buildoptions then
+		ud.buildoptions = (ud.buildoptions and Spring.Utilities.CopyTable(ud.buildoptions)) or {}
+		local have = {}
+		for i = 1, #ud.buildoptions do
+			have[ud.buildoptions[i]] = true
+		end
+		local gated = {}
+		for i = 1, #hub.buildoptions do
+			local striderName = hub.buildoptions[i]
+			if (not have[striderName]) and striderName ~= name then
+				ud.buildoptions[#ud.buildoptions + 1] = striderName
+				have[striderName] = true
+				gated[#gated + 1] = striderName
 			end
 		end
+		ud.customparams.strider_gated = table.concat(gated, " ")
 	end
 end
 

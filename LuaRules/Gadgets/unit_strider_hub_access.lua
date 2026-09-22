@@ -39,13 +39,17 @@ local DISABLED_TOOLTIP = "Requires a powered Strider Hub in range"
 --------------------------------------------------------------------------------
 -- Static def data
 
--- hubDefData[hubDefID] = {rangeSq = <hub build area, squared>, buildOptions = {striderDefID, ...}}
+-- hubDefData[hubDefID] = {range = <hub build area>, rangeSq = <same, squared>}
 local hubDefData = {}
 -- builderDefData[builderDefID] = {
---   eligRangeSq  = (hubRange + builderRange)^2,  -- how close to a hub the builder must be to build any strider
---   striderCmds  = { -striderDefID, ... },       -- build cmdIDs to grey/enable
---   striderCmdSet = { [-striderDefID] = true },  -- fast lookup for AllowCommand
+--   isMobile     = bool,                          -- mobile builders are gated by placement only
+--   eligRangeSq  = (hubRange + builderRange)^2,    -- static builders: proximity to grey the buttons
+--   striderCmds  = { -striderDefID, ... },         -- build cmdIDs to grey/enable
+--   striderCmdSet = { [-striderDefID] = true },    -- fast lookup for AllowCommand
 -- }
+-- Only the striders newly GRANTED to a builder (customParams.strider_gated, set
+-- in gamedata/unitdefs_post.lua) are gated, so a builder's native builds — e.g.
+-- Athena's own striderantiheavy — keep their normal behaviour.
 local builderDefData = {}
 
 local wantedStriderCmd = {}   -- union of all gated strider build cmdIDs, for AllowCommand
@@ -55,30 +59,39 @@ for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.customParams.strider_hub then
 		hubDefData[i] = {
+			range = ud.buildDistance,
 			rangeSq = ud.buildDistance * ud.buildDistance,
-			buildOptions = ud.buildOptions,
 		}
 	end
 end
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	local hubName = ud.customParams.strider_builder
-	if hubName then
-		local hubDef = UnitDefNames[hubName]
-		local hubData = hubDef and hubDefData[hubDef.id]
-		if hubData then
-			local striderCmds = {}
-			local striderCmdSet = {}
-			for j = 1, #hubData.buildOptions do
-				local cmdID = -hubData.buildOptions[j]
+	local gatedStr = ud.customParams.strider_gated
+	if gatedStr and gatedStr ~= "" then
+		local striderCmds = {}
+		local striderCmdSet = {}
+		for name in gatedStr:gmatch("%S+") do
+			local sd = UnitDefNames[name]
+			if sd then
+				local cmdID = -sd.id
 				striderCmds[#striderCmds + 1] = cmdID
 				striderCmdSet[cmdID] = true
 				wantedStriderCmd[cmdID] = true
 			end
-			local eligRange = UnitDefs[hubDef.id].buildDistance + ud.buildDistance
+		end
+		if #striderCmds > 0 then
+			local isMobile = (ud.speed or 0) > 0
+			local eligRangeSq
+			if not isMobile then
+				local hubDef = UnitDefNames[ud.customParams.strider_builder]
+				local hubData = hubDef and hubDefData[hubDef.id]
+				local eligRange = (hubData and hubData.range or 0) + ud.buildDistance
+				eligRangeSq = eligRange * eligRange
+			end
 			builderDefData[i] = {
-				eligRangeSq = eligRange * eligRange,
+				isMobile = isMobile,
+				eligRangeSq = eligRangeSq,
 				striderCmds = striderCmds,
 				striderCmdSet = striderCmdSet,
 			}
@@ -123,6 +136,17 @@ local function HubInRange(x, z, allyTeamID, rangeSq)
 	return false
 end
 
+-- Does this allyTeam have any powered hub at all? Used to grey the buttons of
+-- mobile builders, which can drive to a hub so their own position doesn't matter.
+local function AnyPoweredHub(allyTeamID)
+	for hubID, hub in IterableMap.Iterator(hubs) do
+		if hub.powered and hub.allyTeamID == allyTeamID then
+			return true
+		end
+	end
+	return false
+end
+
 local function SetBuilderAccess(unitID, builder, access)
 	if builder.access == access then
 		return
@@ -140,7 +164,14 @@ local function SetBuilderAccess(unitID, builder, access)
 end
 
 local function UpdateBuilder(unitID, builder)
-	local access = HubInRange(builder.x, builder.z, builder.allyTeamID, builder.info.eligRangeSq)
+	local access
+	if builder.info.isMobile then
+		-- Mobile builder: enabled whenever the allyTeam owns a powered hub;
+		-- placement (AllowCommand) still confines the build to a hub's area.
+		access = AnyPoweredHub(builder.allyTeamID)
+	else
+		access = HubInRange(builder.x, builder.z, builder.allyTeamID, builder.info.eligRangeSq)
+	end
 	SetBuilderAccess(unitID, builder, access)
 end
 
