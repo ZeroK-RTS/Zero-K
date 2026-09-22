@@ -177,30 +177,31 @@ local function IdleAnim()
 end
 
 local function Step(frontLeg, backLeg)
+	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	-- front leg out straight, back toe angled to meet the ground
 	-- back leg out straight, front toe angled to leave the ground
 	for i, p in pairs(frontLeg) do
-		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
-		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
+		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i] * speed)
+		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i] * speed)
 	end
 
 	--lower body at extended stride
-	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED)
+	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED * speed)
 
 	-- swing arms and body
 	if not(isFiring) then
 		if (frontLeg == leftLeg) then
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(larmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(rarmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speed)
+			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(larmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
+			Turn(rarmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
 		else
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(larmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
-			Turn(rarmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speed)
+			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
+			Turn(larmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED * speed)
+			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
+			Turn(rarmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED * speed)
 		end
 	end
 
@@ -209,25 +210,22 @@ local function Step(frontLeg, backLeg)
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
 	end
+	speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 
 	-- front leg straight, foot flat on ground
 	-- back knee bent, drags foot past front leg
 	for i, p in pairs(frontLeg) do
-		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
-		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
+		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i] * speed)
+		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i] * speed)
 	end
 
 	-- raise body as leg passes underneath
-	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
+	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED * speed)
 
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
 	end
-end
-
-local function Passing(frontLeg, backLeg)
-	
 end
 
 local function Walk()
@@ -359,14 +357,15 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Idle)
+	local speed = math.max(0.5, GG.att_MoveChange[unitID] or 1)
 	if num == 1 then
 		Signal(SIG_Aim)
 		SetSignalMask(SIG_Aim)
 		while isFiringBeam do
 			Sleep(100)
 		end
-		Turn(head, y_axis, heading, HEAD_AIM_SPEED)
-		Turn(headflare, x_axis, -pitch, HEAD_AIM_SPEED)
+		Turn(head, y_axis, heading, HEAD_AIM_SPEED * speed)
+		Turn(headflare, x_axis, -pitch, HEAD_AIM_SPEED * speed)
 		WaitForTurn(head, y_axis)
 		WaitForTurn(headflare, x_axis)
 		resetRestore = true
@@ -376,9 +375,9 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_Aim2)
 		isFiring = true
 
-		Turn(torso, y_axis, heading, ARM_AIM_SPEED)
-		Turn(larm, x_axis, -pitch, ARM_AIM_SPEED)
-		Turn(rarm, x_axis, -pitch, ARM_AIM_SPEED)
+		Turn(torso, y_axis, heading, ARM_AIM_SPEED * speed)
+		Turn(larm, x_axis, -pitch, ARM_AIM_SPEED * speed)
+		Turn(rarm, x_axis, -pitch, ARM_AIM_SPEED * speed)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 		resetRestore = true

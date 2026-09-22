@@ -1,5 +1,5 @@
-local boxes = {
-	[0] = {
+return {
+	{
 		boxes = {
 			{
 				{1330, 5120},
@@ -50,7 +50,7 @@ local boxes = {
 		nameLong = "West",
 		nameShort = "W",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{13825, 0},
@@ -108,5 +108,3 @@ local boxes = {
 		nameShort = "E",
 	},
 }
-
-return boxes

@@ -165,7 +165,7 @@ local function getDamages(wd)
 	if wd.paralyzer then
 		damw = val
 		if stun_time == 0 then
-			stun_time = wd.damages.paralyzeDamageTime
+			stun_time = tonumber(wd.customParams.emp_paratime)
 		end
 	else
 		dam = val

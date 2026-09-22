@@ -16,6 +16,7 @@ return { shipskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 180,
     bait_level_default = 1,
     turnatfullspeed = [[1]],
     modelradius     = [[24]],
@@ -62,6 +63,7 @@ return { shipskirm = {
 
     {
       def                = [[ROCKET]],
+      accurateLeading    = 1,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

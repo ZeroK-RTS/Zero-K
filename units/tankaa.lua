@@ -9,12 +9,13 @@ return { tankaa = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[38 52 38]],
-  collisionVolumeType    = [[cylY]],
+  collisionVolumeOffsets = [[0 -10 0]],
+  collisionVolumeScales  = [[38 66 38]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 150,
     bait_level_default = 0,
     modelradius    = [[19]],
   },
@@ -60,6 +61,7 @@ return { tankaa = {
 
     {
       def                = [[FLAK]],
+      accurateLeading    = 1,
       --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },

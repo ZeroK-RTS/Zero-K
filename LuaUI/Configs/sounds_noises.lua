@@ -873,6 +873,14 @@ local sounds = {
 			[1] = "fighter_select",
 		},
 	},
+	planesupport = {
+		ok = {
+			[1] = "bomber_move",
+		},
+		select = {
+			[1] = "fighter_select",
+		},
+	},
 	bomberstrike = {
 		ok = {
 			[1] = "bomber_move",
@@ -1346,6 +1354,14 @@ local sounds = {
 		},
 		select = {
 			[1] = "radar_select",
+		},
+	},
+	commander_egg = {
+		ok = {
+			[1] = "turret_move",
+		},
+		select = {
+			[1] = "building_select2",
 		},
 	},
 	staticheavyradar = {

@@ -133,7 +133,7 @@ local EMPTY_TABLE = {}
 -------------------------------------------------------------------------------
 
 local sound_waypoint  = LUAUI_DIRNAME .. 'Sounds/buildbar_waypoint.wav'
-local sound_click     = LUAUI_DIRNAME .. 'Sounds/buildbar_click.WAV'
+local sound_click     = LUAUI_DIRNAME .. 'Sounds/buildbar_click.wav'
 local sound_queue_add = LUAUI_DIRNAME .. 'Sounds/buildbar_add.wav'
 local sound_queue_rem = LUAUI_DIRNAME .. 'Sounds/buildbar_rem.wav'
 local sound_queue_clear = LUAUI_DIRNAME .. 'Sounds/buildbar_hover.wav'

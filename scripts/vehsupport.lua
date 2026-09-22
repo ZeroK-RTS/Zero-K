@@ -29,6 +29,7 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
+local Vector = Spring.Utilities.Vector
 
 local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
@@ -104,7 +105,7 @@ local function KeepStatic()
 	while true do
 		local gameFrame = Spring.GetGameFrame()
 		if lastShotFrame and (lastShotFrame > gameFrame) then
-			local cmd = Spring.GetCommandQueue(unitID, 2)
+			local cmd = Spring.GetUnitCommands(unitID, 2)
 			SetAbleToMove(not (cmd and cmd[1] and (cmd[1].id == CMD_ATTACK) and (#cmd[1].params == 1) and cmd[2] and (cmd[2].id == CMD_FIGHT) and (#cmd[2].params == 6)))
 		else
 			SetAbleToMove(true)
@@ -330,7 +331,26 @@ function script.Shot()
 	lastShotFrame = Spring.GetGameFrame() + FIGHT_FIRE_TIME
 end
 
+local weaponRange = WeaponDefNames["vehsupport_cortruck_missile"].range
+local lowerRangeBuffer = (weaponRange - tonumber(UnitDefs[unitDefID].customParams.set_target_range_buffer))^2
+local upperRangeBuffer = (weaponRange + 10)^2
+local function IsDistanceNearEdgeOfRange(ux, uz, tx, tz)
+	distSq = Vector.DistSq(ux, uz, tx, tz)
+	return (distSq > lowerRangeBuffer) and (distSq < upperRangeBuffer)
+end
+
 function script.BlockShot(num, targetID)
+	if not targetID then -- Ground target, block shooting right at the edge of range.
+		local ux, _, uz = spGetUnitPosition(unitID)
+		local tx, _, tz = GG.GetUnitGroundTarget(unitID)
+		local ax, _, az = GG.GetUnitAttackCommandTarget(unitID)
+		if ux and tz and IsDistanceNearEdgeOfRange(ux, uz, tx, tz) then
+			return true
+		end
+		if ux and az and IsDistanceNearEdgeOfRange(ux, uz, ax, az) then
+			return true
+		end
+	end
 	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 600, 30, 0.05, true)
 end
 

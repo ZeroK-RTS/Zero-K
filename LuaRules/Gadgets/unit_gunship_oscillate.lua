@@ -26,7 +26,7 @@ local spGetUnitStates = Spring.GetUnitStates
 local CMD_IDLEMODE = CMD.IDLEMODE
 local UPDATE_RATE = 90
 
-local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1120)
+local REVERSE_COMPAT = not Script.IsEngineMinVersion(104, 0, 1121)
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

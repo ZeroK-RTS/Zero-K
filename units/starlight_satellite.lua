@@ -88,7 +88,7 @@ return { starlight_satellite = {
         smoothheightoffset = [[40]],
 
         lups_noshockwave = [[1]],
-        stats_damage = 18000,
+        stats_damage = 24000,
       },
 
       damage                  = {

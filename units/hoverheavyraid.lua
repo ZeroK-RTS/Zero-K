@@ -2,6 +2,7 @@ return { hoverheavyraid = {
   name                = [[Bolas]],
   description         = [[Disruptor Hovercraft]],
   acceleration        = 0.18,
+  activateWhenBuilt   = true,
   brakeRate           = 0.516,
   builder             = false,
   buildPic            = [[hoverheavyraid.png]],

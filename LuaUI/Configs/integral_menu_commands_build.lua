@@ -73,6 +73,7 @@ local special_commands = {
 	[CMD_RAISE]       = {order = 18, row = 3, col = 3},
 	[CMD_RESTORE]     = {order = 19, row = 3, col = 4},
 	[CMD_SMOOTH]      = {order = 20, row = 3, col = 5},
+	commander_egg     = {order = 21, row = 3, col = 6},
 }
 
 --------------------------------------------------------------------------------

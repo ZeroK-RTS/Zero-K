@@ -47,7 +47,7 @@ return { gunshipraid = {
 
   },
 
-  sightDistance          = 500,
+  sightDistance          = 560,
   speed                  = 250,
   turnRate               = 693,
 
@@ -56,7 +56,7 @@ return { gunshipraid = {
     {
       def                = [[LASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 150,
+      maxAngleDif        = 180,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 

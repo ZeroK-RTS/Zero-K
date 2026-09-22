@@ -265,7 +265,7 @@ end
 
 --fetch unit id of passenger (from the load command)
 function getPassengerId()
-	local cmd=Spring.GetCommandQueue(unitID, 1)
+	local cmd=Spring.GetUnitCommands(unitID, 1)
 	local unitId = nil
 	
 	if cmd and cmd[1] then
@@ -279,7 +279,7 @@ end
 
 --fetch id of command
 function getCommandId()
-	local cmd=Spring.GetCommandQueue(unitID, 1)
+	local cmd=Spring.GetUnitCommands(unitID, 1)
 	if cmd and cmd[1] then
 		return cmd[1]['id']
 	end
@@ -288,7 +288,7 @@ function getCommandId()
 end
 
 function getDropPoint()
-	local cmd = Spring.GetCommandQueue(unitID, 1)
+	local cmd = Spring.GetUnitCommands(unitID, 1)
 	if cmd and cmd[1] and cmd[1].id == 81 then -- CMDTYPE.LOAD_UNITS = 75
 		return cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]
 	end
@@ -458,6 +458,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Create()
+	Hide(engineEmit)
 	Turn(dust1, x_axis, math.rad(90))
 	Turn(dust2, x_axis, math.rad(90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
@@ -475,11 +476,13 @@ end
 
 function script.Activate()
 	StartThread(TakeOffOrLand)
+	Show(engineEmit)
 end
 
 function script.Deactivate()
 	StartThread(TakeOffOrLand)
 	StartThread(closeDoors)
+	Hide(engineEmit)
 end
 
 
@@ -488,16 +491,25 @@ function script.QueryTransport(passengerID)
 end
 
 function script.AimFromWeapon(num)
+	if not weaponPieces[num] then
+		num = 3
+	end
 	return weaponPieces[num].aimFrom
 end
 
 function script.QueryWeapon(num)
+	if not weaponPieces[num] then
+		num = 3
+	end
 	local pieces = weaponPieces[num].query
 	return pieces[weaponPieces[num].index]
 end
 
 
 function script.Shot(num)
+	if not weaponPieces[num] then
+		num = 3
+	end
 	local index = weaponPieces[num].index
 	index = index + 1
 	if index > #(weaponPieces[num].query) then

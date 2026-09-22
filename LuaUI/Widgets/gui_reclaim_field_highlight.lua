@@ -585,46 +585,48 @@ end
 
 local function DrawFeatureClusterText()
 	for i = 1, #featureConvexHulls do
-		glPushMatrix()
-
-		local center = featureConvexHulls[i].center
-
-		glTranslate(center.x, center.y, center.z)
-		glRotate(-90, 1, 0, 0)
-
 		local fontSize = fontSizeMin * fontScaling
 		local area = featureConvexHulls[i].area
-		fontSize = math.sqrt(area) * fontSize / minDim
-		fontSize = math.max(fontSize, fontSizeMin)
-		fontSize = math.min(fontSize, fontSizeMax)
+		if area > 0 then
+			glPushMatrix()
 
-		local metal = featureClusters[i].metal
-		--Spring.Echo(metal)
-		local metalText
-		if metal < 1000 then
-			metalText = string.format("%.0f", metal) --exact number
-		elseif metal < 10000 then
-			metalText = string.format("%.1fK", math.floor(metal / 100) / 10) --4.5K
-		else
-			metalText = string.format("%.0fK", math.floor(metal / 1000)) --40K
+			local center = featureConvexHulls[i].center
+
+			glTranslate(center.x, center.y, center.z)
+			glRotate(-90, 1, 0, 0)
+
+			fontSize = math.sqrt(area) * fontSize / minDim
+			fontSize = math.max(fontSize, fontSizeMin)
+			fontSize = math.min(fontSize, fontSizeMax)
+
+			local metal = featureClusters[i].metal
+			--Spring.Echo(metal)
+			local metalText
+			if metal < 1000 then
+				metalText = string.format("%.0f", metal) --exact number
+			elseif metal < 10000 then
+				metalText = string.format("%.1fK", math.floor(metal / 100) / 10) --4.5K
+			else
+				metalText = string.format("%.0fK", math.floor(metal / 1000)) --40K
+			end
+			gl.Scale(fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE)
+
+			local x100  = 100  / (100  + metal)
+			local x1000 = 1000 / (1000 + metal)
+			local r = 1 - x1000
+			local g = x1000 - x100
+			local b = x100
+
+			--glRect(-200, -200, 200, 200)
+			--glColor(r, g, b, 1.0)
+			--glText(metalText, 0, 0, fontSize, "cv")
+			font:Begin()
+				font:SetTextColor(r, g, b, 1.0)
+				font:Print(metalText, 0, 0, BASE_FONT_SIZE, "cv")
+			font:End()
+
+			glPopMatrix()
 		end
-		gl.Scale(fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE)
-
-		local x100  = 100  / (100  + metal)
-		local x1000 = 1000 / (1000 + metal)
-		local r = 1 - x1000
-		local g = x1000 - x100
-		local b = x100
-
-		--glRect(-200, -200, 200, 200)
-		--glColor(r, g, b, 1.0)
-		--glText(metalText, 0, 0, fontSize, "cv")
-		font:Begin()
-			font:SetTextColor(r, g, b, 1.0)
-			font:Print(metalText, 0, 0, BASE_FONT_SIZE, "cv")
-		font:End()
-
-		glPopMatrix()
 	end
 end
 

@@ -30,22 +30,23 @@ local SIG_RESTORE = 4
 local gun_1
 
 local function Step(front, back)
+	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	Move(base, y_axis, 0, 2)
 	
 	-- move and turn front leg
 	Move(front.leg, z_axis, 1, 3 * PACE)
-	Turn(front.blever, x_axis, math.rad(-50), math.rad(95) * PACE)
-	Turn(front.foot, x_axis, math.rad(45), math.rad(80) * PACE)
-	Turn(front.flever, x_axis, math.rad(-45), math.rad(65) * PACE)
-	Turn(front.heeltoe, x_axis, math.rad(10), math.rad(20) * PACE)
+	Turn(front.blever, x_axis, math.rad(-50), math.rad(95) * PACE * speed)
+	Turn(front.foot, x_axis, math.rad(45), math.rad(80) * PACE * speed)
+	Turn(front.flever, x_axis, math.rad(-45), math.rad(65) * PACE * speed)
+	Turn(front.heeltoe, x_axis, math.rad(10), math.rad(20) * PACE * speed)
 	-- move and turn back leg
-	Move(back.leg, z_axis, -2, 3 * PACE)
-	Turn(back.blever, x_axis, math.rad(45), math.rad(95) * PACE)
-	Turn(back.foot, x_axis, math.rad(-35), math.rad(80) * PACE)
-	Turn(back.flever, x_axis, math.rad(20), math.rad(65) * PACE)
-	Turn(back.heeltoe, x_axis, math.rad(-10), math.rad(20) * PACE)
+	Move(back.leg, z_axis, -2, 3 * PACE * speed)
+	Turn(back.blever, x_axis, math.rad(45), math.rad(95) * PACE * speed)
+	Turn(back.foot, x_axis, math.rad(-35), math.rad(80) * PACE * speed)
+	Turn(back.flever, x_axis, math.rad(20), math.rad(65) * PACE * speed)
+	Turn(back.heeltoe, x_axis, math.rad(-10), math.rad(20) * PACE * speed)
 	
-	Move(base, y_axis, -1, 2)
+	Move(base, y_axis, -1, 2 * speed)
 	WaitForTurn(front.foot, x_axis)
 	WaitForTurn(back.foot, x_axis)
 	-- sleep for 1 gameframe; stops animation breaking in the Walk loop
@@ -65,7 +66,6 @@ end
 function script.Create()
 	gun_1 = true
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Move(base, x_axis, -2)
 end
 
 local function Stopping()
@@ -110,7 +110,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	
-	Turn(head, y_axis, heading, math.rad(100))
+	Turn(head, y_axis, heading, math.rad(120))
 	Turn(l_gun, x_axis, -pitch, math.rad(100))
 	Turn(r_gun, x_axis, -pitch, math.rad(100))
 	WaitForTurn(head, y_axis)
@@ -160,7 +160,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/280
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 170.1, 35 * distMult, false, false, true)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 180.1, 35 * distMult, false, false, true)
 	end
 	return false
 end

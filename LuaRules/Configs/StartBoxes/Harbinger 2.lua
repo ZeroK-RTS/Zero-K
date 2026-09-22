@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		nameLong = "North",
 		nameShort = "N",
 		startpoints = {{5070, 2760}},
@@ -85,7 +85,7 @@ return {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "North-East",
 		nameShort = "NE",
 		startpoints = {{6970, 3270}},
@@ -177,7 +177,7 @@ return {
 			},
 		},
 	},
-	[2] = {
+	{
 		nameLong = "East",
 		nameShort = "E",
 		startpoints = {{7630, 5180}},
@@ -304,7 +304,7 @@ return {
 			},
 		},
 	},
-	[3] = {
+	{
 		nameLong = "South-East",
 		nameShort = "SE",
 		startpoints = {{6980, 6980}},
@@ -401,7 +401,7 @@ return {
 			},
 		},
 	},
-	[4] = {
+	{
 		nameLong = "South",
 		nameShort = "S",
 		startpoints = {{5110, 7630}},
@@ -466,7 +466,7 @@ return {
 			},
 		},
 	},
-	[5] = {
+	{
 		nameLong = "South-West",
 		nameShort = "SW",
 		startpoints = {{3165, 6835}},
@@ -559,7 +559,7 @@ return {
 			},
 		},
 	},
-	[6] = {
+	{
 		nameLong = "West",
 		nameShort = "W",
 		startpoints = {{2500, 5065}},
@@ -677,7 +677,7 @@ return {
 			},
 		},
 	},
-	[7] = {
+	{
 		nameLong = "North-West",
 		nameShort = "NW",
 		startpoints = {{3300, 3400}},

@@ -1,5 +1,6 @@
 local base = piece('base')
 local drone = piece('drone')
+local shield = piece('shield')
 
 function script.AimFromWeapon(num)
 	return drone

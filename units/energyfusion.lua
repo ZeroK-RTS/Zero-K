@@ -9,6 +9,9 @@ return { energyfusion = {
   BuildingGroundDecalType       = [[energyfusion_ground.dds]],
   buildPic                      = [[energyfusion.png]],
   category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[80 80 70]],
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

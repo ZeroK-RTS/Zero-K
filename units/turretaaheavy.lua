@@ -21,6 +21,7 @@ return { turretaaheavy = {
     stockpiletime  = [[20]],
     priority_misc  = 1, -- Medium
     okp_damage = 1600,
+    normaltex = [[unittextures/Core_normals.dds]],
   },
 
   explodeAs                     = [[ESTOR_BUILDING]],
@@ -84,6 +85,7 @@ return { turretaaheavy = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
+      leadlimit               = 0,
       metalpershot            = 80,
       model                   = [[wep_m_avalanche.s3o]], -- Model radius 180 for QuadField fix.
       noSelfDamage            = true,

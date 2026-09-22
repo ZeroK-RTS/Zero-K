@@ -428,6 +428,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx, cy, cz -- command position
 		
 		local pointDis = Dist(ex, ez, ux, uz)
+		if pointDis == 0 then
+			ex, ez = math.random()*2 - 1, math.random()*2 - 1
+			pointDis = Dist(ex, ez, ux, uz)
+		end
 		UpdateJink(behaviour, unitData)
 		
 		-- jink towards the enemy
@@ -635,7 +639,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, 250, predictedDist, ux, uz, origEx, origEz)
 	end
 	
-	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
+	local skirmRange = (doHug and behaviour.hugRange) or ((behaviour.skirmRangeOverride or GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
 	skirmRange = skirmRange * (GG.att_RangeChange[unitData.udID] or 1)
 	--Spring.Echo("skirmRange", skirmRange, GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum))
 	local reloadFrames
@@ -839,6 +843,10 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 		return true, orderSent
+	end
+	
+	if enemy and unitData.allyTeam == spGetUnitAllyTeam(enemy) then
+		return false
 	end
 	
 	local didSwarm = false

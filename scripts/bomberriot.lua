@@ -1,6 +1,7 @@
 local base = piece 'base'
 local body = piece 'body'
 local jet = piece 'jet'
+local exhaust = piece 'exhaust'
 local drop = piece 'drop'
 local wingtipl = piece 'wingtipl'
 local wingtipr = piece 'wingtipr'
@@ -25,14 +26,28 @@ local function Lights()
 	end
 end
 
+function script.StartMoving()
+	Show(exhaust)
+end
+
 function script.StopMoving()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	Hide(exhaust)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
 end
 
 function script.Create()
+	Hide(exhaust)
 	SetInitialBomberSettings()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)
 end
 

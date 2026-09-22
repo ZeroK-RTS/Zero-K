@@ -90,8 +90,9 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	--	passedProjectile[proID] = true
 	--	return true
 	elseif weaponDefID and shieldCarrierUnitID and shieldEmitterWeaponNum and noExplode[weaponDefID] then
+		local damageMult = Spring.ValidUnitID(proOwnerID) and Spring.GetUnitRulesParam(proOwnerID, "comm_damage_mult") or 1
 		local _, charge = Spring.GetUnitShieldState(shieldCarrierUnitID) --FIXME figure out a way to get correct shield
-		if charge and shieldDamages[weaponDefID] < charge then
+		if charge and shieldDamages[weaponDefID] * damageMult < charge then
 			Spring.DeleteProjectile(proID)
 			if flowAroundShield[weaponDefID] then
 				SetNewProjectileVelocity(shieldCarrierUnitID, proID)

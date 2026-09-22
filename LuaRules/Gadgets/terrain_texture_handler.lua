@@ -27,7 +27,7 @@ local spGetMapSquareTexture = Spring.GetMapSquareTexture
 local floor = math.floor
 
 local SAVE_FILE = "Gadgets/terrain_texture_handler.lua"
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 1300)
+local BAR_COMPAT = Script.IsEngineMinVersion(105, 0, 1300)
 local USE_FORCE_UPDATE = true
 
 if (gadgetHandler:IsSyncedCode()) then

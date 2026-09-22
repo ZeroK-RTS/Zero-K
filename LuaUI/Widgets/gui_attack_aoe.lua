@@ -25,10 +25,22 @@ local aoeLineWidthMult     = 64
 local scatterColor         = {1, 1, 0, 1}
 local scatterLineWidthMult = 1024
 local depthColor           = {1, 0, 0, 0.5}
-local depthLineWidth       = 1
+local depthLineWidth       = 3
 local circleDivs           = 64
 local minSpread            = 8 --weapons with this spread or less are ignored
 local numAoECircles        = 9
+
+local BUFFER = 20
+local startHeights = {
+	["missileslow_weapon"] = -40 - BUFFER,
+	["seismic_seismic_weapon"] = -27 - BUFFER,
+	["tacnuke_weapon"] = -22 - BUFFER,
+	["empmissile_emp_weapon"] = -17 - BUFFER,
+	["napalmmissile_weapon"] = -27 - BUFFER,
+	["shipcarrier_disarm_rocket"] = -25 - BUFFER,
+	["subtacmissile_tacnuke"] = -25 - BUFFER,
+}
+
 --------------------------------------------------------------------------------
 --vars
 --------------------------------------------------------------------------------
@@ -138,12 +150,17 @@ end
 
 local function GetMouseTargetPosition()
 	local mx, my = GetMouseState()
-	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true, false, true)
+	local alt = Spring.GetModKeyState()
+	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, alt, true, false, true)
 
 	if (mouseTargetType == "ground") then
 		return mouseTarget[1], mouseTarget[2], mouseTarget[3], true
 	elseif (mouseTargetType == "unit") then
-		return GetUnitPosition(mouseTarget)
+		local ux, uy, uz, ax, ay, az = GetUnitPosition(mouseTarget, false, true)
+		if not ax then
+			return ux, uy, uz
+		end
+		return ax, ay, az
 	elseif (mouseTargetType == "feature") then
 		local _, coords = TraceScreenRay(mx, my, true, true, false, true)
 		if coords and coords[3] then
@@ -260,6 +277,18 @@ local function getWeaponInfo(weaponDef, unitDef)
 	else
 		retData.aoe = 0
 	end
+	if (weaponDef.uptime or 0) > 0 then
+		-- In the first frame the projectile moves startVelocity + 2*Acceleration
+		local startSpeed = math.min(weaponDef.startvelocity + weaponDef.weaponAcceleration, weaponDef.projectilespeed)
+		retData.vlaunch = {
+			upFrames = math.floor(weaponDef.uptime * 30 + 0.5) - 2,
+			accel = weaponDef.weaponAcceleration,
+			turnRate = weaponDef.turnRate,
+			startSpeed = startSpeed,
+			startHeight = startHeights[weaponDef.name] or 0,
+			endSpeed = weaponDef.projectilespeed,
+		}
+	end
 	retData.cost = cost
 	retData.mobile = not unitDef.isImmobile
 	retData.waterWeapon = waterWeapon
@@ -273,7 +302,7 @@ local function SetupUnit(unitDef, unitID)
 		return
 	end
 
-	local weapon1, weapon2, rangeMult
+	local weapon1, weapon2, rangeMult, rangeBoost
 	local manualfireWeapon = unitDef.customParams.air_manual_fire_weapon and tonumber(unitDef.customParams.air_manual_fire_weapon)
 	if unitID then
 		weapon1 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
@@ -286,8 +315,8 @@ local function SetupUnit(unitDef, unitID)
 		elseif manual2 then
 			manualfireWeapon = weapon2
 		end
-		
-		rangeMult = Spring.GetUnitRulesParam(unitID, "comm_range_mult")
+		rangeBoost = Spring.GetUnitRulesParam(unitID, "comm_range_boost")
+		rangeMult = Spring.GetUnitRulesParam(unitID, "rangeMult")
 	end
 	
 	local retDgunInfo
@@ -314,6 +343,9 @@ local function SetupUnit(unitDef, unitID)
 						if weaponDef.customParams.gui_draw_leashed_to_range then
 							retDgunInfo.drawLeashedToRange = true
 						end
+						if rangeBoost then
+							retDgunInfo.range = retDgunInfo.range + rangeBoost
+						end
 						if rangeMult then
 							retDgunInfo.range = retDgunInfo.range * rangeMult
 						end
@@ -337,6 +369,9 @@ local function SetupUnit(unitDef, unitID)
 		end
 		if maxWeaponDef.customParams.gui_draw_leashed_to_range then
 			retAoeInfo.drawLeashedToRange = true
+		end
+		if retAoeInfo.range and rangeBoost then
+			retAoeInfo.range = retAoeInfo.range + rangeBoost
 		end
 		if retAoeInfo.range and rangeMult then
 			retAoeInfo.range = retAoeInfo.range * rangeMult
@@ -468,6 +503,9 @@ local function DrawNoExplode(aoe, fx, fy, fz, tx, ty, tz, range)
 	end
 
 	local br = sqrt(bx*bx + bz*bz)
+	if br <= 0.1 then
+		return
+	end
 
 	local wx = -aoe * bz / br
 	local wz = aoe * bx / br
@@ -583,6 +621,9 @@ local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, t
 	end
 
 	local br = sqrt(bx*bx + bz*bz)
+	if br <= 0.1 then
+		return
+	end
 
 	--bars
 	local rx = dx / br
@@ -672,14 +713,18 @@ local function DrawDirectScatter(scatter, fx, fy, fz, tx, ty, tz, range, unitRad
 	if (not bx or d == 0 or d > range) then
 		return
 	end
+	local byInv = sqrt(1 - by*by)
+	if byInv == 0 then
+		return
+	end
 
-	local ux = bx * unitRadius / sqrt(1 - by*by)
-	local uz = bz * unitRadius / sqrt(1 - by*by)
+	local ux = bx * unitRadius / byInv
+	local uz = bz * unitRadius / byInv
 
 	local cx = -scatter * uz
 	local cz = scatter * ux
-	local wx = -scatter * dz / sqrt(1 - by*by)
-	local wz = scatter * dx / sqrt(1 - by*by)
+	local wx = -scatter * dz / byInv
+	local wz = scatter * dx / byInv
 
 	local vertices = {{fx + ux + cx, fy, fz + uz + cz}, {tx + wx, ty, tz + wz},
 					{fx + ux - cx, fy, fz + uz - cz}, {tx - wx, ty, tz - wz}}
@@ -767,6 +812,134 @@ local function LeashDrawRange(unitID, range, tx, ty, tz)
 end
 
 --------------------------------------------------------------------------------
+--Vlaunch missile calculation
+--------------------------------------------------------------------------------
+
+local function DrawVlaunchImpact(hx, hy, hz, tx, ty, tz)
+	glColor(depthColor)
+	glLineWidth(depthLineWidth)
+	glLineStipple(1, 255)
+	glBeginEnd(GL_LINES, VertexList, {{hx,hy,hz},{tx,ty,tz}})
+	glLineStipple(false)
+	glColor(1,1,1,1)
+	glLineWidth(1)
+end
+
+local function CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
+	local vlaunch = info.vlaunch
+	local speed = vlaunch.startSpeed
+	local y = vlaunch.startHeight
+	local horDist = math.sqrt((fx - tx)*(fx - tx) + (fz - tz)*(fz - tz))
+	local vertDist = ty - fy
+	
+	if (not info.range) or info.range + 10 < horDist or horDist < 100 then
+		return false
+	end
+	
+	--if doEcho then
+	--	Spring.Utilities.TableEcho(vlaunch)
+	--end
+	
+	-- Fly upwards
+	for i = 1, vlaunch.upFrames do
+		speed = math.min(vlaunch.endSpeed, speed + vlaunch.accel)
+		y = y + speed
+		--if doEcho then
+		--	Spring.Echo("GUP", 0, fy + y, speed)
+		--	doEcho = false
+		--end
+	end
+	
+	-- Turn to point at target
+	local pitch = math.pi/2
+	local hor = 0
+	local timeout = 1000
+	while pitch > -1.7 and timeout > 0 do
+		-- vlanuch missiles don't accelerate while turning.
+		pitch = pitch - vlaunch.turnRate
+		hor = hor + math.cos(pitch) * speed
+		y = y + math.sin(pitch) * speed
+		
+		--if doEcho then
+		--	Spring.Echo("TRN", hor, fy + y, speed)
+		--	doEcho = false
+		--end
+		if horDist <= hor then
+			-- Impact site is within turning circle, assume no terrain is in the way.
+			return false
+		end
+		
+		local pitchToTarget = math.atan((vertDist - y) / (horDist - hor))
+		if math.abs(pitchToTarget - pitch) < 0.14154 then -- Snap to target when within acos(0.99) radians
+			pitch = pitchToTarget
+			break
+		end
+		timeout = timeout - 1
+	end
+	
+	-- Fly towards target and hit it.
+	local velUnitHor, velUnitY = math.cos(pitch), math.sin(pitch)
+	local toX, toZ = (tx - fx) / horDist, (tz - fz) / horDist
+	local oldX, oldY, oldZ = false, false, false
+	local distSq = (horDist - hor)*(horDist - hor) + (vertDist - y)*(vertDist - y)
+	local prevDistSq = false
+	local speedFactor = 1
+	local accelerating = (vlaunch.accel > 0)
+	timeout = 1000
+	while (distSq > 100000 or (((not prevDistSq) or distSq < prevDistSq) and distSq > 3000)) and timeout > 0 do
+		if accelerating then
+			speed = speed + vlaunch.accel
+			if speed > vlaunch.endSpeed then
+				speed = vlaunch.endSpeed
+				accelerating = false
+			end
+		end
+		prevDistSq = distSq
+		hor = hor + velUnitHor * speed * speedFactor
+		y = y + velUnitY * speed * speedFactor
+		distSq = (horDist - hor)*(horDist - hor) + (vertDist - y)*(vertDist - y)
+		local px, py, pz = fx + toX*hor, fy + y, fz + toZ*hor
+		--if doEcho then
+		--	Spring.Echo("FLY", hor, py, speed)
+		--	doEcho = false
+		--end
+		local groundHeight = (GetGroundHeight(px, pz) or 0)
+		if groundHeight + 5 > py then
+			return px, groundHeight, pz
+		end
+		local aboveGround = py - groundHeight
+		if aboveGround < 80 and oldX then
+			-- Interpolate when near the ground. Does the engine do this? Not sure.
+			for i = 1, 3 do
+				local prop = i/4
+				local ix, iy, iz = prop*px + (1 - prop)*oldX, prop*py + (1 - prop)*oldY, prop*pz + (1 - prop)*oldZ
+				groundHeight = (GetGroundHeight(ix, iz) or 0)
+				if groundHeight + 5 > iy then
+					return ix, iy, iz
+				end
+			end
+		end
+		
+		-- Save some time if we are super high in the sky.
+		if not accelerating then
+			if aboveGround > 1200 then
+				speedFactor = 40
+			elseif aboveGround > 800 then
+				speedFactor = 20
+			elseif aboveGround > 500 then
+				speedFactor = 5
+			else
+				speedFactor = 1
+			end
+		end
+		
+		timeout = timeout - 1
+		oldX, oldY, oldZ = px, py, pz
+	end
+	return false
+end
+
+--------------------------------------------------------------------------------
 --Main draw
 --------------------------------------------------------------------------------
 
@@ -807,6 +980,13 @@ local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info, rangeR
 	end
 
 	local weaponType = info.type
+	if info.vlaunch and info.circleMode ~= "cloaker" then
+		local hx, hy, hz = CalculateVlaunchImpact(info, fx, fy, fz, tx, ty, tz)
+		if hx then
+			DrawVlaunchImpact(hx, hy, hz, tx, ty, tz)
+			tx, ty, tz = hx, hy, hz
+		end
+	end
 
 	if (weaponType == "noexplode") then
 		DrawNoExplode(info.aoe, fx, fy, fz, tx, ty, tz, info.range)

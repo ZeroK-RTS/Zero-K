@@ -235,6 +235,13 @@ local i = 1
 for k,v in pairs(moveDefs) do
 	v.heatmapping = false -- disable heatmapping
 	v.allowRawMovement = true
+
+	-- Movedef can define waterline, which has perf benefits but
+	-- means all units of that movedef are forced to have the same waterline.
+	-- At the moment waterlines are fine-tuned but we could consider
+	-- enabling this and compensating via model adjustment.
+	v.overrideUnitWaterline = false
+
 	array[i] = v
 	v.name = k
 	i = i + 1

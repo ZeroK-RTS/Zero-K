@@ -51,7 +51,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	if unitDefID == leaperDefID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD or cmdID == CMD.FIGHT) then
 		local startX, startZ, startY
 		if cmdOptions.shift then -- queue, use last queue position
-			local queue = Spring.GetCommandQueue(unitID, -1)
+			local queue = Spring.GetUnitCommands(unitID, -1)
 			for i=#queue, 1, -1 do
 				if #(queue[i].params) == 3 then -- todo: be less lazy
 					startX,startY, startZ = queue[i].params[1], queue[i].params[2], queue[i].params[3]

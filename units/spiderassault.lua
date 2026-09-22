@@ -14,10 +14,12 @@ return { spiderassault = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 120,
     bait_level_default = 0,
     modelradius    = [[12]],
     cus_noflashlight = 1,
     selection_scale = 1.05,
+    normaltex = [[unittextures/hermit_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -28,7 +30,7 @@ return { spiderassault = {
   leaveTracks            = true,
   maxSlope               = 36,
   maxWaterDepth          = 22,
-  metalCost              = 150,
+  metalCost              = 145,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB DRONE]],
   objectName             = [[hermit.s3o]],
@@ -58,6 +60,7 @@ return { spiderassault = {
 
     {
       def                = [[THUD_WEAPON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -69,6 +72,7 @@ return { spiderassault = {
     THUD_WEAPON = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 36,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -76,6 +80,7 @@ return { spiderassault = {
         light_camera_height = 1800,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 200,
+        burst = Shared.BURST_RELIABLE,
       },
 
       damage                  = {

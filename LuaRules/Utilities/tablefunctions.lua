@@ -3,6 +3,8 @@ if not Spring.Utilities.Base64Decode then
 	VFS.Include("LuaRules/Utilities/base64.lua", nil, VFS.GAME)
 end
 
+VFS.Include("LuaRules/Utilities/tablefunctions_bar.lua", nil, VFS.GAME)
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -33,6 +35,10 @@ function Spring.Utilities.CopyTable(tableToCopy, deep, appendTo)
   return copy
 end
 
+if not table.copy then
+	table.copy = Spring.Utilities.CopyTable
+end
+
 function Spring.Utilities.MergeTable(primary, secondary, deep)
 	local new = Spring.Utilities.CopyTable(primary, deep)
 	for i, v in pairs(secondary) do
@@ -49,6 +55,10 @@ function Spring.Utilities.MergeTable(primary, secondary, deep)
 		end
 	end
 	return new
+end
+
+if not table.merge then
+	table.merge = Spring.Utilities.MergeTable
 end
 
 function Spring.Utilities.OverwriteTableInplace(primary, secondary, deep)
@@ -189,7 +199,7 @@ function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
 	if not dataRaw then
 		return
 	end
-	if not type(dataRaw) == 'string' then
+	if type(dataRaw) ~= 'string' then
 		Spring.Echo("Customkey data error! type == " .. type(dataRaw))
 	else
 		dataRaw = string.gsub(dataRaw, '_', '=')
@@ -211,4 +221,11 @@ function Spring.Utilities.CustomKeyToUsefulTable(dataRaw)
 	if collectgarbage then
 		collectgarbage("collect")
 	end
+end
+
+function Spring.Utilities.UsefulTableToCustomKey(inputTable)
+	if not inputTable then
+		return
+	end
+	return Spring.Utilities.Base64Encode(Spring.Utilities.TableToString(inputTable))
 end

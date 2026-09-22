@@ -30,7 +30,7 @@ local savedCameraStates = {}
 --------------------------------------------------------------------------------
 
 options_path = 'Hotkeys/Camera/Camera Position Hotkeys'
-options_order = {'lbl_alert', 'zoom_speed', 'zoomAlert', 'zoomDamage', 'zoomMessage', 'lbl_pos', 'savezoom', 'pos_zoom_speed', 'recallStartPos'}
+options_order = {'lbl_alert', 'zoom_speed', 'zoomAlert', 'zoomDamage', 'zoomMessage', 'lbl_pos', 'savezoom', 'savepersists', 'pos_zoom_speed', 'recallStartPos'}
 options = {
 	lbl_alert = {
 		type = 'label',
@@ -83,6 +83,13 @@ options = {
 		desc = 'Save more information about the camera state. This may break if you change camera type midgame.',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+	},
+	savepersists = {
+		name = 'Save persists across battles',
+		desc = 'Save camera position across battles. Really only useful for lining up screenshots.',
+		type = 'bool',
+		value = false,
 		noHotkey = true,
 	},
 	pos_zoom_speed = {
@@ -170,6 +177,23 @@ function widget:PlayerChanged(playerID)
 		return
 	end
 	myTeamID = Spring.GetMyTeamID()
+end
+
+
+function widget:GetConfigData(data)
+	savedTable = {}
+	savedTable.savedCameraPositions = savedCameraPositions
+	savedTable.savedCameraStates = savedCameraStates
+	savedTable.persist = options.savepersists.value
+	return savedTable
+end
+
+function widget:SetConfigData(data)
+	if data and data.savedCameraPositions and data.persist then
+		options.savepersists.value = true
+		savedCameraPositions = data.savedCameraPositions
+		savedCameraStates = data.savedCameraStates
+	end
 end
 
 --------------------------------------------------------------------------------

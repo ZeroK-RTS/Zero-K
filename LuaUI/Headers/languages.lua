@@ -10,6 +10,7 @@ local langs = {
 	{ lang = 'tr', flag = 'tr', name = 'Türkçe' },
 	{ lang = 'uk_UA', flag = 'ua', name = 'Українська' },
 	{ lang = 'sl', flag = 'si', name = 'Slovenščina' },
+	{ lang = 'ja', flag = 'jp', name = '日本語' },
 }
 
 local flagByLang, langByFlag = {}, {}

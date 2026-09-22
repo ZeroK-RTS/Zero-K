@@ -24,6 +24,7 @@ return { tankcon = {
     midposoffset   = [[0 -4 0]],
     modelradius    = [[30]],
     selection_scale = 1.5,
+    normaltex = [[unittextures/welder_normals.dds]],
 
     outline_x = 80,
     outline_y = 80,
@@ -83,6 +84,7 @@ return { tankcon = {
     LASER = {
       name                    = [[Mini Laser]],
       areaOfEffect            = 8,
+      cegTag                  = [[laser_cannon_trail_thin]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,

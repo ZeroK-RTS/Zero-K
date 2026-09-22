@@ -96,7 +96,7 @@ local spGetUnitPosition       = Spring.GetUnitPosition
 local spGetUnitPiecePosition  = Spring.GetUnitPiecePosition
 local spGetUnitVectors        = Spring.GetUnitVectors
 local spGetUnitIsStunned      = Spring.GetUnitIsStunned
-local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitCommands       = Spring.GetUnitCommands
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 --------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
-	local queue = spGetCommandQueue(unitID, -1)
+	local queue = spGetUnitCommands(unitID, -1)
 	local firestate = Spring.Utilities.GetUnitFireState(unitID)
 	spGiveOrderToUnit(unitID, CMD_FIRE_STATE, 0, 0)
 	spGiveOrderToUnit(unitID, CMD_STOP, 0, 0)
@@ -214,7 +214,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 				spGiveOrderToUnit(unitID, cmd.id, cmd.params, MakeOptsWithShift(cmd.options))
 				i = i + 1
 			end
-			--local cq = spGetCommandQueue(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
+			--local cq = spGetUnitCommands(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
 		end
 		if toInsert or index < 0 then
 			spGiveOrderToUnit(unitID, cmdID, params, cmdOpt)
@@ -387,7 +387,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting, followMove)
 	
 	--Spring.Utilities.UnitEcho(unitID, "requesting rearm")
 	local detectedRearm = false
-	local queue = spGetCommandQueue(unitID, -1) or emptyTable
+	local queue = spGetUnitCommands(unitID, -1) or emptyTable
 	local index = #queue + 1
 	for i = 1, #queue do
 		if combatCommands[queue[i].id] then
@@ -683,7 +683,7 @@ function GG.LandComplete(bomberID)
 			(padID and airpadsData[padID] and not airpadsData[padID].mobile) then
 		local padQueueLength = Spring.GetUnitCommandCount(padID)
 		if padQueueLength > 0 then
-			local padQueue = spGetCommandQueue(padID, -1)
+			local padQueue = spGetUnitCommands(padID, -1)
 			for i = 1, #padQueue do
 				padQueue[i][1] = padQueue[i].id
 				padQueue[i][2] = padQueue[i].params

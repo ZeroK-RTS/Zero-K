@@ -13,7 +13,7 @@ end
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
-VFS.Include(luaShaderDir.."instancevboidtable.lua")
+VFS.Include(luaShaderDir.."InstanceVboidTableUnwrapper.lua")
 
 local highlightunitShader, unitShapeShader
 local highlightUnitVBOTable
@@ -22,7 +22,8 @@ local uniqueID = 0
 local highlightunitShaderConfig = {
 	ANIMSPEED = 2 / Game.gameSpeed,
 	ANIMFREQUENCY = 1 / Game.gameSpeed,
-	SKINSUPPORT = Spring.Utilities.IsCurrentVersionNewerThan(105, 1653) and 1 or 0,
+	SKINSUPPORT = Script.IsEngineMinVersion(105, 0, 1654) and 1 or 0,
+	USEQUATERNIONS = Engine.FeatureSupport.transformsInGL4 and "1" or "0",
 }
 
 local vsSrc =
@@ -51,10 +52,15 @@ layout (location = 8) in vec4 hcolor; // rgb color, plainalpha
 layout (location = 9) in uvec4 instData;
 
 //__ENGINEUNIFORMBUFFERDEFS__
+//__QUATERNIONDEFS__
 #line 15000
-layout(std140, binding=0) readonly buffer MatrixBuffer {
-	mat4 mat[];
-};
+
+#if USEQUATERNIONS == 0
+	layout(std140, binding = 0) readonly buffer MatrixBuffer {
+		mat4 UnitPieces[];
+	};
+#endif
+
 struct SUniformsBuffer {
     uint composite; //     u8 drawFlag; u8 unused1; u16 id;
     uint unused2;
@@ -77,11 +83,21 @@ out vec3 v_normal;
 out vec4 v_hcolor;
 void main() {
 	uint baseIndex = instData.x;
-	mat4 modelWorldMatrix = mat[baseIndex];
+	#if USEQUATERNIONS == 0
+		mat4 modelWorldMatrix = UnitPieces[baseIndex];
+	#else
+		Transform modelWorldTX = GetModelWorldTransform(instData.x);
+		mat4 modelWorldMatrix = TransformToMatrix(modelWorldTX);
+	#endif
 	// dynamic models have one extra matrix, as their first matrix is their world pos/offset
 	uint isDynamic = 1u; //default dynamic model
 	if (parameters.x > 0.5) isDynamic = 0u;  //if paramy == 1 then the unit is static
-	mat4 pieceMatrix = mat[baseIndex + pieceIndex + isDynamic];
+	#if USEQUATERNIONS == 0
+		mat4 pieceMatrix = UnitPieces[baseIndex + pieceIndex + isDynamic];
+	#else
+		Transform modelPieceTX = GetPieceModelTransform(baseIndex + isDynamic, pieceIndex);
+		mat4 pieceMatrix = TransformToMatrix(modelPieceTX);
+	#endif
 	vec4 localModelPos = pieceMatrix * vec4(pos + 0.006 * normal, 1.0);
 	//vec4 localModelPos = pieceMatrix * vec4(pos + sin(timeInfo.x  * 0.05) * 10 * normal , 1.0); // Hunt for rogue geometry.
 	// Make the rotation matrix around Y and rotate the model
@@ -204,6 +220,11 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	if WG.HighlightUnitCus then
+		Spring.Echo("highlightUnitShader using CUS instead")
+		widgetHandler:RemoveWidget()
+		return
+	end
 
 	local vertVBO = gl.GetVBO(GL.ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false
 	local indxVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false
@@ -229,7 +250,9 @@ function widget:Initialize()
 	local featuresIDs = Spring.GetAllFeatures()
 
 	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()
+	local quaternionDefs = LuaShader.GetQuaternionDefs()
 	vsSrc = vsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
+	vsSrc = vsSrc:gsub("//__QUATERNIONDEFS__", quaternionDefs)
 	fsSrc = fsSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 
 	highlightunitShader = LuaShader({

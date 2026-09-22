@@ -15,6 +15,7 @@ return { tankheavyassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 140,
     bait_level_default = 0,
     decloak_footprint     = 5,
 
@@ -61,6 +62,7 @@ return { tankheavyassault = {
 
     {
       def                = [[COR_GOL]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
@@ -77,6 +79,7 @@ return { tankheavyassault = {
     COR_GOL             = {
       name                    = [[Tankbuster Cannon]],
       areaOfEffect            = 32,
+      cegTag                  = [[cyclops_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 

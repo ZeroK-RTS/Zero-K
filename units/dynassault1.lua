@@ -34,6 +34,7 @@ return { dynassault1 = {
     dynamic_comm   = 1,
     shared_energy_gen = 1,
     set_target_range_buffer = 50,
+    normaltex = [[unittextures/benzcom_normals.dds]],
   },
 
   energyStorage       = 500,

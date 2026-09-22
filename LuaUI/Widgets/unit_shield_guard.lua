@@ -1,12 +1,12 @@
 function widget:GetInfo()
 	return {
-		name	  = "Shield Guard",
+		name	  = "Shield Guard 2",
 		desc	  = "Replaces guarding mobile shields with follow. Shields move at speed of slowest unit following and wait for stragglers.",
 		author    = "Google Frog",
 		date	  = "9 Mar, 2009",
 		license   = "GNU GPL, v2 or later",
 		layer	 = 5,
-		enabled   = true --  loaded by default?
+		enabled   = false --  loaded by default?
 	}
 end
 

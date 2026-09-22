@@ -144,6 +144,8 @@ function script.BlockShot(num, targetID)
 	local otherNum = 3 - num
 	local gameFrame = Spring.GetGameFrame()
 	Spring.SetUnitWeaponState(unitID, otherNum, "reloadFrame", gameFrame + reloadTime)
+	GG.UnitScriptDistortion(unitID, unitDefID, "launch")
+	GG.UnitScriptDistortion(unitID, unitDefID, "launchGround")
 	return false
 end
 

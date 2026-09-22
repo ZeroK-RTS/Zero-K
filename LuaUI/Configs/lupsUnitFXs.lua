@@ -1,5 +1,33 @@
 -- note that the order of the MergeTable args matters for nested tables (such as colormaps)!
 
+function MergeTable(table1,table2)
+	if not table1 then
+		return table2
+	end
+	if not table2 then
+		return table1
+	end
+	local result = {}
+	for i,v in pairs(table2) do
+		if (type(v)=='table') then
+			result[i] = MergeTable(v,{})
+		else
+			result[i] = v
+		end
+	end
+	for i,v in pairs(table1) do
+		if (result[i]==nil) then
+			if (type(v)=='table') then
+				if (type(result[i])~='table') then result[i] = {} end
+				result[i] = MergeTable(v,result[i])
+			else
+				result[i] = v
+			end
+		end
+	end
+	return result
+end
+
 local presets = {
 	commandAuraRed = {
 		{class='StaticParticles', options=commandCoronaRed},
@@ -51,11 +79,11 @@ local presets = {
 	},
 }
 
-effectUnitDefs = {
+local effectUnitDefs = {
 	--// FUSIONS //--------------------------
 	energysingu = {
 		{class='Bursts', options=energysinguBursts},
-		{class='StaticParticles', options=energysinguCorona},
+		{class='StaticParticles', options=MergeTable(energysinguCorona, {piece="energyball", sizeScaleParam="ballSwell"})},
 		--{class='ShieldSphere', options=energysinguShieldSphere},
 		--{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
 		{class='GroundFlash', options=groundFlashOrange},
@@ -100,9 +128,9 @@ effectUnitDefs = {
 	},
 
 	--// ENERGY STORAGE //--------------------
-	energypylon = {
-		{class='GroundFlash', options=groundFlashenergypylon},
-	},
+	--energypylon = { -- Lights draw it now
+	--	{class='GroundFlash', options=groundFlashenergypylon},
+	--},
 
 	--// FACTORIES //----------------------------
 	factoryship = {
@@ -197,8 +225,8 @@ effectUnitDefs = {
 	--// PLANES //----------------------------
 	bomberheavy = {
 		-- jets
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4, length=35, piece="thrust_L", onActive=true, noIconDraw = true, }},
-		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4, length=35, piece="thrust_R", onActive=true, noIconDraw = true, }},
+		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4 * 1.4, length=35, piece="thrust_L", onActive=true, noIconDraw = true, }},
+		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.4 * 1.4, length=35, piece="thrust_R", onActive=true, noIconDraw = true, }},
 
 		-- ribbons
 		{class='Ribbon', options={width=0.5, size=10, piece="wingtip_L", noIconDraw = true}},
@@ -206,7 +234,7 @@ effectUnitDefs = {
 
 		-- portable singularity
 		{class='Bursts', options=MergeTable(energysinguBursts,{piece="ball", noIconDraw = true, size=5, pos={0,0,0}})},
-		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", noIconDraw = true, size=18, pos={0,0,0}})},
+		{class='StaticParticles', options=MergeTable(energysinguCorona,{piece="ball", onUnitRulesParam="ballHalo", noIconDraw = true, size=18})},
 
 		-- blinky lights
 		{class='StaticParticles', options=MergeTable(blinkyLightRed,   {piece="extra_L"}) },
@@ -252,20 +280,23 @@ effectUnitDefs = {
 	gunshipemp = {
 		{class='Ribbon', options={width=1, size=5, piece="ljet", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=5, piece="rjet", noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="ljet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="rjet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="ljet", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="rjet", onActive=true, noIconDraw = true}},
 	},
 
+	gunshipbomb = {
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=20, piece="exhaust", onActive=true, noIconDraw = true}},
+	},
 	gunshipraid = {
 		{class='Ribbon', options={width=1, size=10, piece="lfx", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=10, piece="rfx", noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, noIconDraw = true}},
 	},
 	planecon = {
 		{class='Ribbon', options={width=1, size=10, piece="engine1", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=10, piece="engine2", noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="body", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="thrust", onActive=true, noIconDraw = true}},
 	},
 	gunshipaa = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=32, piece="ljet", onActive=true, noIconDraw = true}},
@@ -278,24 +309,34 @@ effectUnitDefs = {
 		{class='Ribbon', options={width=1, size=10, piece="wingl", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=10, piece="wingr", noIconDraw = true}},
 	},
+	planesupport = {
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustl", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustr", onActive=true, noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=10, piece="wingl", noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=10, piece="wingr", noIconDraw = true}},
+	},
 	bomberassault = {
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustLeft", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustRight", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.1,0.4,0.6}, width=6, length=60, piece="exhaustTop", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=38, piece="exhaustLeft", distortLength = 150, onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=38, piece="exhaustRight", distortLength = 150, onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.1,0.4,0.6}, width=6, length=50, piece="exhaustTop", distortLength = 180, onActive=true, noIconDraw = true}},
 	},
 	bomberprec = {
 		{class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipl", noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipr", noIconDraw = true}},
-	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
-	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
 	},
 	planefighter = {
-		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", distortLength = 140, onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", distortLength = 140, onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtip1", noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtip2", noIconDraw = true}},
+	},
+	gunshipskirm = {
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust1", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust2", onActive=true, noIconDraw = true}},
 	},
 	gunshipcon = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardRight", onActive=true, emitVector = {0, 0, -1}, noIconDraw = true}},
@@ -307,11 +348,13 @@ effectUnitDefs = {
 		{class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipl", noIconDraw = true}},
 		{class='Ribbon', options={width=1, piece="wingtipr", noIconDraw = true}},
-	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
-	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
 	},
 	planeheavyfighter = {
-		-- jets done in gadget
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust1", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust2", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust3", onActive=true, noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtip1", noIconDraw = true}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtip2", noIconDraw = true}},
 	},
@@ -324,6 +367,7 @@ effectUnitDefs = {
 		{class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav3", onActive=true})},
 		{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav4", onActive=true})},
 		{class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav4", onActive=true})},
+		{class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, baseLength = 9, piece="engineEmit", onActive=true, noIconDraw = true}},
 	},
 	gunshiptrans = {
 		{class='AirJet', options={color={0.2,0.4,0.8}, width=3.5, length=22, piece="engineEmit", onActive=true}},
@@ -340,8 +384,8 @@ effectUnitDefs = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="thrust", onActive=true}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtipl"}},
 		{class='Ribbon', options={width=1, size=8, piece="wingtipr"}},
-	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
-	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
+		{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },
 	},
 	planelightscout = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=1.8, length=15, piece="exhaustl", onActive=true}},
@@ -358,9 +402,9 @@ effectUnitDefs = {
 		{class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rwingengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
 	},
 	gunshipkrow = {
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
-		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true, emitVector = {0, 0, 1}, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=40, piece="jetrear", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=40, piece="jetleft", onActive=true, noIconDraw = true}},
+		{class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=40, piece="jetright", onActive=true, noIconDraw = true}},
 	},
 	nebula = {
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=15, length=60, piece="exhaustmain", onActive=true}},
@@ -435,3 +479,5 @@ for i=1,#UnitDefs do
 		end
 	end
 end
+
+return effectUnitDefs

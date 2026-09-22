@@ -4,12 +4,12 @@ local gpuMem = (Platform.gpuMemorySize and Platform.gpuMemorySize or 1000) / 100
 if Platform ~= nil and Platform.gpuVendor == 'Intel' then
 	isPotatoGpu = true
 end
-if gpuMem and gpuMem > 0 and gpuMem < 1800 then
+if gpuMem and gpuMem > 0 and gpuMem < 3000 then
 	isPotatoGpu = true
 end
 
 
-local widgetName = "ssao 3"
+local widgetName = "ssao 6"
 function widget:GetInfo()
     return {
         name      = widgetName,
@@ -19,7 +19,7 @@ function widget:GetInfo()
         date      = "2019",
         license   = "GPL",
         layer     = 999999,
-        enabled   = true, -- not isPotatoGpu, -- Sometimes causes a bug.
+        enabled   = false, -- Costs too much performance to be default, and can send potato FPS < 20.
     }
 end
 
@@ -271,13 +271,18 @@ function widget:ViewResize()
 end
 
 function widget:Initialize()
+	if isPotatoGpu then
+		Spring.Echo("SSAO: Unsupported hardware.")
+		widgetHandler:RemoveWidget()
+		return
+	end
 	WG.SSAO_DeferredRenderingDisabled = SSAO_DeferredRenderingDisabled
 	if not gl.CreateShader or not gl.RawBindFBO then -- no shader support, so just remove the widget itself, especially for headless
 		Spring.Echo("SSAO: gl.CreateShader or gl.RawBindFBO not found, disabling.")
 		widgetHandler:RemoveWidget()
 		return
 	end
-	if WG.SSAO_RequireDeferredRendering and WG.WidgetEnabledAndActive and not WG.WidgetEnabledAndActive("Deferred rendering") then
+	if WG.SSAO_RequireDeferredRendering and WG.WidgetEnabledAndActive and not (WG.WidgetEnabledAndActive("Deferred rendering") or WG.WidgetEnabledAndActive("Deferred rendering GL4")) then
 		Spring.Echo("SSAO: Deferred rendering not found, disabling.")
 		widgetHandler:RemoveWidget()
 		return

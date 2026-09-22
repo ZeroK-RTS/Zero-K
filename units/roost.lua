@@ -83,6 +83,7 @@ return { roost = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[chickeneggblue.s3o]],
       range                   = 600,
       reloadtime              = 3,

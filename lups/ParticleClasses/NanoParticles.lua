@@ -207,7 +207,8 @@ function NanoParticles:Draw()
 	glMultiTexCoord(2, endPosOld[1], endPosOld[2], endPosOld[3], 1)
 
 	glMultiTexCoord(6,self.size,self.sizeSpread,self.sizeGrowth,self.targetradius)
-	glMultiTexCoord(7,self.delaySpread,1/(self.life - self.reuseLinger))
+	local delaySpread = ((self.life ~= self.reuseLinger) and 1/(self.life - self.reuseLinger)) or 10000
+	glMultiTexCoord(7,self.delaySpread,delaySpread)
 
 	local color = self.color
 	glColor(color[1],color[2],color[3],color[4])

@@ -51,8 +51,21 @@ local function MoveScript()
 	end
 end
 
+local prevMult, prevWeaponMult
+local function RangeUpdate(mult, weaponMult)
+	mult = mult or prevMult or 1
+	weaponMult = weaponMult or prevWeaponMult
+	prevMult, prevWeaponMult = mult, weaponMult
+	if rangeChanged then
+		return
+	end
+	Spring.SetUnitWeaponState(unitID, 1, "range", weaponRange * mult * (weaponMult and weaponMult[1] or 1))
+end
+
 function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
+	Turn(flare, x_axis, 0.01)
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end
@@ -80,12 +93,14 @@ function script.BlockShot(num, targetID)
 			end
 		end
 	end
+	EmitSfx(flare, 1026)
 	return false
 end
 
 function script.EndBurst()
 	if rangeChanged then
-		Spring.SetUnitWeaponState(unitID, 1, "range", weaponRange)
+		rangeChanged = false
+		RangeUpdate()
 	end
 end
 

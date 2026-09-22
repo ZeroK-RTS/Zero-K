@@ -29,6 +29,8 @@ local playerLineageUnits = {} --keep track of unit ownership: Is populated when 
 local unitPriorityState = {} -- Keep track of initial unit priority state.
 local teamResourceShare = {}
 local allyTeamResourceShares = {}
+local teamCommanderShare = {}
+local allyTeamCommanderShares = {}
 local unitAlreadyFinished = {}
 
 local spEcho                  = Spring.Echo
@@ -46,6 +48,8 @@ local spGiveOrderToUnitArray  = Spring.GiveOrderToUnitArray
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor ~= "off" and not Spring.Utilities.Gametype.isCoop())
+local allowPlayerInactivity = not Spring.Utilities.Gametype.isFullCommshare()
+local MERGE_SHARE = tonumber(Spring.GetModOptions().mergeresourceshare or 0.5) or 0.5
 
 include("LuaRules/Configs/constants.lua")
 
@@ -212,6 +216,7 @@ end
 
 local function UpdateTeamActivity(teamID)
 	local resourceShare = 0
+	local commanderShare = 0
 	local teamRank = false
 	local isHostedAi = false
 	local isBackupAi = false
@@ -219,7 +224,12 @@ local function UpdateTeamActivity(teamID)
 	for i = 1, #players do
 		local activeRank = GetPlayerActivity(players[i])
 		if activeRank then
-			resourceShare = resourceShare + 1
+			if resourceShare == 0 then
+				resourceShare = 1
+			else
+				resourceShare = resourceShare + MERGE_SHARE
+			end
+			commanderShare = commanderShare + (Spring.GetPlayerRulesParam(players[i], "initial_commanders") or 1)
 			if (not teamRank) or (activeRank > teamRank) then
 				teamRank = activeRank
 			end
@@ -234,6 +244,7 @@ local function UpdateTeamActivity(teamID)
 				isBackupAi = true
 			else
 				resourceShare = resourceShare + 1
+				commanderShare = commanderShare + (Spring.GetTeamRulesParam(teamID, "initial_commanders") or 1)
 			end
 		else
 			isHostedAi = true
@@ -242,7 +253,12 @@ local function UpdateTeamActivity(teamID)
 			-- AI teams without any hosting player are effectively dead.
 			if GetPlayerActivity(hostingPlayerID, true) and isAiTeam then
 				resourceShare = resourceShare + 1
+				commanderShare = commanderShare + (Spring.GetTeamRulesParam(teamID, "initial_commanders") or 1)
 			end
+		end
+	elseif not allowPlayerInactivity then
+		if resourceShare == 0 then
+			resourceShare = 1
 		end
 	end
 	
@@ -287,7 +303,7 @@ local function UpdateTeamActivity(teamID)
 	end
 	
 	-- Note that AIs do not have a rank so a team with just an AI will have teamRank = false
-	return resourceShare, teamRank, isHostedAi, isBackupAi
+	return resourceShare, commanderShare, teamRank, isHostedAi, isBackupAi
 end
 
 local function GetRawTeamShare(teamID)
@@ -368,6 +384,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	local teamList = spGetTeamList(allyTeamID)
 	
 	local totalResourceShares = 0
+	local totalCommanderShares = 0
 	local giveAwayTeams = {}
 	local giveAwayAiTeams = {}
 	local recieveRank = false
@@ -381,12 +398,13 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local resourceShare, teamRank, isHostedAiTeam, isBackupAi = UpdateTeamActivity(teamID)
+		local resourceShare, commanderShare, teamRank, isHostedAiTeam, isBackupAi = UpdateTeamActivity(teamID)
 		totalResourceShares = totalResourceShares + resourceShare
+		totalCommanderShares = totalCommanderShares + commanderShare
 		if debugAllyTeam and debugAllyTeam[allyTeamID] then
 			local _, leader = Spring.GetTeamInfo(teamID)
 			local name = leader and Spring.GetPlayerInfo(leader)
-			Spring.Echo("playerID", leader or "none", "name", name or "none", "teamID", teamID, "share", resourceShare, "rank", teamRank, "isHostedAi", isHostedAiTeam, "isBackup", isBackupAi)
+			Spring.Echo("playerID", leader or "none", "name", name or "none", "teamID", teamID, "share", resourceShare, "comms", commanderShare, "rank", teamRank, "isHostedAi", isHostedAiTeam, "isBackup", isBackupAi)
 		end
 		
 		if not isBackupAi then
@@ -410,6 +428,8 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		end
 		
 		teamResourceShare[teamID] = resourceShare
+		teamCommanderShare[teamID] = commanderShare
+		Spring.SetTeamRulesParam(teamID, "lagmonitor_commander_allocation", commanderShare)
 	end
 	
 	if debugAllyTeam and debugAllyTeam[allyTeamID] then
@@ -450,6 +470,8 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	end
 	
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
+	allyTeamCommanderShares[allyTeamID] = totalCommanderShares
+	Spring.SetAllyTeamRulesParam(allyTeamID, "lagmonitor_commander_allocation", totalCommanderShares)
 end
 
 local function InitializeAiTeamRulesParams()
@@ -540,6 +562,13 @@ end
 local externalFunctions = {}
 function externalFunctions.GetResourceShares()
 	return allyTeamResourceShares, teamResourceShare
+end
+
+function externalFunctions.GetTeamCommanderShare(teamID)
+	local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
+	local share = Spring.GetTeamRulesParam(teamID, "lagmonitor_commander_allocation", commanderShare) or Spring.GetTeamRulesParam(teamID, "initial_commanders")
+	local totalShare = Spring.GetAllyTeamRulesParam(allyTeamID, "lagmonitor_commander_allocation", totalCommanderShares) or Spring.GetAllyTeamRulesParam(allyTeamID, "initial_commanders")
+	return share, totalShare
 end
 
 function gadget:Initialize()

@@ -594,6 +594,9 @@ function widget:CommandsChanged()
 end
 
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
+	if not WG.metalSpots then
+		return
+	end
 	local bestSpot
 	local bestDist = math.huge
 	local bestIndex

@@ -46,6 +46,7 @@ return { factoryjump = {
     factorytab       = 1,
     shared_energy_gen = 1,
     parent_of_plate   = [[platejump]],
+    normaltex = [[unittextures/Core_normals.dds]],
 
     stats_show_death_explosion = 1,
 

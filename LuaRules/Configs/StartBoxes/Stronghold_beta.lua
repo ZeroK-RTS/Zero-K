@@ -1104,53 +1104,53 @@ local r = math.random()
 if sputGametype.isFFA() or sputGametype.is1v1() then
 	if spUtilities.GetTeamCount() > 4 then return {
 		-- 8-way FFA
-		[0] = { boxes = {boxSE}, startpoints = startSE, nameLong = "South-East", nameShort = "SE" },
-		[1] = { boxes = {boxNW}, startpoints = startNW, nameLong = "North-West", nameShort = "NW" },
-		[2] = { boxes = {boxNE}, startpoints = startNE, nameLong = "North-East", nameShort = "NE" },
-		[3] = { boxes = {boxSW}, startpoints = startSW, nameLong = "South-West", nameShort = "SW" },
-		[4] = { boxes = {boxN }, startpoints = startN,  nameLong = "North",      nameShort = "N"  },
-		[5] = { boxes = {boxS }, startpoints = startS,  nameLong = "South",      nameShort = "S"  },
-		[6] = { boxes = {boxW }, startpoints = startW,  nameLong = "West",       nameShort = "W"  },
-		[7] = { boxes = {boxE }, startpoints = startE,  nameLong = "East",       nameShort = "E"  },
+		{ boxes = {boxSE}, startpoints = startSE, nameLong = "South-East", nameShort = "SE" },
+		{ boxes = {boxNW}, startpoints = startNW, nameLong = "North-West", nameShort = "NW" },
+		{ boxes = {boxNE}, startpoints = startNE, nameLong = "North-East", nameShort = "NE" },
+		{ boxes = {boxSW}, startpoints = startSW, nameLong = "South-West", nameShort = "SW" },
+		{ boxes = {boxN }, startpoints = startN,  nameLong = "North",      nameShort = "N"  },
+		{ boxes = {boxS }, startpoints = startS,  nameLong = "South",      nameShort = "S"  },
+		{ boxes = {boxW }, startpoints = startW,  nameLong = "West",       nameShort = "W"  },
+		{ boxes = {boxE }, startpoints = startE,  nameLong = "East",       nameShort = "E"  },
 	} elseif r < 0.5 then return {
 		-- 1v1 or 4-way FFA, diagonals
-		[0] = { boxes = {boxSE}, startpoints = startSE, nameLong = "South-East", nameShort = "SE" },
-		[1] = { boxes = {boxNW}, startpoints = startNW, nameLong = "North-West", nameShort = "NW" },
-		[2] = { boxes = {boxNE}, startpoints = startNE, nameLong = "North-East", nameShort = "NE" },
-		[3] = { boxes = {boxSW}, startpoints = startSW, nameLong = "South-West", nameShort = "SW" },
+		{ boxes = {boxSE}, startpoints = startSE, nameLong = "South-East", nameShort = "SE" },
+		{ boxes = {boxNW}, startpoints = startNW, nameLong = "North-West", nameShort = "NW" },
+		{ boxes = {boxNE}, startpoints = startNE, nameLong = "North-East", nameShort = "NE" },
+		{ boxes = {boxSW}, startpoints = startSW, nameLong = "South-West", nameShort = "SW" },
 	} else return {
 		-- 1v1 or 4-way FFA, cardinals
-		[0] = { boxes = {boxN}, startpoints = startN, nameLong = "North", nameShort = "N" },
-		[1] = { boxes = {boxS}, startpoints = startS, nameLong = "South", nameShort = "S" },
-		[2] = { boxes = {boxW}, startpoints = startW, nameLong = "West",  nameShort = "W" },
-		[3] = { boxes = {boxE}, startpoints = startE, nameLong = "East",  nameShort = "E" },
+		{ boxes = {boxN}, startpoints = startN, nameLong = "North", nameShort = "N" },
+		{ boxes = {boxS}, startpoints = startS, nameLong = "South", nameShort = "S" },
+		{ boxes = {boxW}, startpoints = startW, nameLong = "West",  nameShort = "W" },
+		{ boxes = {boxE}, startpoints = startE, nameLong = "East",  nameShort = "E" },
 	} end
 elseif sputGametype.isSmallTeams() then
 	if r < 0.5 then return {
 		-- teams, 2-area, top vs bottom
-		[0] = { boxes = {boxSE, boxS}, startpoints = MergeStarts(startSE, startS), nameLong = "South-East", nameShort = "SE" },
-		[1] = { boxes = {boxNW, boxN}, startpoints = MergeStarts(startNW, startN), nameLong = "North-West", nameShort = "NW" },
+		{ boxes = {boxSE, boxS}, startpoints = MergeStarts(startSE, startS), nameLong = "South-East", nameShort = "SE" },
+		{ boxes = {boxNW, boxN}, startpoints = MergeStarts(startNW, startN), nameLong = "North-West", nameShort = "NW" },
 	} else return {
 		-- teams, 2-area, east vs west
-		[0] = { boxes = {boxSE, boxE}, startpoints = MergeStarts(startSE, startE), nameLong = "South-East", nameShort = "SE" },
-		[1] = { boxes = {boxNW, boxW}, startpoints = MergeStarts(startNW, startW), nameLong = "North-West", nameShort = "NW" },
+		{ boxes = {boxSE, boxE}, startpoints = MergeStarts(startSE, startE), nameLong = "South-East", nameShort = "SE" },
+		{ boxes = {boxNW, boxW}, startpoints = MergeStarts(startNW, startW), nameLong = "North-West", nameShort = "NW" },
 	} end
 else
 	if r < 0.25 then return {
 		-- teams, 3-area, top vs bottom
-		[0] = { boxes = {boxS, boxSW, boxSE}, startpoints = MergeStarts(startS, startSW, startSE), nameLong = "South", nameShort = "S" },
-		[1] = { boxes = {boxN, boxNE, boxNW}, startpoints = MergeStarts(startN, startNE, startNW), nameLong = "North", nameShort = "N" },
+		{ boxes = {boxS, boxSW, boxSE}, startpoints = MergeStarts(startS, startSW, startSE), nameLong = "South", nameShort = "S" },
+		{ boxes = {boxN, boxNE, boxNW}, startpoints = MergeStarts(startN, startNE, startNW), nameLong = "North", nameShort = "N" },
 	} elseif r < 0.50 then return {
 		-- teams, 3-area, east vs west
-		[0] = { boxes = {boxE, boxNE, boxSE}, startpoints = MergeStarts(startE, startNE, startSE), nameLong = "East", nameShort = "E" },
-		[1] = { boxes = {boxW, boxSW, boxNW}, startpoints = MergeStarts(startW, startSW, startNW), nameLong = "West", nameShort = "W" },
+		{ boxes = {boxE, boxNE, boxSE}, startpoints = MergeStarts(startE, startNE, startSE), nameLong = "East", nameShort = "E" },
+		{ boxes = {boxW, boxSW, boxNW}, startpoints = MergeStarts(startW, startSW, startNW), nameLong = "West", nameShort = "W" },
 	} elseif r < 0.75 then return {
 		-- teams, 3-area, corners SE vs NW
-		[0] = { boxes = {boxSE, boxE, boxS}, startpoints = MergeStarts(startSE, startE, startS), nameLong = "South-East", nameShort = "SE" },
-		[1] = { boxes = {boxNW, boxW, boxN}, startpoints = MergeStarts(startNW, startW, startN), nameLong = "North-West", nameShort = "NW" },
+		{ boxes = {boxSE, boxE, boxS}, startpoints = MergeStarts(startSE, startE, startS), nameLong = "South-East", nameShort = "SE" },
+		{ boxes = {boxNW, boxW, boxN}, startpoints = MergeStarts(startNW, startW, startN), nameLong = "North-West", nameShort = "NW" },
 	} else return {
 		-- teams, 3-area, corners SW vs NE
-		[0] = { boxes = {boxSW, boxW, boxS}, startpoints = MergeStarts(startSW, startW, startS), nameLong = "South-West", nameShort = "SW" },
-		[1] = { boxes = {boxNE, boxE, boxN}, startpoints = MergeStarts(startNE, startE, startN), nameLong = "North-East", nameShort = "NE" },
+		{ boxes = {boxSW, boxW, boxS}, startpoints = MergeStarts(startSW, startW, startS), nameLong = "South-West", nameShort = "SW" },
+		{ boxes = {boxNE, boxE, boxN}, startpoints = MergeStarts(startNE, startE, startN), nameLong = "North-East", nameShort = "NE" },
 	} end
 end

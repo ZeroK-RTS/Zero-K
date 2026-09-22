@@ -16,11 +16,12 @@ return { shipassault = {
   corpse                 = [[DEAD]],
   --Core_color.dds Core_other.dds
   customParams           = {
-    aim_lookahead      = 80,
+    aim_lookahead      = 120,
     bait_level_default = 0,
     modelradius    = [[55]],
     turnatfullspeed = [[1]],
     extradrawrange = 800,
+    normaltex = [[unittextures/Core_normals.dds]],
 
     outline_x = 160,
     outline_y = 160,
@@ -68,6 +69,7 @@ return { shipassault = {
 
     {
       def                = [[SONIC]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
       mainDir            = [[0 -1 0]],

@@ -135,7 +135,7 @@ function WG.PauseScreen_SetEnabled(newEnabled, newDoNotDisableSound)
 end
 
 local function playSound(filename, ...)
-	local path = SOUND_DIRNAME..filename..".WAV"
+	local path = SOUND_DIRNAME..filename..".wav"
 	if (VFS.FileExists(path)) then
 		Spring.PlaySoundFile(path, ...)
 	else

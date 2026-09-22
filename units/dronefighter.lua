@@ -63,6 +63,7 @@ return { dronefighter = {
   sightDistance          = 520,
   speed                  = 240,
   speedToFront           = 0,
+  stealth                = true,
   turnRate               = 9001,
   turnRadius             = 90,
 

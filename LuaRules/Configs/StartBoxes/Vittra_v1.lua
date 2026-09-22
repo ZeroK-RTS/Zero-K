@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		boxes = {
 			{
 				{Game.mapSizeX / 2, Game.mapSizeZ-1},
@@ -51,7 +51,7 @@ return {
 		nameLong = "South",
 		nameShort = "S",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{Game.mapSizeX / 2, 0},

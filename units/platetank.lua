@@ -42,6 +42,7 @@ return { platetank = {
     unstick_help       = 1,
     child_of_factory   = [[factorytank]],
     buggeroff_offset   = 45,
+    normaltex = [[unittextures/factorytank_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,
@@ -66,7 +67,7 @@ return { platetank = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = "oooooo oooooo oooooo oooooo yyyyyy yyyyyy yyyyyy yyyyyy",
+  yardMap                       = "oooooo oooooo oooooo oooooo uuuuuu uuuuuu uuuuuu uuuuuu",
 
   featureDefs                   = {
 

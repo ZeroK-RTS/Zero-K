@@ -12,6 +12,9 @@ return { energywind = {
   collisionVolumeOffsets        = [[0 5 0]],
   collisionVolumeScales         = [[30 80 30]],
   collisionVolumeType           = [[CylY]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[35 80 35]],
+  selectionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

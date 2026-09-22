@@ -74,12 +74,21 @@ end
 function IterableMap.Get(self, key)
 	return self.dataByKey[key]
 end
+
 function IterableMap.Set(self, key, data)
 	if not self.indexByKey[key] then
 		IterableMap.Add(self, key, data)
 	else
 		self.dataByKey[key] = data
 	end
+end
+
+function IterableMap.GetRandom(self)
+	if IterableMap.IsEmpty(self) then
+		return false
+	end
+	local index = math.random(1, self.indexMax)
+	return key, IterableMap.Get(self, key)
 end
 
 function IterableMap.InMap(self, key)

@@ -1,9 +1,7 @@
 #version 420
 #line 10000
 
-// This file is going to be licensed under some sort of GPL-compatible license, but authors are dragging
-// their feet. Avoid copying for now (unless this header rots for years on end), and check back later.
-// See https://github.com/ZeroK-RTS/Zero-K/issues/5328
+// Shader licensed under GNU GPL, v2 or later. Relicensed from MIT, preserving the notice "(c) Beherith (mysterme@gmail.com)".
 
 //__DEFINES__
 
@@ -62,8 +60,9 @@ void main() {
 	blendedcolor.a = 0.5;
 	//if (dist_to_center > radarcenter_range.w) blendedcolor.a = 0.0;  // do this in fs instead
 
-	blendedcolor.g = 1.0-clamp(obscured*0.5,0.0,1.0);
-
+	blendedcolor.g = 0.8-clamp(obscured*0.5,0.4,1.0);
+	//blendedcolor.r = 0.2;
+	blendedcolor.b = 0.3;
 	blendedcolor.a = min(blendedcolor.g,blendedcolor.a);
 	blendedcolor.g = 1.0;
 

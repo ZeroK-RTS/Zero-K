@@ -16,6 +16,7 @@ return { energyheavygeo = {
     removewait     = 1,
     removestop     = 1,
     aimposoffset = [[0 30 0]],
+    normaltex = [[unittextures/energyheavygeo_normals.dds]],
 
     stats_show_death_explosion = 1,
   },

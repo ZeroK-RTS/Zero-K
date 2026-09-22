@@ -19,10 +19,10 @@ local flare5 = piece 'flare5'
 local flare6 = piece 'flare6'
 local flare7 = piece 'flare7'
 local rocket = piece 'rocket'
-local leg1 = piece 'leg1'	-- front right
-local leg2 = piece 'leg2'	-- back right
-local leg3 = piece 'leg3' 	-- back left
-local leg4 = piece 'leg4' 	-- front left
+local leg1 = piece 'leg1' -- front right
+local leg2 = piece 'leg2' -- back right
+local leg3 = piece 'leg3' -- back left
+local leg4 = piece 'leg4' -- front left
 local gflash = piece 'gflash'
 
 local smokePiece = {base, turret}

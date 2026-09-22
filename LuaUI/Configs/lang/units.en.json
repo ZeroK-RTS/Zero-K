@@ -1,4 +1,9 @@
 {
+	"commander_egg" : {
+		"name" : "Commander Egg",
+		"description" : "Evolves into a Commander. Disarm and slow explosion on death..",
+		"helptext" : "Evolves into a Commander of your choice (Strike, Guardian, Recon, or Engineer). Morph takes 60 seconds. The egg will only hatch if a player on the team is missing a commander. Each player can have up to their starting number of commanders. On death or detonation, releases a powerful slow and disarm blast. Can be transported by air transports."
+	},
 	"starlight_satellite" : {
 		"name" : "Glint",
 		"description" : "Starlight relay satellite",
@@ -1036,8 +1041,8 @@
 	},
 	"shipcarrier" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
+		"description" : "Multirole Support Aircraft Carrier, stockpiles disarm missiles at 5 m/s",
+		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy targets at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of capture drones to engage targets."
 	},
 	"turretaaflak" : {
 		"name" : "Thresher",
@@ -1162,7 +1167,7 @@
 	"dronecarry" : {
 		"name" : "Gull",
 		"description" : "Carrier Drone",
-		"helptext" : "The Gull is a small, aggressive drone armed with an energy MG."
+		"helptext" : "The Gull is a small, aggressive drone armed with a capture ray."
 	},
 	"turretheavylaser" : {
 		"name" : "Stinger",

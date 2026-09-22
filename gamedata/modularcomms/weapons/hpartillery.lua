@@ -3,6 +3,7 @@ local weaponDef = {
 	name                    = [[Plasma Artillery]],
 	accuracy                = 600,
 	areaOfEffect            = 96,
+	cegTag                  = [[medium_arty_trail]],
 	craterBoost             = 1,
 	craterMult              = 2,
 

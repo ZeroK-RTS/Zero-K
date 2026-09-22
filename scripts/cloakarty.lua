@@ -47,12 +47,20 @@ local function Walk()
 			Turn (torso, y_axis, math.rad(30) - math.rad(20)*side, math.rad(45)*truespeed)
 		end
 		Move (waist, y_axis, 1.0, 12*truespeed)
+		
 		WaitForMove (waist, y_axis)
 		Turn (shin[side], x_axis, 0, math.rad(420)*truespeed)
 		Turn (ankle[side], x_axis, 0, math.rad(420)*truespeed)
 		Turn (ankle[3-side], x_axis, math.rad(-30), math.rad(90)*truespeed)
 		Move (waist, y_axis, -2.0, 8*truespeed)
+		
+		local x,y,z = Spring.UnitScript.GetPieceRotation(thigh[1])
+		x,y,z = Spring.UnitScript.GetPieceRotation(thigh[2])
+		
 		WaitForTurn (thigh[side], x_axis)
+		
+		local x,y,z = Spring.UnitScript.GetPieceRotation(thigh[1])
+		x,y,z = Spring.UnitScript.GetPieceRotation(thigh[2])
 		side = 3 - side
 	end
 end

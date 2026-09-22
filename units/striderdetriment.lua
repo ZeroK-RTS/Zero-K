@@ -18,19 +18,24 @@ return { striderdetriment = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead         = 120,
     canjump               = 1,
-    jump_range            = 960,
-    jump_height           = 500,
+    jump_range            = 840,
+    jump_height           = 420,
     jump_speed            = 8,
     jump_delay            = 90,
     jump_delay_turn_scale = 80/2^15,
     jump_reload           = 100,
+    jump_charges          = 3,
     jump_from_midair      = 0,
     jump_rotate_midair    = 0,
+    jump_public_reload    = 1,
     modelradius           = [[95]],
     draw_reload_num       = 3,
     selection_scale       = 1.4,
     decloak_footprint     = 6,
+    health_bar_height     = 8,
+    normaltex = [[unittextures/Detriment_normals.dds]],
 
     stats_show_death_explosion = 1,
 
@@ -42,12 +47,12 @@ return { striderdetriment = {
   explodeAs              = [[NUCLEAR_MISSILE]],
   footprintX             = 4,
   footprintZ             = 4,
-  health                 = 86000,
+  health                 = 76000,
   iconType               = [[krogoth]],
   leaveTracks            = true,
   maxSlope               = 37,
   maxWaterDepth          = 5000,
-  metalCost              = 24000,
+  metalCost              = 21000,
   movementClass          = [[AKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB FIXEDWING GUNSHIP]],
@@ -196,6 +201,8 @@ return { striderdetriment = {
       customParams              = {
         isaa = [[1]],
         reaim_time = 1,
+        light_radius = 80,
+        light_alpha = 0.08,
       },
 
       damage                  = {
@@ -295,6 +302,7 @@ return { striderdetriment = {
         smoothmult   = [[0.7]],
         smoothexponent = [[0.8]],
         smoothheightoffset = [[22]],
+        burst = Shared.BURST_UNRELIABLE,
         -- no `movestructures` because then they can "dodge" via sudden movement
       },
       
@@ -310,7 +318,7 @@ return { striderdetriment = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       lodDistance             = 10000,
-      range                   = 800,
+      range                   = 700,
       reloadtime              = 40,
       rgbColor                = [[0.1 1 0]],
       rgbColor2               = [[0.5 0.1 0.2]],

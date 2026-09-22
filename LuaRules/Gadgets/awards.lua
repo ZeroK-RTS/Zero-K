@@ -428,9 +428,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
 	if not spAreTeamsAllied(attackerTeam, unitTeam) then
-		if paralyzer then
-			AddAwardPoints( 'emp', attackerTeam, costdamage )
-		elseif attackerDefID then
+		if attackerDefID and not paralyzer then
+			-- Paralysis gadget adds emp award
 			if unitDefID == chickenflyerqueenDefID or unitDefID == chickenlandqueenDefID then
 				AddAwardPoints( 'heart', attackerTeam, damage )
 			end

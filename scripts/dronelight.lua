@@ -35,8 +35,8 @@ function script.AimFromWeapon(num) return base end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-	Turn(barrel, y_axis, heading, pivotSpeed)
-	Turn(barrel, x_axis, -pitch, pivotSpeed)
+	Turn(barrel, y_axis, heading)
+	Turn(barrel, x_axis, -pitch)
 	WaitForTurn(barrel, y_axis)
 	WaitForTurn(barrel, x_axis)
 	return true

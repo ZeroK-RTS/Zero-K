@@ -65,7 +65,7 @@ local lastGain = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local handledUnitDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local handledUnitDefIDs, _, _, _, OVERKILL_STATES = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 local shieldPowerDef = {}
 local shieldRegenDef = {}
@@ -87,7 +87,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Single target with Hold Fire", "Prevent Overkill"}
 }
 
 -------------------------------------------------------------------------------------
@@ -166,6 +166,18 @@ local function GetRepairModifiedHealth(targetID, health, gameFrame, timeout)
 		lastGain[targetID] = (lastGain[targetID] or 0)/2 + gain
 	end
 	return health
+end
+
+local function GetDecayFrameTarget(damage, health, timeout)
+	-- Disarm units will shoot when target decay frames are lower than this.
+	local maxTimer = DECAY_FRAMES + timeout
+	local timeDamage = damage * DECAY_FRAMES / health
+	if timeDamage > timeout then
+		-- I deal enough damage to max the timer from zero, so only shoot when decay is imminent
+		return DECAY_FRAMES
+	end
+	-- Shoot at units over the timer because the damage will not be wasted, and it provides leeway.
+	return DECAY_FRAMES + timeout - timeDamage
 end
 
 --[[
@@ -262,7 +274,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	end
 
 	local doomed = targetIdentified and adjHealth and (adjHealth < 0) and (fullDamage > 0) --for regular projectile
-	local disarmed = targetIdentified and disarmFrame and (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
+	local disarmed = targetIdentified and disarmFrame
+			and (disarmDamage > 0) --for disarming projectile
+			and (disarmFrame - gameFrame - timeout >= GetDecayFrameTarget(disarmDamage, adjHealth, disarmTimeout))
 
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
@@ -317,9 +331,14 @@ function GG.OverkillPrevention_IsWanted(unitID, targetID, stateTable)
 		return false
 	end
 	if (stateTable[unitID] == 2 or stateTable[unitID] == 1) and spUtilGetUnitFireState(unitID) ~= 2 then
+		-- Only apply the lowest levels of OKP to units on Fire At Will
 		return false
 	end
 	if stateTable[unitID] == 1 then
+		-- Do OKP for targets aquired automatically.
+		-- Set target (GetUnitTarget) targets are always manual.
+		-- Check CMD.ATTACK options for manual target.
+		-- Manually given CMD.FIGHT create CMD.ATTACK that look manual, but should be treated as automatic
 		if targetID == GG.GetUnitTarget(unitID) then
 			return false
 		end
@@ -329,6 +348,19 @@ function GG.OverkillPrevention_IsWanted(unitID, targetID, stateTable)
 			if cmdID_2 ~= CMD_FIGHT then
 				return false
 			end
+		end
+	end
+	if stateTable[unitID] == 3 then
+		-- Do OKP when the unit has a single queued targets.
+		-- This means one attack command followed by something else, or no attack commands and a set target (GetUnitTarget).
+		local cmdID, cmdOpts, cmdTag, cmdParam1 = spGetUnitCurrentCommand(unitID)
+		if cmdID == CMD_ATTACK and cmdParam1 == targetID and not spUtilCheckBit(DEBUG_NAME, cmdOpts, CMD_OPT_INTERNAL) then
+			local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			if cmdID_2 ~= CMD_FIGHT and cmdID_2 ~= CMD_ATTACK then
+				return false
+			end
+		elseif targetID == GG.GetUnitTarget(unitID) then
+			return false
 		end
 	end
 	return true
@@ -378,7 +410,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		if cmdOptions and cmdOptions.right then
-			state = (state - 2)%4
+			state = (state - 2)%(OVERKILL_STATES + 1)
 		end
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 

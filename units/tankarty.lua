@@ -15,6 +15,7 @@ return { tankarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 200,
     bait_level_default = 1,
     unstick_leeway    = 30, -- Don't lose move orders if stuck while packing.
   },
@@ -51,6 +52,7 @@ return { tankarty = {
 
     {
       def                = [[CORE_ARTILLERY]],
+      accurateLeading    = 3,
       mainDir            = [[0 0 1]],
 --      maxAngleDif        = 180,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
@@ -67,6 +69,7 @@ return { tankarty = {
       areaOfEffect            = 84,
       avoidFeature            = false,
       avoidGround             = true,
+      cegTag                  = [[medium_arty_trail]],
       craterBoost             = 1,
       craterMult              = 2,
 

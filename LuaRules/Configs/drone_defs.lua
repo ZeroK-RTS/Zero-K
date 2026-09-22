@@ -5,7 +5,6 @@ local DRONES_COST_RESOURCES = false
 local carrierDefs = {}
 
 local carrierDefNames = {
-
 	shipcarrier = {
 		spawnPieces = {"DroneAft", "DroneFore", "DroneLower","DroneUpper"},
 		{
@@ -69,30 +68,32 @@ local carrierDefNames = {
 		{
 			drone = UnitDefNames.dronelight.id,
 			reloadTime = 10,
-			maxDrones = 6,
+			maxDrones = 4,
 			spawnSize = 1,
 			range = 500,
 			maxChaseRange = 1200,
-			buildTime = 5,
+			buildTime = 10,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
 	},
-	pw_hq_defender = {
+	pw_hq_attacker_extra = {
 		spawnPieces = {"drone"},
 		{
 			drone = UnitDefNames.dronelight.id,
 			reloadTime = 10,
-			maxDrones = 6,
+			maxDrones = 2,
 			spawnSize = 1,
-			range = 600,
+			range = 500,
 			maxChaseRange = 1200,
-			buildTime = 5,
+			buildTime = 15,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
 	},
 }
+carrierDefNames.pw_hq_defender = Spring.Utilities.CopyTable(carrierDefNames.pw_hq_attacker, true)
+carrierDefNames.pw_hq_defender_extra = Spring.Utilities.CopyTable(carrierDefNames.pw_hq_attacker_extra, true)
 
 local presets = {
 	module_companion_drone = {

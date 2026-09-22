@@ -24,6 +24,7 @@ return { spidercon = {
     modelradius    = [[15]],
     selection_scale = 1.5,
     disable_radar_preview = 1,
+    normaltex = [[unittextures/weaver_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

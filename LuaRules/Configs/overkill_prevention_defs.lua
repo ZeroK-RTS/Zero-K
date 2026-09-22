@@ -1,4 +1,6 @@
 
+local OVERKILL_STATES = 5
+
 -- Value is the default state of the command
 local handledUnitDefIDs = {
 	[UnitDefNames["turretmissile"].id]    = 2,
@@ -69,4 +71,4 @@ local lobsterUnitDefs = {
 }
 
 
-return handledUnitDefIDs, blackHoleUnitDefs, blackHoleWeaponDefs, lobsterUnitDefs
+return handledUnitDefIDs, blackHoleUnitDefs, blackHoleWeaponDefs, lobsterUnitDefs, OVERKILL_STATES

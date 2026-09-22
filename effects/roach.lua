@@ -40,16 +40,6 @@ return {
     },
   },
   blastwing = {
-    groundflash = {
-      flashalpha         = 1,
-      flashsize          = 108,
-      ttl                = 75,
-      color = {
-        [1]  = 0.7,
-        [2]  = 0.3,
-        [3]  = 0.1,
-      },
-    },
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -60,7 +50,7 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:napalmfireball_60]],
-        pos                = [[-55 r110, 10 r30, -55 r110]],
+        pos                = [[-40 r80, 10 r30, -40 r80]],
       },
     },
     redploom_mid = {
@@ -72,8 +62,8 @@ return {
       underwater         = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:napalmfireball_45]],
-        pos                = [[-5 r10, 15 r5, -5 r10]],
+        explosiongenerator = [[custom:napalmfireball_45_large]],
+        pos                = [[-2 r4, 15 r5, -2 r4]],
       },
     },
     groundflash = {

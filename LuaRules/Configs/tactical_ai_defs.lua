@@ -59,14 +59,17 @@ end
 ---------------------------------------------------------------------------
 -- these are not strictly required they just help with inputting the units
 
-local longRangeSwarmieeArray = NameToDefID({
+local longerRangeSwarmieeArray = NameToDefID({
 	"tankarty",
 	"jumparty",
-	"spiderskirm",
-	"shieldskirm",
 	"shiparty",
 	"cloakarty",
 	"amphsupport",
+})
+
+local longRangeSwarmieeArray = NameToDefID({
+	"spiderskirm",
+	"shieldskirm",
 })
 
 local medRangeSwarmieeArray = NameToDefID({
@@ -93,6 +96,7 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"cloaksnipe", -- only worth swarming sniper at low range, too accurate otherwise.
 })
 
+longRangeSwarmieeArray = Union(longRangeSwarmieeArray,longerRangeSwarmieeArray)
 medRangeSwarmieeArray = Union(medRangeSwarmieeArray,longRangeSwarmieeArray)
 lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
@@ -312,9 +316,12 @@ local longRangeSkirmieeArray = NameToDefID({
 	"turretemp",
 })
 
-local artyRangeSkirmieeArray = NameToDefID({
+local longerRangeSkirmieeArray = NameToDefID({
 	"spiderskirm",
 	"shieldskirm",
+})
+
+local artyRangeSkirmieeArray = NameToDefID({
 	"vehsupport",
 	"amphassault",
 	"chicken_sporeshooter",
@@ -359,7 +366,8 @@ riotRangeSkirmieeArray        = Union(riotRangeSkirmieeArray,shortToRiotRangeSki
 lowMedRangeSkirmieeArray      = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
 medRangeSkirmieeArray         = Union(medRangeSkirmieeArray, lowMedRangeSkirmieeArray)
 longRangeSkirmieeArray        = Union(longRangeSkirmieeArray, medRangeSkirmieeArray)
-artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
+longerRangeSkirmieeArray      = Union(longerRangeSkirmieeArray, longRangeSkirmieeArray)
+artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longerRangeSkirmieeArray)
 
 -- Don't add this to the higher ranged units.
 local medRangeAndTurretSkirmieeArray = Union(medRangeSkirmieeArray, NameToDefID({"turretriot", "turretlaser"}))
@@ -518,6 +526,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- skirmEverything (defaults to false): Skirms everything (does not skirm radar with this enabled only)
 -- skirmLeeway (defaults to 0): (Weapon range - skirmLeeway) = distance that the unit will try to keep from units while skirming
 -- stoppingDistance (defaults to 0): (skirmLeeway - stoppingDistance) = max distance from target unit that move commands can be given while skirming
+-- skirmRangeOverride (defaults to false): When set, override weapon range detection with this value
 -- skirmRadar (defaults to false): Skirms radar dots
 -- skirmOnlyNearEnemyRange (defaults to false): If true, skirms only when the enemy unit is withing enemyRange + skirmOnlyNearEnemyRange
 -- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
@@ -1367,7 +1376,8 @@ local behaviourConfig = {
 		name = "cloakskirm",
 
 		-- LLT isn't outranged, but is on the list for the reload step-back
-		skirms = medRangeAndTurretSkirmieeArray,
+		-- Similarly, a couple long-range units are included for the reload step-back
+		skirms = Union(medRangeAndTurretSkirmieeArray, NameToDefID({"jumpskirm", "hoverskirm"})),
 		swarms = medRangeSwarmieeArray,
 		--flees = {},
 		avoidHeightDiff = explodableFull,
@@ -1553,12 +1563,14 @@ local behaviourConfig = {
 	},
 	{
 		name = "amphassault",
-		skirms = longRangeSkirmieeArray,
-		swarms = longRangeSwarmieeArray,
+		skirms = longerRangeSkirmieeArray,
+		swarms = longerRangeSwarmieeArray,
 		--flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 10,
 		minSwarmLeeway = 130,
+		jinkPeriod = 1.5,
+		jinkTangentLength = 30,
 		skirmLeeway = 20,
 		skirmBlockedApproachFrames = 60,
 	},
@@ -1799,19 +1811,15 @@ local behaviourConfig = {
 		name = "cloakjammer",
 		--skirms = {},
 		--swarms = {},
-		flees = armedLand,
-		fleeLeeway = 100,
-		fleeDistance = 100,
-		minFleeRange = 400,
+		skirms = allGround,
+		skirmRangeOverride = 400,
 	},
 	{
 		name = "shieldshield",
 		--skirms = {},
 		--swarms = {},
-		flees = armedLand,
-		fleeLeeway = 100,
-		fleeDistance = 100,
-		minFleeRange = 450,
+		skirms = allGround,
+		skirmRangeOverride = 450,
 	},
 	
 	-- mobile AA
@@ -1837,7 +1845,7 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 	},
 	{
 		name = "vehaa",
@@ -2066,6 +2074,14 @@ local behaviourConfig = {
 	-- Externally handled units
 	{
 		name = "energysolar",
+		externallyHandled = true,
+	},
+	{
+		name = "gunshiptrans",
+		externallyHandled = true,
+	},
+	{
+		name = "gunshipheavytrans",
 		externallyHandled = true,
 	},
 }

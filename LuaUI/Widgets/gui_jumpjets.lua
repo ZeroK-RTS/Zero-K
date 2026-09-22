@@ -36,7 +36,7 @@ local glDrawGroundCircle       = gl.DrawGroundCircle
 local glLineStipple            = gl.LineStipple
 local glVertex                 = gl.Vertex
 local spGetActiveCommand       = Spring.GetActiveCommand
-local spGetCommandQueue        = Spring.GetCommandQueue
+local spGetUnitCommands        = Spring.GetUnitCommands
 local spGetUnitCommandCount    = Spring.GetUnitCommandCount
 local spGetGameFrame           = Spring.GetGameFrame
 local spGetModKeyState         = Spring.GetModKeyState
@@ -244,7 +244,7 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 		local dist = GetDist2(unitPos, groundPos)
 		DrawArc(unitID, unitDefID, unitPos, bx, by, bz, groundPos, range > dist, range, false, quality)
 	elseif (shift) then
-		local queue = spGetCommandQueue(unitID, -1)
+		local queue = spGetUnitCommands(unitID, -1)
 		local i = #queue
 		while queue[i] and (ignore[queue[i].id] and i > 0) do
 			i = i - 1

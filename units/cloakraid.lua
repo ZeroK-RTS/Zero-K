@@ -19,6 +19,7 @@ return { cloakraid = {
     aim_lookahead      = 80,
     set_target_range_buffer = 30,
     set_target_speed_buffer = 8,
+    normaltex = [[unittextures/spherebot_normals.dds]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],

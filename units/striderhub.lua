@@ -47,6 +47,7 @@ return { striderhub = {
     shared_energy_gen = 1,
     like_structure    = 1,
     select_show_eco   = 1,
+    normaltex = [[unittextures/striderhub_normals.dds]],
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

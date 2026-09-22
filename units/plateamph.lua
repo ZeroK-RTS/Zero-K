@@ -45,6 +45,7 @@ return { plateamph = {
     child_of_factory   = [[factoryamph]],
     cus_noflashlight   = 1,
     buggeroff_offset   = 45,
+    normaltex = [[unittextures/corvrad_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,
@@ -67,7 +68,7 @@ return { plateamph = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooooo ooooo ooooo yyyyy yyyyy yyyyy yyyyy]],
+  yardMap                       = [[ooooo ooooo ooooo uuuuu uuuuu uuuuu uuuuu]],
 
   featureDefs      = {
 

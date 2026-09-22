@@ -20,6 +20,7 @@ return { tankriot = {
     selection_scale   = 0.92,
     aim_lookahead     = 160,
     set_target_range_buffer = 40,
+    normaltex = [[unittextures/corbanish_normals.dds]],
 
     outline_x = 110,
     outline_y = 110,

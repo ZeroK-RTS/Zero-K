@@ -5,15 +5,19 @@ include "constants.lua"
 --pieces
 local base = piece "base"
 local missile = piece "missile"
+local exhaust = piece "exhaust"
 local l_wing = piece "l_wing"
 local l_fan = piece "l_fan"
+local l_fan_mount = piece "l_fan_mount"
 local r_wing = piece "r_wing"
 local r_fan = piece "r_fan"
+local r_fan_mount = piece "r_fan_mount"
 
 local smokePiece = { base, l_wing, r_wing }
 
 local SIG_BURROW = 1
 local SIG_HAXY_HAX = 2
+local newlyCreated = true
 local burrowed = false
 
 local PREDICT_FRAMES = 25
@@ -25,15 +29,21 @@ local bombGravity = -WeaponDefs[bombDefID].customParams.mygravity
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
+	Spin(r_fan, y_axis, math.rad(1500), math.rad(80))
+	Spin(l_fan, y_axis, math.rad(-1500), 1math.rad(80))
 	Turn(base, x_axis, 0, 5)
 	Turn(l_wing, x_axis, 0, 5)
 	Turn(r_wing, x_axis, 0, 5)
 	Move(base, y_axis, 0, 10)
+	Sleep(500)
+	Show(exhaust)
 end
 
 local function Burrow()
 	Signal(SIG_BURROW)
 	SetSignalMask(SIG_BURROW)
+	StopSpin(r_fan, y_axis, math.rad(40))
+	StopSpin(l_fan, y_axis, math.rad(40))
 	
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local height = math.max(Spring.GetGroundHeight(x,z) or 0, 0)
@@ -44,6 +54,7 @@ local function Burrow()
 		x,y,z = Spring.GetUnitPosition(unitID)
 		height = math.max(Spring.GetGroundHeight(x,z) or 0, 0)
 	end
+	Hide(exhaust)
 
 	Turn(base, x_axis, math.rad(-90), 5)
 	Turn(l_wing, x_axis, math.rad(90), 5)
@@ -166,17 +177,29 @@ local function BurrowThread()
 		else
 			GG.SetWantedCloaked(unitID, 0)
 		end
+		if newlyCreated then
+			if burrowed then
+				StartThread(Burrow)
+			else
+				StartThread(UnBurrow)
+			end
+			newlyCreated = nil
+		end
 
 		Sleep(200)
 	end
 end
 
 function script.Create()
+	Turn(l_fan_mount, z_axis, math.rad(-12))
+	Turn(r_fan_mount, z_axis, math.rad(12))
+	GG.Attributes.SetRangeUpdater(unitID, true) -- Do not allow range changes.
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(BurrowThread)
-	if not Spring.GetUnitIsStunned(unitID) then
-		Burrow()
+	Hide(exhaust)
+	while Spring.GetUnitIsStunned(unitID) do
+		Sleep(100)
 	end
+	StartThread(BurrowThread)
 end
 
 function script.StartMoving()
@@ -184,11 +207,24 @@ function script.StartMoving()
 end
 
 function script.Deactivate()
+	if Spring.MoveCtrl.GetTag(unitID) ~= nil then
+		return -- Do not burrow on pad
+	end
 	StartThread(Burrow)
 end
 
 function script.StopMoving()
 	StartThread(Burrow)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	Hide(exhaust)
+	StopSpin(r_fan, y_axis, math.rad(40))
+	StopSpin(l_fan, y_axis, math.rad(40))
 end
 
 function script.QueryWeapon(num)

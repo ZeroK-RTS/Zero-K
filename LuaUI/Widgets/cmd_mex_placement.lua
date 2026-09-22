@@ -330,6 +330,9 @@ local addons = { -- coordinates of solars for the Ctrl Alt modifier key, indexed
 ------------------------------------------------------------
 
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
+	if not WG.metalSpots then
+		return
+	end
 	local bestSpot
 	local bestDist = math.huge
 	local bestIndex
@@ -1318,7 +1321,7 @@ function widget:DrawWorld()
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
-		local wantShow = (isMexCmd or distance <= 60)
+		local wantShow = closestSpot and (isMexCmd or distance <= 60)
 		if (not wantShow) and (options.area_point_command.value and (CMD_AREA_MEX == cmdID or CMD_AREA_TERRA_MEX == cmdID)) then
 			if leftPressed then
 				local pressX, pressY = Spring.GetMouseStartPosition(1)

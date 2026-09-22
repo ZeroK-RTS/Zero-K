@@ -17,11 +17,11 @@ return { pw_hq_attacker = {
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 8,
   footprintZ                    = 8,
-  health                        = 10000,
+  health                        = 8000,
   levelGround                   = false,
   iconType                      = [[pw_assault]],
   maxSlope                      = 18,
-  metalCost                     = 1000,
+  metalCost                     = 350,
   noAutoFire                    = false,
   objectName                    = [[pw_hq.s3o]],
   reclaimable                   = false,
@@ -32,7 +32,7 @@ return { pw_hq_attacker = {
   waterline                     = 10,
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
-  --yardMap                       = [[oooooooooooooooooooo]],
+  yardMap                       = string.rep('o', 8*8),
 
   weapons                = {
 
@@ -80,8 +80,8 @@ return { pw_hq_attacker = {
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 6,
-      footprintZ       = 6,
+      footprintX       = 8,
+      footprintZ       = 8,
       object           = [[debris4x4b.s3o]],
     },
   },

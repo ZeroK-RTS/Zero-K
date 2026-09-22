@@ -9,6 +9,7 @@ local planetwarsStructure = {}
 local buildPlate = {}
 local buildPowerCache = {}
 local rangeCache = {}
+local baseDefCache = {}
 local dynComm = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
@@ -20,7 +21,6 @@ for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	buildTimes[i] = ud.buildTime
 	if ud.customParams.level or ud.customParams.dynamic_comm then
-		variableCostUnit[i] = true
 		dynComm[i] = true
 	end
 	if ud.customParams.planetwars_structure then
@@ -53,6 +53,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local debugSent = false
+
 function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if not (unitDefID and buildTimes[unitDefID]) then
@@ -61,10 +63,19 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	local cost = buildTimes[unitDefID]
 	if unitID then
 		if variableCostUnit[unitDefID] then
-			cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
-		else
-			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
+			local paramCost = Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+			if not paramCost and not debugSent and GG then
+				Spring.Utilities.UnitEcho(unitID, "variableCostUnit missing cost")
+				Spring.Echo("unitID, unitDefID, cost", unitID, unitDefID, cost)
+				debugSent = true
+			end
+			cost = paramCost or cost
 		end
+		cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
+	end
+	if not cost then
+		Spring.Echo("Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
+		error("Spring.Utilities.GetUnitCost nil cost")
 	end
 	return cost
 end
@@ -120,6 +131,19 @@ function Spring.Utilities.GetUnitRange(unitID, unitDefID)
 	return Spring.GetUnitRulesParam(unitID, "comm_max_range") or GetCachedBaseRange(unitDefID), Spring.GetUnitRulesParam(unitID, "primary_weapon_range")
 end
 
+function Spring.Utilities.GetBaseDefID(unitDefID)
+	if not unitDefID then
+		return unitDefID
+	end
+	if baseDefCache then
+		return baseDefCache[unitDefID]
+	end
+	local ud = UnitDefs[unitDefID]
+	local bud = ud.customParams.baseDef and UnitDefNames[ud.customParams.baseDef]
+	baseDefCache[unitDefID] = bud and bud.id or unitDefID
+	return baseDefCache[unitDefID]
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -160,13 +184,12 @@ local function GetMexTooltip(unitID, ud)
 
 	local currentIncome = Spring.GetUnitRulesParam(unitID, "current_metalIncome")
 	local mexIncome = (Spring.GetUnitRulesParam(unitID, "mexIncome") or 0) * (ud.customParams.metal_extractor_mult or 0) * (Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1)
-	local baseFactor = Spring.GetUnitRulesParam(unitID, "totalStaticMetalMult") or 1
 
 	if currentIncome == 0 then
 		return WG.Translate("interface", "disabled_base_metal") .. ": " .. math.round(mexIncome,2)
 	end
 
-	return WG.Translate("interface", "income") .. ": " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% " .. WG.Translate("interface", "overdrive")
+	return WG.Translate("interface", "income") .. ": " .. math.round(mexIncome,2) .. " + " .. math.round(metalMult*100) .. "% " .. WG.Translate("interface", "overdrive")
 end
 
 local function GetTerraformTooltip(unitID)
@@ -187,9 +210,17 @@ local function GetZenithTooltip (unitID)
 end
 
 local function GetAvatarTooltip(unitID)
-	local commOwner = Spring.GetUnitRulesParam(unitID, "commander_owner")
-	if not commOwner then return end
-	return commOwner or ""
+	local ownerTeam = Spring.GetUnitRulesParam(unitID, "commander_owner_team")
+	if not ownerTeam then return end
+	local isAI = select(4, Spring.GetTeamInfo(ownerTeam, false))
+	if isAI then
+		return select(2, Spring.GetAIInfo(ownerTeam)) or ""
+	end
+	local leaderID = select(2, Spring.GetTeamInfo(ownerTeam, false))
+	if leaderID then
+		return (Spring.GetPlayerInfo(leaderID, false)) or ""
+	end
+	return ""
 end
 
 local function GetPlanetwarsTooltip(unitID, ud)
@@ -260,7 +291,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	end
 
 	local name_override = ud.customParams.statsname or ud.name
-	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+	local desc = (WG and WG.Translate ("units", name_override .. ".description")) or ud.tooltip
 	local isValidUnit = Spring.ValidUnitID(unitID)
 	if isValidUnit then
 		local customTooltip = GetCustomTooltip(unitID, ud)
@@ -271,7 +302,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	
 	local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
 	if buildSpeed > 0 then
-		return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
+		return (WG and WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)})) or desc
 	end
 	return desc
 end
@@ -316,12 +347,15 @@ if Spring.GetModOptions().techk == "1" and WG then
 		local cost = buildTimes[unitDefID]
 		if unitID then
 			if variableCostUnit[unitDefID] then
-				cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
-			else
-				cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
+				cost = Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 			end
+			cost = cost * ((GG and (GG.att_CostMult[unitID] or 1)) or (Spring.GetUnitRulesParam(unitID, "costMult") or 1))
 		else
 			cost = cost * math.pow(2, (WG.SelectedTechLevel or 1) - 1)
+		end
+		if not cost then
+			Spring.Echo("TECHK, Spring.Utilities.GetUnitCost nil cost, unitID", unitID, "unitDefID", unitDefID)
+			error("TECHK, Spring.Utilities.GetUnitCost nil cost")
 		end
 		return cost
 	end
@@ -334,6 +368,14 @@ if Spring.GetModOptions().techk == "1" and WG then
 		local prefix = ""
 		local level = GetTechLevel(unitID)
 		local preLevel = level
+		while preLevel > 23 do
+			prefix = prefix .. "Absurd "
+			preLevel = preLevel - 23
+		end
+		while preLevel > 12 do
+			prefix = prefix .. "LEGENDARY "
+			preLevel = preLevel - 12
+		end
 		while preLevel > 7 do
 			prefix = prefix .. "Über "
 			preLevel = preLevel - 7
@@ -369,7 +411,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 		end
 
 		local name_override = ud.customParams.statsname or ud.name
-		local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+		local desc = (WG and WG.Translate ("units", name_override .. ".description")) or ud.tooltip
 		local isValidUnit = Spring.ValidUnitID(unitID)
 		if isValidUnit then
 			local tech = GetTechLevel(unitID) or 1
@@ -385,7 +427,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 				local mult = math.pow(2, (WG.SelectedTechLevel or 1) - 1)
 				buildSpeed = buildSpeed * mult
 			end
-			return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
+			return (WG and WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)})) or desc
 		end
 		return desc
 	end

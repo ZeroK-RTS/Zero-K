@@ -13,7 +13,7 @@ return { plateplane = {
     [[planecon]],
     [[planefighter]],
     [[planeheavyfighter]],
-    [[bomberstrike]],
+    [[planesupport]],
     [[bomberprec]],
     [[bomberriot]],
     [[bomberdisarm]],

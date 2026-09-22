@@ -111,7 +111,7 @@ local function CheckGuardRemove(id, params, cmdOptions)
 	for i = 1, #units do
 		local unitID = units[i]
 		if validUnitDefIDs[Spring.GetUnitDefID(unitID)] then
-			local cmd = Spring.GetCommandQueue(unitID, -1)
+			local cmd = Spring.GetUnitCommands(unitID, -1)
 			if cmd then
 				for c = 1, #cmd do
 					-- Do not remove commands that are about to be shift-click removed.

@@ -17,6 +17,7 @@ return { shipaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 120,
     bait_level_default = 0,
     modelradius    = [[45]],
     turnatfullspeed = [[1]],
@@ -75,6 +76,7 @@ return { shipaa = {
 
     [2] = {
       def                = [[AALASER]],
+      accurateLeading    = 1,
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
@@ -88,6 +90,7 @@ return { shipaa = {
       accuracy                = 50,
       areaOfEffect            = 8,
       canattackground         = false,
+      cegTag                  = [[laser_cannon_trail]],
       collideFriendly         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -159,6 +162,7 @@ return { shipaa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_fury.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 1000,

@@ -42,6 +42,7 @@ return { factoryshield = {
     shared_energy_gen   = 1,
     parent_of_plate     = [[plateshield]],
     buggeroff_offset    = 28,
+    normaltex = [[unittextures/corvrad_normals.dds]],
 
     stats_show_death_explosion = 1,
 
@@ -67,7 +68,7 @@ return { factoryshield = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooooooo occccco occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy]],
+  yardMap                       = [[ooooooo oeeeeeo oeeeeeo oeeeeeo oeeeeeo oeeeeeo uuuuuuu uuuuuuu uuuuuuu]],
 
   featureDefs                   = {
 

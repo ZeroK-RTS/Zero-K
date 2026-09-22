@@ -74,6 +74,7 @@ gadgetHandler = {
 	actionHandler = actionHandler,	-- FIXME: not in base
 }
 
+VFS.Include('LuaRules/engine_compat_post.lua', nil, VFSMODE)
 
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
@@ -137,9 +138,8 @@ local callInLists = {
 	-- Feature CallIns
 	"FeatureCreated",
 	"FeatureDestroyed",
-	--[[ FeatureDamaged and FeaturePreDamaged missing on purpose. Basic damage control
-	     can be achieved via armordefs (use the "default" class, make sure to populate
-	     the others including "else" explicitly) so this way we avoid the perf cost. ]]
+	"FeaturePreDamaged",
+	"FeatureDamaged",
 
 	-- Projectile CallIns
 	"ProjectileCreated",
@@ -1608,14 +1608,14 @@ end
 
 local inCreated = false
 local finishedDuringCreated = false -- assumes non-recursive create
-function gadgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function gadgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("G:UnitCreated")
 
 	finishedDuringCreated = false
 	inCreated = true
 	for _,g in r_ipairs(self.UnitCreatedList) do
 		tracy.ZoneBeginN("G:UnitCreated:" .. g.ghInfo.name)
-		g:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+		g:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	inCreated = false
@@ -1678,18 +1678,14 @@ function gadgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam, factID, fact
 end
 
 
-function gadgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, pre)
+function gadgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, weaponDefID)
 	tracy.ZoneBeginN("G:UnitDestroyed")
-	if pre == false then
-		tracy.ZoneEnd()
-		return
-	end
 	if gadgetHandler.GG._AddUnitDamage_teamID then
 		attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
 	end
 	for _,g in r_ipairs(self.UnitDestroyedList) do
 		tracy.ZoneBeginN("G:UnitDestroyed:" .. g.ghInfo.name)
-		g:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+		g:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam, weaponDefID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
@@ -2031,6 +2027,94 @@ function gadgetHandler:FeatureCreated(featureID, allyTeam)
 	for _,g in r_ipairs(self.FeatureCreatedList) do
 		tracy.ZoneBeginN("G:FeatureCreated:" .. g.ghInfo.name)
 		g:FeatureCreated(featureID, allyTeam)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+	return
+end
+
+local FeaturePreDamaged_GadgetMap = {}
+local FeaturePreDamaged_first = true
+
+function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
+	damage, weaponDefID,
+	projectileID, attackerID, attackerDefID, attackerTeam)
+	tracy.ZoneBeginN("G:FeaturePreDamaged")
+
+	if FeaturePreDamaged_first then
+		for _,g in r_ipairs(self.FeaturePreDamagedList) do
+			tracy.ZoneBeginN("G:FeaturePreDamaged_GetWantedWeaponDef :" .. g.ghInfo.name)
+			local weaponDefs = (g.FeaturePreDamaged_GetWantedWeaponDef and g:FeaturePreDamaged_GetWantedWeaponDef()) or allWeaponDefs
+			tracy.ZoneEnd()
+			for _,wdid in ipairs(weaponDefs) do
+				if FeaturePreDamaged_GadgetMap[wdid] then
+					FeaturePreDamaged_GadgetMap[wdid].count = FeaturePreDamaged_GadgetMap[wdid].count + 1
+					FeaturePreDamaged_GadgetMap[wdid].data[FeaturePreDamaged_GadgetMap[wdid].count] = g
+				else
+					FeaturePreDamaged_GadgetMap[wdid] = {
+						count = 1,
+						data = {g}
+					}
+				end
+			end
+		end
+		FeaturePreDamaged_first = false
+	end
+
+	local rDam = damage
+	local rImp = 1.0
+
+	local gadgets = FeaturePreDamaged_GadgetMap[weaponDefID]
+	if gadgets then
+		local data = gadgets.data
+		local g
+		for i = 1, gadgets.count do
+			g = data[i]
+			tracy.ZoneBeginN("G:FeaturePreDamaged:" .. g.ghInfo.name)
+			local dam, imp = g:FeaturePreDamaged(featureID, featureDefID, featureTeam,
+				rDam, weaponDefID,
+				attackerID, attackerDefID, attackerTeam,
+				projectileID)
+			tracy.ZoneEnd()
+			if (dam ~= nil) then
+				rDam = dam
+			end
+			if (imp ~= nil) then
+				rImp = math.min(imp, rImp)
+			end
+		end
+	end
+
+	tracy.ZoneEnd()
+	return rDam, rImp
+end
+
+local FeatureDamaged_first = true
+local FeatureDamaged_count = 0
+local FeatureDamaged_gadgets = {}
+
+function gadgetHandler:FeatureDamaged(featureID, featureDefID, featureTeam, damage, weaponDefID,
+	projectileID, attackerID, attackerDefID, attackerTeam)
+	tracy.ZoneBeginN("G:FeatureDamaged")
+
+	if FeatureDamaged_first then
+		for _,g in r_ipairs(self.FeatureDamagedList) do
+			FeatureDamaged_count = FeatureDamaged_count + 1
+			FeatureDamaged_gadgets[FeatureDamaged_count] = g
+		end
+		FeatureDamaged_first = false
+	end
+
+	if gadgetHandler.GG._AddUnitDamage_teamID then
+		attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
+	end
+
+	local g
+	for i = 1, FeatureDamaged_count do
+		g = FeatureDamaged_gadgets[i]
+		tracy.ZoneBeginN("G:FeatureDamaged:" .. g.ghInfo.name)
+		g:FeatureDamaged(featureID, featureDefID, featureTeam, damage, weaponDefID,
+		projectileID, attackerID, attackerDefID, attackerTeam)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()

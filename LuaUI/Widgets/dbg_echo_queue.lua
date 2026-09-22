@@ -16,7 +16,7 @@ function widget:SelectionChanged(selectedUnits)
 		return
 	end
 	local unitID = selectedUnits[1]
-	local cQueue = Spring.GetCommandQueue(unitID, -1)
+	local cQueue = Spring.GetUnitCommands(unitID, -1)
 	if cQueue then
 		Spring.Utilities.TableEcho(cQueue, "cQueue")
 		Spring.Utilities.UnitEcho(unitID, "queue")

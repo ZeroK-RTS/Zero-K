@@ -24,7 +24,7 @@ local spValidUnitID		= Spring.ValidUnitID
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetUnitMoveGoal = Spring.SetUnitMoveGoal
 local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitCommands = Spring.GetUnitCommands
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
@@ -115,7 +115,7 @@ end
 
 -- warning: causes recursion?
 local function ClearUnitCommandQueue(unitID)
-	local cmds = spGetCommandQueue(unitID, -1)
+	local cmds = spGetUnitCommands(unitID, -1)
 	for i=1,#cmds do
 		spGiveOrderToUnit(unitID, CMD.REMOVE, cmds[i].tag, 0)
 	end

@@ -229,7 +229,6 @@ local overrides = {
 	[CMD_EMBARK] = {caption = '', texture = imageDir .. 'Bold/embark.png'},
 	[CMD_DISEMBARK] = {caption = ' ', texture = imageDir .. 'Bold/disembark.png'},
 
-	[CMD_ONECLICK_WEAPON] = {},--texture = imageDir .. 'Bold/action.png'},
 	[CMD_UNIT_SET_TARGET] = {texture = imageDir .. 'Bold/action.png'},
 
 	[CMD_ABANDON_PW] = {caption= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},

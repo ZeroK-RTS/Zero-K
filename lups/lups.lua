@@ -191,24 +191,16 @@ function SetUnitLuaDraw(unitID,nodraw)
 	if (nodraw) then
 		noDrawUnits[unitID] = (noDrawUnits[unitID] or 0) + 1
 		if (noDrawUnits[unitID]==1) then
-			--if (Spring.Utilities.GetEngineVersion()=="0.76b1") then
-				Spring.UnitRendering.ActivateMaterial(unitID,1)
-				--Spring.UnitRendering.SetLODLength(unitID,1,-1000)
-				for pieceID in ipairs(Spring.GetUnitPieceList(unitID) or {}) do
-					Spring.UnitRendering.SetPieceList(unitID,1,pieceID,nilDispList)
-				end
-			--else
-			--  Spring.UnitRendering.SetUnitLuaDraw(unitID,true)
-			--end
+			Spring.UnitRendering.ActivateMaterial(unitID,1)
+			--Spring.UnitRendering.SetLODLength(unitID,1,-1000)
+			for pieceID in ipairs(Spring.GetUnitPieceList(unitID) or {}) do
+				Spring.UnitRendering.SetPieceList(unitID,1,pieceID,nilDispList)
+			end
 		end
 	else
 		noDrawUnits[unitID] = (noDrawUnits[unitID] or 0) - 1
 		if (noDrawUnits[unitID]==0) then
-			--if (Spring.Utilities.GetEngineVersion()=="0.76b1") then
-				Spring.UnitRendering.DeactivateMaterial(unitID,1)
-			--else
-			--  Spring.UnitRendering.SetUnitLuaDraw(unitID,false)
-			--end
+			Spring.UnitRendering.DeactivateMaterial(unitID,1)
 			noDrawUnits[unitID] = nil
 		end
 	end
@@ -929,7 +921,7 @@ local function GameFrame(_,n)
 	CleanInvalidUnitFX()
 
 	--// update FXs
-	framesToUpdate = thisGameFrame - lastGameFrame
+	local framesToUpdate = thisGameFrame - lastGameFrame
 	for _,partFx in pairs(particles) do
 		if (n>=partFx.dieGameFrame) then
 			--// lifetime ended
@@ -1038,6 +1030,14 @@ local function Initialize()
 	local disableFX = {}
 	for i,v in pairs(LupsConfig.disablefx or {}) do
 		disableFX[i:lower()]=v;
+	end
+	
+	--// Disable lups class if its replacement successfully loads.
+	for fxName,fxClass in pairs(fxClasses) do
+		local replacement = fxClass.GetInfo().replacement
+		if replacement and GG[replacement] and GG[replacement]() then
+			disableFX[fxName] = true
+		end
 	end
 
 	local linkBackupFXClasses = {}

@@ -271,6 +271,9 @@ local function ApplyProjectileLead(proID, speed, weaponID)
 
 	-- Normalize it all back down to what the speed should be
 	local leadSpeed = dist3D(lx, ly, lz, 0, 0, 0)
+	if leadSpeed == 0 then
+		return
+	end
 	local normFactor = speed/leadSpeed
 
 	--Spring.Utilities.UnitEcho(targetID, dist3D(ax*normFactor, ay*normFactor, az*normFactor, 0, 0, 0))

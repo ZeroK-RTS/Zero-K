@@ -15,7 +15,9 @@ return { striderarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 80,
     bait_level_default = 2,
+    normaltex = [[unittextures/Catapult_normals.dds]],
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -49,6 +51,7 @@ return { striderarty = {
 
     {
       def                = [[ROCKET]],
+      accurateLeading    = 1,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
@@ -74,6 +77,7 @@ return { striderarty = {
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],
         light_radius = 400,
+        burst = Shared.BURST_UNRELIABLE,
       },
       
       damage                  = {
@@ -89,6 +93,7 @@ return { striderarty = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadLimit               = 500,
       model                   = [[hobbes_nohax.s3o]],
       noSelfDamage            = true,
       projectiles             = 2,

@@ -21,6 +21,7 @@ return { spideremp = {
     aim_lookahead  = 100,
     set_target_range_buffer = 30,
     set_target_speed_buffer = 8,
+    normaltex = [[unittextures/venom_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -77,6 +78,7 @@ return { spideremp = {
       customParams            = {
         extra_damage = 400,
         force_ignore_ground = [[1]],
+        overstun_time = 0.3,
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,
@@ -97,7 +99,7 @@ return { spideremp = {
       noSelfDamage            = true,
       paralyzeTime            = 1,
       range                   = 240,
-      reloadtime              = 34/30,
+      reloadtime              = 36/30,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

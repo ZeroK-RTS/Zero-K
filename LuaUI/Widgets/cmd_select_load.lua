@@ -88,7 +88,7 @@ end
 --------------------------------------------------------------------------------
 
 local function CopyMoveThenUnload(transportID, unitID)
-	local cmdQueue = Spring.GetCommandQueue(unitID, -1)
+	local cmdQueue = Spring.GetUnitCommands(unitID, -1)
 	if not cmdQueue then
 		return
 	end

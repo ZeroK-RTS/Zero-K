@@ -25,6 +25,7 @@ return { shiptorpraider = {
     selectionscalemult = 1.3,
     selectionwidthscalemult = 1.75,
     selectioninherit = 1,
+    normaltex = [[unittextures/shiptorpraider_normals.dds]],
   },
 
 

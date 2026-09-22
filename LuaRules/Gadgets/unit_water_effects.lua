@@ -115,7 +115,7 @@ function gadget:GameFrame(n)
 
 			if Spring.ValidUnitID(unitID) then
 				local x,y,z = Spring.GetUnitPosition(unitID)
-				local height = Spring.GetGroundHeight(x,z) or y
+				local height = (y < 0 and Spring.GetGroundHeight(x,z)) or y
 				local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 				if not stunned_or_inbuild then
 					if data.storage and data.storage ~= effect.tankMax then

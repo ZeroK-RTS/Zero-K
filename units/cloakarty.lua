@@ -14,6 +14,7 @@ return { cloakarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 140,
     bait_level_default = 0,
     modelradius       = [[14]],
     selection_scale   = 0.85,
@@ -62,6 +63,7 @@ return { cloakarty = {
 
     {
       def                = [[HAMMER_WEAPON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
@@ -74,10 +76,13 @@ return { cloakarty = {
       name                    = [[Light Plasma Cannon]],
       accuracy                = 220,
       areaOfEffect            = 16,
+      cegTag                  = [[light_plasma_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams        = {
+        burst = Shared.BURST_RELIABLE,
+
         light_camera_height = 1400,
         light_color = [[0.80 0.54 0.23]],
         light_radius = 200,

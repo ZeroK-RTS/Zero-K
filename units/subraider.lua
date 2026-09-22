@@ -20,7 +20,7 @@ return { subraider = {
     aimposoffset   = [[0 1 0]],
     midposoffset   = [[0 -5 0]],
     turnatfullspeed = [[1]],
-    okp_damage = 210,
+    okp_damage = 260,
 
     outline_x = 128,
     outline_y = 128,

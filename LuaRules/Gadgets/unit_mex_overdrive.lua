@@ -60,7 +60,7 @@ local MISC_PAYBACK_OD_PROP = 0.15 -- Maximum proportion of overdrive metal that 
      the mechanic don't feel the need to abuse it in a lobsterpot to get ahead.
      Ideally the refund would just be for whomever actually put in resources,
      but that would involve the build step callin which is quite expensive. ]]
-local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
+local MEX_REFUND_VALUE = 125 / 85 * UnitDefNames.staticmex.metalCost
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -178,6 +178,7 @@ local unitPaybackTeamIDs = {} -- indexed by unitID, tells unit which teams gets 
 local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 local allyTeamMiscPaybackRateSum = {} -- teamPayback[allyTeamID] = total non-energy or mex payback expected.
 local paybackReduction = {} --paybackReduction[allyTeamID] = {[unitDefID] = reduced payback, ...}
+local teamSkimMetal = {}
 
 local allyTeamInfo = {}
 
@@ -240,6 +241,7 @@ local function sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summ
 	}
 end
 
+GG.Overdrive_priorityMetalIncome = {}
 GG.Overdrive_teamResources = {}
 local lastTeamResources = {} -- 1 second lag for resource updates
 
@@ -286,6 +288,7 @@ local function SetTeamEconomyRulesParams(
 			baseShare, -- Team share of base metal extractor income
 			odShare, -- Team share of overdrive income
 			miscShare, -- Team share of constructor metal income
+			skim, -- Metal income skimmed off the top by other gadgets. Never added as income.
 
 			energyIncome, -- Total energy generator income
 			energyMisc, -- Team share innate and constructor energyIncome
@@ -308,6 +311,8 @@ local function SetTeamEconomyRulesParams(
 		spSetTeamRulesParam(teamID, "OD_metalBase",       pd.baseShare, privateTable)
 		spSetTeamRulesParam(teamID, "OD_metalOverdrive",  pd.odShare, privateTable)
 		spSetTeamRulesParam(teamID, "OD_metalMisc",       pd.miscShare, privateTable)
+		spSetTeamRulesParam(teamID, "OD_metalSkim",       pd.skim, privateTable)
+		GG.Overdrive_priorityMetalIncome[teamID] = pd.baseShare + pd.odShare + pd.miscShare - pd.skim
 
 		spSetTeamRulesParam(teamID, "OD_energyIncome",    pd.energyIncome, privateTable)
 		spSetTeamRulesParam(teamID, "OD_energyMisc",      pd.energyMisc, privateTable)
@@ -336,6 +341,7 @@ local function SetTeamEconomyRulesParams(
 	pd.baseShare = baseShare
 	pd.odShare = odShare
 	pd.miscShare = miscShare
+	pd.skim = skim
 
 	pd.energyIncome = energyIncome
 	pd.energyMisc = energyMisc
@@ -825,7 +831,70 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Skim handling
+
+local function SetTeamSkim(teamID, key, proportion, func)
+	-- func takes arguments teamID and metal amount
+	if not teamSkimMetal[teamID] then
+		teamSkimMetal[teamID] = {
+			total = 0,
+			sources = {},
+		}
+	end
+	local skimData = teamSkimMetal[teamID].sources
+	if not proportion then
+		skimData[key] = nil
+		local total = 0
+		for k, v in pairs(skimData) do
+			total = total + v.proportion
+		end
+		if total > 0 then
+			teamSkimMetal[teamID].total = total
+		else
+			teamSkimMetal[teamID] = nil
+		end
+		return
+	end
+	skimData[key] = skimData[key] or {}
+	skimData[key].proportion = proportion
+	skimData[key].func = skimData[key].func or func
+	local total = 0
+	for k, v in pairs(skimData) do
+		total = total + v.proportion
+	end
+	teamSkimMetal[teamID].total = total
+end
+
+local function SkimMetalIncome(teamID, metalIncome)
+	if (not teamSkimMetal[teamID]) or teamSkimMetal[teamID].total <= 0 then
+		return metalIncome, 0
+	end
+	local skimData = teamSkimMetal[teamID].sources
+	local mult = 1 / math.max(1, teamSkimMetal[teamID].total)
+	local skimmed = 0
+	for k, v in pairs(Spring.Utilities.CopyTable(skimData)) do
+		-- Copy table to allow modification of future skims during the loop
+		local availible= v.proportion * metalIncome * mult
+		local used, finished = v.func(teamID, availible)
+		if used then
+			skimmed = skimmed + availible
+		end
+		if finished then
+			SetTeamSkim(teamID, toRemove[i])
+		end
+	end
+	return math.max(0, metalIncome - skimmed), math.min(metalIncome, skimmed)
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 -- Overdrive and resource handling
+
+local function UpdateMaxMexDrain(unitID, myProp, gridCapactiy)
+	-- How much energy would the mex drain if the grid were maxxed.
+	local maxE = myProp * gridCapactiy
+	spSetUnitRulesParam(unitID, "max_energy_drain", maxE, alliedTrueTable)
+end
 
 local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacity)
 	local summedMetalProduction = 0
@@ -878,9 +947,11 @@ local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacit
 					local myMetalIncome = curMexIncomes[unitID]
 					local mexE = 0
 					if (allyMetalSquared > 0) then -- divide energy in ratio given by squared metal from mex
-						mexE = allyE * (myMetalIncome * myMetalIncome) / allyMetalSquared --the fraction of E to be consumed with respect to all other Mex
+						local myProp = (myMetalIncome * myMetalIncome) / allyMetalSquared
+						mexE = allyE * myProp --the fraction of E to be consumed with respect to all other Mex
 						energyWasted = energyWasted - mexE -- leftover E minus Mex usage
 						gridEnergySpent[i] = gridEnergySpent[i] + mexE
+						UpdateMaxMexDrain(unitID, myProp, maxGridCapacity[i])
 						-- if a grid is being too overdriven it has become maxed.
 						-- the grid's mexSqauredSum is used for best distribution
 						if gridEnergySpent[i] > maxGridCapacity[i] then --final Mex to be looped since we are out of E to OD the rest of the Mex
@@ -905,7 +976,9 @@ local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacit
 							energyWasted = allyE
 							for unitID_inner, _ in pairs(allyTeamMexes[i]) do --re-distribute the grid energy to Mex (again! except taking account the limited energy of the grid)
 								myMetalIncome = curMexIncomes[unitID_inner]
-								mexE = gridE*(myMetalIncome * myMetalIncome) / gridMetalSquared
+								myProp = (myMetalIncome * myMetalIncome) / gridMetalSquared
+								mexE = gridE * myProp
+								UpdateMaxMexDrain(unitID_inner, myProp, maxGridCapacity[i]) -- Do it here too because we are going to break out of the outer loop
 								local metalMult = energyToExtraM(mexE)
 								local thisMexM = myMetalIncome + myMetalIncome * metalMult
 
@@ -1394,8 +1467,10 @@ function gadget:GameFrame(n)
 						else
 							if not pylonDefs[unitDefID].keeptooltip then
 								if grid ~= 0 then
+									local maxxed = (maxGridCapacity[grid] > 0 and gridEnergySpent[grid] >= maxGridCapacity[grid])
 									spSetUnitRulesParam(unitID, "OD_gridCurrent", gridEnergySpent[grid], alliedTrueTable)
 									spSetUnitRulesParam(unitID, "OD_gridMaximum", maxGridCapacity[grid], alliedTrueTable)
+									spSetUnitRulesParam(unitID, "OD_gridMaxxed", maxxed and 1 or 0, alliedTrueTable)
 									spSetUnitRulesParam(unitID, "OD_gridMetal", gridMetalGain[grid], alliedTrueTable)
 								else
 									spSetUnitRulesParam(unitID, "OD_gridCurrent", -1, alliedTrueTable)
@@ -1531,7 +1606,11 @@ function gadget:GameFrame(n)
 				if GG.EndgameGraphs then
 					GG.EndgameGraphs.AddTeamEnergyShared(teamID, -te.overdriveEnergyNet)
 					if energyWasted > 0 then
-						GG.EndgameGraphs.AddTeamEnergyExcess(teamID, energyWasted * te.inc / allyTeamEnergyIncome)
+						if allyTeamEnergyIncome > 0 then
+							GG.EndgameGraphs.AddTeamEnergyExcess(teamID, energyWasted * te.inc / allyTeamEnergyIncome)
+						else
+							GG.EndgameGraphs.AddTeamEnergyExcess(teamID, energyWasted / allyTeamData.teams)
+						end
 					end
 				end
 				if debugMode then
@@ -1566,7 +1645,7 @@ function gadget:GameFrame(n)
 					totalToShare = totalToShare + shareToSend[i]
 				end
 				
-				local metalIncome = odShare + baseShare + miscShare
+				local metalIncome, skim = SkimMetalIncome(teamID, odShare + baseShare + miscShare)
 				if mCurr + metalIncome < mStor then
 					freeSpace[i] = mStor - (mCurr + metalIncome)
 				end
@@ -1588,6 +1667,7 @@ function gadget:GameFrame(n)
 					baseShare, -- Team share of base metal extractor income
 					odShare, -- Team share of overdrive income
 					miscShare, -- Team share of constructor metal income
+					skim, -- Metal income skimmed off the top by other gadgets. Never added to storage, treat as shared expenditure.
 
 					te.inc, -- Non-reclaim energy income for the team
 					energyMisc, -- Team share of innate and constructor income
@@ -1882,6 +1962,10 @@ end
 
 function externalFunctions.SetNoGridRequirement(enabled)
 	waiveGridLowPower = enabled
+end
+
+function externalFunctions.SetMetalIncomeSkim(teamID, key, proportion, func)
+	SetTeamSkim(teamID, key, proportion, func)
 end
 
 -------------------------------------------------------------------------------------

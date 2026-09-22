@@ -17,17 +17,21 @@ function script.Create()
 	SetInitialBomberSettings()
 	Hide(preDrop)
 	Hide(drop)
+	Hide(jet1)
+	Hide(jet2)
 	
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
 	Turn(Lwing, z_axis, math.rad(90))
 	Turn(Rwing, z_axis, math.rad(-90))
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Activate()
+	Show(jet1)
+	Show(jet2)
 	Turn(Lwing, z_axis, math.rad(90), 2)
 	Turn(Rwing, z_axis, math.rad(-90), 2)
 	Turn(LwingTip, z_axis, math.rad(-165), 2) --160
@@ -35,11 +39,13 @@ function script.Activate()
 end
 
 function script.Deactivate()
+	Hide(jet1)
+	Hide(jet2)
 	Turn(Lwing, z_axis, math.rad(10), 2)
 	Turn(Rwing, z_axis, math.rad(-10), 2)
 	Turn(LwingTip, z_axis, math.rad(-30), 2) -- -30
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.FireWeapon(checkHeight)
@@ -89,7 +95,7 @@ function script.FireWeapon(checkHeight)
 			GG.PokeDecloakUnit(unitID, unitDefID)
 			if sound_index == 0 then
 				local px, py, pz = Spring.GetUnitPosition(unitID)
-				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
+				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz, "battle")
 			end
 			sound_index = sound_index + 1
 			if sound_index >= 6 then

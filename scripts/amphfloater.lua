@@ -29,8 +29,7 @@ local SIG_UNPACK = 64
 
 local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
 local PROJECTILE_SPEED = WeaponDefs[wd].projectilespeed
-
-local UNPACK_TIME = 1/3
+local weaponRange = WeaponDefNames["amphfloater_cannon"].range
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -144,12 +143,6 @@ function script.StartMoving()
 	StartThread(Walk)
 end
 
-local function Unpack()
-	Signal(SIG_UNPACK)
-	SetSignalMask(SIG_UNPACK)
-
-	Sleep(UNPACK_TIME)
-end
 
 local function Stopping()
 	Signal(SIG_WALK)
@@ -166,8 +159,6 @@ local function Stopping()
 	--Move(rthigh, y_axis, 4, 12)
 
 	GG.Floating_StopMoving(unitID)
-
-	StartThread(Unpack)
 end
 
 function script.StopMoving()
@@ -177,22 +168,33 @@ end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 
+local prevMult, prevWeaponMult
+local function RangeUpdate(mult, weaponMult)
+	mult = mult or prevMult or 1
+	weaponMult = weaponMult or prevWeaponMult
+	prevMult, prevWeaponMult = mult, weaponMult
+	
+	local mainRange = weaponRange * mult * (weaponMult and weaponMult[1] or 1)
+	Spring.SetUnitWeaponState(unitID, 1, "range", mainRange)
+	local height = select(2, Spring.GetUnitPosition(unitID))
+	if height < -20 then
+		Spring.SetUnitWeaponState(unitID, 2, "range", mainRange - height)
+		Spring.SetUnitMaxRange(unitID, mainRange - height)
+	else
+		Spring.SetUnitWeaponState(unitID, 2, "range", mainRange)
+		Spring.SetUnitMaxRange(unitID, mainRange)
+	end
+end
+
 local function WeaponRangeUpdate()
 	while true do
-		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -20 then
-			Spring.SetUnitWeaponState(unitID, 2, {range = 400 - height})
-			Spring.SetUnitMaxRange(unitID, 400 - height)
-		else
-			Spring.SetUnitWeaponState(unitID, 2, {range = 450})
-			Spring.SetUnitMaxRange(unitID, 450)
-		end
+		RangeUpdate()
 		Sleep(500)
 	end
 end
 
-
 function script.Create()
+	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
 end
@@ -214,9 +216,9 @@ function script.AimFromWeapon()
 
 	local height = select(2, Spring.GetUnitBasePosition(unitID))
 	if height < -130 then
-		Spring.SetUnitWeaponState(unitID,2,{projectileSpeed = 200})
+		Spring.SetUnitWeaponState(unitID, 2, {projectileSpeed = 200 * (GG.att_ProjSpeed[unitID] or 1)})
 	else
-		Spring.SetUnitWeaponState(unitID,2,{projectileSpeed = PROJECTILE_SPEED})
+		Spring.SetUnitWeaponState(unitID, 2, {projectileSpeed = PROJECTILE_SPEED * (GG.att_ProjSpeed[unitID] or 1)})
 	end
 
 	return barrel

@@ -44,6 +44,7 @@ return { factoryship = {
     parent_of_plate   = [[plateship]],
     buggeroff_offset    = 0,
     buggeroff_radius    = 42,
+    normaltex = [[unittextures/seafac_normals.dds]],
 
     stats_show_death_explosion = 1,
 

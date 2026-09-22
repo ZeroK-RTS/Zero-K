@@ -45,6 +45,7 @@ return { platejump = {
     unstick_help       = 1,
     child_of_factory   = [[factoryjump]],
     buggeroff_offset   = 45,
+    normaltex = [[unittextures/Core_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,
@@ -68,7 +69,7 @@ return { platejump = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooooo ooooo ooooo yyyyy yyyyy yyyyy yyyyy]],
+  yardMap                       = [[ooooo ooooo ooooo uuuuu uuuuu uuuuu uuuuu]],
 
   featureDefs                   = {
 

@@ -16,7 +16,7 @@ end
 
 local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
 
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+local BAR_COMPAT = Script.IsEngineMinVersion(105, 0, 500)
 
 -----------------------------------------------------------------
 -- Configuration Constants

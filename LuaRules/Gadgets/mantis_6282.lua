@@ -15,7 +15,7 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return
 end
 
-local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1350)
+local REVERSE_COMPAT = not Script.IsEngineMinVersion(104, 0, 1350)
 
 local lastX, lastY, lastZ, lastFeatureDefID, lastGameFrame
 

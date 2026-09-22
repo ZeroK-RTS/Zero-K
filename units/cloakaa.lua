@@ -17,9 +17,11 @@ return { cloakaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 150,
     bait_level_default = 0,
     modelradius    = [[11]],
     cus_noflashlight = 1,
+    normaltex = [[unittextures/spherebot_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -85,8 +87,8 @@ return { cloakaa = {
 
       customParams              = {
         isaa = [[1]],
-        light_color = [[0.2 1.2 1.2]],
-        light_radius = 120,
+        light_radius = 80,
+        light_alpha = 0.08,
       },
 
       damage                  = {

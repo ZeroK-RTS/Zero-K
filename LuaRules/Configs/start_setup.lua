@@ -13,8 +13,8 @@ end
 -- starting and innate resources may be overridden by modoptions in start_unit_setup.lua
 
 -- starting resources
-START_METAL   = 325
-START_ENERGY  = 325
+START_METAL   = 350
+START_ENERGY  = 350
 
 INNATE_INC_METAL   = 2
 INNATE_INC_ENERGY  = 2

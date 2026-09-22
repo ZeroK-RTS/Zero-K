@@ -18,14 +18,14 @@ Font = Object:Inherit{
 
 	font          = "FreeSansBold.otf",
 	size          = 12,
-	outlineWidth  = 3,
+	outlineWidth  = 2,
 	outlineWeight = 3,
 
 	shadow        = false,
 	outline       = false,
 	color         = {1, 1, 1, 1},
 	outlineColor  = {0, 0, 0, 1},
-	autoOutlineColor = false,
+	autoOutlineColor = true,
 
 	uiScale = 1
 }
@@ -57,7 +57,7 @@ end
 
 function Font:_LoadFont()
 	local oldfont = self._font
-	self._font = FontHandler.LoadFont(self.font, math.floor(self.size*self.uiScale), math.floor(self.outlineWidth*self.uiScale), self.outlineWeight)
+	self._font = FontHandler.LoadFont(self.font, math.floor(self.size*self.uiScale), math.floor((self.outlineWidth*self.uiScale + 1)/2)*2, self.outlineWeight)
 	--self._font = FontHandler.LoadFont(self.font, self.size, self.outlineWidth, self.outlineWeight)
 	--// do this after LoadFont because it can happen that LoadFont returns the same font again
 	--// but if we Unload our old one before, the gc could collect it before, so the engine would have to reload it again

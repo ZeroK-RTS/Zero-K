@@ -76,7 +76,7 @@ local applicationShader
 
 local pingPongIdx = 1
 
-local shadersEnabled = Spring.Utilities.IsCurrentVersionNewerThan(104, 1243) and LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
+local shadersEnabled = Script.IsEngineMinVersion(104, 0, 1244) and LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 
 local unitsVisible = false
 -----------------------------------------------------------------

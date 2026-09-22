@@ -25,7 +25,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local CreateUnit          = Spring.CreateUnit
-local GetCommandQueue     = Spring.GetCommandQueue
+local GetUnitCommands     = Spring.GetUnitCommands
 local spGetUnitDirection  = Spring.GetUnitDirection
 local GetUnitIsStunned    = Spring.GetUnitIsStunned
 local GetUnitPieceMap     = Spring.GetUnitPieceMap
@@ -636,7 +636,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 				end
 			else
 				-- return to carrier unless in combat
-				local cQueue = GetCommandQueue(droneID, -1)
+				local cQueue = GetUnitCommands(droneID, -1)
 				local engaged = false
 				for j = 1, (cQueue and #cQueue or 0) do
 					if cQueue[j].id == CMD.ATTACK and firestate > 0 then

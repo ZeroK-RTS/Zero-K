@@ -1,5 +1,5 @@
 local layout = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{3971, 1135},
@@ -38,7 +38,7 @@ local layout = {
 		nameLong = "North",
 		nameShort = "N",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{1911, 7922},
@@ -65,7 +65,7 @@ local layout = {
 		nameLong = "South-West",
 		nameShort = "SW",
 	},
-	[2] = {
+	{
 		boxes = {
 			{
 				{7974, 5346},
@@ -96,7 +96,7 @@ local layout = {
 		nameLong = "East",
 		nameShort = "E",
 	},
-	[3] = {
+	{
 		boxes = {
 			{
 				{4309, 3990},
@@ -171,7 +171,7 @@ local layout = {
 }
 
 if Spring.Utilities.GetTeamCount() ~= 4 then
-	layout[3] = nil
+	layout[4] = nil
 end
 
 return layout, { 3, 4 }

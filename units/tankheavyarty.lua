@@ -20,6 +20,7 @@ return { tankheavyarty = {
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
     unstick_leeway    = 60, -- Don't lose move orders if stuck while packing.
+    normaltex = [[unittextures/cortremor_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -62,6 +63,7 @@ return { tankheavyarty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 2,
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
@@ -77,6 +79,7 @@ return { tankheavyarty = {
       areaOfEffect            = 140,
       avoidFeature            = false,
       avoidGround             = false,
+      cegTag                  = [[tremor_arty_trail]],
       craterAreaOfEffect      = 5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -103,6 +106,7 @@ return { tankheavyarty = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 450,
       myGravity               = 0.1,
       noSelfDamage            = false,
       range                   = 1160,

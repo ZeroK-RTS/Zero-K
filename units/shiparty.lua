@@ -14,6 +14,7 @@ return { shiparty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 180,
     bait_level_default = 1,
     --extradrawrange = 200,
     modelradius    = [[55]],
@@ -55,6 +56,7 @@ return { shiparty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 3,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
@@ -70,12 +72,13 @@ return { shiparty = {
       avoidGround             = true,
       burst                   = 2,
       burstRate               = 0.4,
+      cegTag                  = [[medium_arty_trail]],
       craterBoost             = 1,
       craterMult              = 2,
 
-            customParams = {
-                burst = Shared.BURST_RELIABLE,
-            },
+      customParams = {
+        burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
         default = 600.01,

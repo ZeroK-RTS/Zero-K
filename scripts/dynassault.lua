@@ -46,6 +46,7 @@ local ARM_SPEED_PITCH = math.rad(180)
 local ARM_PERPENDICULAR = math.rad(90)
 
 local RESTORE_DELAY = 2500
+local resetRestoreTorso = false
 
 --------------------------------------------------------------------------------
 -- vars
@@ -170,20 +171,6 @@ local function RestoreLegs()
 end
 
 
-function script.Create()
-	dyncomm.Create()
-	Hide(rcannon_flare)
-	Hide(lnanoflare)
-	
---	Turn(larm, x_axis, math.rad(30))
---	Turn(rarm, x_axis, math.rad(-10))
---	Turn(rhand, x_axis, math.rad(41))
---	Turn(lnanohand, x_axis, math.rad(36))
-	
-	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-end
-
 function script.StartMoving()
 	StartThread(Walk)
 end
@@ -197,14 +184,28 @@ end
 --------------------------------------------------------------------------------
 
 local function RestoreTorsoAim()
-	Signal(SIG_RESTORE_TORSO)
-	SetSignalMask(SIG_RESTORE_TORSO)
-	Sleep(RESTORE_DELAY)
 	Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW)
 end
 
+local function RestoreTorsoAfterDelay(sleepTime)
+	local counter = (sleepTime or RESTORE_DELAY)
+	while true do
+		if counter > 0  and not Spring.GetUnitIsStunned(unitID) then
+			counter = counter - 100
+		end
+		if resetRestoreTorso then
+			resetRestoreTorso = false
+			counter = (sleepTime or RESTORE_DELAY)
+		end
+		if counter <= 0 then
+			RestoreTorsoAim()
+		end
+		Sleep(100)
+	end
+end
+
 local function RestoreLaser()
-	StartThread(RestoreTorsoAim)
+	resetRestoreTorso = true
 	Signal(SIG_RESTORE_LASER)
 	SetSignalMask(SIG_RESTORE_LASER)
 	Sleep(RESTORE_DELAY)
@@ -220,7 +221,7 @@ local function RestoreLaser()
 end
 
 local function RestoreDGun()
-	StartThread(RestoreTorsoAim)
+	resetRestoreTorso = true
 	Signal(SIG_RESTORE_DGUN)
 	SetSignalMask(SIG_RESTORE_DGUN)
 	Sleep(RESTORE_DELAY)
@@ -325,6 +326,21 @@ function script.StartBuilding(heading, pitch)
 	Turn(larm, x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	SetUnitValue(COB.INBUILDSTANCE, 1)
+end
+
+function script.Create()
+	dyncomm.Create()
+	Hide(rcannon_flare)
+	Hide(lnanoflare)
+	
+--	Turn(larm, x_axis, math.rad(30))
+--	Turn(rarm, x_axis, math.rad(-10))
+--	Turn(rhand, x_axis, math.rad(41))
+--	Turn(lnanohand, x_axis, math.rad(36))
+	
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreTorsoAfterDelay)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Killed(recentDamage, maxHealth)

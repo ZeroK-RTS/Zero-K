@@ -43,14 +43,14 @@ end
 -- convert the above to boxes (160 radius circles)
 local ret = {}
 for i = 1, #used_starts do
-	ret[i-1] = {
+	ret[i] = {
 		nameLong  = used_starts[i][3],
 		nameShort = used_starts[i][4],
 		startpoints = { { used_starts[i][1], used_starts[i][2] } },
 		boxes = { { } },
 	}
 	for j = 1, 10 do
-		ret[i-1].boxes[1][j] = {
+		ret[i].boxes[1][j] = {
 			used_starts[i][1] + 160 * math.sin(j * math.pi / 5),
 			used_starts[i][2] + 160 * math.cos(j * math.pi / 5),
 		}

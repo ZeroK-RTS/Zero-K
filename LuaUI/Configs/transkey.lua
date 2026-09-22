@@ -60,6 +60,7 @@ local transkey = {
 		world_89				= '0x0f9',
 		dollar					= '$',
 		asterisk                = '*',
+		exclaim                   = '!',
 
 
 }

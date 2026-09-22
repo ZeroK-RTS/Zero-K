@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		boxes = {
 			{
 				{1160.1470947266, 1332.4475097656},
@@ -35,7 +35,7 @@ return {
 		nameLong = "North-West",
 		nameShort = "NW",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{5187.8784179688, 1486.94921875},
@@ -71,7 +71,7 @@ return {
 		nameLong = "North-East",
 		nameShort = "NE",
 	},
-	[2] = {
+	{
 		boxes = {
 			{
 				{3119.0561523438, 5172.4560546875},

@@ -33,6 +33,7 @@ return { dronelight = {
   refuelTime          = 10,
   script              = [[dronelight.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
+  stealth                = true,
   
   customParams        = {
     bait_level_target      = 1,

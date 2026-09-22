@@ -9,6 +9,8 @@ local wingtipl = piece 'wingtipl'
 local wingtipr = piece 'wingtipr'
 local enginel = piece 'enginel'
 local enginer = piece 'enginer'
+local exhaustl = piece 'exhaustl'
+local exhaustr = piece 'exhaustr'
 local head = piece 'head'
 local turretbase = piece 'turretbase'
 local turret = piece 'turret'
@@ -38,7 +40,7 @@ end
 
 function script.Create()
 	SetInitialBomberSettings()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, {wingtipl, wingtipr, head})
 	Turn(turret, y_axis, math.pi)
 	Move(wingl, x_axis, -5, 7)
@@ -49,22 +51,36 @@ function script.Create()
 	Hide(barrell)
 	Hide(sleever)
 	Hide(barrelr)
+	Hide(exhaustl)
+	Hide(exhaustr)
 	
-	Move(flaremissilel, y_axis, 18)
-	Move(flaremissiler, y_axis, 18)
+	Move(flaremissilel, y_axis, 13)
+	Move(flaremissiler, y_axis, 13)
 	Move(flaremissilel, z_axis, 1)
 	Move(flaremissiler, z_axis, 1)
 end
 
 function script.StartMoving()
+	Show(exhaustl)
+	Show(exhaustr)
 	Move(wingl, x_axis, 0, 7)
 	Move(wingr, x_axis, 0, 7)
 end
 
 function script.StopMoving()
+	Hide(exhaustl)
+	Hide(exhaustr)
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -96,7 +112,7 @@ end
 function script.FireWeapon(num)
 	Hide(missiler)
 	Hide(missilel)
-	Sleep(66)
+	Sleep(33)
 	Reload()
 end
 
@@ -111,7 +127,7 @@ function script.BlockShot(num, targetID)
 		if cmdID == CMD.ATTACK and (not cp_2) and cp_1 == targetID then
 			local cmdID_2, _, _, cp_1_2, cp_2_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 			if cmdID_2 == CMD.ATTACK and (not cp_2_2) then
-				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				local cQueue = Spring.GetUnitCommands(unitID, 1)
 				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
 			end
 		end

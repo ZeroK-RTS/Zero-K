@@ -14,7 +14,8 @@ return { turretmissile = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    aimposoffset   = [[0 20 0]],
+    aim_lookahead      = 60,
+    aimposoffset       = [[0 20 0]],
     bait_level_default = 0,
     okp_damage = 103,
 
@@ -27,7 +28,7 @@ return { turretmissile = {
   floater                       = true,
   footprintX                    = 2,
   footprintZ                    = 2,
-  health                        = 340,
+  health                        = 375,
   iconType                      = [[defenseskirm]],
   levelGround                   = false,
   maxSlope                      = 36,
@@ -97,6 +98,7 @@ return { turretmissile = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       metalpershot            = 0,
       model                   = [[hobbes.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,

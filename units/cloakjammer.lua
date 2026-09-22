@@ -21,6 +21,7 @@ return { cloakjammer = {
     
     priority_misc = 1,
     cus_noflashlight = 1,
+    normaltex = [[unittextures/spherebot_normals.dds]],
   },
 
   energyUpkeep           = 1.5,
@@ -34,6 +35,7 @@ return { cloakjammer = {
   metalCost              = 600,
   minCloakDistance       = 210,
   movementClass          = [[AKBOT2]],
+  moveState              = 0,
   objectName             = [[spherecloaker.s3o]],
   onoffable              = true,
   pushResistant          = 0,

@@ -29,7 +29,7 @@ local tooltips = {
 	GOO_GATHER = "Puppy Replication (_STATE_)\n  Set whether Puppies use nearby wrecks to make more Puppies.",
 	DISABLE_ATTACK = "Allow Attack Commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
-	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
+	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire on uncertain enemy positions within radar.",
 	PREVENT_BAIT = "Avoid Bad Targets (_STATE_)\n  _DESC_",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
 	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
@@ -90,7 +90,6 @@ local commandDisplayConfig = {
 	[CMD_EMBARK] = {texture = imageDir .. 'Bold/embark.png'},
 	[CMD_DISEMBARK] = {texture = imageDir .. 'Bold/disembark.png'},
 
-	[CMD_ONECLICK_WEAPON] = {},--texture = imageDir .. 'Bold/action.png'},
 	[CMD_UNIT_SET_TARGET_CIRCLE] = {texture = imageDir .. 'Bold/settarget.png'},
 	[CMD_UNIT_CANCEL_TARGET] = {texture = imageDir .. 'Bold/canceltarget.png'},
 
@@ -102,7 +101,13 @@ local commandDisplayConfig = {
 	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
 
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
-
+	
+	[CMD_MORPH_STOP] = {
+		DynamicDisplayFunc = function (cmdID, command)
+			return {texture = imageDir .. 'Bold/cancel.png', tex2 = command.texture}
+		end
+	},
+	
 	-- states
 	[CMD_WANT_ONOFF] = {
 		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
@@ -205,10 +210,10 @@ local commandDisplayConfig = {
 		},
 		stateTooltip = {
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Enable this to ignore bad targets when not on Force Fire or Attack Move."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid cost under 90, Razor, Sparrow, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid cost under 240, minus Stardust, Raptor, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid cost under 420, unknown radar dots and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag, nanoframes cheaper than 50 and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid targets cheaper than 90, Razor, Sparrow, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid targets cheaper than 240 (except Stardust), Raptor, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid targets cheaper than 420, unknown radar dots and armoured targets."),
 		}
 	},
 	[CMD_RETREAT] = {
@@ -266,13 +271,15 @@ local commandDisplayConfig = {
 			imageDir .. 'states/overkill_off.png',
 			imageDir .. 'states/overkill_auto_target.png',
 			imageDir .. 'states/overkill_fire_at_will.png',
-			imageDir .. 'states/overkill_on.png'
+			imageDir .. 'states/overkill_on_except_single.png',
+			imageDir .. 'states/overkill_on.png',
 		},
 		stateTooltip = {
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Disabled"),
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled for automatic targeting"),
 			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled when set to Fire At Will"),
-			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Always")
+			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled except for single attack command"),
+			tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Always"),
 		}
 	},
 	[CMD.TRAJECTORY] = {
@@ -361,9 +368,9 @@ end
 local textConfig = {
 	bottomLeft = {
 		name = "bottomLeft",
-		x = "15%",
+		x = "10%",
 		right = 0,
-		bottom = 2,
+		bottom = "10%",
 		height = 12,
 		fontsize = 12,
 	},
@@ -383,8 +390,8 @@ local textConfig = {
 	},
 	queue = {
 		name = "queue",
-		right = "18%",
-		bottom = "14%",
+		right = "15%",
+		bottom = "15%",
 		align = "right",
 		fontsize = 16,
 		height = 16,
@@ -406,24 +413,26 @@ local buttonLayoutConfig = {
 	},
 	build = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "Build",
+		invisibleButton = true,
 		showCost = true
 	},
 	buildunit = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "BuildUnit",
+		invisibleButton = true,
 		showCost = true
 	},
 	queue = {
@@ -641,7 +650,12 @@ end
 local modCommands = VFS.Include("LuaRules/Configs/modCommandsDefs.lua")
 for i = 1, #modCommands do
 	local cmd = modCommands[i]
-	commandDisplayConfig[cmd.cmdID] = {tooltip = cmd.tooltip, texture = cmd.image, stateTooltip = cmd.stateTooltip}
+	commandDisplayConfig[cmd.cmdID] = {
+		tooltip = cmd.tooltip,
+		texture = cmd.image,
+		stateTooltip = cmd.stateTooltip,
+		DynamicDisplayFunc = cmd.DynamicDisplayFunc,
+	}
 end
 
 --------------------------------------------------------------------------------

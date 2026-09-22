@@ -1,0 +1,138 @@
+return { planesupport = {
+  name                = [[Magpie]],
+  description         = [[Slowing Support Fighter]],
+  brakerate           = 0.4,
+  builder             = false,
+  buildPic            = [[planesupport.png]],
+  canFly              = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canSubmerge         = false,
+  category            = [[FIXEDWING]],
+  collide             = false,
+  collisionVolumeOffsets = [[0 2 0]],
+  collisionVolumeScales  = [[50 16 80]],
+  collisionVolumeType    = [[ellipsoid]],
+  corpse              = [[DEAD]],
+  cruiseAltitude      = 140,
+
+  customParams        = {
+    refuelturnradius   = [[90]],
+    modelradius        = [[10]],
+    can_set_target     = [[1]],
+    bait_level_default = 0,
+    aim_lookahead      = 200,
+  },
+
+  explodeAs           = [[GUNSHIPEX]],
+  floater             = true,
+  fireState           = 2,
+  footprintX          = 3,
+  footprintZ          = 3,
+  frontToSpeed        = 0.05,
+  health              = 850,
+  iconType            = [[supportfighter]],
+  maxAcc              = 0.55,
+  maxBank             = 0.66,
+  maxElevator         = 0.01,
+  maxPitch            = 0.5,
+  maxRudder           = 0.0085,
+  metalCost           = 150,
+  mygravity           = 1,
+  metalCost           = 250,
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM SATELLITE]],
+  objectName          = [[bomberstrike.s3o]],
+  script              = [[planesupport.lua]],
+  selfDestructAs      = [[GUNSHIPEX]],
+
+  sfxtypes            = {},
+  sightDistance       = 760,
+  speed               = 220,
+  speedToFront        = 0.35,
+  turnRadius          = 80,
+  workerTime          = 0,
+
+  weapons             = {
+    {
+      def                = [[DISRUPTOR_CANNON]],
+      accurateLeading    = 3,
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 100,
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SINK SUB]],
+    },
+  },
+
+
+  weaponDefs          = {
+  
+    DISRUPTOR_CANNON = {
+      name                    = [[Disruption EMG]],
+      accuracy                = 0,
+      alphaDecay              = 0.7,
+      areaOfEffect            = 24,
+      burnblow                = true,
+      burst                   = 2,
+      burstrate               = 2/30,
+      cegTag                  = [[hmg_trail_disrupt]],
+      collideFriendly         = false,
+      craterBoost             = 0.15,
+      craterMult              = 0.3,
+
+      customParams        = {
+        light_color = [[1.3 0.5 1.6]],
+        light_radius = 20,
+        timeslow_damagefactor = 5,
+        timeslow_overslow_frames = 2*30,
+      },
+
+      damage                  = {
+        default = 12,
+      },
+
+      edgeEffectiveness       = 0.5,
+      explosionGenerator      = [[custom:EMG_HIT_LARGE_PURPLE]],
+      firestarter             = 70,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      intensity               = 0.7,
+      interceptedByShieldType = 1,
+      noSelfDamage            = true,
+      projectiles             = 2,
+      range                   = 560,
+      reloadtime              = 0.8,
+      rgbColor                = [[1 0.45 1]],
+      separation              = 1.5,
+      size                    = 2.9,
+      soundHit                = [[weapon/cannon/emg_hit_medium]],
+      soundStart              = [[weapon/emg_medium]],
+      sprayAngle              = 1050,
+      stages                  = 10,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 790,
+    },
+  },
+
+
+  featureDefs         = {
+
+    DEAD  = {
+      blocking         = true,
+      featureDead      = [[HEAP]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[bomberstrike_dead.s3o]],
+    },
+
+    HEAP  = {
+      blocking         = false,
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[debris2x2c.s3o]],
+    },
+
+  },
+
+} }
