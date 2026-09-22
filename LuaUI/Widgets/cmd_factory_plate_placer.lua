@@ -142,7 +142,7 @@ for i = 1, #UnitDefs do
 			local eligRange = striderHubRange[hubDef.id] + ud.buildDistance
 			local eligRangeSq = eligRange * eligRange
 			striderBuilderDef[i] = {hubDefID = hubDef.id, eligRangeSq = eligRangeSq}
-			striderHubToBuilder[hubDef.id] = {defID = i, eligRangeSq = eligRangeSq}
+			striderHubToBuilder[hubDef.id] = {defID = i, eligRange = eligRange, eligRangeSq = eligRangeSq}
 			buildAction[i] = buildAction[i] or ("buildunit_" .. ud.name)
 		end
 	end
@@ -567,52 +567,56 @@ local function DrawFactoryLine(x, y, z, unitDefID, drawDef)
 	glColor(1, 1, 1, 1)
 end
 
--- Draws the green build-area circle on own/allied Strider Hubs while placing a
--- strider or a Caretaker, plus a connector line when placing a Caretaker.
-local function DrawStriderBuildAreas()
-	if not striderDrawMode then
-		return
-	end
-
-	local drawn = false
-	gl.DepthTest(false)
-	glLineWidth(inCircle.width)
-	glColor(inCircle.color[1], inCircle.color[2], inCircle.color[3], inCircle.color[4])
-	for unitID, data in IterableMap.Iterator(striderHubs) do
-		if data.unitDefID == striderDrawHubDefID then
-			drawn = true
-			glDrawGroundCircle(data.x, data.y, data.z, data.range, inCircle.circleDivs)
-		end
-	end
-	if drawn then
-		glLineStipple(false)
-		glLineWidth(1)
-		glColor(1, 1, 1, 1)
-	end
-
-	if striderDrawMode ~= "builder" then
-		return
-	end
-
-	-- Placing a Caretaker: line to the nearest Hub, green if the Caretaker will
-	-- reach that Hub's build area (and can therefore build striders there).
-	local mx, mz = GetMousePos(true)
-	if not mx then
-		return
-	end
-	local _, nearDistSq, nearData = GetClosestStriderHub(mx, mz, striderDrawHubDefID)
-	if not nearData then
-		return
-	end
-	local drawDef = (nearDistSq <= striderBuilderEligRangeSq) and inCircle or outCircle
-	local my = spGetGroundHeight(mx, mz)
-	gl.DepthTest(false)
+local function DrawStriderCircle(data, drawDef, radius)
 	glLineWidth(drawDef.width)
 	glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
-	gl.BeginEnd(GL.LINE_STRIP, DoLine, nearData.x, nearData.y, nearData.z, mx, my, mz)
+	glDrawGroundCircle(data.x, data.y, data.z, radius, drawDef.circleDivs)
+end
+
+-- Strider Hub placement/build overlays. Shown while placing a strider, placing a
+-- Caretaker, or while the build-plate command is active (so a Hub reads as a plate
+-- target like a factory). Each Hub draws a green build-area circle, and -- while
+-- choosing where to place a plate -- a plate-range ring that is green when the
+-- cursor is in range and grey when it is out (matching factory placement).
+local function DrawStriderBuildAreas()
+	local placing = buildPlateCommand or (striderDrawMode == "builder")
+	if not (placing or striderDrawMode == "strider") then
+		return
+	end
+
+	local mx, mz = GetMousePos(true)
+	gl.DepthTest(false)
+	for unitID, data in IterableMap.Iterator(striderHubs) do
+		if buildPlateCommand or data.unitDefID == striderDrawHubDefID then
+			DrawStriderCircle(data, inCircle, data.range) -- build area, always green
+			if placing then
+				local elig = striderHubToBuilder[data.unitDefID]
+				if elig then
+					local inRange = mx and (DistSq(mx, mz, data.x, data.z) <= elig.eligRangeSq)
+					DrawStriderCircle(data, inRange and inCircle or outCircle, elig.eligRange)
+				end
+			end
+		end
+	end
 	glLineStipple(false)
 	glLineWidth(1)
 	glColor(1, 1, 1, 1)
+
+	-- Connector line only while actually placing a Caretaker (the plate command
+	-- already draws its own line to the nearest factory).
+	if striderDrawMode == "builder" and mx then
+		local _, nearDistSq, nearData = GetClosestStriderHub(mx, mz, striderDrawHubDefID)
+		if nearData then
+			local drawDef = (nearDistSq <= striderBuilderEligRangeSq) and inCircle or outCircle
+			local my = spGetGroundHeight(mx, mz)
+			glLineWidth(drawDef.width)
+			glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
+			gl.BeginEnd(GL.LINE_STRIP, DoLine, nearData.x, nearData.y, nearData.z, mx, my, mz)
+			glLineStipple(false)
+			glLineWidth(1)
+			glColor(1, 1, 1, 1)
+		end
+	end
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
@@ -647,11 +651,28 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 			
 			glLineWidth(drawDef.miniWidth)
 			glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
-			
+
 			glDrawCircle(data.x, data.z, drawDef.range)
 		end
 	end
-	
+
+	-- Strider Hubs are plate targets too while the build-plate command is active.
+	if buildPlateCommand then
+		for unitID, data in IterableMap.Iterator(striderHubs) do
+			drawn = true
+			glLineWidth(inCircle.miniWidth)
+			glColor(inCircle.color[1], inCircle.color[2], inCircle.color[3], inCircle.color[4])
+			glDrawCircle(data.x, data.z, data.range) -- build area, green
+			local elig = striderHubToBuilder[data.unitDefID]
+			if elig then
+				local ringDef = (DistSq(mx, mz, data.x, data.z) <= elig.eligRangeSq) and inCircle or outCircle
+				glLineWidth(ringDef.miniWidth)
+				glColor(ringDef.color[1], ringDef.color[2], ringDef.color[3], ringDef.color[4])
+				glDrawCircle(data.x, data.z, elig.eligRange)
+			end
+		end
+	end
+
 	if drawn then
 		glScale(1, 1, 1)
 		glLineStipple(false)
