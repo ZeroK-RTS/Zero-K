@@ -1387,7 +1387,7 @@ explosionDistortionsNames.missileslow_weapon = {
 }
 
 explosionDistortionsNames.raveparty_red_killer = {
-	GetDistortionClass("ExploShockWaveL", "SmallMedium"),
+	GetDistortionClass("ExploShockWaveL", "Medium"),
 }
 explosionDistortionsNames.raveparty_orange_roaster = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Mega"),
