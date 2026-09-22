@@ -107,10 +107,16 @@ local pregame = true
 
 local myTeamID = spGetMyTeamID()
 
--- Planned-but-not-built structures to treat as anchors/occupancy, rebuilt each
--- recompute: the initial build queue pre-game, or ally constructors' build queues
--- in-game. Each entry: {defID, x, z, range}.
+-- Planned-but-not-built structures to treat as anchors/occupancy (never rebuilt),
+-- rebuilt each recompute: the initial build queue pre-game, or -- in-game -- the
+-- build queues of the units this command is being issued to (so re-dragging with
+-- the same con doesn't stack duplicate orders). Each entry: {defID, x, z, range}.
 local queuedBuildings = {}
+
+-- In-game grid structures queued by OTHER ally constructors (not the current
+-- selection). Zero-K lets several cons share a build site, so a drag with a
+-- different unit should build these too rather than skip them. Same entry shape.
+local queuedByOthers = {}
 
 ------------------------------------------------------------
 -- Config
@@ -907,6 +913,20 @@ local function seedQueuedBuildings()
 	end
 end
 
+-- Co-build grid structures queued by OTHER ally cons: add them as buildable connect
+-- nodes so the current selection builds the same sites (Zero-K allows shared build
+-- sites) and the grid routes through them. Mex/geo spots are already handled by the
+-- metal/geo passes, so only pure energy/pylon structures are taken here -- adding a
+-- mex/geo here as well would double-order that spot.
+local function seedQueuedByOthers()
+	for i = 1, #queuedByOthers do
+		local q = queuedByOthers[i]
+		if q.defID ~= mexDefID and q.defID ~= geoDefID then
+			addPylonsToConnect(q.defID, q.x, q.z, q.range, true)
+		end
+	end
+end
+
 -- Returns enemyHeld, allyHeld for the spot at (x, z), based on a structure of
 -- defID (a mex or a geo) sitting on it.
 local function spotOwnership(x, z, defID)
@@ -1012,12 +1032,14 @@ local function copyPylonsFromMexesToConnect()
 	end
 end
 
--- Collect planned-but-not-built grid structures into queuedBuildings: pre-game from
--- the initial build queue, in-game from every ally mobile constructor's build queue
--- (so a drag connects to in-progress work instead of duplicating it, including an
--- ally's queued buildings). Only structures with a pylon range are kept.
+-- Collect planned-but-not-built grid structures. Pre-game: the initial build queue,
+-- all into queuedBuildings. In-game: the selection's own queued buildings go into
+-- queuedBuildings (skip-anchors, so a drag doesn't duplicate them on the same con);
+-- every other ally con's queued buildings go into queuedByOthers (to co-build). Only
+-- structures with a pylon range are kept.
 local function gatherQueuedBuildings()
 	queuedBuildings = {}
+	queuedByOthers = {}
 
 	if pregame then
 		local queue = WG.InitialQueueGetQueue and WG.InitialQueueGetQueue()
@@ -1033,6 +1055,15 @@ local function gatherQueuedBuildings()
 		return
 	end
 
+	-- The command is issued to the current selection; buildings those units already
+	-- have queued are skip-anchors (don't duplicate on the same con), while buildings
+	-- queued by other ally cons are ones this selection should co-build.
+	local selected = {}
+	local sel = Spring.GetSelectedUnits()
+	for i = 1, #sel do
+		selected[sel[i]] = true
+	end
+
 	local myAllyTeam = spGetMyAllyTeamID()
 	local units = spGetAllUnits()
 	for i = 1, #units do
@@ -1042,6 +1073,7 @@ local function gatherQueuedBuildings()
 			if ud and ud.isMobileBuilder then
 				local cmds = spGetCommandQueue(unitID, -1)
 				if cmds then
+					local list = selected[unitID] and queuedBuildings or queuedByOthers
 					for c = 1, #cmds do
 						local cmd = cmds[c]
 						local id = cmd.id
@@ -1049,7 +1081,7 @@ local function gatherQueuedBuildings()
 							local range = pylonRange[-id]
 							if range then
 								local p = cmd.params
-								queuedBuildings[#queuedBuildings + 1] = {defID = -id, x = p[1], z = p[3], range = range}
+								list[#list + 1] = {defID = -id, x = p[1], z = p[3], range = range}
 							end
 						end
 					end
@@ -1087,6 +1119,7 @@ local function updatePylonsToBuild()
 
 	seedExistingPylons()
 	seedQueuedBuildings()
+	seedQueuedByOthers()
 	copyPylonsFromFeaturesToConnect()
 	copyPylonsFromMexesToConnect()
 
