@@ -28,11 +28,11 @@ return { staticcon = {
 
     -- Acts as a "plate" for the Strider Hub: when in range of a powered Strider
     -- Hub (own or allied) it can build striders inside that Hub's build area.
-    -- isfakefactory + notreallyafactory make the strider buildoptions appear in
-    -- the generic Units tab (same as Athena) without turning the Caretaker into
-    -- a real factory. The strider roster is appended in gamedata/unitdefs_post.
+    -- isfakefactory (without notreallyafactory) makes the Caretaker read as a
+    -- fake factory, so its striders show in its own Units tab. Mobile strider
+    -- builders (cons/Commander/Athena) instead reach striders through the Strider
+    -- submenu button. The strider roster is appended in gamedata/unitdefs_post.
     isfakefactory     = 1,
-    notreallyafactory = 1,
     strider_builder   = [[striderhub]],
 
     outline_x = 80,

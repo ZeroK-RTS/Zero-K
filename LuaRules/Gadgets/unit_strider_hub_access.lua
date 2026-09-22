@@ -31,9 +31,22 @@ local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
 local spValidUnitID       = Spring.ValidUnitID
 local spFindUnitCmdDesc   = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
+
+local CMD_STRIDER_MENU = Spring.Utilities.CMD.STRIDER_MENU
 
 local ALLY_ACCESS = {allied = true}
 local DISABLED_TOOLTIP = "Requires a powered Strider Hub in range"
+
+-- UI-only command that opens the Strider build submenu (a hidden integral-menu
+-- tab). Placed on mobile strider builders; the Caretaker uses its own Units tab.
+local striderMenuCmdDesc = {
+	id      = CMD_STRIDER_MENU,
+	type    = CMDTYPE.ICON,
+	name    = "Striders",
+	action  = "stridermenu",
+	tooltip = "Build Striders: opens the strider build menu (needs a powered Strider Hub in range).",
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -99,6 +112,9 @@ for i = 1, #UnitDefs do
 		end
 	end
 end
+
+-- Also intercept the UI-only submenu command so AllowCommand can block it.
+wantedStriderCmd[CMD_STRIDER_MENU] = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -213,6 +229,9 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_STRIDER_MENU then
+		return false -- UI-only; the integral menu opens the submenu on click, never issues it
+	end
 	local info = builderDefData[unitDefID]
 	if not (info and info.striderCmdSet[cmdID]) then
 		return true
@@ -242,14 +261,20 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 
 	if builderDefData[unitDefID] then
+		local info = builderDefData[unitDefID]
 		local x, _, z = spGetUnitPosition(unitID)
 		IterableMap.Add(builders, unitID, {
-			info = builderDefData[unitDefID],
+			info = info,
 			x = x,
 			z = z,
 			allyTeamID = spGetUnitAllyTeam(unitID),
 			access = nil,
 		})
+		-- Mobile strider builders reach striders through the submenu button; the
+		-- Caretaker (immobile) shows them in its own Units tab, so it gets no button.
+		if info.isMobile and not spFindUnitCmdDesc(unitID, CMD_STRIDER_MENU) then
+			spInsertUnitCmdDesc(unitID, striderMenuCmdDesc)
+		end
 		UpdateBuilder(unitID, IterableMap.Get(builders, unitID))
 	end
 end
@@ -275,6 +300,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_STRIDER_MENU)
 	IterableMap.Clear(hubs)
 	IterableMap.Clear(builders)
 

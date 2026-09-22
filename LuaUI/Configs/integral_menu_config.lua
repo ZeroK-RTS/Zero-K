@@ -67,6 +67,7 @@ local commandDisplayConfig = {
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', tooltip = "Unload: Set down a carried unit. Click and drag to unload in an area."},
 	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png', tooltip = "Area Attack: Indiscriminately bomb the terrain in an area."},
 	[CMD_BUILD_PLATE] = {texture = imageDir .. 'Bold/buildplate.png', tooltip = "Build Plate: Place near a factory for an extra production queue."},
+	[CMD_STRIDER_MENU] = {texture = "#" .. UnitDefNames.striderhub.id, tooltip = "Build Striders: opens the strider build menu (needs a powered Strider Hub in range)."},
 
 	[CMD_RAMP] = {texture = imageDir .. 'ramp.png'},
 	[CMD_LEVEL] = {texture = imageDir .. 'level.png'},
@@ -493,7 +494,7 @@ local commandPanels = {
 			return ((cmdID >= 0 or unitMobilePanelSize == 1) and
 				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
 				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
-				not buildCmdStrider[cmdID] and not plateCommandID[cmdID])
+				not plateCommandID[cmdID])
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
@@ -599,11 +600,13 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.buildunit,
 	},
 	{
-		-- Dedicated Strider tab for non-factory strider builders (Caretaker,
-		-- mobile cons, Commander, Athena). Keeps striders out of the Units tab,
-		-- which fixes the Units-tab hotkey clash with Fire State and the Athena
-		-- build-menu overflow. Factories (incl. the Strider Hub) keep their own
-		-- Units tab, so this only applies when nothing is a factory.
+		-- Strider build submenu for non-factory strider builders (mobile cons,
+		-- Commander, Athena). A hiddenTab: it is kept out of the tab strip and
+		-- revealed by the Special-tab "Strider" button (CMD_STRIDER_MENU) via
+		-- WG.IntegralMenu.OpenTab("strider"). This keeps striders out of the Units
+		-- tab (no Fire State hotkey clash, no Athena overflow). Factories -- incl.
+		-- the Strider Hub and the fake-factory Caretaker -- keep their own Units
+		-- tab, so this only applies when nothing selected is a factory.
 		humanName = "Strider",
 		name = "strider",
 		inclusionFunction = function(cmdID, factoryUnitDefID)
@@ -614,8 +617,7 @@ local commandPanels = {
 			return position and true or false, position
 		end,
 		isBuild = true,
-		returnOnClick = "orders",
-		optionName = "tab_strider",
+		hiddenTab = true,
 		gridHotkeys = true,
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
@@ -631,6 +633,7 @@ end
 -- Hidden Commands
 
 local instantCommands = {
+	[CMD_STRIDER_MENU] = true, -- opens the strider submenu; handled by the menu, not issued
 	[CMD.SELFD] = true,
 	[CMD.STOP] = true,
 	[CMD.WAIT] = true,

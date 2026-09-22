@@ -26,6 +26,7 @@ end
 
 AddBuildQueue("striderhub")
 AddBuildQueue("staticmissilesilo")
+AddBuildQueue("staticcon") -- Caretaker shows its striders in its own Units tab
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

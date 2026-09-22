@@ -62,6 +62,7 @@ local special_commands = {
 	staticheavyradar  = {order = 14, row = 1, col = 3},
 	staticmissilesilo = {order = 15, row = 1, col = 4},
 	staticantinuke    = {order = 16, row = 1, col = 5},
+	[CMD_STRIDER_MENU] = {order = 22, row = 1, col = 6}, -- opens the Strider submenu
 	staticarty        = {order = 2, row = 2, col = 1},
 	staticheavyarty   = {order = 3, row = 2, col = 2},
 	staticnuke        = {order = 4, row = 2, col = 3},

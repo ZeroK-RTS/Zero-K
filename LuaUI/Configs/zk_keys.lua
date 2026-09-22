@@ -186,7 +186,6 @@ return {
 		{	"epic_chili_integral_menu_tab_special",	"any+v",},
 		{	"epic_chili_integral_menu_tab_factory",	"any+b",},
 		{	"epic_chili_integral_menu_tab_units",	"any+n",},
-		{	"epic_chili_integral_menu_tab_strider",	"any+y",},
 		{	"exitwindow",	"s+escape",},
 		{	"crudesubmenu",	"f10"},
 		{	"epic_chili_pro_console_enableconsole", "f8"},
