@@ -1,4 +1,4 @@
-local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
+local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef, buildCmdStrider = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -493,7 +493,7 @@ local commandPanels = {
 			return ((cmdID >= 0 or unitMobilePanelSize == 1) and
 				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
 				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
-				not plateCommandID[cmdID])
+				not buildCmdStrider[cmdID] and not plateCommandID[cmdID])
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
@@ -566,7 +566,7 @@ local commandPanels = {
 			return (cmdID < 0 and not factoryUnitDefID and
 				not buildCmdEconomy[cmdID] and not buildCmdFactory[cmdID] and
 				not buildCmdSpecial[cmdID] and not buildCmdDefence[cmdID] and
-				not plateCommandID[cmdID])
+				not buildCmdStrider[cmdID] and not plateCommandID[cmdID])
 		end,
 		isBuild = true,
 		gridHotkeys = true,
@@ -597,6 +597,27 @@ local commandPanels = {
 		gridHotkeys = true,
 		disableableKeys = true,
 		buttonLayoutConfig = buttonLayoutConfig.buildunit,
+	},
+	{
+		-- Dedicated Strider tab for non-factory strider builders (Caretaker,
+		-- mobile cons, Commander, Athena). Keeps striders out of the Units tab,
+		-- which fixes the Units-tab hotkey clash with Fire State and the Athena
+		-- build-menu overflow. Factories (incl. the Strider Hub) keep their own
+		-- Units tab, so this only applies when nothing is a factory.
+		humanName = "Strider",
+		name = "strider",
+		inclusionFunction = function(cmdID, factoryUnitDefID)
+			if factoryUnitDefID then
+				return false
+			end
+			local position = buildCmdStrider[cmdID]
+			return position and true or false, position
+		end,
+		isBuild = true,
+		returnOnClick = "orders",
+		optionName = "tab_strider",
+		gridHotkeys = true,
+		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 }
 

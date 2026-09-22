@@ -158,7 +158,7 @@ options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
 	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'small_icons', 'applyCustomGrid', 'label_apply',
-	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
+	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units', 'tab_strider',
 	'tabFontSize', 'buttonFontScale', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
 	'helpwindow', 'commands_reset_default', 'commands_enable_all', 'commands_disable_all', 'states_enable_all', 'states_disable_all',
 }
@@ -437,6 +437,12 @@ options = {
 	tab_units = {
 		name = "Units Tab",
 		desc = "Switches to units tab.",
+		type = 'button',
+		path = commandPanelPath,
+	},
+	tab_strider = {
+		name = "Strider Tab",
+		desc = "Switches to strider tab.",
 		type = 'button',
 		path = commandPanelPath,
 	},
@@ -2723,10 +2729,18 @@ local function HotkeyTabUnits()
 	end
 end
 
+local function HotkeyTabStrider()
+	local tab = commandPanelMap.strider.tabButton
+	if tab.IsTabPresent() and CheckTabHotkeyAllowed() then
+		tab.DoClick()
+	end
+end
+
 options.tab_defence.OnChange = HotkeyTabDefence
 options.tab_special.OnChange = HotkeyTabSpecial
 options.tab_factory.OnChange = HotkeyTabFactory
 options.tab_units.OnChange   = HotkeyTabUnits
+options.tab_strider.OnChange = HotkeyTabStrider
 
 function options.tabFontSize.OnChange(self)
 	if commandPanels then

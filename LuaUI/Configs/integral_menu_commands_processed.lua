@@ -122,4 +122,23 @@ for name, listData in pairs(factoryUnitPosDef) do
 	end
 end
 
-return buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef
+-- The dedicated "Strider" tab shown for non-factory strider builders (Caretaker,
+-- mobile cons, Commander, Athena). Laid out from the Strider Hub's own roster so
+-- these builds live in their own grid instead of the crowded Units tab.
+local buildCmdStrider = {}
+do
+	local hub = UnitDefNames["striderhub"]
+	if hub and hub.buildOptions then
+		local row, col = 1, 1
+		for i = 1, #hub.buildOptions do
+			buildCmdStrider[-hub.buildOptions[i]] = {row = row, col = col, order = i}
+			col = col + 1
+			if col == 7 then
+				col = 1
+				row = row + 1
+			end
+		end
+	end
+end
+
+return buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, cmdPosDef, factoryUnitPosDef, buildCmdStrider
