@@ -1216,13 +1216,18 @@ function widget:MouseRelease(x, y, button)
 		return false
 	end
 
+	-- Off the map on release, keep the last radius the drag reached (MouseMove retains
+	-- it) instead of bailing, so dragging out past the map edge still builds the grid,
+	-- the way area mex placement does.
 	local distance = GetMouseDistance()
-	if not distance then
+	if distance then
+		cmdDist = distance
+	end
+	if not cmdDist then
 		clearCmd()
 		return false
 	end
 
-	cmdDist = distance
 	updatePylonsToBuild()
 	orderPylonsToBuild()
 
