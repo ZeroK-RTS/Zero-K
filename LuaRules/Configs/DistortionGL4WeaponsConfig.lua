@@ -1285,7 +1285,6 @@ local function AssignWeaponDistortions(weaponID)
 				local empSize = adjRadius * ((stunTime or 0) > 8 and 1 or 1.2)
 				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(empSize), strength)
 			end
-			Spring.Echo(weaponDef.name, distortionClass, adjRadius)
 			explosionDistortionsNames[weaponName] = distorts
 		end
 	end

@@ -440,8 +440,8 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			maxAcc          = state.origMaxAcc      *maxAccelerationFactor, --(speedFactor > 0.001 and speedFactor or 0.001)
 			maxRudder       = state.origMaxRudder   *turnFactor,
 		}
-		spSetAirMoveTypeData (unitID, attribute)
-		spSetAirMoveTypeData (unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
 	elseif state.movetype == 1 then
 		local attribute =  {
 			maxSpeed        = state.origSpeed       *speedFactor,
@@ -450,7 +450,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			accRate         = state.origMaxAcc      *maxAccelerationFactor,
 			decRate         = state.origMaxDec      *maxAccelerationFactor
 		}
-		spSetGunshipMoveTypeData (unitID, attribute)
+		spSetGunshipMoveTypeData(unitID, attribute)
 		GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 	elseif state.movetype == 2 then
 		if workingGroundMoveType then
@@ -468,7 +468,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 				decRate         = state.origMaxDec      *decFactor,
 				turnAccel       = state.origTurnAccel    *turnAccelFactor,
 			}
-			spSetGroundMoveTypeData (unitID, attribute)
+			spSetGroundMoveTypeData(unitID, attribute)
 			GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 		else
 			--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)

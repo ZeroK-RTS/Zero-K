@@ -443,7 +443,7 @@ end
 local function FilterCalculation()
 	local cpx, cpy, cpz = spGetCameraPosition()
 	local gmin, gmax = Spring.GetGroundExtremes()
-	local effectiveHeight = cpy - math.max(0, gmin)
+	local effectiveHeight = math.max(1, cpy - math.max(0, gmin))
 	cpy = 3.5 * math.sqrt(effectiveHeight) * math.log(effectiveHeight)
 	glUniform(eyePosLoc, cpx, cpy, cpz)
 	glUniformInt(passLoc, shaderPasses.filterSize)
