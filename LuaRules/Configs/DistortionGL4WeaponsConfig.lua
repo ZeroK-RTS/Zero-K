@@ -782,6 +782,27 @@ local BaseClasses = {
 			effectType = 7,
 		},
 	},
+	MediumLaser = {
+		distortionType = "beam",
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			noiseStrength = 0.3,
+			noiseScaleSpace = 0.09,
+			onlyModelMap = 0,
+			riseRate = -0.2,
+			pos2x = 100,
+			pos2y = 500,
+			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
+			lifeTime = 4,
+			sustain = 1,
+			rampUp = 0,
+			decay = 3,
+			effectType = 7,
+		},
+	},
 	ExplosionHeatFirewalker = { -- spawned on explosions
 		distortionType = "point",
 		yOffset = 0, -- Y offsets are only ever used for explosions!
@@ -846,8 +867,8 @@ local BaseClasses = {
 }
 
 local SizeRadius = {
-	Quaco = 6,
-	Zetto = 8,
+	Quaco = 8,
+	Zetto = 9.5,
 	Atto = 11,
 	Banthlaser = 13,
 	Femto = 28,
@@ -1070,7 +1091,7 @@ local function AssignDistortionsToAllWeapons()
 		elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
 			projectileDefDistortionsNames[weaponName] = GetDistortionClass("GaussProjectile", "Pico")
 		elseif weaponDef.type == "LightningCannon" then
-			local lightningWidth = (weaponRange > 200 or stunTime > 5) and "Banthlaser" or "Zetto"
+			local lightningWidth = (weaponRange > 200 or stunTime > 5) and "Banthlaser" or "Quaco"
 			projectileDefDistortionsNames[weaponName] = GetDistortionClass("LightningBeam", lightningWidth)
 		elseif weaponDef.type == "BeamLaser" then
 			if wcp.timeslow_damagefactor or wcp.timeslow_onlyslow then
@@ -1078,13 +1099,13 @@ local function AssignDistortionsToAllWeapons()
 				if damage < 20 then -- Weapon contains real damage by this point, so this catches onlyslow too.
 					projectileDefDistortionsNames[weaponName] = GetDistortionClass("SlowBeam", "Atto")
 				else
-					local size = weaponRange > 250 and "Atto" or "Zetto"
+					local size = weaponRange > 250 and "Atto" or "Quaco"
 					projectileDefDistortionsNames[weaponName] = GetDistortionClass("DisruptorBeam", size)
 				end
 			elseif damage > 2500 then
 				projectileDefDistortionsNames[weaponName] = GetDistortionClass("HeavyLaser", "Banthlaser")
-			elseif damage > 800 then
-				projectileDefDistortionsNames[weaponName] = GetDistortionClass("HeavyLaser", "Atto")
+			elseif damage > 700 then
+				projectileDefDistortionsNames[weaponName] = GetDistortionClass("MediumLaser", "Zetto")
 			end
 		elseif weaponDef.type == "DGun" then
 			sizeclass = "DGun"
@@ -1188,7 +1209,6 @@ explosionDistortionsNames.shieldscout_clogger_explode[#explosionDistortionsNames
 explosionDistortionsNames.energysingu_singularity = {
 	GetDistortionClass("ImplosionSingu", "Mega")
 }
-
 
 explosionDistortionsNames.cloaksnipe_shockrifle = {
 	GetDistortionClass("ExploShockWaveM", "Tiny")
