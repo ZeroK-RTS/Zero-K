@@ -1328,11 +1328,11 @@ explosionDistortionsNames.jumpbomb_jumpbomb_death = {
 }
 
 explosionDistortionsNames.tankriot_tawf_banisher = {
-	GetDistortionClass("ExploShockWaveM", "Smallest")
+	GetDistortionClass("ExploShockWaveS", "Smallest")
 }
 
 explosionDistortionsNames.bomberprec_bombsabot = {
-	GetDistortionClass("ExploShockWaveS", "Tiniest", 1.5)
+	GetDistortionClass("ExploShockWaveS", "Micro")
 }
 explosionDistortionsNames.tankheavyassault_cor_gol = {
 	GetDistortionClass("ExploShockWaveM", "Tiny", 1.8)
