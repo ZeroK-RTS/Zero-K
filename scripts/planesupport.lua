@@ -1,5 +1,5 @@
 include "constants.lua"
-include "fixedwingTakeOff.lua"
+include "bombers.lua"
 
 local fuselage = piece 'fuselage'
 local wingl = piece 'wingl'
@@ -27,8 +27,19 @@ local isMoving = false
 
 local SIG_RESTORE = 1
 
+local shotsPerRefuel = tonumber(UnitDefs[unitDefID].customParams.shots_per_refuel) or false
+local shotsRemaining = shotsPerRefuel or true
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function ReammoComplete()
+	Show(missiler)
+	Show(missilel)
+	if shotsPerRefuel then
+		shotsRemaining = shotsPerRefuel
+	end
+end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {wingtipl, wingtipr, head})
@@ -66,16 +77,37 @@ function script.StopMoving()
 	isMoving = false
 end
 
-function Pad_StartMoving()
-	script.StartMoving()
+local function SetOutOfAmmo()
+	shotsRemaining = false
+	Hide(missiler)
+	Hide(missilel)
+	Explode(missiler, SFX.FALL)
+	Explode(missilel, SFX.FALL)
+	Spring.SetUnitRulesParam(unitID, "ammoFraction", nil)
+end
+
+function script.EndBurst()
+	if shotsPerRefuel then
+		shotsRemaining = shotsRemaining - 1
+		if shotsRemaining <= 0 then
+			SetOutOfAmmo()
+			Reload()
+		else
+			Spring.SetUnitRulesParam(unitID, "ammoFraction", shotsRemaining / shotsPerRefuel)
+		end
+	end
 end
 
 function Pad_StopMoving()
+	if shotsPerRefuel and shotsRemaining then
+		SetOutOfAmmo()
+		GG.SetRequireRefuelRaw(unitID) -- Waste excess ammo upon landing
+	end
 	script.StopMoving()
 end
 
-function script.AimWeapon(num, heading, pitch)
-	return true
+function Pad_StartMoving()
+	script.StartMoving()
 end
 
 function script.QueryWeapon(num)
@@ -97,6 +129,9 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if shotsPerRefuel and RearmBlockShot() then
+		return false
+	end
 	if (GetUnitValue(COB.CRASHING) == 1) or not isMoving then
 		return false
 	end
@@ -127,6 +162,10 @@ end
 
 function script.AimFromWeapon(num)
 	return firstFirepoint and flaremissilel or flaremissiler
+end
+
+function script.BlockShot(num, targetID)
+	return shotsPerRefuel and RearmBlockShot()
 end
 
 function script.Killed(recentDamage, maxHealth)

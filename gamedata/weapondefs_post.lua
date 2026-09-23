@@ -65,6 +65,9 @@ local function ProcessUnitDef(udName, ud)
       if wdcp and wdcp.reammoseconds then
         wdcp.reammoseconds = ud.customparams.reammoseconds
       end
+      if wdcp and wdcp.shots_per_refuel then
+        wdcp.shots_per_refuel = ud.customparams.shots_per_refuel
+      end
     end
   end
 
