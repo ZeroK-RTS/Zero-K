@@ -1241,7 +1241,7 @@ local function AssignWeaponDistortions(weaponID)
 		}
 	elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
 		explosionDistortionsNames[weaponName] = {
-			GetDistortionClass("FireExplosionHeat", "SmallMedium"),
+			GetDistortionClass("FireExplosionHeat", "SmallMedium", 0.7),
 		}
 	else
 		local distortionClass
