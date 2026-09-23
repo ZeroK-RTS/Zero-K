@@ -81,7 +81,7 @@ local function ParseBoxes ()
 		
 		if not startboxStringLoadedBoxes then
 			if Game.mapSizeZ > Game.mapSizeX then
-				startBoxConfig[0] = {
+				startBoxConfig[1] = {
 					boxes = {{
 						{0, 0},
 						{0, Game.mapSizeZ * 0.2},
@@ -94,7 +94,7 @@ local function ParseBoxes ()
 					nameLong = "North",
 					nameShort = "N"
 				}
-				startBoxConfig[1] = {
+				startBoxConfig[2] = {
 					boxes = {{
 						{0, Game.mapSizeZ * 0.8},
 						{0, Game.mapSizeZ},
@@ -108,7 +108,7 @@ local function ParseBoxes ()
 					nameShort = "S"
 				}
 			else
-				startBoxConfig[0] = {
+				startBoxConfig[1] = {
 					boxes = {{
 						{0, 0},
 						{0, Game.mapSizeZ},
@@ -121,7 +121,7 @@ local function ParseBoxes ()
 					nameLong = "West",
 					nameShort = "W"
 				}
-				startBoxConfig[1] = {
+				startBoxConfig[2] = {
 					boxes = {{
 						{Game.mapSizeX * 0.8, 0},
 						{Game.mapSizeX * 0.8, Game.mapSizeZ},
@@ -155,20 +155,13 @@ local function ParseBoxes ()
 		end
 	end
 
-	--[[ If the boxes start from 1, shift down (allyteams start from 0).
-	     At some point the internals could be rewritten so that configs
-	     starting from 0 would be shifted up instead (since this is how
-	     Lua generally works) but from the PoV of somebody writing map
-	     configs this is transparent so it's just a code neatness thing
-	     that can wait until later. Note that this deprecates 0-indexing,
-	     even though that is how ~all gameside configs still look (that
-	     would be another mechanical task to perform at some point). ]]
-	if startBoxConfig[1] and not startBoxConfig[0] then
-		Spring.Echo("1-indexed startbox detected, shifting")
+	-- If the boxes start from 0, shift up (Allyteams start from 1)
+	if startBoxConfig[0] and not startBoxConfig[1] then
+		Spring.Echo("0-indexed startbox detected, shifting")
 
 		local ret = {}
 		for boxID, box in pairs(startBoxConfig) do
-			ret[boxID - 1] = box
+			ret[boxID + 1] = box
 		end
 		startBoxConfig = ret
 	end
