@@ -7,6 +7,7 @@ local blades = {piece('b1', 'b2', 'b3', 'b4', 'b5', 'b6')}
 --constants
 local rotorSpeed = math.rad(1080)
 local rotorAccel = math.rad(240)
+local pivotSpeed = math.rad(180)
 --variables
 
 

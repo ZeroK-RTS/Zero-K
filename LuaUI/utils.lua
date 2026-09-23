@@ -12,6 +12,12 @@ function Basename(fullpath)
 	return base, path
 end
 
+---Load, compiles, run, return
+---@param filename string
+---@param envTable table|nil
+---@param VFSMODE number|nil
+---@return any ...any
+---@diagnostic disable-next-line: lowercase-global
 function include(filename, envTable, VFSMODE)
 	--[[ support legacy header paths for the time being
 	     in case people use them in their local widgets ]]
