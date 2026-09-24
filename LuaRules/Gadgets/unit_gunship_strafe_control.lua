@@ -73,7 +73,6 @@ local function ResetExtendTurnRadius(unitID, unitDefID, cmdID)
 		local attribute = {
 			turnRadius = turnRadiusUnitDefs[unitDefID]
 		}
-		Spring.Utilities.UnitEcho(unitID, "turn " .. turnRadiusUnitDefs[unitDefID])
 		spSetAirMoveTypeData(unitID, attribute)
 		spSetAirMoveTypeData(unitID, attribute)
 		turnRadiusExtended[unitID] = nil
@@ -89,7 +88,6 @@ function GG.PossiblySetExtendedTurnRadius(unitID, unitDefID, cmdID)
 		local attribute = {
 			turnRadius = extendRadiusUnitDefs[unitDefID]
 		}
-		Spring.Utilities.UnitEcho(unitID, "extend " .. extendRadiusUnitDefs[unitDefID])
 		spSetAirMoveTypeData(unitID, attribute)
 		spSetAirMoveTypeData(unitID, attribute)
 		turnRadiusExtended[unitID] = true
