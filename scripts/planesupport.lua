@@ -139,6 +139,9 @@ function script.AimWeapon(num, heading, pitch)
 	if (x == 0 and z == 0) then
 		return false
 	end
+	if GG.PossiblySetExtendedTurnRadius then
+		GG.PossiblySetExtendedTurnRadius(unitID, unitDefID)
+	end
 	Turn(missiler, y_axis, heading, 3)
 	Turn(missilel, y_axis, heading, 3)
 	Turn(missiler, x_axis, -pitch, 3)

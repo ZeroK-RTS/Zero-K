@@ -709,7 +709,6 @@ local function weapons2Table(cells, ws, unitID)
 				end
 			end
 		end
-		Spring.Echo("cp.reammoseconds", cp.reammoseconds)
 		if cp.post_capture_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (tonumber(cp.post_capture_reload)/30) .. 's'
@@ -718,11 +717,11 @@ local function weapons2Table(cells, ws, unitID)
 				cells[#cells+1] = ' - Must rearm after ' .. cp.shots_per_refuel .. ' shots'
 			else
 				cells[#cells+1] = ' - Must rearm after shot'
+				show_dps = false
 			end
 			cells[#cells+1] = ''
 			cells[#cells+1] = ' - Rearm time:'
 			cells[#cells+1] = cp.reammoseconds .. 's'
-			show_dps = false
 		elseif show_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (reloadtime) .. 's'

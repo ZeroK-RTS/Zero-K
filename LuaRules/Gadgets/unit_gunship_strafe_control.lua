@@ -3,7 +3,7 @@
 
 function gadget:GetInfo()
    return {
-      name      = "Gunship Strafe Control",
+      name      = "Strafe Control",
       desc      = "Adds toggle for strafe, enables propper hold position control",
       author    = "Google Frog",
       date      = "15 Dec 2010",
@@ -35,22 +35,70 @@ local airStrafeCmdDesc = {
 	params 	= {0, 'Strafe Off','Strafe On'}
 }
 
-local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
-local spFindUnitCmdDesc   = Spring.FindUnitCmdDesc
-local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
+local spFindUnitCmdDesc    = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc    = Spring.EditUnitCmdDesc
+local spMoveCtrlGetTag     = Spring.MoveCtrl.GetTag
+local spSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
 
+local wantedCommand = {}
 local strafeUnitDefs = {}
+local turnRadiusUnitDefs = {}
+local extendRadiusUnitDefs = {}
+
+local turnRadiusExtended = {}
+local lastCommandFrame = {}
+local gameFrame = 0
+local COMMAND_LEEWAY = 90
 
 for id, data in pairs(UnitDefs) do
 	if data.customParams and data.customParams.airstrafecontrol then
 		strafeUnitDefs[id] = true
+		wantedCommand[id] = true
+	end
+	if data.customParams.extend_turn_radius then
+		turnRadiusUnitDefs[id] = data.turnRadius
+		extendRadiusUnitDefs[id] = tonumber(data.customParams.extend_turn_radius)
+		wantedCommand[id] = true
 	end
 end
 
 local unitState = {}
 
 --------------------------------------------------------------------------------
+-- Plane turn radius control
+
+local function ResetExtendTurnRadius(unitID, unitDefID, cmdID)
+	if turnRadiusExtended[unitID] and not spMoveCtrlGetTag(unitID) then
+		local attribute = {
+			turnRadius = turnRadiusUnitDefs[unitDefID]
+		}
+		Spring.Utilities.UnitEcho(unitID, "turn " .. turnRadiusUnitDefs[unitDefID])
+		spSetAirMoveTypeData(unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
+		turnRadiusExtended[unitID] = nil
+	end
+	lastCommandFrame[unitID] = gameFrame
+end
+
+function GG.PossiblySetExtendedTurnRadius(unitID, unitDefID, cmdID)
+	if (lastCommandFrame[unitID] or 0) + COMMAND_LEEWAY > gameFrame then
+		return
+	end
+	if not spMoveCtrlGetTag(unitID) and not turnRadiusExtended[unitID] then
+		local attribute = {
+			turnRadius = extendRadiusUnitDefs[unitDefID]
+		}
+		Spring.Utilities.UnitEcho(unitID, "extend " .. extendRadiusUnitDefs[unitDefID])
+		spSetAirMoveTypeData(unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
+		turnRadiusExtended[unitID] = true
+	end
+end
+
+--------------------------------------------------------------------------------
 -- Command Handling
+
 local function ToggleCommand(unitID, cmdParams, unitDefID)
 	if unitState[unitID] and strafeUnitDefs[unitDefID] then
 		if spMoveCtrlGetTag(unitID) ~= nil then
@@ -70,19 +118,22 @@ local function ToggleCommand(unitID, cmdParams, unitDefID)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_AIR_STRAFE] = true}
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return wantedCommand
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_AIR_STRAFE) then
-		return true  -- command was not used
+	if (cmdID == CMD_AIR_STRAFE) then
+		ToggleCommand(unitID, cmdParams, unitDefID)
+		return false -- command was used
 	end
-	ToggleCommand(unitID, cmdParams, unitDefID)
-	return false  -- command was used
+	if extendRadiusUnitDefs[unitDefID] then
+		ResetExtendTurnRadius(unitID, unitDefID, cmdID)
+	end
+	return true -- command was not used
 end
 
 --------------------------------------------------------------------------------
@@ -111,6 +162,11 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
+function gadget:GameFrame(n)
+	gameFrame = n
+end
+
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-    unitState[unitID] = nil
+	unitState[unitID] = nil
+	turnRadiusExtended[unitID] = nil
 end

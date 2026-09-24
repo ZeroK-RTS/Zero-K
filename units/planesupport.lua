@@ -26,6 +26,7 @@ return { planesupport = {
     can_set_target       = [[1]],
     bait_level_default   = 0,
     aim_lookahead        = 200,
+    extend_turn_radius   = 220,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -33,12 +34,13 @@ return { planesupport = {
   fireState              = 2,
   footprintX             = 3,
   footprintZ             = 3,
-  frontToSpeed           = 0.06,
+  frontToSpeed           = 0.08,
   health                 = 920,
   iconType               = [[bomberskirm]],
   maxAcc                 = 0.55,
+  maxAileron             = 0.02,
   maxBank                = 0.7,
-  maxElevator            = 0.01,
+  maxElevator            = 0.014,
   maxPitch               = 0.5,
   maxRudder              = 0.009,
   metalCost              = 150,
@@ -51,15 +53,15 @@ return { planesupport = {
   selfDestructAs         = [[GUNSHIPEX]],
   sightDistance          = 760,
   speed                  = 252,
-  speedToFront           = 0.4,
-  turnRadius             = 50,
+  speedToFront           = 0.5,
+  turnRadius             = 10,
 
   weapons                = {
     {
       def                = [[DISRUPTOR_CANNON]],
       accurateLeading    = 3,
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 80,
+      maxAngleDif        = 110,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SINK SUB]],
     },
   },
@@ -73,7 +75,7 @@ return { planesupport = {
       alphaDecay              = 0.7,
       areaOfEffect            = 24,
       burnblow                = true,
-      burst                   = 2,
+      burst                   = 3,
       burstrate               = 2/30,
       cegTag                  = [[hmg_trail_disrupt]],
       collideFriendly         = false,
@@ -90,7 +92,7 @@ return { planesupport = {
       },
 
       damage                  = {
-        default = 15,
+        default = 12,
       },
 
       edgeEffectiveness       = 0.5,
