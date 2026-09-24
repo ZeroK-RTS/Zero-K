@@ -12,9 +12,10 @@ local smokePiece = {bay, gantry}
 -- Signal definitions
 local SIG_AIM = 2
 local SIG_MOVE = 1
+local SIG_RESTORE = 4
 
 local RESTORE_DELAY = 5000
-local LOAD_DELAY = 1000
+local LOAD_DELAY = 2100
 local RELEASE_DELAY = 400 -- How long gantry waits after missile leaves
 local TRACK_PERIOD = 50
 
@@ -31,6 +32,7 @@ local WHEEL_SPIN_ACCEL = math.rad(100)
 local WHEEL_SPIN_DECEL = math.rad(200)
 
 local isLoaded, isReady, isMoving, doStrobe = true, false, false, false
+local fireAtWill = true
 local tracks = 1
 
 --------------------------------------------------------------------------------
@@ -108,6 +110,30 @@ local function Reload()
 	end
 	isLoaded = true
 	Show(missile)
+	if not fireAtWill then
+		Signal(SIG_RESTORE)
+		StartThread(Prepare)
+	end
+end
+
+local function RestoreAfterDelay()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
+	Sleep(RESTORE_DELAY)
+	StartThread(Reload)
+end
+
+function FirestateChange(newState)
+	-- The idea is to keep Impaler ready to fire when not set to fire-at-will.
+	-- This retains the leeway of the open animation for general use, ie to find
+	-- good targets, while also allowing hold-fire Impaler to be very responsive
+	-- to player input.
+	fireAtWill = (newState == 2)
+	if fireAtWill then
+		StartThread(RestoreAfterDelay)
+	else
+		StartThread(Prepare)
+	end
 end
 
 function script.StartMoving()
@@ -128,11 +154,6 @@ function script.StopMoving()
 	for i = 1, #wheels do
 		StopSpin(wheels[i], x_axis, WHEEL_SPIN_DECEL)
 	end
-end
-
-local function RestoreAfterDelay()
-	Sleep(RESTORE_DELAY)
-	StartThread(Reload)
 end
 
 function script.AimWeapon(num, heading, pitch)

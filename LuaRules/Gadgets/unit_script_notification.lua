@@ -18,6 +18,7 @@ end
 -- get overwritten by the LUS gadget. Gotta wait until Initialize
 local spGetScriptEnv
 local spCallAsUnit
+local CMD_FIRE_STATE = CMD.FIRE_STATE
 
 local function callScript(unitID, funcName, args)
 	local func = spGetScriptEnv(unitID)
@@ -60,6 +61,21 @@ end
 
 function gadget:UnitFinished(unitID)
 	callScript(unitID, "Unstunned", 3)
+end
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD_FIRE_STATE] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return true
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_FIRE_STATE and cmdParams and cmdParams[1] then
+		callScript(unitID, "FirestateChange", cmdParams[1])
+	end
+	return true
 end
 
 function gadget:Initialize()
