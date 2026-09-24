@@ -26,7 +26,7 @@ return { planesupport = {
     can_set_target       = [[1]],
     bait_level_default   = 0,
     aim_lookahead        = 200,
-    extend_turn_radius   = 220,
+    extend_turn_radius   = 200,
   },
 
   explodeAs              = [[GUNSHIPEX]],

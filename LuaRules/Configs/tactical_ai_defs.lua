@@ -1519,7 +1519,6 @@ local behaviourConfig = {
 		defaultAIState = 0,
 		skirmEverything = true,
 		skirmRadar = true,
-		skirmBlockedApproachOnFight = true,
 		skirmBlockedApproachFrames = 15,
 		skirmLeeway = -220,
 		skirmOrderDis = 400,
