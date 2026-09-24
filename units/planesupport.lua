@@ -52,7 +52,7 @@ return { planesupport = {
   sightDistance          = 760,
   speed                  = 252,
   speedToFront           = 0.4,
-  turnRadius             = 10,
+  turnRadius             = 50,
 
   weapons                = {
     {
