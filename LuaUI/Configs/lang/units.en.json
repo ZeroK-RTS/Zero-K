@@ -1164,6 +1164,11 @@
 		"description" : "Multi-role Fighter",
 		"helptext" : "The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers."
 	},
+	"planesupport" : {
+		"name" : "Magpie",
+		"description" : "Strafing Disruption Fighter-Bomber",
+		"helptext" : "The Magpie fires a pulse of slowing EMG with enough precision to hit air units. While it deals low direct damage, it is invaluable for its ability to quickly slow any target. It has limited ammunition so must return to rearm on occasion, placing it somehwere between a one-shot bomber and the more sustainable dedicated fighters."
+	},
 	"dronecarry" : {
 		"name" : "Gull",
 		"description" : "Carrier Drone",

@@ -1551,7 +1551,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		textColor = color.stats_fg,
 		width = '100%',
 		height = '100%',
-		padding = { 0, 0, 0, 0 },
+		padding = { 0, 4, 0, 0 },
 		}
 	
 	local statschildren = {}
