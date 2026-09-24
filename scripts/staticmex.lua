@@ -10,21 +10,52 @@ local smokePiece = {tamper}
 local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 local metalmultInv = metalmult > 0 and (1/metalmult) or 1
 
-local od = {}
-for i = 1, 4 do
-	od[i] = piece('od' .. i)
-end
+local od_1, od_2, od_3, od_4 = piece('od1', 'od2', 'od3', 'od4')
+local currentWant = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function ShowDistortion(threshold)
-	for i = 1, 4 do
-		if i <= threshold then
-			Show(od[i])
-		else
-			Hide(od[i])
-		end
+local function ShowDistortion(mult)
+	local want = 0
+	if mult >= 2.5 then
+		want = 4
+	elseif mult >= 1.9 then
+		want = 3
+	elseif mult >= 1.4 then
+		want = 2
+	elseif mult >= 1 then
+		want = 1
+	end
+	if want == currentWant then
+		return
+	end
+	currentWant = want
+	if want == 0 then
+		Hide(od_1)
+		Hide(od_2)
+		Hide(od_3)
+		Hide(od_4)
+	elseif want == 1 then
+		Show(od_1)
+		Hide(od_2)
+		Hide(od_3)
+		Hide(od_4)
+	elseif want == 2 then
+		Hide(od_1)
+		Show(od_2)
+		Hide(od_3)
+		Hide(od_4)
+	elseif want == 3 then
+		Hide(od_1)
+		Hide(od_2)
+		Show(od_3)
+		Hide(od_4)
+	elseif want == 4 then
+		Hide(od_1)
+		Hide(od_2)
+		Hide(od_3)
+		Show(od_4)
 	end
 end
 
@@ -45,7 +76,7 @@ local function Open()
 		local overdrive = Spring.GetUnitRulesParam(unitID, "overdrive_proportion") or 0
 		income = income * metalmultInv
 		if income > 0 then
-			ShowDistortion(1 + overdrive * 2)
+			ShowDistortion(1 + overdrive)
 			Spin (furnace, y_axis, income, math.rad(1))
 			Spin (drill1, y_axis, income, math.rad(1))
 			Move (tamper, y_axis, height, income*10)
