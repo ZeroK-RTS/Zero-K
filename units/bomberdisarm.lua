@@ -82,8 +82,8 @@ return { bomberdisarm = {
         disarmDamageOnly = 1,
         disarmTimer      = 16, -- seconds
       
-        light_radius = 350,
-        light_color = [[2 2 2]],
+        light_radius = 220,
+        light_color = [[1.2 1.2 1.15]],
       },
  
       damage                  = {
