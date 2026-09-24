@@ -165,9 +165,10 @@ local function DoRestore()
 	lastTorsoHeading = 0
 end
 
-local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
+local function Step(frontLeg, backLeg, pelvisMult)
 	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	mainLeg, offLeg = offLeg, mainLeg
+	impactFoot = (mainLeg == leftLeg) and rfoot or lfoot
 	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
@@ -237,8 +238,8 @@ local function Walk()
 	
 	local first = true
 	while (true) do
-		Step(mainLeg, offLeg, lfoot, (first and 2) or 1)
-		Step(mainLeg, offLeg, rfoot, (first and 1.2) or 1)
+		Step(mainLeg, offLeg, (first and 2) or 1)
+		Step(mainLeg, offLeg, (first and 1.2) or 1)
 		first = false
 	end
 end
