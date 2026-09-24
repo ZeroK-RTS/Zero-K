@@ -15,7 +15,8 @@ return { striderdante = {
   customParams        = {
     aim_lookahead      = 120,
     decloak_footprint  = 5,
-    manualfire_desc    = [[Fire Special Weapon: Fire a napalm rocket salvo.]]
+    manualfire_desc    = [[Fire Special Weapon: Fire a napalm rocket salvo.]],
+    extradrawrange     = 340,
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
@@ -303,7 +304,7 @@ return { striderdante = {
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rapid_rocket_hit]],
       soundStart              = [[weapon/missile/rapid_rocket_fire]],
-      sprayAngle              = 9000,
+      sprayAngle              = 5400,
       startVelocity           = 350,
       tolerance               = 6500,
       tracks                  = false,
