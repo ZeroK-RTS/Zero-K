@@ -74,7 +74,6 @@ local function ResetExtendTurnRadius(unitID, unitDefID, cmdID)
 			turnRadius = turnRadiusUnitDefs[unitDefID]
 		}
 		spSetAirMoveTypeData(unitID, attribute)
-		spSetAirMoveTypeData(unitID, attribute)
 		turnRadiusExtended[unitID] = nil
 	end
 	lastCommandFrame[unitID] = gameFrame
@@ -88,7 +87,6 @@ function GG.PossiblySetExtendedTurnRadius(unitID, unitDefID, cmdID)
 		local attribute = {
 			turnRadius = extendRadiusUnitDefs[unitDefID]
 		}
-		spSetAirMoveTypeData(unitID, attribute)
 		spSetAirMoveTypeData(unitID, attribute)
 		turnRadiusExtended[unitID] = true
 	end
