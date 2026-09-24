@@ -1158,7 +1158,7 @@ local function AssignWeaponDistortions(weaponID)
 	currentWeaponDefID = DEBUG_MODE and weaponID
 	local weaponDef = WeaponDefs[weaponID]
 	local weaponName = weaponDef.name
-	if string.find(weaponName, "bogus") or string.find(weaponName, "fake") then
+	if string.find(weaponName, "bogus") or string.find(weaponName, "fake") or weaponName == "noweapon" then
 		return
 	end
 	local wcp = weaponDef.customParams

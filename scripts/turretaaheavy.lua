@@ -47,6 +47,9 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if num == 2 then
+		return false
+	end
 	Signal(SIG_Idle)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
@@ -60,6 +63,12 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
+	if num == 2 then
+		return true
+	end
+	if targetID and not Spring.GetUnitWeaponHaveFreeLineOfFire(unitID, 2, targetID) then
+		return true
+	end
 	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 2400, 55, -0.05, true, 100)
 end
 

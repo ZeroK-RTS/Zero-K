@@ -77,6 +77,14 @@ local remStatic = {}
  -- set targeted on a unit then the extra ones will attack other targets.
 local STUN_ATTACKERS_IDLE_REQUIREMENT = 3
 
+local brokenWeaponTargeting = {}
+for weaponDefID = 1, #WeaponDefs do
+	local wdcp = WeaponDefs[weaponDefID].customParams
+	if wdcp.broken_target_replacement then
+		brokenWeaponTargeting[weaponDefID] = tonumber(wdcp.broken_target_replacement)
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility Functions
@@ -320,6 +328,14 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		return true, 25
 	end
 	
+	local basePriority = 0
+	if brokenWeaponTargeting[attackerWeaponDefID] then
+		if not Spring.GetUnitWeaponHaveFreeLineOfFire(unitID, brokenWeaponTargeting[attackerWeaponDefID], targetID) then
+			basePriority = basePriority + 15
+		end
+	end
+	
+	
 	if GG.GetUnitTarget(unitID) == targetID then
 		if disarmWeaponTimeDefs[attackerWeaponDefID] then
 			if (remStunAttackers[targetID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
@@ -327,10 +343,10 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 				if stunned ~= 0 then
 					remStunAttackers[targetID] = (remStunAttackers[targetID] or 0) + 1
 				end
-				return true, 0 -- Maximum priority
+				return true, basePriority -- Maximum priority
 			end
 		else
-			return true, 0 -- Maximum priority
+			return true, basePriority -- Maximum priority
 		end
 	end
 	
@@ -410,7 +426,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	--Spring.Utilities.UnitEcho(targetID, string.format("%.1f", defPrio))
-	return true, defPrio + velocityAdd + lastShotBonus -- bigger value have lower priority
+	return true, basePriority + defPrio + velocityAdd + lastShotBonus -- bigger value have lower priority
 end
 
 function gadget:GameFrame(f)
