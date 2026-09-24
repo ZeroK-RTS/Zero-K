@@ -123,6 +123,11 @@ local queuedBuildings = {}
 -- different unit should build these too rather than skip them. Same entry shape.
 local queuedByOthers = {}
 
+-- Test for mex/geo spots flagged as out of reach of the current builders (see
+-- cmd_spot_reach_flags.lua), rebuilt each recompute.
+local NEVER_BLOCKED = function() return false end
+local SpotBlocked = NEVER_BLOCKED
+
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -166,6 +171,8 @@ local cmdCenterX
 local cmdCenterZ
 local cmdDist
 local cmdPylonRange
+local cmdSpacing         -- build spacing (16-elmo units) captured on press, for fill
+local cmdFill = false    -- alt held: also fill the dragged circle with the structure
 local planDirty = false  -- recompute the build plan only when the drag changes
 local lastPlanDist = 0   -- cmdDist at the last recompute (drag radius)
 local awaitingShiftRelease = false -- an order was given with shift held; deselect once shift lifts
@@ -181,6 +188,11 @@ local function clearCmd()
 	cmdCenterZ = nil
 	cmdDist = nil
 	cmdPylonRange = nil
+	cmdSpacing = nil
+	cmdFill = false
+	if WG.SpotReach then
+		WG.SpotReach.SetShown(widget, false)
+	end
 end
 
 ------------------------------------------------------------
@@ -414,32 +426,46 @@ local pylonsToBuildZ = {}
 local pylonsToBuildRange = {}
 local pylonsToBuildBuild = {}
 local pylonsToBuildTerraform = {}
+local pylonsToBuildFill = {} -- true for alt-fill items, built after the connecting route
+local pylonsToBuildChain = {} -- for pylons laid to link two nodes: index into bridgeChains
 local pylonsToBuildCount = 0
+
+-- Each bridge chain as {a, b}: the pylonsToBuild indices of the two nodes it links.
+-- Chains always run between existing nodes (anchors and sites), never from another
+-- chain, so a chain is only worth building for a constructor that can reach both ends.
+local bridgeChains = {}
 
 -- Extra structures to build alongside the grid (e.g. LLTs to clear enemy-held mex
 -- spots). Kept separate from the pylon lists so they take no part in grid routing.
+-- Each records the mex/geo site it serves.
 local extraBuildDefID = {}
 local extraBuildX = {}
 local extraBuildZ = {}
+local extraBuildSiteX = {}
+local extraBuildSiteZ = {}
 local extraBuildCount = 0
 
-local function addExtraBuild(defID, x, z)
+local function addExtraBuild(defID, x, z, siteX, siteZ)
 	extraBuildCount = extraBuildCount + 1
 	extraBuildDefID[extraBuildCount] = defID
 	extraBuildX[extraBuildCount] = x
 	extraBuildZ[extraBuildCount] = z
+	extraBuildSiteX[extraBuildCount] = siteX
+	extraBuildSiteZ[extraBuildCount] = siteZ
 end
 
 local function clearExtraBuild()
 	extraBuildDefID = {}
 	extraBuildX = {}
 	extraBuildZ = {}
+	extraBuildSiteX = {}
+	extraBuildSiteZ = {}
 	extraBuildCount = 0
 end
 
 -- terraformHeight is the level-to height when the spot must be terraformed first,
 -- or nil when it is naturally buildable.
-local function addPylonsToBuild(defID, x, z, range, build, terraformHeight)
+local function addPylonsToBuild(defID, x, z, range, build, terraformHeight, fill, chain)
 	pylonsToBuildCount = pylonsToBuildCount + 1
 	pylonsToBuildDefID[pylonsToBuildCount] = defID
 	pylonsToBuildX[pylonsToBuildCount] = x
@@ -447,6 +473,8 @@ local function addPylonsToBuild(defID, x, z, range, build, terraformHeight)
 	pylonsToBuildRange[pylonsToBuildCount] = range
 	pylonsToBuildBuild[pylonsToBuildCount] = build
 	pylonsToBuildTerraform[pylonsToBuildCount] = terraformHeight
+	pylonsToBuildFill[pylonsToBuildCount] = fill
+	pylonsToBuildChain[pylonsToBuildCount] = chain
 end
 
 local function clearPylonsToBuild() 
@@ -456,8 +484,11 @@ local function clearPylonsToBuild()
 	pylonsToBuildRange = {}
 	pylonsToBuildBuild = {}
 	pylonsToBuildTerraform = {}
+	pylonsToBuildFill = {}
+	pylonsToBuildChain = {}
 	pylonsToBuildNext = {}
 	pylonsToBuildCount = 0
+	bridgeChains = {}
 end
 
 local EMPTY_TABLE = {}
@@ -512,19 +543,10 @@ local function issueTerraform(x, z, targetHeight, defID, facing, constructors)
 	return tag
 end
 
--- Order the buildable items into a nearest-neighbour path from (startX, startZ), so
--- the queue follows the worker's route -- structures get built as it passes them --
--- instead of all mexes first then all pylons. Returns pylonsToBuild indices.
-local function orderBuildItemsByPath(startX, startZ)
-	local items = {}
-	for i = 1, pylonsToBuildCount do
-		if pylonsToBuildBuild[i] then
-			items[#items + 1] = i
-		end
-	end
-	local ordered = {}
+-- Append items to ordered as a nearest-neighbour path from (cx, cz); returns the
+-- path's end so a following batch can continue from it.
+local function orderItemsFrom(items, cx, cz, ordered)
 	local taken = {}
-	local cx, cz = startX, startZ
 	for _ = 1, #items do
 		local best, bestD
 		for k = 1, #items do
@@ -542,7 +564,69 @@ local function orderBuildItemsByPath(startX, startZ)
 		ordered[#ordered + 1] = best
 		cx, cz = pylonsToBuildX[best], pylonsToBuildZ[best]
 	end
+	return cx, cz
+end
+
+-- Order the buildable items into a nearest-neighbour path from (startX, startZ), so
+-- the queue follows the worker's route -- structures get built as it passes them --
+-- instead of all mexes first then all pylons. The connecting route is ordered
+-- first and the alt-fill after it, continuing from where the route ends, so the
+-- grid gets linked up before it is filled out. Returns pylonsToBuild indices.
+local function orderBuildItemsByPath(startX, startZ)
+	local ordered = {}
+	local cx, cz = startX, startZ
+	for pass = 1, 2 do
+		local wantFill = (pass == 2)
+		local items = {}
+		for i = 1, pylonsToBuildCount do
+			if pylonsToBuildBuild[i] and (pylonsToBuildFill[i] == true) == wantFill then
+				items[#items + 1] = i
+			end
+		end
+		cx, cz = orderItemsFrom(items, cx, cz, ordered)
+	end
 	return ordered
+end
+
+-- Split the selected constructors into groups by unit type, each with its reach
+-- test (flagged mex/geo sites it can't build, see cmd_spot_reach_flags.lua) and the
+-- plan items it gets: everything except the sites it can't reach and every bridge
+-- chain with such a site at either end.
+local function assignItemsToCons(cons)
+	local groups, groupByDef = {}, {}
+	for i = 1, #cons do
+		local defID = spGetUnitDefID(cons[i])
+		local group = groupByDef[defID]
+		if not group then
+			group = {
+				units = {},
+				blocked = WG.SpotReach and WG.SpotReach.GetBlockedTest({cons[i]}) or NEVER_BLOCKED,
+				gets = {},
+			}
+			groupByDef[defID] = group
+			groups[#groups + 1] = group
+		end
+		group.units[#group.units + 1] = cons[i]
+	end
+
+	for g = 1, #groups do
+		local group = groups[g]
+		local siteBlocked = {}
+		for i = 1, pylonsToBuildCount do
+			local defID = pylonsToBuildDefID[i]
+			siteBlocked[i] = pylonsToBuildBuild[i] and (defID == mexDefID or defID == geoDefID)
+				and group.blocked(pylonsToBuildX[i], pylonsToBuildZ[i])
+		end
+		local chainBlocked = {}
+		for c = 1, #bridgeChains do
+			chainBlocked[c] = siteBlocked[bridgeChains[c][1]] or siteBlocked[bridgeChains[c][2]]
+		end
+		for i = 1, pylonsToBuildCount do
+			local chain = pylonsToBuildChain[i]
+			group.gets[i] = pylonsToBuildBuild[i] and not siteBlocked[i] and not (chain and chainBlocked[chain])
+		end
+	end
+	return groups
 end
 
 local function orderPylonsToBuild()
@@ -591,13 +675,12 @@ local function orderPylonsToBuild()
 		return -- the command-insert provider widget isn't available
 	end
 
+	-- Alt selects fill mode for this widget, so it isn't passed on to the orders.
 	local cmdOpts = {
-		alt = a,
 		shift = true,
 		ctrl = c,
 		meta = m,
-		coded = (a and CMD.OPT_ALT   or 0)
-		      + (m and CMD.OPT_META  or 0)
+		coded = (m and CMD.OPT_META  or 0)
 		      + (CMD.OPT_SHIFT)
 		      + (c and CMD.OPT_CTRL  or 0)
 	}
@@ -606,62 +689,92 @@ local function orderPylonsToBuild()
 		Spring.GiveOrder (CMD.STOP, EMPTY_TABLE, 0)
 	end
 
-	-- Selected mobile builders, needed to register terraform for unbuildable spots.
-	local terraformCons = {}
+	-- Selected mobile builders: the ones that receive the orders.
+	local cons = {}
 	local selected = Spring.GetSelectedUnits()
 	for i = 1, #selected do
 		local ud = UnitDefs[spGetUnitDefID(selected[i])]
 		if ud and ud.isMobileBuilder then
-			terraformCons[#terraformCons + 1] = selected[i]
+			cons[#cons + 1] = selected[i]
+		end
+	end
+	if #cons == 0 then
+		return
+	end
+	local groups = assignItemsToCons(cons)
+
+	-- Each con gets its own subset of the sequence, so each keeps its own queue position.
+	local pos = {}
+	for i = 1, #cons do
+		pos[cons[i]] = 0
+	end
+	local function insert(units, id, params)
+		for i = 1, #units do
+			local unitID = units[i]
+			WG.CommandInsert(id, params, cmdOpts, pos[unitID], nil, {unitID})
+			pos[unitID] = pos[unitID] + 1
 		end
 	end
 
-	local pos = 0
-
-	-- Clear enemy-held mex spots first, so the mex queued behind them can build once clear.
+	-- Clear enemy-held mex spots first, so the mex queued behind them can build once
+	-- clear -- by the cons that can reach the spot.
 	for index = 1, extraBuildCount do
+		local units = {}
+		for g = 1, #groups do
+			if not groups[g].blocked(extraBuildSiteX[index], extraBuildSiteZ[index]) then
+				for u = 1, #groups[g].units do
+					units[#units + 1] = groups[g].units[u]
+				end
+			end
+		end
 		local defID = extraBuildDefID[index]
 		local x = extraBuildX[index]
 		local z = extraBuildZ[index]
 		local y = Spring.GetGroundHeight(x, z)
 		local facing = Spring.GetBuildFacing()
-		WG.CommandInsert(-defID, {x, y, z, facing}, cmdOpts, pos)
-		pos = pos + 1
+		insert(units, -defID, {x, y, z, facing})
 	end
 
 	-- Order builds along the worker's route (nearest-neighbour from a selected
 	-- builder, else the drag centre), so they're built as it passes them.
 	local sx, sz = cmdCenterX, cmdCenterZ
-	if terraformCons[1] then
-		local ux, _, uz = Spring.GetUnitPosition(terraformCons[1])
-		if ux then
-			sx, sz = ux, uz
-		end
+	local ux, _, uz = Spring.GetUnitPosition(cons[1])
+	if ux then
+		sx, sz = ux, uz
 	end
 	local ordered = orderBuildItemsByPath(sx, sz)
 
 	for k = 1, #ordered do
 		local index = ordered[k]
-		local defID = pylonsToBuildDefID[index]
-		local x = pylonsToBuildX[index]
-		local z = pylonsToBuildZ[index]
-
-		local terraH = pylonsToBuildTerraform[index]
-		local y = terraH or Spring.GetGroundHeight(x, z)
-		local facing = Spring.GetBuildFacing()
-
-		-- Terraform-level the spot (to terraH) first when it isn't buildable as-is:
-		-- register the terraform, then queue its CMD_LEVEL marker ahead of the build.
-		if terraH and options.autoTerraform.value and CMD_LEVEL then
-			local tag = issueTerraform(x, z, terraH, defID, facing, terraformCons)
-			if tag then
-				WG.CommandInsert(CMD_LEVEL, {x, terraH, z, tag}, cmdOpts, pos)
-				pos = pos + 1
+		local units = {}
+		for g = 1, #groups do
+			if groups[g].gets[index] then
+				for u = 1, #groups[g].units do
+					units[#units + 1] = groups[g].units[u]
+				end
 			end
 		end
 
-		WG.CommandInsert(-defID, {x, y, z, facing}, cmdOpts, pos)
-		pos = pos + 1
+		if #units > 0 then
+			local defID = pylonsToBuildDefID[index]
+			local x = pylonsToBuildX[index]
+			local z = pylonsToBuildZ[index]
+
+			local terraH = pylonsToBuildTerraform[index]
+			local y = terraH or Spring.GetGroundHeight(x, z)
+			local facing = Spring.GetBuildFacing()
+
+			-- Terraform-level the spot (to terraH) first when it isn't buildable as-is:
+			-- register the terraform, then queue its CMD_LEVEL marker ahead of the build.
+			if terraH and options.autoTerraform.value and CMD_LEVEL then
+				local tag = issueTerraform(x, z, terraH, defID, facing, units)
+				if tag then
+					insert(units, CMD_LEVEL, {x, terraH, z, tag})
+				end
+			end
+
+			insert(units, -defID, {x, y, z, facing})
+		end
 	end
 end
 
@@ -752,10 +865,11 @@ end
 
 -- Choose the next pylon stepping from (fromX, fromZ) toward the target. It is
 -- placed as far along as connectivity allows (fromRange + cmdPylonRange, less a
--- margin). If that ground is unbuildable, nudge it ONLY closer to the previous
--- pylon -- never sideways or past it -- so it always stays within link range.
--- If nothing buildable is found within that budget, return the ideal spot flagged
--- for terraforming. Returns x, z, needsTerraform.
+-- margin). If that ground is unbuildable, nudge it closer to the previous pylon
+-- or sideways, staying within link range. If nothing buildable is found within
+-- that budget, take the first of those spots that terraforming can fix -- clear of
+-- structures and of our planned/queued footprints -- flagged for terraforming.
+-- Returns x, z, terraformHeight.
 local CONNECT_MARGIN = 16   -- keep neighbours this far inside link range
 local STEP_SEARCH = 16      -- granularity of the back-toward-prev search
 local MIN_STEP_FRAC = 0.5   -- closest a nudged pylon may sit (fraction of the ideal step)
@@ -816,6 +930,26 @@ local function canPlace(defID, x, z, facing)
 	return PosBuildable(defID, x, z, facing) and not footprintClash(defID, x, z, facing)
 end
 
+-- True if a built (or under-construction) structure sits within a defID footprint
+-- at (x, z). Terraforming levels ground but can't clear these.
+local function structureInFootprint(defID, x, z, facing)
+	local hx, hz = footprintHalf(defID, facing)
+	local units = spGetUnitsInRectangle(x - hx, z - hz, x + hx, z + hz)
+	for i = 1, #units do
+		local ud = UnitDefs[spGetUnitDefID(units[i]) or -1]
+		if ud and ud.isImmobile then
+			return true
+		end
+	end
+	return false
+end
+
+-- A spot terraforming can make buildable: no structure on it and clear of our
+-- other planned/queued footprints; only the ground is wrong.
+local function canTerraformPlace(defID, x, z, facing)
+	return not footprintClash(defID, x, z, facing) and not structureInFootprint(defID, x, z, facing)
+end
+
 local function placeStepPylon(fromX, fromZ, targetX, targetZ, fromRange, facing)
 	local dx = targetX - fromX
 	local dz = targetZ - fromZ
@@ -831,6 +965,8 @@ local function placeStepPylon(fromX, fromZ, targetX, targetZ, fromRange, facing)
 	local linkRange = fromRange + cmdPylonRange
 	local linkRangeSq = linkRange * linkRange
 
+	-- Remember the first spot terraforming could fix, in case none is buildable as-is.
+	local terraX, terraZ
 	local s = maxStep
 	while s >= minStep do
 		for o = 1, #PERP_OFFSETS do
@@ -839,15 +975,24 @@ local function placeStepPylon(fromX, fromZ, targetX, targetZ, fromRange, facing)
 			local nz = fromZ + uz * s + rz * off
 			-- stay within link range of the previous node (keeps the chain connected),
 			-- then require buildable ground clear of our other planned footprints.
-			if DistanceSq(fromX, fromZ, nx, nz) <= linkRangeSq and canPlace(cmdID, nx, nz, facing) then
-				return nx, nz, nil
+			if DistanceSq(fromX, fromZ, nx, nz) <= linkRangeSq then
+				if canPlace(cmdID, nx, nz, facing) then
+					return nx, nz, nil
+				end
+				if not terraX and canTerraformPlace(cmdID, nx, nz, facing) then
+					terraX, terraZ = nx, nz
+				end
 			end
 		end
 		s = s - STEP_SEARCH
 	end
 
-	-- Nothing buildable/clear near the ideal: terraform the on-axis ideal spot. This
-	-- fixes sloped ground; it can't clear a blocker, but it's the best fallback.
+	if terraX then
+		return terraX, terraZ, spGetGroundHeight(terraX, terraZ)
+	end
+
+	-- Every spot within reach is taken: terraform the on-axis ideal spot as a last
+	-- resort. It may overlap something, but the chain must stay connected.
 	local tx, tz = fromX + ux * maxStep, fromZ + uz * maxStep
 	return tx, tz, spGetGroundHeight(tx, tz)
 end
@@ -923,6 +1068,8 @@ local function movePylonsFromConnectToBuild()
 		-- Lay a pylon chain from bi toward bj.
 		local lastX, lastZ, lastRange = pylonsToBuildX[bi], pylonsToBuildZ[bi], pylonsToBuildRange[bi]
 		local tx, tz, trange = pylonsToBuildX[bj], pylonsToBuildZ[bj], pylonsToBuildRange[bj]
+		bridgeChains[#bridgeChains + 1] = {bi, bj}
+		local chain = #bridgeChains
 		local steps = 0
 		while steps < MAX_BRIDGE_PYLONS do
 			local lim = lastRange + trange
@@ -931,7 +1078,7 @@ local function movePylonsFromConnectToBuild()
 			end
 			steps = steps + 1
 			local px, pz, needTerra = placeStepPylon(lastX, lastZ, tx, tz, lastRange, facing)
-			addPylonsToBuild(cmdID, px, pz, cmdPylonRange, true, needTerra)
+			addPylonsToBuild(cmdID, px, pz, cmdPylonRange, true, needTerra, nil, chain)
 			lastX, lastZ, lastRange = px, pz, cmdPylonRange
 		end
 		parent[find(bi)] = find(bj)
@@ -971,7 +1118,9 @@ end
 local function seedQueuedByOthers()
 	for i = 1, #queuedByOthers do
 		local q = queuedByOthers[i]
-		addPylonsToConnect(q.defID, q.x, q.z, q.range, true)
+		if not SpotBlocked(q.x, q.z) then
+			addPylonsToConnect(q.defID, q.x, q.z, q.range, true)
+		end
 	end
 end
 
@@ -1035,7 +1184,7 @@ end
 local function addLLTToClear(x, z)
 	local lx, lz = FindLLTPos(x, z)
 	if lx then
-		addExtraBuild(lltDefID, lx, lz)
+		addExtraBuild(lltDefID, lx, lz, x, z)
 	end
 end
 
@@ -1047,7 +1196,7 @@ local function copyPylonsFromFeaturesToConnect()
 		local fID = features[i]
 		if FeatureDefs[Spring.GetFeatureDefID(fID)].geoThermal then
 			local x, _, z = Spring.GetFeaturePosition(fID)
-			if GetDistanceFromCmd(x, z) - geoRange <= cmdDist + cmdPylonRange then
+			if GetDistanceFromCmd(x, z) - geoRange <= cmdDist + cmdPylonRange and not SpotBlocked(x, z) then
 				local enemyHeld, allyHeld = spotOwnership(x, z, geoDefID)
 				-- Ally-held spots are already grid-connected via the existing-pylon pass.
 				if not allyHeld and not (enemyHeld and not options.clearEnemyMex.value) then
@@ -1067,7 +1216,7 @@ local function copyPylonsFromMexesToConnect()
 		local x, z = spot.x, spot.z
 
 		-- Only act on spots within the dragged area (same reach test addPylonsToConnect uses).
-		if GetDistanceFromCmd(x, z) - mexRange <= cmdDist + cmdPylonRange then
+		if GetDistanceFromCmd(x, z) - mexRange <= cmdDist + cmdPylonRange and not SpotBlocked(x, z) then
 			local enemyHeld, allyHeld = spotOwnership(x, z, mexDefID)
 			-- Ally-held spots are already grid-connected via the existing-pylon pass.
 			if not allyHeld and not (enemyHeld and not options.clearEnemyMex.value) then
@@ -1141,6 +1290,50 @@ local function gatherQueuedBuildings()
 	end
 end
 
+-- Alt-fill: cover the dragged circle with a square grid of the structure, using
+-- the player's build spacing (as the engine's rectangle fill does). Only cells whose
+-- whole footprint is inside the circle and that are buildable and clear of the
+-- connecting route or queued builds are kept. Runs after routing, so the route
+-- claims its spots first.
+local function fillCircle()
+	local facing = Spring.GetBuildFacing()
+	local hx, hz = footprintHalf(cmdID, facing)
+	local gap = (cmdSpacing or 0) * 16
+	local stepX, stepZ = 2 * hx + gap, 2 * hz + gap
+
+	-- Snap the grid to the engine's build grid: a footprint an odd number of 16-elmo
+	-- squares wide is centred on 16n+8, an even one on 16n.
+	local function snap(v, half)
+		if (half / 8) % 2 == 1 then
+			return floor(v / 16) * 16 + 8
+		end
+		return floor(v / 16 + 0.5) * 16
+	end
+	local ox, oz = snap(cmdCenterX, hx), snap(cmdCenterZ, hz)
+	local reach = cmdDist - sqrt(hx * hx + hz * hz) -- centre distance keeping footprint inside
+	if reach < 0 then
+		return
+	end
+	local reachSq = reach * reach
+	local nx, nz = floor(reach / stepX) + 1, floor(reach / stepZ) + 1 -- +1: snapping shifts the origin
+
+	-- Test every cell against the route before adding any: fill cells are spaced by
+	-- the grid, so they must not be checked against each other with the route margin.
+	local cells = {}
+	for i = -nx, nx do
+		for j = -nz, nz do
+			local x, z = ox + i * stepX, oz + j * stepZ
+			if DistanceSq(cmdCenterX, cmdCenterZ, x, z) <= reachSq and canPlace(cmdID, x, z, facing) then
+				cells[#cells + 1] = x
+				cells[#cells + 1] = z
+			end
+		end
+	end
+	for k = 1, #cells, 2 do
+		addPylonsToBuild(cmdID, cells[k], cells[k + 1], cmdPylonRange, true, nil, true)
+	end
+end
+
 local function updatePylonsToBuild()
 	clearPylonsToConnect()
 	clearPylonsToBuild()
@@ -1153,6 +1346,7 @@ local function updatePylonsToBuild()
 	end
 
 	gatherQueuedBuildings()
+	SpotBlocked = WG.SpotReach and WG.SpotReach.GetBlockedTest() or NEVER_BLOCKED
 
 	-- No drag: place a single pylon at the clicked spot (terraform if needed), unless
 	-- that spot is already on a build queue.
@@ -1174,6 +1368,10 @@ local function updatePylonsToBuild()
 	copyPylonsFromMexesToConnect()
 
 	movePylonsFromConnectToBuild()
+
+	if cmdFill then
+		fillCircle()
+	end
 end
 
 
@@ -1229,6 +1427,13 @@ function widget:MousePress(x, y, button)
 	cmdDist = 0
 	lastPlanDist = 0
 	planDirty = true
+	-- Read before clearing the active command: the spacing widget sets it per command.
+	cmdSpacing = Spring.GetBuildSpacing() or tonumber(UnitDefs[cmdID].customParams.default_spacing) or 0
+	cmdFill = spGetModKeyState() and true or false
+	-- The active command is dropped below, so ask for the spot flags to stay drawn.
+	if WG.SpotReach then
+		WG.SpotReach.SetShown(widget, true)
+	end
 
 	-- Drop the engine's active build command. While a building command stays active
 	-- and LMB is held, the engine draws (and places) its own line of buildings along
@@ -1274,6 +1479,7 @@ function widget:MouseRelease(x, y, button)
 		return false
 	end
 
+	cmdFill = spGetModKeyState() and true or false
 	updatePylonsToBuild()
 	orderPylonsToBuild()
 
@@ -1383,6 +1589,13 @@ function widget:DrawWorld()
 	glLineWidth(4)
 
 	gl.Utilities.DrawGroundCircle(cmdCenterX, cmdCenterZ, cmdDist)
+
+	-- Pressing or releasing alt mid-drag toggles the fill.
+	local alt = spGetModKeyState() and true or false
+	if alt ~= cmdFill then
+		cmdFill = alt
+		planDirty = true
+	end
 
 	if planDirty then
 		updatePylonsToBuild()
