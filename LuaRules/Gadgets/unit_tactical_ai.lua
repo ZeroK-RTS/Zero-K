@@ -1208,7 +1208,8 @@ end
 local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 	if unit[unitID] or externallyHandledUnit[unitID] then
 		local state = cmdParams[1]
-		local commandType = commandTypes[unitAIBehaviour[unit[unitID].udID].alternateStateToggle or "default"]
+		local toggleName = (unit[unitID] and unit[unitID].udID and unitAIBehaviour[unit[unitID].udID] and unitAIBehaviour[unit[unitID].udID].alternateStateToggle) or "default"
+		local commandType = commandTypes[toggleName]
 		local cmdDescID = spFindUnitCmdDesc(unitID, commandType.cmdID)
 		
 		if (cmdDescID) then
