@@ -9,6 +9,7 @@ local imageDir = 'LuaUI/Images/commands/'
 local tooltips = {
 	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
+	LOOP_ATTACK = "Attack Style (_STATE_)\n  Strafe targets or loop at maximum range.",
 	FIRE_AT_SHIELD = "Fire at Shields (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 	FIRE_TOWARDS_ENEMY = "Fire Towards Enemies (_STATE_)\n  Shoot towards enemies when there are no other targets.",
 	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
@@ -116,6 +117,10 @@ local commandDisplayConfig = {
 	[CMD_UNIT_AI] = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
 		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
+	},
+	[CMD_LOOP_ATTACK] = {
+		texture = {imageDir .. 'states/plane_strafe_on.png', imageDir .. 'states/plane_strafe_off.png'},
+		stateTooltip = {tooltips.LOOP_ATTACK:gsub("_STATE_", "Strafe"), tooltips.LOOP_ATTACK:gsub("_STATE_", "Loopback")},
 	},
 	[CMD_FIRE_TOWARDS_ENEMY] = {
 		texture = {imageDir .. 'states/shoot_towards_off.png', imageDir .. 'states/shoot_towards_on.png'},

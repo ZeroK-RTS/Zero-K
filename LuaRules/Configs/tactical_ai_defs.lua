@@ -520,6 +520,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- weaponNum(defaults to 1): Weapon to use when skirming
 -- searchRange(defaults to 800): max range of GetNearestEnemy for the unit.
 -- defaultAIState (defaults in config): (1 or 0) state of AI when unit is initialised
+-- alternateStateToggle (defaults to nil): Trigger unit AI with a completely different state toggle. Make sure the toggle is in commandTypes in the gadget.
 -- externallyHandled (defaults to nil): Enable to disable all tactical AI handling, only the state toggle is added.
 
 --*** skirms(defaults to empty): the table of units that this unit will attempt to keep at max range
@@ -926,7 +927,6 @@ local behaviourConfig = {
 		wardFirePredict = 5,
 		wardFireShield = false,
 		wardFireDefault = false,
-		wardAlternateStateToggle = true,
 	},
 	{
 		name = "tankheavyraid",
@@ -1513,6 +1513,19 @@ local behaviourConfig = {
 		wardFireShield = 450,
 		wardFireDefault = true,
 	},
+	{
+		name = "planesupport",
+		alternateStateToggle = "loopAttack",
+		defaultAIState = 0,
+		skirmEverything = true,
+		skirmRadar = true,
+		skirmBlockedApproachOnFight = true,
+		skirmBlockedApproachFrames = 15,
+		skirmLeeway = -220,
+		skirmOrderDis = 400,
+		velocityPrediction = 10,
+		velPredChaseFactor = 0.5,
+	},
 	
 	-- long range skirms
 	{
@@ -1665,7 +1678,6 @@ local behaviourConfig = {
 		wardFireLeeway = 15,
 		wardFireShield = false,
 		wardFireDefault = false, -- Let people choose this.
-		wardAlternateStateToggle = true,
 	},
 	{
 		name = "vehheavyarty",
@@ -1727,7 +1739,6 @@ local behaviourConfig = {
 		wardFireLeeway = 15,
 		wardFireShield = false,
 		wardFireDefault = false, -- Let people choose this.
-		wardAlternateStateToggle = true,
 	},
 	{
 		name = "shieldarty",
@@ -2178,6 +2189,7 @@ local function LoadBehaviour()
 		if behaviourData.land and behaviourData.sea then
 			unitAIBehaviour[ud.id] = {
 				defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
+				alternateStateToggle = behaviourData.alternateStateToggle,
 				waterline = (behaviourData.waterline or 0),
 				floatWaterline = behaviourData.floatWaterline,
 				land = GetBehaviourTable(behaviourData.land, ud),
@@ -2186,6 +2198,7 @@ local function LoadBehaviour()
 		else
 			unitAIBehaviour[ud.id] = GetBehaviourTable(behaviourData, ud)
 			unitAIBehaviour[ud.id].defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState)
+			unitAIBehaviour[ud.id].alternateStateToggle = behaviourData.alternateStateToggle
 		end
 	end
 	

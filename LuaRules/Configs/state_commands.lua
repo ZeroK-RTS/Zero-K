@@ -30,6 +30,7 @@ local stateCommands = {
 	[SUC.GOO_GATHER] = true,
 	[SUC.PUSH_PULL] = true,
 	[SUC.UNIT_AI] = true,
+	[SUC.LOOP_ATTACK] = true,
 	[SUC.WANT_CLOAK] = true,
 	[SUC.DONT_FIRE_AT_RADAR] = true,
 	[SUC.AIR_STRAFE] = true,

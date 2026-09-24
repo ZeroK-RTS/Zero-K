@@ -182,6 +182,7 @@ local ignoredCommand = {
 	[CMD_DISABLE_ATTACK] = true,
 	[CMD_PUSH_PULL] = true,
 	[CMD_UNIT_AI] = true,
+	[CMD_LOOP_ATTACK] = true,
 	[CMD_WANT_CLOAK] = true,
 	[CMD_DONT_FIRE_AT_RADAR] = true,
 	[CMD_AIR_STRAFE] = true,

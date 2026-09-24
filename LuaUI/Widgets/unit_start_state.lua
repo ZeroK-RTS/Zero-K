@@ -690,7 +690,10 @@ do
 			local unitDefName = unitDefID and UnitDefs[unitDefID]
 			unitDefName = unitDefName and unitDefName.name
 			if unitDefName then
-				tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+				tacticalAIUnits[unitDefName] = {
+					value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1,
+					commandType = behaviourData.alternateStateToggle or "default",
+				}
 			end
 			if behaviourData.hasWardFire then
 				wardFireUnits[unitDefName] = (behaviourData.wardFireDefault and 1) or 0
@@ -987,14 +990,24 @@ local function addUnit(defName, path)
 	end
 	
 	if tacticalAIUnits[defName] then
-		options[defName .. "_tactical_ai_2"] = {
-			name = "  Smart AI",
-			desc = "Smart AI: check box to turn it on",
-			type = 'bool',
-			value = tacticalAIUnits[defName].value,
-			path = path,
-		}
-		options_order[#options_order+1] = defName .. "_tactical_ai_2"
+		if tacticalAIUnits[defName].commandType == "default" then
+			options[defName .. "_tactical_ai_2"] = {
+				name = "  Smart AI",
+				desc = "Smart AI: check box to turn it on",
+				type = 'bool',
+				value = tacticalAIUnits[defName].value,
+				path = path,
+			}
+			options_order[#options_order+1] = defName .. "_tactical_ai_2"
+		elseif tacticalAIUnits[defName].commandType == "loopback_attack" then
+			options[defName .. "_loop_attack"] = {
+				name = "  Attack Style: check the box to have the plane loop attack and uncheck for strafe.",
+				type = 'bool',
+				value = planeStandoffUnits[defName].value,
+				path = path,
+			}
+			options_order[#options_order+1] = defName .. "_loop_attack"
+		end
 	end
 	
 	if (ud.transportCapacity >= 1) and ud.canFly then
@@ -1534,6 +1547,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 	
 		QueueState(name, "tactical_ai_2", CMD_UNIT_AI, orderArray)
+		QueueState(name, "loop_attack", CMD_LOOP_ATTACK, orderArray)
 		
 		value = GetStateValue(name, "tactical_ai_transport")
 		if value and WG.AddTransport then

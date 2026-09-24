@@ -125,6 +125,11 @@ function script.Create()
 	Hide(nozzle2)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	
+	local x,y,z = Spring.GetUnitVelocity(unitID)
+	if not (x == 0 and z == 0) then
+		script.StartMoving()
+	end
 end
 
 function script.StartMoving()

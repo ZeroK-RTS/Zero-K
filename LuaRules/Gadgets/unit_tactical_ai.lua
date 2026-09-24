@@ -102,13 +102,29 @@ local CMD_REMOVE       = CMD.REMOVE
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local unitAICmdDesc = {
-	id      = CMD_UNIT_AI,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Unit AI',
-	action  = 'unitai',
-	tooltip = 'Toggles smart unit AI for the unit',
-	params  = {0, 'AI Off', 'AI On'}
+local commandTypes = {
+	default = {
+		cmdID = CMD_UNIT_AI,
+		desc = {
+			id      = CMD_UNIT_AI,
+			type    = CMDTYPE.ICON_MODE,
+			name    = 'Unit AI',
+			action  = 'unitai',
+			tooltip = 'Toggles smart unit AI for the unit',
+			params  = {0, 'AI Off', 'AI On'}
+		}
+	},
+	loopAttack = {
+		cmdID = CMD_LOOP_ATTACK,
+		desc = {
+			id      = CMD_LOOP_ATTACK,
+			type    = CMDTYPE.ICON_MODE,
+			name    = 'Loopback attack',
+			action  = 'loopattack',
+			tooltip = 'Toggles whether the unit strafes or loops',
+			params  = {0, 'Strafe', 'Loopback'}
+		}
+	},
 }
 
 local stateCommands = include("LuaRules/Configs/state_commands.lua")
@@ -1192,11 +1208,12 @@ end
 local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 	if unit[unitID] or externallyHandledUnit[unitID] then
 		local state = cmdParams[1]
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_UNIT_AI)
+		local commandType = commandTypes[unitAIBehaviour[unit[unitID].udID].alternateStateToggle or "default"]
+		local cmdDescID = spFindUnitCmdDesc(unitID, commandType.cmdID)
 		
 		if (cmdDescID) then
-			unitAICmdDesc.params[1] = state
-			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitAICmdDesc.params})
+			commandType.desc.params[1] = state
+			spEditUnitCmdDesc(unitID, cmdDescID, { params = commandType.desc.params})
 			if externallyHandledUnit[unitID] then
 				Spring.SetUnitRulesParam(unitID, "tacticalAi_external", state, ALLY_TABLE)
 			else
@@ -1207,7 +1224,7 @@ local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_UNIT_AI] = true}
+	return {[CMD_UNIT_AI] = true, [CMD_LOOP_ATTACK] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -1215,7 +1232,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_UNIT_AI) then
+	if (cmdID ~= CMD_UNIT_AI and cmdID ~= CMD_LOOP_ATTACK) then
 		return true  -- command was not used
 	end
 	AIToggleCommand(unitID, cmdParams, cmdOptions)
@@ -1267,6 +1284,7 @@ end
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_AI)
+	gadgetHandler:RegisterCMDID(CMD_LOOP_ATTACK)
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
@@ -1292,9 +1310,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		return
 	end
 	local behaviour = unitAIBehaviour[unitDefID]
+	local commandType = commandTypes[behaviour.alternateStateToggle or "default"]
 	
 	if not behaviour.onlyIdleHandling then
-		spInsertUnitCmdDesc(unitID, unitAICmdDesc)
+		spInsertUnitCmdDesc(unitID, commandType.desc)
 	end
 	
 	if behaviour.externallyHandled then

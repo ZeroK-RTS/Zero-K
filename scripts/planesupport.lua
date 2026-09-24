@@ -59,6 +59,11 @@ function script.Create()
 	Move(flaremissiler, y_axis, 13)
 	Move(flaremissilel, z_axis, 1)
 	Move(flaremissiler, z_axis, 1)
+	
+	local x,y,z = Spring.GetUnitVelocity(unitID)
+	if not (x == 0 and z == 0) then
+		script.StartMoving()
+	end
 end
 
 function script.StartMoving()
