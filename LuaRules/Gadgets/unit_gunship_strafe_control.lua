@@ -49,7 +49,7 @@ local extendRadiusUnitDefs = {}
 local turnRadiusExtended = {}
 local lastCommandFrame = {}
 local gameFrame = 0
-local COMMAND_LEEWAY = 90
+local COMMAND_LEEWAY = 60
 
 for id, data in pairs(UnitDefs) do
 	if data.customParams and data.customParams.airstrafecontrol then
