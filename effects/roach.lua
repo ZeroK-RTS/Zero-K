@@ -43,7 +43,7 @@ return {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 7,
+      count              = 5,
       ground             = true,
       water              = true,
       underwater         = true,

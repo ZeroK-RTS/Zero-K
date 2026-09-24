@@ -544,7 +544,7 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
-			effectStrength = 1,
+			effectStrength = 0.6,
 			noiseStrength = 1,
 			noiseScaleSpace = 0.52,
 			distanceFalloff = 0.5,
@@ -552,6 +552,7 @@ local BaseClasses = {
 			onlyModelMap = 0,
 			lifeTime = 50,
 			rampUp = 2,
+			riseRate = 0.5,
 			decay = 10,
 			effectType = 0,
 		},
@@ -907,6 +908,7 @@ local BaseClasses = {
 			onlyModelMap = 0,
 			lifeTime = 400,
 			rampUp = 30,
+			riseRate = 0.5,
 			decay = 260,
 			effectType = 0,
 		},
@@ -1241,7 +1243,7 @@ local function AssignWeaponDistortions(weaponID)
 		}
 	elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
 		explosionDistortionsNames[weaponName] = {
-			GetDistortionClass("FireExplosionHeat", "SmallMedium", 0.7),
+			GetDistortionClass("FireExplosionHeat", "SmallMedium"),
 		}
 	else
 		local distortionClass
@@ -1311,7 +1313,7 @@ explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb = explosionDistortionsNam
 explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb[#explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb + 1] = GetDistortionClass("FireExplosionHeat", "Small")
 
 explosionDistortionsNames.tankraid_napalm_bomblet = explosionDistortionsNames.tankraid_napalm_bomblet or {}
-explosionDistortionsNames.tankraid_napalm_bomblet[#explosionDistortionsNames.tankraid_napalm_bomblet + 1] = GetDistortionClass("FireExplosionHeat", "Smallest")
+explosionDistortionsNames.tankraid_napalm_bomblet[#explosionDistortionsNames.tankraid_napalm_bomblet + 1] = GetDistortionClass("FireExplosionHeat", "Tiny")
 
 explosionDistortionsNames.jumpblackhole_black_hole = {}
 explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
@@ -1372,10 +1374,10 @@ explosionDistortionsNames.jumparty_napalm_sprayer = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
 }
 explosionDistortionsNames.striderdante_napalm_rockets = {
-	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
+	GetDistortionClass("FireExplosionHeat", "Smaller", false, 1.8),
 }
 explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
-	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
+	GetDistortionClass("FireExplosionHeat", "Smaller", false, 1.8),
 }
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),

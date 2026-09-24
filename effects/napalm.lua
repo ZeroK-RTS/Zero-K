@@ -381,7 +381,7 @@ local cegs = {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 3,
+      count              = 2,
       ground             = true,
       water              = true,
       properties = {
@@ -397,7 +397,7 @@ local cegs = {
     groundflash = {
       flashalpha         = 1,
       flashsize          = 95,
-      ttl                = 520,
+      ttl                = 85,
       color = {
         [1]  = 0.7,
         [2]  = 0.3,
@@ -407,25 +407,13 @@ local cegs = {
     redploom_low = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[0 i2]],
-        explosiongenerator = [[custom:NAPALMFIREBALL_45_long]],
-        pos                = [[-10 r10, 25, -10 r10]],
-      },
-    },
-    redploom = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
       count              = 2,
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[0 i10]],
-        explosiongenerator = [[custom:napalmfireball_firewalker_small]],
-        pos                = [[-20 r40, 5 r10, -20 r40]],
+        delay              = [[0 i2]],
+        explosiongenerator = [[custom:napalmfireball_90]],
+        pos                = [[-10 r10, 25, -10 r10]],
       },
     },
   },
@@ -695,6 +683,25 @@ local altforms = {
         particlesizespread = 16,
         particlespeed      = 0.4,
         particlespeedspread = 0.2,
+        sizegrowth         = 0.45,
+        colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+        },
+      },
+    },
+  },
+  napalmfireball_90 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+      properties = {
+        emitrot            = 90,
+        emitrotspread      = 90,
+        particlelife       = 80,
+        particlelifespread = 20,
+        particlesize       = 40,
+        particlesizespread = 18,
+        particlespeed      = 0.5,
+        particlespeedspread = 0.3,
         sizegrowth         = 0.45,
         colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
         },
