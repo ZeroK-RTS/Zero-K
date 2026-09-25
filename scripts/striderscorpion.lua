@@ -126,6 +126,12 @@ local bodyTurnSpeed= math.rad(60)
 local pi=math.pi
 local pi2=pi*2
 
+local body_ctrl
+
+local function CreateBodyCtrl()
+	body_ctrl=Spring.UnitScript.inertial_piece.new(unitID,body,{1,0,1})
+end
+
 -- four-stroke hexapedal walkscript
 local function Walk()
 	Signal(SIG_WALK)
@@ -170,7 +176,8 @@ local function RestoreAfterDelay()
 				Turn(weaponPieces[i].pivot, y_axis, 0, math.rad(60))
 				Turn(weaponPieces[i].pitch, x_axis, 0, math.rad(45))
 			end
-			Turn(body,y_axis,0,bodyTurnSpeed)
+			-- Turn(body,y_axis,0,bodyTurnSpeed)
+			body_ctrl.AdditionalTurn(y_axis,0,bodyTurnSpeed)
 		end
 		Sleep(1000)
 	end
@@ -180,7 +187,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay)
 	Move(flare1, z_axis, 7)
-	Spring.UnitScript.inertial_piece.new(unitID,body,0,1)
+	CreateBodyCtrl()
 --	Turn(armr1, z_axis, math.rad(30), 100)
 --	Turn(arml1, z_axis, math.rad(-30), 100)
 end
@@ -223,11 +230,11 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(sig)
 	SetSignalMask(sig)
 	if num==1 then
-		Turn(body,y_axis,heading,bodyTurnSpeed)
+		body_ctrl.AdditionalTurn(y_axis,heading,bodyTurnSpeed)
 		resetRestore = true
 		
 	elseif num == 2 or num == 3 then
-		Turn(body,y_axis,heading,bodyTurnSpeed)
+		body_ctrl.AdditionalTurn(y_axis,heading,bodyTurnSpeed)
 		local _,body_heading=spGetPieceRotation(body)
 		local wpn_heading=heading-body_heading
 		resetRestore = true
