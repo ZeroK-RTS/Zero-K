@@ -1421,7 +1421,7 @@ explosionDistortionsNames.spideremp_spider = {
 
 -- Precision weapons that deserve large distortions
 explosionDistortionsNames.tankheavyassault_cor_gol = {
-	GetDistortionClass("ExploShockWaveM", "Tiny", 1.8)
+	GetDistortionClass("ExploShockWaveM", "Tiny")
 }
 explosionDistortionsNames.cloaksnipe_shockrifle = {
 	GetDistortionClass("ExploShockWaveM", "Tiny")
