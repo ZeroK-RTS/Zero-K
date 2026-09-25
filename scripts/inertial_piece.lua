@@ -130,6 +130,8 @@ if not Spring.UnitScript.inertial_piece then
 		---@type {[1]:TurnParam?,[2]:TurnParam?,[3]:TurnParam?}
 		local extra_rotations={}
 
+		local old_unit_rot_delta={0,0,0}
+
 		-- local unit_old_pitch_2,unit_old_heading_2=unit_old_pitch,unit_old_heading
         local function KeepRotation()
             while true do
@@ -139,10 +141,17 @@ if not Spring.UnitScript.inertial_piece then
 				for axis = 1, 3 do
 					local change_ratio=change_ratios[axis]
 					local extra_rotation=extra_rotations[axis]
-					if change_ratio then
+					if change_ratio and change_ratio~=0 then
 
 						local unit_rot_delta = angle_limit( -(unit_rotations[axis]-unit_old_rotations[axis]) )
+						
 						local piece_rot = angle_limit(piece_rotations[axis])
+
+						local delta_compensation=unit_rot_delta-old_unit_rot_delta[axis]
+
+						piece_rot=piece_rot - delta_compensation * change_ratio
+
+						Turn(piece,axis,piece_rot)
 
 						local piece_rot_delta = - unit_rot_delta * change_ratio
 						local piece_rot_speed = piece_rot_delta*gameSpeed
@@ -178,7 +187,7 @@ if not Spring.UnitScript.inertial_piece then
 							end
 						end
 						
-
+						old_unit_rot_delta[axis]=unit_rot_delta
 					else
 						if extra_rotation then
 							Turn(piece,axis,extra_rotation.destination,extra_rotation.speed)
