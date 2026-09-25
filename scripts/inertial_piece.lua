@@ -50,7 +50,10 @@
 
 if not Spring.UnitScript.inertial_piece then
     -- local spGetUnitHeading=Spring.GetUnitHeading
-    local spGetUnitRotation=Spring.GetUnitRotation
+    local spGetUnitRotation = Spring.GetUnitRotation
+	local spGetUnitPieceDirection = Spring.GetUnitPieceDirection
+	local spGetUnitPieceInfo = Spring.GetUnitPieceInfo
+	local spGetUnitPieceMap = Spring.GetUnitPieceMap
     local spGetPieceRotation=Spring.UnitScript.GetPieceRotation
 	local pi=math.pi
 	local abs=math.abs
@@ -105,7 +108,7 @@ if not Spring.UnitScript.inertial_piece then
     Spring.UnitScript.inertial_piece=inertial_piece
     -- local suunit=Spring.UnitScript.units
     
-    inertial_piece.new=function (unitId,piece,coefficient_ratios,others)
+    inertial_piece.new=function (unitID,piece,coefficient_ratios,others)
         -- local piece_rotate_speed=suunit[unitId].pieceRotSpeeds[piece]
         -- local piece_rotate_destination=suunit[unitId].pieceRotdestinations[piece]
 
@@ -116,12 +119,42 @@ if not Spring.UnitScript.inertial_piece then
 		for key, value in pairs(coefficient_ratios) do
 			change_ratios[key]=value and (1-value)
 		end
+		
+		local toGetRotation
+
+		
+
+		do
+			-- local pm=spGetUnitPieceMap(unitID)
+			-- if pm then
+			-- 	local parent=pm[spGetUnitPieceInfo(unitID,piece).parent]
+			-- 	toGetRotation=function ()
+			-- 		return spGetUnitPieceDirection(unitID,parent)
+			-- 	end
+			-- else
+			-- 	toGetRotation=function ()
+			-- 		local ur=spGetUnitRotation(unitID)
+			-- 		for k, v in pairs(ur) do
+			-- 			ur[k]=-v
+			-- 		end
+			-- 		return ur
+			-- 	end
+				
+			-- end
+			toGetRotation=function ()
+				local ur={spGetUnitRotation(unitID)}
+				for k, v in pairs(ur) do
+					ur[k]=-v
+				end
+				return ur
+			end
+		end
         --local piece_heading=others.piece_heading or 0
         --local piece_pitch=others.piece_pitch or 0
         -- local unit_old_pitch,unit_old_heading=spGetUnitRotation(unitId)
 
 		---@type {[1]:number,[2]:number,[3]:number}
-		local unit_old_rotations={spGetUnitRotation(unitId)}
+		local unit_old_rotations=toGetRotation()
 
 		---@class TurnParam
 		---@field destination number
@@ -132,22 +165,36 @@ if not Spring.UnitScript.inertial_piece then
 
 		local old_unit_rot_delta={0,0,0}
 
+		local dbg_counter=5
+
 		-- local unit_old_pitch_2,unit_old_heading_2=unit_old_pitch,unit_old_heading
         local function KeepRotation()
             while true do
                 Sleep(1000/30)
-				local unit_rotations={spGetUnitRotation(unitId)}
+				local unit_rotations=toGetRotation()
+				do
+					-- dbg_counter=dbg_counter-1
+					-- if dbg_counter<0 then
+					-- 	dbg_counter=5
+						
+					-- end
+					-- local dbgstr=""
+					-- for i = 1, 3 do
+					-- 	dbgstr = dbgstr .. i .. ":" .. unit_rotations[i] .. ", "
+					-- end
+					-- Spring.Echo(dbgstr)
+				end
 				local piece_rotations={spGetPieceRotation(piece)}
 				for axis = 1, 3 do
 					local change_ratio=change_ratios[axis]
 					local extra_rotation=extra_rotations[axis]
 					if change_ratio and change_ratio~=0 then
 
-						local unit_rot_delta = angle_limit( -(unit_rotations[axis]-unit_old_rotations[axis]) )
+						local unit_rot_delta = distance_toward_section_loop( unit_old_rotations[axis], unit_rotations[axis],-pi,pi )
 						
 						local piece_rot = angle_limit(piece_rotations[axis])
 
-						local delta_compensation=unit_rot_delta-old_unit_rot_delta[axis]
+						local delta_compensation = angle_limit(unit_rot_delta-old_unit_rot_delta[axis])
 
 						piece_rot=piece_rot - delta_compensation * change_ratio
 
