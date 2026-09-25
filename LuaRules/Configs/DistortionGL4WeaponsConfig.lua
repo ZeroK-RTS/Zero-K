@@ -1212,6 +1212,7 @@ local function AssignWeaponDistortions(weaponID)
 	local effectiveRangeExplo = areaofeffect * (0.75 + (0.4 * math.sqrt(weaponDef.edgeEffectiveness)))
 	local burstMult = tonumber(wcp.statsprojectiles) or ((tonumber(wcp.script_burst) or weaponDef.salvoSize) * weaponDef.projectiles)
 	local rapidFire = weaponDef.reload < 0.6 or (weaponDef.reload < 8 and burstMult > 5)
+	local particleBeam = string.find(weaponName, "particlebeam")
 
 	local sizeclass = GetClosestSizeClass(radius)
 	local overrideTable = {}
@@ -1219,7 +1220,7 @@ local function AssignWeaponDistortions(weaponID)
 
 	-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
 	if wcp.lups_noshockwave then
-	elseif string.find(weaponName, "particlebeam") then
+	elseif particleBeam then
 		local lightningWidth = "Quaco"
 		projectileDefDistortionsNames[weaponName] = GetDistortionClass("ParticleBeam", lightningWidth, 0.5)
 	elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
@@ -1257,7 +1258,7 @@ local function AssignWeaponDistortions(weaponID)
 			GetDistortionClass(class, size),
 		}
 	end
-
+	
 	-- Add explosion distortions if needed:
 	if wcp.lups_noshockwave then
 	elseif (wcp.timeslow_damagefactor or wcp.timeslow_onlyslow) and wcp.nofriendlyfire then
@@ -1292,9 +1293,10 @@ local function AssignWeaponDistortions(weaponID)
 			distortionClass = "ExploShockWaveM"
 		elseif effectiveRangeExplo > 24 or wcp.death_explosion then
 			distortionClass = "ExploShockWaveS"
-		elseif effectiveRangeExplo > 10 or ((weaponDef.type == "Cannon" or weaponDef.type == "MissileLauncher") and weaponRange > 100) then
+		elseif effectiveRangeExplo > 10 or ((weaponDef.type == "Cannon" or weaponDef.type == "MissileLauncher") and weaponRange > 100) or particleBeam then
 			distortionClass = "ExploShockWaveXS"
 		end
+
 		if distortionClass then
 			local adjRadius = math.max(36, effectiveRangeExplo + 8)
 			--MarkUnits(adjRadius,"")

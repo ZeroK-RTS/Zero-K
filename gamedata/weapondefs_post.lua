@@ -11,8 +11,17 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- All weapons in the weapons directory are death explosions, and idk how to add customparams to tdf
 
-VFS.FileExists = VFS.FileExists or function() return false end	-- unitdef exporter compatibility
+for _, weaponDef in pairs(WeaponDefs) do
+	weaponDef.customparams = weaponDef.customparams or {}
+	weaponDef.customparams.death_explosion = 1
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+VFS.FileExists = VFS.FileExists or function() return false end -- unitdef exporter compatibility
 
 --[[ This lets mutators add a bit of weapondefs_post processing without
      losing access to future gameside updates to weapondefs_post. ]]
@@ -116,12 +125,6 @@ end
 -- Process the unitDefs
 
 local UnitDefs = DEFS.unitDefs
-
--- Set all weapons to be death_explosions, since unit weapons have not been loaded yet
-for _, weaponDef in pairs(WeaponDefs) do
-	weaponDef.customparams = weaponDef.customparams or {}
-	weaponDef.customparams.death_explosion = 1
-end
 
 -- Load unit weapons and bespoke death explosions
 for udName, ud in pairs(UnitDefs) do
