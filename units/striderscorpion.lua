@@ -38,7 +38,7 @@ return { striderscorpion = {
   health                 = 12000,
   iconType               = [[t3spidergeneric]],
   initCloaked            = true,
-  leaveTracks            = true,
+  leaveTracks            = false,
   maxSlope               = 72,
   maxWaterDepth          = 22,
   metalCost              = 3000,
@@ -62,12 +62,12 @@ return { striderscorpion = {
   },
   sightDistance          = 517,
   speed                  = 39,
-  trackOffset            = 0,
-  trackStrength          = 10,
-  trackStretch           = 1,
-  trackType              = [[crossFoot]],
-  trackWidth             = 76,
-  turnRate               = 480,
+--   trackOffset            = 0,
+--   trackStrength          = 10,
+--   trackStretch           = 1,
+--   trackType              = [[crossFoot]],
+--   trackWidth             = 76,
+  turnRate               = 480*4,
   workerTime             = 0,
 
   weapons                = {
@@ -75,7 +75,7 @@ return { striderscorpion = {
     {
       def                = [[FAKELASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 30,
+    --   maxAngleDif        = 30,
     },
     
     {
@@ -91,16 +91,14 @@ return { striderscorpion = {
     
     {
       def                = [[PARTICLEBEAM]],
-      mainDir            = [[-0.2 0 1]],
-      maxAngleDif        = 240,
+    --   mainDir            = [[-0.2 0 1]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     
     {
       def                = [[PARTICLEBEAM]],
-      mainDir            = [[0.2 0 1]],
-      maxAngleDif        = 240,
+    --   mainDir            = [[0.2 0 1]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -139,7 +137,7 @@ return { striderscorpion = {
       laserFlareSize          = 5.53,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 450,
+      range                   = 430,
       reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
