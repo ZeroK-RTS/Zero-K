@@ -1307,7 +1307,11 @@ local function AssignWeaponDistortions(weaponID)
 			end
 			if rapidFire then
 				adjRadius = adjRadius*0.8
-				strength = 0.4
+				if areaofeffect >= 24 then
+					strength = 0.22
+				else
+					strength = 0.4
+				end
 			end
 			if weaponRange > 2200 and weaponDef.type == "StarburstLauncher" then
 				adjRadius = adjRadius*1.7
