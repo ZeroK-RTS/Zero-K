@@ -72,6 +72,7 @@ return { gunshipskirm = {
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 3,
+        timeslow_overslow_frames = 2*30,
         
         light_camera_height = 2500,
         light_color = [[1.3 0.5 1.6]],
