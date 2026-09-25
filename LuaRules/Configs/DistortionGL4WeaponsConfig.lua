@@ -94,8 +94,9 @@ local BaseClasses = {
 			posz = 0,
 			radius = 200,
 			distanceFalloff = 0.1,
-			noiseStrength = 0.5,
+			noiseStrength = 0.55,
 			noiseScaleSpace = 0.8,
+			distanceFalloff = 0.3,
 			lifeTime = 21,
 			decay = 16,
 			rampUp = 4,
@@ -827,7 +828,7 @@ local BaseClasses = {
 			effectType = 7,
 		},
 	},
-	LightningBeam = {
+	ParticleBeam = {
 		distortionType = "beam",
 		distortionConfig = {
 			posx = 0,
@@ -850,6 +851,31 @@ local BaseClasses = {
 			effectType = 7,
 		},
 	},
+	LightningBeam = {
+		distortionType = "beam",
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 10,
+			effectStrength = 0.1,
+			noiseStrength = 3.5,
+			noiseScaleSpace = 0.15,
+			onlyModelMap = 0,
+			riseRate = -3.4,
+			windAffected = 12.57,
+			distanceFalloff = 0.7,
+			refractiveIndex = 3,
+			pos2x = 100,
+			pos2y = 500,
+			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
+			lifeTime = 16,
+			sustain = 5,
+			rampUp = 1,
+			decay = 2,
+			effectType = 7,
+		},
+	},
 	HeavyLaser = {
 		distortionType = "beam",
 		distortionConfig = {
@@ -858,14 +884,15 @@ local BaseClasses = {
 			posz = 0,
 			radius = 10,
 			noiseStrength = 0.35,
-			noiseScaleSpace = 0.08,
+			noiseScaleSpace = 0.1,
 			onlyModelMap = 0,
-			riseRate = -0.2,
+			riseRate = -5,
 			pos2x = 100,
 			pos2y = 500,
 			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
 			lifeTime = 4,
 			sustain = 1,
+			windAffected = 1,
 			rampUp = 0,
 			decay = 3,
 			effectType = 7,
@@ -881,12 +908,13 @@ local BaseClasses = {
 			noiseStrength = 0.3,
 			noiseScaleSpace = 0.09,
 			onlyModelMap = 0,
-			riseRate = -0.2,
+			riseRate = -4,
 			pos2x = 100,
 			pos2y = 500,
 			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
 			lifeTime = 4,
 			sustain = 1,
+			windAffected = 0.9,
 			rampUp = 0,
 			decay = 3,
 			effectType = 7,
@@ -960,7 +988,7 @@ local BaseClasses = {
 
 local SizeRadius = {
 	Quaco = 8,
-	Zetto = 9.5,
+	Zetto = 10,
 	Atto = 11,
 	Banthlaser = 13,
 	Femtoest = 19,
@@ -1031,6 +1059,7 @@ local function MarkUnits(class, size)
 		return
 	end
 	local wd = WeaponDefs[currentWeaponDefID]
+	Spring.Echo(wd.name, class, size)
 	local name = wd.name
 	local data = name:split("_")
 	local ud = data and data[1] and UnitDefNames[data[1]]
@@ -1038,7 +1067,6 @@ local function MarkUnits(class, size)
 		return
 	end
 	local units = Spring.GetTeamUnitsSorted(0)
-	Spring.Echo("units", ud.id, #units, units[ud.id])
 	local unitID = false
 	if units[ud.id] then
 		for k, v in pairs(units[ud.id]) do
@@ -1060,7 +1088,9 @@ local function GetDistortionClass(baseClassname, sizekey, strength, lifeScale)
 	strength = strength or 1
 	lifeScale = lifeScale or 1
 	local distortionClassKey = baseClassname .. (sizekey or "") .. "_" .. (strength) .. "_" .. (lifeScale)
-	MarkUnits(baseClassname, sizekey)
+	if DEBUG_MODE then
+		MarkUnits(baseClassname, sizekey)
+	end
 
 	if distortionClasses[distortionClassKey] then
 		return distortionClasses[distortionClassKey]
@@ -1189,6 +1219,9 @@ local function AssignWeaponDistortions(weaponID)
 
 	-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
 	if wcp.lups_noshockwave then
+	elseif string.find(weaponName, "particlebeam") then
+		local lightningWidth = "Quaco"
+		projectileDefDistortionsNames[weaponName] = GetDistortionClass("ParticleBeam", lightningWidth, 0.5)
 	elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
 		projectileDefDistortionsNames[weaponName] = GetDistortionClass("GaussProjectile", "Pico")
 	elseif wcp.setunitsonfire and weaponDef.type == "LaserCannon" then -- Flamethrower
@@ -1264,10 +1297,8 @@ local function AssignWeaponDistortions(weaponID)
 		end
 		if distortionClass then
 			local adjRadius = math.max(36, effectiveRangeExplo + 8)
+			--MarkUnits(adjRadius,"")
 			local strength = 1
-			if effectiveRangeExplo < 10 then
-				effectiveRangeExplo = 24
-			end
 			if isAA then
 				adjRadius = adjRadius*0.7
 				strength = 0.9
@@ -1304,10 +1335,28 @@ AssignDistortionsToAllWeapons() -- disable this if it doesn't work
 
 -----------------Manual Overrides--------------------
 
+-- Unique weapons
 projectileDefDistortionsNames.jumpblackhole_black_hole = GetDistortionClass("BlackHole", "Micro")
+
+explosionDistortionsNames.jumpblackhole_black_hole = {}
+explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
 
 projectileDefDistortionsNames.shieldfelon_shieldgun = GetDistortionClass("ShieldGunBeam", "Atto")
 
+explosionDistortionsNames.shieldscout_clogger_explode = {}
+explosionDistortionsNames.shieldscout_clogger_explode[#explosionDistortionsNames.shieldscout_clogger_explode + 1] = GetDistortionClass("ExploShockWaveS", "Pico")
+
+explosionDistortionsNames.bomberassault_thermite_bomb = {
+	GetDistortionClass("ThermiteHeat", "Pico")
+}
+explosionDistortionsNames.energysingu_singularity = {
+	GetDistortionClass("ImplosionSingu", "Mega")
+}
+explosionDistortionsNames.bomberheavy_arm_pidr = {
+	GetDistortionClass("ImplosionBomb", "Medium")
+}
+
+-- Ground fire needs special attention
 explosionDistortionsNames.shieldbomb_shieldbomb_death = explosionDistortionsNames.shieldbomb_shieldbomb_death or {}
 explosionDistortionsNames.shieldbomb_shieldbomb_death[#explosionDistortionsNames.shieldbomb_shieldbomb_death + 1] = GetDistortionClass("ExplosionHeat", "Medium")
 
@@ -1317,60 +1366,8 @@ explosionDistortionsNames.gunshipbomb_gunshipbomb_bomb[#explosionDistortionsName
 explosionDistortionsNames.tankraid_napalm_bomblet = explosionDistortionsNames.tankraid_napalm_bomblet or {}
 explosionDistortionsNames.tankraid_napalm_bomblet[#explosionDistortionsNames.tankraid_napalm_bomblet + 1] = GetDistortionClass("FireExplosionHeat", "Tiny")
 
-explosionDistortionsNames.jumpblackhole_black_hole = {}
-explosionDistortionsNames.jumpblackhole_black_hole[#explosionDistortionsNames.jumpblackhole_black_hole + 1] = GetDistortionClass("BlackHole", "Small")
-
-explosionDistortionsNames.shieldscout_clogger_explode = {}
-explosionDistortionsNames.shieldscout_clogger_explode[#explosionDistortionsNames.shieldscout_clogger_explode + 1] = GetDistortionClass("ExploShockWaveS", "Pico")
-
-explosionDistortionsNames.energysingu_singularity = {
-	GetDistortionClass("ImplosionSingu", "Mega")
-}
-
-explosionDistortionsNames.jumpbomb_jumpbomb_death = {
-	GetDistortionClass("ExploShockWaveL", "SmallMedium")
-}
-
-explosionDistortionsNames.tankriot_tawf_banisher = {
-	GetDistortionClass("ExploShockWaveS", "Smallest")
-}
-
-explosionDistortionsNames.bomberprec_bombsabot = {
-	GetDistortionClass("ExploShockWaveS", "Micro")
-}
-explosionDistortionsNames.tankheavyassault_cor_gol = {
-	GetDistortionClass("ExploShockWaveM", "Tiny", 1.8)
-}
-explosionDistortionsNames.jumpsumo_landing = {
-	GetDistortionClass("GroundShockWaveLanding", "SmallMedium")
-}
-explosionDistortionsNames.striderdetriment_landing = {
-	GetDistortionClass("GroundShockWaveLanding", "Mediumer", 1.8)
-}
-
 explosionDistortionsNames.jumpraid_pyro_death = explosionDistortionsNames.jumpraid_pyro_death or {}
 explosionDistortionsNames.jumpraid_pyro_death[#explosionDistortionsNames.jumpraid_pyro_death + 1] = GetDistortionClass("ExplosionHeatFirewalker", "Smallish", false, 1.3)
-
-explosionDistortionsNames.cloaksnipe_shockrifle = {
-	GetDistortionClass("ExploShockWaveM", "Tiny")
-}
-explosionDistortionsNames.vehheavyarty_cortruck_missile = {
-	GetDistortionClass("ExploShockWaveS", "Nano")
-}
-
-explosionDistortionsNames.bomberassault_thermite_bomb = {
-	GetDistortionClass("ThermiteHeat", "Pico")
-}
-
-explosionDistortionsNames.bomberheavy_arm_pidr = {
-	GetDistortionClass("ImplosionBomb", "Medium")
-}
-
-explosionDistortionsNames.spidercrabe_arm_crabe_gauss = explosionDistortionsNames.spidercrabe_arm_crabe_gauss or {}
-explosionDistortionsNames.spidercrabe_arm_crabe_gauss[#explosionDistortionsNames.spidercrabe_arm_crabe_gauss + 1] = GetDistortionClass("GroundShockWave", "Smallish")
-
-explosionDistortionsNames.turretheavy_plasma = explosionDistortionsNames.turretheavy_plasma or {}
-explosionDistortionsNames.turretheavy_plasma[#explosionDistortionsNames.turretheavy_plasma + 1] = GetDistortionClass("GroundShockWave", "Small")
 
 explosionDistortionsNames.jumparty_napalm_sprayer = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Small", false, 1.5),
@@ -1384,11 +1381,73 @@ explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
 }
+
+-- Fancy explosions for huge artillery
+explosionDistortionsNames.spidercrabe_arm_crabe_gauss = explosionDistortionsNames.spidercrabe_arm_crabe_gauss or {}
+explosionDistortionsNames.spidercrabe_arm_crabe_gauss[#explosionDistortionsNames.spidercrabe_arm_crabe_gauss + 1] = GetDistortionClass("GroundShockWave", "Small")
+
+explosionDistortionsNames.turretheavy_plasma = explosionDistortionsNames.turretheavy_plasma or {}
+explosionDistortionsNames.turretheavy_plasma[#explosionDistortionsNames.turretheavy_plasma + 1] = GetDistortionClass("GroundShockWave", "Small")
+
+explosionDistortionsNames.staticheavyarty_plasma = explosionDistortionsNames.staticheavyarty_plasma or {}
+explosionDistortionsNames.staticheavyarty_plasma[#explosionDistortionsNames.staticheavyarty_plasma + 1] = GetDistortionClass("GroundShockWave", "Small")
+
+explosionDistortionsNames.staticarty_plasma = explosionDistortionsNames.staticarty_plasma or {}
+explosionDistortionsNames.staticarty_plasma[#explosionDistortionsNames.staticarty_plasma + 1] = GetDistortionClass("GroundShockWave", "Small")
+
+-- Rescale some normal explosions that autodetect incorrectly
+explosionDistortionsNames.jumpbomb_jumpbomb_death = {
+	GetDistortionClass("ExploShockWaveL", "SmallMedium")
+}
+explosionDistortionsNames.tankriot_tawf_banisher = {
+	GetDistortionClass("ExploShockWaveS", "Smallest")
+}
+explosionDistortionsNames.bomberprec_bombsabot = {
+	GetDistortionClass("ExploShockWaveS", "Micro")
+}
+explosionDistortionsNames.shieldskirm_storm_rocket = {
+	GetDistortionClass("ExploShockWaveS", "Micro", 0.8)
+}
+explosionDistortionsNames.spideremp_spider = {
+	GetDistortionClass("ExploShockWaveS", "Smallest", 0.22),
+	GetDistortionClass("empWobble", "Smallest"),
+}
+
+-- Precision weapons that deserve large distortions
+explosionDistortionsNames.tankheavyassault_cor_gol = {
+	GetDistortionClass("ExploShockWaveM", "Tiny", 1.8)
+}
+explosionDistortionsNames.cloaksnipe_shockrifle = {
+	GetDistortionClass("ExploShockWaveM", "Tiny")
+}
+explosionDistortionsNames.vehheavyarty_cortruck_missile = {
+	GetDistortionClass("ExploShockWaveS", "Nano")
+}
+explosionDistortionsNames.spiderantiheavy_spy = explosionDistortionsNames.spiderantiheavy_spy or {}
+explosionDistortionsNames.spiderantiheavy_spy[#explosionDistortionsNames.spiderantiheavy_spy + 1] = GetDistortionClass("ExploShockWaveS", "Tiniest")
+
+-- Goomba stomp
+explosionDistortionsNames.jumpsumo_landing = {
+	GetDistortionClass("GroundShockWaveLanding", "SmallMedium")
+}
+explosionDistortionsNames.striderdetriment_landing = {
+	GetDistortionClass("GroundShockWaveLanding", "Mediumer", 1.8)
+}
+
+-- Slow pulses all need timing to match their CEG
+
 explosionDistortionsNames.missileslow_weapon = {
 	GetDistortionClass("SlowDamageImplosion", "Tiniest", 2, 2),
 	GetDistortionClass("DisruptionPulse", "Large", 2),
 }
+explosionDistortionsNames.amphbomb_amphbomb_death = {
+	GetDistortionClass("DisruptionPulse", "Mediumest", 1.4, 0.92),
+}
+explosionDistortionsNames.commweapon_disruptorbomb = {
+	GetDistortionClass("DisruptionPulse", "Mediumest", 1.7, 1.8),
+}
 
+-- Disco Rave Party
 explosionDistortionsNames.raveparty_red_killer = {
 	GetDistortionClass("ExploShockWaveL", "Medium"),
 }
@@ -1405,13 +1464,8 @@ explosionDistortionsNames.raveparty_blue_shocker = {
 explosionDistortionsNames.raveparty_violet_slugger = {
 	GetDistortionClass("DisruptionPulse", "Juno", 2, 3.4),
 }
-explosionDistortionsNames.amphbomb_amphbomb_death = {
-	GetDistortionClass("DisruptionPulse", "Mediumest", 1.4, 0.92),
-}
-explosionDistortionsNames.commweapon_disruptorbomb = {
-	GetDistortionClass("DisruptionPulse", "Mediumest", 1.7, 1.8),
-}
 
+-- BIG NUKE
 explosionDistortionsNames.staticnuke_crblmssl = {
 	GetDistortionClass("ExplosionHeatNuke", "MegaXXL"),
 	GetDistortionClass("AirShockWaveNuke", "Nuke"),
