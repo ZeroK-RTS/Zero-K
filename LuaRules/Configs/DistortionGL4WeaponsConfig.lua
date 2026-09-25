@@ -1418,6 +1418,9 @@ explosionDistortionsNames.spideremp_spider = {
 	GetDistortionClass("ExploShockWaveS", "Smallest", 0.22),
 	GetDistortionClass("empWobble", "Smallest"),
 }
+explosionDistortionsNames.hoverdepthcharge_fake_depthcharge = {
+	GetDistortionClass("ExploShockWaveS", "Smallest")
+}
 
 -- Precision weapons that deserve large distortions
 explosionDistortionsNames.tankheavyassault_cor_gol = {
@@ -1482,6 +1485,30 @@ explosionDistortionsNames.staticnuke_crblmssl = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function PopulateQuality(params)
+	local config = params.distortionConfig
+	if (config.radius or 0) >= 40 and (config.lifeTime or 0) >= 15 then
+		-- Show the largest and longest distortions at all qualities
+		params.quality = 1
+	elseif (config.radius or 0) >= 40 or (config.lifeTime or 0) >= 11 or params.distortionType == "beam" then
+		-- Avoid small explosions at mid-level quality
+		params.quality = 2
+	else
+		params.quality = 3
+	end
+	return params
+end
+
+local function PopulatQualityList(distortionList)
+	for i = 1, #distortionList do
+		distortionList[i] = PopulateQuality(distortionList[i])
+	end
+	return distortionList
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local muzzleFlashDistortions = {}
 local explosionDistortions = {}
 local projectileDefDistortions = {
@@ -1502,7 +1529,7 @@ local projectileDefDistortions = {
 -- convert weaponname -> weaponDefID
 for name, distortionList in pairs(explosionDistortionsNames) do
 	if WeaponDefNames[name] then
-		explosionDistortions[WeaponDefNames[name].id] = distortionList
+		explosionDistortions[WeaponDefNames[name].id] = PopulatQualityList(distortionList)
 	end
 end
 explosionDistortionsNames = nil
@@ -1510,7 +1537,7 @@ explosionDistortionsNames = nil
 -- convert weaponname -> weaponDefID
 for name, distortionList in pairs(muzzleFlashDistortionsNames) do
 	if WeaponDefNames[name] then
-		muzzleFlashDistortions[WeaponDefNames[name].id] = distortionList
+		muzzleFlashDistortions[WeaponDefNames[name].id] = PopulatQualityList(distortionList)
 	end
 end
 muzzleFlashDistortionsNames = nil
@@ -1518,7 +1545,7 @@ muzzleFlashDistortionsNames = nil
 -- convert weaponname -> weaponDefID
 for name, params in pairs(projectileDefDistortionsNames) do
 	if WeaponDefNames[name] then
-		projectileDefDistortions[WeaponDefNames[name].id] = params
+		projectileDefDistortions[WeaponDefNames[name].id] = PopulateQuality(params)
 	end
 end
 projectileDefDistortionsNames = nil

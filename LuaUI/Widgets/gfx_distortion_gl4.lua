@@ -128,6 +128,46 @@ local intensityMultiplier = 1.0
 -- the 3d noise texture used for this shader
 local noisetex3dcube = "LuaUI/Images/noise/noise64_cube_3_seed2026.dds"
 
+------------------------------ Ingame menu options ------------------
+
+local LoadDistortionConfig -- Called on change
+local qualityLevel = 2
+local qualityMap = {
+	high = 3,
+	medium = 2,
+	low = 1,
+	disabled = 0,
+}
+
+options_path = 'Settings/Graphics/Distortions'
+options_order = {
+	'quality',
+}
+
+options = {
+	quality = {
+		name = 'Distortion Quality',
+		type = 'radioButton',
+		value = 'high',
+		items = {
+			{key = 'high', name = 'High', desc = "Show all distortions."},
+			{key = 'medium', name = 'Medium', desc = "Show fewer small distortions. Has very similar performance to High quality but results may vary depending on hardware."},
+			{key = 'low', name = 'Low', desc = "Only show a few large distortions. Improves performance mainly by removing projectile distortions."},
+			{key = 'disabled', name = 'Disabled', desc = "Do not show any distortions."},
+		},
+		OnChange = function(self)
+			if self.value and qualityMap[self.value] and qualityMap[self.value] ~= qualityLevel then
+				qualityLevel = qualityMap[self.value]
+				if qualityLevel == 0 then
+					widgetHandler:RemoveCallIn("DrawWorld")
+				else
+					widgetHandler:UpdateCallIn("DrawWorld")
+				end
+			end
+		end,
+	},
+}
+
 ------------------------------ Data structures and management variables ------------
 
 -- These will contain 'global' type distortions, ones that dont get updated every frame
@@ -589,6 +629,10 @@ local function AddDistortion(instanceID, unitID, pieceIndex, targetVBO, distorti
 	return instanceID
 end
 
+local function CheckParamQuality(parameters)
+	return (qualityLevel or 2) >= (parameters.quality or 2)
+end
+
 -- Specialized fast path for projectile position updates: no nil-checks, always writes pos+dir
 local function updateProjectilePosition(distortionVBO, instanceID, posx, posy, posz, dx, dy, dz)
 	local instanceIndex = distortionVBO.instanceIDtoIndex[instanceID]
@@ -701,7 +745,7 @@ local function RemoveDistortion(distortionshape, instanceID, unitID, noUpload)
 	return nil
 end
 
-local function LoadDistortionConfig()
+function LoadDistortionConfig()
 	local effectTypes = {}
 	local function findeffecttypes(t, res)
 		if not autoupdate then
@@ -788,7 +832,7 @@ function widget:VisibleExplosion(px, py, pz, weaponID, ownerID)
 	end
 	for i, distortion in pairs(explosionDistortions[weaponID]) do
 		local distortionParamTable = distortion.distortionParamTable
-		if distortion.alwaysVisible or spIsSphereInView(px, py, pz, distortionParamTable[4]) then
+		if (distortion.alwaysVisible or spIsSphereInView(px, py, pz, distortionParamTable[4])) and CheckParamQuality(distortion) then
 			local groundHeight = spGetGroundHeight(px, pz) or 1
 			py = math_max(groundHeight + (distortion.yOffset or 0), py)
 			distortionParamTable[1] = px
@@ -803,7 +847,7 @@ function widget:Barrelfire(px, py, pz, weaponID, ownerID)
 	if muzzleFlashDistortions[weaponID] then
 		for i, distortion in pairs(muzzleFlashDistortions[weaponID]) do
 			local distortionParamTable = distortion.distortionParamTable
-			if distortion.alwaysVisible or spIsSphereInView(px, py, pz, distortionParamTable[4]) then
+			if (distortion.alwaysVisible or spIsSphereInView(px, py, pz, distortionParamTable[4])) and CheckParamQuality(distortion) then
 				local groundHeight = spGetGroundHeight(px, pz) or 1
 				distortionParamTable[1] = px
 				distortionParamTable[2] = py
@@ -824,6 +868,9 @@ local function UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
 		and unitEventDistortions.UnitScriptDistortions[unitDefID][distortionIndex]
 	then
 		local distortionTable = unitEventDistortions.UnitScriptDistortions[unitDefID][distortionIndex]
+		if not CheckParamQuality(distortionTable) then
+			return
+		end
 		if not distortionTable.alwaysVisible then
 			local px, py, pz = spGetUnitPosition(unitID)
 			if px == nil or spIsSphereInView(px, py, pz, distortionTable[4]) == false then
@@ -953,83 +1000,85 @@ local function eventDistortionSpawner(eventName, unitID, unitDefID, teamID)
 			local distortionList = unitEventDistortions[eventName][unitDefID] or unitEventDistortions[eventName].default
 			if distortionList then
 				for distortionname, distortionTable in pairs(distortionList) do
-					local visible = distortionTable.alwaysVisible
-					local px, py, pz = spGetUnitPosition(unitID)
-					if not visible then
-						if px and spIsSphereInView(px, py, pz, distortionTable[4]) then
-							visible = true
+					if CheckParamQuality(distortionTable) then
+						local visible = distortionTable.alwaysVisible
+						local px, py, pz = spGetUnitPosition(unitID)
+						if not visible then
+							if px and spIsSphereInView(px, py, pz, distortionTable[4]) then
+								visible = true
+							end
 						end
-					end
 
-					-- bail if only for allies
-					if (not spec) and distortionTable.alliedOnly == true and spIsUnitAllied(unitID) == false then
-						visible = false
-					end
-
-					-- bail if unable to initialize distortion
-					if not distortionTable.initComplete then
-						if not InitializeDistortion(distortionTable, unitID) then
+						-- bail if only for allies
+						if (not spec) and distortionTable.alliedOnly == true and spIsUnitAllied(unitID) == false then
 							visible = false
 						end
-					end
 
-					-- bail if invalid unitID wants a unit-attached distortion
-					if distortionTable.pieceName and (visibleUnits[unitID] == nil) then
-						visible = false
-					end
+						-- bail if unable to initialize distortion
+						if not distortionTable.initComplete then
+							if not InitializeDistortion(distortionTable, unitID) then
+								visible = false
+							end
+						end
 
-					if visible then
-						--if distortionTable.aboveUnit then distortionTable.distortionParamTable end
-						local distortionParamTable = distortionTable.distortionParamTable
-						if distortionTable.pieceName then
-							if distortionTable.aboveUnit then -- if its above the unit, then add the aboveunit offset to the units height too!
-								-- this is done via a quick copy of the table
+						-- bail if invalid unitID wants a unit-attached distortion
+						if distortionTable.pieceName and (visibleUnits[unitID] == nil) then
+							visible = false
+						end
+
+						if visible then
+							--if distortionTable.aboveUnit then distortionTable.distortionParamTable end
+							local distortionParamTable = distortionTable.distortionParamTable
+							if distortionTable.pieceName then
+								if distortionTable.aboveUnit then -- if its above the unit, then add the aboveunit offset to the units height too!
+									-- this is done via a quick copy of the table
+									for i = 1, distortionParamTableSize do
+										distortionCacheTable[i] = distortionParamTable[i]
+									end
+									local unitHeight = spGetUnitHeight(unitID)
+									if unitHeight == nil then
+										local losstate = spGetUnitLosState(unitID)
+										spEcho(
+											"Unitheight is nil for unitID",
+											unitID,
+											"unitDefName",
+											unitName[unitDefID],
+											eventName,
+											distortionname,
+											"losstate",
+											losstate and losstate.los
+										)
+									end
+
+									distortionCacheTable[2] = distortionCacheTable[2]
+										+ distortionTable.aboveUnit
+										+ (unitHeight or 0)
+									distortionParamTable = distortionCacheTable
+								end
+								AddDistortion(
+									stringFormat("%s%d%s", eventName, unitID, distortionname),
+									unitID,
+									distortionTable.pieceIndex,
+									unitDistortionVBOMap[distortionTable.distortionType],
+									distortionParamTable
+								)
+							else
 								for i = 1, distortionParamTableSize do
 									distortionCacheTable[i] = distortionParamTable[i]
 								end
-								local unitHeight = spGetUnitHeight(unitID)
-								if unitHeight == nil then
-									local losstate = spGetUnitLosState(unitID)
-									spEcho(
-										"Unitheight is nil for unitID",
-										unitID,
-										"unitDefName",
-										unitName[unitDefID],
-										eventName,
-										distortionname,
-										"losstate",
-										losstate and losstate.los
-									)
-								end
-
-								distortionCacheTable[2] = distortionCacheTable[2]
-									+ distortionTable.aboveUnit
-									+ (unitHeight or 0)
-								distortionParamTable = distortionCacheTable
+								distortionCacheTable[1] = distortionCacheTable[1] + px
+								distortionCacheTable[2] = distortionParamTable[2]
+									+ py
+									+ ((distortionTable.aboveUnit and spGetUnitHeight(unitID)) or 0)
+								distortionCacheTable[3] = distortionCacheTable[3] + pz
+								AddDistortion(
+									stringFormat("%s%d%s", eventName, unitID, distortionname),
+									nil,
+									distortionTable.pieceIndex,
+									distortionVBOMap[distortionTable.distortionType],
+									distortionCacheTable
+								)
 							end
-							AddDistortion(
-								stringFormat("%s%d%s", eventName, unitID, distortionname),
-								unitID,
-								distortionTable.pieceIndex,
-								unitDistortionVBOMap[distortionTable.distortionType],
-								distortionParamTable
-							)
-						else
-							for i = 1, distortionParamTableSize do
-								distortionCacheTable[i] = distortionParamTable[i]
-							end
-							distortionCacheTable[1] = distortionCacheTable[1] + px
-							distortionCacheTable[2] = distortionParamTable[2]
-								+ py
-								+ ((distortionTable.aboveUnit and spGetUnitHeight(unitID)) or 0)
-							distortionCacheTable[3] = distortionCacheTable[3] + pz
-							AddDistortion(
-								stringFormat("%s%d%s", eventName, unitID, distortionname),
-								nil,
-								distortionTable.pieceIndex,
-								distortionVBOMap[distortionTable.distortionType],
-								distortionCacheTable
-							)
 						end
 					end
 				end
@@ -1317,18 +1366,21 @@ local function updateProjectileDistortions(newgameframe)
 					-- view (rectangle test is XZ-only and can include high
 					-- arcs above the camera frustum).
 					local gib = gibDistortion.distortionParamTable
-					if spIsSphereInView(px, py, pz, gib[4]) then
-						local explosionflags = spGetPieceProjectileParams(projectileID)
-						gib[1] = px
-						gib[2] = py
-						gib[3] = pz
-						AddDistortion(projectileID, nil, nil, projectilePointDistortionVBO, gib, noUpload)
-						distortionType = "point"
+					if CheckParamQuality(gibDistortion) then
+						if spIsSphereInView(px, py, pz, gib[4]) then
+							local explosionflags = spGetPieceProjectileParams(projectileID)
+							gib[1] = px
+							gib[2] = py
+							gib[3] = pz
+							AddDistortion(projectileID, nil, nil, projectilePointDistortionVBO, gib, noUpload)
+							distortionType = "point"
+						end
 					end
 				else
 					local weaponDefID = spGetProjectileDefID(projectileID)
 					local projectileDefDistortion = projectileDefDistortions[weaponDefID]
-					if projectileDefDistortion and (projectileID % (projectileDefDistortion.fraction or 1) == 0) then
+					if projectileDefDistortion and (projectileID % (projectileDefDistortion.fraction or 1) == 0)
+							and CheckParamQuality(projectileDefDistortion) then
 						local distortionParamTable = projectileDefDistortion.distortionParamTable
 						local thisType = projectileDefDistortion.distortionType
 
@@ -1451,7 +1503,9 @@ function widget:Update(dt)
 		checkConfigUpdates()
 	end
 
-	updateProjectileDistortions()
+	if qualityLevel >= 2 then
+		updateProjectileDistortions()
+	end
 end
 
 ------------------------------- Drawing all the distortions ---------------------------------
@@ -1688,22 +1742,4 @@ end
 
 function widget:UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
 	UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
-end
---------------------------- Ingame Configurables -------------------
-
-function widget:GetConfigData(_) -- Called by RemoveWidget
-	local savedTable = {
-		intensityMultiplier = intensityMultiplier,
-		radiusMultiplier = radiusMultiplier,
-	}
-	return savedTable
-end
-
-function widget:SetConfigData(data) -- Called on load (and config change), just before Initialize!
-	if data.intensityMultiplier ~= nil then
-		intensityMultiplier = data.intensityMultiplier
-	end
-	if data.radiusMultiplier ~= nil then
-		radiusMultiplier = data.radiusMultiplier
-	end
 end
