@@ -1,52 +1,4 @@
--- Spring.GetHeadingFromVector ( number x, number z )
 
--- Spring.GetUnitDirection ( number unitID )
-
--- Spring.GetUnitHeading ( number unitID )
-
-
-
--- local function step_to_section_loop(value,step,destination,section_left,section_right)
--- 	local section_len=section_right-section_left
-	
--- 	local destination_norm_dist=destination-value
--- 	local section_len_half=section_len/2
-
--- 	destination_norm_dist=limit_loop(destination_norm_dist,-section_len_half,section_len_half)
--- 	-- while destination_norm_dist>section_len_half do
--- 	-- 	destination_norm_dist=destination_norm_dist-section_len
--- 	-- end
-	
--- 	-- while destination_norm_dist<-section_len_half do
--- 	-- 	destination_norm_dist=destination_norm_dist+section_len
--- 	-- end
-	
--- 	if destination_norm_dist>0 then
--- 		if destination_norm_dist<step then
--- 			return destination_norm_dist
--- 		else
--- 			return step
--- 		end
--- 	else
--- 		if -destination_norm_dist<step then
--- 			return destination_norm_dist
--- 		else
--- 			return -step
--- 		end
--- 	end
-	
--- end
-
--- local function step_to_section_loop_2(value,step_left,step_right,destination,section_left,section_right)
--- 	local section_len=section_right-section_left
-
--- 	local destinations={
--- 		destination-section_len,
--- 		destination,
--- 		destination+section_len
--- 	}
-
--- end
 
 if not Spring.UnitScript.inertial_piece then
     -- local spGetUnitHeading=Spring.GetUnitHeading
@@ -157,11 +109,13 @@ if not Spring.UnitScript.inertial_piece then
 		local unit_old_rotations=toGetRotation()
 
 		---@class TurnParam
-		---@field destination number
+		---@field destination number?
 		---@field speed number?
 
-		---@type {[1]:TurnParam?,[2]:TurnParam?,[3]:TurnParam?}
-		local extra_rotations={}
+		---@type {[1]:TurnParam,[2]:TurnParam,[3]:TurnParam}
+		local extra_rotations={
+			{},{},{}
+		}
 
 		local old_unit_rot_delta={0,0,0}
 
@@ -188,6 +142,8 @@ if not Spring.UnitScript.inertial_piece then
 				for axis = 1, 3 do
 					local change_ratio=change_ratios[axis]
 					local extra_rotation=extra_rotations[axis]
+					local extra_rotation_destination=extra_rotation.destination
+						local extra_rotation_speed=extra_rotation.speed
 					if change_ratio and change_ratio~=0 then
 
 						local unit_rot_delta = distance_toward_section_loop( unit_old_rotations[axis], unit_rotations[axis],-pi,pi )
@@ -208,10 +164,11 @@ if not Spring.UnitScript.inertial_piece then
 							local final_destination=piece_rot + piece_rot_delta
 							local final_speed=abs(piece_rot_speed)
 
-							if extra_rotation then
+							
 
-								local extra_rotation_destination=extra_rotation.destination
-								local extra_rotation_speed=extra_rotation.speed
+							if extra_rotation_destination then
+
+								
 
 								if extra_rotation_speed and extra_rotation_speed~=0 then
 									
@@ -224,55 +181,34 @@ if not Spring.UnitScript.inertial_piece then
 								else
 									Turn(piece,axis,extra_rotation_destination)
 									final_destination=extra_rotation_destination + piece_rot_delta
+									-- extra_rotation.destination=nil
+									-- extra_rotation.speed=nil
 								end
 
 							end
 							Turn(piece,axis,final_destination,final_speed)
 						else
-							if extra_rotation then
-								Turn(piece,axis,extra_rotation.destination,extra_rotation.speed)
+							if extra_rotation_destination then
+								Turn(piece,axis,extra_rotation_destination,extra_rotation_speed)
 							end
 						end
 						
 						old_unit_rot_delta[axis]=unit_rot_delta
 					else
-						if extra_rotation then
-							Turn(piece,axis,extra_rotation.destination,extra_rotation.speed)
+						if extra_rotation_destination then
+							Turn(piece,axis,extra_rotation_destination,extra_rotation_speed)
 						end
 					end
 					-- extra_rotations[axis]=nil
 
 				end
 				unit_old_rotations=unit_rotations
-
-                -- local unit_pitch,unit_heading=spGetUnitRotation(unitId)
-
-                -- local unit_heading_delta=unit_heading-unit_old_heading
-				-- local unit_pitch_delta=unit_pitch-unit_old_pitch
-
-                -- local piece_heading_change=-unit_heading_delta*heading_change_ratio
-				-- local piece_pitch_change=-unit_pitch_delta*pitch_change_ratio
-
-                -- local piece_pitch,piece_heading,_=spGetPieceRotation(piece)
-                -- --[=[
-                -- local piece_rotate_speed_x=piece_rotate_speed[x_axis]
-                -- local piece_rotate_destination_x
-                -- ]=]
-                -- Turn(piece,y_axis,piece_heading-piece_heading_change,piece_heading_change*Game.gameSpeed)
-                -- Turn(piece,x_axis,piece_pitch-piece_pitch_change,piece_pitch_change*Game.gameSpeed)
-
-				-- -- unit_old_pitch_2,unit_old_heading_2=unit_old_pitch,unit_old_heading
-
-                -- unit_old_pitch,unit_old_heading=unit_pitch,unit_heading
-                --[=[
-                if piece_rotate_speed_x~=0 then
-                    Turn(piece,x_axis,)
-                end]=]
             end
         end
         StartThread(KeepRotation)
 		local function AdditionalTurn(axis,destination,speed)
-			extra_rotations[axis]={destination=destination,speed=speed}
+			extra_rotations[axis].destination=destination
+			extra_rotations[axis].speed=speed
 		end
         local o={
 			AdditionalTurn=AdditionalTurn
