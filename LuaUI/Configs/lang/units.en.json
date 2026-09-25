@@ -1167,7 +1167,7 @@
 	"planesupport" : {
 		"name" : "Magpie",
 		"description" : "Strafing Disruption Fighter-Bomber",
-		"helptext" : "The Magpie fires a pulse of slowing EMG with enough precision to hit air units. While it deals low direct damage, it is invaluable for its ability to quickly slow any target. It has limited ammunition so must return to rearm on occasion, placing it somehwere between a one-shot bomber and the more sustainable dedicated fighters."
+		"helptext" : "The Magpie is a multi-purpose plane armed with a pair of disruption EMG cannons that can hit ground and air targets. With low direct damage, its main use lies in its high slow damage that allows it to quickly saturate most targets. It has limited ammunition so must occasionally return to airpads to restock."
 	},
 	"dronecarry" : {
 		"name" : "Gull",
