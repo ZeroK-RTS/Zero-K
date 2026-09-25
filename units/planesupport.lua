@@ -51,6 +51,15 @@ return { planesupport = {
   objectName             = [[bomberstrike.s3o]],
   script                 = [[planesupport.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
+
+  sfxtypes               = {
+
+    explosiongenerators = {
+      [[custom:flashmuzzle_purple]],
+    },
+
+  },
+
   sightDistance          = 760,
   speed                  = 252,
   speedToFront           = 0.5,

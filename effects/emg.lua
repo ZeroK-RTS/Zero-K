@@ -155,16 +155,26 @@ return {
         ttl                = 3,
       },
     },
-    groundflash = {
-      circlealpha        = 1,
-      circlegrowth       = 0,
-      flashalpha         = 0.4,
-      flashsize          = 35,
-      ttl                = 3,
-      color = {
-        [1]  = 1,
-        [2]  = 0.69999998807907,
-        [3]  = 0,
+  },
+
+  ["flashmuzzle_purple"] = {
+    bitmapmuzzleflame = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[1 1 1 0.07  0.8 0.4 0.8 0.01	0.6 0.2 0.6 0.01	0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[flowerflash]],
+        length             = 15,
+        sidetexture        = [[plasma2]],
+        size               = 11,
+        sizegrowth         = 1,
+        ttl                = 4,
       },
     },
   },
