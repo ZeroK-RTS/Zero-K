@@ -979,6 +979,7 @@ local SizeRadius = {
 	Medium = 215,
 	Mediumish = 235,
 	Mediumer = 260,
+	Mediumest = 285,
 	MediumLarge = 320,
 	Large = 400,
 	Juno = 450,
@@ -1403,6 +1404,12 @@ explosionDistortionsNames.raveparty_blue_shocker = {
 }
 explosionDistortionsNames.raveparty_violet_slugger = {
 	GetDistortionClass("DisruptionPulse", "Juno", 2, 3.4),
+}
+explosionDistortionsNames.amphbomb_amphbomb_death = {
+	GetDistortionClass("DisruptionPulse", "Mediumest", 1.4, 0.92),
+}
+explosionDistortionsNames.commweapon_disruptorbomb = {
+	GetDistortionClass("DisruptionPulse", "Mediumest", 1.7, 1.8),
 }
 
 explosionDistortionsNames.staticnuke_crblmssl = {
