@@ -1308,7 +1308,7 @@ local function AssignWeaponDistortions(weaponID)
 			if rapidFire then
 				adjRadius = adjRadius*0.8
 				if areaofeffect >= 24 then
-					strength = 0.22
+					strength = 0.25
 				else
 					strength = 0.4
 				end
