@@ -154,9 +154,16 @@ local function RestoreLegs()
 		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 end
 
+local aiming=false
+
 local function RestoreAfterDelay()
-	local counter = 5
+	local counter = 0
 	while true do
+		if aiming then
+			aiming=false
+		else
+			body_ctrl.AdditionalTurn(y_axis,nil,nil)
+		end
 		if counter > 0 and not Spring.GetUnitIsStunned(unitID) then
 			counter = counter - 1
 		end
@@ -184,10 +191,10 @@ local function RestoreAfterDelay()
 end
 
 function script.Create()
+	CreateBodyCtrl()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay)
 	Move(flare1, z_axis, 7)
-	CreateBodyCtrl()
 --	Turn(armr1, z_axis, math.rad(30), 100)
 --	Turn(arml1, z_axis, math.rad(-30), 100)
 end
@@ -226,6 +233,7 @@ local spGetPieceRotation=Spring.UnitScript.GetPieceRotation
 local abs=math.abs
 
 function script.AimWeapon(num, heading, pitch)
+	aiming=true
 	local sig = 2^num
 	Signal(sig)
 	SetSignalMask(sig)
