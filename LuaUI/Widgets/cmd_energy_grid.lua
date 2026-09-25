@@ -26,6 +26,7 @@ local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetMyAllyTeamID     = Spring.GetMyAllyTeamID
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitIsBeingBuilt = Spring.GetUnitIsBeingBuilt
 local spGetMyTeamID         = Spring.GetMyTeamID
 local spTestBuildOrder      = Spring.TestBuildOrder
 local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
@@ -428,6 +429,7 @@ local pylonsToBuildBuild = {}
 local pylonsToBuildTerraform = {}
 local pylonsToBuildFill = {} -- true for alt-fill items, built after the connecting route
 local pylonsToBuildChain = {} -- for pylons laid to link two nodes: index into bridgeChains
+local pylonsToBuildRepair = {} -- unitID of an ally nanoframe to finish (repair) instead of a new build
 local pylonsToBuildCount = 0
 
 -- Each bridge chain as {a, b}: the pylonsToBuild indices of the two nodes it links.
@@ -465,8 +467,9 @@ end
 
 -- terraformHeight is the level-to height when the spot must be terraformed first,
 -- or nil when it is naturally buildable.
-local function addPylonsToBuild(defID, x, z, range, build, terraformHeight, fill, chain)
+local function addPylonsToBuild(defID, x, z, range, build, terraformHeight, fill, chain, repairID)
 	pylonsToBuildCount = pylonsToBuildCount + 1
+	pylonsToBuildRepair[pylonsToBuildCount] = repairID
 	pylonsToBuildDefID[pylonsToBuildCount] = defID
 	pylonsToBuildX[pylonsToBuildCount] = x
 	pylonsToBuildZ[pylonsToBuildCount] = z
@@ -486,6 +489,7 @@ local function clearPylonsToBuild()
 	pylonsToBuildTerraform = {}
 	pylonsToBuildFill = {}
 	pylonsToBuildChain = {}
+	pylonsToBuildRepair = {}
 	pylonsToBuildNext = {}
 	pylonsToBuildCount = 0
 	bridgeChains = {}
@@ -571,15 +575,17 @@ end
 -- the queue follows the worker's route -- structures get built as it passes them --
 -- instead of all mexes first then all pylons. The connecting route is ordered
 -- first and the alt-fill after it, continuing from where the route ends, so the
--- grid gets linked up before it is filled out. Returns pylonsToBuild indices.
-local function orderBuildItemsByPath(startX, startZ)
+-- grid gets linked up before it is filled out. include(i), if given, limits the
+-- path to the items it accepts. Returns pylonsToBuild indices.
+local function orderBuildItemsByPath(startX, startZ, include)
 	local ordered = {}
 	local cx, cz = startX, startZ
 	for pass = 1, 2 do
 		local wantFill = (pass == 2)
 		local items = {}
 		for i = 1, pylonsToBuildCount do
-			if pylonsToBuildBuild[i] and (pylonsToBuildFill[i] == true) == wantFill then
+			if pylonsToBuildBuild[i] and (pylonsToBuildFill[i] == true) == wantFill
+				and (not include or include(i)) then
 				items[#items + 1] = i
 			end
 		end
@@ -629,6 +635,78 @@ local function assignItemsToCons(cons)
 	return groups
 end
 
+-- Commands whose params give a place (x, y, z) or a target unit/feature ID.
+local positionCommand = {
+	[CMD.MOVE] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RECLAIM] = true,
+	[CMD.RESURRECT] = true,
+	[CMD.GUARD] = true,
+	[CMD.FIGHT] = true,
+	[CMD.PATROL] = true,
+	[CMD.ATTACK] = true,
+	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_BUILD] = true,
+	[CMD_LEVEL] = true,
+	[CMD_JUMP] = true,
+}
+
+-- Returns x, z of where a queued command takes the unit, or nil.
+local function commandPos(cmd)
+	local id, p = cmd.id, cmd.params
+	if not (id < 0 or positionCommand[id]) or not p then
+		return nil
+	end
+	if #p >= 3 then
+		return p[1], p[3]
+	elseif #p >= 1 then
+		local x, z, _
+		if p[1] <= Game.maxUnits then
+			x, _, z = spGetUnitPosition(p[1])
+		else
+			x, _, z = Spring.GetFeaturePosition(p[1] - Game.maxUnits)
+		end
+		return x, z
+	end
+end
+
+-- A unit's queue as a list of {x, z} per command ({} for placeless ones). Orders we
+-- give only reach the queue later, so it is updated locally as they are given.
+local function simulateQueue(unitID)
+	local sim = {}
+	local cmds = spGetCommandQueue(unitID, -1)
+	if cmds then
+		for j = 1, #cmds do
+			local x, z = commandPos(cmds[j])
+			sim[j] = {x = x, z = z}
+		end
+	end
+	return sim
+end
+
+-- The queue index where inserting a command at (cx, cz) adds the least travel, as
+-- CommandInsert does, starting from the unit at (ux, uz) and never before minIdx.
+local function bestInsertIndex(sim, ux, uz, cx, cz, minIdx)
+	local px, pz = ux, uz
+	local best, bestCost
+	for j = 1, #sim do
+		local e = sim[j]
+		if e.x then
+			if j - 1 >= minIdx then
+				local cost = Distance(e.x, e.z, cx, cz) + Distance(px, pz, cx, cz) - Distance(px, pz, e.x, e.z)
+				if not bestCost or cost < bestCost then
+					best, bestCost = j - 1, cost
+				end
+			end
+			px, pz = e.x, e.z
+		end
+	end
+	if not bestCost or Distance(px, pz, cx, cz) < bestCost then
+		best = #sim
+	end
+	return best
+end
+
 local function orderPylonsToBuild()
 	local a,c,m,s = spGetModKeyState()
 
@@ -676,16 +754,19 @@ local function orderPylonsToBuild()
 	end
 
 	-- Alt selects fill mode for this widget, so it isn't passed on to the orders.
+	-- Space (meta) inserts each order where it fits best in a con's queue.
 	local cmdOpts = {
 		shift = true,
 		ctrl = c,
-		meta = m,
-		coded = (m and CMD.OPT_META  or 0)
-		      + (CMD.OPT_SHIFT)
-		      + (c and CMD.OPT_CTRL  or 0)
+		meta = false,
+		coded = CMD.OPT_SHIFT + (c and CMD.OPT_CTRL or 0)
 	}
+	-- Repair drops ctrl: CommandInsert maps ctrl-repair to "don't assist construction".
+	local repairOpts = { shift = true, coded = CMD.OPT_SHIFT }
 
-	if not s then
+	-- Without shift or space the new orders replace the queue.
+	local keepQueue = s or m
+	if not keepQueue then
 		Spring.GiveOrder (CMD.STOP, EMPTY_TABLE, 0)
 	end
 
@@ -702,78 +783,127 @@ local function orderPylonsToBuild()
 		return
 	end
 	local groups = assignItemsToCons(cons)
-
-	-- Each con gets its own subset of the sequence, so each keeps its own queue position.
-	local pos = {}
-	for i = 1, #cons do
-		pos[cons[i]] = 0
-	end
-	local function insert(units, id, params)
-		for i = 1, #units do
-			local unitID = units[i]
-			WG.CommandInsert(id, params, cmdOpts, pos[unitID], nil, {unitID})
-			pos[unitID] = pos[unitID] + 1
+	local groupOf = {}
+	for g = 1, #groups do
+		for u = 1, #groups[g].units do
+			groupOf[groups[g].units[u]] = groups[g]
 		end
 	end
 
-	-- Clear enemy-held mex spots first, so the mex queued behind them can build once
-	-- clear -- by the cons that can reach the spot.
-	for index = 1, extraBuildCount do
-		local units = {}
-		for g = 1, #groups do
-			if not groups[g].blocked(extraBuildSiteX[index], extraBuildSiteZ[index]) then
-				for u = 1, #groups[g].units do
-					units[#units + 1] = groups[g].units[u]
+	-- Register each terraform once, for every con that builds the item.
+	local facing = Spring.GetBuildFacing()
+	local terraTag = {}
+	if options.autoTerraform.value and CMD_LEVEL then
+		for index = 1, pylonsToBuildCount do
+			local terraH = pylonsToBuildTerraform[index]
+			if terraH and pylonsToBuildBuild[index] and not pylonsToBuildRepair[index] then
+				local units = {}
+				for g = 1, #groups do
+					if groups[g].gets[index] then
+						for u = 1, #groups[g].units do
+							units[#units + 1] = groups[g].units[u]
+						end
+					end
+				end
+				if #units > 0 then
+					terraTag[index] = issueTerraform(pylonsToBuildX[index], pylonsToBuildZ[index],
+						terraH, pylonsToBuildDefID[index], facing, units)
 				end
 			end
 		end
-		local defID = extraBuildDefID[index]
-		local x = extraBuildX[index]
-		local z = extraBuildZ[index]
-		local y = Spring.GetGroundHeight(x, z)
-		local facing = Spring.GetBuildFacing()
-		insert(units, -defID, {x, y, z, facing})
 	end
 
-	-- Order builds along the worker's route (nearest-neighbour from a selected
-	-- builder, else the drag centre), so they're built as it passes them.
-	local sx, sz = cmdCenterX, cmdCenterZ
-	local ux, _, uz = Spring.GetUnitPosition(cons[1])
-	if ux then
-		sx, sz = ux, uz
-	end
-	local ordered = orderBuildItemsByPath(sx, sz)
-
-	for k = 1, #ordered do
-		local index = ordered[k]
-		local units = {}
-		for g = 1, #groups do
-			if groups[g].gets[index] then
-				for u = 1, #groups[g].units do
-					units[#units + 1] = groups[g].units[u]
-				end
+	-- Each con gets its own route over its own subset of the plan, starting where its
+	-- queue ends (or where it stands), so cons may build the grid in different orders.
+	for ci = 1, #cons do
+		local unitID = cons[ci]
+		local group = groupOf[unitID]
+		local ux, _, uz = spGetUnitPosition(unitID)
+		if not ux then
+			ux, uz = cmdCenterX, cmdCenterZ
+		end
+		local sim = keepQueue and simulateQueue(unitID) or {}
+		local sx, sz = ux, uz
+		for j = #sim, 1, -1 do
+			if sim[j].x then
+				sx, sz = sim[j].x, sim[j].z
+				break
 			end
 		end
 
-		if #units > 0 then
+		-- Append: queue in route order after the existing queue. Insert (space): place
+		-- each order at its cheapest spot in the (simulated) queue, never ahead of
+		-- minIdx. Returns the queue index used.
+		local appendPos = 0
+		local function give(orders, x, z, minIdx)
+			local idx
+			if m then
+				idx = bestInsertIndex(sim, ux, uz, x, z, minIdx or 0)
+				for o = 1, #orders do
+					local order = orders[o]
+					Spring.GiveOrderToUnit(unitID, CMD.INSERT,
+						{idx + o - 1, order[1], order[3].coded, unpack(order[2])}, CMD.OPT_ALT)
+				end
+			else
+				idx = #sim
+				for o = 1, #orders do
+					local order = orders[o]
+					WG.CommandInsert(order[1], order[2], order[3], appendPos, nil, {unitID})
+					appendPos = appendPos + 1
+				end
+			end
+			for o = 1, #orders do
+				table.insert(sim, idx + o, {x = x, z = z})
+			end
+			return idx
+		end
+
+		-- Clear enemy-held mex spots first, so the mex queued behind them can build once
+		-- clear. With space, the mex is kept after its LLT.
+		local lltEntry = {}
+		for index = 1, extraBuildCount do
+			local siteX, siteZ = extraBuildSiteX[index], extraBuildSiteZ[index]
+			if not group.blocked(siteX, siteZ) then
+				local x, z = extraBuildX[index], extraBuildZ[index]
+				local idx = give({{-extraBuildDefID[index], {x, spGetGroundHeight(x, z), z, facing}, cmdOpts}}, x, z)
+				lltEntry[siteX .. "," .. siteZ] = sim[idx + 1]
+			end
+		end
+
+		local ordered = orderBuildItemsByPath(sx, sz, function(i) return group.gets[i] end)
+		for k = 1, #ordered do
+			local index = ordered[k]
 			local defID = pylonsToBuildDefID[index]
 			local x = pylonsToBuildX[index]
 			local z = pylonsToBuildZ[index]
+			local repairID = pylonsToBuildRepair[index]
 
-			local terraH = pylonsToBuildTerraform[index]
-			local y = terraH or Spring.GetGroundHeight(x, z)
-			local facing = Spring.GetBuildFacing()
-
-			-- Terraform-level the spot (to terraH) first when it isn't buildable as-is:
-			-- register the terraform, then queue its CMD_LEVEL marker ahead of the build.
-			if terraH and options.autoTerraform.value and CMD_LEVEL then
-				local tag = issueTerraform(x, z, terraH, defID, facing, units)
-				if tag then
-					insert(units, CMD_LEVEL, {x, terraH, z, tag})
+			local minIdx = 0
+			local llt = lltEntry[x .. "," .. z]
+			if llt then
+				for j = 1, #sim do
+					if sim[j] == llt then
+						minIdx = j
+						break
+					end
 				end
 			end
 
-			insert(units, -defID, {x, y, z, facing})
+			if repairID then
+				-- An unfinished ally nanoframe: help finish it rather than queue a new build.
+				give({{CMD.REPAIR, {repairID}, repairOpts}}, x, z, minIdx)
+			else
+				local terraH = pylonsToBuildTerraform[index]
+				local y = terraH or spGetGroundHeight(x, z)
+				local orders = {}
+				-- Terraform-level the spot (to terraH) first when it isn't buildable as-is:
+				-- its CMD_LEVEL marker goes right ahead of the build.
+				if terraTag[index] then
+					orders[1] = {CMD_LEVEL, {x, terraH, z, terraTag[index]}, cmdOpts}
+				end
+				orders[#orders + 1] = {-defID, {x, y, z, facing}, cmdOpts}
+				give(orders, x, z, minIdx)
+			end
 		end
 	end
 end
@@ -800,13 +930,15 @@ local function drawPylonsToBuild()
 			end
 			gl.Utilities.DrawGroundCircle(x, z, range)
 
-			--ghost
-			glPushMatrix()
-			glLoadIdentity()
-			glTranslate(x, spGetGroundHeight(x, z), z)
-			glRotate(90 * facing, 0, 1.0, 0 )
-			glUnitShape(defID, myTeamID, false, false, false)
-			glPopMatrix()
+			--ghost (a nanoframe to finish is already visible)
+			if not pylonsToBuildRepair[index] then
+				glPushMatrix()
+				glLoadIdentity()
+				glTranslate(x, spGetGroundHeight(x, z), z)
+				glRotate(90 * facing, 0, 1.0, 0 )
+				glUnitShape(defID, myTeamID, false, false, false)
+				glPopMatrix()
+			end
 		end
 	end
 
@@ -1085,17 +1217,39 @@ local function movePylonsFromConnectToBuild()
 	end
 end
 
--- Seed the existing (already-built) ally structures straight into the build list
--- as anchors: build=false so they are never re-ordered or re-drawn, and they never
--- go through the connect/lay-pylons loop (so we don't relink structures that the
--- existing grid already connects). New nodes then connect to the nearest anchor.
+-- True if a defID build is queued at (x, z) in a queued-building list.
+local function queuedAt(list, defID, x, z)
+	for i = 1, #list do
+		local q = list[i]
+		if q.defID == defID and abs(q.x - x) <= 8 and abs(q.z - z) <= 8 then
+			return true
+		end
+	end
+	return false
+end
+
+-- Seed the existing ally structures straight into the build list as anchors:
+-- build=false so they are never re-ordered or re-drawn, and they never go through
+-- the connect/lay-pylons loop (so we don't relink structures that the existing grid
+-- already connects). New nodes then connect to the nearest anchor. An unfinished
+-- nanoframe is an anchor the grid relies on, so it is ordered finished (repaired) --
+-- unless it's already on a queue: the selection's own (nothing to add) or another
+-- ally con's (seedQueuedByOthers co-builds it).
 local function seedExistingPylons()
 	for index = 1, allPylonsCount do
 		local x = allPylonsX[index]
 		local z = allPylonsZ[index]
 		local range = allPylonsRange[index]
 		if GetDistanceFromCmd(x, z) - range <= cmdDist + cmdPylonRange then
-			addPylonsToBuild(allPylonsDefID[index], x, z, range, false)
+			local defID = allPylonsDefID[index]
+			local unitID = allPylonsID[index]
+			if spGetUnitIsBeingBuilt(unitID) and not SpotBlocked(x, z)
+				and not queuedAt(queuedBuildings, defID, x, z)
+				and not queuedAt(queuedByOthers, defID, x, z) then
+				addPylonsToBuild(defID, x, z, range, true, nil, nil, nil, unitID)
+			else
+				addPylonsToBuild(defID, x, z, range, false)
+			end
 		end
 	end
 end
@@ -1234,7 +1388,9 @@ end
 -- Collect planned-but-not-built grid structures. Pre-game: the initial build queue,
 -- all into queuedBuildings. In-game: the selection's own queued buildings go into
 -- queuedBuildings (skip-anchors, so a drag doesn't duplicate them on the same con);
--- every other ally con's queued buildings go into queuedByOthers (to co-build). Only
+-- every other ally con's queued buildings go into queuedByOthers (to co-build). A
+-- drag without shift or space replaces the selection's queues, so their buildings
+-- are ignored then (another con's copy of the same site still counts). Only
 -- structures with a pylon range are kept.
 local function gatherQueuedBuildings()
 	queuedBuildings = {}
@@ -1257,6 +1413,8 @@ local function gatherQueuedBuildings()
 	-- The command is issued to the current selection; buildings those units already
 	-- have queued are skip-anchors (don't duplicate on the same con), while buildings
 	-- queued by other ally cons are ones this selection should co-build.
+	local _, _, meta, shift = spGetModKeyState()
+	local keepQueue = shift or meta
 	local selected = {}
 	local sel = Spring.GetSelectedUnits()
 	for i = 1, #sel do
@@ -1270,7 +1428,7 @@ local function gatherQueuedBuildings()
 		if spGetUnitAllyTeam(unitID) == myAllyTeam then
 			local ud = UnitDefs[spGetUnitDefID(unitID)]
 			if ud and ud.isMobileBuilder then
-				local cmds = spGetCommandQueue(unitID, -1)
+				local cmds = (keepQueue or not selected[unitID]) and spGetCommandQueue(unitID, -1)
 				if cmds then
 					local list = selected[unitID] and queuedBuildings or queuedByOthers
 					for c = 1, #cmds do
