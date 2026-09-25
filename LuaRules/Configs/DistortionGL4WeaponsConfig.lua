@@ -901,14 +901,15 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
-			noiseStrength = 0.9,
-			noiseScaleSpace = 0.65,
+			noiseStrength = 0.85,
+			noiseScaleSpace = 0.6,
 			distanceFalloff = 0.5,
 			startRadius = 0.3,
 			onlyModelMap = 0,
-			lifeTime = 400,
+			lifeTime = 300, -- Standard 10 seconds, multiplied by other effects
 			rampUp = 30,
-			riseRate = 0.5,
+			riseRate = 0.9,
+			windAffected = -0.5,
 			decay = 260,
 			effectType = 0,
 		},
@@ -1347,7 +1348,7 @@ explosionDistortionsNames.striderdetriment_landing = {
 }
 
 explosionDistortionsNames.jumpraid_pyro_death = explosionDistortionsNames.jumpraid_pyro_death or {}
-explosionDistortionsNames.jumpraid_pyro_death[#explosionDistortionsNames.jumpraid_pyro_death + 1] = GetDistortionClass("ExplosionHeatFirewalker", "Smallish", false, 0.8)
+explosionDistortionsNames.jumpraid_pyro_death[#explosionDistortionsNames.jumpraid_pyro_death + 1] = GetDistortionClass("ExplosionHeatFirewalker", "Smallish", false, 1.3)
 
 explosionDistortionsNames.cloaksnipe_shockrifle = {
 	GetDistortionClass("ExploShockWaveM", "Tiny")
@@ -1371,7 +1372,7 @@ explosionDistortionsNames.turretheavy_plasma = explosionDistortionsNames.turreth
 explosionDistortionsNames.turretheavy_plasma[#explosionDistortionsNames.turretheavy_plasma + 1] = GetDistortionClass("GroundShockWave", "Small")
 
 explosionDistortionsNames.jumparty_napalm_sprayer = {
-	GetDistortionClass("ExplosionHeatFirewalker", "Small"),
+	GetDistortionClass("ExplosionHeatFirewalker", "Small", false, 1.5),
 }
 explosionDistortionsNames.striderdante_napalm_rockets = {
 	GetDistortionClass("FireExplosionHeat", "Smaller", false, 1.8),
@@ -1391,7 +1392,7 @@ explosionDistortionsNames.raveparty_red_killer = {
 	GetDistortionClass("ExploShockWaveL", "Medium"),
 }
 explosionDistortionsNames.raveparty_orange_roaster = {
-	GetDistortionClass("ExplosionHeatFirewalker", "Mega"),
+	GetDistortionClass("ExplosionHeatFirewalker", "Mega", false, 0.8),
 }
 explosionDistortionsNames.raveparty_green_stamper = {
 	GetDistortionClass("ExploShockWaveXL", "Larger"),

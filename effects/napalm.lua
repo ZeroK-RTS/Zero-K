@@ -160,7 +160,7 @@ local cegs = {
       properties = {
         delay              = [[0 i30]],
         explosiongenerator = [[custom:NAPALMFIREBALL_PYRO]],
-        pos                = [[-25 r50, 10 r25, -25 r50]],
+        pos                = [[-15 r30, 12 r25, -15 r30]],
       },
     },
   },
@@ -624,7 +624,7 @@ local altforms = {
       rocks = {
 		properties = {particlelife = 150, particlelifespread = 80,
 	       particlesize       = 50,
-        particlesizespread = 20,
+        particlesizespread = 35,
         particlespeed      = 0.4,
         particlespeedspread = 0.7,
         colormap           = [[0 0 0 0     0.4 0.4 0.4 0.1    0.6 0.6 0.6 0.1    0.5 0.5 0.5 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
@@ -661,8 +661,8 @@ local altforms = {
     modifications = {
       rocks = {
         properties = {
-		particlelife = 250, 
-		particlelifespread = 450,
+		particlelife = 280, 
+		particlelifespread = 250,
         particlespeed      = 0.4,
         particlespeedspread = 0.7,
         colormap           = [[0.2 0.2 0.2 0.1   0.4 0.4 0.4 0.1  0.38 0.38 0.38 0.11    0.35 0.35 0.35 0.12    0.32 0.32 0.32 0.13    0.3 0.3 0.3 0.14   0.12 0.12 0.12 0.18    0 0 0 0]],
