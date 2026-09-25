@@ -674,6 +674,11 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		Spring.Echo("GetEffectiveWeaponRange", GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum), unitData.udID, -dy, behaviour.weaponNum)
 	end
 	
+	local keepOrder = behaviour.skirmKeepOrder
+	if not keepOrder and behaviour.skirmKeepOrderLeeway then
+		keepOrder = (skirmRange + behaviour.skirmKeepOrderLeeway) > predictedDist
+	end
+	
 	--Spring.Echo("skirmRange", skirmRange, "pred", predictedDist, "frame", Spring.GetGameFrame())
 	if doHug or skirmRange > predictedDist then
 		if behaviour.skirmOnlyNearEnemyRange then
@@ -682,7 +687,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 				if doDebug then
 					Spring.Echo("return enemyRange < predictedDist", enemyRange, predictedDist)
 				end
-				return behaviour.skirmKeepOrder
+				return keepOrder
 			end
 		end
 		
@@ -698,13 +703,13 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			-- If a unit has not fired then it has been loaded since frame zero.
 			if reloadFrames and (behaviour.skirmBlockedApproachFrames < -reloadFrames) then
 				if (not behaviour.skirmBlockApproachHeadingBlock) or HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
-					if cmdID and move and not behaviour.skirmKeepOrder then
+					if cmdID and move and not keepOrder then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0 )
 					end
 					if doDebug then
 						Spring.Echo("return behaviour.skirmBlockedApproachFrames < -reloadFrames", behaviour.skirmBlockedApproachFrames, reloadFrames, reloadState, frame)
 					end
-					return behaviour.skirmKeepOrder
+					return keepOrder
 				end
 			end
 		end
@@ -716,6 +721,11 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
+		if behaviour.skirmJinkLength then
+			UpdateJink(behaviour, unitData)
+			cx = cx + ez*unitData.jinkDir*behaviour.skirmJinkLength/eDist
+			cz = cz - ex*unitData.jinkDir*behaviour.skirmJinkLength/eDist
+		end
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
@@ -728,12 +738,12 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
 		unitData.receivedOrder = true
 		return true
-	elseif cmdID and move and not behaviour.skirmKeepOrder then
+	elseif cmdID and move and not keepOrder then
 		spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0 )
 		return true
 	end
 
-	return behaviour.skirmKeepOrder
+	return keepOrder
 end
 
 local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
