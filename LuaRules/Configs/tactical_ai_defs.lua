@@ -2062,7 +2062,24 @@ local behaviourConfig = {
 	},
 	{
 		name = "striderscorpion",
-		onlyIdleHandling = true,
+		weaponNum = 1,
+		skirms = medRangeSkirmieeArray,
+		--swarms = {},
+		--flees = {},
+		-- idleFlee = medRangeRiotIdleFleeArray,
+		avoidHeightDiff = explodableFull,
+		-- maxSwarmLeeway = 0,
+		-- skirmLeeway = 0,
+		skirmLeeway = 20,
+		-- velocityPrediction = 20,
+		-- idlePushAggressDist = 100,
+		-- idleChaseEnemyLeeway = 200,
+		-- idleCommitDistMult = 0.5,
+		-- idleEnemyDistMult = 0.5,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 70,
+		wardFireDefault = true,
 	},
 	{
 		name = "striderdetriment",
@@ -2219,21 +2236,27 @@ local function LoadBehaviour()
 	for i = 1, #behaviourConfig do
 		local behaviourData = behaviourConfig[i]
 		local ud = UnitDefNames[behaviourData.name]
-
-		if behaviourData.land and behaviourData.sea then
-			unitAIBehaviour[ud.id] = {
-				defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
-				alternateStateToggle = behaviourData.alternateStateToggle,
-				waterline = (behaviourData.waterline or 0),
-				floatWaterline = behaviourData.floatWaterline,
-				land = GetBehaviourTable(behaviourData.land, ud),
-				sea = GetBehaviourTable(behaviourData.sea, ud),
-			}
+		if not ud then
+			-- idk why but my mod says unit planesupport not found while magpie do exist
+			Spring.Log("tactical_ai_defs.lua",LOG.ERROR, "unit " .. tostring(behaviourData.name) .. " not found in UnitDefNames")
 		else
-			unitAIBehaviour[ud.id] = GetBehaviourTable(behaviourData, ud)
-			unitAIBehaviour[ud.id].defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState)
-			unitAIBehaviour[ud.id].alternateStateToggle = behaviourData.alternateStateToggle
+			if behaviourData.land and behaviourData.sea then
+				unitAIBehaviour[ud.id] = {
+					defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
+					alternateStateToggle = behaviourData.alternateStateToggle,
+					waterline = (behaviourData.waterline or 0),
+					floatWaterline = behaviourData.floatWaterline,
+					land = GetBehaviourTable(behaviourData.land, ud),
+					sea = GetBehaviourTable(behaviourData.sea, ud),
+				}
+			else
+				unitAIBehaviour[ud.id] = GetBehaviourTable(behaviourData, ud)
+				unitAIBehaviour[ud.id].defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState)
+				unitAIBehaviour[ud.id].alternateStateToggle = behaviourData.alternateStateToggle
+			end
 		end
+
+		
 	end
 	
 	return unitAIBehaviour
