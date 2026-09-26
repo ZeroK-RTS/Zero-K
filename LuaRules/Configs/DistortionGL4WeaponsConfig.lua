@@ -350,7 +350,7 @@ local BaseClasses = {
 			refractiveIndex = -1.2,
 			windAffected = -2.95,
 			riseRate = -2,
-			lifeTime = 30,
+			lifeTime = 40,
 			rampUp = 5,
 			decay = 15,
 			effectType = 0,
@@ -364,7 +364,7 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 200,
-			effectStrength = 0.25,
+			effectStrength = 0.18,
 			noiseStrength = 0.95,
 			noiseScaleSpace = 0.11,
 			distanceFalloff = 0.25,
@@ -1321,8 +1321,8 @@ local function AssignWeaponDistortions(weaponID)
 			}
 			if isStunOrDisarm then
 				local empClass = ((stunTime or 0) > 8 and burstMult < 10 and "empWobbleLong") or "empWobble"
-				local empSize = adjRadius * ((stunTime or 0) > 8 and 1 or 1.2)
-				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(empSize), strength)
+				local timeMult = (stunTime or 0) > 25 and 3 or 1
+				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(adjRadius), strength, timeMult)
 			end
 			explosionDistortionsNames[weaponName] = distorts
 		end
