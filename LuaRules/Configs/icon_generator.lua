@@ -392,9 +392,9 @@ unitConfigs = {
   [UnitDefNames.pw_bomberfac.id] = {
     saveNames = {"pw_bombercontrol", "pw_dropdepot"},
   },
-  [UnitDefNames.vehsupport.id] = {
-    unfold = true,
-  },
+  --[UnitDefNames.vehsupport.id] = {
+  --  unfold = true,
+  --},
   
 }
 
