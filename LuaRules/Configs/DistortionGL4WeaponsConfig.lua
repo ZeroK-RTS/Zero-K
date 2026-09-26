@@ -1455,7 +1455,7 @@ explosionDistortionsNames.amphbomb_amphbomb_death = {
 	GetDistortionClass("DisruptionPulse", "Mediumest", 1.4, 0.92),
 }
 explosionDistortionsNames.commweapon_disruptorbomb = {
-	GetDistortionClass("DisruptionPulse", "Mediumest", 1.7, 1.8),
+	GetDistortionClass("DisruptionPulse", "Mediumest", 1.7, 1.85),
 }
 
 -- Disco Rave Party
