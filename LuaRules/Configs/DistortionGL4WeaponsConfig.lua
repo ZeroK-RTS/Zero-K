@@ -1380,10 +1380,10 @@ explosionDistortionsNames.jumparty_napalm_sprayer = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Small", false, 1.5),
 }
 explosionDistortionsNames.striderdante_napalm_rockets = {
-	GetDistortionClass("FireExplosionHeat", "Smaller", false, 1.8),
+	GetDistortionClass("FireExplosionHeat", "Smaller"),
 }
 explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
-	GetDistortionClass("FireExplosionHeat", "Smaller", false, 1.8),
+	GetDistortionClass("FireExplosionHeat", "Smaller"),
 }
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
