@@ -77,6 +77,37 @@ end
 
 local ZOMBIES_PARTIAL_RECLAIM = (tonumber(modOptions.zombies_partial_reclaim) == 1)
 
+local zombiesReviveAsString = (modOptions.zombies_revive_as) or "" -- pilfered from lockunits_modoption, would there be a better way to do this?
+local zombieReviveOptionCount = 0
+local zombieReviveOptions = {} -- allows duplicates
+local zombiesReviveOptionsAsString = "cloakraid + Bandit + Dart + Flea"
+
+local UnitDefBothNames = {} -- Includes humanName and name
+local function AddName(name, unitDefId)
+	name = name:lower()
+	UnitDefBothNames[name] = UnitDefBothNames[name] or {}
+	UnitDefBothNames[name][#UnitDefBothNames[name] + 1] = unitDefId
+end
+
+if zombiesReviveOptionsAsString ~= "" then
+	zombiesReviveOptionsAsString = zombiesReviveOptionsAsString:gsub("[%s%+]*%+[%s%+]*","+"):gsub("^%s*",""):gsub("%s*$",""):lower()
+
+	for unitDefID = 1, #UnitDefs do
+		AddName(UnitDefs[unitDefID].humanName, unitDefID)
+		AddName(UnitDefs[unitDefID].name, unitDefID)
+	end
+
+	for name in string.gmatch(zombiesReviveOptionsAsString, '([^+]+)') do
+		if UnitDefBothNames[name] then
+			for i = 1, #UnitDefBothNames[name] do
+				local unitDefID = UnitDefBothNames[name][i]
+				zombieReviveOptionCount = zombieReviveOptionCount + 1
+				zombieReviveOptions[zombieReviveOptionCount] = unitDefID
+			end
+		end
+	end
+end
+
 local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
 		local queueSize = spGetUnitCommandCount(unitID)
@@ -131,10 +162,43 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 end
 
 local function RezFrameCallback(featureID)
-	local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,ZOMBIES_PARTIAL_RECLAIM, nil)
-	zombies[unitID] = true
-	GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
-	GG.Zombies.SetZombieBehavior(unitID)
+	local unitID
+	if zombieReviveOptionCount == 0 then
+		unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,ZOMBIES_PARTIAL_RECLAIM, nil)
+		zombies[unitID] = true
+		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
+		GG.Zombies.SetZombieBehavior(unitID)
+	else
+		local x, y, z = Spring.GetFeaturePosition(featureID)
+		local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
+		local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
+		
+		local metalToSpend = 0
+		if ZOMBIES_PARTIAL_RECLAIM then -- partial reclaim reduces the available metal to spawn units
+			metalToSpend = UnitDefNames[resDefName].cost * (currentMetal/maxMetal)
+		else
+			metalToSpend = UnitDefNames[resDefName].cost
+		end
+		local zombieUnitDefID
+		while  metalToSpend >= 0 do
+			zombieUnitDefID = zombieReviveOptions[math.random(1,zombieReviveOptionCount)]
+			local zombieCost = UnitDefs[zombieUnitDefID].cost	
+			
+			unitID = Spring.CreateUnit(zombieUnitDefID, x, y, z, facing, GaiaTeamID)
+			
+			zombies[unitID] = true
+			GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
+			GG.Zombies.SetZombieBehavior(unitID)
+			gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
+			metalToSpend = metalToSpend - zombieCost
+		end
+		
+		local health = Spring.GetUnitHealth(unitID)
+		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
+			Spring.SetUnitHealth(unitID, health*((UnitDefs[zombieUnitDefID].cost + metalToSpend)/UnitDefs[zombieUnitDefID].cost))
+		end
+	end
+	Spring.DestroyFeature(featureID)
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)

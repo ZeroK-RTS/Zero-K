@@ -162,6 +162,14 @@ local options = {
     def = false,
   },
   {
+    key    = 'zombies_revive_as',
+    name   = 'Zombies revive into this',
+    desc   = "Wrecks revive into a minimum of 1 of this unit, multiple if the wreck has multiple times the value left. Specify multiple units to randomise through by using +",
+    type   = "string",
+    section= 'silly',
+    def = false,
+  },
+  {
     key = "max_com_level",
     name = "Commander level limit",
     desc = "Choose the commander level limit. 0 for unlimited.",

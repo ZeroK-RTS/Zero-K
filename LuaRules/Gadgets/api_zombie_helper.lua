@@ -56,32 +56,32 @@ local resurrectingFeatures = {} -- contains inital gameframe, base rez time, fra
 
 -- Get Feature Defname and facing
 local function GetFeatureResurrectData(featureID)
-	local featureDefName, facing = Spring.GetFeatureResurrect(featureID)
-	if featureDefName == "" then
+	local resDefName, facing = Spring.GetFeatureResurrect(featureID)
+	if resDefName == "" then
 		local featureDef = FeatureDefs[Spring.GetFeatureDefID(featureID)]
 		local featureName = featureDef.name or ""
 		if featureDef.resurrectable == 1 then
-			featureDefName = featureName:gsub('(.*)_.*', '%1') --filter out _dead
+			resDefName = featureName:gsub('(.*)_.*', '%1') --filter out _dead
 			facing = facing or 0
 		end
 	end
-	return featureDefName, facing
+	return resDefName, facing
 end
 
 -- Zombie resurrect
 -- Turns a feature into a unit if applicable. Has a callback returning featureID and unitID for data transfer. Returns unitID.
 local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealthBool, unitReviveCallback)
-	local featureDefName,facing = GetFeatureResurrectData(featureID)
+	local resDefName,facing = GetFeatureResurrectData(featureID)
 	local x, y, z = Spring.GetFeaturePosition(featureID)
 
-	local unitID = Spring.CreateUnit(featureDefName, x, y, z, facing, teamID)
+	local unitID = Spring.CreateUnit(resDefName, x, y, z, facing, teamID)
 
 	if not (unitID) then
 		return nil
 	end
 
-	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
-	local size = UnitDefNames[featureDefName].xsize
+	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies") --TODO should this be here? is this used anywhere?
+	local size = UnitDefNames[resDefName].xsize
 	Spring.SpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
 	GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
@@ -196,23 +196,26 @@ end
 -- Use the rezFrameCallback to repurpose the system for other effects or chain into TurnFeatureIntoUnit for a revived unit with ID Callback.
 -- If no callback is provided, revives the wreck as a unslowed zombie unit.
 local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, rezFrameCallback)
-	local resName, face = GetFeatureResurrectData(featureID)
-	if resName and face and not resurrectingFeatures[featureID] then
-		local ud = resName and UnitDefNames[resName]
-		if ud and not NonZombies[resName] then
+	local resDefName, face = GetFeatureResurrectData(featureID)
+	if resDefName and face and not resurrectingFeatures[featureID] then
+		local ud = resDefName and UnitDefNames[resDefName]
+		if ud and not NonZombies[resDefName] then
 			local rezBaseTime = ud.metalCost / buildpower
-			local rezTime = rezBaseTime
 			local _,_,_,_,reclaimPercent,_ = Spring.GetFeatureResources(featureID)
-			
-			rezTime = rezBaseTime + rezBaseTime * (1 - reclaimPercent)
-
-			if (rezTime < minRezTime) then
-				rezTime = minRezTime
+			if reclaimPercent ~= 1 then
+				rezBaseTime = rezBaseTime + rezBaseTime * (1 - reclaimPercent)
 			end
+
+			if (rezBaseTime < minRezTime) then
+				rezBaseTime = minRezTime
+			end
+			
+			local rezFrame = gameframe + rezBaseTime * 32
+
 			resurrectingFeatures[featureID] = {
 				rezInitFrame = gameframe, 				-- frame Feature was queued
 				rezBaseTime = rezBaseTime, 				-- base resurrect time in seconds
-				rezFrame = gameframe + rezTime * 32,	-- frame the resurrect completes or the callback is fired.
+				rezFrame = rezFrame,					-- frame the callback is fired or standard resurrect is performed.
 				rezFrameCallback = rezFrameCallback, 	-- callback function fired on rezFrame
 				rezWarningTime = WARNING_TIME,			-- warning time in seconds for base particles and sfx, set 0 to hide.
 				reclaimPercent = reclaimPercent, 		-- reclaim left in feature in % to compare and adjust reztime
