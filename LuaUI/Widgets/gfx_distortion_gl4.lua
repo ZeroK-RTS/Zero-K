@@ -131,7 +131,7 @@ local noisetex3dcube = "LuaUI/Images/noise/noise64_cube_3_seed2026.dds"
 ------------------------------ Ingame menu options ------------------
 
 local LoadDistortionConfig -- Called on change
-local qualityLevel = 2
+local qualityLevel = 3
 local qualityMap = {
 	high = 3,
 	medium = 2,
