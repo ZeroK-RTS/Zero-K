@@ -944,22 +944,22 @@ local BaseClasses = {
 	},
 	ExplosionHeatLong = { -- spawned on explosions
 		distortionType = "point",
-		yOffset = 0, -- Y offsets are only ever used for explosions!
+		yOffset = 50, -- Y offsets are only ever used for explosions!
 		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
 			posz = 0,
 			radius = 10,
-			effectStrength = 1.1,
+			effectStrength = 0.55,
 			noiseStrength = 1.1,
-			noiseScaleSpace = 0.65,
-			distanceFalloff = 0.5,
+			noiseScaleSpace = 0.52,
+			distanceFalloff = 0.6,
 			startRadius = 0.8,
 			onlyModelMap = 0,
 			lifeTime = 1350,
-			rampUp = 30,
-			decay = 600,
+			rampUp = 15,
+			decay = 350,
 			effectType = 0,
 		},
 	},
@@ -1277,10 +1277,8 @@ local function AssignWeaponDistortions(weaponID)
 		explosionDistortionsNames[weaponName] = {
 			GetDistortionClass("DgunImplosion", "Micro"),
 		}
-	elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
-		explosionDistortionsNames[weaponName] = {
-			GetDistortionClass("FireExplosionHeat", "SmallMedium"),
-		}
+	elseif weaponDef.type == "AircraftBomb" then
+		-- Bespoke
 	else
 		local distortionClass
 		if effectiveRangeExplo > 600 then
@@ -1375,6 +1373,9 @@ explosionDistortionsNames.tankraid_napalm_bomblet[#explosionDistortionsNames.tan
 explosionDistortionsNames.jumpraid_pyro_death = explosionDistortionsNames.jumpraid_pyro_death or {}
 explosionDistortionsNames.jumpraid_pyro_death[#explosionDistortionsNames.jumpraid_pyro_death + 1] = GetDistortionClass("ExplosionHeatFirewalker", "Smallish", false, 1.3)
 
+explosionDistortionsNames.bomberriot_napalm = {
+	GetDistortionClass("FireExplosionHeat", "SmallMedium", 0.8),
+}
 explosionDistortionsNames.jumparty_napalm_sprayer = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Small", false, 1.5),
 }
@@ -1386,6 +1387,7 @@ explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
 }
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
+	GetDistortionClass("ExplosionHeatLong", "Small", 0.2), -- Some distortion for when the camera is inside the larger one
 }
 
 -- Fancy explosions for huge artillery
