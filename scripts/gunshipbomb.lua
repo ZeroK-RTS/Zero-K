@@ -30,7 +30,7 @@ local bombGravity = -WeaponDefs[bombDefID].customParams.mygravity
 local function UnBurrow()
 	Signal(SIG_BURROW)
 	Spin(r_fan, y_axis, math.rad(1500), math.rad(80))
-	Spin(l_fan, y_axis, math.rad(-1500), 1math.rad(80))
+	Spin(l_fan, y_axis, math.rad(-1500), math.rad(80))
 	Turn(base, x_axis, 0, 5)
 	Turn(l_wing, x_axis, 0, 5)
 	Turn(r_wing, x_axis, 0, 5)
