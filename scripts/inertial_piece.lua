@@ -32,7 +32,7 @@ if not Spring.UnitScript.inertial_piece then
 		return destination_norm_dist
 	end
 
-	local function merge_2_rotation(rotation1,speed1,rotation2,speed2)
+	local function merge_2_rotation(rotation1,speed1,rotation2,speed2,time)
 		local sgn1=sgn(rotation1)
 		local sgn2=sgn(rotation2)
 
@@ -47,13 +47,13 @@ if not Spring.UnitScript.inertial_piece then
 		-- local fs1=min( speed1/gameSpeed, abs(rotation1) )
 		-- local fs2=min( speed2/gameSpeed, abs(rotation2) )
 
-		local t1=speed1 and min (abs(rotation1)/speed1, 1/gameSpeed) or 0
-		local t2=speed2 and min (abs(rotation2)/speed2, 1/gameSpeed) or 0
+		local t1=speed1 and min (abs(rotation1)/speed1, 1/time) or 0
+		local t2=speed2 and min (abs(rotation2)/speed2, 1/time) or 0
 		
 		local dest=speed1*sgn1*t1+speed2*sgn2*t2
 		
 		
-		return dest,dest*gameSpeed
+		return dest,dest*time
 	end
 
     local inertial_piece={}
@@ -118,100 +118,109 @@ if not Spring.UnitScript.inertial_piece then
 		}
 
 		local old_unit_rot_delta={0,0,0}
+		-- local old_frame=Spring.GetGameFrame()
 
 		local dbg_counter=5
 
 		-- local unit_old_pitch_2,unit_old_heading_2=unit_old_pitch,unit_old_heading
-        local function KeepRotation()
-            while true do
-                Sleep(1000/30)
-				local unit_rotations=toGetRotation()
-				do
-					-- dbg_counter=dbg_counter-1
-					-- if dbg_counter<0 then
-					-- 	dbg_counter=5
+
+		local function OnChangeHeading(unit_rotations)
+			do
+				-- dbg_counter=dbg_counter-1
+				-- if dbg_counter<0 then
+				-- 	dbg_counter=5
+					
+				-- end
+				-- local dbgstr=""
+				-- for i = 1, 3 do
+				-- 	dbgstr = dbgstr .. i .. ":" .. unit_rotations[i] .. ", "
+				-- end
+				-- Spring.Echo(dbgstr)
+			end
+			local piece_rotations={spGetPieceRotation(piece)}
+			-- local frame=Spring.GetGameFrame()
+			-- local frame_delta=frame-old_frame
+			for axis = 1, 3 do
+				local change_ratio=change_ratios[axis]
+				local extra_rotation=extra_rotations[axis]
+				local extra_rotation_destination=extra_rotation.destination
+					local extra_rotation_speed=extra_rotation.speed
+				if change_ratio and change_ratio~=0 then
+
+					local unit_rot_delta = distance_toward_section_loop( unit_old_rotations[axis], unit_rotations[axis],-pi,pi )
+					
+					local piece_rot = angle_limit(piece_rotations[axis])
+
+					local delta_compensation = angle_limit(unit_rot_delta-old_unit_rot_delta[axis])
+
+					piece_rot=piece_rot - delta_compensation * change_ratio
+
+					Turn(piece,axis,piece_rot)
+
+					local piece_rot_delta = - unit_rot_delta * change_ratio
+					local piece_rot_speed = piece_rot_delta*gameSpeed
+
+					if piece_rot_speed~=0 then
+
+						local final_destination=piece_rot + piece_rot_delta
+						local final_speed=abs(piece_rot_speed)
+
 						
-					-- end
-					-- local dbgstr=""
-					-- for i = 1, 3 do
-					-- 	dbgstr = dbgstr .. i .. ":" .. unit_rotations[i] .. ", "
-					-- end
-					-- Spring.Echo(dbgstr)
-				end
-				local piece_rotations={spGetPieceRotation(piece)}
-				for axis = 1, 3 do
-					local change_ratio=change_ratios[axis]
-					local extra_rotation=extra_rotations[axis]
-					local extra_rotation_destination=extra_rotation.destination
-						local extra_rotation_speed=extra_rotation.speed
-					if change_ratio and change_ratio~=0 then
 
-						local unit_rot_delta = distance_toward_section_loop( unit_old_rotations[axis], unit_rotations[axis],-pi,pi )
-						
-						local piece_rot = angle_limit(piece_rotations[axis])
-
-						local delta_compensation = angle_limit(unit_rot_delta-old_unit_rot_delta[axis])
-
-						piece_rot=piece_rot - delta_compensation * change_ratio
-
-						Turn(piece,axis,piece_rot)
-
-						local piece_rot_delta = - unit_rot_delta * change_ratio
-						local piece_rot_speed = piece_rot_delta*gameSpeed
-
-						if piece_rot_speed~=0 then
-
-							local final_destination=piece_rot + piece_rot_delta
-							local final_speed=abs(piece_rot_speed)
+						if extra_rotation_destination then
 
 							
 
-							if extra_rotation_destination then
-
+							if extra_rotation_speed and extra_rotation_speed~=0 then
 								
+								local extra_rotation_dir=distance_toward_section_loop(piece_rot,extra_rotation_destination,-pi,pi)
 
-								if extra_rotation_speed and extra_rotation_speed~=0 then
-									
-									local extra_rotation_dir=distance_toward_section_loop(piece_rot,extra_rotation_destination,-pi,pi)
+								local m_dest,m_speed=merge_2_rotation(piece_rot_delta,final_speed,extra_rotation_dir,extra_rotation_speed,gameSpeed)
 
-									local m_dest,m_speed=merge_2_rotation(piece_rot_delta,final_speed,extra_rotation_dir,extra_rotation_speed)
-
-									final_destination=piece_rot + m_dest
-									final_speed = abs(m_speed)
-								else
-									Turn(piece,axis,extra_rotation_destination)
-									final_destination=extra_rotation_destination + piece_rot_delta
-									-- extra_rotation.destination=nil
-									-- extra_rotation.speed=nil
-								end
-
+								final_destination=piece_rot + m_dest
+								final_speed = abs(m_speed)
+							else
+								Turn(piece,axis,extra_rotation_destination)
+								final_destination=extra_rotation_destination + piece_rot_delta
+								-- extra_rotation.destination=nil
+								-- extra_rotation.speed=nil
 							end
-							Turn(piece,axis,final_destination,final_speed)
-						else
-							if extra_rotation_destination then
-								Turn(piece,axis,extra_rotation_destination,extra_rotation_speed)
-							end
+
 						end
-						
-						old_unit_rot_delta[axis]=unit_rot_delta
+						Turn(piece,axis,final_destination,final_speed)
 					else
 						if extra_rotation_destination then
 							Turn(piece,axis,extra_rotation_destination,extra_rotation_speed)
 						end
 					end
-					-- extra_rotations[axis]=nil
-
+					
+					old_unit_rot_delta[axis]=unit_rot_delta
+				else
+					if extra_rotation_destination then
+						Turn(piece,axis,extra_rotation_destination,extra_rotation_speed)
+					end
 				end
-				unit_old_rotations=unit_rotations
+				-- extra_rotations[axis]=nil
+
+			end
+			unit_old_rotations=unit_rotations
+		end
+
+        local function KeepRotation()
+            while true do
+                Sleep(33)
+				OnChangeHeading(toGetRotation())
             end
         end
-        StartThread(KeepRotation)
+        -- StartThread(KeepRotation)
 		local function AdditionalTurn(axis,destination,speed)
 			extra_rotations[axis].destination=destination
 			extra_rotations[axis].speed=speed
 		end
         local o={
-			AdditionalTurn=AdditionalTurn
+			AdditionalTurn=AdditionalTurn,
+			OnChangeHeading=OnChangeHeading,
+			KeepRotation=KeepRotation
 		}
         return o
     end

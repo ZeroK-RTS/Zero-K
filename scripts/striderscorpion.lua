@@ -195,6 +195,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay)
 	Move(flare1, z_axis, 7)
+	StartThread(body_ctrl.KeepRotation)
 --	Turn(armr1, z_axis, math.rad(30), 100)
 --	Turn(arml1, z_axis, math.rad(-30), 100)
 end
@@ -206,6 +207,12 @@ end
 function script.StopMoving()
 	StartThread(RestoreLegs)
 end
+
+-- isnt working at all dk why
+-- function script.ChangeHeading(heading)
+-- 	Spring.Echo("ChangeHeading, heading: " .. tostring(heading))
+-- 	-- body_ctrl.OnChangeHeading({0,heading,0})
+-- end
 
 local wpnsangle={
 	-- [4]=math.atan2(0.2,1),
