@@ -77,10 +77,9 @@ end
 
 local ZOMBIES_PARTIAL_RECLAIM = (tonumber(modOptions.zombies_partial_reclaim) == 1)
 
-local zombiesReviveAsString = (modOptions.zombies_revive_as) or "" -- pilfered from lockunits_modoption, would there be a better way to do this?
+local zombiesReviveAsString = (modOptions.zombies_revive_as) or nil -- pilfered from lockunits_modoption, would there be a better way to do this?
 local zombieReviveOptionCount = 0
 local zombieReviveOptions = {} -- allows duplicates
-local zombiesReviveOptionsAsString = "cloakraid + Bandit + Dart + Flea"
 
 local UnitDefBothNames = {} -- Includes humanName and name
 local function AddName(name, unitDefId)
@@ -89,7 +88,7 @@ local function AddName(name, unitDefId)
 	UnitDefBothNames[name][#UnitDefBothNames[name] + 1] = unitDefId
 end
 
-if zombiesReviveOptionsAsString ~= "" then
+if zombiesReviveOptionsAsString then
 	zombiesReviveOptionsAsString = zombiesReviveOptionsAsString:gsub("[%s%+]*%+[%s%+]*","+"):gsub("^%s*",""):gsub("%s*$",""):lower()
 
 	for unitDefID = 1, #UnitDefs do
