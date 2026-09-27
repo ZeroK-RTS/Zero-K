@@ -179,8 +179,9 @@ local function RezFrameCallback(featureID)
 		else
 			metalToSpend = UnitDefNames[resDefName].cost
 		end
+		metalToSpend = math.floor(metalToSpend)
 		local zombieUnitDefID
-		while  metalToSpend >= 0 do
+		while  metalToSpend > 0 do
 			zombieUnitDefID = zombieReviveOptions[math.random(1,zombieReviveOptionCount)]
 			local zombieCost = UnitDefs[zombieUnitDefID].cost	
 			
