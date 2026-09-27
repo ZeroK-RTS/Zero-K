@@ -295,7 +295,7 @@ elseif gpuMem and gpuMem > 0 and gpuMem < 5000 then
 end
 
 -- the 3d noise texture used for this shader
-local noisetex3dcube =  "LuaUI/images/noisetextures/noise64_cube_3.dds"
+local noisetex3dcube =  "LuaUI/images/noise/noise64_cube_3_seed2026.dds"
 local blueNoise2D =  "LuaUI/images/noisetextures/blue_noise_64.tga"
 
 --[[
@@ -1028,7 +1028,7 @@ end
 
 
 local function LoadLightConfig()
-	local success, result =	pcall(VFS.Include, 'luaui/configs/DeferredLightsGL4config.lua')
+	local success, result =	pcall(VFS.Include, 'luarules/configs/DeferredLightsGL4config.lua')
 	--spEcho("Loading GL4 light config", success, result)
 	if success then
 		--spEcho("Loaded GL4 light config")
@@ -1041,7 +1041,7 @@ local function LoadLightConfig()
 		spEcho("Failed to load GL4 Unit light config", success, result)
 	end
 
-	local success2, result2 =	pcall(VFS.Include, 'luaui/configs/DeferredLightsGL4WeaponsConfig.lua')
+	local success2, result2 =	pcall(VFS.Include, 'luarules/configs/DeferredLightsGL4WeaponsConfig.lua')
 	--spEcho("Loading GL4 weapon light config", success2, result2)
 	if success2 then
 		gibLight = result2.gibLight
@@ -1512,8 +1512,8 @@ end
 local configCache = {lastUpdate = Spring.GetTimer()}
 local function checkConfigUpdates()
 	if spDiffTimers(spGetTimer(), configCache.lastUpdate) > 0.5 then
-		local newconfa = VFS.LoadFile('luaui/configs/DeferredLightsGL4config.lua')
-		local newconfb = VFS.LoadFile('luaui/configs/DeferredLightsGL4WeaponsConfig.lua')
+		local newconfa = VFS.LoadFile('luarules/configs/DeferredLightsGL4config.lua')
+		local newconfb = VFS.LoadFile('luarules/configs/DeferredLightsGL4WeaponsConfig.lua')
 		if newconfa ~= configCache.confa or newconfb ~= configCache.confb then
 			LoadLightConfig()
 			if WG['unittrackerapi'] and WG['unittrackerapi'].visibleUnits then

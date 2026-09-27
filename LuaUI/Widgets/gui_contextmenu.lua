@@ -1508,11 +1508,11 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
-			file = "#" .. ud.id,
+			file = WG.GetSquareBuildTexture(ud),
 			keepAspect = false;
 			x = 32,
 			y = 0,
-			height  = 88*(4/5);
+			height  = 88;
 			width   = 88;
 		},
 	}
@@ -1531,7 +1531,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		icons[#icons + 1] = Button:New{
 			x = 2,
 			right = 2,
-			y = 88*(4/5),
+			y = 88,
 			height = 30,
 			caption = "Edit Behaviour",
 			tooltip = "Edit the default behaviour of " .. Spring.Utilities.GetHumanName(ud) .. ".",

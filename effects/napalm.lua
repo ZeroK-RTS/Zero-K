@@ -701,6 +701,25 @@ local altforms = {
       },
     },
   },
+  napalmfireball_45_large = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+      properties = {
+        emitrot            = 90,
+        emitrotspread      = 90,
+        particlelife       = 35,
+        particlelifespread = 12,
+        particlesize       = 90,
+        particlesizespread = 16,
+        particlespeed      = 0.4,
+        particlespeedspread = 0.2,
+        sizegrowth         = 0.45,
+        colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+        },
+      },
+    },
+  },
   napalmfireball_45_long = {
     source = "napalmfireball_200",
     modifications = {

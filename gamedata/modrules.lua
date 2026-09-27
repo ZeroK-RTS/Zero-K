@@ -11,17 +11,17 @@
 local forceSingleThreaded = false
 local modoptions = Spring.GetModOptions()
 if (modoptions and (modoptions.mtpath == 0 or modoptions.mtpath == "0")) then
-	forceSingleThreaded = true
+  forceSingleThreaded = true
 end
 Spring.Echo("forceSingleThreaded", forceSingleThreaded)
 
 local pathExperiment = false
 local pathfinder = Spring.GetModOptions().pathfinder or "qtpfs"
 if Script.IsEngineMinVersion and Script.IsEngineMinVersion(2025, 3, 0) and (pathfinder == "qtpfs") then
-	pathExperiment = true
-	Spring.Echo("pathfinderSelection pathWithQtpfs")
+  pathExperiment = true
+  Spring.Echo("pathfinderSelection pathWithQtpfs")
 else
-	Spring.Echo("pathfinderSelection pathWithOld")
+  Spring.Echo("pathfinderSelection pathWithOld")
 end
 
 local modrules  = {
@@ -38,6 +38,15 @@ local modrules  = {
     
     forceCollisionsSingleThreaded  = forceSingleThreaded,
     forceCollisionAvoidanceSingleThreaded  = forceSingleThreaded,
+  },
+  
+  guard = {
+    guardRecalculateThreshold = 100.0,    -- Distance that a guardee must move before the guard goal is recalculated
+    guardStoppedProximityGoal = 120.0,     -- Distance that a guardian will stop at nearing a stopped guardee
+    guardStoppedExtraDistance = 40.0,     -- The extra distance a guardian will keep from a stopped guardee
+    guardMovingProximityGoal = 160.0,     -- Distance the guardian is considered to be in guarding range and will match the velocity
+    guardMovingIntervalMultiplier = 3, -- A multiplier for the moving goal while guarding, smaller values will result in higher detail movement but more performance cost
+    guardInterceptionLimit = 128.0,       -- Limit for the intercept when a guardian is not in guarding range
   },
   
   construction = {

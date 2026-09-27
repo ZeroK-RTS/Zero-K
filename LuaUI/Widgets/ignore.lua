@@ -18,43 +18,6 @@ local function ProcessString(str)
 	return strtbl
 end
 
-function widget:TextCommand(command)
-	local prcmd = ProcessString(command)
-	if string.lower(prcmd[1]) == "ignore" then
-		if prcmd[2] then
-			Spring.Echo("game_message: Ignoring " .. prcmd[2])
-			widgetHandler:Ignore(prcmd[2])
-		end
-	end
-	if string.lower(prcmd[1]) == "ignorelist" then
-		local IgnoreList,count = widgetHandler:GetIgnoreList()
-		local ignorestring = "game_message: You are ignoring " .. count .. " user(s):"
-		for ignoree,_ in pairs(IgnoreList) do
-			ignorestring = ignorestring .. "\n- " .. ignoree
-		end
-		Spring.Echo(ignorestring)
-	end
-	if string.lower(prcmd[1]) == "unignore" then
-		local IgnoreList,_ = widgetHandler:GetIgnoreList()
-		if not IgnoreList[prcmd[2]] then
-			Spring.Echo("game_message: You were not ignoring " .. prcmd[2])
-			return
-		end
-		Spring.Echo("game_message: Unignoring " .. prcmd[2])
-		widgetHandler:Unignore(prcmd[2])
-	end
-	if string.lower(prcmd[1]) == "clearlist" then
-		local IgnoreList,_ = widgetHandler:GetIgnoreList()
-		for i=1,#IgnoreList do
-			widgetHandler:Unignore(IgnoreList[i])
-		end
-	end
-end
-
-function widget:GetConfigData()
-	local ignorelist,_ = widgetHandler:GetIgnoreList()
-	return ignorelist
-end
 
 function widget:SetConfigData(data)
 	data = data or {}

@@ -1,0 +1,85 @@
+
+local defs = {
+	staticheavyarty = {
+		script = {
+			basestomp = {
+				alwaysVisible = false,
+				distortionType = "point",
+				distortionName = "bigstomp",
+				pieceName = "base",
+				distortionConfig = {
+					posx = 0,
+					posy = -6,
+					posz = 0,
+					radius = 180,
+					effectStrength = 0.42,
+					noiseStrength = 1.5,
+					noiseScaleSpace = 0.5,
+					distanceFalloff = 0.5,
+					onlyModelMap = 1,
+					lifeTime = 16,
+					rampUp = 2.5,
+					decay = 16,
+					startRadius = 0.25,
+					shockWidth = 7,
+					effectType = "groundShockwave",
+				},
+			},
+			shotheat = {
+				-- Barrel Heat after shot
+				alwaysVisible = false,
+				distortionType = "beam",
+				distortionName = "brthabarrelheat",
+				pieceName = "sleeve",
+				distortionConfig = {
+					posx = 0,
+					posy = 5,
+					posz = 90,
+					radius = 50,
+					pos2x = 0,
+					pos2y = 5,
+					pos2z = 150,
+					onlyModelMap = 0,
+					riseRate = 0.5,
+					windAffected = -0.5,
+					noiseStrength = 0.3,
+					noiseScaleSpace = 1.0,
+					distanceFalloff = 1.0,
+					rampUp = 20,
+					decay = 200,
+					lifeTime = 240,
+					effectType = 0,
+				},
+			},
+		},
+	},
+	raveparty = {
+		script = {
+			basestomp = {
+				alwaysVisible = false,
+				distortionType = "point",
+				distortionName = "bigstomp",
+				pieceName = "base",
+				distortionConfig = {
+					posx = 0,
+					posy = -6,
+					posz = 0,
+					radius = 230,
+					effectStrength = 0.7,
+					noiseStrength = 1.5,
+					noiseScaleSpace = 0.5,
+					distanceFalloff = 0.5,
+					onlyModelMap = 1,
+					lifeTime = 16,
+					rampUp = 2.5,
+					decay = 16,
+					startRadius = 0.25,
+					shockWidth = 7,
+					effectType = "groundShockwave",
+				},
+			},
+		},
+	},
+}
+
+return defs

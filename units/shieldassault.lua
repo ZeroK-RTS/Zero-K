@@ -54,7 +54,7 @@ return { shieldassault = {
   },
 
   sightDistance       = 420,
-  speed               = 57,
+  speed               = 60,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

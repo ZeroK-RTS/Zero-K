@@ -873,6 +873,14 @@ local sounds = {
 			[1] = "fighter_select",
 		},
 	},
+	planesupport = {
+		ok = {
+			[1] = "bomber_move",
+		},
+		select = {
+			[1] = "fighter_select",
+		},
+	},
 	bomberstrike = {
 		ok = {
 			[1] = "bomber_move",

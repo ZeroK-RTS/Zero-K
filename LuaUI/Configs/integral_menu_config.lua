@@ -29,7 +29,7 @@ local tooltips = {
 	GOO_GATHER = "Puppy Replication (_STATE_)\n  Set whether Puppies use nearby wrecks to make more Puppies.",
 	DISABLE_ATTACK = "Allow Attack Commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
-	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
+	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire on uncertain enemy positions within radar.",
 	PREVENT_BAIT = "Avoid Bad Targets (_STATE_)\n  _DESC_",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
 	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
@@ -210,10 +210,10 @@ local commandDisplayConfig = {
 		},
 		stateTooltip = {
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Enable this to ignore bad targets when not on Force Fire or Attack Move."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid cost under 90, Razor, Sparrow, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid cost under 240, minus Stardust, Raptor, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid cost under 420, unknown radar dots and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag, nanoframes cheaper than 50 and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid targets cheaper than 90, Razor, Sparrow, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid targets cheaper than 240 (except Stardust), Raptor, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid targets cheaper than 420, unknown radar dots and armoured targets."),
 		}
 	},
 	[CMD_RETREAT] = {
@@ -368,9 +368,9 @@ end
 local textConfig = {
 	bottomLeft = {
 		name = "bottomLeft",
-		x = "15%",
+		x = "10%",
 		right = 0,
-		bottom = 2,
+		bottom = "10%",
 		height = 12,
 		fontsize = 12,
 	},
@@ -390,8 +390,8 @@ local textConfig = {
 	},
 	queue = {
 		name = "queue",
-		right = "18%",
-		bottom = "14%",
+		right = "15%",
+		bottom = "15%",
 		align = "right",
 		fontsize = 16,
 		height = 16,
@@ -413,24 +413,26 @@ local buttonLayoutConfig = {
 	},
 	build = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "Build",
+		invisibleButton = true,
 		showCost = true
 	},
 	buildunit = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "BuildUnit",
+		invisibleButton = true,
 		showCost = true
 	},
 	queue = {

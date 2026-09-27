@@ -105,6 +105,43 @@ return {
     },
   },
 
+  ["gauss_flare_dagger"] = {
+    trail = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 3,
+        dir                = [[dir]],
+        explosiongenerator = [[custom:gauss_ring_dagger]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+  },
+
+  ["gauss_ring_dagger"] = {
+    tealring = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        colormap           = [[0 1 0.5 0.03    0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[bluering]],
+        length             = 7,
+        sidetexture        = [[smoketrailthinner]],
+        size               = 1,
+        sizegrowth         = 15,
+        ttl                = 15,
+      },
+    },
+  },
+
   ["gauss_tag_h"] = {
     tealflash = {
       air                = true,

@@ -34,7 +34,7 @@ local min = math.min
 
 local FULL_GROW = 0.5
 local UPDATE_FREQUENCY = 25
-local NON_BLOCK_BUILD_FRAMES = 40
+local NON_BLOCK_BUILD_FRAMES = 30
 local MIN_METAL_FOR_GROW = 15
 
 local growUnit = {}
@@ -114,6 +114,8 @@ local function UpdateUnitGrow(unitID, data, growScale)
 	if nonBlockingUnit[unitID] and growScale > 0 then
 		nonBlockingUnit[unitID] = nil
 		Spring.SetUnitBlocking(unitID, true, true)
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		Spring.SetUnitPosition(unitID, x, y, z)
 	end
 	growScale = 1 - growScale
 	
@@ -272,7 +274,10 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 end
 
 local function CheckRecentBuilderTimeout(unitID, builderID)
-	if  not builderID then
+	if not builderID then
+		return
+	end
+	if Spring.GetUnitRulesParam(unitID, "ploppee") == 1 then
 		return
 	end
 	local frame = Spring.GetGameFrame()

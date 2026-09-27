@@ -269,7 +269,7 @@ function widget:UnitEnteredLos (unitID, teamID)
 
 	local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
 	if buildProgress < 1 then
-		markerText = markerText .. " (" .. math.floor(100 * buildProgress) .. "% at " ..  os.date( "%M:%S", spGetGameSeconds()) .. ")"
+		markerText = markerText .. string.format(" (%d%% at %s)", math.floor(100 * buildProgress), string.formatTime(spGetGameSeconds()))
 	end
 
 	local x, y, z = spGetUnitPosition(unitID)

@@ -14,6 +14,12 @@ local function DoUpdate(unitID)
 	local data = unitData[unitID]
 	local nearbyHeight = data.baseHeight
 	local nearbyLowHeight = data.baseHeight
+	if not nearbyHeight then
+		data.defaultAim[2] = data.aimOffetOverride
+		GG.OverrideMidAndAimPos(unitID, data.defaultMid, data.defaultAim)
+		return
+	end
+	
 	for i = -1, 1, 1 do
 		for j = -1, 1, 1 do
 			if i ~= 0 or j ~= 0 then
@@ -23,6 +29,7 @@ local function DoUpdate(unitID)
 			end
 		end
 	end
+	
 	local newAimHeight = nearbyHeight - data.baseHeight + data.cliffPeek
 	if data.aimOffetOverride then
 		data.defaultAim[2] = data.aimOffetOverride
@@ -72,6 +79,17 @@ function GG.Script_SetupAimPosTerraform(unitID, floatOnWater, defaultMid, defaul
 	unitData[unitID] = data
 	
 	StartThread(UpdateAimPos, unitID)
+end
+
+function GG.Script_SetupOffsetData(unitID, unitDefID)
+	local ud = UnitDefs[unitDefID]
+	local midTable = ud.model
+	local data = {
+		defaultAim = {midTable.midx, midTable.midy + (aimOff or 0), midTable.midz},
+		defaultMid = {midTable.midx, midTable.midy + (midOff or 0), midTable.midz},
+	}
+	unitData[unitID] = data
+	return data.defaultAim[2]
 end
 
 function GG.Script_OffsetAimAndColVol(unitID, newAimOffetOverride, colVolOffset)

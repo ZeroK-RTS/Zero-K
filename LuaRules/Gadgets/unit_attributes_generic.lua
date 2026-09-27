@@ -369,7 +369,7 @@ local origUnitSpeed = {}
 
 local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFactor, maxAccelerationFactor)
 	if spMoveCtrlGetTag(unitID) ~= nil then
-		return
+		return false
 	end
 	
 	if not origUnitSpeed[unitDefID] then
@@ -440,8 +440,8 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			maxAcc          = state.origMaxAcc      *maxAccelerationFactor, --(speedFactor > 0.001 and speedFactor or 0.001)
 			maxRudder       = state.origMaxRudder   *turnFactor,
 		}
-		spSetAirMoveTypeData (unitID, attribute)
-		spSetAirMoveTypeData (unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
 	elseif state.movetype == 1 then
 		local attribute =  {
 			maxSpeed        = state.origSpeed       *speedFactor,
@@ -450,7 +450,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			accRate         = state.origMaxAcc      *maxAccelerationFactor,
 			decRate         = state.origMaxDec      *maxAccelerationFactor
 		}
-		spSetGunshipMoveTypeData (unitID, attribute)
+		spSetGunshipMoveTypeData(unitID, attribute)
 		GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 	elseif state.movetype == 2 then
 		if workingGroundMoveType then
@@ -468,7 +468,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 				decRate         = state.origMaxDec      *decFactor,
 				turnAccel       = state.origTurnAccel    *turnAccelFactor,
 			}
-			spSetGroundMoveTypeData (unitID, attribute)
+			spSetGroundMoveTypeData(unitID, attribute)
 			GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 		else
 			--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
@@ -476,6 +476,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			spSetUnitCOBValue(unitID, COB.MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
 		end
 	end
+	return true
 end
 
 --------------------------------------------------------------------------------
@@ -772,7 +773,12 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 		or (currentTurn[unitID] or 1) ~= turnMult
 		or (currentAccel[unitID] or 1) ~= accelMult
 	
-	local senseChanges = (currentSense[unitID] ~= senseMult)
+	-- FIXME: nanoframes are normally 0 sight, this can reset them
+	-- to a non-zero value. The engine does not apply sensors to
+	-- nanoframes in general, but a non-zero LoS is what gives the
+	-- ability to decloak via proximity. Should handle nanoframe
+	-- status as a separate x0 multiplier on top of what exists.
+	local senseChanges = ((currentSense[unitID] or 1) ~= senseMult)
 		or (abilityDisabled ~= currentAbilityDisabled[unitID])
 		or (setRadar ~= (currentSetRadar[unitID] or false))
 		or (setSonar ~= (currentSetSonar[unitID] or false))
@@ -789,10 +795,14 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	if moveChanges then
-		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult)
-		currentMove[unitID] = moveMult
-		currentTurn[unitID] = turnMult
-		currentAccel[unitID] = accelMult
+		if UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult) then
+			-- Only update attributes if UpdateMovementSpeed passes
+			currentMove[unitID] = moveMult
+			currentTurn[unitID] = turnMult
+			currentAccel[unitID] = accelMult
+		else
+			hasAttributes = true
+		end
 	end
 	
 	if weaponSpecificMods or weaponChanges then

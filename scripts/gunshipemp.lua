@@ -1,7 +1,8 @@
 local base = piece 'base'
 local cap = piece 'cap'
 local boosters = piece 'boosters'
--- unused pieces: [lr]jet, jets
+local ljet = piece 'ljet'
+local rjet = piece 'rjet'
 local firepoint = piece 'firepoint'
 local weapon = piece 'weapon'
 local housing = piece 'housing'
@@ -34,8 +35,12 @@ local function TiltWings()
 end
 
 function script.Create()
-	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread (TiltWings)
+	Hide(ljet)
+	Hide(rjet)
+	Turn(ljet, x_axis, math.rad(-90))
+	Turn(rjet, x_axis, math.rad(-90))
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(TiltWings)
 end
 
 function script.QueryWeapon(num)
@@ -44,6 +49,16 @@ end
 
 function script.AimFromWeapon(num)
 	return housing
+end
+
+function script.Activate()
+	Show(ljet)
+	Show(rjet)
+end
+
+function script.Deactivate()
+	Hide(ljet)
+	Hide(rjet)
 end
 
 local function RestoreAfterDelay ()

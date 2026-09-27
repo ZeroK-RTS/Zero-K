@@ -9,7 +9,7 @@
 // max_vertices budget, so we can:
 //   invocation 0          → left tent slope  (ridge→ground, SEGMENTS+1 × 2 verts)
 //   invocation 1          → right tent slope (ridge→ground, SEGMENTS+1 × 2 verts)
-//   invocations 2..N-1    → one twig each (4 verts), conditional on a hash
+//   invocations 2..N-1    → one twig each (3 verts), conditional on a hash
 // Splitting the cross-section into two single-sheet slopes (one per invocation)
 // is what lets the full raised-ridge tent fit: each slope gets its own
 // GL_MAX_GEOMETRY_OUTPUT_COMPONENTS budget, so neither busts the 1024 ceiling a
@@ -21,7 +21,7 @@ layout (lines, invocations = 5) in;
 // 46 verts/invocation fits the min-spec total-components budget once the
 // per-vertex cableTangent varying is included (46 × 22 = 1012 ≤ 1024). The
 // tent-slope invocations use the full 46 (= 23 boundaries × 2); twig
-// invocations use 4.
+// invocations use 3.
 layout (triangle_strip, max_vertices = 46) out;
 
 uniform sampler2D heightmapTex;
@@ -35,14 +35,16 @@ uniform float ghostsEnabled;        // 1.0 = run coverage SSBO updates, 0.0 = by
 //
 // Slots are declared as uvec4 because Spring's VBO API requires vec4-aligned
 // attributes; we only use `.x` and ignore `.yzw`.
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
 	uvec4 cableCoverage[];
 };
+#endif
 
 in DataVS {
 	vec2 vsWorldXZ;
 	vec3 vsCableData;
-	vec4 vsGridData;
+	vec3 vsGridData;
 	flat int vsSlot;
 } dataIn[];
 
@@ -52,11 +54,12 @@ in DataVS {
 // pulse animation). For main-ribbon fragments (isBranch<0.5) it carries the
 // cable's len-per-segment so the FS can derive a per-segment bit index for
 // the coverage SSBO. The two semantics are disjoint by isBranch so no conflict.
-// BUDGET NOTE: `gridData` is a vec3 (was vec4 — the .z component was never read
-// by the FS). Shrinking it reclaimed one component so `cableTangent` could be
-// added without busting GL_MAX_GEOMETRY_OUTPUT_COMPONENTS' total budget: with
-// the tangent the per-vertex count is 22 (incl. gl_Position), so max_vertices
-// drops 50→46 to keep 46 × 22 = 1012 ≤ 1024 (min-spec).
+// BUDGET NOTE: `gridData` is a vec3 (eff, flow, isOwnAlly/ghost flag). It was a
+// vec4 whose .z carried a CPU-integrated bubble phase the FS never read;
+// dropping that float (now removed end-to-end — the CPU sends 3 floats)
+// reclaimed the component that funds `cableTangent`: with the tangent the
+// per-vertex count is 22 (incl. gl_Position), so max_vertices is 46 to keep
+// 46 × 22 = 1012 ≤ 1024 (min-spec GL_MAX_GEOMETRY_OUTPUT_COMPONENTS).
 out DataGS {
 	vec3 worldPos;
 	float capacity;
@@ -64,8 +67,6 @@ out DataGS {
 	float width;
 	vec2 cableUV;
 	vec2 timeData;
-	// (gridEfficiency, flow, isOwnAlly). For twigs (isBranch>0.5) .y is overloaded
-	// to the twig root's flow phase (flow is unused there) → pulse stagger.
 	vec3 gridData;
 	// Smooth per-vertex cable along-direction (3D). Linearly interpolated by
 	// the rasteriser so the FS frame (perp3D/trueUp → cylinder normal) rotates
@@ -117,6 +118,28 @@ float hash1(float n) {
 	return fract(sin(n * 12.9898) * 43758.5453);
 }
 
+// Band-limited 2D value noise in [-1,1] over WORLD space. Replaces the raw
+// per-vertex gsHash() wiggle, which was white noise: at high vertex density
+// (cliff oversampling raises numSeg, see curvSeg in main) adjacent vertices
+// got fully-independent ±effAmp kicks, producing a tight full-amplitude
+// zigzag. Quantizing to NOISE_CELL-sized cells and smoothstep-interpolating
+// the four corner hashes gives a fixed feature wavelength: denser sampling
+// converges on the same smooth curve instead of aliasing into noise. Keyed on
+// world position (not arc-length t), so it stays direction-independent — a
+// parent/child MST flip doesn't teleport the pattern.
+const float NOISE_CELL = 16.0;   // elmos per noise cell (feature wavelength)
+float gsValueNoise2(vec2 w, float seed) {
+	vec2 q  = w * (1.0 / NOISE_CELL);
+	vec2 i0 = floor(q);
+	vec2 f  = q - i0;
+	vec2 u  = f * f * (3.0 - 2.0 * f);   // smoothstep weights
+	float n00 = gsHash(i0.x,       i0.y,       seed);
+	float n10 = gsHash(i0.x + 1.0, i0.y,       seed);
+	float n01 = gsHash(i0.x,       i0.y + 1.0, seed);
+	float n11 = gsHash(i0.x + 1.0, i0.y + 1.0, seed);
+	return mix(mix(n00, n10, u.x), mix(n01, n11, u.x), u.y);
+}
+
 const int   MAX_SEGMENTS      = 22;   // hardware budget (max_vertices=46 → 23 boundaries × 2; lowered from 24 to make room for the cableTangent varying). Cable lengths are bounded by pylon range (longest ≈ energypylon's 500 elmo); at SEG_LEN_TARGET this wants ~23, so the very longest backbone cables lose ~1-2 segments — far outweighed by the tangent killing the per-segment faceting.
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
@@ -142,14 +165,13 @@ const int   PLACEMENT_OVERSAMPLE = 2;
 const int   MAX_GRID             = MAX_SEGMENTS * 2;   // local-array bound for the scan
 const float KINK_GAIN            = 0.15;
 
-// Twig parameters mirror the Lua-side BRANCH_* constants.
+// Twig parameters (chance/geometry of the small side branches).
 const float BRANCH_CHANCE     = 0.85;
 const float BRANCH_LEN_MIN    = 6.0;
 const float BRANCH_LEN_MAX    = 8.0;
 const float BRANCH_ANGLE_MIN  = 1.2;
 const float BRANCH_ANGLE_MAX  = 1.5;
 const float BRANCH_WIDTH      = 2.1;
-const float CONE_TIP_WIDTH    = 0.0;
 const float BRANCH_WIDTH_TWIG_LENGTH_FACTOR = 2.0;
 
 // Clearance over the heightmap, applied along the cable's chord-averaged surface
@@ -176,14 +198,14 @@ float gOutSpawnAlong = 0.0;
 int   gOutSlot       = -1;
 
 void emitVtx(vec3 wp, vec3 tangent3D, vec2 cuv,
-             float w, vec4 grid, vec2 td, float cap) {
+             float w, vec3 grid, vec2 td, float cap) {
 	worldPos = wp;
 	capacity = cap;
 	isBranch = gOutBranch;
 	width = w;
 	cableUV = cuv;
 	timeData = td;
-	gridData = grid.xyw;          // .z (per-end flowPhase) used in main() for the twig pulse, not forwarded; see DataGS BUDGET NOTE
+	gridData = grid;
 	cableTangent = tangent3D;     // smooth along-dir → FS interpolates the lit frame
 	spawnAlongMain = gOutSpawnAlong;
 	gsSlot = gOutSlot;
@@ -269,7 +291,7 @@ vec2 arcBiasedCenter(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB, float dh
 vec2 wigglyCablePoint(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB,
                       float arcDh, float effAmp, float seed) {
 	vec2 base = arcBiasedCenter(a, d, perpAB, t, lenAB, arcDh);
-	float n = gsHash(base.x * 0.1, base.y * 0.1, seed) * effAmp * gsNoiseScale(t);
+	float n = gsValueNoise2(base, seed) * effAmp * gsNoiseScale(t);
 	vec2 perpCanon = perpAB;
 	if (perpCanon.x < 0.0 || (perpCanon.x == 0.0 && perpCanon.y < 0.0)) {
 		perpCanon = -perpCanon;
@@ -277,22 +299,44 @@ vec2 wigglyCablePoint(vec2 a, vec2 d, vec2 perpAB, float t, float lenAB,
 	return base + perpCanon * n;
 }
 
-// Lift y to the max heightmap value sampled within ±fullStep along dirH.
-// Linear interpolation between adjacent segment vertices can dip below
-// terrain on convex/rolling slopes — taking the max within a window that
-// covers the next vertex's position guarantees adjacent envelopes overlap
-// at the segment midpoint, so the rendered ribbon stays above any peak in
-// the gap. Used by the main ribbon (centerline lift) and twig emitter
-// (spawn point lift) so they share the same vertical anchor.
-float maxHeightInWindow(vec2 p, vec2 dirH, float fullStep) {
+// Lift y to the max heightmap value sampled within ±window along dirH.
+// Linear interpolation between adjacent samples can dip below terrain on
+// convex/rolling slopes — taking the max within a window that reaches most of
+// the way to the neighbouring sample makes adjacent envelopes overlap, so the
+// profile built from the samples stays above any sub-sample terrain peak.
+//
+// A max-filter along the path is a morphological DILATION of the terrain
+// profile: on a monotone slope every sample takes the height ~0.85·window
+// uphill of it, i.e. the whole profile shifts horizontally downhill by a
+// constant amount. Size `window` to the SMALLEST span that still catches
+// sub-sample terrain — an oversized window reads as the cable overshooting
+// cliff lips like it had inertia. placeRibbonVertices passes the scan-grid
+// cell span (not the emitted-vertex span) for exactly this reason; the
+// per-EMITTED-vertex anti-clip is handled there with windows sized to the
+// local clustered gap.
+float maxHeightInWindow(vec2 p, vec2 dirH, float window) {
 	float yMax = heightAtWorldPos(p);
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.30)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.30)));
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.55)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.55)));
-	yMax = max(yMax, heightAtWorldPos(p + dirH * (fullStep * 0.85)));
-	yMax = max(yMax, heightAtWorldPos(p - dirH * (fullStep * 0.85)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (window * 0.30)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (window * 0.30)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (window * 0.55)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (window * 0.55)));
+	yMax = max(yMax, heightAtWorldPos(p + dirH * (window * 0.85)));
+	yMax = max(yMax, heightAtWorldPos(p - dirH * (window * 0.85)));
 	return yMax;
+}
+
+// Chord-averaged surface normal — the cable's shared "up", sampled at 5 anchor
+// points along the chord (same anchors as cableArcDh). Factored out so the twig
+// emitter lifts its root along the SAME axis the tent apex and clearance pad
+// ride, instead of a local per-point normal that diverges from the trunk frame
+// on uneven ground (which let the root dangle off the tube on slopes).
+vec3 cableNavg(vec2 a, vec2 d) {
+	vec3 nAcc = vec3(0.0);
+	for (int j = 0; j < 5; j++) {
+		float tj = (float(j) + 0.5) * (1.0 / 5.0);
+		nAcc += terrainNormal(a + d * tj);
+	}
+	return normalize(nAcc);
 }
 
 // Adaptive vertex placement, factored out so the twig emitter can replay the
@@ -315,17 +359,26 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
                         out float yBaseArr[MAX_SEGMENTS + 1],
                         out float alongArr[MAX_SEGMENTS + 1]) {
 	vec2  dirH     = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);   // max-filter window ~ avg emit span
 	int   G        = clamp(PLACEMENT_OVERSAMPLE * numSeg, 1, MAX_GRID);
+	float gridStep = lenAB / float(G);   // scan-cell span
 
-	// Profile scan: max-filtered terrain height along the cable path. Its second
+	// Profile scan: terrain height along the cable path, max-filtered only over
+	// ONE scan cell — just enough to catch terrain between scan samples, NOT the
+	// old ±0.85·(lenAB/numSeg) window. That global-average window dilated the
+	// profile by ~19 elmos along the cable, which on any monotone slope is a
+	// constant horizontal shift downhill: cables carried cliff-top height well
+	// past the lip before dropping, as if they had inertia. The anti-clip duty
+	// the wide window used to carry moved to the per-emitted-vertex pass below,
+	// where the window is sized to the LOCAL clustered gap. The profile's second
 	// difference (below) is the along-cable curvature — directional by
-	// construction (crossing a ridge spikes it, running along a crest does not).
+	// construction (crossing a ridge spikes it, running along a crest does not);
+	// the narrower filter also stops smearing kinks across two cells, so
+	// clustering lands harder exactly on the lip.
 	float yCgrid[MAX_GRID + 1];
 	for (int i = 0; i <= G; i++) {
 		float tg = float(i) / float(G);
 		vec2 pg = wigglyCablePoint(a, d, perpAB, tg, lenAB, arcDh, effAmp, seed);
-		yCgrid[i] = maxHeightInWindow(pg, dirH, fullStep);   // base terrain profile
+		yCgrid[i] = maxHeightInWindow(pg, dirH, gridStep);   // base terrain profile
 	}
 
 	// Per-cell importance = uniform floor (1.0, keeps flats at equal arc spacing)
@@ -340,10 +393,8 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
 	}
 	float wStep = cum[G] / float(numSeg);
 
-	int   gi       = 0;
-	int   prevIdx  = -1;
-	float along    = 0.0;
-	vec3  prevBase = vec3(0.0);
+	int   gi      = 0;
+	int   prevIdx = -1;
 	for (int k = 0; k <= numSeg; k++) {
 		// Pick the grid index whose cumulative weight is nearest k·wStep. gi and k
 		// both advance monotonically → one linear sweep. The max(prevIdx+1) guard
@@ -355,18 +406,44 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
 		if (gi < G && (target - cum[gi]) > (cum[gi+1] - target)) idx = gi + 1;
 		idx = min(max(idx, prevIdx + 1), G);
 		prevIdx = idx;
+		idxArr[k] = idx;
+	}
+
+	// Per-vertex anti-clip lift, sized to the LOCAL emitted gaps: each vertex
+	// takes the max of the scan profile over ~0.55 of the gap to each emitted
+	// neighbour, so the two endpoints of every gap jointly cover all its scan
+	// samples with overlap at the midpoint (0.55 + 0.55 > 1) — the same
+	// envelope guarantee the old global-average window gave, but the dilation
+	// radius now shrinks with clustering: at a cliff lip, where curvature
+	// packs vertices into adjacent scan cells, the lift degenerates to the
+	// vertex's own (one-cell-filtered) sample and the "inertia" overshoot is
+	// bounded by one scan cell instead of ±0.85·(lenAB/numSeg). On sparse
+	// stretches the window grows with the gap — but sparse means flat, where
+	// the max is invisible. int() truncation keeps the reach strictly inside
+	// the gap for adjacent-cell neighbours (nothing to cover between them).
+	float along    = 0.0;
+	vec3  prevBase = vec3(0.0);
+	for (int k = 0; k <= numSeg; k++) {
+		int iC = idxArr[k];
+		int iL = (k > 0)      ? idxArr[k-1] : iC;
+		int iR = (k < numSeg) ? idxArr[k+1] : iC;
+		int lo = max(iC - int(float(iC - iL) * 0.55), 0);
+		int hi = min(iC + int(float(iR - iC) * 0.55), G);
+		float yB = yCgrid[iC];
+		for (int i = lo; i <= hi; i++) {
+			yB = max(yB, yCgrid[i]);
+		}
 
 		// Accumulate 3D arc length over the emitted vertices. The clearance pad is
 		// a uniform per-cable Navg shift, so it cancels in consecutive distances —
 		// accumulating over the bare (xz, yBase) points matches emitTentHalf's
 		// center3D-based accumulation exactly.
-		vec2 p    = wigglyCablePoint(a, d, perpAB, float(idx) / float(G), lenAB, arcDh, effAmp, seed);
-		vec3 base = vec3(p.x, yCgrid[idx], p.y);
+		vec2 p    = wigglyCablePoint(a, d, perpAB, float(iC) / float(G), lenAB, arcDh, effAmp, seed);
+		vec3 base = vec3(p.x, yB, p.y);
 		if (k > 0) along += distance(prevBase, base);
 		prevBase = base;
 
-		idxArr[k]   = idx;
-		yBaseArr[k] = yCgrid[idx];
+		yBaseArr[k] = yB;
 		alongArr[k] = along;
 	}
 	return G;
@@ -380,7 +457,7 @@ int placeRibbonVertices(vec2 a, vec2 d, vec2 perpAB, float lenAB, float arcDh,
 // verts/boundary), so the full tent only costs one extra invocation.
 void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
                   float halfW, float widthVal, float effAmp, float seed,
-                  vec4 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
+                  vec3 gridD, vec2 timeD, float cap, int numSeg, float arcDh) {
 	gOutBranch = 0.0;
 	float tentHeight = halfW * TENT_HEIGHT_FACTOR;
 	// `along` is fed into the FS as cableUV.x and drives bubble advection.
@@ -407,16 +484,9 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 	// vertical ROLL from the terrain normal; cross(worldUp, tangent) has no roll
 	// (worldUp is fixed), it only yaws to track the bend. It also matches the FS
 	// lighting frame, which already derives perp3D = cross(worldUp, cableTangent),
-	// so geometry and shading agree.
-	vec3 Navg;
-	{
-		vec3 nAcc = vec3(0.0);
-		for (int j = 0; j < 5; j++) {
-			float tj = (float(j) + 0.5) * (1.0 / 5.0);
-			nAcc += terrainNormal(a + d * tj);
-		}
-		Navg = normalize(nAcc);
-	}
+	// so geometry and shading agree. cableNavg is shared with the twig emitter so
+	// twig roots ride the same axis.
+	vec3 Navg = cableNavg(a, d);
 	vec3 cableDirH_g = normalize(vec3(d.x, 0.0, d.y));
 	// Fallback width axis for the first vertex (chord tangent) and any vertex
 	// whose local tangent degenerates: horizontal, perpendicular to the chord.
@@ -526,13 +596,9 @@ void emitTentHalf(float side, vec2 a, vec2 d, vec2 perpAB,
 // hash says "no twig here" — leaving an empty primitive, which is a no-op.
 void emitTwig(vec2 a, vec2 d, vec2 perpAB,
               float halfMainW, float widthVal, float effAmp, float seed,
-              vec4 gridD, vec2 timeD, float cap, float tCenter,
+              vec3 gridD, vec2 timeD, float cap, float tCenter,
               float spawnAlongMain, int twigIdx, float arcDh, int numSeg,
-              float flowPhase) {
-	// Pack this twig's flow phase into gridData.y (flow, unused by twigs) for the
-	// FS pulse stagger — see the DataGS gridData note.
-	vec4 gridTwig = gridD;
-	gridTwig.y = flowPhase;
+              vec3 railPrev, vec3 railCenter) {
 	// Resolve spawn point on the wiggly main path at tCenter so twigs root on
 	// the visible cable.
 	float lenAB = length(d);
@@ -560,19 +626,14 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	float bLen = BRANCH_LEN_MIN + widthVal*BRANCH_WIDTH_TWIG_LENGTH_FACTOR +
 		gsHashU(spawn.x, spawn.y, twigSeed + 3.0) * (BRANCH_LEN_MAX - BRANCH_LEN_MIN);
 
+	// The twig is a 3-vertex triangle: a full-width root edge tapering to a
+	// point at tip3D. The WIDTH varying passed to the FS stays UNIFORM at
+	// `twigW` along the whole twig, so bubble math sees constant halfWidthE
+	// and bubble radius/spacing don't change with along position; the visible
+	// bubble simply projects smaller near the point. This decouples "bubble
+	// flow looks uniform" from "twig has a cone shape".
 	float twigW    = max(2.5, widthVal * BRANCH_WIDTH);
 	float twigHWr  = min(twigW, widthVal * 0.55) * BRANCH_WIDTH;
-	// Geometric cone taper at 0.45 — visible shape narrows toward the tip
-	// (looks like a branch, not a tube). The WIDTH varying we pass to the FS
-	// stays UNIFORM at `twigW` along the entire twig, so bubble math sees
-	// constant halfWidthE and bubble radius/spacing don't change with along
-	// position. The visible bubble naturally fits the tapered geometry: in v
-	// space the bubble keeps the same cross-axis extent (relative to the
-	// cable's UV cross), which projects to a smaller world-cross at the
-	// thinner tip. At the very end the cable's `t > 0.9` cross discard clips
-	// any bubble that runs off the tip. This decouples "bubble flow looks
-	// uniform" from "twig has cone shape".
-	float twigHWt  = twigHWr * CONE_TIP_WIDTH;
 
 	// Build the twig as a flat ribbon in the slope's local tangent plane at
 	// the spawn point. This way, viewing perpendicular to the slope, the twig
@@ -586,31 +647,45 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	vec3 T = normalize(cableDirH - dot(cableDirH, N) * N);
 	vec3 B = normalize(cross(N, T));
 
+	// Rail frame at the emitted vertex the twig roots on: tangent = back-diff
+	// of adjacent emitted centerline points (exactly emitTentHalf's vtxTangent
+	// at this vertex), width axis B_v = its horizontal perpendicular (exactly
+	// the axis the tent rails are laid on).
+	vec3 railTangent = railCenter - railPrev;
+	float rtL = length(railTangent);
+	railTangent = (rtL > 1e-4) ? railTangent / rtL : cableDirH;
+	vec3 B_v = cross(vec3(0.0, 1.0, 0.0), railTangent);
+	float bvL = length(B_v);
+	B_v = (bvL > 1e-3) ? B_v / bvL : normalize(cross(vec3(0.0, 1.0, 0.0), cableDirH));
+	// Local N gives B an arbitrary sign that can disagree with the rail axis on
+	// broken ground. Align them so the twig grows AWAY from the tube on the
+	// SAME side its root is placed (+B_v*halfMainW*side below) instead of
+	// doubling back across the trunk.
+	if (dot(B, B_v) < 0.0) B = -B;
+
 	float ca = cos(angleOff);
 	float sa = sin(angleOff) * side;
 	vec3 twigDir3D  = ca * T + sa * B;
 	vec3 twigPerp3D = normalize(cross(N, twigDir3D));
 
-	// Anchor spawn to the same max-of-window lift the main ribbon uses, offset
-	// along the local normal N — at this 0.3 magnitude N tracks the trunk's
-	// chord-averaged Navg pad closely enough to keep the junction seated, and N
-	// is already the twig's own basis. TWIG_CLEAR is slightly less than
-	// CENTERLINE_CLEAR so the junction sits just under the trunk's centerline
-	// (z-fight avoidance, see TWIG_CLEAR comment).
-	vec2 dirH = (lenAB > 0.0) ? d / lenAB : vec2(1.0, 0.0);
-	float fullStep = lenAB / float(numSeg);
-	float spawnYbase = maxHeightInWindow(spawn, dirH, fullStep);
-	vec3 spawn3D = vec3(spawn.x, spawnYbase, spawn.y) + N * TWIG_CLEAR;
-
-	// Anchor the root to the spawn-side edge of the cable's in-slope cross
-	// section so the twig pokes out of the side, not the midline.
-	vec3 root3D = spawn3D + B * (halfMainW * 0.2 * side);
+	// Root anchor: reproduce the trunk's spawn-side OUTER rail vertex — the
+	// same center ± B_v*halfW the tent slopes emit, with the same SIDE_CLEAR
+	// anti-underground clamp — so the junction is welded to a vertex the
+	// ribbon actually renders. The old code offset by 0.2*halfW along the
+	// LOCAL-normal B from a max-of-window spawn at the belly; on slopes that
+	// both diverged from the trunk frame and dangled below the visible tube,
+	// detaching the twig. A small lift along the trunk's shared Navg
+	// (TWIG_CLEAR) tucks the junction just proud of the rail to avoid
+	// z-fighting.
+	vec3 Navg = cableNavg(a, d);
+	vec3 center3D = railCenter + Navg * CENTERLINE_CLEAR;
+	vec3 root3D = center3D + B_v * (halfMainW * side);
+	root3D.y = max(root3D.y, heightAtWorldPos(root3D.xz) + SIDE_CLEAR);
+	root3D += Navg * TWIG_CLEAR;
 	vec3 tip3D  = root3D + twigDir3D * bLen;
 
 	vec3 rootL = root3D - twigPerp3D * twigHWr;
 	vec3 rootR = root3D + twigPerp3D * twigHWr;
-	vec3 tipL  = tip3D  - twigPerp3D * twigHWt;
-	vec3 tipR  = tip3D  + twigPerp3D * twigHWt;
 
 	// cableUV.x carries the cable-wide along distance so the FS growth gate
 	// hides this twig until the main growth front has reached spawnAlongMain.
@@ -618,10 +693,10 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	// FS derives perp3D from cross(worldUp, vsTangent) so cylindrical lighting
 	// follows the twig's pointing direction.
 	gOutBranch = 1.0;
-	gOutSpawnAlong = spawnAlongMain;   // shared by all 4 twig vertices; lets FS compute twig-local along
-	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW,        gridTwig, timeD, cap);
-	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW,        gridTwig, timeD, cap);
-	emitVtx(tipL,  twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridTwig, timeD, cap);
+	gOutSpawnAlong = spawnAlongMain;   // shared by all 3 twig vertices; lets FS compute twig-local along
+	emitVtx(rootL, twigDir3D, vec2(spawnAlongMain,        -1.0), twigW, gridD, timeD, cap);
+	emitVtx(rootR, twigDir3D, vec2(spawnAlongMain,         1.0), twigW, gridD, timeD, cap);
+	emitVtx(tip3D, twigDir3D, vec2(spawnAlongMain + bLen, -1.0), twigW, gridD, timeD, cap);
 	EndPrimitive();
 	gOutSpawnAlong = 0.0;
 }
@@ -643,15 +718,15 @@ void main() {
 
 	float cap   = dataIn[0].vsCableData.x;
 	vec2  timeD = dataIn[0].vsCableData.yz;
-	vec4  gridD = dataIn[0].vsGridData;
+	vec3  gridD = dataIn[0].vsGridData;
 
-	// Ghost edges (gridData.w = -1.0) emit the same two tent slopes as live
+	// Ghost edges (gridData.z = -1.0) emit the same two tent slopes as live
 	// (no twigs), using the SAME wiggly path so the live→ghost transition has
 	// no visual snap. Ghost FS path is fast (no lighting/bubble math), and the
 	// GS still skips the 3 twig invocations. Coverage updates use the live
 	// atomicAnd path with the wiggly samples → consistent with what the player
 	// visually sees.
-	bool isGhostEdge = gridD.w < -0.5;
+	bool isGhostEdge = gridD.z < -0.5;
 	if (isGhostEdge && gl_InvocationID > 1) return;
 
 	float widthVal = MIN_TRUNK_WIDTH +
@@ -717,8 +792,8 @@ void main() {
 
 	if (gl_InvocationID == 0) {
 		// Coverage SSBO update — once per cable per frame, not per fragment.
-		// Live edges (gridData.w >= -0.5) atomicOr bits for segments currently
-		// in LOS; ghost edges (gridData.w < -0.5) atomicAnd to clear bits the
+		// Live edges (gridData.z >= -0.5) atomicOr bits for segments currently
+		// in LOS; ghost edges (gridData.z < -0.5) atomicAnd to clear bits the
 		// player has re-scouted. Sampling along the actual wiggly path keeps
 		// reveal accurate even with arc bias on slopes.
 		//
@@ -734,7 +809,7 @@ void main() {
 		// second per-frame update would risk double-clearing ghost bits.
 #if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
 		int slot = dataIn[0].vsSlot;
-		bool isGhost = gridD.w < -0.5;
+		bool isGhost = gridD.z < -0.5;
 		// Hard gate on the user-facing ghosts toggle — skip ALL coverage
 		// bookkeeping (the n-tap LOS scan, atomic ops, even the SSBO read)
 		// when ghosts are off. Restores live-only perf parity with pre-slice-1.
@@ -802,16 +877,17 @@ void main() {
 		}
 		float tCenter        = float(idxArr[bestK]) / float(G);
 		float spawnAlongMain = alongArr[bestK];
-		// This twig root's flow phase: lerp the two ends' values (gridData.z, phaseA
-		// on v0 / phaseB on v1) by its fractional arc position, so it stays
-		// continuous with both pylons and the wave follows flow across the joint.
-		// arc > 0 always here (a twig only emits when len3D >= ~42).
-		float phaseFrac  = spawnAlongMain / alongArr[numSeg];
-		float phaseA     = gridD.z;
-		float phaseB     = dataIn[1].vsGridData.z;
-		float flowPhase  = phaseA + (phaseB - phaseA) * phaseFrac;
+		// Rebuild the rooted vertex and its predecessor exactly as emitTentHalf
+		// does (same wigglyCablePoint xz, same base height) so emitTwig can
+		// reconstruct the local rail frame at the junction. bestK >= 1 always,
+		// so bestK-1 is a valid emitted vertex.
+		float tPrev = float(idxArr[bestK - 1]) / float(G);
+		vec2 pC = wigglyCablePoint(a, d, perpAB, tCenter, lenAB, arcDh, effAmp, seed);
+		vec2 pP = wigglyCablePoint(a, d, perpAB, tPrev,   lenAB, arcDh, effAmp, seed);
+		vec3 railCenter = vec3(pC.x, yBaseArr[bestK],     pC.y);
+		vec3 railPrev   = vec3(pP.x, yBaseArr[bestK - 1], pP.y);
 		emitTwig(a, d, perpAB, halfW, widthVal, effAmp, seed,
 		         gridD, timeD, cap, tCenter, spawnAlongMain, twigIdx, arcDh, numSeg,
-		         flowPhase);
+		         railPrev, railCenter);
 	}
 }

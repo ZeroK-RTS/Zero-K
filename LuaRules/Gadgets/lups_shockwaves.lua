@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "Jan. 2008",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true
+    enabled   = false
   }
 end
 
@@ -22,38 +22,40 @@ if (gadgetHandler:IsSyncedCode()) then
 local hasShockwave = {} -- other gadgets can do Script.SetWatchWeapon and it is a global setting
 local wantedList = {}
 
---// find weapons which cause a shockwave
-for i = 1, #WeaponDefs do
-	local wd = WeaponDefs[i]
-	local customParams = wd.customParams or {}
-	if (not customParams.lups_noshockwave) then
-		local speed = 1
-		local life = 1
-		local normalShockwave = (wd.damageAreaOfEffect>70 and not wd.paralyzer and not customParams.disarmdamageonly)
-		if customParams.lups_explodespeed then
-			speed = wd.customParams.lups_explodespeed
-			normalShockwave = true
-		end
-		if customParams.lups_explodelife then
-			life = wd.customParams.lups_explodelife
-			normalShockwave = true
-		end
-		if wd.description == "Implosion Bomb" then
-			hasShockwave[wd.id] = {special = 1}
-			wantedList[#wantedList + 1] = wd.id
-			Script.SetWatchExplosion(wd.id, true)
-		elseif normalShockwave then
-			hasShockwave[wd.id] = {
-				life = 23*life,
-				speed = speed,
-				growth = (wd.damageAreaOfEffect*1.1)/20*speed
-			}
-			wantedList[#wantedList + 1] = wd.id
-			Script.SetWatchExplosion(wd.id, true)
-		elseif (wd.type == "DGun") then
-			hasShockwave[wd.id] = {DGun = true}
-			wantedList[#wantedList + 1] = wd.id
-			Script.SetWatchExplosion(wd.id, true)
+function gadget:Initialize()
+	--// find weapons which cause a shockwave
+	for i = 1, #WeaponDefs do
+		local wd = WeaponDefs[i]
+		local customParams = wd.customParams or {}
+		if (not customParams.lups_noshockwave) then
+			local speed = 1
+			local life = 1
+			local normalShockwave = (wd.damageAreaOfEffect>70 and not wd.paralyzer and not customParams.disarmdamageonly)
+			if customParams.lups_explodespeed then
+				speed = wd.customParams.lups_explodespeed
+				normalShockwave = true
+			end
+			if customParams.lups_explodelife then
+				life = wd.customParams.lups_explodelife
+				normalShockwave = true
+			end
+			if wd.description == "Implosion Bomb" then
+				hasShockwave[wd.id] = {special = 1}
+				wantedList[#wantedList + 1] = wd.id
+				Script.SetWatchExplosion(wd.id, true)
+			elseif normalShockwave then
+				hasShockwave[wd.id] = {
+					life = 23*life,
+					speed = speed,
+					growth = (wd.damageAreaOfEffect*1.1)/20*speed
+				}
+				wantedList[#wantedList + 1] = wd.id
+				Script.SetWatchExplosion(wd.id, true)
+			elseif (wd.type == "DGun") then
+				hasShockwave[wd.id] = {DGun = true}
+				wantedList[#wantedList + 1] = wd.id
+				Script.SetWatchExplosion(wd.id, true)
+			end
 		end
 	end
 end

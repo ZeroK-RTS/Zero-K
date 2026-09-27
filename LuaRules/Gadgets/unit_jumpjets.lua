@@ -38,6 +38,7 @@ local CMD_MOVE   = CMD.MOVE
 local CMD_REMOVE = CMD.REMOVE
 local privateTable = {private = true}
 local sightTable = {inlos = true}
+local DISARM_CANCEL_FACTOR = 2
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitPosition      = Spring.GetUnitPosition
@@ -413,13 +414,18 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		end
 		
 		if delay > 0 then
+			local timeoutFrames = delay*DISARM_CANCEL_FACTOR
 			while delay > 0 do
 				local stunned = Spring.GetUnitIsStunned(unitID)
 				if not stunned then
-					delay = delay - (GG.att_ReloadChange[unitID] or 1) -- Disarm or slow
+					local speedMult = (GG.att_ReloadChange[unitID] or 1) -- Disarm or slow
+					delay = delay - speedMult
+					if speedMult == 0 then
+						timeoutFrames = timeoutFrames - 1
+					end
 				end
 				local attachedTransport = Spring.GetUnitTransporter(unitID)
-				if attachedTransport then
+				if attachedTransport or timeoutFrames <= 0 then
 					FinishJump(unitID)
 					-- Transport cancels jump
 					CallAsUnitIfExists(unitID, env.cancelJump)
@@ -433,7 +439,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			end
 			
 			CallAsUnitIfExists(unitID,env.beginJump)
-			if PLAY_SOUND and (not cannotJumpMidair) then	-- don't make sound if we jump with legs instead of jets
+			if PLAY_SOUND and (not cannotJumpMidair) then -- don't make sound if we jump with legs instead of jets
 				GG.PlayFogHiddenSound("Jump", UnitDefs[unitDefID].mass/10, start[1], start[2], start[3])
 			end
 			if rotateMidAir then
