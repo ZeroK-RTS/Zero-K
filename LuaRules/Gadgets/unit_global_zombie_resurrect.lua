@@ -77,10 +77,15 @@ end
 
 local ZOMBIES_PARTIAL_RECLAIM = (tonumber(modOptions.zombies_partial_reclaim) == 1)
 
-local zombiesReviveAsString = (modOptions.zombies_revive_as) or nil -- pilfered from lockunits_modoption, would there be a better way to do this?
+local zombiesReviveOptionsAsString = (modOptions.zombies_revive_options) or nil -- pilfered from lockunits_modoption, would there be a better way to do this?
+local zombiesReviveOptionMultiRandomise = tonumber(modOptions.zombies_revive_options_multi_random) or 1
+local zombiesReviveOptionsOverflowSpawn = tonumber(modOptions.zombies_revive_options_overflow_spawn) or 1
+
 local zombieReviveOptionCount = 0
 local zombieReviveOptions = {} -- allows duplicates
+local zombieBudget = 0
 
+--TODO there seems to be something with the comnames adding some more stuff?
 local UnitDefBothNames = {} -- Includes humanName and name
 local function AddName(name, unitDefId)
 	name = name:lower()
@@ -105,6 +110,53 @@ if zombiesReviveOptionsAsString then
 			end
 		end
 	end
+end
+
+
+
+local function SpawnReviveOption(x,y,z,facing,zombieUnitDefID)
+	local unitID = Spring.CreateUnit(zombieUnitDefID, x, y, z, facing, GaiaTeamID)
+	zombies[unitID] = true
+	GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
+	GG.Zombies.SetZombieBehavior(unitID)
+	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
+	return unitID
+end
+
+local function HandleZombieReviveOptions(featureID)
+	local x, y, z = Spring.GetFeaturePosition(featureID)
+	local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
+	local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
+	
+	
+	if ZOMBIES_PARTIAL_RECLAIM then -- partial reclaim reduces the available metal to spawn units
+		zombieBudget = zombieBudget + UnitDefNames[resDefName].cost * (currentMetal/maxMetal)
+	else
+		zombieBudget = zombieBudget + UnitDefNames[resDefName].cost
+	end
+	zombieBudget = math.floor(zombieBudget)
+
+	local zombieUnitDefID = zombieReviveOptions[math.random(1,zombieReviveOptionCount)]
+	local zombieCost = UnitDefs[zombieUnitDefID].cost
+	while zombieBudget >= zombieCost do
+		SpawnReviveOption(x,y,z,facing,zombieUnitDefID)
+		zombieBudget = zombieBudget - zombieCost
+		if zombiesReviveOptionMultiRandomise == 1 then -- Randomises to a new unit if desired
+			zombieUnitDefID = zombieReviveOptions[math.random(1,zombieReviveOptionCount)]
+			zombieCost = UnitDefs[zombieUnitDefID].cost
+		end
+	end
+	
+	if zombiesReviveOptionsOverflowSpawn == 1 then -- We make a partial health zombie or overflow the budget to the next spawn
+		local unitID = SpawnReviveOption(x,y,z,facing,zombieUnitDefID)
+		zombieBudget = zombieBudget - zombieCost
+		local health = Spring.GetUnitHealth(unitID) -- TODO something breaks here, check if unit exists?
+		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
+			Spring.SetUnitHealth(unitID, health*((UnitDefs[zombieUnitDefID].cost + zombieBudget)/UnitDefs[zombieUnitDefID].cost))
+			zombieBudget = 0
+		end
+	end
+	Spring.DestroyFeature(featureID)
 end
 
 local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
@@ -168,37 +220,8 @@ local function RezFrameCallback(featureID)
 		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 		GG.Zombies.SetZombieBehavior(unitID)
 	else
-		local x, y, z = Spring.GetFeaturePosition(featureID)
-		local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
-		local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
-		
-		local metalToSpend = 0
-		if ZOMBIES_PARTIAL_RECLAIM then -- partial reclaim reduces the available metal to spawn units
-			metalToSpend = UnitDefNames[resDefName].cost * (currentMetal/maxMetal)
-		else
-			metalToSpend = UnitDefNames[resDefName].cost
-		end
-		metalToSpend = math.floor(metalToSpend)
-		local zombieUnitDefID
-		while  metalToSpend > 0 do
-			zombieUnitDefID = zombieReviveOptions[math.random(1,zombieReviveOptionCount)]
-			local zombieCost = UnitDefs[zombieUnitDefID].cost	
-			
-			unitID = Spring.CreateUnit(zombieUnitDefID, x, y, z, facing, GaiaTeamID)
-			
-			zombies[unitID] = true
-			GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
-			GG.Zombies.SetZombieBehavior(unitID)
-			gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
-			metalToSpend = metalToSpend - zombieCost
-		end
-		
-		local health = Spring.GetUnitHealth(unitID)
-		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
-			Spring.SetUnitHealth(unitID, health*((UnitDefs[zombieUnitDefID].cost + metalToSpend)/UnitDefs[zombieUnitDefID].cost))
-		end
+		HandleZombieReviveOptions(featureID)
 	end
-	Spring.DestroyFeature(featureID)
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
