@@ -156,7 +156,7 @@ end
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
-	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'radar_icon_buttons', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'small_icons', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'buttonFontScale', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -324,6 +324,15 @@ options = {
 		desc = 'Determines the size of the unit radar icons in the command panel.',
 		OnChange = function(self)
 			UpdateRadarIcons(self.value)
+		end,
+	},
+	radar_icon_buttons = {
+		name = 'Use radar icons for build buttons',
+		type = 'bool',
+		value = false,
+		desc = 'Show units as their radar icon instead of the 3D unit picture on build buttons in the command panel.',
+		OnChange = function(self)
+			DeleteAllButtons()
 		end,
 	},
 	keyboardType2 = {
@@ -1327,7 +1336,10 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	local buildProgress
 	local textBoxes = {}
 	
-	local function SetImageTexture(texture1, texture2)
+	-- keepAspect: true for radar icons, whose circles and squares would otherwise be stretched to the
+	-- button's shape; otherwise the layout's setting (build pictures fill the button).
+	local function SetImageTexture(texture1, texture2, keepAspect)
+		keepAspect = keepAspect or buttonLayout.image.keepAspect
 		if not image then
 			image = Image:New {
 				name = name .. "_image",
@@ -1336,13 +1348,18 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				right = buttonLayout.image.right,
 				bottom = buttonLayout.image.bottom,
 				height = buttonLayout.image.height,
-				keepAspect = buttonLayout.image.keepAspect,
+				keepAspect = keepAspect,
 				file = texture1,
 				file2 = texture2,
 				parent = button,
 			}
 			image:SendToBack()
 			return
+		end
+		
+		if image.keepAspect ~= keepAspect then
+			image.keepAspect = keepAspect
+			image:Invalidate()
 		end
 		
 		if image.file == texture1 and image.file2 == texture2 then
@@ -1488,6 +1505,10 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	
 	
 	function externalFunctionsAndData.ApplyRadarIcon()
+		if options.radar_icon_buttons.value then
+			RemoveRadarIconTexture() -- the button image is already the radar icon
+			return
+		end
 		local ud = UnitDefs[-cmdID]
 		if ud ~= nil then
 			ApplyRadarIconTexture(GetUnitIcon(ud.id))
@@ -1729,8 +1750,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
-			local texture = ((not buttonLayout.image.rectangleAspect) and WG.GetSquareBuildTexture(ud)) or WG.GetRectangleBuildTexture(ud)
-			SetImageTexture(texture, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(ud))
+			local radarIcon = options.radar_icon_buttons.value and GetUnitIcon(ud.id)
+			if radarIcon then
+				SetImageTexture(radarIcon, nil, true)
+			else
+				local texture = ((not buttonLayout.image.rectangleAspect) and WG.GetSquareBuildTexture(ud)) or WG.GetRectangleBuildTexture(ud)
+				SetImageTexture(texture, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(ud))
+			end
 			if buttonLayout.showCost then
 				local cost = GetUnitCost(false, -cmdID)
 				if cost >= 100000000 then
