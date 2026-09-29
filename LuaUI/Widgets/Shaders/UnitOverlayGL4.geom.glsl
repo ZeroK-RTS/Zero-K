@@ -144,6 +144,7 @@ vec4 overlayVertexClip(vec2 pos) {
 #define BITICONCORNER 262144u
 #define BITJUMPCHARGE 1048576u
 #define BITRATEETA 2097152u
+#define BITSTRUCTURE 4194304u
 
 float iconAtlasFlag = 0.0;
 
@@ -171,8 +172,11 @@ void applyOverlayDepth() {
 		// unit's overlay, where ndc is shared). Scaling it down keeps distance ordering between
 		// near-equidistant units from being overridden by another unit's internal layering, while
 		// 0.0005-sized steps near the near plane are still far above any z-fighting threshold.
+		// Structures (BITSTRUCTURE) get a second band right behind the first, so every mobile unit's
+		// overlay draws over every building's -- e.g. units inside a factory stay visible over its icon.
 		float ndc = clamp(gl_Position.z / gl_Position.w, 0.0, 1.0);        // natural [0,1] depth
-		float z = 0.005 + overlayDepthBand * ndc + depthbuffermod * 0.1;   // near-plane sliver + layering
+		float structureBand = ((BARTYPE & BITSTRUCTURE) != 0u) ? overlayDepthBand : 0.0;
+		float z = 0.005 + structureBand + overlayDepthBand * ndc + depthbuffermod * 0.1; // near-plane sliver + layering
 		gl_Position.z = z * gl_Position.w;
 	} else {
 		gl_Position.z += depthbuffermod;
