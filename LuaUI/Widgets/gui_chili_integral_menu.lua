@@ -156,7 +156,7 @@ end
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
 	'simple_mode', 'enable_return_fire', 'enable_roam',
-	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'radar_icon_buttons', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'background_opacity',  'allowclickthrough', 'show_radar_icons', 'radar_icon_size', 'radar_icon_buttons', 'radar_icon_button_size', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'small_icons', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'buttonFontScale', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -331,6 +331,15 @@ options = {
 		type = 'bool',
 		value = false,
 		desc = 'Show units as their radar icon instead of the 3D unit picture on build buttons in the command panel.',
+		OnChange = function(self)
+			DeleteAllButtons()
+		end,
+	},
+	radar_icon_button_size = {
+		name = 'Build button radar icon size',
+		type = 'number',
+		value = 70, min = 20, max = 100, step = 5,
+		desc = 'Size of the radar icon on build buttons (percent of the button), when radar icons are used for build buttons.',
 		OnChange = function(self)
 			DeleteAllButtons()
 		end,
@@ -1336,10 +1345,12 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	local buildProgress
 	local textBoxes = {}
 	
-	-- keepAspect: true for radar icons, whose circles and squares would otherwise be stretched to the
-	-- button's shape; otherwise the layout's setting (build pictures fill the button).
-	local function SetImageTexture(texture1, texture2, keepAspect)
-		keepAspect = keepAspect or buttonLayout.image.keepAspect
+	local image_radar -- centered radar icon used in place of the build picture (radar_icon_buttons)
+	
+	local function SetImageTexture(texture1, texture2)
+		if image_radar then
+			image_radar:SetVisibility(false) -- any regular texture replaces the centered radar icon
+		end
 		if not image then
 			image = Image:New {
 				name = name .. "_image",
@@ -1348,18 +1359,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				right = buttonLayout.image.right,
 				bottom = buttonLayout.image.bottom,
 				height = buttonLayout.image.height,
-				keepAspect = keepAspect,
+				keepAspect = buttonLayout.image.keepAspect,
 				file = texture1,
 				file2 = texture2,
 				parent = button,
 			}
 			image:SendToBack()
 			return
-		end
-		
-		if image.keepAspect ~= keepAspect then
-			image.keepAspect = keepAspect
-			image:Invalidate()
 		end
 		
 		if image.file == texture1 and image.file2 == texture2 then
@@ -1393,6 +1399,33 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		image_icon.file = texture1
 		image_icon:Resize(radarIconSize, radarIconSize)
 		image_icon:Invalidate()
+	end
+	
+	-- Radar icon in place of the build picture: centered in the image area at radar_icon_button_size
+	-- percent, aspect kept so its circles and squares aren't stretched to the button's shape.
+	local function SetRadarImageTexture(texture1)
+		SetImageTexture("")
+		local size = options.radar_icon_button_size.value
+		local offset = string.format('%d%%', math.floor((100 - size) / 2))
+		local sizeStr = string.format('%d%%', size)
+		if not image_radar then
+			image_radar = Image:New {
+				name = name .. "_image_radar",
+				x = offset,
+				y = offset,
+				width = sizeStr,
+				height = sizeStr,
+				keepAspect = true,
+				file = texture1,
+				parent = image,
+			}
+			return
+		end
+		image_radar:SetVisibility(true)
+		if image_radar.file ~= texture1 then
+			image_radar.file = texture1
+			image_radar:Invalidate()
+		end
 	end
 	
 	local function RemoveRadarIconTexture()
@@ -1752,7 +1785,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			end
 			local radarIcon = options.radar_icon_buttons.value and GetUnitIcon(ud.id)
 			if radarIcon then
-				SetImageTexture(radarIcon, nil, true)
+				SetRadarImageTexture(radarIcon)
 			else
 				local texture = ((not buttonLayout.image.rectangleAspect) and WG.GetSquareBuildTexture(ud)) or WG.GetRectangleBuildTexture(ud)
 				SetImageTexture(texture, (not buttonLayout.noUnitOutline) and WG.GetBuildIconFrame(ud))
