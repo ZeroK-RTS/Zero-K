@@ -1110,6 +1110,16 @@ local icontypes = {
     bitmap='icons/mahlazer.dds',
     size=3.0,
   },
+  --Zenith: the Starlight icon without its dish
+  zenith = {
+    bitmap='icons/zenith.png',
+    size=3.0,
+  },
+  --Disco Rave Party: hub with 8 radial barrels
+  raveparty = {
+    bitmap='icons/raveparty.png',
+    size=3.0,
+  },
   mahlazer_special = {
     bitmap='icons/mahlazer_special.dds',
     size=2.8,
