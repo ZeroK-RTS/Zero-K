@@ -673,11 +673,16 @@ end
 
 -- Image file for a unit's panel icon: the radar/strategic icon when that option is on, otherwise the
 -- usual 3D build picture ("#unitDefID"). Falls back to the build picture if no radar icon is found.
+-- The second return is true for a radar icon: those are drawn with their aspect kept (their circles and
+-- squares would otherwise be stretched into the panel's rectangle), while build pictures fill it.
 local function GetUnitImageFile(unitDefID)
 	if useRadarIcons then
-		return GetUnitIcon(unitDefID) or WG.GetRectangleBuildTexture(UnitDefs[unitDefID])
+		local icon = GetUnitIcon(unitDefID)
+		if icon then
+			return icon, true
+		end
 	end
-	return WG.GetRectangleBuildTexture(UnitDefs[unitDefID])
+	return WG.GetRectangleBuildTexture(UnitDefs[unitDefID]), false
 end
 
 local function GetCurrentBuildSpeed(unitID, buildSpeed)
@@ -1665,7 +1670,7 @@ local function GetUnitGroupIconButton(parentControl)
 		end
 
 		unitImage.tooltip = GetUnitSelectionTooltip(ud, unitDefID, unitID)
-		unitImage.file = GetUnitImageFile(unitDefID)
+		unitImage.file, unitImage.keepAspect = GetUnitImageFile(unitDefID)
 		unitImage.file2 = (not useRadarIcons) and GetUnitBorder(unitDefID) or nil
 		unitImage:Invalidate()
 	end
@@ -2417,7 +2422,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				unitImage.tooltip = GetSingleUnitSelectionTooltip(ud, unitDefID)
 			end
 
-			unitImage.file = GetUnitImageFile(unitDefID)
+			unitImage.file, unitImage.keepAspect = GetUnitImageFile(unitDefID)
 			unitImage.file2 = (not useRadarIcons) and GetUnitBorder(unitDefID) or nil
 			unitImage:Invalidate()
 
