@@ -35,7 +35,7 @@ return { commstrike1 = {
   },
 
   energyStorage          = 500,
-  explodeAs              = [[ESTOR_BUILDINGEX]],
+  explodeAs              = [[COMM_EX]],
   footprintX             = 2,
   footprintZ             = 2,
   health                 = 2500,
@@ -49,7 +49,7 @@ return { commstrike1 = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[strikecom.dae]],
   script                 = [[commstrike.lua]],
-  selfDestructAs         = [[ESTOR_BUILDINGEX]],
+  selfDestructAs         = [[COMM_EX]],
 
   sfxtypes               = {
 

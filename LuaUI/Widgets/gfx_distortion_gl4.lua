@@ -827,7 +827,7 @@ local adjustfornight = {
 }
 
 function widget:VisibleExplosion(px, py, pz, weaponID, ownerID)
-	if (not explosionDistortions[weaponID]) or py - 1000 > Spring.GetGroundHeight(px, pz) then -- dont add distortion to (likely) intercepted explosions (mainly to curb nuke flashes)
+	if (not explosionDistortions[weaponID]) then
 		return
 	end
 	for i, distortion in pairs(explosionDistortions[weaponID]) do
