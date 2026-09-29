@@ -1066,6 +1066,32 @@ local icontypes = {
     bitmap='icons/cruisemissile.dds',
     size=1,
   },
+  --per-missile variants: the cruise missile with a centered mark for its payload
+  missile_tac = {
+    bitmap='icons/missile_tac.png',
+    size=1,
+  },
+  missile_emp = {
+    bitmap='icons/missile_emp.png',
+    size=1,
+  },
+  missile_napalm = {
+    bitmap='icons/missile_napalm.png',
+    size=1,
+  },
+  missile_slow = {
+    bitmap='icons/missile_slow.png',
+    size=1,
+  },
+  missile_seismic = {
+    bitmap='icons/missile_seismic.png',
+    size=1,
+  },
+  --missile silo: the cruise missile inside the building frame
+  missilesilo = {
+    bitmap='icons/missilesilo.png',
+    size=2.5,
+  },
 
   --icon for nuclear missile silos
   nuke = {
