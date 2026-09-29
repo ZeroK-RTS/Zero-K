@@ -15,7 +15,7 @@ options_path = 'Settings/Interface/Unit Overlay'
 local layout_path = options_path .. '/Size & Layout'
 options_order = {
 	-- General
-	'showGlyphsNumbers', 'drawFeatureHealth', 'fadeDistance', 'statusFadeDistance', 'iconHideDistance', 'trackDarken', 'reloadThreshold',
+	'showGlyphsNumbers', 'drawFeatureHealth', 'fadeDistance', 'statusFadeDistance', 'iconHideDistance', 'trackDarken', 'reloadThreshold', 'timerHalfFill',
 	'debugDrawAtlas',
 	-- Size & Layout (nested)
 	'overallScale',
@@ -75,6 +75,12 @@ options = {
 		noHotkey = true,
 		desc = 'Weapons that reload faster than this (seconds) do not show a reload timer. Commanders always show one.',
 		OnChange = function() init() end,
+	},
+	timerHalfFill = {
+		name = 'Timer half-ring time',
+		type = 'number', value = 5.0, min = 1.0, max = 60.0, step = 0.5,
+		noHotkey = true,
+		desc = 'Seconds remaining at which a round timer badge (reload, jump, build, status) is half full. Lower gives short waits more of the ring; higher keeps long waits easier to tell apart.',
 	},
 	debugDrawAtlas = {
 		name = 'DEBUG: show icon atlas',
@@ -937,6 +943,7 @@ local shaderSourceCache = {
 			barBorderWidth = 0.25,
 			trackDarken = 0.25,
 			reloadThreshold = 2.0,
+			timerHalfFill = 5.0,
 			pulseAlpha   = 1.0,
 			rowOffset    = 0.0,
 			rowSize      = 1.0,
@@ -1876,7 +1883,7 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 					if show then addBarForUnit(unitID, unitDefID, cfg, reason, range, slotCh) end
 				end
 			elseif kind == "burst" then
-				-- range = reload frames so the badge's log-scale fill reflects the real reload (the value is
+				-- range = reload frames so the badge's time-scaled fill reflects the real reload (the value is
 				-- a modular completion frame, like the multi-weapon reload badges), not a 0-100 percent scale.
 				addBarForUnit(unitID, unitDefID, "bustreload" .. ab.index, reason, unitDefScriptReload[unitDefID] or 100, slotCh)
 			elseif kind == "dgun" or kind == "moveDgun" then
@@ -2516,6 +2523,7 @@ function widget:DrawWorld()
 	healthBarShader:SetUniform("barBorderWidth", options.barBorder.value)
 	healthBarShader:SetUniform("trackDarken", options.trackDarken.value)
 	healthBarShader:SetUniform("reloadThreshold", options.reloadThreshold.value)
+	healthBarShader:SetUniform("timerHalfFill", options.timerHalfFill.value)
 	healthBarShader:SetUniform("digitAtlasStart", digitAtlasStartIndex)
 	healthBarShader:SetUniform("jumpIconCell", jumpIconAtlasIndex)
 	healthBarShader:SetUniform("effectTime", os.clock()) -- drives the animated paralyze/disarm icon lightning

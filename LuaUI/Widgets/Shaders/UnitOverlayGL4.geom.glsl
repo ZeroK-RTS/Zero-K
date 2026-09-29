@@ -19,6 +19,7 @@ uniform float vbarSize;    // weapon-bar size multiplier
 uniform float iconSize;    // unit icon half-size in BARWIDTH units
 uniform float barBorderWidth; // thickness of the decorative band around the bar's track/fill
 uniform float reloadThreshold; // seconds: weapons faster than this hide the timer (commanders show "ready")
+uniform float timerHalfFill;   // seconds remaining at which a radial timer badge's ring is half empty
 uniform float digitAtlasStart; // atlas cell index of the digit strip's first glyph ('s'); +1='%', then 9..0
 uniform float jumpIconCell;     // atlas cell of the jump command icon, composited into jump-charge gauges
 uniform float pulseAlpha;      // oscillating alpha for BITPULSE hovering icons (flashing build/chicken icons)
@@ -247,12 +248,13 @@ void emitBarRectangle(vec4 destination, float corner_radius, float barmode, floa
        EndPrimitive();
 }
 
-// Radial timer badges map remaining seconds onto the ring on a log2 scale: each 10% is one doubling
-// (0s = 0, 1s = 10%, 3s = 20%, 7s = 30%, 15s = 40%, 31s = 50% ... 1023s+ = 100%), so the fill level
-// alone reads "how long" at any zoom, with no per-range shape or scale to decode.
-#define RADIAL_LOG_MAX_SECS 1023.0
-float radialLogFrac(float secs) {
-	return clamp(log2(1.0 + max(secs, 0.0)) / log2(1.0 + RADIAL_LOG_MAX_SECS), 0.0, 1.0);
+// Radial timer badges map remaining seconds onto the ring with a saturating curve s / (s + k), where
+// k = timerHalfFill: 0s = 0, k = half, 3k = 75%, approaching (never reaching) full for long waits.
+// Short waits get most of the ring, so the needle visibly moves as a timer nears done, and the fill
+// level alone reads "how long" at any zoom, with no per-range shape or scale to decode.
+float radialTimeFrac(float secs) {
+	secs = max(secs, 0.0);
+	return secs / (secs + max(timerHalfFill, 0.001));
 }
 
 // Radial timer badge: a billboard quad whose FS draws a circle with a clockwise-from-top angular
@@ -484,7 +486,7 @@ void main(){
 			return;
 		}
 		// RADIAL TIMER BADGE: a circle whose clockwise-from-top fill shows the remaining time on a
-		// log scale (radialLogFrac), so short and long waits share one continuous ring.
+		// saturating time scale (radialTimeFrac), so short and long waits share one continuous ring.
 		// Sources of "seconds remaining":
 		//   - construction (BITCONSTRUCTION): build channel value bands (see updater) -> building/
 		//     reclaiming ETA or a constant state, colored by direction.
@@ -495,13 +497,13 @@ void main(){
 			if ((BARTYPE & BITJUMPCHARGE) != 0u) {
 				// Jump charges: v_parameters.x is the shared reconstructed jumpReload (0..charges); this
 				// badge's own fill is (jumpReload - chargeIndex), clamped 0..1. It is a COUNTDOWN, not a
-				// level meter, so it uses the same log-scale time fill as the weapon-reload / status /
+				// level meter, so it uses the same time-scaled fill as the weapon-reload / status /
 				// construction badges. Otherwise a long jump reload (e.g. a recon comm's ~22s) draws as a
 				// linear fill that reads like a few seconds. secs-until-ready = (1 - frac) * reload, where
 				// reload = v_range / 30 (v_range carries the jump reloadFrames).
 				float frac = clamp(dataIn[0].v_parameters.x - mod(UVOFFSET, 16.0), 0.0, 1.0);
 				float secs = (1.0 - frac) * (dataIn[0].v_range / 30.0);
-				litFrac = 1.0 - radialLogFrac(secs); // fills clockwise as the charge nears ready
+				litFrac = 1.0 - radialTimeFrac(secs); // fills clockwise as the charge nears ready
 			} else {
 				// Gauge (heat / speed / charge / teleport): the badge fills to the channel's 0..1 level
 				// -- a level meter, not a countdown.
@@ -529,7 +531,7 @@ void main(){
 				secs = v - 2.0;                                    // building / frozen-static band [2,1000)
 				healthcolor = vec4(dataIn[0].v_maxcolor.rgb, 1.0); // forward progress -> bartype color (green build / magenta raise)
 			}
-			litFrac = 1.0 - radialLogFrac(secs); // fills clockwise as it nears completion
+			litFrac = 1.0 - radialTimeFrac(secs); // fills clockwise as it nears completion
 		} else if ((BARTYPE & BITTIMELEFT) != 0u) {
 			// Status duration (paralyze/disarm/slow): when locked the channel stores the effect-END frame
 			// (value-101 = endFrame mod 3895, must match STATUS_LOCK_BASE/MOD in the updater) so the badge
@@ -537,7 +539,7 @@ void main(){
 			if (dataIn[0].v_parameters.x < 100.0) return;
 			float secs = mod((dataIn[0].v_parameters.x - 101.0) - timeInfo.x, 3895.0) / 30.0;
 			if (secs <= 0.0) return;
-			litFrac = 1.0 - radialLogFrac(secs); // fills clockwise as the effect runs out
+			litFrac = 1.0 - radialTimeFrac(secs); // fills clockwise as the effect runs out
 		} else {
 			float reloadSecs = dataIn[0].v_range / 30.0;      // full reload duration of this weapon
 			bool alwaysShow = (BARTYPE & BITALWAYSSHOW) != 0u; // commanders
@@ -549,7 +551,7 @@ void main(){
 				float rem = ((BARTYPE & BITINVERSE) != 0u) ? (1.0 - dataIn[0].v_parameters.x) : dataIn[0].v_parameters.x;
 				rem = clamp(rem, 0.0, 1.0);
 				float secs = rem * dataIn[0].v_range / 30.0;
-				float f = radialLogFrac(secs);
+				float f = radialTimeFrac(secs);
 				// reload (BITINVERSE) lights up as it nears ready; status durations darken as they run out
 				litFrac = ((BARTYPE & BITINVERSE) != 0u) ? (1.0 - f) : f;
 			}
