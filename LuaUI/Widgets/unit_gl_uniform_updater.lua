@@ -182,7 +182,7 @@ local function encodeAbility(entry, unitID, unitDefID, gameFrame)
 	elseif kind == "burst" then
 		-- One badge per charge, encoded like a modular reload (target-frame mod 4096): each reloading charge
 		-- counts down to its own reconstructed completion frame (so all in-flight reloads animate in parallel,
-		-- with the magnitude tier matching the real reload), and a loaded charge reads 0 = "ready" (a full
+		-- with the log-scale fill matching the real reload), and a loaded charge reads 0 = "ready" (a full
 		-- circle, kept visible via bitAlwaysShow). Reconcile once per unit per frame; later charges reuse it.
 		local st = burstState[unitID]
 		if not st or st.gf ~= gameFrame then st = reconcileBurst(unitID, unitDefID, gameFrame) end

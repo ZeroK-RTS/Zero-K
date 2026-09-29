@@ -247,17 +247,25 @@ void emitBarRectangle(vec4 destination, float corner_radius, float barmode, floa
        EndPrimitive();
 }
 
-// Radial timer badge: a billboard quad whose FS draws a regular polygon (sides = magnitude) with a
-// clockwise-from-top angular fill. g_uv.x carries the side count, g_fill carries the lit fraction.
+// Radial timer badges map remaining seconds onto the ring on a log2 scale: each 10% is one doubling
+// (0s = 0, 1s = 10%, 3s = 20%, 7s = 30%, 15s = 40%, 31s = 50% ... 1023s+ = 100%), so the fill level
+// alone reads "how long" at any zoom, with no per-range shape or scale to decode.
+#define RADIAL_LOG_MAX_SECS 1023.0
+float radialLogFrac(float secs) {
+	return clamp(log2(1.0 + max(secs, 0.0)) / log2(1.0 + RADIAL_LOG_MAX_SECS), 0.0, 1.0);
+}
+
+// Radial timer badge: a billboard quad whose FS draws a circle with a clockwise-from-top angular
+// fill. g_fill carries the lit fraction.
 // iconOrigin = atlas cell origin (uv) of the icon to composite inside the badge; hasIcon>0.5 enables it.
-// The FS draws the polygon fill AND the icon on this one quad, so they share a depth (no sort gap).
-void emitRadialVertex(vec2 pos, vec4 rect, float sides, float litFrac, vec4 color, vec2 iconOrigin, float hasIcon) {
+// The FS draws the circle fill AND the icon on this one quad, so they share a depth (no sort gap).
+void emitRadialVertex(vec2 pos, vec4 rect, float litFrac, vec4 color, vec2 iconOrigin, float hasIcon) {
        gl_Position = overlayVertexClip(pos);
 	applyOverlayDepth();
 
        g_color = color;
        g_color.a *= dataIn[0].v_parameters.z;
-       g_uv = vec4(sides, iconOrigin.x, iconOrigin.y, hasIcon);
+       g_uv = vec4(0.0, iconOrigin.x, iconOrigin.y, hasIcon);
        g_rect = rect;
        g_loc = pos;
        g_corner_radius = 0.0;
@@ -271,11 +279,11 @@ void emitRadialVertex(vec2 pos, vec4 rect, float sides, float litFrac, vec4 colo
        EmitVertex();
 }
 
-void emitRadialBadge(vec4 d, float sides, float litFrac, vec4 color, vec2 iconOrigin, float hasIcon) {
-       emitRadialVertex(vec2(d.x,        d.y),        d, sides, litFrac, color, iconOrigin, hasIcon);
-       emitRadialVertex(vec2(d.x,        d.y + d.w),  d, sides, litFrac, color, iconOrigin, hasIcon);
-       emitRadialVertex(vec2(d.x + d.z,  d.y),        d, sides, litFrac, color, iconOrigin, hasIcon);
-       emitRadialVertex(vec2(d.x + d.z,  d.y + d.w),  d, sides, litFrac, color, iconOrigin, hasIcon);
+void emitRadialBadge(vec4 d, float litFrac, vec4 color, vec2 iconOrigin, float hasIcon) {
+       emitRadialVertex(vec2(d.x,        d.y),        d, litFrac, color, iconOrigin, hasIcon);
+       emitRadialVertex(vec2(d.x,        d.y + d.w),  d, litFrac, color, iconOrigin, hasIcon);
+       emitRadialVertex(vec2(d.x + d.z,  d.y),        d, litFrac, color, iconOrigin, hasIcon);
+       emitRadialVertex(vec2(d.x + d.z,  d.y + d.w),  d, litFrac, color, iconOrigin, hasIcon);
        EndPrimitive();
 }
 
@@ -475,34 +483,29 @@ void main(){
 			iconAtlasFlag = 0.0;
 			return;
 		}
-		// RADIAL TIMER BADGE: the polygon's side count encodes the magnitude tier of the remaining
-		// time; a clockwise-from-top fill shows the fraction within that tier (sized by the tier's
-		// max so the fill is proportional to the real time, stepping down a shape at each boundary).
+		// RADIAL TIMER BADGE: a circle whose clockwise-from-top fill shows the remaining time on a
+		// log scale (radialLogFrac), so short and long waits share one continuous ring.
 		// Sources of "seconds remaining":
 		//   - construction (BITCONSTRUCTION): build channel value bands (see updater) -> building/
 		//     reclaiming ETA or a constant state, colored by direction.
 		//   - status effect (BITTIMELEFT): the channel value's overflow above 1 is the seconds.
 		//   - weapon reload: derived from the reload fraction (v_parameters.x) and v_range.
-		float sides, litFrac;
+		float litFrac;
 		if ((BARTYPE & BITGAUGE) != 0u) {
 			if ((BARTYPE & BITJUMPCHARGE) != 0u) {
 				// Jump charges: v_parameters.x is the shared reconstructed jumpReload (0..charges); this
 				// badge's own fill is (jumpReload - chargeIndex), clamped 0..1. It is a COUNTDOWN, not a
-				// level meter, so shape it with the same base-4 magnitude tiers + clockwise fill as the
-				// weapon-reload / status / construction badges. Otherwise a long jump reload (e.g. a recon
-				// comm's ~22s) draws as a flat circle that reads like a few seconds. secs-until-ready =
-				// (1 - frac) * reload, where reload = v_range / 30 (v_range carries the jump reloadFrames).
+				// level meter, so it uses the same log-scale time fill as the weapon-reload / status /
+				// construction badges. Otherwise a long jump reload (e.g. a recon comm's ~22s) draws as a
+				// linear fill that reads like a few seconds. secs-until-ready = (1 - frac) * reload, where
+				// reload = v_range / 30 (v_range carries the jump reloadFrames).
 				float frac = clamp(dataIn[0].v_parameters.x - mod(UVOFFSET, 16.0), 0.0, 1.0);
 				float secs = (1.0 - frac) * (dataIn[0].v_range / 30.0);
-				float tier = (secs < 4.0) ? 0.0 : (secs < 16.0) ? 1.0 : (secs < 64.0) ? 2.0 : (secs < 256.0) ? 3.0 : 4.0;
-				sides = (tier < 0.5) ? 1.0 : (7.0 - tier);
-				float hi = pow(4.0, tier + 1.0);
-				litFrac = 1.0 - clamp(secs / hi, 0.0, 1.0); // fills clockwise as the charge nears ready
+				litFrac = 1.0 - radialLogFrac(secs); // fills clockwise as the charge nears ready
 			} else {
-				// Gauge (heat / speed / charge / teleport): the badge fills to the channel's 0..1 magnitude
-				// -- a level meter, not a countdown. Always a circle.
+				// Gauge (heat / speed / charge / teleport): the badge fills to the channel's 0..1 level
+				// -- a level meter, not a countdown.
 				litFrac = clamp(dataIn[0].v_parameters.x, 0.0, 1.0);
-				sides = 1.0;
 			}
 			healthcolor = vec4(dataIn[0].v_maxcolor.rgb, 1.0); // color from the bartype (v_maxcolor)
 		} else if ((BARTYPE & (BITCONSTRUCTION | BITRATEETA)) != 0u) {
@@ -526,10 +529,7 @@ void main(){
 				secs = v - 2.0;                                    // building / frozen-static band [2,1000)
 				healthcolor = vec4(dataIn[0].v_maxcolor.rgb, 1.0); // forward progress -> bartype color (green build / magenta raise)
 			}
-			float tier = (secs < 4.0) ? 0.0 : (secs < 16.0) ? 1.0 : (secs < 64.0) ? 2.0 : (secs < 256.0) ? 3.0 : 4.0;
-			sides = (tier < 0.5) ? 1.0 : (7.0 - tier);
-			float hi = pow(4.0, tier + 1.0);
-			litFrac = 1.0 - clamp(secs / hi, 0.0, 1.0); // fills clockwise as it nears completion
+			litFrac = 1.0 - radialLogFrac(secs); // fills clockwise as it nears completion
 		} else if ((BARTYPE & BITTIMELEFT) != 0u) {
 			// Status duration (paralyze/disarm/slow): when locked the channel stores the effect-END frame
 			// (value-101 = endFrame mod 3895, must match STATUS_LOCK_BASE/MOD in the updater) so the badge
@@ -537,33 +537,24 @@ void main(){
 			if (dataIn[0].v_parameters.x < 100.0) return;
 			float secs = mod((dataIn[0].v_parameters.x - 101.0) - timeInfo.x, 3895.0) / 30.0;
 			if (secs <= 0.0) return;
-			float tier = (secs < 4.0) ? 0.0 : (secs < 16.0) ? 1.0 : (secs < 64.0) ? 2.0 : (secs < 256.0) ? 3.0 : 4.0;
-			sides = (tier < 0.5) ? 1.0 : (7.0 - tier);
-			float hi = pow(4.0, tier + 1.0);
-			litFrac = 1.0 - clamp(secs / hi, 0.0, 1.0); // fills clockwise as the effect runs out
+			litFrac = 1.0 - radialLogFrac(secs); // fills clockwise as the effect runs out
 		} else {
 			float reloadSecs = dataIn[0].v_range / 30.0;      // full reload duration of this weapon
 			bool alwaysShow = (BARTYPE & BITALWAYSSHOW) != 0u; // commanders
 			if (reloadSecs < reloadThreshold) {
 				// Too fast to bother timing: normal units hide it entirely; commanders show "ready".
 				if (!alwaysShow) return;
-				sides = 1.0;      // circle
 				litFrac = 1.0;    // full = ready (0s)
 			} else {
 				float rem = ((BARTYPE & BITINVERSE) != 0u) ? (1.0 - dataIn[0].v_parameters.x) : dataIn[0].v_parameters.x;
 				rem = clamp(rem, 0.0, 1.0);
 				float secs = rem * dataIn[0].v_range / 30.0;
-				// base-4 magnitude tiers, fewer sides as it gets more hopeless: circle 0-4s, hexagon
-				// 4-16s, pentagon 16-64s, square 64-256s, triangle 256-1024s (~17min ≈ never).
-				float tier = (secs < 4.0) ? 0.0 : (secs < 16.0) ? 1.0 : (secs < 64.0) ? 2.0 : (secs < 256.0) ? 3.0 : 4.0;
-				sides = (tier < 0.5) ? 1.0 : (7.0 - tier); // 1 -> circle in FS, else 6/5/4/3 sides
-				float hi = pow(4.0, tier + 1.0); // this tier's max seconds (4/16/64/256/1024)
-				float f  = clamp(secs / hi, 0.0, 1.0);
+				float f = radialLogFrac(secs);
 				// reload (BITINVERSE) lights up as it nears ready; status durations darken as they run out
 				litFrac = ((BARTYPE & BITINVERSE) != 0u) ? (1.0 - f) : f;
 			}
 		}
-		float bsize = BARWIDTH * rowSize; // apothem (distance to side centers); shared size for all badges
+		float bsize = BARWIDTH * rowSize; // badge radius; shared size for all badges
 		// LAYOUT ZONES (slot baked in Lua, rides v_bartype_index_ssboloc.w):
 		//   - TOP band (status/duration: BITTIMELEFT/BITCONSTRUCTION): horizontal row above the bars.
 		//   - WEAPON columns (BITLEFT/BITRIGHT): vertical columns flanking the unit icon.
@@ -615,9 +606,9 @@ void main(){
 			iconOrigin = vec2(mod(iconIdx, float(ICONATLAS_COLS)) / float(ICONATLAS_COLS),
 			                  floor(iconIdx / float(ICONATLAS_COLS)) / float(ICONATLAS_ROWS));
 		}
-		// quad is 2x the apothem so a triangle's corners (up to 2x the apothem) aren't clipped
-		emitRadialBadge(vec4(-bsize * 2.0, -bsize * 2.0, bsize * 4.0, bsize * 4.0),
-			sides, litFrac, healthcolor, iconOrigin, hasIcon);
+		// quad spans the circle (radius = bsize) exactly
+		emitRadialBadge(vec4(-bsize, -bsize, bsize * 2.0, bsize * 2.0),
+			litFrac, healthcolor, iconOrigin, hasIcon);
 	} else {
 		// HORIZONTAL BAR (top/below bars): wide and short, fills left to right.
 		// These two knobs only touch the bars (and their numbers), not the icon/weapon overlays.

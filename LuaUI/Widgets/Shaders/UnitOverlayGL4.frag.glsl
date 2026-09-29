@@ -72,17 +72,6 @@ float roundedBoxSDF(vec2 p, vec2 halfSize, float radius) {
     return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;
 }
 
-// Signed distance to a regular polygon of n sides, apothem r, centered on origin, point-up.
-float polygonSDF(vec2 p, float r, float n) {
-    float an = 3.14159265 / n;
-    vec2 acs = vec2(cos(an), sin(an));
-    float bn = mod(atan(p.x, p.y) + an, 2.0 * an) - an;
-    p = length(p) * vec2(cos(bn), abs(sin(bn)));
-    p -= r * acs;
-    p.y += clamp(-p.y, 0.0, r * acs.y);
-    return length(p) * sign(p.x);
-}
-
 void main(void)
 {
     vec2 rectCenter = g_rect.xy + g_rect.zw * 0.5;
@@ -91,22 +80,14 @@ void main(void)
     }
 
     if (g_barmode > 2.5) {
-        // Radial timer badge: regular polygon (g_uv.x = side count, <2.5 = circle) filled clockwise
-        // from the top (12 o'clock). g_fill = lit fraction; lit area is full color, the rest dim.
+        // Radial timer badge: circle filled clockwise from the top (12 o'clock).
+        // g_fill = lit fraction; lit area is full color, the rest dim.
         vec2 c = g_rect.xy + g_rect.zw * 0.5;
         vec2 p = g_loc - c;
-        float quadHalf = min(g_rect.z, g_rect.w) * 0.5;
-        float apothem = quadHalf * 0.5;              // shape sized by side-centers; corners reach the quad edge
-        float sides = g_uv.x;
-        float sd;
-        if (sides < 2.5) {
-            sd = length(p) - apothem;                // circle
-        } else {
-            float circum = apothem / cos(3.14159265 / sides);
-            sd = polygonSDF(vec2(p.x, -p.y), circum, sides); // flip Y so polygons point up
-        }
-        // NOTE: no early "outside the polygon" discard -- the icon is allowed to spill past the badge
-        // silhouette (its square corners exceed the polygon), matching the old separate-quad look while
+        float radius = min(g_rect.z, g_rect.w) * 0.5; // the quad spans the circle exactly
+        float sd = length(p) - radius;
+        // NOTE: no early "outside the circle" discard -- the icon is allowed to spill past the badge
+        // silhouette (its square corners exceed the circle), matching the old separate-quad look while
         // staying one quad / one depth. The fill is drawn only inside the badge; the icon draws anywhere.
         float ang = atan(p.x, p.y);                  // 0 at top, increasing clockwise
         if (ang < 0.0) ang += 6.28318530718;
@@ -115,10 +96,10 @@ void main(void)
         bool insideBadge = (sd <= 0.0);
         vec3 fillRGB = g_color.rgb * (lit ? 1.0 : 0.25);
         // Icon (g_uv.w > 0.5): atlas cell origin g_uv.yz, sized to the badge's inscribed region but NOT
-        // clipped to the polygon -- corners outside the badge still draw.
+        // clipped to the circle -- corners outside the badge still draw.
         vec4 ic = vec4(0.0);
-        if (g_uv.w > 0.5 && abs(p.x) <= apothem && abs(p.y) <= apothem) {
-            vec2 frac2 = (p / apothem) * 0.5 + 0.5; // [0,1] across the central icon region, y up
+        if (g_uv.w > 0.5 && abs(p.x) <= radius && abs(p.y) <= radius) {
+            vec2 frac2 = (p / radius) * 0.5 + 0.5; // [0,1] across the central icon region, y up
             vec2 cell = vec2(1.0 / float(ICONATLAS_COLS), 1.0 / float(ICONATLAS_ROWS));
             ic = texture(iconAtlasTex, g_uv.yz + frac2 * cell);
         }

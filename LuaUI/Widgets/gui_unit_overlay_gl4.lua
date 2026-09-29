@@ -1876,7 +1876,7 @@ local function addBarsForUnit(unitID, unitDefID, unitTeam, unitAllyTeam, reason)
 					if show then addBarForUnit(unitID, unitDefID, cfg, reason, range, slotCh) end
 				end
 			elseif kind == "burst" then
-				-- range = reload frames so the badge's magnitude tier reflects the real reload (the value is
+				-- range = reload frames so the badge's log-scale fill reflects the real reload (the value is
 				-- a modular completion frame, like the multi-weapon reload badges), not a 0-100 percent scale.
 				addBarForUnit(unitID, unitDefID, "bustreload" .. ab.index, reason, unitDefScriptReload[unitDefID] or 100, slotCh)
 			elseif kind == "dgun" or kind == "moveDgun" then
