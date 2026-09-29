@@ -61,7 +61,7 @@ end
 
 local spectating, fullview = Spring.GetSpectatingState()
 
-options_path = 'Settings/Graphics/Unit Visibility/Vertical Lines'
+options_path = 'Settings/Interface/Height Indicator'
 options_order = { 'enable_high', 'high_fly_size', 'ally_high_alpha', 'enable_vertical_lines_air', 'enable_vertical_lines_water', 'enable_vertical_lines_ally' }
 options = {
 	enable_high = {
@@ -238,41 +238,51 @@ local function DrawWarnings(warnings)
 	gl.MatrixMode(GL.MODELVIEW)
 end
 
-function widget:DrawWorld()
-	local needs_update = needsUpdate
-	needsUpdate = false
-	local f = Spring.GetGameFrame()
-	if f > last_frame then
-		last_frame = f
-		needs_update = true
+function widget:GameFrame(n)
+	local removals = {}
+	for unitID, data in pairs (enemyDots) do
+		if not Spring.ValidUnitID(unitID) then
+			removals[unitID] = true
+		else
+			local x, y, z = Spring.GetUnitPosition(unitID)
+			local losState = {los = false} -- Spring.GetUnitLosState(unitID)
+			data[1] = x
+			if data[1] then
+				data[2] = y
+				data[3] = z
+				data[4] = math.max(Spring.GetGroundHeight(x,z), 0)
+				data[5] = losState.los
+			end
+		end
+	end
+	for unitID in pairs (removals) do
+		enemyDots[unitID] = nil
 	end
 
+	if options.enable_vertical_lines_ally.value ~= "never" or options.enable_high.value == "always" then
+		local show_air   = ((options.enable_vertical_lines_ally.value == "always") or (options.enable_vertical_lines_ally.value == "air"))
+		local show_water = ((options.enable_vertical_lines_ally.value == "always") or (options.enable_vertical_lines_ally.value == "water"))
+		local show_high  = options.enable_high.value == "always"
+		for unitID, data in pairs (allyDots) do
+			local x, y, z = Spring.GetUnitPosition(unitID)
+			data[1] = x
+			if data[1] then
+				data[2] = y
+				data[3] = z
+				data[4] = math.max(Spring.GetGroundHeight(x, z), 0)
+				data[5] = true
+			end
+		end
+	end
+end
+
+function widget:DrawWorld()
 	gl.PushAttrib (GL.LINE_BITS)
 	gl.DepthTest (true)
 	gl.LineWidth (1.4)
 
 	local warningDraw
-	local removals = {}
 	for unitID, data in pairs (enemyDots) do
-		if needs_update then
-			if not Spring.ValidUnitID(unitID) then
-				removals[unitID] = true
-			else
-				local x, y, z = Spring.GetUnitPosition(unitID)
-				local losState = Spring.GetUnitLosState(unitID)
-				local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or Spring.GetGaiaTeamID())
-				data[1] = x
-				if data[1] then
-					data[2] = y
-					data[3] = z
-					data[4] = math.max(Spring.GetGroundHeight(x,z), 0)
-					data[5] = losState.los
-					data[6] = r
-					data[7] = g
-					data[8] = b
-				end
-			end
-		end
 		if data and data[1] then
 			local show_high = options.enable_high.value == "always" or options.enable_high.value == "enemies"
 			local airDraw = ((data[2] > 0 and data[2] - data[4] > VERT_LINE_THRESHOLD) and (
@@ -290,15 +300,16 @@ function widget:DrawWorld()
 			end
 			if airDraw or waterDraw or highDraw then
 				local alpha = 1
+				local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or Spring.GetGaiaTeamID())
 				if highDraw then
 					warningAlpha = math.max(0, math.min(1, (data[2] - data[4] - HIGH_LOWER) / (HIGH_UPPER - HIGH_LOWER)))
 					warningDraw = warningDraw or {}
-					warningDraw[#warningDraw + 1] = {data[1], data[4], data[3], warningAlpha, Spring.GetUnitDefID(unitID), data[6], data[7], data[8]}
+					warningDraw[#warningDraw + 1] = {data[1], data[4], data[3], warningAlpha, Spring.GetUnitDefID(unitID), r, g, b}
 					if not(airDraw or waterDraw) then
 						alpha = warningAlpha
 					end
 				end
-				gl.Color(data[6], data[7], data[8], alpha)
+				gl.Color(r, g, b, alpha)
 				gl.BeginEnd(GL.LINES, function()
 					gl.Vertex(data[1],data[4],data[3])
 					gl.Vertex(data[1],data[2],data[3])
@@ -306,29 +317,12 @@ function widget:DrawWorld()
 			end
 		end
 	end
-	for unitID in pairs (removals) do
-		enemyDots[unitID] = nil
-	end
 
 	if options.enable_vertical_lines_ally.value ~= "never" or options.enable_high.value == "always" then
 		local show_air   = ((options.enable_vertical_lines_ally.value == "always") or (options.enable_vertical_lines_ally.value == "air"))
 		local show_water = ((options.enable_vertical_lines_ally.value == "always") or (options.enable_vertical_lines_ally.value == "water"))
 		local show_high  = options.enable_high.value == "always"
 		for unitID, data in pairs (allyDots) do
-			if needs_update then
-				local x, y, z = Spring.GetUnitPosition(unitID)
-				data[1] = x
-				if data[1] then
-					local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or Spring.GetGaiaTeamID())
-					data[2] = y
-					data[3] = z
-					data[4] = math.max(Spring.GetGroundHeight(x, z), 0)
-					data[5] = true
-					data[6] = r
-					data[7] = g
-					data[8] = b
-				end
-			end
 			if data and data[1] then
 				local airDraw = (show_air and (data[2] > 0 and data[2] > data[4] + VERT_LINE_THRESHOLD))
 				local waterDraw = ((data[2] < 0) and show_water)
@@ -340,16 +334,17 @@ function widget:DrawWorld()
 					data[9] = true
 				end
 				if airDraw or waterDraw or highDraw then
+					local r, g, b = Spring.GetTeamColor(Spring.GetUnitTeam(unitID) or Spring.GetGaiaTeamID())
 					local alpha = 1
 					if highDraw then
 						warningAlpha = math.max(0, math.min(1, (data[2] - data[4] - HIGH_LOWER) / (HIGH_UPPER - HIGH_LOWER))) * options.ally_high_alpha.value
 						warningDraw = warningDraw or {}
-						warningDraw[#warningDraw + 1] = {data[1], data[4], data[3], warningAlpha, Spring.GetUnitDefID(unitID), data[6], data[7], data[8]}
+						warningDraw[#warningDraw + 1] = {data[1], data[4], data[3], warningAlpha, Spring.GetUnitDefID(unitID), r, g, b}
 						if not (airDraw or waterDraw) then
 							alpha = warningAlpha
 						end
 					end
-					gl.Color(data[6], data[7], data[8], alpha)
+					gl.Color(r, g, b, alpha)
 					gl.BeginEnd(GL.LINES, function()
 						gl.Vertex(data[1],data[4],data[3])
 						gl.Vertex(data[1],data[2],data[3])
