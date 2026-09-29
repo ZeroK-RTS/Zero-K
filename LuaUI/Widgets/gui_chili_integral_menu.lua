@@ -1404,7 +1404,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	-- Radar icon in place of the build picture: centered in the image area at radar_icon_button_size
 	-- percent, aspect kept so its circles and squares aren't stretched to the button's shape.
 	local function SetRadarImageTexture(texture1)
-		SetImageTexture("")
+		SetImageTexture(nil) -- no file, not "": Chili draws an unloadable "" as a white rectangle
 		local size = options.radar_icon_button_size.value
 		local offset = string.format('%d%%', math.floor((100 - size) / 2))
 		local sizeStr = string.format('%d%%', size)
