@@ -870,7 +870,7 @@ local featureResurrectDistMult = 1 -- how many times closer features have to be 
 local glphydistmult = 3.5 -- how much closer than BARFADEEND the bar has to be to start drawing numbers/icons. Numbers closer to 1 will make the glyphs be drawn earlier, high numbers will only shows glyphs when zoomed in hard.
 local glyphdistmultfeatures = 1.8 -- how much closer than BARFADEEND the bar has to be to start drawing numbers/icons
 
-local unitDefIsStructure = {} -- unitDefID -> true for immobile units (buildings), whose overlay sorts behind mobile units
+local unitDefIsStructure = {} -- unitDefID -> true for real buildings (immobile, not mobilebuilding), whose overlay sorts behind mobile units
 local unitDefSizeMultipliers = {} -- table of unitdefID to a size mult (default 1.0) to override sizing of bars per unitdef
 local skipGlyphsNumbers = 0.0  -- 0.0 is draw glyph and number,  1.0 means only numbers, 2.0 means only bars,
 
@@ -963,7 +963,9 @@ local shaderSourceCache = {
 for udefID, unitDef in pairs(UnitDefs) do
 	-- BAR PLACEMENT
 	unitDefHeights[udefID] = unitDef.height
-	unitDefIsStructure[udefID] = unitDef.isImmobile or nil
+	-- mobilebuilding (silo missiles, mines, ...) are immobile but not real buildings: they sort with mobile
+	-- units, so e.g. missiles stay visible over their silo. Same test as unit_terraform/unit_jumpjets.
+	unitDefIsStructure[udefID] = (unitDef.isImmobile and not unitDef.customParams.mobilebuilding) or nil
 	unitDefSizeMultipliers[udefID] = math.min(1.45, math.max(0.85, (Spring.GetUnitDefDimensions(udefID).radius / 150) + math.min(0.6, unitDef.power / 4000))) + math.min(0.6, unitDef.health / 22000)
 end
 
