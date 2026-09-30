@@ -10,7 +10,7 @@ return { empmissile = {
 
   customParams           = {
     mobilebuilding = [[1]],
-    overlay_icon_size = 0.55, -- small overlay icon, fitting in a corner of the missile silo's icon
+    overlay_icon_size = 0.8, -- small overlay icon, fitting in a corner of the missile silo's icon
     ignore_for_loss_stats = [[1]],
 
     outline_x = 55,
