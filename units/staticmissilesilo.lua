@@ -24,6 +24,8 @@ return { staticmissilesilo = {
   customparams = {
     solid_factory = [[6]],
     missile_silo_capacity = 4,
+    overlay_icon_size = 2.73, -- overlay icon square spans past the launch pads, so the missiles' icons sit in its corners
+    health_bar_height = -45, -- overlay anchor at missile height (model 120 tall vs missiles 30), so they line up
     stats_show_death_explosion = 1,
   },
   explodeAs                     = [[LARGE_BUILDINGEX]],

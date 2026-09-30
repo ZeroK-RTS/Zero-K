@@ -870,6 +870,7 @@ local featureResurrectDistMult = 1 -- how many times closer features have to be 
 local glphydistmult = 3.5 -- how much closer than BARFADEEND the bar has to be to start drawing numbers/icons. Numbers closer to 1 will make the glyphs be drawn earlier, high numbers will only shows glyphs when zoomed in hard.
 local glyphdistmultfeatures = 1.8 -- how much closer than BARFADEEND the bar has to be to start drawing numbers/icons
 
+local unitDefIconSize = {} -- unitDefID -> customParams.overlay_icon_size: fixed centre-icon size multiplier (replaces the computed per-unit size for the icon only)
 local unitDefIsStructure = {} -- unitDefID -> true for real buildings (immobile, not mobilebuilding), whose overlay sorts behind mobile units
 local unitDefSizeMultipliers = {} -- table of unitdefID to a size mult (default 1.0) to override sizing of bars per unitdef
 local skipGlyphsNumbers = 0.0  -- 0.0 is draw glyph and number,  1.0 means only numbers, 2.0 means only bars,
@@ -963,6 +964,7 @@ local shaderSourceCache = {
 for udefID, unitDef in pairs(UnitDefs) do
 	-- BAR PLACEMENT
 	unitDefHeights[udefID] = unitDef.height
+	unitDefIconSize[udefID] = tonumber(unitDef.customParams.overlay_icon_size)
 	-- mobilebuilding (silo missiles, mines, ...) are immobile but not real buildings: they sort with mobile
 	-- units, so e.g. missiles stay visible over their silo. Same test as unit_terraform/unit_jumpjets.
 	unitDefIsStructure[udefID] = (unitDef.isImmobile and not unitDef.customParams.mobilebuilding) or nil
@@ -1215,9 +1217,12 @@ local function relayoutUnitIcons(unitID)
 	local commandCell = (not wgIconHidden['command']) and wgUnitCommand[unitID] or nil
 	local teamID = Spring.GetUnitTeam(unitID)
 	local tr, tg, tb, ta = Spring.GetTeamColor(teamID)
+	-- overlay_icon_size fixes the centre icon's size for units whose icons must fit together (e.g. silo
+	-- missiles sitting in the corners of the missile silo's icon); it scales the icon quad only.
+	local iconScale = unitDefIconSize[unitDefID] and (unitDefIconSize[unitDefID] * barScale) or effectiveScale
 	pushElementInstance(healthBarVBO,
 		wgNewClusterIconCache(unitDefIconIndex[unitDefID] or 0, rankCell, groupCell, commandCell, rowHeight,
-			{tr or 1, tg or 1, tb or 1, ta or 1}, rankData and rankData.color, effectiveScale, unitDefIsStructure[unitDefID]),
+			{tr or 1, tg or 1, tb or 1, ta or 1}, rankData and rankData.color, iconScale, unitDefIsStructure[unitDefID]),
 		unitID .. "_wgicon_icon", true, nil, unitID)
 	pushedNames['icon'] = true
 
