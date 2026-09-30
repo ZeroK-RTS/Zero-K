@@ -49,41 +49,33 @@ local spGetUnitHealth             = Spring.GetUnitHealth
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
 
-local zombies = {}
+local zombieUnits = {}
+local featureReviveCycleCount = {}
 
-local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
-if (tonumber(ZOMBIES_REZ_MIN) == nil) then
-	-- minimum of 10 seconds, max is determined by rez speed
-	ZOMBIES_REZ_MIN = 10
-end
+local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed) or 12
 
-local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
-if (tonumber(ZOMBIES_REZ_SPEED) == nil) then
-	-- 12m/s, big units have a really long time to respawn
-	ZOMBIES_REZ_SPEED = 12
-end
+local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow) or 0.5
 
-local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow)
-if (tonumber(ZOMBIES_PERMA_SLOW) == nil) then
-	-- from 0 to 1, symbolises from 0% to 50% slow which is always on
-	ZOMBIES_PERMA_SLOW = 1
-end
-
-if ZOMBIES_PERMA_SLOW == 0 then
-	ZOMBIES_PERMA_SLOW = nil
-else
-	ZOMBIES_PERMA_SLOW = 1 - ZOMBIES_PERMA_SLOW*0.5
-end
+local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay) or 10 -- minimum of 10 seconds, max is determined by rez speed
+local ZOMBIES_REZ_MAX = tonumber(modOptions.zombies_delay_max) or 600 --600 only affects things above 7200 cost at 12 rezspeed.
 
 local ZOMBIES_PARTIAL_RECLAIM = (tonumber(modOptions.zombies_partial_reclaim) == 1)
 
-local zombiesReviveOptionsAsString = (modOptions.zombies_revive_options) or nil -- pilfered from lockunits_modoption, would there be a better way to do this?
+local zombiesDeathOnCaptureChance = tonumber(modOptions.zombies_die_on_capture) or nil
+
+local zombiesReviveCyclesCount = tonumber(modOptions.zombies_revive_cycles) or 1
+local zombiesWrecksRemain = tonumber(modOptions.zombies_wrecks_remain) or nil
+
+local zombiesReviveOptionsAsString = (modOptions.zombies_revive_options) or nil 
 local zombiesReviveOptionMultiRandomise = tonumber(modOptions.zombies_revive_options_multi_random) or 1
 local zombiesReviveOptionsOverflowSpawn = tonumber(modOptions.zombies_revive_options_overflow_spawn) or 1
 
+local zombiesBudgetMultiplier = tonumber(modOptions.zombies_budget_multiplier) or 1
+local zombiesPermanentBudgetMultiplier = tonumber(modOptions.zombies_permanent_budget) or nil
+
 local zombieReviveOptionCount = 0
 local zombieReviveOptions = {} -- allows duplicates
-local zombieBudget = 0
+local zombieGlobalBudget = 0
 
 --TODO there seems to be something with the comnames adding some more stuff?
 local UnitDefBothNames = {} -- Includes humanName and name
@@ -93,7 +85,7 @@ local function AddName(name, unitDefId)
 	UnitDefBothNames[name][#UnitDefBothNames[name] + 1] = unitDefId
 end
 
-if zombiesReviveOptionsAsString then
+if zombiesReviveOptionsAsString then -- TODO pilfered from lockunits_modoption, would there be a better way to do this? Maybe should have an api :O
 	zombiesReviveOptionsAsString = zombiesReviveOptionsAsString:gsub("[%s%+]*%+[%s%+]*","+"):gsub("^%s*",""):gsub("%s*$",""):lower()
 
 	for unitDefID = 1, #UnitDefs do
@@ -116,31 +108,30 @@ end
 
 local function SpawnReviveOption(x,y,z,facing,zombieUnitDefID)
 	local unitID = Spring.CreateUnit(zombieUnitDefID, x, y, z, facing, GaiaTeamID)
-	zombies[unitID] = true
+	zombieUnits[unitID] = true
 	GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 	GG.Zombies.SetZombieBehavior(unitID)
 	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
 	return unitID
 end
 
+local currentBudget = 0
 local function HandleZombieReviveOptions(featureID)
 	local x, y, z = Spring.GetFeaturePosition(featureID)
 	local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
 	local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
-	
+	local zombieBudget = math.floor(zombiesBudgetMultiplier * UnitDefNames[resDefName].cost)
 	
 	if ZOMBIES_PARTIAL_RECLAIM then -- partial reclaim reduces the available metal to spawn units
-		zombieBudget = zombieBudget + UnitDefNames[resDefName].cost * (currentMetal/maxMetal)
-	else
-		zombieBudget = zombieBudget + UnitDefNames[resDefName].cost
+		zombieBudget = math.floor(zombieBudget * (currentMetal/maxMetal))
 	end
-	zombieBudget = math.floor(zombieBudget)
-
+	currentBudget = zombieBudget + zombieGlobalBudget + currentBudget
+	
 	local zombieUnitDefID = zombieReviveOptions[math.random(1,zombieReviveOptionCount)]
 	local zombieCost = UnitDefs[zombieUnitDefID].cost
-	while zombieBudget >= zombieCost do
+	while currentBudget >= zombieCost do
 		SpawnReviveOption(x,y,z,facing,zombieUnitDefID)
-		zombieBudget = zombieBudget - zombieCost
+		currentBudget = currentBudget - zombieCost
 		if zombiesReviveOptionMultiRandomise == 1 then -- Randomises to a new unit if desired
 			zombieUnitDefID = zombieReviveOptions[math.random(1,zombieReviveOptionCount)]
 			zombieCost = UnitDefs[zombieUnitDefID].cost
@@ -149,18 +140,22 @@ local function HandleZombieReviveOptions(featureID)
 	
 	if zombiesReviveOptionsOverflowSpawn == 1 then -- We make a partial health zombie or overflow the budget to the next spawn
 		local unitID = SpawnReviveOption(x,y,z,facing,zombieUnitDefID)
-		zombieBudget = zombieBudget - zombieCost
+		currentBudget = currentBudget - zombieCost
 		local health = Spring.GetUnitHealth(unitID) -- TODO something breaks here, check if unit exists?
 		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
-			Spring.SetUnitHealth(unitID, health*((UnitDefs[zombieUnitDefID].cost + zombieBudget)/UnitDefs[zombieUnitDefID].cost))
-			zombieBudget = 0
+			Spring.SetUnitHealth(unitID, health*((UnitDefs[zombieUnitDefID].cost + currentBudget)/UnitDefs[zombieUnitDefID].cost))
+			currentBudget = 0
 		end
 	end
-	Spring.DestroyFeature(featureID)
+	
+	if zombiesPermanentBudgetMultiplier then
+		zombieGlobalBudget = zombieGlobalBudget + zombieBudget * zombiesPermanentBudgetMultiplier
+		Spring.Echo("ZombiePermanentBudget:"..zombieGlobalBudget)
+	end
 end
 
 local function CheckZombieOrders()	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
-	for unitID, _ in pairs(zombies) do
+	for unitID, _ in pairs(zombieUnits) do
 		local queueSize = spGetUnitCommandCount(unitID)
 		if not (queueSize) or not (queueSize > 0) then
 			GG.Zombies.SetZombieBehavior(unitID)
@@ -180,14 +175,17 @@ end
 -- settings gaiastorage before frame 1 somehow doesnt work, well i can guess why...
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if zombies[unitID] then
-		zombies[unitID] = nil
+	if zombieUnits[unitID] then
+		zombieUnits[unitID] = nil
 	end
 end
 
 function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
-	if zombies[unitID] and newTeamID ~= GaiaTeamID then
-		zombies[unitID] = nil
+	if zombieUnits[unitID] and newTeamID ~= GaiaTeamID then
+		zombieUnits[unitID] = nil
+		if zombiesDeathOnCaptureChance and zombiesDeathOnCaptureChance >= math.random(0,1) then
+			Spring.DestroyUnit(unitID)
+		end
 		-- taking away zombie from zombie team unpermaslows it
 		if ZOMBIES_PERMA_SLOW then
 			GG.Zombies.SetZombieSpeedMult(unitID, 1)
@@ -195,14 +193,14 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 	elseif newTeamID == GaiaTeamID then
 		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 		GG.Zombies.SetZombieBehavior(unitID)
-		zombies[unitID] = true
+		zombieUnits[unitID] = true
 	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	if (teamID == GaiaTeamID) and (builderID == GaiaTeamID) then
 		GG.Zombies.SetZombieBehavior(unitID)
-		zombies[unitID] = true
+		zombieUnits[unitID] = true
 		if ZOMBIES_PERMA_SLOW then
 			local maxHealth = select(2, spGetUnitHealth(unitID)) -- TODO is this check something necessary? or could it be removed
 			if maxHealth then
@@ -212,20 +210,45 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	end
 end
 
+local function FeatureReviveCycles(featureID)
+	if featureReviveCycleCount[featureID] == nil then
+		featureReviveCycleCount[featureID] = zombiesReviveCyclesCount - 1 -- one cycle has passed to reach this point
+	else 
+		featureReviveCycleCount[featureID] = featureReviveCycleCount[featureID] - 1
+	end
+	return featureReviveCycleCount[featureID]
+end
+
 local function RezFrameCallback(featureID)
-	local unitID
+	
 	if zombieReviveOptionCount == 0 then
-		unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,ZOMBIES_PARTIAL_RECLAIM, nil)
-		zombies[unitID] = true
+		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID)
+		zombieUnits[unitID] = true
 		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 		GG.Zombies.SetZombieBehavior(unitID)
+		if ZOMBIES_PARTIAL_RECLAIM then
+			GG.Zombies.SetHealthByReclaimPercent(featureID,unitID)
+		end
 	else
 		HandleZombieReviveOptions(featureID)
+	end
+	
+	local zombieCyclesRemaining = 0
+	if zombiesReviveCyclesCount > 1 then
+		zombieCyclesRemaining = FeatureReviveCycles(featureID)
+	end
+	if zombieCyclesRemaining > 0 then
+		GG.Zombies.AddFeatureToZombieCountdown(featureID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
+		return
+	end
+	
+	if not zombiesWrecksRemain then
+		Spring.DestroyFeature(featureID)
 	end
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
-	GG.Zombies.AddFeatureToZombieCountdown(featureID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, RezFrameCallback) 
+	GG.Zombies.AddFeatureToZombieCountdown(featureID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
 end
 
 local function ReInit()
@@ -234,14 +257,14 @@ local function ReInit()
 		local unitID = units[i]
 		local unitTeam = spGetUnitTeam(unitID)
 		if (unitTeam == GaiaTeamID) then
-			zombies[unitID] = true
+			zombieUnits[unitID] = true
 			GG.Zombies.SetZombieSpeedMult(unitID,ZOMBIES_PERMA_SLOW)
 			GG.Zombies.SetZombieBehavior(unitID)
 		end
 	end
 	local features = spGetAllFeatures()
 	for i = 1, #features do
-		GG.Zombies.AddFeatureToZombieCountdown(features[i], ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, RezFrameCallback)
+		GG.Zombies.AddFeatureToZombieCountdown(features[i], ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
 	end
 end
 

@@ -69,8 +69,8 @@ local function GetFeatureResurrectData(featureID)
 end
 
 -- Zombie resurrect
--- Turns a feature into a unit if applicable. Has a callback returning featureID and unitID for data transfer. Returns unitID.
-local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealthBool, unitReviveCallback)
+-- Turns a feature into a unit if applicable and returns the unitID
+local function TurnFeatureIntoUnit(featureID,teamID)
 	local resDefName,facing = GetFeatureResurrectData(featureID)
 	local x, y, z = Spring.GetFeaturePosition(featureID)
 
@@ -86,23 +86,17 @@ local function TurnFeatureIntoUnit(featureID,teamID,reclaimPercentHealthBool, un
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
 	GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
 
-	if reclaimPercentHealthBool then
-		local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
-		if currentMetal and maxMetal and (maxMetal > 0) then
-			local health = Spring.GetUnitHealth(unitID)
-			if health then
-				Spring.SetUnitHealth(unitID, health*(currentMetal/maxMetal))
-			end
+	return unitID
+end
+
+local function SetHealthByReclaimPercent(featureID, unitID)
+	local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
+	if currentMetal and maxMetal and (maxMetal > 0) then
+		local health = Spring.GetUnitHealth(unitID)
+		if health then
+			Spring.SetUnitHealth(unitID, health*(currentMetal/maxMetal))
 		end
 	end
-
-	-- Unit and Wreck exist both for value transfer
-	if (unitReviveCallback) then
-		unitReviveCallback(unitID,featureID)
-	end
-
-	Spring.DestroyFeature(featureID)
-	return unitID
 end
  
 -- Sets the zombie specific speed multiplier. Works on non zombie units too.
@@ -195,7 +189,7 @@ end
 -- Adds a wreck into the zombie countdown table and returns it for further modification.
 -- Use the rezFrameCallback to repurpose the system for other effects or chain into TurnFeatureIntoUnit for a revived unit with ID Callback.
 -- If no callback is provided, revives the wreck as a unslowed zombie unit.
-local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, rezFrameCallback)
+local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, maxRezTime, rezFrameCallback)
 	local resDefName, face = GetFeatureResurrectData(featureID)
 	if resDefName and face and not resurrectingFeatures[featureID] then
 		local ud = resDefName and UnitDefNames[resDefName]
@@ -206,8 +200,12 @@ local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, re
 				rezBaseTime = rezBaseTime + rezBaseTime * (1 - reclaimPercent)
 			end
 
-			if (rezBaseTime < minRezTime) then
+			if minRezTime and rezBaseTime < minRezTime then
 				rezBaseTime = minRezTime
+			end
+			
+			if maxRezTime and rezBaseTime > maxRezTime then
+				rezBaseTime = maxRezTime
 			end
 			
 			local rezFrame = gameframe + rezBaseTime * 32
@@ -262,11 +260,15 @@ function gadget:GameFrame(f)
 	for featureID in pairs(resurrectingFeatures) do
 		local rezFrame = resurrectingFeatures[featureID].rezFrame
 		if rezFrame <= gameframe then
-			if (resurrectingFeatures[featureID].rezFrameCallback) then
-				resurrectingFeatures[featureID].rezFrameCallback(featureID)
+			if resurrectingFeatures[featureID].rezFrameCallback then
+				local callbackFunction = resurrectingFeatures[featureID].rezFrameCallback
+				resurrectingFeatures[featureID] = nil
+				callbackFunction(featureID)
 			else
-				local unitID = TurnFeatureIntoUnit(featureID,GaiaTeamID,true,nil)
+				local unitID = TurnFeatureIntoUnit(featureID,GaiaTeamID)
 				SetZombieBehavior(unitID)
+				SetHealthByReclaimPercent(featureID, unitID)
+				Spring.DestroyFeature(featureID)
 			end
 		else
 			local secondsTillRezCall = floor((rezFrame - f) / 32)
@@ -295,6 +297,7 @@ function gadget:Initialize()
 		TurnFeatureIntoUnit     	= TurnFeatureIntoUnit,
 		SetZombieSpeedMult      	= SetZombieSpeedMult,
 		SetZombieBehavior       	= SetZombieBehavior,
+		SetHealthByReclaimPercent	= SetHealthByReclaimPercent,
 		GetFeatureResurrectData 	= GetFeatureResurrectData,
 		GetZombieResurrectData 		= GetZombieResurrectData, -- I want to expose these for modification from outside if desired
 		AddFeatureToZombieCountdown	= AddFeatureToZombieCountdown
