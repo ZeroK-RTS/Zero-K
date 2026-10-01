@@ -169,6 +169,29 @@ local BaseClasses = {
 			effectType = "groundShockwave",
 		},
 	},
+	GroundShockWaveDeath = {
+		distortionType = "point",
+		alwaysVisible = false,
+		distortionConfig = {
+			posx = 0,
+			posy = 0,
+			posz = 0,
+			radius = 200,
+			effectStrength = 0.9,
+			distanceFalloff = 0.12,
+			noiseStrength = 0.68,
+			noiseScaleSpace = 0.8,
+			distanceFalloff = 0.3,
+			lifeTime = 12,
+			decay = 16,
+			rampUp = 4,
+			onlyModelMap = 1,
+			shockWidth = 1.2,
+			refractiveIndex = -1.2,
+			startRadius = 0.24,
+			effectType = "groundShockwave",
+		},
+	},
 
 	ExploShockWaveXS = {
 		distortionType = "point",
@@ -350,7 +373,7 @@ local BaseClasses = {
 			refractiveIndex = -1.2,
 			windAffected = -2.95,
 			riseRate = -2,
-			lifeTime = 30,
+			lifeTime = 40,
 			rampUp = 5,
 			decay = 15,
 			effectType = 0,
@@ -364,7 +387,7 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 200,
-			effectStrength = 0.25,
+			effectStrength = 0.18,
 			noiseStrength = 0.95,
 			noiseScaleSpace = 0.11,
 			distanceFalloff = 0.25,
@@ -414,12 +437,12 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
+			effectStrength = 0.2,
 			noiseStrength = 1.2,
 			noiseScaleSpace = 0.05,
 			distanceFalloff = 0.9,
 			onlyModelMap = 0,
 			windAffected = -1,
-			effectStrength = 0.2,
 			riseRate = 0.6,
 			startRadius = 0.7,
 			lifeTime = 450,
@@ -436,14 +459,14 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 150,
+			effectStrength = 12,
 			noiseScaleSpace = 0.12,
 			noiseStrength = 0.22,
 			onlyModelMap = 0,
-			lifeTime = 38,
+			lifeTime = 42,
 			refractiveIndex = 1.1,
 			decay = 15,
 			rampUp = 1,
-			effectStrength = 16,
 			startRadius = 0.16,
 			shockWidth = -0.65,
 			effectType = "airShockwave",
@@ -588,6 +611,7 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 150,
+			effectStrength = -1.9,
 			noiseScaleSpace = 0.4,
 			noiseStrength = 0.1,
 			onlyModelMap = 0,
@@ -596,7 +620,6 @@ local BaseClasses = {
 			lifeTime = 62,
 			decay = 24,
 			rampUp = 6,
-			effectStrength = -1,
 			startRadius = 0.9,
 			shockWidth = -0.92,
 			effectType = "airShockwave",
@@ -944,22 +967,22 @@ local BaseClasses = {
 	},
 	ExplosionHeatLong = { -- spawned on explosions
 		distortionType = "point",
-		yOffset = 0, -- Y offsets are only ever used for explosions!
+		yOffset = 50, -- Y offsets are only ever used for explosions!
 		alwaysVisible = true,
 		distortionConfig = {
 			posx = 0,
 			posy = 0,
 			posz = 0,
 			radius = 10,
-			effectStrength = 1.1,
+			effectStrength = 0.55,
 			noiseStrength = 1.1,
-			noiseScaleSpace = 0.65,
-			distanceFalloff = 0.5,
+			noiseScaleSpace = 0.52,
+			distanceFalloff = 0.6,
 			startRadius = 0.8,
 			onlyModelMap = 0,
 			lifeTime = 1350,
-			rampUp = 30,
-			decay = 600,
+			rampUp = 15,
+			decay = 350,
 			effectType = 0,
 		},
 	},
@@ -1277,10 +1300,8 @@ local function AssignWeaponDistortions(weaponID)
 		explosionDistortionsNames[weaponName] = {
 			GetDistortionClass("DgunImplosion", "Micro"),
 		}
-	elseif weaponDef.type == "AircraftBomb" then -- Only Phoenix
-		explosionDistortionsNames[weaponName] = {
-			GetDistortionClass("FireExplosionHeat", "SmallMedium"),
-		}
+	elseif weaponDef.type == "AircraftBomb" then
+		-- Bespoke
 	else
 		local distortionClass
 		if effectiveRangeExplo > 600 then
@@ -1308,23 +1329,25 @@ local function AssignWeaponDistortions(weaponID)
 			if rapidFire then
 				adjRadius = adjRadius*0.8
 				if areaofeffect >= 24 then
-					strength = 0.22
+					strength = 0.25
 				else
 					strength = 0.4
 				end
 			end
 			if weaponRange > 2200 and weaponDef.type == "StarburstLauncher" then
 				adjRadius = adjRadius*1.7
-			elseif wcp.death_explosion and damage > 1000 then
-				adjRadius = adjRadius*1.5
+			elseif wcp.death_explosion and damage > 850 then
+				adjRadius = adjRadius*1.2
 			end
 			local distorts = {
 				GetDistortionClass(distortionClass, GetClosestSizeClass(adjRadius), strength)
 			}
 			if isStunOrDisarm then
 				local empClass = ((stunTime or 0) > 8 and burstMult < 10 and "empWobbleLong") or "empWobble"
-				local empSize = adjRadius * ((stunTime or 0) > 8 and 1 or 1.2)
-				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(empSize), strength)
+				local timeMult = (stunTime or 0) > 25 and 3 or 1
+				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(adjRadius), strength, timeMult)
+			elseif wcp.death_explosion and damage > 850 then
+				distorts[#distorts + 1] = GetDistortionClass("GroundShockWaveDeath", GetClosestSizeClass(adjRadius*1.2))
 			end
 			explosionDistortionsNames[weaponName] = distorts
 		end
@@ -1356,7 +1379,8 @@ explosionDistortionsNames.bomberassault_thermite_bomb = {
 	GetDistortionClass("ThermiteHeat", "Pico")
 }
 explosionDistortionsNames.energysingu_singularity = {
-	GetDistortionClass("ImplosionSingu", "Mega")
+	GetDistortionClass("ImplosionSingu", "Mega"),
+	GetDistortionClass("GroundShockWaveDeath", "MegaXL"),
 }
 explosionDistortionsNames.bomberheavy_arm_pidr = {
 	GetDistortionClass("ImplosionBomb", "Medium")
@@ -1375,17 +1399,21 @@ explosionDistortionsNames.tankraid_napalm_bomblet[#explosionDistortionsNames.tan
 explosionDistortionsNames.jumpraid_pyro_death = explosionDistortionsNames.jumpraid_pyro_death or {}
 explosionDistortionsNames.jumpraid_pyro_death[#explosionDistortionsNames.jumpraid_pyro_death + 1] = GetDistortionClass("ExplosionHeatFirewalker", "Smallish", false, 1.3)
 
+explosionDistortionsNames.bomberriot_napalm = {
+	GetDistortionClass("FireExplosionHeat", "SmallMedium", 0.8),
+}
 explosionDistortionsNames.jumparty_napalm_sprayer = {
 	GetDistortionClass("ExplosionHeatFirewalker", "Small", false, 1.5),
 }
 explosionDistortionsNames.striderdante_napalm_rockets = {
-	GetDistortionClass("FireExplosionHeat", "Smaller", false, 1.8),
+	GetDistortionClass("FireExplosionHeat", "Smaller"),
 }
 explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
-	GetDistortionClass("FireExplosionHeat", "Smaller", false, 1.8),
+	GetDistortionClass("FireExplosionHeat", "Smaller"),
 }
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
+	GetDistortionClass("ExplosionHeatLong", "Small", 0.2), -- Some distortion for when the camera is inside the larger one
 }
 
 -- Fancy explosions for huge artillery
@@ -1400,6 +1428,13 @@ explosionDistortionsNames.staticheavyarty_plasma[#explosionDistortionsNames.stat
 
 explosionDistortionsNames.staticarty_plasma = explosionDistortionsNames.staticarty_plasma or {}
 explosionDistortionsNames.staticarty_plasma[#explosionDistortionsNames.staticarty_plasma + 1] = GetDistortionClass("GroundShockWave", "Small")
+
+-- Bigger explosion for comm death
+explosionDistortionsNames.comm_ex = explosionDistortionsNames.comm_ex or {}
+explosionDistortionsNames.comm_ex[#explosionDistortionsNames.comm_ex + 1] = GetDistortionClass("ExploShockWaveL", "Mediumest", 0.8, 1.4)
+
+explosionDistortionsNames.comm_ex_big = explosionDistortionsNames.comm_ex_big or {}
+explosionDistortionsNames.comm_ex_big[#explosionDistortionsNames.comm_ex_big + 1] = GetDistortionClass("ExploShockWaveL", "MediumLarge", 0.8, 1.4)
 
 -- Rescale some normal explosions that autodetect incorrectly
 explosionDistortionsNames.jumpbomb_jumpbomb_death = {
@@ -1418,10 +1453,16 @@ explosionDistortionsNames.spideremp_spider = {
 	GetDistortionClass("ExploShockWaveS", "Smallest", 0.22),
 	GetDistortionClass("empWobble", "Smallest"),
 }
+explosionDistortionsNames.hoverdepthcharge_fake_depthcharge = {
+	GetDistortionClass("ExploShockWaveS", "Smallest")
+}
+explosionDistortionsNames.tacnuke_tacnuke_weapon = {
+	GetDistortionClass("ExploShockWaveL", "Medium")
+}
 
 -- Precision weapons that deserve large distortions
 explosionDistortionsNames.tankheavyassault_cor_gol = {
-	GetDistortionClass("ExploShockWaveM", "Tiny", 1.8)
+	GetDistortionClass("ExploShockWaveM", "Tiny")
 }
 explosionDistortionsNames.cloaksnipe_shockrifle = {
 	GetDistortionClass("ExploShockWaveM", "Tiny")
@@ -1450,7 +1491,7 @@ explosionDistortionsNames.amphbomb_amphbomb_death = {
 	GetDistortionClass("DisruptionPulse", "Mediumest", 1.4, 0.92),
 }
 explosionDistortionsNames.commweapon_disruptorbomb = {
-	GetDistortionClass("DisruptionPulse", "Mediumest", 1.7, 1.8),
+	GetDistortionClass("DisruptionPulse", "Mediumest", 1.7, 1.85),
 }
 
 -- Disco Rave Party
@@ -1471,19 +1512,60 @@ explosionDistortionsNames.raveparty_violet_slugger = {
 	GetDistortionClass("DisruptionPulse", "Juno", 2, 3.4),
 }
 
--- BIG NUKE
-explosionDistortionsNames.staticnuke_crblmssl = {
+-- BIG NUKE - exp_nuke_effect_chooser.lua decides which distortion to use
+explosionDistortionsNames.staticnuke_crblmssl = nil
+explosionDistortionsNames.staticantinuke_amd_rocket = nil
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Generic event distortions
+
+local muzzleFlashDistortions = {}
+local explosionDistortions = {}
+
+explosionDistortions.teleport_out = {
+	GetDistortionClass("TeleportOut", "Smallest")
+}
+explosionDistortions.teleport_in = {
+	GetDistortionClass("TeleportIn", "Smallest")
+}
+explosionDistortions.gadget_nuke_hit_distortion = {
 	GetDistortionClass("ExplosionHeatNuke", "MegaXXL"),
 	GetDistortionClass("AirShockWaveNuke", "Nuke"),
 	GetDistortionClass("AirShockWaveNukeLater", "Nuke"),
 	GetDistortionClass("GroundShockWaveNuke", "Nuke"),
 }
+explosionDistortions.gadget_nuke_intercepted_distortion = {
+	GetDistortionClass("AirShockWaveNuke", "MegaXXL"),
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local muzzleFlashDistortions = {}
-local explosionDistortions = {}
+local function PopulateQuality(params)
+	local config = params.distortionConfig
+	if (config.radius or 0) >= 40 and (config.lifeTime or 0) >= 15 then
+		-- Show the largest and longest distortions at all qualities
+		params.quality = 1
+	elseif (config.radius or 0) >= 40 or (config.lifeTime or 0) >= 11 or params.distortionType == "beam" then
+		-- Avoid small explosions at mid-level quality
+		params.quality = 2
+	else
+		params.quality = 3
+	end
+	return params
+end
+
+local function PopulatQualityList(distortionList)
+	for i = 1, #distortionList do
+		distortionList[i] = PopulateQuality(distortionList[i])
+	end
+	return distortionList
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local projectileDefDistortions = {
 	default = {
 		distortionType = "point",
@@ -1502,7 +1584,7 @@ local projectileDefDistortions = {
 -- convert weaponname -> weaponDefID
 for name, distortionList in pairs(explosionDistortionsNames) do
 	if WeaponDefNames[name] then
-		explosionDistortions[WeaponDefNames[name].id] = distortionList
+		explosionDistortions[WeaponDefNames[name].id] = PopulatQualityList(distortionList)
 	end
 end
 explosionDistortionsNames = nil
@@ -1510,7 +1592,7 @@ explosionDistortionsNames = nil
 -- convert weaponname -> weaponDefID
 for name, distortionList in pairs(muzzleFlashDistortionsNames) do
 	if WeaponDefNames[name] then
-		muzzleFlashDistortions[WeaponDefNames[name].id] = distortionList
+		muzzleFlashDistortions[WeaponDefNames[name].id] = PopulatQualityList(distortionList)
 	end
 end
 muzzleFlashDistortionsNames = nil
@@ -1518,21 +1600,10 @@ muzzleFlashDistortionsNames = nil
 -- convert weaponname -> weaponDefID
 for name, params in pairs(projectileDefDistortionsNames) do
 	if WeaponDefNames[name] then
-		projectileDefDistortions[WeaponDefNames[name].id] = params
+		projectileDefDistortions[WeaponDefNames[name].id] = PopulateQuality(params)
 	end
 end
 projectileDefDistortionsNames = nil
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Generic event distortions
-
-explosionDistortions.teleport_out = {
-	GetDistortionClass("TeleportOut", "Smallest")
-}
-explosionDistortions.teleport_in = {
-	GetDistortionClass("TeleportIn", "Smallest")
-}
 
 
 --------------------------------------------------------------------------------

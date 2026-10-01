@@ -65,6 +65,9 @@ end
 local function Prepare()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
+	while Spring.GetUnitIsStunned(unitID) do
+		Sleep(1000)
+	end
 
 	Move(bay, x_axis, 0, BAY_SPEED_LOADED)
 	WaitForMove(bay, x_axis)

@@ -156,16 +156,12 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num)
-	EmitSfx(turret, 1025)
 	if firstFirepoint then
 		EmitSfx(flaremissilel, 1024)
 	else
 		EmitSfx(flaremissiler, 1024)
 	end
 	firstFirepoint = not firstFirepoint
-end
-
-function script.FireWeapon(num)
 end
 
 function script.AimFromWeapon(num)

@@ -78,7 +78,7 @@ local icontypes = {
   building = {
     bitmap='icons/building.dds',
     radiusadjust=1,
-    size=0.8,
+    size=1.7,
   },
 
   --------------------------------------------------------------------------------

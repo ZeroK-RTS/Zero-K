@@ -35,7 +35,7 @@ return { corcom1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  explodeAs           = [[ESTOR_BUILDINGEX]],
+  explodeAs           = [[COMM_EX]],
   footprintX          = 2,
   footprintZ          = 2,
   health              = 3000,
@@ -51,7 +51,7 @@ return { corcom1 = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[corcomAlt.s3o]],
   script              = [[corcom_alt.lua]],
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  selfDestructAs      = [[COMM_EX]],
 
   sfxtypes            = {
 
