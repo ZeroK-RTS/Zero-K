@@ -178,7 +178,8 @@ options = {
 
 -- { vertices, width, length }
 local unitDefToSel = {}
-for unitDefID, unitDef in pairs(UnitDefs) do
+for unitDefID = 1, #UnitDefs do
+	local unitDef = UnitDefs[unitDefID]
 	local scaleFactor = 8.0
 	local xsize, zsize = unitDef.xsize, unitDef.zsize
 	local scale = (scaleFactor * (xsize ^ 2 + zsize ^ 2) ^ 0.5)
@@ -196,11 +197,20 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 			zsize * scaleFactor + platterOverlap
 		}
 	elseif unitDef.canFly then
-		unitDefToSel[unitDefID] = {
-			3,
-			scale * 0.6,
-			scale * 0.7
-		}
+		if unitDef.customParams.select_no_rotate or unitDef.customParams.selection_velocity_heading then
+			-- We can at least make an equilateral triangle for the no-longer supported selection_velocity_heading
+			unitDefToSel[unitDefID] = {
+				3,
+				scale * 0.65,
+				scale * 0.66
+			}
+		else
+			unitDefToSel[unitDefID] = {
+				3,
+				scale * 0.6,
+				scale * 0.7
+			}
+		end
 	else
 		unitDefToSel[unitDefID] = {
 			64,

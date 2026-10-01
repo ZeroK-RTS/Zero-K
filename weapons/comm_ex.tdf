@@ -1,0 +1,15 @@
+[COMM_EX]
+{
+  name=Smallbuilding;
+  areaofeffect=420;
+  craterboost=1;
+  cratermult=3.5;
+  explosiongenerator=custom:FLASHNUKE360;
+  impulseboost=0;
+  impulsefactor=0.4;
+  soundhit=explosion/ex_med12;
+  [DAMAGE]
+  {
+    default=885;
+  }
+}

@@ -621,8 +621,11 @@ local function LoadChunk(filename)
 		return nil
 	end
 
-	-- pre-process constants (for example "math.rad(180)" -> "3.1415")
-	-- to avoid tons of needless global dereferences, function calls etc
+	-- Pre-process constants (for example "math.rad(180)" -> "3.1415")
+	-- to avoid tons of needless global dereferences, function calls etc.
+	-- Caveats:
+	-- * does not handle `math.rad = function() return 4 end` style overrides
+	-- * makes some invalid code like `12math.rad(34)56` compile
 	text = text:gsub("math%.pi", math.pi)
 	text = text:gsub("math%.tau", math.tau)
 	text = text:gsub("([xyz])_axis", { x = 1, y = 2, z = 3 })

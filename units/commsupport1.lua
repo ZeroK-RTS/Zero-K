@@ -35,7 +35,7 @@ return { commsupport1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  explodeAs           = [[ESTOR_BUILDINGEX]],
+  explodeAs           = [[COMM_EX]],
   footprintX          = 2,
   footprintZ          = 2,
   health              = 2000,
@@ -50,7 +50,7 @@ return { commsupport1 = {
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[commsupport.s3o]],
   script              = [[commsupport.lua]],
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  selfDestructAs      = [[COMM_EX]],
 
   sfxtypes            = {
 
