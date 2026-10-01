@@ -1,6 +1,8 @@
 include "constants.lua"
+include "trackControl.lua"
 
-local base, nano, guns, doors, turret, shovel = piece ('base', 'nano', 'guns', 'doors', 'turret', 'shovel')
+local base, nano, guns, doors, turret, shovel, wheels1, wheels2, wheels3,
+wheels4, wheels5, wheels6, wheels7, wheels8 = piece ('base', 'nano', 'guns', 'doors', 'turret', 'shovel', 'wheels1', 'wheels2', 'wheels3','wheels4', 'wheels5', 'wheels6', 'wheels7', 'wheels8')
 
 -- Construction
 
@@ -66,11 +68,45 @@ end
 
 -- EndBurst doesn't seem to fix friendlyfire on units with high-RoF
 
+-- Animation
+
+local SIG_Walk = 3
+
+function script.StartMoving()
+	StartThread(TrackControlStartMoving)
+end
+
+function script.StopMoving()
+	TrackControlStopMoving()
+end
+
 -- Misc
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	Spring.SetUnitNanoPieces(unitID, nanos)
+
+		local tracks = {piece('tracks1', 'tracks2', 'tracks3', 'tracks4')}
+	Show(tracks[1])
+	Hide(tracks[2])
+	Hide(tracks[3])
+	Hide(tracks[4])
+
+	InitiailizeTrackControl({
+		wheels = {
+			large = {piece('wheels1', 'wheels8')},
+			small = {piece('wheels2', 'wheels3', 'wheels4', 'wheels5', 'wheels6', 'wheels7')},
+		},
+		tracks = tracks,
+		signal = 3,
+		smallSpeed = math.rad(480),
+		smallAccel = math.rad(15),
+		smallDecel = math.rad(120),
+		largeSpeed = math.rad(280),
+		largeAccel = math.rad(15),
+		largeDecel = math.rad(240),
+		trackPeriod = 60,
+	})
 end
 
 local explodables = { turret, guns, shovel }
