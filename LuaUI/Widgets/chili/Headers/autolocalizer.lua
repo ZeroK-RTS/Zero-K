@@ -152,7 +152,6 @@ local function MyLoadString(str, filename)
 	return chunk, str2
 end
 
-
 function VFS.Include(filename, enviroment, mode)
 	local str = LoadFileSafe(filename, mode)
 
