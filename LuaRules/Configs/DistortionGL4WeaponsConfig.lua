@@ -181,8 +181,8 @@ local BaseClasses = {
 			distanceFalloff = 0.12,
 			noiseStrength = 0.68,
 			noiseScaleSpace = 0.8,
-			distanceFalloff = 0.3,
-			lifeTime = 14,
+			distanceFalloff = 0.4,
+			lifeTime = 15,
 			decay = 16,
 			rampUp = 4,
 			onlyModelMap = 1,
@@ -287,7 +287,7 @@ local BaseClasses = {
 			refractiveIndex = 1.02,
 			decay = 4,
 			rampUp = 4,
-			effectStrength = 4,
+			effectStrength = 6,
 			startRadius = 0.28,
 			shockWidth = -0.50,
 			effectType = "airShockwave",
@@ -1336,7 +1336,8 @@ local function AssignWeaponDistortions(weaponID)
 			if weaponRange > 2200 and weaponDef.type == "StarburstLauncher" then
 				adjRadius = adjRadius*1.7
 			elseif wcp.death_explosion and damage > 850 then
-				adjRadius = adjRadius*1.2
+				adjRadius = adjRadius + 50
+				strength = 1.5
 			end
 			local distorts = {
 				GetDistortionClass(distortionClass, GetClosestSizeClass(adjRadius), strength)
@@ -1346,7 +1347,7 @@ local function AssignWeaponDistortions(weaponID)
 				local timeMult = (stunTime or 0) > 25 and 3 or 1
 				distorts[#distorts + 1] = GetDistortionClass(empClass, GetClosestSizeClass(adjRadius), strength, timeMult)
 			elseif wcp.death_explosion and damage > 850 then
-				distorts[#distorts + 1] = GetDistortionClass("GroundShockWaveDeath", GetClosestSizeClass(adjRadius*1.2))
+				distorts[#distorts + 1] = GetDistortionClass("GroundShockWaveDeath", GetClosestSizeClass(adjRadius*1.4))
 			end
 			explosionDistortionsNames[weaponName] = distorts
 		end
@@ -1430,10 +1431,10 @@ explosionDistortionsNames.staticarty_plasma[#explosionDistortionsNames.staticart
 
 -- Bigger explosion for comm death
 explosionDistortionsNames.comm_ex = explosionDistortionsNames.comm_ex or {}
-explosionDistortionsNames.comm_ex[#explosionDistortionsNames.comm_ex + 1] = GetDistortionClass("ExploShockWaveL", "Mediumest", 0.8, 1.4)
+explosionDistortionsNames.comm_ex[#explosionDistortionsNames.comm_ex + 1] = GetDistortionClass("ExploShockWaveL", "Mediumest", 0.4, 1.4)
 
 explosionDistortionsNames.comm_ex_big = explosionDistortionsNames.comm_ex_big or {}
-explosionDistortionsNames.comm_ex_big[#explosionDistortionsNames.comm_ex_big + 1] = GetDistortionClass("ExploShockWaveL", "MediumLarge", 0.8, 1.4)
+explosionDistortionsNames.comm_ex_big[#explosionDistortionsNames.comm_ex_big + 1] = GetDistortionClass("ExploShockWaveL", "MediumLarge", 0.4, 1.4)
 
 -- Rescale some normal explosions that autodetect incorrectly
 explosionDistortionsNames.jumpbomb_jumpbomb_death = {
@@ -1457,10 +1458,6 @@ explosionDistortionsNames.hoverdepthcharge_fake_depthcharge = {
 }
 explosionDistortionsNames.tacnuke_tacnuke_weapon = {
 	GetDistortionClass("ExploShockWaveL", "Medium")
-}
-explosionDistortionsNames.crawl_blastsml = { -- Dante and Scorpion
-	GetDistortionClass("ExploShockWaveL", "Medium", 1.5),
-	GetDistortionClass("GroundShockWaveDeath", "Medium"),
 }
 
 -- Precision weapons that deserve large distortions
