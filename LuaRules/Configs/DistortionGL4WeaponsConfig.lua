@@ -177,12 +177,12 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 200,
-			effectStrength = 0.9,
+			effectStrength = 1.6,
 			distanceFalloff = 0.12,
 			noiseStrength = 0.68,
 			noiseScaleSpace = 0.8,
 			distanceFalloff = 0.3,
-			lifeTime = 12,
+			lifeTime = 14,
 			decay = 16,
 			rampUp = 4,
 			onlyModelMap = 1,
@@ -772,7 +772,7 @@ local BaseClasses = {
 			noiseStrength = 1,
 			noiseScaleSpace = 1.3,
 			onlyModelMap = 0,
-			lifeTime = 8,
+			lifeTime = 9,
 			distanceFalloff = 1,
 			refractiveIndex = 1.06,
 			decay = 2,
@@ -1457,6 +1457,10 @@ explosionDistortionsNames.hoverdepthcharge_fake_depthcharge = {
 }
 explosionDistortionsNames.tacnuke_tacnuke_weapon = {
 	GetDistortionClass("ExploShockWaveL", "Medium")
+}
+explosionDistortionsNames.crawl_blastsml = { -- Dante and Scorpion
+	GetDistortionClass("ExploShockWaveL", "Medium", 1.5),
+	GetDistortionClass("GroundShockWaveDeath", "Medium"),
 }
 
 -- Precision weapons that deserve large distortions
