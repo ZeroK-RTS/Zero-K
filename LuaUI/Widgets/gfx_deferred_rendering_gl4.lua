@@ -1620,13 +1620,14 @@ function widget:DrawWorld() -- We are drawing in world space, probably a bad ide
 		deferredLightShader = LuaShader.CheckShaderUpdates(shaderSourceCache, 0) or deferredLightShader
 	end
 
-	if pointLightVBO.usedElements > 0 or
-		unitPointLightVBO.usedElements > 0 or
-		beamLightVBO.usedElements > 0 or
-		unitConeLightVBO.usedElements > 0 or
-		coneLightVBO.usedElements > 0 or
-		cursorPointLightVBO.usedElements > 0
-		then
+	--if pointLightVBO.usedElements > 0 or
+	--	unitPointLightVBO.usedElements > 0 or
+	--	beamLightVBO.usedElements > 0 or
+	--	unitConeLightVBO.usedElements > 0 or
+	--	coneLightVBO.usedElements > 0 or
+	--	cursorPointLightVBO.usedElements > 0
+	--	then
+	if true then -- Maintain whitespace below for anticipated merge hell
 
 		local alt, ctrl = spGetModKeyState()
 		local devui = (spGetConfigInt('DevUI', 0) == 1)
