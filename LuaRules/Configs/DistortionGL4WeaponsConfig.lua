@@ -858,18 +858,18 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
-			effectStrength = 0.2,
+			effectStrength = 0.12,
 			noiseStrength = 1.7,
-			noiseScaleSpace = 0.32,
+			noiseScaleSpace = 0.38,
 			onlyModelMap = 0,
 			riseRate = -7.8,
 			distanceFalloff = 0.5,
 			pos2x = 100,
 			pos2y = 500,
 			pos2z = 100, -- beam distortions only, specifies the endpoint of the beam
-			lifeTime = 16,
+			lifeTime = 10,
 			sustain = 5,
-			rampUp = 0,
+			rampUp = 2,
 			decay = 2,
 			effectType = 7,
 		},
@@ -1244,8 +1244,7 @@ local function AssignWeaponDistortions(weaponID)
 	-- Assign projectileDistortions based on type, and decide weather muzzleflashes or explosiondistortions are needed
 	if wcp.lups_noshockwave then
 	elseif particleBeam then
-		local lightningWidth = "Quaco"
-		projectileDefDistortionsNames[weaponName] = GetDistortionClass("ParticleBeam", lightningWidth, 0.5)
+		projectileDefDistortionsNames[weaponName] = GetDistortionClass("ParticleBeam", "Zetto")
 	elseif wcp.single_hit_multi or wcp.single_hit then -- Gauss
 		projectileDefDistortionsNames[weaponName] = GetDistortionClass("GaussProjectile", "Pico")
 	elseif wcp.setunitsonfire and weaponDef.type == "LaserCannon" then -- Flamethrower
