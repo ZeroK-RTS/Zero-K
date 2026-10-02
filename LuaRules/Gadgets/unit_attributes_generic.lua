@@ -341,7 +341,7 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeUp
 			local data = state.weapon[i].damages
 			local toSet = {}
 			while data[did] do
-				toSet[did] = data[did] * damageFactor
+				toSet[did] = data[did] * damageFactor * ((weaponMods and weaponMods[i] and weaponMods[i].damageMult) or 1)
 				did = did + 1
 			end
 			spSetUnitWeaponDamages(unitID, i, toSet)
@@ -762,8 +762,9 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local healthChanges = (currentHealthAdd[unitID] or 0) ~= healthAdd
 		or (currentHealthMult[unitID] or 1) ~= healthMult
 	
-	local rangeUpdateRequired = (currentRange[unitID] or 1) ~= rangeMult or (currentProjectiles[unitID] or 1) ~= projectilesMult
-	local weaponChanges = (currentReload[unitID] or 1) ~= reloadMult
+	local rangeUpdateRequired = weaponSpecificMods or (currentRange[unitID] or 1) ~= rangeMult or (currentProjectiles[unitID] or 1) ~= projectilesMult
+	local weaponChanges = weaponSpecificMods
+		or (currentReload[unitID] or 1) ~= reloadMult
 		or (currentRange[unitID] or 1) ~= rangeMult
 		or (currentProjectiles[unitID] or 1) ~= projectilesMult
 		or (currentDamage[unitID] or 1) ~= damageMult
@@ -805,7 +806,7 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 		end
 	end
 	
-	if weaponSpecificMods or weaponChanges then
+	if weaponChanges then
 		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeUpdateRequired, rangeMult, projSpeedMult, projectilesMult, damageMult, minSpray, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
@@ -922,6 +923,7 @@ local function RemoveUnitFromAttributeType(attType, unitID)
 	end
 	attType.includedUnits[unitID] = nil
 	for i = 1, #attributeNames do
+		local attName=attributeNames[i]
 		if attType[attName] and attType[attName][unitID] ~= nil then
 			attType[attName][unitID] = nil
 		end
