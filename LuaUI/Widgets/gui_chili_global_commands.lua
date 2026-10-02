@@ -429,6 +429,73 @@ local function AddCommand(imageFile, tooltip, onClick)
 	return button
 end
 
+-- A button with icon buttonFile; clicking it opens a column of icon buttons below
+-- it, one per choice (like the map overlay selector). choices are {file, tooltip};
+-- onSelect(index) is called when one is picked, and the optional onOpenChanged(open)
+-- whenever the column opens or closes.
+local function AddIconMenu(buttonFile, tooltip, choices, onSelect, onOpenChanged)
+	local position = commandButtonOffset
+	commandButtonOffset = commandButtonOffset + 1
+
+	local menuPanel = Panel:New{
+		x = 0,
+		y = 0,
+		width = 36,
+		height = (#choices)*BUTTON_PLACE_SPACE + 8,
+		classname = "overlay_panel",
+		parent = screen0,
+		padding = {6,4,0,0}
+	}
+	menuPanel:SetVisibility(false)
+
+	local function SetOpen(open)
+		menuPanel:SetVisibility(open)
+		if onOpenChanged then
+			onOpenChanged(open)
+		end
+	end
+
+	for i = 1, #choices do
+		MakeCommandButton(menuPanel, i, choices[i].file, {desc = choices[i].tooltip}, true, function()
+			SetOpen(false)
+			onSelect(i)
+		end)
+	end
+
+	local menuButton = Chili.Button:New{
+		x = (position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y,
+		y = BUTTON_Y,
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
+		classname = "button_tiny",
+		margin = {0,0,0,0},
+		padding = {2,2,2,2},
+		tooltip = tooltip,
+		noFont = true,
+		parent = contentHolder,
+		OnMouseDown = globalMouseDown,
+		OnClick = {
+			function(self)
+				if not menuPanel.visible then
+					local sx, sy = self:LocalToScreen(0, 0)
+					menuPanel:SetPos(sx - 6, sy + BUTTON_SIZE + 4)
+				end
+				SetOpen(not menuPanel.visible)
+			end
+		},
+	}
+
+	Chili.Image:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = menuButton,
+		file = buttonFile,
+	}
+	return menuButton
+end
+
 local function InitializeControls()
 	mainWindow = Window:New{
 		name      = 'globalCommandsWindow',
@@ -533,6 +600,11 @@ local GlobalCommandBar = {}
 
 function GlobalCommandBar.AddCommand(imageFile, tooltip, onClick)
 	return AddCommand(imageFile, tooltip, onClick)
+end
+
+-- An icon menu button; onSelect(index) is called when the player picks choices[index].
+function GlobalCommandBar.AddIconMenu(buttonFile, tooltip, choices, onSelect, onOpenChanged)
+	return AddIconMenu(buttonFile, tooltip, choices, onSelect, onOpenChanged)
 end
 
 function widget:Initialize()
