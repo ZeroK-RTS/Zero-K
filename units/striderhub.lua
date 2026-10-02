@@ -42,6 +42,7 @@ return { striderhub = {
     midposoffset      = [[0 -10 0]],
     modelradius       = [[35]],
     isfakefactory     = [[1]],
+    strider_hub       = [[1]],
     selection_rank    = [[2]],
     factorytab        = 1,
     shared_energy_gen = 1,

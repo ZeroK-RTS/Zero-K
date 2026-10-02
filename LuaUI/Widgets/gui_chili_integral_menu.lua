@@ -16,6 +16,9 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Clicking this UI-only command opens the hidden "strider" submenu tab.
+local CMD_STRIDER_MENU = Spring.Utilities.CMD.STRIDER_MENU
+
 -- Spring localizations
 local spEcho = Spring.Echo
 local spGetActiveCommand = Spring.GetActiveCommand
@@ -131,6 +134,11 @@ local selectionIndex = 0
 local background
 local returnToOrdersCommand = false
 local simpleModeEnabled = true
+
+-- Name of a hiddenTab panel (e.g. the missiles Launch tab) to reveal this cycle,
+-- or false when no hidden tab is open. Hidden tabs are kept out of the tab strip
+-- until something calls WG.IntegralMenu.OpenTab; selecting any other tab clears it.
+local revealHiddenTab = false
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
@@ -727,7 +735,9 @@ end
 
 local function UpdateReturnToOrders(cmdID)
 	if returnToOrdersCommand and returnToOrdersCommand ~= cmdID then
-		commandPanelMap.orders.tabButton.DoClick()
+		if commandPanelMap.orders.tabButton.IsTabPresent() then
+			commandPanelMap.orders.tabButton.DoClick()
+		end
 		returnToOrdersCommand = false
 	end
 	
@@ -1243,6 +1253,14 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	local keyToShowWhenVisible
 	
 	local function DoClick(_, _, _, mouse)
+		if cmdID == CMD_STRIDER_MENU then
+			-- UI-only: open the hidden strider submenu instead of issuing a command.
+			-- Handled here (before onClick) so it does not return to the orders tab.
+			if WG.IntegralMenu and WG.IntegralMenu.OpenTab then
+				WG.IntegralMenu.OpenTab("strider")
+			end
+			return true
+		end
 		if buttonLayout.ClickFunction and buttonLayout.ClickFunction(cmdID and instantCommands[cmdID], isStateCommand) then
 			return false
 		end
@@ -1725,6 +1743,11 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			local ud = UnitDefs[-cmdID]
 			if buttonLayout.tooltipOverride then
 				button.tooltip = buttonLayout.tooltipOverride
+			elseif command and command.disabled and command.tooltip == "Requires a powered Strider Hub in range" then
+				-- Strider build greyed out because no powered Strider Hub is in range
+				-- (set by unit_strider_hub_access.lua). Matched exactly so other
+				-- disabled builds keep their normal unit-card tooltip.
+				button.tooltip = command.tooltip
 			else
 				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
@@ -2196,6 +2219,11 @@ local function GetTabPanel(parent, rows, columns)
 		if not tabList then
 			return
 		end
+		-- Selecting any other tab closes an open hidden tab (the missiles Launch
+		-- tab), so clicking a tab dismisses it as expected.
+		if revealHiddenTab and name ~= revealHiddenTab then
+			revealHiddenTab = false
+		end
 		currentTab = name
 		for i = 1, #tabList do
 			local data = tabList[i]
@@ -2208,6 +2236,17 @@ local function GetTabPanel(parent, rows, columns)
 		
 	function externalFunctions.SetTabs(newTabList, showTabs, variableHide, tabToSelect)
 		if TabListsAreIdentical(newTabList, tabList) then
+			-- Same tabs, but the requested selection may differ -- e.g. reopening the
+			-- hidden Launch tab after visiting Orders leaves the tab list unchanged.
+			-- Re-select the target so its panel actually shows.
+			if tabToSelect and currentTab ~= tabToSelect then
+				for i = 1, #tabList do
+					if tabList[i].name == tabToSelect then
+						tabList[i].DoClick()
+						break
+					end
+				end
+			end
 			return
 		end
 		if currentSelectedIndex and tabList[currentSelectedIndex] then
@@ -2216,7 +2255,10 @@ local function GetTabPanel(parent, rows, columns)
 		tabList = newTabList
 		tabHolder:ClearChildren()
 		for i = 1, #tabList do
-			if showTabs then
+			-- A hiddenTab (the missiles Launch tab) is never placed in the tab strip,
+			-- even while it is the selected tab: its content shows but no tab button
+			-- appears. It still gets DoClick below so its panel is displayed.
+			if showTabs and not tabList[i].hiddenTab then
 				tabHolder:AddChild(tabList[i].button)
 				tabList[i].SetHideHotkey(variableHide)
 				tabList[i].SetHotkeyActive(hotkeysActive)
@@ -2365,6 +2407,11 @@ local function ProcessAllCommands(commands, customCommands)
 	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
 	local unitMobilePanelSize = GetUnitMobilePanelSize(commands, factoryUnitDefID)
 
+	-- A hidden tab (the missiles Launch tab) stays open until the user presses a tab
+	-- button or a widget closes it via the API. The integral menu deliberately does
+	-- not react to selection changes or unit deaths here; any such policy belongs to
+	-- the widget that opened the tab (see the missile widget's launcher option).
+
 	selectionIndex = selectionIndex + 1
 	
 	for i = 1, #commandPanels do
@@ -2426,10 +2473,17 @@ local function ProcessAllCommands(commands, customCommands)
 	end
 	
 	-- Determine which tabs to display and which to select
+	local forceShowTabs = false
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		if data.commandCount ~= 0 then
+		-- A hiddenTab (the missiles Launch tab) stays out of the tab strip until it
+		-- is explicitly opened via WG.IntegralMenu.OpenTab, which sets revealHiddenTab.
+		local hidden = data.hiddenTab and (data.name ~= revealHiddenTab)
+		if data.commandCount ~= 0 and not hidden then
 			tabsToShow[#tabsToShow + 1] = data.tabButton
+			if data.alwaysShowTab then
+				forceShowTabs = true
+			end
 			data.buttons.ClearOldButtons(selectionIndex)
 			if data.queue then
 				data.queue.ClearOldButtons(selectionIndex)
@@ -2437,6 +2491,25 @@ local function ProcessAllCommands(commands, customCommands)
 			if (not tabToSelect) and data.tabButton.name == lastTabSelected then
 				tabToSelect = lastTabSelected
 			end
+		end
+	end
+
+	-- A freshly opened hidden tab takes selection priority and forces the strip
+	-- visible. If it is no longer available (e.g. all missile units were lost),
+	-- clear the open state so it does not get stuck.
+	if revealHiddenTab then
+		local revealPresent = false
+		for i = 1, #tabsToShow do
+			if tabsToShow[i].name == revealHiddenTab then
+				revealPresent = true
+				break
+			end
+		end
+		if revealPresent then
+			tabToSelect = revealHiddenTab
+			forceShowTabs = true
+		else
+			revealHiddenTab = false
 		end
 	end
 	
@@ -2453,12 +2526,33 @@ local function ProcessAllCommands(commands, customCommands)
 		tabPanel.ClearTabs()
 		lastTabSelected = false
 	else
-		tabPanel.SetTabs(tabsToShow, #tabsToShow > 1, not factoryUnitDefID, tabToSelect)
+		-- Fall back to the first shown tab if the intended one is not present
+		-- (e.g. only the missiles tab is available while nothing is selected,
+		-- so the default "orders" tab does not exist to be selected).
+		local tabToSelectPresent = false
+		for i = 1, #tabsToShow do
+			if tabsToShow[i].name == tabToSelect then
+				tabToSelectPresent = true
+				break
+			end
+		end
+		if not tabToSelectPresent then
+			tabToSelect = tabsToShow[1].name
+		end
+		tabPanel.SetTabs(tabsToShow, (#tabsToShow > 1) or forceShowTabs, not factoryUnitDefID, tabToSelect)
 		lastTabSelected = tabToSelect
 	end
-	
+
 	-- Keeps main window for tweak mode.SetIntegralVisibility(visible)
 	SetIntegralVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
+
+	-- The buttons were just rebuilt as unselected. UpdateButtonSelection only reacts to
+	-- the active command *changing*, so with the same command still armed (e.g. a sticky
+	-- missile launch after firing) it would leave the rebuilt button unselected. Force
+	-- the active command's button to re-highlight here.
+	lastCmdID = nil
+	local _, activeCmdID = spGetActiveCommand()
+	UpdateButtonSelection(activeCmdID)
 end
 
 --------------------------------------------------------------------------------
@@ -2535,7 +2629,9 @@ local function InitializeControls()
 	
 	local function ReturnToOrders(cmdID)
 		if options.selectionClosesTabOnSelect.value then
-			if commandPanelMap.orders then
+			-- Only return to orders if it is actually present; otherwise (e.g.
+			-- missiles tab with nothing selected) stay on the current tab.
+			if commandPanelMap.orders and commandPanelMap.orders.tabButton.IsTabPresent() then
 				commandPanelMap.orders.tabButton.DoClick()
 			end
 		elseif options.selectionClosesTab.value and cmdID then
@@ -2591,7 +2687,8 @@ local function InitializeControls()
 		end
 		
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
-	
+		data.tabButton.hiddenTab = data.hiddenTab
+
 		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap, (gridCustomOverrides and gridCustomOverrides[data.name]) or {})
 		end
@@ -2785,6 +2882,32 @@ function externalFunctions.UpdateCommands()
 	local commands = widgetHandler.commands
 	local customCommands = widgetHandler.customCommands
 	ProcessAllCommands(commands, customCommands)
+end
+
+-- Reveal a hiddenTab panel (e.g. the missiles "Launch" tab) and select it. The
+-- tab is otherwise kept out of the tab strip; opening it forces the strip
+-- visible. Selecting any other tab closes it again (see SwitchToTab).
+function externalFunctions.OpenTab(tabName)
+	if not initialized then
+		return
+	end
+	revealHiddenTab = tabName
+	externalFunctions.UpdateCommands()
+end
+
+function externalFunctions.CloseHiddenTab()
+	if not revealHiddenTab then
+		return
+	end
+	revealHiddenTab = false
+	externalFunctions.UpdateCommands()
+end
+
+function externalFunctions.IsHiddenTabOpen(tabName)
+	if tabName then
+		return revealHiddenTab == tabName
+	end
+	return revealHiddenTab ~= false
 end
 
 --------------------------------------------------------------------------------
