@@ -1456,8 +1456,8 @@ explosionDistortionsNames.spideremp_spider = {
 explosionDistortionsNames.hoverdepthcharge_fake_depthcharge = {
 	GetDistortionClass("ExploShockWaveS", "Smallest")
 }
-explosionDistortionsNames.tacnuke_tacnuke_weapon = {
-	GetDistortionClass("ExploShockWaveL", "Medium")
+explosionDistortionsNames.tacnuke_weapon = {
+	GetDistortionClass("ExploShockWaveL", "SmallMedium", false, 1.5)
 }
 
 -- Precision weapons that deserve large distortions
