@@ -70,26 +70,31 @@ end
 
 -- Zombie resurrect
 -- Turns a feature into a unit if applicable and returns the unitID
-local function TurnFeatureIntoUnit(featureID,teamID)
+-- Instead of using the wreck, can receive a UnitDef Or UnitDefID to spawn a different unit
+local function TurnFeatureIntoUnit(featureID,teamID,unitDefID)
 	local resDefName,facing = GetFeatureResurrectData(featureID)
 	local x, y, z = Spring.GetFeaturePosition(featureID)
-
+	local size
+	if unitDefID then
+		resDefName = unitDefID
+		size = UnitDefs[resDefName].xsize
+	else
+		size = UnitDefNames[resDefName].xsize
+	end
+	
 	local unitID = Spring.CreateUnit(resDefName, x, y, z, facing, teamID)
 
 	if not (unitID) then
 		return nil
 	end
-
 	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies") --TODO should this be here? is this used anywhere?
-	local size = UnitDefNames[resDefName].xsize
 	Spring.SpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
 	GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
-
 	return unitID
 end
 
-local function SetHealthByReclaimPercent(featureID, unitID)
+local function SetHealthToReclaimPercent(featureID, unitID)
 	local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
 	if currentMetal and maxMetal and (maxMetal > 0) then
 		local health = Spring.GetUnitHealth(unitID)
@@ -139,10 +144,11 @@ local function GetUnitNearestAlly(unitID, range)
 		if (allyID ~= unitID) and (allyTeam == GaiaTeamID) and (Spring.Utilities.getMovetype(UnitDefs[allyDefID]) ~= false) then
 			local ox, oy, oz = Spring.GetUnitPosition(allyID)
 			local dist = math.diag(x - ox, z - oz)
-			if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
+			--TODO reinstate once engine thing is fixed
+			--if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
 				best_ally = allyID
 				best_dist = dist
-			end
+			--end
 		end
 	end
 	return best_ally
@@ -175,9 +181,10 @@ local function SetZombieBehavior(unitID)
 		local rx = random(0, mapWidth)
 		local rz = random(0, mapHeight)
 		local ry = Spring.GetGroundHeight(rx,rz)
-		if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
+		--TODO once engine is fixed and this doesnt crash readd
+		--if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
 			orders[#orders+1] = {CMD.FIGHT, {rx, ry, rz}, CMD.OPT_SHIFT}
-		end
+		--end
 	end
 	
 	Spring.GiveOrderArrayToUnit(unitID,orders)
@@ -267,7 +274,7 @@ function gadget:GameFrame(f)
 			else
 				local unitID = TurnFeatureIntoUnit(featureID,GaiaTeamID)
 				SetZombieBehavior(unitID)
-				SetHealthByReclaimPercent(featureID, unitID)
+				SetHealthToReclaimPercent(featureID, unitID)
 				Spring.DestroyFeature(featureID)
 			end
 		else
@@ -297,7 +304,7 @@ function gadget:Initialize()
 		TurnFeatureIntoUnit     	= TurnFeatureIntoUnit,
 		SetZombieSpeedMult      	= SetZombieSpeedMult,
 		SetZombieBehavior       	= SetZombieBehavior,
-		SetHealthByReclaimPercent	= SetHealthByReclaimPercent,
+		SetHealthToReclaimPercent	= SetHealthToReclaimPercent,
 		GetFeatureResurrectData 	= GetFeatureResurrectData,
 		GetZombieResurrectData 		= GetZombieResurrectData, -- I want to expose these for modification from outside if desired
 		AddFeatureToZombieCountdown	= AddFeatureToZombieCountdown
