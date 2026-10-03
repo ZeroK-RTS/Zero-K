@@ -1,6 +1,7 @@
 -- linear constant 65536
 
 include "constants.lua"
+include "trackControl.lua"
 
 -- WARNING: change your constant for the -brackets to 65536 before compilingnot
 local base, body, turret, sleeve, barrel, firepoint, tracks1, tracks2, tracks3, tracks4,
@@ -20,10 +21,6 @@ local RESTORE_DELAY = 3000
 
 local TURRET_TURN_SPEED = math.rad(340)
 local GUN_TURN_SPEED = math.rad(100)
-
-local WHEEL_TURN_SPEED1 = 480
-local WHEEL_TURN_SPEED1_ACCELERATION = 75
-local WHEEL_TURN_SPEED1_DECELERATION = 200
 
 local smokePiece = {body, turret}
 
@@ -108,49 +105,13 @@ local function AnimationControl()
 	end
 end
 
-local function Moving()
-	Signal(SIG_Walk)
-	SetSignalMask(SIG_Walk)
-	
-	Spin(wheels1, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin(wheels2, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin(wheels3, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin(wheels4, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin(wheels5, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin(wheels6, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin(wheels7, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin(wheels8, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-end
-
-local function Stopping()
-	Signal(SIG_Walk)
-	SetSignalMask(SIG_Walk)
-	
-	-- I don\'t like insta braking. It\'s not perfect but works for most cases.
-	-- Probably looks goofy when the unit is turtling,, i.e. does not become faster as time increases..
-	once = animCount*ANIM_SPEED/1000
-
-	StopSpin(wheels1, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-	StopSpin(wheels2, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-	StopSpin(wheels3, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-	StopSpin(wheels4, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-	StopSpin(wheels5, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-	StopSpin(wheels6, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-	StopSpin(wheels7, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-	StopSpin(wheels8, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
-end
-
-
 function script.StartMoving()
-	moving = true
-	animCount = 0
-	StartThread(Moving)
+	StartThread(TrackControlStartMoving)
 end
 
 function script.StopMoving()
-
 	moving = false
-	StartThread(Stopping)
+	TrackControlStopMoving()
 end
 
 -- Weapons
@@ -255,14 +216,32 @@ function script.Killed(recentDamage, maxHealth)
 end
 
 function script.Create()
+
+	local tracks = {piece('tracks1', 'tracks2', 'tracks3', 'tracks4')}
+	Show(tracks[1])
+	Hide(tracks[2])
+	Hide(tracks[3])
+	Hide(tracks[4])
+
+	InitiailizeTrackControl({
+		wheels = {
+			large = {piece('wheels1', 'wheels2',  'wheels3', 'wheels4', 'wheels5')},
+            small = {piece('wheels6',  'wheels7', 'wheels8')},
+		},
+		tracks = tracks,
+		signal = 2,
+		smallSpeed = math.rad(960),
+		smallAccel = math.rad(400),
+		smallDecel = math.rad(600),
+		largeSpeed = math.rad(600),
+		largeAccel = math.rad(200),
+		largeDecel = math.rad(300),
+		trackPeriod = 25,
+	})
 	moving = false
 	
 	Turn(firepoint, x_axis, math.rad(7))
 	
-	Hide(tracks1)
-	Hide(tracks2)
-	Hide(tracks3)
-
 	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(250)
 	end
