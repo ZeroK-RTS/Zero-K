@@ -68,6 +68,7 @@ return { vehheavyarty = {
       name                    = [[Kinetic Missile]],
       areaOfEffect            = 24,
       cegTag                  = [[raventrail]],
+      avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
