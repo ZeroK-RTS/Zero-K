@@ -1,4 +1,4 @@
-local base, bottom, tamper, furnace, door_l, door_r, hinge_l, hinge_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'door_l', 'door_r', 'hinge_l', 'hinge_r', 'drill1', 'drill2', 'drill3', 'posts')
+local base, bottom, tamper, furnace, furnace_empty, door_l, door_r, hinge_l, hinge_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'furnace_empty', 'door_l', 'door_r', 'hinge_l', 'hinge_r', 'drill1', 'drill2', 'drill3', 'posts')
 
 include "pieceControl.lua"
 include "constants.lua"
@@ -77,9 +77,10 @@ local function Open()
 		income = income * metalmultInv
 		if income > 0 then
 			ShowDistortion(1 + overdrive)
-			Spin (furnace, y_axis, income, math.rad(1))
-			Spin (drill1, y_axis, income, math.rad(1))
-			Move (tamper, y_axis, height, income*10)
+			Spin(furnace, y_axis, income, math.rad(1))
+			Spin(drill1, y_axis, income, math.rad(1))
+			Move(tamper, y_axis, height, income*10)
+			Move(furnace_empty, y_axis, math.max(-5, -income*0.5)) -- So the LUPS effect does not clip out the top of the mex on the downstroke
 			WaitForMove (tamper, y_axis)
 			height = 60 - height
 		else
