@@ -70,7 +70,7 @@ end
 
 -- Animation
 
-local SIG_Walk = 3
+local SIG_Walk = 4
 
 function script.StartMoving()
 	StartThread(TrackControlStartMoving)
@@ -98,7 +98,7 @@ function script.Create()
 			small = {piece('wheels2', 'wheels3', 'wheels4', 'wheels5', 'wheels6', 'wheels7')},
 		},
 		tracks = tracks,
-		signal = 3,
+		signal = 4,
 		smallSpeed = math.rad(480),
 		smallAccel = math.rad(15),
 		smallDecel = math.rad(120),
