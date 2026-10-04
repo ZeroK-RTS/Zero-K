@@ -122,17 +122,6 @@ if zombiesReviveOptionsAsString then -- TODO pilfered from lockunits_modoption, 
 	end
 end
 
-local function SpawnReviveOption(x,y,z,facing,zombieUnitDefID)
-	local unitID = Spring.CreateUnit(zombieUnitDefID, x, y, z, facing, zombieTeamID)
-	zombieUnits[unitID] = true
-	GG.Zombies.SetZombieBehavior(unitID)
-	if ZOMBIES_PERMA_SLOW then
-		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
-	end
-	gadgetHandler:NotifyUnitCreatedByMechanic(unitID, false, "zombies")
-	return unitID
-end
-
 local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 	local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
 	local zombieUnitDefID = nil --nil means we use the features default revival thingy
