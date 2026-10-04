@@ -102,13 +102,29 @@ local CMD_REMOVE       = CMD.REMOVE
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local unitAICmdDesc = {
-	id      = CMD_UNIT_AI,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Unit AI',
-	action  = 'unitai',
-	tooltip = 'Toggles smart unit AI for the unit',
-	params  = {0, 'AI Off', 'AI On'}
+local commandTypes = {
+	default = {
+		cmdID = CMD_UNIT_AI,
+		desc = {
+			id      = CMD_UNIT_AI,
+			type    = CMDTYPE.ICON_MODE,
+			name    = 'Unit AI',
+			action  = 'unitai',
+			tooltip = 'Toggles smart unit AI for the unit',
+			params  = {0, 'AI Off', 'AI On'}
+		}
+	},
+	loopAttack = {
+		cmdID = CMD_LOOP_ATTACK,
+		desc = {
+			id      = CMD_LOOP_ATTACK,
+			type    = CMDTYPE.ICON_MODE,
+			name    = 'Loopback attack',
+			action  = 'loopattack',
+			tooltip = 'Toggles whether the unit strafes or loops',
+			params  = {0, 'Strafe', 'Loopback'}
+		}
+	},
 }
 
 local stateCommands = include("LuaRules/Configs/state_commands.lua")
@@ -639,7 +655,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, 250, predictedDist, ux, uz, origEx, origEz)
 	end
 	
-	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
+	local skirmRange = (doHug and behaviour.hugRange) or ((behaviour.skirmRangeOverride or GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
 	skirmRange = skirmRange * (GG.att_RangeChange[unitData.udID] or 1)
 	--Spring.Echo("skirmRange", skirmRange, GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum))
 	local reloadFrames
@@ -658,6 +674,11 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		Spring.Echo("GetEffectiveWeaponRange", GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum), unitData.udID, -dy, behaviour.weaponNum)
 	end
 	
+	local keepOrder = behaviour.skirmKeepOrder
+	if not keepOrder and behaviour.skirmKeepOrderLeeway then
+		keepOrder = (skirmRange + behaviour.skirmKeepOrderLeeway) > predictedDist
+	end
+	
 	--Spring.Echo("skirmRange", skirmRange, "pred", predictedDist, "frame", Spring.GetGameFrame())
 	if doHug or skirmRange > predictedDist then
 		if behaviour.skirmOnlyNearEnemyRange then
@@ -666,7 +687,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 				if doDebug then
 					Spring.Echo("return enemyRange < predictedDist", enemyRange, predictedDist)
 				end
-				return behaviour.skirmKeepOrder
+				return keepOrder
 			end
 		end
 		
@@ -682,13 +703,13 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			-- If a unit has not fired then it has been loaded since frame zero.
 			if reloadFrames and (behaviour.skirmBlockedApproachFrames < -reloadFrames) then
 				if (not behaviour.skirmBlockApproachHeadingBlock) or HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
-					if cmdID and move and not behaviour.skirmKeepOrder then
+					if cmdID and move and not keepOrder then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0 )
 					end
 					if doDebug then
 						Spring.Echo("return behaviour.skirmBlockedApproachFrames < -reloadFrames", behaviour.skirmBlockedApproachFrames, reloadFrames, reloadState, frame)
 					end
-					return behaviour.skirmKeepOrder
+					return keepOrder
 				end
 			end
 		end
@@ -700,6 +721,11 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
+		if behaviour.skirmJinkLength then
+			UpdateJink(behaviour, unitData)
+			cx = cx + ez*unitData.jinkDir*behaviour.skirmJinkLength/eDist
+			cz = cz - ex*unitData.jinkDir*behaviour.skirmJinkLength/eDist
+		end
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
@@ -712,12 +738,12 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
 		unitData.receivedOrder = true
 		return true
-	elseif cmdID and move and not behaviour.skirmKeepOrder then
+	elseif cmdID and move and not keepOrder then
 		spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0 )
 		return true
 	end
 
-	return behaviour.skirmKeepOrder
+	return keepOrder
 end
 
 local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
@@ -1192,11 +1218,13 @@ end
 local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 	if unit[unitID] or externallyHandledUnit[unitID] then
 		local state = cmdParams[1]
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_UNIT_AI)
+		local toggleName = (unit[unitID] and unit[unitID].udID and unitAIBehaviour[unit[unitID].udID] and unitAIBehaviour[unit[unitID].udID].alternateStateToggle) or "default"
+		local commandType = commandTypes[toggleName]
+		local cmdDescID = spFindUnitCmdDesc(unitID, commandType.cmdID)
 		
 		if (cmdDescID) then
-			unitAICmdDesc.params[1] = state
-			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitAICmdDesc.params})
+			commandType.desc.params[1] = state
+			spEditUnitCmdDesc(unitID, cmdDescID, { params = commandType.desc.params})
 			if externallyHandledUnit[unitID] then
 				Spring.SetUnitRulesParam(unitID, "tacticalAi_external", state, ALLY_TABLE)
 			else
@@ -1207,7 +1235,7 @@ local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_UNIT_AI] = true}
+	return {[CMD_UNIT_AI] = true, [CMD_LOOP_ATTACK] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -1215,7 +1243,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_UNIT_AI) then
+	if (cmdID ~= CMD_UNIT_AI and cmdID ~= CMD_LOOP_ATTACK) then
 		return true  -- command was not used
 	end
 	AIToggleCommand(unitID, cmdParams, cmdOptions)
@@ -1267,6 +1295,7 @@ end
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_AI)
+	gadgetHandler:RegisterCMDID(CMD_LOOP_ATTACK)
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
@@ -1292,9 +1321,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		return
 	end
 	local behaviour = unitAIBehaviour[unitDefID]
+	local commandType = commandTypes[behaviour.alternateStateToggle or "default"]
 	
 	if not behaviour.onlyIdleHandling then
-		spInsertUnitCmdDesc(unitID, unitAICmdDesc)
+		spInsertUnitCmdDesc(unitID, commandType.desc)
 	end
 	
 	if behaviour.externallyHandled then

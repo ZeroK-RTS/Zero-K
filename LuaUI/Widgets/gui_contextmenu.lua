@@ -709,16 +709,19 @@ local function weapons2Table(cells, ws, unitID)
 				end
 			end
 		end
-		
 		if cp.post_capture_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (tonumber(cp.post_capture_reload)/30) .. 's'
 		elseif cp.reammoseconds then
-			cells[#cells+1] = ' - Must rearm after shot'
+			if cp.shots_per_refuel then
+				cells[#cells+1] = ' - Must rearm after ' .. cp.shots_per_refuel .. ' shots'
+			else
+				cells[#cells+1] = ' - Must rearm after shot'
+				show_dps = false
+			end
 			cells[#cells+1] = ''
 			cells[#cells+1] = ' - Rearm time:'
 			cells[#cells+1] = cp.reammoseconds .. 's'
-			show_dps = false
 		elseif show_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (reloadtime) .. 's'
@@ -1547,7 +1550,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		textColor = color.stats_fg,
 		width = '100%',
 		height = '100%',
-		padding = { 0, 0, 0, 0 },
+		padding = { 0, 4, 0, 0 },
 		}
 	
 	local statschildren = {}

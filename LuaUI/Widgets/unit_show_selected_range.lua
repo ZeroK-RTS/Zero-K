@@ -48,7 +48,8 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 		wepRanges[unitDefID] = {}
 		local entryIndex = 0
 		for weaponIndex = 1, #weapons do
-			local weaponRange = WeaponDefs[weapons[weaponIndex].weaponDef].range
+			local wd = WeaponDefs[weapons[weaponIndex].weaponDef]
+			local weaponRange = tonumber(wd.customParams.truerange) or wd.range
 			if (weaponRange > 32) then -- 32 and under are fake weapons
 				entryIndex = entryIndex + 1
 				wepRanges[unitDefID][entryIndex] = weaponRange

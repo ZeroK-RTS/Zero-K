@@ -44,6 +44,48 @@ function Spring.Utilities.CommandNameByID(cmdID) -- returns a human-parsable str
 	return ret .. " (" .. tostring(cmdID) .. ")"
 end
 
+function Spring.Utilities.TraceEcho(...)
+	local myargs = { ... }
+	local parts = {}
+	local n = 0
+	for i = 1, #myargs do
+		n = n + 1
+		parts[n] = tostring(myargs[i])
+		n = n + 1
+		parts[n] = "\t"
+	end
+	local infostr = n > 0 and (table.concat(parts) .. " ") or ""
+	local functionstr = "Trace:["
+	for i = 2, 10 do
+		local info = debug.getinfo(i)
+		if info then
+			local funcName = info.name
+			if funcName then
+				functionstr = functionstr .. tostring(funcName) .. " <- "
+			else
+				break
+			end
+		else
+			break
+		end
+	end
+	functionstr = functionstr .. "]"
+	local arguments = ""
+	local info2 = debug and debug.getinfo(2)
+	local funcName1 = (info2 and info2.name) or "??"
+	if funcName1 ~= "??" then
+		for i = 1, 10 do
+			local name, value = debug.getlocal(2, i)
+			if not name then
+				break
+			end
+			local sep = ((arguments == "") and "") or "; "
+			arguments = arguments .. sep .. ((name and tostring(name)) or "name?") .. "=" .. tostring(value)
+		end
+	end
+	Spring.Echo(infostr .. functionstr .. " Args:(" .. arguments .. ")")
+end
+
 function Spring.Utilities.TraceFullEcho(...)
 	if not debug then
 		Spring.Echo("TraceFullEcho not available", ...)

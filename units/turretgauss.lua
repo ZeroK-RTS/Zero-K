@@ -44,6 +44,7 @@ return { turretgauss = {
   sfxtypes               = {
     explosiongenerators = {
       [[custom:flashmuzzle1]],
+      [[custom:gauss_flare_dagger]],
     },
   },
 

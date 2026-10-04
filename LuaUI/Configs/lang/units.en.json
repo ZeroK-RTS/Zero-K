@@ -1041,8 +1041,8 @@
 	},
 	"shipcarrier" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
+		"description" : "Multirole Support Aircraft Carrier, stockpiles disarm missiles at 5 m/s",
+		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy targets at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of capture drones to engage targets."
 	},
 	"turretaaflak" : {
 		"name" : "Thresher",
@@ -1163,6 +1163,11 @@
 		"name" : "Swift",
 		"description" : "Multi-role Fighter",
 		"helptext" : "The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers."
+	},
+	"planesupport" : {
+		"name" : "Magpie",
+		"description" : "Strafing Disruption Fighter-Bomber",
+		"helptext" : "The Magpie is a multi-purpose plane armed with a pair of disruption EMG cannons that can hit ground and air targets. With low direct damage, its main use lies in its high slow damage that allows it to quickly saturate most targets. It has limited ammunition so must occasionally return to airpads to restock."
 	},
 	"dronecarry" : {
 		"name" : "Gull",

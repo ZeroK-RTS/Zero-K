@@ -48,6 +48,10 @@ return { turretaaheavy = {
       def                = [[ADVSAM]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP SATELLITE]],
     },
+    {
+      def                = [[FUDGE_AIM_WEAPON]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP SATELLITE]],
+    },
 
   },
 
@@ -64,6 +68,7 @@ return { turretaaheavy = {
       cylinderTargeting       = 3.2,
 
       customParams              = {
+        broken_target_replacement = 2,
         isaa = [[1]],
         radar_homing_distance = 1800,
 
@@ -106,6 +111,56 @@ return { turretaaheavy = {
       weaponAcceleration      = 600,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 1600,
+    },
+
+    FUDGE_AIM_WEAPON = {
+      name                    = [[Long-Range SAM]],
+      areaOfEffect            = 24,
+      canattackground         = false,
+      cegTag                  = [[chainsawtrail]],
+      craterBoost             = 0,
+      craterMult              = 0,
+      cylinderTargeting       = 1,
+
+      customParams              = {
+        isaa = [[1]],
+        light_color = [[0.6 0.7 0.7]],
+        light_radius = 420,
+      },
+
+      damage                  = {
+        default = 22.51,
+        planes  = 225.1,
+      },
+
+      explosionGenerator      = [[custom:MISSILE_HIT_PIKES_160]],
+      fireStarter             = 20,
+      flightTime              = 4,
+      impactOnly              = true,
+      impulseBoost            = 0.123,
+      impulseFactor           = 0.0492,
+      interceptedByShieldType = 2,
+      leadlimit               = 0,
+      model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
+      noSelfDamage            = true,
+      range                   = 2400,
+      reloadtime              = 1,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/med_aa_hit]],
+      soundStart              = [[weapon/missile/med_aa_fire]],
+      soundTrigger            = true,
+      startVelocity           = 550,
+      texture1                = [[flarescale01]],
+      texture2                = [[AAsmoketrail]],
+      tolerance               = 16000,
+      tracks                  = true,
+      trajectoryHeight        = 0.4,
+      turnRate                = 55000,
+      turret                  = true,
+      waterweapon             = true,
+      weaponAcceleration      = 550,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 800,
     },
 
   },

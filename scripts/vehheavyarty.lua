@@ -12,13 +12,14 @@ local smokePiece = {bay, gantry}
 -- Signal definitions
 local SIG_AIM = 2
 local SIG_MOVE = 1
+local SIG_RESTORE = 4
 
 local RESTORE_DELAY = 5000
 local LOAD_DELAY = 1000
 local RELEASE_DELAY = 400 -- How long gantry waits after missile leaves
 local TRACK_PERIOD = 50
 
-local BAY_DISTANCE = -10
+local BAY_DISTANCE = -11
 local BAY_SPEED_LOADED = 7
 local BAY_SPEED_UNLOADED = 7
 local GANTRY_SPEED_LOADED = math.rad(90)
@@ -30,7 +31,8 @@ local WHEEL_SPIN_SPEED = math.rad(720)
 local WHEEL_SPIN_ACCEL = math.rad(100)
 local WHEEL_SPIN_DECEL = math.rad(200)
 
-local isLoaded, isReady, isMoving, doStrobe = true, false, false, false
+local isLoaded, isReady, isMoving, doStrobe, bayClosing = true, false, false, false, false
+local fireAtWill = true
 local tracks = 1
 
 --------------------------------------------------------------------------------
@@ -63,6 +65,9 @@ end
 local function Prepare()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
+	while Spring.GetUnitIsStunned(unitID) do
+		Sleep(1000)
+	end
 
 	Move(bay, x_axis, 0, BAY_SPEED_LOADED)
 	WaitForMove(bay, x_axis)
@@ -79,7 +84,8 @@ end
 local function Reload()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
-	if not isLoaded then   -- Just fired
+	bayClosing = true
+	if isReady then -- Just fired
 		Sleep(RELEASE_DELAY)
 	end
 	isReady = false
@@ -102,12 +108,42 @@ local function Reload()
 		Move(bay, x_axis, -BAY_DISTANCE, BAY_SPEED_UNLOADED)
 	end
 	WaitForMove(bay, x_axis)
+	Show(missile)
+	bayClosing = false
 
 	if not isLoaded then -- Only wait if reload required
 		Sleep(LOAD_DELAY)
 	end
 	isLoaded = true
-	Show(missile)
+	if not fireAtWill then
+		Signal(SIG_RESTORE)
+		StartThread(Prepare)
+	end
+end
+
+local function RestoreAfterDelay()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
+	Sleep(RESTORE_DELAY)
+	StartThread(Reload)
+end
+
+function FirestateChange(newState)
+	-- The idea is to keep Impaler ready to fire when not set to fire-at-will.
+	-- This retains the leeway of the open animation for general use, ie to find
+	-- good targets, while also allowing hold-fire Impaler to be very responsive
+	-- to player input.
+	fireAtWill = (newState == 2)
+	if fireAtWill then
+		StartThread(RestoreAfterDelay)
+	else
+		Signal(SIG_RESTORE)
+		if bayClosing then
+			StartThread(Reload)
+		else
+			StartThread(Prepare)
+		end
+	end
 end
 
 function script.StartMoving()
@@ -128,11 +164,6 @@ function script.StopMoving()
 	for i = 1, #wheels do
 		StopSpin(wheels[i], x_axis, WHEEL_SPIN_DECEL)
 	end
-end
-
-local function RestoreAfterDelay()
-	Sleep(RESTORE_DELAY)
-	StartThread(Reload)
 end
 
 function script.AimWeapon(num, heading, pitch)

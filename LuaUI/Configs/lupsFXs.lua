@@ -456,7 +456,7 @@ staticmexGlow = {
 	layer       = -5,
 	delay       = 0,
 	pos         = {0,0,0},
-	piece       = "furnace",
+	piece       = "furnace_empty",
 
 	partpos = "x,y,z|"..
 	"y = ((i>3) and 5) or -5,"..

@@ -81,7 +81,7 @@ end
 local bomberDefs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	bomberDefs[i] = (ud.isBomber or ud.isBomberAirUnit or ud.customParams.reallyabomber)
+	bomberDefs[i] = (ud.isBomber or ud.isBomberAirUnit or ud.customParams.reammoseconds)
 end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -367,7 +367,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting, followMove)
 	team = team or spGetUnitTeam(unitID)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		if health and maxHealth and health > maxHealth - 1 then
+		if (health and maxHealth and health > maxHealth - 1) and ((Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1) >= 1) then
 			return false
 		end
 	end
@@ -659,6 +659,10 @@ function gadget:GameFrame(n)
 	end
 end
 
+function GG.SetRequireRefuelRaw(bomberID)
+	spSetUnitRulesParam(bomberID, "noammo", 2)
+end
+
 function GG.RequireRefuel(bomberID)
 	return (spGetUnitRulesParam(bomberID, "noammo") == 2)
 end
@@ -762,7 +766,8 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	local noAmmo = spGetUnitRulesParam(unitID, "noammo")
 	if not noAmmo or noAmmo == 0 then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift and health > maxHealth - 1) then
+		if (cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and ((not cmdOptions.shift and health > maxHealth - 1) and
+				((Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1) >= 1)) then
 			return false  -- don't rearm unless damaged or need ammo
 		end
 	elseif noAmmo == 2 or noAmmo==3 then

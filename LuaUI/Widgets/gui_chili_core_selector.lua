@@ -1922,7 +1922,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		wantUpdateCons = true
 	end
 	local ud = UnitDefs[unitDefID]
-	if CanBeAnIdleCons(ud) and IsConNotCarriedByEnemyTransport(unitID) then
+	if CanBeAnIdleCons(ud) and IsConNotCarriedByEnemyTransport(unitID) and Spring.GetUnitIsDead(unitID) == false then
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end

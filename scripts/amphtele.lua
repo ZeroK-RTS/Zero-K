@@ -75,6 +75,9 @@ local function Create_Beacon_Thread(x,z)
 	beaconCreateX, beaconCreateZ = nil, nil
 	
 	Spring.SpawnCEG("teleport_in", x, y, z, 0, 0, 0, 1)
+	if GG.CustomExplosionLight then
+		GG.CustomExplosionLight("teleport_in", x, y, z, unitID)
+	end
 	
 	DeployTeleport()
 end

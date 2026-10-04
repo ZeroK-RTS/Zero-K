@@ -7,6 +7,8 @@ local boom = piece "boom"
 local neck = piece "neck"
 local gun = piece "gun"
 local ground1 = piece "ground1"
+local door1 = piece "door1"
+local door2 = piece "door2"
 local wakes = {}
 for i = 1, 8 do
 	wakes[i] = piece ("wake"..i)
@@ -34,10 +36,10 @@ local function HoveringAnimations () -- wobbling, waves and dust clouds
 					EmitSfx (wakes[j], 3)
 				end
 			else
-				EmitSfx (ground1, 1025)
+				EmitSfx (ground1, 1024)
 			end
 		end
-		Sleep (200)
+		Sleep (150)
 	end
 end
 
@@ -51,6 +53,8 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(HoveringAnimations)
 	Spring.SetUnitNanoPieces(unitID, {beam})
+	Hide (door1)
+	Hide (door2)
 end
 
 local function BuildAnim (heading)

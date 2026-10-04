@@ -34,16 +34,16 @@ RATE_LIMIT = 0.035
 
 --// render options textured
 textured = (scheme~="bw")
-lightAmbient = {1,1,1}
-lightDiffuse = {0.4,0.4,0.4}
+lightAmbient = {0.98,0.98,0.98}
+lightDiffuse = {0.39,0.39,0.39}
 lightPos     = {-0.2,0.4,0.5}
 
 --// Ambient Occlusion & Outline settings
 aoPower     = ((scheme=="bw") and 1.5) or 1.6
 aoContrast  = ((scheme=="bw") and 2.5) or 3.15
 aoTolerance = 0.011
-olContrast  = ((scheme=="bw") and 5) or 15
-olTolerance = 0.06
+olContrast  = ((scheme=="bw") and 5) or 12
+olTolerance = 0.07
 
 --// halo (white)
 halo  = false --(scheme~="bw")
@@ -70,7 +70,7 @@ halo  = false --(scheme~="bw")
 --//inBatch := commanders are excluded from "buildicons all" by default. This includes them.
 --//saveNames : A list of file names to save the icon to, instead of the default file name.
 
-defaults = {border=0.06, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
+defaults = {border=0.072, angle=45, rot="right", clamp=-10000, scale=1.5, empty=false, attempts=10, wait=120, zoom=1.0, offset={0,0,0},};
 
 
 -----------------------------------------------------------------------
@@ -142,10 +142,26 @@ unitConfigs = {
   [UnitDefNames.factorycloak.id] = {
     clamp = 0,
     unfold = true,
-    wait   = 120,
+    wait   = 125,
   },
   [UnitDefNames.platecloak.id] = {
     clamp = 0,
+  },
+  
+  [UnitDefNames.missileslow.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.napalmmissile.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.empmissile.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.tacnuke.id] = {
+    backgroundOverride = "bg_air.png",
+  },
+  [UnitDefNames.seismic.id] = {
+    backgroundOverride = "bg_air.png",
   },
 
 
@@ -175,7 +191,7 @@ unitConfigs = {
     unfold = true,
     attack = true,
     shotangle = 45,
-    wait   = 120,
+    wait = 120,
   },
   [UnitDefNames.shieldraid.id] = {
     unfold = true,
@@ -190,7 +206,7 @@ unitConfigs = {
   [UnitDefNames.turretgauss.id] = {
     unfold = true,
     attack = true,
-    wait   = 50,
+    wait   = 20,
   },
   [UnitDefNames.spiderantiheavy.id] = {
     unfold = true,
@@ -207,8 +223,8 @@ unitConfigs = {
     dimensionOverride = {maxy = 100},
   },
   [UnitDefNames.cloaksnipe.id] = {
---    unfold = true,
---    attack = true,
+    unfold = true,
+    attack = true,
   },
   [UnitDefNames.cloakassault.id] = {
     unfold = true,
@@ -238,6 +254,10 @@ unitConfigs = {
   },
   [UnitDefNames.chicken_pigeon.id] = {
     border = 0.11,
+  },
+  [UnitDefNames.chicken_blimpy.id] = {
+    unfold = true,
+    wait   = 104,
   },
 
   [UnitDefNames.chicken_dodo.id] = {
@@ -283,10 +303,12 @@ unitConfigs = {
   [UnitDefNames.commrecon1.id] = {
     unfold = true,
     --attack = true,
+    saveNames = {"commrecon"},
   },
   [UnitDefNames.commsupport1.id] = {
 	unfold = true,
     --attack = true,
+    saveNames = {"commsupport"},
   },
   [UnitDefNames.zenith.id] = {
     wait   = 50,
@@ -332,6 +354,7 @@ unitConfigs = {
   },
   [UnitDefNames.dynrecon1.id] = {
     inBatch = true,
+    unfold = true,
     saveNames = {"commrecon", "recon"},
   },
   [UnitDefNames.dynstrike1.id] = {
@@ -340,6 +363,7 @@ unitConfigs = {
   },
   [UnitDefNames.dynsupport1.id] = {
     inBatch = true,
+    unfold = true,
     saveNames = {"commsupport", "engineer"},
   },
   [UnitDefNames.corcom1.id] = {
@@ -368,6 +392,14 @@ unitConfigs = {
   [UnitDefNames.pw_bomberfac.id] = {
     saveNames = {"pw_bombercontrol", "pw_dropdepot"},
   },
+  [UnitDefNames.vehcapture.id] = {
+    unfold = true,
+    noActivate = true,
+    wait = 55,
+  },
+  --[UnitDefNames.vehsupport.id] = {
+  --  unfold = true,
+  --},
   
 }
 

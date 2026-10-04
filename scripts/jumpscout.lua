@@ -11,6 +11,10 @@ local rthigh = piece 'rthigh'
 
 include "constants.lua"
 
+local hpi = math.pi/2
+local pi  = math.pi
+local tau = math.tau
+
 -- Signal definitions
 local SIG_MOVE = 1
 local SIG_AIM = 2
@@ -210,8 +214,19 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(yaw, y_axis, heading, math.rad(420))
-	Turn(gun, x_axis, -pitch, math.rad(220))
+	
+	-- Cannot aim backwards, but aim lookahead still tries
+	heading = heading%tau
+	if heading > hpi then
+		if heading < pi then
+			heading = hpi
+		elseif heading < pi + hpi then
+			heading =  pi + hpi
+		end
+	end
+	
+	Turn(yaw, y_axis, heading, math.rad(360))
+	Turn(gun, x_axis, -pitch, math.rad(200))
 	WaitForTurn(yaw, y_axis)
 	WaitForTurn(gun, x_axis)
 	StartThread(RestoreAfterDelay)

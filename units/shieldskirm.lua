@@ -69,7 +69,7 @@ return { shieldskirm = {
 
     STORM_ROCKET = {
       name                    = [[Heavy Rocket]],
-      areaOfEffect            = 75,
+      areaOfEffect            = 96,
       cegTag                  = [[rocket_trail_bar_flameboosted]],
       craterBoost             = 1,
       craterMult              = 2,
@@ -103,6 +103,7 @@ return { shieldskirm = {
       soundStartVolume        = 7,
       startVelocity           = 190,
       tracks                  = false,
+      targetMoveError         = 0.3,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,
       turret                  = true,

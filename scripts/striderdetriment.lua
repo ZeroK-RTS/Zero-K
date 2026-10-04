@@ -165,9 +165,10 @@ local function DoRestore()
 	lastTorsoHeading = 0
 end
 
-local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
+local function Step(frontLeg, backLeg, pelvisMult)
 	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	mainLeg, offLeg = offLeg, mainLeg
+	impactFoot = (mainLeg == leftLeg) and rfoot or lfoot
 	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
@@ -193,6 +194,13 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED * pelvisMult * speed)
 	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED * speed)
 
+	Sleep(800)
+	if impactFoot == lfoot then
+		GG.UnitScriptDistortion(unitID, unitDefID, "leftfoot")
+	else
+		GG.UnitScriptDistortion(unitID, unitDefID, "rightfoot")
+	end
+	EmitSfx(impactFoot, 1024)
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
@@ -204,7 +212,6 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i] * speed)
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i] * speed)
 	end
-	--EmitSfx(impactFoot, dirtfling)
 	--EmitSfx(impactFoot, footcrater)
 	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult * speed)
 	Turn(torso, x_axis, 0, TORSO_TILT_SPEED * speed)
@@ -231,8 +238,8 @@ local function Walk()
 	
 	local first = true
 	while (true) do
-		Step(mainLeg, offLeg, lfoot, (first and 2) or 1)
-		Step(mainLeg, offLeg, rfoot, (first and 1.2) or 1)
+		Step(mainLeg, offLeg, (first and 2) or 1)
+		Step(mainLeg, offLeg, (first and 1.2) or 1)
 		first = false
 	end
 end

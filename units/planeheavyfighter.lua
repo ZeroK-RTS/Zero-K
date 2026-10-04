@@ -92,7 +92,7 @@ return { planeheavyfighter = {
 
       customParams            = {
         isaa = [[1]],
-        light_radius = 80,
+        light_radius = 40,
         light_alpha = 0.08,
       },
 

@@ -341,7 +341,7 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeUp
 			local data = state.weapon[i].damages
 			local toSet = {}
 			while data[did] do
-				toSet[did] = data[did] * damageFactor
+				toSet[did] = data[did] * damageFactor * ((weaponMods and weaponMods[i] and weaponMods[i].damageMult) or 1)
 				did = did + 1
 			end
 			spSetUnitWeaponDamages(unitID, i, toSet)
@@ -369,7 +369,7 @@ local origUnitSpeed = {}
 
 local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFactor, maxAccelerationFactor)
 	if spMoveCtrlGetTag(unitID) ~= nil then
-		return
+		return false
 	end
 	
 	if not origUnitSpeed[unitDefID] then
@@ -440,8 +440,8 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			maxAcc          = state.origMaxAcc      *maxAccelerationFactor, --(speedFactor > 0.001 and speedFactor or 0.001)
 			maxRudder       = state.origMaxRudder   *turnFactor,
 		}
-		spSetAirMoveTypeData (unitID, attribute)
-		spSetAirMoveTypeData (unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
+		spSetAirMoveTypeData(unitID, attribute)
 	elseif state.movetype == 1 then
 		local attribute =  {
 			maxSpeed        = state.origSpeed       *speedFactor,
@@ -450,7 +450,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			accRate         = state.origMaxAcc      *maxAccelerationFactor,
 			decRate         = state.origMaxDec      *maxAccelerationFactor
 		}
-		spSetGunshipMoveTypeData (unitID, attribute)
+		spSetGunshipMoveTypeData(unitID, attribute)
 		GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 	elseif state.movetype == 2 then
 		if workingGroundMoveType then
@@ -468,7 +468,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 				decRate         = state.origMaxDec      *decFactor,
 				turnAccel       = state.origTurnAccel    *turnAccelFactor,
 			}
-			spSetGroundMoveTypeData (unitID, attribute)
+			spSetGroundMoveTypeData(unitID, attribute)
 			GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 		else
 			--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
@@ -476,6 +476,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			spSetUnitCOBValue(unitID, COB.MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
 		end
 	end
+	return true
 end
 
 --------------------------------------------------------------------------------
@@ -761,8 +762,9 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	local healthChanges = (currentHealthAdd[unitID] or 0) ~= healthAdd
 		or (currentHealthMult[unitID] or 1) ~= healthMult
 	
-	local rangeUpdateRequired = (currentRange[unitID] or 1) ~= rangeMult or (currentProjectiles[unitID] or 1) ~= projectilesMult
-	local weaponChanges = (currentReload[unitID] or 1) ~= reloadMult
+	local rangeUpdateRequired = weaponSpecificMods or (currentRange[unitID] or 1) ~= rangeMult or (currentProjectiles[unitID] or 1) ~= projectilesMult
+	local weaponChanges = weaponSpecificMods
+		or (currentReload[unitID] or 1) ~= reloadMult
 		or (currentRange[unitID] or 1) ~= rangeMult
 		or (currentProjectiles[unitID] or 1) ~= projectilesMult
 		or (currentDamage[unitID] or 1) ~= damageMult
@@ -794,13 +796,17 @@ local function UpdateUnitAttributes(unitID, attTypeMap)
 	end
 	
 	if moveChanges then
-		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult)
-		currentMove[unitID] = moveMult
-		currentTurn[unitID] = turnMult
-		currentAccel[unitID] = accelMult
+		if UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult) then
+			-- Only update attributes if UpdateMovementSpeed passes
+			currentMove[unitID] = moveMult
+			currentTurn[unitID] = turnMult
+			currentAccel[unitID] = accelMult
+		else
+			hasAttributes = true
+		end
 	end
 	
-	if weaponSpecificMods or weaponChanges then
+	if weaponChanges then
 		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeUpdateRequired, rangeMult, projSpeedMult, projectilesMult, damageMult, minSpray, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
@@ -917,6 +923,7 @@ local function RemoveUnitFromAttributeType(attType, unitID)
 	end
 	attType.includedUnits[unitID] = nil
 	for i = 1, #attributeNames do
+		local attName=attributeNames[i]
 		if attType[attName] and attType[attName][unitID] ~= nil then
 			attType[attName][unitID] = nil
 		end

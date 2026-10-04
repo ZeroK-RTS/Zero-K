@@ -60,7 +60,7 @@ local isComm = {}
 function Spring.Utilities.isComm(unitDefID)
 	if not isComm[unitDefID] then
 		local ud = UnitDefs[unitDefID]
-		isComm[unitDefID] = (ud.customParams.dynamic_comm or ud.customParams.commtype) and 1 or 0
+		isComm[unitDefID] = ud and ud.customParams and (ud.customParams.dynamic_comm or ud.customParams.commtype) and 1 or 0
 	end
 	return isComm[unitDefID] == 1
 end

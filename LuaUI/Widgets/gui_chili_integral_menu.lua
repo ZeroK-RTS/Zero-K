@@ -190,6 +190,7 @@ local function SetSmallIcons(wantSmall)
 			keepAspect = false,
 			rectangleAspect = true,
 		}
+		buttonLayoutConfig.build.invisibleButton = false
 		buttonLayoutConfig.buildunit.image = {
 			x = "5%",
 			y = "4%",
@@ -198,23 +199,26 @@ local function SetSmallIcons(wantSmall)
 			keepAspect = false,
 			rectangleAspect = true,
 		}
+		buttonLayoutConfig.buildunit.invisibleButton = false
 	else
 		textConfig.bottomLeft.x = "10%"
 		textConfig.bottomLeft.bottom = "10%"
 		buttonLayoutConfig.build.image = {
 			x = 0,
 			y = 0,
-			right = 0,
-			height = "100%",
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		}
+		buttonLayoutConfig.build.invisibleButton = true
 		buttonLayoutConfig.buildunit.image = {
 			x = 0,
 			y = 0,
-			right = 0,
-			height = "100%",
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		}
+		buttonLayoutConfig.buildunit.invisibleButton = true
 	end
 end
 
@@ -1308,6 +1312,16 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		BUTTON_BORDER_COLOR = button.borderColor
 	end
 	
+	if buttonLayout.invisibleButton then
+		button.backgroundColor = {0, 0, 0, 0}
+		button.borderColor = {0, 0, 0, 0}
+		button.focusColor = {0, 0, 0, 0}
+	else
+		button.backgroundColor[4] = BUTTON_COLOR[4]
+		button.borderColor[4] = BUTTON_BORDER_COLOR[4]
+		button.focusColor[4] = BUTTON_FOCUS_COLOR[4]
+	end
+	
 	local image
 	local image_icon
 	local buildProgress
@@ -1441,15 +1455,19 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			SetImageTexture("")
 		end
 		if isDisabled then
-			button.backgroundColor = BUTTON_DISABLE_COLOR
-			button.focusColor = BUTTON_DISABLE_FOCUS_COLOR
-			button.borderColor = BUTTON_DISABLE_FOCUS_COLOR
+			if not buttonLayout.invisibleButton then
+				button.backgroundColor = BUTTON_DISABLE_COLOR
+				button.focusColor = BUTTON_DISABLE_FOCUS_COLOR
+				button.borderColor = BUTTON_DISABLE_FOCUS_COLOR
+			end
 			image.color = {0.3, 0.3, 0.3, 1}
 			externalFunctionsAndData.ClearGridHotkey()
 		else
-			button.backgroundColor = BUTTON_COLOR
-			button.focusColor = BUTTON_FOCUS_COLOR
-			button.borderColor = BUTTON_BORDER_COLOR
+			if not buttonLayout.invisibleButton then
+				button.backgroundColor = BUTTON_COLOR
+				button.focusColor = BUTTON_FOCUS_COLOR
+				button.borderColor = BUTTON_BORDER_COLOR
+			end
 			image.color = {1, 1, 1, 1}
 			if hotkeyText then
 				SetText(textConfig.topLeft.name, hotkeyText)
