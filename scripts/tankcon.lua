@@ -1,13 +1,16 @@
 include "constants.lua"
 include "trackControl.lua"
 
-local base, nano, guns, doors, turret, shovel, wheels1, wheels2, wheels3,
-wheels4, wheels5, wheels6, wheels7, wheels8 = piece ('base', 'nano', 'guns', 'doors', 'turret', 'shovel', 'wheels1', 'wheels2', 'wheels3','wheels4', 'wheels5', 'wheels6', 'wheels7', 'wheels8')
+-- Local Pieces
+local base, nano, guns, doors, turret, shovel = piece ('base', 'nano', 'guns', 'doors', 'turret', 'shovel')
+
+-- Local Signals
+local SIG_BUILD = 1
+local SIG_AIM = 2
 
 -- Construction
 
 local nanos = { piece 'nano1', piece 'nano2' }
-local SIG_BUILD = 1
 
 function script.StartBuilding(heading)
 	Signal (SIG_BUILD)
@@ -28,7 +31,6 @@ end
 
 local flares = { piece 'flare1', piece 'flare2' }
 local current_flare = 1
-local SIG_AIM = 2
 
 local function RestoreAfterDelay()
 	SetSignalMask(SIG_AIM)
@@ -69,8 +71,6 @@ end
 -- EndBurst doesn't seem to fix friendlyfire on units with high-RoF
 
 -- Animation
-
-local SIG_Walk = 4
 
 function script.StartMoving()
 	StartThread(TrackControlStartMoving)
