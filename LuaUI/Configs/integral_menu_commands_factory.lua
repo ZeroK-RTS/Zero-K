@@ -57,11 +57,11 @@ local factoryUnitPosDef = {
 		vehraid           = unitTypes.RAIDER,
 		vehriot           = unitTypes.RIOT,
 		vehsupport        = unitTypes.SKIRMISHER, -- Not really but nowhere else to go
-		veharty           = unitTypes.ARTILLERY,
+		vehheavyarty      = unitTypes.ARTILLERY,
 		vehaa             = unitTypes.ANTI_AIR,
 		vehassault        = unitTypes.ASSAULT,
 		vehheavyassault	  = unitTypes.HEAVY_SOMETHING,
-		vehheavyarty      = unitTypes.UTILITY,
+		veharty           = unitTypes.UTILITY,
 		vehcapture        = unitTypes.SPECIAL,
 	},
 	factoryhover = {
