@@ -54,3 +54,5 @@ heatray_fire1.wav
 heatray_fire2.wav
 
 launcher.wav - blackhole_fire.wav (Golgotha), cloaker_select.wav (Scorched 3D) and shield_select.wav (Scorched 3D)
+
+disruptor_emg.wav - synthesized for Zero-K, transient sliced from a Suno-generated track
