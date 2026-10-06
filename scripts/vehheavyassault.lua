@@ -1,13 +1,21 @@
 include "constants.lua"
 
-local base, body, turret, sleeve, barrel, firepoint = piece('base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint')
-local rwheel1, rwheel2, rwheel3 = piece('rwheel1', 'rwheel2', 'rwheel3')
-local lwheel1, lwheel2, lwheel3 = piece('lwheel1', 'lwheel2', 'lwheel3')
-local gs1r, gs2r, gs3r = piece('gs1r', 'gs2r', 'gs3r')
-local gs1l, gs2l, gs3l = piece('gs1l', 'gs2l', 'gs3l')
+local base, Hull, TurretHousing, Cannon, firepointC = piece('base', 'Hull', 'TurretHousing', 'Cannon', 'firepointC')
+local TurretL, PistonL1, PistonL2, HeatrayL, firepointL = piece('TurretL', 'PistonL1', 'PistonL2', 'HeatrayL', 'firepointL')
+local TurretR, PistonR1, PistonR2, HeatrayR, firepointR = piece('TurretR', 'PistonR1', 'PistonR2', 'HeatrayR', 'firepointR')
+local Cell1, Cell2, Cell3, Cell4, Cell5, Cell6, FireCell, HeldCell, ReloadCell = piece('Cell1', 'Cell2', 'Cell3', 'Cell4', 'Cell5', 'Cell6', 'FireCell', 'HeldCell', 'ReloadCell')
+local InserterPlate, Arm, Forearm, Loader, BottomClaw, LeftClaw, RightClaw = piece('InserterPlate', 'Arm', 'Forearm', 'Loader', 'BottomClaw', 'LeftClaw', 'RightClaw')
+local RWheel1, RWheel2 = piece('RWheel1', 'RWheel2')
+local LWheel1, LWheel2 = piece('LWheel1', 'LWheel2')
+local RWheelGuard, LWheelGuard, BackWheels = piece('RWheelGuard', 'LWheelGuard', 'BackWheels')
+local gs1r, gs2r = piece('gs1r', 'gs2r')
+local gs1l, gs2l = piece('gs1l', 'gs2l')
 
-local TURRET_TURN_SPEED  = math.rad(280)
-local TURRET_PITCH_SPEED = math.rad(50)
+local CANNON_TURN_SPEED  = math.rad(280)
+local CANNON_PITCH_SPEED = math.rad(50)
+local TURRET_TURN_SPEED = math.rad(50)
+local TURRET_PITCH_SPEED - math.rad(10)
+
 
 local SUSPENSION_BOUND = 3
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -32,20 +40,18 @@ local function Suspension()
 	while true do
 		local s1r = GetWheelHeight(gs1r)
 		local s2r = GetWheelHeight(gs2r)
-		local s3r = GetWheelHeight(gs3r)
 		local s1l = GetWheelHeight(gs1l)
 		local s2l = GetWheelHeight(gs2l)
-		local s3l = GetWheelHeight(gs3l)
 
-		local xtilta = (s3r + s3l - s1l - s1r)/6000
+		local xtilta = (s2r + s2l - s1l - s1r)/6000
 		xtiltv = xtiltv*0.99 + xtilta
 		xtilt = xtilt*0.98 + xtiltv
 
-		local ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/15000
+		local ztilta = (s1r + s2r - s1l - s2l)/15000
 		ztiltv = ztiltv*0.99 + ztilta
 		ztilt = ztilt*0.99 + ztiltv
 
-		local ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
+		local ya = (s1r + s2r + s1l + s2l)/1500
 		yv = yv*0.99 + ya
 		if yv < -0.1 then
 			yv = -0.1
@@ -59,21 +65,17 @@ local function Suspension()
 		Turn(base, x_axis, xtilt)
 		Turn(base, z_axis, -ztilt)
 
-		Move(rwheel1, y_axis, s1r, 20)
-		Move(rwheel2, y_axis, s2r, 20)
-		Move(rwheel3, y_axis, s3r, 20)
-		Move(lwheel1, y_axis, s1l, 20)
-		Move(lwheel2, y_axis, s2l, 20)
-		Move(lwheel3, y_axis, s3l, 20)
+		Move(RWheelGuard, y_axis, s1r, 20)
+		Move(LWheelGuard, y_axis, s1l, 20)
+		Move(BackWheels, y_axis, s2l, 20)
 
 		local _, _, _, speed = spGetUnitVelocity(unitID)
 		local wheelTurnSpeed = speed * 3
-		Spin (rwheel1, x_axis, wheelTurnSpeed)
-		Spin (rwheel2, x_axis, wheelTurnSpeed)
-		Spin (rwheel3, x_axis, wheelTurnSpeed)
-		Spin (lwheel1, x_axis, wheelTurnSpeed)
-		Spin (lwheel2, x_axis, wheelTurnSpeed)
-		Spin (lwheel3, x_axis, wheelTurnSpeed)
+		Spin (RWheel1, x_axis, wheelTurnSpeed)
+		Spin (RWheel2, x_axis, wheelTurnSpeed)
+		Spin (LWheel1, x_axis, wheelTurnSpeed)
+		Spin (LWheel2, x_axis, wheelTurnSpeed)
+		Spin (Backwheels, x_axis, wheelTurnSpeed/2)
 
 		Sleep (34)
 	end
@@ -83,8 +85,10 @@ local function RestoreAfterDelay()
 	SetSignalMask(1)
 	Sleep (5000)
 
-	Turn(turret, y_axis, 0, math.rad(30))
-	Turn(sleeve, x_axis, 0, math.rad(10))
+	Turn(Cannon, y_axis, 0, math.rad(90))
+	Turn(Cannon, x_axis, 0, math.rad(30))
+	Turn(TurretHousing, y_axis, 0, math.rad(20))
+	Turn(TurretHousing, x_axis, 0, math.rad(10))
 end
 
 function script.AimFromWeapon(num)

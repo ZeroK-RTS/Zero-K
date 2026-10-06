@@ -4,7 +4,7 @@ return { vehheavyassault = {
   acceleration        = 0.191,
   brakeRate           = 1.488,
   builder             = false,
-  buildPic            = [[vehriot.png]],
+  buildPic            = [[vehheavyassault.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -36,7 +36,7 @@ return { vehheavyassault = {
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[corleveler_512.s3o]],
+  objectName          = [[demolisher.s3o]],
   script              = [[vehheavyassault.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
@@ -124,7 +124,7 @@ return { vehheavyassault = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[leveler_d.dae]],
+      object           = [[demolisher_dead.s3o]],
     },
 
     HEAP  = {

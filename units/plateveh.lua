@@ -17,6 +17,7 @@ return { plateveh = {
     [[vehassault]],
     [[vehcapture]],
     [[veharty]],
+    [[vehheavyassault]],
     [[vehheavyarty]],
     [[vehaa]],
   },
