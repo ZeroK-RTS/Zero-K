@@ -60,7 +60,8 @@ local factoryUnitPosDef = {
 		veharty           = unitTypes.ARTILLERY,
 		vehaa             = unitTypes.ANTI_AIR,
 		vehassault        = unitTypes.ASSAULT,
-		vehheavyarty      = unitTypes.HEAVY_SOMETHING,
+		vehheavyassault	  = unitTypes.HEAVY_SOMETHING,
+		vehheavyarty      = unitTypes.UTILITY,
 		vehcapture        = unitTypes.SPECIAL,
 	},
 	factoryhover = {
