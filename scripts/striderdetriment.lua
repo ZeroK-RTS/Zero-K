@@ -288,7 +288,7 @@ function unmoonwalkFunc()
 end
 
 function script.StartMoving()
-	if not jumpActive then
+	if not (jumpActive or Spring.GetUnitIsStunned(unitID)) then
 		StartThread(Walk)
 	end
 end
