@@ -48,25 +48,12 @@ local spGetUnitHealth             = Spring.GetUnitHealth
 
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
+
 local zombieTeamID = Spring.GetGaiaTeamID()
-local zombieAllyTeamID = tonumber(modOptions.zombies_team) or nil 
-if zombieAllyTeamID then
+local zombieAllyTeamID = tonumber(modOptions.zombies_team) or nil -- 0 translates to gaia zombies
+if zombieAllyTeamID and zombieAllyTeamID > 0 then
 	zombieAllyTeamID = zombieAllyTeamID -1 --Teams are offset by 1 in the modoptions, and nil when 0
 end
-local function GetRandomTeamIDFromAllyTeam(allyTeamID)
-	local allyTeamList = Spring.GetTeamList(allyTeamID)
-	local teamMateCount = 0
-	
-	for _,_ in ipairs(allyTeamList) do
-		teamMateCount = teamMateCount + 1 
-	end
-	return allyTeamList[math.random(1,teamMateCount)]
-end
-
-local zombieUnits = {}
-local featureReviveCycleCount = {}
-local totalBaseZombieBudget = 0
-local excessBudget = 0
 
 local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed) or 12
 
@@ -92,8 +79,17 @@ local zombieBudgetMultScaler = tonumber(modOptions.zombies_budget_multiplier_sca
 local zombieFlatBudget = tonumber(modOptions.zombies_flat_budget) or 0
 local zombieFlatBudgetScaler = tonumber(modOptions.zombies_flat_budget_scaler) or nil
 
+local zombieUnits = {}
+local featureReviveCycleCount = {}
+local excessBudget = 0
 local zombieReviveOptionCount = 0
 local zombieReviveOptions = {} -- allows duplicates
+
+--Diagnostic variables
+local totalBaseRevivedBudget = 0
+local totalRevivedBudget = 0
+local totalRevivedValue = 0
+local totalReviveCount = 0
 
 --TODO there seems to be something with the comnames adding some more stuff?
 local UnitDefBothNames = {} -- Includes humanName and name
@@ -122,6 +118,16 @@ if zombiesReviveOptionsAsString then -- TODO pilfered from lockunits_modoption, 
 	end
 end
 
+local function GetRandomTeamIDFromAllyTeam(allyTeamID)
+	local allyTeamList = Spring.GetTeamList(allyTeamID)
+	local teamMateCount = 0
+	
+	for _,_ in ipairs(allyTeamList) do
+		teamMateCount = teamMateCount + 1 
+	end
+	return allyTeamList[math.random(1,teamMateCount)]
+end
+
 local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 	local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
 	local zombieUnitDefID = nil --nil means we use the features default revival thingy
@@ -132,7 +138,7 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		zombieCost = UnitDefs[zombieUnitDefID].cost
 	end
 
-	while currentBudget >= zombieCost do
+	while currentBudget >= zombieCost do --TODO zombie cost can end up as a float somehow?
 		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,zombieTeamID,zombieUnitDefID)
 		if unitID then
 			zombieUnits[unitID] = true
@@ -140,6 +146,8 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 			if ZOMBIES_PERMA_SLOW then
 				GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 			end
+			totalReviveCount = totalReviveCount +1
+			totalRevivedValue = math.floor(totalRevivedValue + zombieCost)
 		end
 		currentBudget = currentBudget - zombieCost
 		if zombieReviveOptionMultiRandomise and zombieUnitDefID then -- Randomises to a new unit if desired
@@ -167,13 +175,16 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		if not ZOMBIES_PARTIAL_RECLAIM then
 			return 0
 		end
+		totalReviveCount = totalReviveCount +1
+		totalRevivedValue = math.floor(totalRevivedValue + zombieCost)
+		
 		local health = Spring.GetUnitHealth(unitID) -- TODO something breaks here, check if unit exists?
 		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
 			Spring.SetUnitHealth(unitID, health*((UnitDefs[unitDefID].cost + currentBudget)/UnitDefs[unitDefID].cost))
 			currentBudget = 0
 		end
 	end
-	return currentBudget
+	return math.floor(currentBudget)
 end
 
 local function ZombieBudgetProcessing(featureID,excessBudget)
@@ -183,18 +194,19 @@ local function ZombieBudgetProcessing(featureID,excessBudget)
 	local zombieBudget = UnitDefNames[resDefName].cost
 	
 	if ZOMBIES_PARTIAL_RECLAIM then -- partial reclaim reduces the available metal to spawn units
-		zombieBudget = math.floor(zombieBudget * (currentMetal/maxMetal))
+		zombieBudget =  math.ceil(zombieBudget * (currentMetal/maxMetal))
 	end
 	thisFeatureBudget = math.floor(excessBudget + zombieFlatBudget + zombieBudget * zombieBudgetMult)
 	
 	if zombieFlatBudgetScaler then
-		zombieFlatBudget = zombieFlatBudget + zombieFlatBudgetScaler * zombieBudget/100
+		zombieFlatBudget = math.floor(zombieFlatBudget + zombieFlatBudgetScaler * zombieBudget/100)
 	end
 	
 	if zombieBudgetMultScaler then
-		zombieBudgetMult = zombieBudgetMult +  zombieBudgetMultScaler * 0.000001 * zombieBudget^1.05
+		zombieBudgetMult = zombieBudgetMult + 0.000001 * math.floor(zombieBudgetMultScaler  * zombieBudget^1.05)
 	end
-	totalBaseZombieBudget = totalBaseZombieBudget + zombieBudget
+	totalBaseRevivedBudget = math.floor(totalBaseRevivedBudget + zombieBudget)
+	totalRevivedBudget = math.floor(totalRevivedBudget + thisFeatureBudget)
 	return thisFeatureBudget
 end
 
@@ -210,7 +222,12 @@ end
 function gadget:GameFrame(f)
 	if (f%640) == 1 then
 		CheckZombieOrders()
-		Spring.Echo("totalBaseBudgetValue: "..totalBaseZombieBudget)
+		
+		Spring.Echo("totalBaseRevivedBudget: "..totalBaseRevivedBudget)
+		Spring.Echo("totalRevivedBudget: "..totalRevivedBudget)
+		Spring.Echo("totalRevivedValue: "..totalRevivedValue)
+		Spring.Echo("totalReviveCount: "..totalReviveCount)
+		Spring.Echo("zombieExcessBudget: "..excessBudget)
 		Spring.Echo("zombieFlatBudget: "..zombieFlatBudget)
 		Spring.Echo("zombieBudgetMult: "..zombieBudgetMult)
 	end
@@ -291,7 +308,7 @@ local function RezFrameCallback(featureID)
 		return
 	end
 	
-	if not zombieWrecksRemain then
+	if not zombieWrecksRemain or zombieWrecksRemain == 0 then
 		Spring.DestroyFeature(featureID)
 	end
 end
