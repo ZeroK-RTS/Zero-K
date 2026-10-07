@@ -43,7 +43,6 @@ return { planesupport = {
   maxElevator            = 0.014,
   maxPitch               = 0.5,
   maxRudder              = 0.009,
-  metalCost              = 150,
   mygravity              = 1,
   metalCost              = 250,
   noAutoFire             = false,
