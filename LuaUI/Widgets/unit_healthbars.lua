@@ -572,6 +572,9 @@ local paraUnits   = {}
 local disarmUnits = {}
 local onFireUnits = {}
 local UnitMorphs  = {}
+-- The three lists above are only consumed by DrawOverlays, which is skipped while the
+-- GL4 paralyze effect (WG.DrawParalyzedUnitGL4) draws these overlays. Set in DrawWorld.
+local gatherOverlays = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -917,7 +920,7 @@ do
 
 		morph = UnitMorphs[unitID]
 
-		if (drawUnitsOnFire) and (GetUnitRulesParam(unitID, "on_fire") == 1) then
+		if gatherOverlays and (drawUnitsOnFire) and (GetUnitRulesParam(unitID, "on_fire") == 1) then
 			onFireUnits[#onFireUnits+1] = unitID
 		end
 
@@ -1463,6 +1466,7 @@ do
 	local glMultiTexCoord      = gl.MultiTexCoord
 
 	function widget:DrawWorld()
+		gatherOverlays = not WG.DrawParalyzedUnitGL4
 		if not Spring.IsGUIHidden() then
 			if (#visibleUnits + #visibleFeatures == 0) then
 				return
@@ -1489,7 +1493,7 @@ do
 				unitID    = visibleUnits[i]
 				unitDefID = GetUnitDefID(unitID)
 				if (unitDefID) then
-					if ((not Spring.GetUnitRulesParam(unitID, "no_healthbar")) and DrawUnitInfos(unitID, unitDefID)) or JustGetOverlayInfos(unitID, unitDefID) then
+					if ((not Spring.GetUnitRulesParam(unitID, "no_healthbar")) and DrawUnitInfos(unitID, unitDefID)) or (gatherOverlays and JustGetOverlayInfos(unitID, unitDefID)) then
 						local x, y, z = Spring.GetUnitPosition(unitID)
 						if not (x and y and z) then
 							Spring.Log("HealthBars", "error", "missing position and unitDef of unit " .. unitID)
@@ -1525,7 +1529,7 @@ do
 					end
 				end
 			end
-		else
+		elseif gatherOverlays then
 			local unitID, unitDefID
 			for i = 1, #visibleUnits do
 				unitID    = visibleUnits[i]
@@ -1538,8 +1542,13 @@ do
 
 		glDepthMask(false)
 
-		if not WG.DrawParalyzedUnitGL4 then
+		if gatherOverlays then
 			DrawOverlays()
+		elseif (#paraUnits > 0) or (#disarmUnits > 0) or (#onFireUnits > 0) then
+			-- Nothing reads these while the GL4 effect is active; previously they grew forever.
+			paraUnits = {}
+			disarmUnits = {}
+			onFireUnits = {}
 		end
 		glMultiTexCoord(1, 1, 1, 1)
 		glColor(1, 1, 1, 1)
