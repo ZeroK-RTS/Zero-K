@@ -427,15 +427,6 @@ local function DrawOMap(useMirrorShader)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
-	
-	----draw map compass text
-	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
-	gl.Texture(false)
-	-- gl.DepthMask(false)
-	gl.DepthTest(false)
-	gl.Color(1,1,1,1)
-	gl.PopAttrib()
-	----
 end
 
 local function Initialize()
