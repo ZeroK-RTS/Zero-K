@@ -442,10 +442,14 @@ function widget:Initialize()
 		end
 	end)
 
+	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(presets[preset].BLUR_SIGMA, presets[preset].BLUR_HALF_KERNEL_SIZE, 1.0)
+
 	local gaussianBlurVert = VFS.LoadFile(shadersDir.."identity.vert.glsl")
 	local gaussianBlurFrag = VFS.LoadFile(shadersDir.."gaussianBlur.frag.glsl")
 
-	gaussianBlurFrag = gaussianBlurFrag:gsub("###BLUR_HALF_KERNEL_SIZE###", tostring(presets[preset].BLUR_HALF_KERNEL_SIZE))
+	-- GetGaussLinearWeightsOffsets returns 1 + floor((half - 1) / 2) linear taps (3 for High, 2 for Medium/Low).
+	-- The loop used to run to BLUR_HALF_KERNEL_SIZE and fetched the remaining taps twice with weight 0.
+	gaussianBlurFrag = gaussianBlurFrag:gsub("###BLUR_HALF_KERNEL_SIZE###", tostring(#gaussWeights))
 
 	gaussianBlurShader = LuaShader({
 		vertex = gaussianBlurVert,
@@ -458,8 +462,6 @@ function widget:Initialize()
 		},
 	}, widgetName..": Gaussian Blur")
 	gaussianBlurShader:Initialize()
-
-	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(presets[preset].BLUR_SIGMA, presets[preset].BLUR_HALF_KERNEL_SIZE, 1.0)
 
 	gaussianBlurShader:ActivateWith( function()
 		gaussianBlurShader:SetUniformFloatArrayAlways("weights", gaussWeights)
