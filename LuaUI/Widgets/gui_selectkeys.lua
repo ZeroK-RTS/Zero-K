@@ -309,6 +309,7 @@ local spGetModKeyState = Spring.GetModKeyState
 local spGetUnitHealth    = Spring.GetUnitHealth
 
 local CMD_FIND_PAD       = Spring.Utilities.CMD.FIND_PAD
+local CMD_OPT_SHIFT      = CMD.OPT_SHIFT
 
 local function IsTransporting(unitID)
 	local transported = spGetUnitIsTransporting(unitID)
@@ -383,17 +384,26 @@ local function FilterLowHealthAmmo(threshold)
 	local selection = spGetSelectedUnits()
 	local newselection = {}
 	for i = 1, #selection do
-		-- I want to filter out air units with empty clips, give them a rearm order, and then remove them from selection
-		-- units get removed from selection at threshold
 		local unitID = selection[i]
+		local defID = Spring.GetUnitDefID(unitID)
+		local unitdef = defID and UnitDefs[defID]
 		local health, maxHealth = spGetUnitHealth(unitID)
-		local unithppercent = (health or 0)/(maxHealth or 1000)
-		local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
-		local noammo = Spring.GetUnitRulesParam(unitID, "noammo")
-		if ammofraction < threshold or noammo == 1 or unithppercent < threshold then
-			-- give order to retreat to airpad
-			Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, {}, 0)
-		else
+		local lowhealth = (health or 0)/(maxHealth or 1000) < threshold
+		local keepselect = true
+		if lowhealth then
+			keepselect = false
+			if unitdef.canFly then
+				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, CMD_OPT_SHIFT)
+			end
+		elseif unitdef.canFly then
+			local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
+			local noammo = Spring.GetUnitRulesParam(unitID, "noammo") or 0
+			if ammofraction < threshold or noammo == 1 then
+				keepselect = false
+				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, CMD_OPT_SHIFT)
+			end
+		end
+		if keepselect then
 			newselection[#newselection+1] = selection[i]
 		end
 	end
