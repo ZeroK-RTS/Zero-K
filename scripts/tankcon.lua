@@ -7,6 +7,7 @@ local base, nano, guns, doors, turret, shovel = piece ('base', 'nano', 'guns', '
 -- Local Signals
 local SIG_BUILD = 1
 local SIG_AIM = 2
+local SIG_TRACKS = 4
 
 -- Construction
 
@@ -98,7 +99,7 @@ function script.Create()
 			small = {piece('wheels2', 'wheels3', 'wheels4', 'wheels5', 'wheels6', 'wheels7')},
 		},
 		tracks = tracks,
-		signal = 4,
+		signal = SIG_TRACKS,
 		smallSpeed = math.rad(480),
 		smallAccel = math.rad(15),
 		smallDecel = math.rad(120),
