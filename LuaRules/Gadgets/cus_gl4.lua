@@ -1594,6 +1594,78 @@ local GL_ZERO = GL.ZERO
 
 local numUniformBinOrder = #uniformBinOrder
 
+local glGetUniformLocation = gl.GetUniformLocation
+local glUniform = gl.Uniform
+local glUniformInt = gl.UniformInt
+
+-- Per LuaShader object: uniform locations, and the uniform values ExecuteDrawPass last set on its
+-- program. GL keeps uniform values per program object across passes and frames, and only this
+-- gadget sets uniforms on these programs, so a uniform that already holds the wanted value is not
+-- set again. drawPass and clipPlane0 depend only on the pass, and each program serves one pass,
+-- so they are set once per program; per-bin uniforms are set only where consecutive uniform bins
+-- of a program differ. Reset when GG.CUSGL4.SetShaderUniforms is called from outside; recompiled
+-- shaders are new LuaShader objects and start empty.
+local weakKeys = {__mode = "k"}
+local shaderUniformState = setmetatable({}, weakKeys)
+
+local function ResetShaderUniformState()
+	shaderUniformState = setmetatable({}, weakKeys)
+end
+
+local function GetShaderUniformState(shaderTable)
+	local state = shaderUniformState[shaderTable]
+	if not state then
+		state = {shaderObj = shaderTable.shaderObj, locations = {}, values = {}, drawPass = nil}
+		shaderUniformState[shaderTable] = state
+	end
+	return state
+end
+
+local function CachedUniformLocation(state, name)
+	local location = state.locations[name]
+	if location == nil then
+		location = glGetUniformLocation(state.shaderObj, name)
+		state.locations[name] = location
+	end
+	return location
+end
+
+-- Same uniforms and values as SetShaderUniforms(drawPass, shaderID, uniformBinID), minus the ones
+-- the program already holds. Locations are the ones gl.Uniform(name) would resolve on this program.
+local function SetShaderUniformsCached(state, drawPass, uniformBinID)
+	if state.drawPass ~= drawPass then
+		glUniformInt(CachedUniformLocation(state, "drawPass"), drawPass)
+		-- The clip plane is used for above/below water, for the reflection and refraction cameras only
+		local clipLocation = CachedUniformLocation(state, "clipPlane0")
+		if HasBit(drawPass, 4) then
+			glUniform(clipLocation, 0.0, 1.0, 0.0, 0.0)
+		elseif HasBit(drawPass, 8) then
+			glUniform(clipLocation, 0.0, -1.0, 0.0, 0.0)
+		else
+			glUniform(clipLocation, 0.0, 0.0, 0.0, 1.0)
+		end
+		state.drawPass = drawPass
+	end
+
+	local values = state.values
+	for uniformLocationName, uniformValue in pairs(uniformBins[uniformBinID]) do
+		if uniformLocationName == 'treadRect' then
+			local last = values[uniformLocationName]
+			if not (last and last[1] == uniformValue[1] and last[2] == uniformValue[2] and last[3] == uniformValue[3] and last[4] == uniformValue[4]) then
+				glUniform(CachedUniformLocation(state, uniformLocationName), uniformValue[1], uniformValue[2], uniformValue[3], uniformValue[4])
+				values[uniformLocationName] = {uniformValue[1], uniformValue[2], uniformValue[3], uniformValue[4]}
+			end
+		elseif values[uniformLocationName] ~= uniformValue then
+			if uniformLocationName == 'bitOptions' then
+				glUniformInt(CachedUniformLocation(state, uniformLocationName), uniformValue)
+			else
+				glUniform(CachedUniformLocation(state, uniformLocationName), uniformValue)
+			end
+			values[uniformLocationName] = uniformValue
+		end
+	end
+end
+
 -- Per texture set (bin.textures), its bindings as a flat array {bindPosition, identity, texture, ...}
 -- sorted by bind position: the same set of gl.Texture calls as pairs(bin.textures) makes, without
 -- the per-entry next() calls. Cached on the bin, whose texture set never changes.
@@ -1658,7 +1730,7 @@ local function ExecuteDrawPass(drawPass)
 		local data = passBins[shaderName]
 		if data then
 			local shaderTable = passShaders[shaderName]
-			local shaderActive = false
+			local uniformState = nil -- set once the shader is active
 			local treeShadow = isShadowPass and (shaderName == 'tree')
 			for i = 1, numUniformBinOrder do
 				local uniformBinID = uniformBinOrder[i]
@@ -1666,11 +1738,11 @@ local function ExecuteDrawPass(drawPass)
 				local activeBins = uniformBin and activeBinsOf[uniformBin]
 				local count = activeBins and activeBins.count or 0
 				if count > 0 then
-					if not shaderActive then
+					if not uniformState then
 						shaderTable:Activate()
-						shaderActive = true
+						uniformState = GetShaderUniformState(shaderTable)
 					end
-					SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
+					SetShaderUniformsCached(uniformState, drawPass, uniformBinID)
 					if clipPass and not clipEnabled then
 						glClipDistance(0, true)
 						clipEnabled = true
@@ -1700,7 +1772,7 @@ local function ExecuteDrawPass(drawPass)
 					drewBins = true
 				end
 			end
-			if shaderActive then
+			if uniformState then
 				shaderTable:Deactivate()
 			end
 		end
@@ -2088,7 +2160,10 @@ function gadget:Initialize()
 	GG.CUSGL4.shaders = shaders
 	GG.CUSGL4.GetShader = GetShader
 	GG.CUSGL4.GetShaderName = GetShaderName
-	GG.CUSGL4.SetShaderUniforms = SetShaderUniforms
+	GG.CUSGL4.SetShaderUniforms = function(drawPass, shaderID, uniformBinID)
+		ResetShaderUniformState() -- uniforms set from outside are not tracked by ExecuteDrawPass
+		return SetShaderUniforms(drawPass, shaderID, uniformBinID)
+	end
 	GG.CUSGL4.SetUnitTexture = SetUnitTexture
 	GG.CUSGL4.enabled = true
 end
