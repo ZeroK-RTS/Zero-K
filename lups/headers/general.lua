@@ -47,6 +47,43 @@ end
 
 local hitOpacityMult = {0.2, 0.5, 0.5}
 local HIT_DURATION = 2
+
+-- Same values as GetShieldColor() below, written into caller-owned tables (no allocation).
+local function MergeShieldColorInto(out, col, frac)
+	out[1] = frac*col[1][1] + (1 - frac)*col[2][1]
+	out[2] = frac*col[1][2] + (1 - frac)*col[2][2]
+	out[3] = frac*col[1][3] + (1 - frac)*col[2][3]
+	out[4] = frac*col[1][4] + (1 - frac)*col[2][4]
+	return out
+end
+
+function GetShieldColorInto(unitID, self, out1, out2)
+	local _, charge = Spring.GetUnitShieldState(unitID)
+	local frac = math.max(0, math.min(1, charge/((self.shieldCapacity or 10000) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1))))
+	local col1 = MergeShieldColorInto(out1, self.colormap1, frac)
+	local col2 = self.colormap2 and MergeShieldColorInto(out2, self.colormap2, frac)
+
+	local boundCharge = math.max(20, charge)
+	local changeAlphaMult = 0.1 + 0.9*boundCharge/(boundCharge + 100)
+	col1[4] = col1[4]*changeAlphaMult
+	if col2 then
+		col2[4] = col2[4]*changeAlphaMult
+	end
+
+	if self.hitResposeMult ~= 0 then
+		local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame")
+		local frame = Spring.GetGameFrame()
+		if hitTime and (hitTime + HIT_DURATION > frame) then
+			col1[4] = col1[4] + (col1[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
+			if col2 then
+				col2[4] = col2[4] + (col2[4] or 0.5)*(hitOpacityMult[frame - hitTime + 1] or 1)*(self.hitResposeMult or 1)
+			end
+		end
+	end
+
+	return col1, col2
+end
+
 function GetShieldColor(unitID, self)
 	local _, charge = Spring.GetUnitShieldState(unitID)
 	local frac = math.max(0, math.min(1, charge/((self.shieldCapacity or 10000) * (Spring.GetUnitRulesParam(unitID, "totalShieldMaxMult") or 1))))

@@ -84,6 +84,15 @@ local PACE = 13.33
 
 local lastTexture = ""
 
+-- Draw state: values derived from game state are computed once per drawn frame (or game frame)
+-- and reused by the reflection and world passes. The program belongs to this class, so uniforms
+-- and face culling are only set when they change within a pass (caches reset in BeginDraw).
+local passGameFrame, passCurrTime
+local uMethod, uNoise, uSize, uDrift, uMargin, uUvMul, uUnitId, uHitCount
+local uC1a, uC1b, uC1c, uC1d, uC2a, uC2b, uC2c, uC2d
+local uMulA, uMulB, uMulC, uMulD, uMixA, uMixB, uMixC, uMixD, uPosA, uPosB, uPosC
+local lastCull
+
 function ShieldSphereColorHQParticle:BeginDraw()
 	--gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
 	gl.DepthMask(false)
@@ -91,6 +100,13 @@ function ShieldSphereColorHQParticle:BeginDraw()
 
 	gl.Uniform(timerUniform, Spring.GetGameSecondsInterpolated() / PACE)
 	gl.UniformMatrix(viewInvUniform, "viewinverse")
+
+	passGameFrame = Spring.GetGameFrame()
+	passCurrTime = passGameFrame + Spring.GetFrameTimeOffset()
+	uMethod, uNoise, uSize, uDrift, uMargin, uUvMul, uUnitId, uHitCount = nil, nil, nil, nil, nil, nil, nil, nil
+	uC1a, uC1b, uC1c, uC1d, uC2a, uC2b, uC2c, uC2d = nil, nil, nil, nil, nil, nil, nil, nil
+	uMulA, uMulB, uMulC, uMulD, uMixA, uMixB, uMixC, uMixD, uPosA, uPosB, uPosC = nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
+	lastCull = nil
 end
 
 function ShieldSphereColorHQParticle:EndDraw()
@@ -103,15 +119,63 @@ function ShieldSphereColorHQParticle:EndDraw()
 	gl.Culling(false)
 end
 
-function ShieldSphereColorHQParticle:Draw()
+local GL_FRONT = GL.FRONT
+local GL_BACK  = GL.BACK
+local glUniform = gl.Uniform
+local glUniformInt = gl.UniformInt
+local glCulling = gl.Culling
 
-	gl.Culling(GL.FRONT)
+-- Per drawn frame: noise level, colours and hit points (identical in both passes of a frame;
+-- the noise branch's startOfRechargeDelay update is idempotent within a frame).
+-- Colours and hit points only depend on sim state (shield charge, rules params, game frame, the
+-- hit table lups_shield updates from sync actions and its GameFrame), so they are recomputed
+-- once per game frame; the noise level uses the interpolated time and stays per drawn frame.
+local function UpdateFrameValues(self)
+	if self._simFrame ~= passGameFrame then
+		self._simFrame = passGameFrame
+
+		if self.rechargeDelay > 0 or self.shieldNoise then
+			self._hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
+		end
+
+		local c1, c2 = self._col1, self._col2
+		if not c1 then
+			c1, c2 = {}, {}
+			self._col1, self._col2 = c1, c2
+		end
+		GetShieldColorInto(self.unit, self, c1, c2)
+
+		local hitCount
+		if (GG and GG.GetShieldHitPositions) then --means high quality shield rendering is in place
+			local hitTable = GG.GetShieldHitPositions(self.unit)
+			if hitTable then
+				hitCount = math.min(#hitTable, MAX_POINTS)
+				local arr = self._hits
+				if not arr then
+					arr = {}
+					self._hits = arr
+				end
+				local k = 0
+				for i = 1, hitCount do
+					local hit = hitTable[i]
+					arr[k + 1], arr[k + 2], arr[k + 3], arr[k + 4], arr[k + 5] = hit.dx, hit.dy, hit.dz, hit.mag, hit.aoe
+					k = k + 5
+				end
+				arr[k + 1] = nil -- gl.UniformArray reads up to the first non-number
+			end
+		end
+		self._hitCount = hitCount
+	end
+
 	-- Noise should only vary from 0.0 to 1.0
 	local noiseLevel = 0
 	if self.rechargeDelay > 0 or self.shieldNoise then
-		gl.UniformInt(methodUniform, 2)
-		local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
-		local currTime = Spring.GetGameFrame() + Spring.GetFrameTimeOffset()
+		local hitTime = self._hitTime
+		if hitTime == nil then
+			hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
+			self._hitTime = hitTime
+		end
+		local currTime = passCurrTime
 		local cooldown = hitTime + (self.rechargeDelay or 0) * 30 - currTime
 		if cooldown > 0 and self.rechargeSpinupTime then
 			local rampDown = 1.0
@@ -127,69 +191,132 @@ function ShieldSphereColorHQParticle:Draw()
 		else
 			self.startOfRechargeDelay = currTime
 		end
+	end
+	self._noise = noiseLevel + (self.shieldNoise or 0)
+end
+
+function ShieldSphereColorHQParticle:Draw()
+	if lastCull ~= GL_FRONT then
+		glCulling(GL_FRONT)
+		lastCull = GL_FRONT
+	end
+
+	local stamp = LupsDrawStamp
+	if self._drawStamp ~= stamp then
+		self._drawStamp = stamp
+		UpdateFrameValues(self)
+	end
+
+	local method
+	if self.rechargeDelay > 0 or self.shieldNoise then
+		method = 2
+	elseif not self.texture then
+		method = 0
 	else
-		if not self.texture then
-			gl.UniformInt(methodUniform, 0)
-		else
-			gl.UniformInt(methodUniform, 1)
-			if (lastTexture ~= self.texture) then
-				gl.Texture(0, self.texture)
-				lastTexture = self.texture
-			end
+		method = 1
+		if (lastTexture ~= self.texture) then
+			gl.Texture(0, self.texture)
+			lastTexture = self.texture
 		end
 	end
-	gl.Uniform(shieldRechargingNoiseUniform, noiseLevel + (self.shieldNoise or 0))
-
-	local col1, col2 = GetShieldColor(self.unit, self)
-
-	local hitTable
-	if (GG and GG.GetShieldHitPositions) then --means high quality shield rendering is in place
-		hitTable = GG.GetShieldHitPositions(self.unit)
+	if method ~= uMethod then
+		glUniformInt(methodUniform, method)
+		uMethod = method
 	end
-	
-	gl.Uniform(color1Uniform, col1[1], col1[2], col1[3], col1[4])
-	gl.Uniform(color2Uniform, col2[1], col2[2], col2[3], col2[4])
-	gl.Uniform(colorMultUniform, 1, 1, 1, 1)
+	local noise = self._noise
+	if noise ~= uNoise then
+		glUniform(shieldRechargingNoiseUniform, noise)
+		uNoise = noise
+	end
 
-	local mix = self.mix
-	gl.Uniform(colorMixUniform, mix[1], mix[2], mix[3], mix[4])
+	local c = self._col1
+	local a, b, d, e = c[1], c[2], c[3], c[4]
+	if a ~= uC1a or b ~= uC1b or d ~= uC1c or e ~= uC1d then
+		glUniform(color1Uniform, a, b, d, e)
+		uC1a, uC1b, uC1c, uC1d = a, b, d, e
+	end
+	c = self._col2
+	a, b, d, e = c[1], c[2], c[3], c[4]
+	if a ~= uC2a or b ~= uC2b or d ~= uC2c or e ~= uC2d then
+		glUniform(color2Uniform, a, b, d, e)
+		uC2a, uC2b, uC2c, uC2d = a, b, d, e
+	end
+	if uMulA ~= 1 or uMulB ~= 1 or uMulC ~= 1 or uMulD ~= 1 then
+		glUniform(colorMultUniform, 1, 1, 1, 1)
+		uMulA, uMulB, uMulC, uMulD = 1, 1, 1, 1
+	end
 
-	local pos = self.pos
-	gl.Uniform(shieldPosUniform, pos[1], pos[2], pos[3], 0)
+	c = self.mix
+	a, b, d, e = c[1], c[2], c[3], c[4]
+	if a ~= uMixA or b ~= uMixB or d ~= uMixC or e ~= uMixD then
+		glUniform(colorMixUniform, a, b, d, e)
+		uMixA, uMixB, uMixC, uMixD = a, b, d, e
+	end
 
-	gl.Uniform(shieldSizeUniform, self.size)
-	gl.Uniform(shieldSizeDriftUniform, self.sizeDrift)
-	gl.Uniform(marginUniform, self.marginHQ)
-	gl.Uniform(uvMulUniform, self.uvMul)
-	gl.UniformInt(unitIdUniform, self.unit)
+	c = self.pos
+	a, b, d = c[1], c[2], c[3]
+	if a ~= uPosA or b ~= uPosB or d ~= uPosC then
+		glUniform(shieldPosUniform, a, b, d, 0)
+		uPosA, uPosB, uPosC = a, b, d
+	end
 
-	if hitTable then
-		local hitPointCount = math.min(#hitTable, MAX_POINTS)
-		gl.UniformInt(hitPointCountUniform, hitPointCount)
+	a = self.size
+	if a ~= uSize then
+		glUniform(shieldSizeUniform, a)
+		uSize = a
+	end
+	a = self.sizeDrift
+	if a ~= uDrift then
+		glUniform(shieldSizeDriftUniform, a)
+		uDrift = a
+	end
+	a = self.marginHQ
+	if a ~= uMargin then
+		glUniform(marginUniform, a)
+		uMargin = a
+	end
+	a = self.uvMul
+	if a ~= uUvMul then
+		glUniform(uvMulUniform, a)
+		uUvMul = a
+	end
+	a = self.unit
+	if a ~= uUnitId then
+		glUniformInt(unitIdUniform, a)
+		uUnitId = a
+	end
 
-		local hitArray = {}
-		if hitPointCount > 0 then
-			--Spring.Echo("hitPointCount", hitPointCount)
-			for i = 1, hitPointCount do
-				table.insert(hitArray, hitTable[i].dx)
-				table.insert(hitArray, hitTable[i].dy)
-				table.insert(hitArray, hitTable[i].dz)
-				table.insert(hitArray, hitTable[i].mag)
-				table.insert(hitArray, hitTable[i].aoe)
-			end
+	local hitCount = self._hitCount
+	if hitCount then
+		if hitCount ~= uHitCount then
+			glUniformInt(hitPointCountUniform, hitCount)
+			uHitCount = hitCount
 		end
-		gl.UniformArray(hitPointsUniform, 2, hitArray)
+		-- with no hits the old empty-array upload was a no-op, and the shader reads none
+		if hitCount > 0 then
+			gl.UniformArray(hitPointsUniform, 2, self._hits)
+		end
 	end
 
 	glCallList(sphereList[self.shieldSize])
 
-	if self.drawBackHQ then
-		gl.Culling(GL.BACK)
+	local back = self.drawBackHQ
+	if back then
+		if lastCull ~= GL_BACK then
+			glCulling(GL_BACK)
+			lastCull = GL_BACK
+		end
 
-		gl.Uniform(colorMultUniform, self.drawBackHQ[1], self.drawBackHQ[2], self.drawBackHQ[3], self.drawBackHQ[4])
+		a, b, d, e = back[1], back[2], back[3], back[4]
+		if a ~= uMulA or b ~= uMulB or d ~= uMulC or e ~= uMulD then
+			glUniform(colorMultUniform, a, b, d, e)
+			uMulA, uMulB, uMulC, uMulD = a, b, d, e
+		end
 
-		if self.drawBackMargin then
-			gl.Uniform(marginUniform, self.drawBackMargin)
+		a = self.drawBackMargin
+		if a and a ~= uMargin then
+			glUniform(marginUniform, a)
+			uMargin = a
 		end
 
 		glCallList(sphereList[self.shieldSize])
