@@ -155,9 +155,6 @@ local reclaimEdgeColor = {1.0, 0.2, 1.0, 0.5}
 
 local E2M = 0 -- doesn't convert too well, plus would be inconsistent since trees aren't counted
 
-local drawFeatureConvexHullSolidList
-local drawFeatureConvexHullEdgeList
-local drawFeatureClusterTextList
 local checkFrequency = 30
 local cumDt = 0
 local minDim = 100
@@ -568,64 +565,220 @@ local function DrawHullVertices(hull)
 	end
 end
 
-local function DrawFeatureConvexHullSolid()
-	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-	for i = 1, #featureConvexHulls do
-		glBeginEnd(GL.TRIANGLE_FAN, DrawHullVertices, featureConvexHulls[i])
+-- Font size and label of cluster i, nil when it has no label (zero hull area).
+local function GetClusterText(i)
+	local fontSize = fontSizeMin * fontScaling
+	local area = featureConvexHulls[i].area
+	if area > 0 then
+		fontSize = math.sqrt(area) * fontSize / minDim
+		fontSize = math.max(fontSize, fontSizeMin)
+		fontSize = math.min(fontSize, fontSizeMax)
+
+		local metal = featureClusters[i].metal
+		--Spring.Echo(metal)
+		local metalText
+		if metal < 1000 then
+			metalText = string.format("%.0f", metal) --exact number
+		elseif metal < 10000 then
+			metalText = string.format("%.1fK", math.floor(metal / 100) / 10) --4.5K
+		else
+			metalText = string.format("%.0fK", math.floor(metal / 1000)) --40K
+		end
+		return fontSize, metalText, metal
 	end
 end
 
-local function DrawFeatureConvexHullEdge()
-	glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-	for i = 1, #featureConvexHulls do
-		glBeginEnd(GL.LINE_LOOP, DrawHullVertices, featureConvexHulls[i])
+local function DrawClusterText(i)
+	local fontSize, metalText, metal = GetClusterText(i)
+	if fontSize then
+		glPushMatrix()
+
+		local center = featureConvexHulls[i].center
+
+		glTranslate(center.x, center.y, center.z)
+		glRotate(-90, 1, 0, 0)
+
+		gl.Scale(fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE)
+
+		local x100  = 100  / (100  + metal)
+		local x1000 = 1000 / (1000 + metal)
+		local r = 1 - x1000
+		local g = x1000 - x100
+		local b = x100
+
+		--glRect(-200, -200, 200, 200)
+		--glColor(r, g, b, 1.0)
+		--glText(metalText, 0, 0, fontSize, "cv")
+		font:Begin()
+			font:SetTextColor(r, g, b, 1.0)
+			font:Print(metalText, 0, 0, BASE_FONT_SIZE, "cv")
+		font:End()
+
+		glPopMatrix()
 	end
-	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 end
 
-local function DrawFeatureClusterText()
-	for i = 1, #featureConvexHulls do
-		local fontSize = fontSizeMin * fontScaling
-		local area = featureConvexHulls[i].area
-		if area > 0 then
-			glPushMatrix()
+--------------------------------------------------------------------------------
+-- One display list per cluster and pass instead of three map-wide lists, so off-screen clusters
+-- can be skipped. The passes and the cluster order inside each pass are as before (fog makes
+-- overlapping fills order dependent, so they are not regrouped), and a cluster is only skipped
+-- when its bounding sphere, which contains the hull, the label and the edge line width, is outside
+-- the camera frustum, i.e. when it cannot produce a pixel.
+-- The labels cannot share one font:Begin/End: the engine font shader applies the modelview matrix
+-- when End() draws, and every label needs its own translate/scale (different heights).
 
-			local center = featureConvexHulls[i].center
+local spGetCameraFOV = Spring.GetCameraFOV
+local spIsSphereInView = Spring.IsSphereInView
 
-			glTranslate(center.x, center.y, center.z)
-			glRotate(-90, 1, 0, 0)
+local clusterSolidLists = {}
+local clusterEdgeLists = {}
+local clusterTextLists = {}
+local hullListCount = 0
+local textListCount = 0
+local hullListsBuilt = false
+local textListsBuilt = false
 
-			fontSize = math.sqrt(area) * fontSize / minDim
-			fontSize = math.max(fontSize, fontSizeMin)
-			fontSize = math.min(fontSize, fontSizeMax)
+-- culling bounds
+local BUCKET_SIZE = 2048
+local cullCount = 0
+local cullX, cullY, cullZ, cullR = {}, {}, {}, {}
+local cullBucket = {}
+local clusterVisible = {}
+local bucketCount = 0
+local bucketX, bucketY, bucketZ, bucketR = {}, {}, {}, {}
+local bucketVisible = {}
 
-			local metal = featureClusters[i].metal
-			--Spring.Echo(metal)
-			local metalText
-			if metal < 1000 then
-				metalText = string.format("%.0f", metal) --exact number
-			elseif metal < 10000 then
-				metalText = string.format("%.1fK", math.floor(metal / 100) / 10) --4.5K
-			else
-				metalText = string.format("%.0fK", math.floor(metal / 1000)) --40K
-			end
-			gl.Scale(fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE)
+local function DeletePerClusterLists()
+	for i = 1, hullListCount do
+		glDeleteList(clusterSolidLists[i])
+		glDeleteList(clusterEdgeLists[i])
+		clusterSolidLists[i] = nil
+		clusterEdgeLists[i] = nil
+	end
+	for i = 1, textListCount do
+		if clusterTextLists[i] then
+			glDeleteList(clusterTextLists[i])
+			clusterTextLists[i] = nil
+		end
+	end
+	hullListCount = 0
+	textListCount = 0
+	hullListsBuilt = false
+	textListsBuilt = false
+end
 
-			local x100  = 100  / (100  + metal)
-			local x1000 = 1000 / (1000 + metal)
-			local r = 1 - x1000
-			local g = x1000 - x100
-			local b = x100
+-- Bounding sphere per cluster: hull vertices plus the label quad. The label lies in the y = center.y
+-- plane; text-space x maps to world x and text-space y to world -z, scaled by fontSize/BASE_FONT_SIZE.
+-- Its extent is bounded generously: every glyph advance is below 1 em, glyph overhang below 0.5 em,
+-- and the "cv" aligned line stays within 1.5 em of the centre vertically.
+local function UpdateCullBounds()
+	local count = #featureConvexHulls
+	local bucketIndex = {}
+	local bucketMin, bucketMax = {}, {} -- AABB of the member spheres, per bucket
+	bucketCount = 0
+	for i = 1, count do
+		local hull = featureConvexHulls[i]
+		local x0, y0, z0 = math.huge, math.huge, math.huge
+		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
+		for j = 1, #hull do
+			local pt = hull[j]
+			x0, x1 = math.min(x0, pt.x), math.max(x1, pt.x)
+			y0, y1 = math.min(y0, pt.y), math.max(y1, pt.y)
+			z0, z1 = math.min(z0, pt.z), math.max(z1, pt.z)
+		end
+		local fontSize, metalText = GetClusterText(i)
+		if fontSize then
+			local center = hull.center
+			local hx = fontSize * (0.5 * #metalText + 0.5) + 2
+			local hz = fontSize * 1.5 + 2
+			x0, x1 = math.min(x0, center.x - hx), math.max(x1, center.x + hx)
+			y0, y1 = math.min(y0, center.y), math.max(y1, center.y)
+			z0, z1 = math.min(z0, center.z - hz), math.max(z1, center.z + hz)
+		end
+		if x0 > x1 then -- no vertices and no label: draws nothing
+			x0, x1, y0, y1, z0, z1 = 0, 0, 0, 0, 0, 0
+		end
+		local cx, cy, cz = 0.5*(x0 + x1), 0.5*(y0 + y1), 0.5*(z0 + z1)
+		local r = 0.5*math.sqrt((x1 - x0)^2 + (y1 - y0)^2 + (z1 - z0)^2) + 1
+		cullX[i], cullY[i], cullZ[i], cullR[i] = cx, cy, cz, r
 
-			--glRect(-200, -200, 200, 200)
-			--glColor(r, g, b, 1.0)
-			--glText(metalText, 0, 0, fontSize, "cv")
-			font:Begin()
-				font:SetTextColor(r, g, b, 1.0)
-				font:Print(metalText, 0, 0, BASE_FONT_SIZE, "cv")
-			font:End()
+		local key = math.floor(cx / BUCKET_SIZE) + 4096*math.floor(cz / BUCKET_SIZE)
+		local b = bucketIndex[key]
+		if not b then
+			bucketCount = bucketCount + 1
+			b = bucketCount
+			bucketIndex[key] = b
+			bucketMin[b] = {cx - r, cy - r, cz - r}
+			bucketMax[b] = {cx + r, cy + r, cz + r}
+		else
+			local bMin, bMax = bucketMin[b], bucketMax[b]
+			bMin[1], bMin[2], bMin[3] = math.min(bMin[1], cx - r), math.min(bMin[2], cy - r), math.min(bMin[3], cz - r)
+			bMax[1], bMax[2], bMax[3] = math.max(bMax[1], cx + r), math.max(bMax[2], cy + r), math.max(bMax[3], cz + r)
+		end
+		cullBucket[i] = b
+	end
+	-- bucket sphere: encloses the AABB of its member spheres, hence every member sphere
+	for b = 1, bucketCount do
+		local bMin, bMax = bucketMin[b], bucketMax[b]
+		bucketX[b], bucketY[b], bucketZ[b] = 0.5*(bMin[1] + bMax[1]), 0.5*(bMin[2] + bMax[2]), 0.5*(bMin[3] + bMax[3])
+		bucketR[b] = 0.5*math.sqrt((bMax[1] - bMin[1])^2 + (bMax[2] - bMin[2])^2 + (bMax[3] - bMin[3])^2) + 1
+		bucketVisible[b] = false
+	end
+	cullCount = count
+end
 
-			glPopMatrix()
+local function BuildHullLists()
+	for i = 1, hullListCount do
+		glDeleteList(clusterSolidLists[i])
+		glDeleteList(clusterEdgeLists[i])
+		clusterSolidLists[i] = nil
+		clusterEdgeLists[i] = nil
+	end
+	hullListCount = #featureConvexHulls
+	for i = 1, hullListCount do
+		-- the PolygonMode calls are issued once per pass in DrawWorld
+		clusterSolidLists[i] = glCreateList(glBeginEnd, GL.TRIANGLE_FAN, DrawHullVertices, featureConvexHulls[i])
+		clusterEdgeLists[i] = glCreateList(glBeginEnd, GL.LINE_LOOP, DrawHullVertices, featureConvexHulls[i])
+	end
+	hullListsBuilt = true
+	UpdateCullBounds()
+end
+
+local function BuildTextLists()
+	for i = 1, textListCount do
+		if clusterTextLists[i] then
+			glDeleteList(clusterTextLists[i])
+			clusterTextLists[i] = nil
+		end
+	end
+	textListCount = #featureConvexHulls
+	for i = 1, textListCount do
+		if GetClusterText(i) then
+			clusterTextLists[i] = glCreateList(DrawClusterText, i)
+		end
+	end
+	textListsBuilt = true
+	UpdateCullBounds()
+end
+
+local function UpdateVisibility()
+	local camX, camY, camZ = spGetCameraPosition()
+	-- A wide edge line can reach (width/2 + 1) px beyond its geometry; one pixel spans at most
+	-- dist * 2*tan(vfov/2) / viewHeight world units at distance dist. Grow the spheres by that.
+	local lineHalfWidthPx = 0.5 * (6.0 / cameraScale) + 1
+	local marginPerDist = lineHalfWidthPx * 2 * math.tan(math.rad(spGetCameraFOV()) * 0.5) / screeny
+	for b = 1, bucketCount do
+		local x, y, z, r = bucketX[b], bucketY[b], bucketZ[b], bucketR[b]
+		local dist = math.sqrt((x - camX)^2 + (y - camY)^2 + (z - camZ)^2)
+		bucketVisible[b] = spIsSphereInView(x, y, z, r + marginPerDist * (dist + r))
+	end
+	for i = 1, cullCount do
+		if bucketVisible[cullBucket[i]] then
+			local x, y, z, r = cullX[i], cullY[i], cullZ[i], cullR[i]
+			local dist = math.sqrt((x - camX)^2 + (y - camY)^2 + (z - camZ)^2)
+			clusterVisible[i] = spIsSphereInView(x, y, z, r + marginPerDist * (dist + r))
+		else
+			clusterVisible[i] = false
 		end
 	end
 end
@@ -681,7 +834,7 @@ RefreshFeatureData = function(frame)
 		benchmark:Enter("GameFrame UpdateFeatures")
 	end
 	UpdateFeatures(frame)
-	if featuresUpdated or (drawFeatureConvexHullSolidList == nil) then
+	if featuresUpdated or not hullListsBuilt then
 		ClusterizeFeatures()
 		ClustersToConvexHull()
 		
@@ -689,33 +842,18 @@ RefreshFeatureData = function(frame)
 			benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
 		end
 		--Spring.Echo("featuresUpdated")
-		if drawFeatureConvexHullSolidList then
-			glDeleteList(drawFeatureConvexHullSolidList)
-			drawFeatureConvexHullSolidList = nil
-		end
-
-		if drawFeatureConvexHullEdgeList then
-			glDeleteList(drawFeatureConvexHullEdgeList)
-			drawFeatureConvexHullEdgeList = nil
-		end
-
-		drawFeatureConvexHullSolidList = glCreateList(DrawFeatureConvexHullSolid)
-		drawFeatureConvexHullEdgeList = glCreateList(DrawFeatureConvexHullEdge)
+		BuildHullLists()
 		if benchmark then
 			benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
 		end
 	end
 
-	if textParametersChanged or featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil then
+	if textParametersChanged or featuresUpdated or clusterMetalUpdated or not textListsBuilt then
 		if benchmark then
 			benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
 		end
 		--Spring.Echo("clusterMetalUpdated")
-		if drawFeatureClusterTextList then
-			glDeleteList(drawFeatureClusterTextList)
-			drawFeatureClusterTextList = nil
-		end
-		drawFeatureClusterTextList = glCreateList(DrawFeatureClusterText)
+		BuildTextLists()
 		textParametersChanged = false
 		if benchmark then
 			benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
@@ -739,38 +877,44 @@ function widget:DrawWorld()
 	--glDepthTest(true)
 
 	glBlending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-	if drawFeatureConvexHullSolidList then
+	if hullListsBuilt then
+		UpdateVisibility()
 		glColor(ColorMul(color, reclaimColor))
-		glCallList(drawFeatureConvexHullSolidList)
-		--DrawFeatureConvexHullSolid()
-	end
+		glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+		for i = 1, hullListCount do
+			if clusterVisible[i] then
+				glCallList(clusterSolidLists[i])
+			end
+		end
 
-	if drawFeatureConvexHullEdgeList then
 		glLineWidth(6.0 / cameraScale)
 		glColor(ColorMul(color, reclaimEdgeColor))
-		glCallList(drawFeatureConvexHullEdgeList)
-		--DrawFeatureConvexHullEdge()
+		glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+		for i = 1, hullListCount do
+			if clusterVisible[i] then
+				glCallList(clusterEdgeLists[i])
+			end
+		end
+		glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 		glLineWidth(1.0)
 	end
 
-	if drawFeatureClusterTextList then
-		glCallList(drawFeatureClusterTextList)
-		--DrawFeatureClusterText()
+	if textListsBuilt then
+		if not hullListsBuilt then
+			UpdateVisibility()
+		end
+		for i = 1, textListCount do
+			if clusterVisible[i] and clusterTextLists[i] then
+				glCallList(clusterTextLists[i])
+			end
+		end
 	end
 
 	glDepthTest(true)
 end
 
 function widget:Shutdown()
-	if drawFeatureConvexHullSolidList then
-		glDeleteList(drawFeatureConvexHullSolidList)
-	end
-	if drawFeatureConvexHullEdgeList then
-		glDeleteList(drawFeatureConvexHullEdgeList)
-	end
-	if drawFeatureClusterTextList then
-		glDeleteList(drawFeatureClusterTextList)
-	end
+	DeletePerClusterLists()
 	if benchmark then
 		benchmark:PrintAllStat()
 	end
