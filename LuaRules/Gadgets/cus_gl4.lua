@@ -338,6 +338,11 @@ local unitDrawBins = nil -- this also controls wether cusgl4 is on at all!
 -- uniformBin table itself, so the deferred pass (which shares uniformBin tables with forward) shares them too.
 local activeBinsOf = {}
 
+-- Layout stamps for the recorded draw passes (see RecordDrawPass): every change of an activeBins
+-- array (contents or order) bumps its .version; creating an activeBins array or replacing a bin's
+-- VAO bumps binLayoutStamp.
+local binLayoutStamp = 0
+
 local function MarkBinActive(uniformBinTable, bin)
 	if bin.activeIndex then
 		return
@@ -346,10 +351,12 @@ local function MarkBinActive(uniformBinTable, bin)
 	if not activeBins then
 		activeBins = {count = 0}
 		activeBinsOf[uniformBinTable] = activeBins
+		binLayoutStamp = binLayoutStamp + 1
 	end
 	local count = activeBins.count + 1
 	activeBins[count] = bin
 	activeBins.count = count
+	activeBins.version = (activeBins.version or 0) + 1
 	bin.activeIndex = count
 end
 
@@ -365,6 +372,7 @@ local function MarkBinInactive(uniformBinTable, bin)
 	lastBin.activeIndex = index
 	activeBins[count] = nil
 	activeBins.count = count - 1
+	activeBins.version = (activeBins.version or 0) + 1
 	bin.activeIndex = nil
 end
 
@@ -1197,6 +1205,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 		unitDrawBinsFlagShaderUniformsTexKey.VAO:ClearSubmission()
 		unitDrawBinsFlagShaderUniformsTexKey.VAO:Delete()
 		unitDrawBinsFlagShaderUniformsTexKey.VAO = mybinVAO
+		binLayoutStamp = binLayoutStamp + 1 -- recorded passes hold VAOs
 
 		local newObjectsCount = 0
 		local objectsArray = unitDrawBinsFlagShaderUniformsTexKey.objectsArray
@@ -1788,7 +1797,42 @@ end
 local boundIdentity = {} -- bindPosition -> identity of the texture this pass last bound there
 local boundGroupSig = {} -- group slot -> signature of the group this pass last bound in that slot
 
-local function ExecuteDrawPass(drawPass)
+-- Recorded draw passes. Everything a draw pass derives from the bin layout - which shaders and
+-- uniform bins it draws, which bins in which order, and the gl.Texture calls before each Submit (the
+-- bind cache starts empty every pass, so they follow from the layout alone) - stays the same from
+-- frame to frame until a bin is activated, deactivated or gets a new VAO. RecordDrawPass draws the
+-- pass while recording that sequence; later frames replay the recording with the same GL calls in
+-- the same order (shader activation and the uniform value cache still run live, at the same points)
+-- until a uniform bin the pass read changed its layout: MarkBinActive/MarkBinInactive bump
+-- activeBins.version, and new activeBins arrays or VAOs bump binLayoutStamp.
+local passRecords = {} -- drawPass -> recording
+
+local function NewPassRecord()
+	return {
+		stamp = false, numDeps = 0, deps = {}, depVersions = {},
+		numShaders = 0, shaderNames = {}, shaderFirstUB = {}, shaderLastUB = {},
+		numUBs = 0, ubIDs = {}, ubFirstBin = {}, ubLastBin = {},
+		numBins = 0, binVAO = {}, binSubmit = {}, binFirstTex = {}, binLastTex = {},
+		numTex = 0, texPos = {}, texObj = {},
+		drewBins = false,
+	}
+end
+
+local function PassRecordValid(rec)
+	if rec.stamp ~= binLayoutStamp then
+		return false
+	end
+	local deps, depVersions = rec.deps, rec.depVersions
+	for i = 1, rec.numDeps do
+		if deps[i].version ~= depVersions[i] then
+			return false
+		end
+	end
+	return true
+end
+
+-- Draws the pass (as ExecuteDrawPass did before recordings existed), recording into rec as it goes.
+local function RecordDrawPass(drawPass, rec)
 	for bindPosition = 0, maxPlanBindPosition do -- bindings are unknown at the start of a pass
 		boundIdentity[bindPosition] = nil
 	end
@@ -1802,6 +1846,15 @@ local function ExecuteDrawPass(drawPass)
 	local clipPass = HasBit(drawPass, 4) or HasBit(drawPass, 8)
 	local clipEnabled = false
 	local drewBins = false
+
+	local deps, depVersions = rec.deps, rec.depVersions
+	local shaderNames, shaderFirstUB, shaderLastUB = rec.shaderNames, rec.shaderFirstUB, rec.shaderLastUB
+	local ubIDs, ubFirstBin, ubLastBin = rec.ubIDs, rec.ubFirstBin, rec.ubLastBin
+	local binVAO, binSubmit, binFirstTex, binLastTex = rec.binVAO, rec.binSubmit, rec.binFirstTex, rec.binLastTex
+	local texPos, texObj = rec.texPos, rec.texObj
+	local numDeps, numShaders, numUBs, numBins, numTex = 0, 0, 0, 0, 0
+	local stamp = binLayoutStamp -- nothing below changes the layout
+	rec.stamp = false -- not replayable unless the recording completes
 
 	glCulling(GL_BACK)
 	if (drawPass == 1) then --forward opaque pass
@@ -1821,19 +1874,33 @@ local function ExecuteDrawPass(drawPass)
 				local uniformBinID = uniformBinOrder[i]
 				local uniformBin = data[uniformBinID]
 				local activeBins = uniformBin and activeBinsOf[uniformBin]
+				if activeBins then
+					-- empty ones too: they may become active
+					numDeps = numDeps + 1
+					deps[numDeps] = activeBins
+					depVersions[numDeps] = activeBins.version
+				end
 				local count = activeBins and activeBins.count or 0
 				if count > 0 then
 					if not uniformState then
 						shaderTable:Activate()
 						uniformState = GetShaderUniformState(shaderTable)
+						numShaders = numShaders + 1
+						shaderNames[numShaders] = shaderName
+						shaderFirstUB[numShaders] = numUBs + 1
 					end
 					SetShaderUniformsCached(uniformState, drawPass, uniformBinID)
 					if clipPass and not clipEnabled then
 						glClipDistance(0, true)
 						clipEnabled = true
 					end
+					numUBs = numUBs + 1
+					ubIDs[numUBs] = uniformBinID
+					ubFirstBin[numUBs] = numBins + 1
 					for j = 1, count do
 						local bin = activeBins[j]
+						numBins = numBins + 1
+						binFirstTex[numBins] = numTex + 1
 						if not isShadowPass then
 							local plan = bin.texPlan or BuildTexturePlan(bin)
 							for g = 1, plan.numGroups do
@@ -1845,8 +1912,12 @@ local function ExecuteDrawPass(drawPass)
 										local bindPosition = group[k]
 										local identity = group[k + 1]
 										if boundIdentity[bindPosition] ~= identity then
-											glTexture(bindPosition, group[k + 2])
+											local tex = group[k + 2]
+											glTexture(bindPosition, tex)
 											boundIdentity[bindPosition] = identity
+											numTex = numTex + 1
+											texPos[numTex] = bindPosition
+											texObj[numTex] = tex
 										end
 									end
 									boundGroupSig[slot] = sig
@@ -1859,14 +1930,24 @@ local function ExecuteDrawPass(drawPass)
 								glTexture(1, tex)
 								boundIdentity[1] = identity
 								boundGroupSig[1] = nil
+								numTex = numTex + 1
+								texPos[numTex] = 1
+								texObj[numTex] = tex
 							end
 						end
-						bin.VAO:Submit()
+						binLastTex[numBins] = numTex
+						local vao = bin.VAO
+						local submit = vao.Submit
+						binVAO[numBins] = vao
+						binSubmit[numBins] = submit
+						submit(vao)
 					end
+					ubLastBin[numUBs] = numBins
 					drewBins = true
 				end
 			end
 			if uniformState then
+				shaderLastUB[numShaders] = numUBs
 				shaderTable:Deactivate()
 			end
 		end
@@ -1883,6 +1964,78 @@ local function ExecuteDrawPass(drawPass)
 	if drawPass == 1 then
 		glBlending(GL_ONE, GL_ZERO) -- do full opaque
 	end
+
+	-- drop references left over from a longer recording
+	for i = numDeps + 1, rec.numDeps do
+		deps[i] = nil
+	end
+	for i = numBins + 1, rec.numBins do
+		binVAO[i], binSubmit[i] = nil, nil
+	end
+	for i = numTex + 1, rec.numTex do
+		texObj[i] = nil
+	end
+	rec.numDeps, rec.numShaders, rec.numUBs, rec.numBins, rec.numTex = numDeps, numShaders, numUBs, numBins, numTex
+	rec.drewBins = drewBins
+	rec.stamp = stamp
+end
+
+local function ReplayDrawPass(drawPass, rec)
+	local clipPass = HasBit(drawPass, 4) or HasBit(drawPass, 8)
+	local clipEnabled = false
+
+	glCulling(GL_BACK)
+	if (drawPass == 1) then --forward opaque pass
+		glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+	end
+
+	local passShaders = shaders[drawPass]
+	local shaderNames, shaderFirstUB, shaderLastUB = rec.shaderNames, rec.shaderFirstUB, rec.shaderLastUB
+	local ubIDs, ubFirstBin, ubLastBin = rec.ubIDs, rec.ubFirstBin, rec.ubLastBin
+	local binVAO, binSubmit, binFirstTex, binLastTex = rec.binVAO, rec.binSubmit, rec.binFirstTex, rec.binLastTex
+	local texPos, texObj = rec.texPos, rec.texObj
+	for s = 1, rec.numShaders do
+		local shaderTable = passShaders[shaderNames[s]]
+		shaderTable:Activate()
+		local uniformState = GetShaderUniformState(shaderTable)
+		for u = shaderFirstUB[s], shaderLastUB[s] do
+			SetShaderUniformsCached(uniformState, drawPass, ubIDs[u])
+			if clipPass and not clipEnabled then
+				glClipDistance(0, true)
+				clipEnabled = true
+			end
+			for b = ubFirstBin[u], ubLastBin[u] do
+				for t = binFirstTex[b], binLastTex[b] do
+					glTexture(texPos[t], texObj[t])
+				end
+				binSubmit[b](binVAO[b])
+			end
+		end
+		shaderTable:Deactivate()
+	end
+
+	if clipEnabled then
+		glClipDistance(0, false)
+	end
+	if rec.drewBins then
+		for i = 0, 10 do
+			glTexture(i, false)
+		end
+	end
+	if drawPass == 1 then
+		glBlending(GL_ONE, GL_ZERO) -- do full opaque
+	end
+end
+
+local function ExecuteDrawPass(drawPass)
+	local rec = passRecords[drawPass]
+	if not rec then
+		rec = NewPassRecord()
+		passRecords[drawPass] = rec
+	elseif PassRecordValid(rec) then
+		return ReplayDrawPass(drawPass, rec)
+	end
+	return RecordDrawPass(drawPass, rec)
 end
 
 local function RecompileShaders(recompilation)
@@ -1924,6 +2077,10 @@ local function initGL4()
 		[16   ] = {}, -- shadow
 	}
 	activeBinsOf = {}
+	binLayoutStamp = binLayoutStamp + 1 -- recordings refer to the previous bins
+	for drawPass in pairs(passRecords) do
+		passRecords[drawPass] = nil
+	end
 	Spring.Echo("[CUS GL4] Initializing materials")
 
 	RecompileShaders()
