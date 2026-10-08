@@ -952,6 +952,7 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
+			effectStrength = 1.1,
 			noiseStrength = 0.85,
 			noiseScaleSpace = 0.6,
 			distanceFalloff = 0.5,
@@ -1403,7 +1404,7 @@ explosionDistortionsNames.bomberriot_napalm = {
 	GetDistortionClass("FireExplosionHeat", "SmallMedium", 0.8),
 }
 explosionDistortionsNames.jumparty_napalm_sprayer = {
-	GetDistortionClass("ExplosionHeatFirewalker", "Small", false, 1.5),
+	GetDistortionClass("ExplosionHeatFirewalker", "Small", 0.8, 1.5),
 }
 explosionDistortionsNames.striderdante_napalm_rockets = {
 	GetDistortionClass("FireExplosionHeat", "Smaller"),
