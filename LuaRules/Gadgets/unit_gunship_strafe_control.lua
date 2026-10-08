@@ -54,7 +54,7 @@ local nonStrafeWiggle = {}
 local allowedCommandFrame = {}
 local gameFrame = Spring.GetGameFrame()
 local COMMAND_LEEWAY = 60
-local WIGGLE_PERIOD = 45
+local WIGGLE_LEEWAY = 10
 
 for id, data in pairs(UnitDefs) do
 	if data.customParams and data.customParams.airstrafecontrol then
@@ -79,7 +79,7 @@ local function ResetExtendTurnRadius(unitID, unitDefID, cmdID)
 			turnRadius = turnRadiusUnitDefs[unitDefID]
 		}
 		spSetAirMoveTypeData(unitID, attribute)
-		Spring.Utilities.UnitEcho(unitID, "RESET")
+		--Spring.Utilities.UnitEcho(unitID, "RESET")
 		turnRadiusExtended[unitID] = nil
 	end
 	allowedCommandFrame[unitID] = gameFrame + COMMAND_LEEWAY
@@ -93,7 +93,7 @@ function GG.PossiblySetExtendedTurnRadius(unitID, unitDefID)
 		local attribute = {
 			turnRadius = extendRadiusUnitDefs[unitDefID]
 		}
-		Spring.Utilities.UnitEcho(unitID, "EXT")
+		--Spring.Utilities.UnitEcho(unitID, "EXT")
 		spSetAirMoveTypeData(unitID, attribute)
 		turnRadiusExtended[unitID] = true
 	end
@@ -110,7 +110,7 @@ local function ResetNonStrafeWiggle(unitID, unitDefID, cmdID)
 	if nonStrafeWiggle[unitID] then
 		nonStrafeWiggle[unitID] = nil
 	end
-	allowedCommandFrame[unitID] = gameFrame + COMMAND_LEEWAY
+	allowedCommandFrame[unitID] = gameFrame + WIGGLE_LEEWAY
 end
 
 function GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, wigglePeriod, wiggleMag)
@@ -126,7 +126,7 @@ function GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, wigglePeriod, wiggleMag
 	end
 	allowedCommandFrame[unitID] = gameFrame + wigglePeriod
 	local _,_,_,speed = spGetUnitVelocity(unitID)
-	local speedFactor = (speed + 5)/(speed+3)
+	local speedFactor = (speed + 8)/(speed+3)/(speed*speed*0.15 + 1)
 	local heading = Spring.GetUnitHeading(unitID)*HEADING_TO_RAD
 	local hx = math.sin(heading)
 	local hz = math.cos(heading)
