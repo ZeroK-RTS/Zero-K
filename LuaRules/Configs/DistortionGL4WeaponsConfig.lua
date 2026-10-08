@@ -1530,6 +1530,12 @@ explosionDistortions.teleport_out = {
 explosionDistortions.teleport_in = {
 	GetDistortionClass("TeleportIn", "Smallest")
 }
+explosionDistortions.teleport_big_out = {
+	GetDistortionClass("TeleportOut", "SmallMedium")
+}
+explosionDistortions.teleport_big_in = {
+	GetDistortionClass("TeleportIn", "SmallMedium")
+}
 explosionDistortions.gadget_nuke_hit_distortion = {
 	GetDistortionClass("ExplosionHeatNuke", "MegaXXL"),
 	GetDistortionClass("AirShockWaveNuke", "Nuke"),
