@@ -136,6 +136,7 @@ LupsDrawStamp = 0
 local passStamp = 0
 -- DrawWorldReflection is registered (lups.cfg EnableReflection = 1)
 local reflectionCallinActive = false
+local refractionCallinActive = false
 local reflScannedAfterStart = false
 
 --------------------------------------------------------------------------------
@@ -297,6 +298,26 @@ local RenderSequence = {}  --// mult-dim table with: [layer][partClass][unitID][
 local effectsInDelay = {}  --// fxs which use the delay tag, and waiting for their spawn
 local partIDCount = 0  --// increasing ID used to identify the particles
 
+--// Bookkeeping for the per-layer draw lists (see BuildDrawList and Draw).
+-- Per layer: bumped whenever pairs() order of the layer's tables may change (a class or render
+-- list key is inserted) or an alwaysVisible effect is added; a draw list is only valid while
+-- this is unchanged since it was built.
+local layerStruct = {}
+-- render list -> the class table holding it and its key there (to clean up emptied lists)
+local listUnits = setmetatable({}, {__mode = "k"})
+local listKey   = setmetatable({}, {__mode = "k"})
+-- class table -> set of keys whose render list became empty (and Draw has to remove)
+local emptyKeys = setmetatable({}, {__mode = "k"})
+
+local function NoteEmptyKey(Units, key)
+	local e = emptyKeys[Units]
+	if not e then
+		e = {}
+		emptyKeys[Units] = e
+	end
+	e[key] = true
+end
+
 --// Sorted list of the layers the draw loops visit (integers in [-50,50], like the old
 --// "for i=-50,50" scans), so a pass does not probe 101 mostly empty layers.
 local activeLayers = {}
@@ -402,10 +423,32 @@ function AddParticles(Class,Options   ,__id)
 		visDirty = true
 
 		local space = ((not newParticles.worldspace) and newParticles.unit) or (-1)
-		local fxTable = CreateSubTables(RenderSequence,{newParticles.layer,particleClass,space})
+		local layer = newParticles.layer
+		-- same as CreateSubTables(RenderSequence,{layer,particleClass,space}), noting insertions
+		local FxLayer = RenderSequence[layer]
+		if (FxLayer == nil) then
+			FxLayer = {}
+			RenderSequence[layer] = FxLayer
+		end
+		local Units = FxLayer[particleClass]
+		if (Units == nil) then
+			Units = {}
+			FxLayer[particleClass] = Units
+			layerStruct[layer] = (layerStruct[layer] or 0) + 1
+		end
+		local fxTable = Units[space]
+		if (fxTable == nil) then
+			fxTable = {}
+			Units[space] = fxTable
+			listUnits[fxTable] = Units
+			listKey[fxTable] = space
+			layerStruct[layer] = (layerStruct[layer] or 0) + 1
+		end
+		if newParticles.alwaysVisible then
+			layerStruct[layer] = (layerStruct[layer] or 0) + 1
+		end
 		newParticles.fxTable = fxTable
 		fxTable[#fxTable+1] = newParticles
-		local layer = newParticles.layer
 		if layer ~= nil and not knownLayer[layer] then
 			RegisterLayer(layer)
 		end
@@ -451,7 +494,14 @@ function RemoveParticles(particlesID)
 					break
 				end
 			end
+			if (not fxTable[1]) then
+				local Units = listUnits[fxTable]
+				if Units then
+					NoteEmptyKey(Units, listKey[fxTable])
+				end
+			end
 		end
+		fx._lupsRemoved = true -- draw lists skip it
 		fx:Destroy()
 		particles[particlesID] = nil
 		particlesCount = particlesCount-1;
@@ -621,7 +671,7 @@ end
 
 -- visKey: "visible" (main view), "waterVisible" (refraction, and reflection without reflection
 -- culling) or "reflVis" (reflection with reflection culling, see headers/reflcull.lua).
-local function Draw(extension,layer,water,visKey)
+local function DrawLayer(extension,layer,water,visKey)
 	local FxLayer = RenderSequence[layer];
 	if (not FxLayer) then return end
 
@@ -747,6 +797,219 @@ local function Draw(extension,layer,water,visKey)
 						end -- for
 					end -- if
 				end  --for
+			end
+
+			partClass[EndDrawPass]()
+
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--// Per-layer draw lists. DrawLayer walks every class, unit and effect of a layer in every pass
+--// (normal, reflection, refraction, distortion, opaque), although only the effects the last
+--// visibility pass marked can be drawn. The visibility pass also records, in pairs() order,
+--// every class of each layer and every render list holding such a candidate, with the
+--// candidates in list order; Draw issues exactly DrawLayer's GL calls from that.
+--// pairs() order over a table only changes when keys are inserted, so a layer falls back to
+--// DrawLayer after any insertion (and after an alwaysVisible effect was added) until the next
+--// visibility pass. Removed effects are skipped, and the cleanups DrawLayer does while drawing
+--// (unit lists that became empty, empty classes) happen in the same passes, so the tables
+--// evolve as before.
+
+local drawLists = {}              -- [layer] = draw list built by the last visibility pass
+local drawListPass = -1           -- passStamp of the visibility pass that built them (-1: none)
+local candStamp = setmetatable({}, {__mode = "k"}) -- render list -> passStamp if it holds a candidate
+
+local function BuildDrawList(layer, FxLayer, stamp)
+	local dl = drawLists[layer]
+	if not dl then
+		dl = {nc = 0, ng = 0, nf = 0, cls = {}, units = {}, cg0 = {}, cg1 = {}, gu = {}, gf0 = {}, gf1 = {}, fxs = {}}
+		drawLists[layer] = dl
+	end
+	local cls, clsUnits, cg0, cg1 = dl.cls, dl.units, dl.cg0, dl.cg1
+	local gu, gf0, gf1, fxs = dl.gu, dl.gf0, dl.gf1, dl.fxs
+	local nc, ng, nf = 0, 0, 0
+	for partClass, Units in pairs(FxLayer) do
+		nc = nc + 1
+		cls[nc] = partClass
+		clsUnits[nc] = Units
+		cg0[nc] = ng + 1
+		for unitID, UnitEffects in pairs(Units) do
+			if not UnitEffects[1] then
+				NoteEmptyKey(Units, unitID) -- Draw removes it where DrawLayer would have
+			elseif candStamp[UnitEffects] == stamp then
+				local f0 = nf + 1
+				for i = 1, #UnitEffects do
+					local fx = UnitEffects[i]
+					if fx._candPass == stamp then
+						nf = nf + 1
+						fxs[nf] = fx
+					end
+				end
+				if nf >= f0 then
+					ng = ng + 1
+					gu[ng] = unitID
+					gf0[ng] = f0
+					gf1[ng] = nf
+				end
+			end
+		end
+		cg1[nc] = ng
+	end
+	-- drop references beyond the new ends
+	for i = nc + 1, dl.nc do
+		cls[i], clsUnits[i] = nil, nil
+	end
+	for i = nf + 1, dl.nf do
+		fxs[i] = nil
+	end
+	dl.nc, dl.ng, dl.nf = nc, ng, nf
+	dl.struct = layerStruct[layer]
+	dl.pass = stamp
+end
+
+local function Draw(extension,layer,water,visKey)
+	local dl = drawLists[layer]
+	if not (dl and dl.pass == drawListPass and dl.struct == layerStruct[layer]) then
+		return DrawLayer(extension,layer,water,visKey)
+	end
+	local FxLayer = RenderSequence[layer];
+	if (not FxLayer) then return end
+
+	visKey = visKey or "visible"
+	local reflPass = (visKey == "reflVis")
+	local passStrings   = PassStrings(extension)
+	local BeginDrawPass = passStrings[1]
+	local DrawPass      = passStrings[2]
+	local EndDrawPass   = passStrings[3]
+	local normalPass    = (extension == "")
+	LupsInPushedMatrix = false
+
+	local cls, clsUnits, cg0, cg1 = dl.cls, dl.units, dl.cg0, dl.cg1
+	local gu, gf0, gf1, fxs = dl.gu, dl.gf0, dl.gf1, dl.fxs
+
+	for ci = 1, dl.nc do
+		local partClass = cls[ci]
+		local Units = clsUnits[ci]
+		-- classes removed since (by an earlier pass) are not in pairs(FxLayer) any more
+		local beginDraw = (FxLayer[partClass] == Units) and partClass[BeginDrawPass]
+		if (beginDraw) then
+
+			beginDraw()
+			local drawfunc = partClass[DrawPass]
+			local matrixNeutral = normalPass and partClass.drawIsMatrixNeutral
+
+			if (not next(Units)) then
+				FxLayer[partClass]=nil
+			else
+				-- DrawLayer removes the keys of empty unit lists while iterating
+				local e = emptyKeys[Units]
+				if e then
+					for key in pairs(e) do
+						local list = Units[key]
+						if list and not list[1] then
+							Units[key] = nil
+						end
+					end
+					emptyKeys[Units] = nil
+				end
+
+				for g = cg0[ci], cg1[ci] do
+					local unitID = gu[g]
+					local f1 = gf1[g]
+					if (unitID>-1) then
+						-- render in unit/piece space, only if something is drawn
+						local first
+						for k = gf0[g], f1 do
+							local fx = fxs[k]
+							if not fx._lupsRemoved then
+								local vis
+								if reflPass then
+									vis = fx.reflVis
+									if vis == nil then vis = fx.alwaysVisible or fx.waterVisible end -- added since the last pass
+								else
+									vis = fx.alwaysVisible or fx[visKey]
+								end
+								if vis and (not water or not fx.nowater) then
+									first = k
+									break
+								end
+							end
+						end
+						if first then
+							glPushMatrix()
+							if gadget and not IsUnitPositionKnownCached(unitID) then
+								local x, y, z = Spring.GetUnitPosition(unitID)
+								local a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34, a41, a42, a43, a44 = Spring.GetUnitTransformMatrix(unitID)
+								if a11 then
+									gl.MultMatrix(a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34, x, y, z , a44)
+								else
+									glUnitMultMatrix(unitID)
+								end
+							else
+								glUnitMultMatrix(unitID)
+							end
+
+							for k = first, f1 do
+								local fx = fxs[k]
+								if not fx._lupsRemoved then
+									local vis
+									if reflPass then
+										vis = fx.reflVis
+										if vis == nil then vis = fx.alwaysVisible or fx.waterVisible end -- added since the last pass
+									else
+										vis = fx.alwaysVisible or fx[visKey]
+									end
+									if vis and (not water or not fx.nowater) then
+										if (fx.piecenum) then
+											glPushMatrix()
+												glUnitPieceMultMatrix(unitID,fx.piecenum)
+												glScale(1,1,-1)
+												LupsInPushedMatrix = true
+												drawfunc(fx)
+												LupsInPushedMatrix = false
+											glPopMatrix()
+										else
+											fx[DrawPass](fx)
+										end
+									end
+								end
+							end
+
+							glPopMatrix()
+						end
+					else
+						-- render in world space
+						for k = gf0[g], f1 do
+							local fx = fxs[k]
+							if not fx._lupsRemoved then
+								local vis
+								if reflPass then
+									vis = fx.reflVis
+									if vis == nil then vis = fx.alwaysVisible or fx.waterVisible end -- added since the last pass
+								else
+									vis = fx.alwaysVisible or fx[visKey]
+								end
+								if vis and (not water or not fx.nowater) then
+									if fx.projectile and not fx.worldspace then
+										glPushMatrix()
+										local x,y,z = spGetProjectilePosition(fx.projectile)
+										glTranslate(x,y,z)
+										drawfunc(fx)
+										glPopMatrix()
+									elseif matrixNeutral then
+										drawfunc(fx)
+									else
+										glPushMatrix()
+										drawfunc(fx)
+										glPopMatrix()
+									end
+								end
+							end
+						end
+					end
+				end
 			end
 
 			partClass[EndDrawPass]()
@@ -1228,6 +1491,9 @@ local function CreateVisibleFxList()
 	local doRefl = (reflMode ~= ReflCull.MODE_OFF)
 	reflCullActive = doRefl
 	anyReflFXVisible = false
+	-- the water passes that use waterVisible: refraction, and reflection without culling
+	local waterCand = refractionCallinActive or (reflectionCallinActive and not doRefl)
+	local stamp = passStamp
 
 	for _,fx in pairs(particles) do
 		if ((fx.unit or -1) > -1) then
@@ -1270,6 +1536,15 @@ local function CreateVisibleFxList()
 			end
 			fx.reflVis = rv
 		end
+		-- may this effect be drawn in some pass? mark it and its render list for BuildDrawList
+		local cand = fx.alwaysVisible or fx.visible or (waterCand and fx.waterVisible) or (doRefl and fx.reflVis)
+		if cand then
+			fx._candPass = stamp
+			local fxTable = fx.fxTable
+			if fxTable then
+				candStamp[fxTable] = stamp
+			end
+		end
 	end
 	--Spring.Echo("Lups fx cnt", particles.GetIndexMax())
 	inVisPass = false
@@ -1277,6 +1552,14 @@ local function CreateVisibleFxList()
 	for i=1,removeCnt-1 do
 		RemoveParticles(removeFX[i])
 	end
+	for li = 1, activeLayerCount do
+		local layer = activeLayers[li]
+		local FxLayer = RenderSequence[layer]
+		if FxLayer then
+			BuildDrawList(layer, FxLayer, stamp)
+		end
+	end
+	drawListPass = stamp
 end
 
 --------------------------------------------------------------------------------
@@ -1455,6 +1738,7 @@ local function Update(_,dt)
 	anyDistortionsVisible = false
 	anyReflFXVisible = false
 	reflCullActive = false
+	drawListPass = -1 -- set again if this visibility pass builds draw lists
 	if (next(particles)) then
 		CreateVisibleFxList()
 	end
@@ -1557,6 +1841,8 @@ local function Initialize()
 
 	if GetLupsSetting("enablerefraction", 0) ~= 1 then
 		(gadgetHandler or widgetHandler):RemoveCallIn("DrawWorldRefraction")
+	else
+		refractionCallinActive = true
 	end
 	if GetLupsSetting("enablereflection", 0) ~= 1 then
 		local callinHandler = gadgetHandler or widgetHandler
