@@ -334,6 +334,40 @@ local cusFeatureIDtoDrawFlag = {} -- {featureID = drawFlag, ...}, this remains p
 local uniformBins, uniformBinOrder, texToPreload = VFS.Include("LuaRules/Configs/cus_defs.lua", nil, VFS.ZIP)
 local unitDrawBins = nil -- this also controls wether cusgl4 is on at all!
 
+-- Dense arrays of the non-empty bins of each uniformBin table: {count = n, [1..n] = bin}. Keyed by the
+-- uniformBin table itself, so the deferred pass (which shares uniformBin tables with forward) shares them too.
+local activeBinsOf = {}
+
+local function MarkBinActive(uniformBinTable, bin)
+	if bin.activeIndex then
+		return
+	end
+	local activeBins = activeBinsOf[uniformBinTable]
+	if not activeBins then
+		activeBins = {count = 0}
+		activeBinsOf[uniformBinTable] = activeBins
+	end
+	local count = activeBins.count + 1
+	activeBins[count] = bin
+	activeBins.count = count
+	bin.activeIndex = count
+end
+
+local function MarkBinInactive(uniformBinTable, bin)
+	local index = bin.activeIndex
+	if not index then
+		return
+	end
+	local activeBins = activeBinsOf[uniformBinTable]
+	local count = activeBins.count
+	local lastBin = activeBins[count]
+	activeBins[index] = lastBin
+	lastBin.activeIndex = index
+	activeBins[count] = nil
+	activeBins.count = count - 1
+	bin.activeIndex = nil
+end
+
 local objectIDtoDefID = {}
 
 local shaders = {} -- double nested table of {drawflag : {"units":shaderID}}
@@ -1214,6 +1248,7 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	unitDrawBinsFlagShaderUniformsTexKey.numobjects = numobjects
 	unitDrawBinsFlagShaderUniformsTexKey.objectsArray[numobjects] = objectID
 	unitDrawBinsFlagShaderUniformsTexKey.objectsIndex[objectID  ] = numobjects
+	MarkBinActive(unitDrawBinsFlagShaderUniforms, unitDrawBinsFlagShaderUniformsTexKey)
 
 	if debugmode and flag == 0 then
 		Spring.Echo("AssignObjectToBin", objectID, objectDefID, texKey, uniformBinID, shader, flag, numobjects)
@@ -1326,6 +1361,9 @@ local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, 
 					unitDrawBinsFlagShaderTexKey.objectsArray[numobjects ] = nil -- pop back
 					unitDrawBinsFlagShaderTexKey.objectsArray[objectIndex] = objectIDatEnd -- Bring the last objectID here
 					unitDrawBinsFlagShaderTexKey.numobjects = numobjects -1
+				end
+				if numobjects == 1 then -- bin is now empty
+					MarkBinInactive(unitDrawBins[flag][shader][uniformBinID], unitDrawBinsFlagShaderTexKey)
 				end
 			end
 		else
@@ -1561,12 +1599,20 @@ local function printDrawPassStats()
 	return res
 end
 
+local boundTextures = {} -- bindPosition -> texture this pass last bound there, to skip redundant gl.Texture calls
+
 local function ExecuteDrawPass(drawPass)
 	--defersubmissionupdate = (defersubmissionupdate + 1) % 10;
 	local batches = 0
 	local units = 0
 	local shaderswaps = 0
 	local unbindtextures = false
+	for bindPosition in pairs(boundTextures) do -- bindings are unknown at the start of a pass
+		boundTextures[bindPosition] = nil
+	end
+	-- The shadow pass (RENDERING_MODE 2) samples no texture, except texture2 (unit 1) under
+	-- HASALPHASHADOWS, which only the 'tree' material defines.
+	local isShadowPass = (drawPass == 16)
 	gl.Culling(GL.BACK)
 	if (drawPass == 1) then --forward opaque pass
 		gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA) --
@@ -1575,49 +1621,52 @@ local function ExecuteDrawPass(drawPass)
 	
 	--for shaderName, data in pairs(unitDrawBins[drawPass]) do
 	for _, shaderName in ipairs(shaderOrder) do
-		if unitDrawBins[drawPass][shaderName] then
-			local data = unitDrawBins[drawPass][shaderName]
-			local unitscountforthisshader = 0
-			--Spring.Echo("uniformBinID", uniformBinID)
-
-			for _, uniformBin in pairs(data) do
-				for _, texAndObj in pairs(uniformBin) do
-					unitscountforthisshader = unitscountforthisshader + texAndObj.numobjects
-				end
-			end
-
+		local data = unitDrawBins[drawPass][shaderName]
+		if data then
 			local shaderTable = shaders[drawPass][shaderName]
-			if unitscountforthisshader > 0 then
-				shaderTable:Activate()
-				shaderswaps = shaderswaps + 1
-				for i = 1, #uniformBinOrder do
-					local uniformBinID = uniformBinOrder[i]
-					uniformBin = data[uniformBinID]
-					--Spring.Echo("Shadername", shaderId.shaderName, "uniformBinID", uniformBinID)
-					--local uniforms = uniformBins[uniformBinID]
-					-- TODO: only activate shader if we actually have units in its bins?
-					if uniformBin then
-						SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
-						for _, texAndObj in pairs(uniformBin) do
-							if texAndObj.numobjects > 0 then
-								batches = batches + 1
-								units = units + texAndObj.numobjects
-								local mybinVAO = texAndObj.VAO
-								for bindPosition, tex in pairs(texAndObj.textures) do
+			local shaderActive = false
+			for i = 1, #uniformBinOrder do
+				local uniformBinID = uniformBinOrder[i]
+				local uniformBin = data[uniformBinID]
+				local activeBins = uniformBin and activeBinsOf[uniformBin]
+				if activeBins and activeBins.count > 0 then
+					if not shaderActive then
+						shaderTable:Activate()
+						shaderswaps = shaderswaps + 1
+						shaderActive = true
+					end
+					SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
+					for j = 1, activeBins.count do
+						local texAndObj = activeBins[j]
+						batches = batches + 1
+						units = units + texAndObj.numobjects
+						local mybinVAO = texAndObj.VAO
+						if not isShadowPass then
+							for bindPosition, tex in pairs(texAndObj.textures) do
+								if boundTextures[bindPosition] ~= tex then
 									gl.Texture(bindPosition, tex)
+									boundTextures[bindPosition] = tex
 								end
-
-								SetFixedStatePre(drawPass, shaderTable)
-								shaderactivations = shaderactivations + 1
-
-								mybinVAO:Submit()
-
-								SetFixedStatePost(drawPass, shaderTable)
-								unbindtextures = true
+							end
+						elseif shaderName == 'tree' then
+							local tex = texAndObj.textures[1]
+							if boundTextures[1] ~= tex then
+								gl.Texture(1, tex)
+								boundTextures[1] = tex
 							end
 						end
+
+						SetFixedStatePre(drawPass, shaderTable)
+						shaderactivations = shaderactivations + 1
+
+						mybinVAO:Submit()
+
+						SetFixedStatePost(drawPass, shaderTable)
+						unbindtextures = true
 					end
 				end
+			end
+			if shaderActive then
 				shaderTable:Deactivate()
 			end
 		end
@@ -1677,6 +1726,7 @@ local function initGL4()
 		[2 + 8] = {}, -- alpha + refraction
 		[16   ] = {}, -- shadow
 	}
+	activeBinsOf = {}
 	Spring.Echo("[CUS GL4] Initializing materials")
 
 	RecompileShaders()
