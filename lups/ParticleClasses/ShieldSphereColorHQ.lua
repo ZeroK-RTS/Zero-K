@@ -68,6 +68,11 @@ ShieldSphereColorHQParticle.Default = {
 -- (dx, dy, dz, mag, AoE) x 8
 local MAX_POINTS = 8
 
+-- Compute the hit point UVs in the vertex shader instead of for every fragment. They only depend
+-- on uniforms, so the interpolated values equal the per-fragment ones up to float rounding.
+-- Falls back to the per-fragment shader if this one does not compile.
+local VERTEX_HIT_UV = true
+
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
@@ -348,9 +353,40 @@ ____VS_CODE_DEFS_____
 
 	#define nsin(x) (0.5 * sin(x) + 0.5)
 
+	#ifdef VERTEX_HIT_UV
+	uniform mat4 viewMatrixI;
+	uniform int hitPointCount;
+	uniform float hitPoints[5 * MAX_POINTS];
+
+	// The hit point UVs only depend on uniforms, so they are computed here instead of for every
+	// fragment; the interpolated values equal them up to float rounding (no flat varyings in 1.20).
+	varying vec2 impactUV[MAX_POINTS];
+
+	vec2 RadialCoords(vec3 a_coords)
+	{
+		vec3 a_coords_n = normalize(a_coords);
+		float lon = atan(a_coords_n.z, a_coords_n.x);
+		float lat = acos(a_coords_n.y);
+		vec2 sphereCoords = vec2(lon, lat) / PI;
+		return vec2(sphereCoords.x * 0.5 + 0.5, 1.0 - sphereCoords.y);
+	}
+	#endif
+
 	void main()
 	{
 		gl_TexCoord[0] = gl_MultiTexCoord0;
+
+	#ifdef VERTEX_HIT_UV
+		vec2 uvMulS = vec2(1.0, 0.5) * uvMul;
+		for (int hitPointIdx = 0; hitPointIdx < MAX_POINTS; ++hitPointIdx) {
+			impactUV[hitPointIdx] = vec2(0.0);
+			if (hitPointIdx < hitPointCount) {
+				vec3 impactPoint = vec3(hitPoints[5 * hitPointIdx + 0], hitPoints[5 * hitPointIdx + 1], hitPoints[5 * hitPointIdx + 2]);
+				vec3 impactPointAdj = (vec4(impactPoint, 1.0) * viewMatrixI).xyz;
+				impactUV[hitPointIdx] = RadialCoords(impactPointAdj) * uvMulS;
+			}
+		}
+	#endif
 
 		float r = length(gl_Vertex.xyz);
 		float theta = acos(gl_Vertex.z / r);
@@ -397,6 +433,10 @@ ____FS_CODE_DEFS_____
 
 	uniform int hitPointCount;
 	uniform float hitPoints[5 * MAX_POINTS];
+
+	#ifdef VERTEX_HIT_UV
+	varying vec2 impactUV[MAX_POINTS];
+	#endif
 
 	uniform sampler2D tex0;
 
@@ -581,9 +621,13 @@ ____FS_CODE_DEFS_____
 
 		for (int hitPointIdx = 0; hitPointIdx < MAX_POINTS; ++hitPointIdx) {
 			if (hitPointIdx < hitPointCount) {
+			#ifdef VERTEX_HIT_UV
+				vec2 impactPointUV = impactUV[hitPointIdx];
+			#else
 				vec3 impactPoint = vec3(hitPoints[5 * hitPointIdx + 0], hitPoints[5 * hitPointIdx + 1], hitPoints[5 * hitPointIdx + 2]);
 				vec3 impactPointAdj = (vec4(impactPoint, 1.0) * viewMatrixI).xyz;
 				vec2 impactPointUV = RadialCoords(impactPointAdj) * uvMulS;
+			#endif
 				float mag = hitPoints[5 * hitPointIdx + 3];
 				float aoe = hitPoints[5 * hitPointIdx + 4];
 				offset2 += GetRippleLinearFallOffCoord(uv, impactPointUV, mag, 100.0 / hitRadiusMulti, -120.0, aoe * hitRadiusMulti, timer);
@@ -654,16 +698,40 @@ local function ListToString(defs)
 	return result
 end
 
+-- Extra defines for VERTEX_HIT_UV. The FS defs already define MAX_POINTS.
+local vertexHitUVDefsVS = {
+	string.format("#define MAX_POINTS %d\n", MAX_POINTS),
+	"#define VERTEX_HIT_UV",
+}
+local vertexHitUVDefsFS = {
+	"#define VERTEX_HIT_UV",
+}
+
 function ShieldSphereColorHQParticle:Initialize()
+	if VERTEX_HIT_UV then
+		shieldShader = gl.CreateShader({
+			vertex = string.gsub(vsCode, "____VS_CODE_DEFS_____", ListToString(commonCodeDefs) .. ListToString(vsCodeDefs) .. ListToString(vertexHitUVDefsVS)),
+			fragment = string.gsub(fsCode, "____FS_CODE_DEFS_____", ListToString(commonCodeDefs) .. ListToString(fsCodeDefs) .. ListToString(vertexHitUVDefsFS)),
+			uniformInt = {
+				tex0 = 0,
+			},
+		})
+		if not shieldShader then
+			print(PRIO_MAJOR, "LUPS->Shield: per-vertex hit UV shader failed, using the per-fragment one:\n" .. (gl.GetShaderLog() or ""))
+		end
+	end
+
 	local vsCodeEff = string.gsub(vsCode, "____VS_CODE_DEFS_____", ListToString(commonCodeDefs) .. ListToString(vsCodeDefs))
 	local fsCodeEff = string.gsub(fsCode, "____FS_CODE_DEFS_____", ListToString(commonCodeDefs) .. ListToString(fsCodeDefs))
-	shieldShader = gl.CreateShader({
-		vertex = vsCodeEff,
-		fragment = fsCodeEff,
-		uniformInt = {
-			tex0 = 0,
-		},
-	})
+	if not shieldShader then
+		shieldShader = gl.CreateShader({
+			vertex = vsCodeEff,
+			fragment = fsCodeEff,
+			uniformInt = {
+				tex0 = 0,
+			},
+		})
+	end
 
 	local shLog = gl.GetShaderLog()
 
