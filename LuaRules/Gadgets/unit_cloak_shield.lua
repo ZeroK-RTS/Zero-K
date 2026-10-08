@@ -651,7 +651,6 @@ else
 
 local GetUnitTeam         = Spring.GetUnitTeam
 local GetUnitRadius       = Spring.GetUnitRadius
-local GetUnitHeading      = Spring.GetUnitHeading
 local GetUnitViewPosition = Spring.GetUnitViewPosition
 
 local GetGameFrame        = Spring.GetGameFrame
