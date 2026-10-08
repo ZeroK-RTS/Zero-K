@@ -528,8 +528,10 @@ local function DoDrawSSAO(isScreenSpace)
 		firstTime = false
 	end
 
-	local prevFBO
-	prevFBO = gl.RawBindFBO(gbuffFuseFBO)
+	-- Each offscreen pass binds its FBO straight over the previous pass's one, and the FBO that
+	-- was bound on entry is restored once, before the composite. Restoring it between the passes
+	-- drew nothing, so only the glBindFramebuffer calls in between go away.
+	local prevFBO = gl.RawBindFBO(gbuffFuseFBO)
 		gbuffFuseShader:Activate()
 
 			gbuffFuseShader:SetUniformMatrix("invProjMatrix", "projectioninverse")
@@ -561,9 +563,8 @@ local function DoDrawSSAO(isScreenSpace)
 			end
 		gbuffFuseShader:Deactivate()
 	--end)
-	gl.RawBindFBO(nil, nil, prevFBO)
 
-	prevFBO = gl.RawBindFBO(ssaoFBO)
+	gl.RawBindFBO(ssaoFBO)
 		gl.Clear(GL.COLOR_BUFFER_BIT, 0, 0, 0, 0)
 		ssaoShader:Activate()
 			ssaoShader:SetUniformMatrix("projMatrix", "projection")
@@ -584,27 +585,26 @@ local function DoDrawSSAO(isScreenSpace)
 				gl.Texture(2, false)
 			end
 		ssaoShader:Deactivate()
-	gl.RawBindFBO(nil, nil, prevFBO)
 
 	gl.Texture(0, ssaoTex)
 
+	-- One program for all blur passes (it used to be bound and unbound around every pass; the
+	-- uniform calls are the same). A texture bound below while its FBO is still bound is not
+	-- sampled before the next pass's FBO replaces it.
+	gaussianBlurShader:Activate()
 	for i = 1, presets[preset].BLUR_PASSES do
-		gaussianBlurShader:Activate()
-
 			gaussianBlurShader:SetUniform("dir", 1.0, 0.0) --horizontal blur
-			prevFBO = gl.RawBindFBO(ssaoBlurFBOs[1])
+			gl.RawBindFBO(ssaoBlurFBOs[1])
 			gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
-			gl.RawBindFBO(nil, nil, prevFBO)
 			gl.Texture(0, ssaoBlurTexes[1])
 
 			gaussianBlurShader:SetUniform("dir", 0.0, 1.0) --vertical blur
-			prevFBO = gl.RawBindFBO(ssaoBlurFBOs[2])
+			gl.RawBindFBO(ssaoBlurFBOs[2])
 			gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
-			gl.RawBindFBO(nil, nil, prevFBO)
 			gl.Texture(0, ssaoBlurTexes[2])
-
-		gaussianBlurShader:Deactivate()
 	end
+	gaussianBlurShader:Deactivate()
+	gl.RawBindFBO(nil, nil, prevFBO)
 
 
 	if DEBUG_SSAO then
