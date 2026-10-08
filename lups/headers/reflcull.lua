@@ -103,24 +103,6 @@ local function CountWet(ax, bx, az, bz)
 	return sat[bot + bx + 1] - sat[top + bx + 1] - sat[bot + ax] + sat[top + ax]
 end
 
--- Merges a sample at sample coordinates (i, j) into the cells sharing it.
-local function MergeSample(i, j, h)
-	local cx = floor(i / SPC)
-	local cz = floor(j / SPC)
-	local cx0 = ((i % SPC == 0) and cx > 0) and (cx - 1) or cx
-	local cz0 = ((j % SPC == 0) and cz > 0) and (cz - 1) or cz
-	if cx > GW - 1 then cx = GW - 1 end
-	if cz > GH - 1 then cz = GH - 1 end
-	for z = cz0, cz do
-		for x = cx0, cx do
-			local c = z*GW + x
-			if h < cellMin[c] then
-				cellMin[c] = h
-			end
-		end
-	end
-end
-
 local function ScanRow(j)
 	local z = j*STEP
 	if z > MAP_Z then z = MAP_Z end
@@ -234,10 +216,34 @@ local function HeightMapUpdate(x1, z1, x2, z2)
 			return
 		end
 	end
+	-- Merge every sample (i, j), the height at (min(MAP_X, i*STEP), min(MAP_Z, j*STEP)), into the
+	-- cells sharing it: cell floor(i / SPC), and the cell before it when the sample lies on their
+	-- border (likewise for rows), clamped to the grid. i and j are integers >= 0, so floor(i / SPC)
+	-- is (i - i % SPC) / SPC exactly; the rows are computed once per sample row.
 	for j = j1, j2 do
-		local z = min(MAP_Z, j*STEP)
+		local z = j*STEP
+		if z > MAP_Z then z = MAP_Z end
+		local jr = j % SPC
+		local cz = (j - jr) / SPC
+		local cz0 = ((jr == 0) and cz > 0) and (cz - 1) or cz
+		if cz > GH - 1 then cz = GH - 1 end
 		for i = i1, i2 do
-			MergeSample(i, j, spGetGroundHeight(min(MAP_X, i*STEP), z))
+			local x = i*STEP
+			if x > MAP_X then x = MAP_X end
+			local h = spGetGroundHeight(x, z)
+			local ir = i % SPC
+			local cx = (i - ir) / SPC
+			local cx0 = ((ir == 0) and cx > 0) and (cx - 1) or cx
+			if cx > GW - 1 then cx = GW - 1 end
+			for zz = cz0, cz do
+				local base = zz*GW
+				for xx = cx0, cx do
+					local c = base + xx
+					if h < cellMin[c] then
+						cellMin[c] = h
+					end
+				end
+			end
 		end
 	end
 	if ready then
