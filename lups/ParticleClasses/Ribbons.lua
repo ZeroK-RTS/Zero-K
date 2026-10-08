@@ -287,7 +287,20 @@ function Ribbon:Update(n)
 		end
 		if x and y and z then
 			self.posIdx = (self.posIdx % self.size)+1
-			self.oldPos[self.posIdx] = {x, y, z}
+			-- reuse the slot's table when no other slot shares it (no allocation per frame)
+			local own = self._ownSlots
+			if not own then
+				own = {}
+				self._ownSlots = own
+			end
+			local idx = self.posIdx
+			local slot = self.oldPos[idx]
+			if own[idx] and slot then
+				slot[1], slot[2], slot[3] = x, y, z
+			else
+				self.oldPos[idx] = {x, y, z}
+				own[idx] = true
+			end
 
 			local vx, vy, vz
 			if self.unit then
@@ -303,6 +316,11 @@ function Ribbon:Update(n)
 		local lastIndex = self.posIdx
 		self.posIdx = (self.posIdx % self.size)+1
 		self.oldPos[self.posIdx] = self.oldPos[lastIndex]
+		local own = self._ownSlots
+		if own then -- both slots now share one table
+			own[lastIndex] = nil
+			own[self.posIdx] = nil
+		end
 		
 		self.blendfactor = self.blendfactor - n * self.decayRate
 	end
@@ -372,6 +390,7 @@ function Ribbon:CreateParticle()
 	for i=1,self.size do
 		self.oldPos[i] = curpos
 	end
+	self._ownSlots = nil -- all slots share curpos
 
 	local udid  = self.unit and spGetUnitDefID(self.unit)
 	local weapon = self.weapon

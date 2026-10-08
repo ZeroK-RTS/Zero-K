@@ -132,6 +132,8 @@ local unitNearView = {}
 -- Incremented once per Update: a per-drawn-frame stamp for caches shared by the draw passes
 -- of one frame (reflection, world). Particle classes read LupsDrawStamp.
 LupsDrawStamp = 0
+-- Incremented per visibility pass: stamp for per-pass caches.
+local passStamp = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -264,6 +266,8 @@ for _,filename in ipairs(files) do
 		if (Class.GetInfo) then
 			Class.pi = Class.GetInfo()
 			local sClassName = string.lower(Class.pi.name)
+			-- cached so GameFrame does not lower-case the class name per effect per frame
+			Class.pi.deferrable = deferrableClass[sClassName] or false
 			if (fxClasses[sClassName]) then
 				print(PRIO_LESS,'LUPS: duplicated particle class name "' .. sClassName .. '"')
 			else
@@ -432,10 +436,14 @@ end
 function RemoveParticles(particlesID)
 	local fx = particles[particlesID]
 	if (fx) then
-		if (type(fx.fxTable)=="table") then
-			for j,w in pairs(fx.fxTable) do
-				if (w.id==particlesID) then
-					pop(fx.fxTable,j)
+		local fxTable = fx.fxTable
+		if (type(fxTable)=="table") then
+			-- ids are unique within a render list: stop at the match instead of scanning on
+			-- (nano spray lists hold hundreds of effects). table.remove keeps the draw order.
+			for j = 1, #fxTable do
+				if (fxTable[j].id == particlesID) then
+					pop(fxTable, j)
+					break
 				end
 			end
 		end
@@ -870,12 +878,63 @@ function IsPosInAirLos(x,y,z)
 	return LocalAllyTeamID == Script.ALL_ACCESS_TEAM or (LocalAllyTeamID ~= Script.NO_ACCESS_TEAM and Spring.IsPosInAirLos(x,y,z, LocalAllyTeamID))
 end
 
-function GetUnitLosState(unitID)
+local function GetUnitLosStateRaw(unitID)
 	if LocalAllyTeamID == 0 then
 		UpdateAllyTeamStatus()
 	end
 	return LocalAllyTeamID == Script.ALL_ACCESS_TEAM or (LocalAllyTeamID ~= Script.NO_ACCESS_TEAM and (Spring.GetUnitLosState(unitID, LocalAllyTeamID) or {}).los) or false
 end
+
+--// Per-visibility-pass caches of per-unit engine queries. Several effects of one unit ask the
+--// same questions within a pass, and nothing they depend on changes inside a pass. Outside a
+--// pass (inVisPass false) the queries go straight to the engine.
+local inVisPass = false
+local losStamp, losValue = {}, {}
+local radStamp, radValue = {}, {}
+local vposStamp, vposX, vposY, vposZ = {}, {}, {}, {}
+
+function GetUnitLosState(unitID)
+	if not inVisPass then
+		return GetUnitLosStateRaw(unitID)
+	end
+	if losStamp[unitID] == passStamp then
+		return losValue[unitID]
+	end
+	local v = GetUnitLosStateRaw(unitID)
+	losStamp[unitID] = passStamp
+	losValue[unitID] = v
+	return v
+end
+
+local function UnitRadiusCached(unitID)
+	if not inVisPass then
+		return spGetUnitRadius(unitID)
+	end
+	if radStamp[unitID] == passStamp then
+		return radValue[unitID]
+	end
+	local r = spGetUnitRadius(unitID)
+	radStamp[unitID] = passStamp
+	radValue[unitID] = r
+	return r
+end
+
+local function UnitViewPositionCached(unitID)
+	if not inVisPass then
+		return spGetUnitViewPosition(unitID)
+	end
+	if vposStamp[unitID] == passStamp then
+		return vposX[unitID], vposY[unitID], vposZ[unitID]
+	end
+	local x, y, z = spGetUnitViewPosition(unitID)
+	vposStamp[unitID] = passStamp
+	vposX[unitID], vposY[unitID], vposZ[unitID] = x, y, z
+	return x, y, z
+end
+
+-- for particle classes' Visible()
+LupsGetUnitRadius = UnitRadiusCached
+LupsGetUnitViewPosition = UnitViewPositionCached
 
 -- Returns the visibility for the main view and for the water passes (reflection, refraction).
 local function IsUnitFXVisible(fx)
@@ -898,7 +957,7 @@ local function IsUnitFXVisible(fx)
 			if not fx.worldspace then
 				local near = unitNearView[unitID]
 				if near == nil then
-					near = spIsUnitVisible(unitID, (spGetUnitRadius(unitID) or 0) + COARSE_VIEW_MARGIN, false)
+					near = spIsUnitVisible(unitID, (UnitRadiusCached(unitID) or 0) + COARSE_VIEW_MARGIN, false)
 					unitNearView[unitID] = near
 				end
 				if not near then
@@ -914,7 +973,7 @@ local function IsUnitFXVisible(fx)
 					return true, true
 				end
 			end
-			local unitRadius = (spGetUnitRadius(unitID) or 0) + 40
+			local unitRadius = (UnitRadiusCached(unitID) or 0) + 40
 			local r = fx.radius or fx.size or fx.length
 			if type(r) ~= "number" then
 				r = 0
@@ -924,7 +983,7 @@ local function IsUnitFXVisible(fx)
 			local v = fx:Visible()
 			return v, v
 		else
-			local unitRadius = (spGetUnitRadius(unitID) or 0) + 40
+			local unitRadius = (UnitRadiusCached(unitID) or 0) + 40
 			local r = fx.radius or 0
 			local v = spIsUnitVisible(unitID, unitRadius + r, fx.noIconDraw)
 			return v, v
@@ -969,6 +1028,8 @@ local function CreateVisibleFxList()
 	local removeFX = {}
 	local removeCnt = 1
 	unitNearView = {}
+	passStamp = (passStamp + 1) % 4194304 -- stays exact with float lua numbers
+	inVisPass = true
 
 	for _,fx in pairs(particles) do
 		if ((fx.unit or -1) > -1) then
@@ -1002,6 +1063,7 @@ local function CreateVisibleFxList()
 		end
 	end
 	--Spring.Echo("Lups fx cnt", particles.GetIndexMax())
+	inVisPass = false
 
 	for i=1,removeCnt-1 do
 		RemoveParticles(removeFX[i])
@@ -1011,9 +1073,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- A unit has render lists in several layers/classes: ask the engine once per unit and call
+-- (nothing changes within the call).
+local validStamp, validValue = {}, {}
+local validCallStamp = 0
+
 local function CleanInvalidUnitFX()
 	local removeFX = {}
 	local removeCnt = 1
+	validCallStamp = (validCallStamp + 1) % 4194304
+	local stamp = validCallStamp
 
 	for layerID,layer in pairs(RenderSequence) do
 		for partClass,Units in pairs(layer) do
@@ -1022,7 +1091,15 @@ local function CleanInvalidUnitFX()
 					Units[unitID] = nil
 				else
 					if (unitID>-1) then
-						if (not spValidUnitID(unitID)) then --// UnitID isn't valid anymore, remove all its effects
+						local valid
+						if validStamp[unitID] == stamp then
+							valid = validValue[unitID]
+						else
+							valid = spValidUnitID(unitID)
+							validStamp[unitID] = stamp
+							validValue[unitID] = valid
+						end
+						if (not valid) then --// UnitID isn't valid anymore, remove all its effects
 							for i=1,#UnitEffects do
 								local fx = UnitEffects[i]
 								removeFX[removeCnt] = fx.id
@@ -1104,7 +1181,7 @@ local function GameFrame(_,n)
 			if (partFx.Update) then
 				local pi = partFx.pi
 				if DEFER_OFFSCREEN_UPDATES and not partFx.visible and not (waterPassesEnabled and partFx.waterVisible)
-						and pi and deferrableClass[StrToLower(pi.name or "")] then
+						and pi and pi.deferrable then
 					partFx.pendingFrames = (partFx.pendingFrames or 0) + framesToUpdate
 				else
 					local pending = partFx.pendingFrames

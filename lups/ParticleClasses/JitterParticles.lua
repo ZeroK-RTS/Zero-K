@@ -333,11 +333,11 @@ function JitterParticles:Visible()
 	local posX,posY,posZ = self.pos[1],self.pos[2],self.pos[3]
 	local losState
 	if (self.unit and not self.worldspace) then
-		local ux,uy,uz = spGetUnitViewPosition(self.unit)
+		local ux,uy,uz = LupsGetUnitViewPosition(self.unit) -- cached per visibility pass
 		if not ux then
 			return false
 		end
-		radius = radius + (spGetUnitRadius(self.unit) or 0)
+		radius = radius + (LupsGetUnitRadius(self.unit) or 0) -- cached per visibility pass
 		if self.noIconDraw then
 			if not Spring.IsUnitVisible(self.unit, radius, self.noIconDraw) then
 				return false
