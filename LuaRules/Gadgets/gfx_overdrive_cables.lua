@@ -32,6 +32,9 @@ if gadgetHandler:IsSyncedCode() then return false end
 -- much further down). Both are file-scope locals; the body assignment for
 -- OnCableTreeFull happens in the rendering section.
 local OnCableTreeFull
+-- Bracket a batch of OnCableTreeFull calls (one per ally) so the flat render index is rebuilt
+-- once at the end; defined in the rendering section.
+local BeginRenderBatch, EndRenderBatch
 
 -------------------------------------------------------------------------------------
 -- Topology + flow computation (was previously the synced half).
@@ -1709,6 +1712,7 @@ local function SendAll()
 	local tBin1 = perf and Spring.GetTimer()
 
 	-- One snapshot per ally that currently has edges.
+	BeginRenderBatch()
 	for ally, pa in pairs(perAlly) do
 		OnCableTreeFull({
 			allyTeamID = ally, edgeCount = pa.n,
@@ -1731,6 +1735,7 @@ local function SendAll()
 			alliesWithEdges[ally] = nil
 		end
 	end
+	EndRenderBatch()
 	-- Update the snapshots ConsumersOrWindChanged() compares against next
 	-- tick. Doing this only on the success path means a skipped tick keeps
 	-- the previous baseline so a stable run continues to skip.
@@ -2322,7 +2327,13 @@ local function isOwnAlly(allyTeamID)
 	return allyTeamID == spGetMyAllyTeamID()
 end
 
+-- SendAll hands one snapshot per ally to OnCableTreeFull; the flat render index only has to be
+-- rebuilt once after the last one (nothing reads it in between).
+local deferRenderIndex = false
+local renderIndexDirty = false
+
 local function RebuildRenderEdges()
+	renderIndexDirty = false
 	renderEdges = {}
 	renderEdgesByKey = {}
 	for _, edges in pairs(edgesByAllyTeam) do
@@ -2331,6 +2342,17 @@ local function RebuildRenderEdges()
 			renderEdges[#renderEdges + 1] = e
 			renderEdgesByKey[k] = e
 		end
+	end
+end
+
+BeginRenderBatch = function()
+	deferRenderIndex = true
+end
+
+EndRenderBatch = function()
+	deferRenderIndex = false
+	if renderIndexDirty then
+		RebuildRenderEdges()
 	end
 end
 
@@ -2512,7 +2534,11 @@ function OnCableTreeFull(data)
 
 	edgesByAllyTeam[ally] = existing
 	local tDiff = cablePerf and Spring.GetTimer() or nil
-	RebuildRenderEdges()
+	if deferRenderIndex then
+		renderIndexDirty = true
+	else
+		RebuildRenderEdges()
+	end
 	needsRebuild = true
 
 	if cablePerf then
