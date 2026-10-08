@@ -622,9 +622,13 @@ local function DoDrawSSAO(isScreenSpace)
 	-- Already bound
 	--gl.Texture(0, ssaoBlurTexes[1])
 
+	if not DEBUG_SSAO then
+		gl.AlphaTest(GL.GREATER, 0) -- alpha 0 leaves the target unchanged with this blend; skip the blend for those pixels
+	end
 	gl.CallList(screenWideList)
 
 	if not DEBUG_SSAO then
+		gl.AlphaTest(false)
 		gl.BlendEquation(GL_FUNC_ADD)
 	end
 
