@@ -2132,6 +2132,59 @@ local cableShadowShader   -- depth-only SHADOW_PASS variant, drawn in the shadow
 local cableDeferredShader -- model-gbuffer DEFERRED_PASS variant, drawn in DrawOpaqueUnitsLua
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
+
+-------------------------------------------------------------------------------------
+-- Stable VAOs. The engine's LuaVAOImpl::CondInitVAO only keeps a VAO between draws when a
+-- vertex, an index AND an instance buffer are attached; otherwise it deletes and re-creates
+-- the GL VAO (and re-specifies every attribute) on every DrawArrays call. The cable VAOs
+-- only have a vertex buffer, so each of the up to four cable draws per frame rebuilt its
+-- VAO. A one-element dummy instance buffer (attribute 4, which no cable shader reads; the
+-- cable shaders use 0-3) and a one-element dummy index buffer are attached as well, so the
+-- VAO is built once per vertex buffer. The draws stay non-instanced, non-indexed
+-- glDrawArrays calls (no instance count is passed, DrawArrays ignores the index buffer), so
+-- the cables render exactly as before. If the dummies cannot be made, the plain VAO is used.
+-------------------------------------------------------------------------------------
+local dummyInstVBO, dummyIndxVBO -- nil = not tried yet, false = unavailable
+
+local function GetVAODummies()
+	if dummyInstVBO == nil then
+		dummyInstVBO, dummyIndxVBO = false, false
+		local ok, inst, indx = pcall(function()
+			local instVBO = gl.GetVBO(GL.ARRAY_BUFFER, false)
+			local indxVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false)
+			if not (instVBO and indxVBO) then return nil end
+			instVBO:Define(1, { { id = 4, name = "zkUnusedInstanceAttr", size = 1 } })
+			instVBO:Upload({ 0 })
+			indxVBO:Define(1)
+			indxVBO:Upload({ 0 })
+			return instVBO, indxVBO
+		end)
+		if ok and inst and indx then
+			dummyInstVBO, dummyIndxVBO = inst, indx
+		end
+	end
+	return dummyInstVBO, dummyIndxVBO
+end
+
+local function MakeCableVAO(vbo)
+	local inst, indx = GetVAODummies()
+	if inst then
+		local ok, vao = pcall(function()
+			local v = gl.GetVAO()
+			if not v then return nil end
+			v:AttachVertexBuffer(vbo)
+			v:AttachInstanceBuffer(inst)
+			v:AttachIndexBuffer(indx)
+			return v
+		end)
+		if ok and vao then
+			return vao
+		end
+	end
+	local vao = gl.GetVAO()
+	if vao then vao:AttachVertexBuffer(vbo) end
+	return vao
+end
 -- (drawPerf collapsed into cablePerf at the top of the file; flowMode
 -- collapsed into cableFlowMode. Both names live in the topology block above.)
 
@@ -2481,8 +2534,7 @@ local function RebuildVBO()
 	})
 	local tUp0 = cablePerf and Spring.GetTimer() or nil
 	vbo:Upload(verts)
-	cableVAO = gl.GetVAO()
-	if cableVAO then cableVAO:AttachVertexBuffer(vbo) end
+	cableVAO = MakeCableVAO(vbo)
 	numCableVerts = vertCount
 	needsRebuild = false
 
@@ -2886,8 +2938,7 @@ function gadget:Initialize()
 			{ id = 2, name = "vertGrid",  size = 3 },
 			{ id = 3, name = "vertSlot",  size = 1 },
 		})
-		ghostVAO = gl.GetVAO()
-		if ghostVAO then ghostVAO:AttachVertexBuffer(ghostVBO) end
+		ghostVAO = MakeCableVAO(ghostVBO)
 	end
 
 	-- Topology side: register chat command + scan existing pylons.
