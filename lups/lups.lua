@@ -109,6 +109,26 @@ local GL_ONE_MINUS_SRC_ALPHA = GL.ONE_MINUS_SRC_ALPHA
 
 local isWidget = (widgetHandler and true) or false
 
+-- Off-screen effects of the classes below can skip their per-frame Update and catch up on the
+-- frames they missed (at most MAX_CATCHUP_FRAMES) when they become visible again. This saves the
+-- update cost of every off-screen effect, but it is not exact: an effect that comes back on screen
+-- after more than MAX_CATCHUP_FRAMES frames shows a different animation phase/size, a repeating
+-- effect may show the phase it would have had without its restart, and the overdrive glow
+-- re-blends towards its current strength over about a second instead of already being there.
+-- Ribbons (trail history) and nano particles (spawn logic) need every frame and are never deferred.
+local DEFER_OFFSCREEN_UPDATES = false
+local MAX_CATCHUP_FRAMES = 90
+local waterPassesEnabled = true -- reflection/refraction callins kept (see Initialize)
+local deferrableClass = {bursts = true, staticparticles = true, overdriveparticles = true, shieldsphere = true}
+-- The visibility pass is skipped on drawn frames where nothing it depends on changed: no new sim
+-- frame, same camera, same viewing ally team, and no effects added since the last pass.
+local lastVisFrame, lastVisAllyTeam, lastCamX, lastCamY, lastCamZ, lastCamDX, lastCamDY, lastCamDZ = -1
+local visDirty = true
+-- Per-unit coarse view test, shared by all unit-space effects of a unit within one visibility
+-- pass. The margin covers the largest unit-attached effects (shield spheres, long jets).
+local COARSE_VIEW_MARGIN = 800
+local unitNearView = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -340,6 +360,7 @@ function AddParticles(Class,Options   ,__id)
 			newParticles.id = partIDCount
 		end
 		particles[ newParticles.id ] = newParticles
+		visDirty = true
 
 		local space = ((not newParticles.worldspace) and newParticles.unit) or (-1)
 		local fxTable = CreateSubTables(RenderSequence,{newParticles.layer,particleClass,space})
@@ -489,6 +510,7 @@ end
 --------------------------------------------------------------------------------
 
 local anyFXVisible = false
+local anyWaterFXVisible = false
 local anyDistortionsVisible = false
 
 local function IsUnitPositionKnown(unitID)
@@ -519,10 +541,12 @@ local function RadarDotCheck(unitID)
 	return true
 end
 
-local function Draw(extension,layer,water)
+local function Draw(extension,layer,water,waterPass)
 	local FxLayer = RenderSequence[layer];
 	if (not FxLayer) then return end
 
+	-- the reflection/refraction passes use the visibility without main view culling
+	local visKey = (waterPass and "waterVisible") or "visible"
 	local BeginDrawPass = "BeginDraw"..extension
 	local DrawPass      = "Draw"..extension
 	local EndDrawPass   = "EndDraw"..extension
@@ -564,7 +588,7 @@ local function Draw(extension,layer,water)
 							--// render effects
 							for i=1,#UnitEffects do
 								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx.visible) and (not water or not fx.nowater) then
+								if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
 									if (fx.piecenum) then
 										--// enter piece space
 										glPushMatrix()
@@ -589,7 +613,7 @@ local function Draw(extension,layer,water)
 							------------------------------------------------------------------------------------
 							for i=1,#UnitEffects do
 								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx.visible) and (not water or not fx.nowater) then
+								if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
 									glPushMatrix()
 									if fx.projectile and not fx.worldspace then
 										local x,y,z = spGetProjectilePosition(fx.projectile)
@@ -673,21 +697,21 @@ end
 
 
 local function DrawParticlesWater()
-	if ( not anyFXVisible ) then return end
+	if ( not anyWaterFXVisible ) then return end
 
 	glDepthTest(true)
 
 	--// DrawOpaque()
 	glDepthMask(true)
 	for i=-50,50 do
-		Draw("Opaque",i)
+		Draw("Opaque",i,nil,true)
 	end
 	glDepthMask(false)
 
 	--// Draw() (layers: -50 upto 50)
 	glAlphaTest(GL_GREATER, 0)
 	for i=-50,50 do
-		Draw("",i,true)
+		Draw("",i,true,true)
 	end
 	glAlphaTest(false)
 end
@@ -763,6 +787,7 @@ function GetUnitLosState(unitID)
 	return LocalAllyTeamID == Script.ALL_ACCESS_TEAM or (LocalAllyTeamID ~= Script.NO_ACCESS_TEAM and (Spring.GetUnitLosState(unitID, LocalAllyTeamID) or {}).los) or false
 end
 
+-- Returns the visibility for the main view and for the water passes (reflection, refraction).
 local function IsUnitFXVisible(fx)
 	local unitActive = true
 	local unitID = fx.unit
@@ -773,17 +798,50 @@ local function IsUnitFXVisible(fx)
 	end
 	--Spring.Utilities.UnitEcho(unitID, "w")
 	if (unitActive) then
-		if (isWidget and not fx.noIconDraw) or fx.alwaysVisible then
-			return true
+		if fx.alwaysVisible then
+			return true, true
+		elseif (isWidget and not fx.noIconDraw) then
+			-- The widget used to draw every such effect on the map in every pass, on screen or not.
+			-- The main view now culls them by the class Visible() (where it has one) and the unit's
+			-- view sphere; the water passes keep drawing all of them, since a mirror image can be
+			-- on screen while the effect is not.
+			if not fx.worldspace then
+				local near = unitNearView[unitID]
+				if near == nil then
+					near = spIsUnitVisible(unitID, (spGetUnitRadius(unitID) or 0) + COARSE_VIEW_MARGIN, false)
+					unitNearView[unitID] = near
+				end
+				if not near then
+					return false, true
+				end
+			end
+			if (fx.Visible) then
+				if not fx:Visible() then
+					return false, true
+				end
+				if fx.worldspace then
+					-- World-space effects (e.g. nano lasers spanning builder -> target) cull themselves.
+					return true, true
+				end
+			end
+			local unitRadius = (spGetUnitRadius(unitID) or 0) + 40
+			local r = fx.radius or fx.size or fx.length
+			if type(r) ~= "number" then
+				r = 0
+			end
+			return spIsUnitVisible(unitID, unitRadius + r, false), true
 		elseif (fx.Visible) then
-			return fx:Visible()
+			local v = fx:Visible()
+			return v, v
 		else
 			local unitRadius = (spGetUnitRadius(unitID) or 0) + 40
 			local r = fx.radius or 0
-			return Spring.IsUnitVisible(unitID, unitRadius + r, fx.noIconDraw)
+			local v = spIsUnitVisible(unitID, unitRadius + r, fx.noIconDraw)
+			return v, v
 		end
 	else
-		return fx.alwaysVisible
+		local a = fx.alwaysVisible
+		return a, a
 	end
 end
 
@@ -820,25 +878,33 @@ end
 local function CreateVisibleFxList()
 	local removeFX = {}
 	local removeCnt = 1
+	unitNearView = {}
 
 	for _,fx in pairs(particles) do
 		if ((fx.unit or -1) > -1) then
-			fx.visible = IsUnitFXVisible(fx)
+			fx.visible, fx.waterVisible = IsUnitFXVisible(fx)
 			if (fx.visible) then
 				if (not anyFXVisible) then anyFXVisible = true end
 				if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+			end
+			if (fx.waterVisible) then
+				anyWaterFXVisible = true
 			end
 		elseif ((fx.projectile or -1) > -1) then
 			fx.visible = IsProjectileFXVisible(fx)
+			fx.waterVisible = fx.visible
 			if (fx.visible) then
 			if (not anyFXVisible) then anyFXVisible = true end
 			if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+			anyWaterFXVisible = true
 			end
 		else
 			fx.visible = IsWorldFXVisible(fx)
+			fx.waterVisible = fx.visible
 			if (fx.visible) then
 				if (not anyFXVisible) then anyFXVisible = true end
 				if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+				anyWaterFXVisible = true
 			elseif (fx.Valid and (not fx:Valid())) then
 				removeFX[removeCnt] = fx.id
 				removeCnt = removeCnt + 1
@@ -946,7 +1012,20 @@ local function GameFrame(_,n)
 		else
 			--// update particles
 			if (partFx.Update) then
-				partFx:Update(framesToUpdate)
+				local pi = partFx.pi
+				if DEFER_OFFSCREEN_UPDATES and not partFx.visible and not (waterPassesEnabled and partFx.waterVisible)
+						and pi and deferrableClass[StrToLower(pi.name or "")] then
+					partFx.pendingFrames = (partFx.pendingFrames or 0) + framesToUpdate
+				else
+					local pending = partFx.pendingFrames
+					if pending then
+						partFx.pendingFrames = nil
+						-- Cap catch-up: some classes loop per frame in Update(n) (e.g. Bursts).
+						partFx:Update(math.min(framesToUpdate + pending, MAX_CATCHUP_FRAMES))
+					else
+						partFx:Update(framesToUpdate)
+					end
+				end
 			end
 		end
 	end
@@ -973,7 +1052,20 @@ local function Update(_,dt)
 	end
 
 	--// check which fxs are visible
+	-- Visibility only changes when the sim advances (units/effects move), the camera moves or new
+	-- effects are added, so skip the full pass on drawn frames where none of that happened.
+	local cx, cy, cz = Spring.GetCameraPosition()
+	local dx, dy, dz = Spring.GetCameraDirection()
+	if (not visDirty) and x == lastVisFrame and LocalAllyTeamID == lastVisAllyTeam
+		and cx == lastCamX and cy == lastCamY and cz == lastCamZ
+		and dx == lastCamDX and dy == lastCamDY and dz == lastCamDZ then
+		return
+	end
+	visDirty = false
+	lastVisFrame, lastVisAllyTeam = x, LocalAllyTeamID
+	lastCamX, lastCamY, lastCamZ, lastCamDX, lastCamDY, lastCamDZ = cx, cy, cz, dx, dy, dz
 	anyFXVisible = false
+	anyWaterFXVisible = false
 	anyDistortionsVisible = false
 	if (next(particles)) then
 		CreateVisibleFxList()
@@ -1075,6 +1167,7 @@ local function Initialize()
 	if GetLupsSetting("enablereflection", 0) ~= 1 then
 		(gadgetHandler or widgetHandler):RemoveCallIn("DrawWorldReflection")
 	end
+	waterPassesEnabled = (GetLupsSetting("enablerefraction", 0) == 1) or (GetLupsSetting("enablereflection", 0) == 1)
 
 	--// link backup FXClasses
 	for className,backupName in pairs(linkBackupFXClasses) do
