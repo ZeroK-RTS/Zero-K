@@ -19,7 +19,7 @@ local SIG_RESTORE = 2
 
 local WIGGLE_RATE = 6
 local SWITCH_PERIOD = 9
-local wiggleMag = 0.6
+local wiggleMag = 0.7
 local wiggleSwitch = SWITCH_PERIOD
 
 local smokePiece = { base}
@@ -126,7 +126,7 @@ function script.Shot(num)
 	gun = (gun)%4 + 1
 	EmitSfx(emits[gun].flare, 1024)
 	EmitSfx(emits[gun].barrel, 1025)
-	local currentMag = wiggleMag * (1 - 0.9*math.pow(2*(wiggleSwitch - SWITCH_PERIOD*0.75)/SWITCH_PERIOD, 2))
+	local currentMag = wiggleMag * (1 - 0.75*math.pow(2*(wiggleSwitch - SWITCH_PERIOD*0.75)/SWITCH_PERIOD, 2))
 	if GG.PossiblyDoNonStrafeWiggle and GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, WIGGLE_RATE, wiggleMag) then
 		wiggleSwitch = wiggleSwitch - 1
 		if wiggleSwitch <= 0 then

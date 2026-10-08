@@ -44,6 +44,9 @@ local spSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spGetUnitVelocity    = Spring.GetUnitVelocity
 
+local vecAngle  = Spring.Utilities.Vector.Angle
+local vecAbsVal = Spring.Utilities.Vector.AbsVal
+
 local wantedUnitDefs = {}
 local strafeUnitDefs = {}
 local turnRadiusUnitDefs = {}
@@ -113,7 +116,14 @@ local function ResetNonStrafeWiggle(unitID, unitDefID, cmdID)
 	allowedCommandFrame[unitID] = gameFrame + WIGGLE_LEEWAY
 end
 
-function GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, wigglePeriod, wiggleMag)
+local function GetCommandPosition(cp_1, cp_2, cp_3)
+	if cp_1 and not cp_3 then
+		cp_1, cp_2, cp_3 = Spring.GetUnitPosition(cp_1)
+	end
+	return cp_1, cp_2, cp_3
+end
+
+function GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, wigglePeriod, baseMag)
 	if ((allowedCommandFrame[unitID] or 0) > gameFrame) or spMoveCtrlGetTag(unitID) then
 		return
 	end
@@ -124,13 +134,32 @@ function GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, wigglePeriod, wiggleMag
 	if not (cmdID == CMD_ATTACK or not cmdID) then
 		return
 	end
+	local heading = Spring.GetUnitHeading(unitID)*HEADING_TO_RAD
+	local cx, cy, cz = GetCommandPosition(cp_1, cp_2, cp_3)
+	local angleDiff = 0
+	local distance = 600
+	if cz then
+		local ux, _, uz = Spring.GetUnitPosition(unitID)
+		if uz then
+			local fireAngle = vecAngle(cz - uz, cx - ux)
+			angleDiff = (fireAngle - heading)%(math.pi*2)
+			if angleDiff > 3 then
+				angleDiff = math.pi*2 - angleDiff
+			end
+			if angleDiff > 0.1 then
+				return
+			end
+			distance = vecAbsVal(cz - uz, cx - ux)
+		end
+	end
 	allowedCommandFrame[unitID] = gameFrame + wigglePeriod
 	local _,_,_,speed = spGetUnitVelocity(unitID)
 	local speedFactor = (speed + 8)/(speed+3)/(speed*speed*0.15 + 1)
-	local heading = Spring.GetUnitHeading(unitID)*HEADING_TO_RAD
 	local hx = math.sin(heading)
 	local hz = math.cos(heading)
-	Spring.AddUnitImpulse(unitID, hz*wiggleMag*speedFactor, 0, -hx*wiggleMag*speedFactor)
+	local distFactor = math.pow(math.min(550, distance)/550, 2)
+	local wiggleMag = baseMag*speedFactor*(1 - angleDiff*4)*distFactor
+	Spring.AddUnitImpulse(unitID, hz*wiggleMag, 0, -hx*wiggleMag)
 	return true
 end
 
