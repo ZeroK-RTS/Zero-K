@@ -386,21 +386,22 @@ local function FilterLowHealthAmmo(threshold)
 	for i = 1, #selection do
 		local unitID = selection[i]
 		local defID = Spring.GetUnitDefID(unitID)
-		local unitdef = defID and UnitDefs[defID]
+		local ud = defID and UnitDefs[defID]
+		local canFly = ud and ud.canFly
 		local health, maxHealth = spGetUnitHealth(unitID)
 		local lowhealth = (health or 0)/(maxHealth or 1000) < threshold
 		local keepselect = true
 		if lowhealth then
 			keepselect = false
-			if unitdef.canFly then
-				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, CMD_OPT_SHIFT)
+			if canFly then
+				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
 			end
-		elseif unitdef.canFly then
+		elseif canFly then
 			local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
 			local noammo = Spring.GetUnitRulesParam(unitID, "noammo") or 0
 			if ammofraction < threshold or noammo == 1 then
 				keepselect = false
-				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, CMD_OPT_SHIFT)
+				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
 			end
 		end
 		if keepselect then
