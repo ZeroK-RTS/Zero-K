@@ -417,22 +417,6 @@ local function ClearBit(x, p)
 	return HasBit(x, p) and x - p or x
 end
 
-local function SetFixedStatePre(drawPass, shaderID)
-	if HasBit(drawPass, 4) then
-		gl.ClipDistance(0, true)
-	elseif HasBit(drawPass, 8) then
-		gl.ClipDistance(0, true)
-	end
-end
-
-local function SetFixedStatePost(drawPass, shaderID)
-	if HasBit(drawPass, 4) then
-		gl.ClipDistance(0, false)
-	elseif HasBit(drawPass, 8) then
-		gl.ClipDistance(0, false)
-	end
-end
-
 local function UpdateBuildProgress(unitID, buildProgress, forceRetain)
 	local health, maxHealth, paralyzeDamage, capture, build = spGetUnitHealth(unitID)
 	if health and build ~= buildProgress then
@@ -1585,7 +1569,6 @@ local function ProcessFeatures(features, drawFlags, reason)
 
 end
 
-local shaderactivations = 0
 local shaderOrder = {'tree', 'feature', 'unit', 'unitskinning'} -- this forces ordering, no real reason to do so, just for testing
 
 local drawpassstats = {} -- a table of drawpass number and the actual number of units and batches performed by that pass
@@ -1599,71 +1582,122 @@ local function printDrawPassStats()
 	return res
 end
 
-local boundTextures = {} -- bindPosition -> texture this pass last bound there, to skip redundant gl.Texture calls
+local glTexture = gl.Texture
+local glCulling = gl.Culling
+local glBlending = gl.Blending
+local glClipDistance = gl.ClipDistance
+local GL_BACK = GL.BACK
+local GL_SRC_ALPHA = GL.SRC_ALPHA
+local GL_ONE_MINUS_SRC_ALPHA = GL.ONE_MINUS_SRC_ALPHA
+local GL_ONE = GL.ONE
+local GL_ZERO = GL.ZERO
+
+local numUniformBinOrder = #uniformBinOrder
+
+-- Per texture set (bin.textures), its bindings as a flat array {bindPosition, identity, texture, ...}
+-- sorted by bind position: the same set of gl.Texture calls as pairs(bin.textures) makes, without
+-- the per-entry next() calls. Cached on the bin, whose texture set never changes.
+local maxPlanBindPosition = 10 -- highest bind position any plan uses (unbind loop below is fixed at 10)
+
+local function TextureIdentity(tex)
+	return tex
+end
+
+local function BuildTexturePlan(bin)
+	local plan = {n = 0}
+	local textures = bin.textures
+	if textures then
+		local positions = {}
+		for bindPosition in pairs(textures) do
+			positions[#positions + 1] = bindPosition
+		end
+		table.sort(positions)
+		local n = 0
+		for i = 1, #positions do
+			local bindPosition = positions[i]
+			local tex = textures[bindPosition]
+			plan[n + 1] = bindPosition
+			plan[n + 2] = TextureIdentity(tex)
+			plan[n + 3] = tex
+			n = n + 3
+			if bindPosition > maxPlanBindPosition then
+				maxPlanBindPosition = bindPosition
+			end
+		end
+		plan.n = n
+	end
+	bin.texPlan = plan
+	return plan
+end
+
+local boundIdentity = {} -- bindPosition -> identity of the texture this pass last bound there
 
 local function ExecuteDrawPass(drawPass)
-	--defersubmissionupdate = (defersubmissionupdate + 1) % 10;
-	local batches = 0
-	local units = 0
-	local shaderswaps = 0
-	local unbindtextures = false
-	for bindPosition in pairs(boundTextures) do -- bindings are unknown at the start of a pass
-		boundTextures[bindPosition] = nil
+	for bindPosition = 0, maxPlanBindPosition do -- bindings are unknown at the start of a pass
+		boundIdentity[bindPosition] = nil
 	end
 	-- The shadow pass (RENDERING_MODE 2) samples no texture, except texture2 (unit 1) under
 	-- HASALPHASHADOWS, which only the 'tree' material defines.
 	local isShadowPass = (drawPass == 16)
-	gl.Culling(GL.BACK)
+	-- Reflection/refraction draws need clip distance 0. Enabling it before the first Submit and
+	-- disabling it after the last (instead of around every Submit) gives every draw the same state
+	-- (nothing in between draws depends on it) and the same final state.
+	local clipPass = HasBit(drawPass, 4) or HasBit(drawPass, 8)
+	local clipEnabled = false
+	local drewBins = false
+
+	glCulling(GL_BACK)
 	if (drawPass == 1) then --forward opaque pass
-		gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA) --
-		--gl.PolygonOffset(-2.0, -2.0);
+		glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 	end
-	
-	--for shaderName, data in pairs(unitDrawBins[drawPass]) do
-	for _, shaderName in ipairs(shaderOrder) do
-		local data = unitDrawBins[drawPass][shaderName]
+
+	local passBins = unitDrawBins[drawPass]
+	local passShaders = shaders[drawPass]
+	for s = 1, #shaderOrder do
+		local shaderName = shaderOrder[s]
+		local data = passBins[shaderName]
 		if data then
-			local shaderTable = shaders[drawPass][shaderName]
+			local shaderTable = passShaders[shaderName]
 			local shaderActive = false
-			for i = 1, #uniformBinOrder do
+			local treeShadow = isShadowPass and (shaderName == 'tree')
+			for i = 1, numUniformBinOrder do
 				local uniformBinID = uniformBinOrder[i]
 				local uniformBin = data[uniformBinID]
 				local activeBins = uniformBin and activeBinsOf[uniformBin]
-				if activeBins and activeBins.count > 0 then
+				local count = activeBins and activeBins.count or 0
+				if count > 0 then
 					if not shaderActive then
 						shaderTable:Activate()
-						shaderswaps = shaderswaps + 1
 						shaderActive = true
 					end
 					SetShaderUniforms(drawPass, shaderTable.shaderObj, uniformBinID)
-					for j = 1, activeBins.count do
-						local texAndObj = activeBins[j]
-						batches = batches + 1
-						units = units + texAndObj.numobjects
-						local mybinVAO = texAndObj.VAO
+					if clipPass and not clipEnabled then
+						glClipDistance(0, true)
+						clipEnabled = true
+					end
+					for j = 1, count do
+						local bin = activeBins[j]
 						if not isShadowPass then
-							for bindPosition, tex in pairs(texAndObj.textures) do
-								if boundTextures[bindPosition] ~= tex then
-									gl.Texture(bindPosition, tex)
-									boundTextures[bindPosition] = tex
+							local plan = bin.texPlan or BuildTexturePlan(bin)
+							for k = 1, plan.n, 3 do
+								local bindPosition = plan[k]
+								local identity = plan[k + 1]
+								if boundIdentity[bindPosition] ~= identity then
+									glTexture(bindPosition, plan[k + 2])
+									boundIdentity[bindPosition] = identity
 								end
 							end
-						elseif shaderName == 'tree' then
-							local tex = texAndObj.textures[1]
-							if boundTextures[1] ~= tex then
-								gl.Texture(1, tex)
-								boundTextures[1] = tex
+						elseif treeShadow then
+							local tex = bin.textures[1]
+							local identity = TextureIdentity(tex)
+							if boundIdentity[1] ~= identity then
+								glTexture(1, tex)
+								boundIdentity[1] = identity
 							end
 						end
-
-						SetFixedStatePre(drawPass, shaderTable)
-						shaderactivations = shaderactivations + 1
-
-						mybinVAO:Submit()
-
-						SetFixedStatePost(drawPass, shaderTable)
-						unbindtextures = true
+						bin.VAO:Submit()
 					end
+					drewBins = true
 				end
 			end
 			if shaderActive then
@@ -1671,21 +1705,18 @@ local function ExecuteDrawPass(drawPass)
 			end
 		end
 	end
-	
-	if unbindtextures then
+
+	if clipEnabled then
+		glClipDistance(0, false)
+	end
+	if drewBins then
 		for i = 0, 10 do
-			gl.Texture(i, false)
+			glTexture(i, false)
 		end
 	end
 	if drawPass == 1 then
-		gl.Blending(GL.ONE, GL.ZERO) -- do full opaque
-		--gl.PolygonOffset(0, 0);
+		glBlending(GL_ONE, GL_ZERO) -- do full opaque
 	end
-	
-	--drawpassstats[drawPass].batches = batches
-	--drawpassstats[drawPass].units = units
-	--drawpassstats[drawPass].shaders = shaderswaps
-	return batches, units, shaderswaps
 end
 
 local function RecompileShaders(recompilation)
@@ -2369,12 +2400,12 @@ function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
 		PreloadTextures()
 	end
 	local drawPass = drawPassBitsToNumber(true, deferredPass, drawReflection, drawRefraction)
-	local batches, units = ExecuteDrawPass(drawPass)
+	ExecuteDrawPass(drawPass)
 end
 
 function gadget:DrawShadowUnitsLua()
 	if not unitDrawBins then
 		return
 	end
-	local batches, units = ExecuteDrawPass(16)
+	ExecuteDrawPass(16)
 end
