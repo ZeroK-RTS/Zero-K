@@ -164,6 +164,10 @@ local alliesWithEdges = {}  -- [ally] = true if last send had edges (for empty-c
 -- Cached MSTs per (ally, gridID): only rebuilt when membership of that grid
 -- actually changes. SyncWithGrid composes the desired edge set from this cache.
 local mstByGrid = {}                -- [gridKey] = { ally, gridID, edges = {ek = einfo} }
+-- SyncWithGrid's compose+diff (steps 4-5) only has work when a cached MST changed (step 3
+-- processed a dirty grid) or `edges` was reset (ClearAll) since it last ran: otherwise the
+-- edge keys of the cached MSTs and of `edges` already match.
+local composeNeeded = true
 
 -- Grids that need a rebuild on the next SyncWithGrid call. Sync also adds
 -- entries it discovers itself by diffing rules-params against lastGridNum.
@@ -1192,6 +1196,7 @@ local function SyncWithGrid()
 		return h.cells, h.allyNodes
 	end
 	for gk, info in pairs(pendingGridDirty) do
+		composeNeeded = true
 		local cells, allyNodesRef = getAllyHash(info.ally)
 		local mst = mstByGrid[gk]
 		local memCount = 0
@@ -1223,34 +1228,41 @@ local function SyncWithGrid()
 	end
 	local t3 = perf and Spring.GetTimer()
 
-	-- 4) Compose the desired edge set from cached MSTs.
-	local newEdges = {}
-	for _, mst in pairs(mstByGrid) do
-		for ek, einfo in pairs(mst.edges) do
-			newEdges[ek] = einfo
+	-- 4) Compose the desired edge set from cached MSTs (skipped while no cached MST changed
+	--    and `edges` was not reset since the last compose: the diff would find nothing).
+	local t4
+	if composeNeeded then
+		composeNeeded = false
+		local newEdges = {}
+		for _, mst in pairs(mstByGrid) do
+			for ek, einfo in pairs(mst.edges) do
+				newEdges[ek] = einfo
+			end
 		end
-	end
-	local t4 = perf and Spring.GetTimer()
+		t4 = perf and Spring.GetTimer()
 
-	-- 5) Diff: drop missing, add new. Survivors keep their entry (and
-	--    ComputeMaxPotentials reorientation) untouched. Topology change here
-	--    invalidates the mpCache so its DFS / aggregates get rebuilt next call.
-	for ek, _ in pairs(edges) do
-		if not newEdges[ek] then
-			edges[ek] = nil
-			topologyDirty = true
-			mpCache.valid = false
+		-- 5) Diff: drop missing, add new. Survivors keep their entry (and
+		--    ComputeMaxPotentials reorientation) untouched. Topology change here
+		--    invalidates the mpCache so its DFS / aggregates get rebuilt next call.
+		for ek, _ in pairs(edges) do
+			if not newEdges[ek] then
+				edges[ek] = nil
+				topologyDirty = true
+				mpCache.valid = false
+			end
 		end
-	end
-	for ek, einfo in pairs(newEdges) do
-		if not edges[ek] then
-			edges[ek] = {
-				parentID = einfo.parentID, childID = einfo.childID,
-				px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
-			}
-			topologyDirty = true
-			mpCache.valid = false
+		for ek, einfo in pairs(newEdges) do
+			if not edges[ek] then
+				edges[ek] = {
+					parentID = einfo.parentID, childID = einfo.childID,
+					px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
+				}
+				topologyDirty = true
+				mpCache.valid = false
+			end
 		end
+	else
+		t4 = perf and Spring.GetTimer()
 	end
 	if perf then
 		local t5 = Spring.GetTimer()
@@ -1746,6 +1758,7 @@ local function ClearAll()
 	end
 	alliesWithEdges = {}
 	edges = {}
+	composeNeeded = true -- the next sync has to re-add every cached edge
 	topologyDirty = false
 	-- Reset stability snapshots; on next enable, all edges read as new.
 	lastSentFlow = {}
