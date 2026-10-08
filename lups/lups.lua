@@ -936,6 +936,36 @@ end
 LupsGetUnitRadius = UnitRadiusCached
 LupsGetUnitViewPosition = UnitViewPositionCached
 
+local sqrt = math.sqrt
+
+-- Generous bounding radius of an effect around its unit-space origin.
+local function FxExtent(fx)
+	local r = 0
+	local v = fx.radius
+	if type(v) == "number" and v > r then r = v end
+	v = fx.size
+	if type(v) == "number" and v > r then r = v end
+	v = fx.length
+	if type(v) == "number" and v > r then r = v end
+	local g, f = fx.sphereGrowth, fx.frame
+	if type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
+		r = r + g*f
+	end
+	g, f = fx.uMovCoeff, fx.maxSpeed
+	if type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
+		r = r + g*f
+	end
+	r = 1.1*r
+	local p = fx.pos
+	if type(p) == "table" then
+		local a, b, c = p[1], p[2], p[3]
+		if type(a) == "number" and type(b) == "number" and type(c) == "number" then
+			r = r + sqrt(a*a + b*b + c*c)
+		end
+	end
+	return r
+end
+
 -- Returns the visibility for the main view and for the water passes (reflection, refraction).
 local function IsUnitFXVisible(fx)
 	local unitActive = true
@@ -981,6 +1011,13 @@ local function IsUnitFXVisible(fx)
 			return spIsUnitVisible(unitID, unitRadius + r, false), true
 		elseif (fx.Visible) then
 			local v = fx:Visible()
+			if v and fx.cullByUnitSphere and not fx.worldspace then
+				-- Shield spheres' Visible() only checks allyteam visibility, so the gadget drew every
+				-- shield on the map in every pass. The main view culls them by the unit's sphere; the
+				-- water passes keep the old answer.
+				local r = (UnitRadiusCached(unitID) or 0) + 40 + FxExtent(fx)
+				return spIsUnitVisible(unitID, r, fx.noIconDraw), v
+			end
 			return v, v
 		else
 			local unitRadius = (UnitRadiusCached(unitID) or 0) + 40

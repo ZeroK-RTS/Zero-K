@@ -77,6 +77,9 @@ function ShieldSphereColorHQParticle:Visible()
 	return self.visibleToMyAllyTeam
 end
 
+-- Visible() has no view test: Lups also culls these by the unit's bounding sphere.
+ShieldSphereColorHQParticle.cullByUnitSphere = true
+
 local PACE = 13.33
 
 local lastTexture = ""

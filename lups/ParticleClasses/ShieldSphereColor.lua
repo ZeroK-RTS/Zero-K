@@ -53,6 +53,9 @@ function ShieldSphereColorParticle:Visible()
 	return self.visibleToMyAllyTeam
 end
 
+-- Visible() has no view test: Lups also culls these by the unit's bounding sphere.
+ShieldSphereColorParticle.cullByUnitSphere = true
+
 function ShieldSphereColorParticle:BeginDraw()
 	gl.DepthMask(false)
 	gl.UseShader(shieldShader)
