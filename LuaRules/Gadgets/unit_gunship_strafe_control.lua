@@ -146,7 +146,7 @@ function GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, wigglePeriod, baseMag)
 			if angleDiff > 3 then
 				angleDiff = math.pi*2 - angleDiff
 			end
-			if angleDiff > 0.1 then
+			if angleDiff > 0.15 then
 				return
 			end
 			distance = vecAbsVal(cz - uz, cx - ux)
@@ -157,9 +157,14 @@ function GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, wigglePeriod, baseMag)
 	local speedFactor = (speed + 8)/(speed+3)/(speed*speed*0.15 + 1)
 	local hx = math.sin(heading)
 	local hz = math.cos(heading)
-	local distFactor = math.pow(math.min(550, distance)/550, 2)
-	local wiggleMag = baseMag*speedFactor*(1 - angleDiff*4)*distFactor
-	Spring.AddUnitImpulse(unitID, hz*wiggleMag, 0, -hx*wiggleMag)
+	local distFactor = math.pow(math.min(700, distance)/700, 2)
+	local wiggleMag = baseMag*speedFactor*(1 - angleDiff*3)
+	local vx, vz = hz*wiggleMag, -hx*wiggleMag
+	if distFactor < 1 then
+		vx = vx - hx*(1 - distFactor)*math.min(1, speedFactor)*1.5
+		vz = vz - hz*(1 - distFactor)*math.min(1, speedFactor)*1.5
+	end
+	Spring.AddUnitImpulse(unitID, vx, 0, vz)
 	return true
 end
 
