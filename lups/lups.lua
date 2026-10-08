@@ -1266,20 +1266,21 @@ local reflMode = 0
 local reflUnitStamp, reflUnitValue = {}, {}
 
 -- Generous bounding radius of an effect around its unit-space origin.
+-- (nil checks first: most of these fields are absent, and type() is a C call)
 local function FxExtent(fx)
 	local r = 0
 	local v = fx.radius
-	if type(v) == "number" and v > r then r = v end
+	if v ~= nil and type(v) == "number" and v > r then r = v end
 	v = fx.size
-	if type(v) == "number" and v > r then r = v end
+	if v ~= nil and type(v) == "number" and v > r then r = v end
 	v = fx.length
-	if type(v) == "number" and v > r then r = v end
+	if v ~= nil and type(v) == "number" and v > r then r = v end
 	local g, f = fx.sphereGrowth, fx.frame
-	if type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
+	if g ~= nil and f ~= nil and type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
 		r = r + g*f
 	end
 	g, f = fx.uMovCoeff, fx.maxSpeed
-	if type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
+	if g ~= nil and f ~= nil and type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
 		r = r + g*f
 	end
 	r = 1.1*r
@@ -1670,19 +1671,21 @@ local function GameFrame(_,n)
 			end
 		else
 			--// update particles
-			if (partFx.Update) then
-				local pi = partFx.pi
+			-- (the Update method and pi usually come from the class through the metatable: look the
+			-- method up once, and pi only when it is needed)
+			local update = partFx.Update
+			if (update) then
 				if DEFER_OFFSCREEN_UPDATES and not partFx.visible and not (waterPassesEnabled and partFx.waterVisible)
-						and pi and pi.deferrable then
+						and partFx.pi and partFx.pi.deferrable then
 					partFx.pendingFrames = (partFx.pendingFrames or 0) + framesToUpdate
 				else
 					local pending = partFx.pendingFrames
 					if pending then
 						partFx.pendingFrames = nil
 						-- Cap catch-up: some classes loop per frame in Update(n) (e.g. Bursts).
-						partFx:Update(math.min(framesToUpdate + pending, MAX_CATCHUP_FRAMES))
+						update(partFx, math.min(framesToUpdate + pending, MAX_CATCHUP_FRAMES))
 					else
-						partFx:Update(framesToUpdate)
+						update(partFx, framesToUpdate)
 					end
 				end
 			end
