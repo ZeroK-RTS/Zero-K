@@ -97,21 +97,33 @@ local function GetAllyDraw(data)
 	return airDraw, waterDraw, highDraw
 end
 
+local spValidUnitID         = Spring.ValidUnitID
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
+local spGetGroundHeight     = Spring.GetGroundHeight
+local spGetUnitLosState     = Spring.GetUnitLosState
+local mathMax               = math.max
+local LOS_INLOS = 1 -- LOS state bit, see rts/Sim/Units/Unit.h
+
 local function UpdateUnit(unitID, data, index, isEnemy)
-	if not Spring.ValidUnitID(unitID) then
+	if not spValidUnitID(unitID) then
 		return true
 	end
-	local x, y, z = Spring.GetUnitViewPosition(unitID, true)
+	local x, y, z = spGetUnitViewPosition(unitID, true)
 	data[1] = x
-	if not data[1] then
+	if not x then
 		return true
 	end
 	data[2] = y
 	data[3] = z
-	data[4] = math.max(Spring.GetGroundHeight(x,z), 0)
+	data[4] = mathMax(spGetGroundHeight(x,z), 0)
 	if isEnemy then
-		local losState = (enemy_air_radar_only or enemy_water_radar_only) and Spring.GetUnitLosState(unitID)
-		losState = losState and losState.los
+		-- The raw (number) form of GetUnitLosState does not create a table. The table form has
+		-- los = true exactly when the INLOS bit is set (kept by the engine's raw mask) and no los
+		-- field otherwise, so data[5] stays true, nil or false (no radar-only option) as before.
+		local losState = (enemy_air_radar_only or enemy_water_radar_only) and spGetUnitLosState(unitID, nil, true)
+		if losState then
+			losState = (losState % 2 == LOS_INLOS) or nil
+		end
 		data[5] = losState
 		if not IterableMap.Get(enemyDraw, unitID) then
 			local airDraw, waterDraw, highDraw = GetEnemyDraw(data)
