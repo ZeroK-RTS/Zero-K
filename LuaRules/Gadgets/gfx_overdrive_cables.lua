@@ -1092,7 +1092,12 @@ local function SyncWithGrid()
 	local unitFromGrid = {}    -- [uid] = oldG (only for uids that flipped to a non-zero newG)
 	for allyTeamID, allyNodes in pairs(nodes) do
 		for unitID, _ in pairs(allyNodes) do
-			local newG = (IsActiveForGrid(unitID) and (spGetUnitRulesParam(unitID, "gridNumber") or 0)) or 0
+			-- = (IsActiveForGrid(unitID) and (gridNumber or 0)) or 0; the activity reads (3 engine
+			-- calls) are only needed when the unit is in a grid at all
+			local newG = spGetUnitRulesParam(unitID, "gridNumber") or 0
+			if newG ~= 0 and not IsActiveForGrid(unitID) then
+				newG = 0
+			end
 			local oldG = lastGridNum[unitID]
 			if oldG ~= newG then
 				if oldG and oldG > 0 then MarkGridRemove(allyTeamID, oldG, unitID) end
