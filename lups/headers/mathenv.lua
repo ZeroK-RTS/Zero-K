@@ -17,7 +17,15 @@
 local MathG = {math = math, rand = math.random, random = math.random, sin = math.sin, cos = math.cos, pi = math.pi,
 							 deg = math.deg, loadstring = loadstring, assert = assert, echo = Spring.Echo};
 
---local cachedParsedFunctions = {}
+-- Compiled param functions, keyed by the param string. The generated function has no upvalues
+-- (the chunk is just "return function() ... end") and is only ever run through ProcessParamCode,
+-- which sets its environment to MathG before every call, so reusing it for the same string behaves
+-- exactly like compiling the string again. Saves a loadstring (plus string building) per effect,
+-- e.g. per Units on Fire flame spawn. Bounded, because some callers build strings from per-instance
+-- numbers (e.g. lups_flame_jitter projectile speeds): the table is dropped when full.
+local PARSED_CACHE_MAX = 512
+local cachedParsedFunctions = {}
+local cachedParsedCount = 0
 
 local function Split(str, delim, maxNb)
 		--// Eliminate bad cases...
@@ -49,9 +57,13 @@ local char = string.char
 local type = type
 
 function ParseParamString(strfunc)
-	--if (cachedParsedFunctions[strfunc]) then
-	--  return cachedParsedFunctions[strfunc]
-	--end
+	local useCache = (type(strfunc) == "string")
+	if useCache then
+		local cachedFunc = cachedParsedFunctions[strfunc]
+		if cachedFunc then
+			return cachedFunc
+		end
+	end
 
 	local luaCode = "return function() "
 	local vec_defs,math_defs  = {},{}
@@ -87,7 +99,14 @@ function ParseParamString(strfunc)
 		return function() return 1,2,3,4 end
 	end;
 
-	--cachedParsedFunctions[strfunc] = luaFunc
+	if useCache then
+		if cachedParsedCount >= PARSED_CACHE_MAX then
+			cachedParsedFunctions = {}
+			cachedParsedCount = 0
+		end
+		cachedParsedFunctions[strfunc] = luaFunc
+		cachedParsedCount = cachedParsedCount + 1
+	end
 
 	return luaFunc
 end
