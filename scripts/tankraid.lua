@@ -12,11 +12,10 @@ piece('base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint', 'tracks1', 'tra
 local moving, once, animCount = false,true,0
 
 -- Signal definitions
-local SIG_Walk = 2
+local SIG_TRACKS = 2
 local SIG_Restore = 1
 local SIG_AIM1 = 1
 
-local ANIM_SPEED = 50
 local RESTORE_DELAY = 3000
 
 local TURRET_TURN_SPEED = math.rad(340)
@@ -67,50 +66,11 @@ end
 ----------------------------------------------------------
 ----------------------------------------------------------
 
-local function AnimationControl()
-
-	local current_tracks = 0
-	
-	while true do
-	
-		if moving or once then
-		
-			if current_tracks == 0 then
-			
-				Show(tracks1)
-				Hide(tracks4)
-				current_tracks = current_tracks + 1
-			elseif current_tracks == 1 then
-				
-				Show(tracks2)
-				Hide(tracks1)
-				current_tracks = current_tracks + 1
-			elseif current_tracks == 2 then
-			
-				Show(tracks3)
-				Hide(tracks2)
-				current_tracks = current_tracks + 1
-			elseif current_tracks == 3 then
-			
-				Show(tracks4)
-				Hide(tracks3)
-				current_tracks = 0
-			end
-			
-			once = false
-			
-		end
-		animCount = animCount + 1
-		Sleep(ANIM_SPEED)
-	end
-end
-
 function script.StartMoving()
 	StartThread(TrackControlStartMoving)
 end
 
 function script.StopMoving()
-	moving = false
 	TrackControlStopMoving()
 end
 
@@ -229,16 +189,15 @@ function script.Create()
             small = {piece('wheels6',  'wheels7', 'wheels8')},
 		},
 		tracks = tracks,
-		signal = 2,
+		signal = SIG_TRACKS,
 		smallSpeed = math.rad(960),
 		smallAccel = math.rad(400),
 		smallDecel = math.rad(600),
 		largeSpeed = math.rad(600),
 		largeAccel = math.rad(200),
 		largeDecel = math.rad(300),
-		trackPeriod = 25,
+		trackPeriod = 40,
 	})
-	moving = false
 	
 	Turn(firepoint, x_axis, math.rad(7))
 	
@@ -246,6 +205,5 @@ function script.Create()
 		Sleep(250)
 	end
 	
-	StartThread(AnimationControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
