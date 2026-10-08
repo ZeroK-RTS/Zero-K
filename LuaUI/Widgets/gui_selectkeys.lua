@@ -47,10 +47,13 @@ options_order = {
 	'select_constructor',
 	'select_non_constructor',
 	'lowhealth_30',
+	'highhealth_no_rearm_30',
 	'highhealth_30',
 	'lowhealth_60',
+	'highhealth_no_rearm_60',
 	'highhealth_60',
 	'lowhealth_100',
+	'highhealth_no_rearm_100',
 	'highhealth_100',
 	'filterfulltransports',
 	'filteremptytransports',
@@ -198,20 +201,30 @@ options = {
 		desc = 'Filters high health units out of your selection.',
 		action = 'select PrevSelection+_Not_RelativeHealth_30+_ClearSelection_SelectAll+',
 	},
-	highhealth_30 = { type = 'button',
+	highhealth_no_rearm_30 = { type = 'button',
 		name = 'Deselect Below 30% Health',
 		desc = 'Filters low health units out of your selection',
 		action = 'select PrevSelection+_RelativeHealth_30+_ClearSelection_SelectAll+',
+	},
+	highhealth_30 = { type = 'button',
+		name = 'Deselect <30% Health/Ammo',
+		desc = 'Filters low health or ammo units out of your selection. Planes with insufficient ammo are told to rearm.',
+		action = 'filter_low_health_ammo_30',
 	},
 	lowhealth_60 = { type = 'button',
 		name = 'Deselect Above 60% Health',
 		desc = 'Filters high health units out of your selection.',
 		action = 'select PrevSelection+_Not_RelativeHealth_60+_ClearSelection_SelectAll+',
 	},
-	highhealth_60 = { type = 'button',
+	highhealth_no_rearm_60 = { type = 'button',
 		name = 'Deselect Below 60% Health',
 		desc = 'Filters low health units out of your selection',
 		action = 'select PrevSelection+_RelativeHealth_60+_ClearSelection_SelectAll+',
+	},
+	highhealth_60 = { type = 'button',
+		name = 'Deselect <60% Health/Ammo',
+		desc = 'Filters low health or ammo units out of your selection. Planes with insufficient ammo are told to rearm.',
+		action = 'filter_low_health_ammo_60',
 	},
 	lowhealth_100 = { type = 'button',
 		name = 'Deselect Full Health',
@@ -219,10 +232,15 @@ options = {
 		-- engine check is (hp > threshold) so it has to be epsilon less than 100
 		action = 'select PrevSelection+_Not_RelativeHealth_99+_ClearSelection_SelectAll+',
 	},
-	highhealth_100 = { type = 'button',
+	highhealth_no_rearm_100 = { type = 'button',
 		name = 'Deselect Damaged Units',
 		desc = 'Filters damaged units out of your selection',
 		action = 'select PrevSelection+_RelativeHealth_99+_ClearSelection_SelectAll+',
+	},
+	highhealth_100 = { type = 'button',
+		name = 'Deselect <Full Health/Ammo',
+		desc = 'Filters damaged or units missing ammo out of your selection. Planes with less than full ammo are told to rearm.',
+		action = 'filter_low_health_ammo_100',
 	},
 	
 	----
@@ -288,6 +306,9 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetTeamUnitsByDefs = Spring.GetTeamUnitsByDefs
 local spGetMyTeamID = Spring.GetMyTeamID
 local spGetModKeyState = Spring.GetModKeyState
+local spGetUnitHealth    = Spring.GetUnitHealth
+
+local CMD_FIND_PAD       = Spring.Utilities.CMD.FIND_PAD
 
 local function IsTransporting(unitID)
 	local transported = spGetUnitIsTransporting(unitID)
@@ -357,11 +378,49 @@ local function SelectEmptyTransports()
 	spSelectUnitArray(newselection,addselect)
 end
 
+
+local function FilterLowHealthAmmo(threshold)
+	local selection = spGetSelectedUnits()
+	local newselection = {}
+	for i = 1, #selection do
+		-- I want to filter out air units with empty clips, give them a rearm order, and then remove them from selection
+		-- units get removed from selection at threshold
+		local unitID = selection[i]
+		local health, maxHealth = spGetUnitHealth(unitID)
+		local unithppercent = (health or 0)/(maxHealth or 1000)
+		local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
+		local noammo = Spring.GetUnitRulesParam(unitID, "noammo")
+		if ammofraction < threshold or noammo == 1 or unithppercent < threshold then
+			-- give order to retreat to airpad
+			Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, {}, 0)
+		else
+			newselection[#newselection+1] = selection[i]
+		end
+	end
+	spSelectUnitArray(newselection,false)
+end
+
+local function FilterLowHealthAmmo30()
+	FilterLowHealthAmmo(0.3)
+end
+
+local function FilterLowHealthAmmo60()
+	FilterLowHealthAmmo(0.6)
+end
+
+local function FilterLowHealthAmmo100()
+	FilterLowHealthAmmo(1)
+end
+
+
 function widget:Shutdown()
 	widgetHandler:RemoveAction("selectfulltransports")
 	widgetHandler:RemoveAction("selectemptytransports")
 	widgetHandler:RemoveAction("filteremptytransports")
 	widgetHandler:RemoveAction("filterfulltransports")
+	widgetHandler:RemoveAction("filter_low_health_ammo_30")
+	widgetHandler:RemoveAction("filter_low_health_ammo_60")
+	widgetHandler:RemoveAction("filter_low_health_ammo_100")
 end
 
 function widget:Initialize()
@@ -369,4 +428,7 @@ function widget:Initialize()
 	widgetHandler:AddAction("selectfulltransports", SelectFullTransports, nil, 'tp')
 	widgetHandler:AddAction("filteremptytransports", FilterEmptyTransports, nil, 'tp')
 	widgetHandler:AddAction("filterfulltransports", FilterFullTransports, nil, 'tp')
+	widgetHandler:AddAction("filter_low_health_ammo_30", FilterLowHealthAmmo30, nil, 'tp')
+	widgetHandler:AddAction("filter_low_health_ammo_60", FilterLowHealthAmmo60, nil, 'tp')
+	widgetHandler:AddAction("filter_low_health_ammo_100", FilterLowHealthAmmo100, nil, 'tp')
 end
