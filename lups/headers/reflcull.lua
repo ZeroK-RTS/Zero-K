@@ -270,29 +270,57 @@ end
 -- camera / screen geometry
 ---------------------------------------------------------------------------------------------
 
--- Where the main-camera ray through NDC (a, b) meets the water plane; nil if it does not
--- point downwards.
-local function PlaneHit(a, b)
-	local ah, bv = a*tanH, b*tanV
-	local dy = fY + ah*rY + bv*uY
-	if dy > -1e-4 then
+-- Bounding box (on the water plane) of everything seen through the NDC rectangle; nil if a
+-- corner ray does not point downwards. The main-camera ray through NDC (a, b) meets the water
+-- plane at
+--   ah, bv = a*tanH, b*tanV;  dy = fY + ah*rY + bv*uY  (nil if dy > -1e-4);  t = -camY / dy
+--   x, z = camX + t*(fX + ah*rX + bv*uX), camZ + t*(fZ + ah*rZ + bv*uZ)
+-- Computed for the corners (a1,b1), (a2,b1), (a1,b2), (a2,b2) in that order, sharing the
+-- products (every sum is evaluated as written above, so the results are the same as computing
+-- each corner on its own), with math.min/max replaced by the same comparisons.
+local function RectFootprint(a1, a2, b1, b2)
+	local ah1, ah2, bv1, bv2 = a1*tanH, a2*tanH, b1*tanV, b2*tanV
+	local h1y, h2y, v1y, v2y = ah1*rY, ah2*rY, bv1*uY, bv2*uY
+	local dy1 = fY + h1y + v1y
+	if dy1 > -1e-4 then
 		return nil
 	end
-	local t = -camY / dy
-	return camX + t*(fX + ah*rX + bv*uX), camZ + t*(fZ + ah*rZ + bv*uZ)
-end
-
--- Bounding box (on the water plane) of everything seen through the NDC rectangle.
-local function RectFootprint(a1, a2, b1, b2)
-	local x1, z1 = PlaneHit(a1, b1)
-	if not x1 then return nil end
-	local x2, z2 = PlaneHit(a2, b1)
-	if not x2 then return nil end
-	local x3, z3 = PlaneHit(a1, b2)
-	if not x3 then return nil end
-	local x4, z4 = PlaneHit(a2, b2)
-	if not x4 then return nil end
-	return min(x1, x2, x3, x4), max(x1, x2, x3, x4), min(z1, z2, z3, z4), max(z1, z2, z3, z4)
+	local dy2 = fY + h2y + v1y
+	if dy2 > -1e-4 then
+		return nil
+	end
+	local dy3 = fY + h1y + v2y
+	if dy3 > -1e-4 then
+		return nil
+	end
+	local dy4 = fY + h2y + v2y
+	if dy4 > -1e-4 then
+		return nil
+	end
+	local h1x, h2x, v1x, v2x = ah1*rX, ah2*rX, bv1*uX, bv2*uX
+	local h1z, h2z, v1z, v2z = ah1*rZ, ah2*rZ, bv1*uZ, bv2*uZ
+	local t = -camY / dy1
+	local x1, z1 = camX + t*(fX + h1x + v1x), camZ + t*(fZ + h1z + v1z)
+	t = -camY / dy2
+	local x2, z2 = camX + t*(fX + h2x + v1x), camZ + t*(fZ + h2z + v1z)
+	t = -camY / dy3
+	local x3, z3 = camX + t*(fX + h1x + v2x), camZ + t*(fZ + h1z + v2z)
+	t = -camY / dy4
+	local x4, z4 = camX + t*(fX + h2x + v2x), camZ + t*(fZ + h2z + v2z)
+	local minx, maxx, minz, maxz = x1, x1, z1, z1
+	if x2 < minx then minx = x2 end
+	if x3 < minx then minx = x3 end
+	if x4 < minx then minx = x4 end
+	if x2 > maxx then maxx = x2 end
+	if x3 > maxx then maxx = x3 end
+	if x4 > maxx then maxx = x4 end
+	if z2 < minz then minz = z2 end
+	if z3 < minz then minz = z3 end
+	if z4 < minz then minz = z4 end
+	if z2 > maxz then maxz = z2 end
+	if z3 > maxz then maxz = z3 end
+	if z4 > maxz then maxz = z4 end
+	return minx, maxx, minz, maxz
 end
 
 -- Number of water cells and of all cells under a bounding box; nil if it leaves the map
@@ -384,13 +412,15 @@ local function SphereRelevant(x, y, z, R)
 	local yu = dx*uX + dy*uY + dz*uZ
 	local q = R / (zc*(zc - R))
 	local a0 = xr / (zc*tanH)
-	local ea = q*(zc + abs(xr)) / tanH + dA
+	-- (x < 0 and -x or x) instead of math.abs(x): no C call; zc > 1 here, so the sign of a zero
+	-- does not matter
+	local ea = q*(zc + (xr < 0 and -xr or xr)) / tanH + dA
 	local a1, a2 = a0 - ea, a0 + ea
 	if a1 > 1 or a2 < -1 then
 		return false
 	end
 	local b0 = yu / (zc*tanV)
-	local eb = q*(zc + abs(yu)) / tanV + dB
+	local eb = q*(zc + (yu < 0 and -yu or yu)) / tanV + dB
 	local b1, b2 = b0 - eb, b0 + eb
 	if b1 > 1 or b2 < -1 then
 		return false
