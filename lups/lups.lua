@@ -134,6 +134,9 @@ local unitNearView = {}
 LupsDrawStamp = 0
 -- Incremented per visibility pass: stamp for per-pass caches.
 local passStamp = 0
+-- DrawWorldReflection is registered (lups.cfg EnableReflection = 1)
+local reflectionCallinActive = false
+local reflScannedAfterStart = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -181,6 +184,7 @@ VFS.Include(HEADERS_DIRNAME .. 'figures.lua',nil,VFSMODE)
 VFS.Include(HEADERS_DIRNAME .. 'vectors.lua',nil,VFSMODE)
 VFS.Include(HEADERS_DIRNAME .. 'hsl.lua',nil,VFSMODE)
 VFS.Include(HEADERS_DIRNAME .. 'nanoupdate.lua',nil,VFSMODE)
+local ReflCull = VFS.Include(HEADERS_DIRNAME .. 'reflcull.lua',nil,VFSMODE)
 
 --// load binary insert library
 VFS.Include(HEADERS_DIRNAME .. 'tablebin.lua')
@@ -268,6 +272,7 @@ for _,filename in ipairs(files) do
 			local sClassName = string.lower(Class.pi.name)
 			-- cached so GameFrame does not lower-case the class name per effect per frame
 			Class.pi.deferrable = deferrableClass[sClassName] or false
+			Class.pi.lowerName = sClassName
 			if (fxClasses[sClassName]) then
 				print(PRIO_LESS,'LUPS: duplicated particle class name "' .. sClassName .. '"')
 			else
@@ -614,12 +619,14 @@ local function IsUnitPositionKnownCached(unitID)
 	return known
 end
 
-local function Draw(extension,layer,water,waterPass)
+-- visKey: "visible" (main view), "waterVisible" (refraction, and reflection without reflection
+-- culling) or "reflVis" (reflection with reflection culling, see headers/reflcull.lua).
+local function Draw(extension,layer,water,visKey)
 	local FxLayer = RenderSequence[layer];
 	if (not FxLayer) then return end
 
-	-- the reflection/refraction passes use the visibility without main view culling
-	local visKey = (waterPass and "waterVisible") or "visible"
+	visKey = visKey or "visible"
+	local reflPass = (visKey == "reflVis")
 	local passStrings   = PassStrings(extension)
 	local BeginDrawPass = passStrings[1]
 	local DrawPass      = passStrings[2]
@@ -650,7 +657,14 @@ local function Draw(extension,layer,water,waterPass)
 						local first
 						for i=1,nfx do
 							local fx = UnitEffects[i]
-							if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
+							local vis
+							if reflPass then
+								vis = fx.reflVis
+								if vis == nil then vis = fx.alwaysVisible or fx.waterVisible end -- added since the last pass
+							else
+								vis = fx.alwaysVisible or fx[visKey]
+							end
+							if vis and (not water or not fx.nowater) then
 								first = i
 								break
 							end
@@ -672,7 +686,14 @@ local function Draw(extension,layer,water,waterPass)
 							--// render effects
 							for i=first,nfx do
 								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
+								local vis
+								if reflPass then
+									vis = fx.reflVis
+									if vis == nil then vis = fx.alwaysVisible or fx.waterVisible end -- added since the last pass
+								else
+									vis = fx.alwaysVisible or fx[visKey]
+								end
+								if vis and (not water or not fx.nowater) then
 									if (fx.piecenum) then
 										--// enter piece space
 										glPushMatrix()
@@ -701,7 +722,14 @@ local function Draw(extension,layer,water,waterPass)
 						------------------------------------------------------------------------------------
 						for i=1,#UnitEffects do
 							local fx = UnitEffects[i]
-							if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
+							local vis
+							if reflPass then
+								vis = fx.reflVis
+								if vis == nil then vis = fx.alwaysVisible or fx.waterVisible end -- added since the last pass
+							else
+								vis = fx.alwaysVisible or fx[visKey]
+							end
+							if vis and (not water or not fx.nowater) then
 								if fx.projectile and not fx.worldspace then
 									glPushMatrix()
 									local x,y,z = spGetProjectilePosition(fx.projectile)
@@ -802,14 +830,42 @@ local function DrawParticlesWater()
 	--// DrawOpaque()
 	glDepthMask(true)
 	for li=1,activeLayerCount do
-		Draw("Opaque",activeLayers[li],nil,true)
+		Draw("Opaque",activeLayers[li],nil,"waterVisible")
 	end
 	glDepthMask(false)
 
 	--// Draw() (layers: -50 upto 50)
 	glAlphaTest(GL_GREATER, 0)
 	for li=1,activeLayerCount do
-		Draw("",activeLayers[li],true,true)
+		Draw("",activeLayers[li],true,"waterVisible")
+	end
+	glAlphaTest(false)
+end
+
+--// Reflection pass. Effects whose mirror image cannot land on (or within the distortion reach
+--// of) water visible on screen are skipped; see headers/reflcull.lua.
+local reflCullActive = false   -- the last visibility pass computed fx.reflVis
+local anyReflFXVisible = false
+
+local function DrawParticlesReflection()
+	if not reflCullActive then
+		return DrawParticlesWater()
+	end
+	if not anyReflFXVisible then return end
+
+	glDepthTest(true)
+
+	--// DrawOpaque()
+	glDepthMask(true)
+	for li=1,activeLayerCount do
+		Draw("Opaque",activeLayers[li],nil,"reflVis")
+	end
+	glDepthMask(false)
+
+	--// Draw() (layers: -50 upto 50)
+	glAlphaTest(GL_GREATER, 0)
+	for li=1,activeLayerCount do
+		Draw("",activeLayers[li],true,"reflVis")
 	end
 	glAlphaTest(false)
 end
@@ -936,7 +992,15 @@ end
 LupsGetUnitRadius = UnitRadiusCached
 LupsGetUnitViewPosition = UnitViewPositionCached
 
+--------------------------------------------------------------------------------
+--// Reflection relevance of one effect. Effects are tested with a bounding sphere that is
+--// generous on purpose; anything without a known extent is kept.
+
 local sqrt = math.sqrt
+local REFL_MARGIN = 100        -- movement between visibility passes etc.
+local REFL_UNIT_SHARED_R = 450 -- effects up to this radius share one test per unit and pass
+local reflMode = 0
+local reflUnitStamp, reflUnitValue = {}, {}
 
 -- Generous bounding radius of an effect around its unit-space origin.
 local function FxExtent(fx)
@@ -964,6 +1028,94 @@ local function FxExtent(fx)
 		end
 	end
 	return r
+end
+
+-- world-space classes whose effect centre and extent are known
+local reflWorldSphere = {
+	nanoparticles = function(fx)
+		local p = fx._midpos
+		if p and fx._radius then
+			return p[1], p[2], p[3], fx._radius
+		end
+	end,
+	ribbon = function(fx)
+		local p = fx.oldPos and fx.posIdx and fx.oldPos[fx.posIdx]
+		if p and p[1] and type(fx.radius) == "number" then
+			return p[1], p[2], p[3], fx.radius + 10*(fx.width or 1)
+		end
+	end,
+	groundflash = function(fx)
+		local p = fx.pos
+		if p and p[1] and type(fx.size) == "number" then
+			return p[1], p[2], p[3], fx.size*2.5
+		end
+	end,
+}
+reflWorldSphere.nanolasers = reflWorldSphere.nanoparticles
+reflWorldSphere.nanolasersnoshader = reflWorldSphere.nanoparticles
+-- world-space particle systems: pos plus (generously) the radius their own Visible() uses
+local function ParticleSystemSphere(fx)
+	local p = fx.pos
+	local r = fx.radius
+	if not (p and p[1] and p[2] and p[3] and type(r) == "number") then
+		return
+	end
+	local g, f = fx.sphereGrowth, fx.frame
+	if type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
+		r = r + g*f
+	end
+	g, f = fx.uMovCoeff, fx.maxSpeed
+	if type(g) == "number" and type(f) == "number" and g > 0 and f > 0 then
+		r = r + g*f
+	end
+	return p[1], p[2], p[3], 1.1*r
+end
+reflWorldSphere.simpleparticles2 = ParticleSystemSphere
+reflWorldSphere.simpleparticles = ParticleSystemSphere
+reflWorldSphere.jitterparticles2 = ParticleSystemSphere
+reflWorldSphere.jitterparticles = ParticleSystemSphere
+
+local function IsFxReflectionRelevant(fx)
+	if reflMode == ReflCull.MODE_NONE then
+		return false
+	end
+	local unitID = fx.unit
+	if unitID and unitID > -1 and not fx.worldspace then
+		local ur = UnitRadiusCached(unitID) or 0
+		local r = FxExtent(fx)
+		local shared = (r <= REFL_UNIT_SHARED_R)
+		if shared and reflUnitStamp[unitID] == passStamp then
+			return reflUnitValue[unitID]
+		end
+		local x, y, z = UnitViewPositionCached(unitID)
+		local relevant
+		if not x then
+			relevant = true
+		else
+			local R = 1.5*ur + 40 + REFL_MARGIN + (shared and REFL_UNIT_SHARED_R or r)
+			relevant = ReflCull.SphereRelevant(x, y, z, R)
+		end
+		if shared then
+			reflUnitStamp[unitID] = passStamp
+			reflUnitValue[unitID] = relevant
+		end
+		return relevant
+	end
+	if fx.projectile and fx.projectile > -1 and not fx.worldspace then
+		return true
+	end
+	if unitID and unitID > -1 and fx.pi.lowerName ~= "ribbon" and fx.pi.lowerName ~= "groundflash" then
+		return true -- unit-attached world-space effect of an unknown kind
+	end
+	local getSphere = reflWorldSphere[fx.pi.lowerName]
+	if not getSphere then
+		return true
+	end
+	local x, y, z, R = getSphere(fx)
+	if not (x and y and z and R) then
+		return true
+	end
+	return ReflCull.SphereRelevant(x, y, z, R + REFL_MARGIN)
 end
 
 -- Returns the visibility for the main view and for the water passes (reflection, refraction).
@@ -1068,6 +1220,15 @@ local function CreateVisibleFxList()
 	passStamp = (passStamp + 1) % 4194304 -- stays exact with float lua numbers
 	inVisPass = true
 
+	-- reflection culling: only when the reflection pass runs at all
+	reflMode = ReflCull.MODE_OFF
+	if reflectionCallinActive then
+		reflMode = ReflCull.BeginPass(vsy)
+	end
+	local doRefl = (reflMode ~= ReflCull.MODE_OFF)
+	reflCullActive = doRefl
+	anyReflFXVisible = false
+
 	for _,fx in pairs(particles) do
 		if ((fx.unit or -1) > -1) then
 			fx.visible, fx.waterVisible = IsUnitFXVisible(fx)
@@ -1097,6 +1258,17 @@ local function CreateVisibleFxList()
 				removeFX[removeCnt] = fx.id
 				removeCnt = removeCnt + 1
 			end
+		end
+		if doRefl then
+			-- starts from the water-pass visibility (no main view culling)
+			local rv = (fx.alwaysVisible or fx.waterVisible) and true or false
+			if rv then
+				rv = IsFxReflectionRelevant(fx)
+				if rv then
+					anyReflFXVisible = true
+				end
+			end
+			fx.reflVis = rv
 		end
 	end
 	--Spring.Echo("Lups fx cnt", particles.GetIndexMax())
@@ -1245,6 +1417,14 @@ end
 
 local function Update(_,dt)
 	LupsDrawStamp = (LupsDrawStamp + 1) % 4194304 -- stays exact with float lua numbers
+	if reflectionCallinActive then
+		if not reflScannedAfterStart and spGetGameFrame() >= 1 then
+			-- pregame height map changes do not reach UnsyncedHeightMapUpdate: rescan once
+			reflScannedAfterStart = true
+			ReflCull.Invalidate()
+		end
+		ReflCull.Step() -- builds the water grid incrementally after (re)initialisation
+	end
 
 	--// update frameoffset and self allyteam
 	frameOffset = spGetFrameTimeOffset()
@@ -1273,8 +1453,16 @@ local function Update(_,dt)
 	anyFXVisible = false
 	anyWaterFXVisible = false
 	anyDistortionsVisible = false
+	anyReflFXVisible = false
+	reflCullActive = false
 	if (next(particles)) then
 		CreateVisibleFxList()
+	end
+end
+
+local function UnsyncedHeightMapUpdate(_, x1, z1, x2, z2)
+	if reflectionCallinActive then
+		ReflCull.HeightMapUpdate(x1, z1, x2, z2)
 	end
 end
 
@@ -1371,7 +1559,13 @@ local function Initialize()
 		(gadgetHandler or widgetHandler):RemoveCallIn("DrawWorldRefraction")
 	end
 	if GetLupsSetting("enablereflection", 0) ~= 1 then
-		(gadgetHandler or widgetHandler):RemoveCallIn("DrawWorldReflection")
+		local callinHandler = gadgetHandler or widgetHandler
+		callinHandler:RemoveCallIn("DrawWorldReflection")
+		callinHandler:RemoveCallIn("UnsyncedHeightMapUpdate")
+		reflectionCallinActive = false
+	else
+		reflectionCallinActive = true
+		ReflCull.Init()
 	end
 	waterPassesEnabled = (GetLupsSetting("enablerefraction", 0) == 1) or (GetLupsSetting("enablereflection", 0) == 1)
 
@@ -1431,10 +1625,11 @@ this.Initialize = Initialize
 this.Shutdown   = Shutdown
 this.DrawWorldPreUnit    = DrawParticlesOpaque
 this.DrawWorld           = DrawParticles
-this.DrawWorldReflection = DrawParticlesWater
+this.DrawWorldReflection = DrawParticlesReflection
 this.DrawWorldRefraction = DrawParticlesWater
 this.ViewResize = ViewResize
 this.Update     = Update
+this.UnsyncedHeightMapUpdate = UnsyncedHeightMapUpdate
 if gadget then
 	this.DrawUnit = DrawUnit
 	--this.GameFrame  = GameFrame; // doesn't work for unsynced parts >yet<
