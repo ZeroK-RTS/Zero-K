@@ -368,6 +368,12 @@ local function MarkBinInactive(uniformBinTable, bin)
 	bin.activeIndex = nil
 end
 
+-- The shadow pass binds no textures except texture2 for the 'tree' shader, so all other shadow
+-- (flag 16) objects of a shader + uniform bin share one bin, MERGED_SHADOW_TEXKEY, instead of one bin
+-- per texture set: one Submit instead of dozens. Model shadows only write depth, so drawing the same
+-- objects in other groupings/order gives the same shadow map.
+local MERGED_SHADOW_TEXKEY = -1
+
 local objectIDtoDefID = {}
 
 local shaders = {} -- double nested table of {drawflag : {"units":shaderID}}
@@ -1069,6 +1075,9 @@ local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, 
 	assigncalls = (assigncalls + 1 ) % (2^20)
 	shader = shader or GetShaderName(flag, objectDefID)
 	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
+	if texKey and flag == 16 and shader ~= 'tree' then
+		texKey = MERGED_SHADOW_TEXKEY
+	end
 	
 	if not objectDefID then
 		Spring.Echo("AssignObjectToBin", objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
@@ -1302,6 +1311,9 @@ end
 local function RemoveObjectFromBin(objectID, objectDefID, texKey, shader, flag, uniformBinID, reason)
 	shader = shader or GetShaderName(flag, objectDefID)
 	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
+	if texKey and flag == 16 and shader ~= 'tree' then
+		texKey = MERGED_SHADOW_TEXKEY
+	end
 	if debugmode then Spring.Echo("RemoveObjectFromBin", objectID, objectDefID, texKey, shader, flag, uniformBinID, reason)  end
 
 	if unitDrawBins[flag][shader] then
