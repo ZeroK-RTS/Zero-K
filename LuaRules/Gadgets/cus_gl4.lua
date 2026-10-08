@@ -1678,11 +1678,6 @@ local function SetShaderUniformsCached(state, drawPass, uniformBinID)
 	end
 end
 
--- Per texture set (bin.textures), its bindings as a flat array {bindPosition, identity, texture, ...}
--- sorted by bind position: the same set of gl.Texture calls as pairs(bin.textures) makes, without
--- the per-entry next() calls. Cached on the bin, whose texture set never changes.
-local maxPlanBindPosition = 10 -- highest bind position any plan uses (unbind loop below is fixed at 10)
-
 -- What a texture name binds, for the per-pass bind cache. "%<defID>:<0|1>" is tex1/tex2 of a unit
 -- (defID > 0) or feature (defID < 0) model: the engine binds the S3O texture handler's GL texture for
 -- that model's texture file, and the handler keeps one GL texture per file name (model.textures.tex1/2,
@@ -1729,8 +1724,26 @@ local function TextureIdentity(tex)
 	return identity
 end
 
+-- Per texture set (bin.textures), its bindings sorted by bind position: the same set of gl.Texture
+-- calls as pairs(bin.textures) makes, without the per-entry next() calls. Cached on the bin, whose
+-- texture set never changes. Positions are grouped (0-2: the model's textures and normal map, 3-5:
+-- wreck textures, 6+: shadow/reflection/LOS/BRDF/noise), each group as a flat array
+-- {bindPosition, identity, texture, ...} with a signature string of its positions and identities.
+-- Consecutive bins mostly share groups 2 and 3, and a group whose signature equals the one last
+-- bound in its slot holds exactly these bindings already, so it is skipped with one comparison.
+local maxPlanBindPosition = 10 -- highest bind position any plan uses (unbind loop below is fixed at 10)
+
+local function TextureGroupSlot(bindPosition)
+	if bindPosition <= 2 then
+		return 1
+	elseif bindPosition <= 5 then
+		return 2
+	end
+	return 3
+end
+
 local function BuildTexturePlan(bin)
-	local plan = {n = 0}
+	local plan = {numGroups = 0}
 	local textures = bin.textures
 	if textures then
 		local positions = {}
@@ -1738,30 +1751,48 @@ local function BuildTexturePlan(bin)
 			positions[#positions + 1] = bindPosition
 		end
 		table.sort(positions)
-		local n = 0
+		local group, sigParts
 		for i = 1, #positions do
 			local bindPosition = positions[i]
 			local tex = textures[bindPosition]
-			plan[n + 1] = bindPosition
-			plan[n + 2] = TextureIdentity(tex)
-			plan[n + 3] = tex
-			n = n + 3
+			local identity = TextureIdentity(tex)
+			local slot = TextureGroupSlot(bindPosition)
+			if not group or group.slot ~= slot then
+				if group then
+					group.sig = table.concat(sigParts)
+				end
+				group = {slot = slot, n = 0}
+				sigParts = {}
+				plan[#plan + 1] = group
+			end
+			local n = group.n
+			group[n + 1] = bindPosition
+			group[n + 2] = identity
+			group[n + 3] = tex
+			group.n = n + 3
+			local identityKey = (type(identity) == "string") and identity or ("\3" .. tostring(identity))
+			sigParts[#sigParts + 1] = bindPosition .. "\1" .. identityKey .. "\2"
 			if bindPosition > maxPlanBindPosition then
 				maxPlanBindPosition = bindPosition
 			end
 		end
-		plan.n = n
+		if group then
+			group.sig = table.concat(sigParts)
+		end
+		plan.numGroups = #plan
 	end
 	bin.texPlan = plan
 	return plan
 end
 
 local boundIdentity = {} -- bindPosition -> identity of the texture this pass last bound there
+local boundGroupSig = {} -- group slot -> signature of the group this pass last bound in that slot
 
 local function ExecuteDrawPass(drawPass)
 	for bindPosition = 0, maxPlanBindPosition do -- bindings are unknown at the start of a pass
 		boundIdentity[bindPosition] = nil
 	end
+	boundGroupSig[1], boundGroupSig[2], boundGroupSig[3] = nil, nil, nil
 	-- The shadow pass (RENDERING_MODE 2) samples no texture, except texture2 (unit 1) under
 	-- HASALPHASHADOWS, which only the 'tree' material defines.
 	local isShadowPass = (drawPass == 16)
@@ -1805,12 +1836,20 @@ local function ExecuteDrawPass(drawPass)
 						local bin = activeBins[j]
 						if not isShadowPass then
 							local plan = bin.texPlan or BuildTexturePlan(bin)
-							for k = 1, plan.n, 3 do
-								local bindPosition = plan[k]
-								local identity = plan[k + 1]
-								if boundIdentity[bindPosition] ~= identity then
-									glTexture(bindPosition, plan[k + 2])
-									boundIdentity[bindPosition] = identity
+							for g = 1, plan.numGroups do
+								local group = plan[g]
+								local slot = group.slot
+								local sig = group.sig
+								if boundGroupSig[slot] ~= sig then
+									for k = 1, group.n, 3 do
+										local bindPosition = group[k]
+										local identity = group[k + 1]
+										if boundIdentity[bindPosition] ~= identity then
+											glTexture(bindPosition, group[k + 2])
+											boundIdentity[bindPosition] = identity
+										end
+									end
+									boundGroupSig[slot] = sig
 								end
 							end
 						elseif treeShadow then
@@ -1819,6 +1858,7 @@ local function ExecuteDrawPass(drawPass)
 							if boundIdentity[1] ~= identity then
 								glTexture(1, tex)
 								boundIdentity[1] = identity
+								boundGroupSig[1] = nil
 							end
 						end
 						bin.VAO:Submit()
