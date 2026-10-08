@@ -104,9 +104,10 @@ function script.EndBurst()
 end
 
 function Pad_StopMoving()
-	if shotsPerRefuel and shotsRemaining then
+	if shotsPerRefuel and shotsRemaining and shotsRemaining < shotsPerRefuel then
+		-- Waste excess ammo upon landing to get a full refuel
 		SetOutOfAmmo()
-		GG.SetRequireRefuelRaw(unitID) -- Waste excess ammo upon landing
+		GG.SetRequireRefuelRaw(unitID)
 	end
 	script.StopMoving()
 end
