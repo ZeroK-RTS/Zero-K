@@ -90,17 +90,21 @@ function Bursts:UpdatePartList(partList,n)
 	partList.rotArc   = partList.rotArc*(self.rotairdrag^n) + rotBoost
 	partList.size     = partList.size  + n*self.sizeGrowth
 	partList.life     = partList.life  + n*partList.life_incr
-	local r,g,b,a     = GetColor(self.colormap,partList.life)
-	partList.color    = {r,g,b,a}
+	local color       = partList.color -- reused: no table allocation per part per sim frame
+	color[1],color[2],color[3],color[4] = GetColor(self.colormap,partList.life)
 end
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
 local lasttexture = nil
+local lastSrcBlend, lastDstBlend
+local lastR, lastG, lastB, lastA
 
 function Bursts:BeginDraw()
 	lasttexture = nil
+	lastSrcBlend, lastDstBlend = nil, nil
+	lastR, lastG, lastB, lastA = nil, nil, nil, nil
 end
 
 function Bursts:EndDraw()
@@ -128,7 +132,10 @@ function Bursts:Draw()
       gl.Texture(self.texture)
       lasttexture = self.texture
     end
-    gl.Blending(self.srcBlend,self.dstBlend)
+    if (lastSrcBlend ~= self.srcBlend) or (lastDstBlend ~= self.dstBlend) then
+      gl.Blending(self.srcBlend,self.dstBlend)
+      lastSrcBlend, lastDstBlend = self.srcBlend, self.dstBlend
+    end
     gl.PushMatrix()
     gl.Translate(self.pos[1],self.pos[2],self.pos[3])
 
@@ -138,7 +145,12 @@ function Bursts:Draw()
         local rotv = partList.rotv
         local size = partList.size
 
-        gl.Color(partList.color)
+        local color = partList.color -- the burst lists contain no glColor, so the current colour persists
+        local r, g, b, a = color[1], color[2], color[3], color[4]
+        if (r ~= lastR) or (g ~= lastG) or (b ~= lastB) or (a ~= lastA) then
+          gl.Color(color)
+          lastR, lastG, lastB, lastA = r, g, b, a
+        end
 
         gl.PushMatrix()
           gl.Rotate(partList.rotArc,rotv[1],rotv[2],rotv[3])

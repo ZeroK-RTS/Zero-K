@@ -114,10 +114,12 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 local lasttexture = nil
+local lastSrcBlend, lastDstBlend = nil, nil
 
 function StaticParticles:BeginDraw()
 	gl.UseShader(billShader)
 	lasttexture = nil
+	lastSrcBlend, lastDstBlend = nil, nil
 end
 
 function StaticParticles:EndDraw()
@@ -131,15 +133,24 @@ function StaticParticles:Draw()
 		glTexture(self.texture)
 		lasttexture = self.texture
 	end
-	glBlending(self.srcBlend,self.dstBlend)
+	if (lastSrcBlend ~= self.srcBlend) or (lastDstBlend ~= self.dstBlend) then
+		glBlending(self.srcBlend,self.dstBlend)
+		lastSrcBlend, lastDstBlend = self.srcBlend, self.dstBlend
+	end
 
 	glUniform(sizeUniform,self.usize)
 	glUniform(frameUniform,self.frame)
 
 	glPushMatrix()
-	glTranslate(self.pos[1],self.pos[2],self.pos[3])
+	local pos = self.pos
+	if (pos[1] ~= 0) or (pos[2] ~= 0) or (pos[3] ~= 0) then -- translating by 0 is an exact no-op
+		glTranslate(pos[1],pos[2],pos[3])
+	end
 	glRotate(90,self.emitVector[1],self.emitVector[2],self.emitVector[3])
-	glRotate(self.rot2Speed*self.frame,0,1,0)
+	local rot2 = self.rot2Speed*self.frame
+	if (rot2 ~= 0) then -- rotating by 0 degrees is an exact no-op
+		glRotate(rot2,0,1,0)
+	end
 		glCallList(self.dlist)
 	glPopMatrix()
 end
