@@ -630,6 +630,9 @@ local function DrawFeatureClusterText()
 	end
 end
 
+local RefreshFeatureData -- defined below; Update calls it when drawing turns on with stale data
+local dataStale = true
+
 function widget:Update(dt)
 	cumDt = cumDt + dt
 	local cx, cy, cz = spGetCameraPosition()
@@ -643,6 +646,9 @@ function widget:Update(dt)
 	end
 
 	drawEnabled = UpdateDrawEnabled()
+	if drawEnabled and dataStale then
+		RefreshFeatureData(spGetGameFrame())
+	end
 
 	local frame = spGetGameFrame()
 	color = 0.5 + flashStrength * (frame % checkFrequency - checkFrequency)/(checkFrequency - 1)
@@ -659,6 +665,18 @@ function widget:GameFrame(frame)
 	if frameMod ~= 0 then
 		return
 	end
+	if not drawEnabled then
+		-- Nothing is drawn (by default only while constructors are selected), so skip the scan of
+		-- every feature, the clustering and the display-list rebuilds; Update refreshes on the
+		-- frame drawing turns back on. Each scan re-reads all features, so the result is the same.
+		dataStale = true
+		return
+	end
+	RefreshFeatureData(frame)
+end
+
+RefreshFeatureData = function(frame)
+	dataStale = false
 	if benchmark then
 		benchmark:Enter("GameFrame UpdateFeatures")
 	end
