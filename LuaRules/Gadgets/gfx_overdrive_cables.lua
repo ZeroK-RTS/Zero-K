@@ -2100,6 +2100,9 @@ local edgesByAllyTeam = {}
 local renderEdges = {}
 local renderEdgesByKey = {}    -- flat lookup: edgeKey -> renderEdge entry
 local needsRebuild = false
+-- Lower bound on witherFrame over all withering edges; math.huge = none withering.
+-- Lets GameFrame skip the O(edges) wither scan until some edge can be due.
+local minWitherFrame = math.huge
 
 -- Orphaned enemy edges that the local viewer has seen at least one segment of
 -- in LOS. The synced gadget broadcasts every ally team's grid to all clients,
@@ -2332,6 +2335,7 @@ function OnCableTreeFull(data)
 				-- handler). Out of LOS, snapshot immediately and silently.
 				if anyInLOS(e.px, e.pz, e.cx, e.cz) then
 					e.witherFrame = frame
+					if frame < minWitherFrame then minWitherFrame = frame end
 				else
 					if cableGhosts and e.slot and e.slot >= 0 then
 						ghostEdges[k] = {
@@ -2346,6 +2350,7 @@ function OnCableTreeFull(data)
 				end
 			else
 				e.witherFrame = frame
+				if frame < minWitherFrame then minWitherFrame = frame end
 			end		end
 	end
 
@@ -2512,22 +2517,29 @@ function gadget:GameFrame(n)
 	-- animation first). After the snapshot, the cable seamlessly continues
 	-- to render via the ghost VBO from previously-seen segments.
 	local dropped = false
-	for ally, edges in pairs(edgesByAllyTeam) do
-		for k, e in pairs(edges) do
-			if e.witherFrame and (n - e.witherFrame) >= WITHER_HOLD_FRAMES then
-				if not e.isOwnAlly and cableGhosts and e.slot and e.slot >= 0 then
-					ghostEdges[k] = {
-						px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
-						capacity = e.capacity or 0,
-						slot = e.slot,
-						key = k,
-					}
-					ghostNeedsRebuild = true
+	if (n - minWitherFrame) >= WITHER_HOLD_FRAMES then
+		local newMin = math.huge
+		for ally, edges in pairs(edgesByAllyTeam) do
+			for k, e in pairs(edges) do
+				local wf = e.witherFrame
+				if wf and (n - wf) >= WITHER_HOLD_FRAMES then
+					if not e.isOwnAlly and cableGhosts and e.slot and e.slot >= 0 then
+						ghostEdges[k] = {
+							px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
+							capacity = e.capacity or 0,
+							slot = e.slot,
+							key = k,
+						}
+						ghostNeedsRebuild = true
+					end
+					edges[k] = nil
+					dropped = true
+				elseif wf and wf < newMin then
+					newMin = wf
 				end
-				edges[k] = nil
-				dropped = true
 			end
 		end
+		minWitherFrame = newMin
 	end
 	if dropped then
 		RebuildRenderEdges()
