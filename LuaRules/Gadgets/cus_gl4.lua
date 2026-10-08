@@ -1671,8 +1671,50 @@ end
 -- the per-entry next() calls. Cached on the bin, whose texture set never changes.
 local maxPlanBindPosition = 10 -- highest bind position any plan uses (unbind loop below is fixed at 10)
 
+-- What a texture name binds, for the per-pass bind cache. "%<defID>:<0|1>" is tex1/tex2 of a unit
+-- (defID > 0) or feature (defID < 0) model: the engine binds the S3O texture handler's GL texture for
+-- that model's texture file, and the handler keeps one GL texture per file name (model.textures.tex1/2,
+-- exactly as the model names it). So these names bind the same texture whenever the models name the
+-- same file - e.g. every wreck model uses wreck.dds/wreck2.dds, so units' wreck textures (bind 3/4)
+-- and wreck features' textures (0/1) are the same textures across defs, and so are shared atlases.
+-- 3DO models (and unknown model types) are excluded: their names do not bind S3O textures. Every
+-- other name is its own identity. The result is cached per name; def textures never change.
+local textureIdentityCache = {}
+
+local function ModelIsS3OTextured(def)
+	local modelName = def.modelname
+	local ext = type(modelName) == "string" and modelName:match("%.(%w+)$")
+	if not ext then
+		ext = def.modeltype -- engine resolves the extension (costs a VFS lookup, only when unnamed)
+	end
+	return (type(ext) == "string") and (ext ~= "") and (ext:lower() ~= "3do")
+end
+
 local function TextureIdentity(tex)
-	return tex
+	if type(tex) ~= "string" then
+		return tex
+	end
+	local identity = textureIdentityCache[tex]
+	if identity == nil then
+		identity = tex
+		local defIDstr, texNum = tex:match("^%%(%-?%d+):([01])$")
+		local defID = tonumber(defIDstr)
+		if defID and defID ~= 0 then
+			local def
+			if defID > 0 then
+				def = UnitDefs[defID]
+			else
+				def = FeatureDefs[-defID]
+			end
+			local textures = def and def.model and def.model.textures
+			local fileName = textures and textures[(texNum == "0") and "tex1" or "tex2"]
+			if type(fileName) == "string" and fileName ~= "" and ModelIsS3OTextured(def) then
+				identity = "\0s3o:" .. fileName
+			end
+		end
+		textureIdentityCache[tex] = identity
+	end
+	return identity
 end
 
 local function BuildTexturePlan(bin)
