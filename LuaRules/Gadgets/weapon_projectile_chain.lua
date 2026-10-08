@@ -19,7 +19,9 @@ for i = 1,#WeaponDefs do
 		chainDefs[i] = {
 			childDefID = WeaponDefNames[wcp.child_chain_projectile].id,
 			setSpeed = tonumber(wcp.child_chain_speed) or false,
+			setFlightTime = tonumber(wcp.child_chain_flight_time) or false, --*12 since ttl is in frames it seems
 			maxVerticalFactor = tonumber(wcp.child_max_vertical) or false,
+			childKeepTarget = wcp.child_chain_keep_target or false
 		}
 	end
 end
@@ -71,8 +73,26 @@ function gadget:ProjectileDestroyed(proID, proOwnerID)
 	end
 	projectileParams.team = Spring.GetProjectileTeamID(proID)
 	
+	if chainDef.childKeepTarget then
+		local targetTypeInt,target = Spring.GetProjectileTarget(proID)
+		if targetTypeInt == 117 then -- unit targetTypeInt
+			projectileParams.tracking = 117 
+		end
+	end
+	
+	if chainDef.setFlightTime then
+		projectileParams.ttl = chainDef.setFlightTime*12 -- framerate assumption?
+	end -- does not burnblow for some reason
+	
 	local newProID = Spring.SpawnProjectile(chainDef.childDefID, projectileParams)
 	Spring.SetProjectileVelocity(newProID, vx, vy, vz)
+
+	if chainDef.childKeepTarget then
+		local targetTypeInt,target = Spring.GetProjectileTarget(proID)
+		if targetTypeInt == 117 then -- unit targetTypeInt
+			Spring.SetProjectileTarget(newProID,target,117)
+		end
+	end	
 end
 
 function gadget:Initialize()
