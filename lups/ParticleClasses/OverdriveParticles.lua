@@ -114,10 +114,13 @@ end
 local lasttexture = nil
 local lastSrcBlend, lastDstBlend = nil, nil
 
+local lastColors -- 'colors' uniform last set in this pass (nil: unknown)
+
 function OverdriveParticles:BeginDraw()
 	gl.UseShader(billShader)
 	lasttexture = nil
 	lastSrcBlend, lastDstBlend = nil, nil
+	lastColors = nil
 end
 
 function OverdriveParticles:EndDraw()
@@ -136,7 +139,10 @@ function OverdriveParticles:Draw()
 		lastSrcBlend, lastDstBlend = self.srcBlend, self.dstBlend
 	end
 
-	glUniformInt(colorsUniform, self.ncolors)
+	if (self.ncolors ~= lastColors) then -- the shader only belongs to this class
+		glUniformInt(colorsUniform, self.ncolors)
+		lastColors = self.ncolors
+	end
 	for i = 1, min(self.ncolors+1,12) do
 		local color = self.colormap[i]
 		glUniform( colormapUniform[i] , color[1], color[2], color[3], color[4] )
@@ -144,7 +150,11 @@ function OverdriveParticles:Draw()
 	glUniform(sizeUniform,self.usize)
 	glUniform(frameUniform,self.frame)
 
-	glPushMatrix()
+	-- Lups restores the matrix right after drawing in piece space: no own Push/Pop
+	local ownMatrix = not LupsInPushedMatrix
+	if ownMatrix then
+		glPushMatrix()
+	end
 	local pos = self.pos
 	if (pos[1] ~= 0) or (pos[2] ~= 0) or (pos[3] ~= 0) then -- translating by 0 is an exact no-op
 		glTranslate(pos[1],pos[2],pos[3])
@@ -155,7 +165,9 @@ function OverdriveParticles:Draw()
 		glRotate(rot2,0,1,0)
 	end
 		glCallList(self.dlist)
-	glPopMatrix()
+	if ownMatrix then
+		glPopMatrix()
+	end
 end
 
 

@@ -129,6 +129,10 @@ local visDirty = true
 local COARSE_VIEW_MARGIN = 800
 local unitNearView = {}
 
+-- Incremented once per Update: a per-drawn-frame stamp for caches shared by the draw passes
+-- of one frame (reflection, world). Particle classes read LupsDrawStamp.
+LupsDrawStamp = 0
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -284,6 +288,32 @@ local RenderSequence = {}  --// mult-dim table with: [layer][partClass][unitID][
 local effectsInDelay = {}  --// fxs which use the delay tag, and waiting for their spawn
 local partIDCount = 0  --// increasing ID used to identify the particles
 
+--// Sorted list of the layers the draw loops visit (integers in [-50,50], like the old
+--// "for i=-50,50" scans), so a pass does not probe 101 mostly empty layers.
+local activeLayers = {}
+local activeLayerCount = 0
+local knownLayer = {}
+
+local function RegisterLayer(layer)
+	if knownLayer[layer] ~= nil then
+		return
+	end
+	if type(layer) ~= "number" or layer ~= math.floor(layer) or layer < -50 or layer > 50 then
+		knownLayer[layer] = false
+		return
+	end
+	knownLayer[layer] = true
+	local pos = activeLayerCount + 1
+	for i = 1, activeLayerCount do
+		if activeLayers[i] > layer then
+			pos = i
+			break
+		end
+	end
+	table.insert(activeLayers, pos, layer)
+	activeLayerCount = activeLayerCount + 1
+end
+
 --[[
 local function DebugPieces(unit,piecenum,level)
 	local piece = Spring.GetUnitPieceInfo(unit,piecenum)
@@ -366,6 +396,10 @@ function AddParticles(Class,Options   ,__id)
 		local fxTable = CreateSubTables(RenderSequence,{newParticles.layer,particleClass,space})
 		newParticles.fxTable = fxTable
 		fxTable[#fxTable+1] = newParticles
+		local layer = newParticles.layer
+		if layer ~= nil and not knownLayer[layer] then
+			RegisterLayer(layer)
+		end
 
 		return newParticles.id;
 	else
@@ -541,15 +575,49 @@ local function RadarDotCheck(unitID)
 	return true
 end
 
+-- Draw passes. Unit render lists none of whose effects is drawn in this pass do not enter
+-- unit space (a balanced Push/UnitMultMatrix/Pop changes no GL state, but used to be done for
+-- every unit with effects on the map, on screen or not, in every pass). World-space effects of
+-- classes whose Draw leaves the matrix untouched (Class.drawIsMatrixNeutral) skip the
+-- surrounding PushMatrix/PopMatrix pair.
+local PASS_STRINGS = {}
+local function PassStrings(extension)
+	local s = PASS_STRINGS[extension]
+	if not s then
+		s = {"BeginDraw"..extension, "Draw"..extension, "EndDraw"..extension}
+		PASS_STRINGS[extension] = s
+	end
+	return s
+end
+
+-- The gadget's unit-position check, cached per drawn frame (LOS only changes in sim frames).
+local posKnownStamp = {}
+local posKnownValue = {}
+local function IsUnitPositionKnownCached(unitID)
+	if LocalAllyTeamID < 0 then
+		return true
+	end
+	if posKnownStamp[unitID] == LupsDrawStamp then
+		return posKnownValue[unitID]
+	end
+	local known = IsUnitPositionKnown(unitID)
+	posKnownStamp[unitID] = LupsDrawStamp
+	posKnownValue[unitID] = known
+	return known
+end
+
 local function Draw(extension,layer,water,waterPass)
 	local FxLayer = RenderSequence[layer];
 	if (not FxLayer) then return end
 
 	-- the reflection/refraction passes use the visibility without main view culling
 	local visKey = (waterPass and "waterVisible") or "visible"
-	local BeginDrawPass = "BeginDraw"..extension
-	local DrawPass      = "Draw"..extension
-	local EndDrawPass   = "EndDraw"..extension
+	local passStrings   = PassStrings(extension)
+	local BeginDrawPass = passStrings[1]
+	local DrawPass      = passStrings[2]
+	local EndDrawPass   = passStrings[3]
+	local normalPass    = (extension == "")
+	LupsInPushedMatrix = false
 
 	for partClass,Units in pairs(FxLayer) do
 		local beginDraw = partClass[BeginDrawPass]
@@ -557,6 +625,7 @@ local function Draw(extension,layer,water,waterPass)
 
 			beginDraw()
 			local drawfunc = partClass[DrawPass]
+			local matrixNeutral = normalPass and partClass.drawIsMatrixNeutral
 
 			if (not next(Units)) then
 				FxLayer[partClass]=nil
@@ -564,15 +633,23 @@ local function Draw(extension,layer,water,waterPass)
 				for unitID,UnitEffects in pairs(Units) do
 					if (not UnitEffects[1]) then
 						Units[unitID]=nil
-					else
+					elseif (unitID>-1) then
 
-						if (unitID>-1) then
-
-							------------------------------------------------------------------------------------
-							-- render in unit/piece space ------------------------------------------------------
-							------------------------------------------------------------------------------------
+						------------------------------------------------------------------------------------
+						-- render in unit/piece space, only if something is drawn --------------------------
+						------------------------------------------------------------------------------------
+						local nfx = #UnitEffects
+						local first
+						for i=1,nfx do
+							local fx = UnitEffects[i]
+							if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
+								first = i
+								break
+							end
+						end
+						if first then
 							glPushMatrix()
-							if gadget and not IsUnitPositionKnown(unitID) then
+							if gadget and not IsUnitPositionKnownCached(unitID) then
 								local x, y, z = Spring.GetUnitPosition(unitID)
 								local a11, a12, a13, a14, a21, a22, a23, a24, a31, a32, a33, a34, a41, a42, a43, a44 = Spring.GetUnitTransformMatrix(unitID)
 								if a11 then
@@ -583,10 +660,9 @@ local function Draw(extension,layer,water,waterPass)
 							else
 								glUnitMultMatrix(unitID)
 							end
-							
 
 							--// render effects
-							for i=1,#UnitEffects do
+							for i=first,nfx do
 								local fx = UnitEffects[i]
 								if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
 									if (fx.piecenum) then
@@ -594,7 +670,10 @@ local function Draw(extension,layer,water,waterPass)
 										glPushMatrix()
 											glUnitPieceMultMatrix(unitID,fx.piecenum)
 											glScale(1,1,-1)
+											-- the matrix is restored right after: classes may skip their own Push/Pop
+											LupsInPushedMatrix = true
 											drawfunc(fx)
+											LupsInPushedMatrix = false
 										glPopMatrix()
 										--// leave piece space
 									else
@@ -605,26 +684,32 @@ local function Draw(extension,layer,water,waterPass)
 
 							--// leave unit space
 							glPopMatrix()
+						end
 
-						else
+					else
 
-							------------------------------------------------------------------------------------
-							-- render in world space -----------------------------------------------------------
-							------------------------------------------------------------------------------------
-							for i=1,#UnitEffects do
-								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
+						------------------------------------------------------------------------------------
+						-- render in world space -----------------------------------------------------------
+						------------------------------------------------------------------------------------
+						for i=1,#UnitEffects do
+							local fx = UnitEffects[i]
+							if (fx.alwaysVisible or fx[visKey]) and (not water or not fx.nowater) then
+								if fx.projectile and not fx.worldspace then
 									glPushMatrix()
-									if fx.projectile and not fx.worldspace then
-										local x,y,z = spGetProjectilePosition(fx.projectile)
-										glTranslate(x,y,z)
-									end
+									local x,y,z = spGetProjectilePosition(fx.projectile)
+									glTranslate(x,y,z)
+									drawfunc(fx)
+									glPopMatrix()
+								elseif matrixNeutral then
+									drawfunc(fx)
+								else
+									glPushMatrix()
 									drawfunc(fx)
 									glPopMatrix()
 								end
-							end -- for
-						end -- if
-					end  --if
+							end
+						end -- for
+					end -- if
 				end  --for
 			end
 
@@ -637,8 +722,8 @@ end
 local function DrawDistortionLayers()
 	glBlending(GL_ONE,GL_ONE)
 
-	for i=-50,50 do
-		Draw("Distortion",i)
+	for li=1,activeLayerCount do
+		Draw("Distortion",activeLayers[li])
 	end
 
 	glBlending(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
@@ -659,8 +744,8 @@ local function DrawParticlesOpaque()
 
 	glDepthTest(true)
 	glDepthMask(true)
-	for i=-50,50 do
-		Draw("Opaque",i)
+	for li=1,activeLayerCount do
+		Draw("Opaque",activeLayers[li])
 	end
 	glDepthMask(false)
 	glDepthTest(false)
@@ -673,8 +758,10 @@ local function DrawParticles()
 
 	--// Draw() (layers: -50 upto 0)
 	glAlphaTest(GL_GREATER, 0)
-	for i=-50,0 do
-		Draw("",i)
+	for li=1,activeLayerCount do
+		local layer = activeLayers[li]
+		if layer > 0 then break end
+		Draw("",layer)
 	end
 	glAlphaTest(false)
 
@@ -687,8 +774,11 @@ local function DrawParticles()
 
 	--// Draw() (layers: 1 upto 50)
 	glAlphaTest(GL_GREATER, 0)
-	for i=1,50 do
-		Draw("",i)
+	for li=1,activeLayerCount do
+		local layer = activeLayers[li]
+		if layer > 0 then
+			Draw("",layer)
+		end
 	end
 
 	glAlphaTest(false)
@@ -703,15 +793,15 @@ local function DrawParticlesWater()
 
 	--// DrawOpaque()
 	glDepthMask(true)
-	for i=-50,50 do
-		Draw("Opaque",i,nil,true)
+	for li=1,activeLayerCount do
+		Draw("Opaque",activeLayers[li],nil,true)
 	end
 	glDepthMask(false)
 
 	--// Draw() (layers: -50 upto 50)
 	glAlphaTest(GL_GREATER, 0)
-	for i=-50,50 do
-		Draw("",i,true,true)
+	for li=1,activeLayerCount do
+		Draw("",activeLayers[li],true,true)
 	end
 	glAlphaTest(false)
 end
@@ -1040,6 +1130,8 @@ local function GameFrame(_,n)
 end
 
 local function Update(_,dt)
+	LupsDrawStamp = (LupsDrawStamp + 1) % 4194304 -- stays exact with float lua numbers
+
 	--// update frameoffset and self allyteam
 	frameOffset = spGetFrameTimeOffset()
 	UpdateAllyTeamStatus()

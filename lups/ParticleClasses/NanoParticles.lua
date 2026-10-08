@@ -174,9 +174,16 @@ end
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
+-- Draw() does not touch the matrix stack: Lups skips its Push/PopMatrix pair.
+NanoParticles.drawIsMatrixNeutral = true
+
+local spGetFrameTimeOffset = Spring.GetFrameTimeOffset
+local passTimeOffset -- constant within a drawn frame, read once per pass
+
 function NanoParticles:BeginDraw()
 	glUseShader(billShader)
 	glBlending(GL_ONE,GL_ONE_MINUS_SRC_ALPHA)
+	passTimeOffset = spGetFrameTimeOffset()
 end
 
 function NanoParticles:EndDraw()
@@ -213,9 +220,10 @@ function NanoParticles:Draw()
 	local color = self.color
 	glColor(color[1],color[2],color[3],color[4])
 
+	local timeOffset = passTimeOffset
 	if (self.inversed)
-		then glMultiTexCoord(3, self.urot, self.life - self.reuseLinger - self.frame - Spring.GetFrameTimeOffset(), self.maxLife - self.reuseLinger, self.stopframe)
-		else glMultiTexCoord(3, self.urot, self.frame + Spring.GetFrameTimeOffset(), self.maxLife - self.reuseLinger, self.stopframe) end
+		then glMultiTexCoord(3, self.urot, self.life - self.reuseLinger - self.frame - timeOffset, self.maxLife - self.reuseLinger, self.stopframe)
+		else glMultiTexCoord(3, self.urot, self.frame + timeOffset, self.maxLife - self.reuseLinger, self.stopframe) end
 
 	glCallList(self.dlist)
 end

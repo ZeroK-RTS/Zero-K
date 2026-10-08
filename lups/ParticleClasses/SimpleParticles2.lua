@@ -160,9 +160,15 @@ end
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
+-- Draw() does not touch the matrix stack: Lups skips its Push/PopMatrix pair.
+SimpleParticles2.drawIsMatrixNeutral = true
+
+local passTimeOffset -- constant within a drawn frame, read once per pass
+
 function SimpleParticles2.BeginDraw()
 	glUseShader(billShader)
 	glBlending(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+	passTimeOffset = Spring.GetFrameTimeOffset()
 end
 
 function SimpleParticles2.EndDraw()
@@ -179,7 +185,7 @@ function SimpleParticles2:Draw()
 		lastTexture=self.texture
 	end
 
-	glMultiTexCoord(5, (self.frame + Spring.GetFrameTimeOffset())/200)
+	glMultiTexCoord(5, (self.frame + passTimeOffset)/200)
 	glCallList(self.dlist)
 end
 

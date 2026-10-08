@@ -98,10 +98,16 @@ local IsSphereInView      = Spring.IsSphereInView
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
+-- Draw() does not touch the matrix stack: Lups skips its Push/PopMatrix pair.
+NanoLasers.drawIsMatrixNeutral = true
+
+local passTimeOffset -- constant within a drawn frame, read once per pass
+
 function NanoLasers:BeginDraw()
 	glUseShader(laserShader)
 	glBlending(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 	glAlphaTest(false)
+	passTimeOffset = Spring.GetFrameTimeOffset()
 end
 
 
@@ -144,10 +150,11 @@ function NanoLasers:Draw()
 	glMultiTexCoord(0,endPos[1] - self.normdir[3] * self.scane_mult ,endPos[2],endPos[3] + self.normdir[1] * self.scane_mult,1)
 	glMultiTexCoord(1,startPos[1],startPos[2],startPos[3],1)
 
+	local timeOffset = passTimeOffset
 	if (self.inversed) then
-		glMultiTexCoord(2,  (thisGameFrame+Spring.GetFrameTimeOffset())*self.streamSpeed, self.streamThickness, self.corealpha, self.corethickness)
+		glMultiTexCoord(2,  (thisGameFrame+timeOffset)*self.streamSpeed, self.streamThickness, self.corealpha, self.corethickness)
 	else
-		glMultiTexCoord(2, -(thisGameFrame+Spring.GetFrameTimeOffset())*self.streamSpeed, self.streamThickness, self.corealpha, self.corethickness)
+		glMultiTexCoord(2, -(thisGameFrame+timeOffset)*self.streamSpeed, self.streamThickness, self.corealpha, self.corethickness)
 	end
 
 	glCallList(dlist)

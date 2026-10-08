@@ -88,9 +88,38 @@ end
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
+-- Draw() does not touch the matrix stack: Lups skips its Push/PopMatrix pair.
+Ribbon.drawIsMatrixNeutral = true
+
+-- Per-pass constants: pause state and interpolation offset cannot change within a drawn frame.
+local passPaused, passTimeOffset
+
 function Ribbon:BeginDraw()
 	glUseShader(RibbonShader)
 	glBlending(GL_SRC_ALPHA,GL_ONE)
+	local _, _, paused = Spring.GetGameSpeed()
+	passPaused = paused
+	passTimeOffset = Spring.GetFrameTimeOffset()
+end
+
+-- Interpolated head position for this drawn frame (same in the reflection and world passes).
+local function GetHeadPos(self)
+	local x,y,z
+	if passTimeOffset > 0 then
+		if self.unit then
+			x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
+			local ux, uy, uz = Spring.GetUnitViewPosition(self.unit, true)
+			local _, _, _, mx, my, mz = Spring.GetUnitPosition(self.unit, true)
+			if z and uz and mz then
+				x = x + (ux - mx)
+				y = y + (uy - my)
+				z = z + (uz - mz)
+			end
+		elseif self.projectile then
+			x,y,z = spGetProjectilePosition(self.projectile)
+		end
+	end
+	return x, y, z
 end
 
 
@@ -117,7 +146,7 @@ function Ribbon:Draw()
 	-- to be put in the table. However, it looks like units in paused games are drawn in the position
 	-- they were in at the start of the previous frame. So the latest position in the table has to be
 	-- discarded.
-	local _, _, paused = Spring.GetGameSpeed()
+	local paused = passPaused
 
 	--// insert old pos
 	local j = ((self.posIdx==self.size) and 1) or (self.posIdx+1)
@@ -135,22 +164,13 @@ function Ribbon:Draw()
 	else
 		--// insert interpolated current unit pos
 		if (self.isvalid) then
-			--local x,y,z = GetPiecePos(self.unit,self.piecenum)
-			local x,y,z
-			if Spring.GetFrameTimeOffset() > 0 then
-				if self.unit then
-					x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
-					local ux, uy, uz = Spring.GetUnitViewPosition(self.unit, true)
-					local _, _, _, mx, my, mz = Spring.GetUnitPosition(self.unit, true)
-					if z and uz and mz then
-						x = x + (ux - mx)
-						y = y + (uy - my)
-						z = z + (uz - mz)
-					end
-				elseif self.projectile then
-					x,y,z = spGetProjectilePosition(self.projectile)
-				end
+			-- the interpolated head is the same in the reflection and the world pass of a frame
+			local stamp = LupsDrawStamp
+			if self._headStamp ~= stamp then
+				self._headStamp = stamp
+				self._headX, self._headY, self._headZ = GetHeadPos(self)
 			end
+			local x, y, z = self._headX, self._headY, self._headZ
 			if x and y and z then
 				glUniform( oldPosUniform[quads0+1] , x,y,z )
 			else
