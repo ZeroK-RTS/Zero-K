@@ -705,6 +705,14 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
+	vehheavyassault = {
+		ok = {
+			[1] = "vehicle_move",
+		},
+		select = {
+			[1] = "vehicle_select",
+		},
+	},
 	
 	-- Tank
 	tankcon = {
