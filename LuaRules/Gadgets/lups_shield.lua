@@ -318,6 +318,10 @@ local function ProcessHitTable(unitData, gameFrame)
 end
 
 local function AddShieldHitData(_, hitFrame, unitID, dmg, dx, dy, dz)
+	-- a hit without positive damage shows nothing, and merging two of them divides 0 by 0
+	if not (dmg > 0) then
+		return
+	end
 	local unitData = IterableMap.Get(shieldUnits, unitID)
 	if unitData and unitData.hitData then
 		--Spring.Echo(hitFrame, unitID, dmg)
