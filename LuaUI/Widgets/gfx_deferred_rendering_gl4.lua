@@ -1815,6 +1815,16 @@ function widget:Initialize()
 	WG['lightsgl4'].AddLight  = AddLight
 	WG['lightsgl4'].RemoveLight  = RemoveLight
 	WG['lightsgl4'].GetLightVBO  = GetLightVBO
+	-- Expose the live definitions, unit-attached VBOs and expiry queue to the light editor.
+	WG['lightsgl4'].GetUnitDefLights = function()
+		return unitDefLights
+	end
+	WG['lightsgl4'].GetLightVBOMap = function()
+		return unitLightVBOMap
+	end
+	WG['lightsgl4'].GetLightRemoveQueue = function()
+		return lightRemoveQueue
+	end
 
 	WG['lightsgl4'].IntensityMultiplier = function(value)
 		intensityMultiplier = value
