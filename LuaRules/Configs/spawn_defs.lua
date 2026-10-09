@@ -172,9 +172,10 @@ local specialPowers = Spring.Utilities.CustomKeyToUsefulTable(Spring.GetModOptio
 }
 
 local function SetCustomMiniQueenTime()
-	if modoptions.miniqueentime then
-		if modoptions.miniqueentime == 0 then return nil
-		else return modoptions.miniqueentime end
+	local customTime = tonumber(modoptions.miniqueentime)
+	if customTime then
+		if customTime == 0 then return nil
+		else return customTime end
 	else
 		return 0.6
 	end
