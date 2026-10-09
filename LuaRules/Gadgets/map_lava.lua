@@ -553,7 +553,7 @@ void main() {
 
 	// Specular Color
 	vec3 reflvect = reflect(normalize(-1.0 * sunDir.xyz), normalize(fragNormal));
-	float specular = clamp(pow(dot(normalize(worldtocam), normalize(reflvect)), SPECULAREXPONENT), 0.0, SPECULARSTRENGTH) * shadow;
+	float specular = clamp(pow(max(dot(normalize(worldtocam), normalize(reflvect)), 0.0), SPECULAREXPONENT), 0.0, SPECULARSTRENGTH) * shadow;
 	fragColor.rgb += fragColor.rgb * specular;
 
 	fragColor.rgb += fragColor.rgb * (diffuseEmit.a * distortion.y * 700.0);
