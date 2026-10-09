@@ -335,8 +335,8 @@ void main()
     float greenChannel = dot(valG.xy,Kernel0Weights_RealX_ImY)+dot(valG.zw,Kernel1Weights_RealX_ImY);
     float blueChannel  = dot(valB.xy,Kernel0Weights_RealX_ImY)+dot(valB.zw,Kernel1Weights_RealX_ImY);
 
-    fragColor = vec4(vec3(pow(redChannel, 1.0/colorPower),pow(greenChannel, 1.0/colorPower),
-      pow(blueChannel, 1.0/colorPower)), NORMALIZE_FILTER(filterRadius));
+    fragColor = vec4(vec3(pow(max(redChannel, 0.0), 1.0/colorPower),pow(max(greenChannel, 0.0), 1.0/colorPower),
+      pow(max(blueChannel, 0.0), 1.0/colorPower)), NORMALIZE_FILTER(filterRadius));
     gl_FragData[0] = fragColor;
   }
 
@@ -454,8 +454,8 @@ void main()
     float blueChannel  = dot(valB.xy,Kernel0Weights_RealX_ImY)+dot(valB.zw,Kernel1Weights_RealX_ImY);
     float alphaChannel  = dot(valA.xy,Kernel0Weights_RealX_ImY)+dot(valA.zw,Kernel1Weights_RealX_ImY);
 
-    fragColor = vec4(pow(redChannel, 1.0/colorPower),pow(greenChannel, 1.0/colorPower),
-      pow(blueChannel, 1.0/colorPower), clamp(alphaChannel, 0.0, 1.0));
+    fragColor = vec4(pow(max(redChannel, 0.0), 1.0/colorPower),pow(max(greenChannel, 0.0), 1.0/colorPower),
+      pow(max(blueChannel, 0.0), 1.0/colorPower), clamp(alphaChannel, 0.0, 1.0));
     gl_FragData[0] = fragColor;
   }
 
