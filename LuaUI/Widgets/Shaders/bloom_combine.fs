@@ -11,6 +11,9 @@ vec3 toneMapReinhard(vec3 color){
 	// float whitePoint = 1.0/exposure;
 	const float whitePoint = 1.0;
 	float lum = dot(color, vec3(0.2990, 0.5870, 0.1140));
+	if (lum <= 0.0) {
+		return color; // avoid 0/0 on black pixels
+	}
 	float ilum = (lum * (1.0 + (lum/(whitePoint * whitePoint))))/(lum + 1.0);
 	return color * ilum/lum;
 }
