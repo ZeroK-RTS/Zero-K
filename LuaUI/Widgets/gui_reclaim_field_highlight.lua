@@ -129,7 +129,6 @@ local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 local screenx, screeny
 
 local Benchmark = false and VFS.Include("LuaRules/Gadgets/Include/Benchmark.lua")
-local Optics = VFS.Include("LuaRules/Gadgets/Include/Optics.lua")
 local ConvexHull = VFS.Include("LuaRules/Gadgets/Include/ConvexHull.lua")
 
 local gaiaTeamId = spGetGaiaTeamID()
@@ -141,7 +140,6 @@ local scanForRemovalInterval = 10 * Game.gameSpeed --10 sec
 
 local minDistance = 300
 local minSqDistance = minDistance^2
-local minPoints = 2
 local minFeatureMetal = 8 --flea
 
 local drawEnabled = true
@@ -159,12 +157,27 @@ local checkFrequency = 30
 local cumDt = 0
 local minDim = 100
 
-local featureNeighborsMatrix = {}
-local featureConvexHulls = {}
-local featureClusters = {}
+-- Two features are neighbours when they are at most minDistance apart (x/z).
+-- Spatial hash of the known features: features in cells next to each other (diagonally too) are
+-- always neighbours (2 * GRID_SIZE * sqrt(2) < minDistance), and all neighbours of a feature are
+-- within GRID_REACH cells.
+local GRID_SIZE = 105
+local GRID_REACH = 3
+local GRID_ROW = 8192
+local featureGrid = {}
 
-local featuresUpdated = false
-local clusterMetalUpdated = false
+-- Clusters are the connected components of the neighbour graph: OPTICS with minPoints = 2 and a
+-- cluster threshold equal to the neighbour distance (what this widget used to run over every
+-- feature on every change) yields exactly those, plus single-feature clusters. They are kept
+-- across scans; a scan only re-forms the clusters that features were added to, removed from or
+-- moved in, and only recomputes hulls and display lists of the clusters that changed.
+local clusterList = {} -- draw order
+local clusterOf = {} -- fID -> cluster
+local unassigned = {} -- known features not in a cluster yet (added or moved this scan)
+local brokenClusters = {} -- clusters that lost members this scan
+local changedClusters = {} -- clusters whose members, metal or heights changed this scan
+local scanCount = 0
+local dataBuilt = false
 
 local font = gl.LoadFont("FreeSansBold.otf", BASE_FONT_SIZE, 0, 0)
 
@@ -201,33 +214,62 @@ end
 --------------------------------------------------------------------------------
 -- Feature Tracking
 
-local function UpdateFeatureNeighborsMatrix(fID, added, posChanged, removed)
-	local fInfo = knownFeatures[fID]
-
-	if added then
-		featureNeighborsMatrix[fID] = {}
-		for fID2, fInfo2 in pairs(knownFeatures) do
-			if fID2 ~= fID then --don't include self into featureNeighborsMatrix[][]
-				local sqDist = (fInfo.x - fInfo2.x)^2 + (fInfo.z - fInfo2.z)^2
-				if sqDist <= minSqDistance then
-					featureNeighborsMatrix[fID][fID2] = true
-					featureNeighborsMatrix[fID2][fID] = true
-				end
-			end
-		end
+local function GridAdd(fID, fInfo)
+	local gx, gz = math.floor(fInfo.x / GRID_SIZE), math.floor(fInfo.z / GRID_SIZE)
+	local key = gx * GRID_ROW + gz
+	local cell = featureGrid[key]
+	if not cell then
+		cell = {}
+		featureGrid[key] = cell
 	end
+	cell[fID] = true
+	fInfo.gridKey, fInfo.gx, fInfo.gz = key, gx, gz
+end
 
-	if removed then
-		for fID2, _ in pairs(featureNeighborsMatrix[fID]) do
-			featureNeighborsMatrix[fID2][fID] = nil
-			featureNeighborsMatrix[fID][fID2] = nil
-		end
+local function GridRemove(fID, fInfo)
+	local key = fInfo.gridKey
+	local cell = featureGrid[key]
+	cell[fID] = nil
+	if next(cell) == nil then
+		featureGrid[key] = nil
 	end
+end
 
-	if posChanged then
-		UpdateFeatureNeighborsMatrix(fID, false, false, true) --remove
-		UpdateFeatureNeighborsMatrix(fID, true, false, false) --add again
+-- Takes a feature out of its cluster before it is removed or moved. Its position is kept: the
+-- members it was a neighbour of are what ProcessBrokenClusters looks at.
+local function DetachFeature(fID, fInfo)
+	unassigned[fID] = nil
+	local cluster = clusterOf[fID]
+	if not cluster then
+		return
 	end
+	clusterOf[fID] = nil
+	cluster.members[fID] = nil
+	cluster.count = cluster.count - 1
+	local lostX = cluster.lostX
+	if not lostX then
+		lostX = {}
+		cluster.lostX, cluster.lostZ = lostX, {}
+		brokenClusters[#brokenClusters + 1] = cluster
+	end
+	local n = #lostX + 1
+	lostX[n] = fInfo.x
+	cluster.lostZ[n] = fInfo.z
+end
+
+local function SetFeaturePosition(fID, fInfo, fx, fy, fz)
+	fInfo.x = fx
+	fInfo.y = fy
+	fInfo.z = fz
+	fInfo.drawAlt = ((fy > 0 and fy) or 0) + fInfo.height + 10
+	-- hull vertex; a new table, older hulls may still reference the previous one
+	fInfo.point = {x = fx, y = fInfo.drawAlt, z = fz, fID = fID}
+end
+
+local function RemoveFeature(fID, fInfo)
+	DetachFeature(fID, fInfo)
+	GridRemove(fID, fInfo)
+	knownFeatures[fID] = nil
 end
 
 local function UpdateFeatures(gf)
@@ -235,309 +277,791 @@ local function UpdateFeatures(gf)
 		benchmark:Enter("UpdateFeatures")
 	end
 	local myAllyTeamID = spGetMyAllyTeamID()
-	featuresUpdated = false
-	clusterMetalUpdated = false
-	if benchmark then
-		benchmark:Enter("UpdateFeatures 1loop")
-	end
-	for _, fID in ipairs(spGetAllFeatures()) do
+	scanCount = scanCount + 1
+	local features = spGetAllFeatures()
+	for i = 1, #features do
+		local fID = features[i]
 		local metal, _, energy = spGetFeatureResources(fID)
 		metal = metal + energy * E2M
 
-		if (not knownFeatures[fID]) and (metal >= minFeatureMetal) then --first time seen
+		local fInfo = knownFeatures[fID]
+		if (not fInfo) and (metal >= minFeatureMetal) then --first time seen
 			local f = {}
 			f.lastScanned = gf
+			f.seen = scanCount
 
 			local fx, _, fz = spGetFeaturePosition(fID)
 			local fy = spGetGroundHeight(fx, fz)
-			f.x = fx
-			f.y = fy
-			f.z = fz
 
 			f.isGaia = (spGetFeatureTeam(fID) == gaiaTeamId)
 			f.height = spGetFeatureHeight(fID)
-			f.drawAlt = ((fy > 0 and fy) or 0) + f.height + 10
+			SetFeaturePosition(fID, f, fx, fy, fz)
 
 			f.metal = metal
 
 			knownFeatures[fID] = f
+			GridAdd(fID, f)
+			unassigned[fID] = true
+		elseif fInfo then
+			fInfo.seen = scanCount
+			if gf - fInfo.lastScanned >= scanInterval then
+				fInfo.lastScanned = gf
 
-			UpdateFeatureNeighborsMatrix(fID, true, false, false)
-			featuresUpdated = true
-		end
+				local fx, _, fz = spGetFeaturePosition(fID)
+				local fy = spGetGroundHeight(fx, fz)
 
-		if knownFeatures[fID] and gf - knownFeatures[fID].lastScanned >= scanInterval then
-			knownFeatures[fID].lastScanned = gf
+				if fInfo.x ~= fx or fInfo.z ~= fz then
+					DetachFeature(fID, fInfo)
+					GridRemove(fID, fInfo)
+					SetFeaturePosition(fID, fInfo, fx, fy, fz)
+					GridAdd(fID, fInfo)
+					unassigned[fID] = true
+				elseif fInfo.y ~= fy then
+					-- ground height changed (terrain deformation): same neighbours and cluster,
+					-- only the hull height may change
+					SetFeaturePosition(fID, fInfo, fx, fy, fz)
+					local cluster = clusterOf[fID]
+					if cluster then
+						cluster.heightChanged = true
+						changedClusters[cluster] = true
+					end
+				end
 
-			local fx, _, fz = spGetFeaturePosition(fID)
-			local fy = spGetGroundHeight(fx, fz)
-
-			if knownFeatures[fID].x ~= fx or knownFeatures[fID].y ~= fy or knownFeatures[fID].z ~= fz then
-				knownFeatures[fID].x = fx
-				knownFeatures[fID].y = fy
-				knownFeatures[fID].z = fz
-
-				knownFeatures[fID].drawAlt = ((fy > 0 and fy) or 0) + knownFeatures[fID].height + 10
-
-				UpdateFeatureNeighborsMatrix(fID, false, true, false)
-				featuresUpdated = true
-			end
-
-			if knownFeatures[fID].metal ~= metal then
-				--Spring.Echo("knownFeatures[fID].metal ~= metal", metal)
-				if knownFeatures[fID].clID then
-					--Spring.Echo("knownFeatures[fID].clID")
-					local thisCluster = featureClusters[ knownFeatures[fID].clID ]
-					thisCluster.metal = thisCluster.metal - knownFeatures[fID].metal
+				if fInfo.metal ~= metal then
 					if metal >= minFeatureMetal then
-						thisCluster.metal = thisCluster.metal + metal
-						knownFeatures[fID].metal = metal
-						--Spring.Echo("clusterMetalUpdated = true", thisCluster.metal)
-						clusterMetalUpdated = true
+						fInfo.metal = metal
+						local cluster = clusterOf[fID]
+						if cluster then
+							changedClusters[cluster] = true
+						end
 					else
-						UpdateFeatureNeighborsMatrix(fID, false, false, true)
-						knownFeatures[fID] = nil
-						featuresUpdated = true
+						RemoveFeature(fID, fInfo)
 					end
 				end
 			end
 		end
 	end
 
-	if benchmark then
-		benchmark:Leave("UpdateFeatures 1loop")
-		benchmark:Enter("UpdateFeatures 2loop")
-	end
-
 	for fID, fInfo in pairs(knownFeatures) do
-		if fInfo.isGaia and spValidFeatureID(fID) == false then
-			--Spring.Echo("fInfo.isGaia and spValidFeatureID(fID) == false")
-
-			UpdateFeatureNeighborsMatrix(fID, false, false, true)
-			fInfo = nil
-			knownFeatures[fID] = nil
-			featuresUpdated = true
-		end
-
-		if fInfo and gf - fInfo.lastScanned >= scanForRemovalInterval then --long time unseen features, maybe they were relcaimed or destroyed?
+		-- a feature returned by GetAllFeatures in this scan is valid
+		if fInfo.isGaia and fInfo.seen ~= scanCount and spValidFeatureID(fID) == false then
+			RemoveFeature(fID, fInfo)
+		elseif gf - fInfo.lastScanned >= scanForRemovalInterval then --long time unseen features, maybe they were relcaimed or destroyed?
 			local los = spIsPosInLos(fInfo.x, fInfo.y, fInfo.z, myAllyTeamID)
 			if los then --this place has no feature, it's been moved or reclaimed or destroyed
-				--Spring.Echo("this place has no feature, it's been moved or reclaimed or destroyed")
-
-				UpdateFeatureNeighborsMatrix(fID, false, false, true)
-				fInfo = nil
-				knownFeatures[fID] = nil
-				featuresUpdated = true
+				RemoveFeature(fID, fInfo)
 			end
 		end
-
-		if fInfo and featuresUpdated then
-			knownFeatures[fID].clID = nil
-		end
 	end
-	
+
 	if benchmark then
-		benchmark:Leave("UpdateFeatures 2loop")
 		benchmark:Leave("UpdateFeatures")
 	end
 end
 
-local function ClusterizeFeatures()
-	if benchmark then
-		benchmark:Enter("ClusterizeFeatures")
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Clusters
+
+local DeleteClusterLists, BucketRemove -- drawing side, defined below
+
+local function NewCluster()
+	local cluster = {members = {}, count = 0, metal = 0, fullHull = true}
+	local index = #clusterList + 1
+	clusterList[index] = cluster
+	cluster.index = index
+	changedClusters[cluster] = true
+	return cluster
+end
+
+local function DestroyCluster(cluster)
+	DeleteClusterLists(cluster)
+	BucketRemove(cluster)
+	local index, last = cluster.index, clusterList[#clusterList]
+	clusterList[index] = last
+	last.index = index
+	clusterList[#clusterList] = nil
+	changedClusters[cluster] = nil
+end
+
+local function MoveMembers(fromCluster, toCluster, fIDs)
+	local fromMembers, toMembers = fromCluster.members, toCluster.members
+	for i = 1, #fIDs do
+		local fID = fIDs[i]
+		fromMembers[fID] = nil
+		toMembers[fID] = true
+		clusterOf[fID] = toCluster
 	end
-	local pointsTable = {}
-	local unclusteredPoints  = {}
+	fromCluster.count = fromCluster.count - #fIDs
+	toCluster.count = toCluster.count + #fIDs
+end
 
-	--Spring.Echo("#knownFeatures", #knownFeatures)
-
-	for fID, fInfo in pairs(knownFeatures) do
-		pointsTable[#pointsTable + 1] = {
-			x = fInfo.x,
-			z = fInfo.z,
-			fID = fID,
-		}
-		unclusteredPoints[fID] = true
+-- Union-find over arbitrary keys.
+local function Find(parent, a)
+	local root = a
+	while parent[root] ~= root do
+		root = parent[root]
 	end
-
-	--TableEcho(featureNeighborsMatrix, "featureNeighborsMatrix")
-
-	local opticsObject = Optics.new(pointsTable, featureNeighborsMatrix, minPoints, benchmark)
-	if benchmark then
-		benchmark:Enter("opticsObject:Run()")
+	while parent[a] ~= root do
+		local nextA = parent[a]
+		parent[a] = root
+		a = nextA
 	end
-	opticsObject:Run()
-	
-	if benchmark then
-		benchmark:Leave("opticsObject:Run()")
-		benchmark:Enter("opticsObject:Clusterize(minDistance)")
-	end
-	featureClusters = opticsObject:Clusterize(minDistance)
-	if benchmark then
-		benchmark:Leave("opticsObject:Clusterize(minDistance)")
-	end
+	return root
+end
 
-	--Spring.Echo("#featureClusters", #featureClusters)
+local function IsNear(i, j)
+	return i >= -1 and i <= 1 and j >= -1 and j <= 1
+end
 
-	for i = 1, #featureClusters do
-		local thisCluster = featureClusters[i]
-
-		thisCluster.xmin = math.huge
-		thisCluster.xmax = -math.huge
-		thisCluster.zmin = math.huge
-		thisCluster.zmax = -math.huge
-
-
-		local metal = 0
-		for j = 1, #thisCluster.members do
-			local fID = thisCluster.members[j]
-			local fInfo = knownFeatures[fID]
-
-			thisCluster.xmin = math.min(thisCluster.xmin, fInfo.x)
-			thisCluster.xmax = math.max(thisCluster.xmax, fInfo.x)
-			thisCluster.zmin = math.min(thisCluster.zmin, fInfo.z)
-			thisCluster.zmax = math.max(thisCluster.zmax, fInfo.z)
-
-			metal = metal + fInfo.metal
-			knownFeatures[fID].clID = i
-			unclusteredPoints[fID] = nil
+-- Members lost by a cluster (removed or moved features), grouped into connected groups by their
+-- old positions. For each group: the grid cells holding remaining members that were neighbours of
+-- the group, with one such member per cell (a cell's members are neighbours of each other), and
+-- one of them per part of these cells that touch each other (only one part if they are linked).
+local function GetLostGroups(cluster)
+	local lostX, lostZ = cluster.lostX, cluster.lostZ
+	cluster.lostX, cluster.lostZ = nil, nil
+	local n = #lostX
+	local gxs, gzs, parent = {}, {}, {}
+	local lostGrid = {}
+	for k = 1, n do
+		local gx, gz = math.floor(lostX[k] / GRID_SIZE), math.floor(lostZ[k] / GRID_SIZE)
+		gxs[k], gzs[k] = gx, gz
+		parent[k] = k
+		local key = gx * GRID_ROW + gz
+		local list = lostGrid[key]
+		if not list then
+			list = {}
+			lostGrid[key] = list
 		end
-
-		thisCluster.metal = metal
+		list[#list + 1] = k
+	end
+	for k = 1, n do
+		local x, z = lostX[k], lostZ[k]
+		for i = -GRID_REACH, GRID_REACH do
+			for j = -GRID_REACH, GRID_REACH do
+				local list = lostGrid[(gxs[k] + i) * GRID_ROW + gzs[k] + j]
+				if list then
+					local near = IsNear(i, j)
+					for m = 1, #list do
+						local k2 = list[m]
+						if k2 > k and (near or (x - lostX[k2])^2 + (z - lostZ[k2])^2 <= minSqDistance) then
+							local a, b = Find(parent, k), Find(parent, k2)
+							if a ~= b then
+								parent[a] = b
+							end
+						end
+					end
+				end
+			end
+		end
 	end
 
-	for fID, _ in pairs(unclusteredPoints) do --add Singlepoint featureClusters
-		local fInfo = knownFeatures[fID]
-		local thisCluster = {}
-
-		thisCluster.members = {fID}
-		thisCluster.metal = fInfo.metal
-
-		thisCluster.xmin = fInfo.x
-		thisCluster.xmax = fInfo.x
-		thisCluster.zmin = fInfo.z
-		thisCluster.zmax = fInfo.z
-
-		featureClusters[#featureClusters + 1] = thisCluster
-		knownFeatures[fID].clID = #featureClusters
+	local groups, groupOf = {}, {}
+	for k = 1, n do
+		local root = Find(parent, k)
+		local group = groupOf[root]
+		if not group then
+			group = {reps = {}, repOf = {}, cellX = {}, cellZ = {}}
+			groupOf[root] = group
+			groups[#groups + 1] = group
+		end
+		local reps, repOf, cellX, cellZ = group.reps, group.repOf, group.cellX, group.cellZ
+		local x, z = lostX[k], lostZ[k]
+		for i = -GRID_REACH, GRID_REACH do
+			for j = -GRID_REACH, GRID_REACH do
+				local key = (gxs[k] + i) * GRID_ROW + gzs[k] + j
+				local cell = not repOf[key] and featureGrid[key]
+				if cell then
+					local near = IsNear(i, j)
+					for fID in pairs(cell) do
+						if clusterOf[fID] == cluster then
+							local fInfo = knownFeatures[fID]
+							if near or (x - fInfo.x)^2 + (z - fInfo.z)^2 <= minSqDistance then
+								local r = #reps + 1
+								reps[r] = fID
+								repOf[key] = r
+								cellX[r], cellZ[r] = gxs[k] + i, gzs[k] + j
+								break
+							end
+						end
+					end
+				end
+			end
+		end
 	end
 
-	if benchmark then
-		benchmark:Leave("ClusterizeFeatures")
+	for g = 1, #groups do
+		local group = groups[g]
+		local reps, repOf, cellX, cellZ = group.reps, group.repOf, group.cellX, group.cellZ
+		local cellParent = {}
+		for r = 1, #reps do
+			cellParent[r] = r
+		end
+		for r = 1, #reps do
+			for i = -1, 1 do
+				for j = -1, 1 do
+					local r2 = repOf[(cellX[r] + i) * GRID_ROW + cellZ[r] + j]
+					if r2 then
+						local a, b = Find(cellParent, r), Find(cellParent, r2)
+						if a ~= b then
+							cellParent[a] = b
+						end
+					end
+				end
+			end
+		end
+		local parts, isPart = {}, {}
+		for r = 1, #reps do
+			local root = Find(cellParent, r)
+			if not isPart[root] then
+				isPart[root] = true
+				parts[#parts + 1] = reps[r]
+			end
+		end
+		if #parts > 1 then
+			group.parts = parts
+		end
+	end
+	return groups
+end
+
+-- Searches from all seeds in turn that merge when they meet. A search owns grid cells, i.e. all
+-- members of the cluster in them (they are neighbours of each other). It grows to touching cells
+-- first, whose members are neighbours of its own, which is cheap and enough in dense fields;
+-- after that, to cells further away that hold a neighbour of one of its members. A search that
+-- runs out of both has found a complete component, which becomes a new cluster. Stops when a
+-- single search is left. Each turn a search does about SEARCH_STEP lookups, so the cost follows
+-- the cheaper side. Returns true if anything was split off.
+local SEARCH_STEP = 64
+
+local function SearchComponents(cluster, seedList)
+	local n = #seedList
+	if n <= 1 then
+		return false
+	end
+
+	local owner, noMembers = {}, {}
+	local parent, cellX, cellZ, cellHead, nodes, nodeHead, cells = {}, {}, {}, {}, {}, {}, {}
+	local active = n
+	local split = false
+
+	local function Claim(s, key, gx, gz)
+		local cell = featureGrid[key]
+		local nq = nodes[s]
+		local before = #nq
+		if cell then
+			for fID in pairs(cell) do
+				if clusterOf[fID] == cluster then
+					nq[#nq + 1] = fID
+				end
+			end
+		end
+		if #nq > before then
+			owner[key] = s
+			local cx, cz, cl = cellX[s], cellZ[s], cells[s]
+			cx[#cx + 1] = gx
+			cz[#cz + 1] = gz
+			cl[#cl + 1] = key
+		else
+			noMembers[key] = true
+		end
+	end
+
+	-- merges the search with fewer cells into the other one, returns the remaining search
+	local function Merge(a, b)
+		if #cells[a] < #cells[b] then
+			a, b = b, a
+		end
+		local ax, az, bx, bz = cellX[a], cellZ[a], cellX[b], cellZ[b]
+		for k = cellHead[b], #bx do
+			ax[#ax + 1] = bx[k]
+			az[#az + 1] = bz[k]
+		end
+		local an, bn = nodes[a], nodes[b]
+		for k = nodeHead[b], #bn do
+			an[#an + 1] = bn[k]
+		end
+		local ac, bc = cells[a], cells[b]
+		for k = 1, #bc do
+			ac[#ac + 1] = bc[k]
+		end
+		parent[b] = a
+		cellX[b], cellZ[b], nodes[b], cells[b] = nil, nil, nil, nil
+		active = active - 1
+		return a
+	end
+
+	for i = 1, n do
+		parent[i] = i
+		cellX[i], cellZ[i], nodes[i], cells[i] = {}, {}, {}, {}
+		cellHead[i], nodeHead[i] = 1, 1
+	end
+	for i = 1, n do
+		local fInfo = knownFeatures[seedList[i]]
+		local key = fInfo.gridKey
+		local o = owner[key]
+		if o then
+			o = Find(parent, o)
+			local me = Find(parent, i)
+			if o ~= me then
+				Merge(o, me)
+			end
+		else
+			Claim(Find(parent, i), key, fInfo.gx, fInfo.gz)
+		end
+	end
+
+	while active > 1 do
+		for i = 1, n do
+			local work = 0
+			while work < SEARCH_STEP and parent[i] == i and cells[i] do
+				local me = i
+				local cx, cz = cellX[me], cellZ[me]
+				local h = cellHead[me]
+				if h <= #cx then
+					-- touching cells
+					cellHead[me] = h + 1
+					local gx, gz = cx[h], cz[h]
+					for x = gx - 1, gx + 1 do
+						for z = gz - 1, gz + 1 do
+							local key = x * GRID_ROW + z
+							local o = owner[key]
+							if o then
+								o = Find(parent, o)
+								if o ~= me then
+									me = Merge(me, o)
+									if active <= 1 then
+										return split
+									end
+								end
+							elseif not noMembers[key] then
+								Claim(me, key, x, z)
+							end
+						end
+					end
+					work = work + 9
+				else
+					local nq = nodes[me]
+					local nh = nodeHead[me]
+					if nh <= #nq then
+						-- cells further away holding a neighbour of a member (the touching ones are
+						-- done: all owned cells have been expanded)
+						nodeHead[me] = nh + 1
+						local fInfo = knownFeatures[nq[nh]]
+						local x, z, gx, gz = fInfo.x, fInfo.z, fInfo.gx, fInfo.gz
+						for i2 = -GRID_REACH, GRID_REACH do
+							for j2 = -GRID_REACH, GRID_REACH do
+								if not IsNear(i2, j2) then
+									local key = (gx + i2) * GRID_ROW + gz + j2
+									local o = owner[key]
+									if o then
+										o = Find(parent, o)
+									end
+									if o ~= me and not noMembers[key] then
+										local cell = featureGrid[key]
+										if cell then
+											for fID2 in pairs(cell) do
+												work = work + 1
+												if clusterOf[fID2] == cluster then
+													local fInfo2 = knownFeatures[fID2]
+													if (x - fInfo2.x)^2 + (z - fInfo2.z)^2 <= minSqDistance then
+														if o then
+															me = Merge(me, o)
+															if active <= 1 then
+																return split
+															end
+														else
+															Claim(me, key, gx + i2, gz + j2)
+														end
+														break
+													end
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+						work = work + 1
+					else
+						-- complete component
+						local members = {}
+						local cl = cells[me]
+						for k = 1, #cl do
+							for fID in pairs(featureGrid[cl[k]]) do
+								if clusterOf[fID] == cluster then
+									members[#members + 1] = fID
+								end
+							end
+						end
+						MoveMembers(cluster, NewCluster(), members)
+						cellX[me], cellZ[me], nodes[me], cells[me] = nil, nil, nil, nil
+						split = true
+						active = active - 1
+						if active <= 1 then
+							return split
+						end
+					end
+				end
+			end
+		end
+	end
+	return split
+end
+
+-- A cluster lost members: split off the parts that are no longer connected. Returns true if
+-- anything was split off.
+-- Every remaining member is connected to a remaining neighbour of some lost group (its old path to
+-- a lost member enters a group from such a neighbour). A path through a group can be rerouted
+-- through the group's neighbours if those are connected, so the rest is one cluster when every
+-- group's neighbours are connected. That is checked per group: first by touching cells, then by
+-- searching from the unlinked parts, which meet nearby unless the group really cut something
+-- off (then the cut-off part is found and split off).
+-- A split-off part that touches two groups may have been what connected their neighbours. If the
+-- rest fell apart, an old path between two of its parts leaves the first one only into split-off
+-- parts, and must leave one of those through a different group than it entered: so every part
+-- holds the neighbours of a group touching such a split-off part. Searching from one neighbour
+-- of each of those groups settles it.
+local function SplitCluster(cluster)
+	local groups = GetLostGroups(cluster)
+	local split = false
+	for g = 1, #groups do
+		local parts = groups[g].parts
+		if parts then
+			local seeds = {}
+			for j = 1, #parts do
+				if clusterOf[parts[j]] == cluster then -- not in a part split off already
+					seeds[#seeds + 1] = parts[j]
+				end
+			end
+			split = SearchComponents(cluster, seeds) or split
+		end
+	end
+	if split then
+		local pieceGroup, bridging = {}, {}
+		local bridged = false
+		for g = 1, #groups do
+			local reps = groups[g].reps
+			for j = 1, #reps do
+				local piece = clusterOf[reps[j]]
+				if piece ~= cluster then
+					if pieceGroup[piece] and pieceGroup[piece] ~= g then
+						bridging[piece] = true
+						bridged = true
+					end
+					pieceGroup[piece] = g
+				end
+			end
+		end
+		if bridged then
+			local seeds, isSeed = {}, {}
+			for g = 1, #groups do
+				local reps = groups[g].reps
+				local touches, survivor = false, nil
+				for j = 1, #reps do
+					local fID = reps[j]
+					local piece = clusterOf[fID]
+					if piece == cluster then
+						survivor = survivor or fID
+					elseif bridging[piece] then
+						touches = true
+					end
+				end
+				if touches and survivor and not isSeed[survivor] then -- groups can share neighbours
+					isSeed[survivor] = true
+					seeds[#seeds + 1] = survivor
+				end
+			end
+			SearchComponents(cluster, seeds)
+		end
+	end
+	return split
+end
+
+local function ProcessBrokenClusters()
+	for i = 1, #brokenClusters do
+		local cluster = brokenClusters[i]
+		brokenClusters[i] = nil
+		if cluster.count == 0 then
+			cluster.lostX, cluster.lostZ = nil, nil
+			DestroyCluster(cluster)
+		else
+			changedClusters[cluster] = true
+			if SplitCluster(cluster) then
+				cluster.fullHull = true
+			elseif cluster.hullIsChain and not cluster.fullHull then
+				-- removing points that are not hull vertices leaves the hull as it is
+				local hull = cluster.hull
+				for j = 1, #hull do
+					if clusterOf[hull[j].fID] ~= cluster then
+						cluster.fullHull = true
+						break
+					end
+				end
+			end
+		end
 	end
 end
 
-local function ClustersToConvexHull()
-	if benchmark then
-		benchmark:Enter("ClustersToConvexHull")
+-- Candidate hull points of a cluster that is merged into another one.
+local function AddHullCandidates(cluster, points)
+	if cluster.fullHull or not cluster.hullIsChain then
+		for fID in pairs(cluster.members) do
+			points[#points + 1] = knownFeatures[fID].point
+		end
+	else
+		local hull = cluster.hull
+		for j = 1, #hull do
+			points[#points + 1] = knownFeatures[hull[j].fID].point -- current height
+		end
+		local extra = cluster.extraPoints
+		if extra then
+			for j = 1, #extra do
+				points[#points + 1] = extra[j]
+			end
+		end
 	end
-	featureConvexHulls = {}
-	--Spring.Echo("#featureClusters", #featureClusters)
-	for fc = 1, #featureClusters do
+end
+
+-- Added and moved features join the clusters they are neighbours of; clusters joined by them
+-- merge into the largest one. The hull of a union is the hull of the parts' hull vertices and the
+-- new points.
+local function AssignNewFeatures()
+	local list = {}
+	for fID in pairs(unassigned) do
+		list[#list + 1] = fID
+	end
+	for i = 1, #list do
+		local start = list[i]
+		if unassigned[start] then
+			unassigned[start] = nil
+			local group = {start}
+			local adjacent = {}
+			local k = 1
+			while k <= #group do
+				local fInfo = knownFeatures[group[k]]
+				local x, z, gx, gz = fInfo.x, fInfo.z, fInfo.gx, fInfo.gz
+				for i2 = -GRID_REACH, GRID_REACH do
+					for j2 = -GRID_REACH, GRID_REACH do
+						local cell = featureGrid[(gx + i2) * GRID_ROW + gz + j2]
+						if cell then
+							local near = IsNear(i2, j2)
+							for fID2 in pairs(cell) do
+								local cluster = clusterOf[fID2]
+								if cluster then
+									if not adjacent[cluster] then
+										local fInfo2 = knownFeatures[fID2]
+										if near or (x - fInfo2.x)^2 + (z - fInfo2.z)^2 <= minSqDistance then
+											adjacent[cluster] = true
+										end
+									end
+								elseif unassigned[fID2] then
+									local fInfo2 = knownFeatures[fID2]
+									if near or (x - fInfo2.x)^2 + (z - fInfo2.z)^2 <= minSqDistance then
+										unassigned[fID2] = nil
+										group[#group + 1] = fID2
+									end
+								end
+							end
+						end
+					end
+				end
+				k = k + 1
+			end
+
+			local base
+			for cluster in pairs(adjacent) do
+				if not base or cluster.count > base.count then
+					base = cluster
+				end
+			end
+			if base then
+				changedClusters[base] = true
+				if not base.hullIsChain then
+					base.fullHull = true
+				end
+			else
+				base = NewCluster()
+			end
+			local extra
+			if not base.fullHull then
+				extra = base.extraPoints or {}
+				base.extraPoints = extra
+			end
+
+			for cluster in pairs(adjacent) do
+				if cluster ~= base then
+					if extra then
+						AddHullCandidates(cluster, extra)
+					end
+					local members = {}
+					for fID in pairs(cluster.members) do
+						members[#members + 1] = fID
+					end
+					MoveMembers(cluster, base, members)
+					DestroyCluster(cluster)
+				end
+			end
+			local baseMembers = base.members
+			for j = 1, #group do
+				local fID = group[j]
+				baseMembers[fID] = true
+				clusterOf[fID] = base
+				if extra then
+					extra[#extra + 1] = knownFeatures[fID].point
+				end
+			end
+			base.count = base.count + #group
+		end
+	end
+end
+
+-- Akl-Toussaint: points strictly inside the polygon of the extreme points in eight directions
+-- cannot be hull vertices. Points on or within a small margin of its edges are kept, so the
+-- monotone chain result is the same as for all points.
+local function PruneInterior(points)
+	local n = #points
+	local p = points[1]
+	local e1, e2, e3, e4, e5, e6, e7, e8 = p, p, p, p, p, p, p, p
+	local b1, b2, b3, b4 = p.x, p.x + p.z, p.z, p.z - p.x
+	local b5, b6, b7, b8 = -p.x, -p.x - p.z, -p.z, p.x - p.z
+	for i = 2, n do
+		p = points[i]
+		local x, z = p.x, p.z
+		if x > b1 then b1, e1 = x, p end
+		if x + z > b2 then b2, e2 = x + z, p end
+		if z > b3 then b3, e3 = z, p end
+		if z - x > b4 then b4, e4 = z - x, p end
+		if -x > b5 then b5, e5 = -x, p end
+		if -x - z > b6 then b6, e6 = -x - z, p end
+		if -z > b7 then b7, e7 = -z, p end
+		if x - z > b8 then b8, e8 = x - z, p end
+	end
+	-- counter-clockwise in the x-z plane, repeated points dropped
+	local poly = {}
+	local extremes = {e1, e2, e3, e4, e5, e6, e7, e8}
+	for k = 1, 8 do
+		if extremes[k] ~= poly[#poly] then
+			poly[#poly + 1] = extremes[k]
+		end
+	end
+	if #poly > 1 and poly[#poly] == poly[1] then
+		poly[#poly] = nil
+	end
+	local m = #poly
+	if m < 3 then
+		return points
+	end
+	local ax, az, ex, ez, margin = {}, {}, {}, {}, {}
+	for k = 1, m do
+		local a, b = poly[k], poly[k % m + 1]
+		ax[k], az[k] = a.x, a.z
+		ex[k], ez[k] = b.x - a.x, b.z - a.z
+		margin[k] = 1e-6 * (math.abs(ex[k]) + math.abs(ez[k]))
+	end
+	local kept = {}
+	for i = 1, n do
+		p = points[i]
+		local x, z = p.x, p.z
+		for k = 1, m do
+			if ex[k] * (z - az[k]) - ez[k] * (x - ax[k]) <= margin[k] then
+				kept[#kept + 1] = p
+				break
+			end
+		end
+	end
+	return kept
+end
+
+local function SetClusterHull(cluster, convexHull)
+	local cx, cz, cy = 0, 0, 0
+	for i = 1, #convexHull do
+		local convexHullPoint = convexHull[i]
+		cx = cx + convexHullPoint.x
+		cz = cz + convexHullPoint.z
+		cy = math.max(cy, convexHullPoint.y)
+	end
+
+	local totalArea = 0
+	local pt1 = convexHull[1]
+	for i = 2, #convexHull - 1 do
+		local pt2 = convexHull[i]
+		local pt3 = convexHull[i + 1]
+		--Heron formula to get triangle area
+		local a = math.sqrt((pt2.x - pt1.x)^2 + (pt2.z - pt1.z)^2)
+		local b = math.sqrt((pt3.x - pt2.x)^2 + (pt3.z - pt2.z)^2)
+		local c = math.sqrt((pt3.x - pt1.x)^2 + (pt3.z - pt1.z)^2)
+		local p = (a + b + c)/2 --half perimeter
+
+		local triangleArea = math.sqrt(p * (p - a) * (p - b) * (p - c))
+		totalArea = totalArea + triangleArea
+	end
+
+	convexHull.area = totalArea
+	convexHull.center = {x = cx/#convexHull, z = cz/#convexHull, y = cy + 1}
+
+	cluster.hull = convexHull
+end
+
+local function ClusterToConvexHull(cluster)
+	local convexHull
+	if cluster.count >= 3 then
 		local clusterPoints = {}
-		if benchmark then
-			benchmark:Enter("ClustersToConvexHull 1st Part")
-		end
-		for fcm = 1, #featureClusters[fc].members do
-			local fID = featureClusters[fc].members[fcm]
-			clusterPoints[#clusterPoints + 1] = {
-				x = knownFeatures[fID].x,
-				y = knownFeatures[fID].drawAlt,
-				z = knownFeatures[fID].z
-			}
-			--spMarkerAddPoint(knownFeatures[fID].x, 0, knownFeatures[fID].z, string.format("%i(%i)", fc, fcm))
-		end
-		if benchmark then
-			benchmark:Leave("ClustersToConvexHull 1st Part")
-		end
-		
-		--- TODO perform pruning as described in the article below, if convex hull algo will start to choke out
-		-- http://mindthenerd.blogspot.ru/2012/05/fastest-convex-hull-algorithm-ever.html
-		
-		if benchmark then
-			benchmark:Enter("ClustersToConvexHull 2nd Part")
-		end
-		local convexHull
-		if #clusterPoints >= 3 then
-			--Spring.Echo("#clusterPoints >= 3")
-			--convexHull = ConvexHull.JarvisMarch(clusterPoints, benchmark)
-			convexHull = ConvexHull.MonotoneChain(clusterPoints, benchmark) --twice faster
-		else
-			--Spring.Echo("not #clusterPoints >= 3")
-			local thisCluster = featureClusters[fc]
-
-			local xmin, xmax, zmin, zmax = thisCluster.xmin, thisCluster.xmax, thisCluster.zmin, thisCluster.zmax
-
-			local dx, dz = xmax - xmin, zmax - zmin
-
-			if dx < minDim then
-				xmin = xmin - (minDim - dx) / 2
-				xmax = xmax + (minDim - dx) / 2
+		if cluster.hullIsChain and not cluster.fullHull then
+			-- the old hull's vertices plus the points added since
+			local hull, extra = cluster.hull, cluster.extraPoints
+			for j = 1, #hull do
+				clusterPoints[j] = knownFeatures[hull[j].fID].point -- current height
 			end
-
-			if dz < minDim then
-				zmin = zmin - (minDim - dz) / 2
-				zmax = zmax + (minDim - dz) / 2
+			for j = 1, #extra do
+				clusterPoints[#clusterPoints + 1] = extra[j]
 			end
-
-			local height = clusterPoints[1].y
-			if #clusterPoints == 2 then
-				height = math.max(height, clusterPoints[2].y)
+		end
+		if #clusterPoints < 3 then -- full rebuild, or features stacked on the same spot
+			clusterPoints = {}
+			for fID in pairs(cluster.members) do
+				clusterPoints[#clusterPoints + 1] = knownFeatures[fID].point
 			end
-
-			convexHull = {
-				{x = xmin, y = height, z = zmin},
-				{x = xmax, y = height, z = zmin},
-				{x = xmax, y = height, z = zmax},
-				{x = xmin, y = height, z = zmax},
-			}
+		end
+		if #clusterPoints > 16 then
+			clusterPoints = PruneInterior(clusterPoints)
+		end
+		convexHull = ConvexHull.MonotoneChain(clusterPoints, benchmark) --twice faster
+		cluster.hullIsChain = true
+	else
+		local xmin, xmax, zmin, zmax = math.huge, -math.huge, math.huge, -math.huge
+		local height = -math.huge
+		for fID in pairs(cluster.members) do
+			local fInfo = knownFeatures[fID]
+			xmin = math.min(xmin, fInfo.x)
+			xmax = math.max(xmax, fInfo.x)
+			zmin = math.min(zmin, fInfo.z)
+			zmax = math.max(zmax, fInfo.z)
+			height = math.max(height, fInfo.drawAlt)
 		end
 
-		local cx, cz, cy = 0, 0, 0
-		for i = 1, #convexHull do
-			local convexHullPoint = convexHull[i]
-			cx = cx + convexHullPoint.x
-			cz = cz + convexHullPoint.z
-			cy = math.max(cy, convexHullPoint.y)
+		local dx, dz = xmax - xmin, zmax - zmin
+
+		if dx < minDim then
+			xmin = xmin - (minDim - dx) / 2
+			xmax = xmax + (minDim - dx) / 2
 		end
 
-		if benchmark then
-			benchmark:Leave("ClustersToConvexHull 2nd Part")
-			benchmark:Enter("ClustersToConvexHull 3rd Part")
+		if dz < minDim then
+			zmin = zmin - (minDim - dz) / 2
+			zmax = zmax + (minDim - dz) / 2
 		end
-		
-		local totalArea = 0
-		local pt1 = convexHull[1]
-		for i = 2, #convexHull - 1 do
-			local pt2 = convexHull[i]
-			local pt3 = convexHull[i + 1]
-			--Heron formula to get triangle area
-			local a = math.sqrt((pt2.x - pt1.x)^2 + (pt2.z - pt1.z)^2)
-			local b = math.sqrt((pt3.x - pt2.x)^2 + (pt3.z - pt2.z)^2)
-			local c = math.sqrt((pt3.x - pt1.x)^2 + (pt3.z - pt1.z)^2)
-			local p = (a + b + c)/2 --half perimeter
 
-			local triangleArea = math.sqrt(p * (p - a) * (p - b) * (p - c))
-			totalArea = totalArea + triangleArea
-		end
-		if benchmark then
-			benchmark:Leave("ClustersToConvexHull 3rd Part")
-		end
-		
-		convexHull.area = totalArea
-		convexHull.center = {x = cx/#convexHull, z = cz/#convexHull, y = cy + 1}
-
-		featureConvexHulls[fc] = convexHull
-
-
-		--for i = 1, #convexHull do
-		--	spMarkerAddPoint(convexHull[i].x, convexHull[i].y, convexHull[i].z, string.format("C%i(%i)", fc, i))
-		--end
-
-		if benchmark then
-			benchmark:Leave("ClustersToConvexHull")
-		end
+		convexHull = {
+			{x = xmin, y = height, z = zmin},
+			{x = xmax, y = height, z = zmin},
+			{x = xmax, y = height, z = zmax},
+			{x = xmin, y = height, z = zmax},
+		}
+		cluster.hullIsChain = false
 	end
+	SetClusterHull(cluster, convexHull)
 end
 
 local function ColorMul(scalar, actionColor)
@@ -565,16 +1089,16 @@ local function DrawHullVertices(hull)
 	end
 end
 
--- Font size and label of cluster i, nil when it has no label (zero hull area).
-local function GetClusterText(i)
+-- Font size and label of a cluster, nil when it has no label (zero hull area).
+local function GetClusterText(cluster)
 	local fontSize = fontSizeMin * fontScaling
-	local area = featureConvexHulls[i].area
+	local area = cluster.hull.area
 	if area > 0 then
 		fontSize = math.sqrt(area) * fontSize / minDim
 		fontSize = math.max(fontSize, fontSizeMin)
 		fontSize = math.min(fontSize, fontSizeMax)
 
-		local metal = featureClusters[i].metal
+		local metal = cluster.metal
 		--Spring.Echo(metal)
 		local metalText
 		if metal < 1000 then
@@ -588,12 +1112,12 @@ local function GetClusterText(i)
 	end
 end
 
-local function DrawClusterText(i)
-	local fontSize, metalText, metal = GetClusterText(i)
+local function DrawClusterText(cluster)
+	local fontSize, metalText, metal = GetClusterText(cluster)
 	if fontSize then
 		glPushMatrix()
 
-		local center = featureConvexHulls[i].center
+		local center = cluster.hull.center
 
 		glTranslate(center.x, center.y, center.z)
 		glRotate(-90, 1, 0, 0)
@@ -619,146 +1143,169 @@ local function DrawClusterText(i)
 end
 
 --------------------------------------------------------------------------------
--- One display list per cluster and pass instead of three map-wide lists, so off-screen clusters
--- can be skipped. The passes and the cluster order inside each pass are as before (fog makes
--- overlapping fills order dependent, so they are not regrouped), and a cluster is only skipped
--- when its bounding sphere, which contains the hull, the label and the edge line width, is outside
--- the camera frustum, i.e. when it cannot produce a pixel.
+-- One display list per cluster and pass, so off-screen clusters can be skipped; a cluster's lists
+-- are only rebuilt when it changes. The passes are as before, and a cluster is only skipped when
+-- its bounding sphere, which contains the hull, the label and the edge line width, is outside the
+-- camera frustum, i.e. when it cannot produce a pixel.
 -- The labels cannot share one font:Begin/End: the engine font shader applies the modelview matrix
 -- when End() draws, and every label needs its own translate/scale (different heights).
 
 local spGetCameraFOV = Spring.GetCameraFOV
 local spIsSphereInView = Spring.IsSphereInView
 
-local clusterSolidLists = {}
-local clusterEdgeLists = {}
-local clusterTextLists = {}
-local hullListCount = 0
-local textListCount = 0
-local hullListsBuilt = false
-local textListsBuilt = false
-
--- culling bounds
+-- Clusters are prefiltered by 2048-elmo buckets whose spheres enclose their members' spheres.
 local BUCKET_SIZE = 2048
-local cullCount = 0
-local cullX, cullY, cullZ, cullR = {}, {}, {}, {}
-local cullBucket = {}
-local clusterVisible = {}
-local bucketCount = 0
-local bucketX, bucketY, bucketZ, bucketR = {}, {}, {}, {}
-local bucketVisible = {}
+local buckets = {} -- key -> bucket
+local bucketList = {}
+local dirtyBuckets = {}
 
-local function DeletePerClusterLists()
-	for i = 1, hullListCount do
-		glDeleteList(clusterSolidLists[i])
-		glDeleteList(clusterEdgeLists[i])
-		clusterSolidLists[i] = nil
-		clusterEdgeLists[i] = nil
+DeleteClusterLists = function(cluster)
+	if cluster.solidList then
+		glDeleteList(cluster.solidList)
+		glDeleteList(cluster.edgeList)
+		cluster.solidList, cluster.edgeList = nil, nil
 	end
-	for i = 1, textListCount do
-		if clusterTextLists[i] then
-			glDeleteList(clusterTextLists[i])
-			clusterTextLists[i] = nil
-		end
+	if cluster.textList then
+		glDeleteList(cluster.textList)
+		cluster.textList = nil
 	end
-	hullListCount = 0
-	textListCount = 0
-	hullListsBuilt = false
-	textListsBuilt = false
 end
 
--- Bounding sphere per cluster: hull vertices plus the label quad. The label lies in the y = center.y
--- plane; text-space x maps to world x and text-space y to world -z, scaled by fontSize/BASE_FONT_SIZE.
--- Its extent is bounded generously: every glyph advance is below 1 em, glyph overhang below 0.5 em,
--- and the "cv" aligned line stays within 1.5 em of the centre vertically.
-local function UpdateCullBounds()
-	local count = #featureConvexHulls
-	local bucketIndex = {}
-	local bucketMin, bucketMax = {}, {} -- AABB of the member spheres, per bucket
-	bucketCount = 0
-	for i = 1, count do
-		local hull = featureConvexHulls[i]
+BucketRemove = function(cluster)
+	local bucket = cluster.bucket
+	if bucket then
+		bucket.members[cluster] = nil
+		dirtyBuckets[bucket] = true
+		cluster.bucket = nil
+	end
+end
+
+-- Bounding sphere of a cluster: hull vertices plus the label quad. The label lies in the
+-- y = center.y plane; text-space x maps to world x and text-space y to world -z, scaled by
+-- fontSize/BASE_FONT_SIZE. Its extent is bounded generously: every glyph advance is below 1 em,
+-- glyph overhang below 0.5 em, and the "cv" aligned line stays within 1.5 em of the centre
+-- vertically.
+local function UpdateCullBounds(cluster)
+	local hull = cluster.hull
+	local x0, y0, z0 = math.huge, math.huge, math.huge
+	local x1, y1, z1 = -math.huge, -math.huge, -math.huge
+	for j = 1, #hull do
+		local pt = hull[j]
+		x0, x1 = math.min(x0, pt.x), math.max(x1, pt.x)
+		y0, y1 = math.min(y0, pt.y), math.max(y1, pt.y)
+		z0, z1 = math.min(z0, pt.z), math.max(z1, pt.z)
+	end
+	local fontSize, metalText = GetClusterText(cluster)
+	if fontSize then
+		local center = hull.center
+		local hx = fontSize * (0.5 * #metalText + 0.5) + 2
+		local hz = fontSize * 1.5 + 2
+		x0, x1 = math.min(x0, center.x - hx), math.max(x1, center.x + hx)
+		y0, y1 = math.min(y0, center.y), math.max(y1, center.y)
+		z0, z1 = math.min(z0, center.z - hz), math.max(z1, center.z + hz)
+	end
+	if x0 > x1 then -- no vertices and no label: draws nothing
+		x0, x1, y0, y1, z0, z1 = 0, 0, 0, 0, 0, 0
+	end
+	local cx, cy, cz = 0.5*(x0 + x1), 0.5*(y0 + y1), 0.5*(z0 + z1)
+	cluster.cullX, cluster.cullY, cluster.cullZ = cx, cy, cz
+	cluster.cullR = 0.5*math.sqrt((x1 - x0)^2 + (y1 - y0)^2 + (z1 - z0)^2) + 1
+
+	local key = math.floor(cx / BUCKET_SIZE) + 4096*math.floor(cz / BUCKET_SIZE)
+	local bucket = cluster.bucket
+	if not (bucket and bucket.key == key) then
+		BucketRemove(cluster)
+		bucket = buckets[key]
+		if not bucket then
+			bucket = {key = key, members = {}, visible = false}
+			buckets[key] = bucket
+			bucketList[#bucketList + 1] = bucket
+			bucket.index = #bucketList
+		end
+		bucket.members[cluster] = true
+		cluster.bucket = bucket
+	end
+	dirtyBuckets[bucket] = true
+end
+
+-- Bucket sphere: encloses the AABB of its member spheres, hence every member sphere.
+local function UpdateBuckets()
+	for bucket in pairs(dirtyBuckets) do
 		local x0, y0, z0 = math.huge, math.huge, math.huge
 		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
-		for j = 1, #hull do
-			local pt = hull[j]
-			x0, x1 = math.min(x0, pt.x), math.max(x1, pt.x)
-			y0, y1 = math.min(y0, pt.y), math.max(y1, pt.y)
-			z0, z1 = math.min(z0, pt.z), math.max(z1, pt.z)
+		for cluster in pairs(bucket.members) do
+			local cx, cy, cz, r = cluster.cullX, cluster.cullY, cluster.cullZ, cluster.cullR
+			x0, y0, z0 = math.min(x0, cx - r), math.min(y0, cy - r), math.min(z0, cz - r)
+			x1, y1, z1 = math.max(x1, cx + r), math.max(y1, cy + r), math.max(z1, cz + r)
 		end
-		local fontSize, metalText = GetClusterText(i)
-		if fontSize then
-			local center = hull.center
-			local hx = fontSize * (0.5 * #metalText + 0.5) + 2
-			local hz = fontSize * 1.5 + 2
-			x0, x1 = math.min(x0, center.x - hx), math.max(x1, center.x + hx)
-			y0, y1 = math.min(y0, center.y), math.max(y1, center.y)
-			z0, z1 = math.min(z0, center.z - hz), math.max(z1, center.z + hz)
-		end
-		if x0 > x1 then -- no vertices and no label: draws nothing
-			x0, x1, y0, y1, z0, z1 = 0, 0, 0, 0, 0, 0
-		end
-		local cx, cy, cz = 0.5*(x0 + x1), 0.5*(y0 + y1), 0.5*(z0 + z1)
-		local r = 0.5*math.sqrt((x1 - x0)^2 + (y1 - y0)^2 + (z1 - z0)^2) + 1
-		cullX[i], cullY[i], cullZ[i], cullR[i] = cx, cy, cz, r
-
-		local key = math.floor(cx / BUCKET_SIZE) + 4096*math.floor(cz / BUCKET_SIZE)
-		local b = bucketIndex[key]
-		if not b then
-			bucketCount = bucketCount + 1
-			b = bucketCount
-			bucketIndex[key] = b
-			bucketMin[b] = {cx - r, cy - r, cz - r}
-			bucketMax[b] = {cx + r, cy + r, cz + r}
+		if x0 > x1 then -- empty
+			local last = bucketList[#bucketList]
+			bucketList[bucket.index] = last
+			last.index = bucket.index
+			bucketList[#bucketList] = nil
+			buckets[bucket.key] = nil
 		else
-			local bMin, bMax = bucketMin[b], bucketMax[b]
-			bMin[1], bMin[2], bMin[3] = math.min(bMin[1], cx - r), math.min(bMin[2], cy - r), math.min(bMin[3], cz - r)
-			bMax[1], bMax[2], bMax[3] = math.max(bMax[1], cx + r), math.max(bMax[2], cy + r), math.max(bMax[3], cz + r)
+			bucket.x, bucket.y, bucket.z = 0.5*(x0 + x1), 0.5*(y0 + y1), 0.5*(z0 + z1)
+			bucket.r = 0.5*math.sqrt((x1 - x0)^2 + (y1 - y0)^2 + (z1 - z0)^2) + 1
 		end
-		cullBucket[i] = b
 	end
-	-- bucket sphere: encloses the AABB of its member spheres, hence every member sphere
-	for b = 1, bucketCount do
-		local bMin, bMax = bucketMin[b], bucketMax[b]
-		bucketX[b], bucketY[b], bucketZ[b] = 0.5*(bMin[1] + bMax[1]), 0.5*(bMin[2] + bMax[2]), 0.5*(bMin[3] + bMax[3])
-		bucketR[b] = 0.5*math.sqrt((bMax[1] - bMin[1])^2 + (bMax[2] - bMin[2])^2 + (bMax[3] - bMin[3])^2) + 1
-		bucketVisible[b] = false
-	end
-	cullCount = count
+	dirtyBuckets = {}
 end
 
-local function BuildHullLists()
-	for i = 1, hullListCount do
-		glDeleteList(clusterSolidLists[i])
-		glDeleteList(clusterEdgeLists[i])
-		clusterSolidLists[i] = nil
-		clusterEdgeLists[i] = nil
+local function BuildHullLists(cluster)
+	if cluster.solidList then
+		glDeleteList(cluster.solidList)
+		glDeleteList(cluster.edgeList)
 	end
-	hullListCount = #featureConvexHulls
-	for i = 1, hullListCount do
-		-- the PolygonMode calls are issued once per pass in DrawWorld
-		clusterSolidLists[i] = glCreateList(glBeginEnd, GL.TRIANGLE_FAN, DrawHullVertices, featureConvexHulls[i])
-		clusterEdgeLists[i] = glCreateList(glBeginEnd, GL.LINE_LOOP, DrawHullVertices, featureConvexHulls[i])
-	end
-	hullListsBuilt = true
-	UpdateCullBounds()
+	-- the PolygonMode calls are issued once per pass in DrawWorld
+	cluster.solidList = glCreateList(glBeginEnd, GL.TRIANGLE_FAN, DrawHullVertices, cluster.hull)
+	cluster.edgeList = glCreateList(glBeginEnd, GL.LINE_LOOP, DrawHullVertices, cluster.hull)
 end
 
-local function BuildTextLists()
-	for i = 1, textListCount do
-		if clusterTextLists[i] then
-			glDeleteList(clusterTextLists[i])
-			clusterTextLists[i] = nil
-		end
+local function BuildTextList(cluster)
+	if cluster.textList then
+		glDeleteList(cluster.textList)
+		cluster.textList = nil
 	end
-	textListCount = #featureConvexHulls
-	for i = 1, textListCount do
-		if GetClusterText(i) then
-			clusterTextLists[i] = glCreateList(DrawClusterText, i)
-		end
+	if GetClusterText(cluster) then
+		cluster.textList = glCreateList(DrawClusterText, cluster)
 	end
-	textListsBuilt = true
-	UpdateCullBounds()
+	UpdateCullBounds(cluster)
+end
+
+-- Metal, hull and display lists of the clusters that changed in this scan.
+local function UpdateChangedClusters()
+	for cluster in pairs(changedClusters) do
+		local metal = 0
+		for fID in pairs(cluster.members) do
+			metal = metal + knownFeatures[fID].metal
+		end
+		cluster.metal = metal
+
+		if cluster.fullHull or cluster.count < 3 or not cluster.hullIsChain or cluster.extraPoints then
+			ClusterToConvexHull(cluster)
+			BuildHullLists(cluster)
+		elseif cluster.heightChanged then
+			-- same vertices, take their current heights
+			local hull = cluster.hull
+			local newHull = {}
+			local changed = false
+			for j = 1, #hull do
+				local point = knownFeatures[hull[j].fID].point
+				newHull[j] = point
+				changed = changed or (point ~= hull[j])
+			end
+			if changed then
+				SetClusterHull(cluster, newHull)
+				BuildHullLists(cluster)
+			end
+		end
+		cluster.fullHull = false
+		cluster.extraPoints = nil
+		cluster.heightChanged = nil
+		BuildTextList(cluster)
+	end
+	changedClusters = {}
 end
 
 local function UpdateVisibility()
@@ -767,18 +1314,20 @@ local function UpdateVisibility()
 	-- dist * 2*tan(vfov/2) / viewHeight world units at distance dist. Grow the spheres by that.
 	local lineHalfWidthPx = 0.5 * (6.0 / cameraScale) + 1
 	local marginPerDist = lineHalfWidthPx * 2 * math.tan(math.rad(spGetCameraFOV()) * 0.5) / screeny
-	for b = 1, bucketCount do
-		local x, y, z, r = bucketX[b], bucketY[b], bucketZ[b], bucketR[b]
+	for b = 1, #bucketList do
+		local bucket = bucketList[b]
+		local x, y, z, r = bucket.x, bucket.y, bucket.z, bucket.r
 		local dist = math.sqrt((x - camX)^2 + (y - camY)^2 + (z - camZ)^2)
-		bucketVisible[b] = spIsSphereInView(x, y, z, r + marginPerDist * (dist + r))
+		bucket.visible = spIsSphereInView(x, y, z, r + marginPerDist * (dist + r))
 	end
-	for i = 1, cullCount do
-		if bucketVisible[cullBucket[i]] then
-			local x, y, z, r = cullX[i], cullY[i], cullZ[i], cullR[i]
+	for i = 1, #clusterList do
+		local cluster = clusterList[i]
+		if cluster.bucket.visible then
+			local x, y, z, r = cluster.cullX, cluster.cullY, cluster.cullZ, cluster.cullR
 			local dist = math.sqrt((x - camX)^2 + (y - camY)^2 + (z - camZ)^2)
-			clusterVisible[i] = spIsSphereInView(x, y, z, r + marginPerDist * (dist + r))
+			cluster.visible = spIsSphereInView(x, y, z, r + marginPerDist * (dist + r))
 		else
-			clusterVisible[i] = false
+			cluster.visible = false
 		end
 	end
 end
@@ -821,7 +1370,8 @@ function widget:GameFrame(frame)
 	if not drawEnabled then
 		-- Nothing is drawn (by default only while constructors are selected), so skip the scan of
 		-- every feature, the clustering and the display-list rebuilds; Update refreshes on the
-		-- frame drawing turns back on. Each scan re-reads all features, so the result is the same.
+		-- frame drawing turns back on. The scan compares against the last known state, so the
+		-- result is the same.
 		dataStale = true
 		return
 	end
@@ -831,36 +1381,22 @@ end
 RefreshFeatureData = function(frame)
 	dataStale = false
 	if benchmark then
-		benchmark:Enter("GameFrame UpdateFeatures")
+		benchmark:Enter("RefreshFeatureData")
 	end
 	UpdateFeatures(frame)
-	if featuresUpdated or not hullListsBuilt then
-		ClusterizeFeatures()
-		ClustersToConvexHull()
-		
-		if benchmark then
-			benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
+	ProcessBrokenClusters()
+	AssignNewFeatures()
+	UpdateChangedClusters()
+	if textParametersChanged then
+		for i = 1, #clusterList do
+			BuildTextList(clusterList[i])
 		end
-		--Spring.Echo("featuresUpdated")
-		BuildHullLists()
-		if benchmark then
-			benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
-		end
-	end
-
-	if textParametersChanged or featuresUpdated or clusterMetalUpdated or not textListsBuilt then
-		if benchmark then
-			benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
-		end
-		--Spring.Echo("clusterMetalUpdated")
-		BuildTextLists()
 		textParametersChanged = false
-		if benchmark then
-			benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
-		end
 	end
+	UpdateBuckets()
+	dataBuilt = true
 	if benchmark then
-		benchmark:Leave("GameFrame UpdateFeatures")
+		benchmark:Leave("RefreshFeatureData")
 	end
 end
 
@@ -877,35 +1413,35 @@ function widget:DrawWorld()
 	--glDepthTest(true)
 
 	glBlending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-	if hullListsBuilt then
+	if dataBuilt then
 		UpdateVisibility()
+		local count = #clusterList
+
 		glColor(ColorMul(color, reclaimColor))
 		glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-		for i = 1, hullListCount do
-			if clusterVisible[i] then
-				glCallList(clusterSolidLists[i])
+		for i = 1, count do
+			local cluster = clusterList[i]
+			if cluster.visible then
+				glCallList(cluster.solidList)
 			end
 		end
 
 		glLineWidth(6.0 / cameraScale)
 		glColor(ColorMul(color, reclaimEdgeColor))
 		glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-		for i = 1, hullListCount do
-			if clusterVisible[i] then
-				glCallList(clusterEdgeLists[i])
+		for i = 1, count do
+			local cluster = clusterList[i]
+			if cluster.visible then
+				glCallList(cluster.edgeList)
 			end
 		end
 		glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 		glLineWidth(1.0)
-	end
 
-	if textListsBuilt then
-		if not hullListsBuilt then
-			UpdateVisibility()
-		end
-		for i = 1, textListCount do
-			if clusterVisible[i] and clusterTextLists[i] then
-				glCallList(clusterTextLists[i])
+		for i = 1, count do
+			local cluster = clusterList[i]
+			if cluster.visible and cluster.textList then
+				glCallList(cluster.textList)
 			end
 		end
 	end
@@ -914,7 +1450,9 @@ function widget:DrawWorld()
 end
 
 function widget:Shutdown()
-	DeletePerClusterLists()
+	for i = 1, #clusterList do
+		DeleteClusterLists(clusterList[i])
+	end
 	if benchmark then
 		benchmark:PrintAllStat()
 	end
