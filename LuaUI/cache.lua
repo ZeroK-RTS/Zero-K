@@ -67,18 +67,16 @@ end
 
 local function buildIndex(teamID, radius, Icons)
 	--local index = tostring(teamID)..":"..tostring(radius)..":"..tostring(Icons)
-	local t = {}
-	if teamID then
-		t[#t + 1] = teamID
-	end
+	-- Joins the non-nil teamID, radius and (Icons and 1) with ":", without
+	-- allocating a temporary table on every call.
+	local index = teamID
 	if radius then
-		t[#t + 1] = radius
+		index = (index and (index .. ":" .. radius)) or radius
 	end
-	-- concat wants a table where all elements are strings or numbers
 	if Icons then
-		t[#t+1] = 1
+		index = (index and (index .. ":1")) or 1
 	end
-	return table.concat(t, ":")
+	return (index and tostring(index)) or ""
 end
 
 -- returns unitTable = { [1] = number unitID, ... }
