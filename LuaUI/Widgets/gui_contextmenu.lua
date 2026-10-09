@@ -1962,7 +1962,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	local x = x
 	local y = y
 	if x then
-		y = scrH-y
+		-- x, y are mouse coordinates in real pixels
+		x = x/(WG.uiScale or 1)
+		y = scrH - y/(WG.uiScale or 1)
 	else
 		x = scrH / 3
 		y = scrH / 3
@@ -2137,8 +2139,8 @@ local function MakeUnitContextMenu(unitID,x,y)
 			--classname = "back_button",
 		},
 	}
-	local y = scrH-y
-	local x = x
+	local y = scrH - y/(WG.uiScale or 1)
+	local x = x/(WG.uiScale or 1)
 	
 	if marketandbounty then
 		if team == myTeamID then
@@ -2295,8 +2297,8 @@ function widget:MousePress(x,y,button)
 end
 
 function widget:ViewResize(vsx, vsy)
-	scrW = vsx
-	scrH = vsy
+	scrW = vsx/(WG.uiScale or 1)
+	scrH = vsy/(WG.uiScale or 1)
 end
 
 
@@ -2320,7 +2322,7 @@ function widget:Initialize()
 	 screen0 = Chili.Screen0
 	 color2incolor = Chili.color2incolor
 
-	widget:ViewResize(Spring.GetViewGeometry())
+	widget:ViewResize(Spring.Orig.GetViewGeometry())
 	
 	WG.MakeStatsWindow = MakeStatsWindow
 end

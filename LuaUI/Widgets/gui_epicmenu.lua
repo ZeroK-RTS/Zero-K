@@ -2937,8 +2937,8 @@ end
 --------------------------------------------------------------------------------
 
 function widget:ViewResize(vsx, vsy)
-	scrW = vsx
-	scrH = vsy
+	scrW = vsx/(WG.uiScale or 1)
+	scrH = vsy/(WG.uiScale or 1)
 end
 
 function widget:Initialize()
@@ -2973,7 +2973,7 @@ function widget:Initialize()
 	Colorbars = Chili.Colorbars
 	screen0 = Chili.Screen0
 
-	widget:ViewResize(Spring.GetViewGeometry())
+	widget:ViewResize(Spring.Orig.GetViewGeometry())
 	
 	-- Set default positions of windows on first run
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
