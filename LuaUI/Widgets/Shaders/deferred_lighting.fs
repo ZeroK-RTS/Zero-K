@@ -132,7 +132,7 @@ void main(void)
 	//OK, our blending func is the following: Rr=Lr*Dr+1*Dr
 	float lightalpha = cosphi * attenuation + attenuation * specularHighlight;
 	//dont light underwater:
-	lightalpha = clamp(lightalpha, 0.0, lightalpha * ((mappos4.y + 50.0) * (0.02)));
+	lightalpha *= clamp((mappos4.y + 50.0) * 0.02, 0.0, 1.0);
 
 	gl_FragColor = vec4(lightcolor.rgb * lightalpha * model_lighting_multiplier, 1.0);
 
