@@ -168,11 +168,11 @@ end
 
 function widget:Initialize()
 	Chili = WG.Chili
-	screen0 = Chili.Screen0
 	if (not Chili) then
 		widgetHandler:RemoveWidget()
 		return
 	end
+	screen0 = Chili.Screen0
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	UpdateFlashStateDefs()
 end
