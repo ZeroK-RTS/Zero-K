@@ -936,7 +936,9 @@ local function formatMessage(msg)
 			if name:sub(1,1) ~= '#' then
 				local sanitized = SanitizeNick(name)
 				local pattern = '([^%w_])(' .. sanitized .. ')([^%w_])'
-				local sub = '%1'..colour..'%2'..message_colour..'%3'
+				local sub = function(before, matched_name, after)
+					return before..colour..matched_name..message_colour..after
+				end
 				formatted_arg, _ = formatted_arg:gsub(pattern, sub)
 			end
 		end
