@@ -151,7 +151,7 @@ local function ForceImmediateAbort(unitID, padID, isLanded)
 		spSetUnitLeaveTracks(unitID, true)
 		if isLanded then
 			spSetUnitVelocity(unitID, 0, 0, 0)
-			GG.StopMiscPriorityResourcing(padID, miscPriorityKey)
+			GG.StopMiscPriorityResourcing(padID, "p" .. unitID)
 			-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
 			Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		end
