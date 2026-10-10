@@ -1002,7 +1002,7 @@ function option_CheckEnable(self)
 end
 
 function option_CheckEnablePlayer(self)
-	if not options.enableSpectator.value then
+	if not enabled then
 		return
 	end
 	
@@ -1014,7 +1014,7 @@ function option_CheckEnablePlayer(self)
 end
 
 function option_CheckEnableResource(self)
-	if not options.enableSpectator.value then
+	if not enabled then
 		return
 	end
 	
