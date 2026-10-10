@@ -1049,6 +1049,16 @@ local assigncalls = 0
 -- @param texKey A unique key hashed from the textures names, bindpositions
 local function AssignObjectToBin(objectID, objectDefID, flag, shader, textures, texKey, uniformBinID, calledfrom)
 	assigncalls = (assigncalls + 1 ) % (2^20)
+	-- Queued draw flags (UpdateUnit) are processed at the next update, by which time the object
+	-- may have been deleted. InstanceDataFrom*IDs raises an error for deleted objects, which
+	-- aborts DrawWorldPreUnit before the queue is cleared, so skip them like the resize below does.
+	if objectID >= 0 then
+		if not Spring.ValidUnitID(objectID) then
+			return
+		end
+	elseif not Spring.ValidFeatureID(-objectID) then
+		return
+	end
 	shader = shader or GetShaderName(flag, objectDefID)
 	texKey = texKey or retextureStrKeyByObjectID[objectID] or fastObjectDefIDtoTextureKey[objectDefID]
 	
