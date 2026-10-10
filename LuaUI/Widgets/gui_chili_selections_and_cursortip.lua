@@ -1921,6 +1921,9 @@ local function GetSelectionStatsDisplay(parentControl)
 	
 	function externalFunctions.SetVisibile(newVisible)
 		visible = newVisible
+		if newVisible and selectedUnits then
+			UpdateStaticGroupInfo()
+		end
 		holder:SetVisibility(newVisible)
 	end
 	
