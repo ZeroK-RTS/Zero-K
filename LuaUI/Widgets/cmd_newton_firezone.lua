@@ -974,11 +974,9 @@ local function f_v(t,xold,vold,mass,area,gravity,airDensity) -- a function that 
   local tmp = {hrzn=0,vert=0};
   local rho=1
   local b=(1.0/2.0)*airDensity*area*rho;
-  local horizontalSign = -1*abs(vold.hrzn)/vold.hrzn
-  local verticalSign = -1*abs(vold.vert)/vold.vert
   --MethodA: current spring implementation--
-  tmp.hrzn = (b/mass)*(vold.hrzn^2)*horizontalSign;--horizontal is back-and-forth movement
-  tmp.vert = -gravity+(b/mass)*(vold.vert^2)*verticalSign; --is vertical movement
+  tmp.hrzn = -(b/mass)*vold.hrzn*abs(vold.hrzn);--horizontal is back-and-forth movement
+  tmp.vert = -gravity-(b/mass)*vold.vert*abs(vold.vert); --is vertical movement
   --MethodB: ideal implementation (more accurate to real airdrag, not implemented in spring)--
   -- local totalVelocity = math.sqrt(vold.hrzn^2+vold.vert^2)
   -- tmp.hrzn = (b/mass)*(totalVelocity^2)*(vold.hrzn/totalVelocity)*horizontalSign;
@@ -1002,7 +1000,7 @@ end
 --For projectile simulation:
 --The derivative of X is V (velocity), and the derivative of V is A (acceleration)
 --the equation for A is given as the Drag equation while X and V is not available due to complexity
-local function VecFRK4xv(ytype,t,xold, vold,dt,mass,area,gravity,airDensity)
+local function VecFRK4xv(t,xold, vold,dt,mass,area,gravity,airDensity)
 	local k1x = Scalar_vec2mult(dt,f_x(t,xold,vold));
 	local k1v = Scalar_vec2mult(dt,f_v(t,xold,vold,mass,area,gravity,airDensity));
 	local k2x = Scalar_vec2mult(dt,f_x(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k1x)),Vec2sum(vold,Scalar_vec2mult(0.5,k1v))));
@@ -1016,17 +1014,13 @@ local function VecFRK4xv(ytype,t,xold, vold,dt,mass,area,gravity,airDensity)
 	local k3x2 = Scalar_vec2mult(2.0,k3x);
 	local k3v2 = Scalar_vec2mult(2.0,k3v);
 
-	if (ytype==0) then
-		return(Scalar_vec2mult((1.0/6.0),Vec2sum4(k1x,k2x2,k3x2,k4x)));
-	else
-		return(Scalar_vec2mult((1.0/6.0),Vec2sum4(k1v,k2v2,k3v2,k4v)));
-	end
+	return Scalar_vec2mult((1.0/6.0),Vec2sum4(k1x,k2x2,k3x2,k4x)), Scalar_vec2mult((1.0/6.0),Vec2sum4(k1v,k2v2,k3v2,k4v));
 end
 
 function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity)
 	radius = radius *0.01 --in centi-elmo (centimeter, or 10^-2) instead of elmo. See Spring/rts/Sim/Objects/SolidObject.cpp
 	local horizontalVelocity = sqrt(velX^2+velZ^2)
-	local horizontalAngle = atan2 (velX/horizontalVelocity, velZ/horizontalVelocity)
+	local horizontalAngle = atan2 (velX, velZ)
 	local hrznAngleCos = cos(horizontalAngle)
 	local hrznAngleSin = sin(horizontalAngle)
 
@@ -1051,8 +1045,9 @@ function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity
 	local dt = 15; --frame increment
 	local Tmax = 1800 --max 2 minute
 	for t=t0,Tmax,dt do
-		local xt = Vec2sum(xold,VecFRK4xv(0,t,xold,vold,dt,mass,area,gravity,airDensity));
-		local vt = Vec2sum(vold,VecFRK4xv(1,t,xold,vold,dt,mass,area,gravity,airDensity));
+		local dx, dv = VecFRK4xv(t,xold,vold,dt,mass,area,gravity,airDensity);
+		local xt = Vec2sum(xold,dx);
+		local vt = Vec2sum(vold,dv);
 		xold = xt;
 		vold = vt;
 		prevPosition.x, prevPosition.y, prevPosition.z = currPosition.x, currPosition.y, currPosition.z
