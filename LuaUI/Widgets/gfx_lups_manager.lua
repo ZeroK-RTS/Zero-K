@@ -346,6 +346,7 @@ function widget:Shutdown()
 		for _,unitFxIDs in pairs(particleIDs) do
 			for i=1,#unitFxIDs do
 				local fxID = unitFxIDs[i]
+				Lups.RemoveParticles(fxID)
 			end
 		end
 		particleIDs = {}
