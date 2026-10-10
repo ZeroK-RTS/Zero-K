@@ -470,6 +470,7 @@ ____FS_CODE_DEFS_____
 		else if (method == 1)
 			texel = texture2D(tex0, uvo);
 		else if (method == 2) {
+			texel = vec4(1.0);
 			vec3 adjustedOffset = vec3(0.0);
 			if (length(offset2) > 0) {
 				vec3 pOffset2 = RectToPolar(vec3(offset2, 0));
