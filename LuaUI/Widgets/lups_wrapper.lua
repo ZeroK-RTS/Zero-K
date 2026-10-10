@@ -23,7 +23,7 @@ if VFS.FileExists("lups/lups.cfg",VFS.ZIP) then
     local f=io.open("lups.cfg",'w+');
     if (f) then
       f:write(newFile);
+      f:close();
     end
-    f:close();
   end
 end
