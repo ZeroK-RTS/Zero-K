@@ -12,7 +12,9 @@ if true then -- No engine has this yet
 end
 
 -- Spring.RequestPath causes desync https://github.com/beyond-all-reason/RecoilEngine/issues/2434
-if true or Script.IsEngineMinVersion(2025, 1, 0) and Spring.GetModOptions().luapathrequest ~= "1" then
+
+if true or Script.IsEngineMinVersion(2025, 1, 0) and 
+Spring.GetModOptions().luapathrequest ~= "1" then
 	if widgetHandler then
 		widgetHandler.WG.Disable_RequestPath = true
 	end

@@ -184,6 +184,14 @@ local options = {
     step=1,
   },
   {
+    key    = 'zombies_wrecks_remain',
+    name   = 'Zombie wrecks remain',
+    desc   = "Final Zombie resurrection doesnt consume the wreck.",
+    type   = 'bool',
+    section= 'silly',
+    def = false,
+  },
+  {
     key    = 'zombies_team',
     name   = 'Zombie Team',
     desc   = "Which Team the zombies respawn into. 0 for Gaia/neutral zombies.",
@@ -195,9 +203,9 @@ local options = {
     step=1,
   },
   {
-    key    = 'zombies_wrecks_remain',
-    name   = 'Zombie wrecks remain',
-    desc   = "Final Zombie resurrection doesnt consume the wreck.",
+    key    = 'zombies_team_full_slow',
+    name   = 'Zombie Team Full Speedmod',
+    desc   = "If the whole Zombie team is effected by the speedmultiplier on start, aswell as all produced units.",
     type   = 'bool',
     section= 'silly',
     def = false,

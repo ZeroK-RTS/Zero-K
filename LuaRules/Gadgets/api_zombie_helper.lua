@@ -141,11 +141,11 @@ local function GetUnitNearestAlly(unitID, range)
 		if (allyID ~= unitID) and (allyTeam == GaiaTeamID) and (Spring.Utilities.getMovetype(UnitDefs[allyDefID]) ~= false) then
 			local ox, oy, oz = Spring.GetUnitPosition(allyID)
 			local dist = math.diag(x - ox, z - oz)
-			--TODO reinstate once engine thing is fixed
-			--if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
+			--TODO reinstate once engine thing is fixed, IsTargetReallyReachable enabled for testing
+			if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
 				best_ally = allyID
 				best_dist = dist
-			--end
+			end
 		end
 	end
 	return best_ally
@@ -178,10 +178,10 @@ local function SetZombieBehavior(unitID)
 		local rx = random(0, mapWidth)
 		local rz = random(0, mapHeight)
 		local ry = Spring.GetGroundHeight(rx,rz)
-		--TODO once engine is fixed and this doesnt crash readd
-		--if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
+		--TODO once engine is fixed and this doesnt crash readd, IsTargetReallyReachable enabled for testing
+		if IsTargetReallyReachable(unitID, rx, ry, rz, x, y, z) then
 			orders[#orders+1] = {CMD.FIGHT, {rx, ry, rz}, CMD.OPT_SHIFT}
-		--end
+		end
 	end
 	
 	Spring.GiveOrderArrayToUnit(unitID,orders)
@@ -194,8 +194,11 @@ end
 -- Use the rezFrameCallback to repurpose the system for other effects or chain into TurnFeatureIntoUnit for a revived unit with ID Callback.
 -- If no callback is provided, revives the wreck as a unslowed zombie unit.
 local function AddFeatureToZombieCountdown(featureID, buildpower, minRezTime, maxRezTime, rezFrameCallback)
+	if resurrectingFeatures[featureID] then
+		return resurrectingFeatures[featureID]
+	end
 	local resDefName, face = GetFeatureResurrectData(featureID)
-	if resDefName and face and not resurrectingFeatures[featureID] then
+	if resDefName and face then
 		local ud = resDefName and UnitDefNames[resDefName]
 		if ud and not NonZombies[resDefName] then
 			local rezBaseTime = ud.metalCost / buildpower
