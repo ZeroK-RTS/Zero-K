@@ -51,10 +51,10 @@ local function GetZoomScale()
 
 	local zoomMin = options.cas_height_scale2_start.value
 	local zoomMax = options.cas_height_scale2_end.value
-	if cameraHeight < zoomMin then
+	if cameraHeight <= zoomMin then
 		return 1
 	end
-	if cameraHeight > zoomMax then
+	if cameraHeight >= zoomMax then
 		return options.cas_height_scale2.value
 	end
 	
