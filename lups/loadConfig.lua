@@ -17,7 +17,10 @@ function LoadConfig(configFile)
 	if (VFS.FileExists(configFile)) then
 		local fileStr = VFS.LoadFile(configFile):gsub("//","--")
 		local func, message = loadstring(fileStr)
-		if not func then print(PRIO_MAJOR,"LUPS: Can't parse config! Error is:\n" .. message) end
+		if not func then
+			print(PRIO_MAJOR,"LUPS: Can't parse config! Error is:\n" .. message)
+			return {}
+		end
 
 		local env = {}
 		setfenv(func, env)
