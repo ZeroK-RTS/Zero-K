@@ -1014,7 +1014,9 @@ function widget:Update(dt)
 	if firstFewUpdates then
 		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 			Initialize()
-			CheckAllTerrainChanges()
+			if WG.metalSpots then
+				CheckAllTerrainChanges()
+			end
 		end
 		firstFewUpdates = firstFewUpdates - 1
 		if firstFewUpdates <= 0 then
