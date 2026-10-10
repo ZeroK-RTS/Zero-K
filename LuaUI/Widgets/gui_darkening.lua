@@ -43,8 +43,10 @@ end
 
 
 function SetDarkening(_,_,words)
+  local value = tonumber(words[1]);
+  if (value == nil) then return end
   mapChanged = true;
-  darkening  = tonumber(words[1]);
+  darkening  = value;
   darkeningMap[Game.mapName] = darkening;
   UpdateCallins();
 end
