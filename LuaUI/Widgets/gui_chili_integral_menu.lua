@@ -1037,7 +1037,6 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 				local coded = opts.coded
 				coded = Spring.Utilities.FilterOutBit(coded, CMD.OPT_SHIFT)
 				coded = Spring.Utilities.FilterOutBit(coded, CMD.OPT_CTRL)
-				Spring.Echo(coded, math.random())
 				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
 			end
 			j = j + 1
