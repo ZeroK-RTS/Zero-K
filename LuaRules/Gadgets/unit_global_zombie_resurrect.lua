@@ -307,16 +307,11 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 		return
 	end
-	
-	Spring.Echo(teamID)
-	
 	-- If on Zombie Allyteam with Full slow enabled, slows all created units
 	if IsTeamInAllyTeam(zombieAllyTeamID,teamID) and zombieTeamFullSlow == 1 then
-		Spring.Echo("is zombie")
 		zombieUnits[unitID] = true
 		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 	end
-	Spring.Echo("after")
 end
 
 local function FeatureReviveCycles(featureID)
