@@ -40,7 +40,7 @@ return { commrecon1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  explodeAs           = [[ESTOR_BUILDINGEX]],
+  explodeAs           = [[COMM_EX]],
   footprintX          = 2,
   footprintZ          = 2,
   health              = 1650,
@@ -55,7 +55,7 @@ return { commrecon1 = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[commrecon.s3o]],
   script              = [[commrecon.lua]],
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  selfDestructAs      = [[COMM_EX]],
 
   sfxtypes            = {
 

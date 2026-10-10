@@ -278,9 +278,9 @@ local function SitOnPad(unitID)
 					if reammoProgress > reammoMaxTime then
 						reammoProgress = false
 						GG.RefuelComplete(unitID)
-						Spring.SetUnitRulesParam(unitID, "reammoProgress", nil, LOS_ACCESS)
+						Spring.SetUnitRulesParam(unitID, "reammoProgress", nil)
 					else
-						Spring.SetUnitRulesParam(unitID, "reammoProgress", reammoProgress/reammoMaxTime, LOS_ACCESS)
+						Spring.SetUnitRulesParam(unitID, "reammoProgress", reammoProgress/reammoMaxTime)
 					end
 				end
 			else

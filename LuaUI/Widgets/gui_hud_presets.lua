@@ -820,6 +820,7 @@ local function SetupMinimapLeftPreset()
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.ceil(screenHeight)
+	local fudge = ((WG.uiScale or 1) > 1) and 1 or 0
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH
@@ -872,19 +873,19 @@ local function SetupMinimapLeftPreset()
 	WG.SetWindowPosAndSize("Minimap Window",
 		0,
 		screenHeight - minimapHeight,
-		minimapWidth,
-		minimapHeight
+		minimapWidth + fudge,
+		minimapHeight + fudge
 	)
 	WG.SetWindowPosAndSize("selections",
 		minimapWidth - 3,
 		screenHeight - selectionsHeight,
-		selectionsWidth + 3,
+		selectionsWidth + 3 + fudge,
 		selectionsHeight
 	)
 	WG.SetWindowPosAndSize("integralwindow",
 		minimapWidth + selectionsWidth,
 		screenHeight - integralHeight,
-		integralWidth + 3,
+		integralWidth + 3 + fudge,
 		integralHeight
 	)
 	WG.SetWindowPosAndSize("selector_window",
@@ -926,6 +927,7 @@ local function SetupMinimapRightPreset()
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.ceil(screenHeight)
+	local fudge = ((WG.uiScale or 1) > 1) and 1 or 0
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH
@@ -940,7 +942,6 @@ local function SetupMinimapRightPreset()
 	------------------------------------------------------------------------
 	------------------------------------------------------------------------
 	-- Bottom of the UI
-	
 	local integralWidth, integralHeight,
 		coreSelectorWidth, coreSelectorHeight,
 		minimapWidth, minimapHeight,
@@ -983,19 +984,19 @@ local function SetupMinimapRightPreset()
 	WG.SetWindowPosAndSize("selections",
 		coreSelectorWidth + integralWidth,
 		screenHeight - selectionsHeight,
-		selectionsWidth + 3,
+		selectionsWidth + 3 + fudge,
 		selectionsHeight
 	)
 	WG.SetWindowPosAndSize("integralwindow",
 		coreSelectorWidth - 3,
 		screenHeight - integralHeight,
-		integralWidth + 3,
+		integralWidth + 3 + fudge,
 		integralHeight
 	)
 	WG.SetWindowPosAndSize("selector_window",
 		0,
 		screenHeight - coreSelectorHeight,
-		coreSelectorWidth,
+		coreSelectorWidth + fudge,
 		coreSelectorHeight
 	)
 	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", true)

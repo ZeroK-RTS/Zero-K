@@ -11,8 +11,17 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- All weapons in the weapons directory are death explosions, and idk how to add customparams to tdf
 
-VFS.FileExists = VFS.FileExists or function() return false end	-- unitdef exporter compatibility
+for _, weaponDef in pairs(WeaponDefs) do
+	weaponDef.customparams = weaponDef.customparams or {}
+	weaponDef.customparams.death_explosion = 1
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+VFS.FileExists = VFS.FileExists or function() return false end -- unitdef exporter compatibility
 
 --[[ This lets mutators add a bit of weapondefs_post processing without
      losing access to future gameside updates to weapondefs_post. ]]
@@ -65,6 +74,9 @@ local function ProcessUnitDef(udName, ud)
       if wdcp and wdcp.reammoseconds then
         wdcp.reammoseconds = ud.customparams.reammoseconds
       end
+      if wdcp and wdcp.shots_per_refuel then
+        wdcp.shots_per_refuel = ud.customparams.shots_per_refuel
+      end
     end
   end
 
@@ -92,12 +104,16 @@ local function ProcessUnitDef(udName, ud)
     local fullName = udName .. '_' .. string.lower(ud.explodeas)
     if (WeaponDefs[fullName]) then
       ud.explodeas = fullName
+      WeaponDefs[fullName].customparams = WeaponDefs[fullName].customparams or {}
+      WeaponDefs[fullName].customparams.death_explosion = 1
     end
   end
   if (isstring(ud.selfdestructas)) then
     local fullName = udName .. '_' .. string.lower(ud.selfdestructas)
     if (WeaponDefs[fullName]) then
       ud.selfdestructas = fullName
+      WeaponDefs[fullName].customparams = WeaponDefs[fullName].customparams or {}
+      WeaponDefs[fullName].customparams.death_explosion = 1
     end
   end
   
@@ -110,10 +126,11 @@ end
 
 local UnitDefs = DEFS.unitDefs
 
+-- Load unit weapons and bespoke death explosions
 for udName, ud in pairs(UnitDefs) do
-  if (isstring(udName) and istable(ud)) then
-    ProcessUnitDef(udName, ud)
-  end
+	if (isstring(udName) and istable(ud)) then
+		ProcessUnitDef(udName, ud)
+	end
 end
 
 --------------------------------------------------------------------------------

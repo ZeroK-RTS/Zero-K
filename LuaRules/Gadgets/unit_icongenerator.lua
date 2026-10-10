@@ -37,6 +37,8 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Configs/icon_generator.lua")
+
   local units = {};
   local createunits  = {};
   local nextUnitX,nextUnitZ = 100,100;
@@ -85,7 +87,9 @@ if (gadgetHandler:IsSyncedCode()) then
 			end
 			
 			if lus then
-				if env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate) end
+				if env.Activate and not unitConfigs[UnitDefNames[cunit.defname].id].noActivate then
+					Spring.UnitScript.CallAsUnit(uid, env.Activate)
+				end
 			else Spring.CallCOBScript(uid,"Activate",0) end
 
 			if (cunit.move) then

@@ -214,8 +214,8 @@ local function GetZoomScale()
 	local cs = Spring.GetCameraState()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
 	local cameraHeight
-	if cs.name == "ta" then
-		cameraHeight = cs.height - gy
+	if cs.name == "ta" or cs.name == "spring" then
+		cameraHeight = (cs.height or cs.dist) - gy
 	else
 		cameraHeight = cs.py - gy
 	end

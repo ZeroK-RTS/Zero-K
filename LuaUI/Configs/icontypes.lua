@@ -78,7 +78,7 @@ local icontypes = {
   building = {
     bitmap='icons/building.dds',
     radiusadjust=1,
-    size=0.8,
+    size=1.7,
   },
 
   --------------------------------------------------------------------------------
@@ -799,6 +799,10 @@ local icontypes = {
   },
   stealthfighter = {
     bitmap='icons/stealthfighter.dds',
+    size=1.7,
+  },
+  supportfighter = {
+    bitmap='icons/supportfighter.dds',
     size=1.7,
   },
   bomber = {

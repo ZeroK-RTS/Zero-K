@@ -1091,7 +1091,7 @@ do
 		
 		--// REAMMO
 		if ci.canReammo then
-			local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
+			local reammoProgress = GetUnitRulesParam(unitID, "ammoFraction") or GetUnitRulesParam(unitID, "reammoProgress")
 			if reammoProgress then
 				barDrawer.AddPercentBar("reammo", reammoProgress)
 			end

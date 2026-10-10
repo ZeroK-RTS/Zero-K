@@ -39,17 +39,21 @@ end
 
 -- general arrays
 local allGround = {}
+local allAir = {}
 local allMobileGround = {}
 local armedLand = {}
 
-for name,data in pairs(UnitDefNames) do
-	if not data.canfly then
-		allGround[data.id] = true
-		if data.canAttack and data.weapons[1] and data.weapons[1].onlyTargets.land then
-			armedLand[data.id] = true
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	if ud.canFly then
+		allAir[unitDefID] = true
+	else
+		allGround[unitDefID] = true
+		if ud.canAttack and ud.weapons[1] and ud.weapons[1].onlyTargets.land then
+			armedLand[unitDefID] = true
 		end
-		if not data.isImmobile then
-			allMobileGround[data.id] = true
+		if not ud.isImmobile then
+			allMobileGround[unitDefID] = true
 		end
 	end
 end
@@ -231,13 +235,13 @@ local shortRangeSkirmieeArray = NameToDefID({
 local shortToRiotRangeSkirmieeArray = NameToDefID({
 	"hoverraid",
 	"amphriot",
+	"hoverheavyraid",
 	"amphimpulse",
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
 	"cloakriot",
 	"tankheavyraid",
-	"hoverheavyraid",
 	"striderantiheavy",
 	"striderdante",
 	
@@ -426,7 +430,7 @@ local explodableFull = Union(
 -- Notably, this occurs after the skirm nested union
 veryShortRangeSkirmieeArray = Union(veryShortRangeSkirmieeArray, veryShortRangeExplodables)
 
-local diverSkirmieeArray = Union(shortRangeSkirmieeArray, diverExplodables)
+local diverSkirmieeArray = Union(shortToRiotRangeSkirmieeArray, diverExplodables)
 shortRangeSkirmieeArray  = Union(shortRangeSkirmieeArray, shortRangeExplodables)
 riotRangeSkirmieeArray   = Union(riotRangeSkirmieeArray, shortRangeExplodables)
 
@@ -520,6 +524,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- weaponNum(defaults to 1): Weapon to use when skirming
 -- searchRange(defaults to 800): max range of GetNearestEnemy for the unit.
 -- defaultAIState (defaults in config): (1 or 0) state of AI when unit is initialised
+-- alternateStateToggle (defaults to nil): Trigger unit AI with a completely different state toggle. Make sure the toggle is in commandTypes in the gadget.
 -- externallyHandled (defaults to nil): Enable to disable all tactical AI handling, only the state toggle is added.
 
 --*** skirms(defaults to empty): the table of units that this unit will attempt to keep at max range
@@ -530,7 +535,9 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- skirmRadar (defaults to false): Skirms radar dots
 -- skirmOnlyNearEnemyRange (defaults to false): If true, skirms only when the enemy unit is withing enemyRange + skirmOnlyNearEnemyRange
 -- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
+-- skirmJinkLength (defalts to false): When set, skirmishing units will jink from side to side
 -- skirmKeepOrder (defaults to false): If true the unit does not clear its move order when too far away from the unit it is skirming.
+-- skirmKeepOrderLeeway (defaults to 0): The unit does not clear its move order when within this distance of being issued one. Creates a small buffer of skirmKeepOrder.
 -- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
 -- velPredChaseFactor (from 0 to inf, default false): values closer to 0 reduce the degree to which units use velocityPrediction to chase units running away. Above 1 increases prediction when chasing.
 -- selfVelocityPrediction (defaults to false): Whether the unit predicts its own velocity when calculating range.
@@ -926,7 +933,6 @@ local behaviourConfig = {
 		wardFirePredict = 5,
 		wardFireShield = false,
 		wardFireDefault = false,
-		wardAlternateStateToggle = true,
 	},
 	{
 		name = "tankheavyraid",
@@ -1665,7 +1671,6 @@ local behaviourConfig = {
 		wardFireLeeway = 15,
 		wardFireShield = false,
 		wardFireDefault = false, -- Let people choose this.
-		wardAlternateStateToggle = true,
 	},
 	{
 		name = "vehheavyarty",
@@ -1727,7 +1732,6 @@ local behaviourConfig = {
 		wardFireLeeway = 15,
 		wardFireShield = false,
 		wardFireDefault = false, -- Let people choose this.
-		wardAlternateStateToggle = true,
 	},
 	{
 		name = "shieldarty",
@@ -1963,6 +1967,48 @@ local behaviourConfig = {
 		fleeDistance = 850,
 	},
 	
+	-- Loopback attack fighters
+	{
+		name = "planefighter",
+		alternateStateToggle = "loopAttack",
+		defaultAIState = 0,
+		weaponNum = 2,
+		skirmEverything = true,
+		skirmRadar = true,
+		skirmLeeway = -250,
+		skirmOrderDis = 200,
+		stoppingDistance = -600,
+		skirmJinkLength = 1000,
+		jinkPeriod = 10,
+		velocityPrediction = 10,
+		velPredChaseFactor = 1.5,
+	},
+	{
+		name = "planeheavyfighter",
+		alternateStateToggle = "loopAttack",
+		defaultAIState = 0,
+		skirms = allAir,
+		skirmBlockedApproachFrames = 30,
+		skirmLeeway = -10,
+		skirmKeepOrderLeeway = 20,
+		skirmOrderDis = 200,
+		stoppingDistance = -50,
+		velocityPrediction = 25,
+		velPredChaseFactor = 1.5,
+	},
+	{
+		name = "planesupport",
+		alternateStateToggle = "loopAttack",
+		defaultAIState = 0,
+		skirmEverything = true,
+		skirmRadar = true,
+		skirmBlockedApproachFrames = 15,
+		skirmLeeway = -220,
+		skirmOrderDis = 400,
+		velocityPrediction = 15,
+		velPredChaseFactor = 1.5,
+	},
+	
 	-- only handle idleness
 	{
 		name = "shieldscout",
@@ -2178,6 +2224,7 @@ local function LoadBehaviour()
 		if behaviourData.land and behaviourData.sea then
 			unitAIBehaviour[ud.id] = {
 				defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
+				alternateStateToggle = behaviourData.alternateStateToggle,
 				waterline = (behaviourData.waterline or 0),
 				floatWaterline = behaviourData.floatWaterline,
 				land = GetBehaviourTable(behaviourData.land, ud),
@@ -2186,6 +2233,7 @@ local function LoadBehaviour()
 		else
 			unitAIBehaviour[ud.id] = GetBehaviourTable(behaviourData, ud)
 			unitAIBehaviour[ud.id].defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState)
+			unitAIBehaviour[ud.id].alternateStateToggle = behaviourData.alternateStateToggle
 		end
 	end
 	

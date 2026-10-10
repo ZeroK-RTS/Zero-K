@@ -15,7 +15,6 @@ function gadget:Initialize()
 	local allyTeamList = Spring.GetAllyTeamList()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
-		Spring.Echo("allyTeamIDallyTeamID", allyTeamID)
 		if not Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID) then
 			Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, "Team " .. allyTeamID)
 			Spring.SetGameRulesParam("allyteam_long_name_"  .. allyTeamID, "Team " .. allyTeamID)
