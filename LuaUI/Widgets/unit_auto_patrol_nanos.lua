@@ -77,8 +77,8 @@ local function SetupUnit(unitID)
 		-- point patrol towards map center
 		vx = mapCenterX - x
 		vz = mapCenterZ - z
-		x = x + vx*25/abs(vx)
-		z = z + vz*25/abs(vz)
+		x = x + (vx >= 0 and 25 or -25)
+		z = z + (vz >= 0 and 25 or -25)
 
 		GiveClampedOrderToUnit(unitID, CMD_PATROL, { x, y, z }, {})
 	end
