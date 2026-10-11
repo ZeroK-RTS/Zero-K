@@ -353,7 +353,10 @@ local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 
 	local defenceData = defences[unitID]
 	if defenceData then
-		if not alwaysUpdate and not configData.colorInBuild or inBuild == defenceData.isBuild then
+		if not alwaysUpdate and (not configData.colorInBuild or inBuild == defenceData.inBuild) then
+			if (not isAlly) and inBuild and configData.colorInBuild then
+				defNeedingBuildingChecks[unitID] = true
+			end
 			return
 		end
 		RemoveUnit(unitID)

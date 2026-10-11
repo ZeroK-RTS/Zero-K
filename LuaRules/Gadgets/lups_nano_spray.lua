@@ -152,7 +152,6 @@ end
 --  «« NanoSpray handling »»
 --
 
-local nanoParticles = {}
 local maxEngineParticles = Spring.GetConfigInt("MaxNanoParticles", 10000)
 
 local function GetFaction(udid)
@@ -316,10 +315,8 @@ function gadget:GameFrame(frame)
 						ExecuteLuaCode(nanoSettings)
 
 						local fxType  = nanoSettings.fxtype
-						if (not nanoParticles[unitID]) then nanoParticles[unitID] = {} end
-						local unitFxs = nanoParticles[unitID]
 						if Lups then
-							unitFxs[#unitFxs+1] = Lups.AddParticles(nanoSettings.fxtype,nanoSettings)
+							Lups.AddParticles(nanoSettings.fxtype,nanoSettings)
 						end
 					end
 				end

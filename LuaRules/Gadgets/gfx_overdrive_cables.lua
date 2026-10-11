@@ -2341,6 +2341,8 @@ function OnCableTreeFull(data)
 							key = k,
 						}
 						ghostNeedsRebuild = true
+					else
+						FreeSlot(k)
 					end
 					existing[k] = nil
 				end
@@ -2523,6 +2525,8 @@ function gadget:GameFrame(n)
 						key = k,
 					}
 					ghostNeedsRebuild = true
+				else
+					FreeSlot(k)
 				end
 				edges[k] = nil
 				dropped = true
