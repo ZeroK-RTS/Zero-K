@@ -701,6 +701,34 @@ void emitTwig(vec2 a, vec2 d, vec2 perpAB,
 	gOutSpawnAlong = 0.0;
 }
 
+// Conservative frustum rejection (x/y clip planes only). Everything a cable emits lies within
+// ARC_MAX_DEV_FRAC * lenAB (arc) + NOISE_AMP_ABS (wiggle) + half width + twig reach (< 28 elmos)
+// of the chord in XZ, and within the current/initial map height range in Y (+ tent height).
+const float CULL_PAD_XZ = 40.0;
+const float CULL_PAD_Y  = 40.0;
+vec4 cullClipPos(vec3 wp) {
+#ifdef SHADOW_PASS
+	vec4 lp = shadowView * vec4(wp, 1.0);
+	lp.xy += vec2(0.5);
+	return shadowProj * lp;
+#else
+	return cameraViewProj * vec4(wp, 1.0);
+#endif
+}
+bool cableOutsideView(vec2 a, vec2 b, float lenAB) {
+	float pad = ARC_MAX_DEV_FRAC * lenAB + CULL_PAD_XZ;
+	vec2 lo = min(a, b) - vec2(pad);
+	vec2 hi = max(a, b) + vec2(pad);
+	float yLo = min(mapHeight.x, mapHeight.z) - CULL_PAD_Y;
+	float yHi = max(mapHeight.y, mapHeight.w) + CULL_PAD_Y;
+	int nL = 0; int nR = 0; int nB = 0; int nT = 0;
+	for (int i = 0; i < 8; i++) {
+		vec4 p = cullClipPos(vec3(((i & 1) != 0) ? hi.x : lo.x, ((i & 2) != 0) ? yHi : yLo, ((i & 4) != 0) ? hi.y : lo.y));
+		nL += int(p.x < -p.w); nR += int(p.x > p.w); nB += int(p.y < -p.w); nT += int(p.y > p.w);
+	}
+	return nL == 8 || nR == 8 || nB == 8 || nT == 8;
+}
+
 void main() {
 	// IMPORTANT: parent/child orientation is gameplay info — the bubble
 	// advection direction (driven by cableUV.x growing from a to b) signals
@@ -728,6 +756,15 @@ void main() {
 	// visually sees.
 	bool isGhostEdge = gridD.z < -0.5;
 	if (isGhostEdge && gl_InvocationID > 1) return;
+
+	// Off-screen cables emit nothing. In the forward pass invocation 0 still runs the
+	// LOS-coverage bookkeeping below (ghosts), so ghost behaviour is unchanged.
+	bool culled = cableOutsideView(a, b, lenAB);
+#if defined(SHADOW_PASS) || defined(DEFERRED_PASS)
+	if (culled) return;
+#else
+	if (culled && (gl_InvocationID != 0 || ghostsEnabled < 0.5 || dataIn[0].vsSlot < 0)) return;
+#endif
 
 	float widthVal = MIN_TRUNK_WIDTH +
 		clamp(cap / MAX_CAPACITY_REF, 0.0, 1.0) * (MAX_TRUNK_WIDTH - MIN_TRUNK_WIDTH);
@@ -836,6 +873,7 @@ void main() {
 			}
 		}
 #endif
+		if (culled) return;
 		emitTentHalf(-1.0, a, d, perpAB, halfW, widthVal, effAmp, seed, gridD, timeD, cap, numSeg, arcDh);
 	} else if (gl_InvocationID == 1) {
 		// Right slope of the tent — its own invocation, hence its own

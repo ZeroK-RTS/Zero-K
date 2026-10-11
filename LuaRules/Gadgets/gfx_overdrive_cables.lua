@@ -32,6 +32,9 @@ if gadgetHandler:IsSyncedCode() then return false end
 -- much further down). Both are file-scope locals; the body assignment for
 -- OnCableTreeFull happens in the rendering section.
 local OnCableTreeFull
+-- Bracket a batch of OnCableTreeFull calls (one per ally) so the flat render index is rebuilt
+-- once at the end; defined in the rendering section.
+local BeginRenderBatch, EndRenderBatch
 
 -------------------------------------------------------------------------------------
 -- Topology + flow computation (was previously the synced half).
@@ -164,6 +167,10 @@ local alliesWithEdges = {}  -- [ally] = true if last send had edges (for empty-c
 -- Cached MSTs per (ally, gridID): only rebuilt when membership of that grid
 -- actually changes. SyncWithGrid composes the desired edge set from this cache.
 local mstByGrid = {}                -- [gridKey] = { ally, gridID, edges = {ek = einfo} }
+-- SyncWithGrid's compose+diff (steps 4-5) only has work when a cached MST changed (step 3
+-- processed a dirty grid) or `edges` was reset (ClearAll) since it last ran: otherwise the
+-- edge keys of the cached MSTs and of `edges` already match.
+local composeNeeded = true
 
 -- Grids that need a rebuild on the next SyncWithGrid call. Sync also adds
 -- entries it discovers itself by diffing rules-params against lastGridNum.
@@ -1088,7 +1095,12 @@ local function SyncWithGrid()
 	local unitFromGrid = {}    -- [uid] = oldG (only for uids that flipped to a non-zero newG)
 	for allyTeamID, allyNodes in pairs(nodes) do
 		for unitID, _ in pairs(allyNodes) do
-			local newG = (IsActiveForGrid(unitID) and (spGetUnitRulesParam(unitID, "gridNumber") or 0)) or 0
+			-- = (IsActiveForGrid(unitID) and (gridNumber or 0)) or 0; the activity reads (3 engine
+			-- calls) are only needed when the unit is in a grid at all
+			local newG = spGetUnitRulesParam(unitID, "gridNumber") or 0
+			if newG ~= 0 and not IsActiveForGrid(unitID) then
+				newG = 0
+			end
 			local oldG = lastGridNum[unitID]
 			if oldG ~= newG then
 				if oldG and oldG > 0 then MarkGridRemove(allyTeamID, oldG, unitID) end
@@ -1192,6 +1204,7 @@ local function SyncWithGrid()
 		return h.cells, h.allyNodes
 	end
 	for gk, info in pairs(pendingGridDirty) do
+		composeNeeded = true
 		local cells, allyNodesRef = getAllyHash(info.ally)
 		local mst = mstByGrid[gk]
 		local memCount = 0
@@ -1223,34 +1236,41 @@ local function SyncWithGrid()
 	end
 	local t3 = perf and Spring.GetTimer()
 
-	-- 4) Compose the desired edge set from cached MSTs.
-	local newEdges = {}
-	for _, mst in pairs(mstByGrid) do
-		for ek, einfo in pairs(mst.edges) do
-			newEdges[ek] = einfo
+	-- 4) Compose the desired edge set from cached MSTs (skipped while no cached MST changed
+	--    and `edges` was not reset since the last compose: the diff would find nothing).
+	local t4
+	if composeNeeded then
+		composeNeeded = false
+		local newEdges = {}
+		for _, mst in pairs(mstByGrid) do
+			for ek, einfo in pairs(mst.edges) do
+				newEdges[ek] = einfo
+			end
 		end
-	end
-	local t4 = perf and Spring.GetTimer()
+		t4 = perf and Spring.GetTimer()
 
-	-- 5) Diff: drop missing, add new. Survivors keep their entry (and
-	--    ComputeMaxPotentials reorientation) untouched. Topology change here
-	--    invalidates the mpCache so its DFS / aggregates get rebuilt next call.
-	for ek, _ in pairs(edges) do
-		if not newEdges[ek] then
-			edges[ek] = nil
-			topologyDirty = true
-			mpCache.valid = false
+		-- 5) Diff: drop missing, add new. Survivors keep their entry (and
+		--    ComputeMaxPotentials reorientation) untouched. Topology change here
+		--    invalidates the mpCache so its DFS / aggregates get rebuilt next call.
+		for ek, _ in pairs(edges) do
+			if not newEdges[ek] then
+				edges[ek] = nil
+				topologyDirty = true
+				mpCache.valid = false
+			end
 		end
-	end
-	for ek, einfo in pairs(newEdges) do
-		if not edges[ek] then
-			edges[ek] = {
-				parentID = einfo.parentID, childID = einfo.childID,
-				px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
-			}
-			topologyDirty = true
-			mpCache.valid = false
+		for ek, einfo in pairs(newEdges) do
+			if not edges[ek] then
+				edges[ek] = {
+					parentID = einfo.parentID, childID = einfo.childID,
+					px = einfo.px, pz = einfo.pz, cx = einfo.cx, cz = einfo.cz,
+				}
+				topologyDirty = true
+				mpCache.valid = false
+			end
 		end
+	else
+		t4 = perf and Spring.GetTimer()
 	end
 	if perf then
 		local t5 = Spring.GetTimer()
@@ -1692,6 +1712,7 @@ local function SendAll()
 	local tBin1 = perf and Spring.GetTimer()
 
 	-- One snapshot per ally that currently has edges.
+	BeginRenderBatch()
 	for ally, pa in pairs(perAlly) do
 		OnCableTreeFull({
 			allyTeamID = ally, edgeCount = pa.n,
@@ -1714,6 +1735,7 @@ local function SendAll()
 			alliesWithEdges[ally] = nil
 		end
 	end
+	EndRenderBatch()
 	-- Update the snapshots ConsumersOrWindChanged() compares against next
 	-- tick. Doing this only on the success path means a skipped tick keeps
 	-- the previous baseline so a stable run continues to skip.
@@ -1746,6 +1768,7 @@ local function ClearAll()
 	end
 	alliesWithEdges = {}
 	edges = {}
+	composeNeeded = true -- the next sync has to re-add every cached edge
 	topologyDirty = false
 	-- Reset stability snapshots; on next enable, all edges read as new.
 	lastSentFlow = {}
@@ -2100,6 +2123,9 @@ local edgesByAllyTeam = {}
 local renderEdges = {}
 local renderEdgesByKey = {}    -- flat lookup: edgeKey -> renderEdge entry
 local needsRebuild = false
+-- Lower bound on witherFrame over all withering edges; math.huge = none withering.
+-- Lets GameFrame skip the O(edges) wither scan until some edge can be due.
+local minWitherFrame = math.huge
 
 -- Orphaned enemy edges that the local viewer has seen at least one segment of
 -- in LOS. The synced gadget broadcasts every ally team's grid to all clients,
@@ -2129,6 +2155,59 @@ local cableShadowShader   -- depth-only SHADOW_PASS variant, drawn in the shadow
 local cableDeferredShader -- model-gbuffer DEFERRED_PASS variant, drawn in DrawOpaqueUnitsLua
 local cableVAO          -- live cable geometry
 local numCableVerts = 0
+
+-------------------------------------------------------------------------------------
+-- Stable VAOs. The engine's LuaVAOImpl::CondInitVAO only keeps a VAO between draws when a
+-- vertex, an index AND an instance buffer are attached; otherwise it deletes and re-creates
+-- the GL VAO (and re-specifies every attribute) on every DrawArrays call. The cable VAOs
+-- only have a vertex buffer, so each of the up to four cable draws per frame rebuilt its
+-- VAO. A one-element dummy instance buffer (attribute 4, which no cable shader reads; the
+-- cable shaders use 0-3) and a one-element dummy index buffer are attached as well, so the
+-- VAO is built once per vertex buffer. The draws stay non-instanced, non-indexed
+-- glDrawArrays calls (no instance count is passed, DrawArrays ignores the index buffer), so
+-- the cables render exactly as before. If the dummies cannot be made, the plain VAO is used.
+-------------------------------------------------------------------------------------
+local dummyInstVBO, dummyIndxVBO -- nil = not tried yet, false = unavailable
+
+local function GetVAODummies()
+	if dummyInstVBO == nil then
+		dummyInstVBO, dummyIndxVBO = false, false
+		local ok, inst, indx = pcall(function()
+			local instVBO = gl.GetVBO(GL.ARRAY_BUFFER, false)
+			local indxVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false)
+			if not (instVBO and indxVBO) then return nil end
+			instVBO:Define(1, { { id = 4, name = "zkUnusedInstanceAttr", size = 1 } })
+			instVBO:Upload({ 0 })
+			indxVBO:Define(1)
+			indxVBO:Upload({ 0 })
+			return instVBO, indxVBO
+		end)
+		if ok and inst and indx then
+			dummyInstVBO, dummyIndxVBO = inst, indx
+		end
+	end
+	return dummyInstVBO, dummyIndxVBO
+end
+
+local function MakeCableVAO(vbo)
+	local inst, indx = GetVAODummies()
+	if inst then
+		local ok, vao = pcall(function()
+			local v = gl.GetVAO()
+			if not v then return nil end
+			v:AttachVertexBuffer(vbo)
+			v:AttachInstanceBuffer(inst)
+			v:AttachIndexBuffer(indx)
+			return v
+		end)
+		if ok and vao then
+			return vao
+		end
+	end
+	local vao = gl.GetVAO()
+	if vao then vao:AttachVertexBuffer(vbo) end
+	return vao
+end
 -- (drawPerf collapsed into cablePerf at the top of the file; flowMode
 -- collapsed into cableFlowMode. Both names live in the topology block above.)
 
@@ -2248,7 +2327,13 @@ local function isOwnAlly(allyTeamID)
 	return allyTeamID == spGetMyAllyTeamID()
 end
 
+-- SendAll hands one snapshot per ally to OnCableTreeFull; the flat render index only has to be
+-- rebuilt once after the last one (nothing reads it in between).
+local deferRenderIndex = false
+local renderIndexDirty = false
+
 local function RebuildRenderEdges()
+	renderIndexDirty = false
 	renderEdges = {}
 	renderEdgesByKey = {}
 	for _, edges in pairs(edgesByAllyTeam) do
@@ -2257,6 +2342,17 @@ local function RebuildRenderEdges()
 			renderEdges[#renderEdges + 1] = e
 			renderEdgesByKey[k] = e
 		end
+	end
+end
+
+BeginRenderBatch = function()
+	deferRenderIndex = true
+end
+
+EndRenderBatch = function()
+	deferRenderIndex = false
+	if renderIndexDirty then
+		RebuildRenderEdges()
 	end
 end
 
@@ -2332,6 +2428,7 @@ function OnCableTreeFull(data)
 				-- handler). Out of LOS, snapshot immediately and silently.
 				if anyInLOS(e.px, e.pz, e.cx, e.cz) then
 					e.witherFrame = frame
+					if frame < minWitherFrame then minWitherFrame = frame end
 				else
 					if cableGhosts and e.slot and e.slot >= 0 then
 						ghostEdges[k] = {
@@ -2346,6 +2443,7 @@ function OnCableTreeFull(data)
 				end
 			else
 				e.witherFrame = frame
+				if frame < minWitherFrame then minWitherFrame = frame end
 			end		end
 	end
 
@@ -2436,7 +2534,11 @@ function OnCableTreeFull(data)
 
 	edgesByAllyTeam[ally] = existing
 	local tDiff = cablePerf and Spring.GetTimer() or nil
-	RebuildRenderEdges()
+	if deferRenderIndex then
+		renderIndexDirty = true
+	else
+		RebuildRenderEdges()
+	end
 	needsRebuild = true
 
 	if cablePerf then
@@ -2476,8 +2578,7 @@ local function RebuildVBO()
 	})
 	local tUp0 = cablePerf and Spring.GetTimer() or nil
 	vbo:Upload(verts)
-	cableVAO = gl.GetVAO()
-	if cableVAO then cableVAO:AttachVertexBuffer(vbo) end
+	cableVAO = MakeCableVAO(vbo)
 	numCableVerts = vertCount
 	needsRebuild = false
 
@@ -2512,22 +2613,29 @@ function gadget:GameFrame(n)
 	-- animation first). After the snapshot, the cable seamlessly continues
 	-- to render via the ghost VBO from previously-seen segments.
 	local dropped = false
-	for ally, edges in pairs(edgesByAllyTeam) do
-		for k, e in pairs(edges) do
-			if e.witherFrame and (n - e.witherFrame) >= WITHER_HOLD_FRAMES then
-				if not e.isOwnAlly and cableGhosts and e.slot and e.slot >= 0 then
-					ghostEdges[k] = {
-						px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
-						capacity = e.capacity or 0,
-						slot = e.slot,
-						key = k,
-					}
-					ghostNeedsRebuild = true
+	if (n - minWitherFrame) >= WITHER_HOLD_FRAMES then
+		local newMin = math.huge
+		for ally, edges in pairs(edgesByAllyTeam) do
+			for k, e in pairs(edges) do
+				local wf = e.witherFrame
+				if wf and (n - wf) >= WITHER_HOLD_FRAMES then
+					if not e.isOwnAlly and cableGhosts and e.slot and e.slot >= 0 then
+						ghostEdges[k] = {
+							px = e.px, pz = e.pz, cx = e.cx, cz = e.cz,
+							capacity = e.capacity or 0,
+							slot = e.slot,
+							key = k,
+						}
+						ghostNeedsRebuild = true
+					end
+					edges[k] = nil
+					dropped = true
+				elseif wf and wf < newMin then
+					newMin = wf
 				end
-				edges[k] = nil
-				dropped = true
 			end
 		end
+		minWitherFrame = newMin
 	end
 	if dropped then
 		RebuildRenderEdges()
@@ -2874,8 +2982,7 @@ function gadget:Initialize()
 			{ id = 2, name = "vertGrid",  size = 3 },
 			{ id = 3, name = "vertSlot",  size = 1 },
 		})
-		ghostVAO = gl.GetVAO()
-		if ghostVAO then ghostVAO:AttachVertexBuffer(ghostVBO) end
+		ghostVAO = MakeCableVAO(ghostVBO)
 	end
 
 	-- Topology side: register chat command + scan existing pylons.
