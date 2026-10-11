@@ -59,7 +59,7 @@ local zombieTeamFullSlow = tonumber(modOptions.zombies_team_full_slow) or 0
 
 local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed) or 12
 
-local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow) or 0.5
+local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_speed_mult) or 0.5
 
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay) or 10 -- minimum of 10 seconds, max is determined by rez speed
 local ZOMBIES_REZ_MAX = tonumber(modOptions.zombies_delay_max) or 100000 --600 only affects things above 7200 cost at 12 rezspeed.
@@ -72,7 +72,7 @@ local zombieReviveCyclesCount = tonumber(modOptions.zombies_revive_cycles) or 1
 local zombieWrecksRemain = tonumber(modOptions.zombies_wrecks_remain) or 0
 
 local zombiesReviveOptionsAsString = (modOptions.zombies_revive_options) or nil 
-local zombieReviveOptionMultiRandomise = tonumber(modOptions.zombies_revive_options_multi_random) or nil
+local zombieReviveOptionMultiRandomise = tonumber(modOptions.zombies_revive_options_multi_random) or 0
 local zombieOverflowSpawn = tonumber(modOptions.zombies_revive_options_overflow_spawn) or 1
 
 local zombieBudgetMult = tonumber(modOptions.zombies_budget_multiplier) or 1
@@ -171,20 +171,23 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
 		zombieCost = UnitDefs[zombieUnitDefID].cost
 	end
-
-	while currentBudget >= zombieCost do --TODO zombie cost can end up as a float somehow?
+	
+	if not zombieCost or zombieCost <= 0 then
+		zombieCost = 200
+		Spring.Echo("Unit has no cost set, defaulting to 200")
+	end
+	
+	while math.floor(currentBudget) >= zombieCost do --TODO zombie cost can end up as a float somehow?
 		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,zombieTeamID,zombieUnitDefID)
 		if unitID then
 			zombieUnits[unitID] = true
 			GG.Zombies.SetZombieBehavior(unitID)
-			if ZOMBIES_PERMA_SLOW then
-				GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
-			end
+			GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 			totalReviveCount = totalReviveCount +1
 			totalRevivedValue = math.floor(totalRevivedValue + zombieCost)
 		end
 		currentBudget = currentBudget - zombieCost
-		if zombieReviveOptionMultiRandomise and zombieUnitDefID then -- Randomises to a new unit if desired
+		if zombieReviveOptionMultiRandomise == 1 and zombieUnitDefID then -- Randomises to a new unit if desired
 			zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
 			zombieCost = UnitDefs[zombieUnitDefID].cost
 		end
@@ -201,9 +204,7 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		end
 		zombieUnits[unitID] = true
 		GG.Zombies.SetZombieBehavior(unitID)
-		if ZOMBIES_PERMA_SLOW then
-			GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
-		end
+		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		currentBudget = currentBudget - zombieCost
 		if not ZOMBIES_PARTIAL_RECLAIM == 1 then
@@ -211,7 +212,7 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		end
 		totalReviveCount = totalReviveCount +1
 		totalRevivedValue = math.floor(totalRevivedValue + zombieCost)
-		
+		--TODO check with chickens this seems to do something
 		local health = Spring.GetUnitHealth(unitID) -- TODO something breaks here, check if unit exists?
 		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
 			Spring.SetUnitHealth(unitID, health*((UnitDefs[unitDefID].cost + currentBudget)/UnitDefs[unitDefID].cost))
