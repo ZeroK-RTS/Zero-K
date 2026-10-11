@@ -205,7 +205,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if extendRadiusUnitDefs[unitDefID] then
 		ResetExtendTurnRadius(unitID, unitDefID, cmdID)
 	end
-	if strafeUnitDefs[id] then
+	if strafeUnitDefs[unitDefID] then
 		ResetNonStrafeWiggle(unitID, unitDefID, cmdID)
 	end
 	return true -- command was not used
