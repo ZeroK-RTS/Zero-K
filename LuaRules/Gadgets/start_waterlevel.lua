@@ -16,7 +16,7 @@ function gadget:Initialize() -- GamePreload causes issues with widgets.
 		return
 	end
 
-	local waterlevel = Spring.GetModOptions().waterlevel or 0
+	local waterlevel = tonumber(Spring.GetModOptions().waterlevel) or 0
 
 	local preset = Spring.GetModOptions().waterpreset or "manual"
 	if preset == "dry" then
