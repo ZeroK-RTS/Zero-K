@@ -1687,7 +1687,7 @@ function gadget:GameFrame(n)
 			
 			if totalToShare ~= 0 then
 				local excessFactor = 1 - min(1, totalFreeSpace/totalToShare)
-				local shareFactorPerSpace = totalFreeSpace > 0 and (1 - excessFactor)/totalFreeSpace or 0
+				local shareFactorPerSpace = totalFreeSpace > 0 and (1 - excessFactor)/totalFreeSpace or 1
 				for i = 1, allyTeamData.teams do
 					if shareToSend[i] then
 						local sendID = allyTeamData.team[i]
