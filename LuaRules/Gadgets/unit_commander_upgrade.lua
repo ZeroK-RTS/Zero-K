@@ -620,6 +620,9 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	-- Check the validity of the new module set
 	local pNewModules = {}
 	for i = 1, pNewCount do
+		if not moduleDefs[params[index]] then
+			return false
+		end
 		pNewModules[#pNewModules + 1] = params[index]
 		index = index + 1
 	end
@@ -641,6 +644,9 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	
 	for i = 1, #pNewModules do
 		local moduleDefID = pNewModules[i]
+		if not slotDefs[i] then
+			return false
+		end
 		if upgradeUtilities.ModuleIsValid(newLevelBounded, chassis, slotDefs[i].slotAllows, moduleDefID, modulesByDefID) then
 			cost = cost + moduleDefs[moduleDefID].cost
 		else

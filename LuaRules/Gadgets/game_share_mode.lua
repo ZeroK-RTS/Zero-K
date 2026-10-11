@@ -247,7 +247,7 @@ local function UnmergePlayer(playerID) --> newTeamID
 		UnmergeUnits(leaderTeam, leaderTeam)
 		for i=1, #playerlist do
 			if playerlist[i] ~= playerID and playerlist[i] ~= newleader then -- don't reproccess
-				local myOldTeam = spGetPlayerRulesParam(newleader, "commshare_orig_teamid")
+				local myOldTeam = spGetPlayerRulesParam(playerlist[i], "commshare_orig_teamid")
 				UnmergeUnits(myOldTeam, leaderTeam)
 				spSetTeamRulesParam(myOldTeam, "isCommsharing", newleader, public)
 				spSetPlayerRulesParam(playerlist[i], "commshare_team_id", leaderTeam)

@@ -449,7 +449,7 @@ local function GetSpots(gameConfig, mapConfig)
 		if mapConfig.spots then
 			local spots = SanitiseSpots(mapConfig.spots, spotValueOverride or mapConfig.metalValueOverride, spotValueOverride or false)
 			return DoMetalMult(spots), false
-		elseif mapConfig.metalValueOverride and not gameConfig.metalValueOverride then
+		elseif mapConfig.metalValueOverride and not (gameConfig and gameConfig.metalValueOverride) then
 			spotValueOverride = mapConfig.metalValueOverride
 		end
 	end
