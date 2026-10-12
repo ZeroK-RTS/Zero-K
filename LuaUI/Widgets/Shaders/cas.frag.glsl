@@ -4,11 +4,7 @@
 uniform sampler2D screenCopyTex;
 uniform float sharpness;
 
-#if 0 // in case AMD drivers refuse to compile the shader, though according to GLSL spec they shouldn't
-	#define TEXEL_FETCH_OFFSET(t, c, l, o) texelFetch(t, c + o, l)
-#else
-	#define TEXEL_FETCH_OFFSET texelFetchOffset
-#endif
+#define TEXEL_FETCH_OFFSET(t, c, l, o) texelFetch(t, clamp((c) + (o), ivec2(0), textureSize(t, l) - ivec2(1)), l)
 
 in vec2 viewPos;
 out vec4 fragColor;
@@ -42,14 +38,14 @@ vec3 CASPass(ivec2 tc) {
 	mxRGB += mxRGB2;
 
 	// Smooth minimum distance to signal limit divided by smooth max.
-	vec3 rcpMRGB = vec3(1.0) / mxRGB;
+	vec3 rcpMRGB = vec3(1.0) / max(mxRGB, vec3(1e-6));
 	vec3 ampRGB = clamp(min(mnRGB, 2.0 - mxRGB) * rcpMRGB, vec3(0.0), vec3(1.0));
 
 	// Shaping amount of sharpening.
-	ampRGB = inversesqrt(ampRGB);
+	ampRGB = sqrt(ampRGB);
 
 	float peak = 8.0 - 3.0 * sharpness;
-	vec3 wRGB = vec3(-1.0) / (ampRGB * peak);
+	vec3 wRGB = -ampRGB / peak;
 
 	vec3 rcpWeightRGB = vec3(1.0) / (1.0 + 4.0 * wRGB);
 
