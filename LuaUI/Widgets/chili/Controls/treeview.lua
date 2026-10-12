@@ -98,6 +98,7 @@ function TreeView:Select(item)
 
 	if (obj and obj:InheritsFrom("treeviewnode")) then
 		local oldSelected = self.selected
+		if not UnlinkSafe(oldSelected) then oldSelected = nil end
 		self.selected = MakeWeakLink(obj)
 		self.selected:Invalidate()
 		if (oldSelected) then
