@@ -52,10 +52,14 @@ local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
 local zombieTeamID = GaiaTeamID
 local zombieAllyTeamID = GaiaAllyTeamID
 local zombieTeamInput = tonumber(modOptions.zombies_team) or GaiaAllyTeamID -- 0 translates to gaia zombies
-if zombieTeamInput ~= 0 and zombieTeamInput ~= GaiaAllyTeamID then
+if zombieTeamInput ~= 0 then
 	zombieAllyTeamID = zombieTeamInput -1 --Teams are offset by 1 in the modoptions, and nil when 0
+	if zombieAllyTeamID == GaiaAllyTeamID then
+		zombieAllyTeamID = zombieTeamInput +1 -- TODO there is likely a better solution, it seems sometimes Gaia is not the last team in the list
+	end
 end
 local zombieTeamFullSlow = tonumber(modOptions.zombies_team_full_slow) or 0
+local zombieTeamStartsDead = tonumber(modOptions.zombies_team_starts_dead) or 0
 
 local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed) or 12
 
@@ -165,11 +169,11 @@ end
 local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 	local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
 	local zombieUnitDefID = nil --nil means we use the features default revival thingy
-	local zombieCost = UnitDefNames[resDefName].cost
+	local zombieCost = UnitDefNames[resDefName].cost or UnitDefNames[resDefName].buildTime
 	
 	if unitDefIDTable then
 		zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
-		zombieCost = UnitDefs[zombieUnitDefID].cost
+		zombieCost = UnitDefs[zombieUnitDefID].cost or UnitDefs[zombieUnitDefID].buildTime
 	end
 	
 	if not zombieCost or zombieCost <= 0 then
@@ -189,7 +193,11 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		currentBudget = currentBudget - zombieCost
 		if zombieReviveOptionMultiRandomise == 1 and zombieUnitDefID then -- Randomises to a new unit if desired
 			zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
-			zombieCost = UnitDefs[zombieUnitDefID].cost
+			zombieCost = UnitDefs[zombieUnitDefID].cost or  UnitDefs[zombieUnitDefID].buildTime
+			if not zombieCost or zombieCost <= 0 then
+				zombieCost = 200
+				Spring.Echo("Unit has no cost set, defaulting to 200")
+			end
 		end
 		--TODO do we randomise for each spawn?
 		if zombieAllyTeamID ~= GaiaAllyTeamID then
@@ -215,7 +223,7 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		--TODO check with chickens this seems to do something
 		local health = Spring.GetUnitHealth(unitID) -- TODO something breaks here, check if unit exists?
 		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
-			Spring.SetUnitHealth(unitID, health*((UnitDefs[unitDefID].cost + currentBudget)/UnitDefs[unitDefID].cost))
+			Spring.SetUnitHealth(unitID, health*((zombieCost + currentBudget)/zombieCost))
 			currentBudget = 0
 		end
 	end
@@ -380,6 +388,10 @@ local function SetGlobalReviveAllyTeam(newZombieAllyTeamID)
 	end
 end
 
+local function GetGlobalReviveAllyTeam()
+	return zombieAllyTeamID
+end
+
 function gadget:Initialize()
 	if not (tonumber(modOptions.zombies) == 1) then
 		gadgetHandler:RemoveGadget()
@@ -391,9 +403,19 @@ function gadget:Initialize()
 	
 	GG.ZombiesGlobal = {
 		SetGlobalReviveAllyTeam = SetGlobalReviveAllyTeam,
+		GetGlobalReviveAllyTeam = GetGlobalReviveAllyTeam,
 	}
 end
 
 function gadget:GameStart()
 	ReInit() -- anything it does doesnt mess with existing zombies
+	Spring.Echo(zombieAllyTeamID)
+	Spring.Echo(GaiaAllyTeamID)
+	if zombieTeamStartsDead == 1 then
+		for _, unitID in ipairs(spGetAllUnits()) do
+			if zombieAllyTeamID == Spring.GetUnitAllyTeam(unitID)then
+				Spring.DestroyUnit(unitID)
+			end
+		end
+	end
 end
