@@ -766,7 +766,8 @@ function EditBox:ClearSelected()
 		left, right = right, left
 	end
 	self.cursor = right
-	while self.cursor ~= left do
+	-- '>' because an end inside a multibyte character can be stepped over.
+	while self.cursor > left do
 		self.text, self.cursor = Utf8BackspaceAt(self.text, self.cursor)
 	end
 	self.selStart = nil
@@ -911,7 +912,7 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 	elseif mods.ctrl and key == spGetKeyCode("a") then
 		if not self.multiline then
 			self:_SetSelection(1, 1, #txt + 1, 1)
-		else
+		elseif #self.lines > 0 then
 			self:_SetSelection(1, 1, #self.lines[#self.lines].text + 1, #self.lines)
 		end
 	else
