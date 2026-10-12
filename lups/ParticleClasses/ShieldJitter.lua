@@ -170,7 +170,8 @@ function ShieldJitter.Create(Options)
 end
 
 function ShieldJitter:Destroy()
-	gl.DeleteTexture(self.texture)
+	-- self.texture is a named texture shared by all ShieldJitter effects; deleting it here made the
+	-- next effect load it from disk again.
 end
 
 -----------------------------------------------------------------------------------------------------------------
