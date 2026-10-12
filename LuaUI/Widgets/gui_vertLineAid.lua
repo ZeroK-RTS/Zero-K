@@ -374,7 +374,7 @@ local function DrawUnit(unitID, data, index, isEnemy)
 		return true
 	end
 	local r, g, b = Spring.GetTeamColor(teamID)
-	if not (x and r) then
+	if not (data[1] and r) then
 		return false
 	end
 	if highDraw then
