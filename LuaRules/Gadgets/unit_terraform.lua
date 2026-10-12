@@ -3573,7 +3573,7 @@ local function RegisterStructure(unitID, ud)
 	structure[unitID].frameIndex = structureCheckFrame[currentCheckFrame].count
 	
 	currentCheckFrame = currentCheckFrame + 1
-	if currentCheckFrame > structureCheckLoopFrames then
+	if currentCheckFrame >= structureCheckLoopFrames then
 		currentCheckFrame = 0
 	end
 	
