@@ -248,6 +248,7 @@ local drawPoints = 0
 local volumeDraw
 local groundGridDraw
 local mouseGridDraw
+local previewPoints, previewHeight, previewSelection, previewType -- what volumeDraw and mouseGridDraw were last built from in Update
 ----
 local mouseUnit = {id = false}
 
@@ -1368,6 +1369,20 @@ local function CheckPlacingRectangle(self)
 	end
 end
 
+local function UpdateHeightPreview(volumeFunc, gridFunc)
+	if volumeDraw and mouseGridDraw and previewPoints == drawPoint and previewHeight == terraformHeight
+			and previewSelection == volumeSelection and previewType == terraform_type then
+		return
+	end
+	if (volumeDraw) then
+		gl.DeleteList(volumeDraw); volumeDraw=nil
+		gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+	end
+	volumeDraw = glCreateList(glBeginEnd, GL_LINES, volumeFunc)
+	mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, gridFunc)
+	previewPoints, previewHeight, previewSelection, previewType = drawPoint, terraformHeight, volumeSelection, terraform_type
+end
+
 function widget:Update(dt)
 
 	if buildingPress and buildingPress.frame then
@@ -1409,12 +1424,7 @@ function widget:Update(dt)
 				terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
 				storedHeight = terraformHeight
 			end
-			if (volumeDraw) then
-				gl.DeleteList(volumeDraw); volumeDraw=nil
-				gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
-			end
-			volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
-			mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
+			UpdateHeightPreview(lineVolumeLevel, mouseGridLevel)
 		elseif terraform_type == 2 then
 			ResetMouse()
 			local a,c,m,s = spGetModKeyState()
@@ -1428,12 +1438,7 @@ function widget:Update(dt)
 				terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
 				storedHeight = terraformHeight
 			end
-			if (volumeDraw) then
-				gl.DeleteList(volumeDraw); volumeDraw=nil
-				gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
-			end
-			volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
-			mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
+			UpdateHeightPreview(lineVolumeRaise, mouseGridRaise)
 		elseif terraform_type == 4 then
 			ResetMouse()
 			terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
