@@ -200,13 +200,6 @@ local function UnitEnteredLos(_,unitID)
 	registeredUnits[unitID] = true
 	]]
 
-	if (unitDefID == staticmexDefID) then
-		staticmexes[unitID] = 1
-		staticmexFX.unit    = unitID
-		particleIDs[unitID] = {}
-		AddFxs( unitID, LupsAddFX("StaticParticles",staticmexFX) )
-	end
-
 	local unitDefID = spGetUnitDefID(unitID)
 	local effects   = UnitEffects[unitDefID]
 	if (effects) then
@@ -230,10 +223,6 @@ local function UnitLeftLos(_,unitID)
 	end
 
 	--registeredUnits[unitID] = nil
-	if (unitDefID == staticmexDefID) then
-		staticmexes[unitID] = nil
-	end
-
 	ClearFxs(unitID)
 end
 
