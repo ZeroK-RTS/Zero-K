@@ -678,13 +678,13 @@ function uploadElementRange(iT, startElementIndex, endElementIndex)
 		--we need to reslice the table
 		local unitIDRange = {}
 		local indextoUnitID = iT.indextoUnitID
-		for i = startElementIndex, endElementIndex do
+		for i = startElementIndex + 1, endElementIndex do
 			unitIDRange[#unitIDRange + 1] = indextoUnitID[i]
 		end
 		if iT.featureIDs then
-			iT.instanceVBO:InstanceDataFromFeatureIDs(unitIDRange, iT.unitIDattribID, startElementIndex - 1)
+			iT.instanceVBO:InstanceDataFromFeatureIDs(unitIDRange, iT.unitIDattribID, startElementIndex)
 		else
-			iT.instanceVBO:InstanceDataFromUnitIDs(unitIDRange, iT.unitIDattribID, startElementIndex - 1)
+			iT.instanceVBO:InstanceDataFromUnitIDs(unitIDRange, iT.unitIDattribID, startElementIndex)
 		end
 	end
 end
