@@ -191,7 +191,8 @@ function Screen:IsAbove(x, y, ...)
 			hoveredControl:MouseOver()
 		end
 
-		self.hoveredControl = MakeWeakLink(hoveredControl, self.hoveredControl)
+		--// make a new link (reusing the old one accumulates closures in its metatable)
+		self.hoveredControl = MakeWeakLink(hoveredControl)
 		if (hoveredControl) then
 			local control = hoveredControl
 			--// find tooltip in hovered control or its parents
