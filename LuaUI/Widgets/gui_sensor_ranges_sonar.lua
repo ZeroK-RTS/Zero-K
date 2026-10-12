@@ -85,7 +85,7 @@ void main() {
 	worldscale_circumference = startposrad.w * circlepointposition.z * 5.2345;
 	worldPos = circleWorldPos;
 	blendedcolor = color;
-	blendedcolor.a = opacity / circleWorldPos.w;
+	blendedcolor.a = opacity / max(circleWorldPos.w, 0.0001);
 	blendedcolor.a *= 1.0 - clamp(inboundsness*(-0.03),0.0,1.0);
 	if (worldheight > -5) blendedcolor.a = 0; // No display outside of water
 	gl_Position = cameraViewProj * vec4(circleWorldPos.xyz, 1.0);
