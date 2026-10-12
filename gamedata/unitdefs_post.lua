@@ -114,21 +114,40 @@ end
 
 -- New units
 
+--modOptions.extraunits = 'e2Nsb2FrcmFpZDIgPSB7bmFtZSA9ICJHbGFpdmUgSUkiLCBoZWFsdGggPSA0NjAsIGN1c3RvbVBhcmFtcyA9IHtiYXNlX2RlZiA9ICJjbG9ha3JhaWQifX19'
+-- With customParams.base_def the new unit starts as a copy of that unit and
+-- every key it defines itself overrides the copy.
 
 do
+	local function ToExtraUnitDef(optionName, name, extraDef)
+		if type(extraDef) ~= "table" then
+			Spring.Log("defs.lua", LOG.ERROR, optionName, "extraunit " .. name .. " is not a table")
+			return nil
+		end
+		local ud = lowerkeys(extraDef)
+		local baseName = ud.customparams and ud.customparams.base_def
+		if baseName then
+			if not UnitDefs[baseName] then
+				Spring.Log("defs.lua", LOG.ERROR, optionName, "extraunit " .. name .. " has unknown base_def " .. tostring(baseName))
+				return nil
+			end
+			local baseCopy = Spring.Utilities.CopyTable(UnitDefs[baseName], true)
+			Spring.Utilities.OverwriteTableInplace(baseCopy, ud, true)
+			ud = baseCopy
+		end
+		ud.customparams = ud.customparams or {}
+		return ud
+	end
+
 	local append = false
 	local modoptName = "extraunits"
 	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
 		local units = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
-		if type(tweaks) == "table" then
+		if type(units) == "table" then
 			Spring.Echo("Loading extraunits modoption", append or 0)
-			for name, ud in pairs(units) do
+			for name, extraDef in pairs(units) do
 				Spring.Echo("Loading extraunit " .. name)
-				local ud = lowerkeys(ud)
-				if ud.customparams.base_def then
-					Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(UnitDefs[ud.customparams.base_def]), true)
-				end
-				UnitDefs[name] = ud
+				UnitDefs[name] = ToExtraUnitDef(modoptName, name, extraDef) or UnitDefs[name]
 			end
 		end
 		append = (append or 0) + 1
