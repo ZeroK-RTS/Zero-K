@@ -45,6 +45,7 @@ local function restoreWings()
 end
 
 local function TiltBody()
+	local neutralIssued = false
 
 	while true do
 		if isActive then
@@ -52,6 +53,7 @@ local function TiltBody()
 			local speed = vx*vx + vz*vz
 
 			if speed > 5 then
+				neutralIssued = false
 				local myHeading = Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
 				local velHeading = Spring.GetHeadingFromVector(vx, vz)*GG.Script.headingToRad - myHeading
 				-- south is 0, increases anticlockwise
@@ -105,12 +107,18 @@ local function TiltBody()
 				Turn(base, z_axis, newHeading, math.rad(100))
 				Sleep(200)
 			else
-				restoreWings()
+				if not neutralIssued then
+					restoreWings()
+					neutralIssued = true
+				end
 				Sleep(10)
 			end
 			Sleep(10)
 		else
-			restoreWings()
+			if not neutralIssued then
+				restoreWings()
+				neutralIssued = true
+			end
 			Sleep(10)
 		end
 	end
