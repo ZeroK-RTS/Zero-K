@@ -133,12 +133,12 @@ function widget:RecvLuaMsg(msg, playerID)
 		else
 			storedPlayerStats[playerID] = msg
 		end
-	elseif (msg:sub(1,12)=="inactiveTime") and timedPlayerList[timedPlayerID] then
+	elseif (msg:sub(1,12)=="inactiveTime") then
 		--Ensure that the maximum amount of inactive time is getting sent for each player
 		--Because local player won't have information on their own inactive time, and some others may not have
 		--complete information if they have left and come back
 		local inactiveTime, timedPlayerID = ProcessPlayerInactiveTime(msg)
-		if inactiveTime > timedPlayerList[timedPlayerID].inactiveTime then
+		if timedPlayerList[timedPlayerID] and inactiveTime > timedPlayerList[timedPlayerID].inactiveTime then
 			timedPlayerList[timedPlayerID].inactiveTime = inactiveTime
 		end
 	end
