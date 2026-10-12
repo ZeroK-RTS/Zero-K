@@ -614,7 +614,7 @@ vec3 SpherePoints_GoldenAngle(float i, float numSamples) {
 	return vec3(radius * vec2(cos(theta), sin(theta)), z);
 }
 
-void TextureEnvBlured(in vec3 N, in vec3 Rv, out vec3 iblDiffuse, out vec3 iblSpecular) {
+/* void TextureEnvBlured(in vec3 N, in vec3 Rv, out vec3 iblDiffuse, out vec3 iblSpecular) {
 	iblDiffuse = vec3(0.0);
 	iblSpecular = vec3(0.0);
 
@@ -666,7 +666,7 @@ void TextureEnvBlured(in vec3 N, in vec3 Rv, out vec3 iblDiffuse, out vec3 iblSp
 	iblSpecular = shToColor(shR, shG, shB, Rv);
 
 	iblSpecular = mix(iblSpecular, SampleReflectionMapLod(Rv, 5.0), 0.1); //add some shininess
-}
+} */
 
 
 /***********************************************************************/
