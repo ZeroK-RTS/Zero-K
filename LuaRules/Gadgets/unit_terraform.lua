@@ -3636,6 +3636,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		local index = constructor[unitID].index
 		if index ~= constructors then
 			constructorTable[index] = constructorTable[constructors]
+			constructor[constructorTable[index]].index = index
 		end
 		constructorTable[constructors] = nil
 		constructors = constructors - 1
