@@ -104,6 +104,7 @@ end
 
 local function InitializeUnits()
 	etaTable = {}
+	WG.etaTable = etaTable
 	stockpileEtaTable = {}
 	local spect, spectFull = Spring.GetSpectatingState()
 	local myAllyTeam = Spring.GetMyAllyTeamID()
@@ -134,7 +135,6 @@ function widget:Initialize()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	InitializeUnits()
 	previousFullview = select(2, Spring.GetSpectatingState())
-	WG.etaTable = etaTable
 end
 
 local function updateTime(bi, dt, newTime, negative)
