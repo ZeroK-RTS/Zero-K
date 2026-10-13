@@ -431,6 +431,17 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768 + 0.00001, 0)
 	end
 
+	-- generic morph completed hook (used by unit_commander_egg.lua)
+	-- return false to abort (destroy new unit)
+	if GG.MorphCompleted then
+		if GG.MorphCompleted(unitID, newUnit, unitTeam) == false then
+			Spring.DestroyUnit(newUnit, false, true)
+			Spring.SetUnitBlocking(unitID, true)
+			StopMorph(unitID, morphData)
+			return
+		end
+	end
+
 	--// copy lineage
 	--local lineage = Spring.GetUnitLineage(unitID)
 	--// copy facplop
@@ -473,15 +484,6 @@ local function FinishMorph(unitID, morphData)
 	SendToUnsynced("unit_morph_finished", unitID, newUnit)
 	GG.wasMorphedTo[unitID] = newUnit
 	Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
-
-	-- generic morph completed hook (used by unit_commander_egg.lua)
-	-- return false to abort (destroy new unit)
-	if GG.MorphCompleted then
-		if GG.MorphCompleted(unitID, newUnit, unitTeam) == false then
-			Spring.DestroyUnit(newUnit, false, true)
-			return
-		end
-	end
 
 	Spring.SetUnitBlocking(newUnit, true)
 	
