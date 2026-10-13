@@ -648,6 +648,7 @@ function RemoveMiscPriorityUnit(unitID) --remotely remove a forced priority comm
 			spSetUnitRulesParam(unitID, "miscpriority", 1) --reset to normal priority so that overhead icon doesn't show wrench
 		end
 	end
+	UnitMiscPriority[unitID] = nil
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
