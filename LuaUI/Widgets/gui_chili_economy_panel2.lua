@@ -747,7 +747,7 @@ local function NoStorageEnergyStall(mInco, mPull, eInco, ePull)
 		return false
 	end
 	-- The following fails with some priority arrangements.
-	return eInco/ePull > mInco/mPull
+	return eInco/ePull < mInco/mPull
 end
 
 local  metalWarnOpt = options.metalWarning
