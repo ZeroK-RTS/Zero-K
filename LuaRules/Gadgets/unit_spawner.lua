@@ -220,7 +220,8 @@ computerTeams[gaiaTeamID] = nil
 humanTeams[gaiaTeamID] = nil
 
 local humanTeamsOrdered = {}
-for id,_ in ipairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id end
+for id in pairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id end
+table.sort(humanTeamsOrdered)
 for i=1, #humanTeamsOrdered do
 	if humanTeamsOrdered[i+1] and not Spring.AreTeamsAllied(humanTeamsOrdered[i], humanTeamsOrdered[i+1]) then
 		pvp = true
@@ -439,9 +440,9 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 		end
 	end
 	--echo("Final selected target ID: "..data.targetID)
-	local validUnitID = spValidUnitID(data.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
+	local validUnitID = (targetData.targetID ~= burrowID) and spValidUnitID(targetData.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
 	if validUnitID and targetData.targetID ~= oldTarget then
-		targetData.targetTeam = spGetUnitTeam(data.targets[data.targetID])
+		targetData.targetTeam = spGetUnitTeam(targetData.targetID)
 		--spGiveOrderToUnit(burrowID, CMD_ATTACK, data.targetID, 0)
 		--echo("Target for burrow ID ".. burrowID .." updated to target ID " .. data.targetID)
 	elseif not validUnitID then
@@ -892,8 +893,8 @@ local function Wave()
 		data.endMiniQueenNum = data.endMiniQueenNum + 1
 		if data.endMiniQueenNum == endMiniQueenWaves then
 			for i=1,playerCount do SpawnMiniQueen() end
-				endMiniQueenNum = 0
-			end
+			data.endMiniQueenNum = 0
+		end
 	end
 	data.specialPowerCooldown = data.specialPowerCooldown - 1
 	ProcessSpecialPowers()
