@@ -127,7 +127,7 @@ function Screen:Update(...)
 	local hoveredControl = UnlinkSafe(self.hoveredControl)
 	local activeControl = UnlinkSafe(self.activeControl)
 	if hoveredControl and (not activeControl) then
-		local x, y, lmb, mmb, rmb, outsideSpring = Spring.GetMouseState()
+		local x, y, lmb, mmb, rmb, outsideSpring = Spring.ScaledGetMouseState()
 		if outsideSpring then
 			if self.currentTooltip then
 				self.currentTooltip = nil
