@@ -5,16 +5,13 @@ local defs = {
 	--},
 	{
 		name = "vehriot",
-		searchRange = 180,
 	},
 	{
 		name = "hoverdepthcharge",
 		ignoreHeight = true,
-		searchRange = 180,
 	},
 	{
 		name = "amphimpulse",
-		searchRange = 80,
 	},
 	{
 		name = "jumpraid",
@@ -28,7 +25,6 @@ local defs = {
 		name = "tankriot",
 		lowerHeight = -60,
 		upperHeight = 200,
-		searchRange = 180,
 		mexShootLeeway = 120,
 	},
 }
@@ -46,7 +42,7 @@ for i = 1, #defs do
 		weaponRange = ud.maxWeaponRange
 	end
 	
-	unitData.searchRange = weaponRange + 60
+	unitData.searchRange = unitData.searchRange or (weaponRange + 60)
 	unitData.weaponRange = weaponRange
 	unitData.fireHeight = unitData.fireHeight or 5
 	unitData.lowerHeight = unitData.lowerHeight or -25
