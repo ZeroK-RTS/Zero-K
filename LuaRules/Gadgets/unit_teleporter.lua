@@ -753,6 +753,11 @@ local spGetLocalTeamID   = Spring.GetLocalTeamID
 local myTeam = spGetMyTeamID()
 local myAllyTeam = spGetMyAllyTeamID()
 
+function gadget:PlayerChanged()
+	myTeam = spGetMyTeamID()
+	myAllyTeam = spGetMyAllyTeamID()
+end
+
 local beacons = {}
 local beaconCount = 0
 
