@@ -181,7 +181,7 @@ function gadget:GameFrame(f)
 				if not RemoveZombieToSpawn(featureID) then
 					index = index + 1
 				end
-				GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,true)
+				GG.Zombies.TurnFeatureIntoUnit(featureID,GaiaTeamID,ZOMBIES_PARTIAL_RECLAIM)
 			else
 				local steps_to_spawn = floor((time_to_spawn - f) / 32)
 				local resName, face = GG.Zombies.GetFeatureResurrectData(featureID)
