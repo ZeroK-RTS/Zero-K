@@ -1416,6 +1416,9 @@ explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
 	GetDistortionClass("ExplosionHeatLong", "Small", 0.2), -- Some distortion for when the camera is inside the larger one
 }
+explosionDistortionsNames.commweapon_napalmgrenade = {
+	GetDistortionClass("ExplosionHeatFirewalker", "SmallMedium", 0.8, 3.9),
+}
 
 -- Fancy explosions for huge artillery
 explosionDistortionsNames.spidercrabe_arm_crabe_gauss = explosionDistortionsNames.spidercrabe_arm_crabe_gauss or {}
