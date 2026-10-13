@@ -39,7 +39,6 @@ local TraceScreenRay  = Spring.TraceScreenRay
 local SendLuaUIMsg    = Spring.SendLuaUIMsg
 local GetGroundHeight = Spring.GetGroundHeight
 local GetPlayerInfo   = Spring.GetPlayerInfo
-local GetTeamColor    = Spring.GetTeamColor
 local IsSphereInView  = Spring.IsSphereInView
 local GetSpectatingState = Spring.GetSpectatingState
 
@@ -136,7 +135,8 @@ local n = 0
 function widget:Update(t)
   updateTimer = updateTimer + t
 
-  if (updateTimer%saveEach<0.2) then
+  if n < numMousePos and updateTimer >= (n + 1)*saveEach then
+    n = n + 1
     local mx,my = GetMouseState()
     local _,pos = TraceScreenRay(mx,my,true)
 
@@ -144,8 +144,6 @@ function widget:Update(t)
       poshistory[n*2]   = VFS.PackU16(floor(pos[1]))
       poshistory[n*2+1] = VFS.PackU16(floor(pos[3]))
     end
-
-    n = n + 1
   end
 
   if (updateTimer>sendPacketEvery)and(n>=numMousePos) then
@@ -261,7 +259,6 @@ function widget:DrawWorldPreUnit()
 
       local gy = GetGroundHeight(wx,wz)
       if (IsSphereInView(wx,gy,wz,16)) then
-        local r,g,b = GetTeamColor(teamID)
         if (data[#data-1]) then --mouse pressed?
           glColor(1,0,0,n*0.2)
         else
