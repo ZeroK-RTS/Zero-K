@@ -65,6 +65,8 @@ local impulseMult = {
 	[2] = 0.0036, -- other
 }
 
+local DEFAULT_IMPULSE_MULT = {1,1,1}
+
 local impulseWeaponID = {}
 for i, wd in pairs(WeaponDefs) do
 	if wd.customParams and wd.customParams.impulse then
@@ -203,7 +205,7 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 
 	local dis = math.sqrt(x^2 + y^2 + z^2)
 
-	myImpulseMult = myImpulseMult or {1,1,1}
+	myImpulseMult = myImpulseMult or DEFAULT_IMPULSE_MULT
 
 	local myMass = Spring.GetUnitRulesParam(unitID, "massOverride") or mass[unitDefID]
 	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]*myImpulseMult[moveTypeByID[unitDefID]+1]/myMass
