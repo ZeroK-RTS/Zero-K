@@ -275,7 +275,7 @@ local function DoMexShootUnitUpdate(unitID, unitData)
 	if (not enemyID) and spIsPosInLos(spotX, 0, spotZ, unitData.allyTeamID) then
 		return
 	end
-	local spotY = math.max(0, CallAsTeam(unitData.teamID, function () return spGetGroundHeight(spotX, spotZ) end))
+	local spotY = math.max(0, CallAsTeam(unitData.teamID, spGetGroundHeight, spotX, spotZ))
 	
 	if not behaviour.ignoreHeight then
 		local ux, uy, uz = spGetUnitPosition(unitID)
