@@ -54,6 +54,16 @@ for i = 1,#WeaponDefs do
 	end
 end
 
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	local wanted = {}
+	for wdid = 1, #WeaponDefs do
+		if handledDefs[wdid] or removeDamageDefs[wdid] then
+			wanted[#wanted + 1] = wdid
+		end
+	end
+	return wanted
+end
+
 local function GetShieldRadius(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 end
@@ -88,7 +98,7 @@ local function CacheShieldPieceAndRadius(unitID, unitDefID)
 	end
 	if shieldNum then
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
-		if env.script.QueryWeapon then
+		if env and env.script.QueryWeapon then
 			shieldPieceByUnit[unitID] = env.script.QueryWeapon(shieldNum)
 		end
 	end
@@ -204,7 +214,9 @@ function gadget:ShieldPreDamaged(projectileID, proOwnerID, shieldEmitterWeaponNu
 	proData.resetNextFrame = true
 	proData.hasDamaged = true
 	if proData.resetNextFrameShield then
-		proData.resetNextFrameShield = {proData.resetNextFrameShield}
+		if type(proData.resetNextFrameShield) ~= "table" then
+			proData.resetNextFrameShield = {proData.resetNextFrameShield}
+		end
 		proData.resetNextFrameShield[#proData.resetNextFrameShield + 1] = shieldCarrierUnitID
 	else
 		proData.resetNextFrameShield = shieldCarrierUnitID
