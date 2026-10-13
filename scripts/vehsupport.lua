@@ -44,7 +44,7 @@ local SUSPENSION_BOUND = 6
 local RESTORE_DELAY = 3000
 
 local TURRET_TURN_SPEED = math.rad(240)
-local GUN_TURN_SPEED = math.rad(60)
+local GUN_TURN_SPEED = math.rad(240)
 local ARMS_RAISE_SPEED = 9.33
 local ARMS_LOWER_SPEED = 9.33
 local WHEEL_TURN_MULT = 1.5
@@ -317,7 +317,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
 		Turn(gun, x_axis, -pitch, GUN_TURN_SPEED)
 		WaitForTurn(turret, y_axis)
-		WaitForTurn(gun, y_axis)
+		WaitForTurn(gun, x_axis)
 		StartThread(RestoreAfterDelay)
 
 		return deployed
