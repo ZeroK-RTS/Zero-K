@@ -477,6 +477,7 @@ function Object:SetChildLayer(child,layer)
   end
   
   layer = math.min(layer, #children)
+  if CompareLinks(children[layer], child) then return end
 
   --// it isn't at the same pos anymore, search it!
   for i=1,#children do
