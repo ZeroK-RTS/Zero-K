@@ -2692,7 +2692,9 @@ function gadget:DrawWorldPreUnit()
 	-- only fires from GameFrame, which doesn't tick during pause; without
 	-- this gate the cables would linger on screen until unpause).
 	if not cableEnabled then return end
-	if not cableVAO or numCableVerts == 0 or not cableShader then return end
+	local drawLive = cableVAO and numCableVerts > 0
+	local drawGhosts = cableGhosts and ghostVAO and numGhostVerts > 0
+	if not cableShader or not (drawLive or drawGhosts) then return end
 
 	cableShader:Activate()
 	-- Smooth gameTime: GetGameSeconds() ticks at the sim rate (GAME_SPEED).
@@ -2746,13 +2748,15 @@ function gadget:DrawWorldPreUnit()
 	-- Live cable pass: opaque (FS writes alpha=1.0). Blending enabled
 	-- globally is harmless here since src=1, dst=0 → identity.
 	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-	cableVAO:DrawArrays(GL.LINES, numCableVerts)
+	if drawLive then
+		cableVAO:DrawArrays(GL.LINES, numCableVerts)
+	end
 
 	-- Ghost pass: orphaned enemy edges, semi-transparent flat-gray render.
 	-- DepthMask off so ghosts don't occlude live cables behind them and so
 	-- the alpha-blend composes against terrain without writing depth that
 	-- would clamp later geometry.
-	if cableGhosts and ghostVAO and numGhostVerts > 0 then
+	if drawGhosts then
 		gl.DepthMask(false)
 		ghostVAO:DrawArrays(GL.LINES, numGhostVerts)
 		gl.DepthMask(true)
