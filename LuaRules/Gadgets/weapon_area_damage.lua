@@ -22,6 +22,7 @@ local DAMAGE_PERIOD, weaponInfo = VFS.Include("LuaRules/Configs/area_damage_defs
 
 local explosionList = {}
 local explosionCount = 0
+local AREA_IMPULSE_MULT = {0.22,0.7,1}
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}
@@ -139,7 +140,7 @@ local function HandleDamageArea(data, f)
 						damage = damage - damage*data.plateauFall*(data.plateauRadius - distance)/data.plateauRadius
 					end
 					if data.impulse then
-						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
+						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, AREA_IMPULSE_MULT)
 						GG.SetUnitFallDamageImmunity(u, f + 10)
 						GG.DoAirDrag(u, drag)
 					elseif data.slow then
