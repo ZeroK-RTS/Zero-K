@@ -373,6 +373,7 @@ end
 
 function widget:Shutdown()
 	glDeleteTexture(brightTexture1 or "")
+	glDeleteTexture(brightTexture2 or "")
 	if glDeleteShader then
 		if brightShader ~= nil then glDeleteShader(brightShader or 0) end
 		if blurShader ~= nil then glDeleteShader(blurShader or 0) end
