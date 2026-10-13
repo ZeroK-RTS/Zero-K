@@ -84,7 +84,7 @@ function gadget:GameFrame(n)
 			
 			if def.moveCtrlSpeed then
 				local dx, dz = data[1] - px, data[3] - pz
-				if px and dx ~= 0 and dz ~= 0 then
+				if px and (dx ~= 0 or dz ~= 0) then
 					local horDist = Dist2D(dx, dz)
 					local speed = def.moveCtrlSpeed
 					if def.moveCtrlAccel then
