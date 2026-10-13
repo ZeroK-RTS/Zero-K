@@ -913,11 +913,13 @@ local function DrawShield(unitID, radius, degrees)
 			specular = { 0.25, 0.75, 1.0 },
 			shininess = 4
 		})
+		gl.PushAttrib(GL.LINE_BIT)
 		gl.LineWidth(2.0)
 		gl.BeginEnd(GL.LINES, function()
 			gl.Vertex(ux, uy, uz)
 			gl.Vertex(x, y, z)
 		end)
+		gl.PopAttrib()
 	end
 end
 
