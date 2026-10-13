@@ -107,6 +107,7 @@ local table_remove = table.remove
 
 local co_create = coroutine.create
 local co_resume = coroutine.resume
+local co_status = coroutine.status
 local co_yield = coroutine.yield
 local co_running = coroutine.running
 
@@ -154,8 +155,8 @@ The 'thread' stored in waitingForMove/waitingForTurn/sleepers is the table
 wrapping the actual coroutine object.  This way the signal_mask etc. is
 available too.
 
-The threads table is a weak table.  This saves us from having to manually clean
-up dead threads: any thread which is not sleeping or waiting is in none of
+WakeUp removes finished threads that are no longer queued. The threads table
+is also weak: any thread which is not sleeping or waiting is in none of
 (sleepers,waitingForMove,waitingForTurn) => it is only in the threads table
 => garbage collector will harvest it because the table is weak.
 
@@ -293,6 +294,13 @@ local function WakeUp(thread, ...)
 		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].name)
 	end
 	local good, err = co_resume(co, ...)
+	-- A failed yield can leave a dead thread queued. Keep it available to Signal/Destroy.
+	if not thread.container and co_status(co) == "dead" then
+		local unit = units[thread.unitID]
+		if unit then
+			unit.threads[co] = nil
+		end
+	end
 	if (not good) then
 		Spring.Log(section, LOG.ERROR, err)
 		Spring.Echo("Error in WakeUp (co_resume failure)", thread.unitID)
