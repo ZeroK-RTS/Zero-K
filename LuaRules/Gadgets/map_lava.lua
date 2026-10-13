@@ -910,6 +910,9 @@ function gadget:DrawWorld()
 end
 
 function gadget:Shutdown()
+	if lavaShader and lavaShader.shaderObj then lavaShader:Finalize() end
+	if foglightShader and foglightShader.shaderObj then foglightShader:Finalize() end
+	lavaShader, foglightShader = nil, nil
 	Spring.SetDrawWater(true)
 end
 
