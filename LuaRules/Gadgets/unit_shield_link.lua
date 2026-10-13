@@ -485,9 +485,9 @@ local function DrawFunc()
 		unitID = shieldUnits[i]
 		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link_unit") or -1)
 		if connectedToUnitID and connectedToUnitID >= 0 and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
-			local los1 = spGetUnitLosState(unitID, myTeam, false)
-			local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
-			if (fullview or (los1 and los1.los) or (los2 and los2.los)) and
+			local los1 = not fullview and spGetUnitLosState(unitID, myTeam, true)
+			local los2 = not fullview and spGetUnitLosState(connectedToUnitID, myTeam, true)
+			if (fullview or (los1 and los1 % 2 == 1) or (los2 and los2 % 2 == 1)) and
 					(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
 				
 				x1, y1, z1 = spGetUnitViewPosition(unitID, true)
