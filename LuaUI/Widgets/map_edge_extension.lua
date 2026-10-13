@@ -462,6 +462,7 @@ local function Initialize()
 	SetupShaderTable()
 	Spring.SendCommands("luaui disablewidget External VR Grid")
 	if gl.CreateShader and options.useShader.value then
+		if mirrorShader then gl.DeleteShader(mirrorShader) end
 		mirrorShader = gl.CreateShader(shaderTable)
 		if (mirrorShader == nil) then
 			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Map Edge Extension widget: mirror shader error: "..gl.GetShaderLog())
@@ -487,6 +488,7 @@ local function Initialize()
 		ugrid = gl.GetUniformLocation(mirrorShader,"grid")
 		ubrightness = gl.GetUniformLocation(mirrorShader,"brightness")
 	end
+	if dList then gl.DeleteList(dList) end
 	dList = gl.CreateList(DrawOMap, mirrorShader)
 	--Spring.SetDrawGround(false)
 
