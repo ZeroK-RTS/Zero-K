@@ -287,7 +287,8 @@ function widget:Update()
 	local _, cmdID = spGetActiveCommand()
 	buildPlateCommand = cmdID and ((CMD_BUILD_PLATE == cmdID) or (cmdPlateDefID))
 	
-	if (buildFactoryDefID or cmdFactoryDefID or closestFactoryData) and CMD_BUILD_PLATE ~= cmdID then
+	if (buildFactoryDefID or cmdFactoryDefID or closestFactoryData) and CMD_BUILD_PLATE ~= cmdID
+		and not (activeCmdOverride and cmdID and (-cmdID == buildFactoryDefID or -cmdID == buildPlateDefID)) then
 		ResetInterface()
 	end
 	
