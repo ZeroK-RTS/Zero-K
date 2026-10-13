@@ -122,7 +122,7 @@ function widget:UnitFinished(unitID, unitDefID)
 	AddUnit(unitID, unitDefID)
 end
 
-function widget:UnitEnteredLos(unitID, unitDefID)
+function widget:UnitEnteredLos(unitID, unitTeam, forAllyTeamID, unitDefID)
 	AddUnit(unitID, unitDefID)
 end
 
