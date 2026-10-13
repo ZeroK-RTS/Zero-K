@@ -77,6 +77,9 @@ local function findMyDamagedUnits()
 end
 
 local function repairNearestDamagedUnit(repairUnitID)
+	if spGetUnitCommandCount(repairUnitID) ~= 0 then
+		return
+	end
 	-- find the nearest damaged unit
 	local posx, posy, posz = spGetUnitPosition(repairUnitID)
 	if not posx then return end
@@ -132,6 +135,8 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	repairUnits[unitID] = nil
+	idleRepairUnits[unitID] = nil
+	repairingUnits[unitID] = nil
 	unitsToRepair[unitID] = nil
 end
 
