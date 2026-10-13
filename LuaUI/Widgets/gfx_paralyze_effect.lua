@@ -625,9 +625,11 @@ function widget:GameFrame(n)
 							val = val + 2.01 + 0.1 * disarmed
 						end
 						val = val + ((fire and 8) or 0)
-						uniformcache[1] = val
-						gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
-						uniformSet[unitID] = true
+						if uniformSet[unitID] ~= val then
+							uniformcache[1] = val
+							gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+							uniformSet[unitID] = val
+						end
 					end
 				else
 					toremove[unitID] = true
