@@ -1205,10 +1205,9 @@ local function DrawCombatMorphUnit(unitID, morphData, localTeamID)
 	glUnit(unitID, true)
 	
 	glColor(1,1,1,1)
-	--glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-	--glPolygonOffset(false)
-	--glCulling(false)
-	--glDepthTest(false)
+	glBlending(GL_SRC_ALPHA, GL_ONE)
+	glPolygonOffset(false)
+	glCulling(false)
 end
 
 local function DrawWorldFunc()
@@ -1246,6 +1245,7 @@ local function DrawWorldFunc()
 	glDepthTest(false)
 	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 	glCulling(false)
+	glColor(1,1,1,1)
 	phase = phase + .06
 end
 
