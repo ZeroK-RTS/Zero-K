@@ -724,6 +724,7 @@ end
 local firstUpdate = true
 local updateRunOnceRan = false
 
+local updateCount = 0
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
 	if firstUpdate then
 		vsx,vsy = Spring.GetViewSizes()
@@ -741,7 +742,9 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
 		updateRunOnceRan = true
 	end
-	if not window or (Spring.GetGameFrame()%TEAM_SLOWUPDATE_RATE ~= 0) then return end 
+	if not window then return end
+	updateCount = updateCount + 1
+	if updateCount % TEAM_SLOWUPDATE_RATE ~= 0 then return end
 
 	if not options.hideOnOverview.value then
 		vsx,vsy = Spring.GetViewSizes()
@@ -1262,6 +1265,10 @@ function widget:DrawScreen()
 		end
 		fakewindow:Invalidate()
 		map_panel:Invalidate()
+	end
+
+	if alpha == 0 then
+		return
 	end
 
 	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
