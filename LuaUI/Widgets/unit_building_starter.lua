@@ -142,6 +142,11 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	for i = #toClear, 1, -1 do
+		if toClear[i].unitID == unitID then
+			table.remove(toClear, i)
+		end
+	end
 	for j, i in pairs(buildings) do
 		if (i.ud) then
 			buildings[j] = nil
