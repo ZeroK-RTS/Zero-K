@@ -98,7 +98,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	local vsx, vsy = widgetHandler:GetViewSizes()
+	local vsx, vsy = Spring.GetViewGeometry()
 
 	local Chili = WG.Chili
 	window2 = Chili.Window:New{
