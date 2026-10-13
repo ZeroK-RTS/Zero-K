@@ -2033,7 +2033,7 @@ local function GetQueuePanel(parent, columns)
 		if buildQueue then
 			for i = 1, #buildQueue do
 				for udid, count in pairs(buildQueue[i]) do
-					if buttonCount <= columns then
+					if buttonCount < columns then
 						buttonCount = buttonCount + 1
 						local x, y = buttons.IndexToPosition(buttonCount)
 						local button = buttons.GetButton(x, y, selectionIndex)
