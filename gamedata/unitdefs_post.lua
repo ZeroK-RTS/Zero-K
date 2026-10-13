@@ -120,13 +120,14 @@ do
 	local modoptName = "extraunits"
 	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
 		local units = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
-		if type(tweaks) == "table" then
+		if type(units) == "table" then
 			Spring.Echo("Loading extraunits modoption", append or 0)
 			for name, ud in pairs(units) do
 				Spring.Echo("Loading extraunit " .. name)
 				local ud = lowerkeys(ud)
+				ud.customparams = ud.customparams or {}
 				if ud.customparams.base_def then
-					Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(UnitDefs[ud.customparams.base_def]), true)
+					ud = Spring.Utilities.MergeWithDefault(lowerkeys(UnitDefs[ud.customparams.base_def]), ud)
 				end
 				UnitDefs[name] = ud
 			end
