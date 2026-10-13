@@ -586,17 +586,22 @@ void main(void)
 			
 			fragColor.rgba = vec4(vec3(0.0), (1.0 - nearest * 1.5 / outlineWidth));
 		} else {
-			for (int x = -1 * resolution; x <= resolution; x++){
-				for (int y = -1* resolution; y <= resolution; y++){
+			// alpha = 1 - (sqrt(nearest)/sqrtdist)^k is <= 0 for any tap with distSq >= sqrtdist^2,
+			// and the UNORM target clamps alpha to 0 before blending -> such taps never change the output.
+			int searchRadius = min(int(ceil(sqrtdist)), resolution);
+			float maxDistSq = sqrtdist * sqrtdist;
+			for (int x = -searchRadius; x <= searchRadius; x++){
+				for (int y = -searchRadius; y <= searchRadius; y++){
 					vec2 pixeloffset = vec2(float(x), float(y));
+					float distSq = dot(pixeloffset, pixeloffset);
+					if (distSq >= maxDistSq) continue;
 					vec2 screendelta = pixeloffset * viewGeometryInv;
 					
-					float misctexvalue = texture(modelMisc, screenUV+ screendelta).g;
-					float mapd = texture(mapDepths, screenUV+ screendelta).x;
-					float modd = texture(modelDepths, screenUV + screendelta).x;
-					float dd = max(mapd - modd, 0.0);
-					if (misctexvalue > 0.5 && dd > 0){
-						nearest = min(nearest, dot(pixeloffset, pixeloffset));
+					float misctexvalue = textureLod(modelMisc, screenUV + screendelta, 0.0).g;
+					if (misctexvalue > 0.5) {
+						float mapd = textureLod(mapDepths, screenUV + screendelta, 0.0).x;
+						float modd = textureLod(modelDepths, screenUV + screendelta, 0.0).x;
+						if (mapd > modd) nearest = min(nearest, distSq);
 					}
 				}
 			}
