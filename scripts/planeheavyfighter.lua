@@ -111,8 +111,8 @@ local function RestoreAfterDelay()
 	
 	for i = 1, RESTORE_FRAMES do
 		local prop = 1 - i / RESTORE_FRAMES
-		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", FIRE_SLOWDOWN * prop + prop)
-		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", FIRE_TURN_INC * prop + prop)
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", FIRE_SLOWDOWN * prop + (1 - prop))
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", FIRE_TURN_INC * prop + (1 - prop))
 		GG.UpdateUnitAttributes(unitID)
 		Sleep(33)
 	end
