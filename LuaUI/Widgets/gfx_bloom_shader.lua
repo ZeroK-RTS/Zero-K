@@ -43,8 +43,6 @@ local brightTexture4 = nil
 
 local combineShader = nil
 local screenTexture = nil
-local screenTextureQuarter = nil
-local screenTextureSixteenth = nil
 
 -- speedups
 local glCreateTexture = gl.CreateTexture
@@ -170,12 +168,6 @@ function reset()
 		})
 	end
 	screenTexture = glCreateTexture(vsx, vsy, {
-		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-	})
-	screenTextureQuarter = glCreateTexture(vsx/2, vsy/2, {
-		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-	})
-	screenTextureSixteenth = glCreateTexture(vsx/4, vsy/4, {
 		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 	})
 end
