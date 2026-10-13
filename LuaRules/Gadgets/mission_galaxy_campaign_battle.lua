@@ -1200,7 +1200,7 @@ local function CheckDisableControlAiMessage()
 		local dis_msg = "DISABLE_CONTROL:"
 		for i = 1, #data do
 			dis_msg = dis_msg .. data[i] .. "+"
-			Spring.SetUnitRulesParam(unitID, "disableAiControl", 1, publicTrueTable)
+			Spring.SetUnitRulesParam(data[i], "disableAiControl", 1, publicTrueTable)
 		end
 		SendToUnsynced("SendAIEvent", teamID, dis_msg)
 	end
