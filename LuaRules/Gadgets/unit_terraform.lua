@@ -2934,7 +2934,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	if costDiff ~= 0 then
 		if pyramindCost == 0 then
 			terra.volCostSpent = terra.volCostSpent + costDiff
-			terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent + costDiff) / terra.totalCost
+			terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent) / terra.totalCost
 		else
 			local edgeSpendFactor = (terra.baseCostSpent and 0.38) or 1
 			local edgeSpending = costDiff*edgeSpendFactor*(1 - costDiff/(costDiff + pyramindCost))
