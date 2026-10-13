@@ -662,7 +662,7 @@ local function UpdateList()
 		glDeleteList(drawList)
 		 
 		drawAnything = true
-		drawList = glCreateList(function () glBeginEnd(GL_LINES, DrawWire, drawingUnits, fullview) end)
+		drawList = glCreateList(DrawWire, drawingUnits, fullview)
 	else
 		drawAnything = false
 	end
