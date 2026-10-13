@@ -237,6 +237,11 @@ end
 
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	prevFirestate[unitID] = nil
+	prevMovestate[unitID] = nil
+	prevPriority[unitID] = nil
+	prevMiscPriority[unitID] = nil
+	lastArmored[unitID] = nil
 	-- There should be a better way to do this, lazy fix.
 	WG.icons.SetUnitIcon( unitID, {name='firestate', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='movestate', texture=nil} )
