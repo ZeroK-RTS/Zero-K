@@ -24,6 +24,7 @@ local function GetWheelHeight(piece)
 end
 
 local xtiltv, ztiltv = 0, 0
+local settled = false -- suspension at rest while parked; Shot clears it
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
 -- A parked unit with settled suspension gets the same result from each update, so check it less often.
@@ -38,7 +39,7 @@ local function Suspension()
 	local xtilt, ztilt = 0, 0
 	local yv, yp = 0, 0
 
-	local idleTime, settled = 0, false
+	local idleTime = 0
 	local lastXtilt, lastZtilt, lastYp = 0, 0, 0
 	while true do
 		local _, _, _, speed = spGetUnitVelocity(unitID)
@@ -121,6 +122,7 @@ local sin = math.sin
 function script.Shot(num)
 	xtiltv = xtiltv - cos(lastHeading) / 69
 	ztiltv = ztiltv - sin(lastHeading) / 69
+	settled = false -- the recoil moves the suspension again
 
 	Move (barrel, z_axis, -8)
 	Move (barrel, z_axis, 0, 13)

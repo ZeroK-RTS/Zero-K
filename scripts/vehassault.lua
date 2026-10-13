@@ -42,6 +42,7 @@ local function GetWheelHeight(piece)
 end
 
 local xtiltv, ztiltv = 0, 0
+local settled = false -- suspension at rest while parked; Shot clears it
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
 -- A parked unit with settled suspension gets the same result from each update, so check it less often.
@@ -57,7 +58,7 @@ local function Suspension() -- Shamelessly stolen and adapted from Ripper. Perha
 	local xtilt, ztilt = 0, 0
 	local yv, yp = 0, 0
 	local s1r, s2r, s3r, s1l, s2l, s3l, s4l, s4r, xtilta, ztilta, ya, speed, wheelTurnSpeed
-	local idleTime, settled = 0, false
+	local idleTime = 0
 	local lastXtilt, lastZtilt, lastYp = 0, 0, 0
 	while true do
 		_, _, _, speed = spGetUnitVelocity(unitID)
@@ -170,6 +171,7 @@ end
 function script.Shot(num) -- Moved off FireWeapon for modders/tweakunits mostly.
 	xtiltv = xtiltv - cos(mainhead) / 80
 	ztiltv = ztiltv - sin(mainhead) / 80
+	settled = false -- the recoil moves the suspension again
 	EmitSfx(firepoint, 1024)
 	EmitSfx(firepoint, 1025)
 	StartThread(BarrelRecoil)
