@@ -156,7 +156,7 @@ function EditBox:_LineLog2Phys(logicalLine, pos)
 			local pl = self.physicalLines[plID]
 			py = plID
 			px = px + #pl.colorPrefix
-			if #pl.text + 1 >= px or plID == #logicalLine.pls then
+			if #pl.text + 1 >= px or plID == logicalLine.pls[#logicalLine.pls] then
 				break
 			end
 			if pl.extraSpace then
