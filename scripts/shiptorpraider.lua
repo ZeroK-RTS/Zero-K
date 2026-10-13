@@ -4,10 +4,10 @@ include "pieceControl.lua"
 local hull, torp, turret, sonar, wake1, wake2 = piece ('Hull', 'Torp', 'Turret', 'Sonar', 'Wake1', 'Wake2')
 
 local SIG_Aim = 2
+local SIG_MOVE = 1
 
 local stuns = {false, false, false}
 local disarmed = false
-local moving = false
 local sfxNum = 2
 
 local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
@@ -23,8 +23,10 @@ local function RestoreAfterDelay()
 end
 
 local function MoveScript()
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
 	while true do
-		if moving and not Spring.GetUnitIsCloaked(unitID) and (sfxNum == 1 or sfxNum == 2) then
+		if not Spring.GetUnitIsCloaked(unitID) and (sfxNum == 1 or sfxNum == 2) then
 			EmitSfx(wake1, 3)
 		end
 		Sleep(66)
@@ -32,11 +34,11 @@ local function MoveScript()
 end
 
 function script.StopMoving()
-	moving = false
+	Signal(SIG_MOVE)
 end
 
 function script.StartMoving()
-	moving = true
+	StartThread(MoveScript)
 end
 
 function script.Activate()
@@ -72,7 +74,6 @@ end
 
 function script.Create()
 	Move(wake1, z_axis, -22)
-	StartThread(MoveScript)
 	StartThread(GG.Script.SmokeUnit, unitID, {hull, sonar, turret})
 end
 
