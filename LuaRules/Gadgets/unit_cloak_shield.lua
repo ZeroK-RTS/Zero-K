@@ -330,6 +330,10 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (cloakShieldUnits[unitID]) then
 			cloakShieldUnits[unitID].radius = 0
+			if cloakShieldUnits[unitID].def.moveSpeedMult then
+				SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+				GG.UpdateUnitAttributes(unitID)
+			end
 		end
 		cloakers[unitID] = nil
 		cloakees[unitID] = nil
@@ -366,8 +370,7 @@ local function UpdateCloakees(data, frameNum)
 
 	local closestDistSq = false
 	local activeCloakee = false
-	local recloakUnit = {}
-	local recloakDistSq = {}
+	local recloakUnit, recloakDistSq
 	
 	local allyTeam = GetUnitAllyTeam(unitID)
 	for _,cloakee in ipairs(closeUnits) do
@@ -385,6 +388,9 @@ local function UpdateCloakees(data, frameNum)
 				if (not personalCloak) and (cloakProgress[cloakee] or 0) < 1 then
 					local ux,uy,uz = Spring.GetUnitPosition(cloakee)
 					local distSq = (ux-x)*(ux-x)+(uy-y)*(uy-y)+(uz-z)*(uz-z)
+					if not recloakUnit then
+						recloakUnit, recloakDistSq = {}, {}
+					end
 					recloakUnit[#recloakUnit + 1] = cloakee
 					recloakDistSq[#recloakDistSq + 1] = distSq
 					if (not closestDistSq) or (distSq < closestDistSq) then
