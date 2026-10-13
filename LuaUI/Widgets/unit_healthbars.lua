@@ -890,6 +890,9 @@ do
 		local dist = dx*dx + dy*dy + dz*dz
 
 		if (dist > healthbarDistSq) then
+			if gatherOverlays then
+				JustGetOverlayInfos(unitID, unitDefID)
+			end
 			return
 		end
 		addPercent = (dist < healthbarPercentSq)
