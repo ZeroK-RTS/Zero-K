@@ -123,7 +123,7 @@ local function GetUnitNearestAlly(unitID, range)
 		if (allyID ~= unitID) and (allyTeam == GaiaTeamID) and (Spring.Utilities.getMovetype(UnitDefs[allyDefID]) ~= false) then
 			local ox, oy, oz = Spring.GetUnitPosition(allyID)
 			local dist = math.diag(x - ox, z - oz)
-			if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) and ((best_dist == nil) or (dist < best_dist)) then
+			if ((best_dist == nil) or (dist < best_dist)) and IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) then
 				best_ally = allyID
 				best_dist = dist
 			end
