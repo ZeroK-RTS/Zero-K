@@ -1368,10 +1368,9 @@ function widget:GameFrame(frame)
 		return
 	end
 	if not drawEnabled then
-		-- Nothing is drawn (by default only while constructors are selected), so skip the scan of
-		-- every feature, the clustering and the display-list rebuilds; Update refreshes on the
-		-- frame drawing turns back on. The scan compares against the last known state, so the
-		-- result is the same.
+		-- Keep LOS observations and removals even while hidden. Clustering and display lists
+		-- can wait until Update turns drawing back on.
+		UpdateFeatures(frame)
 		dataStale = true
 		return
 	end
