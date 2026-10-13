@@ -1527,12 +1527,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		value = GetStateValue(name, "fire_at_shield")
-		if value then
+		if value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_FIRE_AT_SHIELD, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
 		value = GetStateValue(name, "fire_towards_enemy")
-		if value then
+		if value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_FIRE_TOWARDS_ENEMY, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
@@ -1608,7 +1608,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetGameRulesParam("morphUnitCreating") == 1) then
+	if not select(2, AmITeamLeader(unitTeam)) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetGameRulesParam("morphUnitCreating") == 1) then
 		return
 	end
 
