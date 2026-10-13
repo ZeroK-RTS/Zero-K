@@ -115,7 +115,7 @@ local function AddFeature(featureID)
 	handledFeatureList[#handledFeatureList + 1] = featureID
 	handledFeatureMap[featureID] = #handledFeatureList
 	
-	if not (metal and metal > 1) then
+	if not (metal and metal > minMetalShownOld) then
 		return
 	end
 	if WG.HighlightUnitGL4 then
@@ -146,17 +146,20 @@ local function UpdateFeatureVisibility()
 		handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
 	end
 	
-	if WG.HighlightUnitGL4 then
+	if WG.HighlightUnitGL4 or WG.HighlightFeatureCus then
 		-- Remove features that don't appear in the list of visible features.
 		local i = 1
 		while i <= #handledFeatureCheck do
 			if handledFeatureCheck[i] ~= newCheck then
 				local featureID = handledFeatureList[i]
-				if handledFeatureApiIDs[featureID] then
+				if WG.StopHighlightUnitGL4 and handledFeatureApiIDs[featureID] then
 					WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
 					--Spring.Utilities.FeatureEcho(featureID, "REMOVE 1")
 				end
 				
+				if WG.HighlightFeatureCus then
+					WG.HighlightFeatureCus(featureID, 0)
+				end
 				handledFeatureCheck[i] = handledFeatureCheck[#handledFeatureCheck]
 				handledFeatureList[i] = handledFeatureList[#handledFeatureList]
 				handledFeatureMap[handledFeatureList[i]] = i
@@ -204,6 +207,23 @@ function widget:Update()
 		minMetalShownNew = 1
 	else
 		minMetalShownNew = options.minmetal.value
+	end
+
+	if minMetalShownNew ~= minMetalShownOld then
+		minMetalShownOld = minMetalShownNew
+		if handledFeatureMap then
+			for i = 1, #handledFeatureList do
+				local featureID = handledFeatureList[i]
+				if WG.StopHighlightUnitGL4 and handledFeatureApiIDs[featureID] then
+					WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
+				end
+				if WG.HighlightFeatureCus then
+					WG.HighlightFeatureCus(featureID, 0)
+				end
+			end
+			handledFeatureList, handledFeatureMap = {}, {}
+			handledFeatureCheck, handledFeatureApiIDs = {}, {}
+		end
 	end
 
 	local pregame = (spGetGameFrame() < 1)
@@ -256,6 +276,19 @@ function widget:Update()
 	end
 	
 	UpdateFeatureVisibility()
+end
+
+function widget:Shutdown()
+	for featureID, apiID in pairs(handledFeatureApiIDs or {}) do
+		if WG.StopHighlightUnitGL4 then
+			WG.StopHighlightUnitGL4(apiID)
+		end
+	end
+	if WG.HighlightFeatureCus then
+		for i = 1, #(handledFeatureList or {}) do
+			WG.HighlightFeatureCus(handledFeatureList[i], 0)
+		end
+	end
 end
 
 function widget:SelectionChanged(units)
