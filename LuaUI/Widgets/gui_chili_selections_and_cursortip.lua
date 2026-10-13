@@ -2189,7 +2189,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local metalInfo
 	local energyInfo
 	
-	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, costInfo, playerNameLabel
+	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, costInfoPanel, playerNameLabel
 	if isTooltipVersion then
 		playerNameLabel = Chili.Label:New{
 			name = "playerNameLabel",
@@ -2343,7 +2343,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local morphShown = false
 		local visible = IsUnitInLos(unitID)
 		
-		if prevUnitID == unitID and prevUnitDefID == unitDefID and prevFeatureID == featureID and prevFeatureDefID == featureDefID and
+		if prevUnitID == unitID and (featureID or prevUnitDefID == unitDefID) and prevFeatureID == featureID and prevFeatureDefID == featureDefID and
 				prevVisible == visible and prevMorphTime == morphTime and prevMorphCost == morphCost and prevMousePlace == ((mousePlaceX and true) or false) then
 			
 			if not requiredOnly then
@@ -2587,6 +2587,13 @@ local function GetTooltipWindow()
 		while window.children[1] do
 			window.children[1]:Dispose()
 		end
+		local hiddenChildren = {}
+		for child in pairs(window.children_hidden) do
+			hiddenChildren[#hiddenChildren + 1] = child
+		end
+		for i = 1, #hiddenChildren do
+			hiddenChildren[i]:Dispose()
+		end
 		textTooltip = Chili.TextBox:New{
 			name = "textTooltip",
 			x = 0,
@@ -2732,14 +2739,14 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 		local name = string.sub(chiliTooltip, 10)
 		local ud = name and UnitDefNames[name]
 		if ud then
-			tooltipWindow.SetUnitishTooltip(nil, ud.id, nil, nil, true)
+			tooltipWindow.SetUnitishTooltip(nil, ud.id, nil, nil, true, nil, nil, nil, nil, requiredOnly)
 			return true
 		end
 	elseif chiliTooltip and string.find(chiliTooltip, "Build") then
 		local name = string.sub(chiliTooltip, 6)
 		local ud = name and UnitDefNames[name]
 		if ud then
-			tooltipWindow.SetUnitishTooltip(nil, ud.id, nil, nil, true)
+			tooltipWindow.SetUnitishTooltip(nil, ud.id, nil, nil, true, nil, nil, nil, nil, requiredOnly)
 			return true
 		end
 	end
@@ -2753,7 +2760,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 			if WG.PlacementCostMult then
 				morphCost = morphCost * WG.PlacementCostMult
 			end
-			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, morphTime, morphCost)
+			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, morphTime, morphCost, nil, nil, requiredOnly)
 		end
 		return true
 	end
@@ -2909,6 +2916,13 @@ local function GetSelectionWindow()
 	function externalFunctions.Reinitialise()
 		while mainPanel.children[1] do
 			mainPanel.children[1]:Dispose()
+		end
+		local hiddenChildren = {}
+		for child in pairs(mainPanel.children_hidden) do
+			hiddenChildren[#hiddenChildren + 1] = child
+		end
+		for i = 1, #hiddenChildren do
+			hiddenChildren[i]:Dispose()
 		end
 		singleUnitDisplay = GetSingleUnitInfoPanel(mainPanel, false)
 		multiUnitDisplay = GetMultiUnitInfoPanel(mainPanel)
