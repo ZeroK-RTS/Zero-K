@@ -97,6 +97,11 @@
 
 local sp = Spring
 
+local function IsTargetInLos(teamID, x, z)
+	local allyTeamID = select(6, sp.GetTeamInfo(teamID))
+	return sp.IsPosInLos(x, sp.GetGroundHeight(x, z), z, allyTeamID)
+end
+
 --[[ The first few entries here are simple examples which aren't polished enough for online play,
      so that modders can learn how to work with this interface; look below for the "real" ones. ]]
 local PowerDefs = {
@@ -220,7 +225,7 @@ local PowerDefs = {
 	tacnuke = {
 		TargetType = "position",
 		Cost = function (self, teamID, x, z)
-			if not sp.IsPosInLos(teamID, x, z) then
+			if not IsTargetInLos(teamID, x, z) then
 				return
 			end
 
@@ -246,7 +251,7 @@ local PowerDefs = {
 	impalation = {
 		TargetType = "position",
 		Cost = function (self, teamID, x, z)
-			if not sp.IsPosInLos(teamID, x, z) then
+			if not IsTargetInLos(teamID, x, z) then
 				return
 			end
 			return 125
@@ -290,7 +295,7 @@ end
 local spawn_template = {
 	TargetType = "position",
 	Cost = function (self, teamID, x, z)
-		if not sp.IsPosInLos(teamID, x, z) or (sp.TestBuildOrder(self.unitDefID, x, 0, z, 0) == 0) then
+		if not IsTargetInLos(teamID, x, z) or (sp.TestBuildOrder(self.unitDefID, x, 0, z, 0) == 0) then
 			return
 		end
 
