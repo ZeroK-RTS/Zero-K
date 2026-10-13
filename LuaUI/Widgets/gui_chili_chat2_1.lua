@@ -835,7 +835,8 @@ function widget:AddConsoleMessage(msg)
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
 	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
-	and #messages > 0 and messages[#messages].text == msg.text then
+	and #messages > 0 and messages[#messages].text == msg.text
+	and messages[#messages].playername == msg.playername then
 		-- update MapPoint position with most recent, as it is probably more relevant
 		messages[#messages].point = msg.point
 		messages[#messages].dup = messages[#messages].dup + 1
