@@ -2444,6 +2444,8 @@ function gadget:Shutdown()
 	modelsIndexVBO = nil
 
 	unitDrawBins = nil
+	activeBinsOf = {}
+	passRecords = {}
 	initiated = false
 	--gadgetHandler:RemoveChatAction("disablecusgl4")
 	--gadgetHandler:RemoveChatAction("reloadcusgl4")
