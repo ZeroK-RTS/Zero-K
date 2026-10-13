@@ -123,6 +123,7 @@ local deferrableClass = {bursts = true, staticparticles = true, overdriveparticl
 -- The visibility pass is skipped on drawn frames where nothing it depends on changed: no new sim
 -- frame, same camera, same viewing ally team, and no effects added since the last pass.
 local lastVisFrame, lastVisAllyTeam, lastCamX, lastCamY, lastCamZ, lastCamDX, lastCamDY, lastCamDZ = -1
+local lastCamVFOV, lastCamHFOV, lastVisVsx, lastVisVsy
 local visDirty = true
 -- Per-unit coarse view test, shared by all unit-space effects of a unit within one visibility
 -- pass. The margin covers the largest unit-attached effects (shield spheres, long jets).
@@ -1724,18 +1725,23 @@ local function Update(_,dt)
 	end
 
 	--// check which fxs are visible
-	-- Visibility only changes when the sim advances (units/effects move), the camera moves or new
-	-- effects are added, so skip the full pass on drawn frames where none of that happened.
+	-- Skip the full pass when the sim, camera (including projection), viewing ally team and
+	-- effects have not changed.
 	local cx, cy, cz = Spring.GetCameraPosition()
 	local dx, dy, dz = Spring.GetCameraDirection()
+	local vfov, hfov = Spring.GetCameraFOV()
+	vsx, vsy, vpx, vpy = Spring.Orig.GetViewGeometry()
 	if (not visDirty) and x == lastVisFrame and LocalAllyTeamID == lastVisAllyTeam
 		and cx == lastCamX and cy == lastCamY and cz == lastCamZ
-		and dx == lastCamDX and dy == lastCamDY and dz == lastCamDZ then
+		and dx == lastCamDX and dy == lastCamDY and dz == lastCamDZ
+		and vfov == lastCamVFOV and hfov == lastCamHFOV
+		and vsx == lastVisVsx and vsy == lastVisVsy then
 		return
 	end
 	visDirty = false
 	lastVisFrame, lastVisAllyTeam = x, LocalAllyTeamID
 	lastCamX, lastCamY, lastCamZ, lastCamDX, lastCamDY, lastCamDZ = cx, cy, cz, dx, dy, dz
+	lastCamVFOV, lastCamHFOV, lastVisVsx, lastVisVsy = vfov, hfov, vsx, vsy
 	anyFXVisible = false
 	anyWaterFXVisible = false
 	anyDistortionsVisible = false

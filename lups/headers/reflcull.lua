@@ -44,7 +44,7 @@ local MAP_Z  = Game.mapSizeZ
 local SQUARE = Game.squareSize or 8
 
 local CELL      = 128          -- grid cell size (elmos)
-local STEP      = 16           -- height sample spacing (elmos), divides CELL
+local STEP      = SQUARE       -- every heightmap vertex; divides CELL
 local SPC       = CELL / STEP  -- samples per cell edge
 local WET_BELOW = 32           -- a cell counts as water if any sample is below this height
 local SAMPLES_PER_UPDATE = 4096 -- ~0.5 ms of GetGroundHeight calls per Update while scanning
