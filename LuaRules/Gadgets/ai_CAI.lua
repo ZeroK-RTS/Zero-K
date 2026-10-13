@@ -1868,6 +1868,7 @@ local function raiderJobHandler(team)
 				aZ = enemyEconomy[i].aZ
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < raider.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < raider.cost then
 					if (not minCost) or minCost < enemyEconomyHeatmap[aX][aZ].cost then
+						minCost = enemyEconomyHeatmap[aX][aZ].cost
 						tX = enemyEconomy[i].x
 						tY = enemyEconomy[i].y
 						tZ = enemyEconomy[i].z
@@ -1880,7 +1881,7 @@ local function raiderJobHandler(team)
 			battleGroup.count = battleGroup.count+1
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ,
-				aX = aX, aZ = aZ,
+				aX = math.ceil(tX/heatSquareWidth), aZ = math.ceil(tZ/heatSquareHeight),
 				currentX = false, currentZ = false,
 				respondToSOSpriority = 1,
 				regroup = true,
@@ -2028,6 +2029,7 @@ local function gunshipJobHandler(team)
 				
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < gunship.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < gunship.cost and static*3 + mobile*2 < gunship.cost then
 					if (not minCost) or minCost < enemyEconomyHeatmap[aX][aZ].cost then
+						minCost = enemyEconomyHeatmap[aX][aZ].cost
 						tX = enemyEconomy[i].x
 						tY = enemyEconomy[i].y
 						tZ = enemyEconomy[i].z
@@ -2040,7 +2042,7 @@ local function gunshipJobHandler(team)
 			battleGroup.count = battleGroup.count+1
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ,
-				aX = aX, aZ = aZ,
+				aX = math.ceil(tX/heatSquareWidth), aZ = math.ceil(tZ/heatSquareHeight),
 				currentX = false, currentZ = false,
 				respondToSOSpriority = 1,
 				regroup = true,
@@ -2162,6 +2164,7 @@ local function combatJobHandler(team)
 				
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < combat.cost and enemyDefenceHeatmap[aX][aZ].cost < combat.cost then
 					if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyOffense[i].x,enemyOffense[i].z) then
+						minTargetDistance = disSQ(averageX, averageZ, enemyOffense[i].x, enemyOffense[i].z)
 						tX = enemyOffense[i].x
 						tY = enemyOffense[i].y
 						tZ = enemyOffense[i].z
@@ -2175,6 +2178,7 @@ local function combatJobHandler(team)
 				
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < combat.cost and enemyDefenceHeatmap[aX][aZ].cost < combat.cost then
 					if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyEconomy[i].x,enemyEconomy[i].z) then
+						minTargetDistance = disSQ(averageX, averageZ, enemyEconomy[i].x, enemyEconomy[i].z)
 						tX = enemyEconomy[i].x
 						tY = enemyEconomy[i].y
 						tZ = enemyEconomy[i].z
@@ -2189,6 +2193,7 @@ local function combatJobHandler(team)
 					
 					if enemyOffenseHeatmap[aX][aZ].cost < combat.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < combat.cost then
 						if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyDefence[i].x,enemyDefence[i].z) then
+							minTargetDistance = disSQ(averageX, averageZ, enemyDefence[i].x, enemyDefence[i].z)
 							tX = enemyDefence[i].x
 							tY = enemyDefence[i].y
 							tZ = enemyDefence[i].z
@@ -2202,7 +2207,7 @@ local function combatJobHandler(team)
 			battleGroup.count = battleGroup.count+1
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ,
-				aX = aX, aZ = aZ,
+				aX = math.ceil(tX/heatSquareWidth), aZ = math.ceil(tZ/heatSquareHeight),
 				currentX = false, currentZ = false,
 				respondToSOSpriority = 0,
 				regroup = true,
@@ -2287,7 +2292,7 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 						end
 					)
 					local empty = true
-					for u = i, #units do
+					for u = 1, #units do
 						if spGetUnitAllyTeam(units[u]) ~= allyTeam then
 							empty = false
 							break
@@ -2566,7 +2571,7 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange, priorit
 		end
 		local battleGroup = a.battleGroup
 		for i = 1, battleGroup.count do
-			if battleGroup[i].respondToSOSpriority <= priority and disSQ(dx, battleGroup[i].aX, dz, battleGroup[i].aZ) < callRange^2 then
+			if battleGroup[i].respondToSOSpriority <= priority and battleGroup[i].currentX and disSQ(dx, dz, battleGroup[i].currentX, battleGroup[i].currentZ) < callRange^2 then
 				battleGroup[i].tempTarget = attackerID
 			end
 		end
@@ -2838,14 +2843,14 @@ function gadget:GameFrame(n)
 		
 		if not data.suspend then
 		
-			if n%60 == 0 + team then
+			if n%60 == team%60 then
 				updateTeamResourcing(team)
 				executeControlFunction(team, n)
 				conJobAllocator(team)
 			end
 			
-			if n%40 == 15 + team then
-				battleGroupHandler(team, n, n%200 == 15)
+			if n%40 == (15 + team)%40 then
+				battleGroupHandler(team, n, n%200 == (15 + team)%200)
 			end
 			
 			if n%40 == (35 + team)%40 then
@@ -2857,13 +2862,13 @@ function gadget:GameFrame(n)
 				gunshipJobHandler(team)
 			end
 			
-			if n%30 == 0 + team then
+			if n%30 == team%30 then
 				conJobHandler(team)
 				factoryJobHandler(team)
 				scoutJobHandler(team)
 			end
 			
-			if n%200 == 0 + team then
+			if n%200 == team%200 then
 				if debugData.showConJobList[team] then
 					echoConJobList(team)
 				end
@@ -2882,19 +2887,19 @@ function gadget:GameFrame(n)
 	
 	for allyTeam,data in pairs(allyTeamData) do
 		
-		if n%50 == 25 + allyTeam then
+		if n%50 == (25 + allyTeam)%50 then
 			if data.ai then
-				updateScoutingHeatmap(allyTeam,n, n%500 == 25)
+				updateScoutingHeatmap(allyTeam,n, n%500 == (25 + allyTeam)%500)
 			end
 		end
 	
-		if n%200 == 0 + allyTeam then
+		if n%200 == allyTeam%200 then
 			if debugData.showEnemyForceCompostion[team] then
 				echoEnemyForceComposition(allyTeam)
 			end
 		end
 	
-		if n%120 == 30 + allyTeam then
+		if n%120 == (30 + allyTeam)%120 then
 			if data.ai then
 			
 				decayEnemyHeatmaps(allyTeam,n)
