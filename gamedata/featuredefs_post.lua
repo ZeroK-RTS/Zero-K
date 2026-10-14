@@ -63,7 +63,7 @@ for name, fd in pairs(FeatureDefs) do
 			fd.metal = metal
 			fd.energy = energy
 			
-			fd.reclaimtime = math.max(1, energy + metal) -- Income equal to BP split between metal and energy.
+			fd.reclaimtime = math.max(1, math.abs(energy) + math.abs(metal)) -- Income equal to BP split between metal and energy.
 		end
 		
 		fd.customparams = fd.customparams or {}
