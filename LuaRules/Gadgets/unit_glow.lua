@@ -39,6 +39,23 @@ local CallAsTeam = CallAsTeam
 local shader
 local glowingUnits = {}
 
+-- The draw callins are registered only while a unit glows, so the gadget handler does not call them otherwise.
+local drawCallInsOn = true
+local function UpdateDrawCallIns()
+	local wanted = (next(glowingUnits) ~= nil)
+	if wanted == drawCallInsOn then
+		return
+	end
+	drawCallInsOn = wanted
+	if wanted then
+		gadgetHandler:UpdateCallIn("DrawWorld")
+		gadgetHandler:UpdateCallIn("DrawWorldRefraction")
+	else
+		gadgetHandler:RemoveCallIn("DrawWorld")
+		gadgetHandler:RemoveCallIn("DrawWorldRefraction")
+	end
+end
+
 function GlowUnit(unitID, r_or_table, g, b, a)
 	if not r_or_table then
 		glowingUnits[unitID] = nil
@@ -47,10 +64,12 @@ function GlowUnit(unitID, r_or_table, g, b, a)
 	else
 		glowingUnits[unitID] = {r_or_table, g, b, a}
 	end
+	UpdateDrawCallIns()
 end
 
 function gadget:UnitDestroyed(unitID)
 	glowingUnits[unitID] = nil
+	UpdateDrawCallIns()
 end
 
 function gadget:RecvFromSynced(magic, unitID, r, g, b, a)
@@ -63,6 +82,7 @@ function gadget:RecvFromSynced(magic, unitID, r, g, b, a)
 	else
 		glowingUnits[unitID] = nil
 	end
+	UpdateDrawCallIns()
 end
 
 function gadget:Initialize()
@@ -122,6 +142,7 @@ function gadget:Initialize()
 			UnitCreated(nil, unitID, spGetUnitDefID(unitID))
 		end
 	end
+	UpdateDrawCallIns()
 end
 
 local function DrawWorldFunc()
@@ -151,7 +172,6 @@ local function DrawWorldFuncTeamWrapper()
 	end
 end
 
--- FIXME: optimize to only run if something is actually glowing!
 gadget.DrawWorld           = DrawWorldFuncTeamWrapper
 gadget.DrawWorldRefraction = DrawWorldFuncTeamWrapper
 
