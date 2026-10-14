@@ -66,6 +66,23 @@ local CallAsTeam = CallAsTeam
 local shader
 local tintedUnits = {}
 
+-- The draw callins are registered only while a unit is tinted, so the gadget handler does not call them otherwise.
+local drawCallInsOn = true
+local function UpdateDrawCallIns()
+	local wanted = (next(tintedUnits) ~= nil)
+	if wanted == drawCallInsOn then
+		return
+	end
+	drawCallInsOn = wanted
+	if wanted then
+		gadgetHandler:UpdateCallIn("DrawWorld")
+		gadgetHandler:UpdateCallIn("DrawWorldRefraction")
+	else
+		gadgetHandler:RemoveCallIn("DrawWorld")
+		gadgetHandler:RemoveCallIn("DrawWorldRefraction")
+	end
+end
+
 function TintUnit(unitID, r_or_table, g, b)
 	if not r_or_table then
 		tintedUnits[unitID] = nil
@@ -74,10 +91,12 @@ function TintUnit(unitID, r_or_table, g, b)
 	else
 		tintedUnits[unitID] = {r_or_table, g, b}
 	end
+	UpdateDrawCallIns()
 end
 
 function gadget:UnitDestroyed(unitID)
 	tintedUnits[unitID] = nil
+	UpdateDrawCallIns()
 end
 
 function gadget:RecvFromSynced(magic, unitID, r, g, b)
@@ -90,6 +109,7 @@ function gadget:RecvFromSynced(magic, unitID, r, g, b)
 	else
 		tintedUnits[unitID] = nil
 	end
+	UpdateDrawCallIns()
 end
 
 function gadget:Initialize()
@@ -136,6 +156,7 @@ function gadget:Initialize()
 			UnitCreated(nil, unitID, spGetUnitDefID(unitID))
 		end
 	end
+	UpdateDrawCallIns()
 end
 
 local function DrawWorldFunc()
@@ -168,7 +189,6 @@ local function DrawWorldFuncTeamWrapper()
 	end
 end
 
--- FIXME: optimize to only run if something is actually tinted!
 gadget.DrawWorld           = DrawWorldFuncTeamWrapper
 gadget.DrawWorldRefraction = DrawWorldFuncTeamWrapper
 
