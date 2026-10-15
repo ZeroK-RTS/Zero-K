@@ -3507,6 +3507,7 @@ local function DeregisterStructure(unitID)
 	local f = structureCheckFrame[structure[unitID].frame]
 	if f.count ~= structure[unitID].frameIndex then
 		structureCheckFrame[structure[unitID].frame].unit[structure[unitID].frameIndex] = structureCheckFrame[structure[unitID].frame].unit[f.count]
+		structure[f.unit[f.count]].frameIndex = structure[unitID].frameIndex
 	end
 	if structureCheckFrame[structure[unitID].frame].count == 1 then
 		structureCheckFrame[structure[unitID].frame] = nil
