@@ -31,7 +31,12 @@ local gun = {
 	[2] = {query = lmissleflare, missile = mmissile, rack = mrack, loaded = true},
 }
 
+local wingsRestored = false
 local function restoreWings()
+	if wingsRestored then
+		return
+	end
+	wingsRestored = true
 	Turn(mhull, y_axis, 0, math.rad(15))
 	Turn(lhull, y_axis, 0, math.rad(15))
 	Turn(rhull, y_axis, 0, math.rad(15))
@@ -45,23 +50,19 @@ local function restoreWings()
 end
 
 local function TiltBody()
-
 	while true do
 		if isActive then
 			local vx,_,vz = spGetUnitVelocity(unitID)
 			local speed = vx*vx + vz*vz
-
 			if speed > 5 then
+				wingsRestored = false
 				local myHeading = Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
 				local velHeading = Spring.GetHeadingFromVector(vx, vz)*GG.Script.headingToRad - myHeading
 				-- south is 0, increases anticlockwise
 
 				local px,_,pz = Spring.GetUnitPiecePosition(unitID, heading)
-
 				local curHeading = -Spring.GetHeadingFromVector(-px, -pz)*GG.Script.headingToRad
-
 				local diffHeading = (velHeading - curHeading + math.pi) % math.tau - math.pi -- keep in range [-math.pi,math.pi)
-
 				local newHeading
 
 				if diffHeading < -math.pi/3 then
@@ -119,6 +120,7 @@ end
 
 local function activate()
 	isActive = true
+	wingsRestored = false
 	Move(mhull, y_axis, -1, 2)
 	Move(rhull, y_axis, -1, 2)
 	Move(lhull, y_axis, -1, 2)
@@ -137,6 +139,7 @@ end
 
 local function deactivate()
 	isActive = false
+	wingsRestored = false
 	Move(mhull, y_axis, -5, 2)
 	Move(rhull, y_axis, -5, 2)
 	Move(lhull, y_axis, -5, 2)
