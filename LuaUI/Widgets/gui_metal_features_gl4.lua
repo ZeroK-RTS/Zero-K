@@ -40,7 +40,7 @@ local FEATURE_RADIUS = 120
 local ALL_FEATURES = false
 
 -- Features rarely enter or leave the view, so look for them a few times per second instead of every frame.
-local VISIBILITY_UPDATE_PERIOD = 0.2
+local VISIBILITY_UPDATE_PERIOD = false
 local visibilityUpdateTime = 0
 
 --------------------------------------------------------------------------------
@@ -260,9 +260,13 @@ function widget:Update(dt)
 		end
 	end
 	
-	visibilityUpdateTime = visibilityUpdateTime + (dt or 0)
-	if visibilityUpdateTime >= VISIBILITY_UPDATE_PERIOD then
-		visibilityUpdateTime = 0
+	if VISIBILITY_UPDATE_PERIOD then
+		visibilityUpdateTime = visibilityUpdateTime + (dt or 0)
+		if visibilityUpdateTime >= VISIBILITY_UPDATE_PERIOD then
+			visibilityUpdateTime = 0
+			UpdateFeatureVisibility()
+		end
+	else
 		UpdateFeatureVisibility()
 	end
 end
