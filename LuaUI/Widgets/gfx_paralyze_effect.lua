@@ -506,8 +506,12 @@ local function DrawParalyzedUnitGL4(unitID, unitDefID, red_start,  green_start, 
 	-- note that widgets are responsible for stopping the drawing of every unit that they submit!
 
 	--Spring.Echo("DrawParalyzedUnitGL4",unitID, unitDefID, UnitDefs[unitDefID].name)
-	if paralyzedDrawUnitVBOTable.instanceIDtoIndex[unitID] then return end -- already got this unit
-	if Spring.ValidUnitID(unitID) ~= true or Spring.GetUnitIsDead(unitID) == true then return end
+	if paralyzedDrawUnitVBOTable.instanceIDtoIndex[unitID] then
+		return -- already got this unit
+	end
+	if Spring.ValidUnitID(unitID) ~= true or Spring.GetUnitIsDead(unitID) == true then
+		return
+	end
 	red_start = red_start or 1.0
 	green_start = green_start or 1.0
 	blue_start = blue_start or 1.0
@@ -576,69 +580,70 @@ local UPDATE_RATE = 2
 local uniformSet = {}
 
 function widget:GameFrame(n)
-	if not TESTMODE then
-		if n % UPDATE_RATE == 0 then
-			for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
-				if Spring.ValidUnitID(unitID) then
-					local para = utGetIsUnitEmped(unitID) and 1
-					local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
-					local slow = math.min(0.5, spGetUnitRulesParam(unitID, "slowState") or 0)
-					local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
-					
-					local wantRemove = (not para) and (not disarmed) and slow <= 0 and (not fire)
-					if (not para) and (not disarmed) then
-						if empLinger[unitID] then
-							empLinger[unitID] = empLinger[unitID] - UPDATE_RATE
-							if empLinger[unitID] > 0 then
-								para = empLinger[unitID] / LINGER_FRAMES
-								wantRemove = false
-							else
-								empLinger[unitID] = nil
-							end
-						elseif disarmLinger[unitID] then
-							disarmLinger[unitID] = disarmLinger[unitID] - UPDATE_RATE
-							if disarmLinger[unitID] > 0 then
-								disarmed = disarmLinger[unitID] / LINGER_FRAMES
-								wantRemove = false
-							else
-								disarmLinger[unitID] = nil
-							end
+	if TESTMODE then
+		return
+	end
+	if n % UPDATE_RATE == 0 then
+		for unitID, index in pairs(paralyzedDrawUnitVBOTable.instanceIDtoIndex) do
+			if Spring.ValidUnitID(unitID) then
+				local para = utGetIsUnitEmped(unitID) and 1
+				local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1) and 1
+				local slow = math.min(0.5, spGetUnitRulesParam(unitID, "slowState") or 0)
+				local fire = (spGetUnitRulesParam(unitID, "on_fire") == 1)
+				
+				local wantRemove = (not para) and (not disarmed) and slow <= 0 and (not fire)
+				if (not para) and (not disarmed) then
+					if empLinger[unitID] then
+						empLinger[unitID] = empLinger[unitID] - UPDATE_RATE
+						if empLinger[unitID] > 0 then
+							para = empLinger[unitID] / LINGER_FRAMES
+							wantRemove = false
+						else
+							empLinger[unitID] = nil
 						end
-					end
-					
-					if wantRemove then
-						toremove[unitID] = true
-					else
-						if para == 1 then
-							empLinger[unitID] = LINGER_FRAMES
+					elseif disarmLinger[unitID] then
+						disarmLinger[unitID] = disarmLinger[unitID] - UPDATE_RATE
+						if disarmLinger[unitID] > 0 then
+							disarmed = disarmLinger[unitID] / LINGER_FRAMES
+							wantRemove = false
+						else
 							disarmLinger[unitID] = nil
-						elseif disarmed == 1 then
-							disarmLinger[unitID] = LINGER_FRAMES
 						end
-						local val = 0
-						if slow > 0 then
-							val = val + 1 + slow
-						end
-						if para then
-							val = val + 4.01 + 0.1 * para
-						elseif disarmed then
-							val = val + 2.01 + 0.1 * disarmed
-						end
-						val = val + ((fire and 8) or 0)
-						uniformcache[1] = val
-						gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
-						uniformSet[unitID] = true
 					end
-				else
-					toremove[unitID] = true
-					uniformSet[unitID] = nil
 				end
+				
+				if wantRemove then
+					toremove[unitID] = true
+				else
+					if para == 1 then
+						empLinger[unitID] = LINGER_FRAMES
+						disarmLinger[unitID] = nil
+					elseif disarmed == 1 then
+						disarmLinger[unitID] = LINGER_FRAMES
+					end
+					local val = 0
+					if slow > 0 then
+						val = val + 1 + slow
+					end
+					if para then
+						val = val + 4.01 + 0.1 * para
+					elseif disarmed then
+						val = val + 2.01 + 0.1 * disarmed
+					end
+					val = val + ((fire and 8) or 0)
+					uniformcache[1] = val
+					gl.SetUnitBufferUniforms(unitID, uniformcache, 4)
+					uniformSet[unitID] = true
+				end
+			else
+				toremove[unitID] = true
+				uniformSet[unitID] = nil
 			end
 		end
-		for unitID, _ in pairs(toremove) do
-			StopDrawParalyzedUnitGL4(unitID)
-			toremove[unitID] = nil
-		end
+	end
+	for unitID, _ in pairs(toremove) do
+		StopDrawParalyzedUnitGL4(unitID)
+		toremove[unitID] = nil
 	end
 end
 
@@ -675,7 +680,9 @@ end
 --end
 
 function widget:UnitEnteredLos(unitID)
-	if fullview then return end
+	if fullview then
+		return
+	end
 	uniformSet[unitID] = nil
 	widget:UnitCreated(unitID, spGetUnitDefID(unitID))
 end
