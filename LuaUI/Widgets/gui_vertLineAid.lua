@@ -101,7 +101,7 @@ local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitLosState     = Spring.GetUnitLosState
-local mathMax               = math.max
+local max                   = math.max
 local LOS_INLOS = 1 -- LOS state bit, see rts/Sim/Units/Unit.h
 
 local function UpdateUnit(unitID, data, index, isEnemy)
@@ -115,7 +115,7 @@ local function UpdateUnit(unitID, data, index, isEnemy)
 	end
 	data[2] = y
 	data[3] = z
-	data[4] = mathMax(spGetGroundHeight(x,z), 0)
+	data[4] = max(spGetGroundHeight(x,z), 0)
 	if isEnemy then
 		-- The raw (number) form of GetUnitLosState does not create a table. The table form has
 		-- los = true exactly when the INLOS bit is set (kept by the engine's raw mask) and no los
