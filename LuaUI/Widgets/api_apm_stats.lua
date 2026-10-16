@@ -68,7 +68,10 @@ local function SendMyPlayerStats()
 		APM = round(NC*60/activeTime),
 	}
 	--If sending own stats, we need to clear previous set incase we have left the game and come back
-	WG.AddPlayerStatsToPanel(playerStats)
+	-- the panel widget can already be gone during Shutdown; the stats are still sent below
+	if WG.AddPlayerStatsToPanel then
+		WG.AddPlayerStatsToPanel(playerStats)
+	end
 	MP = VFS.PackU16(MP)
 	MC = VFS.PackU16(MC)
 	KP = VFS.PackU16(KP)
@@ -108,7 +111,9 @@ local function ProcessPlayerStats(msg, playerID)
 			KPM = round(KP*60/activeTime),
 			APM = round(NC*60/activeTime),
 		}
-		WG.AddPlayerStatsToPanel(playerStats)
+		if WG.AddPlayerStatsToPanel then
+			WG.AddPlayerStatsToPanel(playerStats)
+		end
 	end
 end
 
