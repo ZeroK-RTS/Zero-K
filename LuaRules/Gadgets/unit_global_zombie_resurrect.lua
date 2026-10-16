@@ -48,27 +48,36 @@ local spGetUnitHealth             = Spring.GetUnitHealth
 
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
+local allyTeamCount = #Spring.GetAllyTeamList() -1 -- -1 for Gaia team
 
-local zombieTeamID = GaiaTeamID
 local zombieAllyTeamID = GaiaAllyTeamID
-local zombieTeamInput = tonumber(modOptions.zombies_team) or GaiaAllyTeamID -- 0 translates to gaia zombies
-if zombieTeamInput ~= 0 then
-	zombieAllyTeamID = zombieTeamInput -1 --Teams are offset by 1 in the modoptions, and nil when 0
-	if zombieAllyTeamID == GaiaAllyTeamID then
-		zombieAllyTeamID = zombieTeamInput +1 -- TODO there is likely a better solution, it seems sometimes Gaia is not the last team in the list
+local zombieTeamInput = tonumber(modOptions.zombies_team) or 0 
+
+if zombieTeamInput == 0 then -- 0 translates to gaia zombies
+	zombieAllyTeamID = GaiaAllyTeamID
+elseif zombieTeamInput > allyTeamCount then -- larger than teamcount mean things revive onto their parent teams
+	zombieAllyTeamID = math.huge
+else -- if inbetween 0 and max teamcount, we have a team to spawn on!
+	zombieAllyTeamID = zombieTeamInput -1 -- -1 for offset 
+	if zombieAllyTeamID == GaiaAllyTeamID then --TODO there is likely a better solution, it seems sometimes Gaia is not the last team in the list
+		zombieAllyTeamID = zombieAllyTeamID +1 
 	end
 end
-local zombieTeamFullSlow = tonumber(modOptions.zombies_team_full_slow) or 0
+
+local zombieTeamFullSlow = tonumber(modOptions.zombies_team_full_speed_mult) or 0
 local zombieTeamStartsDead = tonumber(modOptions.zombies_team_starts_dead) or 0
 
-local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed) or 12
+local zombieRezSpeed = tonumber(modOptions.zombies_rezspeed) or 12
+local zombieRezSpeedScaler = tonumber(modOptions.zombies_rezspeed_scaler) or 0
+local zombieRezSpeedMinuteAdd = tonumber(modOptions.zombies_rezspeed_minute_add) or 0
 
 local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_speed_mult) or 0.5
 
-local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay) or 10 -- minimum of 10 seconds, max is determined by rez speed
+local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay_min) or 10 -- minimum of 10 seconds
 local ZOMBIES_REZ_MAX = tonumber(modOptions.zombies_delay_max) or 100000 --600 only affects things above 7200 cost at 12 rezspeed.
 
 local ZOMBIES_PARTIAL_RECLAIM = tonumber(modOptions.zombies_partial_reclaim) or 0
+local zombieOverflowSpawn = tonumber(modOptions.zombies_partial_spawn) or 1
 
 local zombieDeathOnCaptureChance = tonumber(modOptions.zombies_die_on_capture) or 0
 
@@ -77,13 +86,14 @@ local zombieWrecksRemain = tonumber(modOptions.zombies_wrecks_remain) or 0
 
 local zombiesReviveOptionsAsString = (modOptions.zombies_revive_options) or nil 
 local zombieReviveOptionMultiRandomise = tonumber(modOptions.zombies_revive_options_multi_random) or 0
-local zombieOverflowSpawn = tonumber(modOptions.zombies_revive_options_overflow_spawn) or 1
 
 local zombieBudgetMult = tonumber(modOptions.zombies_budget_multiplier) or 1
 local zombieBudgetMultScaler = tonumber(modOptions.zombies_budget_multiplier_scaler) or 0
+local zombieBudgetMultMinuteAdd = tonumber(modOptions.zombies_budget_multiplier_minute_add) or 0
 
 local zombieFlatBudget = tonumber(modOptions.zombies_flat_budget) or 0
 local zombieFlatBudgetScaler = tonumber(modOptions.zombies_flat_budget_scaler) or 0
+local zombieFlatBudgetMinuteAdd = tonumber(modOptions.zombies_flat_budget_minute_add) or 0
 
 local zombieUnits = {}
 local featureReviveCycleCount = {}
@@ -127,13 +137,14 @@ end
 local function DiagnosticsVarDump()
 	--May be good to have a screen like chickens
 	Spring.Echo("-------------")
-	Spring.Echo("totalBaseRevivedBudget: "..totalBaseRevivedBudget)
-	Spring.Echo("totalRevivedBudget: "..totalRevivedBudget)
+	Spring.Echo("totalUnmodifiedReviveBudget: "..totalBaseRevivedBudget)
+	Spring.Echo("totalModifiedReviveBudget: "..totalRevivedBudget)
 	Spring.Echo("totalRevivedValue: "..totalRevivedValue)
 	Spring.Echo("totalReviveCount: "..totalReviveCount)
-	Spring.Echo("zombieExcessBudget: "..excessBudget)
 	Spring.Echo("zombieFlatBudget: "..zombieFlatBudget)
 	Spring.Echo("zombieBudgetMult: "..zombieBudgetMult)
+	Spring.Echo("currentReviveSpeed: "..zombieRezSpeed)
+	Spring.Echo("zombieOverflowBudget: "..excessBudget)
 	Spring.Echo("-------------")
 end
 
@@ -152,10 +163,10 @@ local function IsTeamInAllyTeam (allyTeamID, teamIDtoCheck)
 end
 
 local function GetRandomTeamIDFromAllyTeam(allyTeamID) -- function since the team zombies revive onto could be changed mid game.
-	local allyTeamList = Spring.GetTeamList(allyTeamID)
+	local allyTeamList = Spring.GetTeamList(allyTeamID) or GaiaAllyTeamID
 	local teamMateCount = 0
 	local teamToSpawnOn
-	if allyTeamID == GaiaAllyTeamID or not allyTeamList then
+	if allyTeamID == GaiaAllyTeamID then
 		return GaiaTeamID
 	end
 	
@@ -166,14 +177,19 @@ local function GetRandomTeamIDFromAllyTeam(allyTeamID) -- function since the tea
 	return teamToSpawnOn
 end
 
-local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
+local function HandleZombieRevive(featureID, reviveBudget,reviveTeamID,unitDefIDTable)
 	local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
 	local zombieUnitDefID = nil --nil means we use the features default revival thingy
-	local zombieCost = UnitDefNames[resDefName].cost or UnitDefNames[resDefName].buildTime
-	
+	local zombieCost = UnitDefNames[resDefName].metalCost
+	if not zombieCost or zombieCost <= 0 then
+		zombieCost = UnitDefNames[resDefName].buildTime
+	end
 	if unitDefIDTable then
 		zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
-		zombieCost = UnitDefs[zombieUnitDefID].cost or UnitDefs[zombieUnitDefID].buildTime
+		zombieCost = UnitDefs[zombieUnitDefID].metalCost or 0
+		if zombieCost or zombieCost <= 0 then
+			zombieCost = UnitDefs[zombieUnitDefID].buildTime
+		end
 	end
 	
 	if not zombieCost or zombieCost <= 0 then
@@ -181,8 +197,8 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 		Spring.Echo("Unit has no cost set, defaulting to 200")
 	end
 	
-	while math.floor(currentBudget) >= zombieCost do --TODO zombie cost can end up as a float somehow?
-		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,zombieTeamID,zombieUnitDefID)
+	while reviveBudget >= zombieCost do
+		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,reviveTeamID,zombieUnitDefID)
 		if unitID then
 			zombieUnits[unitID] = true
 			GG.Zombies.SetZombieBehavior(unitID)
@@ -190,67 +206,110 @@ local function HandleZombieRevive(featureID, currentBudget,unitDefIDTable)
 			totalReviveCount = totalReviveCount +1
 			totalRevivedValue = math.floor(totalRevivedValue + zombieCost)
 		end
-		currentBudget = currentBudget - zombieCost
+		reviveBudget = reviveBudget - zombieCost
 		if zombieReviveOptionMultiRandomise == 1 and zombieUnitDefID then -- Randomises to a new unit if desired
 			zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
-			zombieCost = UnitDefs[zombieUnitDefID].cost or  UnitDefs[zombieUnitDefID].buildTime
+			zombieCost = UnitDefs[zombieUnitDefID].metalCost or 0 
+			if not zombieCost or zombieCost <= 0 then
+				zombieCost = UnitDefs[zombieUnitDefID].buildTime
+			end
 			if not zombieCost or zombieCost <= 0 then
 				zombieCost = 200
 				Spring.Echo("Unit has no cost set, defaulting to 200")
 			end
 		end
-		--TODO do we randomise for each spawn?
-		if zombieAllyTeamID ~= GaiaAllyTeamID then
-			zombieTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
+		--TODO should we randomise for each spawn? So far yes, since it gives every possible member of the team a chance for a unit
+		if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > allyTeamCount) then
+			reviveTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
 		end
 	end
-		
-	if zombieOverflowSpawn == 1 and currentBudget > 0 then -- We make a partial health zombie or overflow the budget to the next spawn
-		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,zombieTeamID,zombieUnitDefID)
+	if zombieOverflowSpawn == 1 and math.floor(reviveBudget) > 0 then -- We make a partial health zombie or overflow the budget to the next spawn
+		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,reviveTeamID,zombieUnitDefID)
 		if not unitID then
-			return currentBudget
+			return reviveBudget
 		end
 		zombieUnits[unitID] = true
 		GG.Zombies.SetZombieBehavior(unitID)
 		GG.Zombies.SetZombieSpeedMult(unitID, ZOMBIES_PERMA_SLOW)
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		currentBudget = currentBudget - zombieCost
 		if not ZOMBIES_PARTIAL_RECLAIM == 1 then
 			return 0
 		end
 		totalReviveCount = totalReviveCount +1
 		totalRevivedValue = math.floor(totalRevivedValue + zombieCost)
-		--TODO check with chickens this seems to do something
 		local health = Spring.GetUnitHealth(unitID) -- TODO something breaks here, check if unit exists?
 		if health then --Last zombie spawned gets its health cut by the % of metal it overspent
-			Spring.SetUnitHealth(unitID, health*((zombieCost + currentBudget)/zombieCost))
-			currentBudget = 0
+			Spring.SetUnitHealth(unitID, health*(reviveBudget/zombieCost))
+			reviveBudget = 0
 		end
 	end
-	return math.floor(currentBudget)
+	return math.floor(reviveBudget)
 end
 
 local function ZombieBudgetProcessing(featureID,excessBudget)
 	local thisFeatureBudget
 	local currentMetal, maxMetal = Spring.GetFeatureResources(featureID)
 	local resDefName, facing = GG.Zombies.GetFeatureResurrectData(featureID)
-	local zombieBudget = UnitDefNames[resDefName].cost
+	local zombieBudget = UnitDefNames[resDefName].metalCost
 	
 	if ZOMBIES_PARTIAL_RECLAIM == 1 then -- partial reclaim reduces the available metal to spawn units
-		zombieBudget =  math.ceil(zombieBudget * (currentMetal/maxMetal))
+		zombieBudget =  math.floor(zombieBudget * (currentMetal/maxMetal))
 	end
 	thisFeatureBudget = math.floor(excessBudget + zombieFlatBudget + zombieBudget * zombieBudgetMult)
 	
+	--TODO these scaling functions could use improvement in terms of design goal and intended effect
 	if zombieFlatBudgetScaler ~= 0 then
-		zombieFlatBudget = math.floor(zombieFlatBudget + zombieFlatBudgetScaler * zombieBudget/100)
+		zombieFlatBudget = zombieFlatBudget + zombieFlatBudgetScaler * zombieBudget/100 --TODO Took out flooring, lets see if it desyncs eventually?
 	end
-	
 	if zombieBudgetMultScaler ~= 0 then
 		zombieBudgetMult = zombieBudgetMult + 0.000001 * math.floor(zombieBudgetMultScaler  * zombieBudget^1.05)
 	end
+	if zombieRezSpeedScaler ~= 0 then
+		zombieRezSpeed = zombieRezSpeed + zombieRezSpeedScaler * zombieBudget/1000 --TODO Took out flooring, lets see if it desyncs eventually?
+	end
+	
 	totalBaseRevivedBudget = math.floor(totalBaseRevivedBudget + zombieBudget)
 	totalRevivedBudget = math.floor(totalRevivedBudget + thisFeatureBudget)
 	return thisFeatureBudget
+end
+
+local function FeatureReviveCycles(featureID)
+	if featureReviveCycleCount[featureID] == nil then
+		featureReviveCycleCount[featureID] = zombieReviveCyclesCount - 1 -- one cycle has passed to reach this point
+	else 
+		featureReviveCycleCount[featureID] = featureReviveCycleCount[featureID] - 1
+	end
+	return featureReviveCycleCount[featureID]
+end
+
+local function RezFrameCallback(featureID)
+	local reviveTeamID = GaiaTeamID
+	if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > allyTeamCount) then
+		reviveTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
+	end
+	if zombieAllyTeamID > allyTeamCount then
+		reviveTeamID = Spring.GetFeatureTeam(featureID) or GaiaTeamID
+	end
+	
+	local zombieBudget = ZombieBudgetProcessing(featureID,excessBudget)
+	
+	if #zombieReviveOptions == 0 then
+		excessBudget = HandleZombieRevive(featureID, zombieBudget,reviveTeamID, nil)
+	else
+		excessBudget = HandleZombieRevive(featureID, zombieBudget,reviveTeamID, zombieReviveOptions)
+	end
+	
+	local zombieCyclesRemaining = 0
+	if zombieReviveCyclesCount > 1 then
+		zombieCyclesRemaining = FeatureReviveCycles(featureID)
+	end
+	if zombieCyclesRemaining > 0 then
+		GG.Zombies.AddFeatureToZombieCountdown(featureID, zombieRezSpeed, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
+		return
+	end
+	
+	if zombieWrecksRemain == 0 then
+		Spring.DestroyFeature(featureID)
+	end
 end
 
 local function CheckZombieOrders()	-- Only Gaia units recheck their orders
@@ -269,9 +328,21 @@ function gadget:GameFrame(f)
 		CheckZombieOrders()
 		DiagnosticsVarDump()
 	end
+	if f%1800 == 1 and f ~= 1 then
+		zombieBudgetMult 	= zombieBudgetMult 	+ zombieBudgetMultMinuteAdd
+		zombieFlatBudget 	= zombieFlatBudget 	+ zombieFlatBudgetMinuteAdd
+		zombieRezSpeed 		= zombieRezSpeed 	+ zombieRezSpeedMinuteAdd
+	end
 	if f == 1 then
 		spSetTeamResource(GaiaTeamID, "ms", 500)
 		spSetTeamResource(GaiaTeamID, "es", 10500)
+		if zombieTeamStartsDead == 1 then -- TODO doing it on game start lets people plop a fac. maybe there is some other way of doing things
+			for _, unitID in ipairs(spGetAllUnits()) do
+				if zombieAllyTeamID == Spring.GetUnitAllyTeam(unitID)then
+					Spring.DestroyUnit(unitID)
+				end
+			end
+		end
 	end
 end
 -- settings gaiastorage before frame 1 somehow doesnt work, well i can guess why...
@@ -323,45 +394,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	end
 end
 
-local function FeatureReviveCycles(featureID)
-	if featureReviveCycleCount[featureID] == nil then
-		featureReviveCycleCount[featureID] = zombieReviveCyclesCount - 1 -- one cycle has passed to reach this point
-	else 
-		featureReviveCycleCount[featureID] = featureReviveCycleCount[featureID] - 1
-	end
-	return featureReviveCycleCount[featureID]
-end
-
-local function RezFrameCallback(featureID)
-	
-	if zombieAllyTeamID ~= GaiaAllyTeamID then
-		zombieTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
-	end
-
-	local zombieBudget = ZombieBudgetProcessing(featureID,excessBudget)
-	
-	if zombieReviveOptionCount == 0 then
-		excessBudget = HandleZombieRevive(featureID, zombieBudget, nil)
-	else
-		excessBudget = HandleZombieRevive(featureID, zombieBudget, zombieReviveOptions)
-	end
-	
-	local zombieCyclesRemaining = 0
-	if zombieReviveCyclesCount > 1 then
-		zombieCyclesRemaining = FeatureReviveCycles(featureID)
-	end
-	if zombieCyclesRemaining > 0 then
-		GG.Zombies.AddFeatureToZombieCountdown(featureID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
-		return
-	end
-	
-	if zombieWrecksRemain == 0 then
-		Spring.DestroyFeature(featureID)
-	end
-end
-
 function gadget:FeatureCreated(featureID, allyTeam)
-	GG.Zombies.AddFeatureToZombieCountdown(featureID, ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
+	GG.Zombies.AddFeatureToZombieCountdown(featureID, zombieRezSpeed, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
 end
 
 local function ReInit()
@@ -377,15 +411,12 @@ local function ReInit()
 	end
 	local features = spGetAllFeatures()
 	for i = 1, #features do
-		GG.Zombies.AddFeatureToZombieCountdown(features[i], ZOMBIES_REZ_SPEED, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
+		GG.Zombies.AddFeatureToZombieCountdown(features[i], zombieRezSpeed, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
 	end
 end
 
 local function SetGlobalReviveAllyTeam(newZombieAllyTeamID)
 	zombieAllyTeamID = newZombieAllyTeamID
-	if newZombieAllyTeamID == GaiaAllyTeamID then
-		zombieTeamID = GaiaTeamID
-	end
 end
 
 local function GetGlobalReviveAllyTeam()
@@ -409,13 +440,7 @@ end
 
 function gadget:GameStart()
 	ReInit() -- anything it does doesnt mess with existing zombies
-	Spring.Echo(zombieAllyTeamID)
-	Spring.Echo(GaiaAllyTeamID)
-	if zombieTeamStartsDead == 1 then
-		for _, unitID in ipairs(spGetAllUnits()) do
-			if zombieAllyTeamID == Spring.GetUnitAllyTeam(unitID)then
-				Spring.DestroyUnit(unitID)
-			end
-		end
-	end
+	Spring.Echo("zombieAllyTeamID: "..zombieAllyTeamID)
+	Spring.Echo("AllyTeamCount: "..allyTeamCount)
+	Spring.Echo("GaiaAllyTeamID: "..GaiaAllyTeamID)
 end
