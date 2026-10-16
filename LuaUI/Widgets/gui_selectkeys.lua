@@ -379,6 +379,14 @@ local function SelectEmptyTransports()
 	spSelectUnitArray(newselection,addselect)
 end
 
+local isFixedWing = {}
+if UnitDefs then
+	for defID, def in pairs(UnitDefs) do
+		if def.canFly and not def.isHoveringAirUnit then
+			isFixedWing[defID] = true
+		end
+	end
+end
 
 local function FilterLowHealthAmmo(threshold)
 	local selection = spGetSelectedUnits()
@@ -386,17 +394,16 @@ local function FilterLowHealthAmmo(threshold)
 	for i = 1, #selection do
 		local unitID = selection[i]
 		local defID = Spring.GetUnitDefID(unitID)
-		local ud = defID and UnitDefs[defID]
-		local canFly = ud and ud.canFly
+		local wantPad = isFixedWing[defID] or false
 		local health, maxHealth = spGetUnitHealth(unitID)
 		local lowhealth = (health or 0)/(maxHealth or 1000) < threshold
 		local keepselect = true
 		if lowhealth then
 			keepselect = false
-			if canFly then
+			if wantPad then
 				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
 			end
-		elseif canFly then
+		elseif wantPad then
 			local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
 			local noammo = Spring.GetUnitRulesParam(unitID, "noammo") or 0
 			if ammofraction < threshold or noammo == 1 then
