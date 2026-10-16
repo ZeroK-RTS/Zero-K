@@ -31,6 +31,8 @@ local USE_TERRAIN_TEXTURE_CHANGE = true -- (Spring.GetModOptions() or {}).terrat
 local ECHO_COST = false
 local ECHO_DETAILED_COST_ESTIMATE = false
 
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+
 -- Speedups
 local cos                   = math.cos
 local floor                 = math.floor
@@ -172,8 +174,7 @@ pointExtraAreaCost = pointExtraAreaCost * costMult * inbuiltCostMult
 local steepnessMarkers      = {inner = {count = 0, data = {}, frame = 0}}
 
 local structure             = {}
-local structureTable        = {}
-local structureCount        = 0
+local structureTable        = IterableMap.New()
 
 local structureAreaMap      = {}
 
@@ -188,8 +189,7 @@ local terraformOrder        = {}
 local terraformOrders       = 0
 
 local constructor           = {}
-local constructorTable      = {}
-local constructors          = 0
+local constructorTable      = IterableMap.New()
 local currentCon            = 0
 
 local checkInterval         = 0
@@ -876,8 +876,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	local localStructure = {}
 	local localStructureCount = 0
 	
-	for i = 1, structureCount do
-		local s = structure[structureTable[i] ]
+	for i = 1, IterableMap.GetIndexMax(structureTable) do
+		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
 		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
@@ -908,7 +908,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		segment[i].structureArea = {}
 		
 		for j = 1, localStructureCount do
-			local s = structure[structureTable[localStructure[j]]]
+			local s = structure[IterableMap.GetKeyByIndex(structureTable, localStructure[j])]
 			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
@@ -1238,8 +1238,8 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	local localStructure = {}
 	local localStructureCount = 0
 	
-	for i = 1, structureCount do
-		local s = structure[structureTable[i]]
+	for i = 1, IterableMap.GetIndexMax(structureTable) do
+		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
 		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
@@ -1268,7 +1268,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 		segment[i].structureArea = {}
 		
 		for j = 1, localStructureCount do
-			local s = structure[structureTable[localStructure[j]]]
+			local s = structure[IterableMap.GetKeyByIndex(structureTable, localStructure[j])]
 			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
@@ -1726,8 +1726,8 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	local localStructure = {}
 	local localStructureCount = 0
 	
-	for i = 1, structureCount do
-		local s = structure[structureTable[i]]
+	for i = 1, IterableMap.GetIndexMax(structureTable) do
+		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
 		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
@@ -1759,7 +1759,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 		segment[i].structureArea = {}
 		
 		for j = 1, localStructureCount do
-			local s = structure[structureTable[localStructure[j]]]
+			local s = structure[IterableMap.GetKeyByIndex(structureTable, localStructure[j])]
 			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
@@ -2130,8 +2130,8 @@ end
 function GG.Terraform_RaiseWater(raiseAmount)
 	Spring.SetGameRulesParam("waterlevel", (Spring.GetGameRulesParam("waterlevel") or 0) + raiseAmount)
 	
-	for i = 1, structureCount do
-		local s = structure[structureTable[i]]
+	for i = 1, IterableMap.GetIndexMax(structureTable) do
+		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
 		s.h = s.h - raiseAmount
 	end
 	
@@ -3222,6 +3222,7 @@ function gadget:GameFrame(n)
 	DoTerraformUpdate(n, freeTerraform)
 	
 	--check constrcutors that are repairing terraform blocks
+	local constructors = IterableMap.GetIndexMax(constructorTable)
 	if constructors ~= 0 then
 		if n % checkInterval == 0 then
 			-- only check 1 con per cycle
@@ -3230,7 +3231,7 @@ function gadget:GameFrame(n)
 				currentCon = 1
 			end
 			
-			local unitID = constructorTable[currentCon]
+			local unitID = IterableMap.GetKeyByIndex(constructorTable, currentCon)
 			local cQueue = spGetUnitCommands(unitID, -1)
 			if cQueue then
 				local teamID = spGetUnitTeam(unitID)
@@ -3299,8 +3300,8 @@ function gadget:GameFrame(n)
 	local struc = structureCheckFrame[n % structureCheckLoopFrames]
 	if struc then
 		local i = 1
-		while i <= struc.count do
-			local unit = structure[struc.unit[i]]
+		while i <= IterableMap.GetIndexMax(struc) do
+			local unit = structure[IterableMap.GetKeyByIndex(struc, i)]
 			if unit then
 				local height = spGetGroundHeight(unit.x, unit.z)
 				if height ~= unit.h then
@@ -3505,21 +3506,12 @@ local function DeregisterStructure(unitID)
 	end
 	
 	local f = structureCheckFrame[structure[unitID].frame]
-	if f.count ~= structure[unitID].frameIndex then
-		structureCheckFrame[structure[unitID].frame].unit[structure[unitID].frameIndex] = structureCheckFrame[structure[unitID].frame].unit[f.count]
-		structure[f.unit[f.count]].frameIndex = structure[unitID].frameIndex
-	end
-	if structureCheckFrame[structure[unitID].frame].count == 1 then
+	IterableMap.Remove(f, unitID)
+	if IterableMap.IsEmpty(f) then
 		structureCheckFrame[structure[unitID].frame] = nil
-	else
-		structureCheckFrame[structure[unitID].frame].count = structureCheckFrame[structure[unitID].frame].count - 1
 	end
 		
-	if structure[unitID].index ~= structureCount then
-		structureTable[structure[unitID].index] = structureTable[structureCount]
-		structure[structureTable[structureCount]].index = structure[unitID].index
-	end
-	structureCount = structureCount - 1
+	IterableMap.Remove(structureTable, unitID)
 	structure[unitID] = nil
 end
 
@@ -3531,14 +3523,12 @@ local function RegisterStructure(unitID, ud)
 	local xsize = ud.xsize*4
 	local ysize = (ud.zsize or ud.ysize)*4
 	
-	structureCount = structureCount + 1
-	
 	if ((face == 0) or(face == 2)) then
 		structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-		minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}, index = structureCount}
+		minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}}
 	else
 		structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-		minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
+		minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}}
 	end
 	
 	if structure[unitID].minx == 0 then
@@ -3562,16 +3552,14 @@ local function RegisterStructure(unitID, ud)
 		end
 	end
 	
-	structureTable[structureCount] = unitID
+	IterableMap.Add(structureTable, unitID)
 	
 	-- slow update for terrain checking
 	if not structureCheckFrame[currentCheckFrame] then
-		structureCheckFrame[currentCheckFrame] = {count = 0, unit = {}}
+		structureCheckFrame[currentCheckFrame] = IterableMap.New()
 	end
-	structureCheckFrame[currentCheckFrame].count = structureCheckFrame[currentCheckFrame].count + 1
-	structureCheckFrame[currentCheckFrame].unit[structureCheckFrame[currentCheckFrame].count] = unitID
+	IterableMap.Add(structureCheckFrame[currentCheckFrame], unitID)
 	structure[unitID].frame = currentCheckFrame
-	structure[unitID].frameIndex = structureCheckFrame[currentCheckFrame].count
 	
 	currentCheckFrame = currentCheckFrame + 1
 	if currentCheckFrame >= structureCheckLoopFrames then
@@ -3634,13 +3622,8 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	if constructor[unitID] then
-		local index = constructor[unitID].index
-		if index ~= constructors then
-			constructorTable[index] = constructorTable[constructors]
-			constructor[constructorTable[index]].index = index
-		end
-		constructorTable[constructors] = nil
-		constructors = constructors - 1
+		IterableMap.Remove(constructorTable, unitID)
+		local constructors = IterableMap.GetIndexMax(constructorTable)
 		constructor[unitID]    = nil
 		
 		if constructors ~= 0 then
@@ -3671,12 +3654,11 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		
 		local aTeam = spGetUnitAllyTeam(unitID)
 		
-		constructors = constructors + 1
-		constructorTable[constructors] = unitID
+		IterableMap.Add(constructorTable, unitID)
 		
-		constructor[unitID]    = {allyTeam = aTeam, index = constructors}
+		constructor[unitID]    = {allyTeam = aTeam}
 		
-		checkInterval = ceil(checkLoopFrames/constructors)
+		checkInterval = ceil(checkLoopFrames/IterableMap.GetIndexMax(constructorTable))
 	end
 	
 	-- add structure to structure table
