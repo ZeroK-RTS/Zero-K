@@ -18,7 +18,7 @@ function widget:GetInfo()
 		date      = "2009", --2013 May 12
 		license   = "GNU GPL, v2 or later",
 		layer     = -11, -- above gui_selectedunits_gl4, below gui_name_tags 
-		enabled   = true  --  loaded by default?
+		enabled   = false, -- HealthBars GL4 enables this widget when GL4 is not available
 	}
 end
 
