@@ -76,7 +76,7 @@ local function FixFeature(featureID)
 				change = true,
 				metal = metal,
 				energy = energy ,
-				reclaimTime = energy + metal,
+				reclaimTime = math.abs(energy) + math.abs(metal),
 			}
 			--local def = processedFeature[featureDefID]
 			--Spring.Echo("FeatureCreated", fd.name, def.metal, def.energy, def.reclaimTime)
