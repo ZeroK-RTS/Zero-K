@@ -3,6 +3,7 @@ include "spider_walking.lua"
 
 local ALLY_ACCESS = {allied = true}
 
+local base = piece 'base'
 local notum = piece 'notum'
 local gaster = piece 'gaster'
 local gunL, gunR, aimpoint = piece('gunl', 'gunr', 'aimpoint')
@@ -88,6 +89,7 @@ function script.Create()
 	Move (aimpoint, z_axis, 4)
 	Move (aimpoint, y_axis, 2)
 	Move (aimpoint, x_axis, 0)
+	Move (base, z_axis, -3.5)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
