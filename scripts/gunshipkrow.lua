@@ -79,7 +79,7 @@ local isLanded = true
 local SPECIAL_FIRE_COUNT = 75
 
 local SLOWDOWN_FACTOR = 0.75
-local ACCEL_FACTOR = 1.25
+local ACCEL_FACTOR = SLOWDOWN_FACTOR -- the value in effect since 2024-09 (1.25 was not applied)
 local UNIT_SPEED = UnitDefNames["gunshipkrow"].speed*SLOWDOWN_FACTOR/30
 
 local sound_index = 0
