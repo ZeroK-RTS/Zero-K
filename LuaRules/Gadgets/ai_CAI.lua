@@ -1880,7 +1880,7 @@ local function raiderJobHandler(team)
 			battleGroup.count = battleGroup.count+1
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ,
-				aX = aX, aZ = aZ,
+				aX = math.ceil(tX/heatSquareWidth), aZ = math.ceil(tZ/heatSquareHeight),
 				currentX = false, currentZ = false,
 				respondToSOSpriority = 1,
 				regroup = true,
@@ -2040,7 +2040,7 @@ local function gunshipJobHandler(team)
 			battleGroup.count = battleGroup.count+1
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ,
-				aX = aX, aZ = aZ,
+				aX = math.ceil(tX/heatSquareWidth), aZ = math.ceil(tZ/heatSquareHeight),
 				currentX = false, currentZ = false,
 				respondToSOSpriority = 1,
 				regroup = true,
@@ -2202,7 +2202,7 @@ local function combatJobHandler(team)
 			battleGroup.count = battleGroup.count+1
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ,
-				aX = aX, aZ = aZ,
+				aX = math.ceil(tX/heatSquareWidth), aZ = math.ceil(tZ/heatSquareHeight),
 				currentX = false, currentZ = false,
 				respondToSOSpriority = 0,
 				regroup = true,
