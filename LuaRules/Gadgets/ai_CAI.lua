@@ -2287,7 +2287,7 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 						end
 					)
 					local empty = true
-					for u = i, #units do
+					for u = 1, #units do
 						if spGetUnitAllyTeam(units[u]) ~= allyTeam then
 							empty = false
 							break
