@@ -220,7 +220,8 @@ computerTeams[gaiaTeamID] = nil
 humanTeams[gaiaTeamID] = nil
 
 local humanTeamsOrdered = {}
-for id,_ in ipairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id end
+for id in pairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id end
+table.sort(humanTeamsOrdered)
 for i=1, #humanTeamsOrdered do
 	if humanTeamsOrdered[i+1] and not Spring.AreTeamsAllied(humanTeamsOrdered[i], humanTeamsOrdered[i+1]) then
 		pvp = true
