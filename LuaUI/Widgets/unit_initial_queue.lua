@@ -382,7 +382,7 @@ function widget:RecvLuaMsg(msg, playerID)
 		msg = msg:sub(4)
 		local msgArray = explode('|',msg)
 		local typeArg = tonumber(msgArray[1])
-		if not typeArg or typeArg < 1 or typeArg > 5 then
+		if not typeArg or typeArg < 1 or typeArg > 6 then
 			return
 		end
 		local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
@@ -418,6 +418,11 @@ function widget:RecvLuaMsg(msg, playerID)
 			table.insert(playerXBuildQueue, 1, {unitDefID,x,y,z,face})
 		elseif typeArg == 3 then -- Append to end of queue
 			playerXBuildQueue[#playerXBuildQueue+1] = {unitDefID,x,y,z,face}
+		elseif typeArg == 6 then -- Insert at a given index
+			local index = tonumber(msgArray[7])
+			if index and index >= 1 and index <= #playerXBuildQueue + 1 then
+				table.insert(playerXBuildQueue, index, {unitDefID,x,y,z,face})
+			end
 		end
 	end
 end
@@ -613,6 +618,47 @@ local function GetClosestMetalSpot(x, z) --is used by single mex placement, not 
 	return bestSpot
 end
 
+local function Distance3D(x1, y1, z1, x2, y2, z2)
+	return math.sqrt((x1 - x2)^2 + (y1 - y2)^2 + (z1 - z2)^2)
+end
+
+-- Mirrors the least-added-travel insertion of cmd_commandinsert.lua, which cannot run
+-- pre-game because it works off real units and the commander has not spawned yet.
+-- Travel starts at the chosen start position. Returns a zero-based insertion index.
+local function GetLeastTravelInsertPos(buildData)
+	local sx, sy, sz = Spring.GetTeamStartPosition(myTeamID)
+	if not (sx and sx > 0) then
+		-- No start position picked yet, so there is no travel distance to judge.
+		return 0
+	end
+	sy = Spring.GetGroundHeight(sx, sz) -- Correction for start positions in the air
+
+	local cx, cy, cz = buildData[2], buildData[3], buildData[4]
+	local px, py, pz = sx, sy, sz
+	local minDetour = math.huge
+	local insertPos = 0
+
+	for i = 1, #buildQueue do
+		local qx, qy, qz = buildQueue[i][2], buildQueue[i][3], buildQueue[i][4]
+		-- Extra distance travelled if the new order is placed between the previous one and this one.
+		local detour = Distance3D(px, py, pz, cx, cy, cz)
+			+ Distance3D(cx, cy, cz, qx, qy, qz)
+			- Distance3D(px, py, pz, qx, qy, qz)
+		if detour < minDetour then
+			minDetour = detour
+			insertPos = i - 1
+		end
+		px, py, pz = qx, qy, qz
+	end
+
+	-- Appending to the end of the queue may be cheaper than any insertion within it.
+	if Distance3D(px, py, pz, cx, cy, cz) < minDetour then
+		insertPos = #buildQueue
+	end
+
+	return insertPos
+end
+
 local function CancelQueue()
 	buildQueue = {}
 	Spring.SendLuaUIMsg("IQ|5",'a')
@@ -656,15 +702,18 @@ local function InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		
-		if cmdOptions.meta then -- space insert at front
+		if cmdOptions.meta then -- space: insert wherever it adds the least travel distance
 			local anyClashes = CheckClash(buildData)
 			if not anyClashes then
-				table.insert(buildQueue, 1, buildData)
-				msg = "IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
-				if (buildQueue[MAX_QUEUE + 1] ~= nil) then	-- exceeded max queue, remove the one at the end
-					table.remove(buildQueue, MAX_QUEUE + 1)
-					msg2 = msg
-					msg = "IQ|2|".. (MAX_QUEUE + 1)
+				local insertPos = GetLeastTravelInsertPos(buildData) -- zero-based
+				-- Inserting past a full queue would only push the new order straight back off it.
+				if #buildQueue < MAX_QUEUE or insertPos < MAX_QUEUE then
+					table.insert(buildQueue, insertPos + 1, buildData)
+					msg = "IQ|6|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing.."|"..(insertPos + 1)
+					if (buildQueue[MAX_QUEUE + 1] ~= nil) then	-- exceeded max queue, remove the one at the end
+						table.remove(buildQueue, MAX_QUEUE + 1)
+						msg2 = "IQ|2|".. (MAX_QUEUE + 1)
+					end
 				end
 			end
 		elseif cmdOptions.shift then -- shift-queue
