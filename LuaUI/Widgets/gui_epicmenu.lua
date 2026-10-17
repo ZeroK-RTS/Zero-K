@@ -1704,7 +1704,7 @@ local function SearchElement(termToSearch, path)
 				if not hide then
 					local hotkeystring = GetHotkeyData(currentPath, option)
 					local lowercase_hotkey = hotkeystring:lower()
-					if found_name or lowercase_hotkey:find(termToSearch) then
+					if found_name or lowercase_hotkey:find(termToSearch, 1, true) then
 						filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}--remember this option and where it is found
 					end
 				end
@@ -1722,7 +1722,7 @@ local function SearchElement(termToSearch, path)
 			elseif option.type == 'bool' then
 				local hotkeystring = GetHotkeyData(currentPath, option)
 				local lowercase_hotkey = hotkeystring:lower()
-				if found_name or lowercase_hotkey:find(termToSearch) then
+				if found_name or lowercase_hotkey:find(termToSearch, 1, true) then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
 				end
 			elseif option.type == 'number' then
@@ -1754,7 +1754,7 @@ local function SearchElement(termToSearch, path)
 						lowercase_desc = item.desc and item.desc:lower() or ''
 						local hotkeystring = GetHotkeyData(currentPath, item)
 						local lowercase_hotkey = hotkeystring:lower()
-						local found = SearchInText(lowercase_name, termToSearch) or SearchInText(lowercase_desc, termToSearch) or lowercase_hotkey:find(termToSearch)
+						local found = SearchInText(lowercase_name, termToSearch) or SearchInText(lowercase_desc, termToSearch) or lowercase_hotkey:find(termToSearch, 1, true)
 						if found then
 							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
 							break
@@ -3574,7 +3574,7 @@ function SearchInText(randomTexts, searchText) --this allow search term to be un
 	local explodedTerms = explodeSearchTerm.terms
 	for i = 1, #explodedTerms do
 		local subSearchTerm = explodedTerms[i]
-		local findings = randomTexts:find(subSearchTerm)
+		local findings = randomTexts:find(subSearchTerm, 1, true)
 		if not findings then
 			found = false
 			break
