@@ -263,10 +263,10 @@ function gadget:GameFrame(f)
 			local unit = units[unitID]
 			local cost = unit.defs.cost * (GG.att_CostMult[unitID] or 1)
 			if unit.progress >= cost then
-				unit.progress = unit.progress - cost
 				local x,y,z = spGetUnitPosition(unitID)
 				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(0,3),spGetUnitTeam(unitID))
 				if newId then
+					unit.progress = unit.progress - cost
 					gadgetHandler:NotifyUnitCreatedByMechanic(newId, unitID, "grey_goo")
 					local firestate, movestate
 					if REVERSE_COMPAT then
