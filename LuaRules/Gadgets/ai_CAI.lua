@@ -2162,6 +2162,7 @@ local function combatJobHandler(team)
 				
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < combat.cost and enemyDefenceHeatmap[aX][aZ].cost < combat.cost then
 					if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyOffense[i].x,enemyOffense[i].z) then
+						minTargetDistance = disSQ(averageX, averageZ, enemyOffense[i].x, enemyOffense[i].z)
 						tX = enemyOffense[i].x
 						tY = enemyOffense[i].y
 						tZ = enemyOffense[i].z
@@ -2175,6 +2176,7 @@ local function combatJobHandler(team)
 				
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < combat.cost and enemyDefenceHeatmap[aX][aZ].cost < combat.cost then
 					if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyEconomy[i].x,enemyEconomy[i].z) then
+						minTargetDistance = disSQ(averageX, averageZ, enemyEconomy[i].x, enemyEconomy[i].z)
 						tX = enemyEconomy[i].x
 						tY = enemyEconomy[i].y
 						tZ = enemyEconomy[i].z
@@ -2189,6 +2191,7 @@ local function combatJobHandler(team)
 					
 					if enemyOffenseHeatmap[aX][aZ].cost < combat.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < combat.cost then
 						if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyDefence[i].x,enemyDefence[i].z) then
+							minTargetDistance = disSQ(averageX, averageZ, enemyDefence[i].x, enemyDefence[i].z)
 							tX = enemyDefence[i].x
 							tY = enemyDefence[i].y
 							tZ = enemyDefence[i].z
