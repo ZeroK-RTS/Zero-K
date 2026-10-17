@@ -1868,6 +1868,7 @@ local function raiderJobHandler(team)
 				aZ = enemyEconomy[i].aZ
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < raider.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < raider.cost then
 					if (not minCost) or minCost < enemyEconomyHeatmap[aX][aZ].cost then
+						minCost = enemyEconomyHeatmap[aX][aZ].cost
 						tX = enemyEconomy[i].x
 						tY = enemyEconomy[i].y
 						tZ = enemyEconomy[i].z
@@ -2028,6 +2029,7 @@ local function gunshipJobHandler(team)
 				
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < gunship.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < gunship.cost and static*3 + mobile*2 < gunship.cost then
 					if (not minCost) or minCost < enemyEconomyHeatmap[aX][aZ].cost then
+						minCost = enemyEconomyHeatmap[aX][aZ].cost
 						tX = enemyEconomy[i].x
 						tY = enemyEconomy[i].y
 						tZ = enemyEconomy[i].z
