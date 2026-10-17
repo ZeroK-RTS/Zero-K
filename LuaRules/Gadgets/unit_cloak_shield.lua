@@ -330,6 +330,10 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (cloakShieldUnits[unitID]) then
 			cloakShieldUnits[unitID].radius = 0
+			if cloakShieldUnits[unitID].def.moveSpeedMult then
+				SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+				GG.UpdateUnitAttributes(unitID)
+			end
 		end
 		cloakers[unitID] = nil
 		cloakees[unitID] = nil
