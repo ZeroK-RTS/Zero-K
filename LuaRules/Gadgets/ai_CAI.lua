@@ -2566,7 +2566,7 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange, priorit
 		end
 		local battleGroup = a.battleGroup
 		for i = 1, battleGroup.count do
-			if battleGroup[i].respondToSOSpriority <= priority and disSQ(dx, battleGroup[i].aX, dz, battleGroup[i].aZ) < callRange^2 then
+			if battleGroup[i].respondToSOSpriority <= priority and battleGroup[i].currentX and disSQ(dx, dz, battleGroup[i].currentX, battleGroup[i].currentZ) < callRange^2 then
 				battleGroup[i].tempTarget = attackerID
 			end
 		end
