@@ -2189,7 +2189,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local metalInfo
 	local energyInfo
 	
-	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, costInfo, playerNameLabel
+	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, costInfoPanel, playerNameLabel
 	if isTooltipVersion then
 		playerNameLabel = Chili.Label:New{
 			name = "playerNameLabel",
