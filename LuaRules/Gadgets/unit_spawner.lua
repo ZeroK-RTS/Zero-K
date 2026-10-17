@@ -439,9 +439,9 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 		end
 	end
 	--echo("Final selected target ID: "..data.targetID)
-	local validUnitID = spValidUnitID(data.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
+	local validUnitID = (targetData.targetID ~= burrowID) and spValidUnitID(targetData.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
 	if validUnitID and targetData.targetID ~= oldTarget then
-		targetData.targetTeam = spGetUnitTeam(data.targets[data.targetID])
+		targetData.targetTeam = spGetUnitTeam(targetData.targetID)
 		--spGiveOrderToUnit(burrowID, CMD_ATTACK, data.targetID, 0)
 		--echo("Target for burrow ID ".. burrowID .." updated to target ID " .. data.targetID)
 	elseif not validUnitID then
