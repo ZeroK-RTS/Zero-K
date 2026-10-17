@@ -2845,7 +2845,7 @@ function gadget:GameFrame(n)
 			end
 			
 			if n%40 == 15 + team then
-				battleGroupHandler(team, n, n%200 == 15)
+				battleGroupHandler(team, n, n%200 == (15 + team)%200)
 			end
 			
 			if n%40 == (35 + team)%40 then
@@ -2884,7 +2884,7 @@ function gadget:GameFrame(n)
 		
 		if n%50 == 25 + allyTeam then
 			if data.ai then
-				updateScoutingHeatmap(allyTeam,n, n%500 == 25)
+				updateScoutingHeatmap(allyTeam,n, n%500 == (25 + allyTeam)%500)
 			end
 		end
 	
