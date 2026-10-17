@@ -632,8 +632,8 @@ if autoAiTech then
 	function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID, false)
 		local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID, false)
-		if newAllyTeam ~= oldAllyTeam and aiTeamAlly and aiTeamAlly[teamID] then
-			RemoveAiUnit(unitID, unitDefID, teamID)
+		if newAllyTeam ~= oldAllyTeam and aiTeamAlly and aiTeamAlly[oldTeamID] then
+			RemoveAiUnit(unitID, unitDefID, oldTeamID)
 		end
 	end
 		
