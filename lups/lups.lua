@@ -894,6 +894,40 @@ function BufferRemoveParticles(id)
 	fxRemoveList[#fxRemoveList+1] = id
 end
 
+local function RemoveBufferedParticles()
+	local changedTables = {}
+	for i=1,#fxRemoveList do
+		local id = fxRemoveList[i]
+		local fx = particles[id]
+		if fx then
+			if type(fx.fxTable) == "table" then
+				changedTables[fx.fxTable] = true
+			end
+			fx:Destroy()
+			particles[id] = nil
+			particlesCount = particlesCount - 1
+		else
+			RemoveParticles(id)
+		end
+	end
+
+	-- Compact each affected draw list once, keeping the surviving effects in order.
+	for fxTable in pairs(changedTables) do
+		local oldCount = #fxTable
+		local count = 0
+		for i=1,oldCount do
+			local fx = fxTable[i]
+			if particles[fx.id] == fx then
+				count = count + 1
+				fxTable[count] = fx
+			end
+		end
+		for i=count+1,oldCount do
+			fxTable[i] = nil
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -953,9 +987,7 @@ local function GameFrame(_,n)
 
 	--// now we can remove particles
 	if (#fxRemoveList>0) then
-		for i=1,#fxRemoveList do
-			RemoveParticles(fxRemoveList[i])
-		end
+		RemoveBufferedParticles()
 		fxRemoveList = {}
 	end
 end
