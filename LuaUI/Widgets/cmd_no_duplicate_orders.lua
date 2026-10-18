@@ -136,7 +136,7 @@ function widget:CommandNotify(id, params, options)
 			local unitID = selUnits[i]
 			local cmdID, cmdOpts, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
 			-- Override internal commands to override idle behaviour.
-			if cmdID and (params[1] == cmdParam) and (cmdOpts ~= CMD_OPT_INTERNAL) then
+			if (cmdID == CMD.ATTACK) and (params[1] == cmdParam) and (cmdOpts ~= CMD_OPT_INTERNAL) then
 				blockUnits[unitID] = true
 			end
 		end -- for
