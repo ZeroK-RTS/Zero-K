@@ -48,24 +48,32 @@ local spGetUnitHealth             = Spring.GetUnitHealth
 
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
-local allyTeamCount = #Spring.GetAllyTeamList() -1 -- -1 for Gaia team
-
+local initalAllianceCount = -1 --subtract gaia
+	for index, allyTeamID in ipairs(Spring.GetAllyTeamList()) do
+		local teamlist = Spring.GetTeamList(allyTeamID)
+		Spring.Echo(#teamlist)
+		if (#teamlist) >0 then
+			initalAllianceCount = initalAllianceCount +1
+		end
+	end
 local zombieAllyTeamID = GaiaAllyTeamID
 local zombieTeamInput = tonumber(modOptions.zombies_team) or 0 
 
 if zombieTeamInput == 0 then -- 0 translates to gaia zombies
 	zombieAllyTeamID = GaiaAllyTeamID
-elseif zombieTeamInput > allyTeamCount then -- larger than teamcount mean things revive onto their parent teams
+elseif zombieTeamInput > initalAllianceCount then -- larger than teamcount mean things revive onto their parent teams
 	zombieAllyTeamID = math.huge
 else -- if inbetween 0 and max teamcount, we have a team to spawn on!
 	zombieAllyTeamID = zombieTeamInput -1 -- -1 for offset 
 	if zombieAllyTeamID == GaiaAllyTeamID then --TODO there is likely a better solution, it seems sometimes Gaia is not the last team in the list
-		zombieAllyTeamID = zombieAllyTeamID +1 
+		zombieAllyTeamID = zombieAllyTeamID + 1
 	end
 end
 
 local zombieTeamFullSlow = tonumber(modOptions.zombies_team_full_speed_mult) or 0
 local zombieTeamStartsDead = tonumber(modOptions.zombies_team_starts_dead) or 0
+local zombieTeamRevive = tonumber(modOptions.zombies_team_wrecks_revive) or 1
+
 
 local zombieRezSpeed = tonumber(modOptions.zombies_rezspeed) or 12
 local zombieRezSpeedScaler = tonumber(modOptions.zombies_rezspeed_scaler) or 0
@@ -196,7 +204,10 @@ local function HandleZombieRevive(featureID, reviveBudget,reviveTeamID,unitDefID
 		zombieCost = 200
 		Spring.Echo("Unit has no cost set, defaulting to 200")
 	end
-	
+	local rerollThresholdStep = reviveBudget * zombieReviveOptionMultiRandomise
+	local rerollThreshold = reviveBudget - rerollThresholdStep
+	Spring.Echo(rerollThresholdStep)
+	Spring.Echo(rerollThreshold)
 	while reviveBudget >= zombieCost do
 		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,reviveTeamID,zombieUnitDefID)
 		if unitID then
@@ -207,7 +218,9 @@ local function HandleZombieRevive(featureID, reviveBudget,reviveTeamID,unitDefID
 			totalRevivedValue = math.floor(totalRevivedValue + zombieCost)
 		end
 		reviveBudget = reviveBudget - zombieCost
-		if zombieReviveOptionMultiRandomise == 1 and zombieUnitDefID then -- Randomises to a new unit if desired
+		if zombieUnitDefID and reviveBudget < rerollThreshold then -- Randomises to a new unit if desired
+			Spring.Echo("rerolled at ".. reviveBudget)
+			rerollThreshold = rerollThreshold - rerollThresholdStep
 			zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
 			zombieCost = UnitDefs[zombieUnitDefID].metalCost or 0 
 			if not zombieCost or zombieCost <= 0 then
@@ -219,7 +232,7 @@ local function HandleZombieRevive(featureID, reviveBudget,reviveTeamID,unitDefID
 			end
 		end
 		--TODO should we randomise for each spawn? So far yes, since it gives every possible member of the team a chance for a unit
-		if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > allyTeamCount) then
+		if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > initalAllianceCount) then
 			reviveTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
 		end
 	end
@@ -283,14 +296,17 @@ end
 
 local function RezFrameCallback(featureID)
 	local reviveTeamID = GaiaTeamID
-	if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > allyTeamCount) then
+	if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > initalAllianceCount) then
 		reviveTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
 	end
-	if zombieAllyTeamID > allyTeamCount then
+	if zombieAllyTeamID > initalAllianceCount then
 		reviveTeamID = Spring.GetFeatureTeam(featureID) or GaiaTeamID
 	end
 	
 	local zombieBudget = ZombieBudgetProcessing(featureID,excessBudget)
+	if zombieBudget <= 0 then
+		return
+	end
 	
 	if #zombieReviveOptions == 0 then
 		excessBudget = HandleZombieRevive(featureID, zombieBudget,reviveTeamID, nil)
@@ -395,6 +411,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
+	if zombieTeamRevive == 0 and allyTeam == zombieAllyTeamID then
+		return
+	end
 	GG.Zombies.AddFeatureToZombieCountdown(featureID, zombieRezSpeed, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
 end
 
@@ -441,6 +460,6 @@ end
 function gadget:GameStart()
 	ReInit() -- anything it does doesnt mess with existing zombies
 	Spring.Echo("zombieAllyTeamID: "..zombieAllyTeamID)
-	Spring.Echo("AllyTeamCount: "..allyTeamCount)
+	Spring.Echo("AllyTeamCount: "..initalAllianceCount)
 	Spring.Echo("GaiaAllyTeamID: "..GaiaAllyTeamID)
 end

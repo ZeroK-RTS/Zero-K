@@ -70,7 +70,14 @@ local planetIndex = Spring.GetModOptions().singleplayercampaignbattleid
 planetIndex = planetIndex and tonumber(planetIndex)
 
 local zombies = tobool(modOptions.zombies) or false
-local deadTeamCounter = 0
+local deadAllianceCounter = 0
+local initalAllianceCount = 0
+for index, allyTeamID in ipairs(spGetAllyTeamList()) do
+	local teamlist = spGetTeamList(allyTeamID)
+	if (#teamlist) > 0 then
+		initalAllianceCount = initalAllianceCount +1
+	end
+end
 
 local SPARE_PLANETWARS_UNITS = false
 local SPARE_REGULAR_UNITS = (modOptions.explodeondefeat == "0" or modOptions.explodeondefeat == 0)
@@ -199,7 +206,7 @@ local function ZombieIsSecondToLastStanding(allyTeamID)
 		return false
 	end
 	if GG.ZombiesGlobal.GetGlobalReviveAllyTeam() == allyTeamID then
-		if #spGetAllyTeamList() == deadTeamCounter+3 then
+		if initalAllianceCount == deadAllianceCounter+3 then
 			Spring.Echo("Zombies are defeatable")
 			return false
 		end
@@ -364,7 +371,7 @@ local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
 			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return -- don't perform victory check
 		else -- kaboom
-			deadTeamCounter = deadTeamCounter + 1 --TODO there is likely a better way of this
+			deadAllianceCounter = deadAllianceCounter + 1 --TODO there is likely a better way to this
 			if not (isMission or isScriptMission) then
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
 				EchoUIMessage(name .. " has been destroyed!")
