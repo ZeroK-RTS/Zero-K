@@ -329,7 +329,7 @@ local function FindNearestAirpad(unitID, team)
 		local dist = Spring.GetUnitSeparation(unitID, airpadID, true)
 		dist = dist + (50*excessReservation)^2
 		dist = math.min(999998, dist) --clamp to avoid crazy value
-		if (dist < minDist) then
+		if (dist < minDist) and not excludedPads[teamID][airpadID] then
 			minDist = dist
 			closestPad = airpadID
 		end
