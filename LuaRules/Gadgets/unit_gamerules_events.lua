@@ -28,10 +28,10 @@ local function GameRules_NukeLaunched()
 	SendToUnsynced("GameRules_AIMessage", "NUKE_LAUNCHED")
 end
 
--- Nuke detonations and intercepts are globally visible effects, so AIs get their position.
-local function GameRules_NukeDetonated(px, py, pz, intercepted)
-	local event = (intercepted and "NUKE_INTERCEPTED:") or "NUKE_DETONATED:"
-	SendToUnsynced("GameRules_AIMessage", event .. math.floor(px) .. "," .. math.floor(py) .. "," .. math.floor(pz))
+-- Nuke explosions are globally visible, so AIs get their position. Whether an
+-- airburst was an intercept or a shield hit is not visible, so it is not sent.
+local function GameRules_NukeDetonated(px, py, pz)
+	SendToUnsynced("GameRules_AIMessage", "NUKE_EXPLOSION:" .. math.floor(px) .. "," .. math.floor(py) .. "," .. math.floor(pz))
 end
 
 function gadget:GameFrame(frame)

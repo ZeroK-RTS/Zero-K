@@ -38,11 +38,10 @@ end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if nux[weaponID] then
-		local intercepted = py - math.max(0, GetGroundHeight(px,pz)) > 200
 		if GG.GameRules_NukeDetonated then
-			GG.GameRules_NukeDetonated(px, py, pz, intercepted)
+			GG.GameRules_NukeDetonated(px, py, pz)
 		end
-		if intercepted then
+		if py - math.max(0, GetGroundHeight(px,pz)) > 200 then
 			Spring.SpawnCEG(defaultInterceptExplosion, px, py, pz, 0, 0, 0, nux[weaponID])
 			GG.CustomExplosionLight("gadget_nuke_intercepted_distortion", px, py, pz, ownerID)
 		else
