@@ -31,7 +31,7 @@ return { strideremp = {
     specialreload_userate = 1,    -- driven by the script's specialReloadRemaining
   },
 
-  explodeAs              = [[ESTOR_BUILDING]],
+  explodeAs              = [[CRAWL_BLASTSML]],
   fireState              = 0,
   footprintX             = 4,
   footprintZ             = 4,
@@ -45,7 +45,7 @@ return { strideremp = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[strideremp.dae]],
   script                 = [[strideremp.lua]],
-  selfDestructAs         = [[ESTOR_BUILDING]],
+  selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {
     explosiongenerators = {
@@ -153,7 +153,7 @@ return { strideremp = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[strideremp.dae]],
+      object           = [[strideremp_dead.dae]],
     },
 
     HEAP  = {

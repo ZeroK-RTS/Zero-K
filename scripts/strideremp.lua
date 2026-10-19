@@ -244,7 +244,7 @@ local function ApplyLegs(rise, fwd, pitch)
 	end
 end
 
-local SIG_ANIM = 1
+local SIG_ANIM, SIG_DEPLOY = 1, 2
 
 local function AnimThread()
 	SetSignalMask(SIG_ANIM)
@@ -312,6 +312,7 @@ local function Decloak(frame)
 end
 
 local function DeployThread()
+	SetSignalMask(SIG_DEPLOY)
 	SetState(STATE_DEPLOYING)
 	SetLocked(true)
 	GG.PokeDecloakUnit(unitID, unitDefID)
@@ -413,13 +414,84 @@ function script.AimWeapon(num, heading, pitch)
 	return false
 end
 
-function script.Killed(recentDamage, maxHealth)
-	local severity = recentDamage/maxHealth
-	for i = 1, 8 do
-		Explode(petals[i].shell, SFX.FALL + SFX.SMOKE + (severity > 0.5 and SFX.FIRE or 0))
+--------------------------------------------------------------------------------
+-- death: collapse into the wreck's pose (RIG.death, shared with strideremp_dead.dae)
+
+local DEATH = RIG.death
+local COLLAPSE_SECONDS = 1.1
+local AXIS = {x = x_axis, y = y_axis, z = z_axis}
+
+-- every channel the animation drives, so each one ends at its death value or back at rest
+local function DeathChannels()
+	local turns = {}
+	local function turn(p, axis) turns[#turns + 1] = {p, axis} end
+	for _, p in ipairs({prosoma, pedicel, yoke, opisthosoma, braceCoxa, braceFemur, braceTibia}) do
+		turn(p, x_axis)
 	end
+	for i = 1, 8 do
+		local pt = petals[i]
+		for _, p in ipairs({pt.link1, pt.link2, pt.shell, pt.knuckle, pt.prong}) do
+			turn(p, x_axis)
+		end
+	end
+	for i = 1, #legs do
+		local leg = legs[i]
+		turn(leg.coxa, y_axis)
+		turn(leg.femur, z_axis); turn(leg.tibia, z_axis); turn(leg.tarsus, z_axis)
+	end
+	for name, axes in pairs(DEATH.turn) do
+		for axis in pairs(axes) do turn(piece(name), AXIS[axis]) end
+	end
+	local moves = {{prosoma, y_axis}, {prosoma, z_axis}, {endcapInner, z_axis}, {endcapMid, z_axis}, {endcapTip, z_axis}}
+	return turns, moves
+end
+
+local function PieceName(p)
+	for name, index in pairs(Spring.GetUnitPieceMap(unitID)) do
+		if index == p then return name end
+	end
+end
+
+local function Collapse()
+	GG.Script.InitializeDeathAnimation(unitID)
+	for _, name in ipairs(DEATH.lostRoots) do
+		Explode(piece(name), SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+	end
+	for _, name in ipairs(DEATH.lost) do
+		Hide(piece(name))
+	end
+	local turns, moves = DeathChannels()
+	for i = 1, #turns do
+		local p, axis = turns[i][1], turns[i][2]
+		local name = PieceName(p)
+		local axisName = (axis == x_axis and "x") or (axis == y_axis and "y") or "z"
+		local target = (DEATH.turn[name] and DEATH.turn[name][axisName]) or 0
+		local current = select(axis, Spring.UnitScript.GetPieceRotation(p))
+		Turn(p, axis, target, max(0.05, abs(target - current) / COLLAPSE_SECONDS))
+	end
+	for i = 1, #moves do
+		local p, axis = moves[i][1], moves[i][2]
+		local name = PieceName(p)
+		local axisName = (axis == y_axis and "y") or "z"
+		local target = (DEATH.move[name] and DEATH.move[name][axisName]) or 0
+		local current = select(axis, Spring.UnitScript.GetPieceTranslation(p))
+		Move(p, axis, target, max(0.5, abs(target - current) / COLLAPSE_SECONDS))
+	end
+	Sleep(COLLAPSE_SECONDS * 1000 + 150)
+end
+
+function script.Killed(recentDamage, maxHealth)
+	Signal(SIG_ANIM)
+	Signal(SIG_DEPLOY) -- death ends the cycle: no pulse from a corpse
+	SetState(STATE_IDLE)
+	spSetUnitRulesParam(unitID, "strideremp_charge", 0, LOS_ACCESS)
+	local severity = recentDamage/maxHealth
 	if severity <= 0.5 then
+		Collapse()
 		return 1
+	end
+	for i = 1, 8 do
+		Explode(petals[i].shell, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 	end
 	Explode(opisthosoma, SFX.SHATTER)
 	Explode(prosoma, SFX.SHATTER)
