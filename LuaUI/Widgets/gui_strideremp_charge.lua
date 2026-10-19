@@ -29,7 +29,7 @@ local glLineWidth = gl.LineWidth
 local glDrawGroundCircle = gl.DrawGroundCircle
 local random = math.random
 
-local tracked = {} -- unitID -> light instance ID, or false
+local tracked = {} -- Ungoliants we can see
 
 --------------------------------------------------------------------------------
 -- emitter light: an uneven blue glow on the emitter core, growing with the charge
@@ -38,37 +38,39 @@ local function Lights()
 	return WG['lightsgl4']
 end
 
-local function DropLight(unitID)
-	local lights = Lights()
-	if tracked[unitID] and lights then
-		lights.RemoveLight('point', tracked[unitID], unitID)
-	end
-	if tracked[unitID] ~= nil then
-		tracked[unitID] = false
-	end
-end
+-- Each sim frame attaches a fresh short-lived light to the emitter piece. Lights with a lifetime
+-- are removed by the lights widget's own expiry queue, so when the charge stops (pulse, stun,
+-- death) the glow is gone within LIGHT_LIFE frames. A single persistent unit light cannot be used:
+-- AddPointLight does not register it for RemoveLight, so it would linger on the stunned unit.
+local LIGHT_LIFE = 2
 
-local function UpdateLight(unitID, state)
+local function SpawnLight(unitID, state)
 	local lights = Lights()
 	if not lights then
 		return
 	end
-	local charge = spGetUnitRulesParam(unitID, "strideremp_charge") or 0
-	local level = (state == STATE_CHARGING) and (0.25 + 0.75*charge) or 0.12
+	local charge = (state == STATE_CHARGING) and (spGetUnitRulesParam(unitID, "strideremp_charge") or 0) or 0
+	-- the glow spreads as the charge builds, and thins out as it spreads
+	local radius = (state == STATE_CHARGING) and (120 + 420*charge) or 110
+	local brightness = (state == STATE_CHARGING) and (0.5 - 0.075*charge) or 0.15
 	local flicker = 0.55 + 0.45*random()
-	if random() < 0.08*level then
+	if random() < 0.04 + 0.06*charge then
 		flicker = flicker + 0.8 -- the odd arc flashes the surroundings
 	end
-	local piece = spGetUnitPieceMap(unitID).emit_core
-	tracked[unitID] = lights.AddPointLight(tracked[unitID] or nil, unitID, piece, nil, 0, 0, 0,
-		120 + 420*level, 0.45, 0.72, 1.0, 1.4*level*flicker, 0, 0, 0, 0, 0.8, 0.8, 0.6, 0.5)
+	local pieceMap = spGetUnitPieceMap(unitID)
+	if not pieceMap then
+		return
+	end
+	-- LIGHT_LIFE of these overlap at any time, hence the division
+	lights.AddPointLight(nil, unitID, pieceMap.emit_core, nil, 0, 0, 0, radius, 0.45, 0.72, 1.0,
+		brightness*flicker/LIGHT_LIFE, 0, 0, 0, 0, 0.8, 0.8, 0.6, 0.5, nil, LIGHT_LIFE, LIGHT_LIFE)
 end
 
 --------------------------------------------------------------------------------
 
 function widget:UnitCreated(unitID, unitDefID)
 	if unitDefID == UNIT_DEF_ID and tracked[unitID] == nil then
-		tracked[unitID] = false
+		tracked[unitID] = true
 	end
 end
 
@@ -77,7 +79,6 @@ function widget:UnitEnteredLos(unitID)
 end
 
 function widget:UnitDestroyed(unitID)
-	DropLight(unitID)
 	tracked[unitID] = nil
 end
 
@@ -98,25 +99,11 @@ function widget:Initialize()
 	end
 end
 
-function widget:Shutdown()
-	for unitID in pairs(tracked) do
-		DropLight(unitID)
-	end
-end
-
-local lightTimer = 0
-function widget:Update(dt)
-	lightTimer = lightTimer + dt
-	if lightTimer < 1/30 then
-		return
-	end
-	lightTimer = 0
+function widget:GameFrame(n)
 	for unitID in pairs(tracked) do
 		local state = spGetUnitRulesParam(unitID, "strideremp_state")
 		if state == STATE_DEPLOYING or state == STATE_CHARGING then
-			UpdateLight(unitID, state)
-		elseif tracked[unitID] then
-			DropLight(unitID)
+			SpawnLight(unitID, state)
 		end
 	end
 end
