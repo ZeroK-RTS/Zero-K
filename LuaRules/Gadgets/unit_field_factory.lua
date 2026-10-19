@@ -164,7 +164,7 @@ end
 -- Command handling
 
 local function TryToCopyBlueprint(unitID, unitDefID, targetID, doMovement)
-	if not Spring.ValidUnitID(targetID) then
+	if not Spring.ValidUnitID(targetID) or not Spring.Utilities.IsSamePortalRegion(unitID, targetID) then
 		if doMovement then
 			Spring.ClearUnitGoal(unitID)
 		end

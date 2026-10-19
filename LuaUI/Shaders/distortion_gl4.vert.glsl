@@ -175,7 +175,8 @@ void main()
 		// The -1 is for inverting it so we always see the back faces (great for occlusion testing!) (this should be exploited later on!
 		
 		// this is centered around the target positional offset, and scaled locally
-		vec3 distortionVertexPosition = distortionCenterPosition + -1 * position.xyz * distortionRadius * 1.15; // 1.15 is a magic number that makes the sphere actually fit inside the sphere-ish geometry
+		// The shared 8-sector, 4-stack sphere needs a scale above 1/0.862856.
+		vec3 distortionVertexPosition = distortionCenterPosition + -1 * position.xyz * distortionRadius * 1.2;
 		
 		// transform the vertices to world-space
 		distortionVertexPosition = (placeInWorldMatrix * vec4(distortionVertexPosition, 1.0)).xyz; 

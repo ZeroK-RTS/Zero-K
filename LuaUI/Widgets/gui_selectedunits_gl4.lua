@@ -424,7 +424,21 @@ local function CleanSelections(typeToClear, newSelUnits)
 	return changed
 end
 
+local portalViewGeneration
+local function InPortalView(unitID)
+	return not WG.PortalWorldView or WG.PortalWorldView.ContainsUnit(unitID)
+end
+
 function widget:Update(dt)
+	local probe = WG.PortalWorldView
+	if probe then
+		-- Selected units can transit without a SelectionChanged event.
+		checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
+	end
+	if probe and portalViewGeneration ~= probe.generation then
+		portalViewGeneration = probe.generation
+		checkSelectionType[HOVER_SEL], checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true, true
+	end
 	local uiHidden = Spring.IsGUIHidden()
 	if oldUiHidden and uiHidden then
 		return
@@ -464,14 +478,14 @@ function widget:Update(dt)
 	-- Hover selections
 	if checkSelectionType[HOVER_SEL] then
 		for unitID, _ in pairs(FindPreselUnits()) do
-			if selUnits[unitID] ~= HOVER_SEL then
+			if InPortalView(unitID) and selUnits[unitID] ~= HOVER_SEL then
 				local alreadySelected = selUnits[unitID]
 				local hoverColorID = ((fullSelect or spIsUnitAllied(unitID)) and 254) or 253
 				AddSelected(unitID, hoverColorID, hoverSelectionVBO, not alreadySelected)
 				selUnits[unitID] = HOVER_SEL
 				checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
 			end
-			newSelUnits[unitID] = HOVER_SEL
+			if InPortalView(unitID) then newSelUnits[unitID] = HOVER_SEL end
 		end
 		if CleanSelections(HOVER_SEL, newSelUnits) then
 			checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
@@ -481,7 +495,7 @@ function widget:Update(dt)
 	-- Local selections
 	if checkSelectionType[LOCAL_SEL] then
 		for _, unitID in pairs(spGetSelectedUnits()) do
-			if not newSelUnits[unitID] then
+			if InPortalView(unitID) and not newSelUnits[unitID] then
 				if selUnits[unitID] ~= LOCAL_SEL then
 					AddSelected(unitID, 255, localSelectionVBO, false)
 					selUnits[unitID] = LOCAL_SEL
@@ -498,7 +512,7 @@ function widget:Update(dt)
 	-- Ally/other selections
 	if checkSelectionType[OTHER_SEL] then
 		for unitID, _ in pairs(WG.allySelUnits or {}) do
-			if Spring.ValidUnitID(unitID) and not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
+			if InPortalView(unitID) and Spring.ValidUnitID(unitID) and not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
 				if not selUnits[unitID] then
 					AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
 					selUnits[unitID] = OTHER_SEL
@@ -510,6 +524,7 @@ function widget:Update(dt)
 	end
 
     -- Prime hover to check again next time around, as we may have stopped selecting without making a selection
+	if probe then WG.PortalWorldSelectionCount = localSelectionVBO.usedElements end
 	checkSelectionType[HOVER_SEL] = isSelectionBoxActive
 	checkSelectionType[LOCAL_SEL] = false
 	checkSelectionType[OTHER_SEL] = false

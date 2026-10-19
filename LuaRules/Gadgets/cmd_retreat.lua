@@ -114,7 +114,7 @@ local function FindClosestHaven(teamID, sx, sz)
 	end
 	for havenID = 1, havensTeam.count do
 		local hx, hz = havensTeam.data[havenID].x, havensTeam.data[havenID].z
-		if hx then
+		if hx and Spring.Utilities.IsSamePortalPosition(sx, sz, hx, hz) then
 			local dSquared = (hx - sx)^2 + (hz - sz)^2
 			if (dSquared < closestDistSqr) then
 				closestDistSqr = dSquared

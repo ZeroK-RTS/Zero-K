@@ -367,6 +367,9 @@ local function UpdateCloakees(data, frameNum)
 		y = Spring.GetUnitRulesParam(unitID, "cloaker_pos_y")
 		z = Spring.GetUnitRulesParam(unitID, "cloaker_pos_z")
 	end
+	if not Spring.Utilities.IsPortalPositionAllowed(unitID, x, z) then
+		return
+	end
 	local closeUnits = GetUnitsInSphere(x, y, z, radius)
 	if (closeUnits == nil) then
 		return
@@ -380,7 +383,7 @@ local function UpdateCloakees(data, frameNum)
 	local allyTeam = GetUnitAllyTeam(unitID)
 	for _,cloakee in ipairs(closeUnits) do
 		local udid = GetUnitDefID(cloakee)
-		if ((not uncloakableDefs[udid]) and (not GetUnitRulesParam(cloakee, "comm_shield_id")) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
+		if ((not uncloakableDefs[udid]) and (not GetUnitRulesParam(cloakee, "comm_shield_id")) and (GetUnitAllyTeam(cloakee) == allyTeam) and Spring.Utilities.IsSamePortalRegion(unitID, cloakee)) then
 			-- see if it's already cloaked, and skip if so
 			if GG.GetCloakedAllowed(cloakee) then
 				local personalCloak = CanBurrow(udid) or GG.UnitHasPersonalCloak(cloakee, udid)
@@ -430,7 +433,7 @@ local function UpdateCloakees(data, frameNum)
 			if transported ~= nil then
 				for _,cloakeeLvl2 in ipairs(transported) do
 					local udid2 = GetUnitDefID(cloakeeLvl2)
-					if (GetUnitAllyTeam(cloakeeLvl2) == allyTeam) then
+					if (GetUnitAllyTeam(cloakeeLvl2) == allyTeam) and Spring.Utilities.IsSamePortalRegion(unitID, cloakeeLvl2) then
 						SetUnitCloakAndParam(cloakeeLvl2, 4, radiusOverrideDefs[udid2])
 						-- note: this gives perfect cloaking, but is the only level
 						-- to work under paralysis
@@ -446,7 +449,7 @@ local function UpdateCloakees(data, frameNum)
 		if transported ~= nil then
 			for _,cloakee in ipairs(transported) do
 				local udid = GetUnitDefID(cloakee)
-				if (GetUnitAllyTeam(cloakee) == allyTeam) then
+				if (GetUnitAllyTeam(cloakee) == allyTeam) and Spring.Utilities.IsSamePortalRegion(unitID, cloakee) then
 					SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
 					cloakees[cloakee] = 1
 				end

@@ -155,7 +155,7 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	-- Give teleport command if a teleporter is in the area
 	for i = 1, #units do
 		local otherUnitID = units[perm[i]]
-		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
+		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] and Spring.Utilities.IsSamePortalRegion(unitID, otherUnitID) then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
 				if not GG.Teleport_AllowCommand(unitID, unitDefID, CMD.GUARD, {otherUnitID}, cmdOptions2) then
@@ -168,7 +168,7 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	-- Otherwise, give a guard command to all units in the area
     for i = 1, #units do
 		local otherUnitID = units[perm[i]]
-		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
+		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] and Spring.Utilities.IsSamePortalRegion(unitID, otherUnitID) then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
 				spGiveOrderToUnit(unitID, CMD_GUARD, otherUnitID, cmdOptions2)
@@ -189,7 +189,7 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	local ud = unitDefID and UnitDefs[unitDefID]
 	
 	--// Check command validity
-	if not (ud and targetID and Spring.ValidUnitID(targetID)) then
+	if not (ud and targetID and Spring.ValidUnitID(targetID) and Spring.Utilities.IsSamePortalRegion(unitID, targetID)) then
 		if RAW_MOVE_MODE then
 			GG.RemoveRawMoveUnit(unitID)
 		end

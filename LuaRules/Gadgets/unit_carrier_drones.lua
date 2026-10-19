@@ -196,6 +196,13 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		rot = angle
 	end
 	
+	if GG.PortalWorlds then
+		local r = GG.PortalWorlds.world.regions[GG.PortalWorlds.home[unitID]]
+		if r then
+			xS = math.max(r.x0 + 24, math.min(r.x1 - 24, xS))
+			zS = math.max(r.z0 + 24, math.min(r.z1 - 24, zS))
+		end
+	end
 	--Note: create unit argument: (unitDefID|unitDefName, x, y, z, facing, teamID, build, flattenGround, targetID, builderID)
 	local droneID = CreateUnit(droneName, xS, yS, zS, 1, carrierList[unitID].teamID, droneBuiltExternally and true, false, nil, unitID)
 	if droneID then
@@ -866,6 +873,30 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RECALL_DRONES)
 	gadgetHandler:RegisterCMDID(CMD_TOGGLE_DRONES)
+	-- Carrier-owned drones, including nanoframes, travel with their carrier.
+	-- Return a snapshot so portal travel cannot mutate the roster during iteration.
+	GG.Drones_GetCarrierUnits = function(unitID)
+		local carrier = carrierList[unitID]
+		if not carrier then
+			return
+		end
+		local result = {}
+		for _, set in ipairs(carrier.droneSets) do
+			for droneID in pairs(set.drones) do
+				result[#result + 1] = droneID
+			end
+		end
+		table.sort(result)
+		return result
+	end
+	GG.Drones_ClearOrders = function(droneID)
+		local data = droneList[droneID]
+		if not data then return end
+		droneList[droneID] = nil
+		Spring.GiveOrderToUnit(droneID, CMD.STOP, {}, 0)
+		Spring.GiveOrderToUnit(droneID, CMD.GUARD, {data.carrier}, 0)
+		droneList[droneID] = data
+	end
 	GG.Drones_InitializeDynamicCarrier = Drones_InitializeDynamicCarrier
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -879,6 +910,8 @@ function gadget:Initialize()
 end
 
 function gadget:Shutdown()
+	GG.Drones_GetCarrierUnits = nil
+	GG.Drones_ClearOrders = nil
 	for unitID in pairs(droneList) do
 		Spring.DestroyUnit(unitID, true)
 	end

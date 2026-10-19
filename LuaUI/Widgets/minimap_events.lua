@@ -135,6 +135,10 @@ local xMapSize = Game.mapX * 512
 local yMapSize = Game.mapY * 512
 local pxScale = 1  -- (xMapSize / minimap xPixels)
 local pyScale = 1  -- (yMapSize / minimap yPixels)
+local activeView
+local function InActiveView(x,z)
+	return not activeView or (x>=activeView.x0 and x<=activeView.x1 and z>=activeView.z0 and z<=activeView.z1)
+end
 
 local rectList = 0
 
@@ -386,6 +390,7 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawEvent(event)
+  if not InActiveView(event.x,event.z) then return false end
   local pixels = event.v
 
   local color = event.c
@@ -399,14 +404,15 @@ local function DrawEvent(event)
   glColor(color)
   glCallList(circleList)
   glPopMatrix()
+  return true
 end
 
 
 local function DrawDamage(damage)
 
   local px, py, pz = spGetUnitViewPosition(damage.u)
-  if (px == nil) then
-    return
+  if (px == nil) or not InActiveView(px,pz) then
+    return false
   end
 
 
@@ -437,6 +443,7 @@ local function DrawDamage(damage)
     glPopMatrix()
   end
 
+  return true
 end
 
 
@@ -461,8 +468,11 @@ function widget:DrawInMiniMap(xSize, ySize)
   gl.Lighting(false)
 
   -- setup the pixel scales
-  pxScale = xMapSize / xSize
-  pyScale = yMapSize / ySize
+  activeView = WG.PortalWorldView and WG.PortalWorldView.rect
+  local width=activeView and (activeView.x1-activeView.x0) or xMapSize
+  local height=activeView and (activeView.z1-activeView.z0) or yMapSize
+  pxScale = width / xSize
+  pyScale = height / ySize
 
   glPushMatrix()
 
@@ -470,19 +480,24 @@ function widget:DrawInMiniMap(xSize, ySize)
 
   if GetMiniMapFlipped() then
     glTranslate(1, 0, 0)
-    glScale(-1 / xMapSize, 1 / yMapSize,1)
+    glScale(-1 / width, 1 / height,1)
   else
     glTranslate(0, 1, 0)
-    glScale(1 / xMapSize, -1 / yMapSize,1)
+    glScale(1 / width, -1 / height,1)
   end
+  if activeView then glTranslate(-activeView.x0,-activeView.z0,0) end
   
   -- draw damages before events
+  local drawnDamage,drawnEvents=0,0
   for _,damage in pairs(damageMap) do
-    DrawDamage(damage)
+    if DrawDamage(damage) then drawnDamage=drawnDamage+1 end
   end
 
   for _,event in pairs(eventMap) do
-    DrawEvent(event)
+    if DrawEvent(event) then drawnEvents=drawnEvents+1 end
+  end
+  if (Spring.GetModOptions().zk_duels_test=='orders' or Spring.GetModOptions().zk_duels_test=='four') then
+    WG.PortalMinimapEventTest={damage=drawnDamage,events=drawnEvents,width=width,height=height}
   end
 
   glPopMatrix()

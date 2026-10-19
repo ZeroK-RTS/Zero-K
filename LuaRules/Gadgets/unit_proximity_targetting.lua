@@ -71,7 +71,7 @@ local function GetTargetToClosest(unitID, slowAimer)
 	local bestSol, nextBestSol, shortestDistSq, nextShortestDistSq = false, false, false, false
 	for i = 1, #nearUnits do
 		local targetID = nearUnits[i]
-		if (spGetUnitAllyTeam(targetID) ~= aimerAllyTeam) then
+		if (spGetUnitAllyTeam(targetID) ~= aimerAllyTeam) and Spring.Utilities.IsSamePortalRegion(unitID, targetID) then
 			local losState = spGetUnitLosState(targetID, aimerAllyTeam, true)
 			if (losState % 2 == 1) or ((not precise) and losState % 4 == 2) or (immobileDefs[spGetUnitDefID(targetID)] and losState >= 8) then
 				if (not GG.baitPrevention_ChaffShootingBlock) or not GG.baitPrevention_ChaffShootingBlock(unitID, targetID) then
