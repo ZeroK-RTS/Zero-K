@@ -197,8 +197,12 @@ return {
   },
 
   -- the pulse on the ground, emitted by the script from `base`: ground flashes only render near the
-  -- terrain, so they cannot come from the raised emitter core
+  -- terrain, so they cannot come from the raised emitter core. Both rings reach the pulse radius
+  -- (640) as the stun does: it spreads at explosionSpeed, 12 elmos a frame, and lands ~4 frames
+  -- ahead of that (the engine measures to each unit's edge).
   ["strideremp_blast_ground"] = {
+    -- a blast wave, slowing as it spreads: shockwave's ring sits at 0.86 of the sprite's half-size,
+    -- which grows to size*(1 + sizegrowth)
     shockwave = {
       air                = true,
       class              = [[CBitmapMuzzleFlame]],
@@ -207,23 +211,39 @@ return {
       water              = true,
       properties = {
         alwaysvisible      = true,
-        colormap           = [[0.6 0.85 1.0 0.6    0.3 0.6 1.0 0.3    0 0 0 0]],
+        colormap           = [[0.6 0.85 1.0 0.6    0.55 0.8 1.0 0.55    0.5 0.75 1.0 0.5    0.45 0.7 1.0 0.45    0.4 0.7 1.0 0.4    0.35 0.65 1.0 0.35    0 0 0 0]],
         dir                = [[0, 1, 0]],
         frontoffset        = 0,
         fronttexture       = [[shockwave]],
         length             = 1,
         sidetexture        = [[null]],
         size               = 10,
-        sizegrowth         = 30,
-        ttl                = 24,
+        sizegrowth         = 73,
+        ttl                = 49,
         pos                = [[0, 4, 0]],
+      },
+    },
+    -- the stun front itself, at a steady 12 elmos a frame: groundring's rim sits at 0.94 of the quad
+    front = {
+      air                = true,
+      class              = [[CSimpleGroundFlash]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        alwaysvisible      = true,
+        colormap           = [[0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.35 0.65 1 0.6    0.3 0.6 1 0.55    0 0 0 0]],
+        size               = 51,
+        sizegrowth         = 12.8,
+        texture            = [[groundring]],
+        ttl                = 49,
       },
     },
     groundflash = {
       air                = true,
       alwaysvisible      = true,
-      circlealpha        = 0.6,
-      circlegrowth       = 32,
+      circlealpha        = 0,
+      circlegrowth       = 0,
       flashalpha         = 0.35,
       flashsize          = 640,
       ttl                = 20,

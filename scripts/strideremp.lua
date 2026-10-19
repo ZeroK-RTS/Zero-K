@@ -13,7 +13,7 @@ include "strideremp_rig.lua"
 
 local RIG = STRIDEREMP_RIG
 local TR = RIG.tracks
-local KEYS = RIG.keyFrames
+local KEY_STEP = RIG.keyStep
 local LEN = RIG.len
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
@@ -25,7 +25,7 @@ local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetGameFrame = Spring.GetGameFrame
 
 local sin, cos, atan2, sqrt, acos = math.sin, math.cos, math.atan2, math.sqrt, math.acos
-local min, max, abs, pi = math.min, math.max, math.abs, math.pi
+local min, max, abs, pi, floor = math.min, math.max, math.abs, math.pi, math.floor
 
 local LOS_ACCESS = {inlos = true}
 
@@ -70,7 +70,7 @@ local unitDef = UnitDefs[unitDefID]
 local CHARGE_FRAMES = (tonumber(unitDef.customParams.emp_charge_time) or 6) * 30
 local COOLDOWN_FRAMES = (tonumber(unitDef.customParams.emp_cooldown) or 30) * 30
 local DEPLOY_SECONDS = 4
-local DEPLOY_END = KEYS[#KEYS]
+local DEPLOY_END = RIG.deployLength
 local DEPLOY_RATE = DEPLOY_END / (DEPLOY_SECONDS * 30)
 
 local STRIDE = 26           -- body travel per gait cycle
@@ -110,17 +110,17 @@ local function Ease(k)
 	return 0.5 - 0.5*cos(pi*k)
 end
 
+-- the tracks are keyed densely off the Blender curves, so linear in between follows them
 local function Sample(track, t)
-	if t <= KEYS[1] then
+	local i = t/KEY_STEP
+	local i0 = floor(i)
+	if i0 < 0 then
 		return track[1]
 	end
-	for i = 2, #KEYS do
-		if t <= KEYS[i] then
-			local k = Ease((t - KEYS[i - 1]) / (KEYS[i] - KEYS[i - 1]))
-			return track[i - 1] + (track[i] - track[i - 1])*k
-		end
+	if i0 >= #track - 1 then
+		return track[#track]
 	end
-	return track[#track]
+	return track[i0 + 1] + (track[i0 + 2] - track[i0 + 1])*(i - i0)
 end
 
 --------------------------------------------------------------------------------
