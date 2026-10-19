@@ -27,7 +27,6 @@ local spGetGameFrame = Spring.GetGameFrame
 local sin, cos, atan2, sqrt, acos = math.sin, math.cos, math.atan2, math.sqrt, math.acos
 local min, max, abs, pi = math.min, math.max, math.abs, math.pi
 
-local ALLY_ACCESS = {allied = true}
 local LOS_ACCESS = {inlos = true}
 
 --------------------------------------------------------------------------------
@@ -77,7 +76,7 @@ local DEPLOY_RATE = DEPLOY_END / (DEPLOY_SECONDS * 30)
 local STRIDE = 26           -- body travel per gait cycle
 local LIFT = 7              -- foot lift at mid-swing
 local GROUND_REACH = 20     -- how far a foot may reach up or down to meet the terrain
-local SFX_SPARK, SFX_CHARGE, SFX_FOOTSTEP = 1024, 1025, 1026
+local SFX_SPARK, SFX_CHARGE, SFX_FOOTSTEP, SFX_GROUND_PULSE = 1024, 1025, 1026, 1027
 local HUM_SOUND = "sounds/weapon/constant_electric.wav"
 local CRACKLE_SOUND = "sounds/weapon/electrical_crackle.wav"
 
@@ -293,7 +292,7 @@ local readyFrame = 0
 
 local function SetState(s)
 	state = s
-	spSetUnitRulesParam(unitID, "strideremp_state", s, ALLY_ACCESS)
+	spSetUnitRulesParam(unitID, "strideremp_state", s, LOS_ACCESS)
 end
 
 local function SetLocked(lock)
@@ -334,7 +333,7 @@ local function DeployThread()
 		Decloak(frame)
 		progress = progress + SpeedMult()
 		local charge = min(1, progress/CHARGE_FRAMES)
-		spSetUnitRulesParam(unitID, "strideremp_charge", charge, ALLY_ACCESS)
+		spSetUnitRulesParam(unitID, "strideremp_charge", charge, LOS_ACCESS)
 		spSetUnitRulesParam(unitID, "specialReloadRemaining", 1 - charge, LOS_ACCESS)
 		-- crackle grows from the odd spark to a storm around the emitter
 		if math.random() < 0.15 + 0.85*charge*charge then
@@ -349,7 +348,8 @@ local function DeployThread()
 	end
 
 	EmitSfx(emitCore, GG.Script.DETO_W2)
-	spSetUnitRulesParam(unitID, "strideremp_charge", 0, ALLY_ACCESS)
+	EmitSfx(base, SFX_GROUND_PULSE) -- ground flashes only draw near the terrain, not at the raised core
+	spSetUnitRulesParam(unitID, "strideremp_charge", 0, LOS_ACCESS)
 	SetState(STATE_RECOVERING)
 
 	-- the pulse stuns us too; fold back up once it wears off

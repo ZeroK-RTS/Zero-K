@@ -216,6 +216,22 @@ explosionLightsNames.staticnuke_crblmssl = GetLightClass("Explosion", nil, "Plan
 	lensflare = 4,
 })
 
+-- Ungoliant's EMP pulse: a weapon-style flash, big and blue, with the base class's quick fade.
+-- (It is a script detonation with no projectile, so the light_* weapon customParams cannot drive it.)
+explosionLightsNames.strideremp_emp_blast = GetLightClass("Explosion", nil, nil, {
+	radius = 900,
+	r = 1.4,
+	g = 2.0,
+	b = 3.2,
+	a = 0.6,
+	color2r = 0.3,
+	color2g = 0.5,
+	color2b = 1.2,
+	lifetime = 16,
+	sustain = 3,
+	lensflare = 2,
+})
+
 for name, params in pairs(explosionLightsNames) do
 	if WeaponDefNames[name] then
 		explosionLights[WeaponDefNames[name].id] = params

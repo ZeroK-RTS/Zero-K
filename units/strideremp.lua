@@ -52,6 +52,7 @@ return { strideremp = {
       [[custom:strideremp_spark]],
       [[custom:strideremp_charge]],
       [[custom:strideremp_footstep]],
+      [[custom:strideremp_blast_ground]],
     },
   },
 
@@ -118,8 +119,6 @@ return { strideremp = {
       craterMult              = 0,
 
       customParams            = {
-        light_color       = [[0.55 0.85 1.4]],
-        light_radius      = 900,
         stats_hide_dps    = 1,
         stats_hide_reload = 1,
       },
