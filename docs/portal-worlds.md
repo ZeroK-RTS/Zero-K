@@ -19,17 +19,34 @@ also required. `Engine.FeatureSupport.mapDamageRegions` and synced
 sensor updates; the rectangles must align to the engine's coarsest sensor cell.
 A portal match ends immediately with a diagnostic on an unsupported engine.
 Normal ZK is unaffected with the `zk_duels=baseline` default. Enable
-`zk_duels=duels` only on a composed map. Map packing and the standalone
-`play_duels.py` launcher belong to the separate portal map-tools project, not this
-game repository. They download/check the original maps and generate the archive;
-map media and engine binaries are not included in this PR.
+`zk_duels=duels` only on a composed map. The map fetcher, packer, manifest, map
+helper templates and launch/verification scripts are included in
+[tools/portal_worlds](../tools/portal_worlds/README.md). They fetch/check the original
+maps and generate the composed archive; map media and engine binaries are not
+committed.
+
+From the game checkout on Linux (Python 3.9+, `lua5.1`, `7z`; `cc` for offscreen
+rendering):
 
 ```sh
-# From the map-tools checkout:
+cd tools/portal_worlds
+portal_venv="${XDG_CACHE_HOME:-$HOME/.cache}/zero-k/portal-tools-venv"
+python3 -m venv "$portal_venv"
+. "$portal_venv/bin/activate"
+python3 -m pip install -r requirements.txt
 python3 fetch_portal_maps.py
-python3 build_portal_worlds.py --game-dir /path/Zero-K --engine-source /path/RecoilEngine
-python3 play_duels.py --game-dir /path/Zero-K --engine-dir /path/RecoilEngine/build-amd64-linux/install --play
+python3 build_portal_worlds.py --engine-source /path/RecoilEngine
+python3 verify_four_worlds.py
+python3 play_duels.py --engine-dir /path/RecoilEngine/build-amd64-linux/install --play
 ```
+
+`--game-dir` defaults to this checkout. Generated maps, downloads and diagnostic
+runs stay outside the game in `$XDG_CACHE_HOME/zero-k/portal-worlds` (normally
+`~/.cache/zero-k/portal-worlds`). Set `ZK_PORTAL_WORKSPACE=/absolute/path` to use
+another location. All scripts share that workspace; original map credits are
+retained in the generated `ATTRIBUTION.txt`. The supplied manifest describes four
+8×8 maps and 512-elmo cubicle barriers; edit it or pass `--manifest` and `--target`
+to pack a different composition.
 
 The launcher prints fresh log/recording/screenshot paths. F12 also records camera,
 viewport, GL state and visible projectile diagnostics. It does not suppress logs.
@@ -100,7 +117,7 @@ loading or a client information-security boundary.
 
 ## Tests and review limits
 
-Opt-in `zk_duels_test` modes are used only by the external launcher:
+Opt-in `zk_duels_test` modes are used only by the opt-in launcher:
 
 - `four`: opening/view locks, native resources, direct and queued routes, no
   proximity travel, both directions on every edge for ground/air units, mixed
@@ -143,7 +160,7 @@ Opt-in `zk_duels_test` modes are used only by the external launcher:
   queued travel and source-waypoint cleanup, sensor isolation and visibility after
   arrival. The clients use different local views and compare synced witnesses.
 
-From the separate map-tools checkout, run the two-client fixture with:
+From `tools/portal_worlds`, run the two-client fixture with:
 
 ```sh
 python3 network_playtest.py portal-network --game-dir /path/Zero-K --engine-dir /path/RecoilEngine/build-amd64-linux/install
