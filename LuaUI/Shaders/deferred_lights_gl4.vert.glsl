@@ -222,11 +222,12 @@ void main()
     #line 11000
     if (pointbeamcone < 0.5){ // point
         //scale it and place it into the world
-        //Make it a tiny bit bigger *(1.1) cause the blocky sphere is smaller than the actual radius
+        // The 8-sector, 4-stack mesh has an inradius of 0.862856.
+        // Enclose the analytic sphere so its faces cannot clip light coverage.
         // the -1 is for inverting it so we always see the back faces (great for occlusion testing!) (this should be exploited later on!
        
         // this is centered around the target positional offset, and scaled locally
-        vec3 lightVertexPosition = lightCenterPosition + -1 * position.xyz * lightRadius * 1.1;
+        vec3 lightVertexPosition = lightCenterPosition + -1 * position.xyz * lightRadius * 1.2;
 
 		// Add animations
 		if (worldposrad2.w == 0.0) { // Why was this 1.0 and not 0.0?

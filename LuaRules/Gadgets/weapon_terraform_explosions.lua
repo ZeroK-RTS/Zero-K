@@ -118,7 +118,7 @@ local function DoSmooth(def, x, y, z)
 	for i = sx - gatherradius, sx + gatherradius, increment do
 		for j = sz - gatherradius, sz + gatherradius, increment do
 			local disSQ = (i - x)^2 + (j - z)^2
-			if disSQ <= gatherradiusSQ then
+			if disSQ <= gatherradiusSQ and Spring.Utilities.IsSamePortalPosition(x, z, i, j) then
 				groundPoints = groundPoints + 1
 				groundHeight = groundHeight + spGetGroundHeight(i,j)
 			end
@@ -140,7 +140,9 @@ local function DoSmooth(def, x, y, z)
 		local units = Spring.GetUnitsInCylinder(sx,sz,detachmentradius)
 		for i = 1, #units do
 			local hitUnitID = units[i]
-			GG.DetatchFromGround(hitUnitID, 1, 0.25, 0.002*GRAVITY)
+			if Spring.Utilities.IsPortalPositionAllowed(hitUnitID, x, z) then
+				GG.DetatchFromGround(hitUnitID, 1, 0.25, 0.002*GRAVITY)
+			end
 		end
 	end
 end
@@ -198,7 +200,7 @@ local function DoUnitDestroyedTerraform(unitID, config)
 							end
 						end
 					end
-					if toAdd and GG.Terraform.IsPositionTerraformable(x, z) then
+					if toAdd and GG.Terraform.IsPositionTerraformable(x, z) and Spring.Utilities.IsSamePortalPosition(ux, uz, x, z) then
 						spAddHeightMap(x, z, toAdd)
 					end
 				end
@@ -208,7 +210,7 @@ local function DoUnitDestroyedTerraform(unitID, config)
 		local units = Spring.GetUnitsInCylinder(ux, uz, config.impulseRadius)
 		for i = 1, #units do
 			local hitUnitID = units[i]
-			if hitUnitID ~= unitID then
+			if hitUnitID ~= unitID and Spring.Utilities.IsSamePortalRegion(unitID, hitUnitID) then
 				GG.AddGadgetImpulseRaw(hitUnitID, 0, config.impulseY, 0, true, true)
 			end
 		end

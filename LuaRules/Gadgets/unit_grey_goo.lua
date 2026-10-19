@@ -104,7 +104,7 @@ local function getStealableAlly(x, z, r, unitID, progress, team)
 	local nearby = spGetUnitsInCylinder(x, z, r, team)
 	for i = 1, #nearby do
 		local id = nearby[i]
-		if units[id] and id ~= unitID and (not units[id].disabled) and units[id].progress ~= 0 and
+		if Spring.Utilities.IsSamePortalRegion(unitID, id) and units[id] and id ~= unitID and (not units[id].disabled) and units[id].progress ~= 0 and
 				(units[id].progress < progress or (units[id].progress == progress and unitID < id)) then
 			return id
 		end
@@ -116,7 +116,7 @@ local function UnitDisabled(unitID)
 	return (spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1))
 end
 
-local function getClosestWreck(x, z, r) -- hopefully to be replaced
+local function getClosestWreck(x, z, r, unitID) -- hopefully to be replaced
 	local features = spGetFeaturesInRectangle(x-r, z-r, x+r, z+r)
 	local rsq = r^2
 	
@@ -129,7 +129,7 @@ local function getClosestWreck(x, z, r) -- hopefully to be replaced
 		if validFeatureDefID[fdefid] then
 			local fx, _, fz = spGetFeaturePosition(fid)
 			local dis = disSQ(x,z,fx,fz)
-			if dis <= rsq and ((not minDis) or dis < minDis) and (not killedFeature[fid]) then
+			if Spring.Utilities.IsPortalPositionAllowed(unitID, fx, fz) and dis <= rsq and ((not minDis) or dis < minDis) and (not killedFeature[fid]) then
 				local _, maxMetal = spGetFeatureResources(fid)
 				if maxMetal ~= 0 then
 					minDis = dis
@@ -161,7 +161,7 @@ function gadget:GameFrame(f)
 				local x,y,z = spGetUnitPosition(unitID)
 				-- drain metal while quote not fulfilled
 				while quota > 0 and x and z do
-					local feature = getClosestWreck(x, z, unit.defs.range)
+					local feature = getClosestWreck(x, z, unit.defs.range, unitID)
 					
 					if feature then
 						spSpawnCEG(CEG_SPAWN,

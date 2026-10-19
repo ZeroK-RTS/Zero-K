@@ -87,6 +87,9 @@ for i = 1, #UnitDefs do
 end
 
 local function ValidThrowTarget(unitID, targetID, speed)
+	if not Spring.Utilities.IsSamePortalRegion(unitID, targetID) then
+		return false
+	end
 	if unitID == targetID then
 		return false
 	end
@@ -263,6 +266,9 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		_, _, _, tx, ty, tz = spGetUnitPosition(targetPos, true)
 		local groundHeight = math.max(Spring.Utilities.GetGroundHeightMinusOffmap(tx, tz) or 0, 0)
 		ty = math.min(ty, groundHeight - MAX_ALTITUDE_AIM)
+	end
+	if not Spring.Utilities.IsPortalPositionAllowed(proOwnerID, tx, tz) then
+		return
 	end
 	ty = math.max(ty, 0)
 	
@@ -493,6 +499,10 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 end
 
 local externalFunc = {}
+function externalFunc.IsFlying(unitID)
+	return IterableMap.InMap(physicsRestore, unitID)
+end
+
 function externalFunc.BlockAttack(unitID)
 	local unitData = unitID and IterableMap.Get(throwUnits, unitID)
 	return unitData and unitData.blockAttack

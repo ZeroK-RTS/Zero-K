@@ -300,6 +300,9 @@ local function DoReload(unitID, env, coroutineID, reloadTime, jumpCharges, publi
 end
 
 local function Jump(unitID, goal, origCmdParams, mustJump)
+	if not Spring.Utilities.IsPortalPositionAllowed(unitID, goal[1], goal[3]) then
+		return false, true
+	end
 	goal[1] = math.max(OFF_MAP_LEEWAY, math.min(MAP_X - OFF_MAP_LEEWAY, goal[1]))
 	goal[3] = math.max(OFF_MAP_LEEWAY, math.min(MAP_Z - OFF_MAP_LEEWAY, goal[3]))
 	goal[2]                = spGetGroundHeight(goal[1], goal[3])

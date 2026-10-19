@@ -423,7 +423,8 @@ local function FreeSlot(edgeKey)
 	-- Upload one vec4 of zeros at element offset s. Spring's Upload signature:
 	-- (data, attribIdx, elemOffset, luaStart, luaFinish). attribIdx=nil =
 	-- "all attribs" (we have one), elemOffset=s, explicit luaStart/luaFinish
-	-- avoid the engine's "too few data" check that fires when those default.
+	-- select exactly one complete vec4. SSBO attribute size counts vec4s,
+	-- whereas Upload indexes individual scalar values.
 	if coverageSSBO then
 		coverageSSBO:Upload({0, 0, 0, 0}, nil, s, 1, 4)
 	end
@@ -2847,7 +2848,7 @@ function gadget:Initialize()
 	end
 
 	-- Per-edge coverage SSBO. Spring's VBO API requires vec4-aligned attribs,
-	-- so each slot is one 4-float row; we only use .x (the coverage uint).
+	-- so each slot is one vec4 (size=1); we only use .x (the coverage uint).
 	-- Bit `i` of slot[s].x = "segment i of the cable in slot s has been in LOS
 	-- at least once". Persistent across frames; initial values zero.
 	-- gl.GetVBO(target, freqUpdated_bool). freqUpdated=true → GL_DYNAMIC_DRAW
@@ -2856,7 +2857,7 @@ function gadget:Initialize()
 	coverageSSBO = gl.GetVBO(GL.SHADER_STORAGE_BUFFER, true)
 	if coverageSSBO then
 		coverageSSBO:Define(COVERAGE_MAX_SLOTS, {
-			{ id = 0, name = "coverageData", size = 4 },
+			{ id = 0, name = "coverageData", size = 1 },
 		})
 		local zeros = {}
 		for i = 1, 4 * COVERAGE_MAX_SLOTS do zeros[i] = 0 end
