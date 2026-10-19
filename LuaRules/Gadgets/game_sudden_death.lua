@@ -81,7 +81,7 @@ local propDamageAtRefDist = 0.05 * UPDATE_FREQ_DAMAGE / 30
 local function GetDefaultConfig()
 	local suddenDeathMinutes = tonumber((Spring.GetModOptions() or {}).sudden_death_minutes) or false
 	local suddenDeathSweepSeconds = tonumber((Spring.GetModOptions() or {}).sudden_death_sweep_seconds) or false
-	if not suddenDeathMinutes then
+	if not suddenDeathMinutes or suddenDeathMinutes < 0 then
 		return false
 	end
 	return {
