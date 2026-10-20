@@ -142,7 +142,7 @@ def main():
 	if args.normal and args.test != 'none':
 		portal_options=f'zk_duels_test={args.test}; zk_duels_speed={args.speed};'
 	if args.record:
-		portal_options += f'portal_record=1; portal_record_end={0 if args.play else args.frames}; portal_record_quit={0 if args.play else 1};'
+		portal_options += f'portal_record=1; portal_record_end={0 if args.play else args.frames}; portal_record_quit={0 if args.play else 1}; portal_record_speed={1 if args.play else args.speed};'
 	import re
 	for option in args.modoption:
 		if not re.fullmatch(r'[a-zA-Z0-9_]+=[a-zA-Z0-9_.+-]+', option):
