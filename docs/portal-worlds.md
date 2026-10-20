@@ -213,3 +213,12 @@ request. The router now tracks those tags separately and uses a stopping radius
 inside the activation radius, preserving the remaining multi-hop order. These
 fixtures open connections by scripted commander destruction and are labelled
 fixtures, separate from the autonomous AI recordings.
+
+
+A reviewed 60-minute native Circuit campaign opened all four connections and
+recorded 2,492 transfers (2,150 ground and 342 air), but reached its frame cap
+with four surviving teams. It is not an overall AI victory. Two late ground-unit
+edge stalls and one constructor move goal just outside its region remain for
+investigation. The native invasion policy, rearming and supply planning remain
+WIP. Dots and their review findings complement the mechanics fixtures; neither
+is a claim that every AI or optional unit mechanic is fully supported.
