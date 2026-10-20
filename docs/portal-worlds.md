@@ -9,6 +9,22 @@ native 8×8 maps with a 512-elmo gap, arranged in a 2×2 grid and connected in a
 The resulting physical map is 18×18. The same code has also run a reordered
 three-map, one-column composition.
 
+## Downloadable preview and recordings
+
+The [Linux preview](https://github.com/gajop/bar-spring/releases/tag/portal-preview-20261020)
+provides the engine, both native AIs, the composed map, checksums and clean-PC
+play instructions. Download the standalone **Zero-K gameplay HTML** and open
+it in a browser to watch four worlds at once, seek, pause and inspect units.
+
+The latest live AI demonstration uses `--region-income-multipliers 2,4,8,16`:
+teams 0, 2, 4 and 6 receive those respective native income factors, while their
+opening opponents stay at 1×. The banner and colour legend identify them. All
+teams remain enemies. Team 2 (4× income) won at 26:12.7, with 1,110 observed transfers.
+The observer issues no orders, kills no commanders and forces no winner.
+Native AI logistics and lava avoidance remain limitations; the release review
+retains the findings and an unresolved intermittent native pathfinder crash.
+This preview is WIP and is not merge-ready.
+
 ## Requirements and setup
 
 Use a Recoil build with `Engine.FeatureSupport.mapRegionViews`: `Spring.SetWorldDrawBounds`,
@@ -215,7 +231,7 @@ fixtures open connections by scripted commander destruction and are labelled
 fixtures, separate from the autonomous AI recordings.
 
 
-A reviewed 60-minute native Circuit campaign opened all four connections and
+An earlier uniform-10× 60-minute native Circuit campaign opened all four connections and
 recorded 2,492 transfers (2,150 ground and 342 air), but reached its frame cap
 with four surviving teams. It is not an overall AI victory. Two late ground-unit
 edge stalls and one constructor move goal just outside its region remain for
