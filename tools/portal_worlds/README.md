@@ -20,7 +20,7 @@ python3 -m venv "$portal_venv"
 . "$portal_venv/bin/activate"
 python3 -m pip install -r requirements.txt
 python3 fetch_portal_maps.py
-python3 build_portal_worlds.py --engine-source /path/RecoilEngine
+python3 build_portal_worlds.py --engine-dir /path/engine
 python3 verify_four_worlds.py
 python3 play_duels.py --engine-dir /path/RecoilEngine/build-amd64-linux/install --play
 ```
@@ -127,3 +127,9 @@ mipmaps, authored start positions and optional engine assertion logs. A successf
 startup alone is not treated as a passing gameplay test.
 
 Pillow 11.2.1 introduced the [DXT1 encoder](https://pillow.readthedocs.io/en/stable/releasenotes/11.2.1.html#saving-compressed-dds-images) used by the native minimap writer.
+
+For shareable all-world AI recordings, see [dots playback](dots/README.md).
+The packer also accepts a downloaded engine with `--engine-dir`: no engine-source
+checkout is needed to obtain its bundled detail texture.
+`build_circuit.py` can build the companion native portal-missions AI into a
+separate `--ai-dir`; it preserves the engine’s stock AI and normal build cache.

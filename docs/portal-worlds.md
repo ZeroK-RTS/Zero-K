@@ -35,7 +35,7 @@ python3 -m venv "$portal_venv"
 . "$portal_venv/bin/activate"
 python3 -m pip install -r requirements.txt
 python3 fetch_portal_maps.py
-python3 build_portal_worlds.py --engine-source /path/RecoilEngine
+python3 build_portal_worlds.py --engine-dir /path/engine
 python3 verify_four_worlds.py
 python3 play_duels.py --engine-dir /path/RecoilEngine/build-amd64-linux/install --play
 ```
@@ -48,7 +48,16 @@ retained in the generated `ATTRIBUTION.txt`. The supplied manifest describes fou
 8×8 maps and 512-elmo cubicle barriers; edit it or pass `--manifest` and `--target`
 to pack a different composition.
 
-The launcher prints fresh log/recording/screenshot paths. F12 also records camera,
+The launcher prints fresh log/recording/screenshot paths. With `--record --headless` or `--record --watch`, the launcher also records all-team
+[dots playback](../tools/portal_worlds/dots/README.md). It can be shared as one offline
+HTML file, showing all worlds together with seeking, orders and unit inspection.
+`--duel-income-multiplier` gives one AI per map an explicit setup advantage; it is
+1 by default. `--ai-dir` selects a separately built native AI without altering the
+engine installation. The companion `build_circuit.py` builds Circuit’s optional
+portal missions in an isolated cache. Ordinary Circuit remains usable, but does
+not deliberately plan ground invasions after a local win.
+
+F12 also records camera,
 viewport, GL state and visible projectile diagnostics. It does not suppress logs.
 
 ## Orders and viewing
@@ -116,6 +125,12 @@ team/unit limits, economy and a single simulation. This is not independent-map
 loading or a client information-security boundary.
 
 ## Tests and review limits
+
+`--test factories` queues real native ground/air production on each world and
+checks finished children and inherited membership. The normal-map control uses
+`--normal --test factories`. Native factory validation has no build position;
+the portal check validates the producer rather than rejecting that queue.
+
 
 Opt-in `zk_duels_test` modes are used only by the opt-in launcher:
 
