@@ -13,6 +13,7 @@ import threading
 import subprocess
 import time
 
+from income_settings import team_income_multipliers
 from portal_paths import WORKSPACE, DEFAULT_GAME, diagnostic_library
 
 def main():
@@ -26,7 +27,9 @@ def main():
 	parser.add_argument('--ai', help='Defaults to CircuitAI for play, passive NullAI for scripted fixtures')
 	parser.add_argument('--ai-dir', type=Path, help='Optional isolated AI root, including Interfaces/ and Skirmish/')
 	parser.add_argument('--record', action='store_true', help='Record all-world dots as a spectator (headless or --watch)')
-	parser.add_argument('--duel-income-multiplier', type=float, default=1, help='Income factor for the first team in each region')
+	income_options = parser.add_mutually_exclusive_group()
+	income_options.add_argument('--duel-income-multiplier', type=float, default=1, help='Income factor for the first team in each region')
+	income_options.add_argument('--region-income-multipliers', help='Comma-separated income factors for the first team in each authored region, e.g. 2,4,8,16')
 	parser.add_argument('--map', default='Portal Worlds v3')
 	parser.add_argument('--offscreen-gpu', action='store_true', help='Render on the GPU with SDL offscreen, without a desktop window')
 	parser.add_argument('--x11-hidden', action='store_true', help='Use an unmapped desktop GL window for renderer comparisons')
@@ -79,6 +82,10 @@ def main():
 	if not layout or 'teams' not in layout: parser.error('Map has no generated composition manifest; run build_portal_worlds.py first')
 	if args.teams is None: args.teams=len(layout['teams'])
 	if not 1<=args.teams<=len(layout['teams']): parser.error('Team count exceeds the authored start positions')
+	try:
+		income_multipliers = team_income_multipliers(layout['teams'], args.duel_income_multiplier, args.region_income_multipliers)
+	except ValueError as error:
+		parser.error(str(error))
 	game_dir=args.game_dir.resolve()
 	if not game_dir.is_dir(): parser.error('Game checkout does not exist: '+str(game_dir))
 	engine_dir = args.engine_dir.resolve()
@@ -160,13 +167,11 @@ def main():
  [MODOPTIONS] {{ {portal_options} maxspeed=100; minspeed=0.1; fixedstartpos=1; shuffle=off; commends=1; }}
  [PLAYER0] {{ Name=Probe; Spectator={0 if args.human else 1}; Team=0; }}
 """]
-	champions = {}
-	for team, entry in enumerate(layout['teams'][:args.teams]): champions.setdefault(entry['region'], team)
 	for team in range(args.teams):
 		x,z = positions[team]
 		if not (args.human and team == 0):
 			parts.append(f'[AI{team}] {{ Name=Circuit{team}; ShortName={args.ai}; Version={ai_version}; Team={team}; Host=0; [OPTIONS] {{ profile=default; cheating=0; ally_aware=0; disabledunits={disabled}; }} }}')
-		income = args.duel_income_multiplier if champions[layout['teams'][team]['region']] == team else 1
+		income = income_multipliers[team]
 		parts.append(f'[TEAM{team}] {{ TeamLeader=0; AllyTeam={team}; IncomeMultiplier={income}; RgbColor={colors[team]}; StartPosX={x}; StartPosZ={z}; [CUSTOMKEYS] {{ start_x={x}; start_z={z}; }} }}')
 		polygon=layout['teams'][team]['boxes'][0]
 		x0,x1=min(p[0] for p in polygon)/layout['size'][0],max(p[0] for p in polygon)/layout['size'][0]
