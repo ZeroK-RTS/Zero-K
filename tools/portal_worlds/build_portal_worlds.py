@@ -21,7 +21,7 @@ from portal_paths import ROOT, WORKSPACE, DEFAULT_GAME
 FMT = '<16s7i2f7i'
 TARGET = WORKSPACE / 'content/maps/portal_worlds_v3.sdd'
 GAME_ROOT = None
-ENGINE_SOURCE = None
+CLASSIC_DETAIL = None
 
 
 def dds_header(width, height):
@@ -140,7 +140,8 @@ def material(source, info, region, target, world_size, name):
         if filename:
             normals.append(asset(filename))
     if not normals:
-        image = Image.open(ENGINE_SOURCE/'cont/base/bitmaps/bitmaps/detailtex2.bmp').convert('L')
+        import io
+        image = Image.open(io.BytesIO(CLASSIC_DETAIL)).convert('L')
         flat = Image.new('RGBA', image.size, (128, 128, 255, 128))
         flat.putalpha(image)
         flat.save(dest / 'classic_detail.png')
@@ -371,12 +372,19 @@ def build(manifest_path=ROOT/'portal_maps.json', target=TARGET):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--manifest', type=Path, default=ROOT/'portal_maps.json')
-    parser.add_argument('--game-dir', type=Path, default=DEFAULT_GAME, help='Zero-K source checkout for authored metal/start overrides (default: this checkout)')
-    parser.add_argument('--engine-source', type=Path, required=True, help='Recoil source checkout for the bundled classic detail texture')
+    parser.add_argument('--game-dir', type=Path, default=ROOT/'map-metadata' if (ROOT/'map-metadata').exists() else DEFAULT_GAME,
+                        help='Authored map override root (default: bundled map-metadata or this checkout)')
+    engine = parser.add_mutually_exclusive_group(required=True)
+    engine.add_argument('--engine-source', type=Path, help='Recoil source checkout for the classic detail texture')
+    engine.add_argument('--engine-dir', type=Path, help='Recoil binary install; read its bundled classic detail texture')
     parser.add_argument('--target', type=Path, default=TARGET)
     args = parser.parse_args()
     GAME_ROOT = args.game_dir.resolve()
-    ENGINE_SOURCE = args.engine_source.resolve()
     assert (GAME_ROOT/'LuaRules').is_dir()
-    assert (ENGINE_SOURCE/'cont/base/bitmaps').is_dir()
+    if args.engine_source:
+        CLASSIC_DETAIL = (args.engine_source/'cont/base/bitmaps/bitmaps/detailtex2.bmp').read_bytes()
+    else:
+        import zipfile
+        with zipfile.ZipFile(args.engine_dir/'base/spring/bitmaps.sdz') as archive:
+            CLASSIC_DETAIL = archive.read('bitmaps/detailtex2.bmp')
     build(args.manifest, args.target)

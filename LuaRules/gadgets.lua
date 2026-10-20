@@ -1234,16 +1234,27 @@ end
 
 function gadgetHandler:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, facing)
 	if self.GG.PortalWorlds and builderID then
-		local ud = UnitDefs[unitDefID]
-		local hx, hz = ud.xsize * 4, ud.zsize * 4
-		if facing and facing % 2 == 1 then
-			hx, hz = hz, hx
-		end
 		local portal = self.GG.PortalWorlds
-		local r = portal.world.regions[portal.Region(x, z)]
-		if not r or not Spring.Utilities.IsPortalPositionAllowed(builderID, x, z)
-			or x - hx < r.x0 or x + hx > r.x1 or z - hz < r.z0 or z + hz > r.z1 then
-			return false, true
+		-- Native factory queues have no BuildInfo, hence no position. Check the
+		-- producer instead; the actual child inherits its region in UnitCreated.
+		-- Keep the original nil arguments for the other creation callbacks.
+		if x == nil or z == nil then
+			local builderDef = UnitDefs[Spring.GetUnitDefID(builderID)]
+			local bx, _, bz = Spring.GetUnitPosition(builderID)
+			if not builderDef or not builderDef.isFactory or not portal.Region(bx, bz) then
+				return false, true
+			end
+		else
+			local ud = UnitDefs[unitDefID]
+			local hx, hz = ud.xsize * 4, ud.zsize * 4
+			if facing and facing % 2 == 1 then
+				hx, hz = hz, hx
+			end
+			local r = portal.world.regions[portal.Region(x, z)]
+			if not r or not Spring.Utilities.IsPortalPositionAllowed(builderID, x, z)
+				or x - hx < r.x0 or x + hx > r.x1 or z - hz < r.z0 or z + hz > r.z1 then
+				return false, true
+			end
 		end
 	end
 	tracy.ZoneBeginN("G:AllowUnitCreation")

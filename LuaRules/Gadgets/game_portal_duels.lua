@@ -101,6 +101,9 @@ local function PublishMouth(edge, region, m)
 	local prefix = "zkduels_e" .. edge .. "_r" .. region
 	Spring.SetGameRulesParam(prefix .. "_x", m.x)
 	Spring.SetGameRulesParam(prefix .. "_z", m.z)
+	local aiPrefix = "portal_e" .. edge .. "_r" .. region
+	Spring.SetGameRulesParam(aiPrefix .. "_x", m.x)
+	Spring.SetGameRulesParam(aiPrefix .. "_z", m.z)
 	-- Retain these diagnostic names for the first mouth in a region.
 	if not Spring.GetGameRulesParam("zkduels_m" .. region .. "_x") then
 		Spring.SetGameRulesParam("zkduels_m" .. region .. "_x", m.x)
@@ -174,6 +177,7 @@ local function OpenPortal(team, frame, loss)
 	end
 	openEdges[chosen] = true
 	Spring.SetGameRulesParam("zkduels_e" .. chosen .. "_open", 1)
+	Spring.SetGameRulesParam("portal_e" .. chosen .. "_open", 1)
 	Spring.SetGameRulesParam("zkduels_open", 1)
 	Spring.SetGameRulesParam("zkduels_open_frame", frame)
 	Spring.SetGameRulesParam("zkduels_loser", team)
@@ -293,13 +297,26 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("zkduels_regions", #regions)
 	Spring.SetGameRulesParam("zkduels_edges", #connections)
 	Spring.SetGameRulesParam("zkduels_open", 0)
+	-- Public topology protocol shared with native BARb/Circuit portal missions.
+	Spring.SetGameRulesParam("portal_ai_version", 1)
+	Spring.SetGameRulesParam("portal_ai_diagnostics", options.portal_ai_log == "1" and 1 or 0)
+	Spring.SetGameRulesParam("portal_regions", #regions)
+	Spring.SetGameRulesParam("portal_edges", #connections)
+	for _, entry in ipairs(world.teams) do
+		Spring.SetGameRulesParam("portal_team" .. entry.team .. "_region", entry.region)
+		Spring.SetGameRulesParam("portal_team" .. entry.team .. "_alive", select(3, Spring.GetTeamInfo(entry.team, false)) and 0 or 1)
+	end
 	for i, r in ipairs(regions) do
 		for _, k in ipairs({ "x0", "z0", "x1", "z1" }) do
 			Spring.SetGameRulesParam("zkduels_r" .. i .. "_" .. k, r[k])
+			Spring.SetGameRulesParam("portal_r" .. i .. "_" .. k, r[k])
 		end
 	end
 	for i in ipairs(connections) do
 		Spring.SetGameRulesParam("zkduels_e" .. i .. "_open", 0)
+		Spring.SetGameRulesParam("portal_e" .. i .. "_open", 0)
+		Spring.SetGameRulesParam("portal_e" .. i .. "_a", connections[i][1])
+		Spring.SetGameRulesParam("portal_e" .. i .. "_b", connections[i][2])
 	end
 	-- Cubicle barriers: impassable terrain and build masks between authored regions.
 	for x = 0, Game.mapSizeX - 8, 8 do
@@ -322,10 +339,15 @@ function gadget:Initialize()
 	}
 	Log("READY regions=" .. #regions .. " spots=" .. tostring(GG.metalSpots and #GG.metalSpots))
 end
-function gadget:UnitCreated(id, def, team)
+function gadget:UnitCreated(id, def, team, builder)
 	created[team] = (created[team] or 0) + 1
 	local x, _, z = Spring.GetUnitPosition(id)
-	home[id] = Region(x, z)
+	-- Factories validate their queue before the native spawn point exists.
+	-- A child belongs to its producer even if its exit briefly lies in a strip.
+	home[id] = (builder and home[builder]) or Region(x, z)
+end
+function gadget:TeamDied(team)
+	Spring.SetGameRulesParam("portal_team" .. team .. "_alive", 0)
 end
 function gadget:AllowCommand(id, def, team, cmd, params, opts)
 	-- Inspect inserted orders too, before interpreting their target or queue flags.

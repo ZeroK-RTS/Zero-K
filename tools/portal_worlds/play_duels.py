@@ -3,6 +3,7 @@
 import argparse
 import atexit
 import json
+import math
 import os
 from pathlib import Path
 import signal
@@ -23,6 +24,9 @@ def main():
 	parser.add_argument('--game-dir', type=Path, default=DEFAULT_GAME, help='Zero-K source checkout (default: this checkout); --normal disables portal mode')
 	parser.add_argument('--seconds', type=int, default=1200)
 	parser.add_argument('--ai', help='Defaults to CircuitAI for play, passive NullAI for scripted fixtures')
+	parser.add_argument('--ai-dir', type=Path, help='Optional isolated AI root, including Interfaces/ and Skirmish/')
+	parser.add_argument('--record', action='store_true', help='Record all-world dots as a spectator (headless or --watch)')
+	parser.add_argument('--duel-income-multiplier', type=float, default=1, help='Income factor for the first team in each region')
 	parser.add_argument('--map', default='Portal Worlds v3')
 	parser.add_argument('--offscreen-gpu', action='store_true', help='Render on the GPU with SDL offscreen, without a desktop window')
 	parser.add_argument('--x11-hidden', action='store_true', help='Use an unmapped desktop GL window for renderer comparisons')
@@ -42,6 +46,9 @@ def main():
 	parser.add_argument('--shadows', type=int, choices=[0,1,2], default=1)
 	parser.add_argument('--factories', choices=['cloak','all'], default='all')
 	args = parser.parse_args()
+	if not math.isfinite(args.duel_income_multiplier) or args.duel_income_multiplier < 1:
+		parser.error('--duel-income-multiplier must be finite and at least 1')
+	if args.record and (args.play or args.human): parser.error('--record requires a spectator; use --watch or --headless')
 	args.ai = args.ai or ('NullAI' if args.test != 'none' else 'CircuitAI')
 	game_dir=args.game_dir.resolve()
 	if args.normal:
@@ -91,8 +98,10 @@ def main():
 	write = run / 'write'
 	for path in (iso / 'games', iso / 'maps', write / 'screenshots'):
 		path.mkdir(parents=True, exist_ok=True)
-	for name in ('base', 'fonts', 'AI'):
+	for name in ('base', 'fonts'):
 		(iso / name).symlink_to(engine_dir / name)
+	ai_dir = args.ai_dir.resolve() if args.ai_dir else engine_dir/'AI'
+	(iso/'AI').symlink_to(ai_dir)
 	(iso / 'games/Zero-K.sdd').symlink_to(game_dir)
 	for path in [*(WORKSPACE/'content/maps').iterdir(),*(WORKSPACE/'content').glob('*.sd7')]:
 		if not (iso/'maps'/path.name).exists(): (iso/'maps'/path.name).symlink_to(path)
@@ -118,7 +127,7 @@ def main():
 		if (args.settings_from/'write/LuaUI').is_dir():
 			shutil.copytree(args.settings_from/'write/LuaUI',write/'LuaUI')
 	config.write_text(''.join(f'{key} = {value}\n' for key, value in settings.items()))
-	ai_root=engine_dir/'AI/Skirmish'/args.ai
+	ai_root=ai_dir/'Skirmish'/args.ai
 	ai_versions=sorted(path.name for path in ai_root.iterdir() if path.is_dir())
 	ai_version='stable' if 'stable' in ai_versions else ai_versions[-1]
 	port = 21000 + os.getpid() % 20000
@@ -132,6 +141,8 @@ def main():
 	portal_options='' if args.normal else f'zk_duels={args.mode}; zk_duels_headless={1 if args.headless else 0}; zk_duels_end={0 if args.play else args.frames}; zk_duels_test={args.test}; zk_duels_speed={1 if args.play else args.speed};'
 	if args.normal and args.test != 'none':
 		portal_options=f'zk_duels_test={args.test}; zk_duels_speed={args.speed};'
+	if args.record:
+		portal_options += f'portal_record=1; portal_record_end={0 if args.play else args.frames}; portal_record_quit={0 if args.play else 1};'
 	import re
 	for option in args.modoption:
 		if not re.fullmatch(r'[a-zA-Z0-9_]+=[a-zA-Z0-9_.+-]+', option):
@@ -149,11 +160,14 @@ def main():
  [MODOPTIONS] {{ {portal_options} maxspeed=100; minspeed=0.1; fixedstartpos=1; shuffle=off; commends=1; }}
  [PLAYER0] {{ Name=Probe; Spectator={0 if args.human else 1}; Team=0; }}
 """]
+	champions = {}
+	for team, entry in enumerate(layout['teams'][:args.teams]): champions.setdefault(entry['region'], team)
 	for team in range(args.teams):
 		x,z = positions[team]
 		if not (args.human and team == 0):
 			parts.append(f'[AI{team}] {{ Name=Circuit{team}; ShortName={args.ai}; Version={ai_version}; Team={team}; Host=0; [OPTIONS] {{ profile=default; cheating=0; ally_aware=0; disabledunits={disabled}; }} }}')
-		parts.append(f'[TEAM{team}] {{ TeamLeader=0; AllyTeam={team}; RgbColor={colors[team]}; StartPosX={x}; StartPosZ={z}; [CUSTOMKEYS] {{ start_x={x}; start_z={z}; }} }}')
+		income = args.duel_income_multiplier if champions[layout['teams'][team]['region']] == team else 1
+		parts.append(f'[TEAM{team}] {{ TeamLeader=0; AllyTeam={team}; IncomeMultiplier={income}; RgbColor={colors[team]}; StartPosX={x}; StartPosZ={z}; [CUSTOMKEYS] {{ start_x={x}; start_z={z}; }} }}')
 		polygon=layout['teams'][team]['boxes'][0]
 		x0,x1=min(p[0] for p in polygon)/layout['size'][0],max(p[0] for p in polygon)/layout['size'][0]
 		z0,z1=min(p[1] for p in polygon)/layout['size'][1],max(p[1] for p in polygon)/layout['size'][1]
@@ -177,11 +191,13 @@ def main():
 		env['LD_PRELOAD']=str(limiter)+(':'+env['LD_PRELOAD'] if env.get('LD_PRELOAD') else '')
 		env['SPRING_PROBE_FPS']=str(args.render_fps)
 	(run / 'command.json').write_text(json.dumps({'command': cmd, 'display': env.get('DISPLAY'),
+		'game_worktree_changes': subprocess.check_output(['git','-C',str(game_dir),'status','--porcelain'],text=True).splitlines(),
+		'ai_build': json.loads((ai_dir/'build-info.json').read_text()) if (ai_dir/'build-info.json').exists() else None,
 		'renderer': 'headless' if args.headless else 'desktop default' if args.play else 'GPU unmapped X11' if args.x11_hidden else 'GPU offscreen' if args.offscreen_gpu else 'llvmpipe',
 		'engine_version': subprocess.check_output([cmd[0],'--sync-version'],text=True).strip(),
 		'options': {k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()}, 'game_commit': subprocess.check_output(
 		['git', '-C', str(game_dir), 'rev-parse', 'HEAD'], text=True).strip()}, indent=2))
-	print(f'Run:         {run}\nLog:         {run / "console.log"}\nEngine log:  {write / "infolog.txt"}\nScreenshots: {write / "screenshots"}', flush=True)
+	print(f'Run:         {run}\nLog:         {run / "console.log"}\nEngine log:  {write / "infolog.txt"}\nScreenshots: {write / "screenshots"}\nRecordings:  {write / "recordings"}', flush=True)
 	if args.prepare_only:
 		xlog.close()
 		return
