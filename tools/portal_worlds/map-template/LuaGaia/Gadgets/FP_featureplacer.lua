@@ -44,7 +44,7 @@ local   losState         = {los=true, prevLos=true, contRadar=true, radar=true}
 --            z = 4152,
 --            rot = "0" },
 ----------------------------------------------------
-function ProcessFeatures(featureList)
+local function ProcessFeatures(featureList)
    spEcho("placing " .. #featureList .. " feature(s)")
    for _,fDef in pairs(featureList) do
       if FeatureDefNames[fDef.name] then
@@ -74,7 +74,7 @@ end
 --            z = 4152,
 --            rot = "0" },
 ----------------------------------------------------
-function ProcessUnits(unitList)
+local function ProcessUnits(unitList)
    spEcho("placing " .. #unitList .. " unit(s)")
    for _,uDef in pairs(unitList) do
       if UnitDefNames[uDef.name] then
@@ -91,7 +91,7 @@ function ProcessUnits(unitList)
             end
          end
       else
-         spEcho("featureplacer warning: invalid unit def name", bDef.name)
+         spEcho("featureplacer warning: invalid unit def name", uDef.name)
       end
    end
 end
@@ -106,7 +106,7 @@ end
 --            z = 4152,
 --            rot = "north" },
 ----------------------------------------------------
-function ProcessBuildings(buildingList)
+local function ProcessBuildings(buildingList)
    spEcho("placing " .. #buildingList .. " building(s)")
    for _,bDef in pairs(buildingList) do
       if UnitDefNames[bDef.name] then
@@ -135,10 +135,10 @@ function gadget:GamePreload()
       return
    end
 
-   featurecfg      = VFS.Include(featureSetFile)
-   unitList      = featurecfg.unitlist
-   featureList      = featurecfg.objectlist
-   buildingList   = featurecfg.buildinglist
+   local featurecfg = VFS.Include(featureSetFile)
+   local unitList = featurecfg.unitlist
+   local featureList = featurecfg.objectlist
+   local buildingList = featurecfg.buildinglist
 
    if ( unitList )   then
       ProcessUnits(unitList)

@@ -33,7 +33,8 @@ local function Load(w)
 		end,
 	} }
 	setmetatable(env, { __index = _G })
-	return setfenv(chunk, env)()
+	setfenv(chunk, env)
+	return chunk()
 end
 local w = Load(World(10))
 Check(w.minimumGap == 10) -- Nominal metadata says 2048; physical geometry wins.
