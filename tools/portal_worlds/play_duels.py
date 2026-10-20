@@ -190,9 +190,15 @@ def main():
 		limiter=diagnostic_library('limit_swap')
 		env['LD_PRELOAD']=str(limiter)+(':'+env['LD_PRELOAD'] if env.get('LD_PRELOAD') else '')
 		env['SPRING_PROBE_FPS']=str(args.render_fps)
+	ai_build = json.loads((ai_dir/'build-info.json').read_text()) if (ai_dir/'build-info.json').exists() else None
+	if ai_build is None and not args.ai_dir and (engine_dir/'preview-manifest.json').exists():
+		preview = json.loads((engine_dir/'preview-manifest.json').read_text())
+		bundled = preview.get('native_ai', {}).get(args.ai)
+		if bundled:
+			ai_build = dict(bundled, from_engine_preview=True, library_sha256=bundled['packaged_library_sha256'])
 	(run / 'command.json').write_text(json.dumps({'command': cmd, 'display': env.get('DISPLAY'),
 		'game_worktree_changes': subprocess.check_output(['git','-C',str(game_dir),'status','--porcelain'],text=True).splitlines(),
-		'ai_build': json.loads((ai_dir/'build-info.json').read_text()) if (ai_dir/'build-info.json').exists() else None,
+		'ai_build': ai_build,
 		'renderer': 'headless' if args.headless else 'desktop default' if args.play else 'GPU unmapped X11' if args.x11_hidden else 'GPU offscreen' if args.offscreen_gpu else 'llvmpipe',
 		'engine_version': subprocess.check_output([cmd[0],'--sync-version'],text=True).strip(),
 		'options': {k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()}, 'game_commit': subprocess.check_output(
