@@ -204,3 +204,12 @@ The contributor must review/edit the PR description and verify the code in human
 use before submission, as required by `ai_policy.md`.
 
 The broader mechanics audit and test coverage are in [portal-mechanics-audit.md](portal-mechanics-audit.md). It includes fresh-process full-game save/load and its scenario limits.
+
+
+The opt-in `aircraft`, `aircraft-diagonal` and `aircraft-multihop` fixtures
+exercise real flight orders through one and several connections. They caught
+an immediately completed approach being confused with the original travel
+request. The router now tracks those tags separately and uses a stopping radius
+inside the activation radius, preserving the remaining multi-hop order. These
+fixtures open connections by scripted commander destruction and are labelled
+fixtures, separate from the autonomous AI recordings.
