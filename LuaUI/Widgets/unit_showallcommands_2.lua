@@ -249,6 +249,9 @@ local function drawUnitCommands(unitID)
 	if not unitID then
 		return
 	end
+	if WG.PortalWorldView and not WG.PortalWorldView.ContainsUnit(unitID) then
+		return
+	end
 	
 	local tx,ty,tz,fireTowards = getTargetPosition(unitID)
 	if tx then
