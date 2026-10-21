@@ -1189,6 +1189,7 @@ function widget:Shutdown()
 end
 
 local lx, ly, lw, lh, last_window_x, last_window_y
+local portalViewGeneration
 
 local function DrawMiniMap()
 	gl.Clear(GL.COLOR_BUFFER_BIT,0,0,0,0)
@@ -1196,6 +1197,15 @@ local function DrawMiniMap()
 end
 
 function widget:DrawScreen()
+	local probeView = WG.PortalWorldView
+	if probeView and portalViewGeneration ~= probeView.generation then
+		portalViewGeneration = probeView.generation
+		local r = probeView.rect
+		mapRatio = r and (r.x1 - r.x0) / (r.z1 - r.z0) or Game.mapX / Game.mapY
+		mapIsWider = mapRatio > 1
+		options.use_map_ratio.OnChange(options.use_map_ratio)
+		lw, lh = nil, nil
+	end
 	if (options.disableMinimap.value or window.hidden or cs.name == "ov" or not widgetsWantVisibleMinimap) then
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
