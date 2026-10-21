@@ -32,7 +32,7 @@ local function Accessible(region)
 end
 local function ContainsUnit(id)
 	local x, _, z = Spring.GetUnitPosition(id)
-	return world.Region(x, z) == active
+	return world.ContainsObject(active, x, z)
 end
 local function View(region, cameraState)
 	if not world.regions[region] or not Accessible(region) then
@@ -51,6 +51,10 @@ local function View(region, cameraState)
 	Spring.SetCameraBounds(r.x0, r.z0, r.x1, r.z1)
 	Spring.SetMiniMapView(r.x0, r.z0, r.x1, r.z1)
 	Spring.SetWorldDrawBounds(r.x0, r.z0, r.x1, r.z1)
+	if Engine.FeatureSupport.objectDrawBounds then
+		local bounds = world.objectBounds[region]
+		Spring.SetObjectDrawBounds(bounds.x0, bounds.z0, bounds.x1, bounds.z1)
+	end
 	local x, z = (r.x0 + r.x1) / 2, (r.z0 + r.z1) / 2
 	pendingCamera = cameraState
 		or cameraStates[region]
@@ -77,7 +81,7 @@ local function UpdateSelector()
 	end
 	local function Count(id, target)
 		local x, _, z = Spring.GetUnitPosition(id)
-		local region = world.Region(x, z)
+		local region = world.ObjectRegion(x, z)
 		if region then
 			target[region] = target[region] + 1
 		end

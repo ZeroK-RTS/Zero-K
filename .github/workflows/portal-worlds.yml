@@ -39,3 +39,4 @@ jobs:
           lua5.1 tools/portal_worlds/test_recording_mode.lua
           lua5.1 tools/portal_worlds/test_recording_adapter.lua
           lua5.1 tools/portal_worlds/test_map_templates.lua
+          lua5.1 tools/portal_worlds/test_object_bounds.lua

@@ -43,6 +43,41 @@ for _, edge in ipairs(world.connections) do
 	)
 end
 
+-- Give flying objects room to turn or overshoot without exposing another world.
+-- Half the separating distance on the widest axis keeps even diagonal envelopes
+-- disjoint. Single-region maps use one sixteenth of their shorter side.
+world.objectBounds = {}
+for i, r in ipairs(world.regions) do
+	local margin = math.min(r.width, r.height) / 16
+	for j, other in ipairs(world.regions) do
+		if i ~= j then
+			local dx = math.max(0, r.x0 - other.x1, other.x0 - r.x1)
+			local dz = math.max(0, r.z0 - other.z1, other.z0 - r.z1)
+			margin = math.min(margin, math.max(dx, dz) / 2)
+		end
+	end
+	-- Older preview engines retain their original strict-edge behavior.
+	if not (Engine and Engine.FeatureSupport and Engine.FeatureSupport.objectDrawBounds) then
+		margin = 0
+	end
+	world.objectBounds[i] = { x0 = r.x0 - margin, z0 = r.z0 - margin,
+		x1 = r.x1 + margin, z1 = r.z1 + margin, margin = margin }
+end
+function world.ContainsObject(region, x, z)
+	local r = world.objectBounds[region]
+	return r ~= nil and x ~= nil and z ~= nil
+		and x >= r.x0 and x < r.x1 and z >= r.z0 and z < r.z1
+end
+
+-- Presentation-only lookup; simulation provenance still uses Region/home.
+function world.ObjectRegion(x, z)
+	for i in ipairs(world.regions) do
+		if world.ContainsObject(i, x, z) then
+			return i
+		end
+	end
+end
+
 function world.Region(x, z)
 	if not x or not z then
 		return
