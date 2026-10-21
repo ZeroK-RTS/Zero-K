@@ -59,7 +59,7 @@ def main():
     for name in args.runs:
         run=WORKSPACE/'runs'/name
         log=(run/'console.log').read_text(errors='replace')
-        observed=re.findall(r'\[(FOUR_TEST|FOUR_UI|WEAPON_TEST|COMBAT_TEST|COMBAT_UI|LAYOUT_TEST|LAYOUT_UI|ISOLATION_TEST|MECHANICS_TEST|FULL_MECHANICS|BARRIER_TEST|REPLACEMENTS_TEST|ORDERS_TEST)\] ASSERT (\S+) pass=(true|false)',log)
+        observed=re.findall(r'\[(FOUR_TEST|FOUR_UI|WEAPON_TEST|COMBAT_TEST|COMBAT_UI|LAYOUT_TEST|LAYOUT_UI|ISOLATION_TEST|MECHANICS_TEST|FULL_MECHANICS|BARRIER_TEST|REPLACEMENTS_TEST|ORDERS_TEST|PORTAL_EDGE|PORTAL_EDGE_UI)\] ASSERT (\S+) pass=(true|false)',log)
         passed={tag+':'+key:value=='true' for tag,key,value in observed}
         errors=[line for line in log.splitlines() if 'LUA_ERRRUN' in line or ('Error in ' in line and 'f=-000001' not in line)]
         passed['no_failed_assertion']=all(value=='true' for _,_,value in observed)
@@ -69,6 +69,8 @@ def main():
             passed['five_command_transits']=sum(key.startswith('explicit_transit_') for tag,key,_ in observed if tag=='FOUR_TEST')==5
             passed['sixteen_bidirectional_transits']=sum(key.startswith('bidirectional_edge_') for tag,key,_ in observed if tag=='FOUR_TEST')==16
             passed['all_eight_views_captured']=sum(key.startswith('capture_saved_') for tag,key,_ in observed if tag=='FOUR_UI')==8
+        if '[PORTAL_EDGE]' in log:
+            passed['edge_checks_complete']=sum(tag=='PORTAL_EDGE' for tag,_,_ in observed)==6 and sum(tag=='PORTAL_EDGE_UI' for tag,_,_ in observed)==2
         if '[BARRIER_TEST]' in log:
             passed['barrier_checks_complete']=sum(tag=='BARRIER_TEST' for tag,_,_ in observed)==58
         if '[WEAPON_TEST]' in log:

@@ -106,7 +106,7 @@ function gadget:GameFrame(f)
 				GG.PortalWorlds.home[c.air] == c.a
 					and (function()
 						local ax, _, az = Spring.GetUnitPosition(c.air)
-						return world.Region(ax, az) == c.a
+						return world.ContainsObject(c.a, ax, az)
 					end)()
 			)
 			local lx, _, lz = Spring.GetUnitPosition(c.localWalker)
