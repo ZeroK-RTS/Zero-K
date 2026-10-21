@@ -1754,6 +1754,11 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 	damage, paralyzer, weaponDefID,
 	projectileID, attackerID, attackerDefID, attackerTeam)
 	tracy.ZoneBeginN("G:UnitPreDamaged")
+	local portal = gadgetHandler.GG.PortalWorlds
+	if portal and not portal.UnitDamageAllowed(unitID, attackerID, projectileID) then
+		tracy.ZoneEnd()
+		return 0, 0
+	end
 
 	if UnitPreDamaged_first then
 		for _,g in r_ipairs(self.UnitPreDamagedList) do
@@ -1815,6 +1820,11 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
 	damage, paralyzer, weaponID, projectileID,
 	attackerID, attackerDefID, attackerTeam)
 	tracy.ZoneBeginN("G:UnitDamaged")
+	local portal = gadgetHandler.GG.PortalWorlds
+	if portal and not portal.UnitDamageAllowed(unitID, attackerID, projectileID) then
+		tracy.ZoneEnd()
+		return
+	end
 
 	if UnitDamaged_first then
 		for _,g in r_ipairs(self.UnitDamagedList) do
@@ -2040,6 +2050,14 @@ function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
 	damage, weaponDefID,
 	projectileID, attackerID, attackerDefID, attackerTeam)
 	tracy.ZoneBeginN("G:FeaturePreDamaged")
+	local portal = gadgetHandler.GG.PortalWorlds
+	if portal then
+		local fx, _, fz = Spring.GetFeaturePosition(featureID)
+		if not portal.DamageAllowed(portal.Region(fx, fz), attackerID, projectileID) then
+			tracy.ZoneEnd()
+			return 0, 0
+		end
+	end
 
 	if FeaturePreDamaged_first then
 		for _,g in r_ipairs(self.FeaturePreDamagedList) do
@@ -2170,6 +2188,11 @@ end
 
 function gadgetHandler:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)
 	tracy.ZoneBeginN("G:ShieldPreDamaged")
+	local portal = gadgetHandler.GG.PortalWorlds
+	if portal and not portal.DamageAllowed(portal.UnitRegion(shieldCarrierUnitID), (beamEmitterUnitID and beamEmitterUnitID >= 0 and beamEmitterUnitID) or proOwnerID, proID) then
+		tracy.ZoneEnd()
+		return true
+	end
 
 	for _,g in r_ipairs(self.ShieldPreDamagedList) do
 		-- first gadget to handle this consumes the event
@@ -2199,6 +2222,11 @@ local Explosion_first = true
 
 function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
 	tracy.ZoneBeginN("G:Explosion")
+	local portal = gadgetHandler.GG.PortalWorlds
+	if portal and not (portal.Region(px, pz) and portal.DamageAllowed(portal.Region(px, pz), ownerID, proID)) then
+		tracy.ZoneEnd()
+		return true
+	end
 	if Explosion_first then
 		for _,g in r_ipairs(self.ExplosionList) do
 			tracy.ZoneBeginN("G:Explosion_GetWantedWeaponDef:" .. g.ghInfo.name)
