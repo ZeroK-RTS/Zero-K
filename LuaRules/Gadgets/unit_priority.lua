@@ -746,6 +746,23 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end
 end
 
+function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
+	if dataStr:find("mreserve:",1,true) then
+		local amount = tonumber(dataStr:sub(10))
+		if not amount then
+			return
+		end
+		SetMetalReserved(aiTeam, amount)
+	end
+	if dataStr:find("ereserve:",1,true) then
+		local amount = tonumber(dataStr:sub(10))
+		if not amount then
+			return
+		end
+		SetEnergyReserved(aiTeam, amount)
+	end
+end
+
 function gadget:UnitCreated(unitID, unitDefID, TeamID, builderID)
 	if not havePriorityUnitDef[unitDefID] then
 		local _,_,inBuild = spGetUnitIsStunned(unitID)
