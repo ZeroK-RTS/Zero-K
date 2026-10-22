@@ -168,7 +168,7 @@ local function CheckDamage(unitID)
 	
 	local _, maxHealth = spGetUnitHealth(unitID)
 	local armored, armorMult = spGetUnitArmored(unitID)
-	maxHealth = maxHealth / (armorMult or 1)
+	maxHealth = maxHealth / ((armored and armorMult) or 1)
 	local damagePerElmo = baseDamageAtRefDist + propDamageAtRefDist * maxHealth
 	
 	Spring.AddUnitDamage(unitID, baseDamage + propDamage * maxHealth + inDist * inDist * damagePerElmo)
