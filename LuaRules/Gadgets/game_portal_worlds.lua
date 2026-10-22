@@ -79,68 +79,86 @@ Spring.SetUnitTarget = function(unitID, arg1, arg2, arg3, ...)
 	return rawSetUnitTarget(unitID, arg1, arg2, arg3, ...)
 end
 
-local unitTargets = {
-	[CMD.ATTACK] = true,
-	[CMD.GUARD] = true,
-	[CMD.REPAIR] = true,
-	[CMD.RECLAIM] = true,
-	[CMD.CAPTURE] = true,
-	[CMD.LOAD_UNITS] = true,
-	[CMD.MANUALFIRE] = true,
-	[Spring.Utilities.CMD.REARM] = true,
-	[Spring.Utilities.CMD.FIELD_FAC_SELECT] = true,
-	[Spring.Utilities.CMD.WAIT_AT_BEACON] = true,
-	[Spring.Utilities.CMD.UNIT_SET_TARGET] = true,
-	[Spring.Utilities.CMD.UNIT_SET_TARGET_CIRCLE] = true,
-	[Spring.Utilities.CMD.AIR_MANUALFIRE] = true,
-}
+local stateCommands = VFS.Include("LuaRules/Configs/state_commands.lua") or {}
+local SUC = Spring.Utilities.CMD
 
-local positionCommands = {
-	[CMD.MOVE] = true,
-	[Spring.Utilities.CMD.RAW_MOVE] = true,
-	[CMD.FIGHT] = true,
-	[CMD.PATROL] = true,
-	[CMD.RESTORE] = true,
-	[CMD.RESURRECT] = true,
-	[CMD.UNLOAD_UNITS] = true,
-	[CMD.UNLOAD_UNIT] = true,
-	[Spring.Utilities.CMD.JUMP] = true,
-	[Spring.Utilities.CMD.PLACE_BEACON] = true,
-	[Spring.Utilities.CMD.AREA_GUARD] = true,
-	[Spring.Utilities.CMD.EXTENDED_UNLOAD] = true,
-	[Spring.Utilities.CMD.LEVEL] = true,
-	[Spring.Utilities.CMD.RAISE] = true,
-	[Spring.Utilities.CMD.SMOOTH] = true,
-	[Spring.Utilities.CMD.RAMP] = true,
-	[Spring.Utilities.CMD.BUMPY] = true,
+-- Commands whose parameters are neither world positions nor unit/feature IDs,
+-- or that pack a unit ID at params[1] alongside extra parameters.
+local nonSpatialCommands = {
+	[CMD.REMOVE] = true,
+	[CMD.TIMEWAIT] = true,
+	[CMD.SQUADWAIT] = true,
+	[CMD.GATHERWAIT] = true,
+	[CMD.AUTOREPAIRLEVEL] = true,
+	[SUC.WANTED_SPEED] = true,
+	[SUC.TRANSFER_UNIT] = true,
+	[SUC.FORMATION_RANK] = true,
+	[SUC.FIELD_FAC_UNIT_TYPE] = true,
+	[SUC.FIELD_FAC_QUEUELESS] = true,
+	[SUC.TERRAFORM_INTERNAL] = true,
 }
-for cmd in pairs(unitTargets) do
-	positionCommands[cmd] = true
+for cmd in pairs(stateCommands) do
+	if cmd ~= SUC.UNIT_SET_TARGET and cmd ~= SUC.UNIT_SET_TARGET_CIRCLE then
+		nonSpatialCommands[cmd] = true
+	end
 end
 
-local function CommandRegion(cmd, params)
-	if (cmd == Spring.Utilities.CMD.ORBIT or cmd == Spring.Utilities.CMD.ORBIT_DRAW) and Valid(params[1]) then
-		return UnitRegion(params[1])
+local unitFirstParamCommands = {
+	[SUC.ORBIT] = true,
+	[SUC.ORBIT_DRAW] = true,
+}
+
+local nonSpatialCmdTypes = {
+	[CMDTYPE.ICON] = true,
+	[CMDTYPE.ICON_MODE] = true,
+	[CMDTYPE.NUMBER] = true,
+}
+
+local function IsNonSpatialCommand(id, cmd)
+	if cmd >= 0 and nonSpatialCommands[cmd] then
+		return true
 	end
-	if #params >= 3 and (cmd < 0 or positionCommands[cmd]) then
-		local r1 = Region(params[1], params[3])
-		if #params == 6 then
-			local r2 = Region(params[4], params[6])
-			if r1 ~= r2 then
-				return nil
+	if id and cmd >= 0 then
+		local cmdDescID = Spring.FindUnitCmdDesc(id, cmd)
+		if cmdDescID then
+			local cmdDesc = Spring.GetUnitCmdDescs(id, cmdDescID, cmdDescID)
+			local cmdType = cmdDesc and cmdDesc[1] and cmdDesc[1].type
+			if cmdType and nonSpatialCmdTypes[cmdType] then
+				return true
 			end
 		end
-		return r1
 	end
-	if #params == 1 then
-		if (cmd == CMD.RECLAIM or cmd == CMD.RESURRECT) and params[1] >= Game.maxUnits then
-			local x, _, z = Spring.GetFeaturePosition(params[1] - Game.maxUnits)
-			return Region(x, z)
-		end
-		if unitTargets[cmd] and Valid(params[1]) then
-			return UnitRegion(params[1])
+	return false
+end
+
+local function CommandRegion(id, cmd, params)
+	if IsNonSpatialCommand(id, cmd) then
+		return nil, false
+	end
+	if unitFirstParamCommands[cmd] then
+		return Valid(params[1]) and UnitRegion(params[1]) or nil, true
+	end
+	local count = #params
+	if count == 3 or count == 4 then
+		return Region(params[1], params[3]), true
+	end
+	if count == 6 then
+		local r1, r2 = Region(params[1], params[3]), Region(params[4], params[6])
+		return (r1 == r2 and r1) or nil, true
+	end
+	if count == 1 then
+		local targetID = params[1]
+		if targetID >= Game.maxUnits then
+			local featureID = targetID - Game.maxUnits
+			if Spring.ValidFeatureID(featureID) then
+				local x, _, z = Spring.GetFeaturePosition(featureID)
+				return Region(x, z), true
+			end
+		elseif Valid(targetID) then
+			return UnitRegion(targetID), true
 		end
 	end
+	return nil, false
 end
 
 local function DeleteProjectile(id)
@@ -274,11 +292,8 @@ function gadget:AllowCommand(id, def, team, cmd, params, opts)
 			p[#p + 1] = params[i]
 		end
 	end
-	local destination = CommandRegion(actual, p)
-	if destination and home[id] and destination ~= home[id] then
-		return false
-	end
-	if #p >= 3 and not destination and (actual < 0 or positionCommands[actual]) then
+	local destination, isSpatial = CommandRegion(id, actual, p)
+	if isSpatial and (not destination or (home[id] and destination ~= home[id])) then
 		return false
 	end
 	return true
