@@ -17,6 +17,7 @@ return { factoryveh = {
     [[vehassault]],
     [[vehcapture]],
     [[veharty]],
+    [[vehheavyassault]],
     [[vehheavyarty]],
     [[vehaa]],
   },
