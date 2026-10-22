@@ -396,6 +396,12 @@ function script.Create()
 	StartThread(AnimThread)
 end
 
+-- called by the build icon generator (unit_icongenerator.lua): pose deployed, which tells
+-- it apart from the other spiders
+function BuildIconPose()
+	deployT, deployGoal = DEPLOY_END, DEPLOY_END
+end
+
 -- The trigger measures range from the body: the folded emitter sits ~50 elmos behind
 -- it, which would leave the unit stopping short of its own trigger range.
 function script.AimFromWeapon(num)
