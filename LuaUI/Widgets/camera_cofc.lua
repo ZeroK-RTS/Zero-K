@@ -2471,7 +2471,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 		end
 		oldDx = oldDx*0.8 + dx*0.2
 		oldDy = oldDy*0.8 + dy*0.2
-		if abs(oldDx) > 1 or abs(oldDy) > 1 then
+		if oldDx ~= 0 or oldDy ~= 0 then
 			RotateCamera(x, y, oldDx, oldDy, true, ls_have, false)
 		end
 
