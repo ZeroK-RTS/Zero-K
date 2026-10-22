@@ -466,7 +466,7 @@ function widget:DrawInMiniMap(xSize, ySize)
   gl.Lighting(false)
 
   -- setup the pixel scales
-  activeView = WG.PortalWorldView and WG.PortalWorldView.rect
+  activeView = WG.MapRegionView and WG.MapRegionView.rect
   local width = activeView and (activeView.x1 - activeView.x0) or xMapSize
   local height = activeView and (activeView.z1 - activeView.z0) or yMapSize
   pxScale = width / xSize

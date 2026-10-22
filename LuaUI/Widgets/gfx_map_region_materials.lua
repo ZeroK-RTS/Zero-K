@@ -1,7 +1,7 @@
 -- This file is part of the Spring engine (GPL v2 or later), see LICENSE.html
 function widget:GetInfo()
 	return {
-		name = "Portal map materials",
+		name = "Map region materials",
 		desc = "Apply the viewed map region's DNTS, sun and atmosphere",
 		author = "Codex",
 		license = "GPL v2 or later",
@@ -11,15 +11,15 @@ function widget:GetInfo()
 	}
 end
 
-local world = VFS.Include("LuaRules/Utilities/portal_worlds.lua")
-if not world or not world.profiles then
+local mapRegions = VFS.Include("LuaRules/Utilities/map_regions.lua")
+if not mapRegions or not mapRegions.profiles then
 	return false
 end
 
-local profiles = world.profiles
-local applied, updates, loaded = nil, 0, {}
+local profiles = mapRegions.profiles
+local appliedRegion, updates, loaded = nil, 0, {}
 
-local function Environment(profile)
+local function ApplyEnvironment(profile)
 	local d = profile.direction
 	Spring.SetSunDirection(d[1], d[2], d[3])
 	Spring.SetSunLighting(profile.sun)
@@ -28,7 +28,7 @@ local function Environment(profile)
 		Spring.SetWaterParams(profile.water)
 	end
 	-- Keep ZK's graphics options consistent, so changing one slider does not
-	-- restore the previous map's entire lighting setup through FullSunUpdate.
+	-- restore the previous region's entire lighting setup through FullSunUpdate.
 	local sunWidget = widgetHandler:FindWidget("Sun and Atmosphere Handler")
 	if sunWidget then
 		for key, value in pairs(profile.sun) do
@@ -47,14 +47,14 @@ local function Environment(profile)
 	end
 end
 
-local function Apply(region)
-	local profile = profiles[region]
+local function ApplyRegionMaterial(regionID)
+	local profile = profiles[regionID]
 	for _, texture in ipairs(profile.textures) do
 		local path = texture[2]
 		if not loaded[path] then
 			-- SetMapShadingTexture uses named textures that are already loaded.
 			local list = gl.CreateList(function()
-				assert(gl.Texture(path), "Could not load portal map texture " .. path)
+				assert(gl.Texture(path), "Could not load map region texture " .. path)
 				gl.Texture(false)
 			end)
 			gl.DeleteList(list)
@@ -62,20 +62,20 @@ local function Apply(region)
 		end
 		assert(
 			Spring.SetMapShadingTexture(texture[1], path, texture[3] or 0),
-			"Could not set portal map texture " .. path
+			"Could not set map region texture " .. path
 		)
 	end
 	Spring.SetMapRenderingParams(profile.rendering)
 	Spring.SetDrawWater(profile.drawWater ~= false)
-	Environment(profile)
-	applied = region
-	WG.PortalMapMaterial = { region = region, profile = profile }
+	ApplyEnvironment(profile)
+	appliedRegion = regionID
+	WG.MapRegionMaterial = { region = regionID, profile = profile }
 end
 
 function widget:ParallelWorldShift()
-	local view = WG.PortalWorldView
-	if view and view.region and applied ~= view.region then
-		Apply(view.region)
+	local view = WG.MapRegionView
+	if view and view.region and appliedRegion ~= view.region then
+		ApplyRegionMaterial(view.region)
 	end
 end
 
@@ -88,8 +88,8 @@ function widget:Update()
 	-- ZK loads its default overrides on Update 4 and 28. This widget runs
 	-- after it; retain the active region during that initial setup as well.
 	if updates <= 30 then
-		if applied then
-			Environment(profiles[applied])
+		if appliedRegion then
+			ApplyEnvironment(profiles[appliedRegion])
 		end
 	else
 		widgetHandler:RemoveWidgetCallIn("Update", widget)
@@ -101,5 +101,5 @@ function widget:Shutdown()
 		Spring.SetMapShadingTexture(texture[1], "", texture[3] or 0)
 	end
 	Spring.SetDrawWater(true)
-	WG.PortalMapMaterial = nil
+	WG.MapRegionMaterial = nil
 end

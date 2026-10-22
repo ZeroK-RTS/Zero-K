@@ -23,10 +23,10 @@ end
 -- its world transform include the active region's origin.
 local mapSizeX, mapSizeZ = Game.mapSizeX, Game.mapSizeZ
 local originX, originZ = 0, 0
-local usesViews = VFS.FileExists("mapconfig/portal_worlds.lua", VFS.MAP)
+local usesViews = VFS.Include("LuaRules/Utilities/map_regions.lua") ~= nil
 local viewKey
 local function SetViewRectangle()
-	local view = WG.PortalWorldView
+	local view = WG.MapRegionView
 	local r = view and view.rect
 	if usesViews and not r then
 		return false

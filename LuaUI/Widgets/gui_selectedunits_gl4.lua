@@ -424,8 +424,8 @@ local function CleanSelections(typeToClear, newSelUnits)
 	return changed
 end
 
-local function InPortalView(unitID)
-	return not WG.PortalWorldView or WG.PortalWorldView.ContainsUnit(unitID)
+local function InMapRegionView(unitID)
+	return not WG.MapRegionView or WG.MapRegionView.ContainsUnit(unitID)
 end
 
 function widget:ParallelWorldShift()
@@ -433,7 +433,7 @@ function widget:ParallelWorldShift()
 end
 
 function widget:Update(dt)
-	if WG.PortalWorldView then
+	if WG.MapRegionView then
 		checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
 	end
 	local uiHidden = Spring.IsGUIHidden()
@@ -475,14 +475,14 @@ function widget:Update(dt)
 	-- Hover selections
 	if checkSelectionType[HOVER_SEL] then
 		for unitID, _ in pairs(FindPreselUnits()) do
-			if InPortalView(unitID) and selUnits[unitID] ~= HOVER_SEL then
+			if InMapRegionView(unitID) and selUnits[unitID] ~= HOVER_SEL then
 				local alreadySelected = selUnits[unitID]
 				local hoverColorID = ((fullSelect or spIsUnitAllied(unitID)) and 254) or 253
 				AddSelected(unitID, hoverColorID, hoverSelectionVBO, not alreadySelected)
 				selUnits[unitID] = HOVER_SEL
 				checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
 			end
-			if InPortalView(unitID) then
+			if InMapRegionView(unitID) then
 				newSelUnits[unitID] = HOVER_SEL
 			end
 		end
@@ -494,7 +494,7 @@ function widget:Update(dt)
 	-- Local selections
 	if checkSelectionType[LOCAL_SEL] then
 		for _, unitID in pairs(spGetSelectedUnits()) do
-			if InPortalView(unitID) and not newSelUnits[unitID] then
+			if InMapRegionView(unitID) and not newSelUnits[unitID] then
 				if selUnits[unitID] ~= LOCAL_SEL then
 					AddSelected(unitID, 255, localSelectionVBO, false)
 					selUnits[unitID] = LOCAL_SEL
@@ -511,7 +511,7 @@ function widget:Update(dt)
 	-- Ally/other selections
 	if checkSelectionType[OTHER_SEL] then
 		for unitID, _ in pairs(WG.allySelUnits or {}) do
-			if InPortalView(unitID) and Spring.ValidUnitID(unitID) and not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
+			if InMapRegionView(unitID) and Spring.ValidUnitID(unitID) and not newSelUnits[unitID] and (selUnits[unitID] or OTHER_SEL) == OTHER_SEL then
 				if not selUnits[unitID] then
 					AddSelected(unitID, useTeamcolor and spGetUnitTeam(unitID) or 252, otherSelectionVBO, false)
 					selUnits[unitID] = OTHER_SEL

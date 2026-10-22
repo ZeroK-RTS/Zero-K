@@ -670,7 +670,7 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 	local coreMinHeight = 3*(coreSelectorWidth - 2*hPad - 1) + 2*math.floor(hPad/2) + 2*math.floor(1.5*hPad)
 	
 	-- Minimap
-	local view = WG.PortalWorldView
+	local view = WG.MapRegionView
 	local r = view and view.rect
 	local mapRatio = r and (r.x1 - r.x0) / (r.z1 - r.z0) or Game.mapX / Game.mapY
 	

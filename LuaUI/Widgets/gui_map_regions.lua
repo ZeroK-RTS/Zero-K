@@ -1,7 +1,7 @@
 -- This file is part of the Spring engine (GPL v2 or later), see LICENSE.html
 function widget:GetInfo()
 	return {
-		name = "Portal view bounds",
+		name = "Map region view bounds",
 		desc = "Map region selector and cropped world/minimap views",
 		author = "Codex",
 		license = "GPL v2 or later",
@@ -15,37 +15,35 @@ if not (Engine.FeatureSupport and Engine.FeatureSupport.mapRegionViews) then
 	return false
 end
 
-local world = VFS.Include("LuaRules/Utilities/portal_worlds.lua")
-if not world then
+local mapRegions = VFS.Include("LuaRules/Utilities/map_regions.lua")
+if not mapRegions then
 	return false
 end
 
-local active, generation, ready = 1, 0, false
+local activeRegion, ready = 1, false
 local cameraStates = {}
-local pendingCamera, cameraDrawFrame, selector, systemButtons
+local pendingCamera, cameraDrawFrame, selector, regionButtons
 local nextCountsUpdate = 0
 
-local function ContainsUnit(id)
-	local x, _, z = Spring.GetUnitPosition(id)
-	return world.ContainsObject(active, x, z)
+local function ContainsUnit(unitID)
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	return mapRegions.ContainsObject(activeRegion, x, z)
 end
 
-local function View(region, cameraState)
-	if not world.regions[region] then
+local function SetRegionView(regionID, cameraState)
+	if not mapRegions.regions[regionID] then
 		return false
 	end
 	if ready then
-		cameraStates[active] = Spring.GetCameraState()
+		cameraStates[activeRegion] = Spring.GetCameraState()
 	end
-	active = region
-	generation = generation + 1
-	local r = world.regions[region]
-	WG.PortalWorldView = {
-		generation = generation,
-		region = region,
+	activeRegion = regionID
+	local r = mapRegions.regions[regionID]
+	WG.MapRegionView = {
+		region = regionID,
 		rect = r,
 		ContainsUnit = ContainsUnit,
-		SetRegion = View,
+		SetRegion = SetRegionView,
 	}
 	if WG.DelaySmoothCam then
 		WG.DelaySmoothCam(0.5)
@@ -54,13 +52,13 @@ local function View(region, cameraState)
 	Spring.SetMiniMapView(r.x0, r.z0, r.x1, r.z1)
 	Spring.SetWorldDrawBounds(r.x0, r.z0, r.x1, r.z1)
 	if Engine.FeatureSupport.objectDrawBounds then
-		local bounds = world.objectBounds[region]
+		local bounds = mapRegions.objectBounds[regionID]
 		Spring.SetObjectDrawBounds(bounds.x0, bounds.z0, bounds.x1, bounds.z1)
 	end
 	widgetHandler:ParallelWorldShift()
 	local x, z = (r.x0 + r.x1) / 2, (r.z0 + r.z1) / 2
 	pendingCamera = cameraState
-		or cameraStates[region]
+		or cameraStates[regionID]
 		or {
 			name = "ta",
 			mode = 1,
@@ -76,43 +74,43 @@ local function View(region, cameraState)
 end
 
 local function UpdateSelector()
-	if not systemButtons then
+	if not regionButtons then
 		return
 	end
 	local counts, selected = {}, {}
-	for i in ipairs(world.regions) do
-		counts[i], selected[i] = 0, 0
+	for regionID in ipairs(mapRegions.regions) do
+		counts[regionID], selected[regionID] = 0, 0
 	end
-	local function Count(id, target)
-		local x, _, z = Spring.GetUnitPosition(id)
-		local region = world.ObjectRegion(x, z)
-		if region then
-			target[region] = target[region] + 1
+	local function CountUnit(unitID, target)
+		local x, _, z = Spring.GetUnitPosition(unitID)
+		local regionID = mapRegions.ObjectRegion(x, z)
+		if regionID then
+			target[regionID] = target[regionID] + 1
 		end
 	end
-	for _, id in ipairs(Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}) do
-		Count(id, counts)
+	for _, unitID in ipairs(Spring.GetTeamUnits(Spring.GetMyTeamID()) or {}) do
+		CountUnit(unitID, counts)
 	end
-	for _, id in ipairs(Spring.GetSelectedUnits()) do
-		Count(id, selected)
+	for _, unitID in ipairs(Spring.GetSelectedUnits()) do
+		CountUnit(unitID, selected)
 	end
-	for i, button in pairs(systemButtons) do
-		local name = world.regions[i].name
-		button:SetCaption((active == i and "> " or "") .. name .. "  (" .. counts[i] .. ")")
+	for regionID, button in pairs(regionButtons) do
+		local name = mapRegions.regions[regionID].name
+		button:SetCaption((activeRegion == regionID and "> " or "") .. name .. "  (" .. counts[regionID] .. ")")
 		button.tooltip = "View "
 			.. name
 			.. ". "
-			.. counts[i]
+			.. counts[regionID]
 			.. " of your units here; "
-			.. selected[i]
-			.. " selected. N cycles maps."
-		button.backgroundColor = active == i and { 0.2, 0.42, 0.5, 1 } or { 0.15, 0.18, 0.2, 1 }
+			.. selected[regionID]
+			.. " selected. N cycles regions."
+		button.backgroundColor = activeRegion == regionID and { 0.2, 0.42, 0.5, 1 } or { 0.15, 0.18, 0.2, 1 }
 		button:Invalidate()
 	end
 end
 
 local function CreateSelector()
-	if selector or #world.regions < 2 then
+	if selector or #mapRegions.regions < 2 then
 		return
 	end
 	local Chili = WG.Chili
@@ -121,11 +119,11 @@ local function CreateSelector()
 	end
 	selector = Chili.Window:New({
 		parent = Chili.Screen0,
-		name = "System selector",
+		name = "Map region selector",
 		right = 12,
 		y = 85,
 		width = 240,
-		height = 42 + #world.regions * 36,
+		height = 42 + #mapRegions.regions * 36,
 		padding = { 8, 8, 8, 8 },
 		draggable = false,
 		resizable = false,
@@ -142,10 +140,10 @@ local function CreateSelector()
 		font = { size = 14 },
 		autosize = false,
 	})
-	systemButtons = {}
-	for i, r in ipairs(world.regions) do
-		local region = i
-		systemButtons[i] = Chili.Button:New({
+	regionButtons = {}
+	for i, r in ipairs(mapRegions.regions) do
+		local regionID = i
+		regionButtons[i] = Chili.Button:New({
 			parent = selector,
 			x = 0,
 			y = 22 + (i - 1) * 36,
@@ -154,7 +152,7 @@ local function CreateSelector()
 			caption = r.name,
 			OnClick = {
 				function()
-					View(region)
+					SetRegionView(regionID)
 					UpdateSelector()
 				end,
 			},
@@ -164,12 +162,12 @@ local function CreateSelector()
 end
 
 function widget:Initialize()
-	active = world.TeamHome(Spring.GetMyTeamID()) or 1
+	activeRegion = mapRegions.TeamHome(Spring.GetMyTeamID()) or 1
 end
 
 function widget:Update()
-	if not ready and Spring.GetGameRulesParam("portal_regions") then
-		View(active)
+	if not ready and Spring.GetGameRulesParam("map_regions") then
+		SetRegionView(activeRegion)
 		ready = true
 	end
 	CreateSelector()
@@ -188,10 +186,10 @@ function widget:DrawWorldPreUnit()
 end
 
 function widget:KeyPress(key, mods)
-	if key ~= string.byte("n") or mods.ctrl or mods.alt or mods.meta or #world.regions < 2 then
+	if key ~= string.byte("n") or mods.ctrl or mods.alt or mods.meta or #mapRegions.regions < 2 then
 		return
 	end
-	View(active % #world.regions + 1)
+	SetRegionView(activeRegion % #mapRegions.regions + 1)
 	UpdateSelector()
 	return true
 end
@@ -200,7 +198,7 @@ function widget:Shutdown()
 	if selector then
 		selector:Dispose()
 	end
-	WG.PortalWorldView = nil
+	WG.MapRegionView = nil
 	Spring.SetCameraBounds()
 	Spring.SetMiniMapView()
 	Spring.SetWorldDrawBounds()

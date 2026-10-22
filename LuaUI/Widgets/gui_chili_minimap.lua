@@ -1191,8 +1191,8 @@ end
 local lx, ly, lw, lh, last_window_x, last_window_y
 
 function widget:ParallelWorldShift()
-	local probeView = WG.PortalWorldView
-	local r = probeView and probeView.rect
+	local regionView = WG.MapRegionView
+	local r = regionView and regionView.rect
 	mapRatio = r and (r.x1 - r.x0) / (r.z1 - r.z0) or Game.mapX / Game.mapY
 	mapIsWider = mapRatio > 1
 	options.use_map_ratio.OnChange(options.use_map_ratio)

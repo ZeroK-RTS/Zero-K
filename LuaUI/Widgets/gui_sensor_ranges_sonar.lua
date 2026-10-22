@@ -360,7 +360,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 local function WantToDrawRangeOfUnit(unitID, unitDefID)
-	if WG.PortalWorldView and not WG.PortalWorldView.ContainsUnit(unitID) then
+	if WG.MapRegionView and not WG.MapRegionView.ContainsUnit(unitID) then
 		return false
 	end
 	if drawOnlySelected and not spIsUnitSelected(unitID) then

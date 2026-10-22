@@ -1891,7 +1891,7 @@ function widgetHandler:DrawInMiniMap(xSize, ySize)
 	tracy.ZoneBeginN("W:DrawInMiniMap")
 	for _, w in r_ipairs(self.DrawInMiniMapList) do
 		tracy.ZoneBeginN("W:DrawInMiniMap:" .. w.whInfo.name)
-		local r = WG.PortalWorldView and WG.PortalWorldView.rect
+		local r = WG.MapRegionView and WG.MapRegionView.rect
 		if r then
 			gl.PushMatrix()
 			local width, height = r.x1 - r.x0, r.z1 - r.z0
