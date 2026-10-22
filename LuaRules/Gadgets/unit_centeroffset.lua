@@ -35,7 +35,7 @@ local min = math.min
 local FULL_GROW = 0.5
 local UPDATE_FREQUENCY = 25
 local NON_BLOCK_BUILD_FRAMES = 30
-local MIN_METAL_FOR_GROW = 15
+local MIN_METAL_FOR_GROW_AND_TARGET = 15
 
 local growUnit = {}
 local completeGrowUnit = {}
@@ -46,7 +46,7 @@ local unitScales = {}
 local origColvolCache = {}
 local origColvolOverride = {}
 local recentBuilderTimeout = {}
-local nonBlockingUnit = {}
+local lowMetalNanoframe = {}
 
 local postCompleteGrowDefs = {}
 for i = 1, #UnitDefs do
@@ -111,9 +111,10 @@ end
 -- Unit Handling
 
 local function UpdateUnitGrow(unitID, data, growScale)
-	if nonBlockingUnit[unitID] and growScale > 0 then
-		nonBlockingUnit[unitID] = nil
+	if lowMetalNanoframe[unitID] and growScale > 0 then
+		lowMetalNanoframe[unitID] = nil
 		Spring.SetUnitBlocking(unitID, true, true)
+		Spring.SetUnitNeutral(unitID, false)
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		Spring.SetUnitPosition(unitID, x, y, z)
 	end
@@ -155,7 +156,7 @@ local function GetUnitGrowth(unitID, unitDefID, buildProgress)
 		return 1
 	end
 	local cost = Spring.Utilities.GetUnitCost(unitID, unitDefID)
-	local growScale = max(0, min(1, (buildProgress*cost - MIN_METAL_FOR_GROW)/(cost * FULL_GROW)))
+	local growScale = max(0, min(1, (buildProgress*cost - MIN_METAL_FOR_GROW_AND_TARGET)/(cost * FULL_GROW)))
 	return growScale
 end
 
@@ -283,8 +284,9 @@ local function CheckRecentBuilderTimeout(unitID, builderID)
 	local frame = Spring.GetGameFrame()
 	if recentBuilderTimeout[builderID] and recentBuilderTimeout[builderID] > frame then
 		Spring.SetUnitBlocking(unitID, true, false)
-		nonBlockingUnit[unitID] = true
 	end
+	Spring.SetUnitNeutral(unitID, true)
+	lowMetalNanoframe[unitID] = true
 	recentBuilderTimeout[builderID] = frame + NON_BLOCK_BUILD_FRAMES
 end
 
@@ -330,7 +332,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 	unitScales[unitID] = nil
 	recentBuilderTimeout[unitID] = nil
-	nonBlockingUnit[unitID] = nil
+	lowMetalNanoframe[unitID] = nil
 	if origColvolOverride[unitID] then
 		origColvolOverride[unitID] = nil
 	end
