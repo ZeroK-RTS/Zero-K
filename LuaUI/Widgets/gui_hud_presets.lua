@@ -1532,18 +1532,12 @@ local oldWidth = 0
 local oldHeight = 0
 
 local callCount = 0
-local viewRatio
+
+function widget:ParallelWorldShift()
+	UpdateInterfacePreset(options.interfacePreset)
+end
 
 function widget:Update(dt)
-	local view = WG.PortalWorldView
-	local r = view and view.rect
-	if r then
-		local ratio = (r.x1 - r.x0) / (r.z1 - r.z0)
-		if viewRatio ~= ratio then
-			viewRatio = ratio
-			UpdateInterfacePreset(options.interfacePreset)
-		end
-	end
 	if needToCallFunction then
 		needToCallFunction()
 		callCount = callCount + 1

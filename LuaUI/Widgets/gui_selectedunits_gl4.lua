@@ -424,19 +424,17 @@ local function CleanSelections(typeToClear, newSelUnits)
 	return changed
 end
 
-local portalViewGeneration
 local function InPortalView(unitID)
 	return not WG.PortalWorldView or WG.PortalWorldView.ContainsUnit(unitID)
 end
 
+function widget:ParallelWorldShift()
+	checkSelectionType[HOVER_SEL], checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true, true
+end
+
 function widget:Update(dt)
-	local probe = WG.PortalWorldView
-	if probe then
+	if WG.PortalWorldView then
 		checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true
-	end
-	if probe and portalViewGeneration ~= probe.generation then
-		portalViewGeneration = probe.generation
-		checkSelectionType[HOVER_SEL], checkSelectionType[LOCAL_SEL], checkSelectionType[OTHER_SEL] = true, true, true
 	end
 	local uiHidden = Spring.IsGUIHidden()
 	if oldUiHidden and uiHidden then

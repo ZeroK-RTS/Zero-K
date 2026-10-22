@@ -497,14 +497,20 @@ local function Initialize()
 	dList = gl.CreateList(DrawOMap, mirrorShader)
 	--Spring.SetDrawGround(false)
 
-	if not usesViews then
-		widgetHandler:RemoveCallIn("Update")
+	widgetHandler:RemoveCallIn("Update")
+end
+
+function widget:ParallelWorldShift()
+	if SetViewRectangle() then
+		island = nil
+		ResetWidget()
 	end
 end
 
 function widget:Initialize()
 	SetViewRectangle()
 	if usesViews and not viewKey then
+		widgetHandler:RemoveCallIn("Update")
 		return
 	end
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
@@ -515,14 +521,6 @@ end
 
 local firstUpdate = true
 function widget:Update()
-	if SetViewRectangle() then
-		island = nil
-		ResetWidget()
-		return
-	end
-	if usesViews then
-		return
-	end
 	if firstUpdate then
 		firstUpdate = false
 		return

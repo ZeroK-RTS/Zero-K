@@ -7,6 +7,7 @@ function widget:GetInfo()
 		license = "GPL v2 or later",
 		layer = 10001,
 		enabled = true,
+		handler = true,
 	}
 end
 
@@ -56,6 +57,7 @@ local function View(region, cameraState)
 		local bounds = world.objectBounds[region]
 		Spring.SetObjectDrawBounds(bounds.x0, bounds.z0, bounds.x1, bounds.z1)
 	end
+	widgetHandler:ParallelWorldShift()
 	local x, z = (r.x0 + r.x1) / 2, (r.z0 + r.z1) / 2
 	pendingCamera = cameraState
 		or cameraStates[region]

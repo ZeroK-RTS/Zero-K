@@ -72,19 +72,27 @@ local function Apply(region)
 	WG.PortalMapMaterial = { region = region, profile = profile }
 end
 
+function widget:ParallelWorldShift()
+	local view = WG.PortalWorldView
+	if view and view.region and applied ~= view.region then
+		Apply(view.region)
+	end
+end
+
+function widget:Initialize()
+	widget:ParallelWorldShift()
+end
+
 function widget:Update()
 	updates = updates + 1
-	local view = WG.PortalWorldView
-	if not view or not view.rect then
-		return
-	end
-	local region = view.region
-	if applied ~= region then
-		Apply(region)
 	-- ZK loads its default overrides on Update 4 and 28. This widget runs
 	-- after it; retain the active region during that initial setup as well.
-	elseif updates <= 30 then
-		Environment(profiles[region])
+	if updates <= 30 then
+		if applied then
+			Environment(profiles[applied])
+		end
+	else
+		widgetHandler:RemoveWidgetCallIn("Update", widget)
 	end
 end
 

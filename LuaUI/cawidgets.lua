@@ -332,6 +332,7 @@ local callInLists = {
 	'AlliedUnitAdded',
 	'AlliedUnitRemoved',
 	'AlliedUnitsChanged',
+	'ParallelWorldShift',
 -- these use mouseOwner instead of lists
 --  'MouseMove',
 --  'MouseRelease',
@@ -3030,6 +3031,16 @@ function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
 	for _, w in ipairs(self.AlliedUnitsChangedList) do
 		tracy.ZoneBeginN("W:AlliedUnitsChanged:" .. w.whInfo.name)
 		w:AlliedUnitsChanged(alliedUnits, numAlliedUnits)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
+function widgetHandler:ParallelWorldShift()
+	tracy.ZoneBeginN("W:ParallelWorldShift")
+	for _, w in ipairs(self.ParallelWorldShiftList) do
+		tracy.ZoneBeginN("W:ParallelWorldShift:" .. w.whInfo.name)
+		w:ParallelWorldShift()
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
