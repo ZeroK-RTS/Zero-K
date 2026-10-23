@@ -1,4 +1,4 @@
-local version = "v1.544"
+local version = "v1.545"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -375,51 +375,66 @@ local function explode(div,str) --copied from gui_epicmenu.lua
   return arr
 end
 
+-- Applies an ally's queue message (the part after "IQ|") to that team's queue.
+-- Shared by allied players (RecvLuaMsg) and allied Skirmish AIs (IQ_FromAI).
+local function ReceiveAllyQueueMsg(teamID, msg)
+	--Example: 4|404|648|2|3304|1
+	--Header|unitdefID|x|y|z|facing
+	local msgArray = explode('|',msg)
+	local typeArg = tonumber(msgArray[1])
+	if not typeArg or typeArg < 1 or typeArg > 5 then
+		return
+	end
+	if typeArg == 5 then -- Cancel queue
+		othersBuildQueue[teamID] = {}
+		return
+	end
+	local playerXBuildQueue = othersBuildQueue[teamID]
+	if typeArg == 2 then  -- Remove queue index
+		local index = tonumber(msgArray[2])
+		if playerXBuildQueue and playerXBuildQueue[index] then
+			table.remove(playerXBuildQueue, index)
+		end
+		return
+	end
+	local unitDefID = tonumber(msgArray[2])
+	if not UnitDefs[unitDefID] then
+		return -- Invalid defID
+	end
+	local x,y,z,face = tonumber(msgArray[3]), tonumber(msgArray[4]), tonumber(msgArray[5]), tonumber(msgArray[6])
+	if not (x and y and z and face) then
+		return --Invalid coordinate and facing
+	end
+	if typeArg == 4 then -- Remake queue with a new order
+		othersBuildQueue[teamID] = {{unitDefID,x,y,z,face}}
+		return
+	end
+	if not playerXBuildQueue then
+		playerXBuildQueue = {}
+		othersBuildQueue[teamID] = playerXBuildQueue
+	end
+	if typeArg == 1 then -- Insert at start of queue
+		table.insert(playerXBuildQueue, 1, {unitDefID,x,y,z,face})
+	elseif typeArg == 3 then -- Append to end of queue
+		playerXBuildQueue[#playerXBuildQueue+1] = {unitDefID,x,y,z,face}
+	end
+end
+
 function widget:RecvLuaMsg(msg, playerID)
 	if myPlayerID~=playerID and msg:sub(1,3) == "IQ|" then
-		--Example: IQ|4|404|648|2|3304|1
-		--Header|unitdefID|x|y|z|facing
-		msg = msg:sub(4)
-		local msgArray = explode('|',msg)
-		local typeArg = tonumber(msgArray[1])
-		if not typeArg or typeArg < 1 or typeArg > 5 then
-			return
-		end
 		local teamID = select(4,Spring.GetPlayerInfo(playerID, false))
-		if typeArg == 5 then -- Cancel queue
-			othersBuildQueue[teamID] = {}
-			return
-		end
-		local playerXBuildQueue = othersBuildQueue[teamID]
-		if typeArg == 2 then  -- Remove queue index
-			local index = tonumber(msgArray[2])
-			if playerXBuildQueue and playerXBuildQueue[index] then
-				table.remove(playerXBuildQueue, index)
-			end
-			return
-		end
-		local unitDefID = tonumber(msgArray[2])
-		if not UnitDefs[unitDefID] then
-			return -- Invalid defID
-		end
-		local x,y,z,face = tonumber(msgArray[3]), tonumber(msgArray[4]), tonumber(msgArray[5]), tonumber(msgArray[6])
-		if not (x and y and z and face) then
-			return --Invalid coordinate and facing
-		end
-		if typeArg == 4 then -- Remake queue with a new order
-			othersBuildQueue[teamID] = {{unitDefID,x,y,z,face}}
-			return
-		end
-		if not playerXBuildQueue then
-			playerXBuildQueue = {}
-			othersBuildQueue[teamID] = playerXBuildQueue
-		end
-		if typeArg == 1 then -- Insert at start of queue
-			table.insert(playerXBuildQueue, 1, {unitDefID,x,y,z,face})
-		elseif typeArg == 3 then -- Append to end of queue
-			playerXBuildQueue[#playerXBuildQueue+1] = {unitDefID,x,y,z,face}
-		end
+		ReceiveAllyQueueMsg(teamID, msg:sub(4))
 	end
+end
+
+-- Called by the cmd_initial_queue_ai.lua gadget with an allied Skirmish AI's
+-- queue message (same payload format as the IQ| LuaUI messages).
+local function IQ_FromAI(aiTeamID, msg)
+	aiTeamID = tonumber(aiTeamID)
+	if not aiTeamID or aiTeamID == myTeamID or type(msg) ~= "string" then
+		return
+	end
+	ReceiveAllyQueueMsg(aiTeamID, msg)
 end
 
 ------------------------------------------------------------
@@ -616,6 +631,7 @@ end
 local function CancelQueue()
 	buildQueue = {}
 	Spring.SendLuaUIMsg("IQ|5",'a')
+	Spring.SendLuaRulesMsg("IQ|5") -- relayed to allied Skirmish AIs by cmd_initial_queue_ai.lua
 	mCost, eCost, bCost = GetQueueCosts()
 	buildTime = bCost / sDef.buildSpeed
 end
@@ -682,9 +698,11 @@ local function InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 		end
 		if msg then
 			Spring.SendLuaUIMsg(msg,'a')
+			Spring.SendLuaRulesMsg(msg) -- relayed to allied Skirmish AIs by cmd_initial_queue_ai.lua
 		end
 		if msg2 then
 			Spring.SendLuaUIMsg(msg2,'a')
+			Spring.SendLuaRulesMsg(msg2)
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
@@ -759,10 +777,12 @@ function widget:Initialize()
 	WG.InitialQueue = true
 	
 	buildOptions = GetUnlockedBuildOptions(buildOptions)
+	widgetHandler:RegisterGlobal(widget, "IQ_FromAI", IQ_FromAI)
 end
 
 function widget:Shutdown()
 	WG.InitialQueue = nil
+	widgetHandler:DeregisterGlobal(widget, "IQ_FromAI")
 end
 
 ------------------------------------------------------------
