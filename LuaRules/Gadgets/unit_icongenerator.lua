@@ -83,6 +83,10 @@ VFS.Include("LuaRules/Configs/icon_generator.lua")
 			local env = Spring.UnitScript.GetScriptEnv(uid)
 			if env then
 				lus = true
+				if env.BuildIconPose then
+					-- the unit script poses itself for the picture
+					Spring.UnitScript.CallAsUnit(uid, env.BuildIconPose)
+				end
 				env = env.script
 			end
 			

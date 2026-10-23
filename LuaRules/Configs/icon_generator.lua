@@ -60,6 +60,7 @@ halo  = false --(scheme~="bw")
 --//clamp  := clip everything beneath it (hide underground stuff)
 --//scale  := render the model x times as large and then scale down, to replaces missing AA support of FBOs (and fix rendering of very tine structures like antennas etc.))
 --//unfold := unit needs cob to unfolds
+--//           (a Lua unit script may define a global BuildIconPose(), called once the unit is spawned)
 --//move   := send moving cob events (works only with unfold)
 --//attack := send attack cob events (works only with unfold)
 --//shotangle := vertical aiming, useful for arties etc. (works only with unfold+attack)
@@ -210,6 +211,10 @@ unitConfigs = {
   },
   [UnitDefNames.spiderantiheavy.id] = {
     unfold = true,
+  },
+  [UnitDefNames.strideremp.id] = {
+    unfold = true, -- spawned, so BuildIconPose can deploy it: folded it looks like Funnelweb
+    wait   = 30,
   },
   [UnitDefNames.turretantiheavy.id] = {
     unfold = true,
