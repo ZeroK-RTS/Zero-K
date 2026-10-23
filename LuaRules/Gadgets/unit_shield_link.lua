@@ -129,6 +129,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				end
 				
 				local shieldUnit = {
+				unitID = unitID,
 					shieldMaxCharge  = shieldWep.shieldPower,
 					shieldNum    = shieldNum,
 					shieldRadius = shieldWep.shieldRadius,
@@ -220,6 +221,9 @@ local function IsEnabled(unitID)
 end
 
 local function ShieldsAreTouching(shield1, shield2)
+	if not Spring.Utilities.IsSamePortalRegion(shield1.unitID, shield2.unitID) then
+		return false
+	end
 	local xDiff = shield1.x - shield2.x
 	local zDiff = shield1.z - shield2.z
 	local yDiff = shield1.y - shield2.y

@@ -16,6 +16,7 @@ function widget:GetInfo()
 	}
 end
 
+if not gl.CreateShader then return false end
 
 -- Localized functions for performance
 local mathFloor = math.floor
@@ -1184,12 +1185,12 @@ function widget:Shutdown()
 
 	widgetHandler:DeregisterGlobal('UnitScriptLight')
 
-	deferredLightShader:Delete()
+	if deferredLightShader then deferredLightShader:Delete() end
 	local ram = 0
 	for lighttype, vbo in pairs(unitLightVBOMap) do ram = ram + vbo:Delete() end
 	for lighttype, vbo in pairs(projectileLightVBOMap) do ram = ram + vbo:Delete() end
 	for lighttype, vbo in pairs(lightVBOMap) do ram = ram + vbo:Delete() end
-	ram = ram + cursorPointLightVBO:Delete()
+	if cursorPointLightVBO then ram = ram + cursorPointLightVBO:Delete() end
 
 	--spEcho("DLGL4 ram usage MB = ", ram / 1000000)
 	--spEcho("featureDefLights", table.countMem(featureDefLights))

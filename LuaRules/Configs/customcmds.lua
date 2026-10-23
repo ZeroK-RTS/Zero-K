@@ -67,6 +67,7 @@ local commands = {
 	UNIT_BOMBER_DIVE_STATE = 34281, -- bomber dive
 	AP_FLY_STATE = 34569, -- unit_air_plants
 	AP_AUTOREPAIRLEVEL = 34570, -- unit_air_plants
+	PORTAL_TRAVEL = 34591, -- game_portal_duels: queued explicit portal traversal
 	UNIT_SET_TARGET = 34923, -- unit_target_on_the_move
 	UNIT_CANCEL_TARGET = 34924,
 	UNIT_SET_TARGET_CIRCLE = 34925,

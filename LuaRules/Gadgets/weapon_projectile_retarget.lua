@@ -62,6 +62,20 @@ local function Dist2D(x,y)
 	return math.sqrt(x*x + y*y)
 end
 
+-- Retargeting and move control can run before the generic projectile boundary
+-- sweep. Validate before moving or forcing collision, using launch provenance.
+local function PositionAllowed(proID, x, z)
+	local isolation = GG.PortalIsolation
+	if not isolation then
+		return true
+	end
+	if isolation.ProjectilePositionAllowed(proID, x, z) then
+		return true
+	end
+	isolation.DeleteProjectile(proID)
+	return false
+end
+
 function gadget:GameFrame(n)
 	if thereAreProjectiles then
 		thereAreProjectiles = false
@@ -70,7 +84,7 @@ function gadget:GameFrame(n)
 			local def = data[4]
 			if data[5] then
 				local _,_,_, _,_,_, tx, ty, tz = Spring.GetUnitPosition(data[5], true, true)
-				if tx then
+				if tx and PositionAllowed(proID, tx, tz) then
 					if def.underwaterTrack and ty > -1 then
 						ty = -1
 					end
@@ -109,13 +123,16 @@ function gadget:GameFrame(n)
 					dx, dz = speed*dx/dist, speed*dz/dist
 					
 					height = Spring.GetGroundHeight(px + dx, pz + dz) + def.groundFloat
-					Spring.SetProjectilePosition(proID, px + dx, height, pz + dz)
-					Spring.SetProjectileVelocity(proID, dx, height - py, dz)
-					if dist*horDist < def.rangeSqr then
+					local allowed = PositionAllowed(proID, px + dx, pz + dz)
+					if allowed then
+						Spring.SetProjectilePosition(proID, px + dx, height, pz + dz)
+						Spring.SetProjectileVelocity(proID, dx, height - py, dz)
+					end
+					if allowed and dist*horDist < def.rangeSqr then
 						Spring.SetProjectileCollision(proID)
 					end
 				end
-			elseif px and Dist3Dsqr(data[1] - px, data[2] - py, data[3] - pz) < def.rangeSqr then
+			elseif px and PositionAllowed(proID, px, pz) and Dist3Dsqr(data[1] - px, data[2] - py, data[3] - pz) < def.rangeSqr then
 				Spring.SetProjectileCollision(proID)
 			end
 		end
@@ -172,6 +189,10 @@ end
 local function AddProjectile(proID, def, proOwnerID)
 	local targetType, targetID = GetTarget(proID, proOwnerID, def.useOwnerWeapon)
 	if targetType == UNIT and Spring.ValidUnitID(targetID) then
+		local tx, _, tz = Spring.GetUnitPosition(targetID)
+		if not PositionAllowed(proID, tx, tz) then
+			return
+		end
 		local unitDefID = Spring.GetUnitDefID(targetID)
 		-- May as well home perfectly onto immobile targets, they are not going anywhere.
 		if not (unitDefID and UnitDefs[unitDefID].isImmobile) then

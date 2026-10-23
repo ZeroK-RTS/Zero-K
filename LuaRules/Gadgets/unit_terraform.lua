@@ -413,6 +413,9 @@ local function SetTooltip(unitID, spent, estimatedCost)
 end
 
 local function IsPositionTerraformable(x, z, ignoreStructure)
+	if GG.PortalWorlds and not GG.PortalWorlds.Region(x, z) then
+		return false
+	end
 	if (not ignoreStructure) and HasStructure(x, z) then
 		return false
 	end
@@ -425,7 +428,7 @@ end
 local function SetupPointStructure(point, structArea, segArea)
 	local currHeight = point.orHeight
 	local x, z = point.x, point.z
-	if (structArea[x] and structArea[x][z]) or (GG.map_AllowPositionTerraform and not GG.map_AllowPositionTerraform(x, z)) then
+	if (structArea[x] and structArea[x][z]) or not IsPositionTerraformable(x, z, true) then
 		point.diffHeight = 0.0001
 		point.structure = (structArea and structArea[x] and structArea[x][z]) or 1000
 	else
@@ -656,7 +659,37 @@ local function GetUnitAveragePosition(unit, units)
 	return unitsX/units, unitsZ/units
 end
 
+-- All entry points, including scripted terraforming, use the authored region.
+-- The normal game has no PortalWorlds table and keeps its existing behavior.
+local function PortalTerraformAllowed(points, count, constructors, constructorCount, commandX, commandZ, padding)
+	local portal = GG.PortalWorlds
+	if not portal then
+		return true
+	end
+	local first = points[1]
+	local region = first and portal.Region(first.x, first.z)
+	if not region or (commandX and portal.Region(commandX, commandZ) ~= region) then
+		return false
+	end
+	for i = 1, count do
+		local p = points[i]
+		local pad = padding or 0
+		if not p or portal.Region(p.x - pad, p.z - pad) ~= region or portal.Region(p.x + pad, p.z + pad) ~= region then
+			return false
+		end
+	end
+	for i = 1, constructorCount do
+		if portal.home[constructors[i]] ~= region then
+			return false
+		end
+	end
+	return not GG.PortalIsolation or GG.PortalIsolation.DamageAllowed(region)
+end
+
 local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
+	if not PortalTerraformAllowed({{x=x1,z=z1},{x=x2,z=z2}}, 2, unit, units, commandX, commandZ, math.abs(terraform_width)/2 + 16) then
+		return
+	end
 	--** Initial constructor processing **
 	local unitsX, unitsZ = GetUnitAveragePosition(unit, units)
 	if not unitsX then
@@ -1083,6 +1116,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 end
 
 local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
+	if not PortalTerraformAllowed(mPoint, mPoints, unit, units, commandX, commandZ) then
+		return
+	end
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
 	--** Initial constructor processing **
@@ -1478,6 +1514,9 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 end
 
 local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
+	if not PortalTerraformAllowed(mPoint, mPoints, unit, units, commandX, commandZ) then
+		return
+	end
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
 	--** Initial constructor processing **
@@ -2061,6 +2100,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 
 	if (cmdID == CMD_TERRAFORM_INTERNAL) then
+		local portal = GG.PortalWorlds
+		if portal and (not portal.home[unitID] or portal.Region(cmdParams[3], cmdParams[4]) ~= portal.home[unitID]) then
+			return false
+		end
 		if GG.terraformRequiresUnlock and not GG.terraformUnlocked[teamID] then
 			return false
 		end
@@ -3373,7 +3416,10 @@ local function DoSmoothDirectly(
 		maxSmooth, smoothradiusSQ, FalloffFunc, smoothExponent, movestructures)
 	local structI = movestructures and {}
 	local structJ = movestructures and {}
-	local IsPositionTerraformable = GG.Terraform.IsPositionTerraformable
+	local function IsPositionTerraformable(i, j, ignoreStructure)
+		return Spring.Utilities.IsSamePortalPosition(x, z, i, j)
+			and GG.Terraform.IsPositionTerraformable(i, j, ignoreStructure)
+	end
 	
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
@@ -3388,7 +3434,7 @@ local function DoSmoothDirectly(
 						spAddHeightMap(i, j, newHeight)
 					end
 				end
-			elseif structI then
+			elseif structI and Spring.Utilities.IsSamePortalPosition(x, z, i, j) then
 				structI[#structI + 1] = i
 				structJ[#structJ + 1] = j
 			end

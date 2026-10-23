@@ -13,6 +13,8 @@ function widget:GetInfo()
 	}
 end
 
+if not gl.CreateShader then return false end
+
 -- Localized functions for performance
 local mathMax = math.max
 local mathFloor = math.floor
@@ -933,7 +935,7 @@ function widget:Shutdown()
 	widgetHandler:DeregisterGlobal("AddDistortion")
 	widgetHandler:DeregisterGlobal("RemoveDistortion")
 
-	deferredDistortionShader:Delete()
+	if deferredDistortionShader then deferredDistortionShader:Delete() end
 	local ram = 0
 	for distortiontype, vbo in pairs(unitDistortionVBOMap) do
 		ram = ram + vbo:Delete()

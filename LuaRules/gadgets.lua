@@ -1233,6 +1233,30 @@ function gadgetHandler:AllowStartPosition(playerID, teamID, readyState, cx, cy, 
 end
 
 function gadgetHandler:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, facing)
+	if self.GG.PortalWorlds and builderID then
+		local portal = self.GG.PortalWorlds
+		-- Native factory queues have no BuildInfo, hence no position. Check the
+		-- producer instead; the actual child inherits its region in UnitCreated.
+		-- Keep the original nil arguments for the other creation callbacks.
+		if x == nil or z == nil then
+			local builderDef = UnitDefs[Spring.GetUnitDefID(builderID)]
+			local bx, _, bz = Spring.GetUnitPosition(builderID)
+			if not builderDef or not builderDef.isFactory or not portal.Region(bx, bz) then
+				return false, true
+			end
+		else
+			local ud = UnitDefs[unitDefID]
+			local hx, hz = ud.xsize * 4, ud.zsize * 4
+			if facing and facing % 2 == 1 then
+				hx, hz = hz, hx
+			end
+			local r = portal.world.regions[portal.Region(x, z)]
+			if not r or not Spring.Utilities.IsPortalPositionAllowed(builderID, x, z)
+				or x - hx < r.x0 or x + hx > r.x1 or z - hz < r.z0 or z + hz > r.z1 then
+				return false, true
+			end
+		end
+	end
 	tracy.ZoneBeginN("G:AllowUnitCreation")
 	for _,g in r_ipairs(self.AllowUnitCreationList) do
 		tracy.ZoneBeginN("G:AllowUnitCreation:" .. g.ghInfo.name)
@@ -1265,6 +1289,10 @@ end
 
 
 function gadgetHandler:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, part)
+	-- Reject spatial interactions before resource/status side effects in gadgets.
+	if self.GG.PortalWorlds and (not Spring.Utilities.IsSamePortalRegion(builderID, unitID)) then
+		return false
+	end
 	tracy.ZoneBeginN("G:AllowUnitBuildStep")
 	for _,g in r_ipairs(self.AllowUnitBuildStepList) do
 		tracy.ZoneBeginN("G:AllowUnitBuildStep:" .. g.ghInfo.name)
@@ -1282,6 +1310,10 @@ end
 function gadgetHandler:AllowUnitTransport(
 	transporterID, transporterUnitDefID, transporterTeam,
 	transporteeID, transporteeUnitDefID, transporteeTeam)
+	-- Reject spatial interactions before resource/status side effects in gadgets.
+	if self.GG.PortalWorlds and (not Spring.Utilities.IsSamePortalRegion(transporterID, transporteeID)) then
+		return false
+	end
 	tracy.ZoneBeginN("G:AllowUnitTransport")
 	for _,g in r_ipairs(self.AllowUnitTransportList) do
 		tracy.ZoneBeginN("G:AllowUnitTransport:" .. g.ghInfo.name)
@@ -1303,6 +1335,11 @@ function gadgetHandler:AllowUnitTransportLoad(
 	transporterID, transporterUnitDefID, transporterTeam,
 	transporteeID, transporteeUnitDefID, transporteeTeam,
 	loadPosX, loadPosY, loadPosZ)
+	-- Reject spatial interactions before resource/status side effects in gadgets.
+	if self.GG.PortalWorlds and (not Spring.Utilities.IsSamePortalRegion(transporterID, transporteeID)
+		or not Spring.Utilities.IsPortalPositionAllowed(transporterID, loadPosX, loadPosZ)) then
+		return false
+	end
 	tracy.ZoneBeginN("G:AllowUnitTransportLoad")
 	for _,g in r_ipairs(self.AllowUnitTransportLoadList) do
 		tracy.ZoneBeginN("G:AllowUnitTransportLoad:" .. g.ghInfo.name)
@@ -1325,6 +1362,11 @@ function gadgetHandler:AllowUnitTransportUnload(
 	transporterID, transporterUnitDefID, transporterTeam,
 	transporteeID, transporteeUnitDefID, transporteeTeam,
 	unloadPosX, unloadPosY, unloadPosZ)
+	-- Reject spatial interactions before resource/status side effects in gadgets.
+	if self.GG.PortalWorlds and (not Spring.Utilities.IsSamePortalRegion(transporterID, transporteeID)
+		or not Spring.Utilities.IsPortalPositionAllowed(transporterID, unloadPosX, unloadPosZ)) then
+		return false
+	end
 	tracy.ZoneBeginN("G:AllowUnitTransportUnload")
 	for _,g in r_ipairs(self.AllowUnitTransportUnloadList) do
 		tracy.ZoneBeginN("G:AllowUnitTransportUnload:" .. g.ghInfo.name)
@@ -1380,6 +1422,13 @@ end
 
 function gadgetHandler:AllowFeatureBuildStep(builderID, builderTeam,
 	featureID, featureDefID, part)
+	-- Reject spatial interactions before resource/status side effects in gadgets.
+	if self.GG.PortalWorlds then
+		local x, _, z = Spring.GetFeaturePosition(featureID)
+		if not Spring.Utilities.IsPortalPositionAllowed(builderID, x, z) then
+			return false
+		end
+	end
 	tracy.ZoneBeginN("G:AllowFeatureBuildStep")
 	for _,g in r_ipairs(self.AllowFeatureBuildStepList) do
 		tracy.ZoneBeginN("G:AllowFeatureBuildStep:" .. g.ghInfo.name)
@@ -1754,6 +1803,12 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 	damage, paralyzer, weaponDefID,
 	projectileID, attackerID, attackerDefID, attackerTeam)
 	tracy.ZoneBeginN("G:UnitPreDamaged")
+	local portal = gadgetHandler.GG.PortalIsolation
+	if portal and not (portal.UnitDamageAllowed(unitID, attackerID, projectileID)) then
+		tracy.ZoneEnd()
+		return 0, 0
+	end
+
 
 	if UnitPreDamaged_first then
 		for _,g in r_ipairs(self.UnitPreDamagedList) do
@@ -1815,6 +1870,12 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
 	damage, paralyzer, weaponID, projectileID,
 	attackerID, attackerDefID, attackerTeam)
 	tracy.ZoneBeginN("G:UnitDamaged")
+	local portal = gadgetHandler.GG.PortalIsolation
+	if portal and not (portal.UnitDamageAllowed(unitID, attackerID, projectileID)) then
+		tracy.ZoneEnd()
+		return
+	end
+
 
 	if UnitDamaged_first then
 		for _,g in r_ipairs(self.UnitDamagedList) do
@@ -2040,6 +2101,14 @@ function gadgetHandler:FeaturePreDamaged(featureID, featureDefID, featureTeam,
 	damage, weaponDefID,
 	projectileID, attackerID, attackerDefID, attackerTeam)
 	tracy.ZoneBeginN("G:FeaturePreDamaged")
+	local portal = gadgetHandler.GG.PortalIsolation
+	local fx, _, fz
+	if portal then fx, _, fz = Spring.GetFeaturePosition(featureID) end
+	if portal and not (portal.DamageAllowed(portal.Region(fx, fz), attackerID, projectileID)) then
+		tracy.ZoneEnd()
+		return 0, 0
+	end
+
 
 	if FeaturePreDamaged_first then
 		for _,g in r_ipairs(self.FeaturePreDamagedList) do
@@ -2151,7 +2220,7 @@ function gadgetHandler:ProjectileCreated(proID, proOwnerID, proWeaponDefID)
 end
 
 
-function gadgetHandler:ProjectileDestroyed(proID)
+local function DispatchPortalProjectileDestroyed(self,proID)
 	tracy.ZoneBeginN("G:ProjectileDestroyed")
 	for _,g in r_ipairs(self.ProjectileDestroyedList) do
 		tracy.ZoneBeginN("G:ProjectileDestroyed:" .. g.ghInfo.name)
@@ -2163,6 +2232,13 @@ function gadgetHandler:ProjectileDestroyed(proID)
 end
 
 
+function gadgetHandler:ProjectileDestroyed(proID)
+	local portal = gadgetHandler.GG.PortalIsolation
+	local parent = portal and portal.projectiles[proID]
+	if not parent then return DispatchPortalProjectileDestroyed(self, proID) end
+	return portal.DamageInRegion(parent.region, DispatchPortalProjectileDestroyed, self, proID)
+end
+
 --------------------------------------------------------------------------------
 --
 --  Shield call-ins
@@ -2170,6 +2246,12 @@ end
 
 function gadgetHandler:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)
 	tracy.ZoneBeginN("G:ShieldPreDamaged")
+	local portal = gadgetHandler.GG.PortalIsolation
+	if portal and not (portal.DamageAllowed(portal.UnitRegion(shieldCarrierUnitID), (beamEmitterUnitID and beamEmitterUnitID >= 0 and beamEmitterUnitID or proOwnerID), proID)) then
+		tracy.ZoneEnd()
+		return true
+	end
+
 
 	for _,g in r_ipairs(self.ShieldPreDamagedList) do
 		-- first gadget to handle this consumes the event
@@ -2197,8 +2279,14 @@ local Explosion_GadgetSingle = {}
 
 local Explosion_first = true
 
-function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
+local function DispatchPortalExplosion(self,weaponID, px, py, pz, ownerID, proID)
 	tracy.ZoneBeginN("G:Explosion")
+	local portal = gadgetHandler.GG.PortalIsolation
+	if portal and not (portal.Region(px, pz) and portal.DamageAllowed(portal.Region(px, pz), ownerID, proID)) then
+		tracy.ZoneEnd()
+		return true
+	end
+
 	if Explosion_first then
 		for _,g in r_ipairs(self.ExplosionList) do
 			tracy.ZoneBeginN("G:Explosion_GetWantedWeaponDef:" .. g.ghInfo.name)
@@ -2242,6 +2330,14 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
 	end
 	tracy.ZoneEnd()
 	return noGfx or false
+end
+
+function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
+	local portal = gadgetHandler.GG.PortalIsolation
+	if not portal then return DispatchPortalExplosion(self, weaponID, px, py, pz, ownerID, proID) end
+	local region = portal.Region(px, pz)
+	if not region or not portal.DamageAllowed(region, ownerID, proID) then return true end
+	return portal.DamageInRegion(region, DispatchPortalExplosion, self, weaponID, px, py, pz, ownerID, proID)
 end
 
 --------------------------------------------------------------------------------

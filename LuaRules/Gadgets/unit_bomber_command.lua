@@ -283,7 +283,7 @@ local function FindBestAirpadAt(unitID, x, z, r) -- picks the least crowded pad 
 	local bestPadBookFactor = 9001
 	for airpadID, airpadDefID in pairs(airpadsPerAllyteam[allyTeam]) do
 		local bookFactor = airpadsData[airpadID].reservations.count / airpadsData[airpadID].cap
-		if bookFactor < bestPadBookFactor then
+		if bookFactor < bestPadBookFactor and Spring.Utilities.IsSamePortalRegion(unitID, airpadID) then
 			local ux, uy, uz = Spring.GetUnitPosition(airpadID)
 			if (ux-x)^2 + (uz-z)^2 < r^2 then
 				bestPadID = airpadID
@@ -310,7 +310,7 @@ local function FindNearestAirpad(unitID, team)
 			airpadsPerAllyteam[allyTeam][airpadID] = nil
 		else
 		-- Need to ensure that excludedairpad[teamid][padID] is not nil before running!
-			if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) and not excludedPads[teamID][airpadID] then
+			if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) and not excludedPads[teamID][airpadID] and Spring.Utilities.IsSamePortalRegion(unitID, airpadID) then
 				freePads[airpadID] = true
 				freePadCount = freePadCount + 1
 			end
@@ -329,7 +329,7 @@ local function FindNearestAirpad(unitID, team)
 		local dist = Spring.GetUnitSeparation(unitID, airpadID, true)
 		dist = dist + (50*excessReservation)^2
 		dist = math.min(999998, dist) --clamp to avoid crazy value
-		if (dist < minDist) then
+		if (dist < minDist) and Spring.Utilities.IsSamePortalRegion(unitID, airpadID) then
 			minDist = dist
 			closestPad = airpadID
 		end
@@ -505,6 +505,12 @@ local function CancelAirpadReservation(unitID)
 		reservations.units[unitID] = nil
 		reservations.count = math.max(reservations.count - 1, 0)
 		spSetUnitRulesParam(targetPad,"unreservedPad",math.max(0,airpadsData[targetPad].cap-reservations.count)) --hint widgets
+	end
+end
+
+function GG.CancelAircraftPadReservation(unitID)
+	if airDefs[Spring.GetUnitDefID(unitID)] then
+		CancelAirpadReservation(unitID)
 	end
 end
 
@@ -731,7 +737,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		end
 		--Spring.Echo("Returning to base")
 		local targetAirpad = cmdParams[1]
-		if not airpadsData[targetAirpad] then
+		if not airpadsData[targetAirpad] or not Spring.Utilities.IsSamePortalRegion(unitID, targetAirpad) then
 			return true, true -- trying to land on an unregistered (probably under construction) pad, abort
 		end
 		ReserveAirpad(unitID,targetAirpad) --Reserve the airpad specified in RE-ARM params (if not yet reserved)

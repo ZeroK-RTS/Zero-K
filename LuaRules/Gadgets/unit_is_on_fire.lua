@@ -174,7 +174,12 @@ function gadget:GameFrame(n)
 			else
 				local damage = t.fireDmg*CHECK_INTERVAL
 				t.damageLeft = t.damageLeft - t.fireDmg*CHECK_INTERVAL
+				local portal = GG.PortalIsolation
+				if portal then
+					portal.DamageInRegion(portal.UnitRegion(unitID), Spring.AddUnitDamageByTeam, unitID, damage, 0, t.attackerID, t.weaponID, t.attackerTeam)
+				else
 				Spring.AddUnitDamageByTeam(unitID, damage, 0, t.attackerID, t.weaponID, t.attackerTeam)
+				end
 				cnt=cnt+1
 			end
 		end
