@@ -1175,7 +1175,7 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 				settings.config[fullkey] = option.value
 				
 				if (path == curPath) or filterUserInsertedTerm~= '' then --we need to refresh the window to show changes, and current path is irrelevant if we are doing search
-					MakeSubWindow(curPath, false) --remake window to update the buttons' visuals when pressed
+					MakeSubWindow(curPath, false, nil, true) --remake window to update the buttons' visuals when pressed
 				end
 			end
 	end
@@ -1790,7 +1790,7 @@ end
 WG.Epic_SetShowAdvancedSettings = Epic_SetShowAdvancedSettings
 
 -- Make submenu window based on index from flat window list
-MakeSubWindow = function(path, pause, labelScroll)
+MakeSubWindow = function(path, pause, labelScroll, preserveView)
 	if pause == nil then
 		pause = true
 	end
@@ -2206,12 +2206,22 @@ MakeSubWindow = function(path, pause, labelScroll)
 		}
 	}
 	
+	local previousView
+	if preserveView and window_sub_cur then
+		local scrollPanel = window_sub_cur.children[1]
+		previousView = {
+			x = window_sub_cur.x, y = window_sub_cur.y,
+			width = window_sub_cur.width, height = window_sub_cur.height,
+			scrollX = scrollPanel.scrollPosX, scrollY = scrollPanel.scrollPosY,
+		}
+	end
+
 	KillSubWindow(true)
 	curPath = path -- must be done after KillSubWindow
 	window_sub_cur = Window:New{
 		caption = (searchedElement and "Searching in: \"" .. path .. "...\"") or ((not root) and (path) or "INGAME MENU"),
-		x = settings.sub_pos_x,
-		y = math.floor(settings.sub_pos_y),
+		x = previousView and 0 or settings.sub_pos_x,
+		y = previousView and 0 or math.floor(settings.sub_pos_y),
 		clientWidth = window_width,
 		classname = "main_window_tall",
 		--clientHeight = window_height+B_HEIGHT*4,
@@ -2223,7 +2233,13 @@ MakeSubWindow = function(path, pause, labelScroll)
 		backgroundColor = color.sub_bg,
 		children = window_children,
 	}
-	AdjustWindow(window_sub_cur)
+	if previousView then
+		window_sub_cur:SetPos(previousView.x, previousView.y, previousView.width, previousView.height)
+		window_sub_cur:Realign()
+		window_children[1]:SetScrollPos(previousView.scrollX, previousView.scrollY, false, true)
+	else
+		AdjustWindow(window_sub_cur)
+	end
 	
 	if pause and AllowPauseOnMenuChange(true) then
 		spSendCommands("pause 1")
