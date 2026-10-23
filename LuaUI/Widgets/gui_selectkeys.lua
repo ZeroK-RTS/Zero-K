@@ -336,11 +336,11 @@ local function FilterTransports(wanted)
 end
 
 local function FilterFullTransports()
-	FilterTransports("loaded")
+	FilterTransports("unloaded")
 end
 
 local function FilterEmptyTransports()
-	FilterTransports("unloaded")
+	FilterTransports("loaded")
 end
 
 local function SelectFullTransports()
