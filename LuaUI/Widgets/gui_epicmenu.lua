@@ -418,8 +418,12 @@ local musicTrackbar, masterVolumeTrackbar
 WG.crude.SetMasterVolume = function (newVolume, viaTrackbar)
 	spSendCommands{"set snd_volmaster " .. newVolume}
 	if viaTrackbar then
-		if hackyOptionMemory['Master Volume'] then
-			hackyOptionMemory['Master Volume'].value = newVolume
+		local option = hackyOptionMemory['Master Volume']
+		if option then
+			option.value = newVolume
+			if option.epic_reference then
+				option.epic_reference:SetValue(newVolume)
+			end
 		end
 	elseif masterVolumeTrackbar then
 		masterVolumeTrackbar:SetValue(newVolume)
@@ -440,8 +444,12 @@ WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
 	end
 	WG.music_volume = newVolume
 	if viaTrackbar then
-		if hackyOptionMemory['Music Volume'] then
-			hackyOptionMemory['Music Volume'].value = newVolume
+		local option = hackyOptionMemory['Music Volume']
+		if option then
+			option.value = newVolume
+			if option.epic_reference then
+				option.epic_reference:SetValue(newVolume)
+			end
 		end
 	elseif musicTrackbar then
 		musicTrackbar:SetValue(newVolume)
@@ -1970,7 +1978,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
-			numberPanel:AddChild(
+			option.epic_reference =
 				Trackbar:New{
 					y = 14,
 					width = "100%",
@@ -1985,7 +1993,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 					tooltipFunction = option.tooltipFunction,
 					tooltip_format = option.tooltip_format,
 				}
-			)
+			numberPanel:AddChild(option.epic_reference)
 			tree_children[#tree_children+1] = numberPanel
 		elseif option.type == 'list' then
 			tree_children[#tree_children+1] = Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
