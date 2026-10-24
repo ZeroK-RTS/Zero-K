@@ -293,6 +293,7 @@ local medRangeSkirmieeArray = NameToDefID({
 	
 	"hoverriot",
 	"shieldfelon",
+	"shieldarty",
 
 	"tankassault",
 	"tankheavyassault",
