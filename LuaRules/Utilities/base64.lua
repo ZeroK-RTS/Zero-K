@@ -65,7 +65,7 @@ function Spring.Utilities.Base64Decode(data)
 		for char=1,4 do
 			chars[char] = base64bytes[(string.sub(data,(dpos+char),(dpos+char)) or "=")]
 		end
-		result[#result + 1]  = string.format('%s%s%s',string.char(lor(lsh(chars[1],2), rsh(chars[2],4))),(chars[3] ~= nil) and string.char(lor(lsh(chars[2],4), rsh(chars[3],2))) or "",(chars[4] ~= nil) and string.char(lor(lsh(chars[3],6) % 192, (chars[4]))) or "")
+		result[#result + 1]  = string.char(lor(lsh(chars[1],2), rsh(chars[2],4))) .. ((chars[3] ~= nil) and string.char(lor(lsh(chars[2],4), rsh(chars[3],2))) or "") .. ((chars[4] ~= nil) and string.char(lor(lsh(chars[3],6), (chars[4]))) or "")
 	end
 	result = table.concat(result)
 	return result
