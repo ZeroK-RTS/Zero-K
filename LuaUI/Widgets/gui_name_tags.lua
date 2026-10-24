@@ -201,7 +201,7 @@ local function _DrawTeamNames()
 
 		-- Periodically check if avatar is near center of screen
 		if teamAvatar and teamCheckDelays[teamID] <= 0 then
-			local usx, usy = _GetScreenCoords(teamAvatar[2])
+			local usx, usy = _GetScreenCoords(teamAvatar[1])
 			if not usx or not usy or usx < sxmin or usx > sxmax or usy < symin or usy > symax then
 				teamAvatar = nil
 				teamAvatars[teamID] = nil
@@ -209,7 +209,7 @@ local function _DrawTeamNames()
 		end
 
 		-- Find avatar
-		if (not teamAvatar and teamCheckDelays[teamID] <= 0) or (teamAvatar and not spIsUnitInView(teamAvatar[2])) then
+		if (not teamAvatar and teamCheckDelays[teamID] <= 0) or (teamAvatar and not spIsUnitInView(teamAvatar[1])) then
 			teamAvatars[teamID] = nil
 			teamCheckDelays[teamID] = teamCheckDelay
 
