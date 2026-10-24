@@ -233,7 +233,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return false
 	end
 	if cmdID == CMD_FIELD_FAC_SELECT then
-		if not cmdParams and cmdParams[1] and Spring.ValidUnitID(cmdParams[1]) then
+		if not (cmdParams and cmdParams[1] and Spring.ValidUnitID(cmdParams[1])) then
 			return false
 		end
 		if not Spring.AreTeamsAllied(teamID, Spring.GetUnitTeam(cmdParams[1])) then
