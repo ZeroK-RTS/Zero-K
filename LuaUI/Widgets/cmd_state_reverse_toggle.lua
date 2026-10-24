@@ -143,7 +143,11 @@ local function HandleCommand(cmdID, params, options, nonToggle)
 end
 
 local function SetStateToggle(cmdID, value)
-	HandleCommand(cmdID, {value}, STANDARD_OPTS, true)
+	local options = STANDARD_OPTS
+	if cmdID == Spring.Utilities.CMD.RETREAT and value == 0 then
+		options = {right = true}
+	end
+	HandleCommand(cmdID, {value}, options, true)
 	if WG.IntegralMenu then
 		WG.IntegralMenu.UpdateCommands()
 	end
