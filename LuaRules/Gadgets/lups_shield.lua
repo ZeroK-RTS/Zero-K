@@ -344,7 +344,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 end
 
-function gadget:UnitTaken(unitID, unitDefID, newTeam, oldTeam)
+function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
+	-- UnitTaken runs before the engine changes the unit's allyteam
 	local unitData = IterableMap.Get(shieldUnits, unitID)
 	if unitData then
 		unitData.allyTeamID = Spring.GetUnitAllyTeam(unitID)
