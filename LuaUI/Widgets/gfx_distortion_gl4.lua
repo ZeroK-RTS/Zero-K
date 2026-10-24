@@ -933,16 +933,24 @@ function widget:Shutdown()
 	widgetHandler:DeregisterGlobal("AddDistortion")
 	widgetHandler:DeregisterGlobal("RemoveDistortion")
 
-	deferredDistortionShader:Delete()
+	if deferredDistortionShader then
+		deferredDistortionShader:Delete()
+	end
 	local ram = 0
-	for distortiontype, vbo in pairs(unitDistortionVBOMap) do
-		ram = ram + vbo:Delete()
+	if unitDistortionVBOMap then
+		for distortiontype, vbo in pairs(unitDistortionVBOMap) do
+			ram = ram + vbo:Delete()
+		end
 	end
-	for distortiontype, vbo in pairs(projectileDistortionVBOMap) do
-		ram = ram + vbo:Delete()
+	if projectileDistortionVBOMap then
+		for distortiontype, vbo in pairs(projectileDistortionVBOMap) do
+			ram = ram + vbo:Delete()
+		end
 	end
-	for distortiontype, vbo in pairs(distortionVBOMap) do
-		ram = ram + vbo:Delete()
+	if distortionVBOMap then
+		for distortiontype, vbo in pairs(distortionVBOMap) do
+			ram = ram + vbo:Delete()
+		end
 	end
 
 	--spEcho("distortionGL4 ram usage MB = ", ram / 1000000)
