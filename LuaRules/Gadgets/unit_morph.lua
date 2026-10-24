@@ -1191,25 +1191,6 @@ local function DrawMorphUnit(unitID, morphData, localTeamID)
 end
 
 local phase = 0
-local function DrawCombatMorphUnit(unitID, morphData, localTeamID)
-	local c1 = math.sin(phase)*.2 + .2
-	local c2 = math.sin(phase+ math.pi)*.2 + .2
-	local mult = 2
-
-	glBlending(GL_ONE, GL_ONE)
-	glDepthTest(GL_LEQUAL)
-	--glLighting(true)
-	glPolygonOffset(-10, -10)
-	glCulling(GL.BACK)
-	glColor(c1*mult,0,c2*mult,1)
-	glUnit(unitID, true)
-	
-	glColor(1,1,1,1)
-	--glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-	--glPolygonOffset(false)
-	--glCulling(false)
-	--glDepthTest(false)
-end
 
 local function DrawWorldFunc()
 
@@ -1218,9 +1199,6 @@ local function DrawWorldFunc()
 	end
 
 	gameFrame = GetGameFrame()
-
-	glBlending(GL_SRC_ALPHA, GL_ONE)
-	glDepthTest(GL_LEQUAL)
 
 	local spec, specFullView = GetSpectatingState()
 	local readTeam
@@ -1232,15 +1210,30 @@ local function DrawWorldFunc()
 
 	CallAsTeam({['read'] = readTeam},
 		function()
+			-- Normal morphs: preview of the target unit and progress text.
+			glBlending(GL_SRC_ALPHA, GL_ONE)
+			glDepthTest(GL_LEQUAL)
 			for unitID, morphData in pairs(morphUnitsSynced) do
-				if (unitID and morphData)and(IsUnitVisible(unitID)) then
-					if morphData.combatMorph then
-						DrawCombatMorphUnit(unitID, morphData,readTeam)
-					else
-						DrawMorphUnit(unitID, morphData,readTeam)
-					end
+				if unitID and morphData and (not morphData.combatMorph) and IsUnitVisible(unitID) then
+					DrawMorphUnit(unitID, morphData, readTeam)
 				end
 			end
+
+			-- Combat morphs: additive glow over the unit, state set once for the pass.
+			local c1 = math.sin(phase)*.2 + .2
+			local c2 = math.sin(phase + math.pi)*.2 + .2
+			local mult = 2
+			glBlending(GL_ONE, GL_ONE)
+			glPolygonOffset(-10, -10)
+			glCulling(GL.BACK)
+			glColor(c1*mult, 0, c2*mult, 1)
+			for unitID, morphData in pairs(morphUnitsSynced) do
+				if unitID and morphData and morphData.combatMorph and IsUnitVisible(unitID) then
+					glUnit(unitID, true)
+				end
+			end
+			glColor(1, 1, 1, 1)
+			glPolygonOffset(false)
 		end
 	)
 	glDepthTest(false)
