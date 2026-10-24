@@ -824,7 +824,7 @@ void main() {
 				for (int i = 0; i < n; i++) {
 					float t = (float(i) + 0.5) / float(numSeg);
 					vec2 p = wigglyCablePoint(a, d, perpAB, t, lenAB, arcDh, effAmp, seed);
-					vec2 losUV = clamp(p, vec2(0.0), mapSize.xy) / mapSize.zw;
+					vec2 losUV = clamp(p, vec2(0.0), mapSize.xy) / mapSize.xy;
 					float los = texture(infoTex, losUV).r;
 					if (los >= 0.5) {
 						if (isGhost) clrMask |= (1u << uint(i));
