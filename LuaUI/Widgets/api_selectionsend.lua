@@ -107,11 +107,17 @@ function widget:Update(dt)
 		
 		SendSelUnits(spGetSelectedUnits())
 		
+		local expired = false
 		for pid,dataStr in pairs(allySelData) do
 			allyActiveTx[pid] = allyActiveTx[pid] - 1
+			if allyActiveTx[pid] <= 0 then
+				allySelData[pid] = nil
+				allyActiveTx[pid] = nil
+				expired = true
+			end
 		end
-		if allyActiveTx[pid] == 0 then
-			allySelData[playerID] = nil
+		if expired then
+			UpdateAllySelUnits()
 		end
 		
 	elseif timeSinceBroadcast > 1 and selchanged then
