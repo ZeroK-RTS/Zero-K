@@ -159,7 +159,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 				spGiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0 )
 			end
 		else
-			spSetUnitTarget(unitID, 0)
+			spSetUnitTarget(unitID, nil)
 		end
 	end
 	
