@@ -1463,6 +1463,12 @@ explosionDistortionsNames.hoverdepthcharge_fake_depthcharge = {
 explosionDistortionsNames.tacnuke_weapon = {
 	GetDistortionClass("ExploShockWaveL", "SmallMedium", false, 1.5)
 }
+-- Adv Geo and Detriment death (damage radius 640): the automatic air shockwave, and the ground
+-- shockwave one size class smaller than the automatic MegaXL.
+explosionDistortionsNames.nuclear_missile = {
+	GetDistortionClass("AirShockWaveNuke", "Largest", 1.5),
+	GetDistortionClass("GroundShockWaveDeath", "Mega"),
+}
 
 -- Precision weapons that deserve large distortions
 explosionDistortionsNames.tankheavyassault_cor_gol = {
