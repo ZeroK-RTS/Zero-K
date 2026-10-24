@@ -317,24 +317,12 @@ function widget:PlayerChanged(playerID)
 end
 
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spIsSphereInView = Spring.IsSphereInView
 local spIsUnitIcon = Spring.IsUnitIcon
-local floor = math.floor
+local function DrawEtaText(unitID, timeLeft,yoffset, negative)
+	if not options.showforicons.value and spIsUnitIcon(unitID) or Spring.GetUnitRulesParam(unitID, "no_eta_display") then
+		return
+	end
 
--- The label only changes when its whole-second value changes (%d truncates; timeLeft stays
--- above -1, where floor and truncation agree on the label), so build it once per change instead
--- of formatting a new string for every unit on every drawn frame.
-local function GetEtaString(bi, timeLeft, negative)
-	local key
-	if timeLeft == nil then
-		key = false
-	else
-		key = floor(timeLeft) * 2 + (negative and 1 or 0)
-	end
-	if bi.strKey == key and bi.strLang == build_eta_translation then
-		return bi.str
-	end
 	local etaStr
 	if (timeLeft == nil) then
 		etaStr = '\255\255\255\1' .. build_eta_translation .. ' \255\1\1\255???'
@@ -342,35 +330,23 @@ local function GetEtaString(bi, timeLeft, negative)
 		local color = negative and '\255\255\1\1' or '\255\1\255\1'
 		etaStr = "\255\255\255\1" .. string.format('%s %s%d:%02d', build_eta_translation, color, timeLeft / 60, timeLeft % 60)
 	end
-	bi.str, bi.strKey, bi.strLang = etaStr, key, build_eta_translation
-	return etaStr
-end
-
-local function DrawEtaText(unitID, bi, timeLeft, yoffset, negative)
 	local x, y, z = spGetUnitViewPosition(unitID)
-	if not (x and y and z) then
-		return
+	
+	if x and y and z then
+		local heightMult = Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1
+		-- Include the raised anchor, billboard offset, text and outline.
+		-- Keep a loose bound so labels at the screen edge still draw.
+		local radius = 5 + fontSize*(#etaStr + 2)
+		if not Spring.IsSphereInView(x, y + yoffset*heightMult, z, radius) then
+			return
+		end
+		gl.PushMatrix()
+			gl.Translate(x, y + yoffset*heightMult, z)
+			gl.Billboard()
+			gl.Translate(0, 5 ,0)
+			gl.Text(etaStr, 0, 0, fontSize, "co")
+		gl.PopMatrix()
 	end
-	local heightMult = spGetUnitRulesParam(unitID, "currentModelScale") or 1
-	local etaStr = GetEtaString(bi, timeLeft, negative)
-	local labelY = y + yoffset*heightMult
-
-	-- Skip labels that cannot be on screen (most tracked units are not). The sphere contains the
-	-- whole billboarded label: 5 elmos above the anchor, at most #etaStr glyphs (bytes, including
-	-- colour codes) of under 1 em each centred on it, and under 2 em of height.
-	if not spIsSphereInView(x, labelY, z, 5 + fontSize*(#etaStr + 2)) then
-		return
-	end
-	if not options.showforicons.value and spIsUnitIcon(unitID) or spGetUnitRulesParam(unitID, "no_eta_display") then
-		return
-	end
-
-	gl.PushMatrix()
-		gl.Translate(x, labelY, z)
-		gl.Billboard()
-		gl.Translate(0, 5 ,0)
-		gl.Text(etaStr, 0, 0, fontSize, "co")
-	gl.PopMatrix()
 end
 
 function widget:DrawWorld()
@@ -382,13 +358,13 @@ function widget:DrawWorld()
 	gl.Color(1, 1, 1)
 
 	for unitID, bi in pairs(etaTable) do
-		DrawEtaText(unitID, bi, bi.timeLeft, bi.yoffset, bi.negative)
+		DrawEtaText(unitID, bi.timeLeft,bi.yoffset, bi.negative)
 	end
 
 	for unitID, bi in pairs(stockpileEtaTable) do
 		local stocked, wanted = Spring.GetUnitStockpile(unitID)
 		if wanted > 0 then
-			DrawEtaText(unitID, bi, bi.timeLeft, bi.yoffset, false)
+			DrawEtaText(unitID, bi.timeLeft, bi.yoffset, false)
 		end
 	end
 
