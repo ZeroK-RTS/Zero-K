@@ -334,6 +334,12 @@ local function DrawEtaText(unitID, timeLeft,yoffset, negative)
 	
 	if x and y and z then
 		local heightMult = Spring.GetUnitRulesParam(unitID, "currentModelScale") or 1
+		-- Include the raised anchor, billboard offset, text and outline.
+		-- Keep a loose bound so labels at the screen edge still draw.
+		local radius = 5 + fontSize*(#etaStr + 2)
+		if not Spring.IsSphereInView(x, y + yoffset*heightMult, z, radius) then
+			return
+		end
 		gl.PushMatrix()
 			gl.Translate(x, y + yoffset*heightMult, z)
 			gl.Billboard()
