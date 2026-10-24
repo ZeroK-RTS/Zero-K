@@ -181,7 +181,7 @@
     },
     "mahlazer": {
         "name": "Yıldızışığı",
-        "description": "Gezegensel Enerji Kesici",
+        "description": "Gezegensel Enerji Kesici - 600 enerjilik alana bağlanarak çalışır",
         "helptext": "Bu büyük ölçekli araç, terraform projeleri için araziyi şekillendirmek için kullanılır. Ayrıca sinir bozucu düşman birimleri ve üsleri gibi engellerin temizliği için de faydalıdır."
     },
     "spidercrabe": {
@@ -541,7 +541,7 @@
     },
     "raveparty": {
         "name": "Disko Topu Partisi",
-        "description": "Ölümcül Kuşak Projectörü",
+        "description": "Ölümcül Kuşak Projectörü - 400 enerjilik alana bağlanarak çalışır",
         "helptext": "Disko Topu Partisi, düşmanınıza her seferinde farklı bir sürpriz için altı farklı parti atışı yapar. Bütün aile için eğlenceli!"
     },
     "turretlaser": {
@@ -766,7 +766,7 @@
     },
     "zenith": {
         "name": "Zirve",
-        "description": "Meteor Kontrolcüsü",
+        "description": "Meteor Kontrolcüsü - 400 enerjilik alana bağlanarak çalışır",
         "helptext": "Zirve göktaşlarını gökten toplar (300'e kadar), bir şeyleri parçalamak ya da küçük bir geri kazanılabilir metal kaynağı sağlamak için her yere gönderebilir."
     },
     "vehaa": {
