@@ -76,7 +76,7 @@ options = {
 
 local min, max = math.min, math.max
 local spots, cells, spotSource
-local byPosition, unitSpot, observations, dirty = {}, {}, {}, {}
+local byPosition, unitSpot, building, observations, dirty = {}, {}, {}, {}, {}
 local myAllyTeam, fullView
 local atlas, edges, positions, observed, history, nextHistory, palette, depth
 local paintShader, cellShader, stateShader, drawShader, quad
@@ -366,7 +366,15 @@ local function ObserveUnit(unitID, unitDefID, teamID)
 	end
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	local i = x and byPosition[x] and byPosition[x][z]
-	if i then
+	if not i then
+		return
+	end
+	-- Only a finished mex owns its spot, so a spot in sight with a nanoframe shows
+	-- as empty. UnitFinished reports allied mexes (all in full view); enemy
+	-- nanoframes in sight are checked in GameFrame.
+	local beingBuilt = Spring.GetUnitIsBeingBuilt(unitID)
+	building[unitID] = beingBuilt and not (fullView or allied) or nil
+	if not beingBuilt then
 		unitSpot[unitID] = i
 		SetObservation(i, teamID + 1, 1, true)
 	end
@@ -377,7 +385,7 @@ local function ResetView()
 	local spectating
 	spectating, fullView = Spring.GetSpectatingState()
 	fullView = spectating and fullView
-	unitSpot, observations, dirty = {}, {}, {}
+	unitSpot, building, observations, dirty = {}, {}, {}, {}
 	for i = 1, #spots do
 		observations[i] = {0, 0, 0, 0}
 		dirty[i] = observations[i]
@@ -526,12 +534,17 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 	ObserveUnit(unitID, unitDefID, teamID)
 end
 
+function widget:UnitFinished(unitID, unitDefID, teamID)
+	ObserveUnit(unitID, unitDefID, teamID)
+end
+
 function widget:UnitEnteredLos(unitID, teamID)
 	ForgetUnit(unitID)
 	ObserveUnit(unitID, Spring.GetUnitDefID(unitID), teamID)
 end
 
 function widget:UnitLeftLos(unitID)
+	building[unitID] = nil
 	local i = unitSpot[unitID]
 	if i and not fullView and not Spring.IsUnitAllied(unitID) then
 		-- Remember the spot's owner, not an ID that can later be reused.
@@ -540,6 +553,7 @@ function widget:UnitLeftLos(unitID)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
+	building[unitID] = nil
 	if not mexDefs[unitDefID] then ForgetUnit(unitID); return end
 	local i = unitSpot[unitID]
 	if not i then return end
@@ -549,6 +563,24 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	local old = observations[i]
 	SetObservation(i, (fullView or allied or visible) and 0 or old[1], 0, fullView or allied or visible)
 	unitSpot[unitID] = nil
+end
+
+-- Reclaim turns a mex back into a nanoframe, which no longer owns its spot.
+function widget:UnitReverseBuilt(unitID, unitDefID, teamID)
+	widget:UnitDestroyed(unitID, unitDefID, teamID)
+end
+
+-- Twice a second, whether enemy nanoframes in sight have finished.
+function widget:GameFrame(n)
+	if n % 15 ~= 0 then
+		return
+	end
+	for unitID in pairs(building) do
+		if not Spring.GetUnitIsBeingBuilt(unitID) then
+			building[unitID] = nil
+			ObserveUnit(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
+		end
+	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeam)
