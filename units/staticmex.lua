@@ -22,6 +22,7 @@ return { staticmex = {
     removewait         = 1,
     removestop     = 1,
     selectionscalemult = 1.4,
+    normaltex = [[unittextures/ametalextractorlvl1_normals.dds]],
 
     outline_x = 75,
     outline_y = 75,

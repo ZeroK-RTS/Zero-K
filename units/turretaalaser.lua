@@ -14,9 +14,11 @@ return { turretaalaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    aim_lookahead      = 20,
     bait_level_target  = 2,
     bait_level_target_armor = 1,
     bait_level_default = 0,
+    normaltex = [[unittextures/torpedolauncher_normals.dds]],
   },
 
   damageModifier                = 0.333,
@@ -52,6 +54,7 @@ return { turretaalaser = {
 
     {
       def                = [[AAGUN]],
+      accurateLeading    = 1,
       --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
@@ -65,6 +68,7 @@ return { turretaalaser = {
       name                    = [[Anti-Air Laser]],
       accuracy                = 50,
       areaOfEffect            = 8,
+      cegTag                  = [[laser_cannon_trail]],
       canattackground         = false,
       collideFriendly         = false,
       coreThickness           = 0.5,

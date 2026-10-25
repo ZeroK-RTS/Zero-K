@@ -53,6 +53,8 @@ local reclaimToRemoveUnit = {}
 local aiAllyTeamInfo = autoAiTech and {}
 local aiTeamAlly = autoAiTech and {}
 
+GG.TechUnitCostMult = {}
+
 local tintCycle = {
 	{1, 0.6, 0.9},
 	{1, 0.75, 0.6},
@@ -106,15 +108,6 @@ local function GetFactory(unitDefID)
 	return (hasFactory[unitDefID] >= 0) and hasFactory[unitDefID]
 end
 
-local isComm = {}
-local function IsComm(unitDefID)
-	if not isComm[unitDefID] then
-		local ud = UnitDefs[unitDefID]
-		isComm[unitDefID] = (ud.customParams.dynamic_comm or ud.customParams.commtype) and 1 or 0
-	end
-	return isComm[unitDefID] == 1
-end
-
 local isBuilder = {}
 local function IsBuilder(unitDefID)
 	if not isBuilder[unitDefID] then
@@ -165,6 +158,7 @@ local function SetUnitTechLevel(unitID, level)
 	end
 	
 	local simpleDoubling = math.pow(2, level - 1)
+	GG.TechUnitCostMult[unitID] = simpleDoubling
 	GG.Attributes.AddEffect(unitID, "tech", {
 		projectiles = projectiles,
 		--move =  math.pow(0.95, level - 1),
@@ -240,7 +234,7 @@ local function CheckTechCommand(unitID, unitDefID, unitTeam, cmdParams)
 		return false
 	end
 	local targetUnitDef = Spring.GetUnitDefID(targetID)
-	if not IsBuilding(targetUnitDef) and not (commUpgraders[unitDefID] and IsComm(targetUnitDef)) then
+	if not IsBuilding(targetUnitDef) and not (commUpgraders[unitDefID] and Spring.Utilities.isComm(targetUnitDef)) then
 		return false
 	end
 	local builderLevel = (unitLevel[unitID] or 1)
@@ -610,6 +604,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	hasTechCommand[unitID] = nil
+	GG.TechUnitCostMult[unitID] = nil
 	if (unitLevel[unitID] or 1) <= 1 then
 		return
 	end

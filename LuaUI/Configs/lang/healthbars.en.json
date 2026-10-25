@@ -13,7 +13,7 @@
 	"ability_bar" : "ability",
 	"heat_bar" : "heat",
 	"speed_bar" : "speed",
-	"reammo_bar" : "rearming",
+	"reammo_bar" : "ammo",
 	"reload_bar" : "reload",
 	"slow_bar" : "slow",
 	"goo_bar" : "goo",

@@ -66,7 +66,6 @@ end
 function script.Create()
 	gun_1 = true
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Move(base, x_axis, -2)
 end
 
 local function Stopping()
@@ -111,7 +110,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	
-	Turn(head, y_axis, heading, math.rad(100))
+	Turn(head, y_axis, heading, math.rad(120))
 	Turn(l_gun, x_axis, -pitch, math.rad(100))
 	Turn(r_gun, x_axis, -pitch, math.rad(100))
 	WaitForTurn(head, y_axis)
@@ -161,7 +160,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/280
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 170.1, 35 * distMult, false, false, true)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 180.1, 35 * distMult, false, false, true)
 	end
 	return false
 end

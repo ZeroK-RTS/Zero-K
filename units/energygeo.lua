@@ -22,6 +22,7 @@ return { energygeo = {
     modelradius    = [[42]],
     removewait     = 1,
     selectionscalemult = 1.15,
+    normaltex = [[unittextures/geo_normals.dds]],
 
     stats_show_death_explosion = 1,
 

@@ -758,7 +758,7 @@ function LuaShader:GetHandle()
 	if self.shaderObj ~= nil then
 		return self.shaderObj
 	else
-		local funcName = (debug and debug.getinfo(1).name) or "UnknownFunction"
+		local funcName = (debug and debug.getinfo and debug.getinfo(1).name) or "UnknownFunction"
 		self:ShowError(string.format("Attempt to use invalid shader object in [%s](). Did you call :Compile() or :Initialize()?", funcName))
 	end
 end
@@ -767,7 +767,7 @@ function LuaShader:Delete()
 	if self.shaderObj ~= nil then
 		gl.DeleteShader(self.shaderObj)
 	else
-		local funcName = (debug and debug.getinfo(1).name) or "UnknownFunction"
+		local funcName = (debug and debug.getinfo and debug.getinfo(1).name) or "UnknownFunction"
 		self:ShowError(string.format("Attempt to use invalid shader object in [%s](). Did you call :Compile() or :Initialize()", funcName))
 	end
 end
@@ -779,7 +779,7 @@ function LuaShader:Activate()
 		self.active = true
 		return glUseShader(self.shaderObj)
 	else
-		local funcName = (debug and debug.getinfo(1).name) or "UnknownFunction"
+		local funcName = (debug and debug.getinfo and debug.getinfo(1).name) or "UnknownFunction"
 		self:ShowError(string.format("Attempt to use invalid shader object in [%s](). Did you call :Compile() or :Initialize()", funcName))
 		return false
 	end
@@ -800,7 +800,7 @@ function LuaShader:ActivateWith(func, ...)
 		glActiveShader(self.shaderObj, func, ...)
 		self.active = false
 	else
-		local funcName = (debug and debug.getinfo(1).name) or "UnknownFunction"
+		local funcName = (debug and debug.getinfo and debug.getinfo(1).name) or "UnknownFunction"
 		self:ShowError(string.format("Attempt to use invalid shader object in [%s](). Did you call :Compile() or :Initialize()", funcName))
 	end
 end

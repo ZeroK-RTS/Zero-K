@@ -9,14 +9,14 @@ local radius = 256
 
 local ret = {}
 for i = 1, #starting_points do
-	ret[i-1] = {
+	ret[i] = {
 		nameLong  = starting_points[i][3],
 		nameShort = starting_points[i][4],
 		startpoints = { { starting_points[i][1], starting_points[i][2] } },
 		boxes = { { } },
 	}
 	for j = 1, 10 do
-		ret[i-1].boxes[1][j] = {
+		ret[i].boxes[1][j] = {
 			starting_points[i][1] + radius * math.sin(j * math.pi / 5),
 			starting_points[i][2] + radius * math.cos(j * math.pi / 5),
 		}

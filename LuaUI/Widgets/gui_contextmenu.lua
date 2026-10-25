@@ -497,7 +497,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 		cells[#cells+1] = ' - Regen cost:'
 		cells[#cells+1] = drain .. " E/s"
-		local rechargeDelay = wd.shieldrechargedelay or wd.customParams.shield_recharge_delay
+		local rechargeDelay = wd.shieldrechargedelay or tonumber(wd.customParams.shield_recharge_delay)
 		if rechargeDelay and rechargeDelay > 0 then
 			cells[#cells+1] = ' - Regen delay:'
 			cells[#cells+1] = numformat(rechargeDelay) .. " s"
@@ -518,6 +518,7 @@ local function weapons2Table(cells, ws, unitID)
 		local damc = 0
 
 		local stun_time = 0
+		local overslow = 0
 
 		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
 		local baseDamage = tonumber(cp.stats_damage) or wd.customParams.shield_damage or 0
@@ -535,6 +536,9 @@ local function weapons2Table(cells, ws, unitID)
 			dams = val * (cp.timeslow_damagefactor or 1)
 			if (cp.timeslow_onlyslow == "1") then
 				val = 0
+			end
+			if cp.timeslow_overslow_frames then
+				overslow = tonumber(wd.customParams.timeslow_overslow_frames) / 30
 			end
 		end
 
@@ -705,16 +709,19 @@ local function weapons2Table(cells, ws, unitID)
 				end
 			end
 		end
-		
 		if cp.post_capture_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (tonumber(cp.post_capture_reload)/30) .. 's'
 		elseif cp.reammoseconds then
-			cells[#cells+1] = ' - Must rearm after shot'
+			if cp.shots_per_refuel then
+				cells[#cells+1] = ' - Must rearm after ' .. cp.shots_per_refuel .. ' shots'
+			else
+				cells[#cells+1] = ' - Must rearm after shot'
+				show_dps = false
+			end
 			cells[#cells+1] = ''
 			cells[#cells+1] = ' - Rearm time:'
 			cells[#cells+1] = cp.reammoseconds .. 's'
-			show_dps = false
 		elseif show_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (reloadtime) .. 's'
@@ -733,6 +740,11 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - Max stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time) .. 's\008'
 		end
+		if overslow > 0 then
+			cells[#cells+1] = ' - Overslow time:'
+			cells[#cells+1] = color2incolor(colorPurple) .. numformat(overslow) .. 's\008'
+		end
+		
 		if tonumber(cp.overstun_time) or 0 > 0 then
 			cells[#cells+1] = ' - Overstun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(tonumber(cp.overstun_time)) .. 's\008'
@@ -746,9 +758,10 @@ local function weapons2Table(cells, ws, unitID)
 
 		if show_range then
 			local range = cp.truerange or wd.range
-			local mult = unitID and ((Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1) * (Spring.GetUnitRulesParam(unitID, "rangeMult") or 1)) or 1
+			local mult = unitID and Spring.GetUnitRulesParam(unitID, "rangeMult") or 1
+			local boost = unitID and Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(range * mult) .. " elmo"
+			cells[#cells+1] = numformat((range + boost) * mult) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
@@ -1498,11 +1511,11 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
-			file = "#" .. ud.id,
+			file = WG.GetSquareBuildTexture(ud),
 			keepAspect = false;
 			x = 32,
 			y = 0,
-			height  = 88*(4/5);
+			height  = 88;
 			width   = 88;
 		},
 	}
@@ -1521,7 +1534,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		icons[#icons + 1] = Button:New{
 			x = 2,
 			right = 2,
-			y = 88*(4/5),
+			y = 88,
 			height = 30,
 			caption = "Edit Behaviour",
 			tooltip = "Edit the default behaviour of " .. Spring.Utilities.GetHumanName(ud) .. ".",
@@ -1537,7 +1550,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		textColor = color.stats_fg,
 		width = '100%',
 		height = '100%',
-		padding = { 0, 0, 0, 0 },
+		padding = { 0, 4, 0, 0 },
 		}
 	
 	local statschildren = {}
@@ -1789,23 +1802,47 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		if (weaponStats.paralyzer) then
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue) .. " (P)", textColor = colorCyan, }
-			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(wepCp.emp_paratime) .. "s", textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = 'Max stun time: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(wepCp.emp_paratime) .. "s", textColor = colorCyan, }
 		else
 			local damageSlow = (wepCp.timeslow_damagefactor or 0)*damageValue
 			local damageText
+			local slowTimer = 0
+			local disarmTimer = 0
 			if damageSlow > 0 then
 				if wepCp.timeslow_onlyslow == "1" then
-					 damageText = color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
+					damageText = color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
 				else
 					damageText = numformat(damageValue) .. " + " .. color2incolor(colorPurple) .. numformat(damageSlow) .. " (S)\008"
+				end
+				if wepCp.timeslow_overslow_frames then
+					slowTimer = tonumber(wepCp.timeslow_overslow_frames) / 30
 				end
 			else
 				damageText = numformat(damageValue)
 			end
+			if wepCp.disarmdamagemult then
+				local damageDisarm = tonumber(wepCp.disarmdamagemult)*damageValue
+				damageText = (damageText and (damageText .. " + ") or "") .. color2incolor(colorDisarm) .. numformat(damageDisarm) .. " (D)\008"
+				disarmTimer = tonumber(wepCp.disarmtimer)
+			end
 			statschildren[#statschildren+1] = Label:New{ caption = damageText, textColor = color.stats_fg, }
+			
+			if slowTimer > 0 then
+				statschildren[#statschildren+1] = Label:New{ caption = 'Overslow time:', textColor = color.stats_fg, }
+				statschildren[#statschildren+1] = Label:New{ caption = numformat(slowTimer) .. 's\008', textColor = colorPurple, }
+			end
+			if disarmTimer > 0 then
+				statschildren[#statschildren+1] = Label:New{ caption = 'Max disarm time:', textColor = color.stats_fg, }
+				statschildren[#statschildren+1] = Label:New{ caption = numformat(disarmTimer) .. 's\008', textColor = colorDisarm, }
+			end
+		end
+		if tonumber(wepCp.overstun_time) or 0 > 0 then
+			cells[#cells+1] = Label:New{ caption = 'Overstun time:', textColor = color.stats_fg, }
+			cells[#cells+1] = Label:New{ caption = numformat(tonumber(wepCp.overstun_time)) .. 's\008', textColor = weaponStats.paralyzer and colorCyan or colorDisarm, }
 		end
 
+		
 		local radius = weaponStats.damageAreaOfEffect
 		if expMult > 1 then
 			local maxRadius = radius
@@ -1925,7 +1962,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	local x = x
 	local y = y
 	if x then
-		y = scrH-y
+		-- x, y are mouse coordinates in real pixels
+		x = x/(WG.uiScale or 1)
+		y = scrH - y/(WG.uiScale or 1)
 	else
 		x = scrH / 3
 		y = scrH / 3
@@ -2100,8 +2139,8 @@ local function MakeUnitContextMenu(unitID,x,y)
 			--classname = "back_button",
 		},
 	}
-	local y = scrH-y
-	local x = x
+	local y = scrH - y/(WG.uiScale or 1)
+	local x = x/(WG.uiScale or 1)
 	
 	if marketandbounty then
 		if team == myTeamID then
@@ -2258,8 +2297,8 @@ function widget:MousePress(x,y,button)
 end
 
 function widget:ViewResize(vsx, vsy)
-	scrW = vsx
-	scrH = vsy
+	scrW = vsx/(WG.uiScale or 1)
+	scrH = vsy/(WG.uiScale or 1)
 end
 
 
@@ -2283,7 +2322,7 @@ function widget:Initialize()
 	 screen0 = Chili.Screen0
 	 color2incolor = Chili.color2incolor
 
-	widget:ViewResize(Spring.GetViewGeometry())
+	widget:ViewResize(Spring.Orig.GetViewGeometry())
 	
 	WG.MakeStatsWindow = MakeStatsWindow
 end

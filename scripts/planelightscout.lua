@@ -4,7 +4,7 @@ include "fixedwingTakeOff.lua"
 --------------------------------------------------------------------
 -- constants/vars
 --------------------------------------------------------------------
-local fuselage, KRisaravinglunatic, wingl, wingr = piece("fuselage", "KRisaravinglunatic", "wingl", "wingr")
+local fuselage, KRisaravinglunatic, wingl, wingr, exhaustl, exhaustr = piece("fuselage", "KRisaravinglunatic", "wingl", "wingr", "exhaustl", "exhaustr")
 -- unused pieces: canardl, canardr, enginer, enginel, exhaustl, exhaustr
 local smokePiece = {KRisaravinglunatic}
 
@@ -51,12 +51,29 @@ function SprintDetonate()
 	GG.UpdateUnitAttributes(unitID)
 end
 
+function script.StartMoving()
+	Show(exhaustl)
+	Show(exhaustr)
+end
+
 function script.StopMoving()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	Hide(exhaustl)
+	Hide(exhaustr)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
+end
+
+function Pad_StartMoving()
+	script.StartMoving()
+end
+
+function Pad_StopMoving()
+	script.StopMoving()
 end
 
 function script.Create()
-	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	Hide(exhaustl)
+	Hide(exhaustr)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, unitID, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 

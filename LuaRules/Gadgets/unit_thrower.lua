@@ -118,6 +118,8 @@ local spRemoveUnitCmdDesc   = Spring.RemoveUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitLosState     = Spring.GetUnitLosState
+local spGetUnitIsStunned    = Spring.GetUnitIsStunned
+local spValidUnitID         = Spring.ValidUnitID
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_INSERT = CMD.INSERT
@@ -158,6 +160,17 @@ local min = math.min
 local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()
 local UPDATE_PERIOD = 6
+
+local function IsStunnedOrDead(unitID)
+	if not spValidUnitID(unitID) then
+		return true
+	end
+	local stunnedOrInbuild = spGetUnitIsStunned(unitID)
+	if stunnedOrInbuild then
+		return true
+	end
+	return (GG.att_ReloadChange[unitID] or 1) == 0
+end
 
 local function SendUnitToTarget(unitID, launchMult, flyTimeMult, sideMult, upMult, odx, ty, odz)
 	if Spring.GetUnitTransporter(unitID) then
@@ -215,7 +228,7 @@ local function GetAffectedUnits(unitID, checkOverlobAllyTeam, unitX, unitZ)
 end
 
 local function CheckRedundantCommandRemoval(unitID)
-	if (not Spring.ValidUnitID(unitID)) or Spring.Utilities.GetUnitRepeat(unitID) then
+	if (not spValidUnitID(unitID)) or Spring.Utilities.GetUnitRepeat(unitID) then
 		return
 	end
 	local beingLobbedTo = IterableMap.Get(physicsRestore, unitID)
@@ -291,7 +304,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
 		local launchMult = speedMult
 		
-		local flyTime = SendUnitToTarget(nearID, launchMult, flyTimeMult, 0, 1, odx, ty, odz)
+		local flyTime = SendUnitToTarget(nearID, launchMult * 0.8, flyTimeMult, 0, 1, odx, ty, odz)
 		if flyTime then
 			local nearDefID = Spring.GetUnitDefID(nearID)
 			flyTime = flyTime + 15 -- Sideways time.
@@ -301,13 +314,14 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			Spring.SetUnitLeaveTracks(nearID, false)
 			IterableMap.Add(physicsRestore, nearID,
 				{
+					lobID = proOwnerID,
 					unitDefID = nearDefID,
 					tx = tx,
 					ty = ty,
 					tz = tz,
 					odx = odx,
 					odz = odz,
-					sidewaysCounter = 15,
+					sidewaysCounter = 22,
 					launchMult = launchMult,
 					flyTimeMult = flyTimeMult,
 					drag = -1.5,
@@ -515,13 +529,16 @@ function gadget:Initialize()
 end
 
 local function UpdateTrajectory(unitID, data)
-	if not Spring.ValidUnitID(unitID) then
+	if not spValidUnitID(unitID) then
 		return true
 	end
 	if data.sidewaysCounter then
 		data.sidewaysCounter = data.sidewaysCounter - 1
 		if data.sidewaysCounter < 10 then
-			if not SendUnitToTarget(unitID, data.launchMult, data.flyTimeMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
+			if IsStunnedOrDead(data.lobID) then
+				return true
+			end
+			if not SendUnitToTarget(unitID, data.launchMult*math.min(1, 1 - (data.sidewaysCounter - 3)/5), data.flyTimeMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
 				return true -- remove unit
 			end
 		end
@@ -537,7 +554,6 @@ local function ReinstatePhysics(unitID, data)
 		SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
 		data.drag = data.drag + 0.05
 		if data.drag >= 1 then
-			Spring.SetUnitLeaveTracks(unitID, true)
 			SetUnitDrag(unitID, 1)
 			data.drag = nil
 			GG.Floating_CheckAddFlyingFloat(unitID, data.unitDefID)
@@ -546,6 +562,10 @@ local function ReinstatePhysics(unitID, data)
 	
 	if data.collisionResistence then
 		GG.SetCollisionDamageMult(unitID, math.max(0, math.min(1, data.collisionResistence)))
+		if data.collisionResistence > 0 and not data.reinstatedTracks then
+			Spring.SetUnitLeaveTracks(unitID, true)
+			data.reinstatedTracks = true
+		end
 		data.collisionResistence = data.collisionResistence + 0.066
 		if data.collisionResistence >= 1 then
 			GG.SetCollisionDamageMult(unitID)
@@ -563,7 +583,7 @@ function gadget:GameFrame(n)
 	
 	if applyBlockingFrame[n] then
 		for unitID, _ in pairs(applyBlockingFrame[n]) do
-			if Spring.ValidUnitID(unitID) then
+			if spValidUnitID(unitID) then
 				Spring.SetUnitBlocking(unitID, true, true)
 				unitIsNotBlocking[unitID] = nil
 			end

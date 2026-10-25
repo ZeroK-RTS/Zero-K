@@ -17,7 +17,7 @@ function widget:GetInfo()
 		author    = "jK",
 		date      = "2009", --2013 May 12
 		license   = "GNU GPL, v2 or later",
-		layer     = -10, -- above gui_selectedunits_gl4, below gui_name_tags 
+		layer     = -11, -- above gui_selectedunits_gl4, below gui_name_tags 
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -119,7 +119,10 @@ local function OptionsChanged()
 	drawBarPercentages = options.drawBarPercentages.value
 	barScale = options.barScale.value
 	debugMode = options.debugMode.value
-	
+
+
+	barWidth = options.barWidth.value
+	barHeight = options.barHeight.value
 	healthbarDistSq    = options.unitMaxHeight.value*options.unitMaxHeight.value
 	healthbarPercentSq = options.unitPercentHeight.value*options.unitPercentHeight.value
 	healthbarTitleSq   = options.unitTitleHeight.value*options.unitTitleHeight.value
@@ -131,7 +134,7 @@ end
 
 options_path = 'Settings/Interface/Healthbars'
 options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump', 'showEnemyStatus',
-	'barScale', 'debugMode', 'minReloadTime',
+	'barScale','barWidth','barHeight','debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
 	'invert_shield', 'invert_health', 'invert_building', 'invert_morph',
@@ -141,6 +144,7 @@ options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', '
 	'invert_slow', 'invert_goo', 'invert_jump', 'invert_jump_charge', 'invert_reclaim', 'invert_resurrect',
 }
 options = {
+
 	showhealthbars = {
 		name = 'Show Healthbars',
 		type = 'bool',
@@ -183,6 +187,24 @@ options = {
 		min = 0.5,
 		max = 6,
 		step = 0.25,
+		OnChange = OptionsChanged,
+	},
+	barWidth = {
+		name = 'Bar width',
+		type = 'number',
+		value = 14,
+		min  = 2.5,
+		step = 0.25,
+		max = 30,
+		OnChange = OptionsChanged,
+	},	
+	barHeight = {
+		name = 'Bar Height',
+		type = 'number',
+		value= 3,
+		min  = 1,
+		step = 0.1,
+		max = 5,
 		OnChange = OptionsChanged,
 	},
 	minReloadTime = {
@@ -550,6 +572,9 @@ local paraUnits   = {}
 local disarmUnits = {}
 local onFireUnits = {}
 local UnitMorphs  = {}
+-- The three lists above are only consumed by DrawOverlays, which is skipped while the
+-- GL4 paralyze effect (WG.DrawParalyzedUnitGL4) draws these overlays. Set in DrawWorld.
+local gatherOverlays = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -865,6 +890,9 @@ do
 		local dist = dx*dx + dy*dy + dz*dz
 
 		if (dist > healthbarDistSq) then
+			if gatherOverlays then
+				JustGetOverlayInfos(unitID, unitDefID)
+			end
 			return
 		end
 		addPercent = (dist < healthbarPercentSq)
@@ -895,7 +923,7 @@ do
 
 		morph = UnitMorphs[unitID]
 
-		if (drawUnitsOnFire) and (GetUnitRulesParam(unitID, "on_fire") == 1) then
+		if gatherOverlays and (drawUnitsOnFire) and (GetUnitRulesParam(unitID, "on_fire") == 1) then
 			onFireUnits[#onFireUnits+1] = unitID
 		end
 
@@ -1069,7 +1097,7 @@ do
 		
 		--// REAMMO
 		if ci.canReammo then
-			local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
+			local reammoProgress = GetUnitRulesParam(unitID, "ammoFraction") or GetUnitRulesParam(unitID, "reammoProgress")
 			if reammoProgress then
 				barDrawer.AddPercentBar("reammo", reammoProgress)
 			end
@@ -1441,6 +1469,7 @@ do
 	local glMultiTexCoord      = gl.MultiTexCoord
 
 	function widget:DrawWorld()
+		gatherOverlays = not WG.DrawParalyzedUnitGL4
 		if not Spring.IsGUIHidden() then
 			if (#visibleUnits + #visibleFeatures == 0) then
 				return
@@ -1467,13 +1496,13 @@ do
 				unitID    = visibleUnits[i]
 				unitDefID = GetUnitDefID(unitID)
 				if (unitDefID) then
-					if ((not Spring.GetUnitRulesParam(unitID, "no_healthbar")) and DrawUnitInfos(unitID, unitDefID)) or JustGetOverlayInfos(unitID, unitDefID) then
-						local x, y, z = Spring.GetUnitPosition(unitID)
-						if not (x and y and z) then
-							Spring.Log("HealthBars", "error", "missing position and unitDef of unit " .. unitID)
-						else
-							Spring.MarkerAddPoint(x, y, z, "Missing unitDef")
+					-- DrawUnitInfos also collects the overlay infos; collect them separately only without a bar
+					if Spring.GetUnitRulesParam(unitID, "no_healthbar") then
+						if gatherOverlays then
+							JustGetOverlayInfos(unitID, unitDefID)
 						end
+					else
+						DrawUnitInfos(unitID, unitDefID)
 					end
 				elseif debugMode then
 					local x, y, z = Spring.GetUnitPosition(unitID)
@@ -1503,7 +1532,7 @@ do
 					end
 				end
 			end
-		else
+		elseif gatherOverlays then
 			local unitID, unitDefID
 			for i = 1, #visibleUnits do
 				unitID    = visibleUnits[i]
@@ -1516,7 +1545,14 @@ do
 
 		glDepthMask(false)
 
-		DrawOverlays()
+		if gatherOverlays then
+			DrawOverlays()
+		elseif (#paraUnits > 0) or (#disarmUnits > 0) or (#onFireUnits > 0) then
+			-- Nothing reads these while the GL4 effect is active; previously they grew forever.
+			paraUnits = {}
+			disarmUnits = {}
+			onFireUnits = {}
+		end
 		glMultiTexCoord(1, 1, 1, 1)
 		glColor(1, 1, 1, 1)
 

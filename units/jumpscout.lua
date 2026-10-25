@@ -19,6 +19,7 @@ return { jumpscout = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 100,
     bait_level_default = 1,
     modelradius    = [[10]],
     
@@ -73,6 +74,8 @@ return { jumpscout = {
 
     {
       def                = [[MISSILE]],
+      mainDir            = [[0 0.2 1]],
+      maxAngleDif        = 160,
       badTargetCategory  = [[UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -102,10 +105,11 @@ return { jumpscout = {
       flightTime              = 0.8,
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
+      leadlimit               = 0,
       interceptedByShieldType = 2,
       model                   = [[puppymissile.s3o]],
       noSelfDamage            = true,
-      range                   = 170,
+      range                   = 168,
       reloadtime              = 1.5,
       smokeTrail              = false,
       soundHit                = [[explosion/ex_med5]],

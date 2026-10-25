@@ -47,6 +47,20 @@ skin.button = {
 	DrawControl = DrawButton,
 }
 
+skin.button_hidden = {
+	TileImageBK = ":cl:tech_button_bright_small_bk.png",
+	TileImageFG = ":cl:tech_button_bright_small_fg.png",
+	tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
+	padding = {10, 10, 10, 10},
+
+	backgroundColor = {0.20, 0.38, 0.46, 0},
+	focusColor  = {0.20, 0.42, 0.50, 0},
+	borderColor = {0.20, 0.42, 0.50, 0},
+	pressBackgroundColor = {0.14, 0.365, 0.42, 0},
+
+	DrawControl = DrawButton,
+}
+
 skin.button_tiny = {
 	TileImageBK = ":cl:tech_button_bright_tiny_bk.png",
 	TileImageFG = ":cl:tech_button_bright_tiny_fg.png",

@@ -37,6 +37,8 @@ local unitlistNames = {
 	staticmissilesilo = DEFAULT,
 	pw_hq_attacker = DEFAULT,
 	pw_hq_defender = DEFAULT,
+	pw_hq_attacker_extra = DEFAULT,
+	pw_hq_defender_extra = DEFAULT,
 	striderhub = DEFAULT,
 
 	staticarty = DEFAULT,
@@ -75,9 +77,17 @@ local unitlistNames = {
 	raveparty = DEFAULT,
 }
 
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.planetwars_structure then
+		unitlistNames[ud.name] = DEFAULT
+	end
+end
+
 local unitList = {}
 local UnitDefNames = UnitDefNames
 for name, data in pairs(unitlistNames) do
 	unitList[UnitDefNames[name].id] = data
 end
+
 return unitList

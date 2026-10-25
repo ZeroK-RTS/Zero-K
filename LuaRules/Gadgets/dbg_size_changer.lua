@@ -18,43 +18,6 @@ function gadget:GetInfo()
 	}
 end
 
-local function SetScale(unitID, base, scale)
-	local p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16 = Spring.GetUnitPieceMatrix(unitID, base)
-	local pieceTable = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16}
-
-	Spring.Echo(p1, p2, p3, p4)
-	Spring.Echo(p5, p6, p7, p8)
-	Spring.Echo(p9, p10, p11, p12)
-	Spring.Echo(p13, p14, p15, p16)
-
-	pieceTable[1] = pieceTable[1] * scale
-	pieceTable[2] = pieceTable[2] * scale
-	pieceTable[3] = pieceTable[3] * scale
-
-	pieceTable[5] = pieceTable[5] * scale
-	pieceTable[6] = pieceTable[6] * scale
-	pieceTable[7] = pieceTable[7] * scale
-
-	pieceTable[9] = pieceTable[9] * scale
-	pieceTable[10] = pieceTable[10] * scale
-	pieceTable[11] = pieceTable[11] * scale
-
-	pieceTable[13] = pieceTable[13] * scale
-	pieceTable[14] = pieceTable[14] * scale
-	pieceTable[15] = pieceTable[15] * scale
-
-	Spring.SetUnitPieceMatrix(unitID, base, pieceTable)
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	local base = Spring.GetUnitRootPiece(unitID)
-	if base then
-		SetScale(unitID, base, 2)
-	end
+	Spring.UnitScript.CallAsUnit(unitID, Spring.UnitScript.Scale, Spring.GetUnitRootPiece(unitID), 2)
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------

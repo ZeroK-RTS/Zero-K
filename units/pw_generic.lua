@@ -33,7 +33,7 @@ return { pw_generic = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
-  --yardMap                       = [[oooooooooooooooooooo]],
+  -- no yardmap, would make it annoying to autogenerate for templates
 
   featureDefs                   = {
     DEAD  = {

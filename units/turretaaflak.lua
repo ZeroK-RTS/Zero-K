@@ -8,14 +8,16 @@ return { turretaaflak = {
   buildingGroundDecalType       = [[turretaaflak_aoplane.dds]],
   buildPic                      = [[turretaaflak.png]],
   category                      = [[FLOAT]],
-  collisionVolumeOffsets        = [[0 11 -4]],
-  collisionVolumeScales         = [[50 86 50]],
-  collisionVolumeType            = [[CylY]],
+  collisionVolumeOffsets        = [[0 -4 0]],
+  collisionVolumeScales         = [[50 80 50]],
+  collisionVolumeType            = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    aimposoffset   = [[0 16 0]],
+    aim_lookahead      = 120,
+    aimposoffset       = [[0 12 0]],
     bait_level_default = 0,
+    dynamic_colvol     = [[1]],
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -50,6 +52,7 @@ return { turretaaflak = {
 
     {
       def                = [[ARMFLAK_GUN]],
+      accurateLeading    = 1,
       --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },

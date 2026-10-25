@@ -36,6 +36,7 @@ if (System == nil) then
 		CMD = CMD,
 		CMDTYPE = CMDTYPE,
 		LOG = LOG,
+		RmlUi = RmlUi,
 
 		UnitDefs        = UnitDefs,
 		UnitDefNames    = UnitDefNames,

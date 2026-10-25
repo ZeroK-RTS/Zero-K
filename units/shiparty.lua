@@ -14,6 +14,7 @@ return { shiparty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 180,
     bait_level_default = 1,
     --extradrawrange = 200,
     modelradius    = [[55]],
@@ -55,6 +56,7 @@ return { shiparty = {
 
     {
       def                = [[PLASMA]],
+      accurateLeading    = 3,
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },

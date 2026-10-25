@@ -69,6 +69,7 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
+		GG.CustomExplosionLight("teleport_big_in", x, y, z, unitID)
 
 		-- Stats collection (acuelly not, see below)
 		if GG.mod_stats_AddFactoryPlop then
@@ -130,6 +131,8 @@ local teamSides = {} -- sides selected ingame from widgets - per teams
 local playerIDsByName = {}
 local commChoice = {}
 local allyTeamCommanderCount = {}
+local teamCommanderCount = {}
+local playerCommanderCount = {}
 
 --local prespawnedCommIDs = {}	-- [teamID] = unitID
 
@@ -410,6 +413,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		
 		if Spring.GetGameFrame() <= 1 then
 			Spring.SpawnCEG("gate", x, y, z)
+			GG.CustomExplosionLight("teleport_big_in", x, y, z, unitID)
 			-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
 		end
 
@@ -442,13 +446,11 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 		end
 		
-		local name = "noname" -- Backup for when player does not choose a commander and then resigns.
-		if isAI then
-			name = select(2, Spring.GetAIInfo(teamID))
-		else
-			name = Spring.GetPlayerInfo(playerID, false)
+		-- track starting commander count per team (for egg morph limiting)
+		teamCommanderCount[teamID] = (teamCommanderCount[teamID] or 0) + 1
+		if playerID then
+			playerCommanderCount[playerID] = (playerCommanderCount[playerID] or 0) + 1
 		end
-		Spring.SetUnitRulesParam(unitID, "commander_owner", name, {inlos = true})
 		return true
 	end
 	return false
@@ -579,6 +581,27 @@ local function SpawnAllyTeamExtraCommanders(allyTeamID, wanted)
 	end
 end
 
+local function WriteRulesParams()
+	local players = Spring.GetPlayerList()
+	for i = 1, #players do
+		if playerCommanderCount[players[i]] then
+			Spring.SetPlayerRulesParam(players[i], "initial_commanders", playerCommanderCount[players[i]])
+		end
+	end
+	local teams = Spring.GetTeamList()
+	for i = 1, #teams do
+		if teamCommanderCount[teams[i]] then
+			Spring.SetTeamRulesParam(teams[i], "initial_commanders", teamCommanderCount[teams[i]])
+		end
+	end
+	local allyTeams = Spring.GetAllyTeamList()
+	for i = 1, #allyTeams do
+		if allyTeamCommanderCount[allyTeams[i]] then
+			Spring.SetAllyTeamRulesParam(allyTeams[i], "initial_commanders", allyTeamCommanderCount[allyTeams[i]])
+		end
+	end
+end
+
 function gadget:GameStart()
 	gamestart = true
 	
@@ -603,7 +626,6 @@ function gadget:GameStart()
 
 	-- spawn units
 	for teamNum, team in ipairs(Spring.GetTeamList()) do
-		
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup
 		if not loadGame then
@@ -669,6 +691,8 @@ function gadget:GameStart()
 			end
 		end
 	end
+	
+	WriteRulesParams()
 end
 
 function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
@@ -683,7 +707,7 @@ function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
 end
 
 local function SetStartLocation(teamID, x, z)
-    luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
+	luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
 end
 GG.SetStartLocation = SetStartLocation
 

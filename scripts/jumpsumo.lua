@@ -73,8 +73,8 @@ local rf_angle = math.rad(-25)
 local lb_angle = math.rad(-65)
 local rb_angle = math.rad(65)
 
-local p_angle = -.3
-local th_angle = -.3
+local p_angle = -0.3
+local th_angle = -0.3
 local th_speed = 1.1
 local sh_angle = .4
 local sh_speed = 1
@@ -94,12 +94,13 @@ local thigh_rb = 0
 local jumpActive = false
 
 --signals
-local walk = 2
+local SIG_WALK = 2
 local SIG_Aim = { [2] = 4, [3] = 8, [4] = 16, [5] = 32 }
+local SIG_MOONWALK = 64
 
 local function Walk()
-	Signal(walk)
-	SetSignalMask(walk)
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
 	local zeroSpeedCount = 0
 	
 	Turn(lf_pump, x_axis, -p_angle, 1.4)
@@ -121,15 +122,17 @@ local function Walk()
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(rf_foot, dirtfling)
 			EmitSfx(lb_foot, dirtfling)
+			GG.UnitScriptDistortion(unitID, unitDefID, "rightfront")
+			GG.UnitScriptDistortion(unitID, unitDefID, "leftback")
 		end
 		
 		Turn(lf_ball, y_axis, lf_angle, sp1) -- left front leg forward
-		Turn(rf_ball, y_axis, -rb_angle, sp2) -- right front leg backward
+		Turn(rf_ball, y_axis, -1.3, sp2) -- right front leg backward
 		Turn(lb_ball, y_axis, -lf_angle, sp2) -- left back leg backward
 		Turn(rb_ball, y_axis, rb_angle, sp1) -- right back leg forward
 		
 		Turn(lf_thigh, x_axis, 0, th_speed)
-		Turn(rf_thigh, x_axis, -th_angle, th_speed)
+		Turn(rf_thigh, x_axis, 0.2, th_speed)
 		Turn(lb_thigh, x_axis, th_angle, th_speed)
 		Turn(rb_thigh, x_axis, 0, th_speed)
 		
@@ -180,14 +183,16 @@ local function Walk()
 		if not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(lf_foot, dirtfling)
 			EmitSfx(rb_foot, dirtfling)
+			GG.UnitScriptDistortion(unitID, unitDefID, "leftfront")
+			GG.UnitScriptDistortion(unitID, unitDefID, "rightback")
 		end
 		
-		Turn(lf_ball, y_axis, -lb_angle, sp2) -- left front leg backward
+		Turn(lf_ball, y_axis, 1.3, sp2) -- left front leg backward
 		Turn(rf_ball, y_axis, rf_angle, sp1) -- right front leg forward
 		Turn(lb_ball, y_axis, lb_angle, sp1) -- left front leg forward
 		Turn(rb_ball, y_axis, -rf_angle, sp2) -- right back leg backward
 		
-		Turn(lf_thigh, x_axis, -th_angle, th_speed)
+		Turn(lf_thigh, x_axis, 0.2, th_speed)
 		Turn(rf_thigh, x_axis, 0, th_speed)
 		Turn(lb_thigh, x_axis, 0, th_speed)
 		Turn(rb_thigh, x_axis, th_angle, th_speed)
@@ -264,7 +269,7 @@ function preJump(turn,distance)
 	Turn(b_dome, x_axis, disFactor*x/3, math.abs(x)/2)
 	Turn(b_dome, z_axis, disFactor*z/3, math.abs(z)/2)
 	
-	Signal(walk)
+	Signal(SIG_WALK)
 	Move(t_dome, y_axis, 0, 10)
 	Move(b_dome, y_axis, 0, 20)
 
@@ -410,8 +415,8 @@ function script.Create()
 end
 
 local function Stopping()
-	Signal(walk)
-	SetSignalMask(walk)
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
 	
 	Move(t_dome, y_axis, 0, 10)
 	Move(b_dome, y_axis, 0, 20)
@@ -454,11 +459,28 @@ local function Stopping()
 	Turn(rb_foot, x_axis, 0, sp1)
 end
 
+local function MoonwalkThread()
+	Signal(SIG_MOONWALK)
+	SetSignalMask(SIG_MOONWALK)
+	while true do
+		local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+		if speed < 0.4 then
+			StartThread(Stopping)
+		else
+			StartThread(Walk)
+		end
+		
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local h = Spring.GetGroundHeight(x, z)
+		if math.abs(h - y) < 0.01 then
+			return
+		end
+		Sleep(800)
+	end
+end
+
 function unmoonwalkFunc()
-	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
-	StartThread(Stopping)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+	StartThread(MoonwalkThread)
 end
 
 function script.StartMoving()

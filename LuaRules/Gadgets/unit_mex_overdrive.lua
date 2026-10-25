@@ -890,6 +890,12 @@ end
 -------------------------------------------------------------------------------------
 -- Overdrive and resource handling
 
+local function UpdateMaxMexDrain(unitID, myProp, gridCapactiy)
+	-- How much energy would the mex drain if the grid were maxxed.
+	local maxE = myProp * gridCapactiy
+	spSetUnitRulesParam(unitID, "max_energy_drain", maxE, alliedTrueTable)
+end
+
 local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacity)
 	local summedMetalProduction = 0
 	local summedBaseMetal = 0
@@ -941,9 +947,11 @@ local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacit
 					local myMetalIncome = curMexIncomes[unitID]
 					local mexE = 0
 					if (allyMetalSquared > 0) then -- divide energy in ratio given by squared metal from mex
-						mexE = allyE * (myMetalIncome * myMetalIncome) / allyMetalSquared --the fraction of E to be consumed with respect to all other Mex
+						local myProp = (myMetalIncome * myMetalIncome) / allyMetalSquared
+						mexE = allyE * myProp --the fraction of E to be consumed with respect to all other Mex
 						energyWasted = energyWasted - mexE -- leftover E minus Mex usage
 						gridEnergySpent[i] = gridEnergySpent[i] + mexE
+						UpdateMaxMexDrain(unitID, myProp, maxGridCapacity[i])
 						-- if a grid is being too overdriven it has become maxed.
 						-- the grid's mexSqauredSum is used for best distribution
 						if gridEnergySpent[i] > maxGridCapacity[i] then --final Mex to be looped since we are out of E to OD the rest of the Mex
@@ -968,7 +976,9 @@ local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacit
 							energyWasted = allyE
 							for unitID_inner, _ in pairs(allyTeamMexes[i]) do --re-distribute the grid energy to Mex (again! except taking account the limited energy of the grid)
 								myMetalIncome = curMexIncomes[unitID_inner]
-								mexE = gridE*(myMetalIncome * myMetalIncome) / gridMetalSquared
+								myProp = (myMetalIncome * myMetalIncome) / gridMetalSquared
+								mexE = gridE * myProp
+								UpdateMaxMexDrain(unitID_inner, myProp, maxGridCapacity[i]) -- Do it here too because we are going to break out of the outer loop
 								local metalMult = energyToExtraM(mexE)
 								local thisMexM = myMetalIncome + myMetalIncome * metalMult
 
@@ -1457,8 +1467,10 @@ function gadget:GameFrame(n)
 						else
 							if not pylonDefs[unitDefID].keeptooltip then
 								if grid ~= 0 then
+									local maxxed = (maxGridCapacity[grid] > 0 and gridEnergySpent[grid] >= maxGridCapacity[grid])
 									spSetUnitRulesParam(unitID, "OD_gridCurrent", gridEnergySpent[grid], alliedTrueTable)
 									spSetUnitRulesParam(unitID, "OD_gridMaximum", maxGridCapacity[grid], alliedTrueTable)
+									spSetUnitRulesParam(unitID, "OD_gridMaxxed", maxxed and 1 or 0, alliedTrueTable)
 									spSetUnitRulesParam(unitID, "OD_gridMetal", gridMetalGain[grid], alliedTrueTable)
 								else
 									spSetUnitRulesParam(unitID, "OD_gridCurrent", -1, alliedTrueTable)
@@ -1665,6 +1677,7 @@ function gadget:GameFrame(n)
 			end
 			
 			for i = 1, allyTeamData.teams do
+				local teamID = allyTeamData.team[i]
 				local share = (splitByShare and teamResourceShare[teamID]) or 1
 				if freeSpace[i] then
 					freeSpace[i] = min(freeSpace[i], totalToShare * share)
@@ -1674,13 +1687,13 @@ function gadget:GameFrame(n)
 			
 			if totalToShare ~= 0 then
 				local excessFactor = 1 - min(1, totalFreeSpace/totalToShare)
-				local shareFactorPerSpace = (1 - excessFactor)/totalFreeSpace
+				local shareFactorPerSpace = totalFreeSpace > 0 and (1 - excessFactor)/totalFreeSpace or 1
 				for i = 1, allyTeamData.teams do
 					if shareToSend[i] then
 						local sendID = allyTeamData.team[i]
 							
 						for j = 1, allyTeamData.teams do
-							if freeSpace[j] then
+							if freeSpace[j] and freeSpace[j] > 0 then
 								local recieveID = allyTeamData.team[j]
 								local toShare = shareToSend[i] * freeSpace[j] * shareFactorPerSpace
 								Spring.ShareTeamResource(sendID, recieveID, "metal", toShare)

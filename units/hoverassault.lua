@@ -16,6 +16,7 @@ return { hoverassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead    = 20,
     bait_level_default = 0,
     bait_level_target_armor = 1,
     modelradius       = [[25]],
@@ -57,6 +58,7 @@ return { hoverassault = {
 
     {
       def                = [[DEW]],
+      accurateLeading    = 1,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

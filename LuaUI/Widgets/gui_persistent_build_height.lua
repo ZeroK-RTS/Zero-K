@@ -27,12 +27,12 @@ local spGetGroundHeight  = Spring.GetGroundHeight
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetModKeyState   = Spring.GetModKeyState
 
-local GL_LINE_STRIP		= GL.LINE_STRIP
-local GL_LINES			= GL.LINES
-local glVertex			= gl.Vertex
-local glLineWidth   	= gl.LineWidth
-local glColor       	= gl.Color
-local glBeginEnd    	= gl.BeginEnd
+local GL_LINE_STRIP = GL.LINE_STRIP
+local GL_LINES      = GL.LINES
+local glVertex      = gl.Vertex
+local glLineWidth   = gl.LineWidth
+local glColor       = gl.Color
+local glBeginEnd    = gl.BeginEnd
 
 local floor = math.floor
 local ceil = math.ceil
@@ -277,6 +277,7 @@ function widget:KeyPress(key, mods)
 	
 	if key == toggleHeight and options.enterSetHeightWithB.value then
 		toggleEnabled = not toggleEnabled
+		WG.buildingPlacementHeight = toggleEnabled and buildingPlacementHeight
 		return true
 	end
 	
@@ -294,6 +295,7 @@ function widget:KeyPress(key, mods)
 	elseif key == heightDecrease then
 		buildingPlacementHeight = (buildingPlacementHeight or 0) - INCREMENT_SIZE
 	end
+	WG.buildingPlacementHeight = buildingPlacementHeight
 	
 	buildHeight[buildingPlacementID] = buildingPlacementHeight
 	widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
@@ -311,6 +313,7 @@ function widget:Update(dt)
 		if buildingPlacementID then
 			buildingPlacementID = false
 			toggleEnabled = false
+			WG.buildingPlacementHeight = false
 		end
 		return
 	end
@@ -318,6 +321,7 @@ function widget:Update(dt)
 	if buildingPlacementID ~= -activeCommand then
 		buildingPlacementID = -activeCommand
 		buildingPlacementHeight = (buildHeight[buildingPlacementID] or defaultBuildHeight)
+		WG.buildingPlacementHeight = buildingPlacementHeight
 		
 		facing = Spring.GetBuildFacing()
 		local offFacing = (facing == 1 or facing == 3)
@@ -399,6 +403,7 @@ function widget:MouseWheel(up, value)
 	end
 	toggleEnabled = true
 	buildingPlacementHeight = (buildingPlacementHeight or 0) + INCREMENT_SIZE*value
+	WG.buildingPlacementHeight = buildingPlacementHeight
 	
 	buildHeight[buildingPlacementID] = buildingPlacementHeight
 	widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
@@ -421,6 +426,7 @@ function widget:MousePress(mx, my, button)
 			widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 		else
 			buildingPlacementID = false
+			WG.buildingPlacementHeight = false
 		end
 		return true
 	end
@@ -506,7 +512,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:GetConfigData()
-    local heightByName = {}
+	local heightByName = {}
 	for unitDefID, spacing in pairs(buildHeight) do
 		local name = UnitDefs[unitDefID] and UnitDefs[unitDefID].name
 		if name then
@@ -517,7 +523,7 @@ function widget:GetConfigData()
 end
 
 function widget:SetConfigData(data)
-    local heightByName = data.buildHeight or {}
+	local heightByName = data.buildHeight or {}
 	for name, spacing in pairs(heightByName) do
 		local unitDefID = UnitDefNames[name] and UnitDefNames[name].id
 		if unitDefID then

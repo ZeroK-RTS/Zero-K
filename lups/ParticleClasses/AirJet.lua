@@ -19,6 +19,7 @@ function AirJet.GetInfo()
 		name      = "AirJet",
 		backup    = "", --// backup class, if this class doesn't work (old cards,ati's,etc.)
 		desc      = "",
+		replacement = "gl4Airjets",
 
 		layer     = 4, --// extreme simply z-ordering :x
 

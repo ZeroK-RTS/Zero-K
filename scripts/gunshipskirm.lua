@@ -3,6 +3,8 @@ local lWing = piece 'lWing'
 local rWing = piece 'rWing'
 local gun1 = piece 'gun1'
 local gun2 = piece 'gun2'
+local thrust1 = piece 'thrust1'
+local thrust2 = piece 'thrust2'
 -- unused pieces: muzzle[12], thrust[12]
 
 local smokePiece = {base}
@@ -12,17 +14,23 @@ include "constants.lua"
 local gun_1 = false
 
 function script.Create()
+	Hide(thrust1)
+	Hide(thrust2)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
 function script.Activate()
 	Turn(lWing,z_axis, math.rad(-25),0.7)
 	Turn(rWing,z_axis, math.rad(25),0.7)
+	Show(thrust1)
+	Show(thrust2)
 end
 
 function script.Deactivate()
 	Turn(lWing,z_axis, 0, 1)
 	Turn(rWing,z_axis, 0, 1)
+	Hide(thrust1)
+	Hide(thrust2)
 end
 
 function script.QueryWeapon(num)

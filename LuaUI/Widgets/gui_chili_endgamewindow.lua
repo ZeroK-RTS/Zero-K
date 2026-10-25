@@ -78,7 +78,8 @@ local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
 
-local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
+local awardNames = VFS.Include("LuaRules/Configs/award_names.lua")
+local awardDescs = VFS.Include("LuaRules/Configs/award_descs.lua")
 
 local teamNames = {}
 local teamColors = {}
@@ -132,14 +133,17 @@ end
 --awards
 
 local function MakeAwardPanel(awardType, record)
+	local name = awardNames[awardType]
+	local fontsize = name:len() > 25 and 12 or 16
 	local desc = awardDescs[awardType]
-	local fontsize = desc:len() > 25 and 12 or 16
 	return Panel:New{
 		width=230;
 		height=awardPanelHeight;
+		tooltip=desc;
+		HitTest = function (self, x, y) return self end;
 		children = {
 			Image:New{ file='LuaRules/Images/awards/trophy_'.. awardType ..'.png'; 		parent=awardPanel; x=0;y=0; width=30; height=40; objectOverrideFont = WG.GetFont(), };
-			Label:New{ caption = desc; 		autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0;	textColor={1,1,0,1}; objectOverrideFont = WG.GetFont(fontsize), };
+			Label:New{ caption = name; 		autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0;	textColor={1,1,0,1}; objectOverrideFont = WG.GetFont(fontsize), };
 			Label:New{ caption = record, 	autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=20, objectOverrideFont = WG.GetFont(), };
 		}
 	}

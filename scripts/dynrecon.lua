@@ -51,6 +51,7 @@ local SIG_RESTORE = 1
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
 --local SIG_AIM_3 = 8 --step on
+local SIG_MOONWALK = 16
 
 --------------------------------------------------------------------------------
 -- vars
@@ -318,13 +319,24 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
-function unmoonwalkFunc()
-	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
-	if speed == 0 then
-		bMoving = false
+local function MoonwalkThread()
+	Signal(SIG_MOONWALK)
+	SetSignalMask(SIG_MOONWALK)
+	while true do
+		local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+		bMoving = (speed > 0.4)
+		
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local h = Spring.GetGroundHeight(x, z)
+		if math.abs(h - y) < 0.01 then
+			return
+		end
+		Sleep(800)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+end
+
+function unmoonwalkFunc()
+	StartThread(MoonwalkThread)
 end
 
 function script.StartMoving()

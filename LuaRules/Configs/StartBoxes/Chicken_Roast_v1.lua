@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		nameLong = "Robot Defenders",
 		nameShort = "Base",
 		startpoints = {

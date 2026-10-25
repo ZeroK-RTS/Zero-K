@@ -82,6 +82,7 @@ local cmdStopFirezone = {
 
 local bombUnitDefIDs = {
 	[UnitDefNames["jumpscout"].id] = true,
+	[UnitDefNames["commander_egg"].id] = true,
 }
 local jumpUnitDefIDs = {}
 
@@ -114,8 +115,8 @@ options = {
 		type='radioButton',
 		name='Predict impact location for',
 		items = {
-			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge."},
-			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predited."},
+			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damage."},
+			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predicted."},
 			{name = 'Firezone units', key = 'firezone', desc = "Only units launched with a firezone will have their impact predicted."},
 			{name = 'No units', key = 'none', desc = "No impact prediction."},
 		},
@@ -154,7 +155,7 @@ options = {
 		name='Predict transport drop location for',
 		items = {
 			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted."},
-			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop loction predicted."},
+			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop location predicted."},
 			{name = 'No units', key = 'none', desc = "No units will have their impact position predicted."},
 		},
 		value = 'bomb',  --default at start of widget
@@ -173,8 +174,8 @@ options = {
 		name = "Drop prediction speed threshold",
 		desc = "Draw prediction for transports above this speed.",
 		type = 'number',
-		min = 0, max = 8, step = 0.2,
-		value = 5,
+		min = 0, max = 8, step = 0.1,
+		value = 4,
 		OnChange = function(self)
 			transportPredictionSpeedSq = self.value^2
 		end,

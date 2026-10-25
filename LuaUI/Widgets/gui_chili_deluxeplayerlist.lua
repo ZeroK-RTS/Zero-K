@@ -551,8 +551,8 @@ local function GetPlayerTeamStats(teamID)
 	end
 	-- guard against dividing by zero later, when the fill bar percentage is calculated
 	-- these probably aren't ever going to be zero, but better safe than sorry
-	if mStore and mStore == 0 then mStore = 1000 end
-	if eStore and eStore == 0 then eStore = 1000 end
+	if mStor and mStor == 0 then mStor = 1000 end
+	if eStor and eStor == 0 then eStor = 1000 end
 
 	-- Default these to 1 if the value is nil for some reason.
 	-- These should never be 1 in normal play, so if you see

@@ -27,26 +27,36 @@ VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 VFS.Include("LuaRules/Utilities/rulesParam.lua")
 
+--------------------------------------------------------------------------------
+-- Build icons
+--------------------------------------------------------------------------------
+
 local function GetBuildIconFrame(udef)
 	local cp = udef.customParams
 	if udef.isMobileBuilder then
 		return consTex
-
 	elseif (udef.isBuilder or udef.isFactory) then
 		return consTex
-
 	elseif (udef.weapons[1] and udef.isBuilding) then
 		return unitTex
-
 	elseif (cp.income_energy or cp.metal_extractor_mult or cp.windgen) then
 		return ecoTex
-
 	elseif ((udef.weapons[1] or udef.canKamikaze) and not cp.unarmed) then
 		return unitTex
-
 	else
 		return diffTex
 	end
+end
+
+local function GetSquareBuildTexture(udef)
+	return ("#" .. udef.id)
+end
+
+local function GetRectangleBuildTexture(udef)
+	if not udef.buildpicname then
+		return false
+	end
+	return ":l:unitpics_9_11/" .. udef.buildpicname
 end
 
 --------------------------------------------------------------------------------
@@ -160,7 +170,7 @@ local function WriteTable(concatArray, tab, tabName, params)
 	-- do array component first (ensures order is preserved)
 	for i=0,#tab do
 		local v = tab[i]
-		if v then
+		if v ~= nil then
 			ProcessKeyValuePair(i,v, (tab[0] == nil), (not isDict) and i == #tab)
 			processed[i] = true
 		end
@@ -240,9 +250,9 @@ local function WritePythonOrJSONDict(dict, dictName, params)
 	end
 	
 	-- get rid of trailing commma
-	local strEnd  = string.sub(str,-3)
+	local strEnd  = string.sub(str, -#endLine)
 	if strEnd == endLine then -- , \n
-		str = string.sub(str, 1, -4) .. "\n"
+		str = string.sub(str, 1, -#endLine - 1) .. "\n"
 	end
 	
 	if not params.raw then
@@ -274,7 +284,9 @@ WG.SavePythonOrJSONDict = SavePythonOrJSONDict
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:Initialize()
-  WG.GetBuildIconFrame = GetBuildIconFrame
+	WG.GetBuildIconFrame = GetBuildIconFrame
+	WG.GetSquareBuildTexture = GetSquareBuildTexture
+	WG.GetRectangleBuildTexture = GetRectangleBuildTexture
 end
 
 local builderDefs = {}

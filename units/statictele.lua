@@ -38,6 +38,7 @@ return { statictele = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
+  yardMap                       = string.rep('o', 8*8),
 
   weapons                = {
 

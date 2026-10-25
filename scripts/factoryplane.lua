@@ -138,6 +138,7 @@ function script.Create()
 		buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	end
 	StartThread(padchange)
+	StartThread(Open)
 end
 
 function script.QueryBuildInfo()

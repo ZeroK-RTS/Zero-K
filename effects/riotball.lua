@@ -22,7 +22,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
-        alpha              = 0.6,
+        alpha              = 0.7,
         color              = [[0.3,0,0.4]],
         expansionspeed     = 13.2,
         ttl                = 20,

@@ -13,7 +13,7 @@ end
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
-VFS.Include(luaShaderDir.."instancevboidtable.lua")
+VFS.Include(luaShaderDir.."InstanceVboidTableUnwrapper.lua")
 
 local highlightunitShader, unitShapeShader
 local highlightUnitVBOTable

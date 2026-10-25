@@ -13,6 +13,7 @@ return { corcom1 = {
 
   buildPic            = [[corcom.png]],
   canGuard            = true,
+  canManualFire       = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
@@ -35,7 +36,7 @@ return { corcom1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  explodeAs           = [[ESTOR_BUILDINGEX]],
+  explodeAs           = [[COMM_EX]],
   footprintX          = 2,
   footprintZ          = 2,
   health              = 3000,
@@ -51,7 +52,7 @@ return { corcom1 = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[corcomAlt.s3o]],
   script              = [[corcom_alt.lua]],
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  selfDestructAs      = [[COMM_EX]],
 
   sfxtypes            = {
 
@@ -85,11 +86,16 @@ return { corcom1 = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
-    [5] = {
+    [3] = {
       def                = [[SHOCK_CANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+    [5] = {
+      def = [[DISINTEGRATOR]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SUB SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
@@ -142,7 +148,6 @@ return { corcom1 = {
       weaponVelocity          = 900,
     },
 
-
     SHOCK_CANNON = {
       name                    = [[Riot Cannon]],
       areaOfEffect            = 144,
@@ -171,6 +176,49 @@ return { corcom1 = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 750,
+    },
+
+    DISINTEGRATOR = {
+      name                    = [[Disintegrator]],
+      areaOfEffect            = 48,
+      avoidFeature            = false,
+      avoidFriendly           = false,
+      avoidGround             = false,
+      avoidNeutral            = false,
+      commandfire             = true,
+      craterBoost             = 1,
+      craterMult              = 6,
+
+      customparams            = {
+        noexplode_speed_damage = 1,
+        burst = Shared.BURST_UNRELIABLE,
+        stats_burst_damage  = 18000,
+        stats_typical_damage  = 18000,
+      },
+
+      damage                  = {
+        default = 99999,
+      },
+
+      explosionGenerator      = [[custom:DGUNTRACE]],
+      heightMod               = 1,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 0,
+      leadLimit               = 80,
+      noExplode               = true,
+      noSelfDamage            = true,
+      range                   = 250,
+      reloadtime              = 1,
+      size                    = 6,
+      soundHit                = [[explosion/ex_med6]],
+      soundStart              = [[weapon/laser/heavy_laser4]],
+      soundTrigger            = true,
+      tolerance               = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[DGun]],
+      weaponVelocity          = 300,
     },
 
   },

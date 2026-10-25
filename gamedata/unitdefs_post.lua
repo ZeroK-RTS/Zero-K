@@ -112,6 +112,30 @@ do
 	end
 end
 
+-- New units
+
+
+do
+	local append = false
+	local modoptName = "extraunits"
+	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
+		local units = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
+		if type(tweaks) == "table" then
+			Spring.Echo("Loading extraunits modoption", append or 0)
+			for name, ud in pairs(units) do
+				Spring.Echo("Loading extraunit " .. name)
+				local ud = lowerkeys(ud)
+				if ud.customparams.base_def then
+					Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(UnitDefs[ud.customparams.base_def]), true)
+				end
+				UnitDefs[name] = ud
+			end
+		end
+		append = (append or 0) + 1
+		modoptName = "extraunits" .. append
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -467,6 +491,7 @@ local TURNRATE_MULT_BOT = 1
 local TURNRATE_MULT_VEH = 1
 local ACCEL_MULT_BOT = 1
 local ACCEL_MULT_VEH = 1
+local TURN_ACCEL_FACTOR = 1
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
@@ -484,6 +509,7 @@ for name, ud in pairs(UnitDefs) do
 			ud.brakerate = ud.brakerate * ACCEL_MULT_BOT
 			ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor or 1.2
 		end
+		ud.customparams.turn_accel_factor = ud.customparams.turn_accel_factor * TURN_ACCEL_FACTOR
 	end
 end
 
@@ -683,6 +709,16 @@ for name, ud in pairs(UnitDefs) do
 	ud.mass = (((ud.buildtime/2) + (ud.health/8))^0.6)*6.5
 	if ud.customparams.massmult then
 		ud.mass = ud.mass*ud.customparams.massmult
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Commanders cannot be reclaimed
+--
+for name, ud in pairs(UnitDefs) do
+	if ud.customparams and (ud.customparams.dynamic_comm or ud.customparams.commtype) then
+		ud.reclaimable = false
 	end
 end
 

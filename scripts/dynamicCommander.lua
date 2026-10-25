@@ -166,7 +166,7 @@ local function UpdateWeaponProjectileSpeed(unitID, weaponNum, wd, range)
 	Spring.SetUnitWeaponState(unitID, weaponNum, "projectileSpeed", wantedSpeed)
 end
 
-local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, damageMult)
+local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeBoost, damageMult)
 	local weaponDef1 = weaponName1 and unitWeaponNames[weaponName1]
 	local weaponDef2 = weaponName2 and unitWeaponNames[weaponName2]
 	local shieldDef = shieldName and unitWeaponNames[shieldName]
@@ -224,7 +224,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	local otherRange = false
 	if weapon1 then
 		isManual[weapon1] = weaponDef1.manualFire
-		local range = tonumber(WeaponDefs[weaponDef1.weaponDefID].range)*rangeMult
+		local range = tonumber(WeaponDefs[weaponDef1.weaponDefID].range) + rangeBoost
 		if weaponDef1.manualFire then
 			otherRange = range
 		else
@@ -244,7 +244,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 	
 	if weapon2 then
 		isManual[weapon2] = weaponDef2.manualFire
-		local range = tonumber(WeaponDefs[weaponDef2.weaponDefID].range)*rangeMult
+		local range = tonumber(WeaponDefs[weaponDef2.weaponDefID].range) + rangeBoost
 		if maxRange then
 			if weaponDef2.manualFire then
 				otherRange = range
@@ -333,7 +333,7 @@ local function RangeUpdate(mult, weaponMult) -- TODO, handle weaponMult?
 		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
 		Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
 		Spring.GetUnitRulesParam(unitID, "comm_shield_name"),
-		Spring.GetUnitRulesParam(unitID, ("comm_range_mult") or 1) * mult,
+		(Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0) * mult,
 		Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	)
 end
@@ -379,22 +379,17 @@ local function SpawnModuleWrecks(wreckLevel)
 end
 
 local function SpawnWreck(wreckLevel)
-	local makeRezzable = (wreckLevel == 1)
 	local wreckDef = FeatureDefs[Spring.GetUnitRulesParam(unitID, commWreckUnitRulesParam[wreckLevel])]
-	
+
 	local x, y, z = Spring.GetUnitPosition(unitID)
-	
+
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
-	
+
 	if (wreckDef) then
 		local heading   = Spring.GetUnitHeading(unitID)
 		local teamID	= Spring.GetUnitTeam(unitID)
 		local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
 		Spring.SetFeatureVelocity(featureID, vx, vy, vz)
-		if makeRezzable then
-			local baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID") or unitDefID
-			Spring.SetFeatureResurrect(featureID, UnitDefs[baseUnitDefID].name)
-		end
 	end
 end
 

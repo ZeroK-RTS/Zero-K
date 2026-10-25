@@ -22,6 +22,7 @@ return { amphtele = {
     teleporter_throughput = 150, -- mass per second
     teleporter_beacon_spawn_time = 8,
     teleporter_beacon_unit = [[tele_beacon]],
+    normaltex = [[unittextures/b_spy_jammer_radar_termite_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNIT]],

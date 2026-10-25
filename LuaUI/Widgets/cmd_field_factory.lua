@@ -144,21 +144,21 @@ local function GetButton(parent, x, y, unitDefID, ud, unitName)
 	if unitDefID then
 		Chili.Label:New {
 			name = "bottomLeft",
-			x = "15%",
+			x = "10%",
 			right = 0,
-			bottom = 2,
+			bottom = "10%",
 			height = 12,
 			fontsize = 12,
 			parent = button,
 			caption = ud.metalCost,
 		}
 		Chili.Image:New {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
-			file = "#" .. unitDefID,
+			file = WG.GetSquareBuildTexture(ud),
 			file2 = WG.GetBuildIconFrame(ud),
 			parent = button,
 		}

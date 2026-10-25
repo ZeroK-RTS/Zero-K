@@ -1,10 +1,5 @@
---local x1 = 2300
---local y1 = 5900
---local x2 = 4000
---local y2 = 2000
-
 return {
-	[0] = {
+	{
 		nameLong = "South",
 		nameShort = "S",
 		startpoints = {
@@ -19,7 +14,7 @@ return {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "North",
 		nameShort = "N",
 		startpoints = {

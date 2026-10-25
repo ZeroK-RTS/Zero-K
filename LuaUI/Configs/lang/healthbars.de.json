@@ -11,13 +11,13 @@
 	"teleport_bar" : "Teleportation",
 	"teleport_pw_bar" : "Evakuierung",
 	"ability_bar" : "Fähigkeit",
-	"heat_bar" : "hitze",
-	"speed_bar" : "tempo",
+	"heat_bar" : "Hitze",
+	"speed_bar" : "Schnelligkeit",
 	"reammo_bar" : "bewaffnen",
 	"reload_bar" : "nachladen",
 	"slow_bar" : "langsam",
 	"goo_bar" : "goo",
 	"jump_bar" : "Sprung",
 	"resurrect_bar" : "wiederbeleben",
-	"reclaim_bar" : "reclaim"
+	"reclaim_bar" : "wiedergewinnung"
 }

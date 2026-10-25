@@ -130,6 +130,8 @@ canRTT    = (gl.RenderToTexture  ~= nil)
 canShader = (gl.CreateShader     ~= nil)
 canDistortions = false --// check Initialize()
 
+hardDisableDistortion = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -624,7 +626,9 @@ local function DrawParticlesOpaque()
 	vsx, vsy, vpx, vpy = Spring.Orig.GetViewGeometry()
 	if (vsx~=oldVsx)or(vsy~=oldVsy) then
 		for _,partClass in pairs(fxClasses) do
-			if partClass.ViewResize then partClass.ViewResize(vsx, vsy) end
+			if partClass and partClass.ViewResize then
+				partClass.ViewResize(vsx, vsy)
+			end
 		end
 		oldVsx, oldVsy = vsx, vsy
 	end
@@ -921,7 +925,7 @@ local function GameFrame(_,n)
 	CleanInvalidUnitFX()
 
 	--// update FXs
-	framesToUpdate = thisGameFrame - lastGameFrame
+	local framesToUpdate = thisGameFrame - lastGameFrame
 	for _,partFx in pairs(particles) do
 		if (n>=partFx.dieGameFrame) then
 			--// lifetime ended
@@ -1007,7 +1011,7 @@ local function Initialize()
 
 
 	--// is distortion is supported?
-	DistortionClass = fxClasses["postdistortion"]
+	DistortionClass = (not hardDisableDistortion) and fxClasses["postdistortion"]
 	if DistortionClass then
 		fxClasses["postdistortion"]=nil --// remove it from default classes
 		local di = DistortionClass.pi
@@ -1023,13 +1027,21 @@ local function Initialize()
 			DistortionClass=nil
 		end
 	end
-	canDistortions = (DistortionClass~=nil)
+	canDistortions = (DistortionClass~=nil) and not hardDisableDistortion
 
 
 	--// get list of user disabled fx classes
 	local disableFX = {}
 	for i,v in pairs(LupsConfig.disablefx or {}) do
 		disableFX[i:lower()]=v;
+	end
+	
+	--// Disable lups class if its replacement successfully loads.
+	for fxName,fxClass in pairs(fxClasses) do
+		local replacement = fxClass.GetInfo().replacement
+		if replacement and GG[replacement] and GG[replacement]() then
+			disableFX[fxName] = true
+		end
 	end
 
 	local linkBackupFXClasses = {}

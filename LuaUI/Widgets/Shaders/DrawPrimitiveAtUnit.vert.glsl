@@ -75,13 +75,17 @@ void main()
 	uint baseIndex = instData.x; // this tells us which unit matrix to find
 	#if USEQUATERNIONS == 0
 		mat4 modelMatrix = UnitPieces[baseIndex]; // This gives us the models  world pos and rot matrix
+		v_rotationY = atan(modelMatrix[0][2], modelMatrix[0][0]); // we can get the euler Y rot of the model from the model matrix
 	#else
 		Transform modelWorldTX = GetModelWorldTransform(instData.x);
 		mat4 modelMatrix = TransformToMatrix(modelWorldTX);
+		v_rotationY = -atan(
+			2.0 * (modelWorldTX.quat.x * modelWorldTX.quat.z + modelWorldTX.quat.w * modelWorldTX.quat.y),
+			1.0 - 2.0 * (modelWorldTX.quat.x * modelWorldTX.quat.x + modelWorldTX.quat.y * modelWorldTX.quat.y)
+		);
 	#endif
 
 	gl_Position = cameraViewProj * vec4(modelMatrix[3].xyz, 1.0); // We transform this vertex into the center of the model
-	v_rotationY = atan(modelMatrix[0][2], modelMatrix[0][0]); // we can get the euler Y rot of the model from the model matrix
 	v_uvoffsets = uvoffsets;
 	v_parameters = parameters;
 	// 255: local selection color

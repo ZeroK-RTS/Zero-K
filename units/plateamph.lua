@@ -45,6 +45,7 @@ return { plateamph = {
     child_of_factory   = [[factoryamph]],
     cus_noflashlight   = 1,
     buggeroff_offset   = 45,
+    normaltex = [[unittextures/corvrad_normals.dds]],
 
     outline_x = 165,
     outline_y = 165,

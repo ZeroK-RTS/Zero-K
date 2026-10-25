@@ -13,7 +13,8 @@ local OPTION_TREEWIND           = 2048  -- Makes trees sway gently in the breeze
 local OPTION_PBROVERRIDE        = 4096  -- Forces Recoil default tex2 (non PBR) behaviour
 
 local defaultBitShaderOptions = OPTION_SHADOWMAPPING + OPTION_MODELSFOG
-local defaultUnitBitShaderOptions = defaultBitShaderOptions + OPTION_HEALTH_TEXTURING + OPTION_HEALTH_DISPLACE + OPTION_VERTEX_AO + OPTION_NORMALMAPPING
+local defaultUnitBitShaderOptions = defaultBitShaderOptions + OPTION_HEALTH_TEXTURING + OPTION_HEALTH_DISPLACE + OPTION_NORMALMAPPING -- + OPTION_VERTEX_AO
+--  OPTION_VERTEX_AO causes black splodges on curved surfaces and some overly dark textures.
 
 local uniformBins = {
 	-- Special overriding uniformBins go here, i.e. so that you can set different uniforms:
@@ -46,44 +47,44 @@ local uniformBins = {
 		-- by default gadget will assign these options to every unit texture set bin
 		bitOptions = defaultUnitBitShaderOptions,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1.15,
+		brightnessFactor = 0.85,
 	},
 	defaultunit_transparent = {
 		-- by default gadget will assign these options to every unit texture set bin
 		bitOptions = defaultUnitBitShaderOptions,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1.15,
+		brightnessFactor = 0.85,
 	},
 	-- These are the default featureDef uniformBins, you probably don't want to mess with them unless you really know what you're doing
 	feature = {
 		-- by default gadget will assign these options to every (non-wreck, non-tree) feature texture set bin
 		bitOptions = defaultBitShaderOptions + OPTION_PBROVERRIDE,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 0.9,
+		brightnessFactor = 0.85,
 	},
 	featurepbr = {
 		-- any feature with featureDef.customParams.cuspbr, or that appears in ModelMaterials_GL4/known_pbr_features.lua
 		bitOptions = defaultBitShaderOptions,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1.3,
+		brightnessFactor = 1,
 	},
 	treepbr = {
 		-- Currently unused?
 		bitOptions = defaultBitShaderOptions + OPTION_TREEWIND + OPTION_PBROVERRIDE,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1.3,
+		brightnessFactor = 1,
 	},
 	tree = {
 		-- any whitelisted tree in ModelMaterials_GL4/known_feature_trees.lua, or with featureDef.customParams.treeshader = 'yes', or which contains 'tree' and not 'stree'
 		bitOptions = defaultBitShaderOptions + OPTION_TREEWIND + OPTION_PBROVERRIDE,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1.3,
+		brightnessFactor = 0.8,
 	},
 	wreck = {
 		-- any feature referenced in a unitDef.corpse, or featureDef.featureDead or with '_x', '_dead' or '_heap' in the name
 		bitOptions = defaultBitShaderOptions + OPTION_VERTEX_AO,
 		baseVertexDisplacement = 0.0,
-		brightnessFactor = 1.3,
+		brightnessFactor = 1.15,
 	},
 } -- maps uniformbins to a table of uniform names/values
 

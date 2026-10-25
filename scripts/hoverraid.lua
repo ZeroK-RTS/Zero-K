@@ -65,6 +65,7 @@ end
 function script.Create()
 	GG.Attributes.SetRangeUpdater(unitID, RangeUpdate)
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
+	Turn(flare, x_axis, 0.01)
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 end
@@ -92,6 +93,7 @@ function script.BlockShot(num, targetID)
 			end
 		end
 	end
+	EmitSfx(flare, 1026)
 	return false
 end
 

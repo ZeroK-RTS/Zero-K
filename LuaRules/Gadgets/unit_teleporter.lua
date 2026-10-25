@@ -515,7 +515,9 @@ function gadget:GameFrame(f)
 							GG.PlayFogHiddenSound("sounds/misc/teleport2.wav", 10, dx, dy, dz)
 							
 							Spring.SpawnCEG("teleport_out", ux, uy, uz, 0, 0, 0, size)
-							
+							if GG.CustomExplosionLight then
+								GG.CustomExplosionLight("teleport_out", ux, uy, uz, teleportiee)
+							end
 							if slowToTeleport[tele[tid].teleportieeDefID] then
 								Spring.SetUnitRulesParam(teleportiee, "teleportSpeedMult", nil)
 								GG.UpdateUnitAttributes(teleportiee)
@@ -530,6 +532,9 @@ function gadget:GameFrame(f)
 							-- actual pos might not match nominal destination due to floating amphs
 							local ax, ay, az = Spring.GetUnitPosition(teleportiee)
 							Spring.SpawnCEG("teleport_in", ax, ay, az, 0, 0, 0, size)
+							if GG.CustomExplosionLight then
+								GG.CustomExplosionLight("teleport_in", ax, ay, az, teleportiee)
+							end
 							
 							-- No longer give move orders, also, it was broken.
 							--local mx, mz = tx + offset[tele[tid].offsetIndex].x*(size*4 + 120), tz + offset[tele[tid].offsetIndex].z*(size*4 + 120)

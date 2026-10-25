@@ -66,6 +66,7 @@ local weaponBlocked = false
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
+local SIG_MOONWALK = 4
 
 local PACE = 0.8
 
@@ -164,9 +165,10 @@ local function DoRestore()
 	lastTorsoHeading = 0
 end
 
-local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
+local function Step(frontLeg, backLeg, pelvisMult)
 	local speed = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 	mainLeg, offLeg = offLeg, mainLeg
+	impactFoot = (mainLeg == leftLeg) and rfoot or lfoot
 	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
@@ -192,6 +194,13 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED * pelvisMult * speed)
 	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED * speed)
 
+	Sleep(800)
+	if impactFoot == lfoot then
+		GG.UnitScriptDistortion(unitID, unitDefID, "leftfoot")
+	else
+		GG.UnitScriptDistortion(unitID, unitDefID, "rightfoot")
+	end
+	EmitSfx(impactFoot, 1024)
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 		WaitForTurn(backLeg[i], x_axis)
@@ -203,7 +212,6 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i] * speed)
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i] * speed)
 	end
-	--EmitSfx(impactFoot, dirtfling)
 	--EmitSfx(impactFoot, footcrater)
 	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult * speed)
 	Turn(torso, x_axis, 0, TORSO_TILT_SPEED * speed)
@@ -230,8 +238,8 @@ local function Walk()
 	
 	local first = true
 	while (true) do
-		Step(mainLeg, offLeg, lfoot, (first and 2) or 1)
-		Step(mainLeg, offLeg, rfoot, (first and 1.2) or 1)
+		Step(mainLeg, offLeg, (first and 2) or 1)
+		Step(mainLeg, offLeg, (first and 1.2) or 1)
 		first = false
 	end
 end
@@ -255,17 +263,32 @@ local function StopWalk()
 	Turn(larm, x_axis, 0, math.rad(10))
 end
 
-function unmoonwalkFunc()
-	local _, _, _, speed = Spring.GetUnitVelocity(unitID)
-	if speed == 0 then
-		StartThread(StopWalk)
+local function MoonwalkThread()
+	Signal(SIG_MOONWALK)
+	SetSignalMask(SIG_MOONWALK)
+	while true do
+		local _, _, _, speed = Spring.GetUnitVelocity(unitID)
+		if speed < 0.4 then
+			StartThread(StopWalk)
+		else
+			StartThread(Walk)
+		end
+		
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local h = Spring.GetGroundHeight(x, z)
+		if math.abs(h - y) < 0.01 then
+			return
+		end
+		Sleep(800)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, CMD.OPT_SHIFT)
+end
+
+function unmoonwalkFunc()
+	StartThread(MoonwalkThread)
 end
 
 function script.StartMoving()
-	if not jumpActive then
+	if not (jumpActive or Spring.GetUnitIsStunned(unitID)) then
 		StartThread(Walk)
 	end
 end

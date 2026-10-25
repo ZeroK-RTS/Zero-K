@@ -27,6 +27,7 @@ return { raveparty = {
     want_proximity_targetting = 1,
     speed_bar = 1,
     superweapon = 1,
+    normaltex = [[unittextures/Core_normals.dds]],
 
     keeptooltip    = [[any string I want]],
     neededlink     = 400,
@@ -69,26 +70,32 @@ return { raveparty = {
 
     {
       def                = [[RED_KILLER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[ORANGE_ROASTER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[YELLOW_SLAMMER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[GREEN_STAMPER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[BLUE_SHOCKER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
     {
       def                = [[VIOLET_SLUGGER]],
+      accurateLeading    = 3,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
   },
@@ -272,6 +279,8 @@ return { raveparty = {
       rgbColor                = [[0.1 1 0.1]],
       reloadtime              = 3.5,
       separation              = separation,
+      scarDiameter            = 660,
+      scarIndices             = Shared.SCAR_SET.SUMO,
       size                    = size,
       sizeDecay               = sizeDecay,
       soundHit                = [[explosion/ex_large4]],

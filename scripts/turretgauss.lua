@@ -163,6 +163,7 @@ function script.BlockShot(num, targetID)
 			end
 		end
 	end
+	EmitSfx(muzzle, 1025)
 	return false
 end
 

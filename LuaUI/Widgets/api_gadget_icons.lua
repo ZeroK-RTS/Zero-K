@@ -152,7 +152,7 @@ local function isWaiting(unitID, unitDefID)
 		return false
 	end
 
-	return cmdParam1 or CMD_WAITCODE_NONE
+	return cmdParam or CMD_WAITCODE_NONE
 end
 
 local function UpdateUnitIcons(unitID)

@@ -9,6 +9,7 @@ local planetwarsStructure = {}
 local buildPlate = {}
 local buildPowerCache = {}
 local rangeCache = {}
+local baseDefCache = {}
 local dynComm = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
@@ -130,6 +131,19 @@ function Spring.Utilities.GetUnitRange(unitID, unitDefID)
 	return Spring.GetUnitRulesParam(unitID, "comm_max_range") or GetCachedBaseRange(unitDefID), Spring.GetUnitRulesParam(unitID, "primary_weapon_range")
 end
 
+function Spring.Utilities.GetBaseDefID(unitDefID)
+	if not unitDefID then
+		return unitDefID
+	end
+	if baseDefCache then
+		return baseDefCache[unitDefID]
+	end
+	local ud = UnitDefs[unitDefID]
+	local bud = ud.customParams.baseDef and UnitDefNames[ud.customParams.baseDef]
+	baseDefCache[unitDefID] = bud and bud.id or unitDefID
+	return baseDefCache[unitDefID]
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -196,9 +210,17 @@ local function GetZenithTooltip (unitID)
 end
 
 local function GetAvatarTooltip(unitID)
-	local commOwner = Spring.GetUnitRulesParam(unitID, "commander_owner")
-	if not commOwner then return end
-	return commOwner or ""
+	local ownerTeam = Spring.GetUnitRulesParam(unitID, "commander_owner_team")
+	if not ownerTeam then return end
+	local isAI = select(4, Spring.GetTeamInfo(ownerTeam, false))
+	if isAI then
+		return select(2, Spring.GetAIInfo(ownerTeam)) or ""
+	end
+	local leaderID = select(2, Spring.GetTeamInfo(ownerTeam, false))
+	if leaderID then
+		return (Spring.GetPlayerInfo(leaderID, false)) or ""
+	end
+	return ""
 end
 
 local function GetPlanetwarsTooltip(unitID, ud)
@@ -269,7 +291,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	end
 
 	local name_override = ud.customParams.statsname or ud.name
-	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+	local desc = (WG and WG.Translate ("units", name_override .. ".description")) or ud.tooltip
 	local isValidUnit = Spring.ValidUnitID(unitID)
 	if isValidUnit then
 		local customTooltip = GetCustomTooltip(unitID, ud)
@@ -280,7 +302,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	
 	local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
 	if buildSpeed > 0 then
-		return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
+		return (WG and WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)})) or desc
 	end
 	return desc
 end
@@ -389,7 +411,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 		end
 
 		local name_override = ud.customParams.statsname or ud.name
-		local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+		local desc = (WG and WG.Translate ("units", name_override .. ".description")) or ud.tooltip
 		local isValidUnit = Spring.ValidUnitID(unitID)
 		if isValidUnit then
 			local tech = GetTechLevel(unitID) or 1
@@ -405,7 +427,7 @@ if Spring.GetModOptions().techk == "1" and WG then
 				local mult = math.pow(2, (WG.SelectedTechLevel or 1) - 1)
 				buildSpeed = buildSpeed * mult
 			end
-			return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
+			return (WG and WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)})) or desc
 		end
 		return desc
 	end

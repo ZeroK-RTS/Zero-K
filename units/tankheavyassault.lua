@@ -15,6 +15,7 @@ return { tankheavyassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 140,
     bait_level_default = 0,
     decloak_footprint     = 5,
 
@@ -61,6 +62,7 @@ return { tankheavyassault = {
 
     {
       def                = [[COR_GOL]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },

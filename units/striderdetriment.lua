@@ -18,6 +18,7 @@ return { striderdetriment = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead         = 120,
     canjump               = 1,
     jump_range            = 840,
     jump_height           = 420,
@@ -34,6 +35,7 @@ return { striderdetriment = {
     selection_scale       = 1.4,
     decloak_footprint     = 6,
     health_bar_height     = 8,
+    normaltex = [[unittextures/Detriment_normals.dds]],
 
     stats_show_death_explosion = 1,
 
@@ -201,6 +203,8 @@ return { striderdetriment = {
       customParams              = {
         isaa = [[1]],
         reaim_time = 1,
+        light_radius = 40,
+        light_alpha = 0.08,
       },
 
       damage                  = {

@@ -8,14 +8,15 @@ local engine2 = piece 'engine2'
 local nano = piece 'nano'
 
 --New bits
-local centreClaw 		= piece 'CentreClaw'
-local centreClawBit 	= piece 'CentreClawBit'
-local leftClaw 			= piece 'LeftClaw'
-local leftClawBit 		= piece 'LeftClawBit'
-local rightClaw 		= piece 'RightClaw'
-local rightClawBit 		= piece 'RightClawBit'
-local engShield1 		= piece 'EngShield1'
-local engShield2 		= piece 'EngShield2'
+local centreClaw    = piece 'CentreClaw'
+local centreClawBit = piece 'CentreClawBit'
+local leftClaw      = piece 'LeftClaw'
+local leftClawBit   = piece 'LeftClawBit'
+local rightClaw     = piece 'RightClaw'
+local rightClawBit  = piece 'RightClawBit'
+local engShield1    = piece 'EngShield1'
+local engShield2    = piece 'EngShield2'
+local thrust        = piece 'thrust'
 
 local smokePiece = {base, engine1, engine2}
 
@@ -64,6 +65,9 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(TiltBody)
+	
+	Turn(thrust, x_axis, math.rad(-90))
+	Hide(thrust)
 end
 
 local function StartLanded()
@@ -80,10 +84,12 @@ end
 
 function script.Activate()
 	StopLanded()
+	Show(thrust)
 end
 
 function script.Deactivate()
 	StartThread(StartLanded)
+	Hide(thrust)
 end
 
 function script.StartBuilding()

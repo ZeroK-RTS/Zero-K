@@ -36,6 +36,7 @@ Spring.Utilities.json = vfsInclude("LuaRules/Utilities/json.lua"          , nil,
 
 vfsInclude("LuaRules/Utilities/globals.lua"          , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/stringFunctions.lua"  , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/debugFunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
@@ -256,6 +257,10 @@ local flexCallIns = {
 	'MissileFired',
 	'MissileDestroyed',
 	"PreGameTimekeeping",
+	"VisibleExplosion",
+	"Barrelfire",
+	"UnitScriptLight",
+	"UnitScriptDistortion",
 }
 local flexCallInMap = {}
 for _, ci in ipairs(flexCallIns) do
@@ -629,6 +634,7 @@ local restrictedFunctions = {
 local restrictedWhitelist = {
 	--[[ Other widgets have security holes and there is
 	     no reason for them to have access anyway. ]]
+	['LuaUI/Widgets/gfx_distortion_gl4.lua'] = true,
 	['LuaUI/Widgets/gfx_projectile_lights.lua'] = true,
 	['LuaUI/Widgets/gfx_deferred_rendering_gl4.lua'] = true,
 }
@@ -2534,6 +2540,14 @@ function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
 	return retval
 end
 
+function widgetHandler:ClearMapMarks()
+	tracy.ZoneBeginN("W:ClearMapMarks")
+	for _, w in ipairs(self.ClearMapMarksList) do
+		w:ClearMapMarks()
+	end
+	tracy.ZoneEnd()
+	return
+end
 
 function widgetHandler:GameSetup(state, ready, playerStates)
 	tracy.ZoneBeginN("W:GameSetup")
@@ -2572,22 +2586,22 @@ end
 --  Unit call-ins
 --
 
-function widgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function widgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("W:UnitCreated")
 	for _, w in r_ipairs(self.UnitCreatedList) do
 		tracy.ZoneBeginN("W:UnitCreated:" .. w.whInfo.name)
-		w:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+		w:UnitCreated(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
 end
 
 -- NB: called via Lua at the moment, not engine
-function widgetHandler:UnitResurrected(unitID, unitDefID, unitTeam, builderID)
+function widgetHandler:UnitResurrected(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 	tracy.ZoneBeginN("W:UnitResurrected")
 	for _, w in r_ipairs(self.UnitResurrectedList) do
 		tracy.ZoneBeginN("W:UnitResurrected:" .. w.whInfo.name)
-		w:UnitResurrected(unitID, unitDefID, unitTeam, builderID)
+		w:UnitResurrected(unitID, unitDefID, unitTeam, builderID, builderDefID, builderTeamID)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
@@ -3025,6 +3039,47 @@ function widgetHandler:UnitStructureMoved(unitID, unitDefID, newX, newZ)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
+end
+
+--------------------------------------------------------------------------------
+--
+--  GFX
+--
+
+function widgetHandler:VisibleExplosion(px, py, pz, weaponID, ownerID)
+	tracy.ZoneBeginN("W:VisibleExplosion")
+	for _, w in ipairs(self.VisibleExplosionList) do
+		w:VisibleExplosion(px, py, pz, weaponID, ownerID)
+	end
+	tracy.ZoneEnd()
+	return
+end
+
+function widgetHandler:Barrelfire(px, py, pz, weaponID, ownerID)
+	tracy.ZoneBeginN("W:Barrelfire")
+	for _, w in ipairs(self.BarrelfireList) do
+		w:Barrelfire(px, py, pz, weaponID, ownerID)
+	end
+	tracy.ZoneEnd()
+	return
+end
+
+function widgetHandler:UnitScriptLight(unitID, unitDefID, lightIndex, param)
+	tracy.ZoneBeginN("W:UnitScriptLight")
+	for _, w in ipairs(self.UnitScriptLightList) do
+		w:UnitScriptLight(unitID, unitDefID, lightIndex, param)
+	end
+	tracy.ZoneEnd()
+	return
+end
+
+function widgetHandler:UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
+	tracy.ZoneBeginN("W:UnitScriptDistortion")
+	for _, w in ipairs(self.UnitScriptDistortionList) do
+		w:UnitScriptDistortion(unitID, unitDefID, distortionIndex, param)
+	end
+	tracy.ZoneEnd()
+	return
 end
 
 --------------------------------------------------------------------------------

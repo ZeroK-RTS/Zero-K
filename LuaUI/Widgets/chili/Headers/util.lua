@@ -495,16 +495,29 @@ function mixColors(c1, c2, a)
 	}
 end
 
-function color2incolor(r, g, b, a)
-	if type(r) == 'table' then
-		r, g, b, a = unpack4(r)
+if false then --Script.IsEngineMinVersion(2025, 6, 10) then
+	function color2incolor(r,g,b)
+		if type(r) == 'table' then
+			r,g,b = unpack4(r)
+		end
+		if r then
+			return string.char(17, r*255, g*255, b*255)
+		else
+			return '\017\255\255\255'
+		end
 	end
+else
+	function color2incolor(r,g,b)
+		if type(r) == 'table' then
+			r,g,b = unpack4(r)
+		end
 
-	local inColor = '\255\255\255\255'
-	if r then
-		inColor = string.char(255, r*255, g*255, b*255)
+		if r then
+			return string.char(255, r*255, g*255, b*255)
+		else
+			return '\255\255\255\255'
+		end
 	end
-	return inColor
 end
 
 function incolor2color(inColor)

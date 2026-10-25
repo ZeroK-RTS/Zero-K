@@ -26,7 +26,7 @@ return { gunshipskirm = {
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
-  health                 = 1200,
+  health                 = 1250,
   hoverAttack            = true,
   iconType               = [[gunshipskirm]],
   metalCost              = 300,
@@ -72,6 +72,7 @@ return { gunshipskirm = {
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 3,
+        timeslow_overslow_frames = 2*30,
         
         light_camera_height = 2500,
         light_color = [[1.3 0.5 1.6]],
@@ -89,6 +90,7 @@ return { gunshipskirm = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_maverick.s3o]],
       range                   = 360,
       reloadtime              = 5,

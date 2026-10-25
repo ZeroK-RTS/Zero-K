@@ -201,6 +201,7 @@ return { assaultcruiser = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_m_hailstorm.s3o]],
       noSelfDamage            = true,
       range                   = 420,

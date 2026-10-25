@@ -386,7 +386,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Settings/Toolbox/Dev Commands'
-options_order = {'cheat', 'nocost', 'spectator', 'godmode', 'testunit', 'cheatall', 'fullspeed', 'luauireload', 'luarulesreload', 'debug', 'debugcolvol', 'debugpath', 'singlestep', 'spawn_next_unit', 'spawn_prev_unit', 'spawn_set_pos', 'printunits', 'printunitnames', 'echoCommand', 'missionexport', 'missionexportcommands', 'missionexportselectedcommands', 'exportallyteamcommands', 'missionexportfeatures', 'moveUnit', 'moveUnitSnap', 'moveUnitDelay', 'destroyUnit', 'RotateUnitLeft', 'RotateUnitRight'}
+options_order = {'cheat', 'nocost', 'spectator', 'godmode', 'testunit', 'cheatall', 'fullspeed', 'luauireload', 'luarulesreload', 'debug', 'debugcolvol', 'debugpath', 'singlestep', 'spawn_next_unit', 'spawn_prev_unit', 'spawn_set_pos', 'printunits', 'printunitnames', 'echoselected', 'echoCommand', 'missionexport', 'missionexportcommands', 'missionexportselectedcommands', 'exportallyteamcommands', 'missionexportfeatures', 'moveUnit', 'moveUnitSnap', 'moveUnitDelay', 'destroyUnit', 'RotateUnitLeft', 'RotateUnitRight'}
 options = {
 	cheat = {
 		name = "Cheat",
@@ -511,6 +511,20 @@ options = {
 				Spring.Echo("'" .. name .. "',")
 			end
 		end,
+	},
+	echoselected = {
+		name = "Print Selected Unit IDs",
+		type = 'button',
+		OnChange = function(self)
+			local units = Spring.GetSelectedUnits()
+			if not units then
+				return
+			end
+			for i = 1, #units do
+				Spring.Utilities.UnitEcho(units[i])
+			end
+		end,
+	
 	},
 	echoCommand = {
 		name = 'Echo Given Commands',

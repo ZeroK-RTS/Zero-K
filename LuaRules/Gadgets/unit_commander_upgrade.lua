@@ -73,7 +73,7 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	end
 end
 
-local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
+local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeBoost, damageMult)
 	if (not weapon2) and weapon1 then
 		local weaponName = "0_" .. weapon1
 		local wd = WeaponDefNames[weaponName]
@@ -90,13 +90,13 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 		weapon2 = "commweapon_beamlaser"
 	end
 	
-	rangeMult = rangeMult or Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
-	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
+	rangeBoost = rangeBoost or Spring.GetUnitRulesParam(unitID, "comm_range_boost") or 0
+	Spring.SetUnitRulesParam(unitID, "comm_range_boost", rangeBoost,  INLOS)
 	damageMult = damageMult or Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult, damageMult)
+	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeBoost, damageMult)
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
@@ -197,7 +197,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	end
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
-	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
+	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeBoost, data.damageMult)
 	
 	if newAttributesEffect then
 		newAttributesEffect.static = true
@@ -431,6 +431,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
 	local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
+	-- Base modules for all starting commanders. Keep in sync with fallback in chassisDefByBaseDef block below.
 	local moduleList = {chassisModuleDefs.econ, chassisModuleDefs.module_radarnet}
 	local moduleCost = 0
 	for i = 1, #moduleList do
@@ -526,19 +527,24 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 	
 	if chassisDefByBaseDef[unitDefID] then
-		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
-		
+		-- Fallback for dynamic comms created outside the normal spawn path (e.g. hatched from commander egg).
+		local chassisDefID = chassisDefByBaseDef[unitDefID]
+		local chassisData = chassisDefs[chassisDefID]
+		local chassisModuleDefs = moduleDefNames[chassisData.name] or {}
+		local moduleList = {}
+		local moduleCost = 0
+
 		InitializeDynamicCommander(
 			unitID,
 			0,
-			chassisDefByBaseDef[unitDefID],
-			UnitDefs[unitDefID].metalCost,
-			"Guinea Pig",
+			chassisDefID,
+			UnitDefs[unitDefID].metalCost + moduleCost,
+			"Hatched Commander",
 			unitDefID,
 			chassisData.baseWreckID,
 			chassisData.baseHeapID,
-			{},
-			{}
+			moduleList,
+			false
 		)
 		return
 	end
@@ -614,6 +620,9 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	-- Check the validity of the new module set
 	local pNewModules = {}
 	for i = 1, pNewCount do
+		if not moduleDefs[params[index]] then
+			return false
+		end
 		pNewModules[#pNewModules + 1] = params[index]
 		index = index + 1
 	end
@@ -635,6 +644,9 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	
 	for i = 1, #pNewModules do
 		local moduleDefID = pNewModules[i]
+		if not slotDefs[i] then
+			return false
+		end
 		if upgradeUtilities.ModuleIsValid(newLevelBounded, chassis, slotDefs[i].slotAllows, moduleDefID, modulesByDefID) then
 			cost = cost + moduleDefs[moduleDefID].cost
 		else

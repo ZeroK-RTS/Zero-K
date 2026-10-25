@@ -39,6 +39,10 @@ local hideWithUi = true
 local FEATURE_RADIUS = 120
 local ALL_FEATURES = false
 
+-- Features rarely enter or leave the view, so look for them a few times per second instead of every frame.
+local VISIBILITY_UPDATE_PERIOD = false
+local visibilityUpdateTime = 0
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -182,7 +186,7 @@ local function SetInternalEnableState(state)
 	end
 end
 
-function widget:Update()
+function widget:Update(dt)
 	if firstUpdate then
 		firstUpdate = false
 		SetInternalEnableState(BAR_COMPAT and (WG.HighlightUnitGL4 or WG.HighlightFeatureCus))
@@ -238,6 +242,7 @@ function widget:Update()
 				--Spring.Utilities.FeatureEcho(visibleFeatures[i], i)
 				AddFeature(visibleFeatures[i])
 			end
+			visibilityUpdateTime = 0
 		else
 			for i = 1, #handledFeatureList do
 				if WG.StopHighlightUnitGL4 and handledFeatureApiIDs[handledFeatureList[i]] then
@@ -255,7 +260,15 @@ function widget:Update()
 		end
 	end
 	
-	UpdateFeatureVisibility()
+	if VISIBILITY_UPDATE_PERIOD then
+		visibilityUpdateTime = visibilityUpdateTime + (dt or 0)
+		if visibilityUpdateTime >= VISIBILITY_UPDATE_PERIOD then
+			visibilityUpdateTime = 0
+			UpdateFeatureVisibility()
+		end
+	else
+		UpdateFeatureVisibility()
+	end
 end
 
 function widget:SelectionChanged(units)
@@ -267,4 +280,24 @@ function widget:SelectionChanged(units)
 	else
 		conSelected = false
 	end
+end
+
+function widget:FeatureDestroyed(featureID)
+	-- Visibility is only polled a few times per second. Forget a destroyed feature at once, so that a
+	-- new feature that gets the same ID before the next poll is highlighted too.
+	local i = handledFeatureMap and handledFeatureMap[featureID]
+	if not i then
+		return
+	end
+	if WG.StopHighlightUnitGL4 and handledFeatureApiIDs[featureID] then
+		WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
+	end
+	local last = #handledFeatureList
+	handledFeatureCheck[i] = handledFeatureCheck[last]
+	handledFeatureList[i] = handledFeatureList[last]
+	handledFeatureMap[handledFeatureList[i]] = i
+	handledFeatureCheck[last] = nil
+	handledFeatureList[last] = nil
+	handledFeatureMap[featureID] = nil
+	handledFeatureApiIDs[featureID] = nil
 end

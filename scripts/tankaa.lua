@@ -8,6 +8,7 @@ local flares = {piece("flare1", "flare2")}
 local a1, a2, neck = piece("a1", "a2", "neck")
 
 local currentGun = 1
+local FLARE_OFFSET = -32
 
 local disarmed = false
 local stuns = {false, false, false}
@@ -80,12 +81,18 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
+function script.BlockShot(num)
+	Move(flares[currentGun], z_axis, 0)
+	return false
+end
+
 function script.FireWeapon()
 	EmitSfx(flares[currentGun], 1024)
 
 	local barrel = barrels[currentGun]
 	Move (barrel, z_axis, -14)
 	Move (barrel, z_axis,   0, 21)
+	Move(flares[currentGun], z_axis, FLARE_OFFSET)
 
 	currentGun = 3 - currentGun
 end
@@ -96,6 +103,8 @@ function script.Create()
 	Hide(trax[2])
 	Hide(trax[3])
 	Hide(trax[4])
+	Move(flares[1], z_axis, FLARE_OFFSET)
+	Move(flares[2], z_axis, FLARE_OFFSET)
 
 	InitiailizeTrackControl({
 		wheels = {

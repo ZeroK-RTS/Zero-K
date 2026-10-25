@@ -18,6 +18,7 @@ return { amphassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    aim_lookahead      = 50,
     bait_level_default = 1,
     amph_regen = 40,
     amph_submerged_at = 40,
@@ -27,6 +28,7 @@ return { amphassault = {
     aimposoffset   = [[0 30 0]],
     midposoffset   = [[0 6 0]],
     modelradius    = [[42]],
+    normaltex = [[unittextures/b_sumo_manti_gimp_normals.dds]],
   },
 
   explodeAs           = [[BIG_UNIT]],

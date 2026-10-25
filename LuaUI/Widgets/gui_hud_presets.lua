@@ -18,7 +18,6 @@ end
 
 local CHAT_PADDING = 100
 local DEFAULT_RESOURCE_BAR_HEIGHT = 116
-local USE_SIZE_FACTOR = false
 
 local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
 local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
@@ -189,7 +188,8 @@ end
 local function GetSelectionIconSize(height)
 	local rows = math.floor((height - 25)/50)
 	local size = math.floor((height - 25)/rows)
-	local iconHeight = math.min(53, size) + 4
+	local scale = (options.bottomPanelScale.value or 1)
+	local iconHeight = math.floor((math.min(53, size) + 4) * scale + (scale - 1)*10 + 0.5)
 	return iconHeight
 end
 
@@ -632,23 +632,24 @@ local function SetupNewWidgets()
 end
 
 local function GetBottomSizes(screenWidth, screenHeight, parity)
-	
-	local SIZE_FACTOR = 1
-	if screenWidth > 3000 and USE_SIZE_FACTOR then
-		SIZE_FACTOR = 2
-	end
+	local SIZE_FACTOR = (options.bottomPanelScale.value or 1)
 	
 	-- Integral Menu
-	local integralWidth = math.max(350 * SIZE_FACTOR, math.min(500 * SIZE_FACTOR, screenWidth*0.4))
-	local integralHeight = 7*math.floor((math.min(screenHeight/4.5, 200*integralWidth/450))/7)
+	local integralWidth = math.max(350 * SIZE_FACTOR, math.min(500 * SIZE_FACTOR, screenWidth*0.45))
+	local integralHeight = 7*math.floor((math.min(screenHeight/3.5, 200*integralWidth/450))/7)
 	
 	if integralWidth/integralHeight > 2.5 then
 		integralWidth = integralHeight*2.5
 	end
+	WG.SetWidgetOption(integralName, integralPath, "buttonFontScale", SIZE_FACTOR)
+	WG.SetWidgetOption(coreName, corePath, "buttonFontScale", SIZE_FACTOR)
+	WG.SetWidgetOption(selName, selPath, "tooltipScale", SIZE_FACTOR)
+	WG.SetWidgetOption(selName, selPath, "selectionScale", SIZE_FACTOR)
 	
 	if integralWidth < 480 then
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480) * SIZE_FACTOR)
+		
 	else
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14 * SIZE_FACTOR)
@@ -726,10 +727,6 @@ local function SetupNewUITop()
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.floor(screenHeight)
 	local SIZE_FACTOR = 1
-	if screenWidth > 3000 and USE_SIZE_FACTOR then
-		SIZE_FACTOR = 2
-	end
-	
 	local sideHeight = 38 * SIZE_FACTOR
 	local flushTop = (screenWidth <= 1650)
 	
@@ -823,6 +820,7 @@ local function SetupMinimapLeftPreset()
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.ceil(screenHeight)
+	local fudge = ((WG.uiScale or 1) > 1) and 1 or 0
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH
@@ -875,19 +873,19 @@ local function SetupMinimapLeftPreset()
 	WG.SetWindowPosAndSize("Minimap Window",
 		0,
 		screenHeight - minimapHeight,
-		minimapWidth,
-		minimapHeight
+		minimapWidth + fudge,
+		minimapHeight + fudge
 	)
 	WG.SetWindowPosAndSize("selections",
 		minimapWidth - 3,
 		screenHeight - selectionsHeight,
-		selectionsWidth + 3,
+		selectionsWidth + 3 + fudge,
 		selectionsHeight
 	)
 	WG.SetWindowPosAndSize("integralwindow",
 		minimapWidth + selectionsWidth,
 		screenHeight - integralHeight,
-		integralWidth + 3,
+		integralWidth + 3 + fudge,
 		integralHeight
 	)
 	WG.SetWindowPosAndSize("selector_window",
@@ -929,6 +927,7 @@ local function SetupMinimapRightPreset()
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.ceil(screenHeight)
+	local fudge = ((WG.uiScale or 1) > 1) and 1 or 0
 	
 	if screenWidth <= 1650 then
 		fancySkinOverride = SKIN_FLUSH
@@ -943,7 +942,6 @@ local function SetupMinimapRightPreset()
 	------------------------------------------------------------------------
 	------------------------------------------------------------------------
 	-- Bottom of the UI
-	
 	local integralWidth, integralHeight,
 		coreSelectorWidth, coreSelectorHeight,
 		minimapWidth, minimapHeight,
@@ -986,19 +984,19 @@ local function SetupMinimapRightPreset()
 	WG.SetWindowPosAndSize("selections",
 		coreSelectorWidth + integralWidth,
 		screenHeight - selectionsHeight,
-		selectionsWidth + 3,
+		selectionsWidth + 3 + fudge,
 		selectionsHeight
 	)
 	WG.SetWindowPosAndSize("integralwindow",
 		coreSelectorWidth - 3,
 		screenHeight - integralHeight,
-		integralWidth + 3,
+		integralWidth + 3 + fudge,
 		integralHeight
 	)
 	WG.SetWindowPosAndSize("selector_window",
 		0,
 		screenHeight - coreSelectorHeight,
-		coreSelectorWidth,
+		coreSelectorWidth + fudge,
 		coreSelectorHeight
 	)
 	WG.SetWidgetOption(coreName, corePath, "leftsideofscreen", true)
@@ -1439,7 +1437,7 @@ end
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'minimapScreenSpace', 'interfacePreset'}
+options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'minimapScreenSpace', 'bottomPanelScale', 'interfacePreset'}
 options = {
 	updateNewDefaults = {
 		name  = "Stay up to date",
@@ -1467,6 +1465,15 @@ options = {
 		name = "Minimap Size",
 		type = "number",
 		value = 0.19, min = 0.05, max = 0.4, step = 0.01,
+		--desc = "Controls minimap size for the New UI presets.", -- supresses value tooltip
+		OnChange = function(self)
+			UpdateInterfacePreset(options.interfacePreset)
+		end,
+	},
+	bottomPanelScale = {
+		name = "Bottom Panel Scale",
+		type = "number",
+		value = 1.04, min = 1, max = 2, step = 0.01,
 		--desc = "Controls minimap size for the New UI presets.", -- supresses value tooltip
 		OnChange = function(self)
 			UpdateInterfacePreset(options.interfacePreset)
@@ -1572,8 +1579,7 @@ end
 
 function widget:ViewResize(screenWidth, screenHeight)
 	if options.maintainDefaultUI.value then
-		oldWidth = screenWidth
-		oldHeight = screenHeight
+		oldWidth, oldHeight = Spring.GetViewGeometry()
 		UpdateInterfacePreset(options.interfacePreset)
 	end
 end

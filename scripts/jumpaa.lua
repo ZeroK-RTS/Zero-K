@@ -92,12 +92,33 @@ local function Walk()
 	end
 end
 
+local function StopWalk()
+	Signal(SIG_WALK)
+
+	Turn(rshoulder, x_axis, math.rad(22.5), RUN_SPEED_FAST*0.3)
+	Turn(ruarm, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(rlarm, x_axis, math.rad(-45), RUN_SPEED_FAST*0.3)
+
+	Turn(lshoulder, x_axis, math.rad(22.5), RUN_SPEED_FAST*0.3)
+	Turn(luarm, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(llarm, x_axis, math.rad(-45), RUN_SPEED_FAST*0.3)
+
+	Turn(rthigh, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(rshin, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(rfoot, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+
+	Turn(lthigh, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(lshin, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(lfoot, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+
+end
+
 function script.StartMoving()
 	StartThread(Walk)
 end
 
 function script.StopMoving()
-	Signal(SIG_WALK)
+	StartThread(StopWalk)
 end
 
 function script.Create()
@@ -197,6 +218,22 @@ function halfJump()
 	
 	Turn(rshin, x_axis, 0, math.rad(200))
 	Turn(rfoot, x_axis, 0, math.rad(80))
+end
+
+function endJump()
+	Turn(rshoulder, x_axis, math.rad(22.5), RUN_SPEED_FAST*0.3)
+	Turn(rlarm, x_axis, math.rad(-45), RUN_SPEED_FAST*0.3)
+
+	Turn(lshoulder, x_axis, math.rad(22.5), RUN_SPEED_FAST*0.3)
+	Turn(llarm, x_axis, math.rad(-45), RUN_SPEED_FAST*0.3)
+
+	Turn(rthigh, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(rshin, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(rfoot, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+
+	Turn(lthigh, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(lshin, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
+	Turn(lfoot, x_axis, math.rad(0), RUN_SPEED_FAST*0.3)
 end
 
 function script.Killed(recentDamage, maxHealth)

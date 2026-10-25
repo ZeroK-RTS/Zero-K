@@ -160,6 +160,7 @@ local unitIsHeavy = {
 }
 
 local unitPriorityModifier = {
+	[UnitDefNames["gunshipraid"].id] = 1.4,
 	[UnitDefNames["gunshipemp"].id] = -0.8,
 	[UnitDefNames["striderantiheavy"].id] = -0.8,
 }

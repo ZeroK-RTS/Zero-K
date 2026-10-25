@@ -21,6 +21,9 @@ return { cloakheavyraid = {
   customParams           = {
     modelradius    = [[14]],
     cus_noflashlight = 1,
+    outline_x = 120,
+    outline_y = 120,
+    outline_yoff = 30,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

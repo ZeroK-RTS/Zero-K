@@ -160,7 +160,7 @@ local cegs = {
       properties = {
         delay              = [[0 i30]],
         explosiongenerator = [[custom:NAPALMFIREBALL_PYRO]],
-        pos                = [[-25 r50, 10 r25, -25 r50]],
+        pos                = [[-15 r30, 12 r25, -15 r30]],
       },
     },
   },
@@ -381,12 +381,38 @@ local cegs = {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 3,
+      count              = 2,
       ground             = true,
       water              = true,
       properties = {
         delay              = [[0 i2]],
         explosiongenerator = [[custom:NAPALMFIREBALL_45]],
+        pos                = [[-10 r10, 25, -10 r10]],
+      },
+    },
+  },
+
+  ["napalm_dante_small"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 95,
+      ttl                = 85,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom_low = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i2]],
+        explosiongenerator = [[custom:napalmfireball_90]],
         pos                = [[-10 r10, 25, -10 r10]],
       },
     },
@@ -598,7 +624,7 @@ local altforms = {
       rocks = {
 		properties = {particlelife = 150, particlelifespread = 80,
 	       particlesize       = 50,
-        particlesizespread = 20,
+        particlesizespread = 35,
         particlespeed      = 0.4,
         particlespeedspread = 0.7,
         colormap           = [[0 0 0 0     0.4 0.4 0.4 0.1    0.6 0.6 0.6 0.1    0.5 0.5 0.5 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
@@ -635,8 +661,8 @@ local altforms = {
     modifications = {
       rocks = {
         properties = {
-		particlelife = 250, 
-		particlelifespread = 450,
+		particlelife = 280, 
+		particlelifespread = 250,
         particlespeed      = 0.4,
         particlespeedspread = 0.7,
         colormap           = [[0.2 0.2 0.2 0.1   0.4 0.4 0.4 0.1  0.38 0.38 0.38 0.11    0.35 0.35 0.35 0.12    0.32 0.32 0.32 0.13    0.3 0.3 0.3 0.14   0.12 0.12 0.12 0.18    0 0 0 0]],
@@ -658,6 +684,63 @@ local altforms = {
         particlespeed      = 0.4,
         particlespeedspread = 0.2,
         sizegrowth         = 0.45,
+        colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+        },
+      },
+    },
+  },
+  napalmfireball_90 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+      properties = {
+        emitrot            = 90,
+        emitrotspread      = 90,
+        particlelife       = 80,
+        particlelifespread = 20,
+        particlesize       = 40,
+        particlesizespread = 18,
+        particlespeed      = 0.5,
+        particlespeedspread = 0.3,
+        sizegrowth         = 0.45,
+        colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+        },
+      },
+    },
+  },
+  napalmfireball_45_large = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+      properties = {
+        emitrot            = 90,
+        emitrotspread      = 90,
+        particlelife       = 35,
+        particlelifespread = 12,
+        particlesize       = 90,
+        particlesizespread = 16,
+        particlespeed      = 0.4,
+        particlespeedspread = 0.2,
+        sizegrowth         = 0.45,
+        colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+        },
+      },
+    },
+  },
+  napalmfireball_45_long = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+      properties = {
+        emitrot            = 90,
+        emitrotspread      = 90,
+        particlelife       = 430,
+        particlelifespread = 20,
+        particlesize       = 58,
+        particlesizespread = 15,
+        particlespeed      = 0.4,
+        particlespeedspread = 0.2,
+        sizegrowth         = 0.02,
         colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
         },
       },

@@ -1,4 +1,4 @@
-local base, bottom, tamper, furnace, door_l, door_r, hinge_l, hinge_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'door_l', 'door_r', 'hinge_l', 'hinge_r', 'drill1', 'drill2', 'drill3', 'posts')
+local base, bottom, tamper, furnace, furnace_empty, door_l, door_r, hinge_l, hinge_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'furnace_empty', 'door_l', 'door_r', 'hinge_l', 'hinge_r', 'drill1', 'drill2', 'drill3', 'posts')
 
 include "pieceControl.lua"
 include "constants.lua"
@@ -10,8 +10,54 @@ local smokePiece = {tamper}
 local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 local metalmultInv = metalmult > 0 and (1/metalmult) or 1
 
+local od_1, od_2, od_3, od_4 = piece('od1', 'od2', 'od3', 'od4')
+local currentWant = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function ShowDistortion(mult)
+	local want = 0
+	if mult >= 2.5 then
+		want = 4
+	elseif mult >= 1.9 then
+		want = 3
+	elseif mult >= 1.4 then
+		want = 2
+	elseif mult >= 1 then
+		want = 1
+	end
+	if want == currentWant then
+		return
+	end
+	currentWant = want
+	if want == 0 then
+		Hide(od_1)
+		Hide(od_2)
+		Hide(od_3)
+		Hide(od_4)
+	elseif want == 1 then
+		Show(od_1)
+		Hide(od_2)
+		Hide(od_3)
+		Hide(od_4)
+	elseif want == 2 then
+		Hide(od_1)
+		Show(od_2)
+		Hide(od_3)
+		Hide(od_4)
+	elseif want == 3 then
+		Hide(od_1)
+		Hide(od_2)
+		Show(od_3)
+		Hide(od_4)
+	elseif want == 4 then
+		Hide(od_1)
+		Hide(od_2)
+		Hide(od_3)
+		Show(od_4)
+	end
+end
 
 local function Open()
 	Signal(SIG_OPEN)
@@ -27,14 +73,18 @@ local function Open()
 
 	while true do
 		local income = Spring.GetUnitRulesParam(unitID, "current_metalIncome") or 0
+		local overdrive = Spring.GetUnitRulesParam(unitID, "overdrive_proportion") or 0
 		income = income * metalmultInv
 		if income > 0 then
-			Spin (furnace, y_axis, income, math.rad(1))
-			Spin (drill1, y_axis, income, math.rad(1))
-			Move (tamper, y_axis, height, income*10)
+			ShowDistortion(1 + overdrive)
+			Spin(furnace, y_axis, income, math.rad(1))
+			Spin(drill1, y_axis, income, math.rad(1))
+			Move(tamper, y_axis, height, income*10)
+			Move(furnace_empty, y_axis, math.max(-5, -income*0.5)) -- So the LUPS effect does not clip out the top of the mex on the downstroke
 			WaitForMove (tamper, y_axis)
 			height = 60 - height
 		else
+			ShowDistortion(0)
 			StopSpin (furnace, y_axis, math.rad(5))
 			StopSpin (drill1, y_axis, math.rad(5))
 			Sleep (200)
@@ -47,6 +97,7 @@ function script.Activate()
 end
 
 function script.Create()
+	ShowDistortion(0)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	if not Spring.GetUnitIsStunned(unitID) then
 		StartThread(Open)

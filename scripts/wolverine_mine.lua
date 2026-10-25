@@ -49,6 +49,9 @@ local function Remove ()
 	-- keep alive for a while (xp, stats etc)
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
+	if Spring.SetUnitIconDraw then
+		Spring.SetUnitIconDraw(unitID, false)
+	end
 	Spring.SetUnitNoMinimap(unitID, true)
 	Spring.SetUnitHealth(unitID, {paralyze = 99999999})
 	Spring.SetUnitCloak(unitID, 4)

@@ -52,7 +52,7 @@ return { gunshipheavyskirm = {
     },
 
   },
-  sightDistance       = 660,
+  sightDistance       = 740,
   speed               = 99,
   turnRate            = 600,
   workerTime          = 0,
@@ -61,6 +61,7 @@ return { gunshipheavyskirm = {
 
     {
       def                = [[EMG]],
+      accurateLeading    = 2,
       mainDir            = [[0 0 1]],
       maxAngleDif        = 70,
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
@@ -88,6 +89,7 @@ return { gunshipheavyskirm = {
         light_camera_height = 2000,
         light_color = [[0.9 0.84 0.45]],
         light_ground_height = 120,
+        light_radius = 150,
       },
       
       damage                  = {

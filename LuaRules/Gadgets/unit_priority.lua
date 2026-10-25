@@ -648,6 +648,7 @@ function RemoveMiscPriorityUnit(unitID) --remotely remove a forced priority comm
 			spSetUnitRulesParam(unitID, "miscpriority", 1) --reset to normal priority so that overhead icon doesn't show wrench
 		end
 	end
+	UnitMiscPriority[unitID] = nil
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
@@ -742,6 +743,23 @@ function gadget:RecvLuaMsg(msg, playerID)
 			return
 		end
 		SetEnergyReserved(teamID, amount)
+	end
+end
+
+function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
+	if dataStr:find("mreserve:",1,true) then
+		local amount = tonumber(dataStr:sub(10))
+		if not amount then
+			return
+		end
+		SetMetalReserved(aiTeam, amount)
+	end
+	if dataStr:find("ereserve:",1,true) then
+		local amount = tonumber(dataStr:sub(10))
+		if not amount then
+			return
+		end
+		SetEnergyReserved(aiTeam, amount)
 	end
 end
 

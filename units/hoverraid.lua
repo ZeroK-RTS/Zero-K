@@ -41,6 +41,7 @@ return { hoverraid = {
     explosiongenerators = {
       [[custom:HOVERS_ON_GROUND]],
       [[custom:flashmuzzle1]],
+      [[custom:gauss_flare_dagger]],
     },
 
   },

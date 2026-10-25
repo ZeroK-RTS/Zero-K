@@ -1,5 +1,5 @@
 return {
-	[0] = {
+	{
 		startpoints = {
 			{1254,1254},
 		},
@@ -14,7 +14,7 @@ return {
 		nameLong = "North-West",
 		nameShort = "NW",
 	},
-	[1] = {
+	{
 		startpoints = {
 			{5914,5914},
 		},

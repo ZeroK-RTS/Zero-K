@@ -16,6 +16,7 @@ return { turretsunlance = {
     keeptooltip    = [[any string I want]],
     neededlink     = 25,
     pylonrange     = 50,
+    normaltex = [[unittextures/turretsunlance_normals.dds]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

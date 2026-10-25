@@ -11,8 +11,10 @@ return { turrettorp = {
   corpse            = [[DEAD]],
 
   customParams      = {
-    aimposoffset   = [[0 15 0]],
-    midposoffset   = [[0 15 0]],
+    aim_lookahead      = 60,
+    aimposoffset       = [[0 15 0]],
+    midposoffset       = [[0 15 0]],
+    normaltex          = [[unittextures/torpedolauncher_normals.dds]],
   },
 
   explodeAs         = [[MEDIUM_BUILDINGEX]],
@@ -74,6 +76,7 @@ return { turrettorp = {
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
+      leadlimit               = 0,
       model                   = [[wep_t_longbolt.s3o]],
       numbounce               = 4,
       range                   = 550,

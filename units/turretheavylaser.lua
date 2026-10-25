@@ -14,8 +14,9 @@ return { turretheavylaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    aim_lookahead      = 60,
     bait_level_default = 0,
-    aimposoffset   = [[0 56 0]],
+    aimposoffset       = [[0 56 0]],
 
     outline_x = 115,
     outline_y = 150,
@@ -106,6 +107,7 @@ return { turretheavylaser = {
       soundStart              = [[weapon/laser/heavy_laser3]],
       soundStartVolume        = 8.5,
       sweepfire               = false,
+      targetborder            = 0.9,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

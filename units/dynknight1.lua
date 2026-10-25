@@ -9,6 +9,7 @@ unitDef.radarDistanceJam = 0 -- needless complexity
 unitDef.customParams.commtype = "6"
 unitDef.customParams.statsname = "dynknight1"
 unitDef.customParams.shield_emit_height = "30"
+unitDef.customParams.normaltex = [[unittextures/cremcom_normals.dds]]
 
 unitDef.reclaimable = false -- No reclaiming campaign commander.
 
@@ -22,5 +23,7 @@ unitDef.sfxtypes = {
         [[custom:FLASH64]],
     }
 }
+
+unitDef.featureDefs.DEAD.object = [[cremcom_dead.s3o]]
 
 return { dynknight1 = unitDef }

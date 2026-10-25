@@ -10,6 +10,9 @@ return { energysolar = {
   buildPic                      = [[energysolar.png]],
   category                      = [[SINK UNARMED STUPIDTARGET SOLAR]],
   corpse                        = [[DEAD]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[76 76 76]],
+  selectionVolumeType           = [[ellipsoid]],
 
   customParams                  = {
     bait_level_target = 1,

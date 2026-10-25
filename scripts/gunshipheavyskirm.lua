@@ -17,6 +17,11 @@ local emits = {
 local SIG_AIM = 1
 local SIG_RESTORE = 2
 
+local WIGGLE_RATE = 6
+local SWITCH_PERIOD = 9
+local wiggleMag = 0.7
+local wiggleSwitch = SWITCH_PERIOD
+
 local smokePiece = { base}
 
 function script.Activate()
@@ -24,17 +29,24 @@ function script.Activate()
 	Spin(lffan, y_axis, math.rad(360), math.rad(100))
 	Spin(rrfan, y_axis, math.rad(360), math.rad(100))
 	Spin(lrfan, y_axis, math.rad(360), math.rad(100))
+	Show(lfjet)
+	Show(rfjet)
+	Show(lrjet)
+	Show(rrjet)
 end
 
-function script.StopMoving()
+function script.Deactivate()
 	Spin(rffan, y_axis, 0, math.rad(100))
 	Spin(lffan, y_axis, 0, math.rad(100))
 	Spin(rrfan, y_axis, 0, math.rad(100))
 	Spin(lrfan, y_axis, 0, math.rad(100))
+	Hide(lfjet)
+	Hide(rfjet)
+	Hide(lrjet)
+	Hide(rrjet)
 end
 
 local function TiltBody()
-
 	while true do
 		if attacking then
 			Turn(body, x_axis, 0, math.rad(45))
@@ -60,6 +72,10 @@ local function TiltBody()
 end
 
 function script.Create()
+	Hide(lfjet)
+	Hide(rfjet)
+	Hide(lrjet)
+	Hide(rrjet)
 	
 	Turn(rfjet, x_axis, math.rad(-90))
 	Turn(lfjet, x_axis, math.rad(-90))
@@ -110,6 +126,14 @@ function script.Shot(num)
 	gun = (gun)%4 + 1
 	EmitSfx(emits[gun].flare, 1024)
 	EmitSfx(emits[gun].barrel, 1025)
+	local currentMag = wiggleMag * (1 - 0.75*math.pow(2*(wiggleSwitch - SWITCH_PERIOD*0.75)/SWITCH_PERIOD, 2))
+	if GG.PossiblyDoNonStrafeWiggle and GG.PossiblyDoNonStrafeWiggle(unitID, unitDefID, WIGGLE_RATE, wiggleMag) then
+		wiggleSwitch = wiggleSwitch - 1
+		if wiggleSwitch <= 0 then
+			wiggleSwitch = SWITCH_PERIOD
+			wiggleMag = -1*wiggleMag
+		end
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -34,10 +34,11 @@ return { dynassault1 = {
     dynamic_comm   = 1,
     shared_energy_gen = 1,
     set_target_range_buffer = 50,
+    normaltex = [[unittextures/benzcom_normals.dds]],
   },
 
   energyStorage       = 500,
-  explodeAs           = [[ESTOR_BUILDINGEX]],
+  explodeAs           = [[COMM_EX]],
   footprintX          = 2,
   footprintZ          = 2,
   health              = 4400,
@@ -51,7 +52,7 @@ return { dynassault1 = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   objectName          = [[benzcom1.s3o]],
   script              = [[dynassault.lua]],
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  selfDestructAs      = [[COMM_EX]],
 
   sfxtypes            = {
 

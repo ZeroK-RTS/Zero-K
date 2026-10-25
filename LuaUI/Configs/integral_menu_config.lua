@@ -9,6 +9,7 @@ local imageDir = 'LuaUI/Images/commands/'
 local tooltips = {
 	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
+	LOOP_ATTACK = "Attack Style (_STATE_)\n  Dive or stay at range. Attack Move is required for Loopback for planes set to Hold Position.",
 	FIRE_AT_SHIELD = "Fire at Shields (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 	FIRE_TOWARDS_ENEMY = "Fire Towards Enemies (_STATE_)\n  Shoot towards enemies when there are no other targets.",
 	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
@@ -29,11 +30,11 @@ local tooltips = {
 	GOO_GATHER = "Puppy Replication (_STATE_)\n  Set whether Puppies use nearby wrecks to make more Puppies.",
 	DISABLE_ATTACK = "Allow Attack Commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
-	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
+	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire on uncertain enemy positions within radar.",
 	PREVENT_BAIT = "Avoid Bad Targets (_STATE_)\n  _DESC_",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
 	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
-	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
+	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships circle their target when fighting.",
 	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set when certain amphibious units float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
 	FORMATION_RANK = "Formation Rank (_STATE_)\n  set rank in formation.",
@@ -116,6 +117,10 @@ local commandDisplayConfig = {
 	[CMD_UNIT_AI] = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
 		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
+	},
+	[CMD_LOOP_ATTACK] = {
+		texture = {imageDir .. 'states/plane_strafe_on.png', imageDir .. 'states/plane_strafe_off.png'},
+		stateTooltip = {tooltips.LOOP_ATTACK:gsub("_STATE_", "Strafe"), tooltips.LOOP_ATTACK:gsub("_STATE_", "Loopback")},
 	},
 	[CMD_FIRE_TOWARDS_ENEMY] = {
 		texture = {imageDir .. 'states/shoot_towards_off.png', imageDir .. 'states/shoot_towards_on.png'},
@@ -210,10 +215,10 @@ local commandDisplayConfig = {
 		},
 		stateTooltip = {
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Enable this to ignore bad targets when not on Force Fire or Attack Move."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid cost under 90, Razor, Sparrow, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid cost under 240, minus Stardust, Raptor, unknown radar and armour."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid cost under 420, unknown radar dots and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag, nanoframes cheaper than 50 and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid targets cheaper than 90, Razor, Sparrow, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid targets cheaper than 240 (except Stardust), Raptor, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid targets cheaper than 420, unknown radar dots and armoured targets."),
 		}
 	},
 	[CMD_RETREAT] = {
@@ -368,9 +373,9 @@ end
 local textConfig = {
 	bottomLeft = {
 		name = "bottomLeft",
-		x = "15%",
+		x = "10%",
 		right = 0,
-		bottom = 2,
+		bottom = "10%",
 		height = 12,
 		fontsize = 12,
 	},
@@ -390,8 +395,8 @@ local textConfig = {
 	},
 	queue = {
 		name = "queue",
-		right = "18%",
-		bottom = "14%",
+		right = "15%",
+		bottom = "15%",
 		align = "right",
 		fontsize = 16,
 		height = 16,
@@ -413,24 +418,26 @@ local buttonLayoutConfig = {
 	},
 	build = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "Build",
+		invisibleButton = true,
 		showCost = true
 	},
 	buildunit = {
 		image = {
-			x = "5%",
-			y = "4%",
-			right = "5%",
-			bottom = 12,
+			x = 0,
+			y = 0,
+			right = 1,
+			bottom = 1,
 			keepAspect = false,
 		},
 		tooltipPrefix = "BuildUnit",
+		invisibleButton = true,
 		showCost = true
 	},
 	queue = {

@@ -354,6 +354,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	dontfireatradar=2,
 	antinukezone=2,
 	unitai=2,
+	loopattack=2,
 	unit_kill_subordinates=2,
 	goostate=1,
 	disableattack=2,

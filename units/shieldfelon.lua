@@ -17,6 +17,7 @@ return { shieldfelon = {
     shield_color_mult = 1.1,
     dontfireatradarcommand = '1',
     aim_lookahead     = 30,
+    normaltex = [[unittextures/b_can_pyro_roach_skuttle_normals.dds]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

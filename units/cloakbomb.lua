@@ -90,7 +90,7 @@ return { cloakbomb = {
       paralyzeTime       = 16,
       soundHit           = "weapon/more_lightning",
       damage = {
-        default          = 2500,
+        default          = 2800,
       },
       customParams = {
         burst = Shared.BURST_UNRELIABLE,

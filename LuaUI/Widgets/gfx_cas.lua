@@ -26,7 +26,7 @@ local glBlending = gl.Blending
 local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
-local defaultValue = 0.75
+local defaultValue = 0.55
 local isDisabled = (defaultValue ~= 0)
 
 -----------------------------------------------------------------

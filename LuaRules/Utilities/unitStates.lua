@@ -1,5 +1,6 @@
 local REVERSE_COMPAT = not Script.IsEngineMinVersion(104, 0, 1120)
 
+local spGetUnitHealth = Spring.GetUnitHealth
 local speedCache = {}
 
 function Spring.Utilities.GetUnitRepeat(unitID)
@@ -50,6 +51,11 @@ function Spring.Utilities.GetUnitTrajectoryState(unitID)
 
 	local _,_,_,_,_,_,trajectory = Spring.GetUnitStates(unitID, false, true)
 	return trajectory
+end
+
+function Spring.Utilities.GetIsUnitEmped(unitID)
+	local _, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
+	return ((paralyzeDamage or 0) / (((maxHealth or 0) > 0.1) and maxHealth or 1)) > 1
 end
 
 function Spring.Utilities.EstimateCurrentMaxSpeed(unitID, unitDefID)

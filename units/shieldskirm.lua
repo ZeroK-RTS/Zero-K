@@ -14,7 +14,7 @@ return { shieldskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aim_lookahead  = 80,
+    aim_lookahead  = 120,
     aimposoffset   = [[0 5 0]],
     midposoffset   = [[0 5 0]],
     modelradius    = [[14]],
@@ -59,6 +59,7 @@ return { shieldskirm = {
 
     {
       def                = [[STORM_ROCKET]],
+      accurateLeading    = 1,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -68,7 +69,7 @@ return { shieldskirm = {
 
     STORM_ROCKET = {
       name                    = [[Heavy Rocket]],
-      areaOfEffect            = 75,
+      areaOfEffect            = 96,
       cegTag                  = [[rocket_trail_bar_flameboosted]],
       craterBoost             = 1,
       craterMult              = 2,
@@ -77,6 +78,7 @@ return { shieldskirm = {
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1800,
+        light_radius = 80,
       },
       
       damage                  = {
@@ -101,6 +103,7 @@ return { shieldskirm = {
       soundStartVolume        = 9,
       startVelocity           = 190,
       tracks                  = false,
+      targetMoveError         = 0.3,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,
       turret                  = true,

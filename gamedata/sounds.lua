@@ -160,6 +160,10 @@ local Sounds = {
 			gainmod = 0.7,
 			pitchmod = 0,
 		},
+		HeatrayQuieter = {
+			file = "sounds/weapon/heatray_fire.wav",
+			gain = 0.5,
+		},
 	},
 }
 

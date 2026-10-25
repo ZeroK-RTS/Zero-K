@@ -16,6 +16,7 @@ return { amphsupport = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead      = 80,
     bait_level_default = 0,
     amph_regen        = 15,
     amph_submerged_at = 30,
@@ -69,11 +70,13 @@ return { amphsupport = {
   weapons                = {
     {
       def                = [[CANNON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     {
       def                = [[FAKE_CANNON]],
+      accurateLeading    = 2,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

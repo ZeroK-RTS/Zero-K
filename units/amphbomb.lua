@@ -21,6 +21,7 @@ return { amphbomb = {
     amph_regen = 10,
     amph_submerged_at = 30,
     midposoffset   = [[0 5 0]],
+    normaltex = [[unittextures/b_can_pyro_roach_skuttle_normals.dds]],
  },
 
   explodeAs              = [[AMPHBOMB_DEATH]],

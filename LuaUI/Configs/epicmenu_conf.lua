@@ -199,6 +199,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
+	['Settings/Interface/Height Indicator']         = imgPath..'epicmenu/kbotexclaim.png',
 	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
 	['Settings/Interface/Missile Warnings']         = imgPath..'nuke_button_48.png',
 	['Settings/Interface/Player Name Tags']         = imgPath..'hellomynameis.png',
@@ -215,6 +216,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Unit Stats Help Window']  = imgPath..'advplayerslist/random.png',
 	['Settings/HUD Panels/Player List']             = imgPath..'epicmenu/people.png',
 	['Settings/HUD Panels/Extras/Docking']          = imgPath..'epicmenu/anchor.png',
+	['Settings/HUD Panels/Music Player']            = imgPath..'epicmenu/vol.png',
 	['Settings/HUD Panels/Selected Units Panel']    = imgPath..'epicmenu/grid.png',
 	['Settings/HUD Panels/Command Panel']           = imgPath..'epicmenu/control_panel.png',
 	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
@@ -447,7 +449,7 @@ local pathSelectionXrayHalo = 'Settings/Interface/Selection/Selection XRay&Halo'
 local pathSelectionPlatters = 'Settings/Interface/Selection/Team Platters'
 local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selections'
 	ShButton(pathSelectionGL4, 'Toggle Default Selections', function() spSendCommands{"luaui togglewidget Selected Units GL4 2"} end, "Draws a configurable box and platter underneath units. This is the default, but required a graphics card capable of using shaders.")
-	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes 3"} end, "Draws coloured shapes under selected units")
+	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes 4"} end, "Draws coloured shapes under selected units")
 	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo 2"} end, "Places blurry halo around selected units")
@@ -672,7 +674,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	--	type = 'bool',
 	--	value = false,
 	--	OnChange = function(self)
-	--		SetWidgetEnableState("UnitShapes 3", self.value)
+	--		SetWidgetEnableState("UnitShapes 4", self.value)
 	--	end,
 	--} )
 	--AddOption(pathUnitVisiblity,
@@ -727,7 +729,7 @@ local pathSSAO = 'Settings/Graphics/Ambient Occlusion'
 	ShButton(
 		pathSSAO, 'Toggle SSAO',
 		function()
-			spSendCommands{"luaui togglewidget ssao 3"}
+			spSendCommands{"luaui togglewidget ssao 6"}
 		end, "Toggle Screen Space Ambient Occlusion. It essentially adds a bit of shading to everything.")
 	AddOption(pathSSAO,
 		{
@@ -739,9 +741,9 @@ local pathSSAO = 'Settings/Graphics/Ambient Occlusion'
 				WG.SSAO_RequireDeferredRendering = self.value
 				if WG.WidgetEnabledAndActive then
 					if self.value and not WG.WidgetEnabledAndActive("Deferred rendering") then
-						spSendCommands{"luaui disablewidget ssao 3"}
+						spSendCommands{"luaui disablewidget ssao 6"}
 					else
-						spSendCommands{"luaui enablewidget ssao 3"}
+						spSendCommands{"luaui enablewidget ssao 6"}
 					end
 				end
 			end,

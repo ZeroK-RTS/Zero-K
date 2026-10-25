@@ -42,6 +42,7 @@ return { factoryshield = {
     shared_energy_gen   = 1,
     parent_of_plate     = [[plateshield]],
     buggeroff_offset    = 28,
+    normaltex = [[unittextures/corvrad_normals.dds]],
 
     stats_show_death_explosion = 1,
 

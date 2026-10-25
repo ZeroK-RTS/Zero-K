@@ -494,7 +494,7 @@ local function GetInstructions()
 end
 
 local function CreateGoalWindow()
-	local WINDOW_HEIGHT = 320
+	local WINDOW_HEIGHT = 380
 	local WINDOW_WIDTH = 480
 	
 	local instructionWindow =  Chili.Window:New{
@@ -506,10 +506,10 @@ local function CreateGoalWindow()
 		height = WINDOW_HEIGHT,
 		dockable = true,
 		dockableSavePositionOnly = true,
-		draggable = false,
-		resizable = false,
+		draggable = true,
+		resizable = true,
 		tweakDraggable = true,
-		tweakResizable = false,
+		tweakResizable = true,
 		--color = {1, 1, 1, 0.6},
 		--minimizable = true,
 		--itemMargin  = {0, 0, 0, 0},

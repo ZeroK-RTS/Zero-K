@@ -1,21 +1,13 @@
-local isPotatoGpu = false
-local gpuMem = (Platform.gpuMemorySize and Platform.gpuMemorySize or 1000) / 1000
-if Platform ~= nil and Platform.gpuVendor == 'Intel' then
-	isPotatoGpu = true
-end
-if gpuMem and gpuMem > 0 and gpuMem < 1800 then
-	isPotatoGpu = true
-end
 
 function widget:GetInfo()
 	return {
-		name      = "Bloom Shader Deferred", --(v0.5)
+		name      = "Bloom Shader Deferred 2", --(v0.5)
 		desc      = "Applies bloom to units only",
 		author    = "Kloot, Beherith",
 		date      = "2018-05-13",
 		license   = "GNU GPL, v2 or later",
 		layer     = 99999,
-		enabled   = not isPotatoGpu,
+		enabled   = true,
 	}
 end
 
@@ -23,8 +15,8 @@ local version = 1.1
 
 local dbgDraw = 0               -- draw only the bloom-mask? [0 | 1]
 
-local glowAmplifier = 0.85            -- intensity multiplier when filtering a glow source fragment [1, n]
-local blurAmplifier = 1        -- intensity multiplier when applying a blur pass [1, n] (should be set close to 1)
+local glowAmplifier = 0.65            -- intensity multiplier when filtering a glow source fragment [1, n]
+local blurAmplifier = 0.7        -- intensity multiplier when applying a blur pass [1, n] (should be set close to 1)
 local illumThreshold = 0            -- how bright does a fragment need to be before being considered a glow source? [0, 1]
 
 --quality =1 : 90 fps, 9% memctrler load, 99% shader load
@@ -329,10 +321,25 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	MakeBloomShaders()
 end
 
-function widget:Initialize()
+local function IsPotato()
+	local isPotatoGpu = false
+	local gpuMem = (Platform.gpuMemorySize and Platform.gpuMemorySize or 1000) / 1000
+	if Platform ~= nil and Platform.gpuVendor == 'Intel' then
+		isPotatoGpu = true
+	end
+	if gpuMem and gpuMem > 0 and gpuMem < 1800 then
+		isPotatoGpu = true
+	end
+	return isPotatoGpu
+end
 
+function widget:Initialize()
 	if glCreateShader == nil then
 		RemoveMe("[BloomShader::Initialize] removing widget, no shader support")
+		return
+	end
+	if IsPotato() then
+		RemoveMe("[BloomShader::Initialize] removing widget, insufficient hardware")
 		return
 	end
 
@@ -442,26 +449,3 @@ function widget:DrawWorld()
 	Bloom()
 end
 
-
-function widget:GetConfigData()
-	return {
-		version = version,
-		glowAmplifier = glowAmplifier,
-		preset = preset,
-	}
-end
-
-function widget:SetConfigData(data)
-	if data.version and data.version == version then
-		data.version = version
-		if data.glowAmplifier ~= nil then
-			glowAmplifier = data.glowAmplifier
-		end
-		if data.preset ~= nil then
-			preset = data.preset
-			if preset > 3 then
-				preset = 3
-			end
-		end
-	end
-end

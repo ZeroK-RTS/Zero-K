@@ -100,7 +100,7 @@ return { jumpraid = {
           
         light_camera_height = 2800,
         light_color = [[0.6 0.39 0.18]],
-        light_radius = 260,
+        light_radius = 180,
         light_fade_time = 10,
         light_beam_mult_frames = 5,
         light_beam_mult = 5,

@@ -25,6 +25,7 @@ return { striderscorpion = {
     aimposoffset          = [[0 10 0]],
     decloak_footprint     = 5,
     selection_scale = 1.16,
+    normaltex = [[unittextures/scorpion_normals.dds]],
 
     outline_x = 145,
     outline_y = 145,

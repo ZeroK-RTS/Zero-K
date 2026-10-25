@@ -12,6 +12,7 @@ return { shieldarty = {
 
   customParams           = {
     bait_level_default = 1,
+    normaltex = [[unittextures/b_dom_morty_advcon_freaker_normals.dds]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -89,6 +90,7 @@ return { shieldarty = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[wep_merl.s3o]],
       noSelfDamage            = true,
       range                   = 940,

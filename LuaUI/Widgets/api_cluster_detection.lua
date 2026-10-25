@@ -57,11 +57,13 @@ end
 
 local distCount = 0
 local function GetDistanceSQ(unitID1, unitID2,receivedUnitList)
-	local prevClock = os.clock()
+	local prevClock = echoOutCalculationTime and os.clock()
 	local x1,x2 = receivedUnitList[unitID1][1],receivedUnitList[unitID2][1]
 	local z1,z2 = receivedUnitList[unitID1][3],receivedUnitList[unitID2][3]
 	local distanceSQ = ((x1-x2)^2 + (z1-z2)^2)
-	distCount = distCount + (os.clock() - prevClock)
+	if echoOutCalculationTime then
+		distCount = distCount + (os.clock() - prevClock)
+	end
 	return distanceSQ
 end
 

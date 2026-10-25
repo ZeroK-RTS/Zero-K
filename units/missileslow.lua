@@ -98,6 +98,7 @@ return { missileslow = {
       impulseFactor           = 0,
       impactOnly              = true,
       interceptedByShieldType = 1,
+      leadlimit               = 0,
       model                   = [[slowmissile.dae]],
       myGravity               = 0.1,
       noSelfDamage            = true,

@@ -882,14 +882,14 @@ local moduleDefs = {
 	{
 		name = "module_adv_targeting",
 		humanName = "Adv. Targeting System",
-		description = "Advanced Targeting System - Increases range by 7.5% but reduces total speed by 3%. Limit: 5",
+		description = "Advanced Targeting System - Increases range by 25 but reduces total speed by 3%. Limit: 5",
 		image = moduleImagePath .. "module_adv_targeting.png",
 		limit = 5,
 		cost = 200 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.075
+			sharedData.rangeBoost = (sharedData.rangeBoost or 0) + 25
 			sharedData.speedMultPost = (sharedData.speedMultPost or 1) - 0.03
 		end
 	},

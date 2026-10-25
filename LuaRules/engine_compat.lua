@@ -262,6 +262,11 @@ if not Spring.SetUnitAlwaysUpdateMatrix then -- BAR 105-571
 	end
 end
 
+if gl and not gl.SetUnitBufferUniforms then -- BAR 105-631
+	gl.SetUnitBufferUniforms    = RET_ZERO
+	gl.SetFeatureBufferUniforms = RET_ZERO
+end
+
 if not Spring.GetUnitsInScreenRectangle and not Script.GetSynced() then -- BAR 105-637
 	Spring.GetUnitsInScreenRectangle = RET_TABLE
 end
@@ -632,6 +637,23 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 	end
 end
 
+if not Spring.GetAllyTeamRulesParam then 
+	local spGetGameRulesParam = Spring.GetGameRulesParam
+	Spring.GetAllyTeamRulesParam = function (allyTeamID, key)
+		return spGetGameRulesParam("allyTeamRulesParam_" .. allyTeamID .. "_" .. key)
+	end
+
+	Spring.GetAllyTeamRulesParams = RET_TABLE
+
+	-- Set technically added in BAR 105-1803, but useless without the matching Get
+	if Script.GetSynced() then
+		local spSetGameRulesParam = Spring.SetGameRulesParam
+		Spring.SetAllyTeamRulesParam = function (allyTeamID, key, value)
+			return spSetGameRulesParam("allyTeamRulesParam_" .. allyTeamID .. "_" .. key, value)
+		end
+	end
+end
+
 if not Script.IsEngineMinVersion(105, 0, 1856) then
 	local knownBoolsT = {}
 	local originalSTRP = Spring.SetTeamRulesParam
@@ -858,4 +880,32 @@ if gl and not gl.ObjectLabel then -- 2025.03, but can be nil anyway due to missi
 	gl.ObjectLabel    = RET_NONE
 	gl.PushDebugGroup = RET_NONE
 	gl.PopDebugGroup  = RET_NONE
+end
+
+if Spring.UnitScript and not Spring.UnitScript.Scale then -- 2025.06
+	Spring.UnitScript.WaitForScale  = RET_FALSE
+	Spring.UnitScript.IsInScale     = RET_FALSE
+
+	local spusGetActiveUnitID = Spring.UnitScript.GetActiveUnitID
+
+	local spGetUnitPieceMatrix = Spring.GetUnitPieceMatrix
+	Spring.UnitScript.GetPieceScale = function (piece)
+		local matrix = {spGetUnitPieceMatrix(spusGetActiveUnitID(), piece)}
+
+		if matrix[1] ~= matrix[ 6]
+		or matrix[1] ~= matrix[11] then
+			error("Stop using spSetUnitPieceMatrix to set per-axis sizes. New engine does not support it")
+		end
+
+		return matrix[1]
+	end
+
+	local spSetUnitPieceMatrix = Spring.SetUnitPieceMatrix
+	Spring.UnitScript.Scale = function (piece, scale)
+		local matrix = {spGetUnitPieceMatrix(spusGetActiveUnitID(), piece)}
+		matrix[ 1] = scale
+		matrix[ 6] = scale
+		matrix[11] = scale
+		return spSetUnitPieceMatrix(spusGetActiveUnitID(), piece, matrix)
+	end
 end

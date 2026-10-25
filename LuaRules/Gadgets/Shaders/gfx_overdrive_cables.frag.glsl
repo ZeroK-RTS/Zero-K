@@ -1,0 +1,686 @@
+#version 430
+#extension GL_ARB_uniform_buffer_object : require
+#extension GL_ARB_shading_language_420pack: require
+#extension GL_ARB_shader_storage_buffer_object : require
+
+uniform sampler2D infoTex;
+uniform sampler2D cableTex;
+uniform float gameTime;
+uniform float enableFlow;     // 1.0 = full bubble pass; 0.0 = static cables (no animation)
+uniform float ghostsEnabled;  // 1.0 = ghost branch active; 0.0 = enemy OOL discards immediately
+uniform sampler2DShadow shadowTex;  // engine shadow map ($shadow); sampled for shadow reception
+uniform float shadowsEnabled; // 1.0 = sample the shadow map; 0.0 = treat everything as fully lit
+uniform float losViewEnabled; // 1.0 = LOS overlay is on (GetMapDrawMode=="los"); 0.0 = normal view
+
+// Same SSBO as the GS — per-edge coverage bitmask, gates per-segment
+// ghost rendering for enemy fragments.
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
+layout (std430, binding = 6) coherent buffer cableCoverageBuffer {
+	uvec4 cableCoverage[];
+};
+#endif
+
+in DataGS {
+	vec3 worldPos;
+	float capacity;
+	float isBranch;
+	float width;
+	vec2 cableUV;
+	vec2 timeData;
+	vec3 gridData;          // (gridEfficiency, flow, isOwnAlly / ghost flag); see GS BUDGET NOTE
+	vec3 cableTangent;      // smooth per-vertex cable along-direction; interpolated → drives the lit frame below
+	float spawnAlongMain;   // overloaded: main ribbon → lenPerSeg; twig → twig-along
+	flat int gsSlot;
+};
+
+//__ENGINEUNIFORMBUFFERDEFS__
+
+// =====================================================================
+// VISUAL TUNING — knobs you most likely want to tweak when devving.
+// Pure aesthetic constants; nothing here changes geometry or topology.
+// =====================================================================
+
+// Grow/wither animation rates (elmos/s). The CPU only supplies appear/wither
+// timestamps (timeData); the fronts sweep entirely FS-side. The unsynced
+// WITHER_HOLD_FRAMES must stay generous relative to worst-case cable length /
+// WITHER_RATE so geometry outlives the animation.
+const float GROWTH_RATE        = 250.0;
+const float WITHER_RATE        = 400.0;
+
+// Bark / inner colours. Bark = visible outer cable; inner = brighter core
+// shown through the centre line by `innerMix`. capT (capacity / 100) only
+// blends `innerColor` between two grey levels; no hue.
+const vec3  EDGE_COLOR         = vec3(0.35);
+const vec3  BARK_COLOR         = vec3(0.45);
+const vec3  INNER_COLOR_LO     = vec3(0.55);   // capT = 0
+const vec3  INNER_COLOR_HI     = vec3(0.6);   // capT = 1
+const float TWIG_INNER_DAMPEN  = 1.1;          // twigs read more uniformly than trunks
+const float GRID_INNER_MIX     = 0.0025; // Mix grid colour into the inner tube
+
+// Opaque wires
+const float EDGE_ALPHA         = 1.0;
+const float BASE_ALPHA         = 1.0;
+const float INNER_ALPHA        = 1.0;
+
+// Lighting: floor on diffuse keeps fully-shaded sides from going pitch black
+// (cables read as plasma conduits, not asphalt); spec is blinn-phong on a
+// synthetic cylinder normal.
+const float DIFFUSE_FLOOR      = 0.4;
+const float SPEC_EXP           = 15.0;
+const float SPEC_MAGNITUDE     = 0.42;
+const vec3  SPEC_TINT          = vec3(1.0, 0.95, 0.85);
+
+// LOS / ghost: dim factor remaps losState through this range; fullLOS uses
+// a hard threshold so bubbles only animate inside actual visibility.
+const float DIM_LOS_LO         = 0.2;
+const float DIM_LOS_HI         = 0.6;
+const float DIM_FACTOR_MIN     = 0.5;          // bark brightness at full darkness
+const float FULLLOS_LO         = 0.5;
+const float FULLLOS_HI         = 1.0;
+
+// Bubbles change speed and size depending on flow rate
+// These changes come in 4 steps to deal with bubble teleportation.
+const float BUBBLE_FREQ_BASE = 0.45;
+const float BUBBLE_FREQ_FACTOR = 0.5;
+const float SPEED_1 = 0.2;
+const float SPEED_2 = 0.45;
+const float SPEED_3 = 0.8;
+const float SPEED_4 = 1.0;
+
+const float SPACING_1 = 1.8;
+const float SPACING_2 = 1.5;
+const float SPACING_3 = 1.2;
+const float SPACING_4 = 1.0;
+
+const float SIZE_1 = 1.0;
+const float SIZE_2 = 1.15;
+const float SIZE_3 = 1.25;
+const float SIZE_4 = 1.32;
+
+// Enemy LOS gating: below this losState, enemy fragments are hidden entirely
+// (no ghost). Own-ally fragments ignore this threshold — they fade via
+// dimFactor instead but always render.
+const float ENEMY_LOS_CUT      = 0.1;
+
+// Bubble flow mapping. Advection is FS-only: phase derives purely from
+// gameTime via the crossfaded speed ladder in main() — nothing is
+// CPU-integrated, so there is no bake to stay continuous across.
+const float MAX_SPEED          = 130.0;
+const float MAX_DENSITY_FLOW   = 100.0;
+const float MIN_TRUNK_W        = 3.0;
+const float SPACING_A          = 47.0;        // big bubble layer
+const float SPACING_B          = 29.0;         // small bubble layer
+const float BUBBLE_BIG_R       = 7.5;
+const float BUBBLE_SMALL_R     = 4.0;
+const float HALO_SIZE          = 3.5;
+
+// Bubble compositing weights.
+const float HALO_WEIGHT        = 0.95;
+const float BODY_WEIGHT        = 0.15;
+const float SPEC_WEIGHT        = 1.10;
+const float GRID_DESAT         = 0.18;         // how much to mute saturated grid hue
+const float BUBBLE_WHITE_MIX   = 0.15;         // mix into pure white for "hot core"
+const float HALO_WEIGHT_LAYER  = 0.55;         // layer-B halo blend
+
+// Twig pulse: a fast wave sweeps along the cable's `along` axis (used to
+// pick which twig fires next, encoding direction-from-root). When the wave
+// passes a twig's root, a slow sub-wave sweeps the twig itself.
+const float CABLE_PROP_SPEED   = 220.0;        // elmos/s — fast inter-twig stagger
+const float CABLE_PROP_PERIOD  = 500.0;        // elmos → 7s recurrence at 400/s
+const float TWIG_SWEEP_SPEED   = 60.0;         // elmos/s — visible motion within a twig
+const float PULSE_HW           = 3.0;          // Gaussian sigma in elmos
+const float PULSE_INTENSITY    = 0.9;
+const float PULSE_BODY_W       = 1.10;
+const float PULSE_SPEC_W       = 0.55;
+const float PULSE_HALO_W       = 0.50;
+
+// Ghost shading: simple flat light-gray, alpha-blended over terrain.
+// No lighting, no shimmer, no cylinder normal — reads as a memory trace.
+const vec3  GHOST_COLOR        = vec3(0.25);   // light neutral gray
+const float GHOST_CAP_TINT     = 0.02;         // small capacity-driven brighten
+const float GHOST_BRANCH_DAMP  = 0.85;
+const float GHOST_ALPHA_BASE   = 0.48;         // translucent baseline
+const float GHOST_EDGE_FADE_LO = 0.55;
+const float GHOST_EDGE_FADE_HI = 0.90;
+
+const float EDGE_BUFFER = 0.55; // Avoid rasterisation issues on the edge of the cable
+
+#ifdef DEFERRED_PASS
+// Deferred (model-gbuffer) variant writes cus_gl4's RENDERING_MODE==1 MRT
+// layout instead of a single lit colour. `fragColor` is aliased onto one of
+// the targets so the forward write statements still compile — they are dead
+// code in this variant (the DEFERRED_PASS block in main() returns first).
+out vec4 fragData[5];
+#define fragColor fragData[1]
+#else
+out vec4 fragColor;
+#endif
+
+float hash(vec2 p) {
+	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float hash1(float n) {
+	return fract(sin(n * 12.9898) * 43758.5453);
+}
+
+// One layer of advecting bubbles drawn as world-space-round glassy spheroids.
+// Density is fixed per layer (`spacing` constant); only `speed` changes with
+// flow. Each bubble has hash-derived size + cross-axis offset jitter so the
+// cable looks like bubbly fluid rather than a metronome.
+//
+// Crucially, distance is measured in actual world-space elmos in BOTH axes
+// (along + cross), so bubbles are real circles regardless of cable thickness.
+// `halfWidthE` is the cable cross half-extent in elmos at this fragment
+// (= width * 0.5); `radiusE` is each bubble's target radius in elmos and is
+// clamped so big bubbles fit inside thin cables instead of clipping to a
+// stripe.
+//
+// Shading: faint inner glow + Fresnel rim + small offset highlight, all with
+// smoothstep edges to avoid pixelation at oblique camera angles. Returns
+// (body, specular).
+// `phase` is the travel distance the caller derives from gameTime (via the
+// crossfaded speed ladder in main(), so subtle flow changes can't teleport
+// bubbles). Subtracting it from `along` advects the bubbles.
+//
+// Returns vec3: (body, specular, halo). Caller composites all three with
+// possibly different colour weights for richer look.
+vec3 bubbleLayer(float along, float phase, float density, float spacing,
+                 float radiusMax, float v, float halfWidthE, float layerSeed) {
+	float along2 = along - phase;
+	float idxLow  = floor(along2 / spacing);
+	float coord   = along2 - idxLow * spacing;     // [0, spacing)
+	float idxNear = (coord < spacing * 0.5) ? idxLow : (idxLow + 1.0);
+	float dAlong  = (coord < spacing * 0.5) ? coord : (spacing - coord);
+
+	float h1 = hash1(idxNear + layerSeed);
+	float h2 = hash1(idxNear + layerSeed + 71.3);
+	float h3 = hash1(idxNear + layerSeed + 186.3);
+	float alpha = smoothstep(h3*0.8, h3, density); // More bubbles appear 
+	// Bubble radius in elmos. Random per bubble; clamped so it sits within
+	// the cable cross-section even on thin twigs.
+	float radiusE = radiusMax * (0.7 + 0.3 * h1);
+	radiusE = min(radiusE, halfWidthE * 0.97);
+	if (radiusE < 0.5) return vec3(0.0);
+
+	// Cross-axis offset: in elmos, only as much margin as the cable can
+	// afford. Skinny cables → bubble centred; chunky cables → bubble can
+	// drift a little off-axis.
+	float crossMargin = max(0.0, halfWidthE - radiusE);
+	float yOffsetE    = (h2 - 0.5) * crossMargin * 1.0;
+
+	float dCrossE = v * halfWidthE - yOffsetE;
+	// Use the wider "halo radius" for the early-exit so the halo, which
+	// extends past r=1, isn't truncated.
+	float haloR = radiusE * 1.5;
+	float r2H = (dAlong * dAlong + dCrossE * dCrossE) / (haloR * haloR);
+	if (r2H >= 1.0) return vec3(0.0);
+
+	float r2 = (dAlong * dAlong + dCrossE * dCrossE) / (radiusE * radiusE);
+	float r  = sqrt(r2);
+	float xn = dAlong / radiusE;
+	float yn = dCrossE / radiusE;
+
+	// Screen-space derivative AA. Keeps every smoothstep edge ~1 pixel wide
+	// regardless of zoom; fixes thick-cable staircase pixelation.
+	float aa = clamp(fwidth(r) * 1.4, 0.005, 0.20);
+
+	// HOT CORE — Gaussian-style bright nucleus, peaks at r=0. Reads as
+	// glowing plasma rather than a flat disc.
+	float core = exp(-r2 * 4.5);
+	core *= 1.0 - smoothstep(1.0 - aa, 1.0, r);
+
+	// SHARP RIM — thin meniscus highlight near r ≈ 0.85.
+	float rim = smoothstep(0.55 - aa, 0.85, r)
+	          * (1.0 - smoothstep(0.85, 1.0 - aa * 0.4, r));
+	rim *= 1.4;
+
+	// SPECULAR — small bright dot offset toward the light direction.
+	vec2 hd = vec2(xn + 0.32, yn + 0.42);
+	float hr = length(hd);
+	float spec = 1.0 - smoothstep(0.0, 0.22 + aa, hr);
+	spec *= spec * spec;   // cubed → very sharp
+
+	// HALO — soft additive bloom outside the bubble's hard edge. Extends
+	// from r=0 out to r=1.5 with a gentle Gaussian falloff.
+	float halo = exp(-r2 * 0.9) * 0.45;
+	return vec3(core + rim, spec, halo) * alpha;
+}
+
+// HSL → RGB at S=1, L=0.5 — matches LuaUI/Headers/overdrive.lua's GetGridColor
+// (hue is the same triangle wave used for the panel/grid colour). Hue in [0,1).
+vec3 hueToRgb(float h) {
+	h = fract(h);
+	float r = clamp(abs(h * 6.0 - 3.0) - 1.0, 0.0, 1.0);
+	float g = clamp(2.0 - abs(h * 6.0 - 2.0), 0.0, 1.0);
+	float b = clamp(2.0 - abs(h * 6.0 - 4.0), 0.0, 1.0);
+	return vec3(r, g, b);
+}
+
+// efficiency (energy/metal ratio) → bubble colour, matching the economy
+// panel's grid swatch (LuaUI/Headers/overdrive.lua). The Lua side computes
+// `h = 5760 / (eff+2)^2` (clamped at eff < 3.5 to h = 190) and then feeds
+// `h / 255` into HSLtoRGB — so the hue divisor here is 255, not 360.
+// Result: low-load grids are blue/teal, fully-saturated grids go yellow→red.
+vec3 gridEfficiencyColor(float eff) {
+	if (eff <= 0.0) return vec3(1.0, 0.25, 1.0);
+	float h;
+	if (eff < 3.5) {
+		h = 190.0;
+	} else {
+		h = 5760.0 / ((eff + 2.0) * (eff + 2.0));
+	}
+	return hueToRgb(h / 255.0);
+}
+
+// Shadow reception. Returns 1.0 in full sun, → 0.0 fully shadowed. Mirrors the
+// engine's receive-side convention (cus_gl4.vert.glsl / map_lava.lua): transform
+// world pos by `shadowView` (from the engine UBO), recenter xy by +0.5, then a
+// projective compare against the depth map. NO `shadowProj` here — that's the
+// cast-side transform only; `shadowView` already maps into the sampling space.
+// shadowsEnabled gates the whole thing so we never sample a stale/absent map.
+//
+// Slope-scaled depth bias — the bias the receive pass was missing, which let the
+// cable self-shadow into moiré on the tent's grazing-lit slopes. Mirrors the
+// hard-shadow path in cus_gl4.frag.glsl exactly: nudge the compare depth toward
+// the light by tan(acos(NdotL)) texels, so only near-grazing fragments (small
+// NdotL, where acne shows) get the push while head-on fragments (NdotL→1) stay
+// crisp at ~0 bias. Same `0.5/texSize` magnitude and 5-texel clamp as the engine,
+// and the same space: sp is shadowView*world (sp.w == 1, so sp.z is the raw
+// compare depth), which is what cus_gl4 biases too.
+float getShadowCoeff(vec3 wp, float NdotL) {
+	if (shadowsEnabled < 0.5) return 1.0;
+	vec4 sp = shadowView * vec4(wp, 1.0);
+	sp.xy += vec2(0.5);
+	float texelInv = 0.5 / float(textureSize(shadowTex, 0).x);
+	float bias = clamp(texelInv * tan(acos(clamp(NdotL, 0.0, 1.0))), 0.0, 5.0 * texelInv);
+	sp.z -= bias;
+	return clamp(textureProj(shadowTex, sp), 0.0, 1.0);
+}
+
+void main() {
+	float v = cableUV.y * EDGE_BUFFER;
+	float t = abs(v);
+
+	// Visual grow/wither: cableUV.x is distance along cable in elmos.
+	// Growth front advances from u=0 forward.
+	float along = cableUV.x;
+	float visibleFront = (gameTime - timeData.x) * GROWTH_RATE;
+	if (along > visibleFront) discard;
+	// Wither: tail eats forward from u=0 (witherTime > 0 means withering).
+	if (timeData.y > 0.5) {
+		float witherFront = (gameTime - timeData.y) * WITHER_RATE;
+		if (along < witherFront) discard;
+	}
+
+#ifdef SHADOW_PASS
+	// Cast a shadow wherever the forward pass would render the LIVE cable, so
+	// the shadow never reveals more than the visible cable already does:
+	//   own / spectator (gridData.z >= 1.0) → always rendered    → always cast.
+	//   enemy live      (gridData.z == 0.0) → rendered only in LOS → LOS-gate.
+	//   ghost           (gridData.z <  -0.5) → memory trace, not in this VAO → never.
+	// The grow/wither discards above already trimmed the silhouette to the
+	// visible extent; depth is all the shadow map needs, so skip lighting.
+	if (gridData.z < -0.5) discard;
+	if (gridData.z < 0.5) {
+		vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+		if (texture(infoTex, losUV).r < ENEMY_LOS_CUT) discard;
+	}
+	fragColor = vec4(0.0);
+	return;
+#endif
+
+#ifdef DEFERRED_PASS
+	// Only LIVE cable fragments feed the model gbuffer (same gating the shadow
+	// pass uses): ghosts are translucent memory traces, not solid lit geometry,
+	// and enemy cables contribute only where they are in LOS — so a projectile
+	// light can never illuminate a cable the forward pass wouldn't have drawn.
+	// Falls through to the shared cylinder-normal math below; the gbuffer MRT
+	// write + return sit right after cylNormal is computed.
+	if (gridData.z < -0.5) discard;
+	if (gridData.z < 0.5) {
+		vec2 losUVd = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+		if (texture(infoTex, losUVd).r < ENEMY_LOS_CUT) discard;
+	}
+#endif
+
+	// FAST GHOST PATH — orphaned-enemy edges (gridData.z = -1.0) skip all the
+	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
+	// decide, render translucent flat ghost or discard. Nothing else.
+	if (gridData.z < -0.5) {
+		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
+		float los0 = texture(infoTex, losUV0).r;
+		if (los0 >= ENEMY_LOS_CUT) discard;
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
+		uint cov0 = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
+		// Per-segment ghost gating, mirroring the calc done lower in the FS
+		// for live fragments. spawnAlongMain carries lenPerSeg for main
+		// ribbons, twigs use any-bit fallback.
+		uint segBit0;
+		if (isBranch < 0.5) {
+			float lenPerSeg0 = spawnAlongMain;
+			int segIdx0 = (lenPerSeg0 > 0.0) ? clamp(int(cableUV.x / lenPerSeg0), 0, 23) : 0;
+			segBit0 = 1u << uint(segIdx0);
+		} else {
+			segBit0 = 0xFFFFFFu;
+		}
+		if ((cov0 & segBit0) == 0u) discard;
+#endif
+
+		// Flat ghost shade: light gray, slight capacity-driven brightening,
+		// branches a touch dimmer. Alpha-blend over terrain (depth-write off
+		// in the ghost draw pass) so the ribbon is a translucent overlay
+		// rather than an opaque painted line.
+		float capT0 = clamp(capacity / 100.0, 0.0, 1.0);
+		vec3 ghost0 = GHOST_COLOR * (1.0 - GHOST_CAP_TINT + GHOST_CAP_TINT * 2.0 * capT0);
+		if (isBranch > 0.5) ghost0 *= GHOST_BRANCH_DAMP;
+		float edgeFade0 = 1.0 - smoothstep(GHOST_EDGE_FADE_LO, GHOST_EDGE_FADE_HI, t);
+		fragColor = vec4(ghost0, GHOST_ALPHA_BASE * edgeFade0);
+		return;
+	}
+
+	// Three render classes for the FS:
+	//   isOwnAlly =  2.0 → always live and skip fog of war darkening.
+	//   isOwnAlly =  1.0 → own ally, always live (existing path below).
+	//   isOwnAlly =  0.0 → live enemy edge: render live in LOS, ghost in fog
+	//                       (gated by segment bit), discard if never seen.
+	//   isOwnAlly = -1.0 → orphaned ghost (synced removed it; we kept a
+	//                       snapshot). Always render ghost gated by segment
+	//                       bit; never live, regardless of LOS. This is the
+	//                       "you don't know it died" persistence.
+	float isOwnAlly = gridData.z;
+
+	// Cylinder cross-section normal that respects cable slope, derived from
+	// the smoothly-interpolated cable tangent passed in by the GS.
+	//
+	// `cableTangent` is set per-vertex by the GS to the local cable along-
+	// direction (back-diff of adjacent centerline vertices). The triangle-strip
+	// rasteriser linearly interpolates it across triangles → adjacent fragments
+	// along the cable see a continuously rotating tangent, so the cylinder's lit
+	// side bends smoothly with up/down hills instead of stepping per triangle
+	// (the flat-shaded faceting the old `dFdx(worldPos)` reconstruction caused,
+	// since screen-space derivatives are constant within a triangle). It is
+	// constant across each cross-section (apex+outer emit the same value), so it
+	// reorients only along the cable, never around its axis.
+	//
+	// Cross-section axis is `cross(worldUp, cableT)` — purely horizontal. This is
+	// now EXACTLY the axis the GS builds the cross-section width on (per-vertex
+	// B_v = cross(worldUp, vtxTangent)), so geometry and lighting share one frame
+	// and the texture's transverse grain follows the same curve the normal does.
+	// Sign matches by construction: the GS emits the -B_v edge at cableUV.y = -1
+	// and the +B_v edge at +1, and the FS leans the normal toward +perp3D (= +B_v)
+	// as v → +1.
+	float cableTL = length(cableTangent);
+	vec3 cableT = (cableTL > 1e-4) ? cableTangent / cableTL : vec3(1.0, 0.0, 0.0);
+	vec3 perp3D = cross(vec3(0.0, 1.0, 0.0), cableT);
+	float perp3DL = length(perp3D);
+	if (perp3DL > 1e-3) {
+		perp3D /= perp3DL;
+	} else {
+		// Cable nearly vertical — pick an arbitrary horizontal perp.
+		perp3D = vec3(1.0, 0.0, 0.0);
+	}
+
+	vec3 trueUp = cross(cableT, perp3D);
+	if (trueUp.y < 0.0) trueUp = -trueUp;   // ensure pointing skyward
+	trueUp = normalize(trueUp);
+
+	float up = sqrt(max(0.0, 1.0 - v * v / (2.0 * EDGE_BUFFER)));
+	vec3 cylNormal = normalize(trueUp * up + perp3D * v / EDGE_BUFFER * (1.0 - 0.7*isBranch));
+
+#ifdef DEFERRED_PASS
+	// Feed cus_gl4's model gbuffer (normtex/difftex/...) so deferred projectile
+	// lights shade the cable's own cylinder normal rather than letting whatever
+	// terrain sits underneath bleed through. The animated bubble glow is NOT
+	// written here — it stays a forward-only overlay (DrawWorldPreUnit), so the
+	// light pass can neither dim nor re-light it. Depth is written by the draw
+	// (DepthMask on) so the light reconstructs the cable surface and occludes.
+	float capTd = clamp(capacity / 100.0, 0.0, 1.0);
+	vec3 gbDiff = mix(INNER_COLOR_LO, INNER_COLOR_HI, capTd);
+	fragData[0] = vec4(cylNormal * 0.5 + 0.5, 1.0);   // GBUFFER_NORMTEX (SNORM2NORM)
+	fragData[1] = vec4(gbDiff, 1.0);                  // GBUFFER_DIFFTEX (albedo)
+	fragData[2] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_SPECTEX
+	fragData[3] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_EMITTEX (no bloom yet)
+	fragData[4] = vec4(0.0, 0.0, 0.0, 1.0);           // GBUFFER_MISCTEX
+	return;
+#endif
+
+	// Own lighting (forward rendered; the engine doesn't light cables, so we
+	// sample the shadow map ourselves). Shadow darkens only the SUN term, never
+	// the ambient floor — a cable in shadow falls to DIFFUSE_FLOOR, not black.
+	// Bubbles are composited later and stay emissive (lights in the dark).
+	vec3 gridColor   = gridEfficiencyColor(abs(gridData.x));
+	float maxxed = (gridData.x < -0.5 ? 1.0 : 0.0);
+	float rawNdotL = dot(cylNormal, normalize(sunDir.xyz));
+	float shadowCoeff = getShadowCoeff(worldPos, rawNdotL);
+	float sunNdotL = rawNdotL * shadowCoeff;
+	float diffuse = min(1.0, max(DIFFUSE_FLOOR, DIFFUSE_FLOOR + (1.0 - DIFFUSE_FLOOR) * sunNdotL));
+
+	// LOS state — sampled from $info:los (single-channel red), the engine's
+	// actual game-logic LOS texture: 0.0 = unscouted, 1.0 = currently in LOS.
+	// The floor `isOwnAlly - 1.0` already lifts spectators (isOwnAlly == 2.0) to
+	// full LOS so they never see fog-of-war dim. We extend that floor to own/ally
+	// cables (isOwnAlly >= 0.5) whenever the LOS overlay is OFF: the bark dim is
+	// a LOS-view affordance, and persisting it in normal view reads as a stray
+	// shadow on the player's own grid. Enemy cables (isOwnAlly < 0.5) are
+	// untouched — they only render in LOS at all, so the floor never lifts them.
+	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
+	float losFloor = isOwnAlly - 1.0;
+	if (losViewEnabled < 0.5 && isOwnAlly >= 0.5) losFloor = 1.0;
+	float losState = max(texture(infoTex, losUV).r, losFloor);
+	float fullLOS = smoothstep(FULLLOS_LO, FULLLOS_HI, losState);
+
+	// Specular
+	vec3 viewDir = normalize(cameraViewInv[3].xyz - worldPos);
+	float cameraDist = length(cameraViewInv[3].xyz - worldPos);
+	vec3 halfDir = normalize(normalize(sunDir.xyz) + viewDir);
+	float spec = pow(clamp(dot(cylNormal, halfDir), 0.0, 1.0), SPEC_EXP) * SPEC_MAGNITUDE * shadowCoeff;
+
+	// Bark / inner gray-scale tint by capacity. Industrial conduit look.
+	float capT = clamp(capacity / 100.0, 0.0, 1.0);
+	vec3 innerColor = mix(INNER_COLOR_LO, INNER_COLOR_HI, capT);
+	innerColor = mix(innerColor, gridColor, GRID_INNER_MIX * (1.0 - isBranch));
+
+	// Wire walls and transparent interior
+	float innerMix = smoothstep(0.85, 0.12, clamp(t / EDGE_BUFFER, 0.0, 1.0));
+	float innerMix2 = smoothstep(0.95, 0.15, clamp(t*t / (EDGE_BUFFER*EDGE_BUFFER), 0.0, 1.0));
+	if (isBranch > 0.5) {
+		innerMix *= TWIG_INNER_DAMPEN;
+	}
+	float texX = cableUV.x * 0.08 * (1.0 + 0.9 * isBranch) / sqrt(width);
+	float texY = cableUV.y*0.07 * (1.0 + 2.5 * isBranch) + 0.25 + isBranch*0.5;
+	vec4 cableSample = texture(cableTex, vec2(texX, texY));
+	vec3 baseColor = mix(EDGE_COLOR, cableSample.xyz, max(innerMix2, isBranch*0.85));
+
+	// Surface noise detail
+	float surfN = hash(worldPos.xz * 0.5) * 0.04;
+	baseColor += vec3(surfN);
+
+	// Fade out edges and with camera distance
+	float baseAlpha = mix(EDGE_ALPHA, BASE_ALPHA, innerMix2);
+	float alpha = mix(baseAlpha, INNER_ALPHA, innerMix) * (1.0 - 10.0*pow(t, 20.0));
+	alpha = alpha * max(0.85, losState);
+	
+	// Coverage bits are written by the GS (per-segment, per cable per frame).
+	// Per-fragment gating: derive segIdx from along-distance + len-per-segment
+	// packed into spawnAlongMain (see DataGS comment). Twigs use bit 0 as a
+	// fallback — they're decorative and only show when the parent has any
+	// coverage anyway.
+	uint segBit;
+	if (isBranch < 0.5) {
+		float lenPerSeg = spawnAlongMain;
+		int segIdx = (lenPerSeg > 0.0) ? clamp(int(cableUV.x / lenPerSeg), 0, 23) : 0;
+		segBit = 1u << uint(segIdx);
+	} else {
+		segBit = 0xFFFFFFu;   // twig: any-bit-set OK
+	}
+
+	// Re-scout clear is handled by the GS (atomicAnd at segment midpoints
+	// when the ghost edge's bits overlap with current LOS). Here in the FS
+	// we just discard the ghost fragment when it's in current LOS — the
+	// player is looking at empty ground, the cable shouldn't show.
+	bool isGhostEdge = isOwnAlly < -0.5;
+	if (isGhostEdge && losState >= ENEMY_LOS_CUT) discard;
+
+	bool enemyOutOfLOS = (isOwnAlly < 0.5 && isOwnAlly > -0.5 && losState < ENEMY_LOS_CUT);
+	if (enemyOutOfLOS) {
+		// Ghosts disabled: no SSBO read, no branch evaluation; just discard.
+		if (ghostsEnabled < 0.5) discard;
+#if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)
+		uint cov = (gsSlot >= 0) ? cableCoverage[gsSlot].x : 0u;
+		if ((cov & segBit) == 0u) discard;
+#endif
+		// Same flat translucent shading as the ghost-VBO fast path so
+		// live-out-of-LOS and orphaned ghosts read identically.
+		float capT2 = clamp(capacity / 100.0, 0.0, 1.0);
+		vec3 ghost = GHOST_COLOR * (1.0 - GHOST_CAP_TINT + GHOST_CAP_TINT * 2.0 * capT2);
+		if (isBranch > 0.5) ghost *= GHOST_BRANCH_DAMP;
+		float edgeFade = 1.0 - smoothstep(GHOST_EDGE_FADE_LO, GHOST_EDGE_FADE_HI, t);
+		fragColor = vec4(ghost, GHOST_ALPHA_BASE * edgeFade);
+		return;
+	}
+
+	// Apply lighting - Specular glint stands out too much when zoomed out
+	float distScale = clamp(800.0 / cameraDist, 0.0, 1.0);
+	baseColor = mix(baseColor, vec3(1.0), 0.12 * isBranch); // Brighten branch texture
+	vec3 color = baseColor * max(diffuse, isBranch) + SPEC_TINT * spec * distScale;
+
+	// Static-cable detail level: skip the entire bubble pass and bark dim.
+	// `enableFlow` is a uniform driven by the synced /cabletree flow toggle,
+	// so the same draw call cheaply shortcuts to a flat-lit cable when the
+	// player has opted out of the animated visual.
+	if (enableFlow < 0.5) {
+		// Still apply LOS-aware bark dim so out-of-LOS cables read as
+		// shadowed; just don't add bubble glow on top.
+		color *= mix(DIM_FACTOR_MIN, 1.0, smoothstep(DIM_LOS_LO, DIM_LOS_HI, losState));
+		fragColor = vec4(color, 1.0);
+		return;
+	}
+
+	// Energy bubbles travelling along the cable, like fluid in a pipe.
+	//
+	// Design:
+	//   - +u is the direction of energy flow (synced reorients edges by
+	//     current flow); all cables share one global phase so we never get
+	//     the optical illusion of "counter motion" inside a single cable.
+	//   - Density (bubbles per elmo) is determined by flow rate on the cable.
+	//   - Speed is roughly determined by flow rate as follows. There are
+	//     multiple speed layers on the cable that fade in and out as speed
+	//     changes. This prevents bubble teleportation due to subtle shifts in
+	//     flow rate.
+	//   - Two layered streams of bubbles (big + small) with random per-bubble
+	//     size + cross-axis offset, so the cable looks like a real bubbly
+	//     slurry instead of a metronome of identical dots.
+	//
+	// Cable thickness conveys capacity (orthogonal);
+	float flow = gridData.y;
+	// Linear thickness divisor: a cable 4× thicker than min gets its flow
+	// signal scaled to 1/4 before the sqrt → ~0.5× visual liveliness. Slight
+	// negative bias for thick cables ("wide pipe, same flow, calmer look").
+	float thicknessRatio = max(1.0, width / MIN_TRUNK_W);
+	float effFlow = max(flow, 0.0) / thicknessRatio;
+	float flowFactor = min(1.0, sqrt(effFlow / MAX_DENSITY_FLOW));
+	float halfWidthE = width * 0.5 / EDGE_BUFFER;        // cable cross half-extent in elmos
+
+	// Bubble pass: main ribbon uses two advecting bubble layers; twigs do a
+	// two-stage wave (see CABLE_PROP_SPEED + TWIG_SWEEP_SPEED).
+	float bubbleBody, bubbleSpec, bubbleHalo;
+	if (isBranch > 0.5) {
+		// Two-stage wavefront (decoupled cable-stagger + twig-sweep):
+		//   1. CABLE_PROP_SPEED sweeps a virtual fast wave along the cable's
+		//      `along` axis. Twigs at lower spawnAlongMain get hit earlier,
+		//      so the stagger encodes direction-from-root.
+		//   2. When that wave passes a twig's root, a slower sub-wave starts
+		//      at twig-local 0 and propagates through the twig at
+		//      TWIG_SWEEP_SPEED. Inter-twig stagger feels snappy while motion
+		//      *within* a twig stays comfortable.
+		// `spawnAlongMain` is what lets us decouple these — without it both
+		// speeds would be tied to the same propagation rate.
+		float wavePassedElmos = mod(gameTime * CABLE_PROP_SPEED * (1.0 + 1.2 * maxxed) - spawnAlongMain, CABLE_PROP_PERIOD / (1.0 + 0.5 * maxxed));
+		float subwavePos = TWIG_SWEEP_SPEED * (wavePassedElmos / CABLE_PROP_SPEED);
+		float localAlong = along - spawnAlongMain;
+		float d = localAlong - subwavePos;
+		// No wrap correction: when subwavePos overshoots the twig the
+		// Gaussian naturally falls to ~0 for any fragment.
+		float pulse = exp(-(d * d) / (PULSE_HW * PULSE_HW * (1.0 + 20.0 * maxxed)));
+		float crossT = 1.0 - smoothstep(0.7, 1.0, v * v);
+		float intensity = pulse * crossT * PULSE_INTENSITY * cableSample.a * max(0.5, maxxed);
+		bubbleBody = intensity * PULSE_BODY_W;
+		bubbleSpec = intensity * PULSE_SPEC_W;
+		bubbleHalo = intensity * PULSE_HALO_W;
+		color = mix(color, gridColor, (0.4 + 0.2*maxxed)*cableSample.a);
+	} else {
+		float speed, flowAlpha;
+		float bubbleChance = BUBBLE_FREQ_BASE + flowFactor * BUBBLE_FREQ_FACTOR;
+		vec3 bubbleType;
+		if (flowFactor < 0.4) {
+			speed = MAX_SPEED * gameTime * SPEED_1;
+			flowAlpha = sqrt(clamp((0.4 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.05)/0.05, 0.0, 1.0));
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_1, BUBBLE_BIG_R * SIZE_1,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_1, BUBBLE_SMALL_R * SIZE_1,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		if (flowFactor > 0.2 && flowFactor < 0.6) {
+			speed = MAX_SPEED * gameTime * SPEED_2;
+			flowAlpha = sqrt(clamp((0.6 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.2)/0.2, 0.0, 1.0));
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_2, BUBBLE_BIG_R * SIZE_2,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_2, BUBBLE_SMALL_R * SIZE_2,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		if (flowFactor > 0.4 && flowFactor < 0.8) {
+			speed = MAX_SPEED * gameTime * SPEED_3;
+			flowAlpha = sqrt(clamp((0.8 - flowFactor)/0.2, 0.0, 1.0) * clamp((flowFactor - 0.4)/0.2, 0.0, 1.0));
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_3, BUBBLE_BIG_R * SIZE_3,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_3, BUBBLE_SMALL_R * SIZE_3,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		if (flowFactor > 0.6) {
+			speed = MAX_SPEED * gameTime * SPEED_4;
+			flowAlpha = sqrt(clamp((flowFactor - 0.6)/0.2, 0.0, 1.0));
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_A * SPACING_4, BUBBLE_BIG_R * SIZE_4,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+			bubbleType = bubbleLayer(along, speed, bubbleChance, SPACING_B * SPACING_4, BUBBLE_SMALL_R * SIZE_4,   v, halfWidthE * HALO_SIZE,  3.7);
+			bubbleHalo += bubbleType.z * flowAlpha;
+		}
+		bubbleHalo *= HALO_WEIGHT_LAYER;
+	}
+
+	// Bubble colour: grid-efficiency hue, lightly toned down so it still
+	// glows clearly but isn't neon-saturated.
+	float gridLum    = dot(gridColor, vec3(0.299, 0.587, 0.214));
+	vec3 grayedGrid  = mix(gridColor, vec3(gridLum), GRID_DESAT);
+	vec3 bubbleColor = mix(grayedGrid, vec3(1.0), BUBBLE_WHITE_MIX);
+	vec3 haloColor   = grayedGrid;
+
+	// LOS-aware dimming on the BARK ONLY. Bubbles are plasma — emissive, so
+	// they shouldn't fade in shadow. Composing them after the dim means
+	// glowing balls remain "lights in the dark" rather than disappearing in
+	// LOS-dim regions.
+	float dimFactor = mix(DIM_FACTOR_MIN, 1.0, smoothstep(DIM_LOS_LO, DIM_LOS_HI, losState));
+	color *= dimFactor;
+
+	// Composition order:
+	//   - Halo: additive (soft underglow that should mix with bark colour).
+	//   - Body: max() over current colour, so dark bark can't leak into the
+	//     bubble's true grid hue. Plain additive composition causes hue
+	//     shifts (orange → yellow, magenta → pink) because the bark's green
+	//     channel piles onto the emissive. max() lets the emissive plasma
+	//     show its real colour through the cable in shadow.
+	//   - Spec: additive white sparkle on top.
+	
+	// Tone down distinctive features when zoomed out to cut down on pixelation.
+	color = mix(BARK_COLOR, color, distScale);
+	alpha = alpha * clamp(distScale + 1.0, 0.0, 1.0);
+	
+	color += haloColor * bubbleHalo * HALO_WEIGHT;
+	vec3 bubbleEmissive = bubbleColor * bubbleBody * BODY_WEIGHT;
+	color = max(color, bubbleEmissive);
+	color += vec3(1.0) * bubbleSpec * fullLOS * SPEC_WEIGHT;
+	
+	//color = color*0.0 + texture(cableTex, cableUV.xy * 0.05 + vec2(0, 0.5)).xyz;
+	//alpha = 1.0;
+	fragColor = vec4(color, alpha); // Mix in some of the underlying terrain
+}

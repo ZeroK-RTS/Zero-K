@@ -19,8 +19,12 @@ local function TiltWings()
 	while true do
 		local vx,_,vz = spGetUnitVelocity(unitID)
 		local speed = vx*vx + vz*vz
-		Turn (rjet, x_axis, math.rad(2) * speed, math.rad(60))
-		Turn (ljet, x_axis, math.rad(2) * speed, math.rad(60))
+		local turnTarget = math.rad(2) * speed
+		if turnTarget > math.rad(90) then
+			turnTarget = math.rad(90)
+		end
+		Turn (rjet, x_axis, turnTarget, math.rad(60))
+		Turn (ljet, x_axis, turnTarget, math.rad(60))
 		Sleep(100)
 	end
 end
@@ -33,14 +37,24 @@ local function RestoreAfterDelay ()
 	Turn (gun, x_axis, 0, math.rad(20))
 end
 
+function script.Activate()
+	Show(lfx)
+	Show(rfx)
+end
+
+function script.Deactivate()
+	Hide(lfx)
+	Hide(rfx)
+end
+
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread (TiltWings)
-	Hide (lfx)
-	Hide (rfx)
-	Hide (emit)
-	Turn (rfx, x_axis, math.rad(90))
-	Turn (lfx, x_axis, math.rad(90))
+	Hide(lfx)
+	Hide(rfx)
+	Hide(emit)
+	Turn(rfx, x_axis, math.rad(-90))
+	Turn(lfx, x_axis, math.rad(-90))
 end
 
 function script.QueryWeapon(num)

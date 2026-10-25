@@ -1,5 +1,5 @@
 local boxes = {
-	[0] = {
+	{
 		boxes = {
 			{
 				{3669, 5960},
@@ -77,7 +77,7 @@ local boxes = {
 		nameLong = "South-West",
 		nameShort = "SW",
 	},
-	[1] = {
+	{
 		boxes = {
 			{
 				{4522, 1121},
@@ -164,7 +164,7 @@ local boxes = {
 
 -- use a larger box for teams
 if not (#Spring.GetTeamList(0) == 1 and #Spring.GetTeamList(1) == 1) then
-	boxes[0].boxes[1] = {
+	boxes[1].boxes[1] = {
 		{2180, 6529},
 		{2214, 6586},
 		{2290, 6665},
@@ -213,7 +213,7 @@ if not (#Spring.GetTeamList(0) == 1 and #Spring.GetTeamList(1) == 1) then
 		{1979, 6372},
 		{2073, 6458},
 	}
-	boxes[1].boxes[1] = {
+	boxes[2].boxes[1] = {
 		{5900, 1422},
 		{6087, 1206},
 		{6096, 1080},
@@ -260,8 +260,8 @@ if not (#Spring.GetTeamList(0) == 1 and #Spring.GetTeamList(1) == 1) then
 		{5894, 1508},
 		{5889, 1458},
 	}
-	boxes[0].startpoints[3] = {4106, 5037}
-	boxes[1].startpoints[3] = {4019, 2033}
+	boxes[1].startpoints[3] = {4106, 5037}
+	boxes[2].startpoints[3] = {4019, 2033}
 end
 
 return boxes, {2}

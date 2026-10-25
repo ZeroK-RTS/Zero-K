@@ -152,7 +152,7 @@ local function ExplodeTurret(num)
 	for i=1,3 do
 		if math.random() > 0.5 then
 			Explode(barrels[num][i], SFX.FALL + SFX.SMOKE + SFX.EXPLODE)
-			Hide(barrels[num][i], SFX.FALL + SFX.SMOKE + SFX.EXPLODE)
+			Hide(barrels[num][i])
 		else
 			Explode(barrels[num][i], SFX.SHATTER)
 		end

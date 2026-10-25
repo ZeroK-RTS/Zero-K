@@ -458,6 +458,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Create()
+	Hide(engineEmit)
 	Turn(dust1, x_axis, math.rad(90))
 	Turn(dust2, x_axis, math.rad(90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
@@ -475,11 +476,13 @@ end
 
 function script.Activate()
 	StartThread(TakeOffOrLand)
+	Show(engineEmit)
 end
 
 function script.Deactivate()
 	StartThread(TakeOffOrLand)
 	StartThread(closeDoors)
+	Hide(engineEmit)
 end
 
 

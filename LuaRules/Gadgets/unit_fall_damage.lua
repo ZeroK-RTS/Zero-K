@@ -341,18 +341,23 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local tf = att.friction
 		vx, vy, vz = tx*tf + nx*nf - vx, ty*tf + ny*nf - vy, tz*tf + nz*nf - vz
 		
-		if OutsideMap(x, z) then
-			SetUnitInsideMap(unitID, x, z)
-		end
+		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)
+		local damageTotal = LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + OutsideMapDamage(unitDefID, x, z)
+		damageTotal = damageTotal*(collisionDamageMult[unitID] or 1)
 		GG.AddGadgetImpulseRaw(unitID, vx, vy, vz, true, true)
+		if OutsideMap(x, z) then
+			local health, maxHealth = Spring.GetUnitHealth(unitID)
+			local armored, armorMultiple = Spring.GetUnitArmored(unitID)
+			if health > damageTotal*(armored and armorMultiple or 1) then
+				SetUnitInsideMap(unitID, x, z)
+				Spring.SetUnitVelocity(unitID, 0, 0, 0)
+			end
+		end
 		
 		if env and env.script.StopMoving then
 			env.script.StopMoving()
 		end
 		
-		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)
-		local damageTotal = LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + OutsideMapDamage(unitDefID, x, z)
-		damageTotal = damageTotal*(collisionDamageMult[unitID] or 1)
 		return damageTotal
 	end
 
