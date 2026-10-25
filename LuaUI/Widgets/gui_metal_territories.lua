@@ -11,7 +11,7 @@ function widget:GetInfo()
 end
 
 options_path = 'Settings/Graphics/Map/Metal Territories'
-options_order = {'opacity'}
+options_order = {'opacity', 'borders'}
 options = {
 	opacity = {
 		name = 'Opacity',
@@ -21,23 +21,48 @@ options = {
 		max = 0.8,
 		step = 0.01,
 	},
+	borders = {
+		name = 'Borders',
+		type = 'radioButton',
+		value = 'all',
+		items = {
+			{key = 'off', name = 'Off'},
+			{key = 'all', name = 'Every territory'},
+			{key = 'owners', name = 'Between different owners'},
+		},
+		noHotkey = true,
+	},
 }
 
 local min, max = math.min, math.max
 local spots, cells, spotSource
 local byPosition, unitSpot, observations, dirty = {}, {}, {}, {}
 local myAllyTeam, fullView
-local atlas, positions, observed, history, nextHistory, palette, depth
-local paintShader, stateShader, drawShader, quad
-local stateFullView, drawOpacity, drawInverse, drawView
+local atlas, edges, positions, observed, history, nextHistory, palette, depth
+local paintShader, cellShader, stateShader, drawShader, quad
+local stateFullView, drawOpacity, drawBorders, drawInverse, drawView
 local viewX, viewY, viewW, viewH
 local depthFBO
 local paletteDirty = true
+local borderModes = {off = 0, all = 1, owners = 2}
 local mexDefs = {}
 for id, ud in pairs(UnitDefs) do
 	if ud.customParams and ud.customParams.ismex then
 		mexDefs[id] = true
 	end
+end
+
+-- The static atlas has at most 2048 texels on its longest side.
+local atlasScale = min(1/4, 2048/max(Game.mapSizeX, Game.mapSizeZ))
+local atlasX, atlasZ = max(1, math.ceil(Game.mapSizeX*atlasScale)), max(1, math.ceil(Game.mapSizeZ*atlasScale))
+local texelX, texelZ = Game.mapSizeX/atlasX, Game.mapSizeZ/atlasZ
+-- A border is 1.5x the hatching stroke (0.36*64/sqrt(2) elmos). Its gap from
+-- the edge exceeds half a texel diagonal, so it never samples another cell.
+local borderGap, borderWidth = max(8, 0.75*max(texelX, texelZ)), 24
+
+-- Points p with nx*p.x + nz*p.z <= limit have a lower power distance to a than to b.
+local function Bisector(a, b)
+	return 2*(b.x - a.x), 2*(b.z - a.z), b.x*b.x + b.z*b.z - b.weight - a.x*a.x - a.z*a.z + a.weight
 end
 
 -- Power distance = squared distance - weight. A shared scale keeps equal
@@ -64,15 +89,14 @@ local function BuildCells(source, width, height)
 	for i = 1, #sites do
 		sites[i].weight = 0.25*nearest*max(0.5, min(2.5, (sites[i].metal or 2)/2))
 	end
-	local result = {}
+	local result, lines = {}, {}
 	for i = 1, #sites do
 		local a = sites[i]
+		-- Each vertex keeps the neighbour across its following edge; nil is the map edge.
 		local polygon = {{0, 0}, {width, 0}, {width, height}, {0, height}}
 		for j = 1, #sites do
 			if i ~= j then
-				local b = sites[j]
-				local nx, nz = 2*(b.x - a.x), 2*(b.z - a.z)
-				local limit = b.x*b.x + b.z*b.z - b.weight - a.x*a.x - a.z*a.z + a.weight
+				local nx, nz, limit = Bisector(a, sites[j])
 				local clipped = {}
 				local p = polygon[#polygon]
 				for k = 1, #polygon do
@@ -81,7 +105,7 @@ local function BuildCells(source, width, height)
 					local dq = nx*q[1] + nz*q[2] - limit
 					if (dp <= 0) ~= (dq <= 0) then
 						local t = dp/(dp - dq)
-						clipped[#clipped + 1] = {p[1] + t*(q[1] - p[1]), p[2] + t*(q[2] - p[2])}
+						clipped[#clipped + 1] = {p[1] + t*(q[1] - p[1]), p[2] + t*(q[2] - p[2]), dq > 0 and j or p[3]}
 					end
 					if dq <= 0 then
 						clipped[#clipped + 1] = q
@@ -91,9 +115,29 @@ local function BuildCells(source, width, height)
 				polygon = clipped
 			end
 		end
-		result[i] = polygon
+		-- Neighbour edges as two texels: the unit inward normal (distance =
+		-- ux*x + uz*z + w) and neighbour, then the extent along (-uz, ux).
+		-- An end on the map edge stays open, so borders run into the map edge.
+		local list, listed = {}, {}
+		for k, v in ipairs(polygon) do
+			local j = v[3]
+			if j and not listed[j] then
+				listed[j] = true
+				local nx, nz, limit = Bisector(a, sites[j])
+				local length = math.sqrt(nx*nx + nz*nz)
+				local ux, uz = -nx/length, -nz/length
+				local q = polygon[k%#polygon + 1]
+				local from, to = ux*v[2] - uz*v[1], ux*q[2] - uz*q[1]
+				local open = to > from and 1e6 or -1e6
+				if not polygon[(k - 2)%#polygon + 1][3] then from = from - open end
+				if not q[3] then to = to + open end
+				list[#list + 1] = {ux, uz, limit/length, j - 1}
+				list[#list + 1] = {min(from, to), max(from, to), 0, 0}
+			end
+		end
+		result[i], lines[i] = polygon, list
 	end
-	return sites, result
+	return sites, result, lines
 end
 
 local vertexSource = [[
@@ -110,6 +154,44 @@ local paintSource = [[
 in vec4 data;
 out vec4 result;
 void main() { result = data; }
+]]
+-- Distance to a neighbour edge: to its line beside the edge, else to its nearer
+-- end, so a border turning a corner is rounded. Negative on the far side.
+local edgeDistanceSource = [[
+float EdgeDistance(sampler2D edges, int slot, int cell, vec2 pos) {
+	vec4 line = texelFetch(edges, ivec2(2*slot, cell), 0);
+	vec2 extent = texelFetch(edges, ivec2(2*slot + 1, cell), 0).xy;
+	float d = dot(line.xy, pos) + line.z;
+	float t = dot(vec2(-line.y, line.x), pos);
+	return d < 0.0 ? d : length(vec2(d, max(max(extent.x - t, t - extent.y), 0.0)));
+}
+]]
+local cellSource = [[
+#version 420 compatibility
+uniform sampler2D edges;
+uniform vec2 texelSize;
+in vec4 data;
+out vec4 result;
+]] .. edgeDistanceSource .. [[
+void main() {
+	// Keep the texel's two nearest neighbour edges, as slot + 1 (0 is none).
+	vec2 pos = gl_FragCoord.xy * texelSize;
+	int cell = int(data.r + 0.5);
+	vec2 nearest = vec2(1e30);
+	vec2 slots = vec2(0.0);
+	for (int i = 0; i < textureSize(edges, 0).x/2; i++) {
+		if (texelFetch(edges, ivec2(2*i, cell), 0).xy == vec2(0.0)) break;
+		float d = EdgeDistance(edges, i, cell, pos);
+		if (d < nearest.x) {
+			nearest = vec2(d, nearest.x);
+			slots = vec2(float(i + 1), slots.x);
+		} else if (d < nearest.y) {
+			nearest.y = d;
+			slots.y = float(i + 1);
+		}
+	}
+	result = vec4(data.rg, slots);
+}
 ]]
 local stateSource = [[
 #version 420 compatibility
@@ -141,12 +223,16 @@ uniform sampler2D depthTex;
 uniform sampler2D atlas;
 uniform sampler2D owners;
 uniform sampler2D palette;
+uniform sampler2D edges;
 uniform mat4 inverseViewProjection;
 uniform vec4 view; // width, height, viewport x, viewport y
 uniform vec2 mapSize;
+uniform vec2 border; // gap and outer side of the border line, in elmos
 uniform float opacity;
+uniform int borderMode; // 0 off, 1 every territory, 2 between different owners
 uniform int clipZeroToOne;
 out vec4 result;
+]] .. edgeDistanceSource .. [[
 void main() {
 	vec2 uv = (gl_FragCoord.xy - view.zw) / view.xy;
 	float d = texture(depthTex, uv).r;
@@ -155,17 +241,35 @@ void main() {
 	vec4 world = inverseViewProjection * vec4(2.0*uv - 1.0, z, 1.0);
 	vec2 pos = world.xz / world.w;
 	if (any(lessThan(pos, vec2(0.0))) || any(greaterThanEqual(pos, mapSize))) discard;
-	vec2 territory = texture(atlas, pos / mapSize).rg;
+	vec4 territory = texture(atlas, pos / mapSize);
 	int spot = int(territory.r + 0.5);
 	int owner = int(texelFetch(owners, ivec2(spot, 0), 0).r + 0.5);
-	vec3 color = texelFetch(palette, ivec2(owner, 0), 0).rgb;
+	// Alpha identifies the shown owner.
+	vec4 color = texelFetch(palette, ivec2(owner, 0), 0);
+	// Exact distance to the nearest bordered edge of the texel's two nearest.
+	float edge = 1e6;
+	for (int k = 0; k < 2 && borderMode != 0; k++) {
+		int slot = int(territory[k + 2] + 0.5) - 1;
+		if (slot < 0) continue;
+		if (borderMode == 2) {
+			int neighbour = int(texelFetch(edges, ivec2(2*slot, spot), 0).w + 0.5);
+			int other = int(texelFetch(owners, ivec2(neighbour, 0), 0).r + 0.5);
+			if (texelFetch(palette, ivec2(other, 0), 0).a == color.a) continue;
+		}
+		edge = min(edge, EdgeDistance(edges, slot, spot, pos));
+	}
 	// World-space diagonal stripes, with a pixel-width antialiased edge.
 	float stripe = (pos.x + pos.y)/64.0;
 	float aa = max(fwidth(stripe), 0.001);
 	float hatch = 1.0 - smoothstep(0.18 - aa, 0.18 + aa, abs(fract(stripe) - 0.5));
 	// At subpixel stripe sizes use the mean coverage, avoiding distant shimmer.
 	hatch = mix(hatch, 0.36, smoothstep(0.25, 1.0, aa));
-	result = vec4(color, opacity * territory.g * hatch);
+	// Gap, solid border, then hatching. The edge distance can jump where the
+	// nearest edges change, so antialias with the pixel size in elmos.
+	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
+	float inner = smoothstep(border.x - px, border.x + px, edge);
+	float outer = smoothstep(border.y - px, border.y + px, edge);
+	result = vec4(color.rgb, opacity * (inner - outer + outer * territory.g * hatch));
 }
 ]]
 
@@ -184,17 +288,23 @@ local function ClearTexture(texture)
 	gl.RenderToTexture(texture, function() gl.Clear(GL.COLOR_BUFFER_BIT, 0, 0, 0, 0) end)
 end
 
-local function PaintRow(texture, values, width)
+local function PaintRows(texture, rows, width)
 	gl.UseShader(paintShader)
 	gl.RenderToTexture(texture, function()
 		gl.BeginEnd(GL.POINTS, function()
-			for i, value in pairs(values) do
-				gl.Color(value)
-				gl.Vertex(2*(i - 0.5)/width - 1, 0, 0)
+			for y, values in pairs(rows) do
+				for i, value in pairs(values) do
+					gl.Color(value)
+					gl.Vertex(2*(i - 0.5)/width - 1, 2*(y - 0.5)/#rows - 1, 0)
+				end
 			end
 		end)
 	end)
 	gl.UseShader(0)
+end
+
+local function PaintRow(texture, values, width)
+	PaintRows(texture, {values}, width)
 end
 
 local function SetObservation(i, owner, present, learn)
@@ -244,7 +354,7 @@ local function ResetView()
 end
 
 local function UpdatePalette()
-	local teams, first, colors = Spring.GetTeamList(), {}, {[1] = {0.55, 0.55, 0.55, 1}}
+	local teams, first, colors = Spring.GetTeamList(), {}, {[1] = {0.55, 0.55, 0.55, 0}}
 	for _, teamID in ipairs(teams) do
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		first[ally] = min(first[ally] or teamID, teamID)
@@ -254,7 +364,8 @@ local function UpdatePalette()
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		local colorTeam = ally == myAllyTeam and teamID or first[ally]
 		colors[teamID + 2] = {Spring.GetTeamColor(colorTeam)}
-		colors[teamID + 2][4] = 1
+		-- Alpha is the shown owner: neutral 0, otherwise the colour team + 1.
+		colors[teamID + 2][4] = colorTeam + 1
 		width = max(width, teamID + 2)
 	end
 	if palette then gl.DeleteTexture(palette) end
@@ -264,34 +375,41 @@ local function UpdatePalette()
 end
 
 local function DeleteMapTextures()
-	for _, texture in pairs({atlas, positions, observed, history, nextHistory, palette}) do
+	for _, texture in pairs({atlas, edges, positions, observed, history, nextHistory, palette}) do
 		gl.DeleteTexture(texture)
 	end
-	atlas, positions, observed, history, nextHistory, palette = nil, nil, nil, nil, nil, nil
+	atlas, edges, positions, observed, history, nextHistory, palette = nil, nil, nil, nil, nil, nil, nil
 end
 
 local function BuildMap()
 	DeleteMapTextures()
 	spotSource = WG.metalSpots
-	spots, cells = BuildCells(spotSource or {}, Game.mapSizeX, Game.mapSizeZ)
+	local lines
+	spots, cells, lines = BuildCells(spotSource or {}, Game.mapSizeX, Game.mapSizeZ)
 	byPosition = {}
 	if #spots == 0 then return end
-	local pointData = {}
+	local pointData, width = {}, 1
 	for i, s in ipairs(spots) do
 		byPosition[s.x] = byPosition[s.x] or {}
 		byPosition[s.x][s.z] = i
 		pointData[i] = {s.x, s.z, 0, 0}
+		width = max(width, #lines[i])
 	end
 	positions, observed = NewTexture(#spots, 1), NewTexture(#spots, 1)
 	history, nextHistory = NewTexture(#spots, 1), NewTexture(#spots, 1)
 	PaintRow(positions, pointData, #spots)
-	-- Static cell IDs and radial fade; at most 32 MiB, regardless of map size.
-	local scale = min(1/4, 2048/max(Game.mapSizeX, Game.mapSizeZ))
-	atlas = assert(gl.CreateTexture(max(1, math.ceil(Game.mapSizeX*scale)), max(1, math.ceil(Game.mapSizeZ*scale)), {
-		format = GL.RG32F, min_filter = GL.NEAREST, mag_filter = GL.NEAREST,
+	-- One row of neighbour edges per cell; unused slots stay zero.
+	edges = NewTexture(width, #spots)
+	ClearTexture(edges)
+	PaintRows(edges, lines, width)
+	-- Static cell IDs, radial fade and two nearest edges; at most 32 MiB,
+	-- regardless of map size. Half floats are exact for indices below 2048.
+	atlas = assert(gl.CreateTexture(atlasX, atlasZ, {
+		format = GL.RGBA16F, min_filter = GL.NEAREST, mag_filter = GL.NEAREST,
 		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE, fbo = true,
 	}))
-	gl.UseShader(paintShader)
+	gl.Texture(0, edges)
+	gl.UseShader(cellShader)
 	gl.RenderToTexture(atlas, function()
 		for i, polygon in ipairs(cells) do
 			gl.BeginEnd(GL.TRIANGLE_FAN, function()
@@ -306,6 +424,7 @@ local function BuildMap()
 		end
 	end)
 	gl.UseShader(0)
+	gl.Texture(0, false)
 	cells = nil
 	ResetView()
 end
@@ -317,22 +436,27 @@ function widget:Initialize()
 		return
 	end
 	paintShader = gl.CreateShader({vertex = vertexSource, fragment = paintSource})
+	cellShader = gl.CreateShader({vertex = vertexSource, fragment = cellSource,
+		uniformInt = {edges = 0},
+		uniform = {texelSize = {texelX, texelZ}},
+	})
 	stateShader = gl.CreateShader({vertex = vertexSource, fragment = stateSource,
 		uniformInt = {previousState = 0, observations = 1, positions = 2, los = 3},
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	drawShader = gl.CreateShader({vertex = vertexSource, fragment = drawSource,
-		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3,
+		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3, edges = 4,
 			clipZeroToOne = Platform.glSupportClipSpaceControl and 1 or 0},
-		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
+		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, border = {borderGap, borderGap + borderWidth}},
 	})
-	if not paintShader or not stateShader or not drawShader then
+	if not paintShader or not cellShader or not stateShader or not drawShader then
 		Spring.Echo('Metal Territories shader error: ' .. gl.GetShaderLog())
 		widgetHandler:RemoveWidget(self)
 		return
 	end
 	stateFullView = gl.GetUniformLocation(stateShader, 'fullView')
 	drawOpacity = gl.GetUniformLocation(drawShader, 'opacity')
+	drawBorders = gl.GetUniformLocation(drawShader, 'borderMode')
 	drawInverse = gl.GetUniformLocation(drawShader, 'inverseViewProjection')
 	drawView = gl.GetUniformLocation(drawShader, 'view')
 	quad = gl.CreateList(function() gl.TexRect(-1, -1, 1, 1) end)
@@ -446,16 +570,18 @@ function widget:DrawWorldPreUnit()
 			gl.Texture(1, atlas)
 			gl.Texture(2, history)
 			gl.Texture(3, palette)
+			gl.Texture(4, edges)
 			gl.UseShader(drawShader)
 			gl.UniformMatrix(drawInverse, 'viewprojectioninverse')
 			gl.Uniform(drawView, viewW, viewH, viewX, viewY)
 			gl.Uniform(drawOpacity, options.opacity.value)
+			gl.UniformInt(drawBorders, borderModes[options.borders.value])
 			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 			gl.CallList(quad)
 			gl.UseShader(0)
 		end
 	end
-	for i = 3, 0, -1 do gl.Texture(i, false) end
+	for i = 4, 0, -1 do gl.Texture(i, false) end
 	gl.PopAttrib()
 end
 
@@ -465,6 +591,7 @@ function widget:Shutdown()
 	if depth then gl.DeleteTexture(depth) end
 	if quad then gl.DeleteList(quad) end
 	if paintShader then gl.DeleteShader(paintShader) end
+	if cellShader then gl.DeleteShader(cellShader) end
 	if stateShader then gl.DeleteShader(stateShader) end
 	if drawShader then gl.DeleteShader(drawShader) end
 end
