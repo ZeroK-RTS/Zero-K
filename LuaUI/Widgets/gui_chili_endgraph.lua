@@ -261,7 +261,7 @@ local function MakeProbe(lines, statistic, graphLength, generalHistory, totalTim
 		else
 			seconds = math.min(generalHistory[index].time, totalTime)
 		end
-		timeLabel:SetCaption("Sample: " .. formatTime(math.floor(seconds)))
+		timeLabel:SetCaption("Time: " .. formatTime(math.floor(seconds)))
 		local rowHeight = math.ceil(timeLabel.font:GetLineHeight(13)) + 2
 		local rows = math.max(1, math.floor((height - 12)/rowHeight) - 1)
 		local columnWidths = {}
