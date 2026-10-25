@@ -10,8 +10,13 @@ function widget:GetInfo()
 	}
 end
 
+local paletteDirty = true
+local function RepaintPalette()
+	paletteDirty = true
+end
+
 options_path = 'Settings/Graphics/Map/Metal Territories'
-options_order = {'opacity', 'borders'}
+options_order = {'opacity', 'borders', 'allies', 'allyColor', 'enemies', 'enemyColor'}
 options = {
 	opacity = {
 		name = 'Opacity',
@@ -32,6 +37,41 @@ options = {
 		},
 		noHotkey = true,
 	},
+	allies = {
+		name = 'Allied territories',
+		type = 'radioButton',
+		value = 'you',
+		items = {
+			{key = 'you', name = 'Your colour', desc = "Allies share mex income, so their territories have your colour. Spectators see each player's colour."},
+			{key = 'players', name = "Each player's colour"},
+			{key = 'custom', name = 'Custom', desc = "The colour below. Spectators see each player's colour."},
+		},
+		noHotkey = true,
+		OnChange = RepaintPalette,
+	},
+	allyColor = {
+		name = 'Custom allied colour',
+		type = 'colors',
+		value = {1, 1, 1, 1},
+		OnChange = RepaintPalette,
+	},
+	enemies = {
+		name = 'Enemy territories',
+		type = 'radioButton',
+		value = 'team',
+		items = {
+			{key = 'team', name = 'Team colour', desc = 'Each enemy team has the colour of its first player.'},
+			{key = 'custom', name = 'Custom', desc = 'The colour below. Spectators see team colours.'},
+		},
+		noHotkey = true,
+		OnChange = RepaintPalette,
+	},
+	enemyColor = {
+		name = 'Custom enemy colour',
+		type = 'colors',
+		value = {0, 0, 0, 1},
+		OnChange = RepaintPalette,
+	},
 }
 
 local min, max = math.min, math.max
@@ -43,7 +83,6 @@ local paintShader, cellShader, stateShader, drawShader, quad
 local stateFullView, drawOpacity, drawBorders, drawInverse, drawView
 local viewX, viewY, viewW, viewH
 local depthFBO
-local paletteDirty = true
 local borderModes = {off = 0, all = 1, owners = 2}
 local mexDefs = {}
 for id, ud in pairs(UnitDefs) do
@@ -359,11 +398,20 @@ local function UpdatePalette()
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		first[ally] = min(first[ally] or teamID, teamID)
 	end
+	-- Spectators have no colour of their own, so they see each player's.
+	local spectating = Spring.GetSpectatingState()
+	local allies = spectating and 'players' or options.allies.value
+	local enemies = spectating and 'team' or options.enemies.value
 	local width = 1
 	for _, teamID in ipairs(teams) do
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
-		local colorTeam = ally == myAllyTeam and teamID or first[ally]
-		colors[teamID + 2] = {Spring.GetTeamColor(colorTeam)}
+		-- Each enemy allyteam is one owner, and so are allies in one colour.
+		local mode, custom, colorTeam = enemies, options.enemyColor.value, first[ally]
+		if ally == myAllyTeam then
+			mode, custom = allies, options.allyColor.value
+			colorTeam = mode == 'players' and teamID or Spring.GetMyTeamID()
+		end
+		colors[teamID + 2] = mode == 'custom' and {custom[1], custom[2], custom[3]} or {Spring.GetTeamColor(colorTeam)}
 		-- Alpha is the shown owner: neutral 0, otherwise the colour team + 1.
 		colors[teamID + 2][4] = colorTeam + 1
 		width = max(width, teamID + 2)
@@ -518,6 +566,11 @@ end
 
 function widget:TeamColorsChanged()
 	paletteDirty = true
+end
+
+-- Resigning or changing team changes your colour.
+function widget:PlayerChanged(playerID)
+	if playerID == Spring.GetMyPlayerID() then paletteDirty = true end
 end
 
 function widget:DrawWorldPreUnit()
