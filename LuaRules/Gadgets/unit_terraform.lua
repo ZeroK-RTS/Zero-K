@@ -190,7 +190,6 @@ local terraformOrders       = 0
 
 local constructor           = {}
 local constructorTable      = IterableMap.New()
-local currentCon            = 0
 
 local checkInterval         = 0
 
@@ -876,15 +875,14 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	local localStructure = {}
 	local localStructureCount = 0
 	
-	for i = 1, IterableMap.GetIndexMax(structureTable) do
-		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
+	for _, s in IterableMap.Iterator(structureTable) do
 		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
 			border.bottom > s.minz) then
 			
 			localStructureCount = localStructureCount + 1
-			localStructure[localStructureCount] = i
+			localStructure[localStructureCount] = s
 		end
 	end
 
@@ -908,7 +906,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		segment[i].structureArea = {}
 		
 		for j = 1, localStructureCount do
-			local s = structure[IterableMap.GetKeyByIndex(structureTable, localStructure[j])]
+			local s = localStructure[j]
 			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
@@ -1238,15 +1236,14 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	local localStructure = {}
 	local localStructureCount = 0
 	
-	for i = 1, IterableMap.GetIndexMax(structureTable) do
-		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
+	for _, s in IterableMap.Iterator(structureTable) do
 		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
 			border.bottom > s.minz) then
 			
 			localStructureCount = localStructureCount + 1
-			localStructure[localStructureCount] = i
+			localStructure[localStructureCount] = s
 		end
 	end
 	
@@ -1268,7 +1265,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 		segment[i].structureArea = {}
 		
 		for j = 1, localStructureCount do
-			local s = structure[IterableMap.GetKeyByIndex(structureTable, localStructure[j])]
+			local s = localStructure[j]
 			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
@@ -1726,15 +1723,14 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	local localStructure = {}
 	local localStructureCount = 0
 	
-	for i = 1, IterableMap.GetIndexMax(structureTable) do
-		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
+	for _, s in IterableMap.Iterator(structureTable) do
 		if (border.left < s.maxx and
 			border.right > s.minx and
 			border.top < s.maxz and
 			border.bottom > s.minz) then
 				
 			localStructureCount = localStructureCount + 1
-			localStructure[localStructureCount] = i
+			localStructure[localStructureCount] = s
 		end
 	end
 	
@@ -1759,7 +1755,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 		segment[i].structureArea = {}
 		
 		for j = 1, localStructureCount do
-			local s = structure[IterableMap.GetKeyByIndex(structureTable, localStructure[j])]
+			local s = localStructure[j]
 			if (segment[i].border.left < s.maxx and
 				segment[i].border.right > s.minx and
 				segment[i].border.top < s.maxz and
@@ -2130,8 +2126,7 @@ end
 function GG.Terraform_RaiseWater(raiseAmount)
 	Spring.SetGameRulesParam("waterlevel", (Spring.GetGameRulesParam("waterlevel") or 0) + raiseAmount)
 	
-	for i = 1, IterableMap.GetIndexMax(structureTable) do
-		local s = structure[IterableMap.GetKeyByIndex(structureTable, i)]
+	for _, s in IterableMap.Iterator(structureTable) do
 		s.h = s.h - raiseAmount
 	end
 	
@@ -3207,6 +3202,13 @@ local function DoTerraformUpdate(n, forceCompletion)
 	end
 end
 
+local function CheckStructureHeight(unitID, unit)
+	local height = spGetGroundHeight(unit.x, unit.z)
+	if height ~= unit.h then
+		spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
+	end
+end
+
 function gadget:GameFrame(n)
 	if n == 0 and wantForceCompleteFrameZero then
 		DoTerraformUpdate(n, true)
@@ -3222,16 +3224,10 @@ function gadget:GameFrame(n)
 	DoTerraformUpdate(n, freeTerraform)
 	
 	--check constrcutors that are repairing terraform blocks
-	local constructors = IterableMap.GetIndexMax(constructorTable)
-	if constructors ~= 0 then
+	if not IterableMap.IsEmpty(constructorTable) then
 		if n % checkInterval == 0 then
 			-- only check 1 con per cycle
-			currentCon = currentCon + 1
-			if currentCon > constructors then
-				currentCon = 1
-			end
-			
-			local unitID = IterableMap.GetKeyByIndex(constructorTable, currentCon)
+			local unitID = IterableMap.Next(constructorTable)
 			local cQueue = spGetUnitCommands(unitID, -1)
 			if cQueue then
 				local teamID = spGetUnitTeam(unitID)
@@ -3299,17 +3295,7 @@ function gadget:GameFrame(n)
 	--check structures for terrain deformation
 	local struc = structureCheckFrame[n % structureCheckLoopFrames]
 	if struc then
-		local i = 1
-		while i <= IterableMap.GetIndexMax(struc) do
-			local unit = structure[IterableMap.GetKeyByIndex(struc, i)]
-			if unit then
-				local height = spGetGroundHeight(unit.x, unit.z)
-				if height ~= unit.h then
-					spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
-				end
-			end
-			i = i + 1
-		end
+		IterableMap.Apply(struc, CheckStructureHeight)
 	end
 end
 
@@ -3552,13 +3538,13 @@ local function RegisterStructure(unitID, ud)
 		end
 	end
 	
-	IterableMap.Add(structureTable, unitID)
+	IterableMap.Add(structureTable, unitID, structure[unitID])
 	
 	-- slow update for terrain checking
 	if not structureCheckFrame[currentCheckFrame] then
 		structureCheckFrame[currentCheckFrame] = IterableMap.New()
 	end
-	IterableMap.Add(structureCheckFrame[currentCheckFrame], unitID)
+	IterableMap.Add(structureCheckFrame[currentCheckFrame], unitID, structure[unitID])
 	structure[unitID].frame = currentCheckFrame
 	
 	currentCheckFrame = currentCheckFrame + 1
