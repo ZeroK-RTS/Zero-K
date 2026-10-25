@@ -4,7 +4,6 @@ local weaponDef = {
 	accuracy                = 256,
 	areaOfEffect            = 512,
 	avoidFeature            = false,
-	collideFeature			= false,
 	cegTag                  = [[beamweapon_muzzle_purple]],
 	commandFire             = true,
 	craterBoost             = 0,
