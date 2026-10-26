@@ -132,6 +132,7 @@ local function MakeShader()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	return true
 end
 
 local function DisableShader()
@@ -162,8 +163,8 @@ local function UpdateShader()
 			widgetHandler:UpdateCallIn("DrawScreenEffects")
 			widgetHandler:UpdateCallIn("ViewResize")
 		end
-		if not casShader then
-			MakeShader()
+		if not casShader and not MakeShader() then
+			return
 		end
 		casShader:ActivateWith(function()
 			casShader:SetUniform("sharpness", options.cas_sharpness6.value * GetCurrentZoomScale())
