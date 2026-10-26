@@ -42,9 +42,9 @@ options = {
 		type = 'radioButton',
 		value = 'you',
 		items = {
-			{key = 'you', name = 'Your colour', desc = "Allies share mex income, so their territories have your colour. Spectators see each player's colour."},
+			{key = 'you', name = 'Your colour', desc = "Allies share mex income, so their territories have your colour. Spectators see the colour of the team they spectate."},
 			{key = 'players', name = "Each player's colour"},
-			{key = 'custom', name = 'Custom', desc = "The colour below. Spectators see each player's colour."},
+			{key = 'custom', name = 'Custom', desc = 'The colour below.'},
 		},
 		noHotkey = true,
 		OnChange = RepaintPalette,
@@ -61,7 +61,7 @@ options = {
 		value = 'team',
 		items = {
 			{key = 'team', name = 'Team colour', desc = 'Each enemy team has the colour of its first player.'},
-			{key = 'custom', name = 'Custom', desc = 'The colour below. Spectators see team colours.'},
+			{key = 'custom', name = 'Custom', desc = 'The colour below.'},
 		},
 		noHotkey = true,
 		OnChange = RepaintPalette,
@@ -406,10 +406,8 @@ local function UpdatePalette()
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		first[ally] = min(first[ally] or teamID, teamID)
 	end
-	-- Spectators have no colour of their own, so they see each player's.
-	local spectating = Spring.GetSpectatingState()
-	local allies = spectating and 'players' or options.allies.value
-	local enemies = spectating and 'team' or options.enemies.value
+	-- Spectators see the territories as the team they spectate: its allies are allied.
+	local allies, enemies = options.allies.value, options.enemies.value
 	local width = 1
 	for _, teamID in ipairs(teams) do
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
@@ -600,7 +598,7 @@ function widget:TeamColorsChanged()
 	paletteDirty = true
 end
 
--- Resigning or changing team changes your colour.
+-- Resigning, changing team or spectating another team changes your colour.
 function widget:PlayerChanged(playerID)
 	if playerID == Spring.GetMyPlayerID() then paletteDirty = true end
 end
