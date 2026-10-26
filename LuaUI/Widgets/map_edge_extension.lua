@@ -19,7 +19,34 @@ if VFS.FileExists("nomapedgewidget.txt") then
 	return
 end
 
-local spGetGroundHeight = Spring.GetGroundHeight
+-- The extension mesh uses local coordinates; only height/texture sampling and
+-- its world transform include the active region's origin.
+local mapSizeX, mapSizeZ = Game.mapSizeX, Game.mapSizeZ
+local originX, originZ = 0, 0
+local usesViews = VFS.Include("LuaRules/Utilities/map_regions.lua") ~= nil
+local viewKey
+local function SetViewRectangle()
+	local view = WG.MapRegionView
+	local r = view and view.rect
+	if usesViews and not r then
+		return false
+	end
+	local x0, z0, x1, z1 = 0, 0, Game.mapSizeX, Game.mapSizeZ
+	if r then
+		x0, z0, x1, z1 = r.x0, r.z0, r.x1, r.z1
+	end
+	local key = table.concat({ x0, z0, x1, z1 }, ":")
+	if key == viewKey then
+		return false
+	end
+	viewKey = key
+	originX, originZ = x0, z0
+	mapSizeX, mapSizeZ = x1 - x0, z1 - z0
+	return true
+end
+local function spGetGroundHeight(x, z)
+	return Spring.GetGroundHeight(originX + x, originZ + z)
+end
 local spTraceScreenRay = Spring.TraceScreenRay
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -55,11 +82,11 @@ end
 --------------------------------------------------------------------------------
 
 local function ResetWidget()
-	if dList and not drawingEnabled then
+	if dList then
 		gl.DeleteList(dList)
 		dList = nil
 	end
-	if mirrorShader and not drawingEnabled then
+	if mirrorShader then
 		gl.DeleteShader(mirrorShader)
 		mirrorShader = nil
 	end
@@ -268,23 +295,23 @@ local function IsIsland()
 		end
 	end
 	local sampleDist = 512
-	for i=1,Game.mapSizeX,sampleDist do
+	for i=1,mapSizeX,sampleDist do
 		-- top edge
 		if GetGroundHeight(i, 0) > 0 then
 			return false
 		end
 		-- bottom edge
-		if GetGroundHeight(i, Game.mapSizeZ) > 0 then
+		if GetGroundHeight(i, mapSizeZ) > 0 then
 			return false
 		end
 	end
-	for i=1,Game.mapSizeZ,sampleDist do
+	for i=1,mapSizeZ,sampleDist do
 		-- left edge
 		if GetGroundHeight(0, i) > 0 then
 			return false
 		end
 		-- right edge
-		if GetGroundHeight(Game.mapSizeX, i) > 0 then
+		if GetGroundHeight(mapSizeX, i) > 0 then
 			return false
 		end
 	end
@@ -309,15 +336,14 @@ local function DrawMapVertices(useMirrorShader, tile)
 	local function doMap(dx,dz,sx,sz)
 		local Scale = math.pow(2, options.gridSizeExp.value)
 		local GridSize = math.max(Scale, math.pow(2, options.gridTextureSizeExp.value))
-		local sggh = Spring.GetGroundHeight
+		local sggh = spGetGroundHeight
 		local Vertex = gl.Vertex
 		local glColor = gl.Color
 		local TexCoord = gl.TexCoord
 		local Normal = gl.Normal
 		local GetGroundNormal = Spring.GetGroundNormal
-		local mapSizeX, mapSizeZ = Game.mapSizeX, Game.mapSizeZ
 	
-		local sten = {0, floor(Game.mapSizeZ/Scale)*Scale, 0}--do every other strip reverse
+		local sten = {0, floor(mapSizeZ/Scale)*Scale, 0}--do every other strip reverse
 		local xm0, xm1 = 0, 0
 		local xv0, xv1 = 0, math.abs(dx)+sx
 		local ind = 0
@@ -325,13 +351,13 @@ local function DrawMapVertices(useMirrorShader, tile)
 		local h
 
 		if not useMirrorShader then
-			gl.TexCoord(0, sten[2]/Game.mapSizeZ)
+			gl.TexCoord(0, sten[2]/mapSizeZ)
 			Vertex(xv1, sggh(0,sten[2]),abs(dz+sten[2])+sz)--start and end with a double vertex
 		end
 		
 		if tile then
 			local bla = 1
-			for x = 0,Game.mapSizeX - Scale, Scale do
+			for x = 0,mapSizeX - Scale, Scale do
 				xv0, xv1 = xv1, abs(dx+x+Scale)+sx
 				xm0, xm1 = xm1, xm1+Scale
 				ind = (ind+1)%2
@@ -351,43 +377,43 @@ local function DrawMapVertices(useMirrorShader, tile)
 			if useMirrorShader then
 				TexCoord(0.5, 0.5)
 				
-				local z = Game.mapSizeZ - 0.05
-				for x = Game.mapSizeX, 0, -Scale do
+				local z = mapSizeZ - 0.05
+				for x = mapSizeX, 0, -Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
 					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
 				local x = 0.05
-				for z = Game.mapSizeZ, 0, -Scale do
+				for z = mapSizeZ, 0, -Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
 					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
 				z = 0.05
-				for x = 0, Game.mapSizeX, Scale do
+				for x = 0, mapSizeX, Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
 					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
-				x = Game.mapSizeX - 0.05
-				for z = 0, Game.mapSizeZ, Scale do
+				x = mapSizeX - 0.05
+				for z = 0, mapSizeZ, Scale do
 					local height = sggh(x, z)
 					Vertex(x, height + HEIGHT_UP, z)
 					Vertex(x, height - HEIGHT_LEEWAY, z)
 				end
 			end
 		else
-			for x=0,Game.mapSizeX-Scale,Scale do
+			for x=0,mapSizeX-Scale,Scale do
 				xv0, xv1 = xv1, abs(dx+x+Scale)+sx
 				xm0, xm1 = xm1, xm1+Scale
 				ind = (ind+1)%2
 				for z=sten[ind+1], sten[ind+2], (1+(-ind*2))*Scale do
 					zv = abs(dz+z)+sz
-					TexCoord(xm0/mapSizeX, z/mapSizeZ)
+					TexCoord((originX+xm0)/Game.mapSizeX, (originZ+z)/Game.mapSizeZ)
 					-- Normal(GetGroundNormal(xm0,z))
 					h = sggh(xm0,z)
 					Vertex(xv0,h,zv)
-					TexCoord(xm1/mapSizeX, z/mapSizeZ)
+					TexCoord((originX+xm1)/Game.mapSizeX, (originZ+z)/Game.mapSizeZ)
 					--Normal(GetGroundNormal(xm1,z))
 					h = sggh(xm1,z)
 					Vertex(xv1,h,zv)
@@ -402,16 +428,16 @@ local function DrawMapVertices(useMirrorShader, tile)
 	if useMirrorShader then
 		doMap(0,0,0,0)
 	else
-		doMap(-Game.mapSizeX,-Game.mapSizeZ,-Game.mapSizeX,-Game.mapSizeZ)
-		doMap(0,-Game.mapSizeZ,0,-Game.mapSizeZ)
-		doMap(-Game.mapSizeX,-Game.mapSizeZ,Game.mapSizeX,-Game.mapSizeZ)
+		doMap(-mapSizeX,-mapSizeZ,-mapSizeX,-mapSizeZ)
+		doMap(0,-mapSizeZ,0,-mapSizeZ)
+		doMap(-mapSizeX,-mapSizeZ,mapSizeX,-mapSizeZ)
 	
-		doMap(-Game.mapSizeX,0,-Game.mapSizeX,0)
-		doMap(-Game.mapSizeX,0,Game.mapSizeX,0)
+		doMap(-mapSizeX,0,-mapSizeX,0)
+		doMap(-mapSizeX,0,mapSizeX,0)
 	
-		doMap(-Game.mapSizeX,-Game.mapSizeZ,-Game.mapSizeX,Game.mapSizeZ)
-		doMap(0,-Game.mapSizeZ,0,Game.mapSizeZ)
-		doMap(-Game.mapSizeX,-Game.mapSizeZ,Game.mapSizeX,Game.mapSizeZ)
+		doMap(-mapSizeX,-mapSizeZ,-mapSizeX,mapSizeZ)
+		doMap(0,-mapSizeZ,0,mapSizeZ)
+		doMap(-mapSizeX,-mapSizeZ,mapSizeX,mapSizeZ)
 	end
 end
 
@@ -448,7 +474,7 @@ local function Initialize()
 		enableMapBorder = true
 	end
 	
-	Spring.SendCommands("mapborder " .. ((enableMapBorder and "1") or "0"))
+	Spring.SendCommands("mapborder " .. ((enableMapBorder and not usesViews and "1") or "0"))
 
 	SetupShaderTable()
 	Spring.SendCommands("luaui disablewidget External VR Grid")
@@ -458,17 +484,7 @@ local function Initialize()
 			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Map Edge Extension widget: mirror shader error: "..gl.GetShaderLog())
 		end
 	end
-	if not mirrorShader then
-		widget.DrawWorldPreUnit = function()
-			if dList and ((not island) or options.drawForIslands.value) then
-				gl.DepthMask(true)
-				--gl.Texture(tex)
-				gl.CallList(dList)
-				gl.DepthMask(false)
-				gl.Texture(false)
-			end
-		end
-	else
+	if mirrorShader then
 		umirrorX = gl.GetUniformLocation(mirrorShader,"mirrorX")
 		umirrorZ = gl.GetUniformLocation(mirrorShader,"mirrorZ")
 		ulengthX = gl.GetUniformLocation(mirrorShader,"lengthX")
@@ -484,7 +500,19 @@ local function Initialize()
 	widgetHandler:RemoveCallIn("Update")
 end
 
+function widget:ParallelWorldShift()
+	if SetViewRectangle() then
+		island = nil
+		ResetWidget()
+	end
+end
+
 function widget:Initialize()
+	SetViewRectangle()
+	if usesViews and not viewKey then
+		widgetHandler:RemoveCallIn("Update")
+		return
+	end
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end
@@ -503,21 +531,34 @@ end
 
 function widget:Shutdown()
 	--Spring.SetDrawGround(true)
-	gl.DeleteList(dList)
+	if dList then
+		gl.DeleteList(dList)
+	end
 	if mirrorShader then
 		gl.DeleteShader(mirrorShader)
 	end
 end
 
-local function DrawWorldFunc() --is overwritten when not using the shader
+local function DrawWorldFunc()
     if dList and ((not island) or options.drawForIslands.value) then
         local glTranslate = gl.Translate
         local glUniform = gl.Uniform
-        local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
+        local GamemapSizeZ, GamemapSizeX = mapSizeZ, mapSizeX
+		if not mirrorShader then
+			gl.PushMatrix()
+			gl.Translate(originX, 0, originZ)
+			gl.DepthMask(true)
+			gl.CallList(dList)
+			gl.DepthMask(false)
+			gl.Texture(false)
+			gl.PopMatrix()
+			return
+		end
         
         gl.FogCoord(1)
         gl.UseShader(mirrorShader)
         gl.PushMatrix()
+		glTranslate(originX, 0, originZ)
         gl.DepthMask(true)
         if options.mapBorderStyle.value == "texture" and not forceTextureToGrid then
 			gl.Texture(realTex)

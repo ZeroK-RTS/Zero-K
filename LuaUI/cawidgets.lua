@@ -332,6 +332,7 @@ local callInLists = {
 	'AlliedUnitAdded',
 	'AlliedUnitRemoved',
 	'AlliedUnitsChanged',
+	'ParallelWorldShift',
 -- these use mouseOwner instead of lists
 --  'MouseMove',
 --  'MouseRelease',
@@ -1890,7 +1891,21 @@ function widgetHandler:DrawInMiniMap(xSize, ySize)
 	tracy.ZoneBeginN("W:DrawInMiniMap")
 	for _, w in r_ipairs(self.DrawInMiniMapList) do
 		tracy.ZoneBeginN("W:DrawInMiniMap:" .. w.whInfo.name)
+		local r = WG.MapRegionView and WG.MapRegionView.rect
+		if r then
+			gl.PushMatrix()
+			local width, height = r.x1 - r.x0, r.z1 - r.z0
+			if Spring.GetMiniMapRotation() > 1 then
+				gl.Translate(-xSize * (Game.mapSizeX - r.x1) / width, -ySize * r.z0 / height, 0)
+			else
+				gl.Translate(-xSize * r.x0 / width, ySize * (r.z1 - Game.mapSizeZ) / height, 0)
+			end
+			gl.Scale(Game.mapSizeX / width, Game.mapSizeZ / height, 1)
+		end
 		w:DrawInMiniMap(xSize, ySize)
+		if r then
+			gl.PopMatrix()
+		end
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
@@ -3016,6 +3031,16 @@ function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
 	for _, w in ipairs(self.AlliedUnitsChangedList) do
 		tracy.ZoneBeginN("W:AlliedUnitsChanged:" .. w.whInfo.name)
 		w:AlliedUnitsChanged(alliedUnits, numAlliedUnits)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
+function widgetHandler:ParallelWorldShift()
+	tracy.ZoneBeginN("W:ParallelWorldShift")
+	for _, w in ipairs(self.ParallelWorldShiftList) do
+		tracy.ZoneBeginN("W:ParallelWorldShift:" .. w.whInfo.name)
+		w:ParallelWorldShift()
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
