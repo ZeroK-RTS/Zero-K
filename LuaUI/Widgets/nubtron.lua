@@ -327,7 +327,7 @@ local function CheckAllUnits()
 
 	-- commander
 	if myCommID then
-		local cmdID, _, _, cmdParam1 = spGetUnitCurrentCommand(myCommID)
+		local cmdID, _, _, cmdParam1, cmdParam2, _, _, cmdParam5 = spGetUnitCurrentCommand(myCommID)
 		if cmdID then
 			local udBuilding = UnitDefs[-cmdID]
 			if udBuilding then
@@ -335,14 +335,14 @@ local function CheckAllUnits()
 				if buildeeClass then
 					setCondition('build' .. buildeeClass)
 				end
-			elseif cmdID == CMD_REPAIR then
+			elseif cmdID == CMD_REPAIR and (not cmdParam2 or cmdParam5) then
 				local repaireeID = cmdParam1
 				local udRepairee = UnitDefs[GetUnitDefID(repaireeID)]
-				local repaireeClass = classesByUnit[udRepairee.name]
+				local repaireeClass = udRepairee and classesByUnit[udRepairee.name]
 
 				if repaireeClass then
 					local _, _, _, _, repaireeBuildProgress = GetUnitHealth(repaireeID)
-					if repaireeBuildProgress < 1 then
+					if repaireeBuildProgress and repaireeBuildProgress < 1 then
 						setCondition('build' .. repaireeClass)
 					end
 				end
