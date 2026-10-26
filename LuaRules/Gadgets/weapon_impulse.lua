@@ -206,7 +206,10 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 	myImpulseMult = myImpulseMult or {1,1,1}
 
 	local myMass = Spring.GetUnitRulesParam(unitID, "massOverride") or mass[unitDefID]
-	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]*myImpulseMult[moveTypeByID[unitDefID]+1]/myMass
+	local mag = 0
+	if dis > 0 then
+		mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]*myImpulseMult[moveTypeByID[unitDefID]+1]/myMass
+	end
 
 	if moveTypeByID[unitDefID] == 0 then
 		x,y,z = x*mag, y*mag * GUNSHIP_VERTICAL_MULT, z*mag
