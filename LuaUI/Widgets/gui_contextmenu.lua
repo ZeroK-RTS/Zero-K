@@ -1858,6 +1858,17 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			statschildren[#statschildren+1] = Label:New{ caption = numformat((weaponStats.customParams.burntime or 450)/30) .. "s (15 DPS)", textColor = colorFire, }
 		end
 
+		if wepCp.area_damage then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Sets the ground on fire:', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = ' - DPS: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = wepCp.area_damage_dps, textColor = colorFire, }
+			statschildren[#statschildren+1] = Label:New{ caption = ' - Radius: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(tonumber(wepCp.area_damage_radius)) .. " elmo", textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = ' - Duration: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(tonumber(wepCp.area_damage_duration)) .. " s", textColor = color.stats_fg, }
+		end
+
 		-- statschildren[#statschildren+1] = Label:New{ caption = 'Edge Damage: ', textColor = color.stats_fg, }
 		-- statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue * weaponStats.edgeEffectiveness), textColor = color.stats_fg, }
 		-- edge damage is always 0, see http://springrts.com/mediawiki/images/1/1c/EdgeEffectiveness.png
