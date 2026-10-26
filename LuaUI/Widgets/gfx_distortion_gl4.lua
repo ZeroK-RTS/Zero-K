@@ -1374,6 +1374,8 @@ local function updateProjectileDistortions(newgameframe)
 							gib[3] = pz
 							AddDistortion(projectileID, nil, nil, projectilePointDistortionVBO, gib, noUpload)
 							distortionType = "point"
+						else
+							distortionType = nil
 						end
 					end
 				else
@@ -1427,6 +1429,8 @@ local function updateProjectileDistortions(newgameframe)
 								noUpload
 							)
 							distortionType = thisType
+						else
+							distortionType = nil
 						end
 						--AddDistortion(projectileID, nil, nil, projectilePointDistortionVBO, distortionParamTable)
 					end
@@ -1435,8 +1439,10 @@ local function updateProjectileDistortions(newgameframe)
 				if debugproj then
 					spEcho("Adding projdistortion", projectileID, spGetProjectileName(projectileID))
 				end
-				trackedProjectileTypes[projectileID] = distortionType
-				trackedProjectiles[projectileID] = gameFrame
+				if distortionType then
+					trackedProjectileTypes[projectileID] = distortionType
+					trackedProjectiles[projectileID] = gameFrame
+				end
 			end
 		end
 	end
