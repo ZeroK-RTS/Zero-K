@@ -36,6 +36,7 @@ local FULL_GROW = 0.5
 local UPDATE_FREQUENCY = 25
 local NON_BLOCK_BUILD_FRAMES = 30
 local MIN_METAL_FOR_GROW_AND_TARGET = 15
+local LOW_METAL_NEUTRAL_FRAMES = 60*30 -- No construction decay, so abandoned frames would never stop being neutral.
 
 local growUnit = {}
 local completeGrowUnit = {}
@@ -47,6 +48,7 @@ local origColvolCache = {}
 local origColvolOverride = {}
 local recentBuilderTimeout = {}
 local lowMetalNanoframe = {}
+local neutralTimeout = {}
 
 local postCompleteGrowDefs = {}
 for i = 1, #UnitDefs do
@@ -113,6 +115,7 @@ end
 local function UpdateUnitGrow(unitID, data, growScale)
 	if lowMetalNanoframe[unitID] and growScale > 0 then
 		lowMetalNanoframe[unitID] = nil
+		neutralTimeout[unitID] = nil
 		Spring.SetUnitBlocking(unitID, true, true)
 		Spring.SetUnitNeutral(unitID, false)
 		local x, y, z = Spring.GetUnitPosition(unitID)
@@ -287,6 +290,7 @@ local function CheckRecentBuilderTimeout(unitID, builderID)
 	end
 	Spring.SetUnitNeutral(unitID, true)
 	lowMetalNanoframe[unitID] = true
+	neutralTimeout[unitID] = frame + LOW_METAL_NEUTRAL_FRAMES
 	recentBuilderTimeout[builderID] = frame + NON_BLOCK_BUILD_FRAMES
 end
 
@@ -333,6 +337,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	unitScales[unitID] = nil
 	recentBuilderTimeout[unitID] = nil
 	lowMetalNanoframe[unitID] = nil
+	neutralTimeout[unitID] = nil
 	if origColvolOverride[unitID] then
 		origColvolOverride[unitID] = nil
 	end
@@ -340,6 +345,12 @@ end
 
 function gadget:GameFrame(f)
 	if f%UPDATE_FREQUENCY == 12 then
+		for unitID, timeout in pairs(neutralTimeout) do
+			if timeout < f then
+				neutralTimeout[unitID] = nil
+				Spring.SetUnitNeutral(unitID, false)
+			end
+		end
 		for unitID, data in pairs(growUnit) do
 			if spValidUnitID(unitID) then
 				local buildProgress = select(5, spGetUnitHealth(unitID))
