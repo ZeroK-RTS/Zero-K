@@ -23,6 +23,7 @@ local spSetUnitRadiusAndHeight = Spring.SetUnitRadiusAndHeight
 local spGetUnitPosition        = Spring.GetUnitPosition
 local spGetUnitHealth          = Spring.GetUnitHealth
 local spValidUnitID            = Spring.ValidUnitID
+local spGetGroundHeight        = Spring.GetGroundHeight
 local spSetUnitCollisionVolumeData = Spring.SetUnitCollisionVolumeData
 local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 
@@ -160,6 +161,20 @@ local function GetUnitGrowth(unitID, unitDefID, buildProgress)
 	return growScale
 end
 
+local function GetFootprintMaxHeight(unitID, ud, x, z)
+	local sX, sZ = ud.xsize*4, ud.zsize*4
+	if Spring.GetUnitBuildFacing(unitID)%2 == 1 then
+		sX, sZ = sZ, sX
+	end
+	local height = spGetGroundHeight(x, z)
+	for px = x - sX, x + sX, 8 do
+		for pz = z - sZ, z + sZ, 8 do
+			height = max(height, spGetGroundHeight(px, pz))
+		end
+	end
+	return height
+end
+
 local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	if unitScales[unitID] and not scales then
 		scales = unitScales[unitID]
@@ -211,7 +226,7 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	end
 	
 	-- Sertup growth scale
-	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
+	local baseX, baseY, baseZ, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
 	local cache = GetOrigColvolData(unitID, unitDefID)
 	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
 			volumeType, testType, primaryAxis = cache[1], cache[2], cache[3], cache[4], cache[5], cache[6], cache[7], cache[8], cache[9]
@@ -226,6 +241,9 @@ local function UpdateUnitCollisionData(unitID, unitDefID, scales, force)
 	if baseY < 0 and ud.floatOnWater then
 		baseY = 0
 	end
+	-- Same for terrain above base within the footprint (slopes, dips).
+	-- Engine aims at least 2 elmos above ground, which would be above or behind a buried colvol.
+	baseY = max(baseY, GetFootprintMaxHeight(unitID, ud, baseX, baseZ))
 
 	local volumeBelow = -((midY - baseY) + offsetY - scaleY/2)
 	local aimAbove = (midY - baseY) + aim[2] - mid[2]
