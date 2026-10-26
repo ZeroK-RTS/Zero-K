@@ -2237,6 +2237,17 @@ local cableFSSrc = VFS.LoadFile(SHADER_DIR .. 'gfx_overdrive_cables.frag.glsl')
 -- Receive data from synced
 -------------------------------------------------------------------------------------
 
+-- A captured pylon pair keeps its edge key, so another allyteam can still draw this cable
+-- with the same slot. Free the slot only when no other allyteam has the edge.
+local function FreeSlotUnlessShared(edgeKey, allyTeamID)
+	for otherAllyTeamID, edges in pairs(edgesByAllyTeam) do
+		if otherAllyTeamID ~= allyTeamID and edges[edgeKey] then
+			return
+		end
+	end
+	FreeSlot(edgeKey)
+end
+
 -- Whether the local viewer should treat `allyTeamID`'s cables as "own"
 -- (always visible, optionally ghosted out of LOS) vs "enemy" (only visible
 -- inside actual LOS). Specs and full-view see everything as own.
@@ -2342,7 +2353,7 @@ function OnCableTreeFull(data)
 						}
 						ghostNeedsRebuild = true
 					else
-						FreeSlot(k)
+						FreeSlotUnlessShared(k, ally)
 					end
 					existing[k] = nil
 				end
@@ -2526,7 +2537,7 @@ function gadget:GameFrame(n)
 					}
 					ghostNeedsRebuild = true
 				else
-					FreeSlot(k)
+					FreeSlotUnlessShared(k, ally)
 				end
 				edges[k] = nil
 				dropped = true
