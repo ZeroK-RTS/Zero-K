@@ -1475,8 +1475,7 @@ function GetUnitRelativeAngle (unitIDmain,unitID2,unitIDmainX,unitIDmainZ,unitID
 		rX, _, rZ= spGetUnitPosition(unitID2)
 	end
 	local cX, _, cZ = rX-x, _, rZ-z
-	local cXcZ = math.sqrt(cX*cX + cZ*cZ) --hypothenus for xz direction
-	local relativeAngle = math.atan2 (cX/cXcZ, cZ/cXcZ) --math.atan2 accept trigonometric ratio (ie: ratio that has same value as: cos(angle) & sin(angle). Cos is ratio between x and hypothenus, and Sin is ratio between z and hypothenus)
+	local relativeAngle = math.atan2(cX, cZ)
 	return relativeAngle
 end
 
@@ -1484,8 +1483,7 @@ function GetTargetAngleWithRespectToUnit(unitID, targetCoordinate)
 	local x,_,z = spGetUnitPosition(unitID)
 	local tx, tz = targetCoordinate[1], targetCoordinate[3]
 	local dX, dZ = tx- x, tz-z
-	local dXdZ = math.sqrt(dX*dX + dZ*dZ) --hypothenus for xz direction
-	local targetAngle = math.atan2(dX/dXdZ, dZ/dXdZ) --math.atan2 accept trigonometric ratio (ie: ratio that has same value as: cos(angle) & sin(angle))
+	local targetAngle = math.atan2(dX, dZ)
 	return targetAngle
 end
 
@@ -1872,8 +1870,7 @@ function GetUnitDirection(unitID) --give unit direction in radian, 2D
 		dx,_,dz= spGetUnitDirection(unitID)
 		isMoving = false
 	end
-	local dxdz = math.sqrt(dx*dx + dz*dz) --hypothenus for xz direction
-	local unitDirection = math.atan2(dx/dxdz, dz/dxdz)
+	local unitDirection = math.atan2(dx, dz)
 	if (turnOnEcho == 1) then
 		Spring.Echo("direction(GetUnitDirection) " .. unitDirection*180/math.pi)
 	end
