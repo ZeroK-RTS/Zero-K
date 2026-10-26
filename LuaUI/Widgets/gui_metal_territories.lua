@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author    = "OpenAI Codex, requested by Sparkezel",
 		date      = "2026-10-23",
 		license   = "GNU GPL, v2 or later",
-		layer     = -10,
+		layer     = -10, -- below the selection circles (-9), outlines and range overlays, which draw on top
 		enabled   = false,
 	}
 end
