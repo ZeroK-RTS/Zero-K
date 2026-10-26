@@ -72,3 +72,12 @@ ex_small15.wav
 Apelsinsaft (CY-BY):
 mini_nuke_2.wav
 ex_large9.wav
+
+
+Sound Effects below provided by Soniss (https://sonniss.com/)
+Source: [Game Audio GDC Bundle 2018, 2021] — freely distributed collection
+License: Royalty-free for commercial and non-commercial use (per bundle license)
+Notes: All sounds used under the terms provided in the original GDC Bundle download package
+
+ex_large18.wav - Shapeforms Audio - Sci-Fi Weapons Cyberpunk Arsenal, Olivier Girardot - Guns & Explosions
+ex_large19.wav - BluezoneCorp - Detonation - Explosion

@@ -153,6 +153,7 @@ return { bomberprec = {
       reloadtime              = 8,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
+      soundHitVolume          = 10,
       soundStart              = [[weapon/bomb_drop]],
       startVelocity           = 135,
       tolerance               = 8000,
