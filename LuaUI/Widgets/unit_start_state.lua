@@ -1101,6 +1101,17 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_personal_cloak_0"
 	end
 
+	if ud.customParams.area_cloak and (ud.customParams.area_cloak ~= "0") then
+		options[defName .. "_area_cloak"] = {
+			name = "  Area Cloak",
+			desc = "Area Cloak: check box to turn it on",
+			type = 'bool',
+			value = (ud.customParams.area_cloak_init ~= "0"),
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_area_cloak"
+	end
+
 	if ud.onOffable then
 		if impulseUnitDefID[unitDefID] then
 			options[defName .. "_impulseMode"] = {
@@ -1562,6 +1573,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
 		QueueState(name, "overkill_prevention0", CMD_PREVENT_OVERKILL, orderArray)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
+		QueueState(name, "area_cloak", CMD_CLOAK_SHIELD, orderArray)
 		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
 		QueueState(name, "activateWhenBuilt", CMD_WANT_ONOFF, orderArray)
 	end
