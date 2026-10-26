@@ -168,6 +168,9 @@ local function GetTargetPosition(targetID)
 end
 
 local function IsTargetGroundAllowed(unitID, unitDefID, tx, ty, tz)
+	if not Spring.Utilities.IsPortalPositionAllowed(unitID, tx, tz) then
+		return false
+	end
 	if not setTargetRangeBuffer[unitDefID] then
 		return true
 	end
@@ -327,7 +330,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
 				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (GetUnitRange(data.id, data.unitDefID) or 1)) or 0)
 			end
-		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam))and (data.id ~= data.targetID) then
+		elseif Spring.Utilities.IsSamePortalRegion(data.id, data.targetID) and spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam))and (data.id ~= data.targetID) then
 			if (not Spring.GetUnitIsCloaked(data.targetID)) and not (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID)) then
 				spSetUnitTarget(data.id, data.targetID, false, true)
 			end
@@ -659,6 +662,10 @@ function GG.GetAnyTypeOfUserUnitTarget(unitID)
 		return cp_1, cp_2, cp_3
 	end
 	return false
+end
+
+function GG.ClearUnitTarget(unitID)
+	removeUnit(unitID)
 end
 
 function GG.SetUnitTarget(unitID, targetID)

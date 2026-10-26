@@ -55,11 +55,16 @@ end
 local function DecloakArea(ax, az, radius)
 	local nearby_units = spGetUnitsInCylinder(ax, az, radius)
 	for i = 1, #nearby_units do
-		GG.PokeDecloakUnit(nearby_units[i])
+		if Spring.Utilities.IsPortalPositionAllowed(nearby_units[i], ax, az) then
+			GG.PokeDecloakUnit(nearby_units[i])
+		end
 	end
 end
 
 local function SetScannedArea(scanType, teamID, ax, az, radius, duration)
+	if GG.PortalWorlds and not GG.PortalWorlds.Region(ax, az) then
+		return
+	end
 	local scanConf = scanDefs[scanType]
 	radius = radius or scanConf.radius
 	duration = duration or scanConf.duration
@@ -129,7 +134,9 @@ local function SetScannedArea(scanType, teamID, ax, az, radius, duration)
 		local spawnRad = math.pow(math.random(), 0.1) * (radius - RADIUS_FUDGE)
 		local px, pz = ax + math.cos(dir) * spawnRad, az + math.sin(dir) * spawnRad
 		local py = math.max(Spring.GetGroundHeight(px, pz), 0) + scanConf.cegHeight + math.random()*yVar - yVar*0.5
-		spSpawnCEG(scanConf.ceg, px, py, pz)
+		if Spring.Utilities.IsSamePortalPosition(ax, az, px, pz) then
+			spSpawnCEG(scanConf.ceg, px, py, pz)
+		end
 	end
 end
 

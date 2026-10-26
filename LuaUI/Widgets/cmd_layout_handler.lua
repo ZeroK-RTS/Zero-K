@@ -167,7 +167,8 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	if (cmdCount <= 0) then
 		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
 	end
-	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
+	-- Chili draws the command UI; an out-of-range dummy icon still creates a native frame.
+	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {}
 end
 
 --------------------------------------------------------------------------------

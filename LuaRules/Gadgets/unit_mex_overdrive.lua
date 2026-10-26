@@ -376,7 +376,7 @@ local function AddPylonToGrid(unitID)
 		local pid = attachedPylons[i]
 		local pylonData = pylon[allyTeamID][pid]
 		if pylonData then
-			if pid ~= unitID and pylonData.gridID ~= 0 and pylonData.active then
+			if pid ~= unitID and pylonData.gridID ~= 0 and pylonData.active and Spring.Utilities.IsSamePortalRegion(unitID, pid) then
 				if not attachedGridID[pylonData.gridID] then
 					attachedGrids = attachedGrids + 1
 
@@ -484,6 +484,14 @@ local function MaybeAddPylon(unitID, unitDefID)
 
 	quadFields[allyTeamID]:Insert(unitID, pX, pZ, range)
 	local intersections = quadFields[allyTeamID]:GetIntersections(unitID)
+	-- Cubicle barriers also partition energy connections, regardless of range.
+	for i = intersections[1], 2, -1 do
+		if not Spring.Utilities.IsSamePortalRegion(unitID, intersections[i]) then
+			intersections[i] = intersections[intersections[1]]
+			intersections[intersections[1]] = nil
+			intersections[1] = intersections[1] - 1
+		end
+	end
 	local neededLink = pylonDefs[unitDefID].neededLink
 
 	pylon[allyTeamID][unitID] = {

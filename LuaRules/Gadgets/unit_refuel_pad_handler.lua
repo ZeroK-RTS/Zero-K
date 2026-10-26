@@ -168,7 +168,7 @@ local function ForceImmediateAbort(unitID, padID, isLanded)
 end
 
 local function AbortCheck(unitID, padID, isLanded)
-	if (not landingUnit[unitID]) or landingUnit[unitID].abort then
+	if (not landingUnit[unitID]) or landingUnit[unitID].abort or not Spring.Utilities.IsSamePortalRegion(unitID, padID or landingUnit[unitID].padID) then
 		return ForceImmediateAbort(unitID, padID, isLanded)
 	end
 	
@@ -589,6 +589,9 @@ local function CircleToLand(unitID, padDefID, goal)
 end
 
 function GG.SendBomberToPad(unitID, padID, padPieceID)
+	if not Spring.Utilities.IsSamePortalRegion(unitID, padID) then
+		return
+	end
 	local padDefID = Spring.GetUnitDefID(padID)
 	landingUnit[unitID] = {
 		mobilePad = padDefID and mobilePadDefs[padDefID],

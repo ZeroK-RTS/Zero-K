@@ -128,24 +128,32 @@ local function HandleDamageArea(data, f)
 			if (ulist) then
 				for j = 1, #ulist do
 					local u = ulist[j]
-					local ux, uy, uz = Spring.GetUnitPosition(u)
-					local damage = data.damage
-					local distance = math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)
-					if data.rangeFall ~= 0 and distance > data.plateauRadius then
-						damage = damage - damage*data.rangeFall*(distance - data.plateauRadius)/(data.radius - data.plateauRadius)
-					end
-					local drag = data.impulse and damage*(data.dragFactor or 1)
-					if data.plateauFall and data.plateauFall ~= 0 and distance < data.plateauRadius then
-						damage = damage - damage*data.plateauFall*(data.plateauRadius - distance)/data.plateauRadius
-					end
-					if data.impulse then
-						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
-						GG.SetUnitFallDamageImmunity(u, f + 10)
-						GG.DoAirDrag(u, drag)
-					elseif data.slow then
-						GG.addSlowDamage(u, damage, false, data.teamID)
-					else
-						Spring.AddUnitDamageByTeam(u, damage, 0, data.owner, data.id, data.teamID)
+					local portal = GG.PortalIsolation
+					local region = portal and portal.Region(pos.x, pos.z)
+					if not portal or region and portal.UnitRegion(u) == region then
+						local ux, uy, uz = Spring.GetUnitPosition(u)
+						local damage = data.damage
+						local distance = math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)
+						if data.rangeFall ~= 0 and distance > data.plateauRadius then
+							damage = damage - damage*data.rangeFall*(distance - data.plateauRadius)/(data.radius - data.plateauRadius)
+						end
+						local drag = data.impulse and damage*(data.dragFactor or 1)
+						if data.plateauFall and data.plateauFall ~= 0 and distance < data.plateauRadius then
+							damage = damage - damage*data.plateauFall*(data.plateauRadius - distance)/data.plateauRadius
+						end
+						if data.impulse then
+							GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
+							GG.SetUnitFallDamageImmunity(u, f + 10)
+							GG.DoAirDrag(u, drag)
+						elseif data.slow then
+							GG.addSlowDamage(u, damage, false, data.teamID)
+						else
+							if portal then
+								portal.DamageInRegion(region, Spring.AddUnitDamageByTeam, u, damage, 0, data.owner, data.id, data.teamID)
+							else
+								Spring.AddUnitDamageByTeam(u, damage, 0, data.owner, data.id, data.teamID)
+							end
+						end
 					end
 				end
 			end

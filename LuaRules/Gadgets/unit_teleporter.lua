@@ -143,6 +143,13 @@ local function changeSpeed(tid, bid, speed)
 	end
 end
 
+-- Djinn links stay local when portal worlds is enabled. A Djinn can retain a
+-- beacon after travelling, but must return or create a new local beacon to use it.
+local function SamePortalRegion(unitID, otherID)
+	local portal = GG.PortalWorlds
+	return not portal or (portal.home[unitID] ~= nil and portal.home[unitID] == portal.home[otherID])
+end
+
 local function interruptTeleport(unitID, doNotChangeSpeed)
 	if not tele[unitID] then
 		return
@@ -181,6 +188,9 @@ function tele_deployTeleport(unitID)
 	if not (unitID and tele[unitID]) then
 		return -- The unit probably died
 	end
+	if not SamePortalRegion(unitID, tele[unitID].link) then
+		return
+	end
 	tele[unitID].deployed = true
 	checkFrame[Spring.GetGameFrame() + 1] = true
 	
@@ -203,6 +213,10 @@ end
 function tele_createBeacon(unitID, unitDefID, x, z, beaconID)
 	if not (unitID and tele[unitID]) then
 		return -- The unit probably died
+	end
+	local portal = GG.PortalWorlds
+	if portal and (not portal.home[unitID] or portal.Region(x, z) ~= portal.home[unitID]) then
+		return
 	end
 	local beaconDef = beaconDefsByTeleporterDef[unitDefID]
 	local y = Spring.GetGroundHeight(x,z)
@@ -267,8 +281,17 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		Spring.UnitScript.CallAsUnit(unitID, func)
 	end
 
+	local targetID = cmdParams[1]
 	if cmdID == CMD.INSERT then
 		cmdID = cmdParams[2]
+		targetID = cmdParams[4]
+	end
+
+	if cmdID == CMD_WAIT_AT_BEACON and GG.PortalWorlds then
+		local bid = targetID
+		if not beacon[bid] or not SamePortalRegion(unitID, bid) or not SamePortalRegion(bid, beacon[bid].link) then
+			return false
+		end
 	end
 
 	if cmdID == CMD_WAIT_AT_BEACON and not canTeleport[unitDefID] then
@@ -398,6 +421,8 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 		if not beaconID
 		or not beacon[beaconID]
 		or not Spring.AreTeamsAllied(teamID, Spring.GetUnitTeam(beaconID))
+		or not SamePortalRegion(unitID, beaconID)
+		or not SamePortalRegion(beaconID, beacon[beaconID].link)
 		then
 			return true, true
 		end
@@ -456,6 +481,9 @@ function gadget:GameFrame(f)
 	for i = 1, teleID.count do
 		local tid = teleID.data[i]
 		local bid = tele[tid].link
+		if bid and not SamePortalRegion(tid, bid) then
+			undeployTeleport(tid)
+		end
 		if tele[tid].teleFrame then
 			-- Cannont teleport if Teleporter or Beacon are disarmed, stunned or nanoframes and cannot teleport a nanoframe.
 			local flying = isUnitFlying(tid)

@@ -1144,4 +1144,18 @@ for i=1,#options do
   opt.desc = opt.desc .. '\nkey: ' .. opt.key
 end
 
+-- Experimental multi-region matches require a composed map and matching engine.
+options[#options + 1] = {
+	key = 'zk_duels',
+	name = 'Experimental portal worlds',
+	desc = 'WIP: independent duels on composed map regions, connected after commander loss. Requires a portal-worlds map and engine region-view support.',
+	type = 'list',
+	def = 'baseline',
+	section = 'mapsettings',
+	items = {
+		{key = 'baseline', name = 'Disabled', desc = 'Normal Zero-K rules'},
+		{key = 'duels', name = 'Portal duels (WIP)', desc = 'Enable region isolation and commander-loss portals'},
+	},
+}
+
 return options

@@ -29,7 +29,7 @@ local shaderProgram = gl.CreateShader({
 			float intensity = getIntensity(origColor);
 
 			intensity = intensity * 1.5;
-			if (intensity > 1) intensity = 1;
+			if (intensity > 1.0) intensity = 1.0;
 
 			     if (intensity < 0.2)
 				gl_FragColor = vec4(intensity*0.15, intensity*0.15, intensity*0.15, 0.9);

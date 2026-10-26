@@ -255,6 +255,7 @@ local function GetPlateTooltip(unitID, ud)
 end
 
 local function GetCustomTooltip (unitID, ud, windMult)
+	if Spring.GetUnitRulesParam(unitID, 'portal_destination_name') then return 'Right click with mobile units to travel through this portal' end
 	return GetGridTooltip(unitID, windMult)
 	or GetMexTooltip(unitID, ud)
 	or GetTerraformTooltip(unitID)
@@ -270,6 +271,8 @@ function Spring.Utilities.GetHumanName(ud, unitID)
 	end
 
 	if unitID then
+		local destination=Spring.GetUnitRulesParam(unitID, 'portal_destination_name')
+		if destination then return 'Portal to '..destination end
 		local name = Spring.GetUnitRulesParam(unitID, "comm_name")
 		if name then
 			local level = Spring.GetUnitRulesParam(unitID, "comm_level")

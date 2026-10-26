@@ -1,0 +1,7 @@
+/content
+/runs
+__pycache__/
+.venv/
+diagnostic-tools/*.so
+*.log
+four-worlds-validation.json
