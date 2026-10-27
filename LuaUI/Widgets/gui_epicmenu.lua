@@ -812,8 +812,14 @@ local function MakeIconRadioButtonPanel(option)
 		margin = {0, 0, 0, 0},
 		autosize = false,
 	}
-	panel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 0,
-		objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}), HitTest = returnSelf})
+	panel:AddChild(Label:New{
+		y = 0,
+		padding = {0, 0, 0, 0},
+		caption = option.name,
+		tooltip = option.desc,
+		objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),
+		HitTest = returnSelf,
+	})
 
 	local entries = {}
 	local function PaintSelection()
@@ -849,9 +855,22 @@ local function MakeIconRadioButtonPanel(option)
 				PaintSelection()
 			end},
 		}
-		local entry = {item = item, button = button, normalColor = button.backgroundColor, normalFocusColor = button.focusColor}
+		local entry = {
+			item = item,
+			button = button,
+			normalColor = button.backgroundColor,
+			normalFocusColor = button.focusColor,
+		}
 		if item.icon then
-			entry.image = Image:New{file = item.icon, x = 0, y = 0, right = 0, bottom = 0, keepAspect = true, parent = button}
+			entry.image = Image:New{
+				x = 0,
+				y = 0,
+				right = 0,
+				bottom = 0,
+				file = item.icon,
+				keepAspect = true,
+				parent = button,
+			}
 		end
 		entries[#entries + 1] = entry
 		panel:AddChild(button)
