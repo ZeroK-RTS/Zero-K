@@ -680,7 +680,10 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		return
 	end
 	
-	if terraform_width < minTotalRampWidth or terraform_width > maxTotalRampWidth*2 then
+	if terraform_width < minTotalRampWidth*2 then
+		terraform_width = minTotalRampWidth*2
+	end
+	if terraform_width > maxTotalRampWidth*2 then
 		return
 	end
 
