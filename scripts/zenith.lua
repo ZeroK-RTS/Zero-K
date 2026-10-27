@@ -17,6 +17,10 @@ local HOVER_HEIGHT = 2650
 
 local SPREAD_PER_DIST = 0.03
 
+-- Frames after the last launch until AIs are told the meteor stream stopped.
+-- Covers aim time plus a long flight, so it ends about when the last meteors land.
+local AI_STREAM_TIMEOUT = 7*30
+
 -- 6 minutes to reach capacity.
 local SPAWN_PERIOD = 1200 -- in milliseconds
 local METEOR_CAPACITY = 300
@@ -285,6 +289,9 @@ local function LaunchAll(x, z)
 	-- Raw projectile manipulation doesn't create an event (needed for stuff like Fire Once)
 	if aimCount > 0 then
 		script.EndBurst(1)
+		if GG.GameRules_SetSuperweaponOn then
+			GG.GameRules_SetSuperweaponOn(unitID, true, AI_STREAM_TIMEOUT)
+		end
 	end
 
 	-- Sleep to give time for the aim projectiles to turn
