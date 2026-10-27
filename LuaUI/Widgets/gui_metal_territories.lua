@@ -105,8 +105,9 @@ local texelX, texelZ = Game.mapSizeX/atlasX, Game.mapSizeZ/atlasZ
 -- the edge exceeds half a texel diagonal, so it never samples another cell.
 local borderGap, borderWidth = max(8, 0.75*max(texelX, texelZ)), 24
 -- A line like the border 16 elmos out from the mex (48 elmos wide), hatching
--- beside each line that fades out over hatchWidth, and a tint everywhere else.
-local ringRadius, hatchWidth, tint = 24 + 16, 96, 0.35
+-- beside each line that fades out over hatchWidth, and a tint everywhere else:
+-- tint[1] beside the border, fading to tint[2] over tint[3] elmos from it.
+local ringRadius, hatchWidth, tint = 24 + 16, 240, {0.45, 0.25, 400}
 
 -- Points p with nx*p.x + nz*p.z <= limit have a lower power distance to a than to b.
 local function Bisector(a, b)
@@ -303,7 +304,7 @@ uniform mat4 inverseViewProjection;
 uniform vec4 view; // width, height, viewport x, viewport y
 uniform vec2 border; // gap and outer side of the border line, in elmos
 uniform vec3 ring; // inner and outer radius of the line around the spot, hatching width
-uniform float tint;
+uniform vec3 tint; // beside the border, far from it, and the distance between
 uniform float opacity;
 uniform int clipZeroToOne;
 out vec4 result;
@@ -326,8 +327,9 @@ void main() {
 	// At subpixel stripe sizes use the mean coverage, avoiding distant shimmer.
 	hatch = mix(hatch, 0.36, smoothstep(0.25, 1.0, aa));
 	// Gap, solid border, then hatching that fades out; the same line around the
-	// spot with hatching outside it; a tint elsewhere. The edge distance can jump
-	// where the nearest edges change, so antialias with the pixel size in elmos.
+	// spot with hatching outside it; elsewhere a tint that fades away from the
+	// border. The edge distance can jump where the nearest edges change, so
+	// antialias with the pixel size in elmos.
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
 	float inner = smoothstep(border.x - px, border.x + px, edge);
 	float outer = smoothstep(border.y - px, border.y + px, edge);
@@ -337,7 +339,8 @@ void main() {
 	float line = max(inner - outer, ringInner - ringOuter);
 	float near = max(outer * (1.0 - smoothstep(border.y, border.y + ring.z, edge)),
 		ringOuter * (1.0 - smoothstep(ring.y, ring.y + ring.z, r)));
-	result = vec4(color.rgb, opacity * inner * max(line, max(near * hatch, tint)));
+	float shade = mix(tint.x, tint.y, smoothstep(border.y, border.y + tint.z, edge));
+	result = vec4(color.rgb, opacity * inner * max(line, max(near * hatch, shade)));
 }
 ]]
 -- The minimap: the tint and borders as lines of about a pixel on each side.
@@ -352,7 +355,7 @@ void main() {
 ]]
 local minimapSource = [[
 #version 420 compatibility
-uniform float tint;
+uniform vec3 tint; // beside the border, far from it, and the distance between
 uniform float opacity;
 in vec2 pos;
 out vec4 result;
@@ -363,7 +366,8 @@ void main() {
 	vec4 color = Territory(pos, spot, edge);
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
 	float line = 1.0 - smoothstep(0.5*px, 1.5*px, edge);
-	result = vec4(color.rgb, opacity * max(line, tint));
+	float shade = mix(tint.x, tint.y, smoothstep(0.0, tint.z, edge));
+	result = vec4(color.rgb, opacity * max(line, shade));
 }
 ]]
 
