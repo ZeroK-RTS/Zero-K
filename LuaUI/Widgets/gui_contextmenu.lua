@@ -1752,7 +1752,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		end
 	end
 
-	cells = printWeapons(ud, unitID, isCommander)
+	cells = printWeapons(ud, unitID, isCommander or (unitID and ud.customParams.dynamic_comm))
 	
 	if cells and #cells > 0 then
 		
