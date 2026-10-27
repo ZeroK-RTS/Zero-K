@@ -98,6 +98,9 @@ local texelX, texelZ = Game.mapSizeX/atlasX, Game.mapSizeZ/atlasZ
 -- A border is 1.5x the hatching stroke (0.36*64/sqrt(2) elmos). Its gap from
 -- the edge exceeds half a texel diagonal, so it never samples another cell.
 local borderGap, borderWidth = max(8, 0.75*max(texelX, texelZ)), 24
+-- A line like the border 16 elmos out from the mex (48 elmos wide), hatching
+-- beside each line that fades out over hatchWidth, and a tint everywhere else.
+local ringRadius, hatchWidth, tint = 24 + 16, 96, 0.35
 
 -- Points p with nx*p.x + nz*p.z <= limit have a lower power distance to a than to b.
 local function Bisector(a, b)
@@ -229,7 +232,7 @@ void main() {
 			slots.y = float(i + 1);
 		}
 	}
-	result = vec4(data.rg, slots);
+	result = vec4(data.r, 0.0, slots);
 }
 ]]
 local stateSource = [[
@@ -263,10 +266,13 @@ uniform sampler2D atlas;
 uniform sampler2D owners;
 uniform sampler2D palette;
 uniform sampler2D edges;
+uniform sampler2D positions;
 uniform mat4 inverseViewProjection;
 uniform vec4 view; // width, height, viewport x, viewport y
 uniform vec2 mapSize;
 uniform vec2 border; // gap and outer side of the border line, in elmos
+uniform vec3 ring; // inner and outer radius of the line around the spot, hatching width
+uniform float tint;
 uniform float opacity;
 uniform int borderMode; // 0 off, 1 every territory, 2 between different owners
 uniform int clipZeroToOne;
@@ -303,12 +309,19 @@ void main() {
 	float hatch = 1.0 - smoothstep(0.18 - aa, 0.18 + aa, abs(fract(stripe) - 0.5));
 	// At subpixel stripe sizes use the mean coverage, avoiding distant shimmer.
 	hatch = mix(hatch, 0.36, smoothstep(0.25, 1.0, aa));
-	// Gap, solid border, then hatching. The edge distance can jump where the
-	// nearest edges change, so antialias with the pixel size in elmos.
+	// Gap, solid border, then hatching that fades out; the same line around the
+	// spot with hatching outside it; a tint elsewhere. The edge distance can jump
+	// where the nearest edges change, so antialias with the pixel size in elmos.
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
 	float inner = smoothstep(border.x - px, border.x + px, edge);
 	float outer = smoothstep(border.y - px, border.y + px, edge);
-	result = vec4(color.rgb, opacity * (inner - outer + outer * territory.g * hatch));
+	float r = distance(pos, texelFetch(positions, ivec2(spot, 0), 0).rg);
+	float ringInner = smoothstep(ring.x - px, ring.x + px, r);
+	float ringOuter = smoothstep(ring.y - px, ring.y + px, r);
+	float line = max(inner - outer, ringInner - ringOuter);
+	float near = max(outer * (1.0 - smoothstep(border.y, border.y + ring.z, edge)),
+		ringOuter * (1.0 - smoothstep(ring.y, ring.y + ring.z, r)));
+	result = vec4(color.rgb, opacity * inner * max(line, max(near * hatch, tint)));
 }
 ]]
 
@@ -464,8 +477,8 @@ local function BuildMap()
 	edges = NewTexture(width, #spots)
 	ClearTexture(edges)
 	PaintRows(edges, lines, width)
-	-- Static cell IDs, radial fade and two nearest edges; at most 32 MiB,
-	-- regardless of map size. Half floats are exact for indices below 2048.
+	-- Static cell IDs and two nearest edges; at most 32 MiB, regardless of
+	-- map size. Half floats are exact for indices below 2048.
 	atlas = assert(gl.CreateTexture(atlasX, atlasZ, {
 		format = GL.RGBA16F, min_filter = GL.NEAREST, mag_filter = GL.NEAREST,
 		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE, fbo = true,
@@ -477,7 +490,6 @@ local function BuildMap()
 			gl.BeginEnd(GL.TRIANGLE_FAN, function()
 				gl.Color(i - 1, 0, 0, 1)
 				gl.Vertex(2*spots[i].x/Game.mapSizeX - 1, 2*spots[i].z/Game.mapSizeZ - 1, 0)
-				gl.Color(i - 1, 1, 0, 1)
 				for j = 1, #polygon + 1 do
 					local p = polygon[(j - 1)%#polygon + 1]
 					gl.Vertex(2*p[1]/Game.mapSizeX - 1, 2*p[2]/Game.mapSizeZ - 1, 0)
@@ -507,9 +519,10 @@ function widget:Initialize()
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	drawShader = gl.CreateShader({vertex = vertexSource, fragment = drawSource,
-		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3, edges = 4,
+		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5,
 			clipZeroToOne = Platform.glSupportClipSpaceControl and 1 or 0},
-		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, border = {borderGap, borderGap + borderWidth}},
+		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, border = {borderGap, borderGap + borderWidth},
+			ring = {ringRadius, ringRadius + borderWidth, hatchWidth}, tint = tint},
 	})
 	if not paintShader or not cellShader or not stateShader or not drawShader then
 		Spring.Echo('Metal Territories shader error: ' .. gl.GetShaderLog())
@@ -660,6 +673,7 @@ function widget:DrawWorldPreUnit()
 			gl.Texture(2, history)
 			gl.Texture(3, palette)
 			gl.Texture(4, edges)
+			gl.Texture(5, positions)
 			gl.UseShader(drawShader)
 			gl.UniformMatrix(drawInverse, 'viewprojectioninverse')
 			gl.Uniform(drawView, viewW, viewH, viewX, viewY)
@@ -670,7 +684,7 @@ function widget:DrawWorldPreUnit()
 			gl.UseShader(0)
 		end
 	end
-	for i = 4, 0, -1 do gl.Texture(i, false) end
+	for i = 5, 0, -1 do gl.Texture(i, false) end
 	gl.PopAttrib()
 end
 
