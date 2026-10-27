@@ -82,10 +82,10 @@ local math_random = math.random
 function script.StartBuilding(heading, pitch)
 	Signal (SIG_BUILD)
 	SetSignalMask (SIG_BUILD)
+	SetUnitValue(COB.INBUILDSTANCE, 1)
 
 	Turn (door1, z_axis,  DOOR_ANGLE_Z, TURN_SPEED_OPEN)
 	Turn (door2, z_axis, -DOOR_ANGLE_Z, TURN_SPEED_OPEN)
-	Sleep (250)
 
 	Move (lift, y_axis, 4.5, MOVE_SPEED_OPEN)
 	Move (turret, y_axis, TURRET_Y_MAX, MOVE_SPEED_OPEN)
@@ -102,7 +102,6 @@ function script.StartBuilding(heading, pitch)
 	WaitForTurn (turret, y_axis)
 	WaitForTurn (cradle, x_axis)
 
-	SetUnitValue(COB.INBUILDSTANCE, 1)
 
 	-- misleading-ass wobble
 	local rand = math_random
