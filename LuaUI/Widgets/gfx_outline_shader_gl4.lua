@@ -699,7 +699,7 @@ function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 	myvisibleUnits[unitID] = unitDefID
 	local unitData = unitConf[unitDefID]
 	if unitData.seaConfig then
-		local x, z = Spring.GetUnitPosition(unitID)
+		local x, _, z = Spring.GetUnitPosition(unitID)
 		if Spring.GetGroundHeight(x, z) < 0 then
 			unitData = unitData.seaConfig
 		end
