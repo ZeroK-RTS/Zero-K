@@ -370,6 +370,7 @@ local cableGhosts = (Spring.GetConfigInt("OverdriveCableGhosts", 1) or 1) ~= 0
 -- in callin=GotChatMsg when toggling /cabletree ghosts off.
 local ghostEdges = {}
 local ghostNeedsRebuild = false
+local FreeSlotUnlessShared -- defined with edgesByAllyTeam below
 
 -- ---------------------------------------------------------------------------
 -- Per-edge coverage SSBO
@@ -1903,7 +1904,7 @@ local function CableTreeCmd(cmd, line, words, playerID)
 			if not cableGhosts then
 				for k in pairs(ghostEdges) do
 					ghostEdges[k] = nil
-					FreeSlot(k)
+					FreeSlotUnlessShared(k)
 				end
 				ghostNeedsRebuild = true
 			end
@@ -2238,8 +2239,9 @@ local cableFSSrc = VFS.LoadFile(SHADER_DIR .. 'gfx_overdrive_cables.frag.glsl')
 -------------------------------------------------------------------------------------
 
 -- A captured pylon pair keeps its edge key, so another allyteam can still draw this cable
--- with the same slot. Free the slot only when no other allyteam has the edge.
-local function FreeSlotUnlessShared(edgeKey, allyTeamID)
+-- with the same slot. Free the slot only when no ghost and no other allyteam has the edge.
+function FreeSlotUnlessShared(edgeKey, allyTeamID)
+	if ghostEdges[edgeKey] then return end
 	for otherAllyTeamID, edges in pairs(edgesByAllyTeam) do
 		if otherAllyTeamID ~= allyTeamID and edges[edgeKey] then
 			return
@@ -2583,7 +2585,7 @@ function gadget:GameFrame(n)
 				   and Spring.IsPosInLos(mx, 0, mz, ally)
 				   and Spring.IsPosInLos(e.cx, 0, e.cz, ally) then
 					ghostEdges[k] = nil
-					FreeSlot(k)
+					FreeSlotUnlessShared(k)
 					removed = true
 				end
 				checked = checked + 1
