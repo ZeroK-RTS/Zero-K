@@ -91,6 +91,10 @@ local StackPanel
 local LayoutPanel
 local Grid
 local Trackbar
+
+-- Highlight for the selected item of an iconRadioButton row. The integral
+-- menu's selected-command colour, so a chosen state looks the way it does in-game.
+local STATE_SELECT_COLOR = {0.98, 0.48, 0.26, 0.85}
 local TextBox
 local Image
 local Progressbar
@@ -793,6 +797,70 @@ local function MakeHelp(caption, text)
 end
 
 
+-- An iconRadioButton option: its name above a row of buttons, one per item.
+--
+-- option.items = {{key = value, icon = file, name = text, desc = tooltip}, ...}
+-- An item with an icon shows the picture, otherwise its name. The selected
+-- item is highlighted the way the integral menu highlights a selected command;
+-- the rest are dimmed.
+local function MakeIconRadioButtonPanel(option)
+	local panel = Panel:New{
+		width = "100%",
+		height = 56,
+		backgroundColor = {0, 0, 0, 0},
+		padding = {0, 0, 0, 0},
+		margin = {0, 0, 0, 0},
+		autosize = false,
+	}
+	panel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 0,
+		objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}), HitTest = returnSelf})
+
+	local entries = {}
+	local function PaintSelection()
+		for i = 1, #entries do
+			local entry = entries[i]
+			local selected = (entry.item.value == option.value)
+			entry.button.backgroundColor = selected and STATE_SELECT_COLOR or entry.normalColor
+			entry.button.focusColor = selected and STATE_SELECT_COLOR or entry.normalFocusColor
+			if entry.image then
+				entry.image.color = selected and {1, 1, 1, 1} or {1, 1, 1, 0.7}
+				entry.image:Invalidate()
+			end
+			entry.button:Invalidate()
+		end
+	end
+
+	local x = 0
+	for i = 1, #option.items do
+		local item = option.items[i]
+		local width = item.icon and 44 or 62
+		local button = Button:New{
+			x = x,
+			y = 17,
+			width = width,
+			height = 36,
+			padding = {2, 2, 2, 2},
+			caption = item.icon and "" or item.name,
+			noFont = item.icon and true or nil,
+			objectOverrideFont = (not item.icon) and WG.GetFont(11) or nil,
+			tooltip = item.desc or item.name,
+			OnClick = {function()
+				option.OnChange(item)
+				PaintSelection()
+			end},
+		}
+		local entry = {item = item, button = button, normalColor = button.backgroundColor, normalFocusColor = button.focusColor}
+		if item.icon then
+			entry.image = Image:New{file = item.icon, x = 0, y = 0, right = 0, bottom = 0, keepAspect = true, parent = button}
+		end
+		entries[#entries + 1] = entry
+		panel:AddChild(button)
+		x = x + width + 2
+	end
+	PaintSelection()
+	return panel
+end
+
 local function MakeSubWindow(key)
 end
 
@@ -1171,6 +1239,18 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 			end
 	
 	elseif option.type == 'list' then
+		controlfunc =
+			function(item)
+				option.value = item.value
+				settings.config[fullkey] = option.value
+			end
+	elseif option.type == 'iconRadioButton' then
+		-- Keys can be any value, false included, so the item carries it as
+		-- .value the same way a radioButton item does. The panel repaints
+		-- itself, so unlike radioButton the window is not remade.
+		for i = 1, #option.items do
+			option.items[i].value = option.items[i].key
+		end
 		controlfunc =
 			function(item)
 				option.value = item.value
@@ -1637,7 +1717,7 @@ local function ResetWinSettings(path)
 					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
 					option.checked = option.value
 					option.OnChange(option)
-				elseif option.type == 'list' or option.type == 'radioButton' then
+				elseif option.type == 'list' or option.type == 'radioButton' or option.type == 'iconRadioButton' then
 					option.value = option.default
 					option.OnChange(option)
 				elseif option.type == 'colors' then
@@ -1733,7 +1813,7 @@ local function SearchElement(termToSearch, path)
 				if found_name or lowercase_hotkey:find(termToSearch) then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
 				end
-			elseif option.type == 'number' then
+			elseif option.type == 'number' or option.type == 'iconRadioButton' then
 				if found_name then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
 				end
@@ -2020,6 +2100,9 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 				topHeight = 10,
 			}
 			]]--
+		elseif option.type == 'iconRadioButton' then
+			settings_height = settings_height + B_HEIGHT + 22
+			tree_children[#tree_children+1] = MakeIconRadioButtonPanel(option)
 		elseif option.type == 'radioButton' then
 			tree_children[#tree_children+1] = Control:New{height = 1, minHeight = 0, padding = {0, 0, 0, 0},}
 			tree_children[#tree_children+1] = Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
