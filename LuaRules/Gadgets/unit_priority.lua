@@ -242,7 +242,7 @@ local function CheckReserveResourceUse(teamID, onlyEnergy, resTable)
 	local energyReserve = effectiveTeamEnergyReserved[teamID] or 0
 	if energyReserve ~= 0 then
 		local eCurr = spGetTeamResources(teamID, "energy")
-		if eCurr <= energyReserve - ((resTable and resTable.e) or 0) then
+		if eCurr <= energyReserve or (resTable and eCurr - (resTable.e or 0) < energyReserve) then
 			return false
 		end
 	end
@@ -254,7 +254,7 @@ local function CheckReserveResourceUse(teamID, onlyEnergy, resTable)
 	local metalReserve = effectiveTeamMetalReserved[teamID] or 0
 	if metalReserve ~= 0 then
 		local mCurr = spGetTeamResources(teamID, "metal")
-		if mCurr <= metalReserve - ((resTable and resTable.m) or 0) then
+		if mCurr <= metalReserve or (resTable and mCurr - (resTable.m or 0) < metalReserve) then
 			return false
 		end
 	end
