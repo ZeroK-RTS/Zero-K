@@ -347,9 +347,7 @@ end
 --end
 
 function widget:DrawWorldPreUnit()
-	if Spring.IsGUIHidden() then
-		return
-	end
+	local guiHidden = Spring.IsGUIHidden()
 	
 	local osClock = os.clock()
 	--local camX, camY, camZ = spGetCameraPosition()
@@ -393,7 +391,7 @@ function widget:DrawWorldPreUnit()
 		elseif  OPTIONS.types[cmdType].baseColor[4] > 0  or  OPTIONS.types[cmdType].ringColor[4] > 0  then
 			index = index + 1
 			
-			if commandCoordsRendered[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] == nil then
+			if not guiHidden and commandCoordsRendered[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] == nil then
 				commandCoordsRendered[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] = true
 				local alphaMultiplier = 1 + (OPTIONS.reduceOverlapEffect * (commandHistoryCoords[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] - 1))	 -- add a bit to the multiplier for each cmd issued on the same coords
 				
