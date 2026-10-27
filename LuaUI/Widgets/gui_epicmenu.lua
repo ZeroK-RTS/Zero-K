@@ -1813,9 +1813,23 @@ local function SearchElement(termToSearch, path)
 				if found_name or lowercase_hotkey:find(termToSearch) then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
 				end
-			elseif option.type == 'number' or option.type == 'iconRadioButton' then
+			elseif option.type == 'number' then
 				if found_name then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
+				end
+			elseif option.type == 'iconRadioButton' then
+				if found_name then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
+				else
+					for i = 1, #option.items do
+						local item = option.items[i]
+						lowercase_name = item.name and item.name:lower() or ''
+						lowercase_desc = item.desc and item.desc:lower() or ''
+						if SearchInText(lowercase_name, termToSearch) or SearchInText(lowercase_desc, termToSearch) then
+							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath, option}
+							break
+						end
+					end
 				end
 			elseif option.type == 'list' then
 				if found_name then
