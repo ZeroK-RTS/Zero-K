@@ -724,9 +724,6 @@ end
 local firstUpdate = true
 local updateRunOnceRan = false
 
-local UPDATE_PERIOD = 1 -- seconds
-local lastUpdateTimer
-
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
 	if firstUpdate then
 		vsx,vsy = Spring.GetViewSizes()
@@ -745,11 +742,8 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		updateRunOnceRan = true
 	end
 	if not window then return end
-	-- Rate limit by wall time, not game frames: the game frame does not change while paused.
-	local now = Spring.GetTimer()
-	if lastUpdateTimer and Spring.DiffTimers(now, lastUpdateTimer) < UPDATE_PERIOD then return end
-	lastUpdateTimer = now
 
+	-- Camera and drag state can change while the simulation is paused.
 	if not options.hideOnOverview.value then
 		vsx,vsy = Spring.GetViewSizes()
 		cs = Spring.GetCameraState()
