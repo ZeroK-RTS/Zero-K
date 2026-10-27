@@ -16,7 +16,7 @@ local function RepaintPalette()
 end
 
 options_path = 'Settings/Graphics/Map/Metal Territories'
-options_order = {'opacity', 'borders', 'minimap', 'allies', 'allyColor', 'enemies', 'enemyColor'}
+options_order = {'opacity', 'borders', 'borderWidth', 'hatchWidth', 'hatchFade', 'tintFade', 'minimap', 'allies', 'allyColor', 'enemies', 'enemyColor'}
 options = {
 	opacity = {
 		name = 'Opacity',
@@ -36,6 +36,42 @@ options = {
 			{key = 'owners', name = 'Between different owners'},
 		},
 		noHotkey = true,
+	},
+	borderWidth = {
+		name = 'Border width',
+		desc = 'In elmos. The line around each mex has the same width.',
+		type = 'number',
+		value = 24,
+		min = 4,
+		max = 64,
+		step = 1,
+	},
+	hatchWidth = {
+		name = 'Hatching line width',
+		desc = 'In elmos. The lines are 45 elmos apart.',
+		type = 'number',
+		value = 16.3,
+		min = 2,
+		max = 32,
+		step = 0.1,
+	},
+	hatchFade = {
+		name = 'Hatching fade rate',
+		desc = 'At 1 the hatching beside borders and mexes fades out over 240 elmos, at 2 over 120. At 0 it does not fade.',
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 4,
+		step = 0.05,
+	},
+	tintFade = {
+		name = 'Tint fade rate',
+		desc = 'At 1 the tint fades from the border to a lighter tint over 400 elmos, at 2 over 200. At 0 it does not fade.',
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 4,
+		step = 0.05,
 	},
 	minimap = {
 		name = 'Show on minimap',
@@ -87,6 +123,7 @@ local myAllyTeam, fullView
 local atlas, edges, positions, observed, history, nextHistory, palette, depth
 local paintShader, cellShader, stateShader, drawShader, minimapShader, quad
 local stateFullView, drawOpacity, drawBorders, drawInverse, drawView, minimapOpacity, minimapBorders
+local drawBorder, drawRing, drawTint, drawStroke, minimapTint
 local viewX, viewY, viewW, viewH
 local depthFBO
 local borderModes = {off = 0, all = 1, owners = 2}
@@ -101,13 +138,15 @@ end
 local atlasScale = min(1/4, 2048/max(Game.mapSizeX, Game.mapSizeZ))
 local atlasX, atlasZ = max(1, math.ceil(Game.mapSizeX*atlasScale)), max(1, math.ceil(Game.mapSizeZ*atlasScale))
 local texelX, texelZ = Game.mapSizeX/atlasX, Game.mapSizeZ/atlasZ
--- A border is 1.5x the hatching stroke (0.36*64/sqrt(2) elmos). Its gap from
--- the edge exceeds half a texel diagonal, so it never samples another cell.
-local borderGap, borderWidth = max(8, 0.75*max(texelX, texelZ)), 24
+-- The border's gap from the edge exceeds half a texel diagonal, so it never
+-- samples another cell.
+local borderGap = max(8, 0.75*max(texelX, texelZ))
 -- A line like the border 16 elmos out from the mex (48 elmos wide), hatching
--- beside each line that fades out over hatchWidth, and a tint everywhere else:
--- tint[1] beside the border, fading to tint[2] over tint[3] elmos from it.
-local ringRadius, hatchWidth, tint = 24 + 16, 240, {0.45, 0.25, 400}
+-- beside each line that fades out over hatchFade elmos, and a tint everywhere
+-- else: tint[1] beside the border, fading to tint[2] over tintFade elmos from
+-- it. The fade rate options divide these distances.
+local ringRadius, hatchFade, tint, tintFade = 24 + 16, 240, {0.45, 0.25}, 400
+local stripeSpacing = 64/math.sqrt(2) -- elmos between hatching lines
 
 -- Points p with nx*p.x + nz*p.z <= limit have a lower power distance to a than to b.
 local function Bisector(a, b)
@@ -303,8 +342,9 @@ uniform sampler2D positions;
 uniform mat4 inverseViewProjection;
 uniform vec4 view; // width, height, viewport x, viewport y
 uniform vec2 border; // gap and outer side of the border line, in elmos
-uniform vec3 ring; // inner and outer radius of the line around the spot, hatching width
-uniform vec3 tint; // beside the border, far from it, and the distance between
+uniform vec3 ring; // inner and outer radius of the line around the spot, 1/hatching fade distance
+uniform vec3 tint; // beside the border, far from it, and 1/the distance between
+uniform float stroke; // half the hatching line width, as a fraction of the line spacing
 uniform float opacity;
 uniform int clipZeroToOne;
 out vec4 result;
@@ -323,9 +363,9 @@ void main() {
 	// World-space diagonal stripes, with a pixel-width antialiased edge.
 	float stripe = (pos.x + pos.y)/64.0;
 	float aa = max(fwidth(stripe), 0.001);
-	float hatch = 1.0 - smoothstep(0.18 - aa, 0.18 + aa, abs(fract(stripe) - 0.5));
+	float hatch = 1.0 - smoothstep(stroke - aa, stroke + aa, abs(fract(stripe) - 0.5));
 	// At subpixel stripe sizes use the mean coverage, avoiding distant shimmer.
-	hatch = mix(hatch, 0.36, smoothstep(0.25, 1.0, aa));
+	hatch = mix(hatch, 2.0*stroke, smoothstep(0.25, 1.0, aa));
 	// Gap, solid border, then hatching that fades out; the same line around the
 	// spot with hatching outside it; elsewhere a tint that fades away from the
 	// border. The edge distance can jump where the nearest edges change, so
@@ -337,9 +377,9 @@ void main() {
 	float ringInner = smoothstep(ring.x - px, ring.x + px, r);
 	float ringOuter = smoothstep(ring.y - px, ring.y + px, r);
 	float line = max(inner - outer, ringInner - ringOuter);
-	float near = max(outer * (1.0 - smoothstep(border.y, border.y + ring.z, edge)),
-		ringOuter * (1.0 - smoothstep(ring.y, ring.y + ring.z, r)));
-	float shade = mix(tint.x, tint.y, smoothstep(border.y, border.y + tint.z, edge));
+	float near = max(outer * (1.0 - smoothstep(0.0, 1.0, (edge - border.y)*ring.z)),
+		ringOuter * (1.0 - smoothstep(0.0, 1.0, (r - ring.y)*ring.z)));
+	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, (edge - border.y)*tint.z));
 	result = vec4(color.rgb, opacity * inner * max(line, max(near * hatch, shade)));
 }
 ]]
@@ -355,7 +395,7 @@ void main() {
 ]]
 local minimapSource = [[
 #version 420 compatibility
-uniform vec3 tint; // beside the border, far from it, and the distance between
+uniform vec3 tint; // beside the border, far from it, and 1/the distance between
 uniform float opacity;
 in vec2 pos;
 out vec4 result;
@@ -366,7 +406,7 @@ void main() {
 	vec4 color = Territory(pos, spot, edge);
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
 	float line = 1.0 - smoothstep(0.5*px, 1.5*px, edge);
-	float shade = mix(tint.x, tint.y, smoothstep(0.0, tint.z, edge));
+	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, edge*tint.z));
 	result = vec4(color.rgb, opacity * max(line, shade));
 }
 ]]
@@ -567,12 +607,11 @@ function widget:Initialize()
 	drawShader = gl.CreateShader({vertex = vertexSource, fragment = drawSource,
 		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5,
 			clipZeroToOne = Platform.glSupportClipSpaceControl and 1 or 0},
-		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, border = {borderGap, borderGap + borderWidth},
-			ring = {ringRadius, ringRadius + borderWidth, hatchWidth}, tint = tint},
+		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	minimapShader = gl.CreateShader({vertex = minimapVertexSource, fragment = minimapSource,
 		uniformInt = {atlas = 1, owners = 2, palette = 3, edges = 4},
-		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, tint = tint},
+		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	if not paintShader or not cellShader or not stateShader or not drawShader or not minimapShader then
 		Spring.Echo('Metal Territories shader error: ' .. gl.GetShaderLog())
@@ -586,6 +625,11 @@ function widget:Initialize()
 	drawView = gl.GetUniformLocation(drawShader, 'view')
 	minimapOpacity = gl.GetUniformLocation(minimapShader, 'opacity')
 	minimapBorders = gl.GetUniformLocation(minimapShader, 'borderMode')
+	drawBorder = gl.GetUniformLocation(drawShader, 'border')
+	drawRing = gl.GetUniformLocation(drawShader, 'ring')
+	drawTint = gl.GetUniformLocation(drawShader, 'tint')
+	drawStroke = gl.GetUniformLocation(drawShader, 'stroke')
+	minimapTint = gl.GetUniformLocation(minimapShader, 'tint')
 	quad = gl.CreateList(function() gl.TexRect(-1, -1, 1, 1) end)
 	-- Allocation and uploads run in DrawWorldPreUnit, where drawing is allowed.
 end
@@ -731,6 +775,11 @@ function widget:DrawWorldPreUnit()
 			gl.Uniform(drawView, viewW, viewH, viewX, viewY)
 			gl.Uniform(drawOpacity, options.opacity.value)
 			gl.UniformInt(drawBorders, borderModes[options.borders.value])
+			local borderWidth = options.borderWidth.value
+			gl.Uniform(drawBorder, borderGap, borderGap + borderWidth)
+			gl.Uniform(drawRing, ringRadius, ringRadius + borderWidth, options.hatchFade.value/hatchFade)
+			gl.Uniform(drawTint, tint[1], tint[2], options.tintFade.value/tintFade)
+			gl.Uniform(drawStroke, 0.5*options.hatchWidth.value/stripeSpacing)
 			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 			gl.CallList(quad)
 			gl.UseShader(0)
@@ -751,6 +800,7 @@ function widget:DrawInMiniMap(sx, sy)
 	gl.UseShader(minimapShader)
 	gl.Uniform(minimapOpacity, options.opacity.value)
 	gl.UniformInt(minimapBorders, borderModes[options.borders.value])
+	gl.Uniform(minimapTint, tint[1], tint[2], options.tintFade.value/tintFade)
 	-- The map's top left corner is at the minimap's top left, or bottom right when flipped.
 	local flipped = Spring.Utilities.IsMinimapFlipped()
 	gl.TexRect(0, 0, sx, sy, flipped, flipped)
