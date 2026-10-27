@@ -468,6 +468,7 @@ local pathGesture = 'Settings/Interface/Gesture Menu'
 
 local pathToolbox = 'Settings/Toolbox'
 	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and saving their coordinates]], true)
+	ShButton(pathToolbox, 'Toggle Light Editor', function() spSendCommands{"luaui togglewidget Light Editor GL4"} end, [[Configure unit-attached deferred GL4 lights. Copy Lua snippets into LuaRules/Configs/UnitLights.]], true)
 	ShButton(pathToolbox, 'Toggle Metal Spot Placer', function() spSendCommands{"luaui togglewidget Metal Spot Placer"} end, [[Press Alt+M to start placing metal extractors. Press Alt+M again to print the coordinates to infolog.txt, found in your install directory.]], true)
 
 	
