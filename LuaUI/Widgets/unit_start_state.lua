@@ -150,14 +150,15 @@ local function StateItems(images, tooltipList)
 	return items
 end
 
--- -1 is "inherit from factory" and has no command icon of its own, so it is a
--- captioned button in front of the icons.
-local function WithFactory(items, tooltipList)
-	local withFactory = {{key = -1, name = "Factory", desc = tooltipList[-1]}}
+-- -1 is "inherit from factory": shown with the factory plate icon in front of
+-- the state icons.
+local INHERIT_ICON = 'LuaUI/Images/commands/Bold/buildplate.png'
+local function WithInherit(items, tooltipList)
+	local withInherit = {{key = -1, icon = INHERIT_ICON, name = "Factory", desc = tooltipList[-1]}}
 	for i = 1, #items do
-		withFactory[i + 1] = items[i]
+		withInherit[i + 1] = items[i]
 	end
-	return withFactory
+	return withInherit
 end
 
 local stateItems = {
@@ -180,10 +181,10 @@ local stateItems = {
 		{key = true, icon = STATE_IMAGE_DIR .. "autoassist_on.png", desc = "Auto Assist: Enabled"},
 	},
 }
-stateItems.factory_firestate = WithFactory(stateItems.firestate, tooltips.firestate)
-stateItems.factory_movestate = WithFactory(stateItems.movestate, tooltips.movestate)
-stateItems.factory_priority = WithFactory(stateItems.priority, tooltips.priority)
-stateItems.factory_retreat = WithFactory(stateItems.retreat, tooltips.retreat)
+stateItems.firestate_with_inherit = WithInherit(stateItems.firestate, tooltips.firestate)
+stateItems.movestate_with_inherit = WithInherit(stateItems.movestate, tooltips.movestate)
+stateItems.priority_with_inherit = WithInherit(stateItems.priority, tooltips.priority)
+stateItems.retreat_with_inherit = WithInherit(stateItems.retreat, tooltips.retreat)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -776,7 +777,7 @@ local function addUnit(defName, path)
 			type = 'iconRadioButton',
 			value = ud.fireState, -- most firestates are -1
 			path = path,
-			items = stateItems.factory_firestate,
+			items = stateItems.firestate_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_firestate0"
 	end
@@ -788,7 +789,7 @@ local function addUnit(defName, path)
 			type = 'iconRadioButton',
 			value = ud.moveState,
 			path = path,
-			items = stateItems.factory_movestate,
+			items = stateItems.movestate_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_movestate1"
 	end
@@ -903,7 +904,7 @@ local function addUnit(defName, path)
 		type = 'iconRadioButton',
 		value = -1,
 		path = path,
-		items = stateItems.factory_priority,
+		items = stateItems.priority_with_inherit,
 	}
 	options_order[#options_order+1] = defName .. "_buildpriority_0"
 
@@ -970,7 +971,7 @@ local function addUnit(defName, path)
 			type = 'iconRadioButton',
 			value = (ud.isFactory and 0) or -1,
 			path = path,
-			items = stateItems.factory_retreat,
+			items = stateItems.retreat_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
