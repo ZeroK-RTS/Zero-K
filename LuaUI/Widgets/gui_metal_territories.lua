@@ -16,7 +16,8 @@ local function RepaintPalette()
 end
 
 options_path = 'Settings/Graphics/Map/Metal Territories'
-options_order = {'opacity', 'borders', 'borderWidth', 'hatchWidth', 'hatchFade', 'tintFade', 'minimap', 'allies', 'allyColor', 'enemies', 'enemyColor'}
+options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'borders', 'borderWidth',
+	'hatching', 'hatchWidth', 'hatchFade', 'tint', 'tintOpacity', 'tintFade', 'minimap', 'allies', 'allyColor', 'enemies', 'enemyColor'}
 options = {
 	opacity = {
 		name = 'Opacity',
@@ -25,6 +26,36 @@ options = {
 		min = 0,
 		max = 0.8,
 		step = 0.01,
+	},
+	allyOpacity = {
+		name = 'Allied territory opacity',
+		desc = 'A fraction of Opacity: at 0.6 allied territories are drawn at 60% of it. 0 hides them.',
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 1,
+		step = 0.05,
+		OnChange = RepaintPalette,
+	},
+	enemyOpacity = {
+		name = 'Enemy territory opacity',
+		desc = 'A fraction of Opacity: at 0.6 enemy territories are drawn at 60% of it. 0 hides them.',
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 1,
+		step = 0.05,
+		OnChange = RepaintPalette,
+	},
+	neutralOpacity = {
+		name = 'Neutral territory opacity',
+		desc = 'Territories with no known mex. A fraction of Opacity: at 0.6 they are drawn at 60% of it. 0 hides them.',
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 1,
+		step = 0.05,
+		OnChange = RepaintPalette,
 	},
 	borders = {
 		name = 'Borders',
@@ -46,6 +77,13 @@ options = {
 		max = 64,
 		step = 1,
 	},
+	hatching = {
+		name = 'Hatching',
+		desc = 'Hatching beside borders and around mexes.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
 	hatchWidth = {
 		name = 'Hatching line width',
 		desc = 'In elmos. The lines are 45 elmos apart.',
@@ -64,9 +102,25 @@ options = {
 		max = 4,
 		step = 0.05,
 	},
+	tint = {
+		name = 'Tint',
+		desc = 'Tint territories, strongest beside their borders.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	tintOpacity = {
+		name = 'Tint opacity',
+		desc = 'At 1 the tint beside the border is 45% of Opacity, at 2 it is 90%. 0 hides the tint.',
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 2,
+		step = 0.05,
+	},
 	tintFade = {
 		name = 'Tint fade rate',
-		desc = 'At 1 the tint fades from the border to a lighter tint over 400 elmos, at 2 over 200. At 0 it does not fade.',
+		desc = 'At 1 the tint fades out over 600 elmos from the border, at 2 over 300. At 0 it does not fade.',
 		type = 'number',
 		value = 1,
 		min = 0,
@@ -123,7 +177,7 @@ local myAllyTeam, fullView
 local atlas, edges, positions, observed, history, nextHistory, palette, depth
 local paintShader, cellShader, stateShader, drawShader, minimapShader, quad
 local stateFullView, drawOpacity, drawBorders, drawInverse, drawView, minimapOpacity, minimapBorders
-local drawBorder, drawRing, drawTint, drawStroke, minimapTint
+local drawBorder, drawRing, drawTint, drawStroke, drawHatching, minimapTint
 local viewX, viewY, viewW, viewH
 local depthFBO
 local borderModes = {off = 0, all = 1, owners = 2}
@@ -145,7 +199,7 @@ local borderGap = max(8, 0.75*max(texelX, texelZ))
 -- beside each line that fades out over hatchFade elmos, and a tint everywhere
 -- else: tint[1] beside the border, fading to tint[2] over tintFade elmos from
 -- it. The fade rate options divide these distances.
-local ringRadius, hatchFade, tint, tintFade = 24 + 16, 240, {0.45, 0.25}, 400
+local ringRadius, hatchFade, tint, tintFade = 24 + 16, 240, {0.45, 0}, 600
 local stripeSpacing = 64/math.sqrt(2) -- elmos between hatching lines
 
 -- Points p with nx*p.x + nz*p.z <= limit have a lower power distance to a than to b.
@@ -305,8 +359,9 @@ void main() {
 	result = vec4(owner, 0.0, seen.b, 1.0);
 }
 ]]
--- The shown owner's colour at a map position, its spot, and the exact distance
--- to the nearest bordered edge of the texel's two nearest.
+-- The shown owner's colour and opacity at a map position, its spot, and the
+-- exact distance to the nearest bordered edge of the texel's two nearest. With
+-- borders off every edge counts, so the tint still fades from it.
 local territorySource = [[
 uniform sampler2D atlas;
 uniform sampler2D owners;
@@ -322,7 +377,7 @@ vec4 Territory(vec2 pos, out int spot, out float edge) {
 	// Alpha identifies the shown owner.
 	vec4 color = texelFetch(palette, ivec2(owner, 0), 0);
 	edge = 1e6;
-	for (int k = 0; k < 2 && borderMode != 0; k++) {
+	for (int k = 0; k < 2; k++) {
 		int slot = int(territory[k + 2] + 0.5) - 1;
 		if (slot < 0) continue;
 		if (borderMode == 2) {
@@ -332,7 +387,7 @@ vec4 Territory(vec2 pos, out int spot, out float edge) {
 		}
 		edge = min(edge, EdgeDistance(edges, slot, spot, pos));
 	}
-	return color;
+	return vec4(color.rgb, texelFetch(palette, ivec2(owner, 1), 0).r);
 }
 ]]
 local drawSource = [[
@@ -345,6 +400,7 @@ uniform vec2 border; // gap and outer side of the border line, in elmos
 uniform vec3 ring; // inner and outer radius of the line around the spot, 1/hatching fade distance
 uniform vec3 tint; // beside the border, far from it, and 1/the distance between
 uniform float stroke; // half the hatching line width, as a fraction of the line spacing
+uniform float hatching; // 1 draws the hatching, 0 hides it
 uniform float opacity;
 uniform int clipZeroToOne;
 out vec4 result;
@@ -371,16 +427,17 @@ void main() {
 	// border. The edge distance can jump where the nearest edges change, so
 	// antialias with the pixel size in elmos.
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
-	float inner = smoothstep(border.x - px, border.x + px, edge);
+	float lines = borderMode != 0 ? 1.0 : 0.0;
+	float inner = mix(1.0, smoothstep(border.x - px, border.x + px, edge), lines);
 	float outer = smoothstep(border.y - px, border.y + px, edge);
 	float r = distance(pos, texelFetch(positions, ivec2(spot, 0), 0).rg);
 	float ringInner = smoothstep(ring.x - px, ring.x + px, r);
 	float ringOuter = smoothstep(ring.y - px, ring.y + px, r);
-	float line = max(inner - outer, ringInner - ringOuter);
-	float near = max(outer * (1.0 - smoothstep(0.0, 1.0, (edge - border.y)*ring.z)),
+	float line = max(lines * (inner - outer), ringInner - ringOuter);
+	float near = max(lines * outer * (1.0 - smoothstep(0.0, 1.0, (edge - border.y)*ring.z)),
 		ringOuter * (1.0 - smoothstep(0.0, 1.0, (r - ring.y)*ring.z)));
 	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, (edge - border.y)*tint.z));
-	result = vec4(color.rgb, opacity * inner * max(line, max(near * hatch, shade)));
+	result = vec4(color.rgb, opacity * color.a * inner * max(line, max(hatching * near * hatch, shade)));
 }
 ]]
 -- The minimap: the tint and borders as lines of about a pixel on each side.
@@ -405,9 +462,9 @@ void main() {
 	float edge;
 	vec4 color = Territory(pos, spot, edge);
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
-	float line = 1.0 - smoothstep(0.5*px, 1.5*px, edge);
+	float line = (borderMode != 0 ? 1.0 : 0.0) * (1.0 - smoothstep(0.5*px, 1.5*px, edge));
 	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, edge*tint.z));
-	result = vec4(color.rgb, opacity * max(line, shade));
+	result = vec4(color.rgb, opacity * color.a * max(line, shade));
 }
 ]]
 
@@ -509,6 +566,7 @@ end
 
 local function UpdatePalette()
 	local teams, first, colors = Spring.GetTeamList(), {}, {[1] = {0.55, 0.55, 0.55, 0}}
+	local opacities = {[1] = {options.neutralOpacity.value, 0, 0, 0}}
 	for _, teamID in ipairs(teams) do
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		first[ally] = min(first[ally] or teamID, teamID)
@@ -520,18 +578,22 @@ local function UpdatePalette()
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		-- Each enemy allyteam is one owner, and so are allies in one colour.
 		local mode, custom, colorTeam = enemies, options.enemyColor.value, first[ally]
+		local opacity = options.enemyOpacity.value
 		if ally == myAllyTeam then
 			mode, custom = allies, options.allyColor.value
 			colorTeam = mode == 'players' and teamID or Spring.GetMyTeamID()
+			opacity = options.allyOpacity.value
 		end
 		colors[teamID + 2] = mode == 'custom' and {custom[1], custom[2], custom[3]} or {Spring.GetTeamColor(colorTeam)}
 		-- Alpha is the shown owner: neutral 0, otherwise the colour team + 1.
 		colors[teamID + 2][4] = colorTeam + 1
+		opacities[teamID + 2] = {opacity, 0, 0, 0}
 		width = max(width, teamID + 2)
 	end
 	if palette then gl.DeleteTexture(palette) end
-	palette = NewTexture(width, 1)
-	PaintRow(palette, colors, width)
+	-- The second row is the opacity of each owner's territories.
+	palette = NewTexture(width, 2)
+	PaintRows(palette, {colors, opacities}, width)
 	paletteDirty = false
 end
 
@@ -629,6 +691,7 @@ function widget:Initialize()
 	drawRing = gl.GetUniformLocation(drawShader, 'ring')
 	drawTint = gl.GetUniformLocation(drawShader, 'tint')
 	drawStroke = gl.GetUniformLocation(drawShader, 'stroke')
+	drawHatching = gl.GetUniformLocation(drawShader, 'hatching')
 	minimapTint = gl.GetUniformLocation(minimapShader, 'tint')
 	quad = gl.CreateList(function() gl.TexRect(-1, -1, 1, 1) end)
 	-- Allocation and uploads run in DrawWorldPreUnit, where drawing is allowed.
@@ -718,6 +781,12 @@ function widget:PlayerChanged(playerID)
 	if playerID == Spring.GetMyPlayerID() then paletteDirty = true end
 end
 
+-- Beside the border, far from it, and 1/the distance between.
+local function SetTint(location)
+	local scale = options.tint.value and options.tintOpacity.value or 0
+	gl.Uniform(location, scale*tint[1], scale*tint[2], options.tintFade.value/tintFade)
+end
+
 function widget:DrawWorldPreUnit()
 	if not drawShader then return end
 	gl.PushAttrib(GL.ENABLE_BIT + GL.COLOR_BUFFER_BIT + GL.DEPTH_BUFFER_BIT + GL.POINT_BIT + GL.CURRENT_BIT)
@@ -778,8 +847,9 @@ function widget:DrawWorldPreUnit()
 			local borderWidth = options.borderWidth.value
 			gl.Uniform(drawBorder, borderGap, borderGap + borderWidth)
 			gl.Uniform(drawRing, ringRadius, ringRadius + borderWidth, options.hatchFade.value/hatchFade)
-			gl.Uniform(drawTint, tint[1], tint[2], options.tintFade.value/tintFade)
+			SetTint(drawTint)
 			gl.Uniform(drawStroke, 0.5*options.hatchWidth.value/stripeSpacing)
+			gl.Uniform(drawHatching, options.hatching.value and 1 or 0)
 			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 			gl.CallList(quad)
 			gl.UseShader(0)
@@ -800,7 +870,7 @@ function widget:DrawInMiniMap(sx, sy)
 	gl.UseShader(minimapShader)
 	gl.Uniform(minimapOpacity, options.opacity.value)
 	gl.UniformInt(minimapBorders, borderModes[options.borders.value])
-	gl.Uniform(minimapTint, tint[1], tint[2], options.tintFade.value/tintFade)
+	SetTint(minimapTint)
 	-- The map's top left corner is at the minimap's top left, or bottom right when flipped.
 	local flipped = Spring.Utilities.IsMinimapFlipped()
 	gl.TexRect(0, 0, sx, sy, flipped, flipped)
