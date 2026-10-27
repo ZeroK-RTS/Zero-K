@@ -16,7 +16,7 @@ local function RepaintPalette()
 end
 
 options_path = 'Settings/Graphics/Map/Metal Territories'
-options_order = {'opacity', 'borders', 'allies', 'allyColor', 'enemies', 'enemyColor'}
+options_order = {'opacity', 'borders', 'minimap', 'allies', 'allyColor', 'enemies', 'enemyColor'}
 options = {
 	opacity = {
 		name = 'Opacity',
@@ -35,6 +35,12 @@ options = {
 			{key = 'all', name = 'Every territory'},
 			{key = 'owners', name = 'Between different owners'},
 		},
+		noHotkey = true,
+	},
+	minimap = {
+		name = 'Show on minimap',
+		type = 'bool',
+		value = true,
 		noHotkey = true,
 	},
 	allies = {
@@ -79,8 +85,8 @@ local spots, cells, spotSource
 local byPosition, unitSpot, watched, observations, dirty = {}, {}, {}, {}, {}
 local myAllyTeam, fullView
 local atlas, edges, positions, observed, history, nextHistory, palette, depth
-local paintShader, cellShader, stateShader, drawShader, quad
-local stateFullView, drawOpacity, drawBorders, drawInverse, drawView
+local paintShader, cellShader, stateShader, drawShader, minimapShader, quad
+local stateFullView, drawOpacity, drawBorders, drawInverse, drawView, minimapOpacity, minimapBorders
 local viewX, viewY, viewW, viewH
 local depthFBO
 local borderModes = {off = 0, all = 1, owners = 2}
@@ -259,40 +265,23 @@ void main() {
 	result = vec4(owner, 0.0, seen.b, 1.0);
 }
 ]]
-local drawSource = [[
-#version 420 compatibility
-uniform sampler2D depthTex;
+-- The shown owner's colour at a map position, its spot, and the exact distance
+-- to the nearest bordered edge of the texel's two nearest.
+local territorySource = [[
 uniform sampler2D atlas;
 uniform sampler2D owners;
 uniform sampler2D palette;
 uniform sampler2D edges;
-uniform sampler2D positions;
-uniform mat4 inverseViewProjection;
-uniform vec4 view; // width, height, viewport x, viewport y
 uniform vec2 mapSize;
-uniform vec2 border; // gap and outer side of the border line, in elmos
-uniform vec3 ring; // inner and outer radius of the line around the spot, hatching width
-uniform float tint;
-uniform float opacity;
 uniform int borderMode; // 0 off, 1 every territory, 2 between different owners
-uniform int clipZeroToOne;
-out vec4 result;
 ]] .. edgeDistanceSource .. [[
-void main() {
-	vec2 uv = (gl_FragCoord.xy - view.zw) / view.xy;
-	float d = texture(depthTex, uv).r;
-	if (d >= 1.0) discard;
-	float z = clipZeroToOne != 0 ? d : 2.0*d - 1.0;
-	vec4 world = inverseViewProjection * vec4(2.0*uv - 1.0, z, 1.0);
-	vec2 pos = world.xz / world.w;
-	if (any(lessThan(pos, vec2(0.0))) || any(greaterThanEqual(pos, mapSize))) discard;
+vec4 Territory(vec2 pos, out int spot, out float edge) {
 	vec4 territory = texture(atlas, pos / mapSize);
-	int spot = int(territory.r + 0.5);
+	spot = int(territory.r + 0.5);
 	int owner = int(texelFetch(owners, ivec2(spot, 0), 0).r + 0.5);
 	// Alpha identifies the shown owner.
 	vec4 color = texelFetch(palette, ivec2(owner, 0), 0);
-	// Exact distance to the nearest bordered edge of the texel's two nearest.
-	float edge = 1e6;
+	edge = 1e6;
 	for (int k = 0; k < 2 && borderMode != 0; k++) {
 		int slot = int(territory[k + 2] + 0.5) - 1;
 		if (slot < 0) continue;
@@ -303,6 +292,33 @@ void main() {
 		}
 		edge = min(edge, EdgeDistance(edges, slot, spot, pos));
 	}
+	return color;
+}
+]]
+local drawSource = [[
+#version 420 compatibility
+uniform sampler2D depthTex;
+uniform sampler2D positions;
+uniform mat4 inverseViewProjection;
+uniform vec4 view; // width, height, viewport x, viewport y
+uniform vec2 border; // gap and outer side of the border line, in elmos
+uniform vec3 ring; // inner and outer radius of the line around the spot, hatching width
+uniform float tint;
+uniform float opacity;
+uniform int clipZeroToOne;
+out vec4 result;
+]] .. territorySource .. [[
+void main() {
+	vec2 uv = (gl_FragCoord.xy - view.zw) / view.xy;
+	float d = texture(depthTex, uv).r;
+	if (d >= 1.0) discard;
+	float z = clipZeroToOne != 0 ? d : 2.0*d - 1.0;
+	vec4 world = inverseViewProjection * vec4(2.0*uv - 1.0, z, 1.0);
+	vec2 pos = world.xz / world.w;
+	if (any(lessThan(pos, vec2(0.0))) || any(greaterThanEqual(pos, mapSize))) discard;
+	int spot;
+	float edge;
+	vec4 color = Territory(pos, spot, edge);
 	// World-space diagonal stripes, with a pixel-width antialiased edge.
 	float stripe = (pos.x + pos.y)/64.0;
 	float aa = max(fwidth(stripe), 0.001);
@@ -322,6 +338,32 @@ void main() {
 	float near = max(outer * (1.0 - smoothstep(border.y, border.y + ring.z, edge)),
 		ringOuter * (1.0 - smoothstep(ring.y, ring.y + ring.z, r)));
 	result = vec4(color.rgb, opacity * inner * max(line, max(near * hatch, tint)));
+}
+]]
+-- The minimap: the tint and borders as lines of about a pixel on each side.
+local minimapVertexSource = [[
+#version 420 compatibility
+uniform vec2 mapSize;
+out vec2 pos;
+void main() {
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	pos = gl_MultiTexCoord0.st * mapSize;
+}
+]]
+local minimapSource = [[
+#version 420 compatibility
+uniform float tint;
+uniform float opacity;
+in vec2 pos;
+out vec4 result;
+]] .. territorySource .. [[
+void main() {
+	int spot;
+	float edge;
+	vec4 color = Territory(pos, spot, edge);
+	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
+	float line = 1.0 - smoothstep(0.5*px, 1.5*px, edge);
+	result = vec4(color.rgb, opacity * max(line, tint));
 }
 ]]
 
@@ -524,7 +566,11 @@ function widget:Initialize()
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, border = {borderGap, borderGap + borderWidth},
 			ring = {ringRadius, ringRadius + borderWidth, hatchWidth}, tint = tint},
 	})
-	if not paintShader or not cellShader or not stateShader or not drawShader then
+	minimapShader = gl.CreateShader({vertex = minimapVertexSource, fragment = minimapSource,
+		uniformInt = {atlas = 1, owners = 2, palette = 3, edges = 4},
+		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, tint = tint},
+	})
+	if not paintShader or not cellShader or not stateShader or not drawShader or not minimapShader then
 		Spring.Echo('Metal Territories shader error: ' .. gl.GetShaderLog())
 		widgetHandler:RemoveWidget(self)
 		return
@@ -534,6 +580,8 @@ function widget:Initialize()
 	drawBorders = gl.GetUniformLocation(drawShader, 'borderMode')
 	drawInverse = gl.GetUniformLocation(drawShader, 'inverseViewProjection')
 	drawView = gl.GetUniformLocation(drawShader, 'view')
+	minimapOpacity = gl.GetUniformLocation(minimapShader, 'opacity')
+	minimapBorders = gl.GetUniformLocation(minimapShader, 'borderMode')
 	quad = gl.CreateList(function() gl.TexRect(-1, -1, 1, 1) end)
 	-- Allocation and uploads run in DrawWorldPreUnit, where drawing is allowed.
 end
@@ -688,6 +736,24 @@ function widget:DrawWorldPreUnit()
 	gl.PopAttrib()
 end
 
+-- Drawn into the minimap's texture before the world, with the textures of the
+-- last world draw.
+function widget:DrawInMiniMap(sx, sy)
+	if not options.minimap.value or not palette then return end
+	gl.Texture(1, atlas)
+	gl.Texture(2, history)
+	gl.Texture(3, palette)
+	gl.Texture(4, edges)
+	gl.UseShader(minimapShader)
+	gl.Uniform(minimapOpacity, options.opacity.value)
+	gl.UniformInt(minimapBorders, borderModes[options.borders.value])
+	-- The map's top left corner is at the minimap's top left, or bottom right when flipped.
+	local flipped = Spring.Utilities.IsMinimapFlipped()
+	gl.TexRect(0, 0, sx, sy, flipped, flipped)
+	gl.UseShader(0)
+	for i = 4, 1, -1 do gl.Texture(i, false) end
+end
+
 function widget:Shutdown()
 	DeleteMapTextures()
 	if depthFBO then gl.DeleteFBO(depthFBO) end
@@ -697,4 +763,5 @@ function widget:Shutdown()
 	if cellShader then gl.DeleteShader(cellShader) end
 	if stateShader then gl.DeleteShader(stateShader) end
 	if drawShader then gl.DeleteShader(drawShader) end
+	if minimapShader then gl.DeleteShader(minimapShader) end
 end
