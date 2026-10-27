@@ -1816,6 +1816,7 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 	
 	local tree_children = {}
 	local hotkeybuttons = {}
+	local disposeNumberReferences = {}
 	
 	local root = path == ''
 	
@@ -1978,7 +1979,7 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
-			option.epic_reference =
+			local trackbar =
 				Trackbar:New{
 					y = 14,
 					width = "100%",
@@ -1993,7 +1994,14 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 					tooltipFunction = option.tooltipFunction,
 					tooltip_format = option.tooltip_format,
 				}
-			numberPanel:AddChild(option.epic_reference)
+			numberPanel:AddChild(trackbar)
+			option.epic_reference = trackbar
+			disposeNumberReferences[#disposeNumberReferences + 1] = function()
+				-- A replacement window can already have installed its control.
+				if option.epic_reference == trackbar then
+					option.epic_reference = nil
+				end
+			end
 			tree_children[#tree_children+1] = numberPanel
 		elseif option.type == 'list' then
 			tree_children[#tree_children+1] = Label:New{caption = option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
@@ -2240,6 +2248,7 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 		parent = settings.show_crudemenu and screen0 or nil,
 		backgroundColor = color.sub_bg,
 		children = window_children,
+		OnDispose = disposeNumberReferences,
 	}
 	if previousView then
 		window_sub_cur:SetPos(previousView.x, previousView.y, previousView.width, previousView.height)
