@@ -35,7 +35,7 @@ local STANDARD_OPTS = {
 -- Configuration
 
 -- so that users' own commands can also have reversing
-local stateTypes, gadgetReverse, specialHandling = VFS.Include(LUAUI_DIRNAME .. "Configs/stateTypes.lua", nil, VFS.RAW_FIRST)
+local stateTypes, gadgetReverse, specialToggleHandling, specialSetOpts = VFS.Include(LUAUI_DIRNAME .. "Configs/stateTypes.lua", nil, VFS.RAW_FIRST)
 
 local PING_UPDATE_RATE = 0.5
 local PING_MEMORY = 4
@@ -105,17 +105,19 @@ local function HandleCommand(cmdID, params, options, nonToggle)
 	
 	local overrideState = GetOverriddenState(cmdID)
 	overriddenStateExpiry[cmdID] = currentTime + currentOverrideTime
-	if not nonToggle then
+	if nonToggle then
+		options = specialSetOpts[cmdID] or options
+	else
 		if not overrideState then
 			-- Note that params[1] is the desired state
-			if specialHandling[cmdID] then
-				params[1] = specialHandling[cmdID]((params[1])%stateTypes[cmdID], options)
+			if specialToggleHandling[cmdID] then
+				params[1] = specialToggleHandling[cmdID]((params[1])%stateTypes[cmdID], options)
 			elseif gadgetReverse[cmdID] and options.right then
 				params[1] = (params[1] - 2)%stateTypes[cmdID]
 				options.right = false
 			end
-		elseif specialHandling[cmdID] then
-			params[1] = specialHandling[cmdID]((overriddenStates[cmdID] + 1)%stateTypes[cmdID], options)
+		elseif specialToggleHandling[cmdID] then
+			params[1] = specialToggleHandling[cmdID]((overriddenStates[cmdID] + 1)%stateTypes[cmdID], options)
 		elseif gadgetReverse[cmdID] and options.right then
 			params[1] = (overriddenStates[cmdID] - 1)%stateTypes[cmdID]
 			options.right = false
