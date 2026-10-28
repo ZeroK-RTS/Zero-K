@@ -798,20 +798,15 @@ end
 local function MakeIconButtonRowPanel(option)
 	local panel = Panel:New{
 		width = "100%",
-		height = 56,
+		height = 36,
 		backgroundColor = {0, 0, 0, 0},
 		padding = {2, 0, 0, 0},
 		margin = {0, 0, 0, 0},
 		autosize = false,
 	}
-	panel:AddChild(Label:New{
-		y = 0,
-		padding = {0, 0, 0, 0},
-		caption = option.name,
-		tooltip = option.desc,
-		objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),
-		HitTest = returnSelf,
-	})
+	-- option.name and option.desc are unused
+	-- they used to be a text/tooltip before iconRadioButton
+	-- Still shows up when you search for the text in these fields
 
 	local entries = {}
 	local function PaintSelection()
@@ -834,7 +829,7 @@ local function MakeIconButtonRowPanel(option)
 		local width = item.icon and 40 or 62
 		local button = Button:New{
 			x = x,
-			y = 17,
+			y = 0,
 			width = width,
 			height = 36,
 			padding = {2, 2, 2, 2},
@@ -1256,9 +1251,7 @@ local function AddOption(path, option) --Note: this is used when loading widgets
 				settings.config[fullkey] = option.value
 			end
 	elseif option.type == 'iconButtonRow' then
-		-- Keys can be any value, false included, so the item carries it as
-		-- .value the same way a radioButton item does. The panel repaints
-		-- itself, so unlike radioButton the window is not remade.
+		-- copy defined key to undefined value, both these fields are referenced in different places.
 		for i = 1, #option.items do
 			option.items[i].value = option.items[i].key
 		end
@@ -2030,7 +2023,16 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 			end
 			
 		elseif option.type == 'label' then
-			tree_children[#tree_children+1] = Label:New{caption = option.value or option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
+			if option.icon then
+				-- icon specific div
+				local labelpanel = Panel:New{width = "100%",height = 66,backgroundColor = {0, 0, 0, 0},padding = {0, 0, 0, 0},margin = {0, 0, 0, 0},autosize = false,}
+				labelpanel:AddChild(Image:New{file = option.icon, x = 0, y = 0, height=64, width=64, keepAspect = true})
+				labelpanel:AddChild(Label:New{caption = option.value or option.name, x=72, y=32-8, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})})
+				tree_children[#tree_children+1] = labelpanel
+			else
+				--default, no icon label
+				tree_children[#tree_children+1] = Label:New{caption = option.value or option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
+			end
 			if labelScroll and (labelScroll == (option.value or option.name)) then
 				scrollTo = tree_children[#tree_children]
 				labelScroll = nil
