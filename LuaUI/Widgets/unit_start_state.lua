@@ -139,7 +139,7 @@ end
 
 -- The command panel's own icons for each state, so the settings show the same
 -- picture the player clicks in-game. Each list is the items of an Epic Menu
--- 'iconRadioButton' option: key is the stored value, icon is the button's
+-- 'iconButtonRow' option: key is the stored value, icon is the button's
 -- picture and desc its tooltip.
 local STATE_IMAGE_DIR = 'LuaUI/Images/commands/states/'
 local function StateItems(images, tooltipList)
@@ -597,7 +597,7 @@ options = {
 	commander_firestate0 = {
 		name = "  Firestate",
 		desc = "Values: hold fire, return fire, fire at will",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = 2, -- commander are fire@will by default
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		items = stateItems.firestate, -- most firestates can inherit but no factory/unit build comm (yet)
@@ -606,7 +606,7 @@ options = {
 	commander_movestate1 = {
 		name = "  Movestate",
 		desc = "Values: hold position, maneuver, roam",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		items = stateItems.movestate, -- no factory/unit build comm (yet)
@@ -615,7 +615,7 @@ options = {
 	commander_constructor_buildpriority = {
 		name = "  Constructor Build Priority",
 		desc = "Values: Low, Normal, High",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		items = stateItems.priority,
@@ -624,7 +624,7 @@ options = {
 	commander_misc_priority = {
 		name = "  Miscellaneous Priority",
 		desc = "Values: Low, Normal, High",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		items = stateItems.misc_priority,
@@ -633,7 +633,7 @@ options = {
 	commander_retreat = {
 		name = "  Retreat At Value",
 		desc = "Values: no retreat, 30%, 65%, 99% health remaining",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = 0,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		items = stateItems.retreat,
@@ -654,7 +654,7 @@ options = {
 	commander_selection_rank = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = 3,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		items = stateItems.selectionrank,
@@ -774,7 +774,7 @@ local function addUnit(defName, path)
 		options[defName .. "_firestate0"] = {
 			name = "  Firestate",
 			desc = "Values: inherit from factory, hold fire, return fire, fire at will",
-			type = 'iconRadioButton',
+			type = 'iconButtonRow',
 			value = ud.fireState, -- most firestates are -1
 			path = path,
 			items = stateItems.firestate_with_inherit,
@@ -786,7 +786,7 @@ local function addUnit(defName, path)
 		options[defName .. "_movestate1"] = {
 			name = "  Movestate",
 			desc = "Values: inherit from factory, hold position, maneuver, roam",
-			type = 'iconRadioButton',
+			type = 'iconButtonRow',
 			value = ud.moveState,
 			path = path,
 			items = stateItems.movestate_with_inherit,
@@ -837,7 +837,7 @@ local function addUnit(defName, path)
 		options[defName .. "_repeat"] = {
 			name = "  Repeat",
 			desc = "Repeat construction queue.",
-			type = 'iconRadioButton',
+			type = 'iconButtonRow',
 			value = false,
 			path = path,
 			items = stateItems.repeat_queue,
@@ -849,7 +849,7 @@ local function addUnit(defName, path)
 		options[defName .. "_auto_assist"] = {
 			name = "  Auto Assist",
 			desc = "Newly built constructors assist the factory",
-			type = 'iconRadioButton',
+			type = 'iconButtonRow',
 			value = false,
 			path = path,
 			items = stateItems.auto_assist,
@@ -901,7 +901,7 @@ local function addUnit(defName, path)
 	options[defName .. "_buildpriority_0"] = {
 		name = "  Nanoframe Build Priority",
 		desc = "Values: Inherit, Low, Normal, High",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = -1,
 		path = path,
 		items = stateItems.priority_with_inherit,
@@ -916,7 +916,7 @@ local function addUnit(defName, path)
 		options[defName .. "_constructor_buildpriority"] = {
 			name = "  Constructor Build Priority",
 			desc = "Values: Low, Normal, High",
-			type = 'iconRadioButton',
+			type = 'iconButtonRow',
 			value = 1,
 			path = path,
 			items = stateItems.priority,
@@ -928,7 +928,7 @@ local function addUnit(defName, path)
 		options[defName .. "_misc_priority"] = {
 			name = "  Miscellaneous Priority",
 			desc = "Values: Low, Normal, High",
-			type = 'iconRadioButton',
+			type = 'iconButtonRow',
 			value = tonumber(ud.customParams.priority_misc), -- customParams are strings, item keys are numbers
 			path = path,
 			items = stateItems.misc_priority,
@@ -968,7 +968,7 @@ local function addUnit(defName, path)
 		options[defName .. "_retreatpercent"] = {
 			name = "  Retreat at value",
 			desc = "Values: inherit from factory, no retreat, 33%, 65%, 99% health remaining",
-			type = 'iconRadioButton',
+			type = 'iconButtonRow',
 			value = (ud.isFactory and 0) or -1,
 			path = path,
 			items = stateItems.retreat_with_inherit,
@@ -979,7 +979,7 @@ local function addUnit(defName, path)
 	options[defName .. "_selection_rank"] = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
-		type = 'iconRadioButton',
+		type = 'iconButtonRow',
 		value = defaultSelectionRank[unitDefID] or 3,
 		path = path,
 		items = stateItems.selectionrank,
