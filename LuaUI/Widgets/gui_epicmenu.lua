@@ -2128,7 +2128,7 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 			}
 			]]--
 		elseif option.type == 'iconButtonRow' then
-			settings_height = settings_height + B_HEIGHT + 22
+			settings_height = settings_height + 36 -- dependant on ButtonRowPanel's height
 			tree_children[#tree_children+1] = MakeIconButtonRowPanel(option)
 		elseif option.type == 'radioButton' then
 			tree_children[#tree_children+1] = Control:New{height = 1, minHeight = 0, padding = {0, 0, 0, 0},}

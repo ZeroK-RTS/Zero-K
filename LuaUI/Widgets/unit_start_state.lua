@@ -163,7 +163,7 @@ end
 -- -1 is "inherit from factory": shown with the factory plate icon in front of
 -- the state icons.
 -- TODO: replace the icon for "inherit from Factory"
-local INHERIT_ICON = 'LuaUI/Images/commands/Bold/buildplate.png'
+local INHERIT_ICON = 'LuaUI/Images/factoryarrow.png'
 -- Takes an iconButtonRow items table and tacks on the "inherit from factory" button to the front.
 local function WithInherit(items, tooltipList)
 	local withInherit = {{key = -1, icon = INHERIT_ICON, name = "Factory", desc = tooltipList[-1]}}
