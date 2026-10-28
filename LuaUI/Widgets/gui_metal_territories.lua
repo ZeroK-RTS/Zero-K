@@ -10,23 +10,28 @@ function widget:GetInfo()
 	}
 end
 
-local paletteDirty, closeDirty = true, true
+local paletteDirty, closeDirty, updateFrame = true, true, nil
 local function RepaintPalette()
 	paletteDirty = true
 end
 local function RebuildClose()
 	closeDirty = true
 end
+local function UpdateNow()
+	updateFrame = nil
+end
 
 options_path = 'Settings/Graphics/Map/Metal Territories'
-options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'borders', 'borderWidth', 'borderGap',
-	'merge', 'mergeDistance', 'hatching', 'hatchWidth', 'hatchSpacing', 'hatchAngle', 'hatchFade', 'tint', 'tintOpacity', 'tintFade',
-	'smoothFades', 'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'allies', 'allyColor', 'enemies', 'enemyColor', 'neutralColor'}
+-- Headings are labels; a radio button's name is one too.
+options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'reach', 'borders', 'borderWidth', 'borderGap',
+	'hatchingHeading', 'hatching', 'hatchWidth', 'hatchSpacing', 'hatchAngle', 'hatchFade', 'tintHeading', 'tint', 'tintOpacity', 'tintFade',
+	'minimapHeading', 'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'minimapTintFade', 'allies', 'allyColor', 'enemies', 'enemyColor',
+	'neutralHeading', 'neutralColor', 'additionalHeading', 'smoothFades', 'merge', 'mergeDistance'}
 options = {
 	opacity = {
 		name = 'Opacity',
 		type = 'number',
-		value = 0.3,
+		value = 0.25,
 		min = 0,
 		max = 0.8,
 		step = 0.01,
@@ -64,7 +69,7 @@ options = {
 	borders = {
 		name = 'Borders',
 		type = 'radioButton',
-		value = 'all',
+		value = 'owners',
 		items = {
 			{key = 'off', name = 'Off'},
 			{key = 'all', name = 'Every territory'},
@@ -76,7 +81,7 @@ options = {
 		name = 'Border width',
 		desc = 'In elmos. The line around each mex has the same width.',
 		type = 'number',
-		value = 24,
+		value = 12,
 		min = 4,
 		max = 64,
 		step = 1,
@@ -92,7 +97,7 @@ options = {
 	},
 	merge = {
 		name = 'Merge close metal spots',
-		desc = 'Spots within Merge distance of each other share one territory while they have the same owner, or no known mex. A spot taken by another owner has its own territory again.',
+		desc = 'Spots within Merge distance of each other share one territory while they have the same owner, or no known mex. A spot taken by another owner has its own territory again. With borders between different owners it changes nothing: territories with the same owner are joined anyway.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -102,14 +107,27 @@ options = {
 		name = 'Merge distance',
 		desc = 'In elmos between the metal spots.',
 		type = 'number',
-		value = 64,
-		min = 16,
-		max = 128,
-		step = 1,
+		value = 128,
+		min = 64,
+		max = 512,
+		step = 16,
 		OnChange = RebuildClose,
 	},
-	hatching = {
+	reach = {
+		name = 'Territory reach',
+		desc = 'In elmos. Farther than this from the metal spots, territories fade out over 256 elmos, so they do not cover parts of the map with no metal.',
+		type = 'number',
+		value = 2048,
+		min = 512,
+		max = 8192,
+		step = 64,
+	},
+	hatchingHeading = {
 		name = 'Hatching',
+		type = 'label',
+	},
+	hatching = {
+		name = 'Show hatching',
 		desc = 'Hatching beside borders and around mexes.',
 		type = 'bool',
 		value = true,
@@ -119,16 +137,16 @@ options = {
 		name = 'Hatching line width',
 		desc = 'In elmos.',
 		type = 'number',
-		value = 16.3,
+		value = 9,
 		min = 2,
 		max = 32,
-		step = 0.1,
+		step = 1,
 	},
 	hatchSpacing = {
 		name = 'Hatching spacing',
 		desc = 'In elmos between the hatching lines.',
 		type = 'number',
-		value = 45,
+		value = 22,
 		min = 16,
 		max = 128,
 		step = 1,
@@ -146,13 +164,17 @@ options = {
 		name = 'Hatching fade rate',
 		desc = 'At 1 the hatching beside borders and mexes fades out over 240 elmos, at 2 over 120. At 0 it does not fade.',
 		type = 'number',
-		value = 1,
+		value = 1.7,
 		min = 0,
 		max = 4,
 		step = 0.05,
 	},
-	tint = {
+	tintHeading = {
 		name = 'Tint',
+		type = 'label',
+	},
+	tint = {
+		name = 'Show tint',
 		desc = 'Tint territories, strongest beside their borders and around mexes.',
 		type = 'bool',
 		value = true,
@@ -171,17 +193,22 @@ options = {
 		name = 'Tint fade rate',
 		desc = 'At 1 the tint fades out over 600 elmos from the border and the line around each mex, at 2 over 300. At 0 it does not fade.',
 		type = 'number',
-		value = 1,
+		value = 2,
 		min = 0,
 		max = 4,
 		step = 0.05,
 	},
 	smoothFades = {
-		name = 'Smooth fades',
+		name = 'Smooth fades (higher quality)',
 		desc = 'Fade the hatching and tint from the nearest border even several territories away, with a distance map updated on the GPU. Without it, with borders between different owners or merged territories, a fade can end at a hard edge.',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
+		OnChange = UpdateNow,
+	},
+	minimapHeading = {
+		name = 'Minimap',
+		type = 'label',
 	},
 	minimap = {
 		name = 'Show on minimap',
@@ -200,12 +227,19 @@ options = {
 	},
 	minimapTintOpacity = {
 		name = 'Minimap tint opacity',
-		desc = 'Tint opacity for the minimap. The tint fades as set by Tint fade rate.',
+		desc = 'Tint opacity for the minimap.',
 		type = 'number',
-		value = 1,
+		value = 1.5,
 		min = 0,
-		max = 2,
+		max = 3,
 		step = 0.05,
+	},
+	minimapTintFade = {
+		name = 'Minimap tint fade',
+		desc = 'Fade the minimap tint as set by Tint fade rate. Off, the minimap tint is even.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
 	},
 	allies = {
 		name = 'Allied territories',
@@ -242,12 +276,20 @@ options = {
 		value = {0, 0, 0, 1},
 		OnChange = RepaintPalette,
 	},
+	neutralHeading = {
+		name = 'Neutral territories',
+		type = 'label',
+	},
 	neutralColor = {
 		name = 'Neutral colour',
 		desc = 'Territories with no known mex.',
 		type = 'colors',
 		value = {0.55, 0.55, 0.55, 1},
 		OnChange = RepaintPalette,
+	},
+	additionalHeading = {
+		name = 'Additional options',
+		type = 'label',
 	},
 }
 
@@ -257,10 +299,10 @@ local byPosition, unitSpot, watched, observations, dirty = {}, {}, {}, {}, {}
 local myAllyTeam, fullView
 local atlas, edges, positions, observed, history, nextHistory, palette, depth
 local close, index, groups, nextGroups, seeds, nextSeeds, field, shownGroups
-local mergePasses, fieldOn, fieldFrame, fieldMode = 0, false, nil, nil
+local mergePasses, fieldOn, updateMode = 0, false, nil
 local paintShader, cellShader, stateShader, drawShader, minimapShader, groupShader, seedShader, jumpShader, fieldShader, quad
 local stateFullView, drawOpacity, drawBorders, drawInverse, drawView, minimapOpacity, minimapBorders
-local drawBorder, drawRing, drawTint, drawStripes, drawHatching, drawField, minimapTint, minimapLine, minimapField
+local drawBorder, drawRing, drawTint, drawStripes, drawHatching, drawField, drawReach, minimapTint, minimapLine, minimapField, minimapReach
 local seedBorders, jumpStep
 local viewX, viewY, viewW, viewH
 local depthFBO
@@ -278,7 +320,8 @@ local atlasX, atlasZ = max(1, math.ceil(Game.mapSizeX*atlasScale)), max(1, math.
 local texelX, texelZ = Game.mapSizeX/atlasX, Game.mapSizeZ/atlasZ
 -- The distance map has about 32 elmos a texel, at most 512 on its longest
 -- side. Jump flooding steps halve from half its size, then one more of 1. It
--- is updated every fieldInterval game frames, and when a setting changes.
+-- and the merged territories are updated every updateInterval game frames,
+-- and when a setting changes.
 local fieldScale = min(1/32, 512/max(Game.mapSizeX, Game.mapSizeZ))
 local fieldX, fieldZ = max(1, math.ceil(Game.mapSizeX*fieldScale)), max(1, math.ceil(Game.mapSizeZ*fieldScale))
 local jumps = {}
@@ -291,12 +334,14 @@ do
 	end
 	jumps[#jumps + 1] = 1
 end
-local fieldInterval = 15
+local updateInterval = 15
 -- A line like the border 16 elmos out from the mex (48 elmos wide), hatching
 -- beside each line that fades out over hatchFade elmos, and a tint everywhere
 -- else: tint[1] beside each line, fading to tint[2] over tintFade elmos from
 -- it. The fade rate options divide these distances.
 local ringRadius, hatchFade, tint, tintFade = 24 + 16, 240, {0.45, 0}, 600
+-- Beyond the reach from the metal spots, territories fade out over reachFade elmos.
+local reachFade = 256
 
 -- Points p with nx*p.x + nz*p.z <= limit have a lower power distance to a than to b.
 local function Bisector(a, b)
@@ -472,7 +517,8 @@ void main() {
 -- with the same shown owner when borders are between different owners, else
 -- when merged. With borders off every other edge counts, so the tint still
 -- fades from it. The texel's two nearest edges give the distance near them;
--- the distance map, when on, gives it farther away.
+-- the distance map, when on, gives it farther away. The opacity fades out
+-- beyond the reach from the spot and the spots across those two edges.
 local territorySource = [[
 uniform sampler2D atlas;
 uniform sampler2D owners;
@@ -484,6 +530,7 @@ uniform sampler2D field; // the distance map: from each texel's centre to the ne
 uniform vec2 mapSize;
 uniform int borderMode; // 0 off, 1 every territory, 2 between different owners
 uniform int useField;
+uniform vec2 reach; // the distance from the metal spots where territories start to fade out, and 1/the fade distance
 ]] .. edgeDistanceSource .. shownSource .. [[
 bool Joined(int spot, int other) {
 	if (borderMode == 2) return Shown(other) == Shown(spot);
@@ -519,17 +566,21 @@ vec4 Territory(vec2 pos, out int spot, out float edge, out float mex) {
 	vec4 color = texelFetch(palette, ivec2(owner, 0), 0);
 	edge = 1e6;
 	mex = distance(pos, texelFetch(positions, ivec2(spot, 0), 0).rg);
+	float nearest = mex;
 	for (int k = 0; k < 2; k++) {
 		int slot = int(territory[k + 2] + 0.5) - 1;
 		if (slot < 0) continue;
 		int other = Neighbour(spot, slot);
+		float d = distance(pos, texelFetch(positions, ivec2(other, 0), 0).rg);
+		nearest = min(nearest, d);
 		if (Joined(spot, other)) {
-			mex = min(mex, distance(pos, texelFetch(positions, ivec2(other, 0), 0).rg));
+			mex = min(mex, d);
 		} else {
 			edge = min(edge, EdgeDistance(edges, slot, spot, pos));
 		}
 	}
-	return vec4(color.rgb, texelFetch(palette, ivec2(owner, 1), 0).r);
+	float fade = 1.0 - smoothstep(0.0, 1.0, (nearest - reach.x)*reach.y);
+	return vec4(color.rgb, fade * texelFetch(palette, ivec2(owner, 1), 0).r);
 }
 ]]
 -- Merged territories: each pass gives a spot the lowest group of itself and its
@@ -826,8 +877,8 @@ local function UpdatePalette()
 	-- The second row is the opacity of each owner's territories.
 	palette = NewTexture(width, 2)
 	PaintRows(palette, {colors, opacities}, width)
-	-- Shown owners may have changed: update the distance map.
-	paletteDirty, fieldFrame = false, nil
+	-- Shown owners may have changed: update the merged territories and distance map.
+	paletteDirty, updateFrame = false, nil
 end
 
 local function DeleteMapTextures()
@@ -837,13 +888,13 @@ local function DeleteMapTextures()
 	end
 	atlas, edges, positions, observed, history, nextHistory, palette = nil, nil, nil, nil, nil, nil, nil
 	close, index, groups, nextGroups, seeds, nextSeeds, field, shownGroups = nil, nil, nil, nil, nil, nil, nil, nil
-	mergePasses, fieldOn, fieldFrame = 0, false, nil
+	mergePasses, fieldOn, updateFrame = 0, false, nil
 end
 
 -- Each spot's close spots, within the merge distance both ways, and enough
--- group passes to join the largest cluster of them.
+-- group passes to join the largest cluster of them, at most 64.
 local function BuildClose()
-	closeDirty, fieldFrame = false, nil
+	closeDirty, updateFrame = false, nil
 	if close then gl.DeleteTexture(close) end
 	close, mergePasses = nil, 0
 	if not options.merge.value then return end
@@ -870,17 +921,22 @@ local function BuildClose()
 		mergePasses = max(mergePasses, size[r] - 1)
 	end
 	if mergePasses == 0 then return end
-	mergePasses = min(mergePasses, 16)
+	mergePasses = min(mergePasses, 64)
 	close = NewTexture(width, #spots)
 	ClearTexture(close)
 	PaintRows(close, rows, width)
 end
 
--- This frame's merged territories, then the distance map where it is needed.
+-- The merged territories, then the distance map where it is needed, every
+-- updateInterval game frames and when a setting changes.
 local function UpdateTerritories(mode)
 	if closeDirty then BuildClose() end
+	local frame = Spring.GetGameFrame()
+	if updateFrame and updateMode == mode and math.abs(frame - updateFrame) < updateInterval then return end
+	updateFrame, updateMode = frame, mode
+	-- With borders between different owners, neighbours with the same owner are joined anyway.
 	shownGroups = index
-	if mergePasses > 0 then
+	if mergePasses > 0 and mode ~= borderModes.owners then
 		gl.Texture(1, close)
 		gl.Texture(2, history)
 		gl.Texture(3, palette)
@@ -892,13 +948,9 @@ local function UpdateTerritories(mode)
 		end
 		shownGroups = groups
 	end
-	-- With borders on every territory, each territory's own edges are the nearest.
-	fieldOn = options.smoothFades.value and (mode == borderModes.owners or mergePasses > 0)
-	local frame = Spring.GetGameFrame()
-	if not fieldOn then
-		fieldFrame = nil
-	elseif not fieldFrame or fieldMode ~= mode or math.abs(frame - fieldFrame) >= fieldInterval then
-		fieldFrame, fieldMode = frame, mode
+	-- With borders on every territory and nothing merged, each territory's own edges are the nearest.
+	fieldOn = options.smoothFades.value and (mode == borderModes.owners or shownGroups ~= index)
+	if fieldOn then
 		gl.Texture(1, atlas)
 		gl.Texture(2, history)
 		gl.Texture(3, palette)
@@ -1042,6 +1094,8 @@ function widget:Initialize()
 	minimapLine = gl.GetUniformLocation(minimapShader, 'lineWidth')
 	drawField = gl.GetUniformLocation(drawShader, 'useField')
 	minimapField = gl.GetUniformLocation(minimapShader, 'useField')
+	drawReach = gl.GetUniformLocation(drawShader, 'reach')
+	minimapReach = gl.GetUniformLocation(minimapShader, 'reach')
 	seedBorders = gl.GetUniformLocation(seedShader, 'borderMode')
 	jumpStep = gl.GetUniformLocation(jumpShader, 'step')
 	quad = gl.CreateList(function() gl.TexRect(-1, -1, 1, 1) end)
@@ -1132,10 +1186,10 @@ function widget:PlayerChanged(playerID)
 	if playerID == Spring.GetMyPlayerID() then paletteDirty = true end
 end
 
--- Beside the border, far from it, and 1/the distance between.
-local function SetTint(location, opacity)
+-- Beside the border, far from it, and 1/the distance between (0 if it does not fade).
+local function SetTint(location, opacity, fades)
 	local scale = options.tint.value and opacity or 0
-	gl.Uniform(location, scale*tint[1], scale*tint[2], options.tintFade.value/tintFade)
+	gl.Uniform(location, scale*tint[1], scale*tint[2], fades and options.tintFade.value/tintFade or 0)
 end
 
 function widget:DrawWorldPreUnit()
@@ -1200,10 +1254,11 @@ function widget:DrawWorldPreUnit()
 			gl.Uniform(drawOpacity, options.opacity.value)
 			gl.UniformInt(drawBorders, borderMode)
 			gl.UniformInt(drawField, fieldOn and 1 or 0)
+			gl.Uniform(drawReach, options.reach.value, 1/reachFade)
 			local borderWidth, gap = options.borderWidth.value, options.borderGap.value
 			gl.Uniform(drawBorder, gap, gap + borderWidth)
 			gl.Uniform(drawRing, ringRadius, ringRadius + borderWidth, options.hatchFade.value/hatchFade)
-			SetTint(drawTint, options.tintOpacity.value)
+			SetTint(drawTint, options.tintOpacity.value, true)
 			-- Lines at the angle from the x axis toward north; the normal is (sin, cos).
 			local spacing, angle = options.hatchSpacing.value, math.rad(options.hatchAngle.value)
 			gl.Uniform(drawStripes, math.sin(angle)/spacing, math.cos(angle)/spacing, 0.5*options.hatchWidth.value/spacing)
@@ -1232,7 +1287,8 @@ function widget:DrawInMiniMap(sx, sy)
 	gl.Uniform(minimapOpacity, options.opacity.value)
 	gl.UniformInt(minimapBorders, borderModes[options.borders.value])
 	gl.UniformInt(minimapField, fieldOn and 1 or 0)
-	SetTint(minimapTint, options.minimapTintOpacity.value)
+	gl.Uniform(minimapReach, options.reach.value, 1/reachFade)
+	SetTint(minimapTint, options.minimapTintOpacity.value, options.minimapTintFade.value)
 	gl.Uniform(minimapLine, options.minimapBorderWidth.value)
 	-- The map's top left corner is at the minimap's top left, or bottom right when flipped.
 	local flipped = Spring.Utilities.IsMinimapFlipped()
