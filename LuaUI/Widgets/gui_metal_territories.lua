@@ -10,15 +10,18 @@ function widget:GetInfo()
 	}
 end
 
-local paletteDirty = true
+local paletteDirty, closeDirty = true, true
 local function RepaintPalette()
 	paletteDirty = true
+end
+local function RebuildClose()
+	closeDirty = true
 end
 
 options_path = 'Settings/Graphics/Map/Metal Territories'
 options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'borders', 'borderWidth', 'borderGap',
-	'hatching', 'hatchWidth', 'hatchSpacing', 'hatchAngle', 'hatchFade', 'tint', 'tintOpacity', 'tintFade',
-	'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'allies', 'allyColor', 'enemies', 'enemyColor', 'neutralColor'}
+	'merge', 'mergeDistance', 'hatching', 'hatchWidth', 'hatchSpacing', 'hatchAngle', 'hatchFade', 'tint', 'tintOpacity', 'tintFade',
+	'smoothFades', 'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'allies', 'allyColor', 'enemies', 'enemyColor', 'neutralColor'}
 options = {
 	opacity = {
 		name = 'Opacity',
@@ -82,10 +85,28 @@ options = {
 		name = 'Border gap',
 		desc = 'In elmos, between the border and the edge of its territory. At 0 the borders of neighbouring territories touch.',
 		type = 'number',
-		value = 0,
+		value = 4,
 		min = 0,
 		max = 32,
 		step = 1,
+	},
+	merge = {
+		name = 'Merge close metal spots',
+		desc = 'Spots within Merge distance of each other share one territory while they have the same owner, or no known mex. A spot taken by another owner has its own territory again.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = RebuildClose,
+	},
+	mergeDistance = {
+		name = 'Merge distance',
+		desc = 'In elmos between the metal spots.',
+		type = 'number',
+		value = 64,
+		min = 16,
+		max = 128,
+		step = 1,
+		OnChange = RebuildClose,
 	},
 	hatching = {
 		name = 'Hatching',
@@ -154,6 +175,13 @@ options = {
 		min = 0,
 		max = 4,
 		step = 0.05,
+	},
+	smoothFades = {
+		name = 'Smooth fades',
+		desc = 'Fade the hatching and tint from the nearest border even several territories away, with a distance map updated on the GPU. Without it, with borders between different owners or merged territories, a fade can end at a hard edge.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
 	},
 	minimap = {
 		name = 'Show on minimap',
@@ -228,9 +256,12 @@ local spots, cells, spotSource
 local byPosition, unitSpot, watched, observations, dirty = {}, {}, {}, {}, {}
 local myAllyTeam, fullView
 local atlas, edges, positions, observed, history, nextHistory, palette, depth
-local paintShader, cellShader, stateShader, drawShader, minimapShader, quad
+local close, index, groups, nextGroups, seeds, nextSeeds, field, shownGroups
+local mergePasses, fieldOn, fieldFrame, fieldMode = 0, false, nil, nil
+local paintShader, cellShader, stateShader, drawShader, minimapShader, groupShader, seedShader, jumpShader, fieldShader, quad
 local stateFullView, drawOpacity, drawBorders, drawInverse, drawView, minimapOpacity, minimapBorders
-local drawBorder, drawRing, drawTint, drawStripes, drawHatching, minimapTint, minimapLine
+local drawBorder, drawRing, drawTint, drawStripes, drawHatching, drawField, minimapTint, minimapLine, minimapField
+local seedBorders, jumpStep
 local viewX, viewY, viewW, viewH
 local depthFBO
 local borderModes = {off = 0, all = 1, owners = 2}
@@ -245,6 +276,22 @@ end
 local atlasScale = min(1/4, 2048/max(Game.mapSizeX, Game.mapSizeZ))
 local atlasX, atlasZ = max(1, math.ceil(Game.mapSizeX*atlasScale)), max(1, math.ceil(Game.mapSizeZ*atlasScale))
 local texelX, texelZ = Game.mapSizeX/atlasX, Game.mapSizeZ/atlasZ
+-- The distance map has about 32 elmos a texel, at most 512 on its longest
+-- side. Jump flooding steps halve from half its size, then one more of 1. It
+-- is updated every fieldInterval game frames, and when a setting changes.
+local fieldScale = min(1/32, 512/max(Game.mapSizeX, Game.mapSizeZ))
+local fieldX, fieldZ = max(1, math.ceil(Game.mapSizeX*fieldScale)), max(1, math.ceil(Game.mapSizeZ*fieldScale))
+local jumps = {}
+do
+	local step = 1
+	while 2*step < max(fieldX, fieldZ) do step = 2*step end
+	while step >= 1 do
+		jumps[#jumps + 1] = step
+		step = step/2
+	end
+	jumps[#jumps + 1] = 1
+end
+local fieldInterval = 15
 -- A line like the border 16 elmos out from the mex (48 elmos wide), hatching
 -- beside each line that fades out over hatchFade elmos, and a tint everywhere
 -- else: tint[1] beside each line, fading to tint[2] over tintFade elmos from
@@ -347,14 +394,25 @@ out vec4 result;
 void main() { result = data; }
 ]]
 -- Distance to a neighbour edge: to its line beside the edge, else to its nearer
--- end, so a border turning a corner is rounded. Negative on the far side.
+-- end, so a border turning a corner is rounded. Negative on the far side;
+-- SegmentDistance is the same distance from either side.
 local edgeDistanceSource = [[
-float EdgeDistance(sampler2D edges, int slot, int cell, vec2 pos) {
+float SegmentDistance(sampler2D edges, int slot, int cell, vec2 pos) {
 	vec4 line = texelFetch(edges, ivec2(2*slot, cell), 0);
 	vec2 extent = texelFetch(edges, ivec2(2*slot + 1, cell), 0).xy;
-	float d = dot(line.xy, pos) + line.z;
 	float t = dot(vec2(-line.y, line.x), pos);
-	return d < 0.0 ? d : length(vec2(d, max(max(extent.x - t, t - extent.y), 0.0)));
+	return length(vec2(dot(line.xy, pos) + line.z, max(max(extent.x - t, t - extent.y), 0.0)));
+}
+float EdgeDistance(sampler2D edges, int slot, int cell, vec2 pos) {
+	vec4 line = texelFetch(edges, ivec2(2*slot, cell), 0);
+	float d = dot(line.xy, pos) + line.z;
+	return d < 0.0 ? d : SegmentDistance(edges, slot, cell, pos);
+}
+]]
+-- The shown owner's identity at a spot (its palette alpha); neutral is 0.
+local shownSource = [[
+float Shown(int spot) {
+	return texelFetch(palette, ivec2(int(texelFetch(owners, ivec2(spot, 0), 0).r + 0.5), 0), 0).a;
 }
 ]]
 local cellSource = [[
@@ -408,18 +466,38 @@ void main() {
 	result = vec4(owner, 0.0, seen.b, 1.0);
 }
 ]]
--- The shown owner's colour and opacity at a map position, its spot, and the
--- exact distance to the nearest bordered edge of the texel's two nearest. With
--- borders off every edge counts, so the tint still fades from it.
+-- The shown owner's colour and opacity at a map position, its spot, the exact
+-- distance to the nearest bordered edge, and the distance to the nearest mex of
+-- its territory. Neighbours are one territory, with no border between them,
+-- with the same shown owner when borders are between different owners, else
+-- when merged. With borders off every other edge counts, so the tint still
+-- fades from it. The texel's two nearest edges give the distance near them;
+-- the distance map, when on, gives it farther away.
 local territorySource = [[
 uniform sampler2D atlas;
 uniform sampler2D owners;
 uniform sampler2D palette;
 uniform sampler2D edges;
+uniform sampler2D positions;
+uniform sampler2D groups; // each spot's merged territory, as the lowest spot index in it
+uniform sampler2D field; // the distance map: from each texel's centre to the nearest bordered edge, filtered
 uniform vec2 mapSize;
 uniform int borderMode; // 0 off, 1 every territory, 2 between different owners
-]] .. edgeDistanceSource .. [[
-vec4 Territory(vec2 pos, out int spot, out float edge) {
+uniform int useField;
+]] .. edgeDistanceSource .. shownSource .. [[
+bool Joined(int spot, int other) {
+	if (borderMode == 2) return Shown(other) == Shown(spot);
+	return texelFetch(groups, ivec2(other, 0), 0).r == texelFetch(groups, ivec2(spot, 0), 0).r;
+}
+int Neighbour(int spot, int slot) {
+	return int(texelFetch(edges, ivec2(2*slot, spot), 0).w + 0.5);
+}
+// The distance for fades: also from bordered edges beyond the texel's two
+// nearest, with the distance map.
+float FadeDistance(vec2 pos, float edge) {
+	return useField != 0 ? min(edge, texture(field, pos / mapSize).r) : edge;
+}
+vec4 Territory(vec2 pos, out int spot, out float edge, out float mex) {
 	vec4 territory = texture(atlas, pos / mapSize);
 	spot = int(territory.r + 0.5);
 	// Within half a texel of an edge the position can be across it from the
@@ -440,23 +518,112 @@ vec4 Territory(vec2 pos, out int spot, out float edge) {
 	// Alpha identifies the shown owner.
 	vec4 color = texelFetch(palette, ivec2(owner, 0), 0);
 	edge = 1e6;
+	mex = distance(pos, texelFetch(positions, ivec2(spot, 0), 0).rg);
 	for (int k = 0; k < 2; k++) {
 		int slot = int(territory[k + 2] + 0.5) - 1;
 		if (slot < 0) continue;
-		if (borderMode == 2) {
-			int neighbour = int(texelFetch(edges, ivec2(2*slot, spot), 0).w + 0.5);
-			int other = int(texelFetch(owners, ivec2(neighbour, 0), 0).r + 0.5);
-			if (texelFetch(palette, ivec2(other, 0), 0).a == color.a) continue;
+		int other = Neighbour(spot, slot);
+		if (Joined(spot, other)) {
+			mex = min(mex, distance(pos, texelFetch(positions, ivec2(other, 0), 0).rg));
+		} else {
+			edge = min(edge, EdgeDistance(edges, slot, spot, pos));
 		}
-		edge = min(edge, EdgeDistance(edges, slot, spot, pos));
 	}
 	return vec4(color.rgb, texelFetch(palette, ivec2(owner, 1), 0).r);
+}
+]]
+-- Merged territories: each pass gives a spot the lowest group of itself and its
+-- close spots with the same shown owner.
+local groupSource = [[
+#version 420 compatibility
+uniform sampler2D previous;
+uniform sampler2D close; // a row per spot: its close spots as index + 1, then 0
+uniform sampler2D owners;
+uniform sampler2D palette;
+out vec4 result;
+]] .. shownSource .. [[
+void main() {
+	int spot = int(gl_FragCoord.x);
+	float shown = Shown(spot);
+	float group = texelFetch(previous, ivec2(spot, 0), 0).r;
+	for (int k = 0; k < textureSize(close, 0).x; k++) {
+		int other = int(texelFetch(close, ivec2(k, spot), 0).r + 0.5) - 1;
+		if (other < 0) break;
+		if (Shown(other) == shown) group = min(group, texelFetch(previous, ivec2(other, 0), 0).r);
+	}
+	result = vec4(group, 0.0, 0.0, 1.0);
+}
+]]
+-- The distance map starts from each texel's nearest bordered edge of its two
+-- nearest, if any, as spot + 1 and slot + 1. Each jump flooding pass keeps the
+-- nearest of the edges of the texel and of the eight texels a step away. The
+-- last pass gives the distance to the edge found, 1e6 if none.
+local seedSource = [[
+#version 420 compatibility
+uniform vec2 texelSize;
+out vec4 result;
+]] .. territorySource .. [[
+void main() {
+	vec2 pos = gl_FragCoord.xy * texelSize;
+	vec4 territory = texture(atlas, pos / mapSize);
+	int spot = int(territory.r + 0.5);
+	float nearest = 1e30;
+	result = vec4(0.0);
+	for (int k = 0; k < 2; k++) {
+		int slot = int(territory[k + 2] + 0.5) - 1;
+		if (slot < 0 || Joined(spot, Neighbour(spot, slot))) continue;
+		float d = SegmentDistance(edges, slot, spot, pos);
+		if (d < nearest) {
+			nearest = d;
+			result = vec4(float(spot + 1), float(slot + 1), 0.0, 1.0);
+		}
+	}
+}
+]]
+local jumpSource = [[
+#version 420 compatibility
+uniform sampler2D previous;
+uniform sampler2D edges;
+uniform vec2 texelSize;
+uniform int step;
+out vec4 result;
+]] .. edgeDistanceSource .. [[
+void main() {
+	ivec2 pixel = ivec2(gl_FragCoord.xy);
+	ivec2 size = textureSize(previous, 0);
+	vec2 pos = gl_FragCoord.xy * texelSize;
+	float nearest = 1e30;
+	result = vec4(0.0);
+	for (int k = 0; k < 9; k++) {
+		ivec2 other = pixel + step*ivec2(k % 3 - 1, k / 3 - 1);
+		if (any(lessThan(other, ivec2(0))) || any(greaterThanEqual(other, size))) continue;
+		vec4 seed = texelFetch(previous, other, 0);
+		if (seed.x < 0.5) continue;
+		float d = SegmentDistance(edges, int(seed.y + 0.5) - 1, int(seed.x + 0.5) - 1, pos);
+		if (d < nearest) {
+			nearest = d;
+			result = seed;
+		}
+	}
+}
+]]
+local fieldSource = [[
+#version 420 compatibility
+uniform sampler2D seeds;
+uniform sampler2D edges;
+uniform vec2 texelSize;
+out vec4 result;
+]] .. edgeDistanceSource .. [[
+void main() {
+	vec4 seed = texelFetch(seeds, ivec2(gl_FragCoord.xy), 0);
+	vec2 pos = gl_FragCoord.xy * texelSize;
+	float d = seed.x > 0.5 ? SegmentDistance(edges, int(seed.y + 0.5) - 1, int(seed.x + 0.5) - 1, pos) : 1e6;
+	result = vec4(d, 0.0, 0.0, 1.0);
 }
 ]]
 local drawSource = [[
 #version 420 compatibility
 uniform sampler2D depthTex;
-uniform sampler2D positions;
 uniform mat4 inverseViewProjection;
 uniform vec4 view; // width, height, viewport x, viewport y
 uniform vec2 border; // gap and outer side of the border line, in elmos
@@ -477,29 +644,29 @@ void main() {
 	vec2 pos = world.xz / world.w;
 	if (any(lessThan(pos, vec2(0.0))) || any(greaterThanEqual(pos, mapSize))) discard;
 	int spot;
-	float edge;
-	vec4 color = Territory(pos, spot, edge);
+	float edge, r;
+	vec4 color = Territory(pos, spot, edge, r);
 	// World-space stripes, with a pixel-width antialiased edge.
 	float stripe = dot(pos, stripes.xy);
 	float aa = max(fwidth(stripe), 0.001);
 	float hatch = 1.0 - smoothstep(stripes.z - aa, stripes.z + aa, abs(fract(stripe) - 0.5));
 	// At subpixel stripe sizes use the mean coverage, avoiding distant shimmer.
 	hatch = mix(hatch, min(2.0*stripes.z, 1.0), smoothstep(0.25, 1.0, aa));
-	// Gap, solid border, then hatching that fades out; the same line around the
-	// spot with hatching outside it; elsewhere a tint that fades away from both
+	// Gap, solid border, then hatching that fades out; the same line around each
+	// mex of the territory with hatching outside it; elsewhere a tint that fades away from both
 	// lines. The edge distance can jump where the nearest edges change, so
 	// antialias with the pixel size in elmos. With no gap neighbouring borders touch.
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
+	float fade = FadeDistance(pos, edge);
 	float lines = borderMode != 0 ? 1.0 : 0.0;
 	float inner = mix(1.0, smoothstep(border.x - px, border.x + px, edge), border.x > 0.0 ? lines : 0.0);
 	float outer = smoothstep(border.y - px, border.y + px, edge);
-	float r = distance(pos, texelFetch(positions, ivec2(spot, 0), 0).rg);
 	float ringInner = smoothstep(ring.x - px, ring.x + px, r);
 	float ringOuter = smoothstep(ring.y - px, ring.y + px, r);
 	float line = max(lines * (inner - outer), ringInner - ringOuter);
-	float near = max(lines * outer * (1.0 - smoothstep(0.0, 1.0, (edge - border.y)*ring.z)),
+	float near = max(lines * outer * (1.0 - smoothstep(0.0, 1.0, (fade - border.y)*ring.z)),
 		ringOuter * (1.0 - smoothstep(0.0, 1.0, (r - ring.y)*ring.z)));
-	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, min(edge - border.y, r - ring.y)*tint.z));
+	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, min(fade - border.y, r - ring.y)*tint.z));
 	result = vec4(color.rgb, opacity * color.a * inner * max(line, max(hatching * near * hatch, shade)));
 }
 ]]
@@ -523,11 +690,11 @@ out vec4 result;
 ]] .. territorySource .. [[
 void main() {
 	int spot;
-	float edge;
-	vec4 color = Territory(pos, spot, edge);
+	float edge, mex;
+	vec4 color = Territory(pos, spot, edge, mex);
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
 	float line = (borderMode != 0 ? 1.0 : 0.0) * (1.0 - smoothstep((0.5*lineWidth - 0.5)*px, (0.5*lineWidth + 0.5)*px, edge));
-	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, edge*tint.z));
+	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, FadeDistance(pos, edge)*tint.z));
 	result = vec4(color.rgb, opacity * color.a * max(line, shade));
 }
 ]]
@@ -659,14 +826,99 @@ local function UpdatePalette()
 	-- The second row is the opacity of each owner's territories.
 	palette = NewTexture(width, 2)
 	PaintRows(palette, {colors, opacities}, width)
-	paletteDirty = false
+	-- Shown owners may have changed: update the distance map.
+	paletteDirty, fieldFrame = false, nil
 end
 
 local function DeleteMapTextures()
-	for _, texture in pairs({atlas, edges, positions, observed, history, nextHistory, palette}) do
+	for _, texture in pairs({atlas, edges, positions, observed, history, nextHistory, palette,
+		close, index, groups, nextGroups, seeds, nextSeeds, field}) do
 		gl.DeleteTexture(texture)
 	end
 	atlas, edges, positions, observed, history, nextHistory, palette = nil, nil, nil, nil, nil, nil, nil
+	close, index, groups, nextGroups, seeds, nextSeeds, field, shownGroups = nil, nil, nil, nil, nil, nil, nil, nil
+	mergePasses, fieldOn, fieldFrame = 0, false, nil
+end
+
+-- Each spot's close spots, within the merge distance both ways, and enough
+-- group passes to join the largest cluster of them.
+local function BuildClose()
+	closeDirty, fieldFrame = false, nil
+	if close then gl.DeleteTexture(close) end
+	close, mergePasses = nil, 0
+	if not options.merge.value then return end
+	local limit = options.mergeDistance.value^2
+	local rows, width, root, size = {}, 1, {}, {}
+	local function Root(i)
+		while root[i] ~= i do i = root[i] end
+		return i
+	end
+	for i = 1, #spots do root[i] = i end
+	for i, a in ipairs(spots) do
+		rows[i] = {}
+		for j, b in ipairs(spots) do
+			if j ~= i and (a.x - b.x)^2 + (a.z - b.z)^2 <= limit then
+				rows[i][#rows[i] + 1] = {j, 0, 0, 0}
+				root[Root(i)] = Root(j)
+			end
+		end
+		width = max(width, #rows[i])
+	end
+	for i = 1, #spots do
+		local r = Root(i)
+		size[r] = (size[r] or 0) + 1
+		mergePasses = max(mergePasses, size[r] - 1)
+	end
+	if mergePasses == 0 then return end
+	mergePasses = min(mergePasses, 16)
+	close = NewTexture(width, #spots)
+	ClearTexture(close)
+	PaintRows(close, rows, width)
+end
+
+-- This frame's merged territories, then the distance map where it is needed.
+local function UpdateTerritories(mode)
+	if closeDirty then BuildClose() end
+	shownGroups = index
+	if mergePasses > 0 then
+		gl.Texture(1, close)
+		gl.Texture(2, history)
+		gl.Texture(3, palette)
+		gl.UseShader(groupShader)
+		for pass = 1, mergePasses do
+			gl.Texture(0, pass == 1 and index or groups)
+			gl.RenderToTexture(nextGroups, gl.CallList, quad)
+			groups, nextGroups = nextGroups, groups
+		end
+		shownGroups = groups
+	end
+	-- With borders on every territory, each territory's own edges are the nearest.
+	fieldOn = options.smoothFades.value and (mode == borderModes.owners or mergePasses > 0)
+	local frame = Spring.GetGameFrame()
+	if not fieldOn then
+		fieldFrame = nil
+	elseif not fieldFrame or fieldMode ~= mode or math.abs(frame - fieldFrame) >= fieldInterval then
+		fieldFrame, fieldMode = frame, mode
+		gl.Texture(1, atlas)
+		gl.Texture(2, history)
+		gl.Texture(3, palette)
+		gl.Texture(4, edges)
+		gl.Texture(6, shownGroups)
+		gl.UseShader(seedShader)
+		gl.UniformInt(seedBorders, mode)
+		gl.RenderToTexture(seeds, gl.CallList, quad)
+		gl.UseShader(jumpShader)
+		for _, step in ipairs(jumps) do
+			gl.Texture(0, seeds)
+			gl.UniformInt(jumpStep, step)
+			gl.RenderToTexture(nextSeeds, gl.CallList, quad)
+			seeds, nextSeeds = nextSeeds, seeds
+		end
+		gl.Texture(0, seeds)
+		gl.UseShader(fieldShader)
+		gl.RenderToTexture(field, gl.CallList, quad)
+	end
+	gl.UseShader(0)
 end
 
 local function BuildMap()
@@ -686,6 +938,18 @@ local function BuildMap()
 	positions, observed = NewTexture(#spots, 1), NewTexture(#spots, 1)
 	history, nextHistory = NewTexture(#spots, 1), NewTexture(#spots, 1)
 	PaintRow(positions, pointData, #spots)
+	-- Unmerged, each spot is its own group.
+	local indexData = {}
+	for i = 1, #spots do indexData[i] = {i - 1, 0, 0, 0} end
+	index, groups, nextGroups = NewTexture(#spots, 1), NewTexture(#spots, 1), NewTexture(#spots, 1)
+	PaintRow(index, indexData, #spots)
+	seeds, nextSeeds = NewTexture(fieldX, fieldZ), NewTexture(fieldX, fieldZ)
+	-- Filtered, so fades are smooth between texel centres.
+	field = assert(gl.CreateTexture(fieldX, fieldZ, {
+		format = GL.RGBA32F, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+		wrap_s = GL.CLAMP_TO_EDGE, wrap_t = GL.CLAMP_TO_EDGE, fbo = true,
+	}))
+	closeDirty = true
 	-- One row of neighbour edges per cell; unused slots stay zero.
 	edges = NewTexture(width, #spots)
 	ClearTexture(edges)
@@ -732,15 +996,32 @@ function widget:Initialize()
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	drawShader = gl.CreateShader({vertex = vertexSource, fragment = drawSource,
-		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5,
+		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5, groups = 6, field = 7,
 			clipZeroToOne = Platform.glSupportClipSpaceControl and 1 or 0},
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	minimapShader = gl.CreateShader({vertex = minimapVertexSource, fragment = minimapSource,
-		uniformInt = {atlas = 1, owners = 2, palette = 3, edges = 4},
+		uniformInt = {atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5, groups = 6, field = 7},
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
-	if not paintShader or not cellShader or not stateShader or not drawShader or not minimapShader then
+	groupShader = gl.CreateShader({vertex = vertexSource, fragment = groupSource,
+		uniformInt = {previous = 0, close = 1, owners = 2, palette = 3},
+	})
+	local fieldTexel = {Game.mapSizeX/fieldX, Game.mapSizeZ/fieldZ}
+	seedShader = gl.CreateShader({vertex = vertexSource, fragment = seedSource,
+		uniformInt = {atlas = 1, owners = 2, palette = 3, edges = 4, groups = 6},
+		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}, texelSize = fieldTexel},
+	})
+	jumpShader = gl.CreateShader({vertex = vertexSource, fragment = jumpSource,
+		uniformInt = {previous = 0, edges = 4},
+		uniform = {texelSize = fieldTexel},
+	})
+	fieldShader = gl.CreateShader({vertex = vertexSource, fragment = fieldSource,
+		uniformInt = {seeds = 0, edges = 4},
+		uniform = {texelSize = fieldTexel},
+	})
+	if not paintShader or not cellShader or not stateShader or not drawShader or not minimapShader
+		or not groupShader or not seedShader or not jumpShader or not fieldShader then
 		Spring.Echo('Metal Territories shader error: ' .. gl.GetShaderLog())
 		widgetHandler:RemoveWidget(self)
 		return
@@ -759,6 +1040,10 @@ function widget:Initialize()
 	drawHatching = gl.GetUniformLocation(drawShader, 'hatching')
 	minimapTint = gl.GetUniformLocation(minimapShader, 'tint')
 	minimapLine = gl.GetUniformLocation(minimapShader, 'lineWidth')
+	drawField = gl.GetUniformLocation(drawShader, 'useField')
+	minimapField = gl.GetUniformLocation(minimapShader, 'useField')
+	seedBorders = gl.GetUniformLocation(seedShader, 'borderMode')
+	jumpStep = gl.GetUniformLocation(jumpShader, 'step')
 	quad = gl.CreateList(function() gl.TexRect(-1, -1, 1, 1) end)
 	-- Allocation and uploads run in DrawWorldPreUnit, where drawing is allowed.
 end
@@ -883,6 +1168,8 @@ function widget:DrawWorldPreUnit()
 		gl.RenderToTexture(nextHistory, gl.CallList, quad)
 		gl.UseShader(0)
 		history, nextHistory = nextHistory, history
+		local borderMode = borderModes[options.borders.value]
+		UpdateTerritories(borderMode)
 		local w, h, x, y = (Spring.Orig and Spring.Orig.GetViewGeometry or Spring.GetViewGeometry)()
 		if not depth or w ~= viewW or h ~= viewH then
 			if depthFBO then gl.DeleteFBO(depthFBO) end
@@ -905,11 +1192,14 @@ function widget:DrawWorldPreUnit()
 			gl.Texture(3, palette)
 			gl.Texture(4, edges)
 			gl.Texture(5, positions)
+			gl.Texture(6, shownGroups)
+			gl.Texture(7, field)
 			gl.UseShader(drawShader)
 			gl.UniformMatrix(drawInverse, 'viewprojectioninverse')
 			gl.Uniform(drawView, viewW, viewH, viewX, viewY)
 			gl.Uniform(drawOpacity, options.opacity.value)
-			gl.UniformInt(drawBorders, borderModes[options.borders.value])
+			gl.UniformInt(drawBorders, borderMode)
+			gl.UniformInt(drawField, fieldOn and 1 or 0)
 			local borderWidth, gap = options.borderWidth.value, options.borderGap.value
 			gl.Uniform(drawBorder, gap, gap + borderWidth)
 			gl.Uniform(drawRing, ringRadius, ringRadius + borderWidth, options.hatchFade.value/hatchFade)
@@ -923,7 +1213,7 @@ function widget:DrawWorldPreUnit()
 			gl.UseShader(0)
 		end
 	end
-	for i = 5, 0, -1 do gl.Texture(i, false) end
+	for i = 7, 0, -1 do gl.Texture(i, false) end
 	gl.PopAttrib()
 end
 
@@ -935,16 +1225,20 @@ function widget:DrawInMiniMap(sx, sy)
 	gl.Texture(2, history)
 	gl.Texture(3, palette)
 	gl.Texture(4, edges)
+	gl.Texture(5, positions)
+	gl.Texture(6, shownGroups)
+	gl.Texture(7, field)
 	gl.UseShader(minimapShader)
 	gl.Uniform(minimapOpacity, options.opacity.value)
 	gl.UniformInt(minimapBorders, borderModes[options.borders.value])
+	gl.UniformInt(minimapField, fieldOn and 1 or 0)
 	SetTint(minimapTint, options.minimapTintOpacity.value)
 	gl.Uniform(minimapLine, options.minimapBorderWidth.value)
 	-- The map's top left corner is at the minimap's top left, or bottom right when flipped.
 	local flipped = Spring.Utilities.IsMinimapFlipped()
 	gl.TexRect(0, 0, sx, sy, flipped, flipped)
 	gl.UseShader(0)
-	for i = 4, 1, -1 do gl.Texture(i, false) end
+	for i = 7, 1, -1 do gl.Texture(i, false) end
 end
 
 function widget:Shutdown()
@@ -957,4 +1251,8 @@ function widget:Shutdown()
 	if stateShader then gl.DeleteShader(stateShader) end
 	if drawShader then gl.DeleteShader(drawShader) end
 	if minimapShader then gl.DeleteShader(minimapShader) end
+	if groupShader then gl.DeleteShader(groupShader) end
+	if seedShader then gl.DeleteShader(seedShader) end
+	if jumpShader then gl.DeleteShader(jumpShader) end
+	if fieldShader then gl.DeleteShader(fieldShader) end
 end
