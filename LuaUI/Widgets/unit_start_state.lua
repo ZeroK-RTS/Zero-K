@@ -47,7 +47,6 @@ local blueprintCopyDefaults = {
 	{[[factorytank]],    2},
 }
 
-local tooltipFunc = {}
 local tooltips = {
 	movestate = {
 		[-1] = "Inherit from factory",
@@ -131,12 +130,6 @@ local tooltips = {
 	},
 }
 
-for name, values in pairs(tooltips) do
-	tooltipFunc[name] = function (_, v)
-		return values[v] or "??"
-	end
-end
-
 -- The command panel's own icons for each state, so the settings show the same
 -- picture the player clicks in-game. Each list is the items of an Epic Menu
 -- 'iconButtonRow' option: key is the stored value, icon is the button's
@@ -161,6 +154,13 @@ local function WithInherit(items, tooltipList)
 	return withInherit
 end
 
+local function ToggleItems(offImage, onImage, offDesc, onDesc)
+	return {
+		{key = false, icon = STATE_IMAGE_DIR .. offImage, desc = offDesc},
+		{key = true, icon = STATE_IMAGE_DIR .. onImage, desc = onDesc},
+	}
+end
+
 local stateItems = {
 	firestate = StateItems({"fire_hold.png", "fire_return.png", "fire_atwill.png"}, tooltips.firestate),
 	movestate = StateItems({"move_hold.png", "move_engage.png", "move_roam.png"}, tooltips.movestate),
@@ -171,20 +171,43 @@ local stateItems = {
 		{"selection_rank_0.png", "selection_rank_1.png", "selection_rank_2.png", "selection_rank_3.png"},
 		{[0] = "Selection rank 0", [1] = "Selection rank 1", [2] = "Selection rank 2", [3] = "Selection rank 3"}
 	),
+	formationrank = StateItems(
+		{"formation_rank_0.png", "formation_rank_1.png", "formation_rank_2.png", "formation_rank_3.png"},
+		{[0] = "Formation rank 0", [1] = "Formation rank 1", [2] = "Formation rank 2", [3] = "Formation rank 3"}
+	),
+	flylandstate = StateItems({"fly_on.png", "fly_off.png"}, tooltips.flylandstate),
+	floatstate = StateItems({"amph_sink.png", "amph_attack.png", "amph_float.png"}, tooltips.floatstate),
+	goostate = StateItems({"goo_off.png", "goo_on.png", "goo_cloak.png"}, tooltips.goostate),
+	auto_call_transport = StateItems({"auto_call_off.png", "auto_call_on.png"}, tooltips.auto_call_transport),
+	prevent_bait = StateItems({"bait_off_alternate.png", "bait_1.png", "bait_2.png", "bait_3.png", "bait_4.png"}, tooltips.prevent_bait),
+	overkill_prevention = StateItems(
+		{"overkill_off.png", "overkill_auto_target.png", "overkill_fire_at_will.png", "overkill_on_except_single.png", "overkill_on.png"},
+		tooltips.overkill_prevention
+	),
 	-- Toggles keep their bool values, so saved settings still load.
-	repeat_queue = {
-		{key = false, icon = STATE_IMAGE_DIR .. "repeat_off.png", desc = "Repeat: Disabled"},
-		{key = true, icon = STATE_IMAGE_DIR .. "repeat_on.png", desc = "Repeat: Enabled"},
-	},
-	auto_assist = {
-		{key = false, icon = STATE_IMAGE_DIR .. "autoassist_off.png", desc = "Auto Assist: Disabled"},
-		{key = true, icon = STATE_IMAGE_DIR .. "autoassist_on.png", desc = "Auto Assist: Enabled"},
-	},
+	repeat_queue = ToggleItems("repeat_off.png", "repeat_on.png", "Repeat: Disabled", "Repeat: Enabled"),
+	auto_assist = ToggleItems("autoassist_off.png", "autoassist_on.png", "Auto Assist: Disabled", "Auto Assist: Enabled"),
+	high_trajectory = ToggleItems("traj_low.png", "traj_high.png", "Trajectory: Low", "Trajectory: High"),
+	airstrafe = ToggleItems("strafe_off.png", "strafe_on.png", "Air Strafe: No Strafe", "Air Strafe: Strafe"),
+	tactical_ai = ToggleItems("bulb_off.png", "bulb_on.png", "Smart AI: Disabled", "Smart AI: Enabled"),
+	loop_attack = ToggleItems("plane_strafe_on.png", "plane_strafe_off.png", "Attack Style: Strafe", "Attack Style: Loopback"),
+	transport_ai = ToggleItems("bulb_off.png", "bulb_on.png", "Transport AI: Disabled", "Transport AI: Enabled"),
+	-- true is state 0 of Hold Fire at Radar and of Disable Attack.
+	fire_at_radar = ToggleItems("stealth_off.png", "stealth_on.png", "Fire at radar: Hold Fire", "Fire at radar: Fire"),
+	fire_at_shield = ToggleItems("ward_off.png", "ward_on.png", tooltips.fire_at_shield[0], tooltips.fire_at_shield[1]),
+	fire_towards_enemy = ToggleItems("shoot_towards_off.png", "shoot_towards_on.png", tooltips.fire_towards_enemy[0], tooltips.fire_towards_enemy[1]),
+	personal_cloak = ToggleItems("cloak_off.png", "cloak_on.png", "Personal Cloak: Disabled", "Personal Cloak: Enabled"),
+	area_cloak = ToggleItems("areacloak_off.png", "areacloak_on.png", "Area Cloak: Disabled", "Area Cloak: Enabled"),
+	impulse = ToggleItems("pull_alt.png", "push_alt.png", "Gravity Gun: Pull", "Gravity Gun: Push"),
+	onoff = ToggleItems("off.png", "on.png", "On/Off State: Off", "On/Off State: On"),
+	enable_attack = ToggleItems("disableattack_on.png", "disableattack_off.png", "Force Fire: Blocked", "Force Fire: Allowed"),
 }
 stateItems.firestate_with_inherit = WithInherit(stateItems.firestate, tooltips.firestate)
 stateItems.movestate_with_inherit = WithInherit(stateItems.movestate, tooltips.movestate)
 stateItems.priority_with_inherit = WithInherit(stateItems.priority, tooltips.priority)
 stateItems.retreat_with_inherit = WithInherit(stateItems.retreat, tooltips.retreat)
+stateItems.flylandstate_with_inherit = WithInherit(stateItems.flylandstate, tooltips.flylandstate)
+stateItems.auto_call_transport_with_inherit = WithInherit(stateItems.auto_call_transport, tooltips.auto_call_transport)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -642,13 +665,10 @@ options = {
 	commander_auto_call_transport_2 = {
 		name = "  Auto Call Transport",
 		desc = "Values: Disabled, Enabled",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 0,
-		min = 0,
-		max = 1,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.auto_call_transport,
+		items = stateItems.auto_call_transport,
 	},
 
 	commander_selection_rank = {
@@ -663,13 +683,10 @@ options = {
 	commander_formation_rank = {
 		name = "  Formation Rank",
 		desc = "Formation Rank: units of lower rank line up in front of units of higher rank when given line movement orders.",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 2,
-		min = 0,
-		max = 3,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.formationrank,
+		items = stateItems.formationrank,
 	},
 	
 	commander_blueprint_copy_text = {
@@ -797,10 +814,11 @@ local function addUnit(defName, path)
 	if ud.highTrajectoryType == 2 then
 		options[defName .. "_high_trajectory_1"] = {
 			name = "  Shoot High Trajectory",
-			desc = "Shoot High Trajectory: check box to turn it on",
-			type = 'bool',
+			desc = "Values: low, high",
+			type = 'iconButtonRow',
 			value = false,
 			path = path,
+			items = stateItems.high_trajectory,
 		}
 		options_order[#options_order+1] = defName .. "_high_trajectory_1"
 	end
@@ -809,26 +827,20 @@ local function addUnit(defName, path)
 		options[defName .. "_flylandstate_1"] = {
 			name = "  Fly/Land State",
 			desc = "Values: inherit from factory, fly, land",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = (ud.customParams and ud.customParams.landflystate and ((ud.customParams.landflystate == "1" and 1) or 0)) or -1,
-			min = -1,
-			max = 1,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.flylandstate,
+			items = stateItems.flylandstate_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_flylandstate_1"
 	elseif ud.customParams and ud.customParams.landflystate then
 		options[defName .. "_flylandstate_1_factory"] = {
 			name = "  Fly/Land State for factory",
 			desc = "Values: fly, land",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = (ud.customParams and ud.customParams.landflystate and ud.customParams.landflystate == "1" and 1) or 0,
-			min = 0,
-			max = 1,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.flylandstate,
+			items = stateItems.flylandstate,
 		}
 		options_order[#options_order+1] = defName .. "_flylandstate_1_factory"
 	end
@@ -860,10 +872,11 @@ local function addUnit(defName, path)
 	if ud.customParams and ud.customParams.airstrafecontrol then
 		options[defName .. "_airstrafe1"] = {
 			name = "  Air Strafe",
-			desc = "Air Strafe: check box to turn it on",
-			type = 'bool',
+			desc = "Values: no strafe, strafe",
+			type = 'iconButtonRow',
 			value = ud.customParams.airstrafecontrol == "1",
 			path = path,
+			items = stateItems.airstrafe,
 		}
 		options_order[#options_order+1] = defName .. "_airstrafe1"
 	end
@@ -872,13 +885,10 @@ local function addUnit(defName, path)
 		options[defName .. "_floattoggle"] = {
 			name = "  Float State",
 			desc = "Values: Never float, float to attack, float to attack or when idle",
-			type = 'number',
-			value = (ud.customParams and ud.customParams.floattoggle) or 1,
-			min = 0,
-			max = 2,
-			step = 1,
+			type = 'iconButtonRow',
+			value = (ud.customParams and tonumber(ud.customParams.floattoggle)) or 1,
 			path = path,
-			tooltipFunction = tooltipFunc.floatstate,
+			items = stateItems.floatstate,
 		}
 		options_order[#options_order+1] = defName .. "_floattoggle"
 	end
@@ -887,13 +897,10 @@ local function addUnit(defName, path)
 		options[defName .. "_goostate"] = {
 			name = "  Puppy Goo",
 			desc = "Values: Never gather, Gather when not cloaked, Always Gather",
-			type = 'number',
-			value = (ud.customParams and ud.customParams.grey_goo) or 1,
-			min = 0,
-			max = 2,
-			step = 1,
+			type = 'iconButtonRow',
+			value = (ud.customParams and tonumber(ud.customParams.grey_goo)) or 1,
 			path = path,
-			tooltipFunction = tooltipFunc.goostate,
+			items = stateItems.goostate,
 		}
 		options_order[#options_order+1] = defName .. "_goostate"
 	end
@@ -940,26 +947,20 @@ local function addUnit(defName, path)
 		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Inherit, Disabled, Enabled",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = -1,
-			min = -1,
-			max = 1,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.auto_call_transport,
+			items = stateItems.auto_call_transport_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	elseif Spring.Utilities.isGroundFactory(ud) then
 		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Disabled, Enabled",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = 0,
-			min = 0,
-			max = 1,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.auto_call_transport,
+			items = stateItems.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	end
@@ -990,13 +991,10 @@ local function addUnit(defName, path)
 		options[defName .. "_formation_rank"] = {
 			name = "  Formation Rank",
 			desc = "Formation Rank: set rank in formation",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = 2,
-			min = 0,
-			max = 3,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.formationrank,
+			items = stateItems.formationrank,
 		}
 		options_order[#options_order+1] = defName .. "_formation_rank"
 	end
@@ -1005,18 +1003,21 @@ local function addUnit(defName, path)
 		if tacticalAIUnits[defName].commandType == "default" then
 			options[defName .. "_tactical_ai_2"] = {
 				name = "  Smart AI",
-				desc = "Smart AI: check box to turn it on",
-				type = 'bool',
+				desc = "Values: disabled, enabled",
+				type = 'iconButtonRow',
 				value = tacticalAIUnits[defName].value,
 				path = path,
+				items = stateItems.tactical_ai,
 			}
 			options_order[#options_order+1] = defName .. "_tactical_ai_2"
 		elseif tacticalAIUnits[defName].commandType == "loopback_attack" then
 			options[defName .. "_loop_attack"] = {
-				name = "  Attack Style: check the box to have the plane loop attack and uncheck for strafe.",
-				type = 'bool',
+				name = "  Attack Style",
+				desc = "Values: strafe, loop attack",
+				type = 'iconButtonRow',
 				value = planeStandoffUnits[defName].value,
 				path = path,
+				items = stateItems.loop_attack,
 			}
 			options_order[#options_order+1] = defName .. "_loop_attack"
 		end
@@ -1025,10 +1026,11 @@ local function addUnit(defName, path)
 	if (ud.transportCapacity >= 1) and ud.canFly then
 		options[defName .. "_tactical_ai_transport"] = {
 			name = "  Transport AI",
-			desc = "Transport AI: check box to have transports ferry units automatically.",
-			type = 'bool',
+			desc = "Transport AI: transports ferry units automatically.",
+			type = 'iconButtonRow',
 			value = ud.metalCost < 200, -- Automatically enabled for light transports.
 			path = path,
+			items = stateItems.transport_ai,
 		}
 		options_order[#options_order+1] = defName .. "_tactical_ai_transport"
 	end
@@ -1037,9 +1039,10 @@ local function addUnit(defName, path)
 		options[defName .. "_fire_at_radar"] = {
 			name = "  Fire at radar",
 			desc = "Fire at radar: Set whether precise units with high reload time fire on uncertain enemy positions within radar",
-			type = 'bool',
+			type = 'iconButtonRow',
 			value = dontFireAtRadarUnits[unitDefID],
 			path = path,
+			items = stateItems.fire_at_radar,
 		}
 		options_order[#options_order+1] = defName .. "_fire_at_radar"
 	end
@@ -1049,13 +1052,10 @@ local function addUnit(defName, path)
 		options[defName .. "_overkill_prevention0"] = {
 			name = "  Overkill Prevention",
 			desc = "Control when the unit tries to prevent overkill. This causes units to not shoot at targets that are already likely to die due to incoming fire.",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = overkillPrevention,
-			min = 0,
-			max = OVERKILL_STATES - 1,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.overkill_prevention,
+			items = stateItems.overkill_prevention,
 		}
 		options_order[#options_order+1] = defName .. "_overkill_prevention0"
 	end
@@ -1068,20 +1068,20 @@ local function addUnit(defName, path)
 			options[defName .. "_fire_at_shield"] = {
 				name = "  Fire at Shields",
 				desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
-				type = 'bool',
+				type = 'iconButtonRow',
 				value = (wardFireUnits[defName] == 1),
 				path = path,
-				tooltipFunction = tooltipFunc.prevent_bait,
+				items = stateItems.fire_at_shield,
 			}
 			options_order[#options_order+1] = defName .. "_fire_at_shield"
 		elseif wardCmd == CMD_FIRE_TOWARDS_ENEMY then
 			options[defName .. "_fire_towards_enemy"] = {
 				name = "  Fire Towards Enemies",
 				desc = "Shoot towards the closest enemy when nothing else is in range.",
-				type = 'bool',
+				type = 'iconButtonRow',
 				value = (wardFireUnits[defName] == 1),
 				path = path,
-				tooltipFunction = tooltipFunc.prevent_bait,
+				items = stateItems.fire_towards_enemy,
 			}
 			options_order[#options_order+1] = defName .. "_fire_towards_enemy"
 		end
@@ -1091,13 +1091,10 @@ local function addUnit(defName, path)
 		options[defName .. "_prevent_bait"] = {
 			name = "  Avoid bad targets",
 			desc = "Avoid shooting at low value targets, set by a threshold.",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = baitPreventionDefault[unitDefID],
-			min = 0,
-			max = 4,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.prevent_bait,
+			items = stateItems.prevent_bait,
 		}
 		options_order[#options_order+1] = defName .. "_prevent_bait"
 	end
@@ -1105,10 +1102,11 @@ local function addUnit(defName, path)
 	if ud.canCloak then
 		options[defName .. "_personal_cloak_0"] = {
 			name = "  Personal Cloak",
-			desc = "Personal Cloak: check box to turn it on",
-			type = 'bool',
-			value = ud.customParams.initcloaked,
+			desc = "Values: disabled, enabled",
+			type = 'iconButtonRow',
+			value = (ud.customParams.initcloaked ~= nil),
 			path = path,
+			items = stateItems.personal_cloak,
 		}
 		options_order[#options_order+1] = defName .. "_personal_cloak_0"
 	end
@@ -1116,10 +1114,11 @@ local function addUnit(defName, path)
 	if ud.customParams.area_cloak and (ud.customParams.area_cloak ~= "0") then
 		options[defName .. "_area_cloak"] = {
 			name = "  Area Cloak",
-			desc = "Area Cloak: check box to turn it on",
-			type = 'bool',
+			desc = "Values: disabled, enabled",
+			type = 'iconButtonRow',
 			value = (ud.customParams.area_cloak_init ~= "0"),
 			path = path,
+			items = stateItems.area_cloak,
 		}
 		options_order[#options_order+1] = defName .. "_area_cloak"
 	end
@@ -1128,19 +1127,21 @@ local function addUnit(defName, path)
 		if impulseUnitDefID[unitDefID] then
 			options[defName .. "_impulseMode"] = {
 				name = "  Gravity Gun Push/Pull",
-				desc = "Check box to default to Push.",
-				type = 'bool',
+				desc = "Values: pull, push",
+				type = 'iconButtonRow',
 				value = true,
 				path = path,
+				items = stateItems.impulse,
 			}
 			options_order[#options_order+1] = defName .. "_impulseMode"
 		else
 			options[defName .. "_activateWhenBuilt"] = {
 				name = "  On/Off State",
-				desc = "Check box to set the unit to On when built.",
-				type = 'bool',
+				desc = "Values: off, on",
+				type = 'iconButtonRow',
 				value = ud.activateWhenBuilt,
 				path = path,
+				items = stateItems.onoff,
 			}
 			options_order[#options_order+1] = defName .. "_activateWhenBuilt"
 		end
@@ -1150,9 +1151,10 @@ local function addUnit(defName, path)
 		options[defName .. "_enableattack_1"] = {
 			name = "  Enable Force Fire Command",
 			desc = "Make the unit respond to Force Fire commands as well as Fire Special Weapon.",
-			type = 'bool',
+			type = 'iconButtonRow',
 			value = false,
 			path = path,
+			items = stateItems.enable_attack,
 		}
 		options_order[#options_order+1] = defName .. "_enableattack_1"
 	end
