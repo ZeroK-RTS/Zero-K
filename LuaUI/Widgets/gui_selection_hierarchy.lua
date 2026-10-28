@@ -498,8 +498,8 @@ function WG.SelectMapIgnoringRank(unitMap, append)
 	if useSelectionFiltering then
 		disableForNextUpdate = 1
 		widgetHandler:UpdateWidgetCallIn("Update", widget)
-		Spring.SelectUnitMap(unitMap, append)
 	end
+	Spring.SelectUnitMap(unitMap, append)
 end
 
 --------------------------------------------------------------------------------

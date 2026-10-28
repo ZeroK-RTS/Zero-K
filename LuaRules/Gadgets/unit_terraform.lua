@@ -680,7 +680,10 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		return
 	end
 	
-	if terraform_width < minTotalRampWidth or terraform_width > maxTotalRampWidth*2 then
+	if terraform_width < minTotalRampWidth*2 then
+		terraform_width = minTotalRampWidth*2
+	end
+	if terraform_width > maxTotalRampWidth*2 then
 		return
 	end
 
@@ -2934,7 +2937,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	if costDiff ~= 0 then
 		if pyramindCost == 0 then
 			terra.volCostSpent = terra.volCostSpent + costDiff
-			terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent + costDiff) / terra.totalCost
+			terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent) / terra.totalCost
 		else
 			local edgeSpendFactor = (terra.baseCostSpent and 0.38) or 1
 			local edgeSpending = costDiff*edgeSpendFactor*(1 - costDiff/(costDiff + pyramindCost))
@@ -3507,6 +3510,7 @@ local function DeregisterStructure(unitID)
 	local f = structureCheckFrame[structure[unitID].frame]
 	if f.count ~= structure[unitID].frameIndex then
 		structureCheckFrame[structure[unitID].frame].unit[structure[unitID].frameIndex] = structureCheckFrame[structure[unitID].frame].unit[f.count]
+		structure[f.unit[f.count]].frameIndex = structure[unitID].frameIndex
 	end
 	if structureCheckFrame[structure[unitID].frame].count == 1 then
 		structureCheckFrame[structure[unitID].frame] = nil
@@ -3573,7 +3577,7 @@ local function RegisterStructure(unitID, ud)
 	structure[unitID].frameIndex = structureCheckFrame[currentCheckFrame].count
 	
 	currentCheckFrame = currentCheckFrame + 1
-	if currentCheckFrame > structureCheckLoopFrames then
+	if currentCheckFrame >= structureCheckLoopFrames then
 		currentCheckFrame = 0
 	end
 	
@@ -3636,6 +3640,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		local index = constructor[unitID].index
 		if index ~= constructors then
 			constructorTable[index] = constructorTable[constructors]
+			constructor[constructorTable[index]].index = index
 		end
 		constructorTable[constructors] = nil
 		constructors = constructors - 1

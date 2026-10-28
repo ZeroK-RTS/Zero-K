@@ -110,7 +110,7 @@ local function SetupSuddenDeath()
 		baseDamage = baseDamage * damageMult
 		propDamage = propDamage * damageMult
 		baseDamageAtRefDist = baseDamageAtRefDist * damageMult
-		propDamageatRefDist = propDamageatRefDist * damageMult
+		propDamageAtRefDist = propDamageAtRefDist * damageMult
 	end
 	
 	if suddenSweepFrames < 1 then

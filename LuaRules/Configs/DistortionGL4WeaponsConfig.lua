@@ -952,6 +952,7 @@ local BaseClasses = {
 			posy = 0,
 			posz = 0,
 			radius = 10,
+			effectStrength = 1.1,
 			noiseStrength = 0.85,
 			noiseScaleSpace = 0.6,
 			distanceFalloff = 0.5,
@@ -1403,7 +1404,7 @@ explosionDistortionsNames.bomberriot_napalm = {
 	GetDistortionClass("FireExplosionHeat", "SmallMedium", 0.8),
 }
 explosionDistortionsNames.jumparty_napalm_sprayer = {
-	GetDistortionClass("ExplosionHeatFirewalker", "Small", false, 1.5),
+	GetDistortionClass("ExplosionHeatFirewalker", "Small", 0.8, 1.5),
 }
 explosionDistortionsNames.striderdante_napalm_rockets = {
 	GetDistortionClass("FireExplosionHeat", "Smaller"),
@@ -1414,6 +1415,9 @@ explosionDistortionsNames.striderdante_napalm_rockets_salvo = {
 explosionDistortionsNames.napalmmissile_weapon = {
 	GetDistortionClass("ExplosionHeatLong", "Juno"),
 	GetDistortionClass("ExplosionHeatLong", "Small", 0.2), -- Some distortion for when the camera is inside the larger one
+}
+explosionDistortionsNames.commweapon_napalmgrenade = {
+	GetDistortionClass("ExplosionHeatFirewalker", "SmallMedium", 0.8, 3.9),
 }
 
 -- Fancy explosions for huge artillery
@@ -1528,6 +1532,12 @@ explosionDistortions.teleport_out = {
 }
 explosionDistortions.teleport_in = {
 	GetDistortionClass("TeleportIn", "Smallest")
+}
+explosionDistortions.teleport_big_out = {
+	GetDistortionClass("TeleportOut", "SmallMedium")
+}
+explosionDistortions.teleport_big_in = {
+	GetDistortionClass("TeleportIn", "SmallMedium")
 }
 explosionDistortions.gadget_nuke_hit_distortion = {
 	GetDistortionClass("ExplosionHeatNuke", "MegaXXL"),

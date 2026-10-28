@@ -535,11 +535,10 @@ local function UpdateTrajectory(unitID, data)
 	if data.sidewaysCounter then
 		data.sidewaysCounter = data.sidewaysCounter - 1
 		if data.sidewaysCounter < 10 then
-			if IsStunnedOrDead(data.lobID) then
-				return true
-			end
-			if not SendUnitToTarget(unitID, data.launchMult*math.min(1, 1 - (data.sidewaysCounter - 3)/5), data.flyTimeMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
-				return true -- remove unit
+			if IsStunnedOrDead(data.lobID) or not SendUnitToTarget(unitID, data.launchMult*math.min(1, 1 - (data.sidewaysCounter - 3)/5), data.flyTimeMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz) then
+				-- Abort the push, but keep restoring drag and collision damage.
+				data.sidewaysCounter = nil
+				return
 			end
 		end
 		if data.sidewaysCounter <= 0 then

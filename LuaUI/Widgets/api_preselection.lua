@@ -110,14 +110,17 @@ end
 
 WG.PreSelection_IsSelectionBoxActive = function (thresholdMatters)
 	local x, y, lmb = spGetMouseState()
-	local _, here = SafeTraceScreenRay(x, y, true, thruMinimap)
 	local activeControl = WG.Chili and WG.Chili.Screen0.activeControl
 	if activeControl then
 		return
 	end
 
-	if lmb and not cannotSelect and holdingForSelection and ((not thresholdMatters) or not (here[1] == start[1] and here[2] == start[2] and here[3] == start[3])) then
-		return true
+	if lmb and not cannotSelect and holdingForSelection then
+		if not thresholdMatters then
+			return true
+		end
+		local _, here = SafeTraceScreenRay(x, y, true, thruMinimap)
+		return not (here[1] == start[1] and here[2] == start[2] and here[3] == start[3])
 	end
 	return false
 end

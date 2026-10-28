@@ -24,58 +24,79 @@ local function GetWheelHeight(piece)
 end
 
 local xtiltv, ztiltv = 0, 0
+local settled = false -- suspension at rest while parked; Shot clears it
 local spGetUnitVelocity = Spring.GetUnitVelocity
+
+-- A parked unit with settled suspension gets the same result from each update, so check it less often.
+-- A full update still runs every second, for terrain changes under a parked unit.
+local IDLE_SPEED = 0.01
+local IDLE_SETTLED = 0.0001
+local IDLE_CHECK_PERIOD = 100
+local IDLE_FULL_UPDATE_PERIOD = 1000
+local abs = math.abs
+
 local function Suspension()
 	local xtilt, ztilt = 0, 0
 	local yv, yp = 0, 0
 
+	local idleTime = 0
+	local lastXtilt, lastZtilt, lastYp = 0, 0, 0
 	while true do
-		local s1r = GetWheelHeight(gs1r)
-		local s2r = GetWheelHeight(gs2r)
-		local s3r = GetWheelHeight(gs3r)
-		local s1l = GetWheelHeight(gs1l)
-		local s2l = GetWheelHeight(gs2l)
-		local s3l = GetWheelHeight(gs3l)
-
-		local xtilta = (s3r + s3l - s1l - s1r)/6000
-		xtiltv = xtiltv*0.99 + xtilta
-		xtilt = xtilt*0.98 + xtiltv
-
-		local ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/15000
-		ztiltv = ztiltv*0.99 + ztilta
-		ztilt = ztilt*0.99 + ztiltv
-
-		local ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
-		yv = yv*0.99 + ya
-		if yv < -0.1 then
-			yv = -0.1
-		end
-		yp = yp*0.98 + yv
-		if yp < -3 then
-			yp = -3
-		end
-
-		Move(base, y_axis, yp)
-		Turn(base, x_axis, xtilt)
-		Turn(base, z_axis, -ztilt)
-
-		Move(rwheel1, y_axis, s1r, 20)
-		Move(rwheel2, y_axis, s2r, 20)
-		Move(rwheel3, y_axis, s3r, 20)
-		Move(lwheel1, y_axis, s1l, 20)
-		Move(lwheel2, y_axis, s2l, 20)
-		Move(lwheel3, y_axis, s3l, 20)
-
 		local _, _, _, speed = spGetUnitVelocity(unitID)
-		local wheelTurnSpeed = speed * 3
-		Spin (rwheel1, x_axis, wheelTurnSpeed)
-		Spin (rwheel2, x_axis, wheelTurnSpeed)
-		Spin (rwheel3, x_axis, wheelTurnSpeed)
-		Spin (lwheel1, x_axis, wheelTurnSpeed)
-		Spin (lwheel2, x_axis, wheelTurnSpeed)
-		Spin (lwheel3, x_axis, wheelTurnSpeed)
+		if settled and speed < IDLE_SPEED and idleTime < IDLE_FULL_UPDATE_PERIOD then
+			idleTime = idleTime + IDLE_CHECK_PERIOD
+			Sleep(IDLE_CHECK_PERIOD)
+		else
+			idleTime = 0
+			local s1r = GetWheelHeight(gs1r)
+			local s2r = GetWheelHeight(gs2r)
+			local s3r = GetWheelHeight(gs3r)
+			local s1l = GetWheelHeight(gs1l)
+			local s2l = GetWheelHeight(gs2l)
+			local s3l = GetWheelHeight(gs3l)
 
-		Sleep (34)
+			local xtilta = (s3r + s3l - s1l - s1r)/6000
+			xtiltv = xtiltv*0.99 + xtilta
+			xtilt = xtilt*0.98 + xtiltv
+
+			local ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/15000
+			ztiltv = ztiltv*0.99 + ztilta
+			ztilt = ztilt*0.99 + ztiltv
+
+			local ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
+			yv = yv*0.99 + ya
+			if yv < -0.1 then
+				yv = -0.1
+			end
+			yp = yp*0.98 + yv
+			if yp < -3 then
+				yp = -3
+			end
+
+			Move(base, y_axis, yp)
+			Turn(base, x_axis, xtilt)
+			Turn(base, z_axis, -ztilt)
+
+			Move(rwheel1, y_axis, s1r, 20)
+			Move(rwheel2, y_axis, s2r, 20)
+			Move(rwheel3, y_axis, s3r, 20)
+			Move(lwheel1, y_axis, s1l, 20)
+			Move(lwheel2, y_axis, s2l, 20)
+			Move(lwheel3, y_axis, s3l, 20)
+
+			local wheelTurnSpeed = (speed < IDLE_SPEED and 0) or speed * 3
+			Spin (rwheel1, x_axis, wheelTurnSpeed)
+			Spin (rwheel2, x_axis, wheelTurnSpeed)
+			Spin (rwheel3, x_axis, wheelTurnSpeed)
+			Spin (lwheel1, x_axis, wheelTurnSpeed)
+			Spin (lwheel2, x_axis, wheelTurnSpeed)
+			Spin (lwheel3, x_axis, wheelTurnSpeed)
+
+			settled = speed < IDLE_SPEED and abs(xtilt - lastXtilt) < IDLE_SETTLED and abs(ztilt - lastZtilt) < IDLE_SETTLED and abs(yp - lastYp) < IDLE_SETTLED
+			lastXtilt, lastZtilt, lastYp = xtilt, ztilt, yp
+
+			Sleep (34)
+		end
 	end
 end
 
@@ -101,6 +122,7 @@ local sin = math.sin
 function script.Shot(num)
 	xtiltv = xtiltv - cos(lastHeading) / 69
 	ztiltv = ztiltv - sin(lastHeading) / 69
+	settled = false -- the recoil moves the suspension again
 
 	Move (barrel, z_axis, -8)
 	Move (barrel, z_axis, 0, 13)

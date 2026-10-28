@@ -624,8 +624,8 @@ function widget:Shutdown()
 end
 
 function widget:ViewResize(vsx_, vsy_)
-	vsx = vsx_
-	vsy = vsy_
+	vsx = vsx_/(WG.uiScale or 1)
+	vsy = vsy_/(WG.uiScale or 1)
 end
 
 --------------------------------------------------------------------------------
@@ -642,7 +642,7 @@ function widget:Initialize()
 	color2incolor = Chili.color2incolor
 	SetupAITeamColor()
 
-	widget:ViewResize(Spring.GetViewGeometry())
+	widget:ViewResize(Spring.Orig.GetViewGeometry())
 end
 
 --------------------------------------------------------------------------------

@@ -69,6 +69,7 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
+		GG.CustomExplosionLight("teleport_big_in", x, y, z, unitID)
 
 		-- Stats collection (acuelly not, see below)
 		if GG.mod_stats_AddFactoryPlop then
@@ -412,6 +413,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		
 		if Spring.GetGameFrame() <= 1 then
 			Spring.SpawnCEG("gate", x, y, z)
+			GG.CustomExplosionLight("teleport_big_in", x, y, z, unitID)
 			-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
 		end
 

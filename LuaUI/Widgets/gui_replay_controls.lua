@@ -141,7 +141,8 @@ function CreateTheUI()
 		right = 10;
 		y = windowY;
 		classname = "main_window_small_flat",
-		dockable = false;
+		dockable = true;
+		dockableSavePositionOnly = true;
 		draggable = true,
 		resizable = false,
 		tweakDraggable = true,

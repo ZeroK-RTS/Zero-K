@@ -19,8 +19,10 @@ end
 
 for _, ud in pairs(UnitDefs) do
 	
-	-- set the cost value  (same as shown in the tooltip)
-	ud.cost = ud.metalCost + (ud.energyCost / 60.0)
+	-- Historical "overall cost" measure from before M=E.
+	-- Might still be useful in case people have widgets
+	-- stolen from BAR or something.
+	ud.cost = ud.metalCost
 	
 	-- add the custom weapons based parameters
 	ud.hasShield      = false

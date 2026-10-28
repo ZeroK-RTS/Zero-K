@@ -1752,7 +1752,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		end
 	end
 
-	cells = printWeapons(ud, unitID, isCommander)
+	cells = printWeapons(ud, unitID, isCommander or (unitID and ud.customParams.dynamic_comm))
 	
 	if cells and #cells > 0 then
 		
@@ -1856,6 +1856,17 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		if (weaponStats.customParams.setunitsonfire) then
 			statschildren[#statschildren+1] = Label:New{ caption = 'Afterburn: ', textColor = color.stats_fg, }
 			statschildren[#statschildren+1] = Label:New{ caption = numformat((weaponStats.customParams.burntime or 450)/30) .. "s (15 DPS)", textColor = colorFire, }
+		end
+
+		if wepCp.area_damage then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Sets the ground on fire:', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = ' - DPS: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = wepCp.area_damage_dps, textColor = colorFire, }
+			statschildren[#statschildren+1] = Label:New{ caption = ' - Radius: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(tonumber(wepCp.area_damage_radius)) .. " elmo", textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = ' - Duration: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(tonumber(wepCp.area_damage_duration)) .. " s", textColor = color.stats_fg, }
 		end
 
 		-- statschildren[#statschildren+1] = Label:New{ caption = 'Edge Damage: ', textColor = color.stats_fg, }
@@ -1962,7 +1973,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	local x = x
 	local y = y
 	if x then
-		y = scrH-y
+		-- x, y are mouse coordinates in real pixels
+		x = x/(WG.uiScale or 1)
+		y = scrH - y/(WG.uiScale or 1)
 	else
 		x = scrH / 3
 		y = scrH / 3
@@ -2137,8 +2150,8 @@ local function MakeUnitContextMenu(unitID,x,y)
 			--classname = "back_button",
 		},
 	}
-	local y = scrH-y
-	local x = x
+	local y = scrH - y/(WG.uiScale or 1)
+	local x = x/(WG.uiScale or 1)
 	
 	if marketandbounty then
 		if team == myTeamID then
@@ -2295,8 +2308,8 @@ function widget:MousePress(x,y,button)
 end
 
 function widget:ViewResize(vsx, vsy)
-	scrW = vsx
-	scrH = vsy
+	scrW = vsx/(WG.uiScale or 1)
+	scrH = vsy/(WG.uiScale or 1)
 end
 
 
@@ -2320,7 +2333,7 @@ function widget:Initialize()
 	 screen0 = Chili.Screen0
 	 color2incolor = Chili.color2incolor
 
-	widget:ViewResize(Spring.GetViewGeometry())
+	widget:ViewResize(Spring.Orig.GetViewGeometry())
 	
 	WG.MakeStatsWindow = MakeStatsWindow
 end

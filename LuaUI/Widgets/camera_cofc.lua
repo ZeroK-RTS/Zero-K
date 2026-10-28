@@ -2023,7 +2023,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 			local selUnits = spGetSelectedUnits()
 			if selUnits and selUnits[1] then --find unit in that area
 				local defID = spGetUnitDefID(unitID)
-				local unitSeparation = spGetUnitSeparation (unitID, thirdperson_trackunit, true)
+				local unitSeparation = spGetUnitSeparation(unitID, thirdperson_trackunit, true)
 				if UnitDefs[defID] and not UnitDefs[defID].isImmobile then
 					if lowestUnitSeparation > unitSeparation then
 						foundUnit = selUnits[1]

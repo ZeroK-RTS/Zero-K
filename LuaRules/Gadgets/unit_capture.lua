@@ -597,6 +597,7 @@ local unitCount = 0
 
 local drawList = 0
 local drawAnything = false
+local lastFrame = -1
 
 local function DrawBezierCurve(pointA, pointB, pointC, pointD, amountOfPoints)
 	local step = 1/amountOfPoints
@@ -669,12 +670,14 @@ end
 
 function gadget:PlayerChanged()
 	myTeam = spGetMyAllyTeamID()
+	lastFrame = -1
 end
 
-local lastFrame = 0
 function gadget:DrawWorld()
-	if spGetGameFrame() ~= lastFrame then
+	local gameFrame = spGetGameFrame()
+	if gameFrame ~= lastFrame then
 		UpdateList()
+		lastFrame = gameFrame
 	end
 	
 	if drawAnything then
@@ -688,6 +691,7 @@ function gadget:DrawWorld()
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+	lastFrame = -1
 	local controllerID = spGetUnitRulesParam(unitID, "capture_controller")
 	if drawingUnits[unitID] then
 		if (not controllerID) or controllerID == -1 then
@@ -703,6 +707,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 end
 
 function gadget:UnitDestroyed (unitID)
+	lastFrame = -1
 	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 	if morphedTo then
 		gadget:UnitGiven(morphedTo)

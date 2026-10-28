@@ -170,7 +170,7 @@ local function WriteTable(concatArray, tab, tabName, params)
 	-- do array component first (ensures order is preserved)
 	for i=0,#tab do
 		local v = tab[i]
-		if v then
+		if v ~= nil then
 			ProcessKeyValuePair(i,v, (tab[0] == nil), (not isDict) and i == #tab)
 			processed[i] = true
 		end
@@ -250,9 +250,9 @@ local function WritePythonOrJSONDict(dict, dictName, params)
 	end
 	
 	-- get rid of trailing commma
-	local strEnd  = string.sub(str,-3)
+	local strEnd  = string.sub(str, -#endLine)
 	if strEnd == endLine then -- , \n
-		str = string.sub(str, 1, -4) .. "\n"
+		str = string.sub(str, 1, -#endLine - 1) .. "\n"
 	end
 	
 	if not params.raw then

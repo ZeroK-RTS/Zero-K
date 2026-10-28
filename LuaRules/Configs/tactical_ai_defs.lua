@@ -235,13 +235,13 @@ local shortRangeSkirmieeArray = NameToDefID({
 local shortToRiotRangeSkirmieeArray = NameToDefID({
 	"hoverraid",
 	"amphriot",
+	"hoverheavyraid",
 	"amphimpulse",
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
 	"cloakriot",
 	"tankheavyraid",
-	"hoverheavyraid",
 	"striderantiheavy",
 	"striderdante",
 	
@@ -430,7 +430,7 @@ local explodableFull = Union(
 -- Notably, this occurs after the skirm nested union
 veryShortRangeSkirmieeArray = Union(veryShortRangeSkirmieeArray, veryShortRangeExplodables)
 
-local diverSkirmieeArray = Union(shortRangeSkirmieeArray, diverExplodables)
+local diverSkirmieeArray = Union(shortToRiotRangeSkirmieeArray, diverExplodables)
 shortRangeSkirmieeArray  = Union(shortRangeSkirmieeArray, shortRangeExplodables)
 riotRangeSkirmieeArray   = Union(riotRangeSkirmieeArray, shortRangeExplodables)
 

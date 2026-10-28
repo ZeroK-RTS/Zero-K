@@ -13,6 +13,7 @@ return { armcom1 = {
 
   buildPic               = [[armcom.png]],
   canGuard               = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
@@ -85,11 +86,16 @@ return { armcom1 = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
-    [5] = {
+    [3] = {
       def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+    [5] = {
+      def = [[DISINTEGRATOR]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SUB SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
@@ -179,6 +185,49 @@ return { armcom1 = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
+    },
+
+    DISINTEGRATOR = {
+      name                    = [[Disintegrator]],
+      areaOfEffect            = 48,
+      avoidFeature            = false,
+      avoidFriendly           = false,
+      avoidGround             = false,
+      avoidNeutral            = false,
+      commandfire             = true,
+      craterBoost             = 1,
+      craterMult              = 6,
+
+      customparams            = {
+        noexplode_speed_damage = 1,
+        burst = Shared.BURST_UNRELIABLE,
+        stats_burst_damage  = 18000,
+        stats_typical_damage  = 18000,
+      },
+
+      damage                  = {
+        default = 99999,
+      },
+
+      explosionGenerator      = [[custom:DGUNTRACE]],
+      heightMod               = 1,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 0,
+      leadLimit               = 80,
+      noExplode               = true,
+      noSelfDamage            = true,
+      range                   = 250,
+      reloadtime              = 1,
+      size                    = 6,
+      soundHit                = [[explosion/ex_med6]],
+      soundStart              = [[weapon/laser/heavy_laser4]],
+      soundTrigger            = true,
+      tolerance               = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[DGun]],
+      weaponVelocity          = 300,
     },
 
   },

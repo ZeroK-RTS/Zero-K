@@ -347,6 +347,9 @@ end
 --end
 
 function widget:DrawWorldPreUnit()
+	if Spring.IsGUIHidden() then
+		return
+	end
 	
 	local osClock = os.clock()
 	--local camX, camY, camZ = spGetCameraPosition()

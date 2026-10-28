@@ -87,7 +87,7 @@ local function SumOverlappingAreas(_, data, _, tx, ty, tz, allyTeamID, areaLimit
 		if data.removeFrame and data.removeFrame < gameFrame then
 			return true -- Remove
 		end
-		if data.posUpdateFrame and data.posUpdateFrame > gameFrame then
+		if data.posUpdateFrame and data.posUpdateFrame <= gameFrame then
 			if data.targetID and spValidUnitID(data.targetID) then
 				local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(data.targetID, true, true)
 				data.x = x
@@ -159,7 +159,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 				spGiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0 )
 			end
 		else
-			spSetUnitTarget(unitID, 0)
+			spSetUnitTarget(unitID, nil)
 		end
 	end
 	

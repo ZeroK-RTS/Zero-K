@@ -146,12 +146,16 @@ local function GetBuildRate(unitID)
 	return spGetUnitRulesParam(unitID, "totalBuildPowerChange") or 1
 end
 
+local function GetMiscPriorityKey(unitID)
+	return "p" .. unitID
+end
+
 local function ForceImmediateAbort(unitID, padID, isLanded)
 	if (not spGetUnitIsDead(unitID)) and Spring.ValidUnitID(unitID) then
 		spSetUnitLeaveTracks(unitID, true)
 		if isLanded then
 			spSetUnitVelocity(unitID, 0, 0, 0)
-			GG.StopMiscPriorityResourcing(padID, miscPriorityKey)
+			GG.StopMiscPriorityResourcing(padID, GetMiscPriorityKey(unitID))
 			-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
 			Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		end
@@ -206,7 +210,7 @@ local function SitOnPad(unitID)
 	-- Spring.Echo(pdz)
 	-- Spring.Echo(padHeading*180/PI)
 	
-	local miscPriorityKey = "p" .. unitID
+	local miscPriorityKey = GetMiscPriorityKey(unitID)
 	local headingDiff = heading - padHeading
 	
 	spSetUnitVelocity(unitID, 0, 0, 0)

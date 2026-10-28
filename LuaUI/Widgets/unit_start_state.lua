@@ -137,6 +137,55 @@ for name, values in pairs(tooltips) do
 	end
 end
 
+-- The command panel's own icons for each state, so the settings show the same
+-- picture the player clicks in-game. Each list is the items of an Epic Menu
+-- 'iconButtonRow' option: key is the stored value, icon is the button's
+-- picture and desc its tooltip.
+local STATE_IMAGE_DIR = 'LuaUI/Images/commands/states/'
+local function StateItems(images, tooltipList)
+	local items = {}
+	for i = 1, #images do
+		items[i] = {key = i - 1, icon = STATE_IMAGE_DIR .. images[i], desc = tooltipList[i - 1]}
+	end
+	return items
+end
+
+-- -1 is "inherit from factory": shown with the factory plate icon in front of
+-- the state icons.
+local INHERIT_ICON = 'LuaUI/Images/commands/Bold/buildplate.png'
+local function WithInherit(items, tooltipList)
+	local withInherit = {{key = -1, icon = INHERIT_ICON, name = "Factory", desc = tooltipList[-1]}}
+	for i = 1, #items do
+		withInherit[i + 1] = items[i]
+	end
+	return withInherit
+end
+
+local stateItems = {
+	firestate = StateItems({"fire_hold.png", "fire_return.png", "fire_atwill.png"}, tooltips.firestate),
+	movestate = StateItems({"move_hold.png", "move_engage.png", "move_roam.png"}, tooltips.movestate),
+	priority = StateItems({"wrench_low.png", "wrench_med.png", "wrench_high.png"}, tooltips.priority),
+	misc_priority = StateItems({"wrench_low_other.png", "wrench_med_other.png", "wrench_high_other.png"}, tooltips.priority),
+	retreat = StateItems({"retreat_off.png", "retreat_30.png", "retreat_60.png", "retreat_90.png"}, tooltips.retreat),
+	selectionrank = StateItems(
+		{"selection_rank_0.png", "selection_rank_1.png", "selection_rank_2.png", "selection_rank_3.png"},
+		{[0] = "Selection rank 0", [1] = "Selection rank 1", [2] = "Selection rank 2", [3] = "Selection rank 3"}
+	),
+	-- Toggles keep their bool values, so saved settings still load.
+	repeat_queue = {
+		{key = false, icon = STATE_IMAGE_DIR .. "repeat_off.png", desc = "Repeat: Disabled"},
+		{key = true, icon = STATE_IMAGE_DIR .. "repeat_on.png", desc = "Repeat: Enabled"},
+	},
+	auto_assist = {
+		{key = false, icon = STATE_IMAGE_DIR .. "autoassist_off.png", desc = "Auto Assist: Disabled"},
+		{key = true, icon = STATE_IMAGE_DIR .. "autoassist_on.png", desc = "Auto Assist: Enabled"},
+	},
+}
+stateItems.firestate_with_inherit = WithInherit(stateItems.firestate, tooltips.firestate)
+stateItems.movestate_with_inherit = WithInherit(stateItems.movestate, tooltips.movestate)
+stateItems.priority_with_inherit = WithInherit(stateItems.priority, tooltips.priority)
+stateItems.retreat_with_inherit = WithInherit(stateItems.retreat, tooltips.retreat)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -548,61 +597,46 @@ options = {
 	commander_firestate0 = {
 		name = "  Firestate",
 		desc = "Values: hold fire, return fire, fire at will",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 2, -- commander are fire@will by default
-		min = 0, -- most firestates are -1 but no factory/unit build comm (yet)
-		max = 2,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.firestate,
+		items = stateItems.firestate, -- most firestates can inherit but no factory/unit build comm (yet)
 	},
 
 	commander_movestate1 = {
 		name = "  Movestate",
 		desc = "Values: hold position, maneuver, roam",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 1,
-		min = 0,-- no factory/unit build comm (yet)
-		max = 2,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.movestate,
+		items = stateItems.movestate, -- no factory/unit build comm (yet)
 	},
 
 	commander_constructor_buildpriority = {
 		name = "  Constructor Build Priority",
 		desc = "Values: Low, Normal, High",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 1,
-		min = 0,
-		max = 2,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.priority,
+		items = stateItems.priority,
 	},
 
 	commander_misc_priority = {
 		name = "  Miscellaneous Priority",
 		desc = "Values: Low, Normal, High",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 1,
-		min = 0,
-		max = 2,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.priority,
+		items = stateItems.misc_priority,
 	},
 
 	commander_retreat = {
 		name = "  Retreat At Value",
 		desc = "Values: no retreat, 30%, 65%, 99% health remaining",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 0,
-		min = 0,
-		max = 3,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.retreat,
+		items = stateItems.retreat,
 	},
 	
 	commander_auto_call_transport_2 = {
@@ -620,13 +654,10 @@ options = {
 	commander_selection_rank = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = 3,
-		min = 0,
-		max = 3,
-		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
-		tooltipFunction = tooltipFunc.selectionrank,
+		items = stateItems.selectionrank,
 	},
 
 	commander_formation_rank = {
@@ -743,13 +774,10 @@ local function addUnit(defName, path)
 		options[defName .. "_firestate0"] = {
 			name = "  Firestate",
 			desc = "Values: inherit from factory, hold fire, return fire, fire at will",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = ud.fireState, -- most firestates are -1
-			min = -1,
-			max = 2,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.firestate,
+			items = stateItems.firestate_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_firestate0"
 	end
@@ -758,13 +786,10 @@ local function addUnit(defName, path)
 		options[defName .. "_movestate1"] = {
 			name = "  Movestate",
 			desc = "Values: inherit from factory, hold position, maneuver, roam",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = ud.moveState,
-			min = -1,
-			max = 2,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.movestate,
+			items = stateItems.movestate_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_movestate1"
 	end
@@ -812,9 +837,10 @@ local function addUnit(defName, path)
 		options[defName .. "_repeat"] = {
 			name = "  Repeat",
 			desc = "Repeat construction queue.",
-			type = 'bool',
+			type = 'iconButtonRow',
 			value = false,
 			path = path,
+			items = stateItems.repeat_queue,
 		}
 		options_order[#options_order+1] = defName .. "_repeat"
 	end
@@ -823,9 +849,10 @@ local function addUnit(defName, path)
 		options[defName .. "_auto_assist"] = {
 			name = "  Auto Assist",
 			desc = "Newly built constructors assist the factory",
-			type = 'bool',
+			type = 'iconButtonRow',
 			value = false,
 			path = path,
+			items = stateItems.auto_assist,
 		}
 		options_order[#options_order+1] = defName .. "_auto_assist"
 	end
@@ -874,13 +901,10 @@ local function addUnit(defName, path)
 	options[defName .. "_buildpriority_0"] = {
 		name = "  Nanoframe Build Priority",
 		desc = "Values: Inherit, Low, Normal, High",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = -1,
-		min = -1,
-		max = 2,
-		step = 1,
 		path = path,
-		tooltipFunction = tooltipFunc.priority,
+		items = stateItems.priority_with_inherit,
 	}
 	options_order[#options_order+1] = defName .. "_buildpriority_0"
 
@@ -892,13 +916,10 @@ local function addUnit(defName, path)
 		options[defName .. "_constructor_buildpriority"] = {
 			name = "  Constructor Build Priority",
 			desc = "Values: Low, Normal, High",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = 1,
-			min = 0,
-			max = 2,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.priority,
+			items = stateItems.priority,
 		}
 		options_order[#options_order+1] = defName .. "_constructor_buildpriority"
 	end
@@ -907,13 +928,10 @@ local function addUnit(defName, path)
 		options[defName .. "_misc_priority"] = {
 			name = "  Miscellaneous Priority",
 			desc = "Values: Low, Normal, High",
-			type = 'number',
-			value = ud.customParams.priority_misc,
-			min = 0,
-			max = 2,
-			step = 1,
+			type = 'iconButtonRow',
+			value = tonumber(ud.customParams.priority_misc), -- customParams are strings, item keys are numbers
 			path = path,
-			tooltipFunction = tooltipFunc.priority,
+			items = stateItems.misc_priority,
 		}
 		options_order[#options_order+1] = defName .. "_misc_priority"
 	end
@@ -950,13 +968,10 @@ local function addUnit(defName, path)
 		options[defName .. "_retreatpercent"] = {
 			name = "  Retreat at value",
 			desc = "Values: inherit from factory, no retreat, 33%, 65%, 99% health remaining",
-			type = 'number',
+			type = 'iconButtonRow',
 			value = (ud.isFactory and 0) or -1,
-			min = -1,
-			max = 3,
-			step = 1,
 			path = path,
-			tooltipFunction = tooltipFunc.retreat,
+			items = stateItems.retreat_with_inherit,
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
@@ -964,13 +979,10 @@ local function addUnit(defName, path)
 	options[defName .. "_selection_rank"] = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
-		type = 'number',
+		type = 'iconButtonRow',
 		value = defaultSelectionRank[unitDefID] or 3,
-		min = 0,
-		max = 3,
-		step = 1,
 		path = path,
-		tooltipFunction = tooltipFunc.selectionrank,
+		items = stateItems.selectionrank,
 	}
 	options_order[#options_order+1] = defName .. "_selection_rank"
 	
@@ -1099,6 +1111,17 @@ local function addUnit(defName, path)
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_personal_cloak_0"
+	end
+
+	if ud.customParams.area_cloak and (ud.customParams.area_cloak ~= "0") then
+		options[defName .. "_area_cloak"] = {
+			name = "  Area Cloak",
+			desc = "Area Cloak: check box to turn it on",
+			type = 'bool',
+			value = (ud.customParams.area_cloak_init ~= "0"),
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_area_cloak"
 	end
 
 	if ud.onOffable then
@@ -1562,6 +1585,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
 		QueueState(name, "overkill_prevention0", CMD_PREVENT_OVERKILL, orderArray)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
+		QueueState(name, "area_cloak", CMD_CLOAK_SHIELD, orderArray)
 		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
 		QueueState(name, "activateWhenBuilt", CMD_WANT_ONOFF, orderArray)
 	end
@@ -1608,7 +1632,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetGameRulesParam("morphUnitCreating") == 1) then
+	if not select(2, AmITeamLeader(unitTeam)) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetGameRulesParam("morphUnitCreating") == 1) then
 		return
 	end
 

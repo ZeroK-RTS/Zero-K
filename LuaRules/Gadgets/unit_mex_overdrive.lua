@@ -1677,6 +1677,7 @@ function gadget:GameFrame(n)
 			end
 			
 			for i = 1, allyTeamData.teams do
+				local teamID = allyTeamData.team[i]
 				local share = (splitByShare and teamResourceShare[teamID]) or 1
 				if freeSpace[i] then
 					freeSpace[i] = min(freeSpace[i], totalToShare * share)
@@ -1686,13 +1687,13 @@ function gadget:GameFrame(n)
 			
 			if totalToShare ~= 0 then
 				local excessFactor = 1 - min(1, totalFreeSpace/totalToShare)
-				local shareFactorPerSpace = (1 - excessFactor)/totalFreeSpace
+				local shareFactorPerSpace = totalFreeSpace > 0 and (1 - excessFactor)/totalFreeSpace or 1
 				for i = 1, allyTeamData.teams do
 					if shareToSend[i] then
 						local sendID = allyTeamData.team[i]
 							
 						for j = 1, allyTeamData.teams do
-							if freeSpace[j] then
+							if freeSpace[j] and freeSpace[j] > 0 then
 								local recieveID = allyTeamData.team[j]
 								local toShare = shareToSend[i] * freeSpace[j] * shareFactorPerSpace
 								Spring.ShareTeamResource(sendID, recieveID, "metal", toShare)

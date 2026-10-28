@@ -232,7 +232,7 @@ local function FinishJump(unitID)
 	mcDisable(unitID)
 end
 
-local function DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
+local function DoReload(unitID, env, coroutineID, reloadTime, jumpCharges, publicReload)
 	spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 	spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 
@@ -429,7 +429,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 					FinishJump(unitID)
 					-- Transport cancels jump
 					CallAsUnitIfExists(unitID, env.cancelJump)
-					DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
+					DoReload(unitID, env, coroutineID, reloadTime, jumpCharges, publicReload)
 					return
 				end
 				Sleep()
@@ -528,7 +528,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			return
 		end
 
-		DoReload(unitID, env, coroutineID, reloadTime, jumpCharges)
+		DoReload(unitID, env, coroutineID, reloadTime, jumpCharges, publicReload)
 	end
 
 	StartScript(JumpLoop)
@@ -772,9 +772,7 @@ function gadget:UnitDestroyed(oldUnitID, unitDefID)
 		jumping[oldUnitID] = nil -- empty old unit's data
 		uniqueCoroutineCounter[oldUnitID] = nil
 	end
-	if jumpReloadMod[unitID] then
-		jumpReloadMod[unitID] = nil
-	end
+	jumpReloadMod[oldUnitID] = nil
 end
 
 function gadget:Initialize()

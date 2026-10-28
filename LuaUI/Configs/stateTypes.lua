@@ -35,7 +35,7 @@ local stateData = {
 	[SUC.LOOP_ATTACK] = 2,
 }
 
-local specialHandling = {
+local specialToggleHandling = {
 	[SUC.RETREAT] = function (state, options)
 		if options.right then
 			state = 0
@@ -44,6 +44,16 @@ local specialHandling = {
 		end
 		return state
 	end,
+}
+
+local specialSetOpts = {
+	alt = false,
+	ctrl = false,
+	internal = false,
+	coded = CMD.OPT_RIGHT,
+	right = true,
+	meta = false,
+	shift = false,
 }
 
 local gadgetReverse = {
@@ -56,4 +66,4 @@ local gadgetReverse = {
 	[SUC.GOO_GATHER] = true,
 }
 
-return stateData, gadgetReverse, specialHandling
+return stateData, gadgetReverse, specialToggleHandling, specialSetOpts

@@ -400,7 +400,7 @@ function gadget:Initialize()
 	end
 
 	for id, rawbox in pairs(startboxConfig) do
-		rawbox.boxes = math.triangulate(rawbox.boxes)
+		rawbox.boxes = math.triangulate(rawbox.boxes, "Start box " .. id)
 	end
 
 	-- filter out fake teams (empty or Gaia)

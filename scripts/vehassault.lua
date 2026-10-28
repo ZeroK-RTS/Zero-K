@@ -42,65 +42,86 @@ local function GetWheelHeight(piece)
 end
 
 local xtiltv, ztiltv = 0, 0
+local settled = false -- suspension at rest while parked; Shot clears it
 local spGetUnitVelocity = Spring.GetUnitVelocity
+
+-- A parked unit with settled suspension gets the same result from each update, so check it less often.
+-- A full update still runs every second, for terrain changes under a parked unit.
+local IDLE_SPEED = 0.01
+local IDLE_SETTLED = 0.0001
+local IDLE_CHECK_PERIOD = 100
+local IDLE_FULL_UPDATE_PERIOD = 1000
+local abs = math.abs
+
 
 local function Suspension() -- Shamelessly stolen and adapted from Ripper. Perhaps this should be an include or something?
 	local xtilt, ztilt = 0, 0
 	local yv, yp = 0, 0
 	local s1r, s2r, s3r, s1l, s2l, s3l, s4l, s4r, xtilta, ztilta, ya, speed, wheelTurnSpeed
+	local idleTime = 0
+	local lastXtilt, lastZtilt, lastYp = 0, 0, 0
 	while true do
-		s1r = GetWheelHeight(gs1r)
-		s2r = GetWheelHeight(gs2r)
-		s3r = GetWheelHeight(gs3r)
-		s4r = GetWheelHeight(gs4r)
-		s1l = GetWheelHeight(gs1l)
-		s2l = GetWheelHeight(gs2l)
-		s3l = GetWheelHeight(gs3l)
-		s4l = GetWheelHeight(gs4l)
-		xtilta = (s3r + s3l - s1l - s1r)/6000
-		xtiltv = xtiltv*0.99 + xtilta
-		xtilt = xtilt*0.98 + xtiltv
-
-		ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/15000
-		ztiltv = ztiltv*0.99 + ztilta
-		ztilt = ztilt*0.99 + ztiltv
-		
-		ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
-		
-		yv = yv*0.99 + ya
-		if yv < -0.1 then
-			yv = -0.1
-		end
-		yp = yp*0.98 + yv
-		if yp < -3 then
-			yp = -3
-		end
-
-		Move(base, y_axis, yp)
-		Turn(base, x_axis, xtilt)
-		Turn(base, z_axis, -ztilt)
-
-		Move(rwheel1, y_axis, s1r, 20)
-		Move(rwheel2, y_axis, s2r, 20)
-		Move(rwheel3, y_axis, s3r, 20)
-		Move(rwheel4, y_axis, s4r, 20)
-		Move(lwheel1, y_axis, s1l, 20)
-		Move(lwheel2, y_axis, s2l, 20)
-		Move(lwheel3, y_axis, s3l, 20)
-		Move(lwheel4, y_axis, s4l, 20)
-
 		_, _, _, speed = spGetUnitVelocity(unitID)
-		wheelTurnSpeed = speed * 3
-		Spin (rwheel1, x_axis, wheelTurnSpeed)
-		Spin (rwheel2, x_axis, wheelTurnSpeed)
-		Spin (rwheel3, x_axis, wheelTurnSpeed)
-		Spin (rwheel4, x_axis, wheelTurnSpeed)
-		Spin (lwheel1, x_axis, wheelTurnSpeed)
-		Spin (lwheel2, x_axis, wheelTurnSpeed)
-		Spin (lwheel3, x_axis, wheelTurnSpeed)
-		Spin (lwheel4, x_axis, wheelTurnSpeed)
+		if settled and speed < IDLE_SPEED and idleTime < IDLE_FULL_UPDATE_PERIOD then
+			idleTime = idleTime + IDLE_CHECK_PERIOD
+			Sleep(IDLE_CHECK_PERIOD)
+		else
+			idleTime = 0
+			s1r = GetWheelHeight(gs1r)
+			s2r = GetWheelHeight(gs2r)
+			s3r = GetWheelHeight(gs3r)
+			s4r = GetWheelHeight(gs4r)
+			s1l = GetWheelHeight(gs1l)
+			s2l = GetWheelHeight(gs2l)
+			s3l = GetWheelHeight(gs3l)
+			s4l = GetWheelHeight(gs4l)
+			xtilta = (s3r + s3l - s1l - s1r)/6000
+			xtiltv = xtiltv*0.99 + xtilta
+			xtilt = xtilt*0.98 + xtiltv
 
-		Sleep (34)
+			ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/15000
+			ztiltv = ztiltv*0.99 + ztilta
+			ztilt = ztilt*0.99 + ztiltv
+		
+			ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
+		
+			yv = yv*0.99 + ya
+			if yv < -0.1 then
+				yv = -0.1
+			end
+			yp = yp*0.98 + yv
+			if yp < -3 then
+				yp = -3
+			end
+
+			Move(base, y_axis, yp)
+			Turn(base, x_axis, xtilt)
+			Turn(base, z_axis, -ztilt)
+
+			Move(rwheel1, y_axis, s1r, 20)
+			Move(rwheel2, y_axis, s2r, 20)
+			Move(rwheel3, y_axis, s3r, 20)
+			Move(rwheel4, y_axis, s4r, 20)
+			Move(lwheel1, y_axis, s1l, 20)
+			Move(lwheel2, y_axis, s2l, 20)
+			Move(lwheel3, y_axis, s3l, 20)
+			Move(lwheel4, y_axis, s4l, 20)
+
+			wheelTurnSpeed = (speed < IDLE_SPEED and 0) or speed * 3
+			Spin (rwheel1, x_axis, wheelTurnSpeed)
+			Spin (rwheel2, x_axis, wheelTurnSpeed)
+			Spin (rwheel3, x_axis, wheelTurnSpeed)
+			Spin (rwheel4, x_axis, wheelTurnSpeed)
+			Spin (lwheel1, x_axis, wheelTurnSpeed)
+			Spin (lwheel2, x_axis, wheelTurnSpeed)
+			Spin (lwheel3, x_axis, wheelTurnSpeed)
+			Spin (lwheel4, x_axis, wheelTurnSpeed)
+
+			settled = speed < IDLE_SPEED and abs(xtilt - lastXtilt) < IDLE_SETTLED and abs(ztilt - lastZtilt) < IDLE_SETTLED and abs(yp - lastYp) < IDLE_SETTLED
+			lastXtilt, lastZtilt, lastYp = xtilt, ztilt, yp
+
+			Sleep (34)
+		end
 	end
 end
 
@@ -150,6 +171,7 @@ end
 function script.Shot(num) -- Moved off FireWeapon for modders/tweakunits mostly.
 	xtiltv = xtiltv - cos(mainhead) / 80
 	ztiltv = ztiltv - sin(mainhead) / 80
+	settled = false -- the recoil moves the suspension again
 	EmitSfx(firepoint, 1024)
 	EmitSfx(firepoint, 1025)
 	StartThread(BarrelRecoil)

@@ -416,9 +416,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
-	if unitAIBehaviour[unitDefID] and unitAIBehaviour[unitDefID].hasWardFire then
-		IterableMap.Remove(wardUnits, unitID)
-	end
+	IterableMap.Remove(wardUnits, unitID)
 	if mexShootBehaviour[unitDefID] then
 		IterableMap.Remove(mexUnits, unitID)
 	end

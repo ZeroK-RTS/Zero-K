@@ -6,6 +6,7 @@ local hull, facframe = piece ("hull", "facframe")
 local base = piece("base")
 local engines = {}
 local pads = {}
+local exhaust = {}
 local docked = {}
 
 -- 1, 2, 3, 4 = rear top, rear bottom, left nose, right nose turrets
@@ -13,6 +14,7 @@ local weapons = {}
 
 for i=1,4 do
 	engines[i] = piece("engine"..i)
+	exhaust[i] = piece("exhaust"..i)
 	pads[i] = piece("pad"..i)
 	local turretPiece = piece("turret"..i)
 	weapons[i] = {
@@ -59,6 +61,11 @@ function script.Create()
 	for i=1,2 do
 		Turn(pads[i], y_axis, math.pi)
 	end
+	MultiTurn(exhaust[1], x_axis, math.rad(-90), 0,
+			exhaust[2], x_axis, math.rad(-90), 0,
+			exhaust[3], x_axis, math.rad(-90), 0,
+		    exhaust[4], x_axis, math.rad(-90), 0
+			)
 end
 
 function script.QueryWeapon(num)

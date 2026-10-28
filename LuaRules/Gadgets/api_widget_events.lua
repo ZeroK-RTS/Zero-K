@@ -83,7 +83,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		if not fullview and not Spring.IsUnitInLos(unitID, myAllyTeamID) then
 			return
 		end
-		if paralyzer and damage > 0 and Script.LuaUI("UnitParalyzeDamageEffect") then
+		if paralyzer and Script.LuaUI("UnitParalyzeDamageEffect") then
 			--Spring.Echo("UnitParalyzeDamageHealthbars", unitID, step)
 			Script.LuaUI.UnitParalyzeDamageEffect(unitID, unitDefID, damage)
 		elseif disarmWeapons[weaponDefID] and Script.LuaUI("UnitDisarmDamageEffect") then

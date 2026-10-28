@@ -348,7 +348,7 @@ void main() {
 	// cylinder-normal / lighting / bubble math below. Read LOS + coverage,
 	// decide, render translucent flat ghost or discard. Nothing else.
 	if (gridData.z < -0.5) {
-		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.zw;
+		vec2 losUV0 = clamp(worldPos.xz, vec2(0.0), mapSize.xy) / mapSize.xy;
 		float los0 = texture(infoTex, losUV0).r;
 		if (los0 >= ENEMY_LOS_CUT) discard;
 #if !defined(SHADOW_PASS) && !defined(DEFERRED_PASS)

@@ -52,9 +52,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 end
 
 function gadget:ProjectileDestroyed(proID)
-	if singleHitMultiWeapon[proID] or singleHitWeapon[weaponDefID] then
-		singleHitProjectile[proID] = nil
-	end
+	singleHitProjectile[proID] = nil
 end
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()

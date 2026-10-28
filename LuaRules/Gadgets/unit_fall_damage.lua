@@ -292,6 +292,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				unitWantedVelocity = unitWantedVelocity or {}
 				unitWantedVelocity[#unitWantedVelocity + 1] = {unitID, 0.3}
 				--GG.AddGadgetImpulseRaw(unitID, -1*vx, -1*vy, -1*vz, true, true)
+				if unitImmune[unitID] then
+					if unitImmune[unitID] >= gameframe then
+						return 0
+					end
+					unitImmune[unitID] = nil
+				end
 				return damageTotal
 			end
 			return 0

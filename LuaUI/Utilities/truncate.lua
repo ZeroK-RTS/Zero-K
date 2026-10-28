@@ -7,6 +7,9 @@ function Spring.Utilities.GetTruncatedString(myString, myFont, maxLength)
 	end
 	local length = string.len(myString)
 	while myFont:GetTextWidth(myString) > maxLength do
+		while length > 0 and string.byte(myString, length) >= 128 and string.byte(myString, length) < 192 do
+			length = length - 1
+		end
 		length = length - 1
 		myString = string.sub(myString, 0, length)
 		if length < 1 then

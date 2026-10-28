@@ -3,6 +3,7 @@ local weaponDef = {
 	name                    = [[Disruptor Bomb]],
 	accuracy                = 256,
 	areaOfEffect            = 512,
+	avoidFeature            = false,
 	cegTag                  = [[beamweapon_muzzle_purple]],
 	commandFire             = true,
 	craterBoost             = 0,

@@ -23,8 +23,7 @@ local settings = {}
 local localWidgetsAction = "localwidgetsconfig"
 
 function widget:ViewResize(viewSizeX, viewSizeY)
-  vsx = viewSizeX
-  vsy = viewSizeY
+  vsx, vsy = Spring.GetViewGeometry()
 end
 
 function widget:Initialize()
@@ -34,7 +33,7 @@ function widget:Initialize()
     return
   end
 
-  vsx, vsy = widgetHandler:GetViewSizes()
+  vsx, vsy = Spring.GetViewGeometry()
   Chili = WG.Chili
   window0 = nil
 

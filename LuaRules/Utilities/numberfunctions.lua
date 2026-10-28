@@ -67,7 +67,7 @@ function ToSIPrec(num) -- more presise
 end
 
 -- accepts an array of polygons (where a polygon is an array of {x, z} vertices), and returns an array of counterclockwise triangles
-function math.triangulate(polies)
+function math.triangulate(polies, context)
 	local triangles = {}
 	for j = 1, #polies do
 		local polygon = polies[j]
@@ -92,6 +92,9 @@ function math.triangulate(polies)
 			while not candidate_ok do
 
 				c0 = c0 + 1
+				if c0 > #polygon then
+					error((context or "Polygon collection") .. ": cannot triangulate polygon " .. j .. "; check for crossing edges or duplicate vertices")
+				end
 				c1, c2 = c0+1, c0+2
 				if c1 > #polygon then c1 = c1 - #polygon end
 				if c2 > #polygon then c2 = c2 - #polygon end

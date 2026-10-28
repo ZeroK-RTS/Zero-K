@@ -1579,8 +1579,7 @@ end
 
 function widget:ViewResize(screenWidth, screenHeight)
 	if options.maintainDefaultUI.value then
-		oldWidth = screenWidth
-		oldHeight = screenHeight
+		oldWidth, oldHeight = Spring.GetViewGeometry()
 		UpdateInterfacePreset(options.interfacePreset)
 	end
 end

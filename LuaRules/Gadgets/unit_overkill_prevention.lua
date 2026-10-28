@@ -313,7 +313,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 					GG.recursion_GiveOrderToUnit = false
 				end
 			else
-				spSetUnitTarget(unitID, 0)
+				spSetUnitTarget(unitID, nil)
 			end
 
 			return true

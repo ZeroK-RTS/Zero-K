@@ -90,6 +90,8 @@ renderAtPos = {
 	[UnitDefNames["energywind"].id] = true,
 	[UnitDefNames["energysolar"].id] = true,
 	[UnitDefNames["staticradar"].id] = true,
+	[UnitDefNames["turretgauss"].id] = true,
+	[UnitDefNames["mahlazer"].id] = true,
 }
 
 --------------------------------------------------------------------------------

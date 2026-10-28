@@ -122,7 +122,7 @@ function widget:UnitFinished(unitID, unitDefID)
 	AddUnit(unitID, unitDefID)
 end
 
-function widget:UnitEnteredLos(unitID, unitDefID)
+function widget:UnitEnteredLos(unitID, unitTeam, forAllyTeamID, unitDefID)
 	AddUnit(unitID, unitDefID)
 end
 
@@ -210,10 +210,11 @@ local function DrawShadows()
 
 	for i=1,unitsCount do
 		unitID = unitsList[i]
-		if spValidUnitID(unitID) then
+		-- no unitDefID: an enemy that left line of sight; UnitEnteredLos adds it back
+		unitDefID = spValidUnitID(unitID) and spGetUnitDefID(unitID)
+		if unitDefID then
 
 			-- calculate quad size
-			unitDefID = spGetUnitDefID(unitID)
 			local xsize = UnitDefs[unitDefID].xsize
 			if xsize then
 				quadSize = xsize * 4

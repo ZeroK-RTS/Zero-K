@@ -615,7 +615,7 @@ end
 
 local function ReportPlayer(subject)
 	local extraText = ""
-	local isSpec = select(3, Spring.GetPlayerInfo(subject.id, false))
+	local isSpec = select(3, Spring.GetPlayerInfo(subject.player, false))
 	extraText = extraText .. ((isSpec and "Spectator, ") or "Player, ")
 
 	--[[ Somewhat obsolete given the direct link to battle gives all that info,

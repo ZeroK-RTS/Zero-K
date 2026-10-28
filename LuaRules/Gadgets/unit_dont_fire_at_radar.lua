@@ -128,7 +128,7 @@ function GG.DontFireRadar_CheckAim(unitID)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, firestate, 0)
 			wantGoodTarget[unitID] = {command = true}
-			spSetUnitTarget(unitID,0)
+			spSetUnitTarget(unitID, nil)
 		end
 	end
 end
@@ -139,7 +139,7 @@ function GG.DontFireRadar_CheckBlock(unitID, targetID)
 		if canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
 			return false
 		else
-			spSetUnitTarget(unitID,0)
+			spSetUnitTarget(unitID, nil)
 			return true
 		end
 	end

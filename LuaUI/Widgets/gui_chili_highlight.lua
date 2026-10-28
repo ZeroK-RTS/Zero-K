@@ -166,11 +166,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:ViewResize(viewSizeX, viewSizeY)
-	vsx = viewSizeX
-	vsy = viewSizeY
+	uiScale = WG.uiScale or 1
+	-- vsx, vsy are in UI units, sMidX, sMidY in real pixels
+	vsx = viewSizeX/uiScale
+	vsy = viewSizeY/uiScale
 	sMidX = viewSizeX * 0.5
 	sMidY = viewSizeY * 0.5
-	uiScale = WG.uiScale or 1
 end
 
 function widget:DrawScreen()
@@ -213,7 +214,7 @@ function widget:Initialize()
 		ClearControls = ClearControls,
 	}
 	
-	widget:ViewResize(Spring.GetViewGeometry())
+	widget:ViewResize(Spring.Orig.GetViewGeometry())
 	
 	circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVertices, 18)
 	rectangleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, RoundedRectangleVertices, 18)
