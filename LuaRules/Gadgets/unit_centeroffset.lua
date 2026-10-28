@@ -36,6 +36,7 @@ local FULL_GROW = 0.5
 local UPDATE_FREQUENCY = 25
 local NON_BLOCK_BUILD_FRAMES = 30
 local MIN_METAL_FOR_GROW_AND_TARGET = 15
+local NEUTRAL_TIMEOUT_FRAMES = 30*45
 
 local growUnit = {}
 local completeGrowUnit = {}
@@ -47,6 +48,7 @@ local origColvolCache = {}
 local origColvolOverride = {}
 local recentBuilderTimeout = {}
 local lowMetalNanoframe = {}
+local neutralTimeoutFrame = {}
 
 local postCompleteGrowDefs = {}
 for i = 1, #UnitDefs do
@@ -104,6 +106,44 @@ local function GetModelRadii(unitDefID)
 	end
 
 	return modelRadii[unitDefID]
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Neutral Handling
+
+local function AddNeutralTimeout(unitID, frame)
+	if not neutralTimeoutFrame[frame] then
+		neutralTimeoutFrame[frame] = unitID
+		return
+	end
+	if type(neutralTimeoutFrame[frame]) ~= "table" then
+		neutralTimeoutFrame[frame] = {neutralTimeoutFrame[frame]}
+	end
+	neutralTimeoutFrame[frame][#neutralTimeoutFrame[frame] + 1] = unitID
+end
+
+local function DoNeutralTimeout(unitID)
+	if spValidUnitID(unitID) and lowMetalNanoframe[unitID] then
+		-- There are potential edge cases here where a nanoframe is destroyed then
+		-- the unitID is recreated 40 seconds later. I am not concerned by this
+		-- possibility.
+		Spring.SetUnitNeutral(unitID, false)
+	end
+end
+
+local function ProcessNeutralTimeout(frame)
+	if not neutralTimeoutFrame[frame] then
+		return
+	end
+	if type(neutralTimeoutFrame[frame]) == "table" then
+		for i = 1, #neutralTimeoutFrame[frame] do
+			DoNeutralTimeout(neutralTimeoutFrame[frame][i])
+		end
+	else
+		DoNeutralTimeout(neutralTimeoutFrame[frame])
+	end
+	neutralTimeoutFrame[frame] = nil
 end
 
 --------------------------------------------------------------------------------
@@ -288,6 +328,7 @@ local function CheckRecentBuilderTimeout(unitID, builderID)
 	Spring.SetUnitNeutral(unitID, true)
 	lowMetalNanoframe[unitID] = true
 	recentBuilderTimeout[builderID] = frame + NON_BLOCK_BUILD_FRAMES
+	AddNeutralTimeout(unitID, frame + NEUTRAL_TIMEOUT_FRAMES)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -339,6 +380,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function gadget:GameFrame(f)
+	ProcessNeutralTimeout(f)
 	if f%UPDATE_FREQUENCY == 12 then
 		for unitID, data in pairs(growUnit) do
 			if spValidUnitID(unitID) then
