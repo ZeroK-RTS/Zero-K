@@ -784,7 +784,8 @@ local function addUnit(defName, path)
 
 	options[defName .. "_label"] = {
 		name = "label",
-		type = 'label',
+		type = 'iconlabel',
+		margin = {0, 30, 0, 0},
 		icon = "unitpics/" .. UnitDefNames[defName].buildpicname,
 		value = Spring.Utilities.GetHumanName(ud),
 		path = path,

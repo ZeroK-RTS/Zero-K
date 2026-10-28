@@ -2023,16 +2023,16 @@ MakeSubWindow = function(path, pause, labelScroll, preserveView)
 			end
 			
 		elseif option.type == 'label' then
-			if option.icon then
-				-- icon specific div
-				local labelpanel = Panel:New{width = "100%",height = 66,backgroundColor = {0, 0, 0, 0},padding = {0, 0, 0, 0},margin = {0, 0, 0, 0},autosize = false,}
-				labelpanel:AddChild(Image:New{file = option.icon, x = 0, y = 0, height=64, width=64, keepAspect = true})
-				labelpanel:AddChild(Label:New{caption = option.value or option.name, x=72, y=32-8, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})})
-				tree_children[#tree_children+1] = labelpanel
-			else
-				--default, no icon label
-				tree_children[#tree_children+1] = Label:New{caption = option.value or option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
+			tree_children[#tree_children+1] = Label:New{caption = option.value or option.name, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})}
+			if labelScroll and (labelScroll == (option.value or option.name)) then
+				scrollTo = tree_children[#tree_children]
+				labelScroll = nil
 			end
+		elseif option.type == 'iconlabel' then
+			local labelpanel = Panel:New{width = "100%",height = 66,backgroundColor = {0, 0, 0, 0},padding = {0, 0, 0, 0},margin = option.margin or {0, 0, 0, 0},autosize = false,}
+			labelpanel:AddChild(Image:New{file = option.icon, x = 0, y = 0, height=64, width=64, keepAspect = true})
+			labelpanel:AddChild(Label:New{caption = option.value or option.name, x=72, y=32-8, objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_header", {color = color.sub_header})})
+			tree_children[#tree_children+1] = labelpanel
 			if labelScroll and (labelScroll == (option.value or option.name)) then
 				scrollTo = tree_children[#tree_children]
 				labelScroll = nil
