@@ -26,7 +26,8 @@ options_path = 'Settings/Graphics/Map/Metal Territories'
 options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'reach', 'borders', 'borderWidth', 'borderGap',
 	'hatchingHeading', 'hatching', 'hatchWidth', 'hatchSpacing', 'hatchAngle', 'hatchFade', 'tintHeading', 'tint', 'tintOpacity', 'tintFade',
 	'minimapHeading', 'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'minimapTintFade', 'allies', 'allyColor', 'enemies', 'enemyColor',
-	'neutralHeading', 'neutralColor', 'additionalHeading', 'smoothFades', 'merge', 'mergeDistance'}
+	'neutralHeading', 'neutralColor', 'additionalHeading', 'smoothFades', 'merge', 'mergeDistance',
+	'zoomFade', 'zoomFadeOpacity', 'zoomFadeNear', 'zoomFadeFar'}
 options = {
 	opacity = {
 		name = 'Opacity',
@@ -290,6 +291,40 @@ options = {
 	additionalHeading = {
 		name = 'Additional options',
 		type = 'label',
+	},
+	zoomFade = {
+		name = 'Fade out while zoomed',
+		desc = 'Zoomed in, territories fade out to Zoomed in opacity. Zooming out brings them back, to full opacity at Upper zoom limit. The minimap does not fade.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	zoomFadeOpacity = {
+		name = 'Zoomed in opacity',
+		desc = 'In % of Opacity, at Lower zoom limit and closer.',
+		type = 'number',
+		value = 20,
+		min = 0,
+		max = 100,
+		step = 1,
+	},
+	zoomFadeNear = {
+		name = 'Lower zoom limit',
+		desc = 'The camera distance in elmos to the ground at the centre of the screen. At this distance or closer, territories are drawn at Zoomed in opacity.',
+		type = 'number',
+		value = 1000,
+		min = 200,
+		max = 8000,
+		step = 100,
+	},
+	zoomFadeFar = {
+		name = 'Upper zoom limit',
+		desc = 'At this camera distance or farther, territories are drawn at full opacity. Between the two limits the opacity changes evenly.',
+		type = 'number',
+		value = 3000,
+		min = 200,
+		max = 8000,
+		step = 100,
 	},
 }
 
@@ -1192,6 +1227,27 @@ local function SetTint(location, opacity, fades)
 	gl.Uniform(location, scale*tint[1], scale*tint[2], fades and options.tintFade.value/tintFade or 0)
 end
 
+-- With Fade out while zoomed, a factor for Opacity: Zoomed in opacity at the lower zoom
+-- limit and closer, 1 at the upper limit and farther, linear between. The zoom is the
+-- camera's distance to the ground at the centre of the view, or its height above the
+-- ground when the centre is off the map.
+local function ZoomFade()
+	if not options.zoomFade.value then return 1 end
+	local cx, cy, cz = Spring.GetCameraPosition()
+	local _, pos = Spring.TraceScreenRay(viewW/2, viewH/2, true)
+	local zoom
+	if pos then
+		zoom = math.sqrt((cx - pos[1])^2 + (cy - pos[2])^2 + (cz - pos[3])^2)
+	else
+		zoom = cy - Spring.GetGroundHeight(cx, cz)
+	end
+	local near, far = options.zoomFadeNear.value, options.zoomFadeFar.value
+	local lower, upper = min(near, far), max(near, far)
+	local t = upper > lower and (zoom - lower)/(upper - lower) or (zoom < lower and 0 or 1)
+	local low = options.zoomFadeOpacity.value/100
+	return low + (1 - low)*max(0, min(1, t))
+end
+
 function widget:DrawWorldPreUnit()
 	if not drawShader then return end
 	gl.PushAttrib(GL.ENABLE_BIT + GL.COLOR_BUFFER_BIT + GL.DEPTH_BUFFER_BIT + GL.POINT_BIT + GL.CURRENT_BIT)
@@ -1251,7 +1307,7 @@ function widget:DrawWorldPreUnit()
 			gl.UseShader(drawShader)
 			gl.UniformMatrix(drawInverse, 'viewprojectioninverse')
 			gl.Uniform(drawView, viewW, viewH, viewX, viewY)
-			gl.Uniform(drawOpacity, options.opacity.value)
+			gl.Uniform(drawOpacity, options.opacity.value*ZoomFade())
 			gl.UniformInt(drawBorders, borderMode)
 			gl.UniformInt(drawField, fieldOn and 1 or 0)
 			gl.Uniform(drawReach, options.reach.value, 1/reachFade)
