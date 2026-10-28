@@ -1022,7 +1022,7 @@ local function addUnit(defName, path)
 				items = stateItems.smartai,
 			}
 			options_order[#options_order+1] = defName .. "_tactical_ai_2"
-		elseif tacticalAIUnits[defName].commandType == "loopback_attack" then
+		elseif tacticalAIUnits[defName].commandType == "loopAttack" then
 			options[defName .. "_loop_attack"] = {
 				name = "  Attack Style: check the box to have the plane loop attack and uncheck for strafe.",
 				type = 'iconButtonRow',
