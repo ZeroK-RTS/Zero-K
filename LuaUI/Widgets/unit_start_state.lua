@@ -186,11 +186,11 @@ local stateItems = {
 	formationrank = StateItems({"formation_rank_0.png", "formation_rank_1.png", "formation_rank_2.png", "formation_rank_3.png"}, tooltips.formationrank),
 	overkill_prevention = StateItems({"overkill_off.png", "overkill_auto_target.png", "overkill_fire_at_will.png", "overkill_on_except_single.png", "overkill_on.png"}, tooltips.overkill_prevention),
 	prevent_bait = StateItems({"bait_off_alternate.png", "bait_1.png", "bait_2.png", "bait_3.png" ,"bait_4.png"}, tooltips.prevent_bait),
+	flylandstate = StateItems({"fly_on.png", "fly_off.png"}, tooltips.flylandstate),
 
 	repeat_queue = BoolStateItems('Repeat', "repeat_off.png", "repeat_on.png"),
 	auto_assist = BoolStateItems('Auto Assist', "autoassist_off.png", "autoassist_on.png"),
 	highTrajectoryType = BoolStateItems("High Trajectory Fire", "traj_low.png", "traj_high.png" ),
-	flylandstate = BoolStateItems("Fly/Land State", "fly_off.png", "fly_on.png"),
 	airstrafecontrol = BoolStateItems("Airstrafe Control", "strafe_off.png", "strafe_on.png"),
 	smartai = BoolStateItems("Smart AI", "bulb_off.png", "bulb_on.png"),
 	loopback_attack = BoolStateItems("Fighter Loopback", "plane_strafe_on.png", "plane_strafe_off.png"),
