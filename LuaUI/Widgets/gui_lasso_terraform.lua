@@ -2008,10 +2008,271 @@ function WG.Terraform_GetIsPlacingStructure()
 	return (placingRectangle or buildToGive) and true
 end
 
-function widget:Initialize()
-	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
-	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
-	WG.Terraform_SetPlacingRectangleCheck = Terraform_SetPlacingRectangleCheck
+--------------------------------------------------------------------------------
+-- GL objects
+--------------------------------------------------------------------------------
+
+local shader, TERRAIN, MODEL
+local locProj, locView, locRect, locUseTex, locPicRadius, locGround, locBlocked
+local quadVAO, quadVBO, quadIBO
+-- The panel's and the ground marks' buffers, grown as needed by upload().
+local panelSet = { capacity = 0 }
+local groundSet = { capacity = 0 }
+-- The volumes of the terrain steps being shown, with their wire and grids,
+-- and a second set the next preview is uploaded into meanwhile
+local terrainSet = { capacity = 0 }
+local terrainBack = { capacity = 0 }
+local terrainMesh = nil
+local panelIndices, groundIndices = 0, 0
+local groundKey = nil
+-- What each terrain step being shown does, over the middle of it, in world
+-- space. Refilled with the ground marks and drawn by DrawScreen.
+local stepLabels = {}
+-- The ground marks and the terrain preview being worked out, in a coroutine
+-- that runs for at most PREVIEW_BUDGET_MS each frame, so a large layout is
+-- spread over several frames and the last finished preview is drawn meanwhile
+-- (issue #4811).
+local rebuild = nil
+
+local IDENTITY = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }
+local UNIT_RECT = { 0, 0, 1, 1 }
+
+local VERTEX_LAYOUT = {
+	{ id = 0, name = "pos", size = 3 },
+	{ id = 1, name = "uv", size = 2 },
+	{ id = 2, name = "color", size = 4 },
+	{ id = 3, name = "shape", size = 4 },
+}
+
+local VERTEX_SHADER = [[
+#version 130
+#extension GL_ARB_explicit_attrib_location : require
+layout(location = 0) in vec3 pos;
+layout(location = 1) in vec2 uv;
+layout(location = 2) in vec4 color;
+layout(location = 3) in vec4 shape;
+uniform mat4 proj;
+uniform mat4 view;
+uniform vec4 rect;
+uniform float picRadius;
+out vec2 vUv;
+out vec4 vColor;
+out vec4 vShape;
+void main() {
+	vec3 p = vec3(pos.xy * rect.zw + rect.xy, pos.z);
+	gl_Position = proj * view * vec4(p, 1.0);
+	vUv = uv;
+	vColor = color;
+	// The unit quad's shape is 1 by 1, so a picture takes its size from rect.
+	vShape = vec4(shape.xy * rect.zw, shape.z + picRadius, shape.w);
+}
+]]
+
+local FRAGMENT_SHADER = [[
+#version 130
+uniform sampler2D tex;
+uniform int useTex;
+uniform int ground;
+uniform vec4 blocked;
+in vec2 vUv;
+in vec4 vColor;
+in vec4 vShape;
+out vec4 fragColor;
+void main() {
+	if (ground == 2) {
+		// the volumes and lines of a terrain preview: the vertex's colour as it is
+		fragColor = vColor;
+		return;
+	}
+	vec4 c = vColor;
+	if (useTex == 1) {
+		c *= texture(tex, vUv);
+	}
+	// Distance to the edge of a rounded box, in the box's own units. Half a
+	// unit either side of the edge fades out, and a border keeps only a ring.
+	vec2 halfSize = vShape.xy * 0.5;
+	float r = min(vShape.z, min(halfSize.x, halfSize.y));
+	vec2 q = abs((vUv - 0.5) * vShape.xy) - halfSize + r;
+	float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+	float a = clamp(0.5 - d, 0.0, 1.0);
+	if (ground == 1) {
+		// On the ground the units are elmos, and the shape's last field holds
+		// flags: 1 refused, striped with a red dashed rim, 2 hovered, with a
+		// white rim, 4 nobody selected can build it, crossed out. Every mark
+		// has a firmer rim.
+		vec2 p = vUv * vShape.xy;
+		int flags = int(vShape.w + 0.5);
+		bool refused = (flags & 1) != 0;
+		if (refused && fract((p.x + p.y) / 16.0) < 0.5) {
+			c = vec4(0.05, 0.05, 0.05, 0.7);
+		}
+		if (refused && d > -3.0) {
+			c = fract((p.x + p.y) / 12.0) < 0.6 ? blocked : vec4(0.0);
+		} else if (d > -2.0) {
+			c = vec4(vColor.rgb, min(1.0, vColor.a * 2.5));
+		}
+		if ((flags & 4) != 0 && d < -4.0) {
+			float side = min(vShape.x, vShape.y);
+			float cross = min(abs(vUv.x - vUv.y), abs(vUv.x + vUv.y - 1.0)) * side;
+			if (cross < 3.0) {
+				c = vec4(blocked.rgb, 0.9);
+			}
+		}
+		if ((flags & 2) != 0 && d > -3.0) {
+			c = vec4(1.0, 1.0, 1.0, 1.0);
+		}
+	} else if (vShape.w > 0.0) {
+		a *= clamp(0.5 + d + vShape.w, 0.0, 1.0);
+	}
+	c.a *= a;
+	fragColor = c;
+}
+]]
+
+--- A vertex buffer, index buffer and array able to hold `rects` quads.
+local function makeBuffers(rects)
+	local vbo = gl.GetVBO(GL.ARRAY_BUFFER, true)
+	local ibo = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, true)
+	if not vbo or not ibo then
+		return nil
+	end
+	vbo:Define(rects * 4, VERTEX_LAYOUT)
+	ibo:Define(rects * 6, GL.UNSIGNED_INT)
+	local vao = gl.GetVAO()
+	if not vao then
+		vbo:Delete()
+		ibo:Delete()
+		return nil
+	end
+	vao:AttachVertexBuffer(vbo)
+	vao:AttachIndexBuffer(ibo)
+	return vbo, ibo, vao
+end
+
+local function dropBuffers(vbo, ibo, vao)
+	if vao then
+		vao:Delete()
+	end
+	if ibo then
+		ibo:Delete()
+	end
+	if vbo then
+		vbo:Delete()
+	end
+end
+
+local function makeGL()
+	shader = gl.CreateShader({
+		vertex = VERTEX_SHADER,
+		fragment = FRAGMENT_SHADER,
+		uniformInt = { tex = 0, useTex = 0, ground = 0 },
+		uniformFloat = { picRadius = 0 },
+	})
+	if not shader then
+		log(LOG.ERROR, "shader failed: " .. tostring(gl.GetShaderLog()))
+		return false
+	end
+	locProj = gl.GetUniformLocation(shader, "proj")
+	locView = gl.GetUniformLocation(shader, "view")
+	locRect = gl.GetUniformLocation(shader, "rect")
+	locUseTex = gl.GetUniformLocation(shader, "useTex")
+	locPicRadius = gl.GetUniformLocation(shader, "picRadius")
+	locGround = gl.GetUniformLocation(shader, "ground")
+	locBlocked = gl.GetUniformLocation(shader, "blocked")
+
+	quadVBO, quadIBO, quadVAO = makeBuffers(1)
+	if not quadVAO then
+		log(LOG.ERROR, "vertex buffers are not available")
+		return false
+	end
+	TERRAIN, err = include("LuaUI/Widgets/Include/terrain.lua")
+	MODEL, err = include("LuaUI/Widgets/Include/model.lua")
+	
+	local verts, idx = MODEL.pack({ { x = 0, y = 0, w = 1, h = 1, color = { 1, 1, 1, 1 } } })
+	quadVBO:Upload(verts)
+	quadIBO:Upload(idx)
+	
+	return true
+end
+
+local function dropSet(set)
+	dropBuffers(set.vbo, set.ibo, set.vao)
+	set.vbo, set.ibo, set.vao, set.capacity = nil, nil, nil, 0
+end
+
+local function dropGL()
+	dropSet(panelSet)
+	dropSet(groundSet)
+	dropSet(terrainSet)
+	dropSet(terrainBack)
+	dropBuffers(quadVBO, quadIBO, quadVAO)
+	quadVBO, quadIBO, quadVAO = nil, nil, nil
+	if shader then
+		gl.DeleteShader(shader)
+		shader = nil
+	end
+end
+
+--- Upload quads into a buffer set, growing it when it is too small.
+local function upload(set, verts, idx)
+	local quads = #idx / 6
+	if quads == 0 then
+		return 0
+	end
+	if set.capacity < quads then
+		dropBuffers(set.vbo, set.ibo, set.vao)
+		local capacity = math.max(quads, set.capacity * 2, 64)
+		set.vbo, set.ibo, set.vao = makeBuffers(capacity)
+		set.capacity = set.vao and capacity or 0
+		if not set.vao then
+			return 0
+		end
+	end
+	set.vbo:Upload(verts)
+	set.ibo:Upload(idx)
+	return #idx
+end
+
+-- How many numbers go to the engine in one upload of a preview. The largest
+-- example blueprint's 397000 numbers took 7.3 ms in one go (#4811), so a
+-- part takes about 0.15 ms.
+local UPLOAD_NUMBERS = 8192
+
+--- Upload a mesh of triangles and lines, which need fewer vertices for their
+-- indices than the quads upload() is sized for, a part at a time.
+-- @param pause function() called after each part
+-- @return integer how many indices
+local function uploadMesh(set, verts, idx, pause)
+	if #idx == 0 then
+		return 0
+	end
+	local quads = math.max(math.ceil(#verts / 13 / 4), math.ceil(#idx / 6))
+	if set.capacity < quads then
+		dropBuffers(set.vbo, set.ibo, set.vao)
+		local capacity = math.max(quads, set.capacity * 2, 64)
+		set.vbo, set.ibo, set.vao = makeBuffers(capacity)
+		set.capacity = set.vao and capacity or 0
+		if not set.vao then
+			return 0
+		end
+	end
+	local stride = MODEL.STRIDE
+	local part = math.floor(UPLOAD_NUMBERS / stride) * stride
+	for first = 1, #verts, part do
+		set.vbo:Upload(verts, -1, (first - 1) / stride, first, math.min(first + part - 1, #verts))
+		pause()
+	end
+	for first = 1, #idx, UPLOAD_NUMBERS do
+		set.ibo:Upload(idx, -1, first - 1, first, math.min(first + UPLOAD_NUMBERS - 1, #idx))
+		pause()
+	end
+	return #idx
+end
+
+function SetTerraformDraw()
+	previewPause = function () end
+	terrainMesh = TERRAIN.mesh(drawPoint, Spring.GetGroundHeight, previewPause)
+	terrainMesh.indices = uploadMesh(terrainSet, terrainMesh.verts, terrainMesh.idx, previewPause)
 end
 
 --------------------------------------------------------------------------------
@@ -2089,6 +2350,46 @@ function widget:DrawWorld()
 		return
 	end
 	
+	-- The terrain steps: a grid on the ground, then the volumes. Raised ground
+	-- is drawn with the depth test and no depth writes, so it is seen only where
+	-- nothing stands in front of it and never hides a unit. Dug ground is under
+	-- the terrain, so it is drawn through it.
+	if terrainMesh and terrainMesh.indices and terrainMesh.indices > 0 and terrainSet.vao then
+	Spring.Echo(terrainMesh and terrainMesh.indices, terrainSet.vao)
+		local m = terrainMesh
+		local vao = terrainSet.vao
+		local downFaces = m.faces + m.wire
+		local grid = downFaces + m.downFaces + m.downWire
+		gl.UseShader(shader)
+		gl.UniformMatrix(locProj, "projection")
+		gl.UniformMatrix(locView, "view")
+		gl.Uniform(locRect, unpack(UNIT_RECT))
+		gl.UniformInt(locUseTex, 0)
+		gl.UniformInt(locGround, 2)
+		gl.LineWidth(1)
+		if m.grid > 0 then
+			vao:DrawElements(GL.LINES, m.grid, grid)
+		end
+		gl.DepthTest(true)
+		gl.DepthMask(false)
+		if m.faces > 0 then
+			vao:DrawElements(GL.TRIANGLES, m.faces, 0)
+		end
+		if m.wire > 0 then
+			vao:DrawElements(GL.LINES, m.wire, m.faces)
+		end
+		gl.DepthTest(false)
+		if m.downFaces > 0 then
+			vao:DrawElements(GL.TRIANGLES, m.downFaces, downFaces)
+		end
+		if m.downWire > 0 then
+			vao:DrawElements(GL.LINES, m.downWire, downFaces + m.downFaces)
+		end
+		gl.DepthMask(true)
+		gl.UniformInt(locGround, 0)
+		gl.UseShader(0)
+	end
+	
 	--// draw the lines
 	--glLineStipple(2, 4095)
 	glLineWidth(3.0)
@@ -2112,6 +2413,7 @@ function widget:DrawWorld()
 			glBeginEnd(GL_LINE_STRIP, DrawRampMiddleEnd, dis)
 		end
 	else
+		SetTerraformDraw()
 		if setHeight then
 			--glDepthTest(true)
 			glCallList(groundGridDraw)
@@ -2189,8 +2491,20 @@ function widget:DrawScreen()
 end
 
 --------------------------------------------------------------------------------
--- Drawing
+-- Init
 --------------------------------------------------------------------------------
+
+function widget:Initialize()
+	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
+	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
+	WG.Terraform_SetPlacingRectangleCheck = Terraform_SetPlacingRectangleCheck
+	
+	if not makeGL() then
+		--widgetHandler:RemoveWidget(self)
+		--return
+	end
+	
+end
 
 function widget:Shutdown()
 	if (volumeDraw) then

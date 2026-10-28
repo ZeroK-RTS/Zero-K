@@ -800,7 +800,7 @@ local function MakeIconRadioButtonPanel(option)
 		width = "100%",
 		height = 56,
 		backgroundColor = {0, 0, 0, 0},
-		padding = {0, 0, 0, 0},
+		padding = {2, 0, 0, 0},
 		margin = {0, 0, 0, 0},
 		autosize = false,
 	}
@@ -831,7 +831,7 @@ local function MakeIconRadioButtonPanel(option)
 	local x = 0
 	for i = 1, #option.items do
 		local item = option.items[i]
-		local width = item.icon and 44 or 62
+		local width = item.icon and 40 or 62
 		local button = Button:New{
 			x = x,
 			y = 17,
