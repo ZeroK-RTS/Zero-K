@@ -23,7 +23,7 @@ end
 
 options_path = 'Settings/Graphics/Map/Metal Territories'
 -- Headings are labels; a radio button's name is one too.
-options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'reach', 'borders', 'borderWidth', 'borderGap',
+options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'reach', 'reachBorder', 'borders', 'borderWidth', 'borderGap',
 	'hatchingHeading', 'hatching', 'hatchWidth', 'hatchSpacing', 'hatchAngle', 'hatchFade', 'tintHeading', 'tint', 'tintOpacity', 'tintFade',
 	'minimapHeading', 'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'minimapTintFade', 'minimapNeutral',
 	'minimapNeutralOpacity', 'allies', 'allyColor', 'enemies', 'enemyColor',
@@ -117,12 +117,19 @@ options = {
 	},
 	reach = {
 		name = 'Territory reach',
-		desc = 'In elmos. Farther than this from the metal spots, territories fade out over 256 elmos, so they do not cover parts of the map with no metal.',
+		desc = 'In elmos. Farther than this from the metal spots, territories fade out over 256 elmos, or end with Border at territory reach, so they do not cover parts of the map with no metal.',
 		type = 'number',
 		value = 2048,
 		min = 512,
 		max = 8192,
 		step = 64,
+	},
+	reachBorder = {
+		name = 'Border at territory reach',
+		desc = 'End territories at Territory reach instead of fading them out beyond it. With Borders on, a border is drawn there as between territories.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
 	},
 	hatchingHeading = {
 		name = 'Hatching',
@@ -366,7 +373,7 @@ local mergePasses, fieldOn, updateMode = 0, false, nil
 local paintShader, cellShader, stateShader, drawShader, minimapShader, groupShader, seedShader, jumpShader, fieldShader, quad
 local stateFullView, drawOpacity, drawBorders, drawInverse, drawView, minimapOpacity, minimapBorders
 local drawBorder, drawRing, drawTint, drawStripes, drawHatching, drawField, drawReach, minimapTint, minimapLine, minimapField, minimapReach
-local seedBorders, jumpStep, drawGround, minimapGround
+local seedBorders, jumpStep, drawGround, minimapGround, drawReachBorder, minimapReachBorder
 local viewX, viewY, viewW, viewH
 local depthFBO
 local borderModes = {off = 0, all = 1, owners = 2}
@@ -581,7 +588,8 @@ void main() {
 -- when merged. With borders off every other edge counts, so the tint still
 -- fades from it. The texel's two nearest edges give the distance near them;
 -- the distance map, when on, gives it farther away. The opacity fades out
--- beyond the reach from the spot and the spots across those two edges.
+-- beyond the reach from the spot and the spots across those two edges, or,
+-- with a border at the reach, the territory ends there at an edge.
 local territorySource = [[
 uniform sampler2D atlas;
 uniform sampler2D owners;
@@ -594,6 +602,7 @@ uniform vec2 mapSize;
 uniform int borderMode; // 0 off, 1 every territory, 2 between different owners
 uniform int useField;
 uniform vec2 reach; // the distance from the metal spots where territories start to fade out, and 1/the fade distance
+uniform vec2 reachBorder; // 1 to end territories at the reach instead, and how far in pixels beyond it they are drawn
 uniform int opacityChannel; // the owners' opacity on the map (0) or on the minimap (1)
 ]] .. edgeDistanceSource .. shownSource .. [[
 bool Joined(int spot, int other) {
@@ -644,6 +653,12 @@ vec4 Territory(vec2 pos, out int spot, out float edge, out float mex) {
 		}
 	}
 	float fade = 1.0 - smoothstep(0.0, 1.0, (nearest - reach.x)*reach.y);
+	if (reachBorder.x != 0.0) {
+		// The minimap draws half of its line beyond the edge, as between territories.
+		float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
+		edge = min(edge, reach.x - nearest);
+		fade = smoothstep(-px, px, reach.x - nearest + reachBorder.y*px);
+	}
 	return vec4(color.rgb, fade * texelFetch(palette, ivec2(owner, 1), 0)[opacityChannel]);
 }
 ]]
@@ -1177,6 +1192,8 @@ function widget:Initialize()
 	minimapField = gl.GetUniformLocation(minimapShader, 'useField')
 	drawReach = gl.GetUniformLocation(drawShader, 'reach')
 	minimapReach = gl.GetUniformLocation(minimapShader, 'reach')
+	drawReachBorder = gl.GetUniformLocation(drawShader, 'reachBorder')
+	minimapReachBorder = gl.GetUniformLocation(minimapShader, 'reachBorder')
 	drawGround = gl.GetUniformLocation(drawShader, 'brightGround')
 	minimapGround = gl.GetUniformLocation(minimapShader, 'brightGround')
 	seedBorders = gl.GetUniformLocation(seedShader, 'borderMode')
@@ -1361,6 +1378,7 @@ function widget:DrawWorldPreUnit()
 			gl.UniformInt(drawBorders, borderMode)
 			gl.UniformInt(drawField, fieldOn and 1 or 0)
 			gl.Uniform(drawReach, options.reach.value, 1/reachFade)
+			gl.Uniform(drawReachBorder, options.reachBorder.value and 1 or 0, 0)
 			local borderWidth, gap = options.borderWidth.value, options.borderGap.value
 			gl.Uniform(drawBorder, gap, gap + borderWidth)
 			gl.Uniform(drawRing, ringRadius, ringRadius + borderWidth, options.hatchFade.value/hatchFade)
@@ -1394,9 +1412,11 @@ function widget:DrawInMiniMapBackground(sx, sy)
 	gl.Texture(9, '$shading')
 	gl.UseShader(minimapShader)
 	gl.Uniform(minimapOpacity, options.opacity.value)
-	gl.UniformInt(minimapBorders, borderModes[options.borders.value])
+	local borderMode = borderModes[options.borders.value]
+	gl.UniformInt(minimapBorders, borderMode)
 	gl.UniformInt(minimapField, fieldOn and 1 or 0)
 	gl.Uniform(minimapReach, options.reach.value, 1/reachFade)
+	gl.Uniform(minimapReachBorder, options.reachBorder.value and 1 or 0, borderMode ~= 0 and 0.5*options.minimapBorderWidth.value or 0)
 	SetTint(minimapTint, options.minimapTintOpacity.value, options.minimapTintFade.value)
 	gl.Uniform(minimapLine, options.minimapBorderWidth.value)
 	gl.Uniform(minimapGround, options.brightGround.value)
