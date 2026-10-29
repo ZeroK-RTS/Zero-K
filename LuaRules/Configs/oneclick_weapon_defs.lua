@@ -21,6 +21,9 @@ local oneClickWepDefNames = {
 	shieldbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
+	strideremp = {
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Deploy and release an EMP pulse. Cannot be cancelled once started.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+	},
 	jumpbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},

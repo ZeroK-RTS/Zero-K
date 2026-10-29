@@ -15,6 +15,7 @@ return { striderhub = {
     [[striderdante]],
     [[striderarty]],
     [[striderfunnelweb]],
+    [[strideremp]],
     [[striderbantha]],
     [[striderdetriment]],
     [[shipheavyarty]],
