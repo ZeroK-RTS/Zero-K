@@ -296,9 +296,7 @@ function StaticParticles:CreateParticle()
 end
 
 function StaticParticles:Destroy()
-	for _,part in ipairs(self.particles) do
-		gl.DeleteList(part.dlist)
-	end
+	gl.DeleteList(self.dlist)
 	--gl.DeleteTexture(self.texture)
 end
 
