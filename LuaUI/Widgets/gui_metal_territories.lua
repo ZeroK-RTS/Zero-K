@@ -1380,8 +1380,8 @@ function widget:DrawWorldPreUnit()
 end
 
 -- Drawn into the minimap's texture before the world, with the textures of the
--- last world draw.
-function widget:DrawInMiniMap(sx, sy)
+-- last world draw, under the unit icons.
+function widget:DrawInMiniMapBackground(sx, sy)
 	if not options.minimap.value or not palette then return end
 	gl.Texture(1, atlas)
 	gl.Texture(2, history)
