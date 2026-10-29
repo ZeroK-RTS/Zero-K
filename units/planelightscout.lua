@@ -21,7 +21,7 @@ return { planelightscout = {
     bait_level_target      = 2,
 
     boost_speed_mult = 5,
-    boost_accel_mult = 2,
+    boost_accel_mult = 5, -- same as boost_speed_mult: the value in effect since 2024-09 (2 was not applied)
     boost_duration   = 90,
     boost_detonate   = 1,
 
