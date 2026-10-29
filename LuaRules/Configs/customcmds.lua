@@ -33,6 +33,7 @@ local commands = {
 	GLOBAL_BUILD = 13925, -- global build command state toggle command
 	GBCANCEL = 13926, -- global build command area cancel cmd
 	STOP_PRODUCTION = 13954,
+	COPY_QUEUE = 13955,
 	SELECTION_RANK = 13987,
 	FORMATION_RANK = 13988,
 	SELECT_MISSILES = 14001,

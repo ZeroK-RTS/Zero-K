@@ -39,6 +39,7 @@ local cmdPosDef = {
 	[CMD_ABANDON_PW]      = {pos = 7, priority = 0.3},
 	[CMD_GBCANCEL]        = {pos = 7, priority = 0.4},
 	[CMD_STOP_PRODUCTION] = {pos = 7, priority = 0.7},
+	[CMD_COPY_QUEUE]      = {pos = 7, priority = 0.75},
 	
 	[CMD_BUILD]         = {pos = 7, priority = 0.8},
 	[CMD_AREA_MEX]      = {pos = 7, priority = 1},
