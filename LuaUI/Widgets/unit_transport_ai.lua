@@ -766,6 +766,10 @@ function CanTransport(transportID, unitID)
 		return false
 	end
 
+	if UnitDefs[tdef].customParams.islighttransport and UnitDefs[udef].customParams.requireheavytrans then
+		return false
+	end
+
 	if (UnitDefs[udef].xsize > UnitDefs[tdef].transportSize * 2) then	-- unit size check
 --		spEcho ("size failed")
 		return false
