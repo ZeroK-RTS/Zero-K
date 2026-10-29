@@ -112,7 +112,7 @@ local custom_cmd_actions = {
 	dontfireatradar =   {cmdType = 2, cmdID = CMD_DONT_FIRE_AT_RADAR, name = "Firing at Radar Dots", states = {'Off', 'On'}},
 	antinukezone =      {cmdType = 2, name = "Ceasefire Antinuke Zone", states = {'Off', 'On'}},
 	unitai =            {cmdType = 2, cmdID = CMD_UNIT_AI, name = "Unit AI", states = {'Off', 'On'}},
-	loopattack =        {cmdType = 2, cmdID = CMD_LOOP_ATTACK, name = "Attack Style", states = {'Strafe', 'Loopback'}},
+	loopattack =        {cmdType = 2, cmdID = CMD_LOOP_ATTACK, name = "Attack Style", states = {'Strafe', 'Loopback', 'Manual'}},
 	selection_rank =    {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
 	formation_rank =    {cmdType = 2, name = "Formation Rank", states = {'0', '1', '2', '3'}},
 	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
