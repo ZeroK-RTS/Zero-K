@@ -100,6 +100,7 @@ local commandDisplayConfig = {
 	[CMD_PLACE_BEACON] = {texture = imageDir .. 'Bold/drop_beacon.png'},
 	[CMD_UPGRADE_STOP] = { texture = imageDir .. 'Bold/cancelupgrade.png'},
 	[CMD_STOP_PRODUCTION] = { texture = imageDir .. 'Bold/stopbuild.png'},
+	[CMD_COPY_QUEUE] = { texture = imageDir .. 'Bold/fac_select.png', tooltip = "Copy Factory Queue: Copy the build queue and repeat state of one of your factories or plates of the same type. Hold Shift to append."},
 	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
 
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},

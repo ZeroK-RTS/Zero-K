@@ -15,6 +15,7 @@ local configList = {
 	{cmdID = CMD_RAW_MOVE              , default = true, name = "Move"},
 	{cmdID = CMD.STOP                  , default = true, name = "Stop"},
 	{cmdID = CMD_STOP_PRODUCTION       , default = true, name = "Stop Production"},
+	{cmdID = CMD_COPY_QUEUE            , default = true, name = "Copy Factory Queue"},
 	{cmdID = CMD.PATROL                , default = true, name = "Patrol"},
 	{cmdID = CMD_RECALL_DRONES         , default = true, name = "Recall Drones"},
 	{cmdID = CMD.RECLAIM               , default = true, name = "Reclaim"},
