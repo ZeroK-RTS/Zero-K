@@ -166,7 +166,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 			coded = coded - CMD.OPT_CTRL
 		elseif id == CMD.RESURRECT then
 			if ctrl then
-				coded = coded - CMD.OPT_CTRL - CMD.OPT.META
+				coded = coded - CMD.OPT_CTRL - CMD.OPT_META
 			else
 				coded = coded
 			end
