@@ -43,6 +43,7 @@ local spMoveCtrlGetTag     = Spring.MoveCtrl.GetTag
 local spSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spGetUnitVelocity    = Spring.GetUnitVelocity
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 
 local vecAngle  = Spring.Utilities.Vector.Angle
 local vecAbsVal = Spring.Utilities.Vector.AbsVal
@@ -88,9 +89,18 @@ local function ResetExtendTurnRadius(unitID, unitDefID, cmdID)
 	allowedCommandFrame[unitID] = gameFrame + COMMAND_LEEWAY
 end
 
+function GG.ResetExtendedTurnRadius(unitID, unitDefID)
+	if extendRadiusUnitDefs[unitDefID] then
+		ResetExtendTurnRadius(unitID, unitDefID)
+	end
+end
+
 function GG.PossiblySetExtendedTurnRadius(unitID, unitDefID)
 	if (allowedCommandFrame[unitID] or 0) > gameFrame then
 		return
+	end
+	if spGetUnitRulesParam(unitID, "manualFlight") == 1 then
+		return -- Set by the Manual attack style of the tactical AI
 	end
 	if not spMoveCtrlGetTag(unitID) and not turnRadiusExtended[unitID] then
 		local attribute = {

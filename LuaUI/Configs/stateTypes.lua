@@ -32,7 +32,7 @@ local stateData = {
 	[SUC.FIRE_TOWARDS_ENEMY] = 2,
 	--[SUC.SELECTION_RANK] = 2, -- Handled entirely in luaUI so not included here.
 	[SUC.UNIT_AI] = 2,
-	[SUC.LOOP_ATTACK] = 2,
+	[SUC.LOOP_ATTACK] = 3, -- Only Magpie has the third (Manual) state
 }
 
 local specialToggleHandling = {
