@@ -99,7 +99,8 @@ end
 
 
 function widget:DrawScreen()
-  if (Spring.GetHasLag())and(Spring.GetGameFrame()>1) then
+  local _, _, _, isSimLagging = Spring.GetGameState()
+  if isSimLagging and (Spring.GetGameFrame()>1) then
     dc_timer = 5
   end
     
