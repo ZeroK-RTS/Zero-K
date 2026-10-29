@@ -25,8 +25,9 @@ options_path = 'Settings/Graphics/Map/Metal Territories'
 -- Headings are labels; a radio button's name is one too.
 options_order = {'opacity', 'allyOpacity', 'enemyOpacity', 'neutralOpacity', 'reach', 'borders', 'borderWidth', 'borderGap',
 	'hatchingHeading', 'hatching', 'hatchWidth', 'hatchSpacing', 'hatchAngle', 'hatchFade', 'tintHeading', 'tint', 'tintOpacity', 'tintFade',
-	'minimapHeading', 'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'minimapTintFade', 'allies', 'allyColor', 'enemies', 'enemyColor',
-	'neutralHeading', 'neutralColor', 'additionalHeading', 'smoothFades', 'merge', 'mergeDistance',
+	'minimapHeading', 'minimap', 'minimapBorderWidth', 'minimapTintOpacity', 'minimapTintFade', 'minimapNeutral',
+	'minimapNeutralOpacity', 'allies', 'allyColor', 'enemies', 'enemyColor',
+	'neutralHeading', 'neutralColor', 'additionalHeading', 'smoothFades', 'brightGround', 'merge', 'mergeDistance',
 	'zoomFade', 'zoomFadeOpacity', 'zoomFadeNear', 'zoomFadeFar'}
 options = {
 	opacity = {
@@ -207,6 +208,15 @@ options = {
 		noHotkey = true,
 		OnChange = UpdateNow,
 	},
+	brightGround = {
+		name = 'Bright ground compensation',
+		desc = 'Where the lit ground is bright, as on the minimap, territories are drawn darker and more opaque, so they stay visible on light maps. Dark ground is unchanged. 0 turns it off.',
+		type = 'number',
+		value = 0.5,
+		min = 0,
+		max = 1,
+		step = 0.05,
+	},
 	minimapHeading = {
 		name = 'Minimap',
 		type = 'label',
@@ -241,6 +251,24 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+	},
+	minimapNeutral = {
+		name = 'Minimap neutral territories',
+		desc = 'Show territories with no known mex on the minimap.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = RepaintPalette,
+	},
+	minimapNeutralOpacity = {
+		name = 'Minimap neutral opacity',
+		desc = 'Neutral territories on the minimap, as a fraction of Opacity: at 0.6 they are drawn at 60% of it.',
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 1,
+		step = 0.05,
+		OnChange = RepaintPalette,
 	},
 	allies = {
 		name = 'Allied territories',
@@ -296,7 +324,7 @@ options = {
 		name = 'Fade out while zoomed',
 		desc = 'Zoomed in, territories fade out to Zoomed in opacity. Zooming out brings them back, to full opacity at Upper zoom limit. The minimap does not fade.',
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 	},
 	zoomFadeOpacity = {
@@ -338,7 +366,7 @@ local mergePasses, fieldOn, updateMode = 0, false, nil
 local paintShader, cellShader, stateShader, drawShader, minimapShader, groupShader, seedShader, jumpShader, fieldShader, quad
 local stateFullView, drawOpacity, drawBorders, drawInverse, drawView, minimapOpacity, minimapBorders
 local drawBorder, drawRing, drawTint, drawStripes, drawHatching, drawField, drawReach, minimapTint, minimapLine, minimapField, minimapReach
-local seedBorders, jumpStep
+local seedBorders, jumpStep, drawGround, minimapGround
 local viewX, viewY, viewW, viewH
 local depthFBO
 local borderModes = {off = 0, all = 1, owners = 2}
@@ -566,6 +594,7 @@ uniform vec2 mapSize;
 uniform int borderMode; // 0 off, 1 every territory, 2 between different owners
 uniform int useField;
 uniform vec2 reach; // the distance from the metal spots where territories start to fade out, and 1/the fade distance
+uniform int opacityChannel; // the owners' opacity on the map (0) or on the minimap (1)
 ]] .. edgeDistanceSource .. shownSource .. [[
 bool Joined(int spot, int other) {
 	if (borderMode == 2) return Shown(other) == Shown(spot);
@@ -615,7 +644,7 @@ vec4 Territory(vec2 pos, out int spot, out float edge, out float mex) {
 		}
 	}
 	float fade = 1.0 - smoothstep(0.0, 1.0, (nearest - reach.x)*reach.y);
-	return vec4(color.rgb, fade * texelFetch(palette, ivec2(owner, 1), 0).r);
+	return vec4(color.rgb, fade * texelFetch(palette, ivec2(owner, 1), 0)[opacityChannel]);
 }
 ]]
 -- Merged territories: each pass gives a spot the lowest group of itself and its
@@ -707,6 +736,20 @@ void main() {
 	result = vec4(d, 0.0, 0.0, 1.0);
 }
 ]]
+-- Bright ground compensation: where the lit ground is bright, a darker colour
+-- that is more opaque, for contrast. The ground is the map's minimap image times
+-- its lighting, as the minimap draws it. Dark ground is unchanged.
+local groundSource = [[
+uniform sampler2D ground;
+uniform sampler2D shading;
+uniform float brightGround; // 0 off, 1 the strongest
+vec4 OnGround(vec4 color, vec2 pos) {
+	if (brightGround <= 0.0) return color;
+	vec3 lit = texture(shading, pos / mapSize).rgb * texture(ground, pos / mapSize).rgb;
+	float k = brightGround * smoothstep(0.25, 0.5, dot(lit, vec3(0.299, 0.587, 0.114)));
+	return vec4(color.rgb * (1.0 - 0.6*k), min(color.a * (1.0 + 1.5*k), 1.0));
+}
+]]
 local drawSource = [[
 #version 420 compatibility
 uniform sampler2D depthTex;
@@ -720,7 +763,7 @@ uniform float hatching; // 1 draws the hatching, 0 hides it
 uniform float opacity;
 uniform int clipZeroToOne;
 out vec4 result;
-]] .. territorySource .. [[
+]] .. territorySource .. groundSource .. [[
 void main() {
 	vec2 uv = (gl_FragCoord.xy - view.zw) / view.xy;
 	float d = texture(depthTex, uv).r;
@@ -753,7 +796,7 @@ void main() {
 	float near = max(lines * outer * (1.0 - smoothstep(0.0, 1.0, (fade - border.y)*ring.z)),
 		ringOuter * (1.0 - smoothstep(0.0, 1.0, (r - ring.y)*ring.z)));
 	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, min(fade - border.y, r - ring.y)*tint.z));
-	result = vec4(color.rgb, opacity * color.a * inner * max(line, max(hatching * near * hatch, shade)));
+	result = OnGround(vec4(color.rgb, opacity * color.a * inner * max(line, max(hatching * near * hatch, shade))), pos);
 }
 ]]
 -- The minimap: the tint and borders as lines of a width in pixels, half on each side.
@@ -773,7 +816,7 @@ uniform float lineWidth; // in pixels
 uniform float opacity;
 in vec2 pos;
 out vec4 result;
-]] .. territorySource .. [[
+]] .. territorySource .. groundSource .. [[
 void main() {
 	int spot;
 	float edge, mex;
@@ -781,7 +824,7 @@ void main() {
 	float px = max(max(fwidth(pos.x), fwidth(pos.y)), 0.001);
 	float line = (borderMode != 0 ? 1.0 : 0.0) * (1.0 - smoothstep((0.5*lineWidth - 0.5)*px, (0.5*lineWidth + 0.5)*px, edge));
 	float shade = mix(tint.x, tint.y, smoothstep(0.0, 1.0, FadeDistance(pos, edge)*tint.z));
-	result = vec4(color.rgb, opacity * color.a * max(line, shade));
+	result = OnGround(vec4(color.rgb, opacity * color.a * max(line, shade)), pos);
 }
 ]]
 
@@ -884,7 +927,9 @@ end
 local function UpdatePalette()
 	local neutral = options.neutralColor.value
 	local teams, first, colors = Spring.GetTeamList(), {}, {[1] = {neutral[1], neutral[2], neutral[3], 0}}
-	local opacities = {[1] = {options.neutralOpacity.value, 0, 0, 0}}
+	-- Red is the opacity on the map, green on the minimap.
+	local minimapNeutral = options.minimapNeutral.value and options.minimapNeutralOpacity.value or 0
+	local opacities = {[1] = {options.neutralOpacity.value, minimapNeutral, 0, 0}}
 	for _, teamID in ipairs(teams) do
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		first[ally] = min(first[ally] or teamID, teamID)
@@ -905,7 +950,7 @@ local function UpdatePalette()
 		colors[teamID + 2] = mode == 'custom' and {custom[1], custom[2], custom[3]} or {Spring.GetTeamColor(colorTeam)}
 		-- Alpha is the shown owner: neutral 0, otherwise the colour team + 1.
 		colors[teamID + 2][4] = colorTeam + 1
-		opacities[teamID + 2] = {opacity, 0, 0, 0}
+		opacities[teamID + 2] = {opacity, opacity, 0, 0}
 		width = max(width, teamID + 2)
 	end
 	if palette then gl.DeleteTexture(palette) end
@@ -1084,11 +1129,12 @@ function widget:Initialize()
 	})
 	drawShader = gl.CreateShader({vertex = vertexSource, fragment = drawSource,
 		uniformInt = {depthTex = 0, atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5, groups = 6, field = 7,
-			clipZeroToOne = Platform.glSupportClipSpaceControl and 1 or 0},
+			ground = 8, shading = 9, clipZeroToOne = Platform.glSupportClipSpaceControl and 1 or 0},
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	minimapShader = gl.CreateShader({vertex = minimapVertexSource, fragment = minimapSource,
-		uniformInt = {atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5, groups = 6, field = 7},
+		uniformInt = {atlas = 1, owners = 2, palette = 3, edges = 4, positions = 5, groups = 6, field = 7, ground = 8,
+			shading = 9, opacityChannel = 1},
 		uniform = {mapSize = {Game.mapSizeX, Game.mapSizeZ}},
 	})
 	groupShader = gl.CreateShader({vertex = vertexSource, fragment = groupSource,
@@ -1131,6 +1177,8 @@ function widget:Initialize()
 	minimapField = gl.GetUniformLocation(minimapShader, 'useField')
 	drawReach = gl.GetUniformLocation(drawShader, 'reach')
 	minimapReach = gl.GetUniformLocation(minimapShader, 'reach')
+	drawGround = gl.GetUniformLocation(drawShader, 'brightGround')
+	minimapGround = gl.GetUniformLocation(minimapShader, 'brightGround')
 	seedBorders = gl.GetUniformLocation(seedShader, 'borderMode')
 	jumpStep = gl.GetUniformLocation(jumpShader, 'step')
 	quad = gl.CreateList(function() gl.TexRect(-1, -1, 1, 1) end)
@@ -1304,6 +1352,8 @@ function widget:DrawWorldPreUnit()
 			gl.Texture(5, positions)
 			gl.Texture(6, shownGroups)
 			gl.Texture(7, field)
+			gl.Texture(8, '$minimap')
+			gl.Texture(9, '$shading')
 			gl.UseShader(drawShader)
 			gl.UniformMatrix(drawInverse, 'viewprojectioninverse')
 			gl.Uniform(drawView, viewW, viewH, viewX, viewY)
@@ -1319,12 +1369,13 @@ function widget:DrawWorldPreUnit()
 			local spacing, angle = options.hatchSpacing.value, math.rad(options.hatchAngle.value)
 			gl.Uniform(drawStripes, math.sin(angle)/spacing, math.cos(angle)/spacing, 0.5*options.hatchWidth.value/spacing)
 			gl.Uniform(drawHatching, options.hatching.value and 1 or 0)
+			gl.Uniform(drawGround, options.brightGround.value)
 			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 			gl.CallList(quad)
 			gl.UseShader(0)
 		end
 	end
-	for i = 7, 0, -1 do gl.Texture(i, false) end
+	for i = 9, 0, -1 do gl.Texture(i, false) end
 	gl.PopAttrib()
 end
 
@@ -1339,6 +1390,8 @@ function widget:DrawInMiniMap(sx, sy)
 	gl.Texture(5, positions)
 	gl.Texture(6, shownGroups)
 	gl.Texture(7, field)
+	gl.Texture(8, '$minimap')
+	gl.Texture(9, '$shading')
 	gl.UseShader(minimapShader)
 	gl.Uniform(minimapOpacity, options.opacity.value)
 	gl.UniformInt(minimapBorders, borderModes[options.borders.value])
@@ -1346,11 +1399,12 @@ function widget:DrawInMiniMap(sx, sy)
 	gl.Uniform(minimapReach, options.reach.value, 1/reachFade)
 	SetTint(minimapTint, options.minimapTintOpacity.value, options.minimapTintFade.value)
 	gl.Uniform(minimapLine, options.minimapBorderWidth.value)
+	gl.Uniform(minimapGround, options.brightGround.value)
 	-- The map's top left corner is at the minimap's top left, or bottom right when flipped.
 	local flipped = Spring.Utilities.IsMinimapFlipped()
 	gl.TexRect(0, 0, sx, sy, flipped, flipped)
 	gl.UseShader(0)
-	for i = 7, 1, -1 do gl.Texture(i, false) end
+	for i = 9, 1, -1 do gl.Texture(i, false) end
 end
 
 function widget:Shutdown()
