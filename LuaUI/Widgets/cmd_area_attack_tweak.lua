@@ -86,7 +86,7 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 			targetUnits = Spring.GetUnitsInCylinder(cx, cz, cr)
 		end
 		local antiAirUnits,normalUnits = GetAAUnitList(units)
-		local airTargets, allTargets = ReturnAllAirTarget(targetUnits, Spring.GetUnitAllyTeam(units[1]),(#antiAirUnits>1)) -- get all air target for selected area-command
+		local airTargets, allTargets = ReturnAllAirTarget(targetUnits, Spring.GetUnitAllyTeam(units[1]), (#antiAirUnits >= 1)) -- get all air target for selected area-command
 		if #allTargets>0 then --skip if no target
 			return ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,id,options)
 		end
