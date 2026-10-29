@@ -10,6 +10,7 @@ local tooltips = {
 	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
 	LOOP_ATTACK = "Attack Style (_STATE_)\n  Dive or stay at range. Attack Move is required for Loopback for planes set to Hold Position.",
+	LOOP_ATTACK_MANUAL = "Attack Style (Manual)\n Unit AI off. Planes will circle as close to the target as possible. ",
 	FIRE_AT_SHIELD = "Fire at Shields (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 	FIRE_TOWARDS_ENEMY = "Fire Towards Enemies (_STATE_)\n  Shoot towards enemies when there are no other targets.",
 	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
@@ -119,8 +120,8 @@ local commandDisplayConfig = {
 		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
 	},
 	[CMD_LOOP_ATTACK] = {
-		texture = {imageDir .. 'states/plane_strafe_on.png', imageDir .. 'states/plane_strafe_off.png'},
-		stateTooltip = {tooltips.LOOP_ATTACK:gsub("_STATE_", "Strafe"), tooltips.LOOP_ATTACK:gsub("_STATE_", "Loopback")},
+		texture = {imageDir .. 'states/plane_strafe_on.png', imageDir .. 'states/plane_strafe_off.png', imageDir .. 'states/bulb_off.png'},
+		stateTooltip = {tooltips.LOOP_ATTACK:gsub("_STATE_", "Strafe"), tooltips.LOOP_ATTACK:gsub("_STATE_", "Loopback"), tooltips.LOOP_ATTACK_MANUAL},
 	},
 	[CMD_FIRE_TOWARDS_ENEMY] = {
 		texture = {imageDir .. 'states/shoot_towards_off.png', imageDir .. 'states/shoot_towards_on.png'},

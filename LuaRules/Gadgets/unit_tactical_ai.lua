@@ -125,7 +125,21 @@ local commandTypes = {
 			params  = {0, 'Strafe', 'Loopback'}
 		}
 	},
+	-- Manual hands the unit entirely to the player: no AI orders, idle returns or turn radius extension.
+	loopAttackManual = {
+		cmdID = CMD_LOOP_ATTACK,
+		desc = {
+			id      = CMD_LOOP_ATTACK,
+			type    = CMDTYPE.ICON_MODE,
+			name    = 'Loopback attack',
+			action  = 'loopattack',
+			tooltip = 'Toggles whether the unit strafes, loops or is flown manually',
+			params  = {0, 'Strafe', 'Loopback', 'Manual'}
+		}
+	},
 }
+
+local MANUAL_STATE = 2
 
 local stateCommands = include("LuaRules/Configs/state_commands.lua")
 
@@ -944,7 +958,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	unitData.lastUpdate = frame
 	
 	local exitEarly = GetAiExitEarly(unitID, unitData)
-	if exitEarly and not slowUpdate then
+	if exitEarly and (unitData.manual or not slowUpdate) then
 		return
 	end
 	
@@ -1138,6 +1152,9 @@ local function AddIdleUnit(unitID, unitDefID)
 		return
 	end
 	local unitData = unit[unitID]
+	if unitData.manual then
+		return
+	end
 	unitData.wasIdle = true
 	
 	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
@@ -1217,9 +1234,10 @@ end
 
 local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 	if unit[unitID] or externallyHandledUnit[unitID] then
-		local state = cmdParams[1]
 		local toggleName = (unit[unitID] and unit[unitID].udID and unitAIBehaviour[unit[unitID].udID] and unitAIBehaviour[unit[unitID].udID].alternateStateToggle) or "default"
 		local commandType = commandTypes[toggleName]
+		-- Wrap states this unit lacks, such as Manual sent to a mixed selection of planes.
+		local state = (cmdParams[1] or 0) % (#commandType.desc.params - 1)
 		local cmdDescID = spFindUnitCmdDesc(unitID, commandType.cmdID)
 		
 		if (cmdDescID) then
@@ -1228,7 +1246,24 @@ local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 			if externallyHandledUnit[unitID] then
 				Spring.SetUnitRulesParam(unitID, "tacticalAi_external", state, ALLY_TABLE)
 			else
-				unit[unitID].active = (state == 1)
+				local unitData = unit[unitID]
+				unitData.active = (state == 1)
+				local manual = (state == MANUAL_STATE)
+				if manual ~= (unitData.manual or false) then
+					unitData.manual = manual
+					Spring.SetUnitRulesParam(unitID, "manualFlight", manual and 1 or 0, ALLY_TABLE)
+					if manual then
+						-- Forget idle positions so leaving Manual does not fly the unit back to them.
+						unitData.wasIdle = false
+						unitData.idleWantReturn = nil
+						unitData.setReturn = nil
+						unitData.queueReturnX = nil
+						unitData.queueReturnZ = nil
+						if GG.ResetExtendedTurnRadius then
+							GG.ResetExtendedTurnRadius(unitID, unitData.udID)
+						end
+					end
+				end
 			end
 		end
 	end

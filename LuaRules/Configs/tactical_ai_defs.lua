@@ -1998,7 +1998,7 @@ local behaviourConfig = {
 	},
 	{
 		name = "planesupport",
-		alternateStateToggle = "loopAttack",
+		alternateStateToggle = "loopAttackManual",
 		defaultAIState = 0,
 		skirmEverything = true,
 		skirmRadar = true,

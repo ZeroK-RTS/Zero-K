@@ -129,6 +129,11 @@ local tooltips = {
 		[0] = "Disabled.",
 		[1] = "Shoot towards the closest enemy when nothing else is in range.",
 	},
+	loop_attack = {
+		[0] = "Strafe: dive through targets.",
+		[1] = "Loopback: stay at range and loop around targets.",
+		[2] = "Manual: Unit AI off. Planes will circle as close to the target as possible.",
+	},
 }
 
 for name, values in pairs(tooltips) do
@@ -167,6 +172,8 @@ local stateItems = {
 	priority = StateItems({"wrench_low.png", "wrench_med.png", "wrench_high.png"}, tooltips.priority),
 	misc_priority = StateItems({"wrench_low_other.png", "wrench_med_other.png", "wrench_high_other.png"}, tooltips.priority),
 	retreat = StateItems({"retreat_off.png", "retreat_30.png", "retreat_60.png", "retreat_90.png"}, tooltips.retreat),
+	loop_attack = StateItems({"plane_strafe_on.png", "plane_strafe_off.png"}, tooltips.loop_attack),
+	loop_attack_manual = StateItems({"plane_strafe_on.png", "plane_strafe_off.png", "bulb_off.png"}, tooltips.loop_attack),
 	selectionrank = StateItems(
 		{"selection_rank_0.png", "selection_rank_1.png", "selection_rank_2.png", "selection_rank_3.png"},
 		{[0] = "Selection rank 0", [1] = "Selection rank 1", [2] = "Selection rank 2", [3] = "Selection rank 3"}
@@ -721,8 +728,10 @@ do
 			local unitDefName = unitDefID and UnitDefs[unitDefID]
 			unitDefName = unitDefName and unitDefName.name
 			if unitDefName then
+				local defaultState = behaviourData.defaultAIState or behaviourDefaults.defaultState
 				tacticalAIUnits[unitDefName] = {
-					value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1,
+					value = defaultState == 1,
+					state = defaultState,
 					commandType = behaviourData.alternateStateToggle or "default",
 				}
 			end
@@ -1011,12 +1020,15 @@ local function addUnit(defName, path)
 				path = path,
 			}
 			options_order[#options_order+1] = defName .. "_tactical_ai_2"
-		elseif tacticalAIUnits[defName].commandType == "loopback_attack" then
+		elseif tacticalAIUnits[defName].commandType == "loopAttack" or tacticalAIUnits[defName].commandType == "loopAttackManual" then
+			local hasManual = (tacticalAIUnits[defName].commandType == "loopAttackManual")
 			options[defName .. "_loop_attack"] = {
-				name = "  Attack Style: check the box to have the plane loop attack and uncheck for strafe.",
-				type = 'bool',
-				value = planeStandoffUnits[defName].value,
+				name = "  Attack Style",
+				desc = hasManual and "Values: strafe, loopback, manual" or "Values: strafe, loopback",
+				type = 'iconButtonRow',
+				value = tacticalAIUnits[defName].state,
 				path = path,
+				items = hasManual and stateItems.loop_attack_manual or stateItems.loop_attack,
 			}
 			options_order[#options_order+1] = defName .. "_loop_attack"
 		end
