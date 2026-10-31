@@ -22,7 +22,7 @@ layout (lines, invocations = 5) in;
 // per-vertex cableTangent varying is included (46 × 22 = 1012 ≤ 1024). The
 // tent-slope invocations use the full 46 (= 23 boundaries × 2); twig
 // invocations use 3.
-layout (triangle_strip, max_vertices = 23) out;	//previously 46, reduction for RDNA2 compatibility
+layout (triangle_strip, max_vertices = 27) out;	//previously 46, reduction for RDNA2 compatibility
 
 uniform sampler2D heightmapTex;
 uniform sampler2D infoTex;          // $info:los; same texture FS samples
@@ -140,7 +140,7 @@ float gsValueNoise2(vec2 w, float seed) {
 	return mix(mix(n00, n10, u.x), mix(n01, n11, u.x), u.y);
 }
 
-const int   MAX_SEGMENTS      = 11;   // hardware budget (max_vertices=46 → 23 boundaries × 2; lowered from 24 to make room for the cableTangent varying). Cable lengths are bounded by pylon range (longest ≈ energypylon's 500 elmo); at SEG_LEN_TARGET this wants ~23, so the very longest backbone cables lose ~1-2 segments — far outweighed by the tangent killing the per-segment faceting. Segments halved for RDNA2 compatibility.
+const int   MAX_SEGMENTS      = 13;   // hardware budget (max_vertices=46 → 23 boundaries × 2; lowered from 24 to make room for the cableTangent varying). Cable lengths are bounded by pylon range (longest ≈ energypylon's 500 elmo); at SEG_LEN_TARGET this wants ~23, so the very longest backbone cables lose ~1-2 segments — far outweighed by the tangent killing the per-segment faceting. Segments reduced for RDNA2 compatibility.
 const float SEG_LEN_TARGET    = 22.0; // elmos of 3D arc per segment
 const float NOISE_AMP_ABS     = 4.0;
 const float WIDTH_FACTOR      = 0.6;
