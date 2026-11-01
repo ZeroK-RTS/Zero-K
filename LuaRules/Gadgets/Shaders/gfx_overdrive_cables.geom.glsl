@@ -22,7 +22,7 @@ layout (lines, invocations = 5) in;
 // per-vertex cableTangent varying is included (46 × 22 = 1012 ≤ 1024). The
 // tent-slope invocations use the full 46 (= 23 boundaries × 2); twig
 // invocations use 3.
-layout (triangle_strip, max_vertices = 27) out;	//previously 46, reduction for RDNA2 compatibility
+layout (triangle_strip, max_vertices = 28) out;	//previously 46, reduction for RDNA2 compatibility
 
 uniform sampler2D heightmapTex;
 uniform sampler2D infoTex;          // $info:los; same texture FS samples
