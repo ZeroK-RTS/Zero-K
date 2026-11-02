@@ -17,7 +17,8 @@ end
 include("keysym.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
-local missionMode = Spring.GetModOptions().singleplayercampaignbattleid
+-- Chat is hidden in campaign battles until the player chats, except in coop so that allies' messages show.
+local missionMode = Spring.GetModOptions().singleplayercampaignbattleid and Spring.Utilities.Gametype.IsSinglePlayer()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
