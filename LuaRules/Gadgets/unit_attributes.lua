@@ -117,7 +117,9 @@ function UpdateUnitAttributes(unitID, frame)
 		attributesTable = attributesTable or {}
 		attributesTable.move = moveMult
 		attributesTable.turn = turnMult
-		attributesTable.accel = accelMult
+		-- Acceleration follows the move multiplier, times a script's own change (Sparrow sprint,
+		-- Krow carpet bomb). The scripts set selfMaxAccelerationChange as accel / speed factor.
+		attributesTable.accel = moveMult*(selfMaxAccelerationChange or 1)
 	end
 	
 	if buildMult ~= 1 then
