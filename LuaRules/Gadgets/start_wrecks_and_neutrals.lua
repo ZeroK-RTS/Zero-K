@@ -27,7 +27,10 @@ local GaiaTeamID = Spring.GetGaiaTeamID()
 local maxStartboxcount = Spring.GetGameRulesParam("startbox_max_n") or 2 -- TODO this seems to have some issue. Startboxjutsu is not good enough
 local mapSizeX, mapSizeZ = Game.mapSizeX, Game.mapSizeZ
 
-local allUnitGroups = VFS.Include("LuaRules/Configs/unit_class_groupings.lua")
+local allCompositions = VFS.Include("LuaRules/Configs/unit_compositions.lua")
+local mobileCompositions = allCompositions.mobileCompositions
+local staticCompositions = allCompositions.staticCompositions
+local mixedCompositions = allCompositions.mixedCompositions
 local noGoZones = GG.NoGoZonesGetMexAndGeoNoGoZones()
 
 local startingWreckCount = tonumber(modOptions.starting_wrecks_count) or 0
@@ -38,109 +41,6 @@ local startingNeutralValue = tonumber(modOptions.starting_neutral_value) or 1000
 local startingNeutralMobileChance = tonumber(modOptions.starting_neutral_mobile) or 0
 
 local CENTER_CAMP_MULT = 3
-
-
--- TODO this could go into a config file
---TODO could also be a modoption input buuuut I am not featurecreaping it further juust yet. it proves the concepts and functionality of the tools
--- 
-local mobileCamps = {
-	{
-		ecoLight = 1,
-		turretsMedium = 0.1,
-		raiders = 2,
-		scouts = 3,
-	},
-	{
-		ecoLight = 1,
-		turretsAALight = 0.1,
-		riots = 2,
-		skirmishers = 2,
-	},
-	{
-		ecoLight = 1,
-		turretsLight = 0.1,
-		assaults = 2,
-		riots = 1,
-	},
-	{
-		ecoLight = 1,
-		turretsLight = 0.1,
-		assaults = 1,
-		gunships = 1,
-	}
-}
-
-local staticCamps = {
-	{
-		pwSupport = 0.1,
-		ecoLight = 0.5,
-		ecoSupport = 0.1,
-		turretsMedium = 1,
-		turretsAALight = 0.1,
-		turretsLight = 1
-	},
-	{
-		pwGreebles = 1,
-		ecoLight = 0.5,
-		ecoSupport = 0.1,
-		turretsMedium = 1,
-		turretsAALight = 1,
-		turretsLight = 1
-	},
-	{
-		pwSupport = 0.1,
-		pwGreebles = 1,
-		ecoSupport = 0.1,
-		turretsMedium = 1,
-		turretsAALight = 1,
-		turretsLight = 1
-	},
-	{
-		factories = 0.1,
-		pwGreebles = 1,
-		ecoSupport = 0.1,
-		turretsMedium = 1,
-		turretsAALight = 1,
-		turretsLight = 1
-	}
-}
-local largeCamp = {
-	pwSupport = 1,
-	pwGreebles = 1,
-	ecoSupport = 1,
-	pwDefence = 1,
-	turretsMedium = 1,
-	turretsAALight = 1,
-	turretsLight = 1,
-	artillery = 1,
-}
-
--- TODO remove or keep functions that show off how stuff works?
-local function spawningTest()
-	
-	local spawnList = {}
-	
-	local riots = GG.UnitSpawnerGetRandomUnitsFromListForCost(1000,allUnitGroups.riots)
-	local skirmishers = GG.UnitSpawnerGetRandomUnitsFromListForCost(1000,allUnitGroups.skirmishers)
-	
-	spawnList = GG.UnitSpawnerAddUnitLists({riots,skirmishers})
-	
-	GG.UnitSpawnerQueueListSpawn(spawnList,math.random(1,mapSizeX),math.random(1,mapSizeZ),GaiaTeamID,true)
-	GG.UnitSpawnerQueueListSpawn(spawnList,math.random(1,mapSizeX),math.random(1,mapSizeZ),GaiaTeamID)
-end
-
-local function CompositionBuilderTest()
-	local spawnList = GG.UnitSpawnerCompositionBuilder(
-	1000,
-		{
-			--TODO expand so that multirandom and wreck chance is a per thing thing
-			assaults = 1,
-			skirmishers = 1,
-			turretsLight = 1
-		}
-	)
-	GG.UnitSpawnerQueueListSpawn(spawnList,math.random(1,mapSizeX),math.random(1,mapSizeZ),GaiaTeamID)
-end
 
 local function CheckStartboxOverlap(x,z)
 	local overlaps = false
@@ -153,15 +53,35 @@ local function CheckStartboxOverlap(x,z)
 	return overlaps
 end
 
-local function SpawnNeutralCamps(campCount,campValue,mobileChance)
+local function GetMixedComposition(staticValue,mobileValue)
+	local mobileComposition = GG.UnitSpawnerGetGroupCompositionByBudgetAndType(mobileValue,mobileCompositions)
+	local mobileUnitComposition = GG.UnitSpawnerCompositionBuilder(mobileValue,mobileComposition)
+	local staticComposition = GG.UnitSpawnerGetGroupCompositionByBudgetAndType(staticValue,staticCompositions)
+	local staticUnitComposition = GG.UnitSpawnerCompositionBuilder(staticValue,staticComposition)
+
+	return GG.UnitSpawnerAddUnitLists({mobileUnitComposition,staticUnitComposition})
+end
+
+local function SpawnNeutralCamps(campCount,campValue,mobileRatio)
 	local unitIDs
-	local unitComposition
 	for i = 1, campCount/2, 1 do
-		if mobileChance > math.random() then
-			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,mobileCamps[math.random(1,#mobileCamps)], true)
+		local unitComposition
+		if mobileRatio == 1 then
+			local mobileComposition = GG.UnitSpawnerGetGroupCompositionByBudgetAndType(campValue,mobileCompositions)
+			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,mobileComposition)
+		elseif mobileRatio == 0 then
+			local staticComposition = GG.UnitSpawnerGetGroupCompositionByBudgetAndType(campValue,staticCompositions)
+			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,staticComposition)
 		else
-			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,staticCamps[math.random(1,#staticCamps)], true)
+			local mobileBudget = campValue*mobileRatio
+			local staticBudget = campValue - mobileBudget
+			unitComposition = GetMixedComposition(staticBudget,mobileBudget)
 		end
+		--TODO neutral devastation modoption, chance or ratio of neutrals to start dead
+		--for index, value in ipairs(unitComposition) do
+			--value.wreckChance = math.random(0,1)
+		--end
+		
 		--TODO my map and startbox jutsu is not as strong, but also not too integral to show off the underlying stuff. small startboxes get close spawns
 		--we mirror for an attempt at fairness.
 		local x,z = math.random(0,mapSizeX),math.random(mapSizeZ)
@@ -175,16 +95,34 @@ local function SpawnNeutralCamps(campCount,campValue,mobileChance)
 				x2,z2 = mapSizeX-x,mapSizeZ-z
 				break
 			end
+			iteration = iteration +1
 		end
-		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x,z,GaiaTeamID, false,nil,math.random(10,64),noGoZones)
+		Spring.Echo("Start neutrals")
+		for key, value in pairs(unitComposition) do
+			Spring.Echo(value.unitDefName .." = "..value.unitCount)
+		end
+		
+		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x,z,GaiaTeamID,noGoZones)
 		Spring.MarkerAddPoint(x, 0, z, "Reports of Remnants")
-		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x2,z2,GaiaTeamID, false,nil,math.random(10,64),noGoZones)
+		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x2,z2,GaiaTeamID,noGoZones)
 		Spring.MarkerAddPoint(x2, 0, z2, "Reports of Remnants")
 	end
 	--uneven number results in big map center camp :o 
 	if campCount % 2 == 1 then
-		unitComposition = GG.UnitSpawnerCompositionBuilder(campValue*CENTER_CAMP_MULT,largeCamp, true)
-		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,mapSizeX/2,mapSizeZ/2,GaiaTeamID,false,nil,math.random(10,64),noGoZones)
+		local unitComposition
+		campValue = campValue * CENTER_CAMP_MULT
+		if mobileRatio == 1 then
+			local mobileComposition = GG.UnitSpawnerGetGroupCompositionByBudgetAndType(campValue,mobileCompositions)
+			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,mobileComposition)
+		elseif mobileRatio == 0 then
+			local staticComposition = GG.UnitSpawnerGetGroupCompositionByBudgetAndType(campValue,staticCompositions)
+			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,staticComposition)
+		else
+			local mobileBudget = campValue*mobileRatio
+			local staticBudget = campValue - mobileBudget
+			unitComposition = GetMixedComposition(staticBudget,mobileBudget)
+		end
+		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,mapSizeX/2,mapSizeZ/2,GaiaTeamID,noGoZones)
 		Spring.MarkerAddPoint(mapSizeX/2, 0, mapSizeZ/2, "Reports of large Remnants")
 	end
 end
@@ -193,23 +131,33 @@ end
 local function SpawnWreckClump(campCount,campValue)
 	local unitIDs
 	local unitComposition
+	local campValue = campValue * 2 -- to make value about equal to output wrecks, since we lose about 60%
 	
 	for i = 1, campCount/2, 1 do
-		if 0.5 > math.random(0,1) then
-			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,mobileCamps[math.random(1,#mobileCamps)], true)
-		else
-			unitComposition = GG.UnitSpawnerCompositionBuilder(campValue,staticCamps[math.random(1,#staticCamps)], true)
+		local mobileRatio = math.random()
+		local mobileBudget = campValue*mobileRatio
+		local staticBudget = campValue - mobileBudget
+		Spring.Echo(mobileBudget)
+		Spring.Echo(staticBudget)
+		unitComposition = GetMixedComposition(staticBudget,mobileBudget)
+		for index, value in ipairs(unitComposition) do
+			value.wreckChance = 1
 		end
 		--we mirror for an attempt at fairness.
 		local x,z = math.random(0,mapSizeX),math.random(mapSizeZ)
 		local x2,z2 = mapSizeX-x,mapSizeZ-z
-		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x,z,GaiaTeamID, true,nil,math.random(0,128),noGoZones)
-		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x2,z2,GaiaTeamID, true,nil,math.random(0,128),noGoZones)
+		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x,z,GaiaTeamID,noGoZones)
+		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,x2,z2,GaiaTeamID,noGoZones)
 	end
 	--uneven number results in big map center field
 	if campCount % 2 == 1 then
-		unitComposition = GG.UnitSpawnerCompositionBuilder(campValue*CENTER_CAMP_MULT,largeCamp, true)
-		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,mapSizeX/2,mapSizeZ/2,GaiaTeamID, true,nil,math.random(10,64),noGoZones)
+		local unitComposition
+		campValue = campValue * CENTER_CAMP_MULT
+		unitComposition = GetMixedComposition(campValue/2,campValue/2)
+		for index, value in ipairs(unitComposition) do
+			value.wreckChance = 1
+		end
+		unitIDs,noGoZones = GG.UnitSpawnerQueueListSpawn(unitComposition,mapSizeX/2,mapSizeZ/2,GaiaTeamID,noGoZones)
 	end
 end
 
@@ -219,14 +167,16 @@ function gadget:Initialize()
 end
 
 function gadget:GameStart()
-	maxStartboxcount = Spring.GetGameRulesParam("startbox_max_n")
-	Spring.Echo(maxStartboxcount)
+	-- 512 is the size of a mapsize "unit"
+	Spring.Echo(mapSizeX)
+	Spring.Echo(mapSizeZ)
 	
+	maxStartboxcount = Spring.GetGameRulesParam("startbox_max_n")
+
 	if startingNeutralCount and startingNeutralValue and startingNeutralCount >= 0 and startingNeutralValue >= 0 then
 		SpawnNeutralCamps(startingNeutralCount,startingNeutralValue,startingNeutralMobileChance)
 	end
 	if startingWreckCount and startingWreckValue and startingWreckCount >= 0 and startingWreckValue >= 0 then
 		SpawnWreckClump(startingWreckCount,startingWreckValue)
 	end
-	
 end

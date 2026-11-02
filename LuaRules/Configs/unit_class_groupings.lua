@@ -1,4 +1,5 @@
--- categorises units into groups and compositions!
+-- units grouped and defined for the compositionbuilder,
+-- bundled in a config file for ease of access and cross gadget sharing
 
 
 
@@ -89,6 +90,7 @@ local allGroups = {
         [[shieldaa]],
         [[spideraa]],
         [[tankaa]],
+        [[vehaa]],
     },
     assaults = {
         [[cloakassault]],
@@ -97,7 +99,6 @@ local allGroups = {
         [[shieldassault]],
         [[spiderassault]],
         [[tankassault]],
-        [[vehaa]],
         [[vehassault]],
     },
     artillery = {
@@ -122,13 +123,16 @@ local allGroups = {
         [[planefighter]],
         [[planeheavyfighter]],
     },
-    bombers = {
-        [[bomberassault]],
+    bombersLight = {
         [[bomberdisarm]],
         [[bomberheavy]],
         [[bomberprec]],
         [[bomberriot]]
-        --TODO add magpie once it settles in
+        --TODO add magpie once it settles in/ main doesnt crash anymore
+    },
+    bombersHeavy = {
+        [[bomberheavy]],
+        [[bomberassault]],
     },
     gunships = {
         [[gunshipassault]],
@@ -139,9 +143,7 @@ local allGroups = {
         [[gunshipheavyskirm]],
         [[gunshiptrans]],
     },
-    
     support = {
-        [[spiderantiheavy]],
         [[planelightscout]],
         [[planescout]],
         [[amphlaunch]],
@@ -151,9 +153,10 @@ local allGroups = {
         [[shieldshield]],
     },
     antiHeavy = {
+        [[spiderantiheavy]],
         [[jumpbomb]],
-        [[striderantiheavy]], 
-        [[gunshipemp]], 
+        [[striderantiheavy]],
+        [[gunshipemp]],
     },
     stridersDemi = {
         [[amphassault]],
@@ -259,10 +262,12 @@ local allGroups = {
         [[turretmissile]],
         [[turretlaser]],
     },
-    turretsMedium = {
+    turretsRiot = {
         [[turretimpulse]],
         [[turretemp]],
         [[turretriot]],
+    },
+    turretsSkirm = {
         [[turretgauss]],
         [[turretheavylaser]],
     },
@@ -279,7 +284,7 @@ local allGroups = {
         [[turretaalaser]],
         [[turretaaclose]],
     },
-    turretsAAMedium = {
+    turretsAAHeavy = {
         [[turretaafar]],
         [[turretaaflak]]
     },
@@ -339,9 +344,11 @@ local allGroups = {
 
 allGroups.turretsAll = Union2({
     allGroups.turretsLight,
-    allGroups.turretsMedium,
+    allGroups.turretsRiot,
+    allGroups.turretsRiot,
     allGroups.turretsHeavy,
-    allGroups.turretsAA,
+    allGroups.turretsAALight,
+    allGroups.turretsAAHeavy,
 })
 allGroups.allStandardLandCombatants = Union2({
     allGroups.scouts,
