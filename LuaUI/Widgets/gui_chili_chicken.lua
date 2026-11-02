@@ -42,6 +42,7 @@ local white           = "\255\255\255\255"
 --------------------------------------------------------------------------------
 local gameInfo		  = {}
 local waveMessage
+local waveEngineFont
 local waveSpacingY    = 7
 local waveY           = 800
 local waveSpeed       = 0.2
@@ -311,6 +312,17 @@ local function WaveRow(n)
 	return n*(waveFontSize+waveSpacingY)
 end
 
+-- The wave font draws one byte per glyph, so it cannot draw UTF-8 text such
+-- as translated unit names. Rows with non-ASCII bytes outside colour codes
+-- use the engine font instead.
+local function SetWaveFonts()
+	waveEngineFont = {}
+	for i = 1, #waveMessage do
+		local line = waveMessage[i]
+		waveEngineFont[i] = line and line:gsub("\255...", ""):find("[\128-\255]") ~= nil
+	end
+end
+
 local function MakeLine(chicken, n)
 	if (n <= 0) then
 		return
@@ -349,6 +361,7 @@ function ChickenEvent(chickenEventArgs)
 			waveMessage[3] = MakeLine(chicken2Name, chicken2Number*gameInfo[roostName .. 'Count'])
 		end
 		
+		SetWaveFonts()
 		waveTime = Spring.GetTimer()
 		
 	-- table.foreachi(waveMessage, print)
@@ -360,10 +373,12 @@ function ChickenEvent(chickenEventArgs)
 	elseif (chickenEventArgs.type == "miniQueen") then
 		waveMessage    = {}
 		waveMessage[1] = "Here be dragons!"
+		SetWaveFonts()
 		waveTime = Spring.GetTimer()
 	elseif (chickenEventArgs.type == "queen") then
 		waveMessage    = {}
 		waveMessage[1] = "The Hive is angered!"
+		SetWaveFonts()
 		waveTime = Spring.GetTimer()
 	elseif (chickenEventArgs.type == "refresh") then
 		UpdateRules()
@@ -379,7 +394,11 @@ function widget:DrawScreen()
 		local waveY = viewSizeY - Spring.DiffTimers(t, waveTime)*waveSpeed*viewSizeY
 		if (waveY > 0) then
 			for i=1,#waveMessage do
-				fontHandler.DrawCentered(waveMessage[i], viewSizeX/2, waveY-WaveRow(i))
+				if waveEngineFont[i] then
+					gl.Text(waveMessage[i], viewSizeX/2, waveY-WaveRow(i), waveFontSize, "oc")
+				else
+					fontHandler.DrawCentered(waveMessage[i], viewSizeX/2, waveY-WaveRow(i))
+				end
 			end
 		else
 			waveMessage = nil
