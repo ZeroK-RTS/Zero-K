@@ -111,8 +111,10 @@ if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to
 	if not disableLocalWidgets then
 		local cadata = VFS.Include(CONFIG_FILENAME)
 		if cadata and cadata["Local Widgets Config"] then
-			localWidgetsFirst = cadata["Local Widgets Config"].useLocalWidgetsFirst or true
-			localWidgets = cadata["Local Widgets Config"].useLocalWidgets or true
+			local config = cadata["Local Widgets Config"]
+			-- Unset options default to true, as in localWidgets.lua.
+			localWidgets = (config.useLocalWidgets ~= false)
+			localWidgetsFirst = localWidgets and (config.useLocalWidgetsFirst ~= false)
 		end
 	end
 end
