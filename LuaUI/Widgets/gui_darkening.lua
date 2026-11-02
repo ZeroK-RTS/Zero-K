@@ -83,6 +83,7 @@ function widget:Initialize()
   else
     darkeningMap = {};
   end
+  darkening = WG.mapDarkening or darkening;
   UpdateCallins();
 
   widgetHandler:AddAction("darkening", SetDarkening, nil, "t");
