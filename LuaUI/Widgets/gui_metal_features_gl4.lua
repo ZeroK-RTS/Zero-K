@@ -150,17 +150,20 @@ local function UpdateFeatureVisibility()
 		handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
 	end
 	
-	if WG.HighlightUnitGL4 then
+	if WG.HighlightUnitGL4 or WG.HighlightFeatureCus then
 		-- Remove features that don't appear in the list of visible features.
 		local i = 1
 		while i <= #handledFeatureCheck do
 			if handledFeatureCheck[i] ~= newCheck then
 				local featureID = handledFeatureList[i]
-				if handledFeatureApiIDs[featureID] then
+				if WG.StopHighlightUnitGL4 and handledFeatureApiIDs[featureID] then
 					WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
 					--Spring.Utilities.FeatureEcho(featureID, "REMOVE 1")
 				end
 				
+				if WG.HighlightFeatureCus then
+					WG.HighlightFeatureCus(featureID, 0)
+				end
 				handledFeatureCheck[i] = handledFeatureCheck[#handledFeatureCheck]
 				handledFeatureList[i] = handledFeatureList[#handledFeatureList]
 				handledFeatureMap[handledFeatureList[i]] = i
