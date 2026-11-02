@@ -1550,12 +1550,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		value = GetStateValue(name, "fire_at_shield")
-		if value then
+		if value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_FIRE_AT_SHIELD, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
 		value = GetStateValue(name, "fire_towards_enemy")
-		if value then
+		if value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_FIRE_TOWARDS_ENEMY, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
