@@ -956,7 +956,10 @@ function widget:TeamColorsChanged()
 	paletteDirty = true
 end
 
--- Resigning, changing team or spectating another team changes your colour.
+-- With 'Your colour', allied territories have the colour of your team (for a
+-- spectator, the team spectated), so a change of your team repaints them.
+-- New team colours come in TeamColorsChanged; a change of allyteam resets the
+-- view in DrawWorldPreUnit.
 function widget:PlayerChanged(playerID)
 	if playerID == Spring.GetMyPlayerID() then paletteDirty = true end
 end
