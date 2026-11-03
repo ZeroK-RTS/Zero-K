@@ -204,6 +204,7 @@ local callInLists = {
 	"DrawScreenPost",
 	"DrawScreen",
 	"DrawInMiniMap",
+	"DrawInMiniMapBackground",
 	'DrawOpaqueUnitsLua',
 	'DrawOpaqueFeaturesLua',
 	'DrawAlphaUnitsLua',
@@ -2400,6 +2401,17 @@ function gadgetHandler:DrawInMiniMap(mmsx, mmsy)
 	for _,g in r_ipairs(self.DrawInMiniMapList) do
 		tracy.ZoneBeginN("G:DrawInMiniMap:" .. g.ghInfo.name)
 		g:DrawInMiniMap(mmsx, mmsy)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+	return
+end
+
+function gadgetHandler:DrawInMiniMapBackground(mmsx, mmsy)
+	tracy.ZoneBeginN("G:DrawInMiniMapBackground")
+	for _,g in r_ipairs(self.DrawInMiniMapBackgroundList) do
+		tracy.ZoneBeginN("G:DrawInMiniMapBackground:" .. g.ghInfo.name)
+		g:DrawInMiniMapBackground(mmsx, mmsy)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
