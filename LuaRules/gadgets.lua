@@ -2396,22 +2396,22 @@ function gadgetHandler:DrawScreen(vsx, vsy)
 end
 
 
-function gadgetHandler:DrawInMiniMap(mmsx, mmsy)
+function gadgetHandler:DrawInMiniMap(xSize, ySize)
 	tracy.ZoneBeginN("G:DrawInMiniMap")
 	for _,g in r_ipairs(self.DrawInMiniMapList) do
 		tracy.ZoneBeginN("G:DrawInMiniMap:" .. g.ghInfo.name)
-		g:DrawInMiniMap(mmsx, mmsy)
+		g:DrawInMiniMap(xSize, ySize)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
 	return
 end
 
-function gadgetHandler:DrawInMiniMapBackground(mmsx, mmsy)
+function gadgetHandler:DrawInMiniMapBackground(xSize, ySize)
 	tracy.ZoneBeginN("G:DrawInMiniMapBackground")
 	for _,g in r_ipairs(self.DrawInMiniMapBackgroundList) do
 		tracy.ZoneBeginN("G:DrawInMiniMapBackground:" .. g.ghInfo.name)
-		g:DrawInMiniMapBackground(mmsx, mmsy)
+		g:DrawInMiniMapBackground(xSize, ySize)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
