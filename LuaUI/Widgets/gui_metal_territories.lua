@@ -612,10 +612,13 @@ end
 
 local function UpdatePalette()
 	local neutral = options.neutralColor.value
-	local teams, first, colors = Spring.GetTeamList(), {}, {[1] = {neutral[1], neutral[2], neutral[3], 0}}
-	-- Red is the opacity on the map, green on the minimap.
+	local teams, first, colors = Spring.GetTeamList(), {}, {[1] = {neutral[1], neutral[2], neutral[3]}}
+	-- Row 1 of the palette: x is the opacity on the map, y on the minimap, and z
+	-- the shown owner (neutral 0, otherwise the colour team + 1). Spots with the
+	-- same shown owner are one territory with borders between different owners,
+	-- and can merge.
 	local minimapNeutral = options.minimapNeutral.value and options.minimapNeutralOpacity.value or 0
-	local opacities = {[1] = {options.neutralOpacity.value, minimapNeutral, 0, 0}}
+	local details = {[1] = {options.neutralOpacity.value, minimapNeutral, 0, 0}}
 	for _, teamID in ipairs(teams) do
 		local ally = select(6, Spring.GetTeamInfo(teamID, false))
 		first[ally] = min(first[ally] or teamID, teamID)
@@ -635,15 +638,13 @@ local function UpdatePalette()
 		end
 		local entry = PaletteEntry(teamID)
 		colors[entry] = mode == 'custom' and {custom[1], custom[2], custom[3]} or {Spring.GetTeamColor(colorTeam)}
-		-- Alpha is the shown owner: neutral 0, otherwise the colour team + 1.
-		colors[entry][4] = colorTeam + 1
-		opacities[entry] = {opacity, opacity, 0, 0}
+		details[entry] = {opacity, opacity, colorTeam + 1, 0}
 		width = max(width, entry)
 	end
 	if palette then gl.DeleteTexture(palette) end
-	-- The second row is the opacity of each owner's territories.
+	-- Row 0 is the colour of each owner's territories.
 	palette = NewTexture(width, 2)
-	PaintRows(palette, {colors, opacities}, width)
+	PaintRows(palette, {colors, details}, width)
 	-- Shown owners may have changed: update the merged territories and distance map.
 	paletteDirty, updateFrame = false, nil
 end

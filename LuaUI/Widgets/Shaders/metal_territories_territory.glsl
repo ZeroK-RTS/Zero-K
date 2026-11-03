@@ -52,7 +52,6 @@ vec4 Territory(vec2 pos, out int spot, out float edge, out float mex) {
 		}
 	}
 	int owner = int(texelFetch(owners, ivec2(spot, 0), 0).r + 0.5);
-	// Alpha identifies the shown owner.
 	vec4 color = texelFetch(palette, ivec2(owner, 0), 0);
 	edge = 1e6;
 	mex = distance(pos, texelFetch(positions, ivec2(spot, 0), 0).rg);
