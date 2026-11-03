@@ -801,6 +801,14 @@ local function BuildMap()
 end
 
 function widget:Initialize()
+	-- The Mexspot Fetcher, an API widget that starts first, sets WG.metalSpots
+	-- to false on maps without metal spots, such as metal maps.
+	local metalSpots = WG.metalSpots
+	if metalSpots == false or (metalSpots and #metalSpots == 0) then
+		Spring.Echo('Metal Territories: this map has no metal spots')
+		widgetHandler:RemoveWidget(self)
+		return
+	end
 	if not gl.CreateShader or not gl.RenderToTexture or not gl.BlitFBO then
 		Spring.Echo('Metal Territories requires shaders and render-to-texture support')
 		widgetHandler:RemoveWidget(self)
