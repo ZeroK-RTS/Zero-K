@@ -603,6 +603,13 @@ local function ResetView()
 	paletteDirty = true
 end
 
+-- The palette has a column for each owner value of the owners texture: 0 is
+-- neutral (no known mex) and team t is t + 1. Lua tables start at 1, so column
+-- c is entry c + 1: neutral is entry 1 and team t is entry t + 2.
+local function PaletteEntry(teamID)
+	return teamID + 2
+end
+
 local function UpdatePalette()
 	local neutral = options.neutralColor.value
 	local teams, first, colors = Spring.GetTeamList(), {}, {[1] = {neutral[1], neutral[2], neutral[3], 0}}
@@ -626,11 +633,12 @@ local function UpdatePalette()
 			colorTeam = mode == 'players' and teamID or Spring.GetMyTeamID()
 			opacity = options.allyOpacity.value
 		end
-		colors[teamID + 2] = mode == 'custom' and {custom[1], custom[2], custom[3]} or {Spring.GetTeamColor(colorTeam)}
+		local entry = PaletteEntry(teamID)
+		colors[entry] = mode == 'custom' and {custom[1], custom[2], custom[3]} or {Spring.GetTeamColor(colorTeam)}
 		-- Alpha is the shown owner: neutral 0, otherwise the colour team + 1.
-		colors[teamID + 2][4] = colorTeam + 1
-		opacities[teamID + 2] = {opacity, opacity, 0, 0}
-		width = max(width, teamID + 2)
+		colors[entry][4] = colorTeam + 1
+		opacities[entry] = {opacity, opacity, 0, 0}
+		width = max(width, entry)
 	end
 	if palette then gl.DeleteTexture(palette) end
 	-- The second row is the opacity of each owner's territories.
