@@ -34,14 +34,22 @@ local CMD_PATROL = CMD.PATROL
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 
 local buildDistance = {}
+local buildeeRadius = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	if ud.isMobileBuilder and ud.canAssist then
 		buildDistance[unitDefID] = ud.buildDistance
 	end
+	if ud.isFactory and ud.buildOptions then
+		local radius = 0
+		for i = 1, #ud.buildOptions do
+			radius = math.max(radius, UnitDefs[ud.buildOptions[i]].radius)
+		end
+		buildeeRadius[unitDefID] = radius
+	end
 end
 
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID)
+function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID)
 	if not (options.leaveFactory.value and buildDistance[unitDefID]) then
 		return
 	end
@@ -62,9 +70,9 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID)
 	local fx, _, fz = Spring.GetUnitPosition(factID)
 	local dx, dz = first.params[1] - fx, first.params[3] - fz
 	local distance = math.sqrt(dx*dx + dz*dz)
-	-- Fight looks for units to assist within 300*moveState + buildDistance
-	-- (CBuilderCAI::ExecuteFight). The factory radius covers the nanoframe.
-	local clearance = 300*moveState + buildDistance[unitDefID] + Spring.GetUnitRadius(factID)
+	-- Fight assists units within 300*moveState + buildDistance plus their radius
+	-- (CBuilderCAI::ExecuteFight). The nanoframe is inside the factory radius.
+	local clearance = 300*moveState + buildDistance[unitDefID] + Spring.GetUnitRadius(factID) + (buildeeRadius[factDefID] or 0)
 	if distance <= clearance then
 		-- The target is close enough that fighting there includes the factory.
 		return
