@@ -742,8 +742,9 @@ local function UpdateConstructors(n)
 
 	local count = 0
 	while constructors[constructorIndex] and count < constructorsPerFrame do
+		local unitID = constructors[constructorIndex]
 		if not (fastUpdates and fastUpdates[unitID]) then
-			CheckConstructorBuild(constructors[constructorIndex])
+			CheckConstructorBuild(unitID)
 		end
 		constructorIndex = constructorIndex + 1
 		count = count + 1
