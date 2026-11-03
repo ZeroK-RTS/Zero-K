@@ -206,8 +206,6 @@ local function HandleZombieRevive(featureID, reviveBudget,reviveTeamID,unitDefID
 	end
 	local rerollThresholdStep = reviveBudget * zombieReviveOptionMultiRandomise
 	local rerollThreshold = reviveBudget - rerollThresholdStep
-	Spring.Echo(rerollThresholdStep)
-	Spring.Echo(rerollThreshold)
 	while reviveBudget >= zombieCost do
 		local unitID = GG.Zombies.TurnFeatureIntoUnit(featureID,reviveTeamID,zombieUnitDefID)
 		if unitID then
@@ -285,15 +283,6 @@ local function ZombieBudgetProcessing(featureID,excessBudget)
 	return thisFeatureBudget
 end
 
-local function FeatureReviveCycles(featureID)
-	if featureReviveCycleCount[featureID] == nil then
-		featureReviveCycleCount[featureID] = zombieReviveCyclesCount - 1 -- one cycle has passed to reach this point
-	else 
-		featureReviveCycleCount[featureID] = featureReviveCycleCount[featureID] - 1
-	end
-	return featureReviveCycleCount[featureID]
-end
-
 local function RezFrameCallback(featureID)
 	local reviveTeamID = GaiaTeamID
 	if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > initalAllianceCount) then
@@ -314,11 +303,12 @@ local function RezFrameCallback(featureID)
 		excessBudget = HandleZombieRevive(featureID, zombieBudget,reviveTeamID, zombieReviveOptions)
 	end
 	
-	local zombieCyclesRemaining = 0
-	if zombieReviveCyclesCount > 1 then
-		zombieCyclesRemaining = FeatureReviveCycles(featureID)
-	end
-	if zombieCyclesRemaining > 0 then
+	if featureReviveCycleCount[featureID] and featureReviveCycleCount[featureID] > 1 then
+		featureReviveCycleCount[featureID] = featureReviveCycleCount[featureID] - 1
+		GG.Zombies.AddFeatureToZombieCountdown(featureID, zombieRezSpeed, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
+		return
+	elseif zombieReviveCyclesCount > 1 and not featureReviveCycleCount[featureID] then
+		featureReviveCycleCount[featureID] = zombieReviveCyclesCount -1 -- one cycle has passed
 		GG.Zombies.AddFeatureToZombieCountdown(featureID, zombieRezSpeed, ZOMBIES_REZ_MIN, ZOMBIES_REZ_MAX, RezFrameCallback)
 		return
 	end
@@ -352,10 +342,11 @@ function gadget:GameFrame(f)
 	if f == 1 then
 		spSetTeamResource(GaiaTeamID, "ms", 500)
 		spSetTeamResource(GaiaTeamID, "es", 10500)
-		if zombieTeamStartsDead == 1 then -- TODO doing it on game start lets people plop a fac. maybe there is some other way of doing things
+		if zombieTeamStartsDead == 1 then -- TODO doing it on game may let people plop a fac, though the instant destroy call should avoid that?
 			for _, unitID in ipairs(spGetAllUnits()) do
 				if zombieAllyTeamID == Spring.GetUnitAllyTeam(unitID)then
-					Spring.DestroyUnit(unitID)
+					Spring.CreateUnitWreck(unitID)
+					Spring.DestroyUnit(unitID,false,true,nil,true)
 				end
 			end
 		end

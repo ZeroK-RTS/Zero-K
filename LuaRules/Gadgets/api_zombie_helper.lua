@@ -51,9 +51,6 @@ local ZOMBIE_SOUNDS = {
 local resurrectingFeatures = {} -- contains inital gameframe, base rez time, frame rez should complete and a callback function if someone wants to reuse the functionality
 
 
-
--- unsure if necessary, seems like just an extra failsafe
-
 -- Get Feature Defname and facing
 local function GetFeatureResurrectData(featureID)
 	local resDefName, facing = Spring.GetFeatureResurrect(featureID)
