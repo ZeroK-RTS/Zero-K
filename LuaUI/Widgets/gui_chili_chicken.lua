@@ -114,7 +114,7 @@ local Font
 -- elements
 local window, labelStack, background
 local global_command_button
-local label_anger, label_chickens, label_burrows, label_aggro, label_tech, label_mode
+local label_anger, label_wave, label_chickens, label_burrows, label_aggro, label_tech, label_mode
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -236,6 +236,18 @@ local function UpdateAnger()
 	local angerString = "Hive Anger : ".. GetColor( math.min(angerPercent, 100) )..math.floor(angerPercent).."% \008"
 	if (angerPercent < 100) and (not endlessMode) then angerString = angerString .. "("..FormatTime(gameInfo.queenTime - curTime) .. " left)" end
 	label_anger:SetCaption(angerString)
+end
+
+-- every second, and again when the wave it counts down to starts
+local nextWaveFrame
+local function UpdateNextWave()
+	nextWaveFrame = Spring.GetGameRulesParam("chickenNextWaveFrame")
+	if not nextWaveFrame then
+		label_wave:SetCaption("")
+		return
+	end
+	local seconds = math.ceil(math.max(0, nextWaveFrame - Spring.GetGameFrame()) / 30)
+	label_wave:SetCaption("Next wave in : " .. FormatTime(seconds))
 end
 
 -- done every 2 seconds
@@ -416,7 +428,7 @@ function widget:Initialize()
 		name   = 'chickenpanel';
 		color = {0, 0, 0, 0},
 		width = 270;
-		height = 189;
+		height = 211;
 		right = 0;
 		y = 100,
 		dockable = true;
@@ -434,7 +446,7 @@ function widget:Initialize()
 		parent = window,
 		resizeItems = false;
 		orientation   = "vertical";
-		height = 175;
+		height = 197;
 		width =  260;
 		x = 20,
 		y = 10,
@@ -444,7 +456,7 @@ function widget:Initialize()
 	
 	background = Image:New{
 		width=270;
-		height=189;
+		height=211;
 		y=0;
 		x=0;
 		keepAspect = false,
@@ -454,6 +466,16 @@ function widget:Initialize()
 	}
 	
 	label_anger = Label:New{
+		parent = labelStack,
+		autosize=false;
+		align="left";
+		valign="center";
+		caption = '';
+		height = labelHeight,
+		width = "100%";
+		font = {font = panelFont, size = fontSize, shadow = true, outline = true,},
+	}
+	label_wave = Label:New{
 		parent = labelStack,
 		autosize=false;
 		align="left";
@@ -518,6 +540,7 @@ function widget:Initialize()
 	UpdateRules()
 	WriteTooltipsOnce()
 	UpdateAnger()
+	UpdateNextWave()
 
 	-- Activate tooltips for labels, they do not have them in default chili
 	function label_anger:HitTest(x,y) return self end
@@ -551,6 +574,7 @@ function widget:GameFrame(n)
 	if (n%60< 1) then UpdateRules() end
 	-- every second for smoother countdown
 	if (n%30< 1) then UpdateAnger() end
+	if (n%30 < 1) or (nextWaveFrame and n >= nextWaveFrame) then UpdateNextWave() end
 end
 
 --------------------------------------------------------------------------------
