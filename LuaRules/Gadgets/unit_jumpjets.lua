@@ -601,6 +601,7 @@ local function AttemptJump(unitID, unitDefID, cmdID, cmdParams)
 	if lastJumpPosition[unitID] then
 		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and
 				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
+			lastJumpPosition[unitID] = nil
 			return true, true -- command was used, remove it (unit finished jump)
 		end
 		lastJumpPosition[unitID] = nil
