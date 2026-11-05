@@ -44,9 +44,10 @@ local energyDefault          = 25
 -- scale energy/reclaimtime of map's features
 for name, fd in pairs(FeatureDefs) do
 	if not (fd.customparams or EMPTY_TABLE).mod then
-		local metal = (tonumber(fd.metal) or 0)*mapMetalMult
+		local metal = math.max((tonumber(fd.metal) or 0)*mapMetalMult, 0)
+		local energy = math.max(tonumber(fd.energy) or 0, 0)
+		local reclaimtime = math.max(tonumber(fd.reclaimtime) or 0, 1)
 		
-		local energy = tonumber(fd.energy) or 0
 		if energy > mapEnergyMultThreshold then
 			energy = energy * mapEnergyMult
 		elseif energy > 0 and energy < energyDefaultBound then
@@ -59,12 +60,11 @@ for name, fd in pairs(FeatureDefs) do
 				energy = 0
 				metal = 0
 			end
-			
-			fd.metal = metal
-			fd.energy = energy
-			
-			fd.reclaimtime = math.max(1, energy + metal) -- Income equal to BP split between metal and energy.
+			reclaimtime = math.max(1, energy + metal) -- Income equal to BP split between metal and energy.
 		end
+		fd.metal = metal
+		fd.energy = energy
+		fd.reclaimtime = reclaimtime
 		
 		fd.customparams = fd.customparams or {}
 		fd.customparams.is_tracked_map_feature = 1
