@@ -1887,7 +1887,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 	-- transport carrying a constructor?
 	if fromTransportIDToCarriedConID[unitID] then
-		local conID = fromConIDToCarryingTransportID[unitID]
+		local conID = fromTransportIDToCarriedConID[unitID]
 		fromConIDToCarryingTransportID[conID] = nil
 		fromTransportIDToCarriedConID[unitID] = nil
 		idleTransports[unitID] = nil
