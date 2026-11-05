@@ -420,15 +420,17 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	
 	--create main Chili elements
-	local labelHeight = 22
+	-- the background art is 300x210: scale it evenly, so the lines on the left stay above the claws at the bottom left
+	-- (the stack moves every label but the last down by half its spare height: (182 - 6*21 - 42) / 2 = 7 px)
+	local labelHeight = 21
 	local fontSize = 16
 	
 	window = Window:New{
 		parent = screen0,
 		name   = 'chickenpanel';
 		color = {0, 0, 0, 0},
-		width = 270;
-		height = 211;
+		width = 315;
+		height = 221;
 		right = 0;
 		y = 100,
 		dockable = true;
@@ -446,17 +448,17 @@ function widget:Initialize()
 		parent = window,
 		resizeItems = false;
 		orientation   = "vertical";
-		height = 197;
-		width =  260;
-		x = 20,
-		y = 10,
+		height = 182;
+		width =  280;
+		x = 23,
+		y = 18,
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
 	
 	background = Image:New{
-		width=270;
-		height=211;
+		width=315;
+		height=221;
 		y=0;
 		x=0;
 		keepAspect = false,
