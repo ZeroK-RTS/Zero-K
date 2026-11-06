@@ -2766,7 +2766,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function GetCableDetailSettings()
-	if Platform.gpuVendor == "AMD" or (not Platform.gpuVendor) then
+	if Platform.gpuVendor == "AMD" or Platform.gpuVendor == "ATI" or (not Platform.gpuVendor) then
 		return {
 			vertices = 28,
 			segments = 13,
