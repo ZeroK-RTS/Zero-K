@@ -257,7 +257,7 @@ local unitRange = {} -- table of unit types with their radar ranges
 local isBuilding = {} -- unitDefID keys
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
-	if ud.sonarDistance then
+	if (ud.sonarDistance or 0) > 0 then
 		if string.find(ud.name, "raptor", nil, true) then
 			-- skip raptors from sonar
 		else
