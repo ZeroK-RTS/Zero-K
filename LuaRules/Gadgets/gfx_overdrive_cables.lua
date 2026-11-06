@@ -2765,6 +2765,19 @@ end
 -- Lifecycle
 -------------------------------------------------------------------------------------
 
+local function GetCableDetailSettings()
+	if Platform.gpuVendor == "AMD" or (not Platform.gpuVendor) then
+		return {
+			vertices = 28,
+			segments = 13,
+		}
+	end
+	return {
+		vertices = 46,
+		segments = 22,
+	}
+end
+
 function gadget:Initialize()
 	if not gl.CreateShader or not gl.GetVBO or not gl.GetVAO then
 		gadgetHandler:RemoveGadget()
@@ -2776,6 +2789,9 @@ function gadget:Initialize()
 	local gsSrc = cableGSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 	local fsSrc = cableFSSrc:gsub("//__ENGINEUNIFORMBUFFERDEFS__", engineUniformBufferDefs)
 
+	local detail = GetCableDetailSettings()
+	local gsSrc = gsSrc:gsub("__MAX_CABLE_VERTICES__", detail.vertices)
+	local gsSrc = gsSrc:gsub("__MAX_CABLE_SEGMENTS__", detail.segments)
 
 	cableShader = LuaShader({
 		vertex = vsSrc,
