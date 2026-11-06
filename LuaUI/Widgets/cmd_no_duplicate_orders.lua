@@ -82,7 +82,7 @@ function widget:CommandNotify(id, params, options)
 		for i = 1, #selUnits do
 			local unitID = selUnits[i]
 			local cmdID, _, cmdTag, cmdParam1, _, cmdParam3 = Spring.GetUnitCurrentCommand(unitID)
-			if cmdID then
+			if cmdID and cmdID == id then
 				if (cmdID == CMD.REPAIR) and (params[1] == cmdParam1) and (not shiftMode) then
 					-- Do not block Shift+Right Click as it is used to cancel an order.
 					blockUnits[unitID] = true
@@ -136,7 +136,7 @@ function widget:CommandNotify(id, params, options)
 			local unitID = selUnits[i]
 			local cmdID, cmdOpts, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
 			-- Override internal commands to override idle behaviour.
-			if cmdID and (params[1] == cmdParam) and (cmdOpts ~= CMD_OPT_INTERNAL) then
+			if cmdID and cmdID == id and (params[1] == cmdParam) and (cmdOpts ~= CMD_OPT_INTERNAL) then
 				blockUnits[unitID] = true
 			end
 		end -- for
