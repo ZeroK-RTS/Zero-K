@@ -270,6 +270,13 @@ local function GetUnitDefCloakTimeMult(unitID, udid)
 	return decloakTimeMultCache[udid]
 end
 
+local function UpdateMoveSpeedMult(unitID, data, enabled)
+	if data.moveSpeedMult then
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (enabled and data.moveSpeedMult) or 1)
+		GG.UpdateUnitAttributes(unitID)
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -330,6 +337,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (cloakShieldUnits[unitID]) then
 			cloakShieldUnits[unitID].radius = 0
+			UpdateMoveSpeedMult(unitID, cloakShieldUnits[unitID].def, false)
 		end
 		cloakers[unitID] = nil
 		cloakees[unitID] = nil
@@ -478,13 +486,6 @@ end
 
 function GG.AreaCloakFinishedCharging(unitID)
 	return cloakees[unitID] and (cloakees[unitID] == 1)
-end
-
-local function UpdateMoveSpeedMult(unitID, data, enabled)
-	if data.moveSpeedMult then
-		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (enabled and data.moveSpeedMult) or 1)
-		GG.UpdateUnitAttributes(unitID)
-	end
 end
 
 local function GrowRadius(cloaker)
