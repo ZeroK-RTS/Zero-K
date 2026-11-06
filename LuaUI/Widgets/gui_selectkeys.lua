@@ -379,57 +379,44 @@ local function SelectEmptyTransports()
 	spSelectUnitArray(newselection,addselect)
 end
 
-local isFixedWing = {}
+local isBomber = {}
 if UnitDefs then
 	for defID, def in pairs(UnitDefs) do
-		if def.canFly and not def.isHoveringAirUnit then
-			isFixedWing[defID] = true
+		if def and def.customParams and def.customParams.reammoseconds then
+			isBomber[defID] = true
 		end
 	end
 end
 
-local function FilterLowHealthAmmo(threshold)
-	local selection = spGetSelectedUnits()
-	local newselection = {}
-	for i = 1, #selection do
-		local unitID = selection[i]
-		local defID = Spring.GetUnitDefID(unitID)
-		local wantPad = isFixedWing[defID] or false
-		local health, maxHealth = spGetUnitHealth(unitID)
-		local lowhealth = (health or 0)/(maxHealth or 1000) < threshold
-		local keepselect = true
-		if lowhealth then
-			keepselect = false
-			if wantPad then
-				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
-			end
-		elseif wantPad then
-			local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
-			local noammo = Spring.GetUnitRulesParam(unitID, "noammo") or 0
-			if ammofraction < threshold or noammo == 1 then
-				keepselect = false
-				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
+-- threshold must be between 0 and 1
+-- returns a function
+local function DefineFilterLowHealthAmmo(healththreshold, ammothreashold)
+	return function ()
+		-- filter out low ammo bombers and send them to rearm
+		local selection = spGetSelectedUnits()
+		local removeselection = {}
+		for i = 1, #selection do
+			local unitID = selection[i]
+			local unitdefID = Spring.GetUnitDefID(unitID)
+			if isBomber[unitdefID] then
+				local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
+				local noammo = Spring.GetUnitRulesParam(unitID, "noammo") or 0
+				if ammofraction < ammothreashold or noammo == 1 then
+					Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
+					table.insert(removeselection, unitID)
+				end
 			end
 		end
-		if keepselect then
-			newselection[#newselection+1] = selection[i]
-		end
+		Spring.DeselectUnitArray(removeselection)
+		-- ask engine to filter out low health units
+		local cmd = string.format("select PrevSelection+_RelativeHealth_%.0f+_ClearSelection_SelectAll+", healththreshold * 100)
+		Spring.SendCommands(cmd)
 	end
-	spSelectUnitArray(newselection,false)
 end
 
-local function FilterLowHealthAmmo30()
-	FilterLowHealthAmmo(0.3)
-end
-
-local function FilterLowHealthAmmo60()
-	FilterLowHealthAmmo(0.6)
-end
-
-local function FilterLowHealthAmmo100()
-	FilterLowHealthAmmo(1)
-end
-
+local FilterLowHealthAmmo30 = DefineFilterLowHealthAmmo(0.3, 0.3)
+local FilterLowHealthAmmo60 = DefineFilterLowHealthAmmo(0.6, 0.6)
+local FilterLowHealthAmmo100 = DefineFilterLowHealthAmmo(1, 1)
 
 function widget:Shutdown()
 	widgetHandler:RemoveAction("selectfulltransports")
