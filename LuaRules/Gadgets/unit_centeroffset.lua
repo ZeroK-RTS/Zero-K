@@ -437,6 +437,14 @@ function gadget:Shutdown()
 	for unitID in pairs(unitScales) do
 		UpdateUnitCollisionData(unitID, Spring.GetUnitDefID(unitID), {1, 1, 1})
 	end
+	-- Give growing nanoframes their full colvol back, because the next instance (luarules reload)
+	-- caches the colvol of each unitDefID from the units that exist.
+	for unitID, data in pairs(growUnit) do
+		if spValidUnitID(unitID) then
+			lowMetalNanoframe[unitID] = nil -- Restore only the colvol, not blocking or neutral.
+			UpdateUnitGrow(unitID, data, 1)
+		end
+	end
 end
 
 function gadget:Initialize()
