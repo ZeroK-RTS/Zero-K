@@ -1071,7 +1071,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	--burrow targetting
 	local name = UnitDefs[unitDefID].name
-	if (humanTeams[unitTeam]) and UnitDefs[unitDefID].isImmobile and (not noTarget.name) then
+	if (humanTeams[unitTeam]) and UnitDefs[unitDefID].isImmobile and (not noTarget[name]) then
 		--echo("Building ID "..unitID .." added to target array")
 		local x, y, z = spGetUnitPosition(unitID)
 		data.targets[unitID] = unitTeam
