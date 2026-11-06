@@ -181,7 +181,7 @@ function SetUnitStateIcons(unitID)
 
 	if options.showpriority.value ~= "never" then
 		local state = spGetUnitRulesParam(unitID, "buildpriority")
-		if (not ud) or not (ud.canAssist and ud.buildSpeed ~= 0) then
+		if (not ud) or not ((ud.canAssist or (ud.isFactory and not ud.customParams.nobuildpower)) and ud.buildSpeed ~= 0) then
 			local _,_,_,_,buildProgress = spGetUnitHealth(unitID)
 			if buildProgress == 1 then
 				state = 1
