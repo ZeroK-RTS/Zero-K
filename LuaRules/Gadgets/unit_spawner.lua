@@ -892,8 +892,8 @@ local function Wave()
 		data.endMiniQueenNum = data.endMiniQueenNum + 1
 		if data.endMiniQueenNum == endMiniQueenWaves then
 			for i=1,playerCount do SpawnMiniQueen() end
-				endMiniQueenNum = 0
-			end
+			data.endMiniQueenNum = 0
+		end
 	end
 	data.specialPowerCooldown = data.specialPowerCooldown - 1
 	ProcessSpecialPowers()
