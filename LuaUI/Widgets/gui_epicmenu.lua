@@ -798,15 +798,20 @@ end
 local function MakeIconButtonRowPanel(option)
 	local panel = Panel:New{
 		width = "100%",
-		height = 36,
+		height = 36 + 17,
 		backgroundColor = {0, 0, 0, 0},
 		padding = {2, 0, 0, 0},
 		margin = {0, 0, 0, 0},
 		autosize = false,
 	}
-	-- option.name and option.desc are unused
-	-- they used to be a text/tooltip before iconRadioButton
-	-- Still shows up when you search for the text in these fields
+	panel:AddChild(Label:New{
+		y = 2,
+		padding = {0, 0, 0, 0},
+		caption = option.name,
+		tooltip = option.desc,
+		objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),
+		HitTest = returnSelf,
+	})
 
 	local entries = {}
 	local function PaintSelection()
@@ -829,7 +834,7 @@ local function MakeIconButtonRowPanel(option)
 		local width = item.icon and 40 or 62
 		local button = Button:New{
 			x = x,
-			y = 0,
+			y = 17,
 			width = width,
 			height = 36,
 			padding = {2, 2, 2, 2},
