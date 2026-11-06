@@ -66,7 +66,6 @@ for name, fd in pairs(FeatureDefs) do
 			-- Allow no-resource reclaimables with arbitrary time, but mark it for the UI.
 			fd.customparams.reclaim_time_only = 1
 		end
-		Spring.Echo("SET SET", metal, energy, fd.reclaimable, fd.customparams.reclaim_time_only)
 		fd.metal = metal
 		fd.energy = energy
 		fd.reclaimtime = reclaimtime
