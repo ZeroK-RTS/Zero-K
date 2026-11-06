@@ -92,6 +92,7 @@ local IMAGE = {
 	WIND_SPEED = 'LuaUI/images/windspeed.png',
 	METAL_RECLAIM = 'LuaUI/images/ibeamReclaim.png',
 	ENERGY_RECLAIM = 'LuaUI/images/energyReclaim.png',
+	TIME_RECLAIM = 'LuaUI/images/workReclaim.png',
 	NO_AMMO =  'LuaUI/images/noammo.png',
 }
 
@@ -2279,13 +2280,19 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	end
 	
 	local function UpdateDynamicFeatureAttributes(featureID, unitDefID)
-		local metal, _, energy, _, _ = Spring.GetFeatureResources(featureID)
+		local metal, _, energy, _, reclaimProp = Spring.GetFeatureResources(featureID)
+		local reclaimOnlyTime = Spring.Utilities.GetFeatureReclaimOnlyTime(featureID)
 		local leftOffset = -2
 		if unitDefID then
 			leftOffset = picHeight + LEFT_SPACE
 		end
-		metalInfoUpdate(true, Format(metal), IMAGE.METAL_RECLAIM, leftOffset + 4)
-		energyInfoUpdate(true, Format(energy), IMAGE.ENERGY_RECLAIM, leftOffset + LEFT_SPACE + 4)
+		if reclaimOnlyTime then
+			metalInfoUpdate(true, Format(reclaimOnlyTime * (reclaimProp or 1)), IMAGE.TIME_RECLAIM, leftOffset + 4)
+			energyInfoUpdate(false)
+		else
+			metalInfoUpdate(true, Format(metal), IMAGE.METAL_RECLAIM, leftOffset + 4)
+			energyInfoUpdate(true, Format(energy), IMAGE.ENERGY_RECLAIM, leftOffset + LEFT_SPACE + 4)
+		end
 	end
 	
 	local function UpdateDynamicEconInfo(unitDefID, mousePlaceX, mousePlaceY)

@@ -43,7 +43,8 @@ local energyDefault          = 25
 
 -- scale energy/reclaimtime of map's features
 for name, fd in pairs(FeatureDefs) do
-	if not (fd.customparams or EMPTY_TABLE).mod then
+	fd.customparams = fd.customparams or {} -- Give every feature customparams.
+	if not fd.customparams.mod then -- Standardise map features
 		local metal = math.max((tonumber(fd.metal) or 0)*mapMetalMult, 0)
 		local energy = math.max(tonumber(fd.energy) or 0, 0)
 		local reclaimtime = math.max(tonumber(fd.reclaimtime) or 0, 1)
@@ -61,7 +62,11 @@ for name, fd in pairs(FeatureDefs) do
 				metal = 0
 			end
 			reclaimtime = math.max(1, energy + metal) -- Income equal to BP split between metal and energy.
+		elseif fd.reclaimable then
+			-- Allow no-resource reclaimables with arbitrary time, but mark it for the UI.
+			fd.customparams.reclaim_time_only = 1
 		end
+		Spring.Echo("SET SET", metal, energy, fd.reclaimable, fd.customparams.reclaim_time_only)
 		fd.metal = metal
 		fd.energy = energy
 		fd.reclaimtime = reclaimtime

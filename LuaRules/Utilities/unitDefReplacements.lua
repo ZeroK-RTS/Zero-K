@@ -10,6 +10,7 @@ local buildPlate = {}
 local buildPowerCache = {}
 local rangeCache = {}
 local baseDefCache = {}
+local cachedNoResourceReclaimTime = {}
 local dynComm = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
@@ -142,6 +143,26 @@ function Spring.Utilities.GetBaseDefID(unitDefID)
 	local bud = ud.customParams.baseDef and UnitDefNames[ud.customParams.baseDef]
 	baseDefCache[unitDefID] = bud and bud.id or unitDefID
 	return baseDefCache[unitDefID]
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+function Spring.Utilities.GetFeatureReclaimOnlyTime(featureID, featureDefID)
+	featureDefID = featureDefID or Spring.GetFeatureDefID(featureID)
+	if not featureDefID then
+		return false
+	end
+	if not cachedNoResourceReclaimTime[featureDefID] then
+		local fd = FeatureDefs[featureDefID]
+		local reclaimTime = 0
+		if fd.customParams.reclaim_time_only then
+			cachedNoResourceReclaimTime[featureDefID] = fd.reclaimTime or 0
+		else
+			cachedNoResourceReclaimTime[featureDefID] = 0
+		end
+	end
+	return (cachedNoResourceReclaimTime[featureDefID] > 0) and cachedNoResourceReclaimTime[featureDefID]
 end
 
 -------------------------------------------------------------------------------------
