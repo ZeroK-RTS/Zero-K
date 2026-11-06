@@ -65,6 +65,8 @@ return { vehheavyassault = {
     {
       def                = [[DEMOLISHER_BLASTER]],
       accurateLeading    = 1,
+      mainDir            = [[0 0.3, 1]],
+      maxAngleDif        = 160,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -86,7 +88,6 @@ return { vehheavyassault = {
       coreThickness           = 2.5,
       craterBoost             = 2,
       craterMult              = 2,
-      commandFire             = true,
 
       customparams = {
         light_radius = 380,
