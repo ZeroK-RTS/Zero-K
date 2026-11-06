@@ -912,7 +912,8 @@ local function addUnit(defName, path)
 		options[defName .. "_buildpriority_0"].value = 1
 	end
 
-	if ud.canAssist and ud.buildSpeed ~= 0 then
+	-- The engine sets canAssist = false for every factory, plates included.
+	if (ud.canAssist or (ud.isFactory and not ud.customParams.nobuildpower)) and ud.buildSpeed ~= 0 then
 		options[defName .. "_constructor_buildpriority"] = {
 			name = "  Constructor Build Priority",
 			desc = "Values: Low, Normal, High",
