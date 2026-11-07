@@ -1083,10 +1083,16 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 end
 
+-- the next wave starts on the first game frame after data.waveSchedule (see GameFrame)
+local function ScheduleWave(frame)
+	data.waveSchedule = frame
+	Spring.SetGameRulesParam("chickenNextWaveFrame", math.floor(frame) + 1)
+end
+
 function gadget:GameStart()
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
 	--data.waveSchedule[gracePeriod*30] = true	-- schedule first wave
-	data.waveSchedule = gracePeriod * 30
+	ScheduleWave(gracePeriod * 30)
 end
 
 function gadget:GameFrame(n)
@@ -1094,7 +1100,7 @@ function gadget:GameFrame(n)
 	--if data.waveSchedule[n] then
 	if n > data.waveSchedule then
 		--data.waveSchedule[n + (30 * chickenSpawnRate)] = true
-		data.waveSchedule = n + (30 * chickenSpawnRate)
+		ScheduleWave(n + (30 * chickenSpawnRate))
 		--Spring.Echo(data.waveSchedule)
 		local args = {Wave()}
 		if (args[1]) then
