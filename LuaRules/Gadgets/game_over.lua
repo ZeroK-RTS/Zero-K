@@ -69,6 +69,16 @@ local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid and
 local planetIndex = Spring.GetModOptions().singleplayercampaignbattleid
 planetIndex = planetIndex and tonumber(planetIndex)
 
+local zombies = tobool(modOptions.zombies) or false
+local deadAllianceCounter = 0
+local initalAllianceCount = 0
+for index, allyTeamID in ipairs(spGetAllyTeamList()) do
+	local teamlist = spGetTeamList(allyTeamID)
+	if (#teamlist) > 0 then
+		initalAllianceCount = initalAllianceCount +1
+	end
+end
+
 local SPARE_PLANETWARS_UNITS = false
 local SPARE_REGULAR_UNITS = (modOptions.explodeondefeat == "0" or modOptions.explodeondefeat == 0)
 
@@ -186,6 +196,20 @@ end
 local function GetTeamIsChicken(teamID)
 	local luaAI = Spring.GetTeamLuaAI(teamID)
 	if luaAI and string.find(string.lower(luaAI), "chicken") then
+		return true
+	end
+	return false
+end
+
+local function ZombieIsSecondToLastStanding(allyTeamID)
+	if not zombies then
+		return false
+	end
+	if GG.ZombiesGlobal.GetGlobalReviveAllyTeam() == allyTeamID then
+		if initalAllianceCount == deadAllianceCounter+3 then
+			Spring.Echo("Zombies are defeatable")
+			return false
+		end
 		return true
 	end
 	return false
@@ -309,6 +333,11 @@ local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
 		alliancesToDestroy[#alliancesToDestroy + 1] = allianceID
 		return
 	end
+	
+	if ZombieIsSecondToLastStanding(allianceID) then
+		return
+	end
+	
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
@@ -342,6 +371,7 @@ local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
 			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return -- don't perform victory check
 		else -- kaboom
+			deadAllianceCounter = deadAllianceCounter + 1 --TODO there is likely a better way to this
 			if not (isMission or isScriptMission) then
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
 				EchoUIMessage(name .. " has been destroyed!")
@@ -551,6 +581,9 @@ local function ProcessLastAlly()
 			end -- continue
 			local teamlist = spGetTeamList(allyTeamID)
 			if (not teamlist) then
+				break
+			end -- continue
+			if ZombieIsSecondToLastStanding(allyTeamID) then
 				break
 			end -- continue
 			local hasActiveTeam = false
