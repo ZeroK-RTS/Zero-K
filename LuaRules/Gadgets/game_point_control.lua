@@ -130,6 +130,7 @@ local function PlaceArtefactsFromConfig(config)
 			Spring.SetUnitNeutral(unitID, true)
 		end
 	end
+	return true
 end
 
 --------------------------------------------------------------------------------
