@@ -59,6 +59,10 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 end
 
 local function DrawRangeCircle(ux,uy,uz,range,r)
+	local rect = WG.MapRegionView and WG.MapRegionView.rect
+	if rect and (ux < rect.x0 or ux > rect.x1 or uz < rect.z0 or uz > rect.z1) then
+		return
+	end
 	glColor(1.0 - (r / 5), 0, 0, 0.35)
 	glDrawGroundCircle(ux, uy, uz, range, 40)
 end

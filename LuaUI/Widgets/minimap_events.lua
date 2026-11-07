@@ -135,6 +135,10 @@ local xMapSize = Game.mapX * 512
 local yMapSize = Game.mapY * 512
 local pxScale = 1  -- (xMapSize / minimap xPixels)
 local pyScale = 1  -- (yMapSize / minimap yPixels)
+local activeView
+local function InActiveView(x, z)
+	return not activeView or (x >= activeView.x0 and x <= activeView.x1 and z >= activeView.z0 and z <= activeView.z1)
+end
 
 local rectList = 0
 
@@ -386,6 +390,7 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawEvent(event)
+  if not InActiveView(event.x, event.z) then return end
   local pixels = event.v
 
   local color = event.c
@@ -405,7 +410,7 @@ end
 local function DrawDamage(damage)
 
   local px, py, pz = spGetUnitViewPosition(damage.u)
-  if (px == nil) then
+  if (px == nil) or not InActiveView(px, pz) then
     return
   end
 
@@ -461,8 +466,11 @@ function widget:DrawInMiniMap(xSize, ySize)
   gl.Lighting(false)
 
   -- setup the pixel scales
-  pxScale = xMapSize / xSize
-  pyScale = yMapSize / ySize
+  activeView = WG.MapRegionView and WG.MapRegionView.rect
+  local width = activeView and (activeView.x1 - activeView.x0) or xMapSize
+  local height = activeView and (activeView.z1 - activeView.z0) or yMapSize
+  pxScale = width / xSize
+  pyScale = height / ySize
 
   glPushMatrix()
 
@@ -470,10 +478,13 @@ function widget:DrawInMiniMap(xSize, ySize)
 
   if GetMiniMapFlipped() then
     glTranslate(1, 0, 0)
-    glScale(-1 / xMapSize, 1 / yMapSize,1)
+    glScale(-1 / width, 1 / height, 1)
   else
     glTranslate(0, 1, 0)
-    glScale(1 / xMapSize, -1 / yMapSize,1)
+    glScale(1 / width, -1 / height, 1)
+  end
+  if activeView then
+    glTranslate(-activeView.x0, -activeView.z0, 0)
   end
   
   -- draw damages before events
