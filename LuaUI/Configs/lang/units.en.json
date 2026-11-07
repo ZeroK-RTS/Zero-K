@@ -779,6 +779,11 @@
 		"description" : "Shield Support Strider",
 		"helptext" : "The slow all-terrain Funnelweb features an extremely powerful wide-area shield and high nano power for post-battle utility. It is otherwise unarmed."
 	},
+	"strideremp" : {
+		"name" : "Ungoliant",
+		"description" : "Deployable EMP Strider",
+		"helptext" : "Ungoliant walks into the enemy, rears up and unfolds its emitter, then releases an EMP pulse that stuns everything around it, itself included. Use Detonate (D) or an attack order to start the cycle, which cannot be cancelled and roots it in place; stuns delay it and slows stretch it. A single pulse cannot stun a healthy Paladin or Detriment."
+	},
 	"cloakriot" : {
 		"name" : "Reaver",
 		"description" : "Riot Bot",
