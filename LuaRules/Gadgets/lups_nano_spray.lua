@@ -220,24 +220,13 @@ local factionsNanoFx = {
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local builders = {}
-
-local function BuilderFinished(unitID)
-	builders[#builders+1] = unitID
-end
-
-local function BuilderDestroyed(unitID)
-	for i=1,#builders do
-		if (builders[i] == unitID) then
-			builders[i] = builders[#builders]
-		end
-	end
-	builders[#builders] = nil
-end
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+local builders = IterableMap.New() -- finished builders; the key is the unitID
 
 function gadget:GameFrame(frame)
-	for i = 1, #builders do
-		local unitID = builders[i]
+	local builderCount, builderByIndex = IterableMap.GetBarbarianData(builders)
+	for i = 1, builderCount do
+		local unitID = builderByIndex[i]
 		if ((unitID + frame) % 30 < 1) then --// only update once per second
 			local strength = (spGetUnitCurrentBuildPower(unitID) or 0)*(spGetUnitRulesParam(unitID, "totalEconomyChange") or 1) -- * 16
 			if (strength > 0) then
@@ -387,20 +376,14 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
   
-local registeredBuilders = {}
-
 function gadget:UnitFinished(uid, udid)
-	if (UnitDefs[udid].isBuilder) and not registeredBuilders[uid] then
-		BuilderFinished(uid)
-		registeredBuilders[uid] = nil
+	if UnitDefs[udid].isBuilder then
+		IterableMap.Add(builders, uid)
 	end
 end
 
 function gadget:UnitDestroyed(uid, udid)
-	if (UnitDefs[udid].isBuilder) and registeredBuilders[uid] then
-		BuilderDestroyed(uid)
-		registeredBuilders[uid] = nil
-	end
+	IterableMap.Remove(builders, uid)
 end
 
 function gadget:Initialize()
