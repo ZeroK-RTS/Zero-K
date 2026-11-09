@@ -440,9 +440,9 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 		end
 	end
 	--echo("Final selected target ID: "..data.targetID)
-	local validUnitID = spValidUnitID(data.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
+	local validUnitID = (targetData.targetID ~= burrowID) and spValidUnitID(targetData.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
 	if validUnitID and targetData.targetID ~= oldTarget then
-		targetData.targetTeam = spGetUnitTeam(data.targets[data.targetID])
+		targetData.targetTeam = spGetUnitTeam(targetData.targetID)
 		--spGiveOrderToUnit(burrowID, CMD_ATTACK, data.targetID, 0)
 		--echo("Target for burrow ID ".. burrowID .." updated to target ID " .. data.targetID)
 	elseif not validUnitID then
@@ -1072,7 +1072,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	--burrow targetting
 	local name = UnitDefs[unitDefID].name
-	if (humanTeams[unitTeam]) and UnitDefs[unitDefID].isImmobile and (not noTarget.name) then
+	if (humanTeams[unitTeam]) and UnitDefs[unitDefID].isImmobile and (not noTarget[name]) then
 		--echo("Building ID "..unitID .." added to target array")
 		local x, y, z = spGetUnitPosition(unitID)
 		data.targets[unitID] = unitTeam
