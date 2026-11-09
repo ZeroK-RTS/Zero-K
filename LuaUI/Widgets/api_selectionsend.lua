@@ -20,6 +20,7 @@ end
 
 local selUnitsSend = {}
 local timeSinceBroadcast = 0
+local timeSinceTimeout = 0
 local BROADCAST_PERIOD = 10
 local selchanged = false
 
@@ -101,19 +102,29 @@ end
 
 function widget:Update(dt)
 	timeSinceBroadcast = timeSinceBroadcast + dt
-	
+	-- Local selection broadcasts must not postpone expiry of remote senders.
+	timeSinceTimeout = timeSinceTimeout + dt
+	if timeSinceTimeout >= BROADCAST_PERIOD then
+		local periods = math.floor(timeSinceTimeout / BROADCAST_PERIOD)
+		timeSinceTimeout = timeSinceTimeout - periods * BROADCAST_PERIOD
+		local expired = false
+		for pid,dataStr in pairs(allySelData) do
+			allyActiveTx[pid] = allyActiveTx[pid] - periods
+			if allyActiveTx[pid] <= 0 then
+				allySelData[pid] = nil
+				allyActiveTx[pid] = nil
+				expired = true
+			end
+		end
+		if expired then
+			UpdateAllySelUnits()
+		end
+	end
+
 	if timeSinceBroadcast > BROADCAST_PERIOD then
 		timeSinceBroadcast = 0
 		
 		SendSelUnits(spGetSelectedUnits())
-		
-		for pid,dataStr in pairs(allySelData) do
-			allyActiveTx[pid] = allyActiveTx[pid] - 1
-		end
-		if allyActiveTx[pid] == 0 then
-			allySelData[playerID] = nil
-		end
-		
 	elseif timeSinceBroadcast > 1 and selchanged then
 		timeSinceBroadcast = 0
 		selchanged = false
