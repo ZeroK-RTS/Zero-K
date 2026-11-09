@@ -45,6 +45,12 @@ local function shuffle(t) --Fisher-Yates taught me this trick! (It was actually 
 		local j = math.random(i)
 		tbl[i], tbl[j] = tbl[j], tbl[i]
 	end
+	--TODO Util function doesnt seem to work?
+	--[[
+	local testShuffle = Spring.Utilities.PermuteList(t)
+	Spring.Echo(tbl)
+	Spring.Echo(testShuffle)
+	]]
 	return tbl
 end
 
@@ -80,6 +86,12 @@ local function GetCostFromUnitDefName(unitDefName)
 		unitCost = 200
 		Spring.Echo("Unit has no cost set, defaulting to 200")
 	end
+	--TODO Util function doesnt seem to work?
+	--[[
+	local testUnitCost = Spring.Utilities.GetUnitCost(nil,unitDefName)
+	Spring.Echo(unitCost)
+	Spring.Echo(testUnitCost)
+	]]
 	return unitCost
 end
 
@@ -205,7 +217,7 @@ local function CompositionBuilder(budget,unitGroupAndParams,typeList)
 		local unitGroup = nil
 		local budgetFraction = 1
 		local multiRandomise = true
-		local minUnits = 1
+		local minUnits = 0
 		local wreckChance = 0
 		local unitCount
 		if type(data) == "table" and data.unitGroup then
@@ -221,6 +233,7 @@ local function CompositionBuilder(budget,unitGroupAndParams,typeList)
 			Spring.Echo("Input of Compositionbuilder in unit_composition_spawner has error")
 		end
 		local budgetToSpend = budget*budgetFraction/budgetTotalFraction + excessBudget
+		--Spring.Echo(unitGroup)
 		typeComposition,excessBudget,unitCount = GetRandomUnitsFromListForCost(budgetToSpend,typeList[unitGroup],multiRandomise)
 		if unitCount < minUnits then
 			local unitsToMin = minUnits - unitCount
@@ -245,7 +258,7 @@ local function QueueListSpawn(unitDefParamTable,x,z,teamID,noGoZones) --TODO rem
 		local unitDefName = nil
 		local spawnCount = 1
 		local spawnAsWreckChance = 0 --TODO hmm chance vs ratio... I suppose we can have wrecks, and normal units defined, but a chance covers that too
-		local spacing = math.random (0,96)
+		local spacing = math.random (0,80)
 		local dropPod = true
 		local spawnPattern = "centered"
 		if type(data) == "table" and data.unitDefName then
@@ -304,6 +317,8 @@ local function QueueListSpawn(unitDefParamTable,x,z,teamID,noGoZones) --TODO rem
 	return spawnedUnits, noGoZones
 end
 
+--[[
+example comp building func
 local function GetGroupCompositionByBudgetAndType(budget,compositionType)
     if not budget then
         budget = 300
@@ -324,6 +339,7 @@ local function GetGroupCompositionByBudgetAndType(budget,compositionType)
     end
     return {assaults = 1}
 end
+]]
 
 -- TODO remove or keep functions that show off how stuff works?
 local function spawningTest()

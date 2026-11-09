@@ -14,7 +14,7 @@ function gadget:GetInfo()
 		author    = "Stiofan",
 		date      = "2026",
 		license   = "GNU GPL, v2 or later",
-		layer     = math.huge, -- (I dont know when would be appropriate)
+		layer     = 0,
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -38,9 +38,29 @@ local reinforceBudget =  tonumber(modOptions.reinforce_drop_base) or 0
 local reinforceBudgetGrowth = tonumber(modOptions.reinforce_drop_growth) or 300
 local reinforceGaiaMult = tonumber(modOptions.reinforce_drop_gaia_mult) or 1
 
+local function GetGroupCompositionByBudgetAndType(budget,compositionType)
+    if not budget then
+        budget = 300
+    end
+    if not compositionType then
+        compositionType = allCompositions.mobileCompositions
+    end
+    if (budget < 500) then
+        return compositionType.tinyCost[math.random(#compositionType.tinyCost)]
+	elseif (budget < 1500) then
+        return compositionType.lowCost[math.random(#compositionType.lowCost)]
+    elseif (budget < 2000) then
+        return compositionType.mediumCost[math.random(#compositionType.mediumCost)]
+    elseif (budget < 7500) then
+        return compositionType.highCost[math.random(#compositionType.highCost)]
+    elseif (budget >= 7500) then
+        return compositionType.ludicrousCost[math.random(#compositionType.ludicrousCost)]
+    end
+    return {assaults = 1}
+end
 
 local function TeamReinforcements(budget)
-    local UnitTypeAndRatios = GG.UnitSpawnerGetGroupCompositionByBudgetAndType(budget)
+    local UnitTypeAndRatios = GetGroupCompositionByBudgetAndType(budget)
     local unitComposition = GG.UnitSpawnerCompositionBuilder(budget,UnitTypeAndRatios)
     --[[
     Spring.Echo("ReinforceCompUnits")
@@ -57,7 +77,7 @@ end
 
 --TODO improve the spawning to prefer buildings, then mid
 local function GaiaReinforcements(budget)
-    local unitComposition = GG.UnitSpawnerCompositionBuilder(budget,GG.UnitSpawnerGetGroupCompositionByBudgetAndType(budget))
+    local unitComposition = GG.UnitSpawnerCompositionBuilder(budget,GetGroupCompositionByBudgetAndType(budget))
     --[[
     Spring.Echo("GaiaCompUnits")
     for key, value in pairs(unitComposition) do
