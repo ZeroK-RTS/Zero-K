@@ -10,10 +10,12 @@ function gadget:GetInfo()
 	}
 end
 
--- Protocol. <payload> is the initial queue widget's own format, forwarded
--- verbatim: "1|unitDefID|x|y|z|face" (insert at front), "3|..." (append),
--- "4|..." (replace the queue with this item), "2|index" (remove the 1-based
--- index) or "5" (clear the queue).
+-- Protocol. <payload> is the initial queue widget's own format:
+-- "1|unitDefID|x|y|z|face" (insert at front), "3|..." (append), "4|..."
+-- (replace the queue with this item), "6|...|index" (insert at the 1-based
+-- index), "2|index" (remove the 1-based index) or "5" (clear the queue).
+-- Synced code parses every payload it receives and passes on only a copy
+-- rebuilt from the parsed numbers (SanitizePayload); anything else is dropped.
 --   widget -> LuaRules   "IQ|<payload>"                (Spring.SendLuaRulesMsg)
 --   LuaRules -> AI       "IQ|<teamID>|<payload>"       (Spring.SendSkirmishAIMessage, allied AIs only;
 --                                                       teamID is the player's, or an allied AI's, team)
@@ -35,13 +37,69 @@ if gadgetHandler:IsSyncedCode() then
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetTeamInfo = Spring.GetTeamInfo
 local spGetAIInfo = Spring.GetAIInfo
+local IsValidPosition = Spring.Utilities.IsValidPosition
+local ExplodeString = Spring.Utilities.ExplodeString
+
+local MAX_PAYLOAD_LENGTH = 64 -- real payloads are under 40 characters
+local MAX_QUEUE_INDEX = 100 -- the widget keeps at most 30 items (its MAX_QUEUE)
+
+local aiAllyTeam = {} -- [teamID] = allyTeamID, for each Skirmish AI team
+do
+	local teams = Spring.GetTeamList()
+	for i = 1, #teams do
+		local _, _, _, isAI, _, allyTeamID = spGetTeamInfo(teams[i], false)
+		if isAI then
+			aiAllyTeam[teams[i]] = allyTeamID
+		end
+	end
+end
+
+local function IsQueueIndex(n)
+	return n and n >= 1 and n <= MAX_QUEUE_INDEX and n % 1 == 0
+end
+
+-- Returns the payload rebuilt from its parsed fields, or nil unless it is a
+-- well-formed queue message: a known type, an existing unit def, a position on
+-- the map, a facing of 0-3 and a whole queue index.
+local function SanitizePayload(payload)
+	if #payload > MAX_PAYLOAD_LENGTH then
+		return
+	end
+	local fields = ExplodeString("|", payload)
+	local kind = tonumber(fields[1])
+	if kind == 5 then
+		return "5"
+	elseif kind == 2 then
+		local index = tonumber(fields[2])
+		return IsQueueIndex(index) and ("2|" .. index) or nil
+	elseif kind ~= 1 and kind ~= 3 and kind ~= 4 and kind ~= 6 then
+		return
+	end
+	local unitDefID, x, y, z, face = tonumber(fields[2]), tonumber(fields[3]), tonumber(fields[4]), tonumber(fields[5]), tonumber(fields[6])
+	if not (unitDefID and UnitDefs[unitDefID] and IsValidPosition(x, z) and y and math.abs(y) < 100000
+			and (face == 0 or face == 1 or face == 2 or face == 3)) then
+		return
+	end
+	local msg = string.format("%d|%d|%d|%d|%d|%d", kind, unitDefID, x, y, z, face)
+	if kind == 6 then
+		local index = tonumber(fields[7])
+		if not IsQueueIndex(index) then
+			return
+		end
+		msg = msg .. "|" .. index
+	end
+	return msg
+end
 
 local function RelayPlayerQueue(msg, playerID)
 	local _, _, spectator, teamID, allyTeamID = spGetPlayerInfo(playerID, false)
 	if spectator or not teamID or not allyTeamID then
 		return
 	end
-	SendToUnsynced("IQ_ToAI", teamID, allyTeamID, msg:sub(#PLAYER_PREFIX + 1))
+	local payload = SanitizePayload(msg:sub(#PLAYER_PREFIX + 1))
+	if payload then
+		SendToUnsynced("IQ_ToAI", teamID, allyTeamID, payload)
+	end
 end
 
 local function RelayAIQueue(msg, playerID)
@@ -52,12 +110,9 @@ local function RelayAIQueue(msg, playerID)
 		return
 	end
 	local aiTeam = tonumber(rest:sub(1, sep - 1))
-	local payload = rest:sub(sep + 1)
-	if not aiTeam or payload == "" then
-		return
-	end
-	local _, _, _, isAI, _, allyTeamID = spGetTeamInfo(aiTeam, false)
-	if not isAI then
+	local allyTeamID = aiTeam and aiAllyTeam[aiTeam]
+	local payload = SanitizePayload(rest:sub(sep + 1))
+	if not (allyTeamID and payload) then
 		return
 	end
 	local _, _, hostPlayerID = spGetAIInfo(aiTeam)
@@ -87,16 +142,14 @@ function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
 	if type(dataStr) ~= "string" or dataStr:sub(1, #PLAYER_PREFIX) ~= PLAYER_PREFIX then
 		return
 	end
-	local payload = dataStr:sub(#PLAYER_PREFIX + 1)
-	if payload == "" then
+	local payload = SanitizePayload(dataStr:sub(#PLAYER_PREFIX + 1))
+	if not payload then
 		return
 	end
 	if payload == "5" then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "AI team " .. aiTeam .. " is reporting its initial queue")
 	end
-	CallAsTeam(aiTeam, function()
-		Spring.SendLuaRulesMsg(AI_PREFIX .. aiTeam .. "|" .. payload)
-	end)
+	Spring.SendLuaRulesMsg(AI_PREFIX .. aiTeam .. "|" .. payload)
 end
 
 --------------------------------------------------------------------------------
@@ -117,7 +170,7 @@ local function SendToAlliedAIs(_, sourceTeamID, allyTeamID, payload)
 	for i = 1, #teams do
 		local teamID = teams[i]
 		if teamID ~= sourceTeamID and select(4, spGetTeamInfo(teamID, false)) then
-			pcall(spSendSkirmishAIMessage, teamID, msg)
+			spSendSkirmishAIMessage(teamID, msg)
 		end
 	end
 end
@@ -126,12 +179,7 @@ local function SendToWidget(_, aiTeam, allyTeamID, payload)
 	if not (Spring.GetSpectatingState() or Spring.GetMyAllyTeamID() == allyTeamID) then
 		return
 	end
-	if Script.LuaUI("IQ_FromAI") then
-		local ok, err = pcall(Script.LuaUI.IQ_FromAI, aiTeam, payload)
-		if not ok then
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "IQ_FromAI failed: " .. tostring(err))
-		end
-	end
+	Script.LuaUI.IQ_FromAI(aiTeam, payload) -- a no-op when the widget is off
 end
 
 function gadget:Initialize()
