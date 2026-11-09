@@ -15,7 +15,6 @@ end
 
 --[[
 	TO DO:
-		Add amount label when mouseover line on graph (e.g to see exact metal produced at a certain time),
 		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
 --]]
 
@@ -204,6 +203,121 @@ local function formatTime(seconds)
 	return hours .. ":" .. minutes .. ":" .. seconds
 end
 
+local UpdateProbe = function() end
+local HideProbe = function() end
+
+local function MakeProbe(lines, statistic, graphLength, generalHistory, totalTime)
+	local probeLine = Chili.Line:New{
+		name = "statsProbeLine",
+		parent = graphPanel,
+		x = 0, y = 0, bottom = 0, width = 1,
+		minWidth = 1,
+		style = "vertical",
+		borderColor = {1,1,1,0.8},
+	}
+	local probe = Chili.Panel:New{
+		name = "statsProbe",
+		parent = graphPanel,
+		x = 0, y = 0,
+		padding = {6,6,6,6},
+		backgroundColor = {0,0,0,0.9},
+		-- The readout must not take hover or clicks from the plot or legend.
+		HitTest = function() return false end,
+	}
+	local timeLabel = Chili.Label:New{
+		parent = probe,
+		x = 0, y = 0,
+		caption = "",
+		font = {size = 13},
+	}
+	table.sort(lines, function(a, b) return TeamToPosition(a.teamID) < TeamToPosition(b.teamID) end)
+	for i = 1, #lines do
+		lines[i].label = Chili.Label:New{
+			parent = probe,
+			x = 0, y = 0,
+			caption = "",
+			font = {size = 13, color = lines[i].color},
+		}
+	end
+
+	HideProbe = function()
+		probeLine:Hide()
+		probe:Hide()
+	end
+	UpdateProbe = function()
+		local mx, my, _, _, _, outside = Spring.ScaledGetMouseState()
+		local x, y = graphPanel:ScreenToClient(mx, select(2, Spring.GetViewSizes()) - my)
+		local width, height = graphPanel.clientArea[3], graphPanel.clientArea[4]
+		if outside or not graphPanel:IsVisibleOnScreen() or width <= 0 or height <= 0 or x < 0 or y < 0 or x > width or y > height then
+			HideProbe()
+			return
+		end
+		-- Snap to the nearest plotted vertex. Do not invent values between samples.
+		local index = math.floor(x/width*(graphLength - 1) + 0.5) + 1
+		local seconds
+		if rulesParamStats[statistic] or functionStats[statistic] then
+			-- The gadget samples at frame 0, then every 450 frames, and at game over.
+			seconds = math.min((index - 1)*15, totalTime)
+		else
+			seconds = math.min(generalHistory[index].time, totalTime)
+		end
+		timeLabel:SetCaption("Time: " .. formatTime(math.floor(seconds)))
+		local rowHeight = math.ceil(timeLabel.font:GetLineHeight(13)) + 2
+		local rows = math.max(1, math.floor((height - 12)/rowHeight) - 1)
+		local columnWidths = {}
+		for i = 1, #lines do
+			local line = lines[i]
+			local value = line.values[index]
+			local text = labelScaleFunc[statistic] and labelScaleFunc[statistic](value) or numFormat(value)
+			local exact = tostring(labelScaleFunc[statistic] and math.exp(value) or value)
+			if text ~= exact then
+				text = text .. " (" .. exact .. ")"
+			end
+			line.label:SetCaption(line.name .. ": " .. text)
+			local column = math.floor((i - 1)/rows) + 1
+			columnWidths[column] = math.max(columnWidths[column] or 0, line.label.font:GetTextWidth(line.label.caption, 13) + 8)
+		end
+		local textWidth = 0
+		for i = 1, #columnWidths do
+			textWidth = textWidth + columnWidths[i]
+		end
+		textWidth = math.max(textWidth, timeLabel.font:GetTextWidth(timeLabel.caption, 13) + 8)
+		-- Keep all values in the plot when many teams or long names need columns.
+		local fontSize = math.max(1, math.min(13, math.floor(13*(width - 12*math.max(1, #columnWidths))/textWidth)))
+		if timeLabel.font.size ~= fontSize then
+			timeLabel.font:SetSize(fontSize)
+			timeLabel:UpdateLayout()
+		end
+		rowHeight = math.ceil(timeLabel.font:GetLineHeight()) + 2
+		local columnX, columnWidth = 0, 0
+		for i = 1, #lines do
+			local line = lines[i]
+			if line.label.font.size ~= fontSize then
+				line.label.font:SetSize(fontSize)
+				line.label:UpdateLayout()
+			end
+			if i > 1 and (i - 1)%rows == 0 then
+				columnX = columnX + columnWidth + 12
+				columnWidth = 0
+			end
+			line.label:SetPos(columnX, ((i - 1)%rows + 1)*rowHeight)
+			columnWidth = math.max(columnWidth, line.label.width)
+		end
+		local probeWidth = math.max(timeLabel.width, columnX + columnWidth) + 12
+		local probeHeight = (math.min(rows, #lines) + 1)*rowHeight + 12
+		local probeX = x + 12
+		if probeX + probeWidth > width then
+			probeX = x - probeWidth - 12
+		end
+		probe:SetPos(math.max(0, probeX), math.max(0, math.min(y + 12, height - probeHeight)), probeWidth, probeHeight)
+		probeLine:SetPos((index - 1)/(graphLength - 1)*width)
+		probeLine:Show()
+		probe:Show()
+		probe:BringToFront()
+	end
+	HideProbe()
+end
+
 local function drawIntervals(statistic, graphMin, graphMax)
 	for i = 1, 4 do
 		local line = Chili.Line:New{
@@ -325,7 +439,7 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, statistic, graphMin, graphMax, teamID, team_num, isHighlighted)
+local function drawGraph(graphArray, statistic, graphMin, graphMax, teamID, team_num, isHighlighted, probeLines)
 	if #graphArray == 0 then
 		return
 	end
@@ -346,6 +460,7 @@ local function drawGraph(graphArray, statistic, graphMin, graphMax, teamID, team
 	else
 		name = teamNames[teamID] or "???"
 	end
+	probeLines[#probeLines + 1] = {teamID = teamID, name = name, color = teamColor, values = graphArray}
 
 	--gets vertex's from array and plots them
 	local drawLine = function()
@@ -381,6 +496,9 @@ local function drawGraph(graphArray, statistic, graphMin, graphMax, teamID, team
 			alignPadding = 0.08,
 			font = {color = (isHighlighted and teamColor) or teamColorDark},
 			noClickThrough = true,
+			OnMouseOver = {function() UpdateProbe() end},
+			OnMouseMove = {function() UpdateProbe() end},
+			OnMouseOut = {function() HideProbe() end},
 			OnClick = {
 				function(...)
 					if usingAllyteams then
@@ -498,6 +616,8 @@ function functionStats.attrition_damage(teams, statistic, usingAllyteams, graphL
 end
 
 getEngineArrays = function(statNameData, labelCaption)
+	UpdateProbe = function() end
+	HideProbe = function() end
 	local teams = Spring.GetTeamList()
 	local spectating, specFullView = Spring.GetSpectatingState()
 	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
@@ -557,14 +677,14 @@ getEngineArrays = function(statNameData, labelCaption)
 		highlightID = highlightedTeamId
 	end
 	
-	local team_i = 1
+	local probeLines = {}
 	for teamID, v in pairs(teamScores) do
 		if teamID ~= gaia and teamID ~= highlightID then
-			drawGraph(v, statistic, graphMin, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID)
+			drawGraph(v, statistic, graphMin, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID, probeLines)
 		end
 	end
 	if highlightID then
-		local graph, label = drawGraph(teamScores[highlightID], statistic, graphMin, graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
+		local graph, label = drawGraph(teamScores[highlightID], statistic, graphMin, graphMax*1.005, highlightID, TeamToPosition(highlightID), true, probeLines)
 		if graph then
 			graph:BringToFront()
 		end
@@ -579,6 +699,7 @@ getEngineArrays = function(statNameData, labelCaption)
 	graphPanel:Invalidate()
 	graphPanel:UpdateClientArea()
 	drawIntervals(statistic, graphMin, graphMax)
+	MakeProbe(probeLines, statistic, graphLength, generalHistory, totalTime)
 end
 
 --------------------------------------------------------------------------------
@@ -624,6 +745,10 @@ function makePanel()
 		y = 0,
 		bottom = 40,
 		padding = {2, 2, 2, 2},
+		hitTestAllowEmpty = true,
+		OnMouseOver = {function() UpdateProbe() end},
+		OnMouseMove = {function() UpdateProbe() end},
+		OnMouseOut = {function() HideProbe() end},
 	}
 	graphLabel = Chili.Label:New {
 		parent = window0,
