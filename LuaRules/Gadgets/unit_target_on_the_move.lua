@@ -40,6 +40,7 @@ local spGetUnitLosState     = Spring.GetUnitLosState
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 local GetUnitRange = Spring.Utilities.GetUnitRange
 local getMovetype  = Spring.Utilities.getMovetype
@@ -54,6 +55,7 @@ local TARGET_GROUND = 1
 local TARGET_UNIT   = 2
 
 local CMD_ATTACK = CMD.ATTACK
+local CMD_MANUALFIRE = CMD.MANUALFIRE
 local DEBUG_NAME = "Target on the move"
 
 --------------------------------------------------------------------------------
@@ -295,8 +297,15 @@ end
 --------------------------------------------------------------------------------
 -- Target Handling
 
+local function IsManualFiring(unitID)
+	-- The manual fire command uses the unit target to aim the special weapon.
+	return spGetUnitCurrentCommand(unitID) == CMD_MANUALFIRE
+end
+
 local function clearTarget(unitID)
-	spSetUnitTarget(unitID, nil) -- The second argument is needed.
+	if not IsManualFiring(unitID) then
+		spSetUnitTarget(unitID, nil) -- The second argument is needed.
+	end
 	spSetUnitRulesParam(unitID, "target_type", TARGET_NONE)
 end
 
@@ -313,8 +322,9 @@ local function setTarget(data, sendToWidget)
 		return false
 	end
 	if spValidUnitID(data.id) then
+		local manualFiring = IsManualFiring(data.id)
 		if not data.targetID then
-			if not (data.fireTowards and CheckFireTowardsGroundTarget(data.id, data, data.x, data.y, data.z)) then
+			if not (manualFiring or (data.fireTowards and CheckFireTowardsGroundTarget(data.id, data, data.x, data.y, data.z))) then
 				if IsTargetGroundAllowed(data.id, data.unitDefID, data.x, data.y, data.z) then
 					spSetUnitTarget(data.id, data.x, data.y, data.z, false, true, -1)
 					GG.UnitSetGroundTarget(data.id)
@@ -328,7 +338,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (GetUnitRange(data.id, data.unitDefID) or 1)) or 0)
 			end
 		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam))and (data.id ~= data.targetID) then
-			if (not Spring.GetUnitIsCloaked(data.targetID)) and not (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID)) then
+			if not (manualFiring or Spring.GetUnitIsCloaked(data.targetID) or (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID))) then
 				spSetUnitTarget(data.id, data.targetID, false, true)
 			end
 			if sendToWidget then
