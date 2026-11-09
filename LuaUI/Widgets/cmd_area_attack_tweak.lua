@@ -289,9 +289,7 @@ function PrepareCommandArray(targetUnits, cmdID, options, indx, shuffle, toQueue
 	indx = LoopAroundIndex(indx, #targetUnits)
 	local stepSkip = 1
 	if shuffle then
-		stepSkip = (#targetUnits%(2))*-1 +3
-		--stepSkip is 3 if #targetUnits is EVEN number (eg: 4,6,8), or 2 if  #targetUnits is ODD (eg: 3,5,7)
-		--this will shuffle the target sequence appropriately
+		stepSkip = (#targetUnits % 2 == 1 and 2) or (#targetUnits % 3 ~= 0 and 3) or 1
 	end
 	local attackCommandList = {}
 	local j = 1
