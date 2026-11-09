@@ -92,6 +92,7 @@ local circlePoly = {}
 -- Creating polygons, this is run once widget starts, create quads for each team colour:
 UpdateDrawList = function()
 	for _,team in ipairs(Spring.GetTeamList()) do
+		glDeleteList(circlePoly[team])
 		local r, g, b = spGetTeamColor(team)
 		local alpha = 0.5
 		local fadealpha = 0.2
@@ -178,7 +179,13 @@ UpdateDrawList = function()
 end
 
 function widget:Shutdown()
-	glDeleteList(circlePolysFoe)
+	for _, list in pairs(circlePoly) do
+		glDeleteList(list)
+	end
+end
+
+function widget:TeamColorsChanged()
+	UpdateDrawList()
 end
 
 
