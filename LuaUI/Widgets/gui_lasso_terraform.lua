@@ -1112,8 +1112,8 @@ function widget:MousePress(mx, my, button)
 		buildToGive = {
 			facing = Spring.GetBuildFacing(),
 			cmdID = activeid,
-			x = (x1 + x2)/2,
-			z = (z1 + z2)/2,
+			x = (point[2].x + point[3].x)/2,
+			z = (point[2].z + point[3].z)/2,
 		}
 
 		terraformHeight = point[1].y
