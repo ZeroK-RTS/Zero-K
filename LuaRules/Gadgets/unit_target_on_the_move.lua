@@ -40,7 +40,8 @@ local spGetUnitLosState     = Spring.GetUnitLosState
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
-local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local spGetUnitWeaponTarget = Spring.GetUnitWeaponTarget
+local spUnitWeaponHoldFire  = Spring.UnitWeaponHoldFire
 
 local GetUnitRange = Spring.Utilities.GetUnitRange
 local getMovetype  = Spring.Utilities.getMovetype
@@ -55,7 +56,6 @@ local TARGET_GROUND = 1
 local TARGET_UNIT   = 2
 
 local CMD_ATTACK = CMD.ATTACK
-local CMD_MANUALFIRE = CMD.MANUALFIRE
 local DEBUG_NAME = "Target on the move"
 
 --------------------------------------------------------------------------------
@@ -79,10 +79,22 @@ local fireTowardsCheckBuffer = {}
 local setTargetRangeBuffer = {}
 local fireTowardsRangeBuffer = {}
 local setTargetSpeedMult = {}
+local nonManualFireWeapons = {} -- Only for units with a manual fire weapon.
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	weaponCounts[i] = (ud.weapons and #ud.weapons)
+	local otherWeapons, hasManualFire = {}, false
+	for j = 1, weaponCounts[i] do
+		if WeaponDefs[ud.weapons[j].weaponDef].manualFire then
+			hasManualFire = true
+		else
+			otherWeapons[#otherWeapons + 1] = j
+		end
+	end
+	if hasManualFire then
+		nonManualFireWeapons[i] = otherWeapons
+	end
 	if ((not (ud.canFly and ((ud.isBomber or ud.isBomberAirUnit) and not ud.customParams.can_set_target))) and
 			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		if getMovetype(ud) == 0 then
@@ -155,6 +167,30 @@ local unitCancelTargetCmdDesc = {
 
 --------------------------------------------------------------------------------
 -- Target Handling
+
+-- A unit target replaces the manual fire target, so units with a manual fire
+-- weapon get the set target on their other weapons only.
+local function SetUnitTargetUnit(unitID, unitDefID, targetID)
+	local weapons = nonManualFireWeapons[unitDefID]
+	if not weapons then
+		spSetUnitTarget(unitID, targetID, false, true)
+		return
+	end
+	for i = 1, #weapons do
+		spSetUnitTarget(unitID, targetID, false, true, weapons[i])
+	end
+end
+
+local function SetUnitTargetGround(unitID, unitDefID, x, y, z)
+	local weapons = nonManualFireWeapons[unitDefID]
+	if not weapons then
+		spSetUnitTarget(unitID, x, y, z, false, true, -1)
+		return
+	end
+	for i = 1, #weapons do
+		spSetUnitTarget(unitID, x, y, z, false, true, weapons[i])
+	end
+end
 
 local function IsUnitInRange(unitID, unitDefID, weaponID, targetID)
 	local dis = Spring.GetUnitSeparation(unitID, targetID, true, false) -- 2d range
@@ -268,7 +304,7 @@ local function FireTowardsPosition(unitID, unitDefID, tx, ty, tz)
 	local buffer = fireTowardsRangeBuffer[unitDefID] or setTargetRangeBuffer[unitDefID] or FIRE_TOWARDS_BUFFER
 	local fx, fy, fz = GG.GetFireTowardsPos(unitID, unitDefID, tx, ty, tz, buffer)
 	if fx then
-		spSetUnitTarget(unitID, fx, fy, fz, false, true, -1)
+		SetUnitTargetGround(unitID, unitDefID, fx, fy, fz)
 		--Spring.MarkerAddPoint(ux + fx, fy, uz + fz, "")
 	end
 end
@@ -297,13 +333,16 @@ end
 --------------------------------------------------------------------------------
 -- Target Handling
 
-local function IsManualFiring(unitID)
-	-- The manual fire command uses the unit target to aim the special weapon.
-	return spGetUnitCurrentCommand(unitID) == CMD_MANUALFIRE
-end
-
 local function clearTarget(unitID)
-	if not IsManualFiring(unitID) then
+	local weapons = nonManualFireWeapons[spGetUnitDefID(unitID)]
+	if weapons then
+		for i = 1, #weapons do
+			local _, isUserTarget = spGetUnitWeaponTarget(unitID, weapons[i])
+			if isUserTarget then
+				spUnitWeaponHoldFire(unitID, weapons[i])
+			end
+		end
+	else
 		spSetUnitTarget(unitID, nil) -- The second argument is needed.
 	end
 	spSetUnitRulesParam(unitID, "target_type", TARGET_NONE)
@@ -322,11 +361,10 @@ local function setTarget(data, sendToWidget)
 		return false
 	end
 	if spValidUnitID(data.id) then
-		local manualFiring = IsManualFiring(data.id)
 		if not data.targetID then
-			if not (manualFiring or (data.fireTowards and CheckFireTowardsGroundTarget(data.id, data, data.x, data.y, data.z))) then
+			if not (data.fireTowards and CheckFireTowardsGroundTarget(data.id, data, data.x, data.y, data.z)) then
 				if IsTargetGroundAllowed(data.id, data.unitDefID, data.x, data.y, data.z) then
-					spSetUnitTarget(data.id, data.x, data.y, data.z, false, true, -1)
+					SetUnitTargetGround(data.id, data.unitDefID, data.x, data.y, data.z)
 					GG.UnitSetGroundTarget(data.id)
 				end
 			end
@@ -338,8 +376,8 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (GetUnitRange(data.id, data.unitDefID) or 1)) or 0)
 			end
 		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam))and (data.id ~= data.targetID) then
-			if not (manualFiring or Spring.GetUnitIsCloaked(data.targetID) or (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID))) then
-				spSetUnitTarget(data.id, data.targetID, false, true)
+			if (not Spring.GetUnitIsCloaked(data.targetID)) and not (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID)) then
+				SetUnitTargetUnit(data.id, data.unitDefID, data.targetID)
 			end
 			if sendToWidget then
 				spSetUnitRulesParam(data.id, "target_type", TARGET_UNIT)
