@@ -527,12 +527,14 @@ function Spring.UnitScript.Signal(mask)
 			local signal_mask = thread.signal_mask
 			if (type(signal_mask) == "number" and bit_and(signal_mask, mask) ~= 0 and thread.container) then
 				RemoveTableElement(thread.container, thread)
+				thread.container = nil
 			end
 		end
 	else
 		for _,thread in pairs(activeUnit.threads) do
 			if (thread.signal_mask == mask and thread.container) then
 				RemoveTableElement(thread.container, thread)
+				thread.container = nil
 			end
 		end
 	end
