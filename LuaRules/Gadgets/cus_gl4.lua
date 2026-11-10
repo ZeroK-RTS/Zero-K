@@ -1276,6 +1276,7 @@ local function AddObject(objectID, drawFlag, reason)
 	else
 		objectDefID = -1 *  Spring.GetFeatureDefID(-1 * objectID)
 		objectIDtoDefID[objectID] = objectDefID
+		if Spring.SetFeaturePaletteIndex then Spring.SetFeaturePaletteIndex(-1 * objectID, nil) end -- Recoil #3718: teamless features are left on an unwritten palette slot
 	end
 	if not objectDefID then
 		return -- This bail is needed so that we dont add/update units that dont actually exist any more, when cached from the catchup phase
