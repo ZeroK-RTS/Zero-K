@@ -45,6 +45,18 @@ local function MergeShieldColor(col, frac)
 	}
 end
 
+-- Shield spheres are drawn in unit space: a unit sphere scaled by size * (1 + sizeDrift),
+-- moved by pos. Uses the active camera, so it is also right in the water passes.
+function IsShieldSphereInView(self)
+	local x, y, z = Spring.GetUnitViewPosition(self.unit)
+	if not x then
+		return true
+	end
+	local pos = self.pos
+	local radius = self.size * (1 + (self.sizeDrift or 0)) + math.sqrt(pos[1]*pos[1] + pos[2]*pos[2] + pos[3]*pos[3])
+	return Spring.IsSphereInView(x, y, z, radius + 32)
+end
+
 local hitOpacityMult = {0.2, 0.5, 0.5}
 local HIT_DURATION = 2
 function GetShieldColor(unitID, self)
