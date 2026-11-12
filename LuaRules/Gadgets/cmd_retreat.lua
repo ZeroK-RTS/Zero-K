@@ -86,9 +86,9 @@ local retreatState = {} -- stores the the current state of the retreat command f
 local retreatables = {} -- unit has the ability to retreat (so it should have a retreat state command available)
 local isPlane = {}
 local havens = {}
-local RADIUS = 160 --retreat zone radius
-local DIAM = RADIUS * 2
-local RADSQ = RADIUS * RADIUS
+local RADIUS = 160 --retreat zone radius, zones placed with a click
+local MIN_RADIUS = 80 --zones placed with a drag
+local MAX_RADIUS = 800
 
 local ignoreAllowCommand = false
 
@@ -104,36 +104,42 @@ end
 ----- Haven Handling
 ----------------------------
 
+-- Returns the haven with the closest edge.
 local function FindClosestHaven(teamID, sx, sz)
-	local closestDistSqr = math.huge
-	local cx, cz  --  closest coordinates
-	local cHavenID
 	local havensTeam = havens[teamID]
 	if not havensTeam then
-		return -1, -1, -1
+		return
 	end
+	local closestDist = math.huge
+	local closestHaven
 	for havenID = 1, havensTeam.count do
-		local hx, hz = havensTeam.data[havenID].x, havensTeam.data[havenID].z
-		if hx then
-			local dSquared = (hx - sx)^2 + (hz - sz)^2
-			if (dSquared < closestDistSqr) then
-				closestDistSqr = dSquared
-				cx = hx
-				cz = hz
-				cHavenID = havenID
-			end
+		local haven = havensTeam.data[havenID]
+		local dist = math.sqrt((haven.x - sx)^2 + (haven.z - sz)^2) - haven.r
+		if dist < closestDist then
+			closestDist = dist
+			closestHaven = haven
 		end
 	end
-	if (not cx) then
-		return -1, -1, -1
-	end
-	return cx, cz, closestDistSqr, cHavenID
+	return closestHaven
 end
 
-local function FindClosestHavenToUnit(unitID)
-	local ux, _, uz = spGetUnitPosition(unitID)
-	local teamID = spGetUnitTeam(unitID)
-	return FindClosestHaven(teamID, ux, uz)
+-- Returns the ID of the haven that contains the point and has the closest centre.
+local function FindHavenAt(teamID, sx, sz)
+	local havensTeam = havens[teamID]
+	if not havensTeam then
+		return
+	end
+	local closestDistSqr = math.huge
+	local closestHavenID
+	for havenID = 1, havensTeam.count do
+		local haven = havensTeam.data[havenID]
+		local dSquared = (haven.x - sx)^2 + (haven.z - sz)^2
+		if dSquared < haven.r^2 and dSquared < closestDistSqr then
+			closestDistSqr = dSquared
+			closestHavenID = havenID
+		end
+	end
+	return closestHavenID
 end
 
 local function WriteHavenToTeamRulesParam(teamID, havenID)
@@ -141,10 +147,11 @@ local function WriteHavenToTeamRulesParam(teamID, havenID)
 		local data = havens[teamID].data[havenID]
 		Spring.SetTeamRulesParam(teamID, "haven_x" .. havenID, data.x, alliedTrueTable)
 		Spring.SetTeamRulesParam(teamID, "haven_z" .. havenID, data.z, alliedTrueTable)
+		Spring.SetTeamRulesParam(teamID, "haven_r" .. havenID, data.r, alliedTrueTable)
 	end
 end
 
-local function AddHaven(teamID, x, z)
+local function AddHaven(teamID, x, z, r)
 	if not teamID then
 		return
 	end
@@ -153,7 +160,7 @@ local function AddHaven(teamID, x, z)
 	end
 	local teamHavens = havens[teamID]
 	teamHavens.count = teamHavens.count + 1
-	teamHavens.data[teamHavens.count] = {x = x, z = z}
+	teamHavens.data[teamHavens.count] = {x = x, z = z, r = r}
 	Spring.SetTeamRulesParam(teamID, "haven_count", havens[teamID].count, alliedTrueTable)
 	WriteHavenToTeamRulesParam(teamID, teamHavens.count)
 end
@@ -169,12 +176,14 @@ local function RemoveHaven(teamID, havenID)
 	end
 end
 
-local function ToggleHaven(teamID, x,z)
-	local _, _, dSquared, closestHavenID = FindClosestHaven(teamID, x,z)
-	if dSquared ~= -1 and dSquared < RADSQ then
-		RemoveHaven(teamID, closestHavenID)
+-- Without a radius: remove the haven at x, z, or add one with the default radius.
+-- With a radius (a dragged zone): always add.
+local function ToggleHaven(teamID, x, z, radius)
+	local havenID = (not radius) and FindHavenAt(teamID, x, z)
+	if havenID then
+		RemoveHaven(teamID, havenID)
 	else
-		AddHaven(teamID, x,z)
+		AddHaven(teamID, x, z, radius or RADIUS)
 	end
 	SendToUnsynced("HavenUpdate", teamID)
 end
@@ -320,15 +329,21 @@ local function StartRetreat(unitID)
 		return
 	end
 
-	local hx, hz, dSquared = FindClosestHavenToUnit(unitID)
-	if dSquared < RADSQ then
+	local ux, _, uz = spGetUnitPosition(unitID)
+	local teamID = spGetUnitTeam(unitID)
+	if FindHavenAt(teamID, ux, uz) then
+		return
+	end
+	local haven = FindClosestHaven(teamID, ux, uz)
+	if not haven then
 		return
 	end
 
+	local spread = math.min(haven.r, RADIUS)
 	GiveRetreatOrders(unitID,
-		hx + RADIUS - rand(10, DIAM),
-		hz + RADIUS - rand(10, DIAM))
-	MaybeLandGunshipAtAirpad(unitID, hx, hz, RADIUS)
+		haven.x + spread - rand(10, 2*spread),
+		haven.z + spread - rand(10, 2*spread))
+	MaybeLandGunshipAtAirpad(unitID, haven.x, haven.z, haven.r)
 	SendToUnsynced("StartRetreat", unitID)
 end
 
@@ -455,12 +470,11 @@ function gadget:RecvLuaMsg(msg, playerID)
 		return
 	end
 	
-	local t = msg_table[5];
+	local t = tonumber(msg_table[5]);
 	
 	local spec, teamID, allianceID;
 	
 	if(t) then
-		t = tonumber(t);
 		local _,_,_,isAI = Spring.GetTeamInfo(t, false)
 		if(isAI) then
 			local aiid, ainame, aihost = Spring.GetAIInfo(t);
@@ -485,7 +499,13 @@ function gadget:RecvLuaMsg(msg, playerID)
 		return
 		--fixme, yell at players
 	end
-	ToggleHaven( teamID, x, z )
+	local radius = tonumber(msg_table[6])
+	if radius and radius > 0 then
+		radius = math.floor(math.min(math.max(radius, MIN_RADIUS), MAX_RADIUS))
+	else
+		radius = nil
+	end
+	ToggleHaven( teamID, x, z, radius )
 end
 
 local interruptingCommands = { -- fixme: some common header should probably contain those?
@@ -543,6 +563,7 @@ function gadget:Initialize()
 	end
 	
 	Spring.SetGameRulesParam('retreatZoneRadius', RADIUS)
+	Spring.SetGameRulesParam('retreatZoneMaxRadius', MAX_RADIUS)
 	
 	local teams = Spring.GetTeamList()
 	for i = 0, #teams-1 do

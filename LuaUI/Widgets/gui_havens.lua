@@ -131,7 +131,7 @@ local max = math.max
 local abs 	= math.abs
 
 local havens = {}
-local RADIUS = 0
+local MAX_RADIUS = 0
 
 ----------------------------------------------------------------------------------------
 -- functions
@@ -173,6 +173,7 @@ HavenUpdate = function () -- local function
 				havens[start + i] = {
 					x = px,
 					z = pz,
+					r = spGetTeamRulesParam(teamID, "haven_r" .. i),
 					y = spGetGroundHeight(px, pz), -- strange when height at xz changes
 					name = teamLeaderName,
 					color = teamcolor,
@@ -193,15 +194,15 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:Initialize()
-	RADIUS = spGetGameRulesParam('retreatZoneRadius') or 5
+	MAX_RADIUS = spGetGameRulesParam('retreatZoneMaxRadius')
 	widgetHandler:RegisterGlobal(widget, "HavenUpdate", HavenUpdate)
 	HavenUpdate()
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_SETHAVEN then
-		local x,y,z = cmdParams[1], cmdParams[2], cmdParams[3]
-		spSendLuaRulesMsg('sethaven|' .. x .. '|' .. y .. '|' .. z )
+		local x, y, z, radius = cmdParams[1], cmdParams[2], cmdParams[3], cmdParams[4]
+		spSendLuaRulesMsg('sethaven|' .. x .. '|' .. y .. '|' .. z .. '||' .. radius)
 		return true
 	end
 end
@@ -212,11 +213,11 @@ function widget:CommandsChanged()
 	--Add retreat-area button
 	table.insert(customCommands, {
 		id      = CMD_SETHAVEN,
-		type    = CMDTYPE.ICON_MAP,
-		tooltip = 'Place a retreat zone. Units will retreat there.',
+		type    = CMDTYPE.ICON_AREA,
+		tooltip = 'Place a retreat zone. Units will retreat there. Drag to set the size.',
 		cursor  = 'Repair',
 		action  = 'sethaven',
-		params  = { },
+		params  = {MAX_RADIUS},
 		texture = 'LuaUI/Images/commands/Bold/retreat.png',
 
 		pos = {123},
@@ -241,10 +242,10 @@ local function DrawWorldFunc()
 
 		gl.LineWidth(4)
 		glColor(1, 1, 1, 0.5) --WHITE
-		gl.DrawGroundCircle(x, y, z, RADIUS, 32)
+		gl.DrawGroundCircle(x, y, z, havenPosition.r, 32)
 		gl.LineWidth(2)
 		glColor(havenPosition.color)
-		gl.DrawGroundCircle(x, y, z, RADIUS, 32)
+		gl.DrawGroundCircle(x, y, z, havenPosition.r, 32)
 
 		if drawNames then
 			gl.PushMatrix()
