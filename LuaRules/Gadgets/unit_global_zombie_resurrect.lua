@@ -46,6 +46,8 @@ local spGetUnitCommandCount       = Spring.GetUnitCommandCount
 local spSetTeamResource           = Spring.SetTeamResource
 local spGetUnitHealth             = Spring.GetUnitHealth
 
+local REVIVE_TO_OWN_TEAM_ID = 99
+
 local GaiaTeamID     = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID = select(6, Spring.GetTeamInfo(GaiaTeamID, false))
 local initalAllianceCount = -1 --subtract gaia
@@ -57,17 +59,17 @@ local initalAllianceCount = -1 --subtract gaia
 		end
 	end
 local zombieAllyTeamID = GaiaAllyTeamID
-local zombieTeamInput = tonumber(modOptions.zombies_team) or 0 
+local zombieTeamInput = tonumber(modOptions.zombies_team) or 0
 
-if zombieTeamInput == 0 then -- 0 translates to gaia zombies
-	zombieAllyTeamID = GaiaAllyTeamID
-elseif zombieTeamInput > initalAllianceCount then -- larger than teamcount mean things revive onto their parent teams
-	zombieAllyTeamID = math.huge
-else -- if inbetween 0 and max teamcount, we have a team to spawn on!
+if zombieTeamInput == REVIVE_TO_OWN_TEAM_ID then -- set onto their parent teams
+	zombieAllyTeamID = REVIVE_TO_OWN_TEAM_ID
+elseif zombieTeamInput > 0 and zombieTeamInput < initalAllianceCount then -- if inbetween 0 and max teamcount, we have a team to spawn on!
 	zombieAllyTeamID = zombieTeamInput -1 -- -1 for offset 
 	if zombieAllyTeamID == GaiaAllyTeamID then --TODO there is likely a better solution, it seems sometimes Gaia is not the last team in the list
 		zombieAllyTeamID = zombieAllyTeamID + 1
 	end
+else -- anything else translates to gaia zombies
+	zombieAllyTeamID = GaiaAllyTeamID
 end
 
 local zombieTeamFullSlow = tonumber(modOptions.zombies_team_full_speed_mult) or 0
@@ -217,7 +219,7 @@ local function HandleZombieRevive(featureID, reviveBudget,reviveTeamID,unitDefID
 		end
 		reviveBudget = reviveBudget - zombieCost
 		if zombieUnitDefID and reviveBudget < rerollThreshold then -- Randomises to a new unit if desired
-			Spring.Echo("rerolled at ".. reviveBudget)
+			--Spring.Echo("rerolled at ".. reviveBudget)
 			rerollThreshold = rerollThreshold - rerollThresholdStep
 			zombieUnitDefID = unitDefIDTable[math.random(1,#unitDefIDTable)]
 			zombieCost = UnitDefs[zombieUnitDefID].metalCost or 0 
@@ -230,7 +232,7 @@ local function HandleZombieRevive(featureID, reviveBudget,reviveTeamID,unitDefID
 			end
 		end
 		--TODO should we randomise for each spawn? So far yes, since it gives every possible member of the team a chance for a unit
-		if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > initalAllianceCount) then
+		if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID == REVIVE_TO_OWN_TEAM_ID) then
 			reviveTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
 		end
 	end
@@ -285,10 +287,9 @@ end
 
 local function RezFrameCallback(featureID)
 	local reviveTeamID = GaiaTeamID
-	if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID > initalAllianceCount) then
+	if zombieAllyTeamID ~= GaiaAllyTeamID and not (zombieAllyTeamID == REVIVE_TO_OWN_TEAM_ID) then
 		reviveTeamID = GetRandomTeamIDFromAllyTeam(zombieAllyTeamID)
-	end
-	if zombieAllyTeamID > initalAllianceCount then
+	elseif zombieAllyTeamID and zombieAllyTeamID == REVIVE_TO_OWN_TEAM_ID then
 		reviveTeamID = Spring.GetFeatureTeam(featureID) or GaiaTeamID
 	end
 	

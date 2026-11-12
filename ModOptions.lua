@@ -191,7 +191,7 @@ TODO would be nice to a seperate section but I think it needs lobby changes.
   {
     key    = 'zombies_team',
     name   = 'Zombie Team',
-    desc   = "Which Allyteam the zombies respawn into. Set 0 for Gaia/neutral zombies. Set higher than teamcount to revive onto the original owner team.",
+    desc   = "Which Allyteam the zombies respawn into. Set 0 for Gaia/neutral zombies. Set 99 to revive onto the original owner team.",
     section= 'silly',
     type   = 'number',
     def=0,
