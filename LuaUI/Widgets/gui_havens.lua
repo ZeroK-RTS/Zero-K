@@ -214,7 +214,7 @@ function widget:CommandsChanged()
 	table.insert(customCommands, {
 		id      = CMD_SETHAVEN,
 		type    = CMDTYPE.ICON_AREA,
-		tooltip = 'Place a retreat zone. Units will retreat there. Drag to set the size.',
+		tooltip = 'Place a retreat zone. Units will retreat there. Drag to set the size. Click a zone to remove it.',
 		cursor  = 'Repair',
 		action  = 'sethaven',
 		params  = {MAX_RADIUS},

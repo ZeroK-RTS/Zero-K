@@ -176,10 +176,9 @@ local function RemoveHaven(teamID, havenID)
 	end
 end
 
--- Without a radius: remove the haven at x, z, or add one with the default radius.
--- With a radius (a dragged zone): always add.
+-- Remove the haven at x, z, or add one with the given or default radius.
 local function ToggleHaven(teamID, x, z, radius)
-	local havenID = (not radius) and FindHavenAt(teamID, x, z)
+	local havenID = FindHavenAt(teamID, x, z)
 	if havenID then
 		RemoveHaven(teamID, havenID)
 	else
