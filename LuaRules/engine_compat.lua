@@ -909,3 +909,13 @@ if Spring.UnitScript and not Spring.UnitScript.Scale then -- 2025.06
 		return spSetUnitPieceMatrix(spusGetActiveUnitID(), piece, matrix)
 	end
 end
+
+if not Engine.FeatureSupport.selfDTimeInSeconds then -- Recoil #3675, after 2026.09.02
+	local spGetUnitSelfDTime = Spring.GetUnitSelfDTime
+	Spring.GetUnitSelfDTime = function (unitID)
+		local halfSeconds = spGetUnitSelfDTime(unitID)
+		if halfSeconds and halfSeconds > 0 then
+			return halfSeconds * 0.5
+		end
+	end
+end

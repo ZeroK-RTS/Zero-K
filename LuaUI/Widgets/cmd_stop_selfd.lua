@@ -18,7 +18,7 @@ function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpti
     if not unitID then return end
     if teamID ~= Spring.GetMyTeamID() then return end
 
-    if (Spring.GetUnitSelfDTime(unitID) > 0) then
+    if Spring.GetUnitSelfDTime(unitID) then
         Spring.GiveOrderToUnit(unitID, CMD.SELFD, EMPTY_TABLE, 0)
     end
 end
