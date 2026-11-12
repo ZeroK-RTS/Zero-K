@@ -73,7 +73,7 @@ local function CheckDeathTeam(teamID)
 			realUnitCount = realUnitCount + 1
 
 			local selfDtime = spGetUnitSelfDTime(unitID)
-			if selfDtime > 0 then
+			if selfDtime then
 				selfDUnitCount = selfDUnitCount + 1
 				selfDUnitIDs[selfDUnitCount] = unitID
 			end
