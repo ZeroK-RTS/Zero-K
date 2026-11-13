@@ -128,7 +128,7 @@ options = {
 		name = 'Border at territory reach',
 		desc = 'End territories at Territory reach instead of fading them out beyond it. With Borders on, a border is drawn there as between territories.',
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 	},
 	hatchingHeading = {
