@@ -295,7 +295,7 @@ local function DrawWorldFunc()
 				end
 				
 				local unitInView = spIsUnitInView(unitID)
-				if unitInView and xshift and unitHeights and unitHeights[unitID] then
+				if unitInView and (not WG.MapRegionView or WG.MapRegionView.ContainsUnit(unitID)) and xshift and unitHeights and unitHeights[unitID] then
 					if forRadarIcons then
 						DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
 					else
