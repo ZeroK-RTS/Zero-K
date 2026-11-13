@@ -158,6 +158,7 @@ function script.Shot(num)
 	StartThread(ShotThread)
 end
 
+local ROLLED_CHARGE_RADIUS = WeaponDefNames["hoverdepthcharge_fake_depthcharge"].damageAreaOfEffect
 local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
 local RELOAD = math.ceil(depthchargeWeaponDef.reload * Game.gameSpeed)
 
@@ -201,7 +202,7 @@ function script.BlockShot(num, targetID)
 		if targetID then
 			local tx, ty, tz = Spring.GetUnitPosition(targetID)
 			local gy = Spring.GetGroundHeight(tx, tz)
-			if ty - gy > 5 and gy > -5 then -- is in the air
+			if ty - gy > ROLLED_CHARGE_RADIUS and gy > -5 then -- is too high in the air for the rolled charge
 				return false
 			end
 		end
