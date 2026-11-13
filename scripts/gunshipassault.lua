@@ -16,6 +16,8 @@ include "constants.lua"
 local gun_1 = false
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
+local WING_MAX_ANGLE = math.rad(75)
+
 local function TiltWings()
 	while true do
 		if attacking then
@@ -23,8 +25,8 @@ local function TiltWings()
 			Sleep(250)
 		else
 			local vx,_,vz = spGetUnitVelocity(unitID)
-			local speed = vx*vx + vz*vz
-			Turn(wings, x_axis, math.rad(3)*speed, math.rad(45))
+			local hSpeedSq = vx*vx + vz*vz
+			Turn(wings, x_axis, math.min(WING_MAX_ANGLE, math.rad(3)*hSpeedSq), math.rad(45))
 			Sleep(250)
 		end
 	end
