@@ -765,28 +765,23 @@ function CanTransport(transportID, unitID)
 	if (not udef or not tdef) then
 		return false
 	end
-
-	if UnitDefs[tdef].customParams.islighttransport and UnitDefs[udef].customParams.requireheavytrans then
+	local ud = UnitDefs[udef]
+	local tud = UnitDefs[tdef]
+	if tud.customParams.islighttransport and ud.customParams.requireheavytrans then
 		return false
 	end
-
-	if (UnitDefs[udef].xsize > UnitDefs[tdef].transportSize * 2) then	-- unit size check
---		spEcho ("size failed")
+	if (ud.xsize > tud.transportSize * 2) then -- unit size check
 		return false
 	end
-
 	local trans = spGetUnitIsTransporting(transportID) -- capacity check
-	if (UnitDefs[tdef].transportCapacity <= #trans) then
---		spEcho ("count failed")
+	if (tud.transportCapacity <= #trans) then
 		return false
 	end
-
-
-	local mass = UnitDefs[udef].mass -- mass check
+	local mass = ud.mass -- mass check
 	for i=1, #trans do
 		mass = mass + UnitDefs[spGetUnitDefID(trans[i])].mass
 	end
-	if (mass > UnitDefs[tdef].transportMass) then
+	if (mass > tud.transportMass) then
 --		spEcho ("mass failed")
 		return false
 	end
