@@ -329,7 +329,7 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function widget:PlayerChanged()
-	teamID = Spring.GetMyTeamID()
+	myTeamID = Spring.GetMyTeamID()
 end
 
 function widget:Shutdown()
