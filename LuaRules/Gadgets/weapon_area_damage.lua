@@ -225,11 +225,11 @@ local CHECK_PERIOD = 15
 
 local myPlayerID = Spring.GetLocalPlayerID()
 local myAllyTeamID = Spring.GetLocalAllyTeamID()
+local hostingAI = false
 local fullView = select(2, Spring.GetSpectatingState())
 
 -- Spring.SendSkirmishAIMessage only reaches native AIs that run on this computer.
 local aiTeamsByAllyTeam = {} -- [allyTeamID] = {teamID, ...}
-local haveAI = false
 
 local zones = IterableMap.New() -- zones that some receiver here may still see later
 
@@ -270,7 +270,7 @@ local function UpdateZone(_, zone, _, frame)
 end
 
 local function AddZone(_, px, py, pz, radius, endFrame, weaponDefID, teamID, strength)
-	if not (haveAI or Script.LuaUI("VisibleAreaDamage")) then
+	if not (hostingAI or Script.LuaUI("VisibleAreaDamage")) then
 		return
 	end
 	local zone = {
@@ -289,9 +289,7 @@ local function AddZone(_, px, py, pz, radius, endFrame, weaponDefID, teamID, str
 end
 
 function gadget:GameFrame(n)
-	if n%CHECK_PERIOD == 0 then
-		IterableMap.Apply(zones, UpdateZone, n)
-	end
+	IterableMap.ApplyFraction(zones, CHECK_PERIOD, n, UpdateZone, n)
 end
 
 function gadget:PlayerChanged(playerID)
@@ -301,16 +299,27 @@ function gadget:PlayerChanged(playerID)
 	end
 end
 
+local function CheckRegisterAI(teamID)
+	local _, _, _, isAI, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
+	if not isAI then
+		return false
+	end
+	local _, _, aiHostPlayerID = Spring.GetAIInfo(teamID)
+	if aiHostPlayerID ~= myPlayerID then
+		return false
+	end
+	aiTeamsByAllyTeam[allyTeamID] = aiTeamsByAllyTeam[allyTeamID] or {}
+	local teams = aiTeamsByAllyTeam[allyTeamID]
+	teams[#teams + 1] = teamID
+	return true
+end
+
 function gadget:Initialize()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local _, _, _, isAI, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
-		if isAI then
-			aiTeamsByAllyTeam[allyTeamID] = aiTeamsByAllyTeam[allyTeamID] or {}
-			local teams = aiTeamsByAllyTeam[allyTeamID]
-			teams[#teams + 1] = teamID
-			haveAI = true
+		if CheckRegisterAI(teamID) then
+			hostingAI = true
 		end
 	end
 	gadgetHandler:AddSyncAction("areaDamage_zone", AddZone)
