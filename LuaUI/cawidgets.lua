@@ -258,6 +258,7 @@ local flexCallIns = {
 	'MissileDestroyed',
 	"PreGameTimekeeping",
 	"VisibleExplosion",
+	"VisibleAreaDamage",
 	"Barrelfire",
 	"UnitScriptLight",
 	"UnitScriptDistortion",
@@ -3053,6 +3054,14 @@ function widgetHandler:VisibleExplosion(px, py, pz, weaponID, ownerID)
 	end
 	tracy.ZoneEnd()
 	return
+end
+
+function widgetHandler:VisibleAreaDamage(px, py, pz, radius, endFrame, weaponDefID, strength)
+	tracy.ZoneBeginN("W:VisibleAreaDamage")
+	for _, w in ipairs(self.VisibleAreaDamageList) do
+		w:VisibleAreaDamage(px, py, pz, radius, endFrame, weaponDefID, strength)
+	end
+	tracy.ZoneEnd()
 end
 
 function widgetHandler:Barrelfire(px, py, pz, weaponID, ownerID)
