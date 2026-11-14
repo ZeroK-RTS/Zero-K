@@ -26,6 +26,7 @@ if (System == nil) then
 		--
 		VFS = VFS,
 		Script = Script,
+		tracy = tracy,
 		Spring = Spring,
 		Engine = Engine,
 		Platform = Platform,
