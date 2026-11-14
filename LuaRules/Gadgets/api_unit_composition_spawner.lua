@@ -14,7 +14,7 @@ function gadget:GetInfo()
 		author    = "Stiofan",
 		date      = "2026",
 		license   = "GNU GPL, v2 or later",
-		layer     = 1, -- Before terraforming gadget (I dont know when would be appropriate)
+		layer     = 0, -- Before terraforming gadget (I dont know when would be appropriate)
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -29,30 +29,13 @@ local GaiaTeamID = Spring.GetGaiaTeamID()
 local mapSizeX, mapSizeZ = Game.mapSizeX, Game.mapSizeZ
 local allUnitGroups = VFS.Include("LuaRules/Configs/unit_class_groupings.lua")
 local allCompositions = VFS.Include("LuaRules/Configs/unit_compositions.lua")
-local UNIT_SPACING = 0
-local STRUCTURE_SPACING = 128
+local SPACING_MIN = 0
+local SPACING_MAX = 80
+local Y_OFFSET = 0
 
 --Utilities
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local function shuffle(t) --Fisher-Yates taught me this trick! (It was actually Github)
-	local tbl = {}
-	for i = 1, #t do
-		tbl[i] = t[i]
-	end
-	for i = #tbl, 2, -1 do
-		local j = math.random(i)
-		tbl[i], tbl[j] = tbl[j], tbl[i]
-	end
-	--TODO Util function doesnt seem to work?
-	--[[
-	local testShuffle = Spring.Utilities.PermuteList(t)
-	Spring.Echo(tbl)
-	Spring.Echo(testShuffle)
-	]]
-	return tbl
-end
 
 -- adds 2 Unit Lists together! accounts for different "spellings"
 local function AddUnitLists(tableList)
@@ -67,38 +50,17 @@ local function AddUnitLists(tableList)
 				returnList[#returnList +1] = {unitDefName = i, unitCount = v}
 			else
 				Spring.Echo("Input of AddUnitLists unit_composition_spawner has error")
-				Spring.Echo(i)
-				Spring.Echo(v)
+				Spring.Utilities.TableEcho(table)
 			end
 		end
 	end
 	return returnList
 end
 
--- failsafe for 0 cost units
-local function GetCostFromUnitDefName(unitDefName)
-	--Spring.Echo(unitDefName)
-	local unitCost = UnitDefNames[unitDefName].metalCost or 0
-	if unitCost or unitCost <= 0 then
-		unitCost = UnitDefNames[unitDefName].buildTime
-	end
-	if not unitCost or unitCost <= 0 then
-		unitCost = 200
-		Spring.Echo("Unit has no cost set, defaulting to 200")
-	end
-	--TODO Util function doesnt seem to work?
-	--[[
-	local testUnitCost = Spring.Utilities.GetUnitCost(nil,unitDefName)
-	Spring.Echo(unitCost)
-	Spring.Echo(testUnitCost)
-	]]
-	return unitCost
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetRandomUnitsFromListByCount(targetCount,unitDefNameList,multiRandomise)
+local function GetRandomUnitsFromTypeListByCount(targetCount,unitDefNameList,multiRandomise)
 	local unitDefName = unitDefNameList[math.random(#unitDefNameList)]
 	if not multiRandomise then
 		local returnUnitArray = {} 
@@ -130,7 +92,12 @@ local function GetRandomUnitsFromListForCost(budget,unitDefNameList,multiRandomi
 	local returnUnitArray = {}
 	local excess = 0
 	local unitCount = 0
-	local shuffledUnitDefNameList = shuffle(unitDefNameList)
+	local shuffledUnitDefNameList = unitDefNameList
+	if not shuffledUnitDefNameList then
+		--There is some typo I cant seem to find that will run into issues on nil here
+		shuffledUnitDefNameList = {[[amphimpulse]],[[amphraid]],[[hoverdepthcharge]],[[hoverraid]],[[amphriot]],}
+	end
+	Spring.Utilities.PermuteList(shuffledUnitDefNameList)
 	local unitDefName
 	local unitCost
 	local loopWithHit = true
@@ -138,7 +105,7 @@ local function GetRandomUnitsFromListForCost(budget,unitDefNameList,multiRandomi
 		loopWithHit = false
 		for i = 1,  #shuffledUnitDefNameList, 1 do --we walk a shuffled list of all options instead of randomising to try and spend all budget
 			unitDefName = shuffledUnitDefNameList[i]
-			unitCost = GetCostFromUnitDefName(unitDefName)
+			unitCost = Spring.Utilities.GetUnitCost(nil,UnitDefNames[unitDefName].id)--GetCostFromUnitDefName(unitDefName)
 			if not multiRandomise and unitCost <= budget then --we found a shuffled unit that fits and spend all budget
 				unitCount = math.floor(budget/unitCost)
 				returnUnitArray[1] = {unitDefName = unitDefName, unitCount = unitCount}
@@ -160,7 +127,7 @@ local function GetRandomUnitsFromListForCost(budget,unitDefNameList,multiRandomi
 				unitCount = unitCount + 1
 			end
 		end
-		shuffledUnitDefNameList = shuffle(shuffledUnitDefNameList)
+		Spring.Utilities.PermuteList(shuffledUnitDefNameList)
 	end
 	--[[Spring.Echo(unitDefCountList)
 	for key, value in pairs(unitDefCountList) do
@@ -181,7 +148,8 @@ unitTypeAndRatio should be "scouts"= 2 where 2 is the fraction of the budget all
 A more complex setup would be
 {
 	{unitGroup = scouts, budgetFraction = 2, minUnits = 1, multiRandomise = true, wreckChance = 0.5},
-	{unitGroup = skirmishers, budgetFraction = 1, minUnits =2, multiRandomise = false}
+	{unitGroup = skirmishers, budgetFraction = 1, minUnits =2, multiRandomise = false},
+	{unitGroup = cloakriot, budgetFraction 0.2, minUnits = 5}
 }
 returns something akin to 
 { unitDefName = "vehriot",count = 2,wreckChance = 0.5,spacing = 64}
@@ -233,13 +201,27 @@ local function CompositionBuilder(budget,unitGroupAndParams,typeList)
 			Spring.Echo("Input of Compositionbuilder in unit_composition_spawner has error")
 		end
 		local budgetToSpend = budget*budgetFraction/budgetTotalFraction + excessBudget
-		--Spring.Echo(unitGroup)
-		typeComposition,excessBudget,unitCount = GetRandomUnitsFromListForCost(budgetToSpend,typeList[unitGroup],multiRandomise)
-		if unitCount < minUnits then
-			local unitsToMin = minUnits - unitCount
-			local minUnitComposition = GetRandomUnitsFromListByCount(unitsToMin,typeList[unitGroup],multiRandomise)
-			typeComposition = AddUnitLists({minUnitComposition,typeComposition})
+		Spring.Echo(unitGroup)
+		if UnitDefNames[unitGroup] then
+			local count = math.floor(budgetToSpend/Spring.Utilities.GetUnitCost(nil,UnitDefNames[unitGroup].id))
+			if count < minUnits then
+				count = minUnits
+			end
+			if count > 0 then
+				typeComposition = {{unitDefName = unitGroup, unitCount = count}}
+			else
+				typeComposition = {}
+			end
+			--Spring.Utilities.TableEcho(typeComposition)
+		else
+			typeComposition,excessBudget,unitCount = GetRandomUnitsFromListForCost(budgetToSpend,typeList[unitGroup],multiRandomise)
+			if unitCount < minUnits then
+				local unitsToMin = minUnits - unitCount
+				local minUnitComposition = GetRandomUnitsFromTypeListByCount(unitsToMin,typeList[unitGroup],multiRandomise)
+				typeComposition = AddUnitLists({minUnitComposition,typeComposition})
+			end
 		end
+		--Spring.Utilities.TableEcho(typeComposition)
 		for index, value in ipairs(typeComposition) do
 			value.wreckChance = wreckChance
 		end
@@ -258,7 +240,7 @@ local function QueueListSpawn(unitDefParamTable,x,z,teamID,noGoZones) --TODO rem
 		local unitDefName = nil
 		local spawnCount = 1
 		local spawnAsWreckChance = 0 --TODO hmm chance vs ratio... I suppose we can have wrecks, and normal units defined, but a chance covers that too
-		local spacing = math.random (0,80)
+		local spacing = math.random (SPACING_MIN,SPACING_MAX)
 		local dropPod = true
 		local spawnPattern = "centered"
 		if type(data) == "table" and data.unitDefName then
@@ -287,7 +269,7 @@ local function QueueListSpawn(unitDefParamTable,x,z,teamID,noGoZones) --TODO rem
 				firstSearchSuccess = false
 			end
 			if searchSuccess then
-				local localY = Spring.GetGroundHeight(localX, localZ) + 20 -- The offset seems in flavour
+				local localY = Spring.GetGroundHeight(localX, localZ) + Y_OFFSET 
 				if dropPod then
 					--GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, timeToGround, fallGravity, absSpawnHeight, absBrakeHeight, dyncommID, staticDyncommLevel, dynamicCommanderOnly)
 					-- TODO mess with till its neat!
@@ -376,28 +358,31 @@ end
 
 local function CompositionBuilderTest()
 	local spawnList = GG.UnitSpawnerCompositionBuilder(
-	1000,
+	2000,
 		{
 			{unitGroup = "pwGreebles", budgetFraction = 0, minUnits = 2, multiRandomise = true, wreckChance = 1},
 			assaults = 1,
 			skirmishers = 1,
-			turretsLight = 1
+			turretsLight = 1,
+			energypylon = 1
 		}
 	)
 	GG.UnitSpawnerQueueListSpawn(spawnList,math.random(1,mapSizeX),math.random(1,mapSizeZ),GaiaTeamID)
 end
---[[
+
 function gadget:GameStart()
-	Spring.Echo("spawningTest")
-	spawningTest()
-	Spring.Echo("compositionTest")
-	CompositionBuilderTest()
+	Y_OFFSET = 20 -- The offset seems in flavour for drops, though is silly for pregame wrecks and structures
+	
+	--Spring.Echo("spawningTest")
+	--spawningTest()
+	--Spring.Echo("compositionTest")
+	--CompositionBuilderTest()
+	
 end
-]]
 
 GG.UnitSpawnerAddUnitLists = AddUnitLists
-GG.UnitSpawnerGetGroupCompositionByBudgetAndType = GetGroupCompositionByBudgetAndType
+--GG.UnitSpawnerGetGroupCompositionByBudgetAndType = GetGroupCompositionByBudgetAndType
 GG.UnitSpawnerGetRandomUnitsFromListForCost = GetRandomUnitsFromListForCost
-GG.UnitSpawnerGetRandomUnitsFromListByCount = GetRandomUnitsFromListByCount
+GG.UnitSpawnerGetRandomUnitsFromTypeListByCount = GetRandomUnitsFromTypeListByCount
 GG.UnitSpawnerCompositionBuilder = CompositionBuilder
 GG.UnitSpawnerQueueListSpawn = QueueListSpawn

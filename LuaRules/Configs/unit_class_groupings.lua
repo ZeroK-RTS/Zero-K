@@ -1,20 +1,7 @@
 -- units grouped and defined for the compositionbuilder,
 -- bundled in a config file for ease of access and cross gadget sharing
 
-
-
--- adds 2 tables together!
-local function Union(t1, t2)
-	local ret = {}
-	for i, v in pairs(t1) do
-		ret[i] = v
-	end
-	for i, v in pairs(t2) do
-		ret[i] = v
-	end
-	return ret
-end
-
+--TODO make into Spring util function!!
 local function Union2 (tables)
     local returnTable = {}
     for k,v in pairs(tables) do
