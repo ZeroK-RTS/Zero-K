@@ -99,7 +99,7 @@ function UpdateUnitAttributes(unitID, frame)
 	end
 	
 	-- Let other gadgets and widgets get the total effect without
-	-- duplicating the pevious calculations.
+	-- duplicating the previous calculations.
 	spSetUnitRulesParam(unitID, "baseSpeedMult", baseSpeedMult, INLOS_ACCESS) -- Guaranteed not to be 0 <- This is a pain to generalise
 	
 	if slowState ~= 0 then
@@ -117,7 +117,7 @@ function UpdateUnitAttributes(unitID, frame)
 		attributesTable = attributesTable or {}
 		attributesTable.move = moveMult
 		attributesTable.turn = turnMult
-		attributesTable.accel = accelMult
+		attributesTable.accel = maxAccMult
 	end
 	
 	if buildMult ~= 1 then
