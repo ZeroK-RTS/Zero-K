@@ -137,6 +137,11 @@ function ShieldSphereColorHQParticle:Draw()
 	end
 	gl.Uniform(shieldRechargingNoiseUniform, noiseLevel + (self.shieldNoise or 0))
 
+	-- After the recharge noise state above, which must update in every pass.
+	if not IsShieldSphereInView(self) then
+		return
+	end
+
 	local col1, col2 = GetShieldColor(self.unit, self)
 
 	local hitTable
