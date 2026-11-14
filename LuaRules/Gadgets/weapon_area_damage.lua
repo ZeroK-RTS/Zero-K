@@ -12,6 +12,22 @@ function gadget:GetInfo()
 	}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Lingering damage zones (napalm burn, Zeno slow cloud, Placeholder pull) are
+-- told to widgets and to skirmish AIs when the receiver can see them: at
+-- creation if the zone is in LOS or belongs to its allyteam, or later, once,
+-- when the zone centre comes into LOS before the zone ends. Fullview
+-- spectators get every zone at creation.
+--
+-- Widget callin (cawidgets.lua):
+--   widget:VisibleAreaDamage(px, py, pz, radius, endFrame, weaponDefID, strength)
+-- Skirmish AI message (Spring.SendSkirmishAIMessage, AIs hosted by this client):
+--   "AREA_DAMAGE:<weaponDefName>:x,y,z,radius,endFrame,strength"
+-- weaponDefID tells the kind (customParams area_damage_*). strength is 1, or
+-- the scale that area_damage_height_max applies to damage and time falloff.
+-- Damage stops at the first damage update at or after endFrame.
+
 if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 -- SYNCED
@@ -52,13 +68,14 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 	local weaponDamage = weaponInfo[weaponID].damage
 	local timeLoss     = weaponInfo[weaponID].timeLoss
 	local heightMax    = weaponInfo[weaponID].heightMax
+	local mult = 1
 	if heightMax then
 		local heightInt = weaponInfo[weaponID].heightInt or heightMax
 		local height = (py - math.max(0, Spring.Utilities.GetGroundHeightMinusOffmap(px, pz) or 0))
 		if height > heightMax then
 			return false
 		elseif height > heightMax - heightInt then
-			local mult = ((heightMax - height)/heightInt)
+			mult = ((heightMax - height)/heightInt)
 			weaponDamage = weaponDamage*mult
 			timeLoss     = timeLoss*mult
 			local heightReduce = weaponInfo[weaponID].heightReduce
@@ -68,6 +85,7 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 		end
 	end
 	
+	local expiry = frameNum + weaponInfo[weaponID].duration
 	explosionCount = explosionCount + 1
 	explosionList[explosionCount] = {
 		radius = weaponInfo[weaponID].radius,
@@ -77,7 +95,7 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 		damage = weaponDamage,
 		teamID = teamID,
 		impulse = weaponInfo[weaponID].impulse,
-		expiry = frameNum + weaponInfo[weaponID].duration,
+		expiry = expiry,
 		rangeFall = weaponInfo[weaponID].rangeFall,
 		timeLoss = timeLoss,
 		damageUpdateRate = weaponInfo[weaponID].damageUpdateRate,
@@ -85,6 +103,7 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 		pos = {x = px, y = py, z = pz},
 		owner = ownerID,
 	}
+	SendToUnsynced("areaDamage_zone", px, py, pz, weaponInfo[weaponID].radius, expiry, weaponID, teamID, mult)
 end
 
 local function RegisterSpawnedDamageArea(weaponID, px, py, pz, ownerID, teamID)
@@ -192,6 +211,113 @@ function gadget:Initialize()
 	for w,_ in pairs(weaponInfo) do
 		Script.SetWatchExplosion(w, true)
 	end
+end
+
+--------------------------------------------------------------------------------
+else -- UNSYNCED
+--------------------------------------------------------------------------------
+
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+
+local spIsPosInLos = Spring.IsPosInLos
+
+local CHECK_PERIOD = 15
+
+local myPlayerID = Spring.GetLocalPlayerID()
+local myAllyTeamID = Spring.GetLocalAllyTeamID()
+local fullView = select(2, Spring.GetSpectatingState())
+
+-- Spring.SendSkirmishAIMessage only reaches native AIs that run on this computer.
+local aiTeamsByAllyTeam = {} -- [allyTeamID] = {teamID, ...}
+local haveAI = false
+
+local zones = IterableMap.New() -- zones that some receiver here may still see later
+
+local function CanSee(zone, allyTeamID)
+	return allyTeamID == zone.allyTeamID or spIsPosInLos(zone.x, zone.y, zone.z, allyTeamID)
+end
+
+-- Tells each receiver that can see the zone now. Returns true when no receiver still waits for it.
+local function SendZone(zone)
+	local done = true
+	if not zone.sentToWidgets and Script.LuaUI("VisibleAreaDamage") then
+		if fullView or CanSee(zone, myAllyTeamID) then
+			zone.sentToWidgets = true
+			Script.LuaUI.VisibleAreaDamage(zone.x, zone.y, zone.z, zone.radius, zone.endFrame, zone.weaponDefID, zone.strength)
+		else
+			done = false
+		end
+	end
+	for allyTeamID, teams in pairs(aiTeamsByAllyTeam) do
+		if not zone.sentToAis[allyTeamID] then
+			if CanSee(zone, allyTeamID) then
+				zone.sentToAis[allyTeamID] = true
+				local msg = string.format("AREA_DAMAGE:%s:%d,%d,%d,%d,%d,%.2f", WeaponDefs[zone.weaponDefID].name,
+					math.floor(zone.x), math.floor(zone.y), math.floor(zone.z), zone.radius, zone.endFrame, zone.strength)
+				for i = 1, #teams do
+					Spring.SendSkirmishAIMessage(teams[i], msg)
+				end
+			else
+				done = false
+			end
+		end
+	end
+	return done
+end
+
+local function UpdateZone(_, zone, _, frame)
+	return frame >= zone.endFrame or SendZone(zone)
+end
+
+local function AddZone(_, px, py, pz, radius, endFrame, weaponDefID, teamID, strength)
+	if not (haveAI or Script.LuaUI("VisibleAreaDamage")) then
+		return
+	end
+	local zone = {
+		x = px, y = py, z = pz,
+		radius = radius,
+		endFrame = endFrame,
+		weaponDefID = weaponDefID,
+		strength = strength,
+		allyTeamID = teamID and Spring.GetTeamAllyTeamID(teamID),
+		sentToWidgets = false,
+		sentToAis = {},
+	}
+	if not SendZone(zone) then
+		IterableMap.Add(zones, IterableMap.GetUnusedKey(zones), zone)
+	end
+end
+
+function gadget:GameFrame(n)
+	if n%CHECK_PERIOD == 0 then
+		IterableMap.Apply(zones, UpdateZone, n)
+	end
+end
+
+function gadget:PlayerChanged(playerID)
+	if playerID == myPlayerID then
+		myAllyTeamID = Spring.GetLocalAllyTeamID()
+		fullView = select(2, Spring.GetSpectatingState())
+	end
+end
+
+function gadget:Initialize()
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local _, _, _, isAI, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
+		if isAI then
+			aiTeamsByAllyTeam[allyTeamID] = aiTeamsByAllyTeam[allyTeamID] or {}
+			local teams = aiTeamsByAllyTeam[allyTeamID]
+			teams[#teams + 1] = teamID
+			haveAI = true
+		end
+	end
+	gadgetHandler:AddSyncAction("areaDamage_zone", AddZone)
+end
+
+function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction("areaDamage_zone")
 end
 
 end
