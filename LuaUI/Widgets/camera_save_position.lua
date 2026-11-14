@@ -143,7 +143,7 @@ for i = 1, 10 do
 				end
 			else
 				local data = savedCameraPositions[i]
-				if data[1] and data[2] and data[3] then
+				if data and data[1] and data[2] and data[3] then
 					SetCameraTarget(data[1], data[2], data[3], recallTime)
 				end
 			end
