@@ -217,6 +217,8 @@ end
 else -- UNSYNCED
 --------------------------------------------------------------------------------
 
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+
 local spIsPosInLos = Spring.IsPosInLos
 
 local CHECK_PERIOD = 15
@@ -225,88 +227,70 @@ local myPlayerID = Spring.GetLocalPlayerID()
 local myAllyTeamID = Spring.GetLocalAllyTeamID()
 local fullView = select(2, Spring.GetSpectatingState())
 
-local aiTeamsByAllyTeam = {} -- [allyTeamID] = {teamID, ...} of native skirmish AIs hosted by this client
-local haveLocalAI = false
+-- Spring.SendSkirmishAIMessage only reaches native AIs that run on this computer.
+local aiTeamsByAllyTeam = {} -- [allyTeamID] = {teamID, ...}
+local haveAI = false
 
-local zones = {} -- zones that a receiver here may still see later
-local zoneCount = 0
+local zones = IterableMap.New() -- zones that some receiver here may still see later
 
-local function TellWidgets(zone)
-	if Script.LuaUI("VisibleAreaDamage") then
-		Script.LuaUI.VisibleAreaDamage(zone.x, zone.y, zone.z, zone.radius, zone.endFrame, zone.weaponDefID, zone.strength)
-	end
+local function CanSee(zone, allyTeamID)
+	return allyTeamID == zone.allyTeamID or spIsPosInLos(zone.x, zone.y, zone.z, allyTeamID)
 end
 
-local function TellAIs(zone, allyTeamID)
-	zone.msg = zone.msg or string.format("AREA_DAMAGE:%s:%d,%d,%d,%d,%d,%.2f", WeaponDefs[zone.weaponDefID].name,
-		math.floor(zone.x), math.floor(zone.y), math.floor(zone.z), zone.radius, zone.endFrame, zone.strength)
-	local teams = aiTeamsByAllyTeam[allyTeamID]
-	for i = 1, #teams do
-		Spring.SendSkirmishAIMessage(teams[i], zone.msg)
+-- Tells each receiver that can see the zone now. Returns true when no receiver still waits for it.
+local function SendZone(zone)
+	local done = true
+	if not zone.sentToWidgets and Script.LuaUI("VisibleAreaDamage") then
+		if fullView or CanSee(zone, myAllyTeamID) then
+			zone.sentToWidgets = true
+			Script.LuaUI.VisibleAreaDamage(zone.x, zone.y, zone.z, zone.radius, zone.endFrame, zone.weaponDefID, zone.strength)
+		else
+			done = false
+		end
 	end
+	for allyTeamID, teams in pairs(aiTeamsByAllyTeam) do
+		if not zone.sentToAis[allyTeamID] then
+			if CanSee(zone, allyTeamID) then
+				zone.sentToAis[allyTeamID] = true
+				local msg = string.format("AREA_DAMAGE:%s:%d,%d,%d,%d,%d,%.2f", WeaponDefs[zone.weaponDefID].name,
+					math.floor(zone.x), math.floor(zone.y), math.floor(zone.z), zone.radius, zone.endFrame, zone.strength)
+				for i = 1, #teams do
+					Spring.SendSkirmishAIMessage(teams[i], msg)
+				end
+			else
+				done = false
+			end
+		end
+	end
+	return done
+end
+
+local function UpdateZone(_, zone, _, frame)
+	return frame >= zone.endFrame or SendZone(zone)
 end
 
 local function AddZone(_, px, py, pz, radius, endFrame, weaponDefID, teamID, strength)
-	local widgetListens = Script.LuaUI("VisibleAreaDamage")
-	if not (widgetListens or haveLocalAI) then
+	if not (haveAI or Script.LuaUI("VisibleAreaDamage")) then
 		return
 	end
-	local zone = {x = px, y = py, z = pz, radius = radius, endFrame = endFrame, weaponDefID = weaponDefID, strength = strength}
-	local zoneAllyTeamID = teamID and Spring.GetTeamAllyTeamID(teamID)
-	if widgetListens then
-		if fullView or zoneAllyTeamID == myAllyTeamID or spIsPosInLos(px, py, pz, myAllyTeamID) then
-			TellWidgets(zone)
-		else
-			zone.widgets = true
-		end
+	local zone = {
+		x = px, y = py, z = pz,
+		radius = radius,
+		endFrame = endFrame,
+		weaponDefID = weaponDefID,
+		strength = strength,
+		allyTeamID = teamID and Spring.GetTeamAllyTeamID(teamID),
+		sentToWidgets = false,
+		sentToAis = {},
+	}
+	if not SendZone(zone) then
+		IterableMap.Add(zones, IterableMap.GetUnusedKey(zones), zone)
 	end
-	for allyTeamID in pairs(aiTeamsByAllyTeam) do
-		if allyTeamID == zoneAllyTeamID or spIsPosInLos(px, py, pz, allyTeamID) then
-			TellAIs(zone, allyTeamID)
-		else
-			zone.ais = zone.ais or {}
-			zone.ais[allyTeamID] = true
-		end
-	end
-	if zone.widgets or zone.ais then
-		zoneCount = zoneCount + 1
-		zones[zoneCount] = zone
-	end
-end
-
-local function UpdateZone(zone)
-	if zone.widgets and (fullView or spIsPosInLos(zone.x, zone.y, zone.z, myAllyTeamID)) then
-		zone.widgets = nil
-		TellWidgets(zone)
-	end
-	if zone.ais then
-		for allyTeamID in pairs(zone.ais) do
-			if spIsPosInLos(zone.x, zone.y, zone.z, allyTeamID) then
-				zone.ais[allyTeamID] = nil
-				TellAIs(zone, allyTeamID)
-			end
-		end
-		if not next(zone.ais) then
-			zone.ais = nil
-		end
-	end
-	return zone.widgets or zone.ais
 end
 
 function gadget:GameFrame(n)
-	if zoneCount == 0 or n%CHECK_PERIOD ~= 0 then
-		return
-	end
-	local i = 1
-	while i <= zoneCount do
-		local zone = zones[i]
-		if n < zone.endFrame and UpdateZone(zone) then
-			i = i + 1
-		else
-			zones[i] = zones[zoneCount]
-			zones[zoneCount] = nil
-			zoneCount = zoneCount - 1
-		end
+	if n%CHECK_PERIOD == 0 then
+		IterableMap.Apply(zones, UpdateZone, n)
 	end
 end
 
@@ -322,11 +306,11 @@ function gadget:Initialize()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local _, _, _, isAI, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
-		if isAI and select(3, Spring.GetAIInfo(teamID)) == myPlayerID and not Spring.GetTeamLuaAI(teamID) then
+		if isAI then
 			aiTeamsByAllyTeam[allyTeamID] = aiTeamsByAllyTeam[allyTeamID] or {}
 			local teams = aiTeamsByAllyTeam[allyTeamID]
 			teams[#teams + 1] = teamID
-			haveLocalAI = true
+			haveAI = true
 		end
 	end
 	gadgetHandler:AddSyncAction("areaDamage_zone", AddZone)
