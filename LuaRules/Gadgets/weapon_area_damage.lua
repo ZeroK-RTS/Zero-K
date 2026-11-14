@@ -289,7 +289,7 @@ local function AddZone(_, px, py, pz, radius, endFrame, weaponDefID, teamID, str
 end
 
 function gadget:GameFrame(n)
-	IterableMap.ApplyFraction(zones, CHECK_PERIOD, n, UpdateZone, n)
+	IterableMap.ApplyFraction(zones, CHECK_PERIOD, n%CHECK_PERIOD, UpdateZone, n)
 end
 
 function gadget:PlayerChanged(playerID)
@@ -301,7 +301,7 @@ end
 
 local function CheckRegisterAI(teamID)
 	local _, _, _, isAI, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
-	if not isAI then
+	if not isAI or Spring.GetTeamLuaAI(teamID) then
 		return false
 	end
 	local _, _, aiHostPlayerID = Spring.GetAIInfo(teamID)
