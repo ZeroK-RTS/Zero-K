@@ -137,10 +137,14 @@ function widget:DefaultCommand(type, id)
 	end
 end
 
-function widget:DrawInMiniMap()
+function widget:DrawInMiniMap(xSize, ySize, cropped)
 	if drawGeos then
 		gl.PushMatrix()
-		gl.LoadIdentity()
+		if cropped then
+			gl.Scale(xSize, ySize, 1)
+		else
+			gl.LoadIdentity()
+		end
 		if GetMiniMapFlipped() then
 			gl.Translate(1, 0, 0)
 			gl.Scale(-mapXinv , mapZinv, 1)

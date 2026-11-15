@@ -282,6 +282,8 @@ local function DrawWorldFunc()
 	glDepthTest(true)
 	glAlphaTest(GL_GREATER, 0.001)
 	
+	local regionView = WG.MapRegionView
+
 	--for texture, units in pairs(textureUnitsXshift) do
 	for texture, curTextureData in pairs(textureData) do
 		for iconName, units in pairs(curTextureData) do
@@ -295,7 +297,7 @@ local function DrawWorldFunc()
 				end
 				
 				local unitInView = spIsUnitInView(unitID)
-				if unitInView and xshift and unitHeights and unitHeights[unitID] then
+				if unitInView and (not regionView or regionView.ContainsUnit(unitID)) and xshift and unitHeights and unitHeights[unitID] then
 					if forRadarIcons then
 						DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
 					else

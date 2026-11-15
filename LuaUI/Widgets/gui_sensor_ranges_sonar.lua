@@ -359,7 +359,12 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	processUnit(unitID, unitDefID)
 end
 
+local regionView -- WG.MapRegionView, read once per update
+
 local function WantToDrawRangeOfUnit(unitID, unitDefID)
+	if regionView and not regionView.ContainsUnit(unitID) then
+		return false
+	end
 	if drawOnlySelected and not spIsUnitSelected(unitID) then
 		return false
 	end
@@ -396,6 +401,7 @@ function widget:GameFrame(n)
 	if n % UPDATE_RATE == 0 and not disableDraw then
 		local instanceData = circleInstanceVBO.instanceData -- ok this is so nasty that it makes all my prev pop-push work obsolete
 		anythingToDraw = false
+		regionView = WG.MapRegionView
 		IterableMap.Apply(unitList, UpdateUnitData, instanceData)
 		uploadAllElements(circleInstanceVBO)
 	end
