@@ -745,13 +745,17 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 
 	-- Camera and drag state can change while the simulation is paused.
 	if not options.hideOnOverview.value then
-		vsx,vsy = Spring.GetViewSizes()
-		cs = Spring.GetCameraState()
-		if cs.name == "ov" and not tabbedMode then
+		-- Without an argument GetCameraState makes a new table, so read only the name on every update.
+		local overview = (Spring.GetCameraState(false) == "ov")
+		if overview ~= tabbedMode or Spring.GetGameFrame()%TEAM_SLOWUPDATE_RATE == 0 then
+			vsx,vsy = Spring.GetViewSizes()
+			cs = Spring.GetCameraState()
+		end
+		if overview and not tabbedMode then
 			Chili.Screen0:RemoveChild(window)
 			tabbedMode = true
 		end
-		if cs.name ~= "ov" and tabbedMode then
+		if not overview and tabbedMode then
 			Chili.Screen0:AddChild(window)
 			window:BringToFront()
 			tabbedMode = false
