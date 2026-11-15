@@ -570,12 +570,13 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 	AddOption(pathGraphicsMap,
 	{
 		name = 'Map Brightness',
-		desc = 'How bright the terrain appears.',
+		desc = 'How bright the terrain appears. Resets to full brightness every game.',
 		type = 'number',
 		min = 0,
 		max = 1,
 		step = 0.01,
 		value = 1,
+		noSave = true,
 		icon = imgPath..'epicmenu/stock_brightness.png',
 		OnChange = function(self) spSendCommands{"luaui enablewidget Darkening", "luaui darkening " .. 1-self.value} end,
 	} )
