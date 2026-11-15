@@ -21,7 +21,6 @@ local needsremerging = false
 local invites = {}
 local givemebuttons = {}
 local givemepanel = {}
-local givemesubjects = {}
 local buildframe = -2
 local built = false
 local sharemode = false
@@ -56,6 +55,7 @@ local images = {
 local defaultamount = 100
 
 local UpdateListFunction
+local UpdateSubjects
 local SetWantRebuild
 local wantRebuild = false
 
@@ -132,6 +132,7 @@ options = {
 		hotkey = "tab",
 		OnChange = function(self)
 			if window then
+				UpdateSubjects()
 				if wantRebuild and UpdateListFunction then
 					UpdateListFunction()
 					wantRebuild = false
@@ -359,7 +360,7 @@ local function RenderName(subject)
 	if (subject.player) then
 		local pingTime = select(6, Spring.GetPlayerInfo(subject.player, false))
 		givemebuttons[subject.id]["ping"]:SetText(PingTimeOut(pingTime))
-	elseif givemebuttons[subject.id]["ping"] then
+	else
 		givemebuttons[subject.id]["ping"]:SetText("\255\180\180\180 n/a")
 	end
 	local oldText = givemebuttons[subject.id]["text"].text
@@ -375,149 +376,50 @@ local function RenderName(subject)
 	end
 end
 
-local oldSubjects = {}
-
-local function SafeSetButtonVisibility(button, visibility)
-	if not button then
-		return
+-- Use the same action set to build the row and to detect state changes.
+local function GetPlayerActions(subject)
+	local myPlayerID = Spring.GetMyPlayerID()
+	local mySpec = Spring.GetSpectatingState()
+	local myTeamID = Spring.GetMyTeamID()
+	local actions = {}
+	if subject.player then
+		actions.battlekick = true -- Report, including spectators and myself.
 	end
-	button:SetVisibility(visibility)
+	if mySpec or subject.spec or subject.dead or subject.allyteam ~= Spring.GetMyAllyTeamID() then
+		return actions
+	end
+	local teamLeader = select(2, Spring.GetTeamInfo(subject.team, false))
+	if subject.player == myPlayerID then
+		if sharemode and teamLeader ~= myPlayerID and #Spring.GetPlayerList(myTeamID) > 1 then
+			actions.leave = true
+		end
+	elseif subject.ai or (subject.team == myTeamID and not sharemode) or (subject.team ~= myTeamID and subject.player == teamLeader) then
+		actions.unit = true
+		actions.metal = true
+		actions.energy = true
+		if subject.player and sharemode and subject.team ~= myTeamID then
+			actions.commshare = true
+		end
+	elseif sharemode and subject.team == myTeamID and teamLeader == myPlayerID then
+		actions.kick = true
+	end
+	if sharemode and subject.player and subject.player ~= myPlayerID and subject.team ~= myTeamID and invites[subject.player] then
+		actions.accept = true
+	end
+	return actions
 end
 
 local function UpdatePlayer(subject)
-	--Spring.Echo("playerupdate " .. subject.name)
-	if givemebuttons[subject.id] == nil or built == false then
-		local name = subject.name
-		--Spring.Echo("player" .. subject.id .. "( " .. name .. ") is not a player!")
-		return
-	end
-	oldSubjects[subject.id] = subject
-	local myPlayerID = Spring.GetMyPlayerID()
-	local mySpec, specFullView = Spring.GetSpectatingState()
-	local myteamID = Spring.GetMyTeamID()
-	local myallyteamID = Spring.GetMyAllyTeamID()
-	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID, false)) == myPlayerID)
-	--Spring.Echo("I am spec " .. tostring(mySpec))
-	--Spring.Echo(subject.name)
-	local teamID = subject.team
-	local allyteamID = subject.allyteam
-	local teamLeader = subject.player and select(2, Spring.GetTeamInfo(teamID, false)) == subject.player
-	--Spring.Echo("leader: " .. tostring(teamLeader))
-	--Spring.Echo("ai: " .. tostring(subject.ai))
-	--Spring.Echo("allyteam: " .. allyteamID)
-	--Spring.Echo("myallyteam: " .. myallyteamID)
-	if subject.player and subject.player == myPlayerID then
-		if givemebuttons[subject.id]["leave"] then
-			if (teamLeader or sharemode == false or mySpec) then
-				SafeSetButtonVisibility(givemebuttons[subject.id]["leave"], false)
-			elseif not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-				SafeSetButtonVisibility(givemebuttons[subject.id]["leave"], true)
-			end
-		end
-		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
-	elseif subject.ai then
-		--Spring.Echo("dec3")
-		SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], false)
-		if subject.allyteam ~= myallyteamID or specFullView then -- hostile ai's stuff.
-			--Spring.Echo("dec4")
-			SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
-			SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
-			SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
-			if (not specFullView ) then
-				--Spring.Echo("dec5")
-				SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], false)
-			end
-		end
-	elseif subject.allyteam ~= myallyteamID or specFullView then -- hostile people's stuff.
-		--Spring.Echo("dec6")
-		SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["accept"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
-		if (not specFullView or subject.spec) then
-			--Spring.Echo("dec7")
-			SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], false)
-			SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], false)
-			SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], false)
-			SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], false)
-			SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], false)
-			SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], false)
-		end
-	elseif mySpec then -- Spectator, but not fullview
-		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
-	else -- other people's stuff.
-		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
-		if teamID == myteamID then
-			if amiteamleader then
-				--Spring.Echo("dec8")
-				SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], true)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
-			else
-				--Spring.Echo("dec9")
-				SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
-			end
-			if sharemode == false then
-				--Spring.Echo("dec10")
-				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], true)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], true)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], true)
-			end
-		else
-			SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
-			if teamLeader == false then
-				--Spring.Echo("dec11")
-				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
-			else
-				--Spring.Echo("dec12")
-				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], true)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], true)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], true)
-				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], true)
-			end
-		end
-	end
-	if (subject.spec) then
-		SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], false)
-		SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], false)
-	end
+	local buttons = givemebuttons[subject.id]
+	local _, specFullView = Spring.GetSpectatingState()
+	local showEco = not subject.spec and (subject.allyteam == Spring.GetMyAllyTeamID() or specFullView)
+	buttons.metalbar:SetVisibility(showEco)
+	buttons.energybar:SetVisibility(showEco)
+	buttons.metalin:SetVisibility(showEco)
+	buttons.energyin:SetVisibility(showEco)
+	buttons.offHolder:SetVisibility(showEco)
+	buttons.defHolder:SetVisibility(showEco)
+	buttons.pingCtrl:SetVisibility(not subject.ai)
 	RenderName(subject)
 end
 
@@ -735,7 +637,7 @@ local function InitName(subject, playerPanel)
 	local metalBarX = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + (options.enableNumWHR.value and whrWidth or 0)
 	local infoSize = 48
 	
-	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
+	if subject.actions.unit then
 		givemebuttons[subject.id]["unit"] = chili.Button:New{
 			parent = playerPanel,
 			height = buttonsize,
@@ -945,103 +847,89 @@ local function InitName(subject, playerPanel)
 		tooltip = "This player's defence"
 	}
 	
-	if subject.player ~= Spring.GetMyPlayerID() then
-		if subject.player then
-			local commshareButtonX = givemebuttons[subject.id]["energy"].x + buttonsize
-			local commshareButtonY = givemebuttons[subject.id]["energy"].y
-			
-			givemebuttons[subject.id]["accept"] = chili.Button:New{
-				parent = playerPanel,
-				height = buttonsize,
-				width = buttonsize,
-				x= commshareButtonX,
-				y= commshareButtonY,
-				OnClick = {function () InviteChange(subject.player,true) end},
-				padding={1,1,1,1},
-				tooltip = "Click this to accept this player's invite!",
-				children={
-					chili.Image:New{
-						file=images.merge,
-						width='100%',
-						height='100%'
-					}
-				},
-				noFont = true,
-			}
-			givemebuttons[subject.id]["commshare"] = chili.Button:New{
-				parent = playerPanel,
-				height = buttonsize,
-				width = buttonsize,
-				x= commshareButtonX,
-				y= commshareButtonY,
-				OnClick = {function () InvitePlayer(subject.player,false) end},
-				padding={1,1,1,1},
-				tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!",
-				children={
-					chili.Image:New{
-						file=images.inviteplayer,
-						width='100%',
-						height='100%'
-					}
-				},
-				noFont = true,
-			}
-			givemebuttons[subject.id]["kick"] = chili.Button:New{
-				parent = playerPanel,
-				height = buttonsize,
-				width = buttonsize,
-				x= commshareButtonX,
-				y= commshareButtonY,
-				OnClick = {function () KickPlayer(subject.player) end},
-				padding={1,1,1,1},
-				tooltip = "Kick this player from your squad.",
-				children={
-					chili.Image:New{
-						file=images.leave,
-						width='100%',
-						height='100%'
-					}
-				},
-				noFont = true,
-			}
-			givemebuttons[subject.id]["battlekick"] = chili.Button:New{
-				parent = playerPanel,
-				height = buttonsize,
-				width = buttonsize,
-				x= metalBarX,
-				y= givemebuttons[subject.id]["text"].y - 6,
-				OnClick = {function () ReportPlayer(subject) end},
-				padding={2,2,2,2},
-				tooltip = "Report this player to moderators.",
-				children={
-					chili.Image:New{
-						file=images.report,
-						width='100%',
-						height='100%'
-					}
-				},
-				noFont = true,
-			}
-			--givemebuttons[subject.id]["battlekick"] = chili.Button:New{
-			--	parent = playerPanel,
-			--	height = buttonsize,
-			--	width = buttonsize,
-			--	x= metalBarX,
-			--	y= givemebuttons[subject.id]["text"].y - 6,
-			--	OnClick = {function () BattleKickPlayer(subject) end},
-			--	padding={1,1,1,1},
-			--	tooltip = "Kick this player from the battle.",
-			--	children={
-			--		chili.Image:New{
-			--			file=images.kick,
-			--			width='100%',
-			--			height='100%'
-			--		}
-			--	},
-			--	noFont = true,
-			--}
-		end
-	else
+	local commshareButtonX = bottomRowStartX + 3*buttonsize
+	local commshareButtonY = bottomRowStartY
+	if subject.actions.accept then
+		givemebuttons[subject.id]["accept"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= commshareButtonX,
+			y= commshareButtonY,
+			OnClick = {function () InviteChange(subject.player,true) end},
+			padding={1,1,1,1},
+			tooltip = "Click this to accept this player's invite!",
+			children={
+				chili.Image:New{
+					file=images.merge,
+					width='100%',
+					height='100%'
+				}
+			},
+			noFont = true,
+		}
+	end
+	if subject.actions.commshare then
+		givemebuttons[subject.id]["commshare"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= commshareButtonX,
+			y= commshareButtonY,
+			OnClick = {function () InvitePlayer(subject.player,false) end},
+			padding={1,1,1,1},
+			tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!",
+			children={
+				chili.Image:New{
+					file=images.inviteplayer,
+					width='100%',
+					height='100%'
+				}
+			},
+			noFont = true,
+		}
+	end
+	if subject.actions.kick then
+		givemebuttons[subject.id]["kick"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= commshareButtonX,
+			y= commshareButtonY,
+			OnClick = {function () KickPlayer(subject.player) end},
+			padding={1,1,1,1},
+			tooltip = "Kick this player from your squad.",
+			children={
+				chili.Image:New{
+					file=images.leave,
+					width='100%',
+					height='100%'
+				}
+			},
+			noFont = true,
+		}
+	end
+	if subject.actions.battlekick then
+		givemebuttons[subject.id]["battlekick"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= metalBarX,
+			y= givemebuttons[subject.id]["text"].y - 6,
+			OnClick = {function () ReportPlayer(subject) end},
+			padding={2,2,2,2},
+			tooltip = "Report this player to moderators.",
+			children={
+				chili.Image:New{
+					file=images.report,
+					width='100%',
+					height='100%'
+				}
+			},
+			noFont = true,
+		}
+	end
+	if subject.actions.leave then
 		givemebuttons[subject.id]["leave"] = chili.Button:New{
 			parent = playerPanel,
 			height = buttonsize,
@@ -1058,24 +946,6 @@ local function InitName(subject, playerPanel)
 					height='100%',
 					x='0%',
 					y=0
-				}
-			},
-			noFont = true,
-		}
-		givemebuttons[subject.id]["battlekick"] = chili.Button:New{
-			parent = playerPanel,
-			height = buttonsize,
-			width = buttonsize,
-			x= metalBarX,
-			y= givemebuttons[subject.id]["text"].y - 6,
-			OnClick = {function () ReportPlayer(subject) end},
-			padding={2,2,2,2},
-			tooltip = "Report this player to moderators.",
-			children={
-				chili.Image:New{
-					file=images.report,
-					width='100%',
-					height='100%'
 				}
 			},
 			noFont = true,
@@ -1225,7 +1095,7 @@ local function InitName(subject, playerPanel)
 	--Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
 	local isSpec = select(3,Spring.GetPlayerInfo(subject.id, false))
 	--if not isSpec then
-		RenderName(subject)
+		UpdatePlayer(subject)
 	--end
 end
 
@@ -1233,6 +1103,9 @@ end
 local function Buildme()
 	--Spring.Echo("Initializing for " .. #subjects)
 	--Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
+	local wasVisible = window and window.visible
+	givemebuttons = {}
+	givemepanel = {}
 	if (window) then
 		window:Dispose()
 	end
@@ -1382,7 +1255,7 @@ local function Buildme()
 		backgroundColor= {0,0,0,0},
 		borderColor= {0,0,0,0}
 	}
-	window:SetVisibility(false)
+	window:SetVisibility(wasVisible or false)
 	buildframe = Spring.GetGameFrame()
 	--Spring.Echo("window " .. tostring(window.parent))
 	--Spring.Echo("Succesfully initialized")
@@ -1402,35 +1275,22 @@ end
 
 local function UpdateInviteTable()
 	local myPlayerID = Spring.GetMyPlayerID()
-	for i=1,Spring.GetPlayerRulesParam(myPlayerID, "commshare_invitecount") do
+	local currentInvites = {}
+	for i=1,(Spring.GetPlayerRulesParam(myPlayerID, "commshare_invitecount") or 0) do
 		local playerID = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_id")
 		local timeleft = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_timeleft") or 0
-		if (givemebuttons[givemesubjects[playerID].id]) then
-			--Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
-			if playerID == automergeid then
-				InviteChange(playerID)
-				return
-			end
-			--Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
-			if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
-				invites[playerID] = timeleft
-				SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], true)
+		if playerID then
+			if timeleft > 1 and invites[playerID] ~= timeleft and deadinvites[playerID] ~= timeleft then
+				currentInvites[playerID] = timeleft
 			elseif invites[playerID] == timeleft then
-				invites[playerID] = nil -- dead invite
 				deadinvites[playerID] = timeleft
-				SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], false)
-			elseif timeleft == 1 then
-				SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], false)
-				invites[playerID] = nil
-			elseif invites[playerID] and timeleft > 1 then
-				invites[playerID] = timeleft
-					SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], true)
-					--Spring.Echo("showing")
 			end
-		-- else
-			--Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID, false)))
+			if currentInvites[playerID] and playerID == automergeid then
+				InviteChange(playerID)
+			end
 		end
 	end
+	invites = currentInvites
 end
 
 local function UpdatePlayers()
@@ -1490,16 +1350,15 @@ local function UpdateAllyTeam(allyTeam)
 				if (subject.player == Spring.GetMyPlayerID()) then
 					mySubjectID = #subjects
 				end
-				givemesubjects[subject.player] = subjects[#subjects]
 			end
 		end
 	end
 end
 
-local function UpdateSubjects()
+function UpdateSubjects()
 	--Spring.Echo("Updating subjects")
 	mySubjectID = -1
-	local oldnum = #subjects
+	local oldSubjects = subjects
 	subjects = {}
 	UpdateAllyTeam(Spring.GetMyAllyTeamID())
 	for _, allyteamID in ipairs(Spring.GetAllyTeamList()) do
@@ -1518,7 +1377,10 @@ local function UpdateSubjects()
 	end
 	--Spring.Echo("My subject ID is " .. mySubjectID)
 	--Spring.Echo("Subject count " .. #subjects)
-	if (#subjects ~= oldnum and built and mySubjectID >= 0) then
+	for _, subject in ipairs(subjects) do
+		subject.actions = GetPlayerActions(subject)
+	end
+	if (not deepcompare(subjects, oldSubjects) and built and mySubjectID >= 0) then
 		--Spring.Echo("Rebuilding")
 		SetWantRebuild()
 	end
@@ -1537,12 +1399,8 @@ function widget:ReceiveUserInfo(info)
 end
 
 function widget:PlayerChanged(playerID)
-	if (built) then
+	if built then
 		UpdateSubjects()
-		if ( mySubjectID >= 0) then
-			--Spring.Echo("Rebuilding")
-			SetWantRebuild()
-		end
 	end
 end
 
@@ -1569,17 +1427,7 @@ function widget:Update(dt)
 		lastWindow = window and window.visible
 		dtSum = 0
 		lastUpdate = f
-		local invitecount = Spring.GetPlayerRulesParam(Spring.GetMyPlayerID(), "commshare_invitecount")
-		
-		for _, subject in ipairs(subjects) do
-			if (givemebuttons[subject.id] and givemebuttons[subject.id]["accept"]) then
-				SafeSetButtonVisibility(givemebuttons[subject.id]["accept"], false)
-			end
-		end
-		if invitecount and built then
-			--Spring.Echo("There are " .. invitecount .. " invites")
-			UpdateInviteTable()
-		end
+		UpdateInviteTable()
 		UpdateSubjects()
 		if (Spring.GetMyAllyTeamID() ~= myAllyTeamID) then
 			SetWantRebuild()
