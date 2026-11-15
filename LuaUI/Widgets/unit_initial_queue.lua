@@ -743,6 +743,10 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(self)
 		return
 	end
+	if Spring.GetSpectatingState() or Spring.IsReplay() then -- Spectators can't queue, so don't add build buttons
+		widgetHandler:RemoveWidget(self)
+		return
+	end
 	if Spring.GetModOptions().singleplayercampaignbattleid then -- Don't run in campaign battles.
 		widgetHandler:RemoveWidget(self)
 		return
