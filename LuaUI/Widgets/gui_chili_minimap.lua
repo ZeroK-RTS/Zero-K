@@ -741,7 +741,9 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
 		updateRunOnceRan = true
 	end
-	if not window then return end
+	if not window then
+		return
+	end
 
 	-- Camera and drag state can change while the simulation is paused.
 	if not options.hideOnOverview.value then
