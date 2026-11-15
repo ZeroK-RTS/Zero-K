@@ -214,9 +214,9 @@ MakeWidgetList = function()
 			local lowercase_desc = data.desc:lower()
 			
 			if filterUserInsertedTerm == "" or
-			lowercase_name:find(filterUserInsertedTerm) or
-			lowercase_desc:find(filterUserInsertedTerm) or
-			lowercase_category:find(filterUserInsertedTerm)
+			lowercase_name:find(filterUserInsertedTerm, 1, true) or
+			lowercase_desc:find(filterUserInsertedTerm, 1, true) or
+			lowercase_category:find(filterUserInsertedTerm, 1, true)
 			then
 			
 				if not data.fromZip then
