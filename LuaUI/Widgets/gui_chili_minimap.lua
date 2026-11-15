@@ -724,11 +724,10 @@ end
 local firstUpdate = true
 local updateRunOnceRan = false
 
-function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
+function widget:Update()
 	if firstUpdate then
 		vsx,vsy = Spring.GetViewSizes()
 		cs = Spring.GetCameraState()
-
 		firstUpdate = false
 		return
 	end
@@ -744,11 +743,8 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 	if not window then
 		return
 	end
-
-	-- Camera and drag state can change while the simulation is paused.
 	if not options.hideOnOverview.value then
-		-- Without an argument GetCameraState makes a new table, so read only the name on every update.
-		local overview = (Spring.GetCameraState(false) == "ov")
+		local overview = (Spring.GetCameraState(false) == "ov") -- false just returns camera name.
 		if overview ~= tabbedMode or Spring.GetGameFrame()%TEAM_SLOWUPDATE_RATE == 0 then
 			vsx,vsy = Spring.GetViewSizes()
 			cs = Spring.GetCameraState()
@@ -764,7 +760,6 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		end
 	end
 	WG.MinimapDraggingCamera = options.leftClickOnMinimap.value == 'camera' or leftClickDraggingCamera
-	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
 function widget:GameStart()
