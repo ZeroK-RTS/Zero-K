@@ -724,11 +724,10 @@ end
 local firstUpdate = true
 local updateRunOnceRan = false
 
-function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
+function widget:Update()
 	if firstUpdate then
 		vsx,vsy = Spring.GetViewSizes()
 		cs = Spring.GetCameraState()
-
 		firstUpdate = false
 		return
 	end
@@ -741,23 +740,26 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
 		updateRunOnceRan = true
 	end
-	if not window or (Spring.GetGameFrame()%TEAM_SLOWUPDATE_RATE ~= 0) then return end 
-
+	if not window then
+		return
+	end
 	if not options.hideOnOverview.value then
-		vsx,vsy = Spring.GetViewSizes()
-		cs = Spring.GetCameraState()
-		if cs.name == "ov" and not tabbedMode then
+		local overview = (Spring.GetCameraState(false) == "ov") -- false just returns camera name.
+		if overview ~= tabbedMode or Spring.GetGameFrame()%TEAM_SLOWUPDATE_RATE == 0 then
+			vsx,vsy = Spring.GetViewSizes()
+			cs = Spring.GetCameraState()
+		end
+		if overview and not tabbedMode then
 			Chili.Screen0:RemoveChild(window)
 			tabbedMode = true
 		end
-		if cs.name ~= "ov" and tabbedMode then
+		if not overview and tabbedMode then
 			Chili.Screen0:AddChild(window)
 			window:BringToFront()
 			tabbedMode = false
 		end
 	end
 	WG.MinimapDraggingCamera = options.leftClickOnMinimap.value == 'camera' or leftClickDraggingCamera
-	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
 function widget:GameStart()
