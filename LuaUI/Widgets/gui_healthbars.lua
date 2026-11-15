@@ -1349,10 +1349,11 @@ do
 
 			--// draw bars of units
 			local unitID, unitDefID
+			local regionView = WG.MapRegionView
 			for i = 1, #visibleUnits do
 				unitID    = visibleUnits[i]
 				unitDefID = GetUnitDefID(unitID)
-				if unitDefID then
+				if unitDefID and (not regionView or regionView.ContainsUnit(unitID)) then
 					DrawUnitInfos(unitID, unitDefID)
 				end
 			end
