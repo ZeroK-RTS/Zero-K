@@ -429,6 +429,8 @@ end
 function widget:GameFrame(n)
 	if not gameStarted then
 		gameStarted = true
+		-- Refresh the command menu, so it drops the build options added in CommandsChanged
+		Spring.ForceLayoutUpdate()
 	end
 
 	-- Don't run if we are a spec
@@ -740,10 +742,6 @@ function widget:Initialize()
 
 	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
 		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
-		widgetHandler:RemoveWidget(self)
-		return
-	end
-	if Spring.GetSpectatingState() or Spring.IsReplay() then -- Spectators can't queue, so don't add build buttons
 		widgetHandler:RemoveWidget(self)
 		return
 	end
