@@ -430,7 +430,7 @@ for sourceName, copyTable in pairs(copy) do
 			UnitDefs[cloneName].featuredefs.dead.object = stats.wreckmodel
 			UnitDefs[cloneName].featuredefs.dead.footprintx = UnitDefs[cloneName].footprintx
 			UnitDefs[cloneName].featuredefs.dead.footprintz = UnitDefs[cloneName].footprintz
-			UnitDefs[cloneName].featuredefs.heap.object = stats.heapmodel
+			UnitDefs[cloneName].featuredefs.heap.object = statsByLevel.heapmodel[stats.level]
 			UnitDefs[cloneName].featuredefs.heap.footprintx = UnitDefs[cloneName].footprintx
 			UnitDefs[cloneName].featuredefs.heap.footprintz = UnitDefs[cloneName].footprintz
 		end
