@@ -312,7 +312,7 @@ local function CheckControlGroupHotkeys(num)
 	return false
 end
 
-local function RawGetFilteredSelection(units, subselection, subselectionCheckDone, doubleClickUnitDefID)
+local function RawGetFilteredSelection(units, subselection, subselectionCheckDone, doubleClickUnitDefID, isGroupSelected)
 	if not useSelectionFiltering or disableForNextUpdate then
 		return
 	end
@@ -337,7 +337,7 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		return
 	end
 
-	local isControlGroupSelection = CheckControlGroupHotkeys()
+	local isControlGroupSelection = isGroupSelected or CheckControlGroupHotkeys()
 
 	if doubleClickUnitDefID then
 		for i = 1, #units do
@@ -433,7 +433,7 @@ local function GetFilteredSelection(units)
 end
 
 function widget:SelectionChanged(units, subselection)
-	return RawGetFilteredSelection(units, subselection, true, GetDoubleClickUnitDefID(units))
+	return RawGetFilteredSelection(units, subselection, true, GetDoubleClickUnitDefID(units), Spring.GetSelectedGroup() ~= -1)
 end
 
 --------------------------------------------------------------------------------
