@@ -116,13 +116,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 	if not attackerTeam and projectileID then
 		attackerTeam = Spring.GetProjectileTeamID(projectileID)
-		if not paralyzer then
-			local health = Spring.GetUnitHealth(unitID)
-			if health <= 0 then
-				-- Without attackerTeam in UnitDamaged, destruction will not be tracked normally.
-				gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-			end
-		end
+	end
+	if attackerTeam and spGetUnitHealth(unitID) <= 0 then -- Crashing planes and dead attackers give UnitDestroyed no attackerTeam.
+		gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
 	end
 
 	local costdamage = DamageToCostDamage(unitID, damage, unitDefID, unitTeam)
@@ -255,7 +251,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
-	if dontCountUnits[unitDefID] then
+	if dontCountUnits[unitDefID] or destructionTallied[unitID] then
 		return
 	end
 
