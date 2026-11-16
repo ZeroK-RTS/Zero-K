@@ -426,6 +426,7 @@ local function drawGraph(graphArray, statistic, graphMin, graphMax, teamID, team
 end
 
 local function GetTeamStats(teams, statistic, usingAllyteams, graphLength)
+	local spectating, specFullView = Spring.GetSpectatingState()
 	local graphMax, graphMin = 0, 0
 	local teamScores = {}
 	for i = 1, #teams do
@@ -499,7 +500,6 @@ end
 
 getEngineArrays = function(statNameData, labelCaption)
 	local teams = Spring.GetTeamList()
-	local spectating, specFullView = Spring.GetSpectatingState()
 	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
 	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
 	local totalTime = Spring.GetGameRulesParam("gameover_second")
