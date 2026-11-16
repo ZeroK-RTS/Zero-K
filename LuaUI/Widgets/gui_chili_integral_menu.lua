@@ -1644,6 +1644,10 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		return cmdID
 	end
 	
+	function externalFunctionsAndData.IsDisabled()
+		return isDisabled
+	end
+	
 	function externalFunctionsAndData.SetBuildQueueCount(count)
 		if not (count or queueCount) then
 			return
@@ -2820,7 +2824,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if pos then
 		local x, y = pos[2], pos[1]
 		local button = commandPanel.buttons.GetButton(x, y)
-		if button then
+		if button and not button.IsDisabled() then
 			return button.DoClick()
 		end
 	end
