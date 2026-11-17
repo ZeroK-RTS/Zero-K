@@ -207,7 +207,7 @@ function widget:Initialize()
 		y = "45%";
 		dockable = true;
 		dockableSavePositionOnly = true,
-		draggable = true,
+		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
