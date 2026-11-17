@@ -1184,12 +1184,20 @@ function widget:Shutdown()
 
 	widgetHandler:DeregisterGlobal('UnitScriptLight')
 
-	deferredLightShader:Delete()
+	if deferredLightShader then deferredLightShader:Delete() end
 	local ram = 0
-	for lighttype, vbo in pairs(unitLightVBOMap) do ram = ram + vbo:Delete() end
-	for lighttype, vbo in pairs(projectileLightVBOMap) do ram = ram + vbo:Delete() end
-	for lighttype, vbo in pairs(lightVBOMap) do ram = ram + vbo:Delete() end
-	ram = ram + cursorPointLightVBO:Delete()
+	if unitLightVBOMap then
+		for lighttype, vbo in pairs(unitLightVBOMap) do ram = ram + vbo:Delete() end
+	end
+	if projectileLightVBOMap then
+		for lighttype, vbo in pairs(projectileLightVBOMap) do ram = ram + vbo:Delete() end
+	end
+	if lightVBOMap then
+		for lighttype, vbo in pairs(lightVBOMap) do ram = ram + vbo:Delete() end
+	end
+	if cursorPointLightVBO and cursorPointLightVBO.Delete then
+		ram = ram + cursorPointLightVBO:Delete()
+	end
 
 	--spEcho("DLGL4 ram usage MB = ", ram / 1000000)
 	--spEcho("featureDefLights", table.countMem(featureDefLights))
