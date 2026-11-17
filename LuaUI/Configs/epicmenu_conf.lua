@@ -460,6 +460,7 @@ local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
 	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
 
 ShButton('Settings/Interface/Player Name Tags', 'Toggle Player Name Tags', function() spSendCommands{"luaui togglewidget Player Name Tags"} end, "Draws player names near visible units.")
+ShButton('Settings/Interface/Crawling Bomb Range', 'Toggle Crawling Bomb Range', function() spSendCommands{"luaui togglewidget Crawling Bomb Range"} end, "Draws the explosion radius of allied crawling bombs and of enemy crawling bombs in line of sight.")
 ShButton('Settings/Interface/Battle Value Tracker', 'Toggle Battle Value Tracker', function() spSendCommands{"luaui togglewidget Battle Resource Tracker"} end, "Draws value killed and lost during a shortly after each battle. This toggle enables tracking, so battles that happen prior to the toggle are not shown.")
 
 
