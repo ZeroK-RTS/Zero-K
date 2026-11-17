@@ -53,6 +53,7 @@ local canDgun = UnitDefs[unitDefID].canDgun
 local dead = false
 local bMoving = false
 local bAiming = false
+local dgunAim = false
 local inBuildAnim = false
 
 local SPEED_MULT = 1.12
@@ -383,21 +384,32 @@ local function AimRifle(heading, pitch, isDgun)
 	return true
 end
 
+local function PrioritiseDgun()
+	dgunAim = true
+	Sleep(500)
+	dgunAim = false
+end
+
 function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
 	inBuildAnim = false
 	if weaponNum == 1 then
+		if dgunAim then return false end
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		bAiming = true
 		return AimRifle(heading, pitch)
 	elseif weaponNum == 2 then
+		if dyncomm.IsManualFire(num) and not dgunAim then
+			StartThread(PrioritiseDgun)
+		end
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
 		SetSignalMask(SIG_AIM_2)
 		bAiming = true
 		return AimRifle(heading, pitch, canDgun)
 	elseif weaponNum == 3 then
+		if dgunAim then return false end
 		return true
 	end
 	return false
@@ -405,6 +417,9 @@ end
 
 function script.FireWeapon(num)
 	dyncomm.EmitWeaponFireSfx(flare, num)
+	if weaponNum == 2 then
+		dgunAim = false
+	end
 end
 
 function script.Shot(num)
