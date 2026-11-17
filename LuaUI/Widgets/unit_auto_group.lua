@@ -204,6 +204,9 @@ local function SetGroupFromAuto(unitID, unitDefID)
 	end
 
 	SetUnitGroup(unitID, autoGroup)
+	if WG.SelectMapIgnoringRank and Spring.GetSelectedGroup() == autoGroup then
+		WG.SelectMapIgnoringRank({[unitID] = true}, true) -- The engine selected it, keep the group.
+	end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
