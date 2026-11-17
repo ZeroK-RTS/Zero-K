@@ -42,7 +42,9 @@ local function CanBuildPlate(unitDefID)
 		local buildDefID = buildOptions[i]
 		if not plateParent[buildDefID] then
 			local cp = UnitDefs[buildDefID].customParams
-			plateParent[buildDefID] = (cp.parent_of_plate and 1) or 0
+			-- parent_of_plate: normal factory plate. strider_hub: Caretaker acts as
+			-- the Strider Hub's plate, so Hub builders also get the plate button.
+			plateParent[buildDefID] = (cp.parent_of_plate and 1) or (cp.strider_hub and 1) or 0
 		end
 		if plateParent[buildDefID] == 1 then
 			return true
