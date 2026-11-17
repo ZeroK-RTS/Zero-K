@@ -429,6 +429,8 @@ end
 function widget:GameFrame(n)
 	if not gameStarted then
 		gameStarted = true
+		-- Refresh the command menu, so it drops the build options added in CommandsChanged
+		Spring.ForceLayoutUpdate()
 	end
 
 	-- Don't run if we are a spec
