@@ -117,7 +117,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	if not attackerTeam and projectileID then
 		attackerTeam = Spring.GetProjectileTeamID(projectileID)
 	end
-	if attackerTeam and spGetUnitHealth(unitID) <= 0 then -- Crashing planes and dead attackers give UnitDestroyed no attackerTeam.
+	if attackerTeam and spGetUnitHealth(unitID) <= 0 then -- Counted here; the later UnitDestroyed returns at destructionTallied.
 		gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
 	end
 
