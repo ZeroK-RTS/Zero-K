@@ -401,6 +401,7 @@ options = {
 			end
 		end,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 	},
 	leftsideofscreen = {
@@ -408,6 +409,7 @@ options = {
 		type = 'bool',
 		value = true,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 		OnChange = OptionsUpdateLayout,
 	},

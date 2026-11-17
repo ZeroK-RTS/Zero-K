@@ -531,6 +531,7 @@ options = {
 			end
 		end,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 	},
 	leftPadding = {

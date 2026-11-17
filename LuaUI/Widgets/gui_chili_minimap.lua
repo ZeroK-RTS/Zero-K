@@ -654,6 +654,7 @@ options = {
 			fakewindow:Invalidate()
 		end,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 	},
 	--[[

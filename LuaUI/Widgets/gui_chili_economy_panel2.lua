@@ -540,6 +540,7 @@ options = {
 			ApplySkin(window_energy, fancySkinRight)
 		end,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 	}
 }
