@@ -2069,6 +2069,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		end
 		
 		local terraform_type = cmdParams[1]
+		if (not Game.mapDamage) or (modOptions.terrarestoreonly == "1" and terraform_type ~= 5) then
+			return false
+		end
 		local commandX = cmdParams[3]
 		local commandZ = cmdParams[4]
 		local commandTag = cmdParams[5]
