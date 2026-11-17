@@ -61,9 +61,10 @@ local function HighlightGeos()
 	for i = 1, #features do
 		local fID = features[i]
 		if FeatureDefs[Spring.GetFeatureDefID(fID)].geoThermal then
-			local fx, fy, fz = Spring.GetFeaturePosition(fID)
+			local fx, _, fz = Spring.GetFeaturePosition(fID)
+			local fy = Spring.GetGroundHeight(fx, fz)
 			gl.BeginEnd(GL.LINE_STRIP, PillarVerts, fx, fy, fz)
-			geos[#geos+1] = {x = fx, z = fz}
+			geos[#geos+1] = {x = fx, y = fy, z = fz}
 		end
 	end
 end
@@ -88,6 +89,21 @@ function widget:GamePreload() -- for cases when features are not yet spawned at 
 		gl.DeleteList(geoDisplayList)
 	end
 	geoDisplayList = gl.CreateList(HighlightGeos)
+end
+
+function widget:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
+	-- The bounds use map squares. Include adjacent squares for interpolated heights.
+	x1, z1 = (x1 - 1) * Game.squareSize, (z1 - 1) * Game.squareSize
+	x2, z2 = (x2 + 1) * Game.squareSize, (z2 + 1) * Game.squareSize
+	for i = 1, #geos do
+		local geo = geos[i]
+		if geo.x >= x1 and geo.x <= x2 and geo.z >= z1 and geo.z <= z2
+				and Spring.GetGroundHeight(geo.x, geo.z) ~= geo.y then
+			gl.DeleteList(geoDisplayList)
+			geoDisplayList = gl.CreateList(HighlightGeos)
+			return
+		end
+	end
 end
 
 function widget:DrawWorld()
