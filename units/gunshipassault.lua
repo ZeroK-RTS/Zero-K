@@ -98,6 +98,7 @@ return { gunshipassault = {
       smokeTrail              = false,
       soundHit                = [[weapon/missile/rapid_rocket_hit]],
       soundStart              = [[weapon/missile/rapid_rocket_fire]],
+      soundStartVolume        = 8.5,
       startVelocity           = 150,
       tolerance               = 15000,
       tracks                  = true,

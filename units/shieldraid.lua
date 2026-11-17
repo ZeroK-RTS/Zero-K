@@ -97,6 +97,7 @@ return { shieldraid = {
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/small_laser_fire2]],
+      soundStartVolume        = 4.5,
       soundTrigger            = true,
       thickness               = 2.55,
       tolerance               = 10000,
