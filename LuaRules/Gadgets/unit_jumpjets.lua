@@ -636,7 +636,7 @@ local function AttemptJump(unitID, unitDefID, cmdID, cmdParams)
 					local offset = utRandomPointInCircle(radius)
 					randpos[1] = cmdParams[1] + offset[1]
 					randpos[3] = cmdParams[3] + offset[2]
-					if ValidJumpLocation(unitDefID, randpos) then
+					if ValidJumpLocation(unitDefID, randpos) and GetDist2Sqr({x, y, z}, randpos) < range*range then
 						tries = 0
 					elseif tries == 1 then
 						tries = 0
