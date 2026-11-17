@@ -12,9 +12,11 @@ if true then -- No engine has this yet
 end
 
 -- Spring.RequestPath causes desync https://github.com/beyond-all-reason/RecoilEngine/issues/2434
+-- Synced Spring.RequestPath crashes engines before 2026.09.02 https://github.com/beyond-all-reason/RecoilEngine/pull/3459
+local requestPathFixed = Script.IsEngineMinVersion(2026, 10) or (Script.IsEngineMinVersion(2026, 9) and tonumber(Engine.versionPatchSet) >= 2)
 
 if Script.IsEngineMinVersion(2025, 1, 0) and Spring.GetModOptions().luapathrequest ~= "1" and
-		((tonumber(Spring.GetModOptions().zombies) ~= 1) or Spring.GetModOptions().singleplayercampaignbattleid) then
+		((tonumber(Spring.GetModOptions().zombies) ~= 1) or Spring.GetModOptions().singleplayercampaignbattleid or not requestPathFixed) then
 	if widgetHandler then
 		widgetHandler.WG.Disable_RequestPath = true
 	end
