@@ -238,6 +238,7 @@ local flexCallIns = {
 	'DrawScreenEffects',
 	'DrawScreenPost',
 	'DrawInMiniMap',
+	'DrawInMiniMapBackground',
 	'DrawOpaqueUnitsLua',
 	'DrawOpaqueFeaturesLua',
 	'DrawAlphaUnitsLua',
@@ -282,6 +283,7 @@ local reverseCallIns = {
 	'DrawScreenEffects',
 	'DrawScreenPost',
 	'DrawInMiniMap',
+	'DrawInMiniMapBackground',
 	'DefaultCommand',
 }
 local reverseCallInMap = {}
@@ -1892,6 +1894,16 @@ function widgetHandler:DrawInMiniMap(xSize, ySize)
 	for _, w in r_ipairs(self.DrawInMiniMapList) do
 		tracy.ZoneBeginN("W:DrawInMiniMap:" .. w.whInfo.name)
 		w:DrawInMiniMap(xSize, ySize)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
+function widgetHandler:DrawInMiniMapBackground(xSize, ySize)
+	tracy.ZoneBeginN("W:DrawInMiniMapBackground")
+	for _, w in r_ipairs(self.DrawInMiniMapBackgroundList) do
+		tracy.ZoneBeginN("W:DrawInMiniMapBackground:" .. w.whInfo.name)
+		w:DrawInMiniMapBackground(xSize, ySize)
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
