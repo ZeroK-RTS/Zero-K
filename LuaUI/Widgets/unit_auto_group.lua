@@ -205,7 +205,11 @@ local function SetGroupFromAuto(unitID, unitDefID)
 
 	SetUnitGroup(unitID, autoGroup)
 	if WG.SelectMapIgnoringRank and Spring.GetSelectedGroup() == autoGroup then
-		WG.SelectMapIgnoringRank({[unitID] = true}, true) -- The engine selected it, keep the group.
+		-- If the group was previously selected then the engine automatically
+		-- adds unitID to the selection. However, in the case where the new
+		-- unit has low selection rank, this causes the new selection to be
+		-- rejected, so we also add selection here.
+		WG.SelectMapIgnoringRank({[unitID] = true}, true)
 	end
 end
 
