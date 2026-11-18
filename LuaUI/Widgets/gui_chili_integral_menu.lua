@@ -470,6 +470,7 @@ options = {
 		type = 'bool',
 		value = false,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 	},
 	fancySkinning = {
@@ -477,6 +478,7 @@ options = {
 		type = 'bool',
 		value = false,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 	},
 	label_super_grid_config = {

@@ -1720,7 +1720,7 @@ local unresetableSettings = {button = true, label = true, menu = true}
 local function ResetWinSettings(path)
 	for _, elem in ipairs(pathoptions[path]) do
 		local option = elem[2]
-		if not (unresetableSettings[option.type]) then
+		if not (unresetableSettings[option.type] or option.ignoreReset) then
 			if option.default ~= nil then --fixme : need default
 				if option.type == 'bool' or option.type == 'number' then
 					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
@@ -1743,7 +1743,7 @@ end
 local function HasSettingsToReset(path)
 	for _, elem in ipairs(pathoptions[path]) do
 		local option = elem[2]
-		if not (unresetableSettings[option.type]) then
+		if not (unresetableSettings[option.type] or option.ignoreReset) then
 			if option.default ~= nil then --fixme : need default
 				return true
 			else

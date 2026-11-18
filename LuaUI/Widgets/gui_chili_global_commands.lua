@@ -143,6 +143,7 @@ options = {
 			contentHolder:Invalidate()
 		end,
 		hidden = true,
+		ignoreReset = true,
 		noHotkey = true,
 	},
 	hide = {
