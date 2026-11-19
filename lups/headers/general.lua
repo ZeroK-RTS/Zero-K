@@ -57,7 +57,7 @@ function IsShieldSphereInView(self)
 	-- into account to be correct in the world space. Extending the
 	-- sphere is cheaper
 	local radius = self.size * (1 + (self.sizeDrift or 0)) + math.diag(pos[1], pos[2], pos[3])
-	return Spring.IsSphereInView(x, y, z, radius + 128)
+	return Spring.IsSphereInView(x, y, z, radius)
 end
 
 local hitOpacityMult = {0.2, 0.5, 0.5}
