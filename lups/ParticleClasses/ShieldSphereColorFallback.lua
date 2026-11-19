@@ -57,6 +57,9 @@ function ShieldSphereColorFallback:EndDraw()
 end
 
 function ShieldSphereColorFallback:Draw()
+	if not IsShieldSphereInView(self) then
+		return
+	end
 	local pos  = self.pos
 	gl.Translate(pos[1],pos[2],pos[3])
 	

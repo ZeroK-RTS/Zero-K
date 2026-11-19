@@ -73,6 +73,9 @@ function ShieldSphereColorParticle:EndDraw()
 end
 
 function ShieldSphereColorParticle:Draw()
+	if not IsShieldSphereInView(self) then
+		return
+	end
 	local col1, col2 = GetShieldColor(self.unit, self)
 	glMultiTexCoord(1, col1[1],col1[2],col1[3],col1[4] or 1)
 	glMultiTexCoord(2, col2[1],col2[2],col2[3],col2[4] or 1)
