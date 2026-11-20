@@ -827,7 +827,7 @@ if not math.normalize then -- BAR 105-2611
 			end
 		end
 
-		return ret
+		return unpack(ret)
 	end
 end
 
