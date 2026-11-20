@@ -119,7 +119,17 @@ local function GetCommandPos(command) -- get the command position
 	return -10,-10,-10
 end
 
-local function ProcessCommand(id, params, options, sequence_order)
+-- Give an order to units, or to the selection when units is nil.
+local function GiveOrderTo(units, id, params, options)
+	if units then
+		Spring.GiveOrderToUnitArray(units, id, params, options)
+	else
+		Spring.GiveOrder(id, params, options)
+	end
+end
+
+-- units: the units to order, or nil for the selection.
+local function ProcessCommand(id, params, options, sequence_order, units)
 
 	local cx, cy, cz -- command position
 	local setPositionOverride = false
@@ -129,8 +139,10 @@ local function ProcessCommand(id, params, options, sequence_order)
 	-- which looks a lot like a block, but it can be told apart because
 	-- unlike blocks queued by hand (i.e. through the default engine UI)
 	-- automex supplies non-zero sequence order
+	-- An explicit unit list comes from a widget queueing its own sequence (with its
+	-- own sequence_order), never a hand-queued block, so skip the block detection.
 	local shift = options.shift
-	if shift and id < 0 and sequence_order == 0 then
+	if shift and id < 0 and sequence_order == 0 and not units then
 		-- If the command is possibly part of a block of structures
 		if structureSquenceCount then
 			structureSquenceCount = structureSquenceCount + 1
@@ -149,13 +161,13 @@ local function ProcessCommand(id, params, options, sequence_order)
 	if ctrl and not meta and id == CMD.REPAIR then
 		-- Engine CTRL means "keep repairing even when being reclaimed" (now inaccessible)
 		-- Engine META means "only repair live units, don't assist construction" (now CTRL)
-		Spring.GiveOrder(id, params, options.coded - CMD.OPT_CTRL + CMD.OPT_META)
+		GiveOrderTo(units, id, params, options.coded - CMD.OPT_CTRL + CMD.OPT_META)
 		return true
 	end
 	if not meta and id == CMD.RESURRECT then
 		-- Engine CTRL means "keep rezzing even when being reclaimed" (now inaccessible)
 		-- Engine META means "only rez fresh wrecks, don't refill partially-reclaimed" (now default, CTRL disables)
-		Spring.GiveOrder(id, params, options.coded - (ctrl and CMD.OPT_CTRL or 0) + (ctrl and 0 or CMD.OPT_META))
+		GiveOrderTo(units, id, params, options.coded - (ctrl and CMD.OPT_CTRL or 0) + (ctrl and 0 or CMD.OPT_META))
 		return true
 	end
 
@@ -175,7 +187,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 		end
 
 		if not (shift or id == CMD_AREA_MEX or id == CMD_AREA_TERRA_MEX) then
-			Spring.GiveOrder(CMD.INSERT, {sequence_order, id, coded, unpack(params)}, CMD.OPT_ALT)
+			GiveOrderTo(units, CMD.INSERT, {sequence_order, id, coded, unpack(params)}, CMD.OPT_ALT)
 			return true
 		end
 
@@ -192,8 +204,8 @@ local function ProcessCommand(id, params, options, sequence_order)
 			return false
 		end
 		
-		-- Insert the command at the appropriate spot in each selected units queue.
-		local units = Spring.GetSelectedUnits()
+		-- Insert the command at the appropriate spot in each unit's queue.
+		units = units or Spring.GetSelectedUnits()
 		for i = 1, #units do
 			local unitID = units[i]
 			local commands = Spring.GetUnitCommands(unitID, -1)
@@ -251,18 +263,22 @@ local function EncodeOptions(options)
 	return coded
 end
 
-function WG.CommandInsert(id, params, options, seq, nonInsertIfPossible)
+-- units: optional list of units to order instead of the selection. Each unit's
+-- queue position is its own queue length + seq, so a caller giving different
+-- units different subsets of a sequence should order them one at a time, each
+-- with its own seq.
+function WG.CommandInsert(id, params, options, seq, nonInsertIfPossible, units)
 	options.coded = (options.coded or EncodeOptions(options))
 	seq = seq or 0
 
-	if ProcessCommand(id, params, options, seq) then
+	if ProcessCommand(id, params, options, seq, units) then
 		return
 	end
 
 	if not options.shift then
 		if seq == 0 then
 			-- ProcessCommand ensures that META is also false at this point
-			Spring.GiveOrder (id, params, options.coded)
+			GiveOrderTo(units, id, params, options.coded)
 			return
 		end
 
@@ -274,7 +290,7 @@ function WG.CommandInsert(id, params, options, seq, nonInsertIfPossible)
 		options.coded = options.coded + CMD_OPT_SHIFT
 	end
 
-	local units = Spring.GetSelectedUnits()
+	units = units or Spring.GetSelectedUnits()
 	for i = 1, #units do
 		local unitID = units[i]
 		local commands = Spring.GetUnitCommandCount(unitID)

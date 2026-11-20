@@ -19,6 +19,7 @@ return { energypylon = {
 
   customParams                  = {
     pylonrange = 500,
+    energy_grid = true,
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
     modelradius    = [[24]],
