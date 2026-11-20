@@ -118,7 +118,7 @@ local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
 local ECON_SUPREMACY_MULT = 25
 local MISSION_PLAYER_ALLY_TEAM_ID = 0
 
-local disableEconSupremacy = (isScriptMission or campaignBattleID or (Spring.GetModOptions().disable_overwhelming_advantage == 1))
+local disableEconSupremacy = (isScriptMission or campaignBattleID or tobool(Spring.GetModOptions().disable_overwhelming_advantage))
 
 local commsAlive = {}
 local allyTeams = spGetAllyTeamList()
@@ -126,7 +126,7 @@ for i = 1, #allyTeams do
 	commsAlive[allyTeams[i]] = {}
 end
 
-local aiTeamResign = not (isScriptMission or campaignBattleID or (Spring.GetModOptions().disable_ai_team_resign == 1))
+local aiTeamResign = not (isScriptMission or campaignBattleID or tobool(Spring.GetModOptions().disable_ai_team_resign))
 
 local vitalConstructorAllyTeam = {}
 local vitalAlive = {}
