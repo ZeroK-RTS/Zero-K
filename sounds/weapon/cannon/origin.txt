@@ -68,3 +68,5 @@ shell_gun.wav
 
 Apelsinsaft (CC-BY):
 cannon_fire9.wav
+
+disruptor_emg_hit.wav - synthesized for Zero-K and mixed by Anarchid, low end from emg_hit_medium.wav
