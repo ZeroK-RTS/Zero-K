@@ -333,6 +333,7 @@ local callInLists = {
 	'AlliedUnitAdded',
 	'AlliedUnitRemoved',
 	'AlliedUnitsChanged',
+	'ParallelWorldShift',
 -- these use mouseOwner instead of lists
 --  'MouseMove',
 --  'MouseRelease',
@@ -1887,11 +1888,47 @@ function widgetHandler:DrawScreenPost(vsx, vsy)
 	tracy.ZoneEnd()
 end
 
+-- Widgets draw in whole-map minimap pixel coordinates. Returns the translation (in pixels) and
+-- scale that map them onto a minimap cropped to the rectangle r, for the minimap rotation in
+-- radians. Along each minimap axis a map axis that runs forwards is pinned at the rectangle's low
+-- edge and one that runs backwards (top-down z, or a flipped axis) at its high edge.
+local function MiniMapRegionTransform(r, rotation, xSize, ySize, mapSizeX, mapSizeZ)
+	local width, height = r.x1 - r.x0, r.z1 - r.z0
+	local scaleMapX, scaleMapZ = mapSizeX / width, mapSizeZ / height
+	local lowX, highX = -r.x0 / width, (r.x1 - mapSizeX) / width
+	local lowZ, highZ = -r.z0 / height, (r.z1 - mapSizeZ) / height
+	local quarterTurns = math.floor(rotation / (math.pi / 2) + 0.5) % 4
+	if quarterTurns == 1 then
+		return lowZ * xSize, lowX * ySize, scaleMapZ, scaleMapX
+	elseif quarterTurns == 2 then
+		return highX * xSize, lowZ * ySize, scaleMapX, scaleMapZ
+	elseif quarterTurns == 3 then
+		return highZ * xSize, highX * ySize, scaleMapZ, scaleMapX
+	end
+	return lowX * xSize, highZ * ySize, scaleMapX, scaleMapZ
+end
+
 function widgetHandler:DrawInMiniMap(xSize, ySize)
 	tracy.ZoneBeginN("W:DrawInMiniMap")
+	-- Map widgets' whole-map minimap coordinates onto the cropped region view, except for widgets
+	-- that draw in minimap pixels taken from the screen (drawInMiniMapPixelSpace in GetInfo).
+	local r = WG.MapRegionView and WG.MapRegionView.rect
+	local translateX, translateY, scaleX, scaleY
+	if r then
+		translateX, translateY, scaleX, scaleY = MiniMapRegionTransform(r, Spring.GetMiniMapRotation() or 0, xSize, ySize, Game.mapSizeX, Game.mapSizeZ)
+	end
 	for _, w in r_ipairs(self.DrawInMiniMapList) do
 		tracy.ZoneBeginN("W:DrawInMiniMap:" .. w.whInfo.name)
+		local transform = r and not w.whInfo.drawInMiniMapPixelSpace
+		if transform then
+			gl.PushMatrix()
+			gl.Translate(translateX, translateY, 0)
+			gl.Scale(scaleX, scaleY, 1)
+		end
 		w:DrawInMiniMap(xSize, ySize)
+		if transform then
+			gl.PopMatrix()
+		end
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
@@ -3017,6 +3054,16 @@ function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
 	for _, w in ipairs(self.AlliedUnitsChangedList) do
 		tracy.ZoneBeginN("W:AlliedUnitsChanged:" .. w.whInfo.name)
 		w:AlliedUnitsChanged(alliedUnits, numAlliedUnits)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
+function widgetHandler:ParallelWorldShift()
+	tracy.ZoneBeginN("W:ParallelWorldShift")
+	for _, w in ipairs(self.ParallelWorldShiftList) do
+		tracy.ZoneBeginN("W:ParallelWorldShift:" .. w.whInfo.name)
+		w:ParallelWorldShift()
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()

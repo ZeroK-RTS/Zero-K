@@ -58,7 +58,12 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	end
 end
 
+local regionRect -- WG.MapRegionView.rect, read once per draw
+
 local function DrawRangeCircle(ux,uy,uz,range,r)
+	if regionRect and (ux < regionRect.x0 or ux > regionRect.x1 or uz < regionRect.z0 or uz > regionRect.z1) then
+		return
+	end
 	glColor(1.0 - (r / 5), 0, 0, 0.35)
 	glDrawGroundCircle(ux, uy, uz, range, 40)
 end
@@ -109,6 +114,7 @@ function widget:DrawWorldPreUnit()
 	end
 
 	glLineWidth(1.5)
+	regionRect = WG.MapRegionView and WG.MapRegionView.rect
 
 	for uDefID, uIDs in pairs(selUnits) do
 		if commDefIDs[uDefID] then -- Dynamic comm have different ranges and different weapons activated

@@ -68,10 +68,11 @@ local function DrawMergedDecloakRanges(drawActive, drawDisabled)
 	if not currentSelection then
 		return
 	end
+	local regionView = WG.MapRegionView
 	for i = 1, #currentSelection do
 		local unitID = currentSelection[i]
 		local unitDefID = spGetUnitDefID(unitID)
-		if unitDefID then
+		if unitDefID and (not regionView or regionView.ContainsUnit(unitID)) then
 			if not decloakDist[unitDefID] then
 				local ud = UnitDefs[unitDefID]
 				decloakDist[unitDefID] = ud.decloakDistance
