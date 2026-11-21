@@ -98,7 +98,7 @@ function gadget:Initialize()
 
 			void main() {
 				float opac = dot(normalize(normal), normalize(eyeVec));
-				opac = pow(1.0 - abs(opac), 2);
+				opac = pow(1.0 - abs(opac), 2.0);
 				gl_FragColor.rgba = color;
 				gl_FragColor.a = gl_FragColor.a * opac;
 			}

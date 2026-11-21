@@ -63,7 +63,7 @@ local function DistSq(x1, z1, x2, z2)
 end
 
 local function IsFactoryEligible(plateID, plate, factoryID, factory)
-	if (not factory.enabled) or plate.allyTeamID ~= factory.allyTeamID or plate.tech ~= factory.tech then
+	if not Spring.Utilities.IsSamePortalRegion(plateID, factoryID) or (not factory.enabled) or plate.allyTeamID ~= factory.allyTeamID or plate.tech ~= factory.tech then
 		return false
 	end
 	if GG.GetUnitTechLevel and GG.GetUnitTechLevel(plateID) > GG.GetUnitTechLevel(factoryID) then

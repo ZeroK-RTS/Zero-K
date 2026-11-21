@@ -260,7 +260,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	for i = 1, #units do
 		local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX,
 			createdUnitMinZ, createdUnitMaxX, createdUnitMaxZ)
-		if units[i] ~= unitID and shouldUnitBeMoved then
+		if units[i] ~= unitID and shouldUnitBeMoved and Spring.Utilities.IsSamePortalRegion(unitID, units[i]) then
 
 			local rectUX, rectUY, rectUZ = spGetUnitPosition(units[i])
 
@@ -287,7 +287,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 			local rectUDef = UnitDefs[spGetUnitDefID(units[i])]
 			local targetX, targetZ = FindAccessibleSpot(diffsCopy, rectUDef, rectUX, rectUZ)
-			if targetX then
+			if targetX and Spring.Utilities.IsPortalPositionAllowed(units[i], targetX, targetZ) then
 			spSetUnitPosition(units[i], targetX, targetZ)
 				-- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
 			--else

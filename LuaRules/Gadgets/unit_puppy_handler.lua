@@ -171,6 +171,9 @@ function GG.PuppyHandler_Shot(unitID)
 end
 
 function gadget:Initialize()
+	GG.Puppy_IsInFlight = function(unitID)
+		return hiddenPuppy[unitID] == true
+	end
 	for i = 1, #wantedWeaponsList do
 		Script.SetWatchExplosion(wantedWeaponsList[i], true)
 	end

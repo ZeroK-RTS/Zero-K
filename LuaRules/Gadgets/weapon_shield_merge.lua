@@ -53,6 +53,9 @@ local errorSent = false
 -- Network management
 
 local function ShieldsAreTouching(shield1, shield2)
+	if not Spring.Utilities.IsSamePortalRegion(shield1.unitID, shield2.unitID) then
+		return false
+	end
 	local xDiff = shield1.x - shield2.x
 	local zDiff = shield1.z - shield2.z
 	local yDiff = shield1.y - shield2.y
@@ -158,6 +161,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 			local ux,uy,uz = spGetUnitPosition(unitID)
 			
 			local shieldData = {
+				unitID = unitID,
 				shieldRadius = shieldWep.shieldRadius,
 				neighbors    = IterableMap.New(),
 				allyTeamID   = allyTeamID,
@@ -229,14 +233,20 @@ end
 local totalCharge = 0
 local shieldCharges = nil
 local chargeProportion = 1
+local struckShield
 local function SumCharge(unitID, _, index)
+	if not Spring.Utilities.IsSamePortalRegion(struckShield, unitID) then
+		return
+	end
 	shieldCharges[index] = select(2, Spring.GetUnitShieldState(unitID)) or 0
 	totalCharge = totalCharge + shieldCharges[index]
 end
 
 -- Double evil
 local function SetCharge(unitID, _, index)
-	Spring.SetUnitShieldState(unitID, -1, true, shieldCharges[index]*chargeProportion)
+	if shieldCharges[index] then
+		Spring.SetUnitShieldState(unitID, -1, true, shieldCharges[index]*chargeProportion)
+	end
 end
 
 local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage, proID)
@@ -268,6 +278,7 @@ local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage
 		if shieldData then
 			totalCharge = 0
 			shieldCharges = {}
+			struckShield = unitID
 			IterableMap.ApplyNoArg(shieldData.neighbors, SumCharge)
 
 			if damage < totalCharge then

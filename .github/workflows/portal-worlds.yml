@@ -1,0 +1,42 @@
+name: Portal tooling tests
+
+on:
+  push:
+    paths:
+      - '.github/workflows/portal-worlds.yml'
+      - 'tools/portal_worlds/**'
+      - 'tests/portal_worlds.lua'
+      - 'LuaRules/**/*portal*.lua'
+      - 'LuaUI/**/*portal*.lua'
+  pull_request:
+    paths:
+      - '.github/workflows/portal-worlds.yml'
+      - 'tools/portal_worlds/**'
+      - 'tests/portal_worlds.lua'
+      - 'LuaRules/**/*portal*.lua'
+      - 'LuaUI/**/*portal*.lua'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tooling:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Lua 5.1
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends lua5.1
+      - name: Check recording and launcher tooling
+        run: python3 -m unittest discover -s tools/portal_worlds -p 'test_*.py'
+      - name: Check portal geometry and Lua adapters
+        run: |
+          lua5.1 tests/portal_worlds.lua
+          lua5.1 tools/portal_worlds/test_recording_mode.lua
+          lua5.1 tools/portal_worlds/test_recording_adapter.lua
+          lua5.1 tools/portal_worlds/test_map_templates.lua
+          lua5.1 tools/portal_worlds/test_object_bounds.lua

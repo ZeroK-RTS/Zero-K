@@ -1352,7 +1352,7 @@ do
 			for i = 1, #visibleUnits do
 				unitID    = visibleUnits[i]
 				unitDefID = GetUnitDefID(unitID)
-				if unitDefID then
+				if unitDefID and (not WG.PortalWorldView or WG.PortalWorldView.ContainsUnit(unitID)) then
 					DrawUnitInfos(unitID, unitDefID)
 				end
 			end
