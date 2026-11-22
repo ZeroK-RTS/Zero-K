@@ -21,6 +21,7 @@ return { planefighter = {
   cruiseAltitude         = 200,
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"aerialAA","scout"}},
     bait_level_default = 0,
 
     specialreloadtime = [[850]],

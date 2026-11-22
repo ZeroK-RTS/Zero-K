@@ -15,6 +15,7 @@ return { amphfloater = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags    = {sectiontags = "baseGame", classtags ="skirm"},
     bait_level_default = 0,
     aim_lookahead      = 100,
     amph_regen         = 60,

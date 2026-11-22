@@ -15,6 +15,7 @@ return { amphtele = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="support"},
     amph_regen = 30,
     amph_submerged_at = 40,
 

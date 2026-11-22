@@ -12,6 +12,7 @@ return { chicken = {
   category            = [[LAND SINK SMALL]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"scout","raider"}},
     outline_x = 70,
     outline_y = 70,
     outline_yoff = 15,
@@ -27,9 +28,7 @@ return { chicken = {
   idleTime            = 300,
   leaveTracks         = true,
   maxSlope            = 36,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 25,
+  metalCost           = 25,
   movementClass       = [[AKBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING SATELLITE GUNSHIP]],

@@ -18,6 +18,7 @@ return { chickenf = {
   cruiseAltitude      = 150,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"bomberLight","aerialAA"}},
     outline_x = 180,
     outline_y = 180,
     outline_yoff = 17.5,
@@ -33,9 +34,7 @@ return { chickenf = {
   idleTime            = 300,
   leaveTracks         = true,
   maxSlope            = 18,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 450,
+  metalCost           = 150,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],

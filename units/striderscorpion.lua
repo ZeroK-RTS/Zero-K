@@ -21,6 +21,7 @@ return { striderscorpion = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderMedium"},
     bait_level_default = 0,
     aimposoffset          = [[0 10 0]],
     decloak_footprint     = 5,

@@ -35,6 +35,7 @@ return { plateamph = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     modelradius        = [[50]],
     aimposoffset       = [[0 18 -26]],
     midposoffset       = [[0 0 -26]],

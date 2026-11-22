@@ -12,6 +12,7 @@ return { chicken_spidermonkey = {
   category            = [[LAND]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"support","antiHeavy"}},
     outline_x = 145,
     outline_y = 145,
     outline_yoff = 30,
@@ -28,9 +29,7 @@ return { chicken_spidermonkey = {
   leaveTracks         = true,
   maxSlope            = 72,
   maxWaterDepth       = 22,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 500,
+  metalCost           = 300,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET MINE]],

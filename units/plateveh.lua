@@ -34,6 +34,7 @@ return { plateveh = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     sortName           = [[2]],
     default_spacing    = 4,
     solid_factory      = 2,

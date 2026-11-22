@@ -39,6 +39,7 @@ return { chickenbroodqueen = {
   category            = [[LAND]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "extraChickens", classtags = {"constructor","assault"}},
     outline_x = 185,
     outline_y = 185,
     outline_yoff = 27.5,
@@ -54,9 +55,7 @@ return { chickenbroodqueen = {
   leaveTracks         = true,
   maxSlope            = 72,
   maxWaterDepth       = 22,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 1000,
+  metalCost           = 1000,
   movementClass       = [[TKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

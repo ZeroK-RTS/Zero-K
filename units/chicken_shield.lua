@@ -12,6 +12,7 @@ return { chicken_shield = {
   category            = [[LAND]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"support","shield"}}, --shield may be uncessecary
     shield_emit_height = 26,
     shield_emit_offset = 0,
 
@@ -30,9 +31,7 @@ return { chicken_shield = {
   leaveTracks         = true,
   maxSlope            = 37,
   maxWaterDepth       = 5000,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 1200,
+  metalCost           = 700,
   movementClass       = [[BHOVER5]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],

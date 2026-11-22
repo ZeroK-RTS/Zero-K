@@ -15,6 +15,7 @@ return { jumparty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="artillery"},
     aim_lookahead      = 100,
     bait_level_default = 1,
     selection_scale   = 0.88,

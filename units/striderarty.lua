@@ -15,6 +15,7 @@ return { striderarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderMedium"},
     aim_lookahead      = 80,
     bait_level_default = 2,
     normaltex = [[unittextures/Catapult_normals.dds]],

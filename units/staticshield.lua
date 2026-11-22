@@ -31,6 +31,7 @@ return { staticshield = {
   yardMap                       = [[oooo]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="staticSupport"},
     aimposoffset   = [[0 5 0]],
     removewait     = 1,
 

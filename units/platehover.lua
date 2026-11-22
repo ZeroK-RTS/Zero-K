@@ -33,6 +33,7 @@ return { platehover = {
   corpse           = [[DEAD]],
 
   customParams     = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     sortName           = [[8]],
     modelradius        = [[50]],
     default_spacing    = 4,

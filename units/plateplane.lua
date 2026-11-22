@@ -36,6 +36,7 @@ return { plateplane = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     landflystate       = [[0]],
     factory_land_state = 1,
     sortName           = [[4]],

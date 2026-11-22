@@ -15,6 +15,7 @@ return { amphraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="raider"},
     bait_level_default = 0,
     amph_regen        = 5,
     amph_submerged_at = 40,

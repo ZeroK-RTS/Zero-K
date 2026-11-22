@@ -15,6 +15,7 @@ return { mahlazer = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="super"},
     modelradius    = [[80]],
     aimposoffset   = [[0 35 0]],
     midposoffset   = [[0 0 0]],

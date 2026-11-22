@@ -19,6 +19,7 @@ return { chickenlandqueen = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "chickens", classtags = "striderHeavy"}, --unsure if it makes sense for chicken queen
     selection_scale       = 2,
 
     outline_x = 400,
@@ -35,9 +36,7 @@ return { chickenlandqueen = {
   idleAutoHeal           = 20,
   idleTime               = 300,
   leaveTracks            = true,
-  metalCost              = 0,
-  energyCost             = 0,
-  buildTime              = 40000,
+  metalCost              = 40000,
   minCloakDistance       = 250,
   movementClass          = [[AKBOT4]],
   noAutoFire             = false,

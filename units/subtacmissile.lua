@@ -16,6 +16,7 @@ return { subtacmissile = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderMedium"},
     bait_level_default = 0,
     modelradius    = [[15]],
     stockpiletime  = [[30]],

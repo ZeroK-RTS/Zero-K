@@ -23,6 +23,7 @@ return { gunshipbomb = {
   cruiseAltitude         = 30,
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="bomb"},
     landflystate   = [[1]],
     idle_cloak = 1,
     stats_detonate_weapon = [[gunshipbomb_gunshipbomb_bomb]],

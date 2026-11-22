@@ -20,6 +20,7 @@ return { jumpcon = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="constructor"},
     canjump            = 1,
     jump_range         = 400,
     jump_speed         = 6,

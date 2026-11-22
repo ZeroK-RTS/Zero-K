@@ -19,6 +19,7 @@ return { chicken_dragon = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"striderMedium","striderHeavy"}},--seems appropriate
     outline_x = 270,
     outline_y = 270,
     outline_yoff = 40,
@@ -33,9 +34,7 @@ return { chicken_dragon = {
   idleTime               = 300,
   leaveTracks            = true,
   maxSlope               = 36,
-  metalCost              = 0,
-  energyCost             = 0,
-  buildTime              = 10500,
+  metalCost              = 10500,
   minCloakDistance       = 225,
   movementClass          = [[BHOVER5]],
   noAutoFire             = false,

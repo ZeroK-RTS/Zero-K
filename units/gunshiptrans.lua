@@ -23,6 +23,7 @@ return { gunshiptrans = {
   cruiseAltitude      = 140,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="transport"},
     airstrafecontrol  = [[1]],
     midposoffset      = [[0 0 0]],
     modelradius       = [[15]],

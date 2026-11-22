@@ -34,6 +34,7 @@ return { platejump = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     aimposoffset       = [[0 20 -32]],
     midposoffset       = [[0 0 -28]],
     canjump            = [[1]],

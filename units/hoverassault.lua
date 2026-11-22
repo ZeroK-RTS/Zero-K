@@ -16,6 +16,7 @@ return { hoverassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="assault"},
     aim_lookahead    = 20,
     bait_level_default = 0,
     bait_level_target_armor = 1,

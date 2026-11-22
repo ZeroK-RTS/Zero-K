@@ -18,6 +18,7 @@ return { vehsupport = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="skirm"},
     aim_lookahead      = 50,
     modelradius        = [[13]],
     aimposoffset       = [[0 10 0]],

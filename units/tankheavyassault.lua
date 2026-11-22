@@ -15,6 +15,7 @@ return { tankheavyassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderDemi"},
     aim_lookahead      = 140,
     bait_level_default = 0,
     decloak_footprint     = 5,

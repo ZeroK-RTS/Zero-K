@@ -35,6 +35,7 @@ return { plategunship = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     aimposoffset       = [[0 10 0]],
     landflystate       = [[0]],
     factory_land_state = 0,

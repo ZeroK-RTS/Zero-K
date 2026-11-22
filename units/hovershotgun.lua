@@ -13,6 +13,7 @@ return { hovershotgun = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "extraUnits", classtags = {"assault","riot"}},
     modelradius    = [[25]],
     turnatfullspeed_hover = [[1]],
  },

@@ -29,6 +29,7 @@ return { gunshipcon = {
   cruiseAltitude      = 80,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="constructor"},
     airstrafecontrol = [[0]],
     modelradius    = [[15]],
     aimposoffset   = [[0 35 0]],

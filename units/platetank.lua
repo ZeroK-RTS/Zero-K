@@ -33,6 +33,7 @@ return { platetank = {
   selectionVolumeType           = [[box]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     sortName           = [[6]],
     solid_factory      = [[4]],
     default_spacing    = 4,

@@ -2130,6 +2130,29 @@ local behaviourConfig = {
 		name = "gunshipheavytrans",
 		externallyHandled = true,
 	},
+	
+	-- Extra Units!
+	{
+		name = "hoverminer",
+		skirms = allMobileGround,
+		skirmRadar = true,
+		--swarms = {},
+		--flees = {},
+		skirmLeeway = -150,
+		skirmOrderDis = 200,
+		skirmOrderDisMin = 100, -- Make it turn around.
+		
+		wardFireCmdID = CMD_FIRE_TOWARDS_ENEMY,
+		wardFireEverything = true,
+		wardFireUnboundedRange = true,
+		wardFireLeewayOverride = 80,
+		wardFireEnableLeeway = 10,
+		wardFirePredict = 5,
+		wardFireLeeway = 15,
+		wardFireShield = false,
+		wardFireDefault = true, -- true by default!
+	},
+	
 }
 
 --------------------------------------------------------------------------------

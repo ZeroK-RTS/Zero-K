@@ -14,6 +14,7 @@ return { cloakskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="skirm"},
     aim_lookahead  = 120,
     modelradius    = [[18]],
     midposoffset   = [[0 6 0]],

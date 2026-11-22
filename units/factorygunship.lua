@@ -35,6 +35,7 @@ return { factorygunship = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factory"},
     ploppable = 1,
     lab_hax_feature_only = 1,
     landflystate   = [[0]],

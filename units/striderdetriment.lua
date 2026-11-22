@@ -18,6 +18,7 @@ return { striderdetriment = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderHeavy"},
     aim_lookahead         = 120,
     canjump               = 1,
     jump_range            = 840,

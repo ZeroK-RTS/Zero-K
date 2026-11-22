@@ -17,6 +17,7 @@ return { spiderriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="riot"},
     aimposoffset       = [[0 10 0]],
     aim_lookahead      = 80,
     selection_scale = 1.2,

@@ -15,6 +15,7 @@ return { veharty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="artillery"},
     selection_scale   = 0.85,
     bait_level_default = 0,
 

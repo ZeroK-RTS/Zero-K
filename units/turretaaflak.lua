@@ -14,6 +14,7 @@ return { turretaaflak = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="turretAAHeavy"},
     aim_lookahead      = 120,
     aimposoffset       = [[0 12 0]],
     bait_level_default = 0,

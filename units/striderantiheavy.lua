@@ -18,6 +18,7 @@ return { striderantiheavy = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"antiHeavy","striderDemi"}},--could go to medium maybe...
     bait_level_default = 0,
     modelradius    = [[21]],
 

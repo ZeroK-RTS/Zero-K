@@ -20,6 +20,7 @@ return { shieldcon = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="constructor"},
     shield_emit_height = 17,
   },
 

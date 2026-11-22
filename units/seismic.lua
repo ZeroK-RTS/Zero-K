@@ -13,6 +13,7 @@ return { seismic = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="siloMissile"},
     mobilebuilding = [[1]],
     ignore_for_loss_stats = [[1]],
 

@@ -16,6 +16,7 @@ return { hoverarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="artillery"},
     aim_lookahead    = 120,
     bait_level_default = 1,
     modelradius    = [[32]],

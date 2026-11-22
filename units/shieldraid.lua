@@ -14,6 +14,7 @@ return { shieldraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="raider"},
     modelradius        = [[12]],
     aim_lookahead      = 80,
     set_target_range_buffer = 30,

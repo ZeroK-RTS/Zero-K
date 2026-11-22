@@ -15,6 +15,7 @@ return { turretantiheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="turretHeavy"},
     bait_level_default = 1,
     bait_level_target_armor = 1,
 

@@ -15,6 +15,7 @@ return { tankheavyarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"artillery","support"}},-- does this make sense?
     bait_level_default = 0,
     modelradius       = [[17]],
     cus_noflashlight  = 1,

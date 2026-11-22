@@ -17,6 +17,7 @@ return { hoverskirm = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="skirm"},
     aim_lookahead    = 100,
     bait_level_default = 1,
     modelradius    = [[25]],

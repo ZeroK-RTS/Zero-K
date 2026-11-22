@@ -16,6 +16,7 @@ return { shipcarrier = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderMedium"}, -- no need for sea strider category if we can differentiate via movetypes
     midposoffset   = [[0 -10 0]],
     modelradius    = [[80]],
     stockpiletime  = [[30]],

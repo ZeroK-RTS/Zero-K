@@ -16,6 +16,7 @@ return { shipriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"raider","riot"}},
     aim_lookahead      = 100,
     turnatfullspeed = [[1]],
     --extradrawrange = 420,

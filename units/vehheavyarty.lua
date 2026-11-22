@@ -13,6 +13,7 @@ return { vehheavyarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="artillery"},
     chase_everything = 1, -- don't ignore solars. Doesn't chase mobiles anyway
     target_stupid_targets = 1, -- ditto, don't deprioritize solars (mobile stupid targets already deprioritized)
 

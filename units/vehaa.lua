@@ -15,6 +15,7 @@ return { vehaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="antiAir"},
     bait_level_default = 0,
     modelradius    = [[9]],
     okp_damage = 280.1,

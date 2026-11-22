@@ -17,6 +17,7 @@ return { commander_egg = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="bomb"},--makes a good bomb, even if it doesn move...?
     instantselfd = [[1]],
     modelradius = [[15]],
     stats_show_death_explosion = 1,

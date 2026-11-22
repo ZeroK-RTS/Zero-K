@@ -33,6 +33,7 @@ return { platespider = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     aimposoffset       = [[0 14 -26]],
     midposoffset       = [[0 0 -26]],
     sortName           = [[5]],

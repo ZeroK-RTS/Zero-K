@@ -19,6 +19,7 @@ return { hoveraa = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="antiAir"},
     bait_level_default = 0,
     modelradius    = [[25]],
     midposoffset   = [[0 8 0]],

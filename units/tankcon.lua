@@ -20,6 +20,7 @@ return { tankcon = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="constructor"},
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -4 0]],
     modelradius    = [[30]],

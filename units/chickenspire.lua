@@ -14,6 +14,7 @@ return { chickenspire = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "extraChickens", classtags = {"turretHeavy","staticStrategic"}},
     outline_x = 155,
     outline_y = 200,
     outline_yoff = 75,
@@ -32,9 +33,7 @@ return { chickenspire = {
   levelGround                   = false,
   maxSlope                      = 36,
   maxWaterDepth                 = 20,
-  metalCost                     = 0,
-  energyCost                    = 0,
-  buildTime                     = 2500,
+  metalCost                     = 3500,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[spire.s3o]],

@@ -14,6 +14,7 @@ return { turretmissile = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="turretLight"},
     aim_lookahead      = 60,
     aimposoffset       = [[0 20 0]],
     bait_level_default = 0,

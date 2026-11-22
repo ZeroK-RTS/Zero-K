@@ -23,6 +23,7 @@ return { bomberheavyold = {
   cruiseAltitude      = 250,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "extraUnits", classtags = "bomberHeavy"}, --Old likho cameo?
     modelradius      = [[10]],
     reammoseconds    = [[25]],
     refuelturnradius = [[150]],

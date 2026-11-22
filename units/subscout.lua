@@ -15,6 +15,7 @@ return { subscout = {
   collisionVolumeType    = [[cylZ]],
 
   customParams          = {
+    unit_class_tags = {sectiontags = "extraUnits", classtags ={"scout","bomb","antiSub"}},
     fireproof = [[1]],
     turnatfullspeed = [[1]],
   },
@@ -24,7 +25,7 @@ return { subscout = {
   footprintX            = 2,
   footprintZ            = 2,
   health                = 200,
-  iconType              = [[submarine]],
+  iconType              = [[shipscout_alt]],
   kamikaze              = true,
   kamikazeDistance      = 80,
   metalCost             = 200,

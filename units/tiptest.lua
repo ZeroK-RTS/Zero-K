@@ -9,5 +9,6 @@ unitDef.speed = 150
 unitDef.turnRate = 300
 unitDef.turninplace = 0
 unitDef.customParams.turnatfullspeed = 1
+unitDef.customParams.unit_class_tags = nil
 
 return { tiptest = unitDef }

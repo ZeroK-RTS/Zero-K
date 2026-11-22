@@ -15,6 +15,7 @@ return { vehassault = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="assault"},
     aim_lookahead     = 120,
     bait_level_default = 0,
     aimposoffset   = [[0 8 0]],

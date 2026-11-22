@@ -19,6 +19,7 @@ return { shieldbomb = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="bomb"},
     modelradius    = [[7]],
     idle_cloak = 1,
     selection_scale = 1, -- Maybe change later

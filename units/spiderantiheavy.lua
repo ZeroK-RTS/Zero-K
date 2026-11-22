@@ -17,6 +17,7 @@ return { spiderantiheavy = {
   corpse                = [[DEAD]],
 
   customParams          = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="antiHeavy"},
     bait_level_default = 2,
     dontfireatradarcommand = '1',
     cus_noflashlight = 1,

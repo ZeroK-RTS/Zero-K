@@ -22,6 +22,7 @@ return { gunshipkrow = {
   cruiseAltitude         = 120,
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderMedium"},
     modelradius    = [[10]],
     fire_towards_range_buffer = 95,
   },

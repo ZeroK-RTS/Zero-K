@@ -15,6 +15,7 @@ return { staticarty = {
   collisionVolumeType           = [[ellipsoid]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="staticStrategic"},
     aim_lookahead      = 120,
     keeptooltip        = [[any string I want]],
     neededlink         = 50,

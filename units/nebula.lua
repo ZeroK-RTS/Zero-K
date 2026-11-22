@@ -23,6 +23,7 @@ return { nebula = {
   cruiseAltitude         = 300,
 
   customParams           = {
+    unit_class_tags = {sectiontags = "extraUnits", classtags ="striderHeavy"},-- I am interested in just making it my version of neb tbh :O
     cantuseairpads = 1,
     modelradius    = [[40]],
     shield_emit_height = 20,

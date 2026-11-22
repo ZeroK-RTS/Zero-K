@@ -12,6 +12,7 @@ return { shieldshield = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="support"},
     priority_misc = 1, -- Medium
     unarmed       = true,
     aimposoffset   = [[0 5 0]],

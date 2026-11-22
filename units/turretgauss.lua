@@ -15,6 +15,7 @@ return { turretgauss = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"turretSkirm","turretAntiSub"}},
     bait_level_default = 1,
     bait_level_target_armor = 1,
     modelradius    = [[15]],

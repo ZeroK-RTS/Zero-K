@@ -15,6 +15,7 @@ return { tankheavyraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="raider"},
     modelradius       = [[10]],
     selection_scale   = 0.85,
     aim_lookahead     = 120,

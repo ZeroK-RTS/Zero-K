@@ -14,6 +14,7 @@ return { spideremp = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"raider","riot"}},
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
     bait_level_default = 0,

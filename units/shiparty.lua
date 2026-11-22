@@ -14,6 +14,7 @@ return { shiparty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="artillery"},
     aim_lookahead      = 180,
     bait_level_default = 1,
     --extradrawrange = 200,

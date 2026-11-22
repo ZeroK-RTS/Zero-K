@@ -29,6 +29,7 @@ return { plateship = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     sortName               = [[7]],
     unstick_help           = 1,
     aimposoffset           = [[30 0 -5]],

@@ -12,6 +12,7 @@ return { chicken_drone = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
+  unit_class_tags = {sectiontags = "extraChickens", classtags = "constructor"},
 	morphto_1 = "chickend",
 	morphtime_1 = 20,
 	morphcost_1 = 15,
@@ -34,9 +35,7 @@ return { chicken_drone = {
   leaveTracks         = true,
   maxSlope            = 36,
   maxWaterDepth       = 5000,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 60,
+  metalCost           = 60,
   metalMake           = 0,
   metalStorage        = 50,
   movementClass       = [[AKBOT2]],

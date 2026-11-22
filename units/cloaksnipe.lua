@@ -19,6 +19,7 @@ return { cloaksnipe = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="artillery"},
     aim_lookahead      = 80,
     bait_level_default = 1,
     modelradius    = [[15]],

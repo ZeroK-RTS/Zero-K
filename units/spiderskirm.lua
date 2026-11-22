@@ -11,6 +11,7 @@ return { spiderskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="skirm"},
     midposoffset   = [[0 -5 0]],
     aim_lookahead  = 160,
     bait_level_default = 0,

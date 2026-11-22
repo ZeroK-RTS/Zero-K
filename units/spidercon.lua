@@ -21,6 +21,7 @@ return { spidercon = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="constructor"},
     modelradius    = [[15]],
     selection_scale = 1.5,
     disable_radar_preview = 1,

@@ -12,6 +12,7 @@ return { chicken_dodo = {
   category              = [[LAND SINK]],
 
   customParams          = {
+    unit_class_tags = {sectiontags = "chickens", classtags = "bomb"}
   },
 
   explodeAs             = [[DODO_DEATH]],
@@ -25,9 +26,7 @@ return { chicken_dodo = {
   kamikazeDistance      = 80,
   leaveTracks           = true,
   maxSlope              = 36,
-  metalCost             = 0,
-  energyCost            = 0,
-  buildTime             = 170,
+  metalCost             = 170,
   movementClass         = [[AKBOT2]],
   movestate             = 2,
   noAutoFire            = false,

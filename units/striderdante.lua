@@ -13,6 +13,7 @@ return { striderdante = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderMedium"},
     aim_lookahead      = 120,
     decloak_footprint  = 5,
     manualfire_desc    = [[Fire Special Weapon: Fire a napalm rocket salvo.]],
@@ -291,13 +292,10 @@ return { striderdante = {
       fireStarter             = 250,
       fixedlauncher           = true,
       flightTime              = 2/30,
-      groundbounce            = 1,
-      waterbounce             = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 2,
       model                   = [[wep_m_hailstorm.s3o]],
-      numBounce               = 2,
       projectiles             = 2,
       range                   = 460,
       reloadtime              = 20,

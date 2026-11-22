@@ -15,6 +15,7 @@ return { tankriot = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="riot"},
     bait_level_default = 0,
     cus_noflashlight  = 1,
     selection_scale   = 0.92,

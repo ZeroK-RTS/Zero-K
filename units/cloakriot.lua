@@ -17,6 +17,7 @@ return { cloakriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="riot"},
     modelradius       = [[7]],
     cus_noflashlight  = 1,
     selection_scale   = 0.85,

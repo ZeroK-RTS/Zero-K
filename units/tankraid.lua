@@ -18,6 +18,7 @@ return { tankraid = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="raider"},
     fireproof      = [[1]],
     --specialreloadtime = [[850]],
     modelradius       = [[20]],

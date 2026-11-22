@@ -8,6 +8,7 @@ return { cloakcon = {
   builder                = true,
 
   buildoptions           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="constructor"},
   },
 
   buildPic               = [[cloakcon.png]],

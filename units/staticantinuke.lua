@@ -18,6 +18,7 @@ return { staticantinuke = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="staticStrategic"},
     removewait     = 1,
     removestop     = 1,
     nuke_coverage  = 2500,

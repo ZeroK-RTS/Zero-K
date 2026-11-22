@@ -35,6 +35,7 @@ return { plateshield = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     sortName           = [[1]],
     modelradius        = [[50]],
     aimposoffset       = [[0 10 -25]],

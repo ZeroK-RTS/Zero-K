@@ -19,6 +19,7 @@ return { staticcon = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="ecoSupport"},
     aimposoffset     = [[0 18 0]],
     midposoffset     = [[0 -4 0]],
     modelradius      = [[24]],

@@ -16,6 +16,7 @@ return { hoverriot = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="riot"},
     selection_scale    = 0.92,
     aim_lookahead      = 80,
     --specialreloadtime = [[1200]],

@@ -1,5 +1,6 @@
 local included = VFS.Include("units/jumpsumo.lua")
 local unitDef = included.jumpsumo
 unitDef.customParams.override_tex2 = "unittextures/m0r1.dds"
+unitDef.customParams.unit_class_tags = nil
 
 return { dbg_m0r1 = unitDef }

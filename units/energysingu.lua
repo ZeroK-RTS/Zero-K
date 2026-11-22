@@ -15,6 +15,7 @@ return { energysingu = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="ecoHeavy"},
     pylonrange = 150,
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 12 0]],

@@ -15,6 +15,7 @@ return { turretaaheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="staticStrategic"},-- beeg threat!
     bait_level_default = 2,
     modelradius    = [[37]],
     stockpilecost  = [[80]],

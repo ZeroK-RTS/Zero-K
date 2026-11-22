@@ -7,6 +7,7 @@ return { chicken_rafflesia = {
   category                      = [[SINK]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "extraChickens", classtags = "staticSupport"},
     shield_emit_offset = -4,
     normaltex = [[unittextures/chicken_rafflesia_normals.dds]],
   },
@@ -22,9 +23,7 @@ return { chicken_rafflesia = {
   levelGround                   = false,
   maxSlope                      = 36,
   maxWaterDepth                 = 20,
-  metalCost                     = 0,
-  energyCost                    = 0,
-  buildTime                     = 480,
+  metalCost                     = 480,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[chicken_rafflesia.s3o]],

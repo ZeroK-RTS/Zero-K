@@ -11,6 +11,7 @@ return { turrettorp = {
   corpse            = [[DEAD]],
 
   customParams      = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"turretAntiSub"}},
     aim_lookahead      = 60,
     aimposoffset       = [[0 15 0]],
     midposoffset       = [[0 15 0]],

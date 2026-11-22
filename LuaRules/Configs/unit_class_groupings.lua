@@ -1,6 +1,110 @@
 -- units grouped and defined for the compositionbuilder,
 -- bundled in a config file for ease of access and cross gadget sharing
 
+
+--LETS THINK!!!
+
+-- We can get amph and hover movetypes from their well, movetype, so dont necessarily need a category?
+-- there is the category category, but I dont really want to do string befuddling or try to use a normal param
+    
+-- [[AKBOT2]],[[AKBOT3]],[[AKBOT4]] are amph bot movetypes
+-- 
+-- [[BOAT2]],[[BOAT3]],[[BOAT4]],[[BOAT5]], --boats!
+
+-- [[ATKBOT3]] spiders that can water? mostly chickens
+
+-- no need for sea strider category if we can differentiate via movetypes
+
+-- shield category may be doable with just shields mabi
+
+-- gunships are weird o,o" I will likely need help with it
+
+-- Dampner mine could be unique?
+
+-- Morningstar and Punisher sort of double up...
+
+-- Anarchid needs its legs fixed
+
+-- Dozer and slicer have potential TM but are not ready really
+
+-- Lancelet needs some stuff but then could be good
+
+--What a handy thing to find!
+-- only thing here thats iffy is the air movetype for atkbot3... but it fits I spose!
+local staticUnits, movetypeDefID, movetypes = VFS.Include("LuaRules/Configs/CAI/unitMovetype.lua")
+
+local spTableMerge = Spring.Utilities.MergeTable
+
+--Vibecoded Table func! would be good to have as a util func?
+local function stringToTable(str)
+    -- Wrap the string in a return statement
+    local code = "return " .. str
+    local chunk, err
+
+    if setfenv then
+        -- Lua 5.1 / LuaJIT
+        chunk, err = loadstring(code)
+        if chunk then setfenv(chunk, {}) end
+    else
+        -- Lua 5.2, 5.3, 5.4
+        chunk, err = load(code, "deserialize", "t", {})
+    end
+
+    if not chunk then
+        return nil, err
+    end
+
+    -- Use pcall to safely catch any runtime errors during evaluation
+    local success, result = pcall(chunk)
+    if not success or type(result) ~= "table" then
+        return nil, result or "Result was not a table"
+    end
+
+    return result
+end
+
+local sectionGroupings = {}
+local classGroupings = {}
+local taggedUnitDefNames = {}
+local taggedUnitDefIDs = {}
+for unitDefID = 1, #UnitDefs do
+    local ud = UnitDefs[unitDefID]
+	local cp = UnitDefs[unitDefID].customParams
+	if cp.unit_class_tags then
+        local unitDefName = UnitDefs[unitDefID].name
+        local movementTag = movetypeDefID[unitDefID] or "static"
+        local sectionTags = nil
+        local classTags = nil
+        local unitClassTags = stringToTable(cp.unit_class_tags)
+        if unitClassTags and unitClassTags.sectiontags then
+            sectionTags = unitClassTags.sectiontags
+            if type(sectionTags) =="string" then --lets them spell as they wish!
+                sectionTags = {sectionTags}
+            end
+            if not sectionGroupings[sectionTags] then
+                sectionGroupings[sectionTags] = {unitDefName}
+            else
+                table.insert(sectionGroupings[sectionTags],unitDefName)
+            end 
+        end
+        if unitClassTags and unitClassTags.classtags then
+            classTags = unitClassTags.classtags
+            if type(classTags) =="string" then --lets them spell as they wish!
+                classTags = {classTags}
+            end
+            for index, tagName in ipairs(classTags) do
+                if not classGroupings[tagName] then
+                    classGroupings[tagName] = {unitDefName}
+                else
+                    table.insert(classGroupings[tagName],1,unitDefName)
+                end
+            end
+        end
+        taggedUnitDefIDs[unitDefID] = {sectionTags = sectionTags, classTags = classTags, movementTags = {movementTag}}
+        taggedUnitDefNames[unitDefName] = {sectionTags = sectionTags, classTags = classTags, movementTags = {movementTag}}
+    end
+end
+
 --TODO make into Spring util function!!
 local function Union2 (tables)
     local returnTable = {}
@@ -12,8 +116,8 @@ local function Union2 (tables)
     return returnTable
 end
 
-local allGroups = {
-    constructors = {
+local legacyGroups = {
+    constructor = {
         [[amphcon]],
         [[cloakcon]],
         [[gunshipcon]],
@@ -25,13 +129,13 @@ local allGroups = {
         [[tankcon]],
         [[vehcon]],
     },
-    scouts = {
+    scout = {
         [[jumpscout]],
         [[shieldscout]],
         [[spiderscout]],
         [[vehscout]],
     },
-    raiders = {
+    raider = {
         [[amphimpulse]],
         [[amphraid]],
         [[cloakheavyraid]],
@@ -46,7 +150,7 @@ local allGroups = {
         [[tankraid]],
         [[vehraid]],
     },
-    riots = {
+    riot = {
         [[amphriot]],
         [[cloakriot]],
         [[hoverdepthcharge]],
@@ -57,7 +161,7 @@ local allGroups = {
         [[tankriot]],
         [[vehriot]],
     },
-    skirmishers = {
+    skirm = {
         [[amphfloater]],
         [[amphsupport]], --for most purposes it is a skirm...
         [[cloakskirm]],
@@ -79,7 +183,7 @@ local allGroups = {
         [[tankaa]],
         [[vehaa]],
     },
-    assaults = {
+    assault = {
         [[cloakassault]],
         [[hoverassault]],
         [[jumpassault]],
@@ -99,7 +203,7 @@ local allGroups = {
         [[veharty]], -- feels skirmishy, but what is artillery but long range skirming 
         [[vehheavyarty]],
     },
-    bombs = {
+    bomb = {
         [[amphbomb]],
         [[cloakbomb]],
         [[gunshipbomb]],
@@ -110,14 +214,14 @@ local allGroups = {
         [[planefighter]],
         [[planeheavyfighter]],
     },
-    bombersLight = {
+    bomberLight = {
         [[bomberdisarm]],
         [[bomberheavy]],
         [[bomberprec]],
         [[bomberriot]]
         --TODO add magpie once it settles in/ main doesnt crash anymore
     },
-    bombersHeavy = {
+    bomberHeavy = {
         [[bomberheavy]],
         [[bomberassault]],
     },
@@ -126,7 +230,7 @@ local allGroups = {
         [[gunshipheavyskirm]],
         [[gunshipskirm]],
     },
-    transports = {
+    transport = {
         [[gunshipheavyskirm]],
         [[gunshiptrans]],
     },
@@ -145,23 +249,23 @@ local allGroups = {
         [[striderantiheavy]],
         [[gunshipemp]],
     },
-    stridersDemi = {
+    striderDemi = {
         [[amphassault]],
         [[jumpsumo]],
         [[spidercrabe]],
         [[tankheavyassault]],
     },
-    stridersMedium = {
+    striderMedium = {
         [[gunshipkrow]],
         [[striderarty]],
         [[striderdante]],
         [[striderfunnelweb]],
         [[striderscorpion]]
     },
-    stridersHeavy = {
+    striderHeavy = {
         [[nebula]], --fuck it, nebula
         [[striderbantha]],
-        --[[striderdetriment]] --TODO figure out where to put this :0
+        [[striderdetriment]] --TODO figure out where to put this :0
     },
     
     -- Get ships from shipfac 
@@ -180,7 +284,7 @@ local allGroups = {
        [[subtacmissile]],
        
     },
-    drones = {
+    drone = {
         [[dronecarry]],
         [[dronefighter]],
         [[droneheavyslow]],
@@ -204,7 +308,7 @@ local allGroups = {
         --[[hoverminer]] --may be broken
     },
     
-    factories = {
+    factory = {
         [[factoryshield]],
         [[factorycloak]],
         [[factoryveh]],
@@ -218,7 +322,7 @@ local allGroups = {
         [[factoryship]],
         [[striderhub]],
     },
-    factoryPlates = {
+    factoryPlate = {
         [[plateshield]],
         [[platecloak]],
         [[plateveh]],
@@ -245,16 +349,16 @@ local allGroups = {
         [[staticcon]],
         [[staticrearm]],
     },
-    turretsLight = {
+    turretLight = {
         [[turretmissile]],
         [[turretlaser]],
     },
-    turretsRiot = {
+    turretRiot = {
         [[turretimpulse]],
         [[turretemp]],
         [[turretriot]],
     },
-    turretsSkirm = {
+    turretSkirm = {
         [[turretgauss]],
         [[turretheavylaser]],
     },
@@ -262,16 +366,16 @@ local allGroups = {
         [[turretantiheavy]],
 	    [[turretheavy]]
     },
-    turretsAntiSub = {
+    turretAntiSub = {
         [[turretgauss]], --Is duplicate
         [[turrettorp]],
     },
     -- Artemis is more a strategic threat than general AA thingy
-    turretsAALight = {
+    turretAALight = {
         [[turretaalaser]],
         [[turretaaclose]],
     },
-    turretsAAHeavy = {
+    turretAAHeavy = {
         [[turretaafar]],
         [[turretaaflak]]
     },
@@ -299,7 +403,7 @@ local allGroups = {
         [[seismic]],
         [[tacnuke]],
     },
-    supers = {
+    super = {
         [[mahlazer]],
 	    [[raveparty]],
 	    [[zenith]]
@@ -329,28 +433,28 @@ local allGroups = {
     }
 }
 
-allGroups.turretsAll = Union2({
-    allGroups.turretsLight,
-    allGroups.turretsRiot,
-    allGroups.turretsRiot,
-    allGroups.turretsHeavy,
-    allGroups.turretsAALight,
-    allGroups.turretsAAHeavy,
+legacyGroups.turretsAll = Union2({
+    legacyGroups.turretLight,
+    legacyGroups.turretRiot,
+    legacyGroups.turretRiot,
+    legacyGroups.turretsHeavy,
+    legacyGroups.turretAALight,
+    legacyGroups.turretAAHeavy,
 })
-allGroups.allStandardLandCombatants = Union2({
-    allGroups.scouts,
-    allGroups.raiders,
-    allGroups.riots,
-    allGroups.skirmishers,
-    allGroups.assaults,
-    allGroups.artillery,
-    allGroups.antiAir,
-    allGroups.stridersDemi,
-    allGroups.stridersMedium,
-    allGroups.stridersHeavy,
+legacyGroups.allStandardLandCombatants = Union2({
+    legacyGroups.scout,
+    legacyGroups.raider,
+    legacyGroups.riot,
+    legacyGroups.skirm,
+    legacyGroups.assault,
+    legacyGroups.artillery,
+    legacyGroups.antiAir,
+    legacyGroups.striderDemi,
+    legacyGroups.striderMedium,
+    legacyGroups.striderHeavy,
 })
 
 
 
 
-return allGroups
+return classGroupings, sectionGroupings, taggedUnitDefNames , taggedUnitDefIDs

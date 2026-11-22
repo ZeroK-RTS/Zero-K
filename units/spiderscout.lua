@@ -18,6 +18,7 @@ return { spiderscout = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="scout"},
     modelradius        = [[10]],
     idle_cloak         = 1,
     selection_scale    = 1, -- Maybe change later

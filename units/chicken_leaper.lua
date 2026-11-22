@@ -11,6 +11,7 @@ return { chicken_leaper = {
   category            = [[LAND]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "extraChickens", classtags = "raider"}, -- hmm feels okay as a raider?
     outline_x = 145,
     outline_y = 145,
     outline_yoff = 17.5,
@@ -26,9 +27,7 @@ return { chicken_leaper = {
   idleTime            = 300,
   leaveTracks         = false,
   maxSlope            = 36,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 100,
+  metalCost           = 100,
   movementClass       = [[AKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],

@@ -14,6 +14,7 @@ return { shipscout = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="scout"},
     modelradius    = [[12]],
     turnatfullspeed = [[1]],
     bait_level_default = 0,

@@ -13,6 +13,7 @@ return { chicken_tiamat = {
   category            = [[LAND FIREPROOF]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "extraChickens", classtags = {"striderDemi","striderMedium","shield"}},
     fireproof          = 1,
     shield_emit_height = 32,
     shield_emit_offset = -4,
@@ -32,9 +33,7 @@ return { chicken_tiamat = {
   leaveTracks         = true,
   maxSlope            = 37,
   maxWaterDepth       = 5000,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 350,
+  metalCost           = 1750,
   movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],

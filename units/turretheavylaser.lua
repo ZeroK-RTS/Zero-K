@@ -14,6 +14,7 @@ return { turretheavylaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="turretSkirm"},
     aim_lookahead      = 60,
     bait_level_default = 0,
     aimposoffset       = [[0 56 0]],

@@ -15,6 +15,7 @@ return { tankarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="artillery"},
     aim_lookahead      = 200,
     bait_level_default = 1,
     unstick_leeway    = 30, -- Don't lose move orders if stuck while packing.

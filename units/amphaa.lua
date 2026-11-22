@@ -15,6 +15,7 @@ return { amphaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="antiAir"},
     aim_lookahead      = 150,
     bait_level_default = 0,
     amph_regen        = 20,

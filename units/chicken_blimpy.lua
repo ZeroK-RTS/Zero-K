@@ -17,6 +17,7 @@ return { chicken_blimpy = {
   cruiseAltitude      = 250,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = "bomberLight"},
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -30,9 +31,7 @@ return { chicken_blimpy = {
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxSlope            = 18,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 750,
+  metalCost           = 550,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],

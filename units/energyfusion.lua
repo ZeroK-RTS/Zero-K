@@ -15,6 +15,7 @@ return { energyfusion = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="ecoHeavy"},
     pylonrange = 150,
     removewait = 1,
     removestop     = 1,

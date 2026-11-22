@@ -22,6 +22,7 @@ return { gunshipemp = {
   cruiseAltitude      = 78,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="antiHeavy"},
     airstrafecontrol = [[1]],
     modelradius      = [[9]],
     target_priority_cost = 140,

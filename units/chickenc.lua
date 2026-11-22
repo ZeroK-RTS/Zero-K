@@ -12,6 +12,7 @@ return { chickenc = {
   category            = [[LAND SINK]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"riot","skirm","antiSub"}},
     outline_x = 130,
     outline_y = 130,
     outline_yoff = 30,
@@ -27,9 +28,7 @@ return { chickenc = {
   leaveTracks         = true,
   maxSlope            = 72,
   maxWaterDepth       = 22,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 520,
+  metalCost           = 400,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],

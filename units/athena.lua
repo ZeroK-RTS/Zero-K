@@ -55,6 +55,7 @@ return { athena = {
   cruiseAltitude      = 80,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags = {"support","constructor"}}, --has jamming but is rarely used for that purpose so am omiting it in grouping
     airstrafecontrol = [[1]],
     modelradius    = [[15]],
     isfakefactory = 1,

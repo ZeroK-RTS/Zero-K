@@ -6,91 +6,91 @@ local allCompositions = {
     -- Get your static composition today! 
     staticCompositions = {
         tinyCost = { -- less than 500 cost, a few light defences and eco structures
-            {turretsLight = 1, ecoLight = 1},
-            {turretsRiot = 1,turretsLight = 0, ecoLight = 0.5},
-            {factoryPlates = 1, turretsLight =1},
-            {factoryPlates = 1, turretsLight =1, ecoLight = 0.5},
-            {turretsLight =1, ecoLight = 0.5, ecoSupport = 0.5},
+            {turretLight = 1, ecoLight = 1},
+            {turretRiot = 1,turretLight = 0, ecoLight = 0.5},
+            {factoryPlate = 1, turretLight =1},
+            {factoryPlate = 1, turretLight =1, ecoLight = 0.5},
+            {turretLight =1, ecoLight = 0.5, ecoSupport = 0.5},
         },
         lowCost = { -- less than 1000 cost, riot turrets, maybe a factory, no skirmsher turrets yet, light aa
-            {turretsRiot = 1,turretsLight = 0, ecoLight = 1,},
-            {factoryPlates = 1, turretsLight =3, ecoLight = 3, ecoSupport = 1},
-            {turretsRiot = 1,turretsLight = 3, factoryPlates = 1},
-            {turretsRiot = 1,turretsLight = 3, ecoLight = 2, ecoSupport = 1},
-            {turretsRiot = 1,turretsLight = 3, ecoLight = 2, turretsAALight = 1},
-            {factoryPlates = 1,turretsLight = 3, ecoLight = 2, turretsAALight = 1}
+            {turretRiot = 1,turretLight = 0, ecoLight = 1,},
+            {factoryPlate = 1, turretLight =3, ecoLight = 3, ecoSupport = 1},
+            {turretRiot = 1,turretLight = 3, factoryPlate = 1},
+            {turretRiot = 1,turretLight = 3, ecoLight = 2, ecoSupport = 1},
+            {turretRiot = 1,turretLight = 3, ecoLight = 2, turretAALight = 1},
+            {factoryPlate = 1,turretLight = 3, ecoLight = 2, turretAALight = 1}
         },
-        mediumCost = { --less than 3000 cost, turrets skirmishers may struggle with, maybe a fusion or so tossed in
-            {{unitGroup = "factories", budgetFraction = 3, minUnits = 1,},turretsLight =1,ecoLight =1, turretsAALight = 1, ecoSupport = 1, turretsRiot = 1,},
-            {ecoHeavy = 1,turretsLight =1, ecoSupport = 3,  turretsRiot = 1, turretsAALight = 1,{unitGroup = "staticSupport", budgetFraction = 0, minUnits = 1,}},
-            {turretsSkirm = 1, ecoLight =2, ecoSupport = 1, turretsAALight = 1, factoryPlates = 0.2,},
-            {turretsSkirm = 1, turretsLight =3, ecoLight =1, ecoSupport = 1, turretsAALight = 1, factoryPlates = 0.2,},
-            {turretsSkirm = 1, turretsRiot = 3,ecoLight =1, ecoSupport = 1, turretsAALight = 1,},
-            {ecoHeavy = 1, turretsHeavy = 1, ecoLight = 2, ecoSupport= 0.3, {unitGroup = "factories", budgetFraction = 3, minUnits = 1,},{unitGroup = "energypylon", budgetFraction = 0, minUnits = 1,}}
+        mediumCost = { --less than 3000 cost, turrets skirm may struggle with, maybe a fusion or so tossed in
+            {{classGroup = "factory", budgetFraction = 3, minUnits = 1,},turretLight =1,ecoLight =1, turretAALight = 1, ecoSupport = 1, turretRiot = 1,},
+            {ecoHeavy = 1,turretLight =1, ecoSupport = 3,  turretRiot = 1, turretAALight = 1,{classGroup = "staticSupport", budgetFraction = 0, minUnits = 1,}},
+            {turretSkirm = 1, ecoLight =2, ecoSupport = 1, turretAALight = 1, factoryPlate = 0.2,},
+            {turretSkirm = 1, turretLight =3, ecoLight =1, ecoSupport = 1, turretAALight = 1, factoryPlate = 0.2,},
+            {turretSkirm = 1, turretRiot = 3,ecoLight =1, ecoSupport = 1, turretAALight = 1,},
+            {ecoHeavy = 1, turretsHeavy = 1, ecoLight = 2, ecoSupport= 0.3, {classGroup = "factory", budgetFraction = 3, minUnits = 1,},{classGroup = "energypylon", budgetFraction = 0, minUnits = 1,}}
         },
-        highCost = { -- less than 7500 cost, a relatively developed base, turrets, factories, caretakers, maybe a desolator, big AA?
-            {ecoHeavy = 1,turretsHeavy = 1,turretsSkirm = 1, ecoSupport = 0.5, turretsLight =1, turretsRiot = 1, {unitGroup = "staticSupport", budgetFraction = 0, minUnits = 1,},ecoLight = 1,factories = 0.5, {unitGroup = "energypylon", budgetFraction = 0, minUnits = 1,}},
-            {ecoHeavy = 1,turretsHeavy = 1,turretsSkirm = 1, ecoSupport = 0.5, ecoLight = 2, factories = 0.5,turretsLight =1, turretsRiot = 1, {unitGroup = "staticSupport", budgetFraction = 0, minUnits = 1,}, {unitGroup = "energypylon", budgetFraction = 0, minUnits = 1,}},
-            {ecoHeavy = 1, staticStrategic = 1, turretsRiot =1, ecoSupport = 0.5, turretsSkirm =1,ecoLight = 2, factoryPlates = 0.05, factories = 0.5, {unitGroup = "energypylon", budgetFraction = 0, minUnits = 1,}}
+        highCost = { -- less than 7500 cost, a relatively developed base, turrets, factory, caretakers, maybe a desolator, big AA?
+            {ecoHeavy = 1,turretsHeavy = 1,turretSkirm = 1, ecoSupport = 0.5, turretLight =1, turretRiot = 1, {classGroup = "staticSupport", budgetFraction = 0, minUnits = 1,},ecoLight = 1,factory = 0.5, {classGroup = "energypylon", budgetFraction = 0, minUnits = 1,}},
+            {ecoHeavy = 1,turretsHeavy = 1,turretSkirm = 1, ecoSupport = 0.5, ecoLight = 2, factory = 0.5,turretLight =1, turretRiot = 1, {classGroup = "staticSupport", budgetFraction = 0, minUnits = 1,}, {classGroup = "energypylon", budgetFraction = 0, minUnits = 1,}},
+            {ecoHeavy = 1, staticStrategic = 1, turretRiot =1, ecoSupport = 0.5, turretSkirm =1,ecoLight = 2, factoryPlate = 0.05, factory = 0.5, {classGroup = "energypylon", budgetFraction = 0, minUnits = 1,}}
         },
         ludicrousCost = {-- 7500 or more, anything goes! but we may want another tier
-            {supers = 1, turretsHeavy = 1, ecoHeavy = 1, staticStrategic = 1, turretsRiot =1, turretsSkirm =1,ecoLight = 0.5, factoryPlates = 0.05, factories = 0.1, ecoSupport = 0.3,energypylon = 0.1}
+            {super = 1, turretsHeavy = 1, ecoHeavy = 1, staticStrategic = 1, turretRiot =1, turretSkirm =1,ecoLight = 0.5, factoryPlate = 0.05, factory = 0.1, ecoSupport = 0.3,energypylon = 0.1}
         }
     },
     -- everything defined here should be mobile
     -- TODO harddefine some support for things?
     mobileCompositions = {
         tinyCost = { -- less than 500 cost, small groups or single units
-            {scouts = 1},
-            {raiders = 1},
-            {riots = 1},
-            {skirmishers = 1},
-            {bombs = 1},
-            {assaults = 1},
-            {drones = 0.1,raiders = 1},--unsure about drones...
-            {scouts = 1,raiders = 1}
+            {scout = 1},
+            {raider = 1},
+            {riot = 1},
+            {skirm = 1},
+            {bomb = 1},
+            {assault = 1},
+            {drone = 0.1,raider = 1},--unsure about drone...
+            {scout = 1,raider = 1}
         },
-        lowCost = { -- less than 1000 cost, light compositions, raider riot skirms and assaults, and maybe support tools
-            {raiders = 1,skirmishers = 1},
-            {raiders = 1,riots = 1},
-            {riots = 1,skirmishers = 1},
-            {riots = 1,assaults = 1},
-            {assaults = 1},
-            {assaults = 1,skirmishers = 1,},
-            {assaults = 1,bombs = 0.2,},
-            {transports = 0.3,raiders = 1},
-            {drones = 0.3,riots = 1}, --unsure about drones...
+        lowCost = { -- less than 1000 cost, light compositions, raider riot skirms and assault, and maybe support tools
+            {raider = 1,skirm = 1},
+            {raider = 1,riot = 1},
+            {riot = 1,skirm = 1},
+            {riot = 1,assault = 1},
+            {assault = 1,raider = 1},
+            {assault = 1,skirm = 1,},
+            {assault = 1,bomb = 0.2,},
+            {transport = 0.3,raider = 1},
+            {drone = 0.3,riot = 1}, --unsure about drone...
         },
         mediumCost = { --less than 3000 cost, start for demis aswell as larger compositions with some support tools
-            {constructors = 0.1,assaults = 1,skirmishers = 1,},
-            {assaults = 1, riots = 1,},
-            {assaults = 1,artillery = 1,scouts = 0.1,},
-            {raiders = 1,artillery = 1,},
-            {antiSub = 1, artillery = 1,},
-            {gunships = 1,},
-            {bombersLight = 1,},
-            {stridersDemi = 1,antiAir = 0.01},
-            {riots = 1, transports = 0.5,},
-            {antiHeavy = 1},
+            {constructor = 0.1,assault = 1,skirm = 1,},
+            {assault = 1, riot = 1,},
+            {assault = 1,artillery = 1,scout = 0.1,},
+            {raider = 1,artillery = 1,},
+            {antiSub = 1, artillery = 1,raider = 1},
+            {gunship = 1,skirm = 1},
+            {bomberLight = 1,raider = 1},
+            {striderDemi = 1,antiAir = 1},
+            {riot = 1, transport = 0.5,},
+            {antiHeavy = 1,raider = 1},
             {aerialAA = 1, raider = 0.5}
         },
         highCost = { -- less than 7500 cost, demis and some light striders and big army comps
-            {assaults = 1,artillery = 1,raiders = 0.5,},
-            {stridersDemi = 1,raiders = 0.2,},
-            {stridersDemi = 1,antiSub = 0.5,},
-            {aerialAA = 1,bombersLight = 1},
-            {bombersHeavy = 1},
-            {stridersMedium = 1,{unitGroup = "support", budgetFraction = 0, minUnits = 1,},},
-            {stridersDemi = 1,assaults = 1},
+            {assault = 1,artillery = 1,raider = 0.5,},
+            {striderDemi = 1,raider = 0.2,},
+            {striderDemi = 1,antiSub = 0.5,},
+            {aerialAA = 1,bomberLight = 1, assault = 1},
+            {bomberHeavy = 1,striderDemi = 1},
+            {striderMedium = 1,{classGroup = "support", budgetFraction = 0, minUnits = 1,},},
+            {striderDemi = 1,assault = 1},
             {antiHeavy = 1}
         },
         ludicrousCost = {-- 7500 or more, anything goes! but we may want another tier
-            {antiHeavy = 1,{unitGroup = "support", budgetFraction = 0, minUnits = 1,}},
-            {stridersDemi = 1,bombersHeavy = 1},
-            {stridersMedium = 3,assaults = 1,{unitGroup = "support", budgetFraction = 0, minUnits = 1,}},
-            {stridersMedium = 1,{unitGroup = "support", budgetFraction = 0, minUnits = 1,}},
-            {stridersDemi = 1,aerialAA = 1,{unitGroup = "support", budgetFraction = 0, minUnits = 1,}},
-            {stridersHeavy = 1, stridersMedium = 0,{unitGroup = "support", budgetFraction = 0, minUnits = 1,}}
+            {antiHeavy = 1,{classGroup = "support", budgetFraction = 0, minUnits = 1,}},
+            {striderDemi = 1,bomberHeavy = 1},
+            {striderMedium = 3,assault = 1,{classGroup = "support", budgetFraction = 0, minUnits = 1,}},
+            {striderMedium = 1,{classGroup = "support", budgetFraction = 0, minUnits = 1,}},
+            {striderDemi = 1,aerialAA = 1,{classGroup = "support", budgetFraction = 0, minUnits = 1,}},
+            {striderHeavy = 1, striderMedium = 0,{classGroup = "support", budgetFraction = 0, minUnits = 1,}}
         }
     },
     -- mix of static an mobile units
@@ -108,27 +108,27 @@ return allCompositions
 local mobileCamps = {
 	{
 		ecoLight = 1,
-		turretsRiot = 0.1,
-		raiders = 2,
-		scouts = 3,
+		turretRiot = 0.1,
+		raider = 2,
+		scout = 3,
 	},
 	{
 		ecoLight = 1,
-		turretsAALight = 0.1,
-		riots = 2,
-		skirmishers = 2,
+		turretAALight = 0.1,
+		riot = 2,
+		skirm = 2,
 	},
 	{
 		ecoLight = 1,
-		turretsLight = 0.1,
-		assaults = 2,
-		riots = 1,
+		turretLight = 0.1,
+		assault = 2,
+		riot = 1,
 	},
 	{
 		ecoLight = 1,
-		turretsLight = 0.1,
-		assaults = 1,
-		gunships = 1,
+		turretLight = 0.1,
+		assault = 1,
+		gunship = 1,
 	}
 }
 
@@ -137,33 +137,33 @@ local staticCamps = {
 		pwSupport = 1,
 		ecoLight = 0.5,
 		ecoSupport = 0.5,
-		turretsRiot = 1,
-		turretsAALight = 0.5,
-		turretsLight = 1
+		turretRiot = 1,
+		turretAALight = 0.5,
+		turretLight = 1
 	},
 	{
 		pwGreebles = 1,
 		ecoLight = 0.5,
 		ecoSupport = 0.5,
-		turretsRiot = 1,
-		turretsAALight = 0.5,
-		turretsLight = 1
+		turretRiot = 1,
+		turretAALight = 0.5,
+		turretLight = 1
 	},
 	{
 		pwSupport = 1,
 		pwGreebles = 1,
 		ecoSupport = 0.1,
-		turretsRiot = 1,
-		turretsAALight = 0.5,
-		turretsLight = 1
+		turretRiot = 1,
+		turretAALight = 0.5,
+		turretLight = 1
 	},
 	{
-		factories = 1,
+		factory = 1,
 		pwGreebles = 1,
 		ecoSupport = 0.1,
-		turretsRiot = 1,
-		turretsAALight = 0.5,
-		turretsLight = 1
+		turretRiot = 1,
+		turretAALight = 0.5,
+		turretLight = 1
 	}
 }
 local largeCamp = {
@@ -171,9 +171,9 @@ local largeCamp = {
 	pwGreebles = 1,
 	ecoSupport = 1,
 	pwDefence = 1,
-	turretsRiot = 1,
-	turretsAALight = 1,
-	turretsLight = 1,
+	turretRiot = 1,
+	turretAALight = 1,
+	turretLight = 1,
 	artillery = 1,
 }
 ]]

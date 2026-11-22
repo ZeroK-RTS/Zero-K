@@ -16,6 +16,7 @@ return { shiptorpraider = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"raider","antiSub"}},
     modelradius        = [[14]],
     turnatfullspeed    = [[1]],
     aim_lookahead      = 80,

@@ -12,6 +12,7 @@ return { chicken_digger = {
   category            = [[LAND]],
 
   customParams        = {
+    --unit_class_tags = {sectiontags = "extraChickens", classtags = "raider"}, --Maybe if updated with some extra functionality it would be good
   },
 
   explodeAs           = [[SMALL_UNITEX]],
@@ -25,9 +26,7 @@ return { chicken_digger = {
   leaveTracks         = true,
   maxSlope            = 36,
   maxWaterDepth       = 22,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 40,
+  metalCost           = 40,
   movementClass       = [[KBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],

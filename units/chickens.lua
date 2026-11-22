@@ -12,6 +12,7 @@ return { chickens = {
   category            = [[SWIM]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = "skirm"},
     outline_x = 115,
     outline_y = 115,
     outline_yoff = 20,
@@ -26,9 +27,7 @@ return { chickens = {
   idleTime            = 300,
   leaveTracks         = true,
   maxSlope            = 36,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 200,
+  metalCost           = 160,
   movementClass       = [[BHOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],

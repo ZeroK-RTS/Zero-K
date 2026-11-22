@@ -19,6 +19,7 @@ return { jumpsumo = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="striderDemi"}, --riot?
     bait_level_default = 0,
     can_target_allies  = 1,
     canjump            = 1,

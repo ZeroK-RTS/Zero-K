@@ -18,6 +18,7 @@ return { chicken_roc = {
   cruiseAltitude      = 150,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"bomberHeavy","gunship"}},
     outline_x = 180,
     outline_y = 180,
     outline_yoff = 17.5,
@@ -35,9 +36,7 @@ return { chicken_roc = {
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxSlope            = 36,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 1250,
+  metalCost           = 1250,
   minCloakDistance    = 250,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],

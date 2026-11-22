@@ -12,6 +12,7 @@ return { chicken_listener = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
+    --unit_class_tags = {sectiontags = "chickens", classtags = "support"}, --Needs work to well, work.
     outline_x = 85,
     outline_y = 85,
     outline_yoff = 9,
@@ -28,9 +29,7 @@ return { chicken_listener = {
   leaveTracks         = true,
   maxSlope            = 36,
   maxWaterDepth       = 22,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 300,
+  metalCost           = 300,
   movementClass       = [[KBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

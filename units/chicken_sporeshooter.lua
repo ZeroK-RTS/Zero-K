@@ -12,6 +12,7 @@ return { chicken_sporeshooter = {
   category            = [[LAND]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"skimrishers","antiAir","antiSub"}},
     outline_x = 130,
     outline_y = 130,
     outline_yoff = 30,
@@ -27,9 +28,7 @@ return { chicken_sporeshooter = {
   leaveTracks         = true,
   maxSlope            = 72,
   maxWaterDepth       = 22,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 400,
+  metalCost           = 500,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET]],

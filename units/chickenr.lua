@@ -12,6 +12,7 @@ return { chickenr = {
   category            = [[LAND]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = "artillery"},
     outline_x = 85,
     outline_y = 85,
     outline_yoff = 20,
@@ -28,9 +29,7 @@ return { chickenr = {
   leaveTracks         = true,
   maxSlope            = 36,
   maxWaterDepth       = 5000,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 200,
+  metalCost           = 200,
   movementClass       = [[BHOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MOBILE STUPIDTARGET MINE]],

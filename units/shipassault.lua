@@ -16,6 +16,7 @@ return { shipassault = {
   corpse                 = [[DEAD]],
   --Core_color.dds Core_other.dds
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"assault","riot","antiSub"}},
     aim_lookahead      = 120,
     bait_level_default = 0,
     modelradius    = [[55]],

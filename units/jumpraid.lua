@@ -15,6 +15,7 @@ return { jumpraid = {
   corpse                = [[DEAD]],
 
   customParams          = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="raider"}, -- should it have a riot tag?
     canjump            = 1,
     jump_range         = 400,
     jump_speed         = 6.6,

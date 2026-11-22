@@ -18,6 +18,7 @@ return { vehraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="raider"},
     modelradius        = [[10]],
     aim_lookahead      = 80,
     set_target_range_buffer = 30,

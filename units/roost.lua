@@ -7,6 +7,7 @@ return { roost = {
   category          = [[SINK]],
 
   customParams      = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"turretAALight","ecoLight"}},
   },
   
   energyMake        = 0,
@@ -36,7 +37,6 @@ return { roost = {
   },
   sightDistance     = 273,
   upright           = false,
-  waterline         = 0,
   workerTime        = 0,
   yardMap           = [[ooooooooo]],
 

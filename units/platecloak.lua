@@ -35,6 +35,7 @@ return { platecloak = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factoryPlate"},
     sortName           = [[1]],
     default_spacing    = 4,
     midposoffset       = [[0 0 -20]],

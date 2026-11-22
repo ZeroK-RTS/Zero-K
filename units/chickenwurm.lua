@@ -6,12 +6,14 @@ return { chickenwurm = {
   brakeRate           = 1.23,
   builder             = false,
   buildPic            = [[chickenwurm.png]],
+  canCloak            = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"riot","assault","antiSub"}},-- something is off about Wurm having a different cloak implementation, but if it aint broken why fix it. I'll check for stealth too when grouping.
     fireproof         = 1,
 
     outline_x = 160,
@@ -29,9 +31,7 @@ return { chickenwurm = {
   leaveTracks         = true,
   maxSlope            = 90,
   maxWaterDepth       = 5000,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 350,
+  metalCost           = 350,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING GUNSHIP SATELLITE STUPIDTARGET MINE]],

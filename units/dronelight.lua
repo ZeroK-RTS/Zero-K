@@ -36,6 +36,7 @@ return { dronelight = {
   stealth                = true,
   
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="drone"},
     bait_level_target      = 1,
     is_drone = 1,
   },

@@ -32,6 +32,7 @@ local movedefMap = {
 	["bhover3"] = "amph",
 	["boat3"] = "sea",
 	["boat4"] = "sea",
+	["boat5"] = "sea",
 	["boat6"] = "sea",
 	["uboat3"] = "sea",
 }

@@ -18,6 +18,7 @@ return { bomberstrike = {
   cruiseAltitude      = 160,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "extraUnits", classtags = "bomberLight"}, --Old magpie cameo!
     reallyabomber    = [[1]],
     reammoseconds    = [[10]],
     refuelturnradius = [[150]],

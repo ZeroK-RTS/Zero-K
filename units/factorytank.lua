@@ -33,6 +33,7 @@ return { factorytank = {
   selectionVolumeType           = [[box]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factory"},
     ploppable = 1,
     sortName = [[6]],
     solid_factory = [[4]],

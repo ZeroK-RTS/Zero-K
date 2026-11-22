@@ -16,6 +16,7 @@ return { assaultcruiser = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "extraUnits", classtags ={"assault","antiSub","striderDemi"}},
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -23,7 +24,7 @@ return { assaultcruiser = {
   footprintX             = 5,
   footprintZ             = 5,
   health                 = 9600,
-  iconType               = [[vanquisher]],
+  iconType               = [[shipassault_alt]],
   metalCost              = 1600,
   minWaterDepth          = 15,
   movementClass          = [[BOAT5]],

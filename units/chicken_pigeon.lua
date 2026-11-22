@@ -17,6 +17,7 @@ return { chicken_pigeon = {
   cruiseAltitude      = 200,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = "bomberLight"},
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -28,9 +29,7 @@ return { chicken_pigeon = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   maxSlope            = 18,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 50,
+  metalCost           = 40,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE STUPIDTARGET]],
   objectName          = [[chicken_pigeon.s3o]],

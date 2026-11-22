@@ -14,6 +14,7 @@ return { wolverine_mine = {
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="bomb"},-- TODO questionable?
     bait_level_default = 0,
     bait_level_target  = 1, -- Just for safety.
     dontcount = [[1]],

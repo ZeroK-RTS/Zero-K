@@ -29,6 +29,7 @@ return { factoryship = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factory"},
     ploppable = 1,
     sortName       = [[7]],
     unstick_help   = 1,

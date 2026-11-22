@@ -34,6 +34,7 @@ return { factoryveh = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="factory"},
     ploppable = 1,
     sortName       = [[2]],
     default_spacing = 8,

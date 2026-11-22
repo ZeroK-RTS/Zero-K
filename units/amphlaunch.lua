@@ -16,6 +16,7 @@ return { amphlaunch = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    unit_class_tags    = {sectiontags = "baseGame", classtags ="support"},
     amph_regen         = 10,
     amph_submerged_at  = 40,
     thrower_gather     = 160,

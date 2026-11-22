@@ -15,6 +15,7 @@ return { energysolar = {
   selectionVolumeType           = [[ellipsoid]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="ecoLight"},
     bait_level_target = 1,
     pylonrange      = 100,
     aimposoffset    = [[0 16 0]],

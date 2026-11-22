@@ -18,6 +18,7 @@ return { chickenflyerqueen = {
   cruiseAltitude      = 150,
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = "striderHeavy"},  --unsure if it makes sense for chicken queen
     statsname = "chickenlandqueen",
 
     outline_x = 400,
@@ -38,9 +39,7 @@ return { chickenflyerqueen = {
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxSlope            = 36,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 40000,
+  metalCost           = 40000,
   minCloakDistance    = 250,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],

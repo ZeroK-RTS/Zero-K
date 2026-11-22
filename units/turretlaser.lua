@@ -14,6 +14,7 @@ return { turretlaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="turretLight"},
     aim_lookahead      = 60,
     aimposoffset       = [[0 22 0]],
     cus_noflashlight   = 1,

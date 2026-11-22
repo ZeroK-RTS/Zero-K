@@ -12,6 +12,7 @@ return { hoverminer = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "extraUnits", classtags ={"riot","skirm","support"}},
     modelradius    = [[25]],
     turnatfullspeed_hover = [[1]],
   },
@@ -19,17 +20,17 @@ return { hoverminer = {
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
-  health              = 400,
+  health              = 600,
   iconType            = [[hoverskirm]],
   leaveTracks         = true,
   maxSlope            = 18,
   maxWaterDepth       = 22,
-  metalCost           = 200,
+  metalCost           = 300,
   movementClass       = [[HOVER3]],
   moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[hoverminer.s3o]],
+  objectName          = [[hoverminer.s3o]], -- has a bos script :O
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -58,11 +59,14 @@ return { hoverminer = {
   weaponDefs          = {
 
     MINE = {
-      name                    = [[Light Mine]],
-      accuracy                = 1600,
+      name                    = [[Teleporting Mine]],
+      accuracy                = 0,
       avoidFriendly           = false,
       avoidNeutral            = false,
-      burnblow                = true,
+      burnblow                = false,
+      burst                   = 3,
+      burstRate               = 0.1,
+      burntime                = 0.0033,
       collideEnemy            = false,
       collideFriendly         = false,
       collideNeutral          = false,
@@ -70,7 +74,7 @@ return { hoverminer = {
       craterMult              = 0,
 
       customParams            = {
-        spawns_name = "wolverine_mine",
+        spawns_name = "wolverine_mine",--TODO implement unique mine!
         spawns_expire = 60,
       },
 
@@ -84,15 +88,19 @@ return { hoverminer = {
       impulseFactor           = 0,
       impactOnly              = true,
       interceptedByShieldType = 0,
-      --model                   = [[logmine.s3o]],
+      --model                   = [[logmine.s3o]], --Theres an alternative that tosses them out slowly like disks
+      myGravity               = 100,
       noSelfDamage            = true,
       range                   = 300,
       reloadtime              = 5,
       size                    = 0,
-      soundHit                = [[misc/teleport]],
+      sprayangle              = 3600,
+      startVelocity           = 2000,
+      --soundHit                = [[misc/teleport2]],
       --soundStart              = [[misc/teleport2]],
+      trajectoryHeight        = 1.5,
       turret                  = true,
-      weaponType              = [[Cannon]],
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 2000,
     },
 

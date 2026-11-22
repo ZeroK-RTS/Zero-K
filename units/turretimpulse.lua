@@ -18,6 +18,7 @@ return { turretimpulse = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ="turretRiot"},
     bait_level_default = 0,
     can_target_allies  = 1,
     modelradius    = [[25]],

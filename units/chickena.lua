@@ -12,6 +12,7 @@ return { chickena = {
   category            = [[LAND SINK]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "chickens", classtags = {"assault","antiHeavy"}},
     outline_x = 235,
     outline_y = 235,
     outline_yoff = 25,
@@ -27,9 +28,7 @@ return { chickena = {
   leaveTracks         = true,
   maxSlope            = 37,
   maxWaterDepth       = 5000,
-  metalCost           = 0,
-  energyCost          = 0,
-  buildTime           = 350,
+  metalCost           = 300,
   movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[SHIP SWIM FLOAT TERRAFORM FIXEDWING SATELLITE GUNSHIP MINE]],

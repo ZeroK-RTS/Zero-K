@@ -16,6 +16,7 @@ return { hoverdepthcharge = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"riot","antiSub"}},
     aim_lookahead    = 20,
     bait_level_default = 0,
     modelradius    = [[25]],

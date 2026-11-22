@@ -56,7 +56,7 @@ local function GetGroupCompositionByBudgetAndType(budget,compositionType)
     elseif (budget >= 7500) then
         return compositionType.ludicrousCost[math.random(#compositionType.ludicrousCost)]
     end
-    return {assaults = 1}
+    return {assault = 1}
 end
 
 local function TeamReinforcements(budget)
@@ -98,7 +98,7 @@ local function GaiaReinforcements(budget)
             unitToSpawnOn = gaiaUnits[math.random(1,#gaiaBuildings)]
             local x,y,z = Spring.GetUnitBasePosition(unitToSpawnOn)
             -- Sit and wait when spawned on allies
-            GG.UnitSpawnerQueueListSpawn(unitComposition,x,z,GaiaTeamID)
+            GG.UnitSpawnerQueueListSpawn(unitComposition,x,z,GaiaTeamID,nil)
             return
         end
         -- Lets not spawn on moving units

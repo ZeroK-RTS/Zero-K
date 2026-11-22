@@ -14,6 +14,7 @@ return { staticnuke = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    unit_class_tags = {sectiontags = "baseGame", classtags ={"staticStrategic","super"}},
     stockpiletime  = [[180]],
     stockpilecost  = [[3240]],
     priority_misc  = 1, -- Medium
