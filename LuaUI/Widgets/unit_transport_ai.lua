@@ -547,7 +547,7 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 		if useful and halting and queue >= 1 then
 			spGiveOrderToUnit(unitID, CMD_EMBARK, EMPTY_TABLE, CMD.OPT_ALT)
 		else
-			RemoveUnit(unitDefID, spGetUnitDefID(unitDefID))
+			RemoveUnit(unitID, unitDefID)
 		end
 	end
 end
