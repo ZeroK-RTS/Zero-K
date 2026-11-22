@@ -47,6 +47,7 @@ local powerTexture = 'Luaui/Images/visible_energy.png'
 local facplopTexture = 'Luaui/Images/factory.png'
 local nofacTexture = 'Luaui/Images/nofactory.png'
 local rearmTexture = 'LuaUI/Images/noammo.png'
+local repairTexture = 'LuaUI/Images/commands/Bold/repair.png'
 local retreatTexture = 'LuaUI/Images/unit_retreat.png'
 local excludedPadTexture = 'LuaUI/Images/commands/Bold/excludeairpad.png'
 
