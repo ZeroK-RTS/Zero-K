@@ -58,9 +58,9 @@ local function NotEqual(v1, v2)
 		return true
 	end
 
-	local isindexable = (t=="table")or(t=="metatable")or(t=="userdata")
+	local isindexable = (t1=="table")or(t1=="metatable")or(t1=="userdata")
 	if (not isindexable) then
-		return (t1 ~= t2)
+		return (v1 ~= v2)
 	end
 
 	for i,v in pairs(v1) do
