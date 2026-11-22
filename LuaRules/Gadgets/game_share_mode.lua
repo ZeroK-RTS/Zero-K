@@ -663,7 +663,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		if debugMode then
 			spEcho("team is afk: " .. tostring(afk))
 		end
-		if not afk and #spGetPlayerList(playerID) > 1 then
+		if not afk and #spGetPlayerList(teamID) > 1 then
 			UnmergePlayer(playerID)
 			return
 		else
