@@ -41,7 +41,7 @@
 	},
 	"zenith" : {
 		"name" : "Zenith",
-		"description" : "Meteor Controller",
+		"description" : "Meteor Controller - Benötigt ein angeschlossenes Stromnetz von 400 Energie, um feuern zu können.",
 		"helptext" : "The Zenith collects meteorites from the sky (up to 300), which it can send anywhere to break things or provide a small reclaimable source of metal."
 	},
 	"athena" : {
@@ -151,7 +151,7 @@
 	},
 	"raveparty" : {
 		"name" : "Disco Rave Party",
-		"description" : "Zerstörendregenbogenwerfer",
+		"description" : "Zerstörendregenbogenwerfer - Benötigt ein angeschlossenes Stromnetz von 400 Energie, um feuern zu können.",
 		"helptext" : "Der Disco Rave Party verschießt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Überraschung darstellt. Ein Spaß für die ganze Familie!"
 	},
 	"chickenc" : {
@@ -446,7 +446,7 @@
 	},
 	"mahlazer" : {
 		"name" : "Starlight",
-		"description" : "Planetarischer Energiemeißel",
+		"description" : "Planetarischer Energiemeißel - Benötigt ein angeschlossenes Stromnetz von 600 Energie, um feuern zu können.",
 		"helptext" : "Diese gigantische Waffe nutzt ihren energetischen Strahl, um große Gräben im Terrain zu hinterlassen und dabei alles, was sich ihr in den Weg stellt, auszulöschen. Ebenfalls als Auslöscher von störenden Hindernissen, wie zum Beispiel nervtötende feindliche Enheiten und Basen, sehr nützlich."
 	},
 	"tele_beacon" : {
