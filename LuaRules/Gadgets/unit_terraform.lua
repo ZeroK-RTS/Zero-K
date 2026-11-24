@@ -77,6 +77,7 @@ local mapHeight = Game.mapSizeZ
 
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 local CMD_OPT_ALT   = CMD.OPT_ALT
+local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
 local CMD_REPAIR    = CMD.REPAIR
 local CMD_INSERT    = CMD.INSERT
 
@@ -147,6 +148,7 @@ local decayCheckFrequency = 90 -- frequency of terraform decay checks
 local structureCheckLoopFrames = 300 -- frequency of slow update for building deformation check
 
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
+local siteExitMargin = 48 -- how far past the footprint a con moves before terraforming under its own structure
 
 local enemyDistConst = 36 -- Constant added to enemy distinct check
 local nearbyEnemyPenalty = 20 -- Cost multiplier for terraform on enemy units
@@ -203,6 +205,7 @@ local nextUpdateCheck       = 0 -- Time at which to check performance
 
 -- Map terraform commands given by teamID and tag.
 local fallbackCommands  = {}
+local siteExitChecks = {}
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 local terraUnitHP = UnitDefs[terraunitDefID].health - 1000 -- Stop terraunit having full health to make it always able to be built.
@@ -3213,7 +3216,50 @@ local function DoTerraformUpdate(n, forceCompletion)
 	end
 end
 
+local function GetStructureSiteExit(unitID, unitDefID)
+	local queue = spGetUnitCommands(unitID, 3)
+	if not queue then
+		return
+	end
+	local build
+	for i = 2, #queue do
+		if queue[i].id < 0 then
+			build = queue[i]
+			break
+		end
+	end
+	if not (build and build.params[3]) then
+		return
+	end
+	local buildDef = UnitDefs[-build.id]
+	local reach = 4*(UnitDefs[unitDefID].xsize + max(buildDef.xsize, buildDef.zsize))
+	local ux, _, uz = spGetUnitPosition(unitID)
+	local dx = ux - build.params[1]
+	local dz = uz - build.params[3]
+	if abs(dx) >= reach or abs(dz) >= reach then
+		return
+	end
+	if abs(dx) > abs(dz) then
+		ux = build.params[1] + ((dx < 0 and -1) or 1)*(reach + siteExitMargin)
+	else
+		uz = build.params[3] + ((dz < 0 and -1) or 1)*(reach + siteExitMargin)
+	end
+	ux, uz = getPointInsideMap(ux, uz)
+	return ux, spGetGroundHeight(ux, uz), uz
+end
+
 function gadget:GameFrame(n)
+	if next(siteExitChecks) then
+		local units = siteExitChecks
+		siteExitChecks = {}
+		for unitID, unitDefID in pairs(units) do
+			local exitX, exitY, exitZ = GetStructureSiteExit(unitID, unitDefID)
+			if exitX then
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, exitX, exitY, exitZ}, CMD_OPT_ALT)
+			end
+		end
+	end
+
 	if n == 0 and wantForceCompleteFrameZero then
 		DoTerraformUpdate(n, true)
 	end
@@ -3356,6 +3402,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if closestID then
 		REPAIR_ORDER_PARAMS[4] = closestID
 		spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
+		siteExitChecks[unitID] = unitDefID -- next frame, once a structure order given with it has arrived
 		return true, false
 	end
 
