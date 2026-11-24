@@ -309,14 +309,14 @@ end
 
 local function HideEngineIcons()
 	for unitDefID, ud in pairs(UnitDefs) do
-		originalIcon[unitDefID] = string.gsub(ud.iconType, "_hidden$", "")
+		local name = string.gsub(ud.iconType, "_hidden$", "")
+		if not Spring.GetIconData(name) then -- the engine draws the default icon for unknown names
+			name = "default"
+		end
+		originalIcon[unitDefID] = name
 	end
 	for unitDefID, name in pairs(originalIcon) do
-		local hidden = name .. "_hidden"
-		if not Spring.GetIconData(hidden) then -- the engine draws the default icon for unknown names
-			hidden = "default_hidden"
-		end
-		Spring.SetUnitDefIcon(unitDefID, hidden)
+		Spring.SetUnitDefIcon(unitDefID, name .. "_hidden")
 	end
 end
 
