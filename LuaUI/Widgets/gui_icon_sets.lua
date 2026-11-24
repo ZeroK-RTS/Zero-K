@@ -42,6 +42,9 @@ options = {
 					Spring.SetUnitDefIcon(UnitDefNames["shipcon"].id, "shipbuilder")
 				end
 			end
+			if WG.UnitDefIconsChanged then
+				WG.UnitDefIconsChanged()
+			end
 		end,
 	},
 	ships = {
@@ -73,6 +76,9 @@ options = {
 				if options.coniconchassis.value then
 					Spring.SetUnitDefIcon(UnitDefNames["shipcon"].id, "shipbuilder_alt")
 				end
+			end
+			if WG.UnitDefIconsChanged then
+				WG.UnitDefIconsChanged()
 			end
 		end,
 	},

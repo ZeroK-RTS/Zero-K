@@ -1391,6 +1391,14 @@ local icontypes = {
   },
 }
 
+local hiddenIcons = {}
+for name, icon in pairs(icontypes) do
+	hiddenIcons[name .. "_hidden"] = icon -- Drawn empty by the engine (gamedata/icontypes.lua), set by Radar Icons GL4.
+end
+for name, icon in pairs(hiddenIcons) do
+	icontypes[name] = icon
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

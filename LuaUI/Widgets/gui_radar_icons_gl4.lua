@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Radar Icons GL4",
-		desc      = "Draws unit icons and radar dots instead of the engine, with smooth edges without anti-aliasing.",
+		desc      = "Draws unit icons instead of the engine, with smooth edges without anti-aliasing. Enable it before the game starts.",
 		author    = "moss-orbit-9f339e",
 		date      = "2026-11-24",
 		license   = "GNU GPL, v2 or later",
@@ -93,13 +93,10 @@ local defCache = {}
 local teamCache = {}
 local ghostPos = {}
 local selectedUnits = {}
-
-local function SetEngineIconMode()
-	Spring.SetConfigInt("LuaRadarIcons", (options.minimap.value == "engine") and 2 or 1, true) -- Read by the Engine Icon Hider gadget.
-end
+local originalIcon = {} -- unitDefID -> icon type, while the unitDef has the "_hidden" type (gamedata/icontypes.lua)
 
 options_path = 'Settings/Graphics/Unit Visibility/Radar Icons'
-options_order = {'smooth', 'minimap'}
+options_order = {'smooth'}
 options = {
 	smooth = {
 		name = 'Smooth icon edges',
@@ -107,17 +104,6 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-	},
-	minimap = {
-		name = 'Minimap icons',
-		type = 'radioButton',
-		value = 'lua',
-		items = {
-			{key = 'lua', name = 'Drawn by this widget'},
-			{key = 'engine', name = 'Drawn by the engine (slower)'},
-		},
-		noHotkey = true,
-		OnChange = SetEngineIconMode,
 	},
 }
 
@@ -321,6 +307,25 @@ local function GetIcon(name)
 	return icon
 end
 
+local function HideEngineIcons()
+	for unitDefID, ud in pairs(UnitDefs) do
+		originalIcon[unitDefID] = string.gsub(ud.iconType, "_hidden$", "")
+	end
+	for unitDefID, name in pairs(originalIcon) do
+		local hidden = name .. "_hidden"
+		if not Spring.GetIconData(hidden) then -- the engine draws the default icon for unknown names
+			hidden = "default_hidden"
+		end
+		Spring.SetUnitDefIcon(unitDefID, hidden)
+	end
+end
+
+local function RestoreEngineIcons()
+	for unitDefID, name in pairs(originalIcon) do
+		Spring.SetUnitDefIcon(unitDefID, name)
+	end
+end
+
 local function MarkSeen(unitID, allyTeam)
 	local seen = seenBy[unitID]
 	if not seen then
@@ -358,7 +363,7 @@ local function WantedKind(unitID, unitDefID)
 		if los % 2 == LOS_INLOS then
 			return KIND_LOS
 		end
-		if math.floor(los / LOS_INRADAR) % 2 == 1 then
+		if math.floor(los / LOS_INRADAR) % 2 == 1 and (unitDefID or IsKnownGhost(unitID)) then -- the engine draws unidentified radar dots
 			return KIND_RADAR
 		end
 	end
@@ -450,7 +455,7 @@ local function FillSlot(slot, unitID, kind)
 	if kind == KIND_GHOST and not ghostPos[unitID] then
 		kind = KIND_HIDDEN
 	end
-	local icon = GetIcon(ud and ud.iconType or "default")
+	local icon = GetIcon(ud and originalIcon[unitDefID] or "default")
 	if kind == KIND_LOS then
 		radiusCache[unitID] = spGetUnitRadius(unitID) or radiusCache[unitID]
 	end
@@ -676,9 +681,6 @@ function widget:DrawWorld()
 end
 
 function widget:DrawInMiniMapBackground(sx, sy)
-	if options.minimap.value ~= "lua" then
-		return
-	end
 	UpdatePositions()
 	if count == 0 then
 		return
@@ -832,12 +834,17 @@ function widget:Initialize()
 	for i = 1, #selection do
 		selectedUnits[selection[i]] = true
 	end
-	SetEngineIconMode()
+	HideEngineIcons()
 	RefreshAll()
+	WG.UnitDefIconsChanged = function() -- called by gui_icon_sets after it sets unitDef icons
+		HideEngineIcons()
+		RefreshAll()
+	end
 end
 
 function widget:Shutdown()
-	Spring.SetConfigInt("LuaRadarIcons", 0, true)
+	WG.UnitDefIconsChanged = nil
+	RestoreEngineIcons()
 	if iconVAO then
 		iconVAO:Delete()
 		instanceVBO:Delete()
