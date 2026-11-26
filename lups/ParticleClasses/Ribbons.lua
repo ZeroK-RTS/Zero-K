@@ -61,10 +61,12 @@ local spIsSphereInView       = Spring.IsSphereInView
 local spGetUnitVelocity      = Spring.GetUnitVelocity
 local spGetUnitPiecePosition = Spring.GetUnitPiecePosition
 local spGetUnitViewPosition  = Spring.GetUnitViewPosition
+local spGetUnitPosition      = Spring.GetUnitPosition
 local spGetUnitPiecePosDir   = Spring.GetUnitPiecePosDir
 local spGetUnitVectors       = Spring.GetUnitVectors
 local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
+local spGetDrawFrame         = Spring.GetDrawFrame
 local glUniform    = gl.Uniform
 local glUniformInt = gl.UniformInt
 local glUseShader  = gl.UseShader
@@ -88,13 +90,396 @@ end
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
+local MAX_POINTS = 256
+local HISTORY_BINDING = 8
+local WRITES_BINDING = 9
+local INSTANCE_FLOATS = 12
+
+local gl4Shader, gl4PausedLoc
+local historyShader, historyWriteCountLoc
+local ribbonVAO, ribbonVertices, ribbonIndices
+local instanceVBO, instanceCapacity = nil, 0
+local historyVBO, historyCapacity = nil, 0
+local writesVBO, writesCapacity = nil, 0
+
+local historyRibbons = {}
+local freeSlots = {}
+local slotCount = 0
+local writes, writeCount = {}, 0
+
+local batchRibbons, batchSize = {}, 0
+local batchTextures = {}
+local batchData = {}
+local batchCount = {}
+local batchMaxQuads = 0
+local drawPaused, drawInterpolated
+local unitOffsets, unitOffsetsFrame = {}, nil
+
+local gl4VertexShader = [[
+	#version 430 compatibility
+
+	layout(std430, binding = 8) readonly buffer RibbonHistory {
+		vec4 history[];
+	};
+
+	layout(location = 0) in vec2 pointAndSide;
+	layout(location = 1) in vec4 headAndLatest;
+	layout(location = 2) in vec4 ringBaseQuadsWidth;
+	layout(location = 3) in vec4 ribbonColor;
+
+	uniform int paused;
+
+	out vec2 texCoord;
+	out vec4 color;
+
+	vec3 RingPoint(int index)
+	{
+		int size = int(ringBaseQuadsWidth.y) + 1;
+		int slot = int(headAndLatest.w) + 1 + index;
+		if (slot >= size) {
+			slot -= size;
+		}
+		return history[int(ringBaseQuadsWidth.x) + slot].xyz;
+	}
+
+	vec3 TrailPoint(int index, int quads)
+	{
+		if (paused != 0) {
+			if (index == quads - 1) {
+				return (RingPoint(index - 1) + RingPoint(index)) / 2.0;
+			}
+			if (index == quads) {
+				return RingPoint(quads - 1);
+			}
+		} else if (index == quads) {
+			return headAndLatest.xyz;
+		}
+		return RingPoint(index);
+	}
+
+	void main()
+	{
+		int quads = int(ringBaseQuadsWidth.y);
+		if (gl_VertexID / 4 >= quads) {
+			gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+			texCoord = vec2(0.0);
+			color = vec4(0.0);
+			return;
+		}
+
+		int index = int(pointAndSide.x);
+		float side = pointAndSide.y;
+		vec4 position = gl_ModelViewMatrix * vec4(TrailPoint(index, quads), 1.0);
+		vec3 updir;
+		if (index == quads) {
+			updir = position.xyz - (gl_ModelViewMatrix * vec4(TrailPoint(index - 1, quads), 1.0)).xyz;
+		} else {
+			updir = (gl_ModelViewMatrix * vec4(TrailPoint(index + 1, quads), 1.0)).xyz - position.xyz;
+		}
+		vec3 right = normalize(cross(updir, position.xyz));
+		position.xyz += right * side * ringBaseQuadsWidth.z;
+		gl_Position = gl_ProjectionMatrix * position;
+
+		texCoord = vec2((side + 1.0) * 0.5, float(index) / float(quads));
+		color = ribbonColor;
+	}
+]]
+
+local gl4FragmentShader = [[
+	#version 430 compatibility
+
+	uniform sampler2D ribbonTex;
+
+	in vec2 texCoord;
+	in vec4 color;
+
+	void main()
+	{
+		gl_FragColor = texture2D(ribbonTex, texCoord) * color;
+	}
+]]
+
+local historyComputeShader = [[
+	#version 430
+
+	layout(local_size_x = 64) in;
+
+	layout(std430, binding = 8) writeonly buffer RibbonHistory {
+		vec4 history[];
+	};
+
+	layout(std430, binding = 9) readonly buffer RibbonWrites {
+		vec4 writes[];
+	};
+
+	uniform int writeCount;
+
+	void main()
+	{
+		uint i = gl_GlobalInvocationID.x;
+		if (i < uint(writeCount)) {
+			history[uint(writes[i].w)] = vec4(writes[i].xyz, 0.0);
+		}
+	}
+]]
+
+local function DeleteGL4Renderer()
+	local buffers = {ribbonVAO, ribbonVertices, ribbonIndices, instanceVBO, historyVBO, writesVBO}
+	for i = 1, 6 do
+		if buffers[i] then
+			buffers[i]:Delete()
+		end
+	end
+	if gl4Shader then
+		gl.DeleteShader(gl4Shader)
+	end
+	if historyShader then
+		gl.DeleteShader(historyShader)
+	end
+	gl4Shader, historyShader = nil, nil
+	ribbonVAO, ribbonVertices, ribbonIndices = nil, nil, nil
+	instanceVBO, historyVBO, writesVBO = nil, nil, nil
+end
+
+local function CreateGL4Renderer()
+	if not (Platform.glHaveGL4 and gl.DispatchCompute and gl.GetVAO and gl.GetVBO) then
+		return
+	end
+
+	gl4Shader = gl.CreateShader({
+		vertex = gl4VertexShader,
+		fragment = gl4FragmentShader,
+		uniformInt = {
+			ribbonTex = 0,
+		},
+	})
+	historyShader = gl.CreateShader({compute = historyComputeShader})
+	ribbonVertices = gl.GetVBO(GL.ARRAY_BUFFER, false)
+	ribbonIndices = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false)
+	if not (gl4Shader and historyShader and ribbonVertices and ribbonIndices) then
+		print(PRIO_MAJOR, "LUPS->Ribbon: GL4 renderer not available, using display lists: " .. gl.GetShaderLog())
+		DeleteGL4Renderer()
+		return
+	end
+	gl4PausedLoc = gl.GetUniformLocation(gl4Shader, "paused")
+	historyWriteCountLoc = gl.GetUniformLocation(historyShader, "writeCount")
+
+	local vertices, indices = {}, {}
+	for quad = 0, MAX_POINTS - 2 do
+		local v = 8*quad
+		vertices[v + 1], vertices[v + 2] = quad + 1, -1
+		vertices[v + 3], vertices[v + 4] = quad + 1, 1
+		vertices[v + 5], vertices[v + 6] = quad, 1
+		vertices[v + 7], vertices[v + 8] = quad, -1
+		local i, first = 6*quad, 4*quad
+		indices[i + 1], indices[i + 2], indices[i + 3] = first, first + 1, first + 2
+		indices[i + 4], indices[i + 5], indices[i + 6] = first, first + 2, first + 3
+	end
+	ribbonVertices:Define(4*(MAX_POINTS - 1), {{id = 0, name = "pointAndSide", size = 2}})
+	ribbonVertices:Upload(vertices)
+	ribbonIndices:Define(6*(MAX_POINTS - 1), GL.UNSIGNED_SHORT)
+	ribbonIndices:Upload(indices)
+end
+
+local function AddToHistory(fx)
+	local slot = table.remove(freeSlots)
+	if not slot then
+		slotCount = slotCount + 1
+		slot = slotCount
+	end
+	historyRibbons[slot] = fx
+	fx.historySlot = slot
+	fx.historyBase = (slot - 1)*MAX_POINTS
+	fx.uploadedPoints = nil
+end
+
+local function RemoveFromHistory(fx)
+	historyRibbons[fx.historySlot] = nil
+	freeSlots[#freeSlots + 1] = fx.historySlot
+	fx.historySlot = nil
+end
+
+local function StagePoints(fx, first, count)
+	local oldPos, size, base = fx.oldPos, fx.size, fx.historyBase
+	local j = first
+	for _ = 1, count do
+		local pos = oldPos[j]
+		local w = 4*writeCount
+		writes[w + 1], writes[w + 2], writes[w + 3], writes[w + 4] = pos[1], pos[2], pos[3], base + j - 1
+		writeCount = writeCount + 1
+		j = (j % size) + 1
+	end
+end
+
+local function UploadHistory()
+	if historyCapacity < slotCount then
+		if historyVBO then
+			historyVBO:Delete()
+		end
+		historyCapacity = math.max(2*historyCapacity, slotCount)
+		historyVBO = gl.GetVBO(GL.SHADER_STORAGE_BUFFER, true)
+		historyVBO:Define(historyCapacity*MAX_POINTS, 1)
+		for slot = 1, slotCount do
+			if historyRibbons[slot] then
+				historyRibbons[slot].uploadedPoints = nil
+			end
+		end
+	end
+
+	for i = 1, batchSize do
+		local fx = batchRibbons[i]
+		local uploaded = fx.uploadedPoints
+		if not uploaded then
+			StagePoints(fx, 1, fx.size)
+		elseif uploaded < fx.writtenPoints then
+			local count = math.min(fx.writtenPoints - uploaded, fx.size)
+			StagePoints(fx, (fx.posIdx - count) % fx.size + 1, count)
+		end
+		fx.uploadedPoints = fx.writtenPoints
+	end
+
+	if writeCount == 0 then
+		return
+	end
+	if writesCapacity < writeCount then
+		if writesVBO then
+			writesVBO:Delete()
+		end
+		writesCapacity = math.max(2*writesCapacity, writeCount)
+		writesVBO = gl.GetVBO(GL.SHADER_STORAGE_BUFFER, true)
+		writesVBO:Define(writesCapacity, 1)
+	end
+	writesVBO:Upload(writes, nil, 0, 1, 4*writeCount)
+	historyVBO:BindBufferRange(HISTORY_BINDING)
+	writesVBO:BindBufferRange(WRITES_BINDING)
+	glUseShader(historyShader)
+	glUniformInt(historyWriteCountLoc, writeCount)
+	gl.DispatchCompute(math.ceil(writeCount/64), 1, 1, GL.SHADER_STORAGE_BARRIER_BIT)
+	writesVBO:UnbindBufferRange(WRITES_BINDING)
+	historyVBO:UnbindBufferRange(HISTORY_BINDING)
+	writeCount = 0
+end
+
+local function GetInterpolatedHead(fx)
+	if fx.unit then
+		local x, y, z = spGetUnitPiecePosDir(fx.unit, fx.piecenum)
+		local offset = unitOffsets[fx.unit]
+		if offset == nil then
+			local ux, uy, uz = spGetUnitViewPosition(fx.unit, true)
+			local _, _, _, mx, my, mz = spGetUnitPosition(fx.unit, true)
+			offset = uz and mz and {ux - mx, uy - my, uz - mz} or false
+			unitOffsets[fx.unit] = offset
+		end
+		if z and offset then
+			return x + offset[1], y + offset[2], z + offset[3]
+		end
+		return x, y, z
+	elseif fx.projectile then
+		return spGetProjectilePosition(fx.projectile)
+	end
+end
+
+local function AddToBatch(fx)
+	local texture = fx.texture
+	local count = batchCount[texture]
+	if not count then
+		batchTextures[#batchTextures + 1] = texture
+		batchData[texture] = {}
+		count = 0
+	end
+
+	local x, y, z
+	if drawInterpolated and fx.isvalid then
+		x, y, z = GetInterpolatedHead(fx)
+	end
+	if not (x and y and z) then
+		local pos = fx.oldPos[fx.posIdx]
+		x, y, z = pos[1], pos[2], pos[3]
+	end
+	local color = fx.color
+	local alpha = color[4] or 1
+	if fx.blendfactor < 1 then
+		alpha = alpha*fx.blendfactor
+	end
+
+	local data = batchData[texture]
+	local i = INSTANCE_FLOATS*count
+	data[i + 1], data[i + 2], data[i + 3], data[i + 4] = x, y, z, fx.posIdx - 1
+	data[i + 5], data[i + 6], data[i + 7], data[i + 8] = fx.historyBase, fx.quads0, fx.width, 0
+	data[i + 9], data[i + 10], data[i + 11], data[i + 12] = color[1], color[2], color[3], alpha
+	batchCount[texture] = count + 1
+	batchMaxQuads = math.max(batchMaxQuads, fx.quads0)
+	batchSize = batchSize + 1
+	batchRibbons[batchSize] = fx
+end
+
+local function DrawBatch()
+	if batchSize == 0 then
+		return
+	end
+
+	UploadHistory()
+	if instanceCapacity < batchSize then
+		if instanceVBO then
+			ribbonVAO:Delete()
+			instanceVBO:Delete()
+		end
+		instanceCapacity = math.max(2*instanceCapacity, batchSize)
+		instanceVBO = gl.GetVBO(GL.ARRAY_BUFFER, true)
+		instanceVBO:Define(instanceCapacity, {
+			{id = 1, name = "headAndLatest", size = 4},
+			{id = 2, name = "ringBaseQuadsWidth", size = 4},
+			{id = 3, name = "ribbonColor", size = 4},
+		})
+		ribbonVAO = gl.GetVAO()
+		ribbonVAO:AttachVertexBuffer(ribbonVertices)
+		ribbonVAO:AttachIndexBuffer(ribbonIndices)
+		ribbonVAO:AttachInstanceBuffer(instanceVBO)
+	end
+
+	glUseShader(gl4Shader)
+	glUniformInt(gl4PausedLoc, drawPaused and 1 or 0)
+	historyVBO:BindBufferRange(HISTORY_BINDING)
+	local first = 0
+	for i = 1, #batchTextures do
+		local texture = batchTextures[i]
+		local count = batchCount[texture]
+		if count > 0 then
+			instanceVBO:Upload(batchData[texture], nil, first, 1, INSTANCE_FLOATS*count)
+			glTexture(0, ":c:" .. texture)
+			ribbonVAO:DrawElements(GL.TRIANGLES, 6*batchMaxQuads, 0, count, 0, first)
+			batchCount[texture] = 0
+			first = first + count
+		end
+	end
+	historyVBO:UnbindBufferRange(HISTORY_BINDING)
+	batchMaxQuads = 0
+	batchSize = 0
+end
+
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+
 function Ribbon:BeginDraw()
 	glUseShader(RibbonShader)
 	glBlending(GL_SRC_ALPHA,GL_ONE)
+	if gl4Shader then
+		local _, _, paused = Spring.GetGameSpeed()
+		drawPaused = paused
+		drawInterpolated = not paused and Spring.GetFrameTimeOffset() > 0
+		local drawFrame = spGetDrawFrame()
+		if drawFrame ~= unitOffsetsFrame then
+			unitOffsets = {}
+			unitOffsetsFrame = drawFrame
+		end
+	end
 end
 
 
 function Ribbon:EndDraw()
+	if gl4Shader then
+		DrawBatch()
+	end
 	glUseShader(0)
 	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 	glTexture(0,false)
@@ -104,6 +489,10 @@ end
 
 
 function Ribbon:Draw()
+	if gl4Shader and self.worldspace then
+		AddToBatch(self)
+		return
+	end
 	
 	local quads0 = self.quads0
 	if self.texture ~= lastTexture then
@@ -238,10 +627,13 @@ function Ribbon.Initialize()
 	for i=1,256 do
 		oldPosUniform[i] = gl.GetUniformLocation(RibbonShader,"oldPos["..(i-1).."]")
 	end
+
+	CreateGL4Renderer()
 end
 
 
 function Ribbon.Finalize()
+	DeleteGL4Renderer()
 	if (gl.DeleteShader) then
 		gl.DeleteShader(RibbonShader)
 	end
@@ -268,6 +660,7 @@ function Ribbon:Update(n)
 		if x and y and z then
 			self.posIdx = (self.posIdx % self.size)+1
 			self.oldPos[self.posIdx] = {x, y, z}
+			self.writtenPoints = self.writtenPoints + 1
 
 			local vx, vy, vz
 			if self.unit then
@@ -283,6 +676,7 @@ function Ribbon:Update(n)
 		local lastIndex = self.posIdx
 		self.posIdx = (self.posIdx % self.size)+1
 		self.oldPos[self.posIdx] = self.oldPos[lastIndex]
+		self.writtenPoints = self.writtenPoints + 1
 		
 		self.blendfactor = self.blendfactor - n * self.decayRate
 	end
@@ -337,6 +731,7 @@ function Ribbon:CreateParticle()
 	elseif (self.size<2) then self.size=2 end
 
 	self.posIdx = 1
+	self.writtenPoints = 0
 	self.quads0 = self.size-1
 	self.blendfactor = 1
 
@@ -376,10 +771,16 @@ function Ribbon.Create(Options)
 	local newObject = MergeTable(Options, Ribbon.Default)
 	setmetatable(newObject,Ribbon)  -- make handle lookup
 	newObject:CreateParticle()
+	if gl4Shader and newObject.worldspace then
+		AddToHistory(newObject)
+	end
 	return newObject
 end
 
 function Ribbon:Destroy()
+	if self.historySlot then
+		RemoveFromHistory(self)
+	end
 end
 
 -----------------------------------------------------------------------------------------------------------------
