@@ -90,8 +90,8 @@ return { shipriot = {
       
       customParams            = {
         light_camera_height = 2000,
-        light_color = [[0.3 0.3 0.05]],
-        light_radius = 50,
+        light_color = [[0.1 0.1 0.015]],
+        light_radius = 40,
       },
       
       damage                  = {
@@ -113,8 +113,9 @@ return { shipriot = {
       size                    = 2,
       sizeDecay               = 0,
       soundHit                = [[impacts/shotgun_impactv5]],
+      soundHitVolume          = 1,
       soundStart              = [[weapon/cannon/cannon_fire4]],
-      soundStartVolume        = 0.05,
+      soundStartVolume        = 1.8,
       soundTrigger            = true,
       sprayangle              = 2500,
       stages                  = 20,
