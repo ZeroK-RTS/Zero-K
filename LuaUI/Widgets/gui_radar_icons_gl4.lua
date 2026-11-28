@@ -6,7 +6,7 @@ function widget:GetInfo()
 		date      = "2026-11-24",
 		license   = "GNU GPL, v2 or later",
 		layer     = -1000000000, -- Below gfx_distortion_gl4: the icons cover all other world drawing, like the engine icons.
-		enabled   = false,
+		enabled   = true,
 	}
 end
 
@@ -221,6 +221,12 @@ void main()
 	gl_Position = cameraViewProj * vec4(world, 1.0);
 	vUV = IconUV();
 	vColor = IconColor();
+	
+	float buildprogress = uni[instData.y].userDefined[0].x;
+	if (buildprogress > 0) {
+		float simFrame = (timeInfo.x + timeInfo.w);
+		vColor = vColor * mix(1.0, ((sin(simFrame * 0.24) + 1.0) * 0.15 + 0.7), min(1.0, buildprogress*1000.0));
+	}
 }
 ]]
 

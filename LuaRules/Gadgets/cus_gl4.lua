@@ -226,6 +226,8 @@ local manualReload = autoReload.enabled or false
 local debugmode = false
 local perfdebug = false
 
+local UPDATE_FOR_ICONS = true -- When true, update uniforms etc for icon objects. Other shaders use the values to draw icons.
+
 -- These 4 things are for the UnitViewportAPI
 local unitsInViewport = {} -- unitID:drawFlag
 local numUnitsInViewport = 0
@@ -1265,7 +1267,7 @@ end
 local function AddObject(objectID, drawFlag, reason)
 	if debugmode then Spring.Echo("AddObject", objectID, objectDefID, drawFlag, reason) end
 
-	if (drawFlag >= 128) then --icon
+	if (drawFlag >= 128) and not UPDATE_FOR_ICONS then --icon
 		return
 	end
 
@@ -1394,7 +1396,7 @@ end
 local function UpdateObject(objectID, drawFlag, reason)
 	if debugmode then Spring.Echo("UpdateObject", objectID, drawFlag, reason) end
 
-	if (drawFlag >= 128) then --icon
+	if (drawFlag >= 128) and not UPDATE_FOR_ICONS then --icon
 		return
 	end
 
@@ -1531,7 +1533,7 @@ local function ProcessCusUnit(unitID, drawFlag, gameFrame, reason)
 		unitsInViewport[unitID] = nil
 	end
 	
-	if (drawFlag == 0) or (drawFlag >= 128) then
+	if ((drawFlag == 0) or (drawFlag >= 128)) and not UPDATE_FOR_ICONS then
 		RemoveObject(unitID, reason)
 	else
 		if not cusUnitIDtoDrawFlag[unitID] then --object was not seen
