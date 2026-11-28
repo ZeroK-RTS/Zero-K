@@ -1391,12 +1391,23 @@ local icontypes = {
   },
 }
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Empty versions of icons for Radar Icons GL4. We set these to preserve size and distance.
+
+local EMPTY_ICON = "icons/empty.png"
 local hiddenIcons = {}
 for name, icon in pairs(icontypes) do
-	hiddenIcons[name .. "_hidden"] = icon -- Drawn empty by the engine (gamedata/icontypes.lua), set by Radar Icons GL4.
+	local copy = {}
+	for k, v in pairs(icon) do
+		copy[k] = v
+	end
+	copy.bitmap = EMPTY_ICON
+	hiddenIcons[name .. "_hidden"] = copy 
 end
-for name, icon in pairs(hiddenIcons) do
-	icontypes[name] = icon
+
+for k, v in pairs(hiddenIcons) do
+	icontypes[k] = v
 end
 
 --------------------------------------------------------------------------------
