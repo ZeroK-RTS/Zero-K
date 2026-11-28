@@ -20,7 +20,7 @@ local spIsGUIHidden           = Spring.IsGUIHidden
 local spGetModKeyState        = Spring.GetModKeyState
 local spGetUnitAllyTeam       = Spring.GetUnitAllyTeam
 local spGetSelectedUnits      = Spring.GetSelectedUnits
-local spGetUnitPosition       = Spring.GetUnitPosition
+local spGetUnitViewPosition   = Spring.GetUnitViewPosition
 local spGetUnitRulesParam     = Spring.GetUnitRulesParam
 local spGetUnitTeam           = Spring.GetUnitTeam
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
@@ -235,7 +235,7 @@ local function getTargetPosition(unitID)
 			return nil
 		end
 		if targetID and targetID ~= 0 and Spring.ValidUnitID(targetID) then
-			_, _, _, tx, ty, tz = spGetUnitPosition(targetID, true)
+			tx, ty, tz = spGetUnitViewPosition(targetID, true)
 		else
 			return nil
 		end
@@ -252,7 +252,7 @@ local function drawUnitCommands(unitID)
 	
 	local tx,ty,tz,fireTowards = getTargetPosition(unitID)
 	if tx then
-		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
+		local x,y,z = spGetUnitViewPosition(unitID, true)
 		if fireTowards then
 			local dist = math.sqrt((x - tx)^2 + (y - ty)^2 + (z - tz)^2)
 			if dist < fireTowards then
