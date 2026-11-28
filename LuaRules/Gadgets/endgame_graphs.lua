@@ -116,12 +116,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 	if not attackerTeam and projectileID then
 		attackerTeam = Spring.GetProjectileTeamID(projectileID)
-		if not paralyzer then
-			local health = Spring.GetUnitHealth(unitID)
-			if health <= 0 then
-				-- Without attackerTeam in UnitDamaged, destruction will not be tracked normally.
-				gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-			end
+	end
+	if not paralyzer then
+		local health = Spring.GetUnitHealth(unitID)
+		if health <= 0 then
+			-- Without attackerTeam in UnitDamaged, destruction will not be tracked normally.
+			gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
 		end
 	end
 
