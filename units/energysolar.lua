@@ -17,6 +17,7 @@ return { energysolar = {
   customParams                  = {
     bait_level_target = 1,
     pylonrange      = 100,
+    energy_grid = true,
     aimposoffset    = [[0 16 0]],
     midposoffset    = [[0 0 0]],
     auto_close_time = 4, -- Unit AI off time.

@@ -561,7 +561,7 @@ local function MakeMexTerraform(units, pointX, pointZ, height, holeMode)
 	return {CMD_LEVEL, {pointX, pointY, pointZ, commandTag}}
 end
 
-local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
+local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts, singleSpot)
 	local xmin = cx-cr
 	local xmax = cx+cr
 	local zmin = cz-cr
@@ -626,10 +626,15 @@ local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 	end
 	local makeMexEnergy = (not terraMode) and (energyToMake > 0)
 
+	-- Skip spots the player flagged as out of reach of these builders (cmd_spot_reach_flags.lua),
+	-- unless the player picked this one spot directly.
+	local spotBlocked = not singleSpot and WG.SpotReach and WG.SpotReach.GetBlockedTest(units)
+
 	for i = 1, #WG.metalSpots do
 		local mex = WG.metalSpots[i]
 		--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-		if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or (terraMode and not burryMode) or IsSpotBuildable(i)) then -- circle area, slower
+		if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or (terraMode and not burryMode) or IsSpotBuildable(i))
+				and not (spotBlocked and spotBlocked(mex.x, mex.z)) then -- circle area, slower
 			commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 		end
 	end
@@ -658,6 +663,29 @@ local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 				unitArrayToReceive[#unitArrayToReceive+1] = unitID
 			end
 		end
+
+		-- The builders for a spot: those that can reach it, going by the spots the
+		-- player flagged (cmd_spot_reach_flags.lua). One reach test per unit type.
+		local reachTests = {}
+		local function SpotBuilders(x, z)
+			if singleSpot or pregame or not WG.SpotReach then
+				return unitArrayToReceive
+			end
+			local builders = {}
+			for i = 1, #unitArrayToReceive do
+				local unitID = unitArrayToReceive[i]
+				local unitDefID = spGetUnitDefID(unitID)
+				local test = reachTests[unitDefID]
+				if not test then
+					test = WG.SpotReach.GetBlockedTest({unitID})
+					reachTests[unitDefID] = test
+				end
+				if not test(x, z) then
+					builders[#builders + 1] = unitID
+				end
+			end
+			return builders
+		end
 		
 		-- If ctrl or alt is held and the first metal spot is blocked by a mex, then the mex command is blocked
 		-- and the remaining commands are issused with shift. This causes the area mex command to act as if shift
@@ -667,23 +695,27 @@ local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 		end
 		
 		--prepare command list
+		-- Commands for a spot carry its builders as a third entry; the rest go to all.
 		for i, command in ipairs(orderedCommands) do
 			local x = command.x
 			local z = command.z
 			local y = math.max(0, Spring.GetGroundHeight(x, z))
+			local builders = SpotBuilders(x, z)
 
 			-- check if some other widget wants to handle the command before sending it to units.
 			if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, cmdOpts, true) then
 				if terraMode and burryMode then
-					local params = MakeMexTerraform(units, x, z, -wallHeight, true)
+					local params = MakeMexTerraform(builders, x, z, -wallHeight, true)
 					if params then
+						params[3] = builders
 						commandArrayToIssue[#commandArrayToIssue + 1] = params
 					end
 				end
-				commandArrayToIssue[#commandArrayToIssue + 1] = {-mexDefID, {x,y,z,0}}
+				commandArrayToIssue[#commandArrayToIssue + 1] = {-mexDefID, {x,y,z,0}, builders}
 				if terraMode and not burryMode then
-					local params = MakeMexTerraform(units, x, z, wallHeight)
+					local params = MakeMexTerraform(builders, x, z, wallHeight)
 					if params then
+						params[3] = builders
 						commandArrayToIssue[#commandArrayToIssue + 1] = params
 					end
 				end
@@ -699,21 +731,37 @@ local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 
 					-- check if some other widget wants to handle the command before sending it to units.
 					if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, cmdOpts, true) then
-						commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0} }
+						commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0}, builders}
 					end
 				end
 			end
 		end
 
-		for i = 1, #commandArrayToIssue do
-			local command = commandArrayToIssue[i]
-			if pregame then
+		if pregame then
+			for i = 1, #commandArrayToIssue do
+				local command = commandArrayToIssue[i]
 				WG.InitialQueueHandleCommand(command[1], command[2], cmdOpts)
 				if i == 1 then
 					cmdOpts.shift = true
 				end
-			else
-				WG.CommandInsert(command[1], command[2], cmdOpts, i - 1, true)
+			end
+		else
+			-- Builders get different subsets of the sequence, so each keeps its own
+			-- queue position and options (CommandInsert turns on shift after the first).
+			local unitPos, unitOpts = {}, {}
+			for i = 1, #unitArrayToReceive do
+				local unitID = unitArrayToReceive[i]
+				unitPos[unitID] = 0
+				unitOpts[unitID] = {alt = cmdOpts.alt, ctrl = cmdOpts.ctrl, meta = cmdOpts.meta, shift = cmdOpts.shift, right = cmdOpts.right, coded = cmdOpts.coded}
+			end
+			for i = 1, #commandArrayToIssue do
+				local command = commandArrayToIssue[i]
+				local receivers = command[3] or unitArrayToReceive
+				for j = 1, #receivers do
+					local unitID = receivers[j]
+					WG.CommandInsert(command[1], command[2], unitOpts[unitID], unitPos[unitID], true, {unitID})
+					unitPos[unitID] = unitPos[unitID] + 1
+				end
 			end
 		end
 	end
@@ -738,7 +786,7 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 		if closestSpot then
 			local cx, cz = closestSpot.x, closestSpot.z
 			local cy = spGetGroundHeight(cx, cz)
-			return HandleAreaMex(cmdID, cx, cy, cz, 30, cmdOpts)
+			return HandleAreaMex(cmdID, cx, cy, cz, 30, cmdOpts, true)
 		end
 		return false
 	end
