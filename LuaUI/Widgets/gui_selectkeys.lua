@@ -209,7 +209,7 @@ options = {
 	highhealth_30 = { type = 'button',
 		name = 'Deselect <30% Health/Ammo',
 		desc = 'Filters low health or ammo units out of your selection. Planes with insufficient ammo are told to rearm.',
-		action = 'filter_low_health_ammo_30',
+		action = 'filter_low_health_ammo 0.3',
 	},
 	lowhealth_60 = { type = 'button',
 		name = 'Deselect Above 60% Health',
@@ -224,7 +224,7 @@ options = {
 	highhealth_60 = { type = 'button',
 		name = 'Deselect <60% Health/Ammo',
 		desc = 'Filters low health or ammo units out of your selection. Planes with insufficient ammo are told to rearm.',
-		action = 'filter_low_health_ammo_60',
+		action = 'filter_low_health_ammo 0.6',
 	},
 	lowhealth_100 = { type = 'button',
 		name = 'Deselect Full Health',
@@ -240,7 +240,7 @@ options = {
 	highhealth_100 = { type = 'button',
 		name = 'Deselect <Full Health/Ammo',
 		desc = 'Filters damaged or units missing ammo out of your selection. Planes with less than full ammo are told to rearm.',
-		action = 'filter_low_health_ammo_100',
+		action = 'filter_low_health_ammo 1',
 	},
 	
 	----
@@ -301,6 +301,7 @@ local hercID = UnitDefNames["gunshipheavytrans"].id
 
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spSelectUnitArray = Spring.SelectUnitArray
+local spDeselectUnitArray = Spring.DeselectUnitArray
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetTeamUnitsByDefs = Spring.GetTeamUnitsByDefs
@@ -379,59 +380,55 @@ local function SelectEmptyTransports()
 	spSelectUnitArray(newselection,addselect)
 end
 
-
-local function FilterLowHealthAmmo(threshold)
-	local selection = spGetSelectedUnits()
-	local newselection = {}
-	for i = 1, #selection do
-		local unitID = selection[i]
-		local defID = Spring.GetUnitDefID(unitID)
-		local ud = defID and UnitDefs[defID]
-		local canFly = ud and ud.canFly
-		local health, maxHealth = spGetUnitHealth(unitID)
-		local lowhealth = (health or 0)/(maxHealth or 1000) < threshold
-		local keepselect = true
-		if lowhealth then
-			keepselect = false
-			if canFly then
-				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
-			end
-		elseif canFly then
-			local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
-			local noammo = Spring.GetUnitRulesParam(unitID, "noammo") or 0
-			if ammofraction < threshold or noammo == 1 then
-				keepselect = false
-				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
-			end
-		end
-		if keepselect then
-			newselection[#newselection+1] = selection[i]
+-- local isFixedWing = {}
+local isBomber = {}
+if UnitDefs then
+	for defID, def in pairs(UnitDefs) do
+		-- if def.canFly and not def.isHoveringAirUnit then
+		-- 	isFixedWing[defID] = true
+		-- end
+		if def and def.customParams and def.customParams.reammoseconds then
+			isBomber[defID] = true
 		end
 	end
-	spSelectUnitArray(newselection,false)
 end
 
-local function FilterLowHealthAmmo30()
-	FilterLowHealthAmmo(0.3)
+-- called via widgethandler:AddAction pipeline, uses signature (cmd, optLine, optWords, data, isRepeat, release)
+-- becomes the data parameter is the 3rd argument of widgetHandler:AddAction
+-- optLine is a string representing a normalized health threshold
+local function FilterLowHealthAmmo(cmd, optLine, optWords, data)
+	local threshold = tonumber(optLine) or 1
+	local ammothreshold = data or threshold
+	local selection = spGetSelectedUnits()
+	local removeselection = {}
+	for i = 1, #selection do
+		local unitID = selection[i]
+		-- filter out low ammo bombers and send them to rearm
+		local unitdefID = Spring.GetUnitDefID(unitID)
+		if isBomber[unitdefID] then
+			local ammofraction = Spring.GetUnitRulesParam(unitID, "ammoFraction") or 1
+			local noammo = Spring.GetUnitRulesParam(unitID, "noammo") or 0
+			if ammofraction < ammothreshold or noammo == 1 then
+				Spring.GiveOrderToUnit(unitID, CMD_FIND_PAD, nil, 0)
+				table.insert(removeselection, unitID)
+			end
+		end
+		-- filter out low health units
+		local health, maxHealth = spGetUnitHealth(unitID)
+		local lowhealth = (health or 0)/(maxHealth or 1000) < threshold
+		if lowhealth then
+			table.insert(removeselection, unitID)
+		end
+	end
+	spDeselectUnitArray(removeselection)
 end
-
-local function FilterLowHealthAmmo60()
-	FilterLowHealthAmmo(0.6)
-end
-
-local function FilterLowHealthAmmo100()
-	FilterLowHealthAmmo(1)
-end
-
 
 function widget:Shutdown()
 	widgetHandler:RemoveAction("selectfulltransports")
 	widgetHandler:RemoveAction("selectemptytransports")
 	widgetHandler:RemoveAction("filteremptytransports")
 	widgetHandler:RemoveAction("filterfulltransports")
-	widgetHandler:RemoveAction("filter_low_health_ammo_30")
-	widgetHandler:RemoveAction("filter_low_health_ammo_60")
-	widgetHandler:RemoveAction("filter_low_health_ammo_100")
+	widgetHandler:RemoveAction("filter_low_health_ammo")
 end
 
 function widget:Initialize()
@@ -439,7 +436,5 @@ function widget:Initialize()
 	widgetHandler:AddAction("selectfulltransports", SelectFullTransports, nil, 'tp')
 	widgetHandler:AddAction("filteremptytransports", FilterEmptyTransports, nil, 'tp')
 	widgetHandler:AddAction("filterfulltransports", FilterFullTransports, nil, 'tp')
-	widgetHandler:AddAction("filter_low_health_ammo_30", FilterLowHealthAmmo30, nil, 'tp')
-	widgetHandler:AddAction("filter_low_health_ammo_60", FilterLowHealthAmmo60, nil, 'tp')
-	widgetHandler:AddAction("filter_low_health_ammo_100", FilterLowHealthAmmo100, nil, 'tp')
+	widgetHandler:AddAction("filter_low_health_ammo", FilterLowHealthAmmo, nil, 'tp') -- takes normalized health value argument
 end
