@@ -1393,6 +1393,25 @@ local icontypes = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Empty versions of icons for Radar Icons GL4. We set these to preserve size and distance.
+
+local EMPTY_ICON = "icons/empty.png"
+local hiddenIcons = {}
+for name, icon in pairs(icontypes) do
+	local copy = {}
+	for k, v in pairs(icon) do
+		copy[k] = v
+	end
+	copy.bitmap = EMPTY_ICON
+	hiddenIcons[name .. "_hidden"] = copy 
+end
+
+for k, v in pairs(hiddenIcons) do
+	icontypes[k] = v
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 return icontypes
 
