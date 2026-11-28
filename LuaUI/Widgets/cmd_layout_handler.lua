@@ -151,9 +151,14 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 			reParamsCmds[cc.cmdDescID] = cc.params
 		end
 		--// remove api keys (custom keys are prohibited in the engine handler)
+		--// disabled is a boolean read by the integral menu from the raw
+		--// customCommands list; the engine's descriptor parser rejects any
+		--// non-string/table value and logs "GetLuaCmdDescList() bad entry", so it
+		--// must be stripped from the copy sent to the engine.
 		cc.pos       = nil
 		cc.cmdDescID = nil
 		cc.params    = nil
+		cc.disabled  = nil
 		
 		customCmds[#customCmds+1] = cc
 	end
