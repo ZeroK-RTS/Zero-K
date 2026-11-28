@@ -147,6 +147,9 @@ local function SetFiringState(shouldFire)
 		return
 	end
 	isFiring = shouldFire
+	if GG.GameRules_SetSuperweaponOn then
+		GG.GameRules_SetSuperweaponOn(unitID, shouldFire)
+	end
 
 	if shouldFire then
 		CallSatelliteScript('mahlazer_EngageTheLaserBeam')
