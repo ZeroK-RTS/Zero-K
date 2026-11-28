@@ -314,7 +314,7 @@ local function updateDrawing()
 			local units = drawUnit.data
 			for i = 1, count do
 				local unitID = units[i]
-				if unitID and WG.allySelUnits[unitID] and not alreadyDrawn[sel[i]] then
+				if unitID and WG.allySelUnits[unitID] and not alreadyDrawn[unitID] then
 					drawUnitCommands(unitID)
 					alreadyDrawn[unitID] = true
 					toDraw[#toDraw + 1] = unitID
