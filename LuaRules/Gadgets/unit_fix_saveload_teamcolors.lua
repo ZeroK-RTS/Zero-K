@@ -20,4 +20,12 @@ function gadget:Initialize()
 			Spring.SetUnitPaletteIndex(unitID, nil)
 		end
 	end
+
+	local features = Spring.GetAllFeatures()
+	for i = 1, #features do
+		local featureID = features[i]
+		if not Spring.GetFeaturePaletteIndex(featureID) then
+			Spring.SetFeaturePaletteIndex(featureID, nil)
+		end
+	end
 end
