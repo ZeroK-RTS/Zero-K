@@ -584,7 +584,7 @@ void main() {
 
 	// Bubble pass: main ribbon uses two advecting bubble layers; twigs do a
 	// two-stage wave (see CABLE_PROP_SPEED + TWIG_SWEEP_SPEED).
-	float bubbleBody, bubbleSpec, bubbleHalo;
+	float bubbleBody = 0.0, bubbleSpec = 0.0, bubbleHalo = 0.0;
 	if (isBranch > 0.5) {
 		// Two-stage wavefront (decoupled cable-stagger + twig-sweep):
 		//   1. CABLE_PROP_SPEED sweeps a virtual fast wave along the cable's
