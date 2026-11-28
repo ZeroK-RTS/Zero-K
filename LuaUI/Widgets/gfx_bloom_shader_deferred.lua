@@ -57,7 +57,6 @@ local blurShader = nil
 local brightShader = nil
 local brightTexture1 = nil
 local brightTexture2 = nil
-local brightTexture1Cleared = false
 
 local combineShader = nil
 
@@ -134,8 +133,10 @@ local function MakeBloomShaders()
 		if (brightTexture2 == nil ) then Spring.Echo('brightTexture2 == nil ') end
 		RemoveMe("[BloomShader::ViewResize] removing widget, bad texture target")
 		return
+	else
+		-- New textures may contain garbage memory on some drivers, so clear to black
+		gl.RenderToTexture(brightTexture1, gl.Clear, GL.COLOR_BUFFER_BIT, 0, 0, 0, 0)
 	end
-	brightTexture1Cleared = false
 
 
 	if glDeleteShader then
@@ -388,13 +389,6 @@ local function Bloom()
 	df = df + 1
 	gl.DepthMask(false)
 	gl.Color(1, 1, 1, 1)
-
-	if not brightTexture1Cleared then
-		brightTexture1Cleared = true
-		-- The bright pass blends over the previous contents of the texture's memory.
-		-- Those contents are undefined in new textures on some drivers. Define them:
-		gl.RenderToTexture(brightTexture1, gl.Clear, GL.COLOR_BUFFER_BIT, 0, 0, 0, 0)
-	end
 
 	glUseShader(brightShader)
 		glUniform(   brightShaderIllumLoc, illumThreshold)
