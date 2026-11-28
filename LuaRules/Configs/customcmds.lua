@@ -37,6 +37,7 @@ local commands = {
 	FORMATION_RANK = 13988,
 	SELECT_MISSILES = 14001,
 	BUILD_PLATE = 14002,
+	STRIDER_MENU = 14003, -- opens the Strider build submenu (hidden tab) on strider builders
 
 	MISC_BUILD = 25612, -- This is used for integral menu
 
