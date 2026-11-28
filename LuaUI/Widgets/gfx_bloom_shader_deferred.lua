@@ -133,6 +133,9 @@ local function MakeBloomShaders()
 		if (brightTexture2 == nil ) then Spring.Echo('brightTexture2 == nil ') end
 		RemoveMe("[BloomShader::ViewResize] removing widget, bad texture target")
 		return
+	else
+		-- New textures may contain garbage memory on some drivers, so clear to black
+		gl.RenderToTexture(brightTexture1, gl.Clear, GL.COLOR_BUFFER_BIT, 0, 0, 0, 0)
 	end
 
 
