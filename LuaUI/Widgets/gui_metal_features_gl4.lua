@@ -119,7 +119,7 @@ local function AddFeature(featureID)
 	handledFeatureList[#handledFeatureList + 1] = featureID
 	handledFeatureMap[featureID] = #handledFeatureList
 	
-	if not (metal and metal > 1) then
+	if not (metal and metal > minMetalShownOld) then
 		return
 	end
 	if WG.HighlightUnitGL4 then
@@ -208,6 +208,23 @@ function widget:Update(dt)
 		minMetalShownNew = 1
 	else
 		minMetalShownNew = options.minmetal.value
+	end
+
+	if minMetalShownNew ~= minMetalShownOld then
+		minMetalShownOld = minMetalShownNew
+		if handledFeatureMap then
+			for i = 1, #handledFeatureList do
+				local featureID = handledFeatureList[i]
+				if WG.StopHighlightUnitGL4 and handledFeatureApiIDs[featureID] then
+					WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
+				end
+				if WG.HighlightFeatureCus then
+					WG.HighlightFeatureCus(featureID, 0)
+				end
+			end
+			handledFeatureList, handledFeatureMap = {}, {}
+			handledFeatureCheck, handledFeatureApiIDs = {}, {}
+		end
 	end
 
 	local pregame = (spGetGameFrame() < 1)
