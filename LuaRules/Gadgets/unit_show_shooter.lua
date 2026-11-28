@@ -3,8 +3,8 @@
 
 function gadget:GetInfo()
 	return {
-		name     = "Show Shooter",
-		desc     = "Reveals a unit if it shoots its weapon while in air LOS.",
+		name     = "Show Shooter and Structure Radar",
+		desc     = "Reveals a unit if it shoots its weapon while in air LOS. Also shows structure radar dots permanently (if enabled).",
 		author	 = "Google Frog",
 		date     = "28 October 2015",
 		license	 = "GNU GPL, v2 or later",
@@ -23,6 +23,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local GetMovetypeUnitDefID = Spring.Utilities.GetMovetypeUnitDefID
+
 local ALLYTEAM_COUNT = #(Spring.GetAllyTeamList()) - 1 -- Because allyTeams start at 0
 local SLOW_UPDATE = 15
 
@@ -34,8 +36,13 @@ local fakeWeaponByNum = {}
 local immobileUnits = {} -- Units which are static
 local noDecloakUnits = {}
 local buildRevealUnitDef = {}
+local scoutedStructures = {} -- Structures that are permanent radar dots
+
+local setScoutedInGameFrame = false
 local pendingBuildRevealUnits = false
 local r = {}
+
+local DOT_SCOUTED_STRUCTURES = true
 
 for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
@@ -71,6 +78,7 @@ local revealedUnits = {}
 
 for i = 0, ALLYTEAM_COUNT do
 	revealedUnits[i] = {}
+	scoutedStructures[i] = {}
 end
 
 -- Units which have already had their reveal state checked since last slow update.
@@ -161,7 +169,11 @@ local function RevealedUnitTimeout(n)
 				if data > 1 then
 					revealedUnits[allyTeamID][unitID] = data - 1
 				else
-					Spring.SetUnitLosMask(unitID, allyTeamID, 0) -- Releasing mask reverts LOS to engine control.
+					if scoutedStructures[allyTeamID][unitID] then
+						Spring.SetUnitLosMask(unitID, allyTeamID, 2)
+					else
+						Spring.SetUnitLosMask(unitID, allyTeamID, 0) -- Releasing mask reverts LOS to engine control.
+					end
 					revealedUnits[allyTeamID][unitID] = nil
 				end
 			end
@@ -175,6 +187,17 @@ local function ClearFiredUnits(n)
 	end
 end
 
+function gadget:UnitEnteredLos(unitID, unitTeam, allyTeamID, unitDefID)
+	if not DOT_SCOUTED_STRUCTURES then
+		return
+	end
+	if unitDefID and not GetMovetypeUnitDefID(unitDefID) and not scoutedStructures[allyTeamID][unitID] then
+		setScoutedInGameFrame = setScoutedInGameFrame or {}
+		setScoutedInGameFrame[#setScoutedInGameFrame + 1] = {allyTeamID, unitID}
+		scoutedStructures[allyTeamID][unitID] = true
+	end
+end
+
 function gadget:GameFrame(n)
 	ClearFiredUnits(n)
 	RevealedUnitTimeout(n)
@@ -185,6 +208,21 @@ function gadget:GameFrame(n)
 				i = i + 1
 			end
 		end
+	end
+	if setScoutedInGameFrame then
+		for i = 1, #setScoutedInGameFrame do
+			local allyTeamID, unitID = setScoutedInGameFrame[i][1], setScoutedInGameFrame[i][2]
+			if Spring.ValidUnitID(unitID) then
+				Spring.SetUnitLosMask(unitID, allyTeamID, 2)
+			end
+		end
+		setScoutedInGameFrame = false
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	for allyTeamID = 0, ALLYTEAM_COUNT do
+		scoutedStructures[allyTeamID][unitID] = nil
 	end
 end
 
