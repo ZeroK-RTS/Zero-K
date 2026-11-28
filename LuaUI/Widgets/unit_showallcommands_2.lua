@@ -245,8 +245,13 @@ local function getTargetPosition(unitID)
 	return tx, ty, tz, fireTowards
 end
 
+local regionView -- WG.MapRegionView, read once per draw
+
 local function drawUnitCommands(unitID)
 	if not unitID then
+		return
+	end
+	if regionView and not regionView.ContainsUnit(unitID) then
 		return
 	end
 	
@@ -291,6 +296,7 @@ end
 
 local function updateDrawing()
 	local drawSelected, drawAll = GetDrawLevel()
+	regionView = WG.MapRegionView
 	if drawAll then
 		local count = drawUnit.count
 		local units = drawUnit.data

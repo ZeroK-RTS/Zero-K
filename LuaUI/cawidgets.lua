@@ -337,6 +337,7 @@ local callInLists = {
 	'AlliedUnitAdded',
 	'AlliedUnitRemoved',
 	'AlliedUnitsChanged',
+	'MapRegionViewChanged',
 -- these use mouseOwner instead of lists
 --  'MouseMove',
 --  'MouseRelease',
@@ -1405,6 +1406,7 @@ end
 --
 
 function widgetHandler:Shutdown()
+	self.shuttingDown = true
 	Spring.Echo("Start widgetHandler:Shutdown")
 	self:SaveOrderList()
 	Spring.Echo("Shutdown - SaveOrderList Complete")
@@ -1891,11 +1893,41 @@ function widgetHandler:DrawScreenPost(vsx, vsy)
 	tracy.ZoneEnd()
 end
 
+-- Map whole-map minimap coordinates to the crop for each quarter-turn.
+local function MiniMapRegionTransform(r, rotation, xSize, ySize, mapSizeX, mapSizeZ)
+	local width, height = r.x1 - r.x0, r.z1 - r.z0
+	local scaleMapX, scaleMapZ = mapSizeX / width, mapSizeZ / height
+	local lowX, highX = -r.x0 / width, (r.x1 - mapSizeX) / width
+	local lowZ, highZ = -r.z0 / height, (r.z1 - mapSizeZ) / height
+	local quarterTurns = math.floor(rotation / (math.pi / 2) + 0.5) % 4
+	if quarterTurns == 1 then
+		return lowZ * xSize, lowX * ySize, scaleMapZ, scaleMapX
+	elseif quarterTurns == 2 then
+		return highX * xSize, lowZ * ySize, scaleMapX, scaleMapZ
+	elseif quarterTurns == 3 then
+		return highZ * xSize, highX * ySize, scaleMapZ, scaleMapX
+	end
+	return lowX * xSize, highZ * ySize, scaleMapX, scaleMapZ
+end
+
 function widgetHandler:DrawInMiniMap(xSize, ySize)
 	tracy.ZoneBeginN("W:DrawInMiniMap")
+	local r = WG.MapRegionView and WG.MapRegionView.rect
+	local translateX, translateY, scaleX, scaleY
+	if r then
+		translateX, translateY, scaleX, scaleY = MiniMapRegionTransform(r, Spring.GetMiniMapRotation() or 0, xSize, ySize, Game.mapSizeX, Game.mapSizeZ)
+	end
 	for _, w in r_ipairs(self.DrawInMiniMapList) do
 		tracy.ZoneBeginN("W:DrawInMiniMap:" .. w.whInfo.name)
-		w:DrawInMiniMap(xSize, ySize)
+		if r then
+			gl.PushMatrix()
+			gl.Translate(translateX, translateY, 0)
+			gl.Scale(scaleX, scaleY, 1)
+		end
+		w:DrawInMiniMap(xSize, ySize, r ~= nil)
+		if r then
+			gl.PopMatrix()
+		end
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()
@@ -3031,6 +3063,19 @@ function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
 	for _, w in ipairs(self.AlliedUnitsChangedList) do
 		tracy.ZoneBeginN("W:AlliedUnitsChanged:" .. w.whInfo.name)
 		w:AlliedUnitsChanged(alliedUnits, numAlliedUnits)
+		tracy.ZoneEnd()
+	end
+	tracy.ZoneEnd()
+end
+
+function widgetHandler:MapRegionViewChanged()
+	if self.shuttingDown then
+		return
+	end
+	tracy.ZoneBeginN("W:MapRegionViewChanged")
+	for _, w in ipairs(self.MapRegionViewChangedList) do
+		tracy.ZoneBeginN("W:MapRegionViewChanged:" .. w.whInfo.name)
+		w:MapRegionViewChanged()
 		tracy.ZoneEnd()
 	end
 	tracy.ZoneEnd()

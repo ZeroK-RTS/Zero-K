@@ -1193,10 +1193,13 @@ function widget:DrawWorld()
 	end
 end
 
-function widget:DrawInMiniMap()
-
+function widget:DrawInMiniMap(xSize, ySize, cropped)
 	glPushMatrix()
-		glLoadIdentity()
+		if cropped then
+			glScale(xSize, ySize, 1)
+		else
+			glLoadIdentity()
+		end
 
 		if GetMiniMapFlipped() then
 			glTranslate(1, 0, 0)

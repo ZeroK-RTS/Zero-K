@@ -210,7 +210,6 @@ local function drawBoxesMinimap()
 end
 
 local function xForm()
-		gl.LoadIdentity()
 		if flipped then
 			gl.Translate(1, 0, 0)
 			gl.Scale(-1 / Game.mapSizeX, 1 / Game.mapSizeZ, 1)
@@ -395,10 +394,15 @@ function widget:DrawScreenEffects()
 	gl.Fog(true)
 end
 
-function widget:DrawInMiniMap(minimapX, minimapY)
+function widget:DrawInMiniMap(minimapX, minimapY, cropped)
 	local newFlipped = GetMiniMapFlipped()
 
 	gl.PushMatrix()
+	if cropped then
+		gl.Scale(minimapX, minimapY, 1)
+	else
+		gl.LoadIdentity()
+	end
 
 	if flipped ~= newFlipped then
 		flipped = newFlipped
@@ -415,13 +419,8 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 
 	gl.Color(1,1,1,1)
 	gl.LineWidth(1.0)
-	gl.PopMatrix()
-
 	local dotSize = math.max(minimapX, minimapY) * 0.3
-	gl.PushMatrix()
 	gl.LineWidth(3)
-
-	gl.CallList(xformList)
 
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
